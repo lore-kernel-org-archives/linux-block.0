@@ -7,49 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54D7C3F68F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F95C2BA83
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A28DD20873
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D71602168B
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:39:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581701989;
-	bh=SW0AGWU43L1UZ/wqfndLFzbkWOYuZ1G2GYhqzyIz6A0=;
+	s=default; t=1581701991;
+	bh=3IvopkT27FOsq+8sijVVp9M6p5tv3XeeY25VMCYj45M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Is+HIG6uWcdpbN8VCyRbq2miQpn82GQfW9LrVSzhKijzEeECg+dXJk/Q2taMfICLJ
-	 f2yqTP1OtAgmbW2nhLbe8kbm6/zFd/fONzZu/G0lHQzl6NS4o1GjzsLOqnTS96jWgk
-	 9KVilWsPEYsVo4foTHqNpBIZ+UHXv8xyMkUbnIpM=
+	b=iGtjgvH+lmqpolnMOKmYmiK8gQeWV7zmn4rdWmUieAHRJq1bBCEYxTN4aGN55dyne
+	 wlF9ME4rMTmAxd2Fkb7f4cgq39NHTBlolbuHeNtWp4nUhoO8jE0D6UMCYafIIgdt6L
+	 jQxoy95fL8WvaE/RbhybTx3MNjWg9RgAggQhP3p8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389872AbgBNQEN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:04:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52150 "EHLO mail.kernel.org"
+        id S2388964AbgBNQEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 11:04:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52016 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389419AbgBNQEN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:04:13 -0500
+        id S2389861AbgBNQEI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:04:08 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 83B0324676;
-        Fri, 14 Feb 2020 16:04:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 646EE24699;
+        Fri, 14 Feb 2020 16:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696252;
-        bh=SW0AGWU43L1UZ/wqfndLFzbkWOYuZ1G2GYhqzyIz6A0=;
+        s=default; t=1581696248;
+        bh=3IvopkT27FOsq+8sijVVp9M6p5tv3XeeY25VMCYj45M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Kf7cEikS0RRI+SIXDPbwaFudJjuRWviMnoLMmVAaJlPqTljD67Sd+Pq/QKQmSGLnL
-         dOi4lvLWH6BuFT0772q7RbW3LyTQYHVCdSag66smQjbDrnyIlrxToSn0kxDyMgsWwv
-         ha1RBeVFekXmj6Jzfq2/sXT4rhgynOTNyaIDnGes=
+        b=XAakfZlb0hDrBUZmZZdYTTyGVBnoXeFlr6m4/6uQdWMuysDdJvzEtC1NJgjy8phzx
+         yxWQGXV4biU73cm+bTsNB9ERMZTKLWROjd/1L8BDlLzUKXpkkTa+lK3vthYf4mf88Y
+         3LqWacCd6MKOCbThOflXPh5bekKz8GvLPmBXXE/k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Colin Ian King <colin.king@canonical.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 108/459] drivers/block/zram/zram_drv.c: fix error return codes not being returned in writeback_store
-Date:   Fri, 14 Feb 2020 10:55:58 -0500
-Message-Id: <20200214160149.11681-108-sashal@kernel.org>
+Cc:     Sun Ke <sunke32@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.4 105/459] nbd: add a flush_workqueue in nbd_start_device
+Date:   Fri, 14 Feb 2020 10:55:55 -0500
+Message-Id: <20200214160149.11681-105-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
@@ -62,53 +58,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Sun Ke <sunke32@huawei.com>
 
-[ Upstream commit 3b82a051c10143639a378dcd12019f2353cc9054 ]
+[ Upstream commit 5c0dd228b5fc30a3b732c7ae2657e0161ec7ed80 ]
 
-Currently when an error code -EIO or -ENOSPC in the for-loop of
-writeback_store the error code is being overwritten by a ret = len
-assignment at the end of the function and the error codes are being
-lost.  Fix this by assigning ret = len at the start of the function and
-remove the assignment from the end, hence allowing ret to be preserved
-when error codes are assigned to it.
+When kzalloc fail, may cause trying to destroy the
+workqueue from inside the workqueue.
 
-Addresses Coverity ("Unused value")
+If num_connections is m (2 < m), and NO.1 ~ NO.n
+(1 < n < m) kzalloc are successful. The NO.(n + 1)
+failed. Then, nbd_start_device will return ENOMEM
+to nbd_start_device_ioctl, and nbd_start_device_ioctl
+will return immediately without running flush_workqueue.
+However, we still have n recv threads. If nbd_release
+run first, recv threads may have to drop the last
+config_refs and try to destroy the workqueue from
+inside the workqueue.
 
-Link: http://lkml.kernel.org/r/20191128122958.178290-1-colin.king@canonical.com
-Fixes: a939888ec38b ("zram: support idle/huge page writeback")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
-Acked-by: Minchan Kim <minchan@kernel.org>
-Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+To fix it, add a flush_workqueue in nbd_start_device.
+
+Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
+Signed-off-by: Sun Ke <sunke32@huawei.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/zram/zram_drv.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/nbd.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 4285e75e52c34..1bf4a908a0bd9 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -626,7 +626,7 @@ static ssize_t writeback_store(struct device *dev,
- 	struct bio bio;
- 	struct bio_vec bio_vec;
- 	struct page *page;
--	ssize_t ret;
-+	ssize_t ret = len;
- 	int mode;
- 	unsigned long blk_idx = 0;
- 
-@@ -762,7 +762,6 @@ static ssize_t writeback_store(struct device *dev,
- 
- 	if (blk_idx)
- 		free_block_bdev(zram, blk_idx);
--	ret = len;
- 	__free_page(page);
- release_init_lock:
- 	up_read(&zram->init_lock);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b4607dd961852..78181908f0df6 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1265,6 +1265,16 @@ static int nbd_start_device(struct nbd_device *nbd)
+ 		args = kzalloc(sizeof(*args), GFP_KERNEL);
+ 		if (!args) {
+ 			sock_shutdown(nbd);
++			/*
++			 * If num_connections is m (2 < m),
++			 * and NO.1 ~ NO.n(1 < n < m) kzallocs are successful.
++			 * But NO.(n + 1) failed. We still have n recv threads.
++			 * So, add flush_workqueue here to prevent recv threads
++			 * dropping the last config_refs and trying to destroy
++			 * the workqueue from inside the workqueue.
++			 */
++			if (i)
++				flush_workqueue(nbd->recv_workq);
+ 			return -ENOMEM;
+ 		}
+ 		sk_set_memalloc(config->socks[i]->sock->sk);
 -- 
 2.20.1
 
