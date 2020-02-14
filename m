@@ -2,92 +2,110 @@ Return-Path: <SRS0=urI+=4C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064C7C2BA83
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 14:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A4CC2BA83
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 15:51:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D044824650
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 14:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 609B524684
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 15:51:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581691215;
-	bh=mH5i6V3YTMULw6H6EwUEg5VymMpkbQ9unTGmkWMJHw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=xSulmlgBhCZyND9YMUSiMiTNItL5cs7WoJ5DZV/+HJDRug+xPhtnZ3U+5fHDciH5h
-	 49V0uE1RhZ8AKJpAHZ2QXEAYC+jRng3qBs+gdcmIwWj5Ai+8nEOCTfeJ9JOBIPY+tp
-	 34sUtpcpheAyg/TF/s4y7bcBucyMPKNlg6dWVbEk=
+	s=default; t=1581695494;
+	bh=3IvopkT27FOsq+8sijVVp9M6p5tv3XeeY25VMCYj45M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=jioQUlz02EghWaKJZlJf0yCRH7JDk6mbD6qtBbQgIz1ITwcmmPeQ2UGaana8k94RP
+	 YgW4OerHIBYkFVXzKJq87jPkFNH3SJVJAyBVYs9Gm9R6DyOdzSjCRnrOTk6LCYnQlg
+	 D8jHD4zfX5mJInag5IOA7y9xYXmK/gCW3gpgaCUw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729347AbgBNOkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 09:40:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38624 "EHLO mail.kernel.org"
+        id S1730800AbgBNPvd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 10:51:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56600 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729102AbgBNOkP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 09:40:15 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729475AbgBNPvc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:51:32 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 23A382187F;
-        Fri, 14 Feb 2020 14:40:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8F02E2168B;
+        Fri, 14 Feb 2020 15:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581691214;
-        bh=mH5i6V3YTMULw6H6EwUEg5VymMpkbQ9unTGmkWMJHw0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RSBxjsv7GyGJhd5Tv6ppSe4iLV+As/SfqLKHeujuydizvxrBM+N3DzUBweJfetWPm
-         YGerA1vuipxeTZRNMLqQYLyP6xaqElvmx0eYrnzH/brjKtXWHL2ETNESFs5UYX4bga
-         yr/ufxeOHFtFFAJak/Lhio4plQw85jwOA9fBDy2E=
-Date:   Fri, 14 Feb 2020 23:40:07 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Tim Walker <tim.t.walker@seagate.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Message-ID: <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com>
-References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
- <20200211122821.GA29811@ming.t460p>
- <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
- <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <yq1blq3rxzj.fsf@oracle.com>
- <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
- <yq1r1yzqfyb.fsf@oracle.com>
- <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
+        s=default; t=1581695492;
+        bh=3IvopkT27FOsq+8sijVVp9M6p5tv3XeeY25VMCYj45M=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=b7N866QrqQhcnRKzCjYfVZCZo+lB9vPBKfoL8I7VpdU8vKFFmzGBmymXlw6z95l0B
+         YJU2lK7tiP9mrMLxB2xKdEZXxnbLxbW1XjZ3E0AwjKRlMv4whD9s11CVqBwBshwacb
+         zzwH3Obhyo3Ysq0XTLxCkHxRfz8eUaFF4+houn+s=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Sun Ke <sunke32@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.5 121/542] nbd: add a flush_workqueue in nbd_start_device
+Date:   Fri, 14 Feb 2020 10:41:53 -0500
+Message-Id: <20200214154854.6746-121-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
+References: <20200214154854.6746-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 08:32:57AM +0100, Hannes Reinecke wrote:
-> On 2/13/20 5:17 AM, Martin K. Petersen wrote:
-> > People often artificially lower the queue depth to avoid timeouts. The
-> > default timeout is 30 seconds from an I/O is queued. However, many
-> > enterprise applications set the timeout to 3-5 seconds. Which means that
-> > with deep queues you'll quickly start seeing timeouts if a drive
-> > temporarily is having issues keeping up (media errors, excessive spare
-> > track seeks, etc.).
-> > 
-> > Well-behaved devices will return QF/TSF if they have transient resource
-> > starvation or exceed internal QoS limits. QF will cause the SCSI stack
-> > to reduce the number of I/Os in flight. This allows the drive to recover
-> > from its congested state and reduces the potential of application and
-> > filesystem timeouts.
-> > 
-> This may even be a chance to revisit QoS / queue busy handling.
-> NVMe has this SQ head pointer mechanism which was supposed to handle
-> this kind of situations, but to my knowledge no-one has been
-> implementing it.
-> Might be worthwhile revisiting it; guess NVMe HDDs would profit from that.
+From: Sun Ke <sunke32@huawei.com>
 
-We don't need that because we don't allocate enough tags to potentially
-wrap the tail past the head. If you can allocate a tag, the queue is not
-full. And convesely, no tag == queue full.
+[ Upstream commit 5c0dd228b5fc30a3b732c7ae2657e0161ec7ed80 ]
+
+When kzalloc fail, may cause trying to destroy the
+workqueue from inside the workqueue.
+
+If num_connections is m (2 < m), and NO.1 ~ NO.n
+(1 < n < m) kzalloc are successful. The NO.(n + 1)
+failed. Then, nbd_start_device will return ENOMEM
+to nbd_start_device_ioctl, and nbd_start_device_ioctl
+will return immediately without running flush_workqueue.
+However, we still have n recv threads. If nbd_release
+run first, recv threads may have to drop the last
+config_refs and try to destroy the workqueue from
+inside the workqueue.
+
+To fix it, add a flush_workqueue in nbd_start_device.
+
+Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
+Signed-off-by: Sun Ke <sunke32@huawei.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b4607dd961852..78181908f0df6 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1265,6 +1265,16 @@ static int nbd_start_device(struct nbd_device *nbd)
+ 		args = kzalloc(sizeof(*args), GFP_KERNEL);
+ 		if (!args) {
+ 			sock_shutdown(nbd);
++			/*
++			 * If num_connections is m (2 < m),
++			 * and NO.1 ~ NO.n(1 < n < m) kzallocs are successful.
++			 * But NO.(n + 1) failed. We still have n recv threads.
++			 * So, add flush_workqueue here to prevent recv threads
++			 * dropping the last config_refs and trying to destroy
++			 * the workqueue from inside the workqueue.
++			 */
++			if (i)
++				flush_workqueue(nbd->recv_workq);
+ 			return -ENOMEM;
+ 		}
+ 		sk_set_memalloc(config->socks[i]->sock->sk);
+-- 
+2.20.1
+
