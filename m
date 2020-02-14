@@ -7,46 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E947C3B1A4
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB87EC2BA83
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:00:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 330AB20656
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 16:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 884E62468E
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 17:00:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581699565;
-	bh=IJFFK9lUXPW6Igq4Yk/ketC4Toh+k7TZgcMHH8fWc0s=;
+	s=default; t=1581699618;
+	bh=alg3hx0ZsAVDxehLFVHesumGzR/P6vdWyx9Oo5Cvnrc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=a80watEl0eKe+nUMS8LxwWrwpTaRqSvghgRD7aGWfiitTc3VjSz8DMxbZHXmJK3uO
-	 7zIuHXsePDmsUelwzziGQH2Y18AkU1V2cB2gEFMDf+g8i95qtINbwdSLDXHrRaPAop
-	 81kdX1SW1mCSUSYwJTsjdueWLMyaHfn1JGAGVu1c=
+	b=N2rHSPR3GByBw8N0JuRa/87XU8ygsKoi+hqm75v7BG+wUioAnC+mKyTghk11KFPPn
+	 tn6l9GEncPia9N1FHY5b0UNywP++/WovWDQch0Cp/RhPcZZpHlYZXLhW8XAtc4+r3o
+	 K+vd3b3PRPGY2ccaRrC/o/DkXmDf2N8x8Pk4b3NU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389551AbgBNQ7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:59:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47986 "EHLO mail.kernel.org"
+        id S2404314AbgBNQQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 11:16:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47492 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392686AbgBNQQz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:16:55 -0500
+        id S2404308AbgBNQQh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:16:37 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8723124700;
-        Fri, 14 Feb 2020 16:16:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7818324698;
+        Fri, 14 Feb 2020 16:16:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581697014;
-        bh=IJFFK9lUXPW6Igq4Yk/ketC4Toh+k7TZgcMHH8fWc0s=;
+        s=default; t=1581696997;
+        bh=alg3hx0ZsAVDxehLFVHesumGzR/P6vdWyx9Oo5Cvnrc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=115hf7CCo59SKFOVYpJvRxrBVhPQUZh0huqutFfF/Sw7GdCc884sMRMcRHQch2pzE
-         vjVRT7L3qywyh1VaWw/70F1o8ujeUgzIzhjxysp1fuYR54p9eJOEPrgehsGYHhX796
-         wOa8Lv0+zyNXp3NurvyAKvReGYfqWmIlUjql8EM8=
+        b=WNK5il/V09FrjRUBslZBhYAAMXBmM3UuKD7Zyh//RkSDKp8UGJ0oRnDL4x5rNwKaU
+         QOJW3W14pkcnapsXEXCkXLBktD1ulOLbxf9ecHTGslC4Zi3JM/8u2nv/9yuPVTGfle
+         Pd80mOLy9/b7E5GOS/FtXhg/txhFh1hPnFmIYN74=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zhiqiang Liu <liuzhiqiang26@huawei.com>,
-        Bob Liu <bob.liu@oracle.com>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+Cc:     Arnd Bergmann <arnd@arndb.de>, Ilya Dryomov <idryomov@gmail.com>,
+        Sasha Levin <sashal@kernel.org>, ceph-devel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 244/252] brd: check and limit max_part par
-Date:   Fri, 14 Feb 2020 11:11:39 -0500
-Message-Id: <20200214161147.15842-244-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 230/252] rbd: work around -Wuninitialized warning
+Date:   Fri, 14 Feb 2020 11:11:25 -0500
+Message-Id: <20200214161147.15842-230-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214161147.15842-1-sashal@kernel.org>
 References: <20200214161147.15842-1-sashal@kernel.org>
@@ -59,107 +58,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit c8ab422553c81a0eb070329c63725df1cd1425bc ]
+[ Upstream commit a55e601b2f02df5db7070e9a37bd655c9c576a52 ]
 
-In brd_init func, rd_nr num of brd_device are firstly allocated
-and add in brd_devices, then brd_devices are traversed to add each
-brd_device by calling add_disk func. When allocating brd_device,
-the disk->first_minor is set to i * max_part, if rd_nr * max_part
-is larger than MINORMASK, two different brd_device may have the same
-devt, then only one of them can be successfully added.
-when rmmod brd.ko, it will cause oops when calling brd_exit.
+gcc -O3 warns about a dummy variable that is passed
+down into rbd_img_fill_nodata without being initialized:
 
-Follow those steps:
-  # modprobe brd rd_nr=3 rd_size=102400 max_part=1048576
-  # rmmod brd
-then, the oops will appear.
+drivers/block/rbd.c: In function 'rbd_img_fill_nodata':
+drivers/block/rbd.c:2573:13: error: 'dummy' is used uninitialized in this function [-Werror=uninitialized]
+  fctx->iter = *fctx->pos;
 
-Oops log:
-[  726.613722] Call trace:
-[  726.614175]  kernfs_find_ns+0x24/0x130
-[  726.614852]  kernfs_find_and_get_ns+0x44/0x68
-[  726.615749]  sysfs_remove_group+0x38/0xb0
-[  726.616520]  blk_trace_remove_sysfs+0x1c/0x28
-[  726.617320]  blk_unregister_queue+0x98/0x100
-[  726.618105]  del_gendisk+0x144/0x2b8
-[  726.618759]  brd_exit+0x68/0x560 [brd]
-[  726.619501]  __arm64_sys_delete_module+0x19c/0x2a0
-[  726.620384]  el0_svc_common+0x78/0x130
-[  726.621057]  el0_svc_handler+0x38/0x78
-[  726.621738]  el0_svc+0x8/0xc
-[  726.622259] Code: aa0203f6 aa0103f7 aa1e03e0 d503201f (7940e260)
+Since this is a dummy, I assume the warning is harmless, but
+it's better to initialize it anyway and avoid the warning.
 
-Here, we add brd_check_and_reset_par func to check and limit max_part par.
-
---
-V5->V6:
- - remove useless code
-
-V4->V5:(suggested by Ming Lei)
- - make sure max_part is not larger than DISK_MAX_PARTS
-
-V3->V4:(suggested by Ming Lei)
- - remove useless change
- - add one limit of max_part
-
-V2->V3: (suggested by Ming Lei)
- - clear .minors when running out of consecutive minor space in brd_alloc
- - remove limit of rd_nr
-
-V1->V2:
- - add more checks in brd_check_par_valid as suggested by Ming Lei.
-
-Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Fixes: mmtom ("init/Kconfig: enable -O3 for all arches")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/brd.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 17defbf4f332c..02e8fff3f8283 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -463,6 +463,25 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 	return kobj;
- }
- 
-+static inline void brd_check_and_reset_par(void)
-+{
-+	if (unlikely(!max_part))
-+		max_part = 1;
-+
-+	/*
-+	 * make sure 'max_part' can be divided exactly by (1U << MINORBITS),
-+	 * otherwise, it is possiable to get same dev_t when adding partitions.
-+	 */
-+	if ((1U << MINORBITS) % max_part != 0)
-+		max_part = 1UL << fls(max_part);
-+
-+	if (max_part > DISK_MAX_PARTS) {
-+		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
-+			DISK_MAX_PARTS, DISK_MAX_PARTS);
-+		max_part = DISK_MAX_PARTS;
-+	}
-+}
-+
- static int __init brd_init(void)
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index b942f4c8cea8c..d3ad1b8c133e6 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -2097,7 +2097,7 @@ static int rbd_img_fill_nodata(struct rbd_img_request *img_req,
+ 			       u64 off, u64 len)
  {
- 	struct brd_device *brd, *next;
-@@ -486,8 +505,7 @@ static int __init brd_init(void)
- 	if (register_blkdev(RAMDISK_MAJOR, "ramdisk"))
- 		return -EIO;
- 
--	if (unlikely(!max_part))
--		max_part = 1;
-+	brd_check_and_reset_par();
- 
- 	for (i = 0; i < rd_nr; i++) {
- 		brd = brd_alloc(i);
+ 	struct ceph_file_extent ex = { off, len };
+-	union rbd_img_fill_iter dummy;
++	union rbd_img_fill_iter dummy = {};
+ 	struct rbd_img_fill_ctx fctx = {
+ 		.pos_type = OBJ_REQUEST_NODATA,
+ 		.pos = &dummy,
 -- 
 2.20.1
 
