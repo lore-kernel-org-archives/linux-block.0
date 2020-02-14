@@ -2,155 +2,302 @@ Return-Path: <SRS0=urI+=4C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F37C3B195
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 09:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4D3C3B195
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 09:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E82B82086A
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 09:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A23C2086A
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 09:17:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnXXsezG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbgBNJJy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 04:09:54 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:33387 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbgBNJJx (ORCPT
+        id S1728783AbgBNJRY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 04:17:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24665 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726769AbgBNJRY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 04:09:53 -0500
-Received: from mail-qk1-f172.google.com ([209.85.222.172]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MvsyF-1jIp9D0379-00sruX; Fri, 14 Feb 2020 10:09:52 +0100
-Received: by mail-qk1-f172.google.com with SMTP id w15so8514686qkf.6;
-        Fri, 14 Feb 2020 01:09:51 -0800 (PST)
-X-Gm-Message-State: APjAAAVpGzCvn3TrqF0sTgxI71i6581hMcWTOCRaSO1omTJAIaSidDKZ
-        YARVga/dR5a54HLdpQr+9ucQA2Sq7s4dwm3hQ7w=
-X-Google-Smtp-Source: APXvYqxh028ChAc8N1k4FZjK4jhf4HQEXUKLNb21unbBirlpHH7Mcc1k2Nx0SldXFlCm5Z41/Vb6p4zPWXOV8tEVuro=
-X-Received: by 2002:a05:620a:909:: with SMTP id v9mr1516008qkv.138.1581671390700;
- Fri, 14 Feb 2020 01:09:50 -0800 (PST)
+        Fri, 14 Feb 2020 04:17:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581671842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tYQ2cjdzL+tg5mDuA9/r/Sx50QWKzKgP5Xest4v4Zb0=;
+        b=KnXXsezG6VvyAG8HMUWnhb4btoGKKCqt3A+b3GlpKHJTJ5iK3SSpNX+NusDULn0FnqKBX1
+        z1HXXeT05qQrzn28goRm3WTJSt7dg5vmq3U66TGrlzFkAlnmJqnchiFlyxYUk+RZUXCvY7
+        ehlO1ATWjoktX4+r7eVnLQ+TIW3WEYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-Ik0arHxfP1W1dlpnHLqREg-1; Fri, 14 Feb 2020 04:17:14 -0500
+X-MC-Unique: Ik0arHxfP1W1dlpnHLqREg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21C981857340;
+        Fri, 14 Feb 2020 09:17:12 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D1F4519C4F;
+        Fri, 14 Feb 2020 09:17:00 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 17:16:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Omar Sandoval <osandov@fb.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: Re: [PATCH 10/10] scsi: replace sdev->device_busy with sbitmap
+Message-ID: <20200214091656.GA777@ming.t460p>
+References: <20200211121135.30064-11-ming.lei@redhat.com>
+ <202002140428.063yIjwM%lkp@intel.com>
 MIME-Version: 1.0
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
-In-Reply-To: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 14 Feb 2020 10:09:34 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a09YDtmOjpBWQEsKd09aotvUW6tOoxUE=CYxh1g8hNW7A@mail.gmail.com>
-Message-ID: <CAK8P3a09YDtmOjpBWQEsKd09aotvUW6tOoxUE=CYxh1g8hNW7A@mail.gmail.com>
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:u1u2uKcPKdrt69fdOzIH3uPc4q8YGxq5TGOZx2RP5uR2lukOopR
- dLdqjKzGlLzYzDlPYNmrIj51AUWNxLDWs5TvFJHsYl4JRj/Oxqx9CK2EfY40a222myUmrHw
- XYDHvw2EGAFp2ZqGQWxocEwBE24qvn2ht8MZgB7MF1ssVxUAKSYNz+VNuDtKNOGEPNsikBh
- OrhpFZQv5ol08rmdHc2vw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:getncO7sm3I=:gxKt2RWF3LRJTSuoPBZrqA
- tDhA65huQXs8RdA6+PXMWXbI3BC0m/f1DVa6dPdx3e8J/FKASJxK4uqngzvUSsrJHVZ3pNn7+
- jwZWBIXJckwDeE3SNMZzZ8UzVuV/4W286FL7BemNySpeZ1P3SOyMKMvkRQ7gP4GP2Tpb/rhvd
- YITkpVs4OEQg/eWOCiUzl7QAhKjJRVdYlHpOlpIz2IveKcSEuaKuaOgScBtsmygUbrSeLzsiX
- ENJVVn02tI9YY3nnlZz+p5mGUKIH8DcyOg31o3lmS+O+3f8hAHX9XM2kkG99OM058jp0A2wab
- MWzdcc6e/I+C70sLKx/s0267fHxP3yQutU9szm/ntd44ANvun188zOEIgmRLL5ewFFqTVoiEs
- IHR0LPWB5MlP2/+43diSS/s/dVvxhSVsrCUW/cW2uWNWVKPz5NI4wUzVBHmIEtmOnrI0Ac7YS
- IamFCXrl1XtJpICQnDFvku8kowaM4q26BhpOpbsS3JyoHZ/DBEswlu/753ewe02EYDTq9F2cX
- PdhU2ZAJmzm6NGtQOKFGFRA7ScUlkG5IA61NuI3mQ87FH6Q1f1Y1CYmd0o10qLDurjV5iD2Dr
- taSTBREdB9UiT+RMIP68Cmo0ArlEeGWnE+Ku+Unos/laX0JksRYW+VwHMxxG+vBpEgxs74PW0
- bjlGJ8B8gNy1OJ33/e49EMBnMT6KmpLlRhK2si4yUEx+tXstI5Ke8slM7ROx/ygp2eeW3etI5
- 8m4pyO21TxyYivtAzQeu5ZDejahz8oaR+ZhSJVIzb7afksTjN16P1OJfZsLcat4t6HYfk41HJ
- epA7DGo36QY9TyrCGjdEMGz59Ecuu7h57B01Ywf0t/S+jEzf7U=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202002140428.063yIjwM%lkp@intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 4:43 PM Naresh Kamboju
-<naresh.kamboju@linaro.org> wrote:
->
-> arm beagleboard x15 device failed to boot Linux mainline and
-> linux-next kernel due
-> to below error.
-> This error occurred across all x15 device for these kernel version.
->
-> This regression started happening on x15 from this commit onwards (27th Jan)
->   git branch: master
->   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->   git commit: aae1464f46a2403565f75717438118691d31ccf1
->   git describe: v5.5-489-gaae1464f46a2
+On Fri, Feb 14, 2020 at 04:22:08AM +0800, kbuild test robot wrote:
+> Hi Ming,
+> 
+> Thank you for the patch! Perhaps something to improve:
+> 
+> [auto build test WARNING on scsi/for-next]
+> [also build test WARNING on mkp-scsi/for-next block/for-next v5.6-rc1 next-20200213]
+> [if your patch is applied to the wrong git tree, please drop us a note to help
+> improve the system. BTW, we also suggest to use '--base' option to specify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/scsi-tracking-device-queue-depth-via-sbitmap/20200213-215727
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi.git for-next
+> config: arm-allmodconfig (attached as .config)
+> compiler: arm-linux-gnueabi-gcc (GCC) 7.5.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.5.0 make.cross ARCH=arm 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from drivers/message/fusion/mptbase.h:839:0,
+>                     from drivers/message/fusion/mptsas.c:63:
+>    drivers/message/fusion/mptsas.c: In function 'mptsas_send_link_status_event':
+>    drivers/message/fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message/fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message/fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message/fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message/fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message/fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message/fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message/fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message/fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message/fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message/fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message/fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+> --
+>    In file included from drivers/message//fusion/mptbase.h:839:0,
+>                     from drivers/message//fusion/mptsas.c:63:
+>    drivers/message//fusion/mptsas.c: In function 'mptsas_send_link_status_event':
+>    drivers/message//fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message//fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message//fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message//fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message//fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message//fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message//fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message//fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message//fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
+>           ^~~~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:26: error: 'struct scsi_device' has no member named 'device_busy'; did you mean 'device_blocked'?
+>           atomic_read(&sdev->device_busy)));
+>                              ^
+>    drivers/message//fusion/mptdebug.h:72:3: note: in definition of macro 'MPT_CHECK_LOGGING'
+>       CMD;      \
+>       ^~~
+>    drivers/message//fusion/mptsas.c:3755:7: note: in expansion of macro 'devtprintk'
+>           devtprintk(ioc,
+>           ^~~~~~~~~~
+>    include/linux/compiler.h:269:22: note: in expansion of macro '__READ_ONCE'
+>     #define READ_ONCE(x) __READ_ONCE(x, 1)
+>                          ^~~~~~~~~~~
+> >> arch/arm/include/asm/atomic.h:27:24: note: in expansion of macro 'READ_ONCE'
+>     #define atomic_read(v) READ_ONCE((v)->counter)
+>                            ^~~~~~~~~
+>    drivers/message//fusion/mptsas.c:3759:7: note: in expansion of macro 'atomic_read'
+>           atomic_read(&sdev->device_busy)));
 
-Is it only the merge that introduced the issue, or is the branch that got
-merged already broken?
+Hello,
 
-If it's easy for you to reproduce, please run the same test on commit
-e4e4c2ff78ed from Mark's regulator tree to narrow it down further.
+Thanks for the report.
 
-Added Mark to Cc as well, in case it is indeed one of those.
+Looks miss this non-scsi directory, will fix it in V2 after getting
+some feedback.
 
-      Arnd
 
-8<---
-> Test output log,
-> [   37.606241] mmc1: Card stuck being busy! mmc_poll_for_busy
-> [   37.611850] mmc1: cache flush error -110
-> [   37.615883] blk_update_request: I/O error, dev mmcblk1, sector
-> 4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
-> [   37.627387] Aborting journal on device mmcblk1p9-8.
-> [   37.635448] systemd[1]: Installed transient /etc/machine-id file.
-> [   37.659283] systemd[1]: Couldn't move remaining userspace
-> processes, ignoring: Input/output error
-> [   37.744027] EXT4-fs error (device mmcblk1p9):
-> ext4_journal_check_start:61: Detected aborted journal
-> [   37.753322] EXT4-fs (mmcblk1p9): Remounting filesystem read-only
-> [   37.917486] systemd-gpt-auto-generator[108]: Failed to dissect:
-> Input/output error
-> [   37.927825] systemd[104]:
-> /lib/systemd/system-generators/systemd-gpt-auto-generator failed with
-> exit status 1.
-> <>
-> [   68.856307] mmc1: Card stuck being busy! mmc_poll_for_busy
-> [   68.861838] mmc1: cache flush error -110
-> [   68.865812] blk_update_request: I/O error, dev mmcblk1, sector 0 op
-> 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
-> <>
-> [   98.906243] mmc1: Card stuck being busy! mmc_poll_for_busy
-> [   98.911774] mmc1: cache flush error -110
-> [   98.915747] blk_update_request: I/O error, dev mmcblk1, sector 0 op
-> 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
-> <>
-> Dependency failed for Serial Getty on ttyS2.
-> [  128.946258] mmc1: Card stuck being busy! mmc_poll_for_busy
-> [  128.951786] mmc1: cache flush error -110
-> [  128.955756] blk_update_request: I/O error, dev mmcblk1, sector 0 op
-> 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
-> [FAILED] Failed to start File System Check on Root Device.
-> See 'systemctl status systemd-fsck-root.service' for details.
-> [  OK  ] Started Apply Kernel Variables.
-> [  OK  ] Reached target Login Prompts.
->          Starting Remount Root and Kernel File Systems...
-> [  OK  ] Reached target Timers.
-> [  OK  ] Closed Syslog Socket.
-> [  OK  ] Started Emergency Shell.
-> [  129.227328] EXT4-fs error (device mmcblk1p9): ext4_remount:5354:
-> Abort forced by user
-> [  OK  ] Reached target Emergency Mode.
-> [  OK  ] Reached target Sockets.
-> [FAILED] Failed to start Remount Root and Kernel File Systems.
-> <>
-> You are in emergency mode. After logging in, type \"journalctl -xb\" to view
-> system logs, \"systemctl reboot\" to reboot, \"systemctl default\" or \"exit\"
-> to boot into default mode.
-> Press Enter for maintenance
-> auto-login-action timed out after 874 seconds
->
-> ref:
-> https://lkft.validation.linaro.org/scheduler/job/1137693#L4034
-> https://lkft.validation.linaro.org/scheduler/job/1158106#L4048
-> https://lkft.validation.linaro.org/scheduler/job/1137690#L3985
-> https://lkft.validation.linaro.org/scheduler/job/1137691#L4012
-> https://lkft.validation.linaro.org/scheduler/job/1137696#L4043
-> https://lkft.validation.linaro.org/scheduler/job/1137699#L4153
+Thank,
+Ming
+
