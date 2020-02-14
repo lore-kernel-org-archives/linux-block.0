@@ -2,119 +2,114 @@ Return-Path: <SRS0=urI+=4C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3726C2BA83
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 12:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 271E1C2BA83
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 14:05:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A27022314
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 12:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F09F324649
+	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 14:05:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581682144;
-	bh=TamJWj2dcsCw+v7sGhZboKQCnSDZVMI+YTkqD6uMsdc=;
+	s=default; t=1581689119;
+	bh=ztMdt3oEz3IEYAhpCdtBhaJTpddt87Qu/Jt6NDeR+K8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=1fRIbRXMR3b9CFQ7mb0iwOPt1mW9MQrropBmpXDWeqaCdfE7nytHYrww21nZTotmw
-	 o/IavifBbSrKf5oR0ANW3TXUcus6EcFbR+cof2aWXyeAFtWtHIKOurfOph1F2vj0TN
-	 96Js5Kv547nvf3axIrlfLl69R2tdRupPA66ShNq8=
+	b=sCBjKk/6bintmeG9++KuGSEeKzJPK1Ly6v3zwUcAH542ANB7FhOFz/U9HjpUM8nPE
+	 QuJ+XgPsxIrAanaX6EjB9pCVbo/FZ/66dWk7zP5ekL8GasuJ7uaVs95ihMaGcsZ+At
+	 d6vDa8Wg4AGCKakdmZT7y8pfK8DgRyfAk7q8/suU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbgBNMJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 07:09:04 -0500
-Received: from foss.arm.com ([217.140.110.172]:60514 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726220AbgBNMJD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 07:09:03 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B0C71FB;
-        Fri, 14 Feb 2020 04:09:03 -0800 (PST)
-Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D2ABC3F68F;
-        Fri, 14 Feb 2020 04:09:02 -0800 (PST)
-Date:   Fri, 14 Feb 2020 12:09:01 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        John Stultz <john.stultz@linaro.org>
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-Message-ID: <20200214120901.GE4827@sirena.org.uk>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAK8P3a09YDtmOjpBWQEsKd09aotvUW6tOoxUE=CYxh1g8hNW7A@mail.gmail.com>
+        id S1729294AbgBNOFS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 09:05:18 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:40798 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbgBNOFR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Feb 2020 09:05:17 -0500
+Received: by mail-qk1-f194.google.com with SMTP id b7so9266291qkl.7
+        for <linux-block@vger.kernel.org>; Fri, 14 Feb 2020 06:05:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=05uQZMBwV8GnBepYg6ALQFiI3J3horleCUJcgJHWnJM=;
+        b=o4Uk/4IexNqYace9U6l2/aln39T9TBJxopHzeSuSj6WJ3XJDejcEpOgsNk6G8o3IMD
+         zFjdtzra7NPfhLZW6cVihUFa7jFn2FExquIlVWHjl942/44EiY2C4od/F5fxYMye9gcq
+         fc4dyxgR4fS1CF3KnW+lPOk8STV8Xa6CsqInMfL0eH40i1UGNmMWpuVTgpuFvbXenMH4
+         yk+L3q+lMERsYKt7U5pEqhBRz4G61hTXckWVx26qfqgVRu/e+Xqs0x9To+JQ9W7zSk0I
+         69KU0gH4/hz5xMUvN3lSr0ixMd9NcCV63uYH3PicqmSLMBI8XFSSMhXe5PM7yHtr/ICu
+         BA0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=05uQZMBwV8GnBepYg6ALQFiI3J3horleCUJcgJHWnJM=;
+        b=VoqpE2XYL6tGJ7k9CYrpqB8WeJETwT/oNWcW580EdKP7ErOj4PzmLA7NeI2D3N335C
+         CbmOwcpw+YJ6lNSxekoTLEVh7LQmdsmVFJ1ZUcHENN3o9/gXEcany0DwBOTG6yMrROu9
+         /+rs3j3Jey/6JFfCiN4b9DtNXbe9028pc/smTylL+QeUXd6u+BEWz6WldY/x+gakGGWy
+         MvDzYIYZT/hpFsBkTk9O1bXCoHVHbRzrs+LmKCifPilVPZFyVKv/wV8n/cHLDXHx5RiA
+         iLUYY9BK8Dx4ClTJhZCwwGJWDhnLxxOYMFcWNdOuuw0/gkANOuJ3hFWb1o3WR/R9wtLC
+         9Zyg==
+X-Gm-Message-State: APjAAAUGSnHg64bAEmIZ6ng0WKR9B5b1srdOhmf/0MuPmgBDByNKtqBA
+        ha0WnFOjZkOMBoyaGQd2uI8=
+X-Google-Smtp-Source: APXvYqzHv35r29XL/U7MdyR2z2hHS5htKqKO1d8KGLZN49EQEyXDl2Pl7bzpCu61y7z88f44bg79fQ==
+X-Received: by 2002:a37:e214:: with SMTP id g20mr2739383qki.367.1581689116294;
+        Fri, 14 Feb 2020 06:05:16 -0800 (PST)
+Received: from localhost ([71.172.127.161])
+        by smtp.gmail.com with ESMTPSA id z21sm3362590qka.122.2020.02.14.06.05.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2020 06:05:15 -0800 (PST)
+Date:   Fri, 14 Feb 2020 09:05:14 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jack@suse.cz,
+        bvanassche@acm.org
+Subject: Re: [PATCH] bdi: fix use-after-free for bdi device
+Message-ID: <20200214140514.GL88887@mtj.thefacebook.com>
+References: <20200211140038.146629-1-yuyufen@huawei.com>
+ <b7cd6193-586b-f4e0-9a5d-cc961eafaf81@huawei.com>
+ <20200212213344.GE80993@mtj.thefacebook.com>
+ <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
+ <20200213034818.GE88887@mtj.thefacebook.com>
+ <fa6183c5-b92c-c431-37ab-09638f890f6c@huawei.com>
+ <20200213135809.GH88887@mtj.thefacebook.com>
+ <f369a99d-e794-0c1b-85cf-83b577fb0f46@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="WK3l2KTTmXPVedZ6"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a09YDtmOjpBWQEsKd09aotvUW6tOoxUE=CYxh1g8hNW7A@mail.gmail.com>
-X-Cookie: Shipping not included.
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <f369a99d-e794-0c1b-85cf-83b577fb0f46@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
---WK3l2KTTmXPVedZ6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Fri, Feb 14, 2020 at 10:50:01AM +0800, Yufen Yu wrote:
+> > So, unregistering can leave ->dev along and re-registering can test
+> > whether it's NULL and if not put the existing one and put a new one
+> > there. Wouldn't that work?
+> 
+> Do you mean set bdi->dev as 'NULL' in call_rcu() callback function
+> (i.e. bdi_release_device()) and test 'bdi->dev' in bdi_register_va()?
+> 
+> I think that may do not work.
+> We cannot make sure the order of rcu callback function and re-registering.
+> Then bdi_release_device() may put the new allocated device by re-registering.
 
-On Fri, Feb 14, 2020 at 10:09:34AM +0100, Arnd Bergmann wrote:
-> On Thu, Feb 13, 2020 at 4:43 PM Naresh Kamboju
+No, I meant not freeing bdi->dev on deregistration and only doing so
+when it actually needs to - on re-registration or release. So, sth
+like the following.
 
-> > arm beagleboard x15 device failed to boot Linux mainline and
-> > linux-next kernel due
-> > to below error.
-> > This error occurred across all x15 device for these kernel version.
+* Unregister: Unregister bdi->dev but don't free it. Leave the pointer
+  alone.
 
-> > This regression started happening on x15 from this commit onwards (27th Jan)
-> >   git branch: master
-> >   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> >   git commit: aae1464f46a2403565f75717438118691d31ccf1
-> >   git describe: v5.5-489-gaae1464f46a2
+* Re-register: If bdi->dev is not null, initiate RCU-free and update
+  bdi->dev to the new dev.
 
-That's Linus' commit:
+* Release: If bdi->dev is not NULL, initiate RCU-free of it.
 
-	Merge tag 'regulator-v5.6' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+Thanks.
 
-Please include human readable descriptions of things like commits and
-issues being discussed in e-mail in your mails, this makes them much
-easier for humans to read especially when they have no internet access.
-I do frequently catch up on my mail on flights or while otherwise
-travelling so this is even more pressing for me than just being about
-making things a bit easier to read.
-
-> Is it only the merge that introduced the issue, or is the branch that got
-> merged already broken?
-
-Or is this just the first commit where the problem happened to be
-noticed?  Commits done just before that on the same day include the
-dmaengine and MMC merges which seem potentially relevant:
-
-> > [   37.606241] mmc1: Card stuck being busy! mmc_poll_for_busy
-> > [   37.611850] mmc1: cache flush error -110
-> > [   37.615883] blk_update_request: I/O error, dev mmcblk1, sector
-> > 4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
-
---WK3l2KTTmXPVedZ6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl5GjdwACgkQJNaLcl1U
-h9AvCAf/dNif51L4NKZ71gq7xDibg/Hu9NUWD7LqMNzduUaeB40Fq+WubJqBcLk+
-5mCGCEcLMyx+DcVmO6g1RkyZ2OIRNGbIK7ebZRdOv+iiNo4/L7trEb3nN4Qh6CBo
-pWhcjz9EPAqY28y1eYU6l0itlyVFKfPcrNP7iGVqxZoHQgUHUjseRx+jxA60QACD
-zfwZ9O2qt9wkc0oTjUb4JMay7mV/C9BxUwEITTsGS8jxt42JZITUHM9vmaLDFGYC
-Tnzif/D3K3ohyXE+XeSuuQVXEtb/liTwuBWd5fqJQhpw3/tdzb1T7iDdP0xCvg2/
-ZEF3zDb9H8FddbrDCZWgytK6Xa37bg==
-=Juis
------END PGP SIGNATURE-----
-
---WK3l2KTTmXPVedZ6--
+-- 
+tejun
