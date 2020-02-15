@@ -2,73 +2,70 @@ Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A75C35242
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 00:58:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C44EC35242
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 01:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BDBA20726
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 00:58:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CA32207FF
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 01:38:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oFEvn2gZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rpj30XWc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727868AbgBOA6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 19:58:06 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:49846 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727855AbgBOA6F (ORCPT
+        id S1727602AbgBOBid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 20:38:33 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:15619 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727572AbgBOBid (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 19:58:05 -0500
+        Fri, 14 Feb 2020 20:38:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1581728285; x=1613264285;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DYyJ+E40k/e4I8+PSANvrJI06g/bZ7Q5iQX0Tcyb2mk=;
-  b=oFEvn2gZgQqyxtagxeNgwtDFM3O43GRBqKkGFg5eBcFRZFwTnrPHUbeF
-   XuGsaK+P3/Ax3FZuPKx6F93SM1Yzko06CnmRZYoEuOtM+qMhHSm0T3sxq
-   9aFbWdP53DsH3nmoHV1fW5QBRCwCQ9GpJlx6lpHW8E1nf6hybZKbhyLIN
-   kRe1JiJ+01zG1tuZof1PKJbl46WxXC4XCJhSiqzuWPX4Mgmyto97YVIIm
-   4Bd+9IXkIkLAf8wBdpKT3yQZ3N8xvN4XVTe6tDIMvP6JAx5ZGi2s48i/i
-   neEBx2dFTa0bkk+4Sr4LpYwYv4WII4Bx385476pPB/LnalVuONvdDepPs
-   A==;
-IronPort-SDR: il27ZXHrjt+kL4BiGymH5hlyJ1mEP8KsLg+VMpq620aGX6MEeVC8zSHLzQZhMXffz+5oqDaRSc
- 1UAPcHIq3hC7InUC/lODqvRcksequb8LfOtYfaFHk4+zE5hOWs4133rNqbvcSBYQQ9myAZy+Si
- Hwd1OyHL7D97k3yH6IO91sasiUYAw/pe+eghyo/Qmr1P/k0NBw1Mk1uDkO72elalpTkn5eYQ/1
- 9ONXsCHlTa/eU7dvYA7UGKufOHp2MazYYlM+Q6Uxdpw8SBFoP+E7c4tePI59+fUc1/iuUmFmAv
- jWE=
+  t=1581730714; x=1613266714;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aNsmvkaH4ULgQFsXfejZzWVM/4puB/idKPxtDie+r7g=;
+  b=rpj30XWc1bmOihyULmDBkXeJ9ZucVFmYplKKQtJu0RORh29eScvUiEDd
+   EDbzp9eiEwV8ehy1XMu1ABRVHo22S4y4evH72J/czoWf/jDE21jODaZE2
+   Rnvb+010FrMQHmmG20//iVIr65D9DcSrTi3R4QcBXDlSLAHHoH7LZsnw+
+   92EtQh73YpM3D0NOnspLc+PkVL33qyYOyDtGy2ZffeGkeFbI0dofcOJAQ
+   Xb1p97ZHuHn+6w6AbMhLn9izk3oU+TR3iOsHTwRh+L92fVpzszE/yXYcC
+   3nXvSy3VKdYZ8S7mCKcVnwJd4o2Vb+arqgQhDLkXAixQabmx9PvLoDoyf
+   Q==;
+IronPort-SDR: PeRzGmpzuZKik4w6ZMTookROb7t2rHyfwoIAO7N/GOmort6jXsgeNmPlDc0WHc0GGrE7kawc1f
+ ekywVfvgUD4y71v+sJnXrmIW7JgnrPfUj1EJWSJ/ZQn0r5rISGwhq3Ax0TvTvS5maA1VMcs/dp
+ 1TCa0Y336L7y4npF3QM1pluuMtVtUu2xF4hLZsdqyRfmR3Rhtvdf1JCD29orUwciY3NFvs9cOO
+ AxmUBSG22sS90s+uI7hbZbSTDmLLHBmwnxNpGXp6/MHcwLwn/BCnpuUpZAtYJczNJTjqQlDDwI
+ XV8=
 X-IronPort-AV: E=Sophos;i="5.70,442,1574092800"; 
-   d="scan'208";a="129905405"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 08:58:05 +0800
-IronPort-SDR: hkQMpJQ6oF6RyL6KaBFmosV7dIqjLH5jtoOIqMq1RCxm1FX+El7ZrcrBvi7t6jwmVHojDnYXZ9
- N8H6sH0/V29BrDpKVgWjBUJmFo/MbGg79mLPWae94B2Sa+1lhd+LzYrtTzXnZWTrF2ovID/cEt
- HZktPJrlY9xHHaicWPHp+L9F6nrKqlcU1qv06GPe5kiUPWSiMovFaYkdMZeoaawoBixjMNW8hv
- AFkIiW3yueS5FvImAU+lrWj2ZhDNqiOYsTPHpslYDfyW4vCz1oxwEoACpX5ETiBmRlrVsmmn0u
- boVoUS3Y0CxVbDGVKSELiyCR
+   d="scan'208";a="130431803"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 09:38:33 +0800
+IronPort-SDR: da6TGbNBDKTmFCBAVXMQkTpkayJTNZWuPNsJU3tDrDFwQQVqu/2B5hQxrKFrisChJTZouAGHMK
+ mbsTmnpMSDV7NGii20DNrV4D8AzNY+48O15BWhfNOCw2GgKr77ZrU48CbOHVuVB6HK+T/rhh0L
+ IL5pkpSb+RjQBwl1AM0Xu3PFE3z7JnqZWWrH9bNe17DDDKcx7qgWMJGTU5D8uJeMY0D3sY4PoW
+ jHXr9EVxDueNqxkTfHBacuvT2+FiCLWKaBCDyA5mu6zDE+CHhABwG2pEGBDZ+RukORQA+psaDx
+ 7rJLoLFHWAb5bwvkQ9/HUyRP
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 16:50:50 -0800
-IronPort-SDR: hThJ9weKWzCzB4Kv9hCUQ6DQeLyig+4A1hooySwEwdsDCnY0JTrUejxqaAVpjsi35qZSOA9EqZ
- T3ciZXYPEeBY+0cjBfBTQ+MGv739iWfHnJO0I7lhOQVgIoN5bJtRgxcl8GpCozkTAz4Oua/r4O
- o10Ryyd3/z9WwGvi4FsEqW+GEotpf92eVdMsYigOl7PM5omKCejNV18OjXi86DSrKart4vAhdH
- 0IA3brj1go7y+qWXoNBGlnINm447XJ1OZKaStCWxANwbDYYtr+Kx+1RY7vTwln2jAXQ/OVufOG
- ms4=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 17:31:17 -0800
+IronPort-SDR: mXXkIDZ3lJFYANe+amb8ctB+mL/we5+Tfq9lkGy7gt06t4kQ1JOok4j/pEZcYJ71a6Jg6Bleu4
+ Nc6pGJ56wnGo4gBkA2z8SXd/D1elvNpZwYqfowxvrNFEHniDppGXsBxspymEBDosAAkp5STU66
+ iCNAfmue1hVRPlpDbfvdk1x9cTOJ/uz2KFOqOsJBSWeSKsvp0eknl9MRP4NplWEdI4kJ0jMrIF
+ s3bB/MBt5eb5XA8VKq/iq40eyR4ZXduXN+498vlF6dnufcYA4AisMVukZb8qbVdE48Lz2K4vZ/
+ p6c=
 WDCIronportException: Internal
 Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 14 Feb 2020 16:58:05 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 14 Feb 2020 17:38:32 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     axboe@kernel.dk, damien.lemoal@wdc.com
-Cc:     kbusch@kernel.org, linux-block@vger.kernel.org,
+To:     osandov@fb.com
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 3/3] null_blk: add trace in null_blk_zoned.c
-Date:   Fri, 14 Feb 2020 16:57:58 -0800
-Message-Id: <20200215005758.3212-4-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH blktests V2 0/3] nvme: add cntlid and model testcases
+Date:   Fri, 14 Feb 2020 17:38:28 -0800
+Message-Id: <20200215013831.6715-1-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20200215005758.3212-1-chaitanya.kulkarni@wdc.com>
-References: <20200215005758.3212-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -76,65 +73,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the help of previously added tracepoints we can now trace
-report-zones, zone-write and zone-mgmt ops in null_blk_zoned.c.
+Hi Omar,
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/null_blk_zoned.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+This is a small patch-series which adds two new testcases for
+setting up controller IDs and model from configfs.
 
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index ed34785dd64b..673618d8222a 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -2,6 +2,9 @@
- #include <linux/vmalloc.h>
- #include "null_blk.h"
- 
-+#define CREATE_TRACE_POINTS
-+#include "null_blk_trace.h"
-+
- /* zone_size in MBs to sectors. */
- #define ZONE_SIZE_SHIFT		11
- 
-@@ -80,6 +83,8 @@ int null_report_zones(struct gendisk *disk, sector_t sector,
- 		return 0;
- 
- 	nr_zones = min(nr_zones, dev->nr_zones - first_zone);
-+	trace_nullb_report_zones(nullb, nr_zones);
-+
- 	for (i = 0; i < nr_zones; i++) {
- 		/*
- 		 * Stacked DM target drivers will remap the zone information by
-@@ -148,6 +153,8 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		/* Invalid zone condition */
- 		return BLK_STS_IOERR;
- 	}
-+
-+	trace_nullb_zone_op(cmd, zno, zone->cond);
- 	return BLK_STS_OK;
- }
- 
-@@ -155,7 +162,8 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
- 				   sector_t sector)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
--	struct blk_zone *zone = &dev->zones[null_zone_no(dev, sector)];
-+	unsigned int zone_no = null_zone_no(dev, sector);
-+	struct blk_zone *zone = &dev->zones[zone_no];
- 	size_t i;
- 
- 	switch (op) {
-@@ -203,6 +211,8 @@ static blk_status_t null_zone_mgmt(struct nullb_cmd *cmd, enum req_opf op,
- 	default:
- 		return BLK_STS_NOTSUPP;
- 	}
-+
-+	trace_nullb_zone_op(cmd, zone_no, zone->cond);
- 	return BLK_STS_OK;
- }
- 
+I've tested these testcases with and without newly added attribute.
+If they still fail on your system, I'll creata a new vm and test it
+on nvme-5.5 branch.
+
+Regards,
+Chaitanya
+
+Changes from V1:-
+
+1. Reorg series into three patches.
+2. Fix shellcheck warnings (and shellcheck on my machine :P)
+3. Fix test description.
+4. For model related testcases declare global variable model and use 
+        nvme list | grep "${nvmedev}n1" | grep -o "$model"
+   instead of 
+        nvme list | grep ${nvmedev}n1 | grep -q test~model.
+
+Chaitanya Kulkarni (3):
+  nvme: allow target to set cntlid min/max & model
+  nvme: test target cntlid min cntlid max
+  nvme: test target model attribute
+
+ tests/nvme/033     | 61 +++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/033.out |  4 +++
+ tests/nvme/034     | 64 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/034.out |  3 +++
+ tests/nvme/rc      | 25 ++++++++++++++++++
+ 5 files changed, 157 insertions(+)
+ create mode 100755 tests/nvme/033
+ create mode 100644 tests/nvme/033.out
+ create mode 100755 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
+
+ Here is the test result with and without cntlid and model attributes :-
+Shellcheck :-
+# /bin/shellcheck -x tests/nvme/rc tests/nvme/033 tests/nvme/034 
+# echo $?
+0
+# for i in 033 034; do ./check tests/nvme/${i} ; done 
+nvme/033 (Test NVMeOF target cntlid[min|max] attributes)     [not run]
+    attr_cntlid_[min|max] not found
+nvme/034 (Test NVMeOF target model attribute)                [not run]
+    attr_model not found
+
+# for i in 033 034; do ./check tests/nvme/${i} ; done 
+nvme/033 (Test NVMeOF target cntlid[min|max] attributes)     [passed]
+    runtime  1.706s  ...  1.513s
+nvme/034 (Test NVMeOF target model attribute)                [passed]
+    runtime  1.672s  ...  1.510s
+
 -- 
 2.22.1
 
