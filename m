@@ -2,151 +2,91 @@ Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FF1C352A3
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8E6C2BA83
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 08:29:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6ADF22084E
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:47:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6naduLO"
+	by mail.kernel.org (Postfix) with ESMTP id BA16320718
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 08:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727721AbgBODrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 22:47:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48525 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727720AbgBODrL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 22:47:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581738430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hkwg5DEXlLJyMnQCtdrdMz1gYg6CkSO++6/Wb9Fh0qI=;
-        b=Q6naduLOHcGNrcY1IfhlXeqO/iZ4yAL2rDSWSxQqO0+PW9JkcBB9AMSg8WQG6SZ7nwELWf
-        mqqi+/xwdWSH3B7mXFz7dJGiCgPIX49JPMQ7L+kc3u6NMIeK0eZ/bSBBBL6I5bwrksX/EY
-        mLGLQ8MG3vp0GfbQyOZ1cXOnJ/oV3TM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-ddDc33jVMHSXuRB4w2yvnA-1; Fri, 14 Feb 2020 22:47:06 -0500
-X-MC-Unique: ddDc33jVMHSXuRB4w2yvnA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECBAF800D53;
-        Sat, 15 Feb 2020 03:47:04 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA2895C1C3;
-        Sat, 15 Feb 2020 03:46:57 +0000 (UTC)
-Date:   Sat, 15 Feb 2020 11:46:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Salman Qazi <sqazi@google.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Gwendal Grignou <gwendal@google.com>,
-        Jesse Barnes <jsbarnes@google.com>
-Subject: Re: BLKSECDISCARD ioctl and hung tasks
-Message-ID: <20200215034652.GA19867@ming.t460p>
-References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
- <20200213082643.GB9144@ming.t460p>
- <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
- <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
- <de7b841c-a195-1b1e-eb60-02cbd6ba4e0a@acm.org>
- <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
- <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1725903AbgBOI3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Feb 2020 03:29:07 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42418 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725882AbgBOI3G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Feb 2020 03:29:06 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 20F13AE89;
+        Sat, 15 Feb 2020 08:29:05 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [RFC PATCH 0/3] bcache: accelerate device registration speed 
+Date:   Sat, 15 Feb 2020 16:28:55 +0800
+Message-Id: <20200215082858.128025-1-colyli@suse.de>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 11:42:32AM -0800, Salman Qazi wrote:
-> On Fri, Feb 14, 2020 at 1:23 AM Ming Lei <tom.leiming@gmail.com> wrote:
-> >
-> > On Fri, Feb 14, 2020 at 1:50 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> > >
-> > > On 2020-02-13 11:21, Salman Qazi wrote:
-> > > > AFAICT, This is not actually sufficient, because the issuer of the bio
-> > > > is waiting for the entire bio, regardless of how it is split later.
-> > > > But, also there isn't a good mapping between the size of the secure
-> > > > discard and how long it will take.  If given the geometry of a flash
-> > > > device, it is not hard to construct a scenario where a relatively
-> > > > small secure discard (few thousand sectors) will take a very long time
-> > > > (multiple seconds).
-> > > >
-> > > > Having said that, I don't like neutering the hung task timer either.
-> > >
-> > > Hi Salman,
-> > >
-> > > How about modifying the block layer such that completions of bio
-> > > fragments are considered as task activity? I think that bio splitting is
-> > > rare enough for such a change not to affect performance of the hot path.
-> >
-> > Are you sure that the task hung warning won't be triggered in case of
-> > non-splitting?
-> 
-> I demonstrated a few emails ago that it doesn't take a very large
-> secure discard command to trigger this.  So, I am sceptical that we
-> will be able to use splitting to solve this.
-> 
-> >
-> > >
-> > > How about setting max_discard_segments such that a discard always
-> > > completes in less than half the hung task timeout? This may make
-> > > discards a bit slower for one particular block driver but I think that's
-> > > better than hung task complaints.
-> >
-> > I am afraid you can't find a golden setting max_discard_segments working
-> > for every drivers. Even it is found, the performance  may have been affected.
-> >
-> > So just wondering why not take the simple approach used in blk_execute_rq()?
-> 
-> My colleague Gwendal pointed out another issue which I had missed:
-> secure discard is an exclusive command: it monopolizes the device.
-> Even if we fix this via your approach, it will show up somewhere else,
-> because other operations to the drive will not make progress for that
-> length of time.
+Hi folks,
 
-What are the 'other operations'? Are they block IOs?
+This series is an effort to accelerate bcache device registration
+speed. With this series the registration speed can be x3 ~ 7x times
+faster in my tests.
 
-If yes, that is why I suggest to fix submit_bio_wait(), which should cover
-most of sync bio submission.
+Since Linux v5.6-rc1, the bcache code may survive more than 24+ horus
+on my testing machine (Lenovo SR650, 48 Cores, both NVMe SSDs as
+cache device and cached device). Before Linux v5.3, bcache code may
+only survive around 40 minutes then deadlock detected. After Linux v5.3,
+bcache code may survive 12+ hours then out-of-memory happens and whole
+system huang. Now in my testing bcache can survive from 24+ hours high
+randome write I/Os, and generate a very large internal btree. After a
+reboot, registring a single cached device and cache device may take
+55 minutes on my testing machine, this is too long time IMHO.
 
-Anyway, the fix is simple & generic enough, I'd plan to post a formal
-patch if no one figures out better doable approaches.
+I don't realize such problem because bcache could not work for so long
+time before. After look into the bcache registration code, I realize
+the bcache registration time is consumed by 3 steps,
+1) Check btree nodes
+   To check each key of all the btree nodes are valid and good.
+2) Journal replay
+   Replay all valid journal entries and insert them back to btree.
+3) Count dirty sectors
+   For a specific bcache device, iterate all btree keys and count
+   dirty sectors (or stripes) for it.
 
-> 
-> For Chromium OS purposes, if we had a blank slate, this is how I would solve it:
-> 
-> * Under the assumption that the truly sensitive data is not very big:
->     * Keep secure data on a separate partition to make sure that those
-> LBAs have controlled history
->     * Treat the files in that partition as immutable (i.e. no
-> overwriting the contents of the file without first secure erasing the
-> existing contents).
->     * By never letting more than one version of the file accumulate,
-> we can guarantee that the secure erase will always be fast for
-> moderate sized files.
-> 
-> But for all the existing machines with keys on them, we will need to
-> do something else.
+The step 2) is strictly linear order, no chance to speed up. But the
+step 1) and 3) accesses btree nodes in read-only more, they can be
+speed up by parallelized threads. This series try to create multiple
+threads to check btrees and count dirty sectors, from my testing
+it can speed up x3 ~ x7 times for bcache registration.
 
-The issue you reported is a generic one, not Chromium only.
+It will be helpful if you may test the patches and feed back me the
+result or problem. Currently I target these patchs for next merge
+window of Linux v5.7.
 
+Thanks in advance.
 
-Thanks,
-Ming
+Coly Li
+---
+
+Coly Li (3):
+  bcache: move macro btree() and btree_root() into btree.h
+  bcache: make bch_btree_check() to be multiple threads
+  bcache: make bch_sectors_dirty_init() to be multiple threads
+
+ drivers/md/bcache/btree.c     | 229 ++++++++++++++++++++++++++++++------------
+ drivers/md/bcache/btree.h     |  88 ++++++++++++++++
+ drivers/md/bcache/writeback.c | 156 +++++++++++++++++++++++++++-
+ drivers/md/bcache/writeback.h |  19 ++++
+ 4 files changed, 427 insertions(+), 65 deletions(-)
+
+-- 
+2.16.4
 
