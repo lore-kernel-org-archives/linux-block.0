@@ -2,217 +2,146 @@ Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1F8C3F68F
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01886C352A3
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:20:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 570322084E
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0CE72084E
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mGQQgiT9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LoQ/oLWO";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Tj9dh2Y8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727778AbgBODTx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 22:19:53 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:53493 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727705AbgBODTw (ORCPT
+        id S1727860AbgBODUg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 22:20:36 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:52643 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727705AbgBODUf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 22:19:52 -0500
+        Fri, 14 Feb 2020 22:20:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1581736796; x=1613272796;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xsR2n8HMtbr40xX/TMWrxT2gDLYItZq16GnQP4LAQIY=;
-  b=mGQQgiT99Hhlem59mTG31HEXDn2SwHfiQ/Y/hVAFJY1Y+6YKzsty/JHS
-   +yF+sh9XeHy4UecjZx25xIjpeRjCDzfhuWAqVPdhU7EEVS4TjQWyIxRa4
-   YBKE97tiGDF7cjeE8VcdrtQhA/FQ1UrONp5ZQVZf9RHwAwDG+77sE4Vh7
-   KaehsaUlxJlx94vtLlRpJWEtjfwAMG8Ai2jsWHAlTeKNu4Pdj2d79DEkx
-   z59HxIcJayo5VXNo2f9gzyJBBHoi6X+6oqUgIH0Dazv+VWSJvsCatwKsM
-   btRxFWVva2+yDLcY8VovD+LGHpRLkZm9didEvpiXMCwLtF70Khr+Xf5FM
-   Q==;
-IronPort-SDR: iPzfSBcZPHhQwC5mEV3T9GmAOyhZ3uOjdsfw+Lfyv+S25WIZ4yhk7FRa/n47UeNW9lbLf73coz
- urX7hjIjaFwFmm0sELRKrvi0D7z0t7UE3s98G0iKF/E9Szi7cs+U2vwGFV6qYfNq26HgkFP85W
- 6Fv7lluQFp0W23vsqMmIfrvnk/2p7SmBjQQjOXml9MS6OXu+nuiyQ4vYZ3Kg1CdQtxhIrB01mj
- j8VT1E6wRU0Ryp1pUYGET4qL6NmMsvZCv0AWdnKvkVhqYRa7pbeD41P9t9Rfu9ejVnYvjvm0av
- Q60=
+  t=1581736835; x=1613272835;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=7UVso2nmBdQ5BMulq/+ush68v3dJaGI99IMpEhTsXoQ=;
+  b=LoQ/oLWOXQeXisZoP8Cfk8GiXo1f0RBTkVzPkNJxpiflbvzcwT0E+p7c
+   SOLM81YbfCIQsvA9A4Q7iwj0FY4gPygWYgxAMnxKKZF34iUji7ycHrgWn
+   neyaU38kjGO+itMk9ym4a/QnR1/ZUtJFqNAYyTi/vkFDTZhN/p8T0+WnG
+   RVmq0rFSHP5pmb5G7WEIiWQNB2D6jLBHq5UC7+o58OjP7+MLWme4DXOni
+   PXX+tix94ofWHfA6Z8JSGy3/tfGqfbdp/Ji6XsiNE8GPgSwB550XjcPys
+   4PfLior0pPmUeQYeXvoACyiCfxTGpP96cjY8zBMaNbA2JJ1/qIIh5HZDw
+   A==;
+IronPort-SDR: IMmBf1EchhVKPv5+pgisOOhlBtnB8Z7vT4r3gqV77UJH9fp6yd6SAzrhPbbJmu/sr84+Z4L4zG
+ sZGKQB4BhgxknewdLwQoKuRXYc/pSapxyzJTeARAAI/6sP3mLZ7mZl3uNlxaL303p2HwsTFHXR
+ m99Pd5YiY+YnvIvnPypcalz3gtzqYF7ZkftYdabA7GZ7l9/bBbAX8FiL7u4Mqo6wVAqbOVnQ3h
+ PegbFrbYJLJN6hS3V6prG86mn2KTbHleGoUP/f9mteW+d+ttToO6p86f4S0fOMt4uZ+3mDIa30
+ ZjM=
 X-IronPort-AV: E=Sophos;i="5.70,443,1574092800"; 
-   d="scan'208,223";a="231731625"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 11:19:56 +0800
-IronPort-SDR: 57vRl+x7ovFsXO5lFYalPo6zm4mH6XBXO8SSbQk76ineS5d3/llUzEfq4b4/WMJjMC9P9Z0BpN
- r2a3mVbkKCBAsWjUQ0cinLisRx5WtAhsfcS+D8WGwi9MEDwDXIM2cfwbmfbWsmSHAZ+02qVQ12
- 1I9Cm0SdW0aQmi1mMnkzaesKLU1lyk/Qh0ky7eVBOAukCn6/PrJ3dIpmLZwQ3S5xYbQNzz2yMt
- lM0/P7gNhhW0xX0ZToN/lLDzQdpjmXgfk0Dhq4GIFtrTldKyz6rrRP/bKWb7pbA8TTf1eVMnQA
- b/ch7fuxJumVGJS81eG0Tuef
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 19:12:36 -0800
-IronPort-SDR: i9yYuSV5gKvHo4vb49OFeN+UQWKcz6+M9hhNacXghv4OkJKuqjMyDvGww333p4OOXiz3ulcbIG
- B0f+/J8mz69mUweP0FdR+uWnnbNe5ATwAcVzMsQJXsLM32SWmNHQbqNUa1c0JJbv+uEQpUssaQ
- NB+s6H2Ez4zPDfy735Wq4+xgjRvKaCux2HO8oNjoMUFgfqM1FoQ2vFNDAwjgEVTqMbd4MW6UOu
- pplTk1jtPrKZQnxM/5NuLDxRfzrwSXpN8p8u7PVxmJSvXnroGafoemPkwRtKOomH8RQrh02oqA
- oLg=
-WDCIronportException: Internal
-Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 14 Feb 2020 19:19:52 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     adobriyan@gmail.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH] null_blk: initialize cmd->error before use
-Date:   Fri, 14 Feb 2020 19:19:50 -0800
-Message-Id: <20200215031950.6688-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.24.0
+   d="scan'208";a="134268463"
+Received: from mail-mw2nam10lp2105.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.105])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 11:20:35 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lmEfJojsq9esBL7i7ckW0M/1cWcUoKBUrMxgbKUKk8KObH/q7TvRIgGXkaXvcposLIOFeI6t5I8f+Tdr2vmW9QXwCO2CPZhbuXqAo8beJpSNusVyj/6kPjwpCXi7vpyYAVDGImvy2oN1CPs8KbuZVXLEuAg5yKd0hQB7XMH1cB0qLbKe80MRMq2P5uxqfc7OQ9S/FewQ0MtJiKOlsrvcPDtTs3s0I81/XvS88RxTesOo62L1382R0PLec0c3w1f3AsKg89ZUaxeRk7CAtc5HywWP59WOaB1ZtFXZg8rC8YnI4JSYMe09C1Oi5pK8P2W7Vv7W26tL8CgLbpjIE1f0Dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SNNqlCz862tjMb86LopTK59oDlgmd3G+Yljkhp12bXI=;
+ b=YrRT9ipwRSfDlwkNTk+5UidSLFoufy/DpKk6cWZwdXOr9wePw5d+YY7tqMrWlMx6snOB/QTIZUQwsjIOsZ/F1KftgX/asz2ah5J+ob0oZE1IsGzKeS+l/XUpGovqmhC6sREAS9tfrstWxVSC+t5yIqQNSUQYWb8H9zpItYcQJ64yxGlnsVHQWeSwFA4QfOZx1ssEzo2kQPh6mQYsFwKNw3ybjQdhZU3DGqG8/SoZ45AmCpwmkG65o8ARFmoH9L8Obh3aeUdA09ZhSNIW0L3HZQjM3kXKXQ/eNwdyjMJ15qmycgHZnhPZBTgc6XI2ajZEOu4IY4PDvd7xSXARJQzxNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SNNqlCz862tjMb86LopTK59oDlgmd3G+Yljkhp12bXI=;
+ b=Tj9dh2Y8oXL8zR0Q/euIJlDH1xp/C/7h7ZF59na2r9X4Oibicde+z6+gGXgDOe2zv4qsSP0wciDzeOUlsrzdPcEJMTZ9voGNL8bLYH73W46wAxsX1myZDBm36gWJ8TauUon7lX9hTuK6ZUh0Tespz98sG9ev1/IaTc0Q/85XozI=
+Received: from DM6PR04MB5754.namprd04.prod.outlook.com (20.179.51.24) by
+ DM6PR04MB4828.namprd04.prod.outlook.com (20.176.106.78) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.25; Sat, 15 Feb 2020 03:20:33 +0000
+Received: from DM6PR04MB5754.namprd04.prod.outlook.com
+ ([fe80::c0fb:7c35:bcd2:fd28]) by DM6PR04MB5754.namprd04.prod.outlook.com
+ ([fe80::c0fb:7c35:bcd2:fd28%2]) with mapi id 15.20.2729.025; Sat, 15 Feb 2020
+ 03:20:32 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Alexey Dobriyan <adobriyan@gmail.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: fix spurious IO errors after failed past-wp
+ access
+Thread-Topic: [PATCH] null_blk: fix spurious IO errors after failed past-wp
+ access
+Thread-Index: AQHV4eJLw22qyEV6Fk6EkV++6gr6jw==
+Date:   Sat, 15 Feb 2020 03:20:32 +0000
+Message-ID: <DM6PR04MB5754FA61DFF5CA3C6912775886140@DM6PR04MB5754.namprd04.prod.outlook.com>
+References: <20200212202320.GA2704@avx2>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 0d2f3503-f4c0-4b93-677b-08d7b1c6044b
+x-ms-traffictypediagnostic: DM6PR04MB4828:
+x-microsoft-antispam-prvs: <DM6PR04MB4828700CF508F69BBB1AED7A86140@DM6PR04MB4828.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 03142412E2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(189003)(199004)(478600001)(71200400001)(64756008)(66556008)(66446008)(33656002)(55016002)(86362001)(53546011)(76116006)(6506007)(66946007)(26005)(91956017)(4326008)(4744005)(186003)(9686003)(66476007)(2906002)(316002)(110136005)(81156014)(52536014)(8676002)(8936002)(5660300002)(81166006)(7696005);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB4828;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JwsNYPnabJpyH5hqLg3LL2375a7rccDMnfOz8sjSfWZapyHKZgnmhl17FZllWk3JrxDBVWdf5ZF3MK902RtdODT4ouNdfI/zxdjvHRWsnOG6o8fBz9qYNYKk/WdRDgpemeFo9gWEdZmdZj7Du5VfY7bNXmyxmYDrsgdEYCKHpc9GL+HgQciW7O/TAG2qogtAbgfLhir/MoBjqUU6BCi728CIfIr7uoOgFnoi4j/YeMvYdA4Sy0qaJmMdhgc2yxvtW5Ri9ZY83D9O240Ft9FN7F5ETASpjAw2IenlyfZF/vZtl0SjV4IpSTasyU8rwXm4zqBowwJKRBKfsc0ZcAc7XNSGKojlp/b8HavLICOGwtI7gRz18tZPNbI37GUzxYoUAbrlyhp/xvMVkOTYodkyUdLH+Ev2o6gsIR9dubn5w1qNc0LkY0jfAr/NPIh+DT/y
+x-ms-exchange-antispam-messagedata: 7Hko6//ECk7vW4Aby04sSR1w+iahmHIJnqRoFSbVpAdOOpcpYD9lw1xO8SBW7ybRkdgl4y0sr9+6xcO411cilKcloFGU0FgFj2um6re41iAjANIVoMAXclISfK180Rt2VppIr3woBxANNxfmE14AGQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2f3503-f4c0-4b93-677b-08d7b1c6044b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2020 03:20:32.6797
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FZTqUubC4uyCYuhty1qysc1G/8DR3IWCGYSEcIKNnpgZy9qGBrDaDZpeZU7+ZfbbXwXNS9rTxLx6JE1r2IfogDFcVS4/U6Hy0in0cLM/CiY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4828
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From : Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
-
-null_blk driver supports bio and request mode. For each mode when
-processing a new request initialize cmd->error to BLK_STS_OK so that in 
-the completion function it will indicate success by default instead of
-using previously recorded error if any.
-
-Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
-Simple test log :-
-
-1. Without Patch :- 
- # dd if=/dev/zero of=/dev/nullb0 bs=4k count=4096
- 4096+0 records in
- 4096+0 records out
- 16777216 bytes (17 MB) copied, 0.262258 s, 64.0 MB/s
- # dmesg  -c 
-1.1 Now write again to generate an error :-
- # dd if=/dev/zero of=/dev/nullb0 bs=4k count=4096
- 4096+0 records in
- 4096+0 records out
- 16777216 bytes (17 MB) copied, 0.283751 s, 59.1 MB/s
- # dmesg  -c 
- [  600.946406] print_req_error: 3512 callbacks suppressed
- [   600.946409] blk_update_request: I/O error, dev nullb0, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  600.947701] buffer_io_error: 4086 callbacks suppressed
- [  600.947703] Buffer I/O error on dev nullb0, logical block 0, lost async page write
- [  600.949694] blk_update_request: I/O error, dev nullb0, sector 8 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.952283] Buffer I/O error on dev nullb0, logical block 1, lost async page write
- [  600.954002] Buffer I/O error on dev nullb0, logical block 2, lost async page write
- [  600.955722] Buffer I/O error on dev nullb0, logical block 3, lost async page write
- [  600.957472] Buffer I/O error on dev nullb0, logical block 4, lost async page write
- [  600.959228] Buffer I/O error on dev nullb0, logical block 5, lost async page write
- [  600.960622] Buffer I/O error on dev nullb0, logical block 6, lost async page write
- [  600.961587] Buffer I/O error on dev nullb0, logical block 7, lost async page write
- [  600.962529] Buffer I/O error on dev nullb0, logical block 8, lost async page write
- [  600.963473] Buffer I/O error on dev nullb0, logical block 9, lost async page write
- [  600.964574] blk_update_request: I/O error, dev nullb0, sector 256 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.966079] blk_update_request: I/O error, dev nullb0, sector 504 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.967897] blk_update_request: I/O error, dev nullb0, sector 752 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.969464] blk_update_request: I/O error, dev nullb0, sector 1000 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.972423] blk_update_request: I/O error, dev nullb0, sector 1248 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.975262] blk_update_request: I/O error, dev nullb0, sector 1496 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.977683] blk_update_request: I/O error, dev nullb0, sector 1744 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  600.979164] blk_update_request: I/O error, dev nullb0, sector 1992 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- # dd of=/dev/null if=/dev/nullb0 bs=4k count=100
- 100+0 records in
- 100+0 records out
- 409600 bytes (410 kB) copied, 0.00286957 s, 143 MB/s
- # dmesg  -c 
- 
-1.2 Read from the device and expect an error :- 
- # dd of=/dev/null if=/dev/nullb0 bs=4k count=100
- dd: error reading ‘/dev/nullb0’: Input/output error
- 92+0 records in
- 92+0 records out
- 376832 bytes (377 kB) copied, 0.0127975 s, 29.4 MB/s
- # dmesg  -c 
- [  633.362252] print_req_error: 3540 callbacks suppressed
- [  633.362261] blk_update_request: I/O error, dev nullb0, sector 984 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
- [  633.363834] blk_update_request: I/O error, dev nullb0, sector 992 op 0x0:(READ) flags 0x84700 phys_seg 23 prio class 0
- [  633.365366] blk_update_request: I/O error, dev nullb0, sector 1240 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
- [  633.365449] blk_update_request: I/O error, dev nullb0, sector 736 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
- [  633.368981] buffer_io_error: 4087 callbacks suppressed
- [  633.368983] Buffer I/O error on dev nullb0, logical block 92, async page read
-
-2. With patch :-
- # dd if=/dev/zero of=/dev/nullb0 bs=4k count=4096
- 4096+0 records in
- 4096+0 records out
- 16777216 bytes (17 MB) copied, 0.270187 s, 62.1 MB/s
- # dmesg  -c 
-
-2.1 Now write again to generate an error :-
- # dd if=/dev/zero of=/dev/nullb0 bs=4k count=4096
- 4096+0 records in
- 4096+0 records out
- 16777216 bytes (17 MB) copied, 0.464682 s, 36.1 MB/s
- # dmesg  -c 
- [  696.630879] blk_update_request: I/O error, dev nullb0, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.632550] Buffer I/O error on dev nullb0, logical block 0, lost async page write
- [  696.633733] blk_update_request: I/O error, dev nullb0, sector 8 op 0x1:(WRITE) flags 0x800 phys_seg 23 prio class 0
- [  696.636239] Buffer I/O error on dev nullb0, logical block 1, lost async page write
- [  696.637996] Buffer I/O error on dev nullb0, logical block 2, lost async page write
- [  696.639718] Buffer I/O error on dev nullb0, logical block 3, lost async page write
- [  696.641455] Buffer I/O error on dev nullb0, logical block 4, lost async page write
- [  696.643151] Buffer I/O error on dev nullb0, logical block 5, lost async page write
- [  696.644821] Buffer I/O error on dev nullb0, logical block 6, lost async page write
- [  696.645827] Buffer I/O error on dev nullb0, logical block 7, lost async page write
- [  696.646828] Buffer I/O error on dev nullb0, logical block 8, lost async page write
- [  696.647843] Buffer I/O error on dev nullb0, logical block 9, lost async page write
- [  696.649017] blk_update_request: I/O error, dev nullb0, sector 192 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.650580] blk_update_request: I/O error, dev nullb0, sector 200 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.652030] blk_update_request: I/O error, dev nullb0, sector 208 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.653491] blk_update_request: I/O error, dev nullb0, sector 216 op 0x1:(WRITE) flags 0x800 phys_seg 23 prio class 0
- [  696.656347] blk_update_request: I/O error, dev nullb0, sector 400 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.658912] blk_update_request: I/O error, dev nullb0, sector 408 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
- [  696.661490] blk_update_request: I/O error, dev nullb0, sector 416 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
- [  696.665040] blk_update_request: I/O error, dev nullb0, sector 664 op 0x1:(WRITE) flags 0x4800 phys_seg 31 prio class 0
-2.2 Read from the device with no error :- 
- # dd of=/dev/null if=/dev/nullb0 bs=4k count=100
- 100+0 records in
- 100+0 records out
- 409600 bytes (410 kB) copied, 0.00504116 s, 81.3 MB/s
- # dmesg  -c 
- # dmesg  -c
-2.3 Read from the device with no error :- 
- # dd of=/dev/null if=/dev/nullb0 bs=4k count=100
- 100+0 records in
- 100+0 records out
- 409600 bytes (410 kB) copied, 0.00435289 s, 94.1 MB/s
- # dmesg  -c
-
----
- drivers/block/null_blk_main.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 16510795e377..3bf9c05f9825 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -606,6 +606,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
- 		cmd = &nq->cmds[tag];
- 		cmd->tag = tag;
- 		cmd->nq = nq;
-+		cmd->error = BLK_STS_OK;
- 		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
- 			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
- 				     HRTIMER_MODE_REL);
-@@ -1385,6 +1386,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		cmd->timer.function = null_cmd_timer_expired;
- 	}
- 	cmd->rq = bd->rq;
-+	cmd->error = BLK_STS_OK;
- 	cmd->nq = nq;
- 
- 	blk_mq_start_request(bd->rq);
--- 
-2.22.1
-
+Alexey, thanks for the patch however the description is=0A=
+not simple to understand.=0A=
+=0A=
+I just sent a patch with a description and the test result.=0A=
+=0A=
+On 02/12/2020 12:23 PM, Alexey Dobriyan wrote:=0A=
+> Steps to reproduce:=0A=
+>=0A=
+> 	BLKRESETZONE zone 0=0A=
+>=0A=
+> 	// force EIO=0A=
+> 	pwrite(fd, buf, 4096, 4096);=0A=
+>=0A=
+> 	[issue more IO including zone ioctls]=0A=
+>=0A=
+> It will start failing randomly including IO to unrelated zones because of=
+=0A=
+> ->error "reuse". Trigger can be partition detection as well if test is no=
+t=0A=
+> run immediately which is even more entertaining.=0A=
+>=0A=
+> The fix is of course to clear ->error where necessary.=0A=
+>=0A=
+> Signed-off-by: Alexey Dobriyan (SK hynix)<adobriyan@gmail.com>=0A=
+> ---=0A=
+>=0A=
+>   drivers/block/null_blk_main.c |    2 ++=0A=
+=0A=
