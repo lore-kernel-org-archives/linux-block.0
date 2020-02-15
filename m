@@ -2,222 +2,151 @@ Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF13C352A3
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FF1C352A3
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E749C20848
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ADF22084E
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:47:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bI24jqFD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6naduLO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727646AbgBODV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 22:21:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28130 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727642AbgBODV4 (ORCPT
+        id S1727721AbgBODrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 22:47:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48525 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727720AbgBODrL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 22:21:56 -0500
+        Fri, 14 Feb 2020 22:47:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581736915;
+        s=mimecast20190719; t=1581738430;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RCO3qBRBZClLx/EzYQoiju5YHAvawKO9qGqCEWQMhiA=;
-        b=bI24jqFDzlZE55Cabs+M7hsbk7WS/aTub11VjqonSVp5mjL6tlpPJFI/xhWrlnoJnQ2/aT
-        rtC8+k1XhXqcS3VZzAlOAy9hcL/vKEB62W2KZ59jAJ1Y4LDVf3EYpdsG1FYDpb3ARyWs7l
-        IEIJAHNhUfuMNtvIXr1pANHD7WX8adk=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hkwg5DEXlLJyMnQCtdrdMz1gYg6CkSO++6/Wb9Fh0qI=;
+        b=Q6naduLOHcGNrcY1IfhlXeqO/iZ4yAL2rDSWSxQqO0+PW9JkcBB9AMSg8WQG6SZ7nwELWf
+        mqqi+/xwdWSH3B7mXFz7dJGiCgPIX49JPMQ7L+kc3u6NMIeK0eZ/bSBBBL6I5bwrksX/EY
+        mLGLQ8MG3vp0GfbQyOZ1cXOnJ/oV3TM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-mFNbtY18P6WQgae6eyfZBQ-1; Fri, 14 Feb 2020 22:21:51 -0500
-X-MC-Unique: mFNbtY18P6WQgae6eyfZBQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-277-ddDc33jVMHSXuRB4w2yvnA-1; Fri, 14 Feb 2020 22:47:06 -0500
+X-MC-Unique: ddDc33jVMHSXuRB4w2yvnA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51D0C8017DF;
-        Sat, 15 Feb 2020 03:21:50 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E42215C12E;
-        Sat, 15 Feb 2020 03:21:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECBAF800D53;
+        Sat, 15 Feb 2020 03:47:04 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA2895C1C3;
+        Sat, 15 Feb 2020 03:46:57 +0000 (UTC)
+Date:   Sat, 15 Feb 2020 11:46:52 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: insert passthrough request into hctx->dispatch directly
-Date:   Sat, 15 Feb 2020 11:21:40 +0800
-Message-Id: <20200215032140.4093-1-ming.lei@redhat.com>
+To:     Salman Qazi <sqazi@google.com>
+Cc:     Ming Lei <tom.leiming@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Gwendal Grignou <gwendal@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+Message-ID: <20200215034652.GA19867@ming.t460p>
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+ <20200213082643.GB9144@ming.t460p>
+ <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+ <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+ <de7b841c-a195-1b1e-eb60-02cbd6ba4e0a@acm.org>
+ <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
+ <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For some reason, device may be in one situation which can't handle
-FS request, so STS_RESOURCE is always returned and the FS request
-will be added to hctx->dispatch. However passthrough request may
-be required at that time for fixing the problem. If passthrough
-request is added to scheduler queue, there isn't any chance for
-blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
-Then the FS IO request may never be completed, and IO hang is caused.
+On Fri, Feb 14, 2020 at 11:42:32AM -0800, Salman Qazi wrote:
+> On Fri, Feb 14, 2020 at 1:23 AM Ming Lei <tom.leiming@gmail.com> wrote:
+> >
+> > On Fri, Feb 14, 2020 at 1:50 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> > >
+> > > On 2020-02-13 11:21, Salman Qazi wrote:
+> > > > AFAICT, This is not actually sufficient, because the issuer of the bio
+> > > > is waiting for the entire bio, regardless of how it is split later.
+> > > > But, also there isn't a good mapping between the size of the secure
+> > > > discard and how long it will take.  If given the geometry of a flash
+> > > > device, it is not hard to construct a scenario where a relatively
+> > > > small secure discard (few thousand sectors) will take a very long time
+> > > > (multiple seconds).
+> > > >
+> > > > Having said that, I don't like neutering the hung task timer either.
+> > >
+> > > Hi Salman,
+> > >
+> > > How about modifying the block layer such that completions of bio
+> > > fragments are considered as task activity? I think that bio splitting is
+> > > rare enough for such a change not to affect performance of the hot path.
+> >
+> > Are you sure that the task hung warning won't be triggered in case of
+> > non-splitting?
+> 
+> I demonstrated a few emails ago that it doesn't take a very large
+> secure discard command to trigger this.  So, I am sceptical that we
+> will be able to use splitting to solve this.
+> 
+> >
+> > >
+> > > How about setting max_discard_segments such that a discard always
+> > > completes in less than half the hung task timeout? This may make
+> > > discards a bit slower for one particular block driver but I think that's
+> > > better than hung task complaints.
+> >
+> > I am afraid you can't find a golden setting max_discard_segments working
+> > for every drivers. Even it is found, the performance  may have been affected.
+> >
+> > So just wondering why not take the simple approach used in blk_execute_rq()?
+> 
+> My colleague Gwendal pointed out another issue which I had missed:
+> secure discard is an exclusive command: it monopolizes the device.
+> Even if we fix this via your approach, it will show up somewhere else,
+> because other operations to the drive will not make progress for that
+> length of time.
 
-So passthrough request has to be added to hctx->dispatch directly.
+What are the 'other operations'? Are they block IOs?
 
-Fix this issue by inserting passthrough request into hctx->dispatch
-directly. Then it becomes consistent with original legacy IO request
-path, in which passthrough request is always added to q->queue_head.
+If yes, that is why I suggest to fix submit_bio_wait(), which should cover
+most of sync bio submission.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-flush.c    |  2 +-
- block/blk-mq-sched.c | 22 +++++++++++++++-------
- block/blk-mq.c       | 16 ++++++++++------
- block/blk-mq.h       |  3 ++-
- 4 files changed, 28 insertions(+), 15 deletions(-)
+Anyway, the fix is simple & generic enough, I'd plan to post a formal
+patch if no one figures out better doable approaches.
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 3f977c517960..5cc775bdb06a 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -412,7 +412,7 @@ void blk_insert_flush(struct request *rq)
- 	 */
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
--		blk_mq_request_bypass_insert(rq, false);
-+		blk_mq_request_bypass_insert(rq, false, false);
- 		return;
- 	}
-=20
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index ca22afd47b3d..856356b1619e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -361,13 +361,19 @@ static bool blk_mq_sched_bypass_insert(struct blk_m=
-q_hw_ctx *hctx,
- 				       bool has_sched,
- 				       struct request *rq)
- {
--	/* dispatch flush rq directly */
--	if (rq->rq_flags & RQF_FLUSH_SEQ) {
--		spin_lock(&hctx->lock);
--		list_add(&rq->queuelist, &hctx->dispatch);
--		spin_unlock(&hctx->lock);
-+	/*
-+	 * dispatch flush and passthrough rq directly
-+	 *
-+	 * passthrough request has to be added to hctx->dispatch directly.
-+	 * For some reason, device may be in one situation which can't
-+	 * handle FS request, so STS_RESOURCE is always returned and the
-+	 * FS request will be added to hctx->dispatch. However passthrough
-+	 * request may be required at that time for fixing the problem. If
-+	 * passthrough request is added to scheduler queue, there isn't any
-+	 * chance to dispatch it given we prioritize requests in hctx->dispatch=
-.
-+	 */
-+	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
- 		return true;
--	}
-=20
- 	if (has_sched)
- 		rq->rq_flags |=3D RQF_SORTED;
-@@ -391,8 +397,10 @@ void blk_mq_sched_insert_request(struct request *rq,=
- bool at_head,
-=20
- 	WARN_ON(e && (rq->tag !=3D -1));
-=20
--	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
-+	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
-+		blk_mq_request_bypass_insert(rq, at_head, false);
- 		goto run;
-+	}
-=20
- 	if (e && e->type->ops.insert_requests) {
- 		LIST_HEAD(list);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a12b1763508d..5f5c43ae3792 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -735,7 +735,7 @@ static void blk_mq_requeue_work(struct work_struct *w=
-ork)
- 		 * merge.
- 		 */
- 		if (rq->rq_flags & RQF_DONTPREP)
--			blk_mq_request_bypass_insert(rq, false);
-+			blk_mq_request_bypass_insert(rq, false, false);
- 		else
- 			blk_mq_sched_insert_request(rq, true, false, false);
- 	}
-@@ -1677,12 +1677,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx=
- *hctx, struct request *rq,
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
--void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
-+void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
-+				  bool run_queue)
- {
- 	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
-=20
- 	spin_lock(&hctx->lock);
--	list_add_tail(&rq->queuelist, &hctx->dispatch);
-+	if (at_head)
-+		list_add(&rq->queuelist, &hctx->dispatch);
-+	else
-+		list_add_tail(&rq->queuelist, &hctx->dispatch);
- 	spin_unlock(&hctx->lock);
-=20
- 	if (run_queue)
-@@ -1849,7 +1853,7 @@ static blk_status_t __blk_mq_try_issue_directly(str=
-uct blk_mq_hw_ctx *hctx,
- 	if (bypass_insert)
- 		return BLK_STS_RESOURCE;
-=20
--	blk_mq_request_bypass_insert(rq, run_queue);
-+	blk_mq_request_bypass_insert(rq, false, run_queue);
- 	return BLK_STS_OK;
- }
-=20
-@@ -1876,7 +1880,7 @@ static void blk_mq_try_issue_directly(struct blk_mq=
-_hw_ctx *hctx,
-=20
- 	ret =3D __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
- 	if (ret =3D=3D BLK_STS_RESOURCE || ret =3D=3D BLK_STS_DEV_RESOURCE)
--		blk_mq_request_bypass_insert(rq, true);
-+		blk_mq_request_bypass_insert(rq, false, true);
- 	else if (ret !=3D BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
-=20
-@@ -1910,7 +1914,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_h=
-w_ctx *hctx,
- 		if (ret !=3D BLK_STS_OK) {
- 			if (ret =3D=3D BLK_STS_RESOURCE ||
- 					ret =3D=3D BLK_STS_DEV_RESOURCE) {
--				blk_mq_request_bypass_insert(rq,
-+				blk_mq_request_bypass_insert(rq, false,
- 							list_empty(list));
- 				break;
- 			}
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index eaaca8fc1c28..c0fa34378eb2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -66,7 +66,8 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct=
- blk_mq_tags *tags,
-  */
- void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request =
-*rq,
- 				bool at_head);
--void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
-+void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
-+				  bool run_queue);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ct=
-x *ctx,
- 				struct list_head *list);
-=20
---=20
-2.20.1
+> 
+> For Chromium OS purposes, if we had a blank slate, this is how I would solve it:
+> 
+> * Under the assumption that the truly sensitive data is not very big:
+>     * Keep secure data on a separate partition to make sure that those
+> LBAs have controlled history
+>     * Treat the files in that partition as immutable (i.e. no
+> overwriting the contents of the file without first secure erasing the
+> existing contents).
+>     * By never letting more than one version of the file accumulate,
+> we can guarantee that the secure erase will always be fast for
+> moderate sized files.
+> 
+> But for all the existing machines with keys on them, we will need to
+> do something else.
+
+The issue you reported is a generic one, not Chromium only.
+
+
+Thanks,
+Ming
 
