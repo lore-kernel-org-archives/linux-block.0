@@ -1,143 +1,158 @@
-Return-Path: <SRS0=urI+=4C=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8C2C3B1BF
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 19:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D28EC35242
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 00:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5790722314
-	for <linux-block@archiver.kernel.org>; Fri, 14 Feb 2020 19:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED5862083B
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 00:58:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sCTWvjx2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lQUYb7rN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388540AbgBNTmq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 14:42:46 -0500
-Received: from mail-io1-f41.google.com ([209.85.166.41]:38449 "EHLO
-        mail-io1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387571AbgBNTmp (ORCPT
+        id S1727815AbgBOA6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 19:58:01 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:49846 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725924AbgBOA6A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 14:42:45 -0500
-Received: by mail-io1-f41.google.com with SMTP id s24so11790432iog.5
-        for <linux-block@vger.kernel.org>; Fri, 14 Feb 2020 11:42:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=F9lKhkJG1SEh5Pys1eJu5aR0S9IH7RxfHuDYsnTzNDA=;
-        b=sCTWvjx2wV809VMBb9QOcB5aTNrexqJYXfMwhaj8TNiZaYHGj3Cku8IlFZlzZLzMx+
-         KC/uNSbltbfBGBDMRsOyCwJ8MOpO4sgY8WvLRN7/LupfUwsxtlh05QAdR5NHjYMk0/vs
-         FZB4pl+coQmXuz1rvUe+oxNMHgPlVoYzF0dikvn9LvkXj8h7LCUovEY1J0ffH+oMScfl
-         5xm03TRLOumre+BfWxQxQu13kXse3Y5lE4AkaT4SMi3FYq9wEGnp52/IjX0Q2r8oztE4
-         yzH8J1NOISdtLh+gegj6HQqwBpzoLx3drwY9mV4emNa1ABjS72La8yzj+Hty1rrJIv2Z
-         yLmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=F9lKhkJG1SEh5Pys1eJu5aR0S9IH7RxfHuDYsnTzNDA=;
-        b=iMStzcb1/o4Ap+d+xdCYuNvhqToM/UR/Ajvg8R9OqTqtyrIY6mWVPUdqElno/7GOgw
-         gqLZfx369mt6UqXXmpHXJ3MVCeJyefR9p6vt/gYPs/WQx1A+Idfza3xFIDIaH+xTNlrV
-         XRq4RYopiou/J2kruske/bOUMC6z+xMs5AmaA0J2cKhIFEWNe3GhJ4S/4RzjbnZRavcu
-         P1TJOo6LW46A++NAE83RJzLOafb82usez/nC7To75iKBWB0ZK3MOaNoAKuBjnViwjErc
-         O4GV0hb+MAl7JS8esiVYUEsDUkuKU3uNca9Loie57ZGpK+8kIXjNH1QwnvGnkR4odZxL
-         j2Xg==
-X-Gm-Message-State: APjAAAWVjUbtnketHP749IO9Gy1fl7quxU0Ti0znTCOkAsOT8TR+ogSr
-        FEuI8O5Bx0TFLSr13IYxx/8njWf0NHo9lmCkWlUTQw==
-X-Google-Smtp-Source: APXvYqzwDLvXH5bSFR1jXSTBdiYIoEzZ+RWU82vPHCAkkWx5s2exQ3ptCOmxaAr0D2vmJBobgrzDAkDCEjmxp8TzinY=
-X-Received: by 2002:a6b:108:: with SMTP id 8mr3690162iob.70.1581709363693;
- Fri, 14 Feb 2020 11:42:43 -0800 (PST)
+        Fri, 14 Feb 2020 19:58:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1581728280; x=1613264280;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gD1skkDmGJHe05d4BOl8LGuzLYSqtI8mjmeXb2ght7U=;
+  b=lQUYb7rNfp0SFwSS1P0AXRJ1dctPE6Pzy9dFQZx/ioXIAogPvIaLb3NY
+   3XlRKRBtooM1I/WLaqVV8kEreclvAnzD+rPtql02tO8Q5S0bTkQygr4+6
+   jubTwrxK5fsfPQE5YCXI8mByfQMeiLbc0hld8IL6rT+OOMxkslK3Evy+T
+   TP315rTcYMFjP1eUlO7f2PgPG5S2/JvFOl8hWoX9W+Xz9etmsC7XbC2dw
+   w9qcoJ8DcNIexatSqysQi63eakEPoNmPRbSQ7SEgEvEKXsazt1m01nfF8
+   N/e71J9ojhddg3WaYs2GYCEV2d8b+zda4ppDIUwx2YpTW2VyKVLQcF6pg
+   g==;
+IronPort-SDR: 8Y3DuM9BZGKOc9O9AfTk7ckw+sKM58GWbmFCVqpjWQ+UxKmU0SjJOtzMx5H02mlmtkFpsZpgcK
+ knehYAizj2yVxCWmYm4smwkrjxpFTRjmWrELNe1BZ6Bs6BlSt8Eu1Wl+EFam1PoS+ha7BCeb45
+ NbVh6EtOIKHsGLYDWQCD8uGyUNjSQvaEVU32iG8sLyeJxpUd4/yLOnPFiGpANEymfcWBlulBbQ
+ PkB3bVDraIj1MWT58WyDeqi7niH4jBDVwe/KMN3sxmO7E9ynN8F6elvoKiDf3W271CcTIXw3fL
+ G8w=
+X-IronPort-AV: E=Sophos;i="5.70,442,1574092800"; 
+   d="scan'208";a="129905392"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 08:57:59 +0800
+IronPort-SDR: a+9SUcIk4Spwm8kC6B14/aYvqVYQ7FAiti4G6unfsleRvaUL/V9mJiWuUeimVhQm59UkVfy3Co
+ h5l35xJZ1rjhrg1DfhHTQDVKtfMPn/H42900QAot1WVD3Xb6kjIHWFXKbtuRW35ptEUu/xyQoE
+ aFE/IV7HTfRx0pDCcKOlNxkxnsxT/GP/S1SiNAM05EsfLZdORnBk8BK3v9BwvIrUjzDsap8EfY
+ PW6iupt0CXF5wFLVLywLZNtY1NacUndkfidTfx3R5G6FAs9+6aqH2VyFMhqNMELaOVOaCHQAr6
+ trEjVvntvN2TN/zkacUQR/oD
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 16:50:45 -0800
+IronPort-SDR: DoYvh1Llc3oiL9bvqIwQ3dlFykHwDtSP/XUUGFw2bmBSCgmjO1BY8+l/crZj+n8WgIT0o0cPC9
+ C7O244ArHEtU9+wH7KcnJ/IEl7odqUVupGLwXbsnOIZBrogDC2Y7j015JHtbTI1r6R/MWUUGlC
+ +sX/9Lp4S7rlbH3fUQlDGPwfiV0sc5W5wyKKm8Ni0MqneoMbOMqwWfwrXaij9QA9REiRFMxei7
+ BjLPiQ2dfnn1EUrO8nNfwKoSXLoViLOqcnRBcw8NBWJZPU7GAnriJWgICy9KihLJlbrJGFXtJm
+ 6dQ=
+WDCIronportException: Internal
+Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
+  by uls-op-cesaip01.wdc.com with ESMTP; 14 Feb 2020 16:58:00 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     axboe@kernel.dk, damien.lemoal@wdc.com
+Cc:     kbusch@kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 0/3] null_blk: add tracnepoints for zoned mode
+Date:   Fri, 14 Feb 2020 16:57:55 -0800
+Message-Id: <20200215005758.3212-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
- <20200213082643.GB9144@ming.t460p> <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
- <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
- <de7b841c-a195-1b1e-eb60-02cbd6ba4e0a@acm.org> <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
-In-Reply-To: <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
-From:   Salman Qazi <sqazi@google.com>
-Date:   Fri, 14 Feb 2020 11:42:32 -0800
-Message-ID: <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
-Subject: Re: BLKSECDISCARD ioctl and hung tasks
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Gwendal Grignou <gwendal@google.com>,
-        Jesse Barnes <jsbarnes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 1:23 AM Ming Lei <tom.leiming@gmail.com> wrote:
->
-> On Fri, Feb 14, 2020 at 1:50 PM Bart Van Assche <bvanassche@acm.org> wrote:
-> >
-> > On 2020-02-13 11:21, Salman Qazi wrote:
-> > > AFAICT, This is not actually sufficient, because the issuer of the bio
-> > > is waiting for the entire bio, regardless of how it is split later.
-> > > But, also there isn't a good mapping between the size of the secure
-> > > discard and how long it will take.  If given the geometry of a flash
-> > > device, it is not hard to construct a scenario where a relatively
-> > > small secure discard (few thousand sectors) will take a very long time
-> > > (multiple seconds).
-> > >
-> > > Having said that, I don't like neutering the hung task timer either.
-> >
-> > Hi Salman,
-> >
-> > How about modifying the block layer such that completions of bio
-> > fragments are considered as task activity? I think that bio splitting is
-> > rare enough for such a change not to affect performance of the hot path.
->
-> Are you sure that the task hung warning won't be triggered in case of
-> non-splitting?
+Hi,
 
-I demonstrated a few emails ago that it doesn't take a very large
-secure discard command to trigger this.  So, I am sceptical that we
-will be able to use splitting to solve this.
+Recently we've added several new operations for zoned block devices
+blk-zone.c ZBD). These operations have a direct effect on the
+zone-state machine present in the null_blk_zoned.c. 
 
->
-> >
-> > How about setting max_discard_segments such that a discard always
-> > completes in less than half the hung task timeout? This may make
-> > discards a bit slower for one particular block driver but I think that's
-> > better than hung task complaints.
->
-> I am afraid you can't find a golden setting max_discard_segments working
-> for every drivers. Even it is found, the performance  may have been affected.
->
-> So just wondering why not take the simple approach used in blk_execute_rq()?
+This will allow us to add new testcases in blktests in order to verify
+the correct operations on the driver side.
 
-My colleague Gwendal pointed out another issue which I had missed:
-secure discard is an exclusive command: it monopolizes the device.
-Even if we fix this via your approach, it will show up somewhere else,
-because other operations to the drive will not make progress for that
-length of time.
+This is a small patch series which adds tracepoints for the null_blk
+block driver when configured in a zoned mode (with command line
+parameter zoned=1).
 
-For Chromium OS purposes, if we had a blank slate, this is how I would solve it:
+The first patch is a prep patch that adds a helper to stringify zone
+conditions which we use in the trace, the second patch adds new
+tracepoint definitions and the third patch allows null_blk_zoned to
+trace operations.
 
-* Under the assumption that the truly sensitive data is not very big:
-    * Keep secure data on a separate partition to make sure that those
-LBAs have controlled history
-    * Treat the files in that partition as immutable (i.e. no
-overwriting the contents of the file without first secure erasing the
-existing contents).
-    * By never letting more than one version of the file accumulate,
-we can guarantee that the secure erase will always be fast for
-moderate sized files.
+Please have a look at the end for sample output.
 
-But for all the existing machines with keys on them, we will need to
-do something else.
+P.S. I've kept the helper function blk_zone_cond_str() into header
+file, please let me know if it needs to be in the blk-zoned.c.
 
+Regards,
+Chaitanya              
 
+Chaitanya Kulkarni (3):
+  block: add zone condition debug helpers
+  null_blk: add tracepoint helpers for zoned mode
+  null_blk: add trace in null_blk_zoned.c
 
->
-> Thanks,
-> Ming Lei
+ block/blk-zoned.c              | 14 ++++++
+ drivers/block/Makefile         |  3 ++
+ drivers/block/null_blk_trace.c | 20 +++++++++
+ drivers/block/null_blk_trace.h | 78 ++++++++++++++++++++++++++++++++++
+ drivers/block/null_blk_zoned.c | 12 +++++-
+ include/linux/blkdev.h         | 26 ++++++++++++
+ include/uapi/linux/blkzoned.h  |  1 +
+ 7 files changed, 153 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/block/null_blk_trace.c
+ create mode 100644 drivers/block/null_blk_trace.h
+
+Sample Test Output :-
+
+# modprobe null_blk zoned=1 zone_size=128 gb=1 bs=4096
+# cd /sys/kernel/debug/tracing/
+# echo 1 > events/nullb/enable; cat trace_pipe 
+# for i in open close finish reset; do blkzone $i /dev/nullb0; done 
+# dd if=/dev/zero of=/dev/nullb0 bs=4k count=5
+
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=0 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=1 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=2 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=3 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=4 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=5 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=6 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_OPEN       zone_no=7 zone_cond=EXP_OPEN  
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=0 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=1 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=2 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=3 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=4 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=5 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=6 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_CLOSE      zone_no=7 zone_cond=EMPTY     
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=0 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=1 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=2 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=3 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=4 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=5 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=6 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_FINISH     zone_no=7 zone_cond=FULL      
+nullb_zone_op: disk=nullb0,  req=ZONE_RESET_ALL  zone_no=0 zone_cond=EMPTY 
+nullb_zone_op: disk=nullb0,  req=WRITE           zone_no=0 zone_cond=IMP_OPEN  
+nullb_zone_op: disk=nullb0,  req=WRITE           zone_no=0 zone_cond=IMP_OPEN  
+nullb_zone_op: disk=nullb0,  req=WRITE           zone_no=0 zone_cond=IMP_OPEN  
+nullb_zone_op: disk=nullb0,  req=WRITE           zone_no=0 zone_cond=IMP_OPEN  
+nullb_zone_op: disk=nullb0,  req=WRITE           zone_no=0 zone_cond=IMP_OPEN
+-- 
+2.22.1
+
