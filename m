@@ -2,146 +2,222 @@ Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01886C352A3
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF13C352A3
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:21:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0CE72084E
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:20:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E749C20848
+	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 03:21:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LoQ/oLWO";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Tj9dh2Y8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bI24jqFD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727860AbgBODUg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Feb 2020 22:20:36 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:52643 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727705AbgBODUf (ORCPT
+        id S1727646AbgBODV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Feb 2020 22:21:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28130 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727642AbgBODV4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Feb 2020 22:20:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1581736835; x=1613272835;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=7UVso2nmBdQ5BMulq/+ush68v3dJaGI99IMpEhTsXoQ=;
-  b=LoQ/oLWOXQeXisZoP8Cfk8GiXo1f0RBTkVzPkNJxpiflbvzcwT0E+p7c
-   SOLM81YbfCIQsvA9A4Q7iwj0FY4gPygWYgxAMnxKKZF34iUji7ycHrgWn
-   neyaU38kjGO+itMk9ym4a/QnR1/ZUtJFqNAYyTi/vkFDTZhN/p8T0+WnG
-   RVmq0rFSHP5pmb5G7WEIiWQNB2D6jLBHq5UC7+o58OjP7+MLWme4DXOni
-   PXX+tix94ofWHfA6Z8JSGy3/tfGqfbdp/Ji6XsiNE8GPgSwB550XjcPys
-   4PfLior0pPmUeQYeXvoACyiCfxTGpP96cjY8zBMaNbA2JJ1/qIIh5HZDw
-   A==;
-IronPort-SDR: IMmBf1EchhVKPv5+pgisOOhlBtnB8Z7vT4r3gqV77UJH9fp6yd6SAzrhPbbJmu/sr84+Z4L4zG
- sZGKQB4BhgxknewdLwQoKuRXYc/pSapxyzJTeARAAI/6sP3mLZ7mZl3uNlxaL303p2HwsTFHXR
- m99Pd5YiY+YnvIvnPypcalz3gtzqYF7ZkftYdabA7GZ7l9/bBbAX8FiL7u4Mqo6wVAqbOVnQ3h
- PegbFrbYJLJN6hS3V6prG86mn2KTbHleGoUP/f9mteW+d+ttToO6p86f4S0fOMt4uZ+3mDIa30
- ZjM=
-X-IronPort-AV: E=Sophos;i="5.70,443,1574092800"; 
-   d="scan'208";a="134268463"
-Received: from mail-mw2nam10lp2105.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.105])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Feb 2020 11:20:35 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lmEfJojsq9esBL7i7ckW0M/1cWcUoKBUrMxgbKUKk8KObH/q7TvRIgGXkaXvcposLIOFeI6t5I8f+Tdr2vmW9QXwCO2CPZhbuXqAo8beJpSNusVyj/6kPjwpCXi7vpyYAVDGImvy2oN1CPs8KbuZVXLEuAg5yKd0hQB7XMH1cB0qLbKe80MRMq2P5uxqfc7OQ9S/FewQ0MtJiKOlsrvcPDtTs3s0I81/XvS88RxTesOo62L1382R0PLec0c3w1f3AsKg89ZUaxeRk7CAtc5HywWP59WOaB1ZtFXZg8rC8YnI4JSYMe09C1Oi5pK8P2W7Vv7W26tL8CgLbpjIE1f0Dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SNNqlCz862tjMb86LopTK59oDlgmd3G+Yljkhp12bXI=;
- b=YrRT9ipwRSfDlwkNTk+5UidSLFoufy/DpKk6cWZwdXOr9wePw5d+YY7tqMrWlMx6snOB/QTIZUQwsjIOsZ/F1KftgX/asz2ah5J+ob0oZE1IsGzKeS+l/XUpGovqmhC6sREAS9tfrstWxVSC+t5yIqQNSUQYWb8H9zpItYcQJ64yxGlnsVHQWeSwFA4QfOZx1ssEzo2kQPh6mQYsFwKNw3ybjQdhZU3DGqG8/SoZ45AmCpwmkG65o8ARFmoH9L8Obh3aeUdA09ZhSNIW0L3HZQjM3kXKXQ/eNwdyjMJ15qmycgHZnhPZBTgc6XI2ajZEOu4IY4PDvd7xSXARJQzxNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SNNqlCz862tjMb86LopTK59oDlgmd3G+Yljkhp12bXI=;
- b=Tj9dh2Y8oXL8zR0Q/euIJlDH1xp/C/7h7ZF59na2r9X4Oibicde+z6+gGXgDOe2zv4qsSP0wciDzeOUlsrzdPcEJMTZ9voGNL8bLYH73W46wAxsX1myZDBm36gWJ8TauUon7lX9hTuK6ZUh0Tespz98sG9ev1/IaTc0Q/85XozI=
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com (20.179.51.24) by
- DM6PR04MB4828.namprd04.prod.outlook.com (20.176.106.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.25; Sat, 15 Feb 2020 03:20:33 +0000
-Received: from DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::c0fb:7c35:bcd2:fd28]) by DM6PR04MB5754.namprd04.prod.outlook.com
- ([fe80::c0fb:7c35:bcd2:fd28%2]) with mapi id 15.20.2729.025; Sat, 15 Feb 2020
- 03:20:32 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] null_blk: fix spurious IO errors after failed past-wp
- access
-Thread-Topic: [PATCH] null_blk: fix spurious IO errors after failed past-wp
- access
-Thread-Index: AQHV4eJLw22qyEV6Fk6EkV++6gr6jw==
-Date:   Sat, 15 Feb 2020 03:20:32 +0000
-Message-ID: <DM6PR04MB5754FA61DFF5CA3C6912775886140@DM6PR04MB5754.namprd04.prod.outlook.com>
-References: <20200212202320.GA2704@avx2>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 0d2f3503-f4c0-4b93-677b-08d7b1c6044b
-x-ms-traffictypediagnostic: DM6PR04MB4828:
-x-microsoft-antispam-prvs: <DM6PR04MB4828700CF508F69BBB1AED7A86140@DM6PR04MB4828.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 03142412E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(189003)(199004)(478600001)(71200400001)(64756008)(66556008)(66446008)(33656002)(55016002)(86362001)(53546011)(76116006)(6506007)(66946007)(26005)(91956017)(4326008)(4744005)(186003)(9686003)(66476007)(2906002)(316002)(110136005)(81156014)(52536014)(8676002)(8936002)(5660300002)(81166006)(7696005);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR04MB4828;H:DM6PR04MB5754.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JwsNYPnabJpyH5hqLg3LL2375a7rccDMnfOz8sjSfWZapyHKZgnmhl17FZllWk3JrxDBVWdf5ZF3MK902RtdODT4ouNdfI/zxdjvHRWsnOG6o8fBz9qYNYKk/WdRDgpemeFo9gWEdZmdZj7Du5VfY7bNXmyxmYDrsgdEYCKHpc9GL+HgQciW7O/TAG2qogtAbgfLhir/MoBjqUU6BCi728CIfIr7uoOgFnoi4j/YeMvYdA4Sy0qaJmMdhgc2yxvtW5Ri9ZY83D9O240Ft9FN7F5ETASpjAw2IenlyfZF/vZtl0SjV4IpSTasyU8rwXm4zqBowwJKRBKfsc0ZcAc7XNSGKojlp/b8HavLICOGwtI7gRz18tZPNbI37GUzxYoUAbrlyhp/xvMVkOTYodkyUdLH+Ev2o6gsIR9dubn5w1qNc0LkY0jfAr/NPIh+DT/y
-x-ms-exchange-antispam-messagedata: 7Hko6//ECk7vW4Aby04sSR1w+iahmHIJnqRoFSbVpAdOOpcpYD9lw1xO8SBW7ybRkdgl4y0sr9+6xcO411cilKcloFGU0FgFj2um6re41iAjANIVoMAXclISfK180Rt2VppIr3woBxANNxfmE14AGQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 14 Feb 2020 22:21:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581736915;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RCO3qBRBZClLx/EzYQoiju5YHAvawKO9qGqCEWQMhiA=;
+        b=bI24jqFDzlZE55Cabs+M7hsbk7WS/aTub11VjqonSVp5mjL6tlpPJFI/xhWrlnoJnQ2/aT
+        rtC8+k1XhXqcS3VZzAlOAy9hcL/vKEB62W2KZ59jAJ1Y4LDVf3EYpdsG1FYDpb3ARyWs7l
+        IEIJAHNhUfuMNtvIXr1pANHD7WX8adk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-mFNbtY18P6WQgae6eyfZBQ-1; Fri, 14 Feb 2020 22:21:51 -0500
+X-MC-Unique: mFNbtY18P6WQgae6eyfZBQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51D0C8017DF;
+        Sat, 15 Feb 2020 03:21:50 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E42215C12E;
+        Sat, 15 Feb 2020 03:21:46 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: insert passthrough request into hctx->dispatch directly
+Date:   Sat, 15 Feb 2020 11:21:40 +0800
+Message-Id: <20200215032140.4093-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2f3503-f4c0-4b93-677b-08d7b1c6044b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2020 03:20:32.6797
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FZTqUubC4uyCYuhty1qysc1G/8DR3IWCGYSEcIKNnpgZy9qGBrDaDZpeZU7+ZfbbXwXNS9rTxLx6JE1r2IfogDFcVS4/U6Hy0in0cLM/CiY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB4828
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Alexey, thanks for the patch however the description is=0A=
-not simple to understand.=0A=
-=0A=
-I just sent a patch with a description and the test result.=0A=
-=0A=
-On 02/12/2020 12:23 PM, Alexey Dobriyan wrote:=0A=
-> Steps to reproduce:=0A=
->=0A=
-> 	BLKRESETZONE zone 0=0A=
->=0A=
-> 	// force EIO=0A=
-> 	pwrite(fd, buf, 4096, 4096);=0A=
->=0A=
-> 	[issue more IO including zone ioctls]=0A=
->=0A=
-> It will start failing randomly including IO to unrelated zones because of=
-=0A=
-> ->error "reuse". Trigger can be partition detection as well if test is no=
-t=0A=
-> run immediately which is even more entertaining.=0A=
->=0A=
-> The fix is of course to clear ->error where necessary.=0A=
->=0A=
-> Signed-off-by: Alexey Dobriyan (SK hynix)<adobriyan@gmail.com>=0A=
-> ---=0A=
->=0A=
->   drivers/block/null_blk_main.c |    2 ++=0A=
-=0A=
+For some reason, device may be in one situation which can't handle
+FS request, so STS_RESOURCE is always returned and the FS request
+will be added to hctx->dispatch. However passthrough request may
+be required at that time for fixing the problem. If passthrough
+request is added to scheduler queue, there isn't any chance for
+blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
+Then the FS IO request may never be completed, and IO hang is caused.
+
+So passthrough request has to be added to hctx->dispatch directly.
+
+Fix this issue by inserting passthrough request into hctx->dispatch
+directly. Then it becomes consistent with original legacy IO request
+path, in which passthrough request is always added to q->queue_head.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-flush.c    |  2 +-
+ block/blk-mq-sched.c | 22 +++++++++++++++-------
+ block/blk-mq.c       | 16 ++++++++++------
+ block/blk-mq.h       |  3 ++-
+ 4 files changed, 28 insertions(+), 15 deletions(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 3f977c517960..5cc775bdb06a 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -412,7 +412,7 @@ void blk_insert_flush(struct request *rq)
+ 	 */
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+-		blk_mq_request_bypass_insert(rq, false);
++		blk_mq_request_bypass_insert(rq, false, false);
+ 		return;
+ 	}
+=20
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index ca22afd47b3d..856356b1619e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -361,13 +361,19 @@ static bool blk_mq_sched_bypass_insert(struct blk_m=
+q_hw_ctx *hctx,
+ 				       bool has_sched,
+ 				       struct request *rq)
+ {
+-	/* dispatch flush rq directly */
+-	if (rq->rq_flags & RQF_FLUSH_SEQ) {
+-		spin_lock(&hctx->lock);
+-		list_add(&rq->queuelist, &hctx->dispatch);
+-		spin_unlock(&hctx->lock);
++	/*
++	 * dispatch flush and passthrough rq directly
++	 *
++	 * passthrough request has to be added to hctx->dispatch directly.
++	 * For some reason, device may be in one situation which can't
++	 * handle FS request, so STS_RESOURCE is always returned and the
++	 * FS request will be added to hctx->dispatch. However passthrough
++	 * request may be required at that time for fixing the problem. If
++	 * passthrough request is added to scheduler queue, there isn't any
++	 * chance to dispatch it given we prioritize requests in hctx->dispatch=
+.
++	 */
++	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
+ 		return true;
+-	}
+=20
+ 	if (has_sched)
+ 		rq->rq_flags |=3D RQF_SORTED;
+@@ -391,8 +397,10 @@ void blk_mq_sched_insert_request(struct request *rq,=
+ bool at_head,
+=20
+ 	WARN_ON(e && (rq->tag !=3D -1));
+=20
+-	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
++	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
++		blk_mq_request_bypass_insert(rq, at_head, false);
+ 		goto run;
++	}
+=20
+ 	if (e && e->type->ops.insert_requests) {
+ 		LIST_HEAD(list);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a12b1763508d..5f5c43ae3792 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -735,7 +735,7 @@ static void blk_mq_requeue_work(struct work_struct *w=
+ork)
+ 		 * merge.
+ 		 */
+ 		if (rq->rq_flags & RQF_DONTPREP)
+-			blk_mq_request_bypass_insert(rq, false);
++			blk_mq_request_bypass_insert(rq, false, false);
+ 		else
+ 			blk_mq_sched_insert_request(rq, true, false, false);
+ 	}
+@@ -1677,12 +1677,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx=
+ *hctx, struct request *rq,
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+-void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
++				  bool run_queue)
+ {
+ 	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
+=20
+ 	spin_lock(&hctx->lock);
+-	list_add_tail(&rq->queuelist, &hctx->dispatch);
++	if (at_head)
++		list_add(&rq->queuelist, &hctx->dispatch);
++	else
++		list_add_tail(&rq->queuelist, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+=20
+ 	if (run_queue)
+@@ -1849,7 +1853,7 @@ static blk_status_t __blk_mq_try_issue_directly(str=
+uct blk_mq_hw_ctx *hctx,
+ 	if (bypass_insert)
+ 		return BLK_STS_RESOURCE;
+=20
+-	blk_mq_request_bypass_insert(rq, run_queue);
++	blk_mq_request_bypass_insert(rq, false, run_queue);
+ 	return BLK_STS_OK;
+ }
+=20
+@@ -1876,7 +1880,7 @@ static void blk_mq_try_issue_directly(struct blk_mq=
+_hw_ctx *hctx,
+=20
+ 	ret =3D __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+ 	if (ret =3D=3D BLK_STS_RESOURCE || ret =3D=3D BLK_STS_DEV_RESOURCE)
+-		blk_mq_request_bypass_insert(rq, true);
++		blk_mq_request_bypass_insert(rq, false, true);
+ 	else if (ret !=3D BLK_STS_OK)
+ 		blk_mq_end_request(rq, ret);
+=20
+@@ -1910,7 +1914,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_h=
+w_ctx *hctx,
+ 		if (ret !=3D BLK_STS_OK) {
+ 			if (ret =3D=3D BLK_STS_RESOURCE ||
+ 					ret =3D=3D BLK_STS_DEV_RESOURCE) {
+-				blk_mq_request_bypass_insert(rq,
++				blk_mq_request_bypass_insert(rq, false,
+ 							list_empty(list));
+ 				break;
+ 			}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index eaaca8fc1c28..c0fa34378eb2 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -66,7 +66,8 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct=
+ blk_mq_tags *tags,
+  */
+ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request =
+*rq,
+ 				bool at_head);
+-void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
++				  bool run_queue);
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ct=
+x *ctx,
+ 				struct list_head *list);
+=20
+--=20
+2.20.1
+
