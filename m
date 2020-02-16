@@ -1,231 +1,195 @@
-Return-Path: <SRS0=Iyu6=4D=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=IDql=4E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E86BC4741C
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 13:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F39FC76199
+	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 08:09:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A9B0217F4
-	for <linux-block@archiver.kernel.org>; Sat, 15 Feb 2020 13:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 651DA206E2
+	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 08:09:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VmKAFLhp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726007AbgBONyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Feb 2020 08:54:25 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10181 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725965AbgBONyZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Feb 2020 08:54:25 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id A5D3DDC9F6972F513505;
-        Sat, 15 Feb 2020 21:54:22 +0800 (CST)
-Received: from [10.173.220.74] (10.173.220.74) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.439.0; Sat, 15 Feb 2020 21:54:19 +0800
-Subject: Re: [PATCH] bdi: fix use-after-free for bdi device
-To:     Tejun Heo <tj@kernel.org>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <jack@suse.cz>,
-        <bvanassche@acm.org>
-References: <20200211140038.146629-1-yuyufen@huawei.com>
- <b7cd6193-586b-f4e0-9a5d-cc961eafaf81@huawei.com>
- <20200212213344.GE80993@mtj.thefacebook.com>
- <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
- <20200213034818.GE88887@mtj.thefacebook.com>
- <fa6183c5-b92c-c431-37ab-09638f890f6c@huawei.com>
- <20200213135809.GH88887@mtj.thefacebook.com>
- <f369a99d-e794-0c1b-85cf-83b577fb0f46@huawei.com>
- <20200214140514.GL88887@mtj.thefacebook.com>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <32a14db2-65e0-5d5c-6c53-45b3474d841d@huawei.com>
-Date:   Sat, 15 Feb 2020 21:54:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1726020AbgBPIJr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Feb 2020 03:09:47 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:39702 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbgBPIJr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Feb 2020 03:09:47 -0500
+Received: by mail-qt1-f196.google.com with SMTP id c5so10018227qtj.6;
+        Sun, 16 Feb 2020 00:09:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=dNEzfTwUBmfbDmP8jHrIogG2oGgC1+4D3raZbBbSc2I=;
+        b=VmKAFLhpDtAwHFCSjp+NzMIgHyhm7krjkidskFg0N+Fgdz3R8JDO3b8ne9kX2NFKY+
+         N/GybcS2uUJYFLbORG6aDUumIctsLO+Be5ocFLSryqNoTi+9rDFflc5gpxK+RKw1+Io/
+         n88bkYbb9GtMZ/vk5gE20Oue9ZjRBfLFFDCNBLu+HP1A2TycZn6CtUMlARKRH4vGlG4M
+         ig34rD5d25IBzbXpRYhrTD01cJRhTk9nw4VwW4ldj26nRlASBkqDb3QHKjwIJg6/eOCD
+         MMD6AR29nHG9e3OxFlZGf9E7wRVQhM5ujrZu534Vpv+52f9/1EdXj4e0dwx5Bp2ei4oZ
+         JmRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=dNEzfTwUBmfbDmP8jHrIogG2oGgC1+4D3raZbBbSc2I=;
+        b=VfHtnrsmKl/URU+kHaUAv3G5HFNSPhYdIG9Ce1wsDV/GhflDerjacvV9AFyGy5zu/S
+         wby6buuJNTIJ39hH6NwjAy9G6mUrqJicVf9jEU/L8rqLpVhEmJ91h9mHSmhbK4ZEPcm0
+         k/ye1dQ++OGUhWjqV2L7s46sXwJrg3y/mp1+v3dZGYPgMzeknw3INhy3wgs9LTfPJQqT
+         lgb3n24Zv89rI/pWyJNIXSLa538MJG4XRdy9YQ5+bHRnhGU+uEjAjkhJxqwQkVQg2TKP
+         ZHZFXKzrpfZYKjpXsJq+IZYK31zEubUrBgoIE9iX4f/mAVNzTRen3V5/4kTLU3c7H8gB
+         CnLA==
+X-Gm-Message-State: APjAAAUOpTjwDPCTaeUUWt7qnGDRjIerK6I1mqWxBc6HrtQNr9dMWbhA
+        soHsXE0PwmBfsEZHtCO6y3b2XK/Se5ETb6d+Eww=
+X-Google-Smtp-Source: APXvYqyWsEgZR3nj4ltlF/cwwuK/9RC88Bxi124aJCUSlJQqix+GJMRtc5vW2gcs32HrxaV4C+AM8gxZqKNu36C+0WQ=
+X-Received: by 2002:ac8:47cc:: with SMTP id d12mr9206563qtr.246.1581840585855;
+ Sun, 16 Feb 2020 00:09:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200214140514.GL88887@mtj.thefacebook.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.74]
-X-CFilter-Loop: Reflected
+References: <cover.1580786525.git.zhangweiping@didiglobal.com> <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
+In-Reply-To: <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Sun, 16 Feb 2020 16:09:34 +0800
+Message-ID: <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
+Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and nvme
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, tejun
+Keith Busch <kbusch@kernel.org> =E4=BA=8E2020=E5=B9=B42=E6=9C=884=E6=97=A5=
+=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:42=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, Feb 04, 2020 at 11:30:45AM +0800, Weiping Zhang wrote:
+> > This series try to add Weighted Round Robin for block cgroup and nvme
+> > driver. When multiple containers share a single nvme device, we want
+> > to protect IO critical container from not be interfernced by other
+> > containers. We add blkio.wrr interface to user to control their IO
+> > priority. The blkio.wrr accept five level priorities, which contains
+> > "urgent", "high", "medium", "low" and "none", the "none" is used for
+> > disable WRR for this cgroup.
+>
+Hi Bush,
 
-On 2020/2/14 22:05, Tejun Heo wrote:
-> Hello,
-> 
-> On Fri, Feb 14, 2020 at 10:50:01AM +0800, Yufen Yu wrote:
->>> So, unregistering can leave ->dev along and re-registering can test
->>> whether it's NULL and if not put the existing one and put a new one
->>> there. Wouldn't that work?
->>
->> Do you mean set bdi->dev as 'NULL' in call_rcu() callback function
->> (i.e. bdi_release_device()) and test 'bdi->dev' in bdi_register_va()?
->>
->> I think that may do not work.
->> We cannot make sure the order of rcu callback function and re-registering.
->> Then bdi_release_device() may put the new allocated device by re-registering.
-> 
-> No, I meant not freeing bdi->dev on deregistration and only doing so
-> when it actually needs to - on re-registration or release. So, sth
-> like the following.
-> 
-> * Unregister: Unregister bdi->dev but don't free it. Leave the pointer
->    alone.
-> 
-> * Re-register: If bdi->dev is not null, initiate RCU-free and update
->    bdi->dev to the new dev.
- >
- > * Release: If bdi->dev is not NULL, initiate RCU-free of it.
+> The NVMe protocol really doesn't define WRR to be a mechanism to mitigate
+> interference, though. It defines credits among the weighted queues
+> only for command fetching, and an urgent strict priority class that
+> starves the rest. It has nothing to do with how the controller should
+> prioritize completion of those commands, even if it may be reasonable to
+> assume influencing when the command is fetched should affect its
+> completion.
+>
+Thanks your feedback, the fio test result on WRR shows that, the high-wrr-f=
+io
+get more bandwidth/iops and low latency. I think it's a good feature
+for the case
+that run multiple workload with different priority, especially for
+container colocation.
 
-Okay, I think we can do that.
+> On the "weighted" strict priority, there's nothing separating "high"
+> from "low" other than the name: the "set features" credit assignment
+> can invert which queues have higher command fetch rates such that the
+> "low" is favoured over the "high".
+>
+If there is no limitation in the hardware controller, we can add more
+checking in
+"set feature command". I think mostly people won't give "low" more
+credits than "high",
+it really does not make sense.
 
-When do re-register, we need to update bdi->dev as 'NULL' or the new dev
-before invoking call_rcu() to free '->dev'. So readers started after call_rcu()
-cannot read the old dev, like:
+> There's no protection against the "urgent" class starving others: normal
+> IO will timeout and trigger repeated controller resets, while polled IO
+> will consume 100% of CPU cycles without making any progress if we make
+> this type of queue available without any additional code to ensure the
+> host behaves..
+>
+I think we can just disable it in the software layer , actually, I have no =
+real
+application need this.
 
-bdi_register_va()
-{
-	...
-	if (bdi->dev) {
-		//rcu_assgin_pointer(bdi->dev, new_dev);
-		rcu_assgin_pointer(bdi->dev, NULL);
-		call_rcu();//rcu callback function will free the old dev
-	}
-	...
-}
+> On the driver implementation, the number of module parameters being
+> added here is problematic. We already have 2 special classes of queues,
+> and defining this at the module level is considered too coarse when
+> the system has different devices on opposite ends of the capability
+> spectrum. For example, users want polled queues for the fast devices,
+> and none for the slower tier. We just don't have a good mechanism to
+> define per-controller resources, and more queue classes will make this
+> problem worse.
+>
+We can add a new "string" module parameter, which contains a model number,
+in most cases, the save product with a common prefix model number, so
+in this way
+nvme can distinguish the different performance devices(hign or low end).
+Before create io queue, nvme driver can get the device's Model number(40 By=
+tes),
+then nvme driver can compare device's model number with module parameter, t=
+o
+decide how many io queues for each disk;
 
-After assigning new value for bdi->dev, rcu callback function cannot get
-the old device. So I think we may need to replace the '->dev' with a new
-struct pointer, in which includes '->dev' and 'rcu_head'. We pass the
-struct.rcu_head pointer to call_rcu() and then it can get old dev address.
+/* if model_number is MODEL_ANY, these parameters will be applied to
+all nvme devices. */
+char dev_io_queues[1024] =3D "model_number=3DMODEL_ANY,
+poll=3D0,read=3D0,wrr_low=3D0,wrr_medium=3D0,wrr_high=3D0,wrr_urgent=3D0";
+/* these paramters only affect nvme disk whose model number is "XXX" */
+char dev_io_queues[1024] =3D "model_number=3DXXX,
+poll=3D1,read=3D2,wrr_low=3D3,wrr_medium=3D4,wrr_high=3D5,wrr_urgent=3D0;";
 
-IMO, maybe we can maintain the original code logic, fix the problem like:
+struct dev_io_queues {
+        char model_number[40];
+        unsigned int poll;
+        unsgined int read;
+        unsigned int wrr_low;
+        unsigned int wrr_medium;
+        unsigned int wrr_high;
+        unsigned int wrr_urgent;
+};
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index 4fc87dee005a..e2de4a4e5392 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -185,6 +185,11 @@ struct bdi_writeback {
-  #endif
-  };
+We can use these two variable to store io queue configurations:
 
-+struct bdi_rcu_device {
-+	struct device *dev;
-+	struct rcu_head rcu_head;
-+};
-+
-  struct backing_dev_info {
-  	u64 id;
-  	struct rb_node rb_node; /* keyed by ->id */
-@@ -219,7 +224,7 @@ struct backing_dev_info {
-  #endif
-  	wait_queue_head_t wb_waitq;
+/* default values for the all disk, except whose model number is not
+in io_queues_cfg */
+struct dev_io_queues io_queues_def =3D {};
 
--	struct device *dev;
-+	struct bdi_rcu_device *rcu_dev;
-  	struct device *owner;
+/* user defined values for a specific model number */
+struct dev_io_queues io_queues_cfg =3D {};
 
-  	struct timer_list laptop_mode_wb_timer;
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 62f05f605fb5..05f07ce19091 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -850,7 +850,7 @@ static int bdi_init(struct backing_dev_info *bdi)
-  {
-  	int ret;
+If we need multiple configurations( > 2), we can also extend
+dev_io_queues to support it.
 
--	bdi->dev = NULL;
-+	bdi->rcu_dev = NULL;
+> On the blk-mq side, this implementation doesn't work with the IO
+> schedulers. If one is in use, requests may be reordered such that a
+> request on your high-priority hctx may be dispatched later than more
+> recent ones associated with lower priority. I don't think that's what
+> you'd want to happen, so priority should be considered with schedulers
+> too.
+>
+Currently, nvme does not use io scheduler by defalut, if user want to make
+wrr compatible with io scheduler, we can add other patches to handle this.
 
-  	kref_init(&bdi->refcnt);
-  	bdi->min_ratio = 0;
-@@ -932,20 +932,28 @@ struct backing_dev_info *bdi_get_by_id(u64 id)
+> But really, though, NVMe's WRR is too heavy weight and difficult to use.
+> The techincal work group can come up with something better, but it looks
+> like they've lost interest in TPAR 4011 (no discussion in 2 years, afaics=
+).
 
-  int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
-  {
--	struct device *dev;
-  	struct rb_node *parent, **p;
-+	struct bdi_rcu_device *rcu_dev;
-
--	if (bdi->dev)	/* The driver needs to use separate queues per device */
-+	/* The driver needs to use separate queues per device */
-+	if (bdi->rcu_dev)
-  		return 0;
-
--	dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0), bdi, fmt, args);
--	if (IS_ERR(dev))
--		return PTR_ERR(dev);
-+	rcu_dev = kzalloc(sizeof(struct bdi_rcu_device), GFP_KERNEL);
-+	if (!rcu_dev)
-+		return -ENOMEM;
-+
-+	rcu_dev->dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0),
-+						bdi, fmt, args);
-+	if (IS_ERR(rcu_dev->dev)) {
-+		kfree(rcu_dev);
-+		return PTR_ERR(rcu_dev->dev);
-+	}
-
-  	cgwb_bdi_register(bdi);
--	bdi->dev = dev;
-+	bdi->rcu_dev = rcu_dev;
-
--	bdi_debug_register(bdi, dev_name(dev));
-+	bdi_debug_register(bdi, dev_name(rcu_dev->dev));
-  	set_bit(WB_registered, &bdi->wb.state);
-
-  	spin_lock_bh(&bdi_lock);
-@@ -1005,17 +1013,28 @@ static void bdi_remove_from_list(struct backing_dev_info *bdi)
-  	synchronize_rcu_expedited();
-  }
-
-+static void bdi_put_device_rcu(struct rcu_head *rcu)
-+{
-+	struct bdi_rcu_device *rcu_dev = container_of(rcu,
-+			struct bdi_rcu_device, rcu_head);
-+	put_device(rcu_dev->dev);
-+	kfree(rcu_dev);
-+}
-+
-  void bdi_unregister(struct backing_dev_info *bdi)
-  {
-+	struct bdi_rcu_device *rcu_dev = bdi->rcu_dev;
-  	/* make sure nobody finds us on the bdi_list anymore */
-  	bdi_remove_from_list(bdi);
-  	wb_shutdown(&bdi->wb);
-  	cgwb_bdi_unregister(bdi);
-
--	if (bdi->dev) {
-+	if (rcu_dev) {
-  		bdi_debug_unregister(bdi);
--		device_unregister(bdi->dev);
--		bdi->dev = NULL;
-+		get_device(rcu_dev->dev);
-+		device_unregister(rcu_dev->dev);
-+		rcu_assign_pointer(bdi->rcu_dev, NULL);
-+		call_rcu(&rcu_dev->rcu_head, bdi_put_device_rcu);
-  	}
-
-  	if (bdi->owner) {
-@@ -1031,7 +1050,7 @@ static void release_bdi(struct kref *ref)
-
-  	if (test_bit(WB_registered, &bdi->wb.state))
-  		bdi_unregister(bdi);
--	WARN_ON_ONCE(bdi->dev);
-+	WARN_ON_ONCE(bdi->rcu_dev);
-  	wb_exit(&bdi->wb);
-  	cgwb_bdi_exit(bdi);
-  	kfree(bdi);
-
-
-
-
-
-
-
+For the test result, I think it's a useful feature.
+It really gives high priority applications high iops/bandwith and low laten=
+cy,
+and it makes software very thin and simple.
