@@ -2,194 +2,115 @@ Return-Path: <SRS0=IDql=4E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F39FC76199
-	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 08:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE74C2BA83
+	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 17:05:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 651DA206E2
-	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 08:09:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C1272086A
+	for <linux-block@archiver.kernel.org>; Sun, 16 Feb 2020 17:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VmKAFLhp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="d+sCg2C9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726020AbgBPIJr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Feb 2020 03:09:47 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:39702 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbgBPIJr (ORCPT
+        id S1728457AbgBPRFe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Feb 2020 12:05:34 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:39532 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728370AbgBPRFe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Feb 2020 03:09:47 -0500
-Received: by mail-qt1-f196.google.com with SMTP id c5so10018227qtj.6;
-        Sun, 16 Feb 2020 00:09:46 -0800 (PST)
+        Sun, 16 Feb 2020 12:05:34 -0500
+Received: by mail-pl1-f196.google.com with SMTP id g6so5762351plp.6
+        for <linux-block@vger.kernel.org>; Sun, 16 Feb 2020 09:05:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dNEzfTwUBmfbDmP8jHrIogG2oGgC1+4D3raZbBbSc2I=;
-        b=VmKAFLhpDtAwHFCSjp+NzMIgHyhm7krjkidskFg0N+Fgdz3R8JDO3b8ne9kX2NFKY+
-         N/GybcS2uUJYFLbORG6aDUumIctsLO+Be5ocFLSryqNoTi+9rDFflc5gpxK+RKw1+Io/
-         n88bkYbb9GtMZ/vk5gE20Oue9ZjRBfLFFDCNBLu+HP1A2TycZn6CtUMlARKRH4vGlG4M
-         ig34rD5d25IBzbXpRYhrTD01cJRhTk9nw4VwW4ldj26nRlASBkqDb3QHKjwIJg6/eOCD
-         MMD6AR29nHG9e3OxFlZGf9E7wRVQhM5ujrZu534Vpv+52f9/1EdXj4e0dwx5Bp2ei4oZ
-         JmRg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=1wblhQ0F68iiM2c0m/hr6TtOKn6RpxPFT13cYvSOlTY=;
+        b=d+sCg2C9v8jg3GNQcr/hcptBv4GvXxzNEv4lBCWHGzr4Sy2raZYJpgME9+g5pV4bOm
+         BAC7l7TTo/SqyzDvOcDhCOz3TPVoh7e/kRM2WHpYPaop41jGUbeCkvCfcHUIJX2gWAqI
+         vVVXN7qnpyCd9IZMFWDevc3HkmlEsk/0K4k/3ehv8+PB8iTv6Vp4wgX+Av4ntbvr//+R
+         P+60oHigC7Q8nznPizwTh6gHRNJrqdJ88OgPBJOQ4FEJ4+FbiG3smKozINUuFSMowv6V
+         fouC+oXUUIWICOTmW7NjuBGdBEXElNdpbqNKxLxXlmXIp8620J0rjl+1WCtAgUhs02oM
+         rODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dNEzfTwUBmfbDmP8jHrIogG2oGgC1+4D3raZbBbSc2I=;
-        b=VfHtnrsmKl/URU+kHaUAv3G5HFNSPhYdIG9Ce1wsDV/GhflDerjacvV9AFyGy5zu/S
-         wby6buuJNTIJ39hH6NwjAy9G6mUrqJicVf9jEU/L8rqLpVhEmJ91h9mHSmhbK4ZEPcm0
-         k/ye1dQ++OGUhWjqV2L7s46sXwJrg3y/mp1+v3dZGYPgMzeknw3INhy3wgs9LTfPJQqT
-         lgb3n24Zv89rI/pWyJNIXSLa538MJG4XRdy9YQ5+bHRnhGU+uEjAjkhJxqwQkVQg2TKP
-         ZHZFXKzrpfZYKjpXsJq+IZYK31zEubUrBgoIE9iX4f/mAVNzTRen3V5/4kTLU3c7H8gB
-         CnLA==
-X-Gm-Message-State: APjAAAUOpTjwDPCTaeUUWt7qnGDRjIerK6I1mqWxBc6HrtQNr9dMWbhA
-        soHsXE0PwmBfsEZHtCO6y3b2XK/Se5ETb6d+Eww=
-X-Google-Smtp-Source: APXvYqyWsEgZR3nj4ltlF/cwwuK/9RC88Bxi124aJCUSlJQqix+GJMRtc5vW2gcs32HrxaV4C+AM8gxZqKNu36C+0WQ=
-X-Received: by 2002:ac8:47cc:: with SMTP id d12mr9206563qtr.246.1581840585855;
- Sun, 16 Feb 2020 00:09:45 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=1wblhQ0F68iiM2c0m/hr6TtOKn6RpxPFT13cYvSOlTY=;
+        b=EGjETPVIzyM6tk/ikQnY+Dp6P5NWR//62/H5wviA4IaKdLOUeHESs7lXHj1MpBu1Gq
+         1oBJztzaoAkX8PTP+yTFzqo1vY2g1fgAunf/8CB0EjAa6zH4L2bNumxY6D7Nl3sQHiEq
+         FmVFQzHgBhv4yR615zGyLeh6ZWa4hjuSnVZM9MTuWFfezbcBmA/UMgSXGjLplIqQKF2e
+         mAJp61U/SFM8hNSXqAJfZdHiLeT9mupO4q5wRHOKSheAgjj/SPH5oy4kxB65VIiB4SVR
+         SKInWM8IXAnyS7nk1YtRrsrHG99ls9LY0FAcQEPLetIkKtid3iApsknHwWlgrNgkeRiM
+         pqdg==
+X-Gm-Message-State: APjAAAXaggcO0Y5529RRAIiEJFxGk2pkHTp0OEaPoxMcwH4O5ta4ie/4
+        346l/FfMTJyek8XeDe4elDrwAO4gHxo=
+X-Google-Smtp-Source: APXvYqwT5I6lMSNNt7fg3XPwOq+/bid3MfBPcDhuL/afvzMqHWHzh7Rq3htDMYJB6xuBK19u2SfAOg==
+X-Received: by 2002:a17:902:8a8d:: with SMTP id p13mr12227950plo.159.1581872731818;
+        Sun, 16 Feb 2020 09:05:31 -0800 (PST)
+Received: from ?IPv6:2605:e000:100e:8c61:b1fd:20cc:c368:304b? ([2605:e000:100e:8c61:b1fd:20cc:c368:304b])
+        by smtp.gmail.com with ESMTPSA id b42sm13687205pjc.27.2020.02.16.09.05.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Feb 2020 09:05:31 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.6-rc2
+Message-ID: <7f2de313-552e-e3d0-9b33-faf09bc65b57@kernel.dk>
+Date:   Sun, 16 Feb 2020 09:05:30 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <cover.1580786525.git.zhangweiping@didiglobal.com> <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
-In-Reply-To: <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Sun, 16 Feb 2020 16:09:34 +0800
-Message-ID: <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
-Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and nvme
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Keith Busch <kbusch@kernel.org> =E4=BA=8E2020=E5=B9=B42=E6=9C=884=E6=97=A5=
-=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:42=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, Feb 04, 2020 at 11:30:45AM +0800, Weiping Zhang wrote:
-> > This series try to add Weighted Round Robin for block cgroup and nvme
-> > driver. When multiple containers share a single nvme device, we want
-> > to protect IO critical container from not be interfernced by other
-> > containers. We add blkio.wrr interface to user to control their IO
-> > priority. The blkio.wrr accept five level priorities, which contains
-> > "urgent", "high", "medium", "low" and "none", the "none" is used for
-> > disable WRR for this cgroup.
->
-Hi Bush,
+Hi Linus,
 
-> The NVMe protocol really doesn't define WRR to be a mechanism to mitigate
-> interference, though. It defines credits among the weighted queues
-> only for command fetching, and an urgent strict priority class that
-> starves the rest. It has nothing to do with how the controller should
-> prioritize completion of those commands, even if it may be reasonable to
-> assume influencing when the command is fetched should affect its
-> completion.
->
-Thanks your feedback, the fio test result on WRR shows that, the high-wrr-f=
-io
-get more bandwidth/iops and low latency. I think it's a good feature
-for the case
-that run multiple workload with different priority, especially for
-container colocation.
+Not a lot here, which is great, basically just three small bcache fixes
+from Coly, and four NVMe fixes via Keith.
 
-> On the "weighted" strict priority, there's nothing separating "high"
-> from "low" other than the name: the "set features" credit assignment
-> can invert which queues have higher command fetch rates such that the
-> "low" is favoured over the "high".
->
-If there is no limitation in the hardware controller, we can add more
-checking in
-"set feature command". I think mostly people won't give "low" more
-credits than "high",
-it really does not make sense.
+Please pull!
 
-> There's no protection against the "urgent" class starving others: normal
-> IO will timeout and trigger repeated controller resets, while polled IO
-> will consume 100% of CPU cycles without making any progress if we make
-> this type of queue available without any additional code to ensure the
-> host behaves..
->
-I think we can just disable it in the software layer , actually, I have no =
-real
-application need this.
 
-> On the driver implementation, the number of module parameters being
-> added here is problematic. We already have 2 special classes of queues,
-> and defining this at the module level is considered too coarse when
-> the system has different devices on opposite ends of the capability
-> spectrum. For example, users want polled queues for the fast devices,
-> and none for the slower tier. We just don't have a good mechanism to
-> define per-controller resources, and more queue classes will make this
-> problem worse.
->
-We can add a new "string" module parameter, which contains a model number,
-in most cases, the save product with a common prefix model number, so
-in this way
-nvme can distinguish the different performance devices(hign or low end).
-Before create io queue, nvme driver can get the device's Model number(40 By=
-tes),
-then nvme driver can compare device's model number with module parameter, t=
-o
-decide how many io queues for each disk;
+  git://git.kernel.dk/linux-block.git tags/block-5.6-2020-02-16
 
-/* if model_number is MODEL_ANY, these parameters will be applied to
-all nvme devices. */
-char dev_io_queues[1024] =3D "model_number=3DMODEL_ANY,
-poll=3D0,read=3D0,wrr_low=3D0,wrr_medium=3D0,wrr_high=3D0,wrr_urgent=3D0";
-/* these paramters only affect nvme disk whose model number is "XXX" */
-char dev_io_queues[1024] =3D "model_number=3DXXX,
-poll=3D1,read=3D2,wrr_low=3D3,wrr_medium=3D4,wrr_high=3D5,wrr_urgent=3D0;";
 
-struct dev_io_queues {
-        char model_number[40];
-        unsigned int poll;
-        unsgined int read;
-        unsigned int wrr_low;
-        unsigned int wrr_medium;
-        unsigned int wrr_high;
-        unsigned int wrr_urgent;
-};
+----------------------------------------------------------------
+Anton Eidelman (1):
+      nvme/tcp: fix bug on double requeue when send fails
 
-We can use these two variable to store io queue configurations:
+Coly Li (3):
+      bcache: ignore pending signals when creating gc and allocator thread
+      bcache: Revert "bcache: shrink btree node cache after bch_btree_check()"
+      bcache: remove macro nr_to_fifo_front()
 
-/* default values for the all disk, except whose model number is not
-in io_queues_cfg */
-struct dev_io_queues io_queues_def =3D {};
+Keith Busch (1):
+      nvme/pci: move cqe check after device shutdown
 
-/* user defined values for a specific model number */
-struct dev_io_queues io_queues_cfg =3D {};
+Nigel Kirkland (1):
+      nvme: prevent warning triggered by nvme_stop_keep_alive
 
-If we need multiple configurations( > 2), we can also extend
-dev_io_queues to support it.
+Yi Zhang (1):
+      nvme: fix the parameter order for nvme_get_log in nvme_get_fw_slot_info
 
-> On the blk-mq side, this implementation doesn't work with the IO
-> schedulers. If one is in use, requests may be reordered such that a
-> request on your high-priority hctx may be dispatched later than more
-> recent ones associated with lower priority. I don't think that's what
-> you'd want to happen, so priority should be considered with schedulers
-> too.
->
-Currently, nvme does not use io scheduler by defalut, if user want to make
-wrr compatible with io scheduler, we can add other patches to handle this.
+ drivers/md/bcache/alloc.c   | 18 ++++++++++++++++--
+ drivers/md/bcache/btree.c   | 13 +++++++++++++
+ drivers/md/bcache/journal.c |  7 ++-----
+ drivers/md/bcache/super.c   | 17 -----------------
+ drivers/nvme/host/core.c    | 12 ++++++------
+ drivers/nvme/host/pci.c     | 23 ++++++++++++++++++-----
+ drivers/nvme/host/rdma.c    |  2 +-
+ drivers/nvme/host/tcp.c     |  9 +++++++--
+ 8 files changed, 63 insertions(+), 38 deletions(-)
 
-> But really, though, NVMe's WRR is too heavy weight and difficult to use.
-> The techincal work group can come up with something better, but it looks
-> like they've lost interest in TPAR 4011 (no discussion in 2 years, afaics=
-).
+-- 
+Jens Axboe
 
-For the test result, I think it's a useful feature.
-It really gives high priority applications high iops/bandwith and low laten=
-cy,
-and it makes software very thin and simple.
