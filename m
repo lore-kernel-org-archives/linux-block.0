@@ -2,202 +2,100 @@ Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B0FC34026
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 15:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3B7C34026
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 16:12:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A97D22B48
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 15:55:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BCA421D56
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 16:12:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="Pd8TlXxr";
-	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="Ona4IlGE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sBI24QLX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726399AbgBRPzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 10:55:09 -0500
-Received: from mx0a-00003501.pphosted.com ([67.231.144.15]:37562 "EHLO
-        mx0a-00003501.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726360AbgBRPzJ (ORCPT
+        id S1726444AbgBRQMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 11:12:05 -0500
+Received: from mail-oi1-f180.google.com ([209.85.167.180]:39866 "EHLO
+        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726360AbgBRQMF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 10:55:09 -0500
-Received: from pps.filterd (m0075550.ppops.net [127.0.0.1])
-        by mx0a-00003501.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IFmFvT034160
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 10:55:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seagate.com; h=mime-version :
- references : in-reply-to : from : date : message-id : subject : to : cc :
- content-type; s=proofpoint;
- bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
- b=Pd8TlXxrRMOfmLTHuJsp2iJVyPTeke5+u0mwVxNXf+bKYpNlKQ2PwniZy8NOzupiV7dq
- tNzJLOM5TnpewPQNA/ttBAuowmjz8MqhaUS3CUr4I4W/W/3LgXRkMr/iHH92HcuVbF9T
- xIHqI03bScVyktpfGp1E902Koz1iK4e8rDzw/xga1pnGnxqiAIXl83UZltbxxPaGo+tV
- Zm19QrO4PLKa4xg3hmYxFEy7Q9fW/aX0MTNx0PnmBAhTL2E812PkXNYiMuHY3lzyxD0C
- neP1cfO/meSy1IjFye62pA+O1Wx0LMkIa3pKYE27evlXwBo3B2gKZXEE/dzyPt6ObHnp YA== 
-Authentication-Results: seagate.com;
-        dkim=pass header.s=google header.d=seagate.com
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-        by mx0a-00003501.pphosted.com with ESMTP id 2y6xtqkx6b-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 10:55:08 -0500
-Received: by mail-wm1-f72.google.com with SMTP id m4so225520wmi.5
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:55:08 -0800 (PST)
+        Tue, 18 Feb 2020 11:12:05 -0500
+Received: by mail-oi1-f180.google.com with SMTP id z2so20616180oih.6
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 08:12:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=seagate.com; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
-        b=Ona4IlGEcWZfh6ckDkpNYiNAcM2nQ7bwfAeS48H8KPa2P0iukl4xAXOENVc/XNfbrn
-         afmuQNGns01izKW0uYNYYIfCtdkYzZxwtAbcUBQzl3HjMoJxZ7jm7BEKW+DILBxfTLpT
-         w0h07QcLENsXoz3Omv9EeIxaHIThy3KPJzWqPXj1BHhrRCV18cn8LhgZs8WRT428OUt2
-         3JXrKNcIAWrUp1YAN1a5QG/0xKYJkyYVSsp5d7FM50esKgIk0gmnKrj77yAKYjgUqKzT
-         fuXxdo0J7ApMUdMGmiL8JXHuVHddwvPhzf6yobCQtWTQzVrQzvjwmGDiQkIt2O/PRWcM
-         tB8Q==
+        bh=CNVXd7GvQijAf9sUVbG2f1QgUfkHVv1jwB+UDYOWbyY=;
+        b=sBI24QLXeAMxnYobfUFiAmd4xR2PTbf+BdHJLpEnENN3qmIvaSodggHdxVC0a8TFor
+         daiCdzzMriYxSKIJDxlEJfBopsHtk8VdOYbkisI/98VtSvYnBm/rESBdpNEJJPXu0FF8
+         0BOofIxPjKHH2UCJaaashNaSc+UrHk7gBR97j07A04GcQwrzuXuIgsQCEq/JmIEOeDi/
+         mfRYWHmCsOX35tJZn56nzIQq+sayeHW3VdvXIXHmKnTOmW5kNVP/nDcGO4e6Plhn6dWU
+         U5qibufJ9kPP1ziTSLn4iP65+lhELzA/Z1ZgW2XEkCMDGEs440z34HMvlcKrmZoj1Nu0
+         Wv2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
-        b=NuNvyFALfQoPNIuY/NgTi12hTHVj0W+7bDDjEZOD1ke1z8FSzeZtGRLHcZBaFf6Mi0
-         sIUES2tjeofKX3T7Vs004HHfEipfM0mMypq2Ljb9HGwFfjFERCLkVp7cj42NXZcRBsep
-         eiHo1M+SaJnwlOe4hwf1Y70LnSajWGgVbWykMKAxk7Iai+Qcb+RFI0Z8+MhwXShC8xeg
-         fnIi86W5AL+rZZJBqr3kTXPvyUJC2xkQhGLyYx3+MpTh34/XXqx2V0WWsGNumjTOtdvf
-         YbTkjCu8fTf8pwGZRLVn/+spav8gBFCMysy5v9o+jiAsmvxYOhEQukDiLvGFvSwxeVls
-         Ur2Q==
-X-Gm-Message-State: APjAAAUBCfjsPJYscdgd5xWKQAEroGw8YyShp7FqcVczsDHxOA5GnlWt
-        InPTDByNDsQLVYR0OALtQyY5erwW4NGFVz3IFrELM+K9yE27NwXhH3j2x9TBRrzrH73fxS2jrBK
-        Lf2V/e2kzFPeKWPj3hIt8nYEiDcS/4xtBKcUWkaIg0dZprT7upinaadu3wKUdZvmD
-X-Received: by 2002:a7b:c152:: with SMTP id z18mr3848785wmi.70.1582041306535;
-        Tue, 18 Feb 2020 07:55:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx7kjtcwQBU6hxW2ktpZzuRb16b7GW1dpbZK+0FbadMiM6j4qD6QT740JsUZrXMIpAxofZZ3R6I5bUS+Tr8rZ8=
-X-Received: by 2002:a7b:c152:: with SMTP id z18mr3848736wmi.70.1582041306110;
- Tue, 18 Feb 2020 07:55:06 -0800 (PST)
+        bh=CNVXd7GvQijAf9sUVbG2f1QgUfkHVv1jwB+UDYOWbyY=;
+        b=YKOFtFe2kzm+DFx1nH+58XzgZzW9Fehj4MmzNjghEq+GPciuu97otySj2aTany45vR
+         QIEk5cADm9ddAmUVZbnmLXy4HnbAC27TaGPdv6hb7F1oU3p9FtqU/9jbIpLtUMFVteQt
+         5tq1dzNauFCTfEM6Ano8xA+IoX8/gIZauN4ro6Rs9tmxD/JHOHfnjqIxlxh1oSjeU57c
+         39shz4qktRIFF7k3tL3kXFF6DWM+mthI8V2ePwKxg60gcZbwJXX3LBCfoAPQmHPukRIa
+         adjGfsfe3V9BELYlt6BRqQH2b6hXUA22LWu5RHlgM335f7szqITpnO901lYv1Dox5B/N
+         Le1w==
+X-Gm-Message-State: APjAAAWvSIERCRDzLUNVUaBfWrxH1jw+8aW7KMR6T8cBM/RD5Su7Q6V9
+        47J765LWY60NB24sSS/fgc1+Qj4wu11m4pZEyv7JAg==
+X-Google-Smtp-Source: APXvYqyItQcqBDeH/j9bd5sgRpZfMvMbTo7/hzatU4ZDPYxeI+o76a9irGBqbSncYfhrdjrsgUL2OhHxhb9qaNUNIWU=
+X-Received: by 2002:aca:fcc1:: with SMTP id a184mr1665266oii.36.1582042324768;
+ Tue, 18 Feb 2020 08:12:04 -0800 (PST)
 MIME-Version: 1.0
-References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
- <20200211122821.GA29811@ming.t460p> <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
- <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <yq1blq3rxzj.fsf@oracle.com> <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
- <yq1r1yzqfyb.fsf@oracle.com> <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
- <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com> <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
- <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
-In-Reply-To: <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
-From:   Tim Walker <tim.t.walker@seagate.com>
-Date:   Tue, 18 Feb 2020 10:54:54 -0500
-Message-ID: <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+ <20200213082643.GB9144@ming.t460p> <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+ <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+ <de7b841c-a195-1b1e-eb60-02cbd6ba4e0a@acm.org> <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
+ <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com> <20200215034652.GA19867@ming.t460p>
+In-Reply-To: <20200215034652.GA19867@ming.t460p>
+From:   Jesse Barnes <jsbarnes@google.com>
+Date:   Tue, 18 Feb 2020 08:11:53 -0800
+Message-ID: <CAJmaN=miqzhnZUTqaTOPp+OWY8+QYhXoE=h5apSucMkEU4nvtA@mail.gmail.com>
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Salman Qazi <sqazi@google.com>, Ming Lei <tom.leiming@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Gwendal Grignou <gwendal@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Proofpoint-PolicyRoute: Outbound
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-18_04:2020-02-18,2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- suspectscore=1 priorityscore=1501 bulkscore=0 malwarescore=0
- mlxlogscore=999 clxscore=1015 spamscore=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002180119
-X-Proofpoint-Spam-Policy: Default Domain Policy
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 12:05 PM Keith Busch <kbusch@kernel.org> wrote:
+On Fri, Feb 14, 2020 at 7:47 PM Ming Lei <ming.lei@redhat.com> wrote:
+> What are the 'other operations'? Are they block IOs?
 >
-> On Fri, Feb 14, 2020 at 05:04:25PM +0100, Hannes Reinecke wrote:
-> > On 2/14/20 3:40 PM, Keith Busch wrote:
-> > > On Fri, Feb 14, 2020 at 08:32:57AM +0100, Hannes Reinecke wrote:
-> > > > On 2/13/20 5:17 AM, Martin K. Petersen wrote:
-> > > > > People often artificially lower the queue depth to avoid timeouts. The
-> > > > > default timeout is 30 seconds from an I/O is queued. However, many
-> > > > > enterprise applications set the timeout to 3-5 seconds. Which means that
-> > > > > with deep queues you'll quickly start seeing timeouts if a drive
-> > > > > temporarily is having issues keeping up (media errors, excessive spare
-> > > > > track seeks, etc.).
-> > > > >
-> > > > > Well-behaved devices will return QF/TSF if they have transient resource
-> > > > > starvation or exceed internal QoS limits. QF will cause the SCSI stack
-> > > > > to reduce the number of I/Os in flight. This allows the drive to recover
-> > > > > from its congested state and reduces the potential of application and
-> > > > > filesystem timeouts.
-> > > > >
-> > > > This may even be a chance to revisit QoS / queue busy handling.
-> > > > NVMe has this SQ head pointer mechanism which was supposed to handle
-> > > > this kind of situations, but to my knowledge no-one has been
-> > > > implementing it.
-> > > > Might be worthwhile revisiting it; guess NVMe HDDs would profit from that.
-> > >
-> > > We don't need that because we don't allocate enough tags to potentially
-> > > wrap the tail past the head. If you can allocate a tag, the queue is not
-> > > full. And convesely, no tag == queue full.
-> > >
-> > It's not a problem on our side.
-> > It's a problem on the target/controller side.
-> > The target/controller might have a need to throttle I/O (due to QoS settings
-> > or competing resources from other hosts), but currently no means of
-> > signalling that to the host.
-> > Which, incidentally, is the underlying reason for the DNR handling
-> > discussion we had; NetApp tried to model QoS by sending "Namespace not
-> > ready" without the DNR bit set, which of course is a totally different
-> > use-case as the typical 'Namespace not ready' response we get (with the DNR
-> > bit set) when a namespace was unmapped.
-> >
-> > And that is where SQ head pointer updates comes in; it would allow the
-> > controller to signal back to the host that it should hold off sending I/O
-> > for a bit.
-> > So this could / might be used for NVMe HDDs, too, which also might have a
-> > need to signal back to the host that I/Os should be throttled...
+> If yes, that is why I suggest to fix submit_bio_wait(), which should cover
+> most of sync bio submission.
 >
-> Okay, I see. I think this needs a new nvme AER notice as Martin
-> suggested. The desired host behavior is simiilar to what we do with a
-> "firmware activation notice" where we temporarily quiesce new requests
-> and reset IO timeouts for previously dispatched requests. Perhaps tie
-> this to the CSTS.PP register as well.
-Hi all-
+> Anyway, the fix is simple & generic enough, I'd plan to post a formal
+> patch if no one figures out better doable approaches.
 
-With regards to our discussion on queue depths, it's common knowledge
-that an HDD choses commands from its internal command queue to
-optimize performance. The HDD looks at things like the current
-actuator position, current media rotational position, power
-constraints, command age, etc to choose the best next command to
-service. A large number of commands in the queue gives the HDD a
-better selection of commands from which to choose to maximize
-throughput/IOPS/etc but at the expense of the added latency due to
-commands sitting in the queue.
+Yeah I think any block I/O operation that occurs after the
+BLKSECDISCARD is submitted will also potentially be affected by the
+hung task timeouts, and I think your patch will address that.  My only
+concern with it is that it might hide some other I/O "hangs" that are
+due to device misbehavior instead.  Yes driver and device timeouts
+should generally catch those, but with this in place we might miss a
+few bugs.
 
-NVMe doesn't allow us to pull commands randomly from the SQ, so the
-HDD should attempt to fill its internal queue from the various SQs,
-according to the SQ servicing policy, so it can have a large number of
-commands to choose from for its internal command processing
-optimization.
+Given the nature of these types of storage devices though, I think
+that's a minor issue and not worth blocking the patch on, given that
+it should prevent a lot of false positive hang reports as Salman
+demonstrated.
 
-It seems to me that the host would want to limit the total number of
-outstanding commands to an NVMe HDD for the same latency reasons they
-are frequently limited today. If we assume the HDD would have a
-relatively deep (perhaps 256) internal queue (which is deeper than
-most latency-sensitive customers would want to run) then the SQ would
-be empty most of the time. To me it seems that only when the host's
-number of outstanding commands fell below the threshold should the
-host add commands to the SQ. Since the drive internal command queue
-would not be full, the HDD would immediately pull the commands from
-the SQ and put them into its internal command queue.
-
-I can't think of any advantage to running a deep SQ in this scenario.
-
-When the host requests to delete a SQ the HDD should abort the
-commands it is holding in its internal queue that came from the SQ to
-be deleted, then delete the SQ.
-
-Best regards,
--Tim
-
--- 
-Tim Walker
-Product Design Systems Engineering, Seagate Technology
-(303) 775-3770
+Thanks,
+Jesse
