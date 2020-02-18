@@ -2,153 +2,202 @@ Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF7DC3403B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 13:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B0FC34026
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 15:55:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7D6D207FD
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 13:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A97D22B48
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 15:55:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=inango-systems.com header.i=@inango-systems.com header.b="jSWjqqQy"
+	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="Pd8TlXxr";
+	dkim=pass (2048-bit key) header.d=seagate.com header.i=@seagate.com header.b="Ona4IlGE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726521AbgBRNlM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 08:41:12 -0500
-Received: from mail.inango-systems.com ([178.238.230.57]:55690 "EHLO
-        mail.inango-sw.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726116AbgBRNlM (ORCPT
+        id S1726399AbgBRPzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 10:55:09 -0500
+Received: from mx0a-00003501.pphosted.com ([67.231.144.15]:37562 "EHLO
+        mx0a-00003501.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726360AbgBRPzJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 08:41:12 -0500
-X-Greylist: delayed 393 seconds by postgrey-1.27 at vger.kernel.org; Tue, 18 Feb 2020 08:41:10 EST
-Received: from localhost (localhost [127.0.0.1])
-        by mail.inango-sw.com (Postfix) with ESMTP id 0842010807C2;
-        Tue, 18 Feb 2020 15:34:36 +0200 (IST)
-Received: from mail.inango-sw.com ([127.0.0.1])
-        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 7hm_tDghVA1O; Tue, 18 Feb 2020 15:34:35 +0200 (IST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.inango-sw.com (Postfix) with ESMTP id 2FF9810807BD;
-        Tue, 18 Feb 2020 15:34:35 +0200 (IST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.inango-sw.com 2FF9810807BD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inango-systems.com;
-        s=45A440E0-D841-11E8-B985-5FCC721607E0; t=1582032875;
-        bh=BnLIe6sgQYUJrm3LGDhkAzwCf08EBK8HoDQzaBz3dbM=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=jSWjqqQylMIF6017ESekgGCGMmWr3d62l3xi8/WwRQZlhHkpb2gUhc3i8eDYPwpVZ
-         TMy459ext8jfUY1WufwSbOPEsIpFLukncYnFKvlmVet2QK2u3s6RPmyQCUX9Fe0yOT
-         VTYKR/T6lTYgfEmwbT6/GtexzVCO5gdjCF8nkVrsg33SX0SKWEiZmsaRhF6XI/r3z0
-         I4W2HqAvLF1CuBixRc4Dj2g67lV3nul9ozqnqFCAB38tUFM623cvkIYZC82VmIPg1m
-         G+oyu9KDAspC39+bcHQJzgxdu+BtYizKzcaITyQMZ5Zym4acJynA/yGL1xaSNPaacB
-         Q7BVzfJeGjsyw==
-X-Virus-Scanned: amavisd-new at inango-sw.com
-Received: from mail.inango-sw.com ([127.0.0.1])
-        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 4_YIkOoajecK; Tue, 18 Feb 2020 15:34:35 +0200 (IST)
-Received: from mail.inango-sw.com (mail.inango-sw.com [172.17.220.3])
-        by mail.inango-sw.com (Postfix) with ESMTP id 0A57210807B0;
-        Tue, 18 Feb 2020 15:34:35 +0200 (IST)
-Date:   Tue, 18 Feb 2020 15:34:34 +0200 (IST)
-From:   Nikolai Merinov <n.merinov@inango-systems.com>
-To:     hch@infradead.org, Davidlohr Bueso <dave@stgolabs.net>,
-        Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Message-ID: <2004778677.1182221.1582032874756.JavaMail.zimbra@inango-systems.com>
-In-Reply-To: <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
-References: <20181124162123.21300-1-n.merinov@inango-systems.com> <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org> <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
-Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
- partition entry
+        Tue, 18 Feb 2020 10:55:09 -0500
+Received: from pps.filterd (m0075550.ppops.net [127.0.0.1])
+        by mx0a-00003501.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IFmFvT034160
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 10:55:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seagate.com; h=mime-version :
+ references : in-reply-to : from : date : message-id : subject : to : cc :
+ content-type; s=proofpoint;
+ bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
+ b=Pd8TlXxrRMOfmLTHuJsp2iJVyPTeke5+u0mwVxNXf+bKYpNlKQ2PwniZy8NOzupiV7dq
+ tNzJLOM5TnpewPQNA/ttBAuowmjz8MqhaUS3CUr4I4W/W/3LgXRkMr/iHH92HcuVbF9T
+ xIHqI03bScVyktpfGp1E902Koz1iK4e8rDzw/xga1pnGnxqiAIXl83UZltbxxPaGo+tV
+ Zm19QrO4PLKa4xg3hmYxFEy7Q9fW/aX0MTNx0PnmBAhTL2E812PkXNYiMuHY3lzyxD0C
+ neP1cfO/meSy1IjFye62pA+O1Wx0LMkIa3pKYE27evlXwBo3B2gKZXEE/dzyPt6ObHnp YA== 
+Authentication-Results: seagate.com;
+        dkim=pass header.s=google header.d=seagate.com
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        by mx0a-00003501.pphosted.com with ESMTP id 2y6xtqkx6b-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 10:55:08 -0500
+Received: by mail-wm1-f72.google.com with SMTP id m4so225520wmi.5
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:55:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=seagate.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
+        b=Ona4IlGEcWZfh6ckDkpNYiNAcM2nQ7bwfAeS48H8KPa2P0iukl4xAXOENVc/XNfbrn
+         afmuQNGns01izKW0uYNYYIfCtdkYzZxwtAbcUBQzl3HjMoJxZ7jm7BEKW+DILBxfTLpT
+         w0h07QcLENsXoz3Omv9EeIxaHIThy3KPJzWqPXj1BHhrRCV18cn8LhgZs8WRT428OUt2
+         3JXrKNcIAWrUp1YAN1a5QG/0xKYJkyYVSsp5d7FM50esKgIk0gmnKrj77yAKYjgUqKzT
+         fuXxdo0J7ApMUdMGmiL8JXHuVHddwvPhzf6yobCQtWTQzVrQzvjwmGDiQkIt2O/PRWcM
+         tB8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kSDqbBAaWJOPcd7RVa5GGBLqUbqCfZEQDaf8+NwB1Nc=;
+        b=NuNvyFALfQoPNIuY/NgTi12hTHVj0W+7bDDjEZOD1ke1z8FSzeZtGRLHcZBaFf6Mi0
+         sIUES2tjeofKX3T7Vs004HHfEipfM0mMypq2Ljb9HGwFfjFERCLkVp7cj42NXZcRBsep
+         eiHo1M+SaJnwlOe4hwf1Y70LnSajWGgVbWykMKAxk7Iai+Qcb+RFI0Z8+MhwXShC8xeg
+         fnIi86W5AL+rZZJBqr3kTXPvyUJC2xkQhGLyYx3+MpTh34/XXqx2V0WWsGNumjTOtdvf
+         YbTkjCu8fTf8pwGZRLVn/+spav8gBFCMysy5v9o+jiAsmvxYOhEQukDiLvGFvSwxeVls
+         Ur2Q==
+X-Gm-Message-State: APjAAAUBCfjsPJYscdgd5xWKQAEroGw8YyShp7FqcVczsDHxOA5GnlWt
+        InPTDByNDsQLVYR0OALtQyY5erwW4NGFVz3IFrELM+K9yE27NwXhH3j2x9TBRrzrH73fxS2jrBK
+        Lf2V/e2kzFPeKWPj3hIt8nYEiDcS/4xtBKcUWkaIg0dZprT7upinaadu3wKUdZvmD
+X-Received: by 2002:a7b:c152:: with SMTP id z18mr3848785wmi.70.1582041306535;
+        Tue, 18 Feb 2020 07:55:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx7kjtcwQBU6hxW2ktpZzuRb16b7GW1dpbZK+0FbadMiM6j4qD6QT740JsUZrXMIpAxofZZ3R6I5bUS+Tr8rZ8=
+X-Received: by 2002:a7b:c152:: with SMTP id z18mr3848736wmi.70.1582041306110;
+ Tue, 18 Feb 2020 07:55:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.17.220.3]
-X-Mailer: Zimbra 8.8.15_GA_3888 (ZimbraWebClient - GC79 (Linux)/8.8.15_GA_3890)
-Thread-Topic: partitions/efi: Fix partition name parsing in GUID partition entry
-Thread-Index: 9xpn1qrbCtCK5dkZiyC1ZLQoAz8IQA==
+References: <CANo=J14resJ4U1nufoiDq+ULd0k-orRCsYah8Dve-y8uCjA62Q@mail.gmail.com>
+ <20200211122821.GA29811@ming.t460p> <CANo=J14iRK8K3bc1g3rLBp=QTLZQak0DcHkvgZS2f=xO_HFgxQ@mail.gmail.com>
+ <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <yq1blq3rxzj.fsf@oracle.com> <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
+ <yq1r1yzqfyb.fsf@oracle.com> <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
+ <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com> <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
+ <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
+In-Reply-To: <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
+From:   Tim Walker <tim.t.walker@seagate.com>
+Date:   Tue, 18 Feb 2020 10:54:54 -0500
+Message-ID: <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-PolicyRoute: Outbound
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-18_04:2020-02-18,2020-02-18 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ suspectscore=1 priorityscore=1501 bulkscore=0 malwarescore=0
+ mlxlogscore=999 clxscore=1015 spamscore=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002180119
+X-Proofpoint-Spam-Policy: Default Domain Policy
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Fri, Feb 14, 2020 at 12:05 PM Keith Busch <kbusch@kernel.org> wrote:
+>
+> On Fri, Feb 14, 2020 at 05:04:25PM +0100, Hannes Reinecke wrote:
+> > On 2/14/20 3:40 PM, Keith Busch wrote:
+> > > On Fri, Feb 14, 2020 at 08:32:57AM +0100, Hannes Reinecke wrote:
+> > > > On 2/13/20 5:17 AM, Martin K. Petersen wrote:
+> > > > > People often artificially lower the queue depth to avoid timeouts. The
+> > > > > default timeout is 30 seconds from an I/O is queued. However, many
+> > > > > enterprise applications set the timeout to 3-5 seconds. Which means that
+> > > > > with deep queues you'll quickly start seeing timeouts if a drive
+> > > > > temporarily is having issues keeping up (media errors, excessive spare
+> > > > > track seeks, etc.).
+> > > > >
+> > > > > Well-behaved devices will return QF/TSF if they have transient resource
+> > > > > starvation or exceed internal QoS limits. QF will cause the SCSI stack
+> > > > > to reduce the number of I/Os in flight. This allows the drive to recover
+> > > > > from its congested state and reduces the potential of application and
+> > > > > filesystem timeouts.
+> > > > >
+> > > > This may even be a chance to revisit QoS / queue busy handling.
+> > > > NVMe has this SQ head pointer mechanism which was supposed to handle
+> > > > this kind of situations, but to my knowledge no-one has been
+> > > > implementing it.
+> > > > Might be worthwhile revisiting it; guess NVMe HDDs would profit from that.
+> > >
+> > > We don't need that because we don't allocate enough tags to potentially
+> > > wrap the tail past the head. If you can allocate a tag, the queue is not
+> > > full. And convesely, no tag == queue full.
+> > >
+> > It's not a problem on our side.
+> > It's a problem on the target/controller side.
+> > The target/controller might have a need to throttle I/O (due to QoS settings
+> > or competing resources from other hosts), but currently no means of
+> > signalling that to the host.
+> > Which, incidentally, is the underlying reason for the DNR handling
+> > discussion we had; NetApp tried to model QoS by sending "Namespace not
+> > ready" without the DNR bit set, which of course is a totally different
+> > use-case as the typical 'Namespace not ready' response we get (with the DNR
+> > bit set) when a namespace was unmapped.
+> >
+> > And that is where SQ head pointer updates comes in; it would allow the
+> > controller to signal back to the host that it should hold off sending I/O
+> > for a bit.
+> > So this could / might be used for NVMe HDDs, too, which also might have a
+> > need to signal back to the host that I/Os should be throttled...
+>
+> Okay, I see. I think this needs a new nvme AER notice as Martin
+> suggested. The desired host behavior is simiilar to what we do with a
+> "firmware activation notice" where we temporarily quiesce new requests
+> and reset IO timeouts for previously dispatched requests. Perhaps tie
+> this to the CSTS.PP register as well.
+Hi all-
 
-Did you have a time to look at this patch? Should I make any modification? 
+With regards to our discussion on queue depths, it's common knowledge
+that an HDD choses commands from its internal command queue to
+optimize performance. The HDD looks at things like the current
+actuator position, current media rotational position, power
+constraints, command age, etc to choose the best next command to
+service. A large number of commands in the queue gives the HDD a
+better selection of commands from which to choose to maximize
+throughput/IOPS/etc but at the expense of the added latency due to
+commands sitting in the queue.
 
-Regards,
-Nikolai
+NVMe doesn't allow us to pull commands randomly from the SQ, so the
+HDD should attempt to fill its internal queue from the various SQs,
+according to the SQ servicing policy, so it can have a large number of
+commands to choose from for its internal command processing
+optimization.
 
------ Original Message -----
-> From: "n merinov" <n.merinov@inango-systems.com>
-> To: hch@infradead.org, "Davidlohr Bueso" <dave@stgolabs.net>, "Jens Axboe" <axboe@kernel.dk>, "Ard Biesheuvel"
-> <ardb@kernel.org>, linux-efi@vger.kernel.org, linux-block@vger.kernel.org, "linux-kernel"
-> <linux-kernel@vger.kernel.org>
-> Cc: "n merinov" <n.merinov@inango-systems.com>
-> Sent: Monday, January 13, 2020 3:27:23 PM
-> Subject: [PATCH v3] partitions/efi: Fix partition name parsing in GUID partition entry
+It seems to me that the host would want to limit the total number of
+outstanding commands to an NVMe HDD for the same latency reasons they
+are frequently limited today. If we assume the HDD would have a
+relatively deep (perhaps 256) internal queue (which is deeper than
+most latency-sensitive customers would want to run) then the SQ would
+be empty most of the time. To me it seems that only when the host's
+number of outstanding commands fell below the threshold should the
+host add commands to the SQ. Since the drive internal command queue
+would not be full, the HDD would immediately pull the commands from
+the SQ and put them into its internal command queue.
 
-> GUID partition entry defined to have a partition name as 36 UTF-16LE
-> code units. This means that on big-endian platforms ASCII symbols
-> would be read with 0xXX00 efi_char16_t character code. In order to
-> correctly extract ASCII characters from a partition name field we
-> should be converted from 16LE to CPU architecture.
-> 
-> The problem exists on all big endian platforms.
-> 
-> Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
-> ---
-> block/partitions/efi.c | 3 ++-
-> block/partitions/efi.h | 2 +-
-> include/linux/efi.h    | 5 +++++
-> 3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-> index db2fef7dfc47..f1d0820de844 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -715,7 +715,8 @@ int efi_partition(struct parsed_partitions *state)
-> 				ARRAY_SIZE(ptes[i].partition_name));
-> 		info->volname[label_max] = 0;
-> 		while (label_count < label_max) {
-> -			u8 c = ptes[i].partition_name[label_count] & 0xff;
-> +			u8 c = 0xff & efi_char16le_to_cpu(
-> +					ptes[i].partition_name[label_count]);
-> 			if (c && !isprint(c))
-> 				c = '!';
-> 			info->volname[label_count] = c;
-> diff --git a/block/partitions/efi.h b/block/partitions/efi.h
-> index 3e8576157575..4d4cae0bb79e 100644
-> --- a/block/partitions/efi.h
-> +++ b/block/partitions/efi.h
-> @@ -88,7 +88,7 @@ typedef struct _gpt_entry {
-> 	__le64 starting_lba;
-> 	__le64 ending_lba;
-> 	gpt_entry_attributes attributes;
-> -	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
-> +	efi_char16le_t partition_name[72 / sizeof(efi_char16le_t)];
-> } __packed gpt_entry;
-> 
-> typedef struct _gpt_mbr_record {
-> diff --git a/include/linux/efi.h b/include/linux/efi.h
-> index aa54586db7a5..47882f2d45db 100644
-> --- a/include/linux/efi.h
-> +++ b/include/linux/efi.h
-> @@ -45,9 +45,14 @@
-> typedef unsigned long efi_status_t;
-> typedef u8 efi_bool_t;
-> typedef u16 efi_char16_t;		/* UNICODE character */
-> +typedef __le16 efi_char16le_t;		/* UTF16-LE */
-> +typedef __be16 efi_char16be_t;		/* UTF16-BE */
-> typedef u64 efi_physical_addr_t;
-> typedef void *efi_handle_t;
-> 
-> +#define efi_char16le_to_cpu le16_to_cpu
-> +#define efi_char16be_to_cpu be16_to_cpu
-> +
-> /*
->  * The UEFI spec and EDK2 reference implementation both define EFI_GUID as
->  * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the implied alignment
-> --
-> 2.17.1
+I can't think of any advantage to running a deep SQ in this scenario.
+
+When the host requests to delete a SQ the HDD should abort the
+commands it is holding in its internal queue that came from the SQ to
+be deleted, then delete the SQ.
+
+Best regards,
+-Tim
+
+-- 
+Tim Walker
+Product Design Systems Engineering, Seagate Technology
+(303) 775-3770
