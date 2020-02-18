@@ -2,132 +2,153 @@ Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 137DAC34026
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 12:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF7DC3403B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 13:41:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4C162176D
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 12:35:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7D6D207FD
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 13:41:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=inango-systems.com header.i=@inango-systems.com header.b="jSWjqqQy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbgBRMfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 07:35:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5202 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726347AbgBRMfm (ORCPT
+        id S1726521AbgBRNlM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 08:41:12 -0500
+Received: from mail.inango-systems.com ([178.238.230.57]:55690 "EHLO
+        mail.inango-sw.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726116AbgBRNlM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 07:35:42 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ICQ99x020165
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:35:41 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y87e6gymc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:35:41 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Tue, 18 Feb 2020 12:35:38 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 18 Feb 2020 12:35:34 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ICZXnD39846136
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Feb 2020 12:35:33 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E77964C05C;
-        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78E1E4C046;
-        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.110])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
-Date:   Tue, 18 Feb 2020 13:35:31 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: Re: [PATCH 1/2] virtio-blk: fix hw_queue stopped on arbitrary error
-In-Reply-To: <CACVXFVNiADTW_vLVc1bUSa0CoViLbVzoMnSJW4=sx=MCE-xUPw@mail.gmail.com>
-References: <20200213123728.61216-1-pasic@linux.ibm.com>
-        <20200213123728.61216-2-pasic@linux.ibm.com>
-        <CACVXFVNiADTW_vLVc1bUSa0CoViLbVzoMnSJW4=sx=MCE-xUPw@mail.gmail.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        Tue, 18 Feb 2020 08:41:12 -0500
+X-Greylist: delayed 393 seconds by postgrey-1.27 at vger.kernel.org; Tue, 18 Feb 2020 08:41:10 EST
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id 0842010807C2;
+        Tue, 18 Feb 2020 15:34:36 +0200 (IST)
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 7hm_tDghVA1O; Tue, 18 Feb 2020 15:34:35 +0200 (IST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id 2FF9810807BD;
+        Tue, 18 Feb 2020 15:34:35 +0200 (IST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.inango-sw.com 2FF9810807BD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inango-systems.com;
+        s=45A440E0-D841-11E8-B985-5FCC721607E0; t=1582032875;
+        bh=BnLIe6sgQYUJrm3LGDhkAzwCf08EBK8HoDQzaBz3dbM=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=jSWjqqQylMIF6017ESekgGCGMmWr3d62l3xi8/WwRQZlhHkpb2gUhc3i8eDYPwpVZ
+         TMy459ext8jfUY1WufwSbOPEsIpFLukncYnFKvlmVet2QK2u3s6RPmyQCUX9Fe0yOT
+         VTYKR/T6lTYgfEmwbT6/GtexzVCO5gdjCF8nkVrsg33SX0SKWEiZmsaRhF6XI/r3z0
+         I4W2HqAvLF1CuBixRc4Dj2g67lV3nul9ozqnqFCAB38tUFM623cvkIYZC82VmIPg1m
+         G+oyu9KDAspC39+bcHQJzgxdu+BtYizKzcaITyQMZ5Zym4acJynA/yGL1xaSNPaacB
+         Q7BVzfJeGjsyw==
+X-Virus-Scanned: amavisd-new at inango-sw.com
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 4_YIkOoajecK; Tue, 18 Feb 2020 15:34:35 +0200 (IST)
+Received: from mail.inango-sw.com (mail.inango-sw.com [172.17.220.3])
+        by mail.inango-sw.com (Postfix) with ESMTP id 0A57210807B0;
+        Tue, 18 Feb 2020 15:34:35 +0200 (IST)
+Date:   Tue, 18 Feb 2020 15:34:34 +0200 (IST)
+From:   Nikolai Merinov <n.merinov@inango-systems.com>
+To:     hch@infradead.org, Davidlohr Bueso <dave@stgolabs.net>,
+        Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Message-ID: <2004778677.1182221.1582032874756.JavaMail.zimbra@inango-systems.com>
+In-Reply-To: <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
+References: <20181124162123.21300-1-n.merinov@inango-systems.com> <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org> <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
+Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
+ partition entry
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021812-0012-0000-0000-00000387F466
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021812-0013-0000-0000-000021C4846F
-Message-Id: <20200218133531.3eb08120.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-18_02:2020-02-17,2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- impostorscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
- spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002180101
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.17.220.3]
+X-Mailer: Zimbra 8.8.15_GA_3888 (ZimbraWebClient - GC79 (Linux)/8.8.15_GA_3890)
+Thread-Topic: partitions/efi: Fix partition name parsing in GUID partition entry
+Thread-Index: 9xpn1qrbCtCK5dkZiyC1ZLQoAz8IQA==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 18 Feb 2020 10:21:18 +0800
-Ming Lei <tom.leiming@gmail.com> wrote:
+Hello,
 
-> On Thu, Feb 13, 2020 at 8:38 PM Halil Pasic <pasic@linux.ibm.com> wrote:
-> >
-> > Since nobody else is going to restart our hw_queue for us, the
-> > blk_mq_start_stopped_hw_queues() is in virtblk_done() is not sufficient
-> > necessarily sufficient to ensure that the queue will get started again.
-> > In case of global resource outage (-ENOMEM because mapping failure,
-> > because of swiotlb full) our virtqueue may be empty and we can get
-> > stuck with a stopped hw_queue.
-> >
-> > Let us not stop the queue on arbitrary errors, but only on -EONSPC which
-> > indicates a full virtqueue, where the hw_queue is guaranteed to get
-> > started by virtblk_done() before when it makes sense to carry on
-> > submitting requests. Let us also remove a stale comment.
-> 
-> The generic solution may be to stop queue only when there is any
-> in-flight request
-> not completed.
-> 
-
-I think this is a pretty close to that. The queue is stopped only on
-ENOSPC, which means virtqueue is full.
-
-> Checking -ENOMEM may not be enough, given -EIO can be returned from
-> virtqueue_add()
-> too in case of dma map failure.
-
-I'm not checking on -ENOMEM. So the queue would not be stopped on EIO.
-Maybe I'm misunderstanding something In any case, please have another
-look at the diff, and if your concerns persist please help me understand.
-
-Thanks for having a look!
+Did you have a time to look at this patch? Should I make any modification? 
 
 Regards,
-Halil
+Nikolai
 
+----- Original Message -----
+> From: "n merinov" <n.merinov@inango-systems.com>
+> To: hch@infradead.org, "Davidlohr Bueso" <dave@stgolabs.net>, "Jens Axboe" <axboe@kernel.dk>, "Ard Biesheuvel"
+> <ardb@kernel.org>, linux-efi@vger.kernel.org, linux-block@vger.kernel.org, "linux-kernel"
+> <linux-kernel@vger.kernel.org>
+> Cc: "n merinov" <n.merinov@inango-systems.com>
+> Sent: Monday, January 13, 2020 3:27:23 PM
+> Subject: [PATCH v3] partitions/efi: Fix partition name parsing in GUID partition entry
+
+> GUID partition entry defined to have a partition name as 36 UTF-16LE
+> code units. This means that on big-endian platforms ASCII symbols
+> would be read with 0xXX00 efi_char16_t character code. In order to
+> correctly extract ASCII characters from a partition name field we
+> should be converted from 16LE to CPU architecture.
 > 
-> Thanks,
-
+> The problem exists on all big endian platforms.
+> 
+> Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
+> ---
+> block/partitions/efi.c | 3 ++-
+> block/partitions/efi.h | 2 +-
+> include/linux/efi.h    | 5 +++++
+> 3 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+> index db2fef7dfc47..f1d0820de844 100644
+> --- a/block/partitions/efi.c
+> +++ b/block/partitions/efi.c
+> @@ -715,7 +715,8 @@ int efi_partition(struct parsed_partitions *state)
+> 				ARRAY_SIZE(ptes[i].partition_name));
+> 		info->volname[label_max] = 0;
+> 		while (label_count < label_max) {
+> -			u8 c = ptes[i].partition_name[label_count] & 0xff;
+> +			u8 c = 0xff & efi_char16le_to_cpu(
+> +					ptes[i].partition_name[label_count]);
+> 			if (c && !isprint(c))
+> 				c = '!';
+> 			info->volname[label_count] = c;
+> diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+> index 3e8576157575..4d4cae0bb79e 100644
+> --- a/block/partitions/efi.h
+> +++ b/block/partitions/efi.h
+> @@ -88,7 +88,7 @@ typedef struct _gpt_entry {
+> 	__le64 starting_lba;
+> 	__le64 ending_lba;
+> 	gpt_entry_attributes attributes;
+> -	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
+> +	efi_char16le_t partition_name[72 / sizeof(efi_char16le_t)];
+> } __packed gpt_entry;
+> 
+> typedef struct _gpt_mbr_record {
+> diff --git a/include/linux/efi.h b/include/linux/efi.h
+> index aa54586db7a5..47882f2d45db 100644
+> --- a/include/linux/efi.h
+> +++ b/include/linux/efi.h
+> @@ -45,9 +45,14 @@
+> typedef unsigned long efi_status_t;
+> typedef u8 efi_bool_t;
+> typedef u16 efi_char16_t;		/* UNICODE character */
+> +typedef __le16 efi_char16le_t;		/* UTF16-LE */
+> +typedef __be16 efi_char16be_t;		/* UTF16-BE */
+> typedef u64 efi_physical_addr_t;
+> typedef void *efi_handle_t;
+> 
+> +#define efi_char16le_to_cpu le16_to_cpu
+> +#define efi_char16be_to_cpu be16_to_cpu
+> +
+> /*
+>  * The UEFI spec and EDK2 reference implementation both define EFI_GUID as
+>  * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the implied alignment
+> --
+> 2.17.1
