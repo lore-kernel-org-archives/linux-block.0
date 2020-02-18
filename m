@@ -2,131 +2,132 @@ Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC5BC34031
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 03:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 137DAC34026
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 12:35:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A00A215A4
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 03:46:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BPlXNCfP"
+	by mail.kernel.org (Postfix) with ESMTP id E4C162176D
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 12:35:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726256AbgBRDqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Feb 2020 22:46:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57001 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726166AbgBRDqP (ORCPT
+        id S1726486AbgBRMfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 07:35:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5202 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726347AbgBRMfm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Feb 2020 22:46:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581997574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0hlTXaKliAAW3e6s/e3LvUgWbi2BfbLv5eWGC29PrKQ=;
-        b=BPlXNCfPu8aZO/mjSzTDSKdMBZOPAdKQ8gt1Zj/oU4kBhHWHixytBhe7Mm6+gvQdhKA/S3
-        BakKJZ3ZRziOqzPVEOYfVNfaOyhy1qZGlJY98zwCBQz40ldKYhD9liwW8MSI9PQHULzKis
-        Ii3PE3EA9RhN/Gwz9NDPmnNf8ieweYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-qJyyi4HNN9ySWoA3fSGaEg-1; Mon, 17 Feb 2020 22:46:10 -0500
-X-MC-Unique: qJyyi4HNN9ySWoA3fSGaEg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EFC41007271;
-        Tue, 18 Feb 2020 03:46:09 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F6D5DA60;
-        Tue, 18 Feb 2020 03:46:01 +0000 (UTC)
-Date:   Tue, 18 Feb 2020 11:45:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 3/5] blk-mq: Fix a recently introduced regression in
- blk_mq_realloc_hw_ctxs()
-Message-ID: <20200218034556.GC30750@ming.t460p>
-References: <20200217210839.28535-1-bvanassche@acm.org>
- <20200217210839.28535-4-bvanassche@acm.org>
+        Tue, 18 Feb 2020 07:35:42 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ICQ99x020165
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:35:41 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y87e6gymc-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 07:35:41 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 18 Feb 2020 12:35:38 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Feb 2020 12:35:34 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ICZXnD39846136
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Feb 2020 12:35:33 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E77964C05C;
+        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78E1E4C046;
+        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.110])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Feb 2020 12:35:32 +0000 (GMT)
+Date:   Tue, 18 Feb 2020 13:35:31 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Subject: Re: [PATCH 1/2] virtio-blk: fix hw_queue stopped on arbitrary error
+In-Reply-To: <CACVXFVNiADTW_vLVc1bUSa0CoViLbVzoMnSJW4=sx=MCE-xUPw@mail.gmail.com>
+References: <20200213123728.61216-1-pasic@linux.ibm.com>
+        <20200213123728.61216-2-pasic@linux.ibm.com>
+        <CACVXFVNiADTW_vLVc1bUSa0CoViLbVzoMnSJW4=sx=MCE-xUPw@mail.gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200217210839.28535-4-bvanassche@acm.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021812-0012-0000-0000-00000387F466
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021812-0013-0000-0000-000021C4846F
+Message-Id: <20200218133531.3eb08120.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-18_02:2020-02-17,2020-02-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ impostorscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002180101
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 17, 2020 at 01:08:37PM -0800, Bart Van Assche wrote:
-> q->nr_hw_queues must only be updated once it is known that
-> blk_mq_realloc_hw_ctxs() has succeeded. Otherwise it can happen that
-> reallocation fails and that q->nr_hw_queues is larger than the number of
-> allocated hardware queues. This patch fixes the following crash if
-> increasing the number of hardware queues fails:
-> 
-> BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x775/0x810
-> Write of size 8 at addr 0000000000000118 by task check/977
-> 
-> CPU: 3 PID: 977 Comm: check Not tainted 5.6.0-rc1-dbg+ #8
-> Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> Call Trace:
->  dump_stack+0xa5/0xe6
->  __kasan_report.cold+0x65/0x99
->  kasan_report+0x16/0x20
->  check_memory_region+0x140/0x1b0
->  memset+0x28/0x40
->  blk_mq_map_swqueue+0x775/0x810
->  blk_mq_update_nr_hw_queues+0x468/0x710
->  nullb_device_submit_queues_store+0xf7/0x1a0 [null_blk]
->  configfs_write_file+0x1c4/0x250 [configfs]
->  __vfs_write+0x4c/0x90
->  vfs_write+0x145/0x2c0
->  ksys_write+0xd7/0x180
->  __x64_sys_write+0x47/0x50
->  do_syscall_64+0x6f/0x2f0
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Johannes Thumshirn <jth@kernel.org>
-> Cc: Keith Busch <kbusch@kernel.org>
-> Fixes: ac0d6b926e74 ("block: Reduce the amount of memory required per request queue")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-mq.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 2b9f490f5a64..5408098b58f2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2824,7 +2824,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->  			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
->  			       sizeof(*hctxs));
->  		q->queue_hw_ctx = new_hctxs;
-> -		q->nr_hw_queues = set->nr_hw_queues;
->  		kfree(hctxs);
->  		hctxs = new_hctxs;
->  	}
+On Tue, 18 Feb 2020 10:21:18 +0800
+Ming Lei <tom.leiming@gmail.com> wrote:
 
-Looks correct, since ->nr_hw_queues needs to be updated after hctxs are
-initialized successfully:
+> On Thu, Feb 13, 2020 at 8:38 PM Halil Pasic <pasic@linux.ibm.com> wrote:
+> >
+> > Since nobody else is going to restart our hw_queue for us, the
+> > blk_mq_start_stopped_hw_queues() is in virtblk_done() is not sufficient
+> > necessarily sufficient to ensure that the queue will get started again.
+> > In case of global resource outage (-ENOMEM because mapping failure,
+> > because of swiotlb full) our virtqueue may be empty and we can get
+> > stuck with a stopped hw_queue.
+> >
+> > Let us not stop the queue on arbitrary errors, but only on -EONSPC which
+> > indicates a full virtqueue, where the hw_queue is guaranteed to get
+> > started by virtblk_done() before when it makes sense to carry on
+> > submitting requests. Let us also remove a stale comment.
+> 
+> The generic solution may be to stop queue only when there is any
+> in-flight request
+> not completed.
+> 
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+I think this is a pretty close to that. The queue is stopped only on
+ENOSPC, which means virtqueue is full.
 
+> Checking -ENOMEM may not be enough, given -EIO can be returned from
+> virtqueue_add()
+> too in case of dma map failure.
 
-thanks,
-Ming
+I'm not checking on -ENOMEM. So the queue would not be stopped on EIO.
+Maybe I'm misunderstanding something In any case, please have another
+look at the diff, and if your concerns persist please help me understand.
+
+Thanks for having a look!
+
+Regards,
+Halil
+
+> 
+> Thanks,
 
