@@ -2,98 +2,111 @@ Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B30EC34026
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6022C34026
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D990D21D56
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:41:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A99F22B48
+	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:53:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsEV4pt5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U2j547Cy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbgBRSlB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 13:41:01 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:44307 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726422AbgBRSlB (ORCPT
+        id S1726403AbgBRSxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 13:53:40 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:53798 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbgBRSxk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 13:41:01 -0500
-Received: by mail-ot1-f68.google.com with SMTP id h9so20483798otj.11;
-        Tue, 18 Feb 2020 10:41:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EZCiAlqDH3qOaiJgV5vGDQ5vRps2KrE4XKxEP2OQROw=;
-        b=hsEV4pt5WaXrHLoH1HPuSHEWmmmafWmhhYLpdXlN9spNtEg8FNcn130X8yoxLL7ADk
-         FqnA//uNhE//EssWuwC/JHz4UGQ9Xy+Ak1bvW5AMZQH7Hay8NvbprXa3HHUSnXSMAvq8
-         qDtgxN6XeAd8dLkp24SFA6s0oCjyxTm/ocavaHwlcL1pR1gjhc1OqMIfzX0+8VXwqCz7
-         ALg0nMKr6hXVv+AZIrE9u6F27pxb3FEYzWFB9q33qD1l8OMFG8cPb9CQxqXDQuiEXyPq
-         LxmpQJlHqZIj5TgH+T+ZXVkwg4bTh7Fn8PYv+DLbJSIcPJu7i3IkY6oluvcJg1gHt2N3
-         l/qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EZCiAlqDH3qOaiJgV5vGDQ5vRps2KrE4XKxEP2OQROw=;
-        b=JrpaOU36tr+pHNqcGwjoJKeGoND0ZoGMHGGIxExZ3Wo7sWw61lpUB5QPxPIDeOXAo2
-         /YpzyRAaeTvaofk95jTSS31GKgdL8Z/NVgKj5Qvb7ftKDGByKIRUhp/1gTmDcZs1xwMb
-         q5K4TppKvvMrS+JQF7B5zR3sxdaky7IB5993amPuu2XFsF6tuGaD2GwX/jRctLc43bX6
-         nXK5iDbFXFvIL1TcZybQ14tRgHKHJQauF4aL6pKFkxC1yxA1b9IdPEUVdr5BlB7YrhZI
-         XfgXt+WTkCHSWNTJhJPRsCpbbT9zYGXFyPhfbNZDl0XBfG7z7UK26QQI1MwbLolBD/da
-         FuAQ==
-X-Gm-Message-State: APjAAAWeY+gC00ja4+LJWiYl0Mu1LxExJHbrraTfeE7w8EavmJBHX4x8
-        Wm3piYhh1IARm3RGzTlBocrBIaSKrHWU+lzyYtSCPFwsfRk=
-X-Google-Smtp-Source: APXvYqwILFYaM0G8aVXHHaVO6r1RT9OQuAWCnL94KV8KPjsDTVTLkXtMFU3biliEASl7JfiD9n7GzgyPviMCcX+zND0=
-X-Received: by 2002:a9d:53c4:: with SMTP id i4mr17734076oth.48.1582051259934;
- Tue, 18 Feb 2020 10:40:59 -0800 (PST)
+        Tue, 18 Feb 2020 13:53:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6j4dbVJFJ7oC5DhQZUAIAKi7jxQSaytsVxqOSb9w4KQ=; b=U2j547CyaTMSl1ZbRusn62lgFo
+        J84flzxCZ4FHWDTcaPQ1AXHDxrJ4x9KkJ4LkWBgafCFjPC1U5sTuP2Xga8daT30nhifZiBXhNOkGa
+        nL27PfE/VPWQjKFtFMEWNa2HvzjkyCFuFi0AohXmC6XOGhRfjc+QP3NVjvuRmrJUOKkB6xsgDcLN6
+        Tm1XDKozCfBPbzoqOqd8YPIMQjf1OdhXTZ/hOY7UA47vOkuseO4GfUb4lTd18nx2XKopkgHIxUsYV
+        aQN4ihIQzpNNZwDK+rVq1IToXO1awP5GMc1SVbK95/HKgB2pn4ACNF2ijCKTa5bNuZOGmNp9sVzLw
+        aizBuPiw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j4800-0007Am-Hw; Tue, 18 Feb 2020 18:53:36 +0000
+Date:   Tue, 18 Feb 2020 10:53:36 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Nikolai Merinov <n.merinov@inango-systems.com>
+Cc:     hch@infradead.org, Davidlohr Bueso <dave@stgolabs.net>,
+        Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>,
+        linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
+ partition entry
+Message-ID: <20200218185336.GA14242@infradead.org>
+References: <20181124162123.21300-1-n.merinov@inango-systems.com>
+ <20191224092119.4581-1-n.merinov@inango-systems.com>
+ <20200108133926.GC4455@infradead.org>
+ <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
 MIME-Version: 1.0
-References: <20200203053650.8923-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20200203053650.8923-1-xiyou.wangcong@gmail.com>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Tue, 18 Feb 2020 10:40:48 -0800
-Message-ID: <CAM_iQpVegeSSWDWZTt4+ZT6qE3-AwsyHj7DAkFiFu8+8Hy-5jA@mail.gmail.com>
-Subject: Re: [Patch v3] block: introduce block_rq_error tracepoint
-To:     linux-block@vger.kernel.org
-Cc:     LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
+On Mon, Jan 13, 2020 at 03:27:23PM +0500, Nikolai Merinov wrote:
+> GUID partition entry defined to have a partition name as 36 UTF-16LE
+> code units. This means that on big-endian platforms ASCII symbols
+> would be read with 0xXX00 efi_char16_t character code. In order to
+> correctly extract ASCII characters from a partition name field we
+> should be converted from 16LE to CPU architecture.
+> 
+> The problem exists on all big endian platforms.
+> 
+> Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
+> ---
+>  block/partitions/efi.c | 3 ++-
+>  block/partitions/efi.h | 2 +-
+>  include/linux/efi.h    | 5 +++++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+> index db2fef7dfc47..f1d0820de844 100644
+> --- a/block/partitions/efi.c
+> +++ b/block/partitions/efi.c
+> @@ -715,7 +715,8 @@ int efi_partition(struct parsed_partitions *state)
+>  				ARRAY_SIZE(ptes[i].partition_name));
+>  		info->volname[label_max] = 0;
+>  		while (label_count < label_max) {
+> -			u8 c = ptes[i].partition_name[label_count] & 0xff;
+> +			u8 c = 0xff & efi_char16le_to_cpu(
+> +					ptes[i].partition_name[label_count]);
 
+Why are you swapping the order of the comparism to an unusual one here?
 
-On Sun, Feb 2, 2020 at 9:37 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
->
-> Currently, rasdaemon uses the existing tracepoint block_rq_complete
-> and filters out non-error cases in order to capture block disk errors.
->
-> But there are a few problems with this approach:
->
-> 1. Even kernel trace filter could do the filtering work, there is
->    still some overhead after we enable this tracepoint.
->
-> 2. The filter is merely based on errno, which does not align with kernel
->    logic to check the errors for print_req_error().
->
-> 3. block_rq_complete only provides dev major and minor to identify
->    the block device, it is not convenient to use in user-space.
->
-> So introduce a new tracepoint block_rq_error just for the error case
-> and provides the device name for convenience too. With this patch,
-> rasdaemon could switch to block_rq_error.
->
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> -	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
+> +	efi_char16le_t partition_name[72 / sizeof(efi_char16le_t)];
+>  } __packed gpt_entry;
+>  
+>  typedef struct _gpt_mbr_record {
+> diff --git a/include/linux/efi.h b/include/linux/efi.h
+> index aa54586db7a5..47882f2d45db 100644
+> --- a/include/linux/efi.h
+> +++ b/include/linux/efi.h
+> @@ -45,9 +45,14 @@
+>  typedef unsigned long efi_status_t;
+>  typedef u8 efi_bool_t;
+>  typedef u16 efi_char16_t;		/* UNICODE character */
+> +typedef __le16 efi_char16le_t;		/* UTF16-LE */
+> +typedef __be16 efi_char16be_t;		/* UTF16-BE */
+>  typedef u64 efi_physical_addr_t;
+>  typedef void *efi_handle_t;
+>  
+> +#define efi_char16le_to_cpu le16_to_cpu
+> +#define efi_char16be_to_cpu be16_to_cpu
 
-Can you take this patch?
-
-Thanks!
+I'd rather use plain __le16 and le16_to_cpu here.  Also the be
+variants seems to be entirely unused.
