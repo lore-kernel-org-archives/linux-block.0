@@ -2,120 +2,153 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3867C34055
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372BCC34047
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C7B224672
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:24:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E1392467E
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oxowl+Lv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q0KvBn7A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgBSQYA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:24:00 -0500
-Received: from mail-vk1-f196.google.com ([209.85.221.196]:36887 "EHLO
-        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726826AbgBSQYA (ORCPT
+        id S1726713AbgBSQZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:25:29 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:46566 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726659AbgBSQZ3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:24:00 -0500
-Received: by mail-vk1-f196.google.com with SMTP id b2so298693vkk.4
-        for <linux-block@vger.kernel.org>; Wed, 19 Feb 2020 08:24:00 -0800 (PST)
+        Wed, 19 Feb 2020 11:25:29 -0500
+Received: by mail-lj1-f194.google.com with SMTP id x14so958693ljd.13;
+        Wed, 19 Feb 2020 08:25:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tUCnssO5MQUtUphe3hr1D6XyGMraXMVzCxN86p9qtZo=;
-        b=oxowl+Lvvz80ew5XyDzHOY3VfNaXuD4u1IDJe6f1JzqlkFeuwsorfRQP3fnbE7VDpz
-         yyfS/nWnrEjmJ5E4IJUJJsfN5sdEfbbb9RfjIn95wuc023N8lncxStdFYi3ULDAdUYzE
-         OWOb+qMoEZd20Zm4mVW1Xfx68HirDjV8yf4IMYEe6qgtWrwbvNzsQUbqVkFo0Gk/GrPF
-         1MdclO/xBI41rn2B/PytPsC/Pt3jupFfGO73X9K6TUwxw/kSfwP5sFMF+HJkcgZ5oSbW
-         OpMn18vIiLQu0TkPat8wY2pqsIMo3Pr/DNnnoMX6wEsAqcrNIR0Ic0A+Qx6bihhSmZuh
-         XOYA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LGUcIpTbEbd2gKzVZah8ywZm+EFWRECsbgMwE4dPkmc=;
+        b=q0KvBn7A14JQWVR1QGa6Q4b8U95+mkJ2Huoy2MrpQLM+x3CC3hwCOoVa/kQCAa2W7e
+         3kjdB16EuvFpGvPNgwlDpVjhHCwgfyWIiw1IaGYXn1MSNL8IF1a1JjNAYTJc+172PpxZ
+         5Z7vqbxPTifdCh9BU79UqIkJLfQlOn9qwxbCAR6Y6bIYX48nmkIJrhr87EWUuP0cRAb1
+         nPTwI8k4maeYJnZeaHiA4yp3J1yLLkAkwPGFGHeMP8H9vTGdP7OdDBpI4g3rkVJ/FpVq
+         d9m3b/L3RLClnokebu6bmvS9R0qn1q+RO2Ih2ptmAuXi2bVjMCusV2prdez3VivLhmuN
+         AoAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tUCnssO5MQUtUphe3hr1D6XyGMraXMVzCxN86p9qtZo=;
-        b=o/4QfZvvH78eSY5B9MPiWlOwtkmF+RuJuHq74IGxzKqVydEP0jNqH4v3OaipZWxnqq
-         onGu+WSJGrEDbLy6dUm24S+PCQcscYjn1HkmDeoYBaZDbhxygZsxfifKKEHmwdexLlq7
-         InOKg/sdBSaoUSc2ymHmK9KmlpmI9xxr1aqgukiZLmtBjWMnOy76vK/zUV1rIRIUdkFU
-         egUbESkVuYp6lH+dYO7vdcFZPjh9lw0RoJFc0CaO83I9QOUfRwOH9OUbrdcH6UJUUy/s
-         F/KnLclz90uu4Wna8DY0a2F/FU7V96krQdhTmSX/GNCPGAOPExti0gNyw2IdxcKnF6hX
-         kOZg==
-X-Gm-Message-State: APjAAAU8HyfSLXdwsEK6flgVn0FAdqDX40xwLzfek3jcSA64uziu5Qpf
-        MLqejgrAfr/yL7qi9av9Vij/QaW1YWpWJy8asGWazRgswcY=
-X-Google-Smtp-Source: APXvYqzyh9yyZ5QkoRBBnXRGTTWzKcqCjGW/k3Lkb+t+GXzqJPCTsA6Ga1EtjzJdVzfC+ekGLGASGI7AaSfdBeOHzt8=
-X-Received: by 2002:a1f:4541:: with SMTP id s62mr11622389vka.59.1582129439617;
- Wed, 19 Feb 2020 08:23:59 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LGUcIpTbEbd2gKzVZah8ywZm+EFWRECsbgMwE4dPkmc=;
+        b=g5WZT/6mRjPY9xhI6zebnx+kYzTg0le6DugGvUo70NNVjyPNa0zMLoxZClzlyxziW2
+         K1xhLlBStU32Y/543boK6ghgI9CSmWJQrqfWxHSGw+FQfuaOAsDdGchZg/E88mhCgRN0
+         wnjpZQMQzoaxobpB8ObsBA06n0x9ICK8rg0YRTSLY0FFvirUJKcRBPfq0AAVhLyd+GN9
+         ldRWpkLun/T41fwlHO5cbl87VoB1dvx9jD/wj8o8oHkefcmX4CdYffwSb69ZZx3Gmy83
+         kdEGJ8UWvR/OPoQkQl4j1DdBn8HLIysSD7kvL7dNIU1I7TlYW0EWR+K11WIvpKuqrqor
+         LErA==
+X-Gm-Message-State: APjAAAUaWjwToWqca0sUCObsG/gyBjzrWFYQWHAV0XZYOOp19uxiWDqQ
+        vlO1QklsqYo0cW/lAh9Iv+jVrNUN
+X-Google-Smtp-Source: APXvYqzgQTpVrzmYj7+xZaS9PwsyHhb4+lZha07RnRL0jtLKr12a2UhG+kDKXAbBvaNwDh566wCCjg==
+X-Received: by 2002:a2e:b536:: with SMTP id z22mr15860746ljm.259.1582129526316;
+        Wed, 19 Feb 2020 08:25:26 -0800 (PST)
+Received: from localhost.localdomain (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
+        by smtp.gmail.com with ESMTPSA id i67sm26819lfd.38.2020.02.19.08.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2020 08:25:25 -0800 (PST)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
+        Colin Cross <ccross@android.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>
+Cc:     linux-efi@vger.kernel.org, linux-tegra@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline parameter
+Date:   Wed, 19 Feb 2020 19:23:39 +0300
+Message-Id: <20200219162339.16192-1-digetx@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
-In-Reply-To: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 19 Feb 2020 17:23:23 +0100
-Message-ID: <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 13 Feb 2020 at 16:43, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->
-> arm beagleboard x15 device failed to boot Linux mainline and
-> linux-next kernel due
-> to below error.
-> This error occurred across all x15 device for these kernel version.
->
-> This regression started happening on x15 from this commit onwards (27th Jan)
->   git branch: master
->   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->   git commit: aae1464f46a2403565f75717438118691d31ccf1
->   git describe: v5.5-489-gaae1464f46a2
->
->
-> Test output log,
-> [   37.606241] mmc1: Card stuck being busy! mmc_poll_for_busy
-> [   37.611850] mmc1: cache flush error -110
-> [   37.615883] blk_update_request: I/O error, dev mmcblk1, sector
-> 4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
-> [   37.627387] Aborting journal on device mmcblk1p9-8.
-> [   37.635448] systemd[1]: Installed transient /etc/machine-id file.
-> [   37.659283] systemd[1]: Couldn't move remaining userspace
-> processes, ignoring: Input/output error
-> [   37.744027] EXT4-fs error (device mmcblk1p9):
-> ext4_journal_check_start:61: Detected aborted journal
-> [   37.753322] EXT4-fs (mmcblk1p9): Remounting filesystem read-only
-> [   37.917486] systemd-gpt-auto-generator[108]: Failed to dissect:
-> Input/output error
-> [   37.927825] systemd[104]:
-> /lib/systemd/system-generators/systemd-gpt-auto-generator failed with
-> exit status 1.
-> <>
+The gpt_sector=<sector> causes the GPT partition search to look at the
+specified sector for a valid GPT header if the GPT is not found at the
+beginning or the end of block device.
 
-Try to restore the value for the cache flush timeout, by updating the
-define MMC_CACHE_FLUSH_TIMEOUT_MS to 10 * 60 * 1000".
+In particular this is needed for NVIDIA Tegra consumer-grade Android
+devices in order to make them usable with the upstream kernel because
+these devices use a proprietary / closed-source partition table format
+for the EMMC and it's impossible to change the partition's format. Luckily
+there is a GPT table in addition to the proprietary table, which is placed
+in uncommon location of the EMMC storage and bootloader passes the
+location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
 
-The offending commit could perhaps be this one.
+This patch is based on the original work done by Colin Cross for the
+downstream Android kernel.
 
-commit 24ed3bd01d6a844fd5e8a75f48d0a3d10ed71bf9
-Author: Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed Jan 22 15:27:45 2020 +0100
-mmc: core: Specify timeouts for BKOPS and CACHE_FLUSH for eMMC
+Cc: Colin Cross <ccross@android.com>
+Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+---
+ Documentation/admin-guide/kernel-parameters.txt |  5 +++++
+ block/partitions/efi.c                          | 15 +++++++++++++++
+ 2 files changed, 20 insertions(+)
 
-[...]
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 50138e6826a1..ee4781daa379 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -1382,6 +1382,11 @@
+ 			primary GPT is corrupted, it enables the backup/alternate
+ 			GPT to be used instead.
+ 
++	gpt_sector	[EFI] Forces GPT partition search to look at the
++			specified sector for a valid GPT header if the GPT is
++			not found at the beginning or the end of the block
++			device.
++
+ 	grcan.enable0=	[HW] Configuration of physical interface 0. Determines
+ 			the "Enable 0" bit of the configuration register.
+ 			Format: 0 | 1
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index db2fef7dfc47..0c8926d76d7a 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -103,6 +103,17 @@ force_gpt_fn(char *str)
+ }
+ __setup("gpt", force_gpt_fn);
+ 
++/* This allows a kernel command line option 'gpt_sector=<sector>' to
++ * enable GPT header lookup at a non-standard location.
++ */
++static u64 force_gpt_sector;
++static int __init
++force_gpt_sector_fn(char *str)
++{
++	WARN_ON(kstrtoull(str, 10, &force_gpt_sector) < 0);
++	return 1;
++}
++__setup("gpt_sector=", force_gpt_sector_fn);
+ 
+ /**
+  * efi_crc32() - EFI version of crc32 function
+@@ -621,6 +632,10 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
+         if (!good_agpt && force_gpt)
+                 good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
+ 
++	if (!good_agpt && force_gpt && force_gpt_sector)
++		good_agpt = is_gpt_valid(state, force_gpt_sector,
++					 &agpt, &aptes);
++
+         /* The obviously unsuccessful case */
+         if (!good_pgpt && !good_agpt)
+                 goto fail;
+-- 
+2.24.0
 
-Kind regards
-Uffe
