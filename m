@@ -2,114 +2,95 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF52C3404E
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 06:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE24C34022
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 06:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAE3B24658
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 06:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582093196;
-	bh=Tgni9eYzm21ACiqSs0VgFNoTEdm7KmNqvw7TBLe51MA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=uCMZ/lmYr+NqhWiQiL09ljMhRIulPHHVsSHOR9FUv29UiqG8KsihjEq7kG72NNj/n
-	 /4Uq8K/ScNHhnjusj/J+oadCAgY1TP1NibhLvxp2UEDN3aqwDeMLlmwJ7qkxXJacnK
-	 sfQlQKYXogoCkBg1QwVfOa0mJoL7V2x3d0uhImaY=
+	by mail.kernel.org (Postfix) with ESMTP id 209FA208C4
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 06:32:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hzru1pus"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726169AbgBSGTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 01:19:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42804 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726096AbgBSGTy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 01:19:54 -0500
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55753208E4;
-        Wed, 19 Feb 2020 06:19:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582093194;
-        bh=Tgni9eYzm21ACiqSs0VgFNoTEdm7KmNqvw7TBLe51MA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EFSBdDyHy0nO5ZETJuVYVohdSXiDO1A47cuf/R9Z/chm9x704DP+tudUVijqJVCPv
-         mOh7peWu0fnE31SMqNRczjFBH49TKYxHqkBhzMZuLhqJwB7pX+pEgAstS+zIl6KnGb
-         Ieey+LMkuIRcZZ/QRaTZMx70m7FoxWRG17b17miE=
-Date:   Wed, 19 Feb 2020 08:19:49 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jinpu Wang <jinpuwang@gmail.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-Message-ID: <20200219061949.GB15239@unreal>
-References: <20200124204753.13154-1-jinpuwang@gmail.com>
- <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
- <20200131165421.GB29820@ziepe.ca>
- <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
- <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com>
- <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
- <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
- <20200219002449.GA11943@ziepe.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200219002449.GA11943@ziepe.ca>
+        id S1726133AbgBSGcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 01:32:25 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35780 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726106AbgBSGcZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Feb 2020 01:32:25 -0500
+Received: by mail-pl1-f194.google.com with SMTP id g6so9141014plt.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 22:32:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=Qgy6aIuitVSVRLUgnkmkswnIF5SNQ7J4oIPeyJTRMkA=;
+        b=Hzru1pusUyGdeV8M6RRcjDJxg2YxJAjf0qtGNjxsY8CpSmP+3yfog4haYzLBPulCK1
+         5LXLvLgbLGzXT5ZFqflTQWGZgiT522Cr/YWNm4EI3Om6rfoLEojGad6Pz8Plu22YQGRk
+         NbuXYKfdLMzEu55MFm+QlJmkfnRYkR2H+HU7lpkW8Em9QqiUmF74qnKaMUtNe+q2z2tf
+         zN+f9NZwezqAVHCD4zsFYa2MvjlN3IFLvjoEM9HjFoCkLVKweND5Q/I6UFk1eDDSgkoT
+         QmteUHhQUVQULUYy2VuW2dCR6MMOe/8u7FM7eRpzFW5OnQELnhhEzFuCropOTMppEXpU
+         rJUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Qgy6aIuitVSVRLUgnkmkswnIF5SNQ7J4oIPeyJTRMkA=;
+        b=H7Wak+ACDJ+c9JebhwvCZGJnATuj6hTZsixHYvcQPVOsmnXk79j8lp+DUd6fF97emw
+         3vd9FKva9lqMCC3fDnbzVcZ3sUXkaMQchOLHXFhLL6I+8SjpEJ13EhG+46ECzaVvDMFp
+         03Fd2ptKg8DlRDxKoSVncXEb2ILfJmtpoFnAvoHSqz+Wjp9H27P15lZuV2aqVj7fnVe9
+         WY5Zu4aclwfk9mfpW/bD6IQpcNSDMNibGWXPUo4AiCq6sO9/V7X0tRWHeXGGDBlBRGVr
+         0x8Cm/OOPT4vxrrI/6mXSnyZBX3Ni7XDitUxRbaKMESNt25Da61THXA8HNGTrhCHK3UQ
+         C7Iw==
+X-Gm-Message-State: APjAAAV7QjOiuNWQ79od9I51NtZpCFZycgrhRt6gZ/wX6JXRl3aeKgb1
+        PId7/SsgBXezocVUZ4zdy10=
+X-Google-Smtp-Source: APXvYqzIJksnqer7CyInqvYmguad+0IFUcRA20InqN28rnJ/x6iNawGUGLuStBLSgnApI1Gl09UsMg==
+X-Received: by 2002:a17:902:223:: with SMTP id 32mr24842193plc.167.1582093944724;
+        Tue, 18 Feb 2020 22:32:24 -0800 (PST)
+Received: from debian.lc ([61.120.150.75])
+        by smtp.gmail.com with ESMTPSA id e7sm1184487pfj.114.2020.02.18.22.32.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Feb 2020 22:32:24 -0800 (PST)
+From:   Hou Pu <houpu.main@gmail.com>
+X-Google-Original-From: Hou Pu <houpu@bytedance.com>
+To:     josef@toxicpanda.com, axboe@kernel.dk, mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        Hou Pu <houpu@bytedance.com>
+Subject: [PATCH 0/2] requeue request if only one connection is configured
+Date:   Wed, 19 Feb 2020 01:31:05 -0500
+Message-Id: <20200219063107.25550-1-houpu@bytedance.com>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 18, 2020 at 08:24:49PM -0400, Jason Gunthorpe wrote:
-> On Thu, Feb 06, 2020 at 04:12:22PM +0100, Jinpu Wang wrote:
-> > On Fri, Jan 31, 2020 at 6:49 PM Jens Axboe <axboe@kernel.dk> wrote:
-> > >
-> > > On 1/31/20 10:28 AM, Jinpu Wang wrote:
-> > > > Jens Axboe <axboe@kernel.dk> 于2020年1月31日周五 下午6:04写道：
-> > > >>
-> > > >> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
-> > > >>> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
-> > > >>>> Hi Doug, Hi Jason, Hi Jens, Hi All,
-> > > >>>>
-> > > >>>> since we didn't get any new comments for the V8 prepared by Jack a
-> > > >>>> week ago do you think rnbd/rtrs could be merged in the current merge
-> > > >>>> window?
-> > > >>>
-> > > >>> No, the cut off for something large like this would be rc4ish
-> > > >>
-> > > >> Since it's been around for a while, I would have taken it in a bit
-> > > >> later than that. But not now, definitely too late. If folks are
-> > > >> happy with it, we can get it queued for 5.7.
-> > > >>
-> > > >
-> > > > Thanks Jason, thanks Jens, then we will prepare later another round for 5.7
-> > >
-> > > It would also be really nice to see official sign-offs (reviews) from non
-> > > ionos people...
-> >
-> > Totally agree.
-> > Hi Bart, hi Leon,
-> >
-> > Both of you spent quite some time to review the code, could you give a
-> > Reviewed-by for some of the patches you've reviewed?
->
-> Anyone? I don't want to move ahead with a block driver without someone
-> from the block community saying it is OK
+Hello,
 
-I wanted to ask for a resend based on latest -rc2, if it is possible.
+NBD server could be upgraded if we have multiple connections.
+But if we have only one connection, after we take down NBD server,
+all inflight IO could finally timeout and return error. These
+patches fix this using current reconfiguration framework.
 
-Thanks
+I noticed that Mike has following patchset
 
->
-> Jason
+nbd: local daemon restart support
+https://lore.kernel.org/linux-block/5DD41C49.3080209@redhat.com/
+
+It add another netlink interface (NBD_ATTR_SWAP_SOCKETS) and requeue
+request immediately after recongirure/swap socket. It do not need to
+wait for timeout to fire and requeue in timeout handler, which seems more
+like an improvement. Let fix this in current framework first.
+
+Hou Pu (2):
+  nbd: enable replace socket if only one connection is configured
+  nbd: requeue command if the soecket is changed
+
+ drivers/block/nbd.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+-- 
+2.11.0
+
