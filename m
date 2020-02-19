@@ -2,123 +2,131 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC3E5C34056
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 17:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BA9C169F9
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 17:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0764206DB
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 17:44:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60B4B20801
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 17:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dmGfpdpt";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="vnKfOxTg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5cq4mF/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbgBSRoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 12:44:32 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:50112 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbgBSRob (ORCPT
+        id S1726784AbgBSRor (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 12:44:47 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:36550 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726634AbgBSRoq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 12:44:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1582134272; x=1613670272;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=LUnfOZixuZvo4Uw6YOMEvIGpnqioICXi5h+XrtHrr+M=;
-  b=dmGfpdpt4cC9qrB7n8No+FN9rJ04shBRqu6QkSDSXjydCi4BpS8ZbA3k
-   4whBv86pIx528Omj7wucfmG1VyPVzVx9VVfnrZyoIyifpt5df3C+8CE88
-   OrmfJvGmEM9R9GeMZHiPfcb3bN43VH9NA8Zz1uLTrJuxqwzPiS6V6giz0
-   lHhiDK2DWyjqbMc5ul/3gSwgxKwhKn1q8WVCZMIGuAzEKT8zqKd7PR0f7
-   sEJX7ixSh3ETGMjX73ieHQjS86tNCokZ7XMH+mJd/X/PHALayzisZk3hj
-   CPNchfSEdIkxenDTYXmYjcNaJzbcC6dcA9AO/BVHix9xp2ZvYXaTsoXNi
-   g==;
-IronPort-SDR: DirhfexE6NQms0IFBWHZ83KcIU366pEVXxgf9I+kjfk5n7d3XZk9D4vW2/11iXWdUlwhuHgc4L
- VcstoaqNm7y5nfxX05l5AOBjNX5IiQPLZc9hXZLARR4drTxbeo4wZSDNPFPwKLkFdSHUQfeKXY
- dtd/CcKOxtjirTSEuBK2HYsvCzjLcV82TF2fqhQQOJCCu2f5cIsP31ogJbgB7nArQvn0rbYUeV
- ktNM9SS69mcMRxCQUhYwHwCx1bFroUBgMXy0PuzEiQZv6QCexrcLxKvjWgLxXDZj4L4qPxvYXi
- Wbs=
-X-IronPort-AV: E=Sophos;i="5.70,461,1574092800"; 
-   d="scan'208";a="134568923"
-Received: from mail-dm6nam12lp2174.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.174])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2020 01:44:31 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ItoVoWzalxEsuE8JKiWV18uvCZmPejHv8Nsx+pmiMvQesWcuQfYFwgzpQGoYY1PxlMPd9NM2PmMbaj+CsSvpY1McQKH6Tt7jhOJaA4QouDaLeCCVc7RrxovWChsn8j4Hh8qBesASMzQvBpdlpReE0rFddH9+wDtQQ28PC0twlBgWxBnN7IzhQkPeI6x2tJ6jXai/C3ER/KKOmS3f5sleDxPoe1hH7FPLPNEM1Sy8ogAQso8tS6NGh2LXs1kG0GvC2AfFtKfSdAGW7Sk5sBXPTwdVNkWs6N3R+hv+g82UIk1RBLboXH6hy2snRwxROQxxXU1ulXR8NoqoNOXWfa+vGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LUnfOZixuZvo4Uw6YOMEvIGpnqioICXi5h+XrtHrr+M=;
- b=JCs/HmMIJShGh+ZKWRUjK4Lt0yuO1vIbHg8Az75hGI9TDD/Fsum5B0flF+mT7jn5NINETxVc4GCr6o6DIcF9X8lDc2Ho4VCyroOz+Pdh4ljxmLzO8CYewfhglqISWCDQA5KXg5RLWk3bHBzMfV7sC5elzUPYBaPHfxGYlWxliph7/Xh/2mPwfsqqTMtygclQ9nWSuW+6G5bKKZ5hspDlPBINp70y3NOvVgwd2a3fRec367IHq3JKJNyuXXhQqo24yzn1WFTxzni5O5ALtOlK4nj/aw9wlrJCzjXVnES0NwGCYdcfB4tfCJr2DAHIz4UydL2ws5pXtqXbIzsjS0KVCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Wed, 19 Feb 2020 12:44:46 -0500
+Received: by mail-lf1-f66.google.com with SMTP id f24so813561lfh.3;
+        Wed, 19 Feb 2020 09:44:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LUnfOZixuZvo4Uw6YOMEvIGpnqioICXi5h+XrtHrr+M=;
- b=vnKfOxTgg0csOSgrHUZN5RaaYjJKpZb6boRmxfy+mK5yM+UijM/iv0ryliW4TCsYGoXfw6b8iACMlTX2HxfM3zmMq0dt4vzIGbryctiV3RWkXRoqcS/Bb5IBLS39KP5ba+3KlYXYqEH6x2G67yOIlthhtxENssYwE6nmu8A0eiQ=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (20.179.57.21) by
- BYAPR04MB5478.namprd04.prod.outlook.com (20.178.234.25) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.31; Wed, 19 Feb 2020 17:44:29 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fdf8:bd6f:b33d:c2df]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fdf8:bd6f:b33d:c2df%3]) with mapi id 15.20.2750.016; Wed, 19 Feb 2020
- 17:44:29 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2 0/3] null_blk: add tracnepoints for zoned mode
-Thread-Topic: [PATCH V2 0/3] null_blk: add tracnepoints for zoned mode
-Thread-Index: AQHV5oDlsjqP0gJg0kWUTukh7pHHxQ==
-Date:   Wed, 19 Feb 2020 17:44:29 +0000
-Message-ID: <BYAPR04MB5749EB446FF18D5C52A1DE5986100@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20200218172840.4097-1-chaitanya.kulkarni@wdc.com>
- <20200219162912.GC10644@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3d08bfd5-d897-4fea-0451-08d7b5635ed8
-x-ms-traffictypediagnostic: BYAPR04MB5478:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB5478B7A303E38D1975791BD886100@BYAPR04MB5478.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1002;
-x-forefront-prvs: 0318501FAE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(376002)(346002)(39860400002)(136003)(366004)(199004)(189003)(4326008)(186003)(7696005)(478600001)(558084003)(5660300002)(2906002)(26005)(71200400001)(316002)(54906003)(76116006)(66946007)(66476007)(64756008)(66446008)(55016002)(66556008)(53546011)(6506007)(86362001)(8936002)(81166006)(8676002)(81156014)(6916009)(9686003)(52536014)(33656002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5478;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kydnz7QQQwpfyZdDx9VGt93buHU5LdsDG63zt1oZ0Ma1eryrGNGBlvjbSYl0WmELWkAm0tSOgRQKR5hJdrARAiUQZYv1gH6GQHgrDVRh5XFxyXpyaJjk7R3aBYUZxAStAIyGwR1HuO1KMAquP8hYHYXtaPKDBVdp9ta1xm3jPkF58PXaHc0z4M4tCEtjU9nUryuYRMzcHRNEDh8UHpxugZRbAWzAkMO7F7ga68jvgjaEE2G+1+OoC4lJiOlLb62o7MzpfY5AUz/6tgaCRTsmTo+E3Lzi/8dG5WvDZV3wZJg6nRmekq05nvXlyHeUQVGmmzm5adqY0bJw4I3lmow11wvBZajc/dGyu+eLdjqUsBQ80oeczu2u487vxa0WeCE6lgGHt/JO9uuOPI/iL92g/VnxVgFDIRQFvAm+joxFJj5QkVQvWFWQJgXuA5yLynfw
-x-ms-exchange-antispam-messagedata: E6hQLRN0Vhz1tQCQrmtP98D253zvEpDV+YR6i5px1K8YSl30PUWh7yqGlvCrswTn3fE05hWmB0kyFaDzFtOwslJp51hTDjfzaoI1uiCZox4NwKTagdttMAorxaTqyfgX1eKlI1HoFBt1RE1EXwioog==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=uPOumAcBRmkHJ4EJLjVwjyx0UkodYRqLQx2fcbRzjcU=;
+        b=e5cq4mF/bFwQMZTp+Vg5gt8plzWasQB/r379lvjWCErASKW+BA24SB2zyRZyLc7oSZ
+         eKHynbtTSgcyUJYqX+Jqk+hTx5l+o5ytfPRpvB8WPsPBQHThkSIWoujH9ARG2lEYmljh
+         Sa5plISmGyfd5q9hLgFzpxQKAELhTv2KoKASuA+jpf+fzErpbrZ/BUx7QH1X6S8ZlOUA
+         z6S+YwuBYuPsVwJ9Auuythr9wVH6piDHCcXCH+ECIltgt6y6HT9dxZARyfD4LqYNSPZ8
+         fSCHMfObm2ls8WuoqWT3eLjzLPLAp0P22mi/GAvLHFu7lzuvB88AQYdHT04Yfrvt4QH/
+         RPlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=uPOumAcBRmkHJ4EJLjVwjyx0UkodYRqLQx2fcbRzjcU=;
+        b=G5ouDUSr6vEQA41NgErXP1VhP0li4TOijwsliMr3ocroWYVecmLWW1tbHg1ZaQqKwa
+         W7SUnZT/CevepzvPMlZ2FbMum52vDP+9S/0BP/f7LQhpTBRENY8WBsxQz3Mk2v7ktGZf
+         nLTylRLWLCfFVophLOg1UvK353DUByf0ej1EZTt1zR60edoX3dBPkw6f0OhjfYErpDOp
+         Gbi2GeJcou+oR0R9+laYpJrb8EzktuvV32+aJqMGFZQwHuYpoIwBfEXPca+DBXttiJlD
+         jYMP5NkoBLkMx+MES7/xT/LKeBPDyza7ZO1tNkIaNgsaa7ifRg0XwARnkAXHwZwvOHWM
+         84Qw==
+X-Gm-Message-State: APjAAAX3a/lTZTXX+JpklliJ9nL3lTpTOKD3HrdpeJOsVB7Ei6WEXAmU
+        5FsrMIVJ170rR5K3KSjBUGl8h9ah
+X-Google-Smtp-Source: APXvYqw3ltqhA/bDiRtozOcGmk+Vo3B59KY45uUdjerXfOUHP0AtD/B/7ZhTC9AxNjJ9jBSxV6oGVA==
+X-Received: by 2002:a19:5e41:: with SMTP id z1mr14182445lfi.101.1582134283843;
+        Wed, 19 Feb 2020 09:44:43 -0800 (PST)
+Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
+        by smtp.googlemail.com with ESMTPSA id s17sm254568ljo.18.2020.02.19.09.44.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2020 09:44:43 -0800 (PST)
+Subject: Re: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline
+ parameter
+To:     Stephen Warren <swarren@wwwdotorg.org>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
+        Colin Cross <ccross@android.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>, linux-efi@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200219162339.16192-1-digetx@gmail.com>
+ <20200219162738.GA10644@infradead.org>
+ <f9e41108-7811-0deb-6977-be0f60e23b52@wwwdotorg.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <0c0d0cff-7b20-f777-8724-0d2b07e60e3d@gmail.com>
+Date:   Wed, 19 Feb 2020 20:44:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d08bfd5-d897-4fea-0451-08d7b5635ed8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2020 17:44:29.2160
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: L8eIfEGQgEF7+BMuZjV8u6SZGhmSkITSm7P4ziJmRaozCfxXyqbBHJQF0qU8DDmgEnbbLX2xKsZCasdqrNhL2Rw+vuv6MW/N27x+Z7Q63M0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5478
+In-Reply-To: <f9e41108-7811-0deb-6977-be0f60e23b52@wwwdotorg.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 02/19/2020 08:29 AM, Christoph Hellwig wrote:=0A=
-> s/tracnepoints/tracepoints/ ?=0A=
->=0A=
-=0A=
-Thanks will fix in next version.=0A=
+19.02.2020 19:59, Stephen Warren пишет:
+> On 2/19/20 9:27 AM, Christoph Hellwig wrote:
+>> On Wed, Feb 19, 2020 at 07:23:39PM +0300, Dmitry Osipenko wrote:
+>>> The gpt_sector=<sector> causes the GPT partition search to look at the
+>>> specified sector for a valid GPT header if the GPT is not found at the
+>>> beginning or the end of block device.
+>>>
+>>> In particular this is needed for NVIDIA Tegra consumer-grade Android
+>>> devices in order to make them usable with the upstream kernel because
+>>> these devices use a proprietary / closed-source partition table format
+>>> for the EMMC and it's impossible to change the partition's format.
+>>> Luckily
+>>> there is a GPT table in addition to the proprietary table, which is
+>>> placed
+>>> in uncommon location of the EMMC storage and bootloader passes the
+>>> location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
+>>>
+>>> This patch is based on the original work done by Colin Cross for the
+>>> downstream Android kernel.
+>>
+>> I don't think a magic command line is the way to go.  The best would be
+>> to reverse-engineer the proprietary partition table format.  If that is
+>> too hard we can at least key off the odd GPT location based of it's
+>> magic number.
+> 
+> I thought that the backup GPT was always present in the standard
+> location; it's just the primary GPT that's in an odd location. So, this
+> kernel parameter just forces the kernel to look first for the primary
+> GPT in the unusual location, thus avoiding an error message when that's
+> not there, and the system falls back to the backup GPT.
+> 
+> Or, do I misremember the layout, or the kernel's behaviour if primary
+> GPT is missing?
+
+The backup GPT not always presents in the standard location. For example
+Tegra30 ASUS Google Nexus 7 has a backup GPT in the proper location and
+this is what KMSG prints:
+
+[    1.722888] Primary GPT is invalid, using alternate GPT.
+[    1.723076]  mmcblk1: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10
+
+But this doesn't work for Tegra20 Acer A500 and (IIRC) Tegra30 Ouya
+because both primary and backup GPTs are invalid at the standard locations.
