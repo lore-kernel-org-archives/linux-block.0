@@ -2,109 +2,144 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C02C34055
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C05BC3405F
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A037320578
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="b7HJsPgN"
+	by mail.kernel.org (Postfix) with ESMTP id 0BE7224673
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726794AbgBSQng (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:43:36 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:39021 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbgBSQng (ORCPT
+        id S1726784AbgBSQwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:52:20 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:52941 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726450AbgBSQwU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:43:36 -0500
-Received: by mail-pg1-f193.google.com with SMTP id j15so365814pgm.6
-        for <linux-block@vger.kernel.org>; Wed, 19 Feb 2020 08:43:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=CSi48COg7O+zi2K9/ck2d1xU7vAVOC+iAJju5Ur3V0o=;
-        b=b7HJsPgNeKbBv9+A8TG0o1/TRxU+ISF8hI4w5ytwopFEZmuolUmVpZotDd2JWlAWax
-         xo61mx55cKtmeqHiCfN8OTSOS8duITjAQIFwEJgo1IRTLTEHxFb4I1urWQVDy4b2k8VI
-         TXVh5piKH5spZ/4RFxPDS4TtvNQeTzouZDqWu7zOvanpicLnPdAlCL5C5RbRJr1Nz8oz
-         Bd4lqDeEI1YSTFH/1DrlJpw/zb5tL+dDSC3uUu9q92ZBxj8xet8oWUhHbnOtNLwsW/f/
-         WjXfUNp7clzRKZd1kDcC/VGLdjqSS0AtM/ivQeD6tuYjjzvEEvLmR3s6RFZy05pEZWcq
-         QDlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=CSi48COg7O+zi2K9/ck2d1xU7vAVOC+iAJju5Ur3V0o=;
-        b=foDPWjcsyFWZ0X6E8gD11DG5femCE/bqbBMJNnCAw5AoVp6JeNwMbWPzrFeuu1evbk
-         Oa9Yk9hA4TJfoPR0e9rn4fwhlRvyn2EeIN4iF8w9ctqpje9t/RIsf7/oNp3mu7V9Jum3
-         597h9Uq61oTZthi0wDewv0ggCL5v3ZO0/vAvxXz1nhkZFdZeW9s/1DKroP0RLiOmiwqz
-         mUhDYVEJz4fhGd7O0b0SEOp8RTt7YjAaf5k+rtjZ45SXwdkWHaE6zoWtUtvbcvCRjUna
-         vih8P2Xl+qN8qbXxzITHBJN0OR+XmX6sGWp4X5/d1sK4/vio0dFQh8YbSXPwhc2EiXTo
-         wRMQ==
-X-Gm-Message-State: APjAAAVZDb2skGStNd0dZLvXmDXc/NlRVb9jD4rrRMGW25wwnJVf2sG9
-        +SqprPGDn82Ds/TEOESWFiE8LA==
-X-Google-Smtp-Source: APXvYqwkwvCm9Kp71y3MrnjzoDfDxZEAFsr7tdGwNYzqLSkQ1xCDQSS9SWKiHNHCiMxp3TrtM6V5Mw==
-X-Received: by 2002:a63:5f17:: with SMTP id t23mr29042208pgb.91.1582130615265;
-        Wed, 19 Feb 2020 08:43:35 -0800 (PST)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id s7sm215492pgp.44.2020.02.19.08.43.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2020 08:43:34 -0800 (PST)
-Date:   Wed, 19 Feb 2020 08:43:30 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     "sunke (E)" <sunke32@huawei.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com
-Subject: Re: [PATCH blktests v4] nbd/003:add mount and clear_sock test for nbd
-Message-ID: <20200219164330.GB353282@vader>
-References: <1577071109-68332-1-git-send-email-sunke32@huawei.com>
- <8ece15f7-addf-44b2-0b54-4e1a450037f2@huawei.com>
- <20200211222345.GI100751@vader>
- <c374674b-f884-3d2e-14ca-bae2982e3fbd@huawei.com>
+        Wed, 19 Feb 2020 11:52:20 -0500
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.145]) with ESMTPA (Nemesis) id
+ 1M8QFi-1j8sQZ3yPg-004Vt0; Wed, 19 Feb 2020 17:51:52 +0100
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Adam Williamson <awilliam@redhat.com>,
+        Chris Murphy <bugzilla@colorremedies.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ben Hutchings <ben.hutchings@codethink.co.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tim Waugh <tim@cyberelk.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH] compat_ioctl, cdrom: Replace .ioctl with .compat_ioctl in four appropriate places
+Date:   Wed, 19 Feb 2020 17:50:07 +0100
+Message-Id: <20200219165139.3467320-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c374674b-f884-3d2e-14ca-bae2982e3fbd@huawei.com>
+X-Provags-ID: V03:K1:s83bO8mKDR7xliqovCqp1GmWzEogAJvpGM54ZuLLH4pmNDsLTFY
+ ZxQUDSrXrb28nM+9drVbtrJ8MxqeW1pcICoxq0M2y+aB7qvD7iMDpcHWlECDzZL3mhdhI8K
+ BS8BYAcJqRI2ZWDXrlXqDDTO/DjF/Q05SjUWe1SBIBOeT7W12CpXurHmSTHy5X5VVQQIUtO
+ bOHv7lVkw7ikMgz7kiz/w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6qcWV+qWiLI=:kjXIiUB/VicY7yGRA7ziGY
+ 1kANGtrqCMHfXJf786bqSJ4WFSALkZjbMLtINIV4T+vxgzLgP14+/+o87XoB8AVtCbsM8kSU2
+ JI4f2MPP0HNWgn+2LpS3cLb7xghKtlFrZesE8ZoHQdrwNQA8TYnwo7i8iyWT9HB/jOsfGV3LL
+ 44C+RdOO+cVWTpSTxrIQlkh0FqrhHoevLjCx+9RY95AdV8S2y5F34wcsWwJ6ip0PT5kuzV6Il
+ hzgefpeFTffFB3QgfQolJedi0HJGGr8LxI0ncuaVgWICAk3xBtKfPuNevbrVXP4lsI1AM8hgF
+ e+AIJYY4vi0qSKjKANRQ/QT0Dx71Txo5/LLy3/UAuJTwirsg+AcLyZvPJMm64+1WptLr3b6BF
+ RKNkDnFWVixEY95EGsfpmnYdt9NeK0dbodW6RUy81Q/jnEPU2MGfTAu1tIbqmB2W35IXC6DuF
+ podvY+5Xxnq/2Q2vk9VqoBFXvehS9LY6pj6EZ5yEWpyT7NauOEat01WVpSczGhPHXHnEN/3h6
+ aKIueqLHBKpGHnXYIjiuy2iGxQsibiG/eLbSbcBMKwYVdRWRbqcnHP4Kq9GTyLwL4dTE5USZi
+ aPOlnrKGSAjB/LMbVO4F7dN1KG6ykrsF2HvXh7QxFP6Q1NvKuZte5cMMhgj1N8BSC4ARzLYxv
+ LBdyXTSwHlhJGZV+d1tLgWwyR1mZFiTy0jP5n1sx42z9DwEe1XaujjxQN57RcT2S93y3Qj0Ky
+ rm7R3B5pUNK3kdNFswGHNan0hA50VY7ikJxsHyKcBI69ebqUEeCdCLq1mGBHTdpDNsPeiCTQE
+ 1WnDQxC7sbtImKsPybVj6QylWejuYsNDlTlTBj14+wohn9SOzM=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 04:13:02PM +0800, sunke (E) wrote:
-> 
-> 
-> 在 2020/2/12 6:23, Omar Sandoval 写道:
-> > On Mon, Dec 23, 2019 at 11:15:35AM +0800, sunke (E) wrote:
-> > > Hi Omar,
-> > > 
-> > > The nbd/003 you simplified does the same I want to do and I made some small
-> > > changes. I ran the simplified nbd/003 with linux kernel at the commit
-> > > 7e0165b2f1a, it could pass.Then, I rollbacked the linux kernel to commit
-> > > 090bb803708, it indeed triggered the BUGON.
-> > > 
-> > > However, there is one difference. NBD has ioctl and netlink interfaces. I
-> > > use the netlink interface and the simplified nbd/003 use the ioctl
-> > > interface. The nbd/003 with the netlink interface indeed seem to trigger
-> > > some other issue. So, can it be nbd/004?
-> > 
-> > Sure, how about we add a flag to mount_clear_sock that specifies to use
-> > the netlink interface instead of the ioctl interface, and make nbd/004
-> > which is the same as nbd/003 expect it runs it with the netlink flag?
-> > 
-> Hi Omar
-> 
-> I can not understand adding a flag to mount_clear_sock.
+From: Adam Williamson <awilliam@redhat.com>
 
-Sorry, I thought you were saying that there is a netlink interface
-equivalent to ioctl(NBD_CLEAR_SOCK).
+Arnd Bergmann inadvertently typoed these in d320a9551e394 and
+64cbfa96551a; they seem to be the cause of
+https://bugzilla.redhat.com/show_bug.cgi?id=1801353 , invalid
+SCSI commands when udev tries to query a DVD drive.
 
-> How about add
-> _start_nbd_server_netlink and _stop_nbd_server_netlink in tests/nbd/rc,
-> others can also reuse the code?
+[arnd] Found another instance of the same bug, also introduced
+in my compat_ioctl series.
 
-Sure, that works.
+Fixes: d320a9551e39 ("compat_ioctl: scsi: move ioctl handling into drivers")
+Fixes: 64cbfa96551a ("compat_ioctl: move cdrom commands into cdrom.c")
+Fixes: c103d6ee69f9 ("compat_ioctl: ide: floppy: add handler")
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=1801353
+Bisected-by: Chris Murphy <bugzilla@colorremedies.com>
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/block/paride/pcd.c | 2 +-
+ drivers/cdrom/gdrom.c      | 2 +-
+ drivers/ide/ide-gd.c       | 2 +-
+ drivers/scsi/sr.c          | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index 117cfc8cd05a..cda5cf917e9a 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -276,7 +276,7 @@ static const struct block_device_operations pcd_bdops = {
+ 	.release	= pcd_block_release,
+ 	.ioctl		= pcd_block_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.ioctl		= blkdev_compat_ptr_ioctl,
++	.compat_ioctl	= blkdev_compat_ptr_ioctl,
+ #endif
+ 	.check_events	= pcd_block_check_events,
+ };
+diff --git a/drivers/cdrom/gdrom.c b/drivers/cdrom/gdrom.c
+index 886b2638c730..c51292c2a131 100644
+--- a/drivers/cdrom/gdrom.c
++++ b/drivers/cdrom/gdrom.c
+@@ -519,7 +519,7 @@ static const struct block_device_operations gdrom_bdops = {
+ 	.check_events		= gdrom_bdops_check_events,
+ 	.ioctl			= gdrom_bdops_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.ioctl			= blkdev_compat_ptr_ioctl,
++	.compat_ioctl		= blkdev_compat_ptr_ioctl,
+ #endif
+ };
+ 
+diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
+index 1bb99b556393..05c26986637b 100644
+--- a/drivers/ide/ide-gd.c
++++ b/drivers/ide/ide-gd.c
+@@ -361,7 +361,7 @@ static const struct block_device_operations ide_gd_ops = {
+ 	.release		= ide_gd_release,
+ 	.ioctl			= ide_gd_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.ioctl			= ide_gd_compat_ioctl,
++	.compat_ioctl		= ide_gd_compat_ioctl,
+ #endif
+ 	.getgeo			= ide_gd_getgeo,
+ 	.check_events		= ide_gd_check_events,
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 0fbb8fe6e521..e4240e4ae8bb 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -688,7 +688,7 @@ static const struct block_device_operations sr_bdops =
+ 	.release	= sr_block_release,
+ 	.ioctl		= sr_block_ioctl,
+ #ifdef CONFIG_COMPAT
+-	.ioctl		= sr_block_compat_ioctl,
++	.compat_ioctl	= sr_block_compat_ioctl,
+ #endif
+ 	.check_events	= sr_block_check_events,
+ 	.revalidate_disk = sr_block_revalidate_disk,
+-- 
+2.25.0
+
