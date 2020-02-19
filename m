@@ -2,245 +2,474 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A30A0C34047
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 12:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42767C34050
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 12:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77E1320801
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 12:55:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2550F24677
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 12:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727421AbgBSMzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 07:55:10 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37320 "EHLO mx2.suse.de"
+        id S1726548AbgBSM7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 07:59:51 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42306 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727402AbgBSMzJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 07:55:09 -0500
+        id S1726622AbgBSM7v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Feb 2020 07:59:51 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C37E2B488;
-        Wed, 19 Feb 2020 12:55:07 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 0B60CAEFB;
+        Wed, 19 Feb 2020 12:59:49 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id CD4BF1E0EB5; Wed, 19 Feb 2020 13:55:05 +0100 (CET)
-Date:   Wed, 19 Feb 2020 13:55:05 +0100
+        id B0E2F1E0EB5; Wed, 19 Feb 2020 13:59:47 +0100 (CET)
+Date:   Wed, 19 Feb 2020 13:59:47 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     Tejun Heo <tj@kernel.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, jack@suse.cz, bvanassche@acm.org
-Subject: Re: [PATCH] bdi: fix use-after-free for bdi device
-Message-ID: <20200219125505.GP16121@quack2.suse.cz>
-References: <20200211140038.146629-1-yuyufen@huawei.com>
- <b7cd6193-586b-f4e0-9a5d-cc961eafaf81@huawei.com>
- <20200212213344.GE80993@mtj.thefacebook.com>
- <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
- <20200213034818.GE88887@mtj.thefacebook.com>
- <fa6183c5-b92c-c431-37ab-09638f890f6c@huawei.com>
- <20200213135809.GH88887@mtj.thefacebook.com>
- <f369a99d-e794-0c1b-85cf-83b577fb0f46@huawei.com>
- <20200214140514.GL88887@mtj.thefacebook.com>
- <32a14db2-65e0-5d5c-6c53-45b3474d841d@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, tristmd@gmail.com,
+        Jan Kara <jack@suse.cz>, stable@vger.kernel.org
+Subject: Re: [PATCH] blktrace: Protect q->blk_trace with RCU
+Message-ID: <20200219125947.GA29390@quack2.suse.cz>
+References: <20200206142812.25989-1-jack@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <32a14db2-65e0-5d5c-6c53-45b3474d841d@huawei.com>
+In-Reply-To: <20200206142812.25989-1-jack@suse.cz>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+On Thu 06-02-20 15:28:12, Jan Kara wrote:
+> KASAN is reporting that __blk_add_trace() has a use-after-free issue
+> when accessing q->blk_trace. Indeed the switching of block tracing (and
+> thus eventual freeing of q->blk_trace) is completely unsynchronized with
+> the currently running tracing and thus it can happen that the blk_trace
+> structure is being freed just while __blk_add_trace() works on it.
+> Protect accesses to q->blk_trace by RCU during tracing and make sure we
+> wait for the end of RCU grace period when shutting down tracing. Luckily
+> that is rare enough event that we can afford that. Note that postponing
+> the freeing of blk_trace to an RCU callback should better be avoided as
+> it could have unexpected user visible side-effects as debugfs files
+> would be still existing for a short while block tracing has been shut
+> down.
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=205711
+> CC: stable@vger.kernel.org
+> Reported-by: Tristan <tristmd@gmail.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-On Sat 15-02-20 21:54:08, Yufen Yu wrote:
-> On 2020/2/14 22:05, Tejun Heo wrote:
-> > Hello,
-> > 
-> > On Fri, Feb 14, 2020 at 10:50:01AM +0800, Yufen Yu wrote:
-> > > > So, unregistering can leave ->dev along and re-registering can test
-> > > > whether it's NULL and if not put the existing one and put a new one
-> > > > there. Wouldn't that work?
-> > > 
-> > > Do you mean set bdi->dev as 'NULL' in call_rcu() callback function
-> > > (i.e. bdi_release_device()) and test 'bdi->dev' in bdi_register_va()?
-> > > 
-> > > I think that may do not work.
-> > > We cannot make sure the order of rcu callback function and re-registering.
-> > > Then bdi_release_device() may put the new allocated device by re-registering.
-> > 
-> > No, I meant not freeing bdi->dev on deregistration and only doing so
-> > when it actually needs to - on re-registration or release. So, sth
-> > like the following.
-> > 
-> > * Unregister: Unregister bdi->dev but don't free it. Leave the pointer
-> >    alone.
-> > 
-> > * Re-register: If bdi->dev is not null, initiate RCU-free and update
-> >    bdi->dev to the new dev.
-> >
-> > * Release: If bdi->dev is not NULL, initiate RCU-free of it.
-> 
-> Okay, I think we can do that.
-> 
-> When do re-register, we need to update bdi->dev as 'NULL' or the new dev
-> before invoking call_rcu() to free '->dev'. So readers started after call_rcu()
-> cannot read the old dev, like:
-> 
-> bdi_register_va()
-> {
-> 	...
-> 	if (bdi->dev) {
-> 		//rcu_assgin_pointer(bdi->dev, new_dev);
-> 		rcu_assgin_pointer(bdi->dev, NULL);
-> 		call_rcu();//rcu callback function will free the old dev
-> 	}
-> 	...
-> }
-> 
-> After assigning new value for bdi->dev, rcu callback function cannot get
-> the old device. So I think we may need to replace the '->dev' with a new
-> struct pointer, in which includes '->dev' and 'rcu_head'. We pass the
-> struct.rcu_head pointer to call_rcu() and then it can get old dev address.
-> 
-> IMO, maybe we can maintain the original code logic, fix the problem like:
+Jens, do you plan to pick up the patch? Also the reporter asked me to
+update the reference as:
 
-I've now noticed there's commit 68f23b8906 "memcg: fix a crash in wb_workfn
-when a device disappears" from end of January which tries to address the
-issue you're looking into. Now AFAIU the code is till somewhat racy after
-that commit so I wanted to mention this mostly so that you fixup also the
-new bdi_dev_name() while you're fixing blkg_dev_name().
+Reported-by: Tristan Madani <tristmd@gmail.com>
 
-Also I was wondering about one thing: If we really care about bdi->dev only
-for the name, won't we be much better off with just copying the name to
-bdi->name on registration? Sure it would consume a bit of memory for the
-name copy but I don't think we really care and things would be IMO *much*
-simpler that way... Yufen, Tejun, what do you think?
+Should I resend the patch with this update & reviewed-by's or will you fix
+it up on commit? Thanks.
 
 								Honza
 
+> ---
+>  include/linux/blkdev.h       |   2 +-
+>  include/linux/blktrace_api.h |  18 +++++--
+>  kernel/trace/blktrace.c      | 114 +++++++++++++++++++++++++++++++------------
+>  3 files changed, 97 insertions(+), 37 deletions(-)
 > 
-> diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-> index 4fc87dee005a..e2de4a4e5392 100644
-> --- a/include/linux/backing-dev-defs.h
-> +++ b/include/linux/backing-dev-defs.h
-> @@ -185,6 +185,11 @@ struct bdi_writeback {
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 4c636c42ad68..1cb5afed5515 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -524,7 +524,7 @@ struct request_queue {
+>  	unsigned int		sg_reserved_size;
+>  	int			node;
+>  #ifdef CONFIG_BLK_DEV_IO_TRACE
+> -	struct blk_trace	*blk_trace;
+> +	struct blk_trace __rcu	*blk_trace;
+>  	struct mutex		blk_trace_mutex;
 >  #endif
->  };
-> 
-> +struct bdi_rcu_device {
-> +	struct device *dev;
-> +	struct rcu_head rcu_head;
-> +};
+>  	/*
+> diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+> index 7bb2d8de9f30..3b6ff5902edc 100644
+> --- a/include/linux/blktrace_api.h
+> +++ b/include/linux/blktrace_api.h
+> @@ -51,9 +51,13 @@ void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *f
+>   **/
+>  #define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
+>  	do {								\
+> -		struct blk_trace *bt = (q)->blk_trace;			\
+> +		struct blk_trace *bt;					\
+> +									\
+> +		rcu_read_lock();					\
+> +		bt = rcu_dereference((q)->blk_trace);			\
+>  		if (unlikely(bt))					\
+>  			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
+> +		rcu_read_unlock();					\
+>  	} while (0)
+>  #define blk_add_trace_msg(q, fmt, ...)					\
+>  	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
+> @@ -61,10 +65,14 @@ void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *f
+>  
+>  static inline bool blk_trace_note_message_enabled(struct request_queue *q)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> -	if (likely(!bt))
+> -		return false;
+> -	return bt->act_mask & BLK_TC_NOTIFY;
+> +	struct blk_trace *bt;
+> +	bool ret;
 > +
->  struct backing_dev_info {
->  	u64 id;
->  	struct rb_node rb_node; /* keyed by ->id */
-> @@ -219,7 +224,7 @@ struct backing_dev_info {
->  #endif
->  	wait_queue_head_t wb_waitq;
-> 
-> -	struct device *dev;
-> +	struct bdi_rcu_device *rcu_dev;
->  	struct device *owner;
-> 
->  	struct timer_list laptop_mode_wb_timer;
-> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-> index 62f05f605fb5..05f07ce19091 100644
-> --- a/mm/backing-dev.c
-> +++ b/mm/backing-dev.c
-> @@ -850,7 +850,7 @@ static int bdi_init(struct backing_dev_info *bdi)
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+> +	ret = bt && (bt->act_mask & BLK_TC_NOTIFY);
+> +	rcu_read_unlock();
+> +	return ret;
+>  }
+>  
+>  extern void blk_add_driver_data(struct request_queue *q, struct request *rq,
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 475e29498bca..a6d3016410eb 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -335,6 +335,7 @@ static void put_probe_ref(void)
+>  
+>  static void blk_trace_cleanup(struct blk_trace *bt)
+>  {
+> +	synchronize_rcu();
+>  	blk_trace_free(bt);
+>  	put_probe_ref();
+>  }
+> @@ -629,8 +630,10 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
+>  static int __blk_trace_startstop(struct request_queue *q, int start)
 >  {
 >  	int ret;
-> 
-> -	bdi->dev = NULL;
-> +	bdi->rcu_dev = NULL;
-> 
->  	kref_init(&bdi->refcnt);
->  	bdi->min_ratio = 0;
-> @@ -932,20 +932,28 @@ struct backing_dev_info *bdi_get_by_id(u64 id)
-> 
->  int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> +	bt = rcu_dereference_protected(q->blk_trace,
+> +				       lockdep_is_held(&q->blk_trace_mutex));
+>  	if (bt == NULL)
+>  		return -EINVAL;
+>  
+> @@ -740,8 +743,8 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+>  void blk_trace_shutdown(struct request_queue *q)
 >  {
-> -	struct device *dev;
->  	struct rb_node *parent, **p;
-> +	struct bdi_rcu_device *rcu_dev;
-> 
-> -	if (bdi->dev)	/* The driver needs to use separate queues per device */
-> +	/* The driver needs to use separate queues per device */
-> +	if (bdi->rcu_dev)
->  		return 0;
-> 
-> -	dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0), bdi, fmt, args);
-> -	if (IS_ERR(dev))
-> -		return PTR_ERR(dev);
-> +	rcu_dev = kzalloc(sizeof(struct bdi_rcu_device), GFP_KERNEL);
-> +	if (!rcu_dev)
-> +		return -ENOMEM;
-> +
-> +	rcu_dev->dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0),
-> +						bdi, fmt, args);
-> +	if (IS_ERR(rcu_dev->dev)) {
-> +		kfree(rcu_dev);
-> +		return PTR_ERR(rcu_dev->dev);
-> +	}
-> 
->  	cgwb_bdi_register(bdi);
-> -	bdi->dev = dev;
-> +	bdi->rcu_dev = rcu_dev;
-> 
-> -	bdi_debug_register(bdi, dev_name(dev));
-> +	bdi_debug_register(bdi, dev_name(rcu_dev->dev));
->  	set_bit(WB_registered, &bdi->wb.state);
-> 
->  	spin_lock_bh(&bdi_lock);
-> @@ -1005,17 +1013,28 @@ static void bdi_remove_from_list(struct backing_dev_info *bdi)
->  	synchronize_rcu_expedited();
->  }
-> 
-> +static void bdi_put_device_rcu(struct rcu_head *rcu)
-> +{
-> +	struct bdi_rcu_device *rcu_dev = container_of(rcu,
-> +			struct bdi_rcu_device, rcu_head);
-> +	put_device(rcu_dev->dev);
-> +	kfree(rcu_dev);
-> +}
-> +
->  void bdi_unregister(struct backing_dev_info *bdi)
->  {
-> +	struct bdi_rcu_device *rcu_dev = bdi->rcu_dev;
->  	/* make sure nobody finds us on the bdi_list anymore */
->  	bdi_remove_from_list(bdi);
->  	wb_shutdown(&bdi->wb);
->  	cgwb_bdi_unregister(bdi);
-> 
-> -	if (bdi->dev) {
-> +	if (rcu_dev) {
->  		bdi_debug_unregister(bdi);
-> -		device_unregister(bdi->dev);
-> -		bdi->dev = NULL;
-> +		get_device(rcu_dev->dev);
-> +		device_unregister(rcu_dev->dev);
-> +		rcu_assign_pointer(bdi->rcu_dev, NULL);
-> +		call_rcu(&rcu_dev->rcu_head, bdi_put_device_rcu);
+>  	mutex_lock(&q->blk_trace_mutex);
+> -
+> -	if (q->blk_trace) {
+> +	if (rcu_dereference_protected(q->blk_trace,
+> +				      lockdep_is_held(&q->blk_trace_mutex))) {
+>  		__blk_trace_startstop(q, 0);
+>  		__blk_trace_remove(q);
 >  	}
-> 
->  	if (bdi->owner) {
-> @@ -1031,7 +1050,7 @@ static void release_bdi(struct kref *ref)
-> 
->  	if (test_bit(WB_registered, &bdi->wb.state))
->  		bdi_unregister(bdi);
-> -	WARN_ON_ONCE(bdi->dev);
-> +	WARN_ON_ONCE(bdi->rcu_dev);
->  	wb_exit(&bdi->wb);
->  	cgwb_bdi_exit(bdi);
->  	kfree(bdi);
-> 
-> 
-> 
-> 
-> 
-> 
+> @@ -752,8 +755,10 @@ void blk_trace_shutdown(struct request_queue *q)
+>  #ifdef CONFIG_BLK_CGROUP
+>  static u64 blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> +	/* We don't use the 'bt' value here except as an optimization... */
+> +	bt = rcu_dereference_protected(q->blk_trace, 1);
+>  	if (!bt || !(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
+>  		return 0;
+>  
+> @@ -796,10 +801,14 @@ blk_trace_request_get_cgid(struct request_queue *q, struct request *rq)
+>  static void blk_add_trace_rq(struct request *rq, int error,
+>  			     unsigned int nr_bytes, u32 what, u64 cgid)
+>  {
+> -	struct blk_trace *bt = rq->q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> -	if (likely(!bt))
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(rq->q->blk_trace);
+> +	if (likely(!bt)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+>  
+>  	if (blk_rq_is_passthrough(rq))
+>  		what |= BLK_TC_ACT(BLK_TC_PC);
+> @@ -808,6 +817,7 @@ static void blk_add_trace_rq(struct request *rq, int error,
+>  
+>  	__blk_add_trace(bt, blk_rq_trace_sector(rq), nr_bytes, req_op(rq),
+>  			rq->cmd_flags, what, error, 0, NULL, cgid);
+> +	rcu_read_unlock();
+>  }
+>  
+>  static void blk_add_trace_rq_insert(void *ignore,
+> @@ -853,14 +863,19 @@ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+>  static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+>  			      u32 what, int error)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> -	if (likely(!bt))
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+> +	if (likely(!bt)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+>  
+>  	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
+>  			bio_op(bio), bio->bi_opf, what, error, 0, NULL,
+>  			blk_trace_bio_get_cgid(q, bio));
+> +	rcu_read_unlock();
+>  }
+>  
+>  static void blk_add_trace_bio_bounce(void *ignore,
+> @@ -905,11 +920,14 @@ static void blk_add_trace_getrq(void *ignore,
+>  	if (bio)
+>  		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0);
+>  	else {
+> -		struct blk_trace *bt = q->blk_trace;
+> +		struct blk_trace *bt;
+>  
+> +		rcu_read_lock();
+> +		bt = rcu_dereference(q->blk_trace);
+>  		if (bt)
+>  			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_GETRQ, 0, 0,
+>  					NULL, 0);
+> +		rcu_read_unlock();
+>  	}
+>  }
+>  
+> @@ -921,27 +939,35 @@ static void blk_add_trace_sleeprq(void *ignore,
+>  	if (bio)
+>  		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0);
+>  	else {
+> -		struct blk_trace *bt = q->blk_trace;
+> +		struct blk_trace *bt;
+>  
+> +		rcu_read_lock();
+> +		bt = rcu_dereference(q->blk_trace);
+>  		if (bt)
+>  			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_SLEEPRQ,
+>  					0, 0, NULL, 0);
+> +		rcu_read_unlock();
+>  	}
+>  }
+>  
+>  static void blk_add_trace_plug(void *ignore, struct request_queue *q)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+>  	if (bt)
+>  		__blk_add_trace(bt, 0, 0, 0, 0, BLK_TA_PLUG, 0, 0, NULL, 0);
+> +	rcu_read_unlock();
+>  }
+>  
+>  static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
+>  				    unsigned int depth, bool explicit)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+>  	if (bt) {
+>  		__be64 rpdu = cpu_to_be64(depth);
+>  		u32 what;
+> @@ -953,14 +979,17 @@ static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
+>  
+>  		__blk_add_trace(bt, 0, 0, 0, 0, what, 0, sizeof(rpdu), &rpdu, 0);
+>  	}
+> +	rcu_read_unlock();
+>  }
+>  
+>  static void blk_add_trace_split(void *ignore,
+>  				struct request_queue *q, struct bio *bio,
+>  				unsigned int pdu)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+>  	if (bt) {
+>  		__be64 rpdu = cpu_to_be64(pdu);
+>  
+> @@ -969,6 +998,7 @@ static void blk_add_trace_split(void *ignore,
+>  				BLK_TA_SPLIT, bio->bi_status, sizeof(rpdu),
+>  				&rpdu, blk_trace_bio_get_cgid(q, bio));
+>  	}
+> +	rcu_read_unlock();
+>  }
+>  
+>  /**
+> @@ -988,11 +1018,15 @@ static void blk_add_trace_bio_remap(void *ignore,
+>  				    struct request_queue *q, struct bio *bio,
+>  				    dev_t dev, sector_t from)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  	struct blk_io_trace_remap r;
+>  
+> -	if (likely(!bt))
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+> +	if (likely(!bt)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+>  
+>  	r.device_from = cpu_to_be32(dev);
+>  	r.device_to   = cpu_to_be32(bio_dev(bio));
+> @@ -1001,6 +1035,7 @@ static void blk_add_trace_bio_remap(void *ignore,
+>  	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
+>  			bio_op(bio), bio->bi_opf, BLK_TA_REMAP, bio->bi_status,
+>  			sizeof(r), &r, blk_trace_bio_get_cgid(q, bio));
+> +	rcu_read_unlock();
+>  }
+>  
+>  /**
+> @@ -1021,11 +1056,15 @@ static void blk_add_trace_rq_remap(void *ignore,
+>  				   struct request *rq, dev_t dev,
+>  				   sector_t from)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  	struct blk_io_trace_remap r;
+>  
+> -	if (likely(!bt))
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+> +	if (likely(!bt)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+>  
+>  	r.device_from = cpu_to_be32(dev);
+>  	r.device_to   = cpu_to_be32(disk_devt(rq->rq_disk));
+> @@ -1034,6 +1073,7 @@ static void blk_add_trace_rq_remap(void *ignore,
+>  	__blk_add_trace(bt, blk_rq_pos(rq), blk_rq_bytes(rq),
+>  			rq_data_dir(rq), 0, BLK_TA_REMAP, 0,
+>  			sizeof(r), &r, blk_trace_request_get_cgid(q, rq));
+> +	rcu_read_unlock();
+>  }
+>  
+>  /**
+> @@ -1051,14 +1091,19 @@ void blk_add_driver_data(struct request_queue *q,
+>  			 struct request *rq,
+>  			 void *data, size_t len)
+>  {
+> -	struct blk_trace *bt = q->blk_trace;
+> +	struct blk_trace *bt;
+>  
+> -	if (likely(!bt))
+> +	rcu_read_lock();
+> +	bt = rcu_dereference(q->blk_trace);
+> +	if (likely(!bt)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+>  
+>  	__blk_add_trace(bt, blk_rq_trace_sector(rq), blk_rq_bytes(rq), 0, 0,
+>  				BLK_TA_DRV_DATA, 0, len, data,
+>  				blk_trace_request_get_cgid(q, rq));
+> +	rcu_read_unlock();
+>  }
+>  EXPORT_SYMBOL_GPL(blk_add_driver_data);
+>  
+> @@ -1597,6 +1642,7 @@ static int blk_trace_remove_queue(struct request_queue *q)
+>  		return -EINVAL;
+>  
+>  	put_probe_ref();
+> +	synchronize_rcu();
+>  	blk_trace_free(bt);
+>  	return 0;
+>  }
+> @@ -1758,6 +1804,7 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
+>  	struct hd_struct *p = dev_to_part(dev);
+>  	struct request_queue *q;
+>  	struct block_device *bdev;
+> +	struct blk_trace *bt;
+>  	ssize_t ret = -ENXIO;
+>  
+>  	bdev = bdget(part_devt(p));
+> @@ -1770,21 +1817,23 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
+>  
+>  	mutex_lock(&q->blk_trace_mutex);
+>  
+> +	bt = rcu_dereference_protected(q->blk_trace,
+> +				       lockdep_is_held(&q->blk_trace_mutex));
+>  	if (attr == &dev_attr_enable) {
+> -		ret = sprintf(buf, "%u\n", !!q->blk_trace);
+> +		ret = sprintf(buf, "%u\n", !!bt);
+>  		goto out_unlock_bdev;
+>  	}
+>  
+> -	if (q->blk_trace == NULL)
+> +	if (bt == NULL)
+>  		ret = sprintf(buf, "disabled\n");
+>  	else if (attr == &dev_attr_act_mask)
+> -		ret = blk_trace_mask2str(buf, q->blk_trace->act_mask);
+> +		ret = blk_trace_mask2str(buf, bt->act_mask);
+>  	else if (attr == &dev_attr_pid)
+> -		ret = sprintf(buf, "%u\n", q->blk_trace->pid);
+> +		ret = sprintf(buf, "%u\n", bt->pid);
+>  	else if (attr == &dev_attr_start_lba)
+> -		ret = sprintf(buf, "%llu\n", q->blk_trace->start_lba);
+> +		ret = sprintf(buf, "%llu\n", bt->start_lba);
+>  	else if (attr == &dev_attr_end_lba)
+> -		ret = sprintf(buf, "%llu\n", q->blk_trace->end_lba);
+> +		ret = sprintf(buf, "%llu\n", bt->end_lba);
+>  
+>  out_unlock_bdev:
+>  	mutex_unlock(&q->blk_trace_mutex);
+> @@ -1801,6 +1850,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+>  	struct block_device *bdev;
+>  	struct request_queue *q;
+>  	struct hd_struct *p;
+> +	struct blk_trace *bt;
+>  	u64 value;
+>  	ssize_t ret = -EINVAL;
+>  
+> @@ -1831,8 +1881,10 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+>  
+>  	mutex_lock(&q->blk_trace_mutex);
+>  
+> +	bt = rcu_dereference_protected(q->blk_trace,
+> +				       lockdep_is_held(&q->blk_trace_mutex));
+>  	if (attr == &dev_attr_enable) {
+> -		if (!!value == !!q->blk_trace) {
+> +		if (!!value == !!bt) {
+>  			ret = 0;
+>  			goto out_unlock_bdev;
+>  		}
+> @@ -1844,18 +1896,18 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+>  	}
+>  
+>  	ret = 0;
+> -	if (q->blk_trace == NULL)
+> +	if (bt == NULL)
+>  		ret = blk_trace_setup_queue(q, bdev);
+>  
+>  	if (ret == 0) {
+>  		if (attr == &dev_attr_act_mask)
+> -			q->blk_trace->act_mask = value;
+> +			bt->act_mask = value;
+>  		else if (attr == &dev_attr_pid)
+> -			q->blk_trace->pid = value;
+> +			bt->pid = value;
+>  		else if (attr == &dev_attr_start_lba)
+> -			q->blk_trace->start_lba = value;
+> +			bt->start_lba = value;
+>  		else if (attr == &dev_attr_end_lba)
+> -			q->blk_trace->end_lba = value;
+> +			bt->end_lba = value;
+>  	}
+>  
+>  out_unlock_bdev:
+> -- 
+> 2.16.4
 > 
 -- 
 Jan Kara <jack@suse.com>
