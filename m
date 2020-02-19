@@ -2,94 +2,83 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35ED0C34031
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EECEC34031
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:58:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 012F824654
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4809B24654
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:58:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kMQXFD6a";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="fhHfbZQD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bOMe4+ku";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ssz/MPD2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727635AbgBSBx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 20:53:57 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:30716 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726698AbgBSBx5 (ORCPT
+        id S1728039AbgBSB6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 20:58:48 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:56331 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727811AbgBSB6s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 20:53:57 -0500
+        Tue, 18 Feb 2020 20:58:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1582077236; x=1613613236;
+  t=1582077528; x=1613613528;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=C4b5MbHB+/G8AHIkSZVnnaiTZrkK6rScfUNtJNqV0rk=;
-  b=kMQXFD6aQZUaKHfPtSZMN5Vr52z53Exqso/flakpQFBl02wojVRL4FFN
-   wA8U1wwmd6sFkE9JGXllI78teymw7kvIpU3UepMGR1ffVv+teuX5a/OWW
-   14MkyFS9ugSc89VuL0MprzM1hiSpoTL8NyCfTaKbbRRtxj44UFKOfsvwj
-   ER0YD7LMbCwfrKm9m+Re8CHxvppKk8auK4BJeeE3itOk1RHBuTBh4FasG
-   l2DaKqV52HsXEcd/JnSZYbEHJbcpYvUFUzi4DdKxfiIHtzFsnQqWHhbRr
-   Qeak1IAqfXeSnda5QJYYjD9Uacp63F1glcyAxaLtNatTUdX3+qHnvosu3
-   w==;
-IronPort-SDR: ZXDjF0MMVF9XmbsubOVkwHNV7d3eP2ycJz+QFBOoEgue1tsXg+RKWVoxz6wRL6SVJIWZDgc68b
- pBUCenHHVsDgayGZ3iO5RjzVqf69e4r9QoKxNwkmyLIpoYRx1PzIwTm4e66+hga+ibDoEdjV+G
- 8C66MoNJmRmOB1/KoiLaRHBFVyLVg0RI+YZ3zdaYOpyhJUtO07GxBiJtBnGUBS4Mhqug3Vvua5
- L8pArMMrSwav+L1xU4gfRhgtSqHWw+uXGaCNsXtCgLX2H75VVqLo8sc9Lcdk9pk2h8WvAs1Nig
- mcw=
+  bh=Du/vgAxQnrg/7fOYhkUcufbgXgiBSEnrPsstJDUdg2s=;
+  b=bOMe4+kuhxhoY86nIIn6vmSLiXD826rRGRMvjcOLX8OC4/PTz9VWT5vd
+   4yd9a/c91Wfd96ImHgQiLtX5ci8aHF8QZ69m4dDmJhqmUQBKcgSHpBYTj
+   CUUKlJNbd7W42TT65BcnHHVGJpoaNWdJ1Tl8f7RRcfEJyVmmvfJBrr5l/
+   gZMXWHDOVAQYNAZpR3T3K5Tl8Wqnar0P8kJLqswaL6ItWGk/PvmOr5GKj
+   m2BnYVlCzzl2Ucusv8BBzC2qOIqTh5BsSSD4g4ehFMtrxX8vug/JXXAr+
+   D08zfK4ab0zl5xQRxpjv2rnl1kRGmN+FLSpWPvlLGF1Lcu9ZqU+2nOyc+
+   g==;
+IronPort-SDR: iq+SaOd9rzwY+It76/Qur5dw4DbqiyTKoFiQc503I1Pjza5S4KhxEKipwE7rgjMX/8PPFo1+zb
+ uhVUgcL8CoWo9hLVjcnIGGVGXKSM9AuZ1ebtGjienH5GGHPrf+18M8wiUEfQqsVKp+DtB7099P
+ fdd1/jlcn++iMqro7Q+UEufrZBmQ+Q68LCWx1IiqqOGr0RTdfB3Q5ymKzl3SqgwF0/T2AbWueo
+ AE1viYlESjRzlnLMFziVE80TRO2ITAe8zIokFpu8LgvjklZRoo1P5pcUxYZg2kXwHuQ1i6gYZE
+ QUQ=
 X-IronPort-AV: E=Sophos;i="5.70,458,1574092800"; 
-   d="scan'208";a="130137500"
-Received: from mail-bn8nam11lp2170.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.170])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Feb 2020 09:53:55 +0800
+   d="scan'208";a="130673048"
+Received: from mail-mw2nam12lp2048.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.48])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Feb 2020 09:58:47 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wdqjo3xp+IyNSAcOmlU4QZN0RLRHM5BnVnG3Via9jFKUDLWGgLLvrht0oHnr38gZsE7YAB5Waac/FAAagSRki6Xa29iN80l4RY0d7nJF49m6NT+OlU341BxegpiWoi49UMQ2sAf0GBnG1IuFT2tj+y2fKyTob0J8JJlzBc8PGAulDQtV/mRsxllGHS2azduE7VmdJ3RwKRfGXb2HDYT04I8hNfrJdk0fM0W9OFCCc4XCKu4jmolAStfJ9vbXCvBGB3JYkRg9QVYzZ3LNqotjWJeJIve++9nQf1jIs9kq7OPZzZhiF/kNSv+cRcUXHzt6u1cLff86gl5jqvH7q9wFaw==
+ b=RcG9SE52BfZj+sUwTSfnLrqM38LFj2Ni9eVLTfd5/RWJNo6subsLGUBzKPnC9gWwZwkQZiUArcBAels/FQvns1mqU5JFGiyVvGRjDTw0QVLqGIgeqfTR7TyMgD5aUMof0GZ1PkGTJJ0ZnNrZILv18jT+H3nFFXETdujpglJ2+22cO+4NB9B5akrKQjby+UlmTyBZ95j/vijTHpceAzJwO30CAmwtzvbTQjtVhg7tc0oYEq13dCShn/cXBQ8wHLn/6GgHaAbRLCXuFS0uDTDIT11HUZDtkc5lIjSwQpEluHM6S6u/Dg/1qpeIOySttVUR5NALsgFgxTgyA3JKT6TG9A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CvxZxGHWq3pe705JX0ZYr7NqUDqcD3Lx5P/PsvXP0gg=;
- b=nFx2CL19+oOzuxYBnUlqb/9TwkxOcOBke8S91Wb3zsP1gaNblz0kvo4S/lEDk+N+I1EYpp+5xUJYKnfkvArvBrHL9FkuceopXaCKjxjM3EamuoGANQg+tdCMzXfs2+or3VEMPsICHy7ywXEiQCnk7aTPR7YcXEZLr0X++0KRl8vYejZuwXRNLZyIbKNg2J+jpG+NJz/jEK8od/PcEBxsZLtqmdEuRxA9DLmhlV9X73MUjEB7L5WoTA19B3Iz6Edazf9Mhg/tq+OLQJK7t/gtlPf1srOtS6Mtp2ultslkyClE+VO/DJxO5tCUCziAvLx38WMTn17HZuvRhMUCFpPVrQ==
+ bh=AV+tpcCZZKPAuKeWcZfx72vxZaYkltWFBowKQRYvEJ0=;
+ b=i0PJCKZcjHV0w7Uf3vWHRhqTk+G6kE0nk0KEhD+TGf9tTL7UEkkG4pNtcWA1qPNbZgNOXkIaNBZJXIlcjFOR7MGtDWJN6j5W+kU0OGtRvMFYhGpiKZaaTNuKBQnOsnAmiiFnij9fMxzUlJE04ucun314qL18Tuo2OpCVnzJFX7e9RG9aW4EcT8ljR0hKazdnlPEhrWgv0TYJHxNr6LYX6xBVzsGq14h6ZTuNoh4tv+wVfjqy9X1Rk0hce/EhIjRf73hKvaZzL0N+MsZWXEoIAwDC30o1ShkAhd604aPCnE65BZgZG1PPZC4Vij/k3Yo6pl/+rk3NRWV6fADdqE9JKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CvxZxGHWq3pe705JX0ZYr7NqUDqcD3Lx5P/PsvXP0gg=;
- b=fhHfbZQDHsydXP6IMg1yZz4khxZLuAB0oMyoAWwyZPwq5gJFZxfkiNgdfuLS5IaR2bXusYqUk5fKz+FALbJ5AHX2JSfKETV7a85DatrJwj5+6H0rpew2GLGVdYW7Fjsi57jrwvZlvMbzooXY0yBBKgjZi9Rt8y7i77j0D2YZTg8=
+ bh=AV+tpcCZZKPAuKeWcZfx72vxZaYkltWFBowKQRYvEJ0=;
+ b=ssz/MPD2hu/EM/Zm5ZTdcfK1EXBzr/2IPK9F/UKWZ/eaHR/ggyb8Krv5y8XjZyFWLaC9M6SRCiwO3+JctF10lx440W6In0yINdFefGDVsADI/nsoNpFnAcoj+eLzabCQ1huMAl/GBClArnXqmJ7bClJW86JrjTdpzJZNRGY0eMQ=
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com (20.179.59.16) by
- BYAPR04MB4760.namprd04.prod.outlook.com (52.135.239.25) with Microsoft SMTP
+ BYAPR04MB6072.namprd04.prod.outlook.com (20.178.197.217) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.31; Wed, 19 Feb 2020 01:53:54 +0000
+ 15.20.2729.31; Wed, 19 Feb 2020 01:58:45 +0000
 Received: from BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::6daf:1b7c:1a61:8cb2]) by BYAPR04MB5816.namprd04.prod.outlook.com
  ([fe80::6daf:1b7c:1a61:8cb2%6]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
- 01:53:54 +0000
+ 01:58:45 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-CC:     Tim Walker <tim.t.walker@seagate.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Thread-Topic: [LSF/MM/BPF TOPIC] NVMe HDD
-Thread-Index: AQHV4EctI/0h/tDOq0WOdKN0iYUQSA==
-Date:   Wed, 19 Feb 2020 01:53:53 +0000
-Message-ID: <BYAPR04MB58165C6B400AE30986F988D5E7100@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <yq1blq3rxzj.fsf@oracle.com>
- <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
- <yq1r1yzqfyb.fsf@oracle.com> <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
- <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com>
- <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
- <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
- <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
- <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
- <20200219013137.GA31488@ming.t460p>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH V2 1/3] block: add a zone condition debug helper
+Thread-Topic: [PATCH V2 1/3] block: add a zone condition debug helper
+Thread-Index: AQHV5oDoYz+JRPRCgUubcBCM9eci/g==
+Date:   Wed, 19 Feb 2020 01:58:45 +0000
+Message-ID: <BYAPR04MB581681E76D092E8444BC5A91E7100@BYAPR04MB5816.namprd04.prod.outlook.com>
+References: <20200218172840.4097-1-chaitanya.kulkarni@wdc.com>
+ <20200218172840.4097-2-chaitanya.kulkarni@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -99,99 +88,125 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [199.255.47.9]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 033d0c78-a9cc-484a-a91e-08d7b4de9322
-x-ms-traffictypediagnostic: BYAPR04MB4760:
-x-microsoft-antispam-prvs: <BYAPR04MB4760EB1B70F5A1BB8FEDD76FE7100@BYAPR04MB4760.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 9ed6c6ae-122c-493b-4707-08d7b4df40db
+x-ms-traffictypediagnostic: BYAPR04MB6072:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB6072201369648D1008D2B577E7100@BYAPR04MB6072.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-oob-tlc-oobclassifiers: OLM:3631;
 x-forefront-prvs: 0318501FAE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(366004)(376002)(346002)(39860400002)(199004)(189003)(71200400001)(81166006)(52536014)(81156014)(478600001)(66476007)(8936002)(66446008)(55016002)(33656002)(8676002)(7696005)(64756008)(66946007)(66556008)(5660300002)(9686003)(4326008)(86362001)(186003)(91956017)(76116006)(6506007)(53546011)(2906002)(26005)(316002)(110136005)(54906003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4760;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(39860400002)(346002)(376002)(366004)(189003)(199004)(9686003)(7696005)(55016002)(478600001)(4326008)(8676002)(5660300002)(8936002)(33656002)(2906002)(86362001)(91956017)(76116006)(66556008)(66446008)(66476007)(64756008)(66946007)(186003)(52536014)(6506007)(53546011)(81156014)(26005)(81166006)(316002)(110136005)(71200400001)(21314003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB6072;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: eXp7Few2syXh/r5sKhOljXJKTPslk5L5GoR42Mwa25AzsviJ1QTdYxCDS0O8m1mYD9FPNGg/m8zrDSska49hrjyOdfG8hB1A1nYD6Q+NtuqaLtMwTMeowL8fX8WnWRJwKYqIoLbQR+4mV6PQW3O3487DXnJdStJDOlZrv4c+p2nTElHbRVTdr01mKYxeque39xinkxjFe1aOHg6Td1PDhkEXHRqRN+c/XlT6DONLqTV7kq897c7vRBD4cZDHktc26yC/HEkG+gGlSIIGmngH2h+AY0eWqye+bc8eBxNw2dFHqJzYZDGW5bNvabcLm7tttUy/M9d6hHhNbDrZfPK8I4764GKp8k/QuCyAr2l1PL8zJC4PsCI3z7900XBmylYhY+OXBmEARmFlGLZUWcel+D3l3bPTlEYWFlnBI9fFG+gf+NeaWsZeg44e7vAo7yaE
-x-ms-exchange-antispam-messagedata: ZFZ3SS4ip2+WF1Q3SBOG1sLsxVQGdypxOPPXTK6sjTi4tD9YFoNmJ4hIxNNsgIn/n9LzXThHDRpbOFTzi9b/GkWoYqwmnR686GMrOhMHZm9eeB0VMT9RBPkHKfDa6ZBciKg9knPAbMOPIjfSq0+vXw==
-x-ms-exchange-transport-forked: True
+x-microsoft-antispam-message-info: a4vLTRMBVgL50fXV0JHNiaJoa6tyVEMw5VpxVrB7/pYs8mw4VKGJDxkT/P6lTVir7HEyAsu+5nxcbCgTVqAsh0EREz+W3vzklMqRQ0yXgl8CHWjkT92LJHoFZeKKTb1k9UOdJH5UAclJZitKQB1qUoN7byVIGH1Jv0WpIjr87eZILjXEAnIJuB3SEAPXizrfiwEmMmpFSPHef1x03GC1DlUCg0OU2vBYtF7NHeCrycsdeb9TyJ9ghyY19k6yeplq5GmV/5JZhsLNvCtyArT3QcVvGZy8NNroZjYswpzv4dlTP9c3YSTITkR6XdwydwH/Cs9AEcUX8FPoDs/Bq42kDtbGwnjh/pXmKA92xojCKOw9Wa1ggSGHD0+h23h7yT5KsRuHaNMBzJHGezWdrzKUYEdVv0i6Ygp4c4gJDGyLfuNdWued8lXhoaR9loHdKvqKYB3bNrQGNEYpuMDGCwpArXFmlHhMXp7VmQtlevDJc7ga7Akth+rOPpTOmQp8k+Rg
+x-ms-exchange-antispam-messagedata: NxlFkAg/ZL/8twKb+fmp9rA8DnR+/j2JAedJnCew86fejZpmZPShMQQfGOiVc/eaZ1HlIRQ4xw6D4MlqNsLYhYbN7BvaSM1HRxLH8so3HiVdRkcyaSeDGPsrfmUiRwSuZ6DiQ7sNs4b/dn11z+qv6Q==
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 033d0c78-a9cc-484a-a91e-08d7b4de9322
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2020 01:53:53.9007
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ed6c6ae-122c-493b-4707-08d7b4df40db
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2020 01:58:45.4214
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4xloStyw3MJ6IVVc9SddOgSeOwXaPjl+obzIjbHc/opHu7pvqy7ZCD/gb+VDPaMJ87WDOB0bi/+v8EjhONb+5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4760
+X-MS-Exchange-CrossTenant-userprincipalname: hfa4N8eFpiUieNdr5rjRAG974SbsLedY+uLXFnZ6OeXKYT4eurG27v+IK7c6RKP+WxEaWaGypk+Vpd2GUs44Ow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6072
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/02/19 10:32, Ming Lei wrote:=0A=
-> On Wed, Feb 19, 2020 at 02:41:14AM +0900, Keith Busch wrote:=0A=
->> On Tue, Feb 18, 2020 at 10:54:54AM -0500, Tim Walker wrote:=0A=
->>> With regards to our discussion on queue depths, it's common knowledge=
+On 2020/02/19 2:29, Chaitanya Kulkarni wrote:=0A=
+> Add a helper to stringify the zone conditions. We use this helper in the=
 =0A=
->>> that an HDD choses commands from its internal command queue to=0A=
->>> optimize performance. The HDD looks at things like the current=0A=
->>> actuator position, current media rotational position, power=0A=
->>> constraints, command age, etc to choose the best next command to=0A=
->>> service. A large number of commands in the queue gives the HDD a=0A=
->>> better selection of commands from which to choose to maximize=0A=
->>> throughput/IOPS/etc but at the expense of the added latency due to=0A=
->>> commands sitting in the queue.=0A=
->>>=0A=
->>> NVMe doesn't allow us to pull commands randomly from the SQ, so the=0A=
->>> HDD should attempt to fill its internal queue from the various SQs,=0A=
->>> according to the SQ servicing policy, so it can have a large number of=
-=0A=
->>> commands to choose from for its internal command processing=0A=
->>> optimization.=0A=
->>=0A=
->> You don't need multiple queues for that. While the device has to fifo=0A=
->> fetch commands from a host's submission queue, it may reorder their=0A=
->> executuion and completion however it wants, which you can do with a=0A=
->> single queue.=0A=
->>  =0A=
->>> It seems to me that the host would want to limit the total number of=0A=
->>> outstanding commands to an NVMe HDD=0A=
->>=0A=
->> The host shouldn't have to decide on limits. NVMe lets the device report=
-=0A=
->> it's queue count and depth. It should the device's responsibility to=0A=
+> next patch to track zone conditions in tracepoints.=0A=
 > =0A=
-> Will NVMe HDD support multiple NS? If yes, this queue depth isn't=0A=
-> enough, given all NSs share this single host queue depth.=0A=
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+> ---=0A=
+> Changes from V1 : -=0A=
 > =0A=
->> report appropriate values that maximize iops within your latency limits,=
-=0A=
->> and the host will react accordingly.=0A=
+> 1. Move blk_zone_cond_str() to blk-zoned.c.=0A=
+> 2. Mark zone_cond_namd array static.=0A=
+> 3. Remove BLK_ZONE_COND_LAST.=0A=
+> 4. Get rid of inline prefix for blk_zone_cond_str().=0A=
+> ---=0A=
+>  block/blk-zoned.c      | 32 ++++++++++++++++++++++++++++++++=0A=
+>  include/linux/blkdev.h | 10 ++++++++++=0A=
+>  2 files changed, 42 insertions(+)=0A=
 > =0A=
-> Suppose NVMe HDD just wants to support single NS and there is single queu=
-e,=0A=
-> if the device just reports one host queue depth, block layer IO sort/merg=
-e=0A=
-> can only be done when there is device saturation feedback provided.=0A=
-> =0A=
-> So, looks either NS queue depth or per-NS device saturation feedback=0A=
-> mechanism is needed, otherwise NVMe HDD may have to do internal IO=0A=
-> sort/merge.=0A=
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c=0A=
+> index 05741c6f618b..f18f1ee9d71f 100644=0A=
+> --- a/block/blk-zoned.c=0A=
+> +++ b/block/blk-zoned.c=0A=
+> @@ -20,6 +20,38 @@=0A=
+>  =0A=
+>  #include "blk.h"=0A=
+>  =0A=
+> +#define ZONE_COND_NAME(name) [BLK_ZONE_COND_##name] =3D #name=0A=
+> +static const char *const zone_cond_name[] =3D {=0A=
+> +	ZONE_COND_NAME(NOT_WP),=0A=
+> +	ZONE_COND_NAME(EMPTY),=0A=
+> +	ZONE_COND_NAME(IMP_OPEN),=0A=
+> +	ZONE_COND_NAME(EXP_OPEN),=0A=
+> +	ZONE_COND_NAME(CLOSED),=0A=
+> +	ZONE_COND_NAME(READONLY),=0A=
+> +	ZONE_COND_NAME(FULL),=0A=
+> +	ZONE_COND_NAME(OFFLINE),=0A=
+> +};=0A=
+> +#undef ZONE_COND_NAME=0A=
+> +=0A=
+> +/**=0A=
+> + * blk_zone_cond_str - Return string XXX in BLK_ZONE_COND_XXX.=0A=
+> + * @zone_cond: BLK_ZONE_COND_XXX.=0A=
+> + *=0A=
+> + * Description: Centralize block layer function to convert BLK_ZONE_COND=
+_XXX=0A=
+> + * into string format. Useful in the debugging and tracing zone conditio=
+ns. For=0A=
+> + * invalid BLK_ZONE_COND_XXX it returns string "UNKNOWN".=0A=
+> + */=0A=
+> +const char *blk_zone_cond_str(enum blk_zone_cond zone_cond)=0A=
+> +{=0A=
+> +	static const char *zone_cond_str =3D "UNKNOWN";=0A=
+> +=0A=
+> +	if (zone_cond < ARRAY_SIZE(zone_cond_name) && zone_cond_name[zone_cond]=
+)=0A=
+> +		zone_cond_str =3D zone_cond_name[zone_cond];=0A=
+> +=0A=
+> +	return zone_cond_str;=0A=
+> +}=0A=
+> +EXPORT_SYMBOL_GPL(blk_zone_cond_str);=0A=
+> +=0A=
+>  static inline sector_t blk_zone_start(struct request_queue *q,=0A=
+>  				      sector_t sector)=0A=
+>  {=0A=
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+> index 053ea4b51988..a40a3a27bfbc 100644=0A=
+> --- a/include/linux/blkdev.h=0A=
+> +++ b/include/linux/blkdev.h=0A=
+> @@ -887,6 +887,16 @@ extern void blk_execute_rq_nowait(struct request_que=
+ue *, struct gendisk *,=0A=
+>  /* Helper to convert REQ_OP_XXX to its string format XXX */=0A=
+>  extern const char *blk_op_str(unsigned int op);=0A=
+>  =0A=
+> +#ifdef CONFIG_BLK_DEV_ZONED=0A=
+> +/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */=0A=
+> +extern const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);=0A=
+> +#else=0A=
+> +static const char *blk_zone_cond_str(unsigned int zone_cond)=0A=
+> +{=0A=
+> +	return "NOT SUPPORTED";=0A=
+> +}=0A=
 =0A=
-SAS and SATA HDDs today already do internal IO reordering and merging, a=0A=
-lot. That is partly why even with "none" set as the scheduler, you can see=
+why not inline ? That compiles ? Please check builds with=0A=
+CONFIG_BLK_DEV_ZONED disabled.=0A=
 =0A=
-iops increasing with QD used.=0A=
-=0A=
-But yes, I think you do have a point with the saturation feedback. This may=
-=0A=
-be necessary for better scheduling host-side.=0A=
-=0A=
-> =0A=
-> =0A=
-> Thanks,=0A=
-> Ming=0A=
-> =0A=
+> +#endif /* CONFIG_BLK_DEV_ZONED */=0A=
+> +=0A=
+>  int blk_status_to_errno(blk_status_t status);=0A=
+>  blk_status_t errno_to_blk_status(int errno);=0A=
+>  =0A=
 > =0A=
 =0A=
 =0A=
