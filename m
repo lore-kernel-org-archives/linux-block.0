@@ -2,69 +2,113 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7C0C34047
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC702C34047
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD91324654
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B01C524656
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Cyo/GGaR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TUWZ2C3B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbgBSQgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:36:16 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:34282 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726768AbgBSQgQ (ORCPT
+        id S1726771AbgBSQgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:36:38 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:38055 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726754AbgBSQgh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:36:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7ZSbNFkxei41IBj0vQCwV7MDN8Vq2H6fNuqbJft01qc=; b=Cyo/GGaRgIWMGOogxR2laGCqOs
-        QmbJPjaUllV4ccs4NoDJXB8yVj0rbDMW+rjmWQr217DWdPpyQZ/MbAZHsBiZxqvZ8nPwggcoj5iBN
-        c9THBYGzY6508A0jwL2Nk4aITxlNrK2cba+9hxSC9cM3px0gLZoA3HQOoPtDUyGUth+KTYPLp9ak+
-        cJ8x+jhihq44IUlT/SPLUqZQM/EByQ/6iYXxSLsez6hQ65o1m7cwKr4g4ZmvrmC8NE6t15fXtTkHZ
-        1fhfA1O3rO/4KbXZ3EC+AOidkCMenkqhGIpdiDIk3da25stIQx3+Id2qLN7JxcFHfZqNBMIJYp06F
-        BCmYgB4w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j4SKd-00076v-5c; Wed, 19 Feb 2020 16:36:15 +0000
-Date:   Wed, 19 Feb 2020 08:36:15 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: insert passthrough request into hctx->dispatch
- directly
-Message-ID: <20200219163615.GE18377@infradead.org>
-References: <20200215032140.4093-1-ming.lei@redhat.com>
+        Wed, 19 Feb 2020 11:36:37 -0500
+Received: by mail-lf1-f65.google.com with SMTP id r14so621880lfm.5;
+        Wed, 19 Feb 2020 08:36:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vXh1VMvfvDfHD2y+Q2/VZWuGDoIMJdUUkgrMD7alNPc=;
+        b=TUWZ2C3BLx6pFGzi711Kzm28XjqwZfjADvGmburkO9xBly4w6nNJ11ET0+hL1GefjW
+         oUWvZdO4qSJ/fHH0DdtXq2MBsrxBsTO4gGd431dTlUtdkNMt4xWBADT1xBvvIGCCU5PW
+         6OLu0yzE3o5VnivOAzMT3ArlndKjiLCkgFOorRpCPB6e4dCqit/LnnygkRGo6fgCz43m
+         +WS656xZUF7xKZgNrtsy4lD0uXfzO3ZWShiEzBDTwJB+Agif4ucjZzO3kz+7NcgW1iG9
+         fEhDR8suEdyONDFuJSe30/RQue57GRJbMPUI311Ed2aCWGXoRo6paHgpzyr5prA2XpIo
+         ZUdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vXh1VMvfvDfHD2y+Q2/VZWuGDoIMJdUUkgrMD7alNPc=;
+        b=DF4TRrPvh+nsIsFar8EJNC6M8BrohHuuEkUZUFsbIgdeX+gEe/uONxAvo9nH5g9dDy
+         vWR8C001PRNzatUSOBmCFOcn70H4Uf7EjvIid2KK9pwaIh8bfGBm4nGDD5GKz1aBUGqq
+         75NB7xvAwaxpu2PRyoFFqnapbYlnvJVlPW0oAn2yxOGsnHLIxGPa5xx/izctr8RuuvKd
+         zElETCEea7CeZELhv7O6z2dXTy5Fi3HE0DtWXtSFoBp4n5xLP/RQmIpMvB2Z0a/sGMCi
+         rqZ0yFSN3R5ZuHNeOua8Zz+MNOB06Ps2lRAQD1Xk/PaOY55fxZPWaPe4HxuSRlYDen0m
+         cLXA==
+X-Gm-Message-State: APjAAAXZkR8n8T0nZ0NdFCYcXqSABnmoDPUqLtMFPg88uzgn2wEU+Szt
+        7wv5tDWOgRUg5xXNyCTH5aueMdTD
+X-Google-Smtp-Source: APXvYqyYv00AS0925LOonBZM+4OrCpcT7exm+p1YSBtU1xDpt6HnAt3upoZ9rGXeXiRAZezazTSe+Q==
+X-Received: by 2002:ac2:59dd:: with SMTP id x29mr13756833lfn.95.1582130194886;
+        Wed, 19 Feb 2020 08:36:34 -0800 (PST)
+Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
+        by smtp.googlemail.com with ESMTPSA id r9sm36766lfc.72.2020.02.19.08.36.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2020 08:36:33 -0800 (PST)
+Subject: Re: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline
+ parameter
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
+        Colin Cross <ccross@android.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20200219162339.16192-1-digetx@gmail.com>
+ <CAKv+Gu9vOh5vmHTGLYA9nszQfGq-yMRPvyYUhSzwcYJD+ZYKHA@mail.gmail.com>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <e97c45d8-42cc-fa38-957f-1d32e400d253@gmail.com>
+Date:   Wed, 19 Feb 2020 19:36:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200215032140.4093-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAKv+Gu9vOh5vmHTGLYA9nszQfGq-yMRPvyYUhSzwcYJD+ZYKHA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 15, 2020 at 11:21:40AM +0800, Ming Lei wrote:
-> For some reason, device may be in one situation which can't handle
-> FS request, so STS_RESOURCE is always returned and the FS request
-> will be added to hctx->dispatch. However passthrough request may
-> be required at that time for fixing the problem. If passthrough
-> request is added to scheduler queue, there isn't any chance for
-> blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
-> Then the FS IO request may never be completed, and IO hang is caused.
+19.02.2020 19:26, Ard Biesheuvel пишет:
+> On Wed, 19 Feb 2020 at 17:25, Dmitry Osipenko <digetx@gmail.com> wrote:
+>>
+>> The gpt_sector=<sector> causes the GPT partition search to look at the
+>> specified sector for a valid GPT header if the GPT is not found at the
+>> beginning or the end of block device.
+>>
+>> In particular this is needed for NVIDIA Tegra consumer-grade Android
+>> devices in order to make them usable with the upstream kernel because
+>> these devices use a proprietary / closed-source partition table format
+>> for the EMMC and it's impossible to change the partition's format. Luckily
+>> there is a GPT table in addition to the proprietary table, which is placed
+>> in uncommon location of the EMMC storage and bootloader passes the
+>> location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
+>>
+>> This patch is based on the original work done by Colin Cross for the
+>> downstream Android kernel.
+>>
+>> Cc: Colin Cross <ccross@android.com>
+>> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
 > 
-> So passthrough request has to be added to hctx->dispatch directly.
-> 
-> Fix this issue by inserting passthrough request into hctx->dispatch
-> directly. Then it becomes consistent with original legacy IO request
-> path, in which passthrough request is always added to q->queue_head.
+> Which block device is this parameter applied to?
 
-Do you have a description of an actual problem this fixes?  Maybe even
-a reproducer for blktests?
+All available devices.
