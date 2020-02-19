@@ -7,117 +7,102 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B9E5C34031
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F55C34031
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:37:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10D76207FD
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:32:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AD2D24654
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:37:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cswxiv4S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMzCaOIF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726964AbgBSBcA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 20:32:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48422 "EHLO
+        id S1726567AbgBSBhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 20:37:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45718 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726761AbgBSBcA (ORCPT
+        with ESMTP id S1726761AbgBSBhd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 20:32:00 -0500
+        Tue, 18 Feb 2020 20:37:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582075918;
+        s=mimecast20190719; t=1582076252;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zVYL+QbOz6z8x8H9e6MwpzZamAakZ5n5YLc7miQ2518=;
-        b=Cswxiv4SxDk0VNa22bM5LSLBvj0gl2ZGB7bM+Vrn3K10q49qEJPe+Zk1+K9dKK3HkArGXO
-        0vm7OrUh6m7P2GxrIvoCbvZQbfFNfMJ7DrtOs3yvDx4Io+9fByE6il342qZ4lMH0QuCrUT
-        bhMZFkkfIgJ7tQS9qf9Lvvo3ceQFVhI=
+        bh=1YeOd9uo3Rq2skMsNEuAFJimpSsCP2dpyPDTjtiFOT0=;
+        b=hMzCaOIFW41kvcv9tbcFDTz80OoemSqKu6Xz2Nlj7DJtYNDCWLUHaI7MiAgH26jDDuKRh7
+        4ycZ0QXNMIqH7WYQL/mwHjHouOrXAld3N8su8T47hXVT8s7h8pDeE3831iZOeSHD83vj66
+        OQwaZA9k5i3PCNov0/wca+uW+uR9QM0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-9ETsOWYJP5KwewucCzzY8g-1; Tue, 18 Feb 2020 20:31:51 -0500
-X-MC-Unique: 9ETsOWYJP5KwewucCzzY8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-172-gbr0Imr6PB-e84fKDCbUlQ-1; Tue, 18 Feb 2020 20:37:28 -0500
+X-MC-Unique: gbr0Imr6PB-e84fKDCbUlQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2E78010C7;
-        Wed, 19 Feb 2020 01:31:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EF3E8017CC;
+        Wed, 19 Feb 2020 01:37:26 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6167A5D9E5;
-        Wed, 19 Feb 2020 01:31:41 +0000 (UTC)
-Date:   Wed, 19 Feb 2020 09:31:37 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F414560C81;
+        Wed, 19 Feb 2020 01:37:18 +0000 (UTC)
+Date:   Wed, 19 Feb 2020 09:37:14 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Tim Walker <tim.t.walker@seagate.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Message-ID: <20200219013137.GA31488@ming.t460p>
-References: <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <yq1blq3rxzj.fsf@oracle.com>
- <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
- <yq1r1yzqfyb.fsf@oracle.com>
- <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
- <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com>
- <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
- <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
- <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
- <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
+To:     Jesse Barnes <jsbarnes@google.com>
+Cc:     Salman Qazi <sqazi@google.com>, Ming Lei <tom.leiming@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Gwendal Grignou <gwendal@google.com>
+Subject: Re: BLKSECDISCARD ioctl and hung tasks
+Message-ID: <20200219013714.GB31488@ming.t460p>
+References: <CAKUOC8VN5n+YnFLPbQWa1hKp+vOWH26FKS92R+h4EvS=e11jFA@mail.gmail.com>
+ <20200213082643.GB9144@ming.t460p>
+ <d2c77921-fdcd-4667-d21a-60700e6a2fa5@acm.org>
+ <CAKUOC8U1H8qJ+95pcF-fjeu9hag3P3Wm6XiOh26uXOkvpNngZg@mail.gmail.com>
+ <de7b841c-a195-1b1e-eb60-02cbd6ba4e0a@acm.org>
+ <CACVXFVP114+QBhw1bXqwgKRw_s4tBM_ZkuvjdXEU7nwkbJuH1Q@mail.gmail.com>
+ <CAKUOC8Xss0YPefhKfwBiBar-7QQ=QrVh3d_8NBfidCCxUuxcgg@mail.gmail.com>
+ <20200215034652.GA19867@ming.t460p>
+ <CAJmaN=miqzhnZUTqaTOPp+OWY8+QYhXoE=h5apSucMkEU4nvtA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
+In-Reply-To: <CAJmaN=miqzhnZUTqaTOPp+OWY8+QYhXoE=h5apSucMkEU4nvtA@mail.gmail.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 02:41:14AM +0900, Keith Busch wrote:
-> On Tue, Feb 18, 2020 at 10:54:54AM -0500, Tim Walker wrote:
-> > With regards to our discussion on queue depths, it's common knowledge
-> > that an HDD choses commands from its internal command queue to
-> > optimize performance. The HDD looks at things like the current
-> > actuator position, current media rotational position, power
-> > constraints, command age, etc to choose the best next command to
-> > service. A large number of commands in the queue gives the HDD a
-> > better selection of commands from which to choose to maximize
-> > throughput/IOPS/etc but at the expense of the added latency due to
-> > commands sitting in the queue.
-> > 
-> > NVMe doesn't allow us to pull commands randomly from the SQ, so the
-> > HDD should attempt to fill its internal queue from the various SQs,
-> > according to the SQ servicing policy, so it can have a large number of
-> > commands to choose from for its internal command processing
-> > optimization.
+On Tue, Feb 18, 2020 at 08:11:53AM -0800, Jesse Barnes wrote:
+> On Fri, Feb 14, 2020 at 7:47 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > What are the 'other operations'? Are they block IOs?
+> >
+> > If yes, that is why I suggest to fix submit_bio_wait(), which should cover
+> > most of sync bio submission.
+> >
+> > Anyway, the fix is simple & generic enough, I'd plan to post a formal
+> > patch if no one figures out better doable approaches.
 > 
-> You don't need multiple queues for that. While the device has to fifo
-> fetch commands from a host's submission queue, it may reorder their
-> executuion and completion however it wants, which you can do with a
-> single queue.
->  
-> > It seems to me that the host would want to limit the total number of
-> > outstanding commands to an NVMe HDD
+> Yeah I think any block I/O operation that occurs after the
+> BLKSECDISCARD is submitted will also potentially be affected by the
+> hung task timeouts, and I think your patch will address that.  My only
+> concern with it is that it might hide some other I/O "hangs" that are
+> due to device misbehavior instead.  Yes driver and device timeouts
+> should generally catch those, but with this in place we might miss a
+> few bugs.
+
+We may add a warning(device name, request, ...) when one IO isn't completed in
+sysctl_hung_task_timeout_secs, so this device misbehavior still can be
+caught.
+
 > 
-> The host shouldn't have to decide on limits. NVMe lets the device report
-> it's queue count and depth. It should the device's responsibility to
+> Given the nature of these types of storage devices though, I think
+> that's a minor issue and not worth blocking the patch on, given that
+> it should prevent a lot of false positive hang reports as Salman
+> demonstrated.
 
-Will NVMe HDD support multiple NS? If yes, this queue depth isn't
-enough, given all NSs share this single host queue depth.
-
-> report appropriate values that maximize iops within your latency limits,
-> and the host will react accordingly.
-
-Suppose NVMe HDD just wants to support single NS and there is single queue,
-if the device just reports one host queue depth, block layer IO sort/merge
-can only be done when there is device saturation feedback provided.
-
-So, looks either NS queue depth or per-NS device saturation feedback
-mechanism is needed, otherwise NVMe HDD may have to do internal IO
-sort/merge.
+OK, I will post it soon.
 
 
 Thanks,
