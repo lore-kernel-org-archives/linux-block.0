@@ -1,112 +1,130 @@
-Return-Path: <SRS0=AW5R=4G=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6022C34026
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8EDC34031
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 00:24:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A99F22B48
-	for <linux-block@archiver.kernel.org>; Tue, 18 Feb 2020 18:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F120208E4
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 00:24:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U2j547Cy"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="cfgAwvjv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726403AbgBRSxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 13:53:40 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:53798 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbgBRSxk (ORCPT
+        id S1726795AbgBSAYv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 19:24:51 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:43571 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726761AbgBSAYv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 13:53:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6j4dbVJFJ7oC5DhQZUAIAKi7jxQSaytsVxqOSb9w4KQ=; b=U2j547CyaTMSl1ZbRusn62lgFo
-        J84flzxCZ4FHWDTcaPQ1AXHDxrJ4x9KkJ4LkWBgafCFjPC1U5sTuP2Xga8daT30nhifZiBXhNOkGa
-        nL27PfE/VPWQjKFtFMEWNa2HvzjkyCFuFi0AohXmC6XOGhRfjc+QP3NVjvuRmrJUOKkB6xsgDcLN6
-        Tm1XDKozCfBPbzoqOqd8YPIMQjf1OdhXTZ/hOY7UA47vOkuseO4GfUb4lTd18nx2XKopkgHIxUsYV
-        aQN4ihIQzpNNZwDK+rVq1IToXO1awP5GMc1SVbK95/HKgB2pn4ACNF2ijCKTa5bNuZOGmNp9sVzLw
-        aizBuPiw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j4800-0007Am-Hw; Tue, 18 Feb 2020 18:53:36 +0000
-Date:   Tue, 18 Feb 2020 10:53:36 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Nikolai Merinov <n.merinov@inango-systems.com>
-Cc:     hch@infradead.org, Davidlohr Bueso <dave@stgolabs.net>,
-        Jens Axboe <axboe@kernel.dk>, Ard Biesheuvel <ardb@kernel.org>,
-        linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
- partition entry
-Message-ID: <20200218185336.GA14242@infradead.org>
-References: <20181124162123.21300-1-n.merinov@inango-systems.com>
- <20191224092119.4581-1-n.merinov@inango-systems.com>
- <20200108133926.GC4455@infradead.org>
- <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
+        Tue, 18 Feb 2020 19:24:51 -0500
+Received: by mail-qt1-f195.google.com with SMTP id d18so15966824qtj.10
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 16:24:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=FhF0ZDyYKNk5Yq7ZCEqXSDJQMEKVIumdy/wollI5R68=;
+        b=cfgAwvjvb/VB7SWmcerqu/ZyUwshT0CVr5ZIulzf4plfCSpJdpPpyg07bgx30E6yhB
+         z1K0LyKRH7WtzU4F35eW72koqyztJDHsZN8bJ9rMZ9lbB7zGBTSt1oPUMHpIBVDrq0dt
+         7N572uEP/glYaRFIsRtr9BHWGeSLADfP65Pl6F10aYeOJHLfCDVLCLa4ekee3ry2JJGK
+         pDLuURBxTR78Pgr14za88DzQzMZU7tt70XODF8tpIfy/vPDiddCBn9YyXQGGl72HTlex
+         EWbGQ3lX7j/HtdS8cOJJ3fF6jdN2UFQYFMrMXXZydVyLn3A6gwFToRXzH1lRnOgem/YT
+         dVKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=FhF0ZDyYKNk5Yq7ZCEqXSDJQMEKVIumdy/wollI5R68=;
+        b=JQDBeVvkAJeSw0PMmiyX/5jU2cZdy7pUEEC3hF2mjyWWMtpfeFxSvVwrWnK/vk/fZS
+         d3IxN6cikVYJorpcJHVVJ+FBidiTXSTFI/4Xd+TQAUcQoI8RirHyuIco+01Ze4lmZ6eq
+         U9ySpX7liPMvgFHgsnf145W7Xgm4uRhkgNJGePK5nJHXuRCzZy2XAbyvkaeoXRjIXse9
+         M9rM8IrND/ONZhC/GOvUXoZ5KDDTLdZS6G6xKF/L7tHSkxjE8W8Yfh5tEqe/STWeQeZJ
+         ASEg4trdVOrJ0Vd6d7FYqvg53CcDFN9OohRO5cDIL6JIaBbYzYu0lLQRrZc4eWTWdnlN
+         q0ow==
+X-Gm-Message-State: APjAAAUjV6NG0Gx9ZStNMqe5ZoNVR5lC8s4DjLw3+Y+fMGkORVgv0RiO
+        FcFGkTZID8czO/1OcuyVbSm2fA==
+X-Google-Smtp-Source: APXvYqyi9lhP3wSZE+ti5Vo+9JmVlEjKnucnVmZUWRpTNqkLz64F+yn/m4F4y1SBatd06kYNJN4+DA==
+X-Received: by 2002:ac8:4419:: with SMTP id j25mr19800017qtn.378.1582071890465;
+        Tue, 18 Feb 2020 16:24:50 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id 132sm156980qkn.109.2020.02.18.16.24.49
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Feb 2020 16:24:49 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1j4DAX-00037W-5U; Tue, 18 Feb 2020 20:24:49 -0400
+Date:   Tue, 18 Feb 2020 20:24:49 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Jinpu Wang <jinpuwang@gmail.com>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>
+Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
+ RNBD (former IBNBD) RDMA Network Block Device
+Message-ID: <20200219002449.GA11943@ziepe.ca>
+References: <20200124204753.13154-1-jinpuwang@gmail.com>
+ <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
+ <20200131165421.GB29820@ziepe.ca>
+ <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
+ <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com>
+ <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
+ <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 03:27:23PM +0500, Nikolai Merinov wrote:
-> GUID partition entry defined to have a partition name as 36 UTF-16LE
-> code units. This means that on big-endian platforms ASCII symbols
-> would be read with 0xXX00 efi_char16_t character code. In order to
-> correctly extract ASCII characters from a partition name field we
-> should be converted from 16LE to CPU architecture.
+On Thu, Feb 06, 2020 at 04:12:22PM +0100, Jinpu Wang wrote:
+> On Fri, Jan 31, 2020 at 6:49 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >
+> > On 1/31/20 10:28 AM, Jinpu Wang wrote:
+> > > Jens Axboe <axboe@kernel.dk> 于2020年1月31日周五 下午6:04写道：
+> > >>
+> > >> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
+> > >>> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
+> > >>>> Hi Doug, Hi Jason, Hi Jens, Hi All,
+> > >>>>
+> > >>>> since we didn't get any new comments for the V8 prepared by Jack a
+> > >>>> week ago do you think rnbd/rtrs could be merged in the current merge
+> > >>>> window?
+> > >>>
+> > >>> No, the cut off for something large like this would be rc4ish
+> > >>
+> > >> Since it's been around for a while, I would have taken it in a bit
+> > >> later than that. But not now, definitely too late. If folks are
+> > >> happy with it, we can get it queued for 5.7.
+> > >>
+> > >
+> > > Thanks Jason, thanks Jens, then we will prepare later another round for 5.7
+> >
+> > It would also be really nice to see official sign-offs (reviews) from non
+> > ionos people...
 > 
-> The problem exists on all big endian platforms.
+> Totally agree.
+> Hi Bart, hi Leon,
 > 
-> Signed-off-by: Nikolai Merinov <n.merinov@inango-systems.com>
-> ---
->  block/partitions/efi.c | 3 ++-
->  block/partitions/efi.h | 2 +-
->  include/linux/efi.h    | 5 +++++
->  3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-> index db2fef7dfc47..f1d0820de844 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -715,7 +715,8 @@ int efi_partition(struct parsed_partitions *state)
->  				ARRAY_SIZE(ptes[i].partition_name));
->  		info->volname[label_max] = 0;
->  		while (label_count < label_max) {
-> -			u8 c = ptes[i].partition_name[label_count] & 0xff;
-> +			u8 c = 0xff & efi_char16le_to_cpu(
-> +					ptes[i].partition_name[label_count]);
+> Both of you spent quite some time to review the code, could you give a
+> Reviewed-by for some of the patches you've reviewed?
 
-Why are you swapping the order of the comparism to an unusual one here?
+Anyone? I don't want to move ahead with a block driver without someone
+from the block community saying it is OK
 
-> -	efi_char16_t partition_name[72 / sizeof (efi_char16_t)];
-> +	efi_char16le_t partition_name[72 / sizeof(efi_char16le_t)];
->  } __packed gpt_entry;
->  
->  typedef struct _gpt_mbr_record {
-> diff --git a/include/linux/efi.h b/include/linux/efi.h
-> index aa54586db7a5..47882f2d45db 100644
-> --- a/include/linux/efi.h
-> +++ b/include/linux/efi.h
-> @@ -45,9 +45,14 @@
->  typedef unsigned long efi_status_t;
->  typedef u8 efi_bool_t;
->  typedef u16 efi_char16_t;		/* UNICODE character */
-> +typedef __le16 efi_char16le_t;		/* UTF16-LE */
-> +typedef __be16 efi_char16be_t;		/* UTF16-BE */
->  typedef u64 efi_physical_addr_t;
->  typedef void *efi_handle_t;
->  
-> +#define efi_char16le_to_cpu le16_to_cpu
-> +#define efi_char16be_to_cpu be16_to_cpu
-
-I'd rather use plain __le16 and le16_to_cpu here.  Also the be
-variants seems to be entirely unused.
+Jason
