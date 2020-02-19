@@ -2,145 +2,120 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4007AC34047
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 15:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3867C34055
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B2482464E
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 15:42:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C7B224672
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:24:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oxowl+Lv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbgBSPme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 10:42:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6240 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726569AbgBSPmc (ORCPT
+        id S1726786AbgBSQYA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:24:00 -0500
+Received: from mail-vk1-f196.google.com ([209.85.221.196]:36887 "EHLO
+        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726826AbgBSQYA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 10:42:32 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01JFbAaH041915
-        for <linux-block@vger.kernel.org>; Wed, 19 Feb 2020 10:42:31 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ucky101-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 19 Feb 2020 10:42:30 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Wed, 19 Feb 2020 15:42:25 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 19 Feb 2020 15:42:21 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01JFgKeq20906272
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Feb 2020 15:42:20 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 494E74C046;
-        Wed, 19 Feb 2020 15:42:20 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D27A94C040;
-        Wed, 19 Feb 2020 15:42:19 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.98.43])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Feb 2020 15:42:19 +0000 (GMT)
-Date:   Wed, 19 Feb 2020 16:42:18 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: Re: [PATCH 1/2] virtio-blk: fix hw_queue stopped on arbitrary error
-In-Reply-To: <CACVXFVPBPCzr+sfQ4HOw1DNPGnEfp+5BLqQkXWQgkaBKqr3yVQ@mail.gmail.com>
-References: <20200213123728.61216-1-pasic@linux.ibm.com>
-        <20200213123728.61216-2-pasic@linux.ibm.com>
-        <CACVXFVNiADTW_vLVc1bUSa0CoViLbVzoMnSJW4=sx=MCE-xUPw@mail.gmail.com>
-        <20200218133531.3eb08120.pasic@linux.ibm.com>
-        <CACVXFVPBPCzr+sfQ4HOw1DNPGnEfp+5BLqQkXWQgkaBKqr3yVQ@mail.gmail.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        Wed, 19 Feb 2020 11:24:00 -0500
+Received: by mail-vk1-f196.google.com with SMTP id b2so298693vkk.4
+        for <linux-block@vger.kernel.org>; Wed, 19 Feb 2020 08:24:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tUCnssO5MQUtUphe3hr1D6XyGMraXMVzCxN86p9qtZo=;
+        b=oxowl+Lvvz80ew5XyDzHOY3VfNaXuD4u1IDJe6f1JzqlkFeuwsorfRQP3fnbE7VDpz
+         yyfS/nWnrEjmJ5E4IJUJJsfN5sdEfbbb9RfjIn95wuc023N8lncxStdFYi3ULDAdUYzE
+         OWOb+qMoEZd20Zm4mVW1Xfx68HirDjV8yf4IMYEe6qgtWrwbvNzsQUbqVkFo0Gk/GrPF
+         1MdclO/xBI41rn2B/PytPsC/Pt3jupFfGO73X9K6TUwxw/kSfwP5sFMF+HJkcgZ5oSbW
+         OpMn18vIiLQu0TkPat8wY2pqsIMo3Pr/DNnnoMX6wEsAqcrNIR0Ic0A+Qx6bihhSmZuh
+         XOYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tUCnssO5MQUtUphe3hr1D6XyGMraXMVzCxN86p9qtZo=;
+        b=o/4QfZvvH78eSY5B9MPiWlOwtkmF+RuJuHq74IGxzKqVydEP0jNqH4v3OaipZWxnqq
+         onGu+WSJGrEDbLy6dUm24S+PCQcscYjn1HkmDeoYBaZDbhxygZsxfifKKEHmwdexLlq7
+         InOKg/sdBSaoUSc2ymHmK9KmlpmI9xxr1aqgukiZLmtBjWMnOy76vK/zUV1rIRIUdkFU
+         egUbESkVuYp6lH+dYO7vdcFZPjh9lw0RoJFc0CaO83I9QOUfRwOH9OUbrdcH6UJUUy/s
+         F/KnLclz90uu4Wna8DY0a2F/FU7V96krQdhTmSX/GNCPGAOPExti0gNyw2IdxcKnF6hX
+         kOZg==
+X-Gm-Message-State: APjAAAU8HyfSLXdwsEK6flgVn0FAdqDX40xwLzfek3jcSA64uziu5Qpf
+        MLqejgrAfr/yL7qi9av9Vij/QaW1YWpWJy8asGWazRgswcY=
+X-Google-Smtp-Source: APXvYqzyh9yyZ5QkoRBBnXRGTTWzKcqCjGW/k3Lkb+t+GXzqJPCTsA6Ga1EtjzJdVzfC+ekGLGASGI7AaSfdBeOHzt8=
+X-Received: by 2002:a1f:4541:: with SMTP id s62mr11622389vka.59.1582129439617;
+ Wed, 19 Feb 2020 08:23:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021915-0012-0000-0000-0000038853E3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021915-0013-0000-0000-000021C4E7E3
-Message-Id: <20200219164218.6164cb17.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-19_03:2020-02-19,2020-02-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 suspectscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002190118
+References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
+In-Reply-To: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed, 19 Feb 2020 17:23:23 +0100
+Message-ID: <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
+Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        lkft-triage@lists.linaro.org,
+        open list <linux-kernel@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        John Stultz <john.stultz@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 19 Feb 2020 09:46:56 +0800
-Ming Lei <tom.leiming@gmail.com> wrote:
+On Thu, 13 Feb 2020 at 16:43, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>
+> arm beagleboard x15 device failed to boot Linux mainline and
+> linux-next kernel due
+> to below error.
+> This error occurred across all x15 device for these kernel version.
+>
+> This regression started happening on x15 from this commit onwards (27th Jan)
+>   git branch: master
+>   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>   git commit: aae1464f46a2403565f75717438118691d31ccf1
+>   git describe: v5.5-489-gaae1464f46a2
+>
+>
+> Test output log,
+> [   37.606241] mmc1: Card stuck being busy! mmc_poll_for_busy
+> [   37.611850] mmc1: cache flush error -110
+> [   37.615883] blk_update_request: I/O error, dev mmcblk1, sector
+> 4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
+> [   37.627387] Aborting journal on device mmcblk1p9-8.
+> [   37.635448] systemd[1]: Installed transient /etc/machine-id file.
+> [   37.659283] systemd[1]: Couldn't move remaining userspace
+> processes, ignoring: Input/output error
+> [   37.744027] EXT4-fs error (device mmcblk1p9):
+> ext4_journal_check_start:61: Detected aborted journal
+> [   37.753322] EXT4-fs (mmcblk1p9): Remounting filesystem read-only
+> [   37.917486] systemd-gpt-auto-generator[108]: Failed to dissect:
+> Input/output error
+> [   37.927825] systemd[104]:
+> /lib/systemd/system-generators/systemd-gpt-auto-generator failed with
+> exit status 1.
+> <>
 
-> On Tue, Feb 18, 2020 at 8:35 PM Halil Pasic <pasic@linux.ibm.com> wrote:
-> >
-> > On Tue, 18 Feb 2020 10:21:18 +0800
-> > Ming Lei <tom.leiming@gmail.com> wrote:
-> >
-> > > On Thu, Feb 13, 2020 at 8:38 PM Halil Pasic <pasic@linux.ibm.com> wrote:
-> > > >
-> > > > Since nobody else is going to restart our hw_queue for us, the
-> > > > blk_mq_start_stopped_hw_queues() is in virtblk_done() is not sufficient
-> > > > necessarily sufficient to ensure that the queue will get started again.
-> > > > In case of global resource outage (-ENOMEM because mapping failure,
-> > > > because of swiotlb full) our virtqueue may be empty and we can get
-> > > > stuck with a stopped hw_queue.
-> > > >
-> > > > Let us not stop the queue on arbitrary errors, but only on -EONSPC which
-> > > > indicates a full virtqueue, where the hw_queue is guaranteed to get
-> > > > started by virtblk_done() before when it makes sense to carry on
-> > > > submitting requests. Let us also remove a stale comment.
-> > >
-> > > The generic solution may be to stop queue only when there is any
-> > > in-flight request
-> > > not completed.
-> > >
-> >
-> > I think this is a pretty close to that. The queue is stopped only on
-> > ENOSPC, which means virtqueue is full.
-> >
-> > > Checking -ENOMEM may not be enough, given -EIO can be returned from
-> > > virtqueue_add()
-> > > too in case of dma map failure.
-> >
-> > I'm not checking on -ENOMEM. So the queue would not be stopped on EIO.
-> > Maybe I'm misunderstanding something In any case, please have another
-> > look at the diff, and if your concerns persist please help me understand.
-> 
-> Looks I misread the patch, and this patch is fine:
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Try to restore the value for the cache flush timeout, by updating the
+define MMC_CACHE_FLUSH_TIMEOUT_MS to 10 * 60 * 1000".
 
-Thank you very much!
+The offending commit could perhaps be this one.
 
-Regards,
-Halil
+commit 24ed3bd01d6a844fd5e8a75f48d0a3d10ed71bf9
+Author: Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed Jan 22 15:27:45 2020 +0100
+mmc: core: Specify timeouts for BKOPS and CACHE_FLUSH for eMMC
 
-> 
-> 
-> Thanks,
-> Ming Lei
+[...]
 
+Kind regards
+Uffe
