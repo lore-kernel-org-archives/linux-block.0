@@ -6,57 +6,48 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5FAC34047
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81328C34055
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:29:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FAD72067D
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59A8E2067D
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CuskNoV2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N62EAJ+k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbgBSQ2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:28:53 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:60608 "EHLO
+        id S1726713AbgBSQ3O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:29:14 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:60632 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726652AbgBSQ2w (ORCPT
+        with ESMTP id S1726712AbgBSQ3N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:28:52 -0500
+        Wed, 19 Feb 2020 11:29:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GwhmZYOXRKo5GEKPILaa/bNrAAaJJsxIZFE07QbD0wk=; b=CuskNoV23y0pgw1lrJE3Z/uBKg
-        kgo2Mw4zt1V4h6kjNj+Lj0V+RL0DI/31PtIl/cia3LVFABALbkRas5vqQ29sz3daMa7j9vtOfMdYV
-        K4fO/H976LDtxjWe861017Oyk7KzG8d4ZEu2vdkWoXHllsyHBmTDINOOIWKUB9D3gFIgcBmrfxKyT
-        6ID1AeqpGla9b/ZQFm74guNcca/fOpEzxoj0lYfsU1iU425eM9wXmIuq5yd0eRcOGj3oSm9jGoOL8
-        fmYPiz7mv4q/gH4Q8D9lpZ9XE3JMmDOIsvCLm+ksUxv2wBecGMKO26F384mm0LgzZxDZgP8VAP4UX
-        sVsojUAg==;
+        bh=hn7DQDonTg5ZLUi5HWwm6QqNVXWAGzFqxUeSMPbsib0=; b=N62EAJ+kjp750uA4yJHdeNR/I8
+        zJc8cNgFKUEu5i/A22F56Dhij9Ye0u/MLcfRWV6WBUytqGg2T1Y4baOx6qDM3ImpCgTiQA2aIiZ4v
+        WuVEin/4bvbJhCIYN57/nuECR+Z1kSfs6QJH2k+AmX5QylOkPNQexmM/776bSkFdBI/Fxfs0zKeG6
+        0RbXbQa5EyUHOJJSJu5E14n9FaZgbDRaSyGP5A2ebzDJZpLYuFvaMzOErxYbpmaKCjehWlJx87eTt
+        EZzZkzjnYlyXe0g76/ApYUAicsuNjbQLSCAk4G4JBNkBCoUucRPcgO8nes3B+K0Q4Fl+aHDRh2GGa
+        uHkgfbiA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j4SDU-00032E-OA; Wed, 19 Feb 2020 16:28:52 +0000
-Date:   Wed, 19 Feb 2020 08:28:52 -0800
+        id 1j4SDo-00034D-UJ; Wed, 19 Feb 2020 16:29:12 +0000
+Date:   Wed, 19 Feb 2020 08:29:12 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [PATCH] block: Fix partition support for host aware zoned block
- devices
-Message-ID: <20200219162852.GB10644@infradead.org>
-References: <20200219042632.819101-1-shinichiro.kawasaki@wdc.com>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     damien.lemoal@wdc.com, axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH V2 0/3] null_blk: add tracnepoints for zoned mode
+Message-ID: <20200219162912.GC10644@infradead.org>
+References: <20200218172840.4097-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200219042632.819101-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20200218172840.4097-1-chaitanya.kulkarni@wdc.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 01:26:32PM +0900, Shin'ichiro Kawasaki wrote:
-> +	/* Iterate partitions skipping the holder device at index 0 */
-
-s/holder/whole/ ?
-
-> +extern bool disk_has_partitions(struct gendisk *disk);
-
-No need for externs on function prototypes in headers.
+s/tracnepoints/tracepoints/ ?
