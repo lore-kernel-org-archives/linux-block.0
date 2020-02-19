@@ -2,144 +2,87 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C05BC3405F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CEECC34047
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:59:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BE7224673
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:52:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1198A2464E
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:59:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726784AbgBSQwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:52:20 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:52941 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726450AbgBSQwU (ORCPT
+        id S1726605AbgBSQ75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:59:57 -0500
+Received: from avon.wwwdotorg.org ([104.237.132.123]:32954 "EHLO
+        avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726551AbgBSQ75 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:52:20 -0500
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1M8QFi-1j8sQZ3yPg-004Vt0; Wed, 19 Feb 2020 17:51:52 +0100
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Adam Williamson <awilliam@redhat.com>,
-        Chris Murphy <bugzilla@colorremedies.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ben Hutchings <ben.hutchings@codethink.co.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Tim Waugh <tim@cyberelk.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH] compat_ioctl, cdrom: Replace .ioctl with .compat_ioctl in four appropriate places
-Date:   Wed, 19 Feb 2020 17:50:07 +0100
-Message-Id: <20200219165139.3467320-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.25.0
+        Wed, 19 Feb 2020 11:59:57 -0500
+Received: from [10.20.204.51] (unknown [216.228.112.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by avon.wwwdotorg.org (Postfix) with ESMTPSA id 7C4F21C092D;
+        Wed, 19 Feb 2020 09:59:55 -0700 (MST)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.102.1 at avon.wwwdotorg.org
+Subject: Re: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline
+ parameter
+To:     Christoph Hellwig <hch@infradead.org>,
+        Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
+        Colin Cross <ccross@android.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>, linux-efi@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200219162339.16192-1-digetx@gmail.com>
+ <20200219162738.GA10644@infradead.org>
+From:   Stephen Warren <swarren@wwwdotorg.org>
+Message-ID: <f9e41108-7811-0deb-6977-be0f60e23b52@wwwdotorg.org>
+Date:   Wed, 19 Feb 2020 09:59:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:s83bO8mKDR7xliqovCqp1GmWzEogAJvpGM54ZuLLH4pmNDsLTFY
- ZxQUDSrXrb28nM+9drVbtrJ8MxqeW1pcICoxq0M2y+aB7qvD7iMDpcHWlECDzZL3mhdhI8K
- BS8BYAcJqRI2ZWDXrlXqDDTO/DjF/Q05SjUWe1SBIBOeT7W12CpXurHmSTHy5X5VVQQIUtO
- bOHv7lVkw7ikMgz7kiz/w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6qcWV+qWiLI=:kjXIiUB/VicY7yGRA7ziGY
- 1kANGtrqCMHfXJf786bqSJ4WFSALkZjbMLtINIV4T+vxgzLgP14+/+o87XoB8AVtCbsM8kSU2
- JI4f2MPP0HNWgn+2LpS3cLb7xghKtlFrZesE8ZoHQdrwNQA8TYnwo7i8iyWT9HB/jOsfGV3LL
- 44C+RdOO+cVWTpSTxrIQlkh0FqrhHoevLjCx+9RY95AdV8S2y5F34wcsWwJ6ip0PT5kuzV6Il
- hzgefpeFTffFB3QgfQolJedi0HJGGr8LxI0ncuaVgWICAk3xBtKfPuNevbrVXP4lsI1AM8hgF
- e+AIJYY4vi0qSKjKANRQ/QT0Dx71Txo5/LLy3/UAuJTwirsg+AcLyZvPJMm64+1WptLr3b6BF
- RKNkDnFWVixEY95EGsfpmnYdt9NeK0dbodW6RUy81Q/jnEPU2MGfTAu1tIbqmB2W35IXC6DuF
- podvY+5Xxnq/2Q2vk9VqoBFXvehS9LY6pj6EZ5yEWpyT7NauOEat01WVpSczGhPHXHnEN/3h6
- aKIueqLHBKpGHnXYIjiuy2iGxQsibiG/eLbSbcBMKwYVdRWRbqcnHP4Kq9GTyLwL4dTE5USZi
- aPOlnrKGSAjB/LMbVO4F7dN1KG6ykrsF2HvXh7QxFP6Q1NvKuZte5cMMhgj1N8BSC4ARzLYxv
- LBdyXTSwHlhJGZV+d1tLgWwyR1mZFiTy0jP5n1sx42z9DwEe1XaujjxQN57RcT2S93y3Qj0Ky
- rm7R3B5pUNK3kdNFswGHNan0hA50VY7ikJxsHyKcBI69ebqUEeCdCLq1mGBHTdpDNsPeiCTQE
- 1WnDQxC7sbtImKsPybVj6QylWejuYsNDlTlTBj14+wohn9SOzM=
+In-Reply-To: <20200219162738.GA10644@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Adam Williamson <awilliam@redhat.com>
+On 2/19/20 9:27 AM, Christoph Hellwig wrote:
+> On Wed, Feb 19, 2020 at 07:23:39PM +0300, Dmitry Osipenko wrote:
+>> The gpt_sector=<sector> causes the GPT partition search to look at the
+>> specified sector for a valid GPT header if the GPT is not found at the
+>> beginning or the end of block device.
+>>
+>> In particular this is needed for NVIDIA Tegra consumer-grade Android
+>> devices in order to make them usable with the upstream kernel because
+>> these devices use a proprietary / closed-source partition table format
+>> for the EMMC and it's impossible to change the partition's format. Luckily
+>> there is a GPT table in addition to the proprietary table, which is placed
+>> in uncommon location of the EMMC storage and bootloader passes the
+>> location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
+>>
+>> This patch is based on the original work done by Colin Cross for the
+>> downstream Android kernel.
+> 
+> I don't think a magic command line is the way to go.  The best would be
+> to reverse-engineer the proprietary partition table format.  If that is
+> too hard we can at least key off the odd GPT location based of it's
+> magic number.
 
-Arnd Bergmann inadvertently typoed these in d320a9551e394 and
-64cbfa96551a; they seem to be the cause of
-https://bugzilla.redhat.com/show_bug.cgi?id=1801353 , invalid
-SCSI commands when udev tries to query a DVD drive.
+I thought that the backup GPT was always present in the standard 
+location; it's just the primary GPT that's in an odd location. So, this 
+kernel parameter just forces the kernel to look first for the primary 
+GPT in the unusual location, thus avoiding an error message when that's 
+not there, and the system falls back to the backup GPT.
 
-[arnd] Found another instance of the same bug, also introduced
-in my compat_ioctl series.
-
-Fixes: d320a9551e39 ("compat_ioctl: scsi: move ioctl handling into drivers")
-Fixes: 64cbfa96551a ("compat_ioctl: move cdrom commands into cdrom.c")
-Fixes: c103d6ee69f9 ("compat_ioctl: ide: floppy: add handler")
-Link: https://bugzilla.redhat.com/show_bug.cgi?id=1801353
-Bisected-by: Chris Murphy <bugzilla@colorremedies.com>
-Signed-off-by: Adam Williamson <awilliam@redhat.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/block/paride/pcd.c | 2 +-
- drivers/cdrom/gdrom.c      | 2 +-
- drivers/ide/ide-gd.c       | 2 +-
- drivers/scsi/sr.c          | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
-index 117cfc8cd05a..cda5cf917e9a 100644
---- a/drivers/block/paride/pcd.c
-+++ b/drivers/block/paride/pcd.c
-@@ -276,7 +276,7 @@ static const struct block_device_operations pcd_bdops = {
- 	.release	= pcd_block_release,
- 	.ioctl		= pcd_block_ioctl,
- #ifdef CONFIG_COMPAT
--	.ioctl		= blkdev_compat_ptr_ioctl,
-+	.compat_ioctl	= blkdev_compat_ptr_ioctl,
- #endif
- 	.check_events	= pcd_block_check_events,
- };
-diff --git a/drivers/cdrom/gdrom.c b/drivers/cdrom/gdrom.c
-index 886b2638c730..c51292c2a131 100644
---- a/drivers/cdrom/gdrom.c
-+++ b/drivers/cdrom/gdrom.c
-@@ -519,7 +519,7 @@ static const struct block_device_operations gdrom_bdops = {
- 	.check_events		= gdrom_bdops_check_events,
- 	.ioctl			= gdrom_bdops_ioctl,
- #ifdef CONFIG_COMPAT
--	.ioctl			= blkdev_compat_ptr_ioctl,
-+	.compat_ioctl		= blkdev_compat_ptr_ioctl,
- #endif
- };
- 
-diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
-index 1bb99b556393..05c26986637b 100644
---- a/drivers/ide/ide-gd.c
-+++ b/drivers/ide/ide-gd.c
-@@ -361,7 +361,7 @@ static const struct block_device_operations ide_gd_ops = {
- 	.release		= ide_gd_release,
- 	.ioctl			= ide_gd_ioctl,
- #ifdef CONFIG_COMPAT
--	.ioctl			= ide_gd_compat_ioctl,
-+	.compat_ioctl		= ide_gd_compat_ioctl,
- #endif
- 	.getgeo			= ide_gd_getgeo,
- 	.check_events		= ide_gd_check_events,
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 0fbb8fe6e521..e4240e4ae8bb 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -688,7 +688,7 @@ static const struct block_device_operations sr_bdops =
- 	.release	= sr_block_release,
- 	.ioctl		= sr_block_ioctl,
- #ifdef CONFIG_COMPAT
--	.ioctl		= sr_block_compat_ioctl,
-+	.compat_ioctl	= sr_block_compat_ioctl,
- #endif
- 	.check_events	= sr_block_check_events,
- 	.revalidate_disk = sr_block_revalidate_disk,
--- 
-2.25.0
-
+Or, do I misremember the layout, or the kernel's behaviour if primary 
+GPT is missing?
