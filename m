@@ -6,68 +6,57 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16255C34056
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D1FC34047
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D43672067D
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 741BB206E2
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gYhmPc4S"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kySvMotf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgBSQcB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:32:01 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:34100 "EHLO
+        id S1726652AbgBSQdA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:33:00 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:34126 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbgBSQcA (ORCPT
+        with ESMTP id S1726530AbgBSQc7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:32:00 -0500
+        Wed, 19 Feb 2020 11:32:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=UVfIeb+4tVcWdeMMBdsbYkC/EIC/Hs/Sd7Slwqh1/iA=; b=gYhmPc4SHdZ4+l5wtpn6+4s70w
-        trenfn4NekiYc9+4QlPCicf3Ru3BstX5PbP3YIO8J/9d9i1zviKpHA/+Uiksm14520mZL+X/3SM0L
-        jaS3+A05YvsVQf2HGOXar66glBA+YxMSpqjjZXeD1ISAHeZdEG7mh4vRpDkiuk9jTlmJ63CF3V6bP
-        coZtokAFhFYQKsDw1VyOZc4U5OqXJCsyKxse78WcYj0oWO6/QK56EmnnGDPP3k5MmFVovH1x1CN8M
-        t7+BB9Y1NMIHS3dKtwvYTh08GjCaT5tvV3GDFFf0XszM80502ERGETiyY74gurZcVK3GIF/mP/drK
-        tb2saKBg==;
+        bh=0Iv9s1m6y0FbmfZ8mnurdq7ew1/pc50IKzonMUk6MHg=; b=kySvMotf4OaWku5JVAz2NwHg/0
+        vkpIamQZgNbWtkloCyuH3tX+Nd9PwjCssEGOw81eA6DVfOupZFaDLkeROgtnLiOHwa6ExwNFEDKVF
+        RVozgRl8QKjdHgRfnBGzTScRAJBYH9tarebGYyWa+dOfx4JVtWkFsemdcay8IkYoNPaDr7Aw85jbv
+        fJS1L0rXfRHC3+exv+Aj5/81JzCSBqBuuo4lOkm6e50zDYAaVJtCPmPvT8X0HJVUfwTKkt/a5WZ3s
+        rOY1DQWU//t06lTQsIOomS/vf+ZpctaThtqM6h3isLua9/BPfL9wGpFJ+Bw/QDcmRv9w21kyJRu1b
+        j4nD8wTg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j4SGW-0005aw-1X; Wed, 19 Feb 2020 16:32:00 +0000
-Date:   Wed, 19 Feb 2020 08:32:00 -0800
+        id 1j4SHS-0005f5-TU; Wed, 19 Feb 2020 16:32:58 +0000
+Date:   Wed, 19 Feb 2020 08:32:58 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Coly Li <colyli@suse.de>
-Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/3] bcache: ignore pending signals when creating gc and
- allocator thread
-Message-ID: <20200219163200.GA18377@infradead.org>
-References: <20200213141207.77219-1-colyli@suse.de>
- <20200213141207.77219-2-colyli@suse.de>
+To:     Stephen Warren <swarren@wwwdotorg.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Simon Glass <sjg@chromium.org>
+Subject: Re: dd, close(), sync, and the Linux disk cache
+Message-ID: <20200219163258.GB18377@infradead.org>
+References: <b7ad1223-4224-da46-4c48-50427360f31c@wwwdotorg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200213141207.77219-2-colyli@suse.de>
+In-Reply-To: <b7ad1223-4224-da46-4c48-50427360f31c@wwwdotorg.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 10:12:05PM +0800, Coly Li wrote:
-> +	/*
-> +	 * In case previous btree check operation occupies too many
-> +	 * system memory for bcache btree node cache, and the
-> +	 * registering process is selected by OOM killer. Here just
-> +	 * ignore the SIGKILL sent by OOM killer if there is, to
-> +	 * avoid kthread_run() being failed by pending signals. The
-> +	 * bcache registering process will exit after the registration
-> +	 * done.
-> +	 */
-> +	if (signal_pending(current))
-> +		flush_signals(current);
-> +
-> +	k = kthread_run(bch_allocator_thread, ca, "bcache_allocator");
+On Wed, Feb 12, 2020 at 05:02:43PM -0700, Stephen Warren wrote:
+> Jens et. al.,
+> 
+> If I dd to an SD card (e.g. via a USB SD card reader), is it required to run
+> sync afterward in order to guarantee that all written data is written to the
+> SD card? I'm running dd with a simple command-line like "dd if=file.img
+> of=/dev/sdc".
 
-This really needs to go into the kthread code itself instead of
-requiring cargo culting in the callers.
-
+Yes.  Or use of=dsync on the dd command line.
