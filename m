@@ -6,76 +6,57 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A03C34047
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5FAC34047
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:28:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EA8B24654
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FAD72067D
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 16:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MjkW87BV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CuskNoV2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726945AbgBSQ1w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 11:27:52 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:60162 "EHLO
+        id S1726659AbgBSQ2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 11:28:53 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:60608 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726514AbgBSQ1v (ORCPT
+        with ESMTP id S1726652AbgBSQ2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:27:51 -0500
+        Wed, 19 Feb 2020 11:28:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+CojvMx93xsodiDvTtV8/VrGBaV6zZUC2VstkM1u1l4=; b=MjkW87BVQNY2tB0+8h16ljneX5
-        hvtTluLOHHUfLC/dX/YPRFHXtmiZhwcCvDndhqME9bbd7LrfHXdOxvEqcY6zTbuQDftls28L4iATG
-        uQ80SplXnwJ+VyJN/vbPrIStB9Qlopf+NUovvu0r91zcG6z+L5LHOZ9sHM/fnfm+An5Fvq5OLASn9
-        RHakAxi18QNh9YlhSkm0qGy+/1Diq11nU5wrk/W1APzhp+vQT88P7AtvVcxxopYf6qR4fueaKexJm
-        u8f34hRz8qFCwj+kwcRxMtypfZBZQ75fcNBAcHNdoStX4ZhR5tDdid67P9vIckdkv/1Z3DtdMRKss
-        cOvT7kZw==;
+        bh=GwhmZYOXRKo5GEKPILaa/bNrAAaJJsxIZFE07QbD0wk=; b=CuskNoV23y0pgw1lrJE3Z/uBKg
+        kgo2Mw4zt1V4h6kjNj+Lj0V+RL0DI/31PtIl/cia3LVFABALbkRas5vqQ29sz3daMa7j9vtOfMdYV
+        K4fO/H976LDtxjWe861017Oyk7KzG8d4ZEu2vdkWoXHllsyHBmTDINOOIWKUB9D3gFIgcBmrfxKyT
+        6ID1AeqpGla9b/ZQFm74guNcca/fOpEzxoj0lYfsU1iU425eM9wXmIuq5yd0eRcOGj3oSm9jGoOL8
+        fmYPiz7mv4q/gH4Q8D9lpZ9XE3JMmDOIsvCLm+ksUxv2wBecGMKO26F384mm0LgzZxDZgP8VAP4UX
+        sVsojUAg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j4SCI-0002si-55; Wed, 19 Feb 2020 16:27:38 +0000
-Date:   Wed, 19 Feb 2020 08:27:38 -0800
+        id 1j4SDU-00032E-OA; Wed, 19 Feb 2020 16:28:52 +0000
+Date:   Wed, 19 Feb 2020 08:28:52 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Davidlohr Bueso <dave@stgolabs.net>,
-        Colin Cross <ccross@android.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>, linux-efi@vger.kernel.org,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline
- parameter
-Message-ID: <20200219162738.GA10644@infradead.org>
-References: <20200219162339.16192-1-digetx@gmail.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH] block: Fix partition support for host aware zoned block
+ devices
+Message-ID: <20200219162852.GB10644@infradead.org>
+References: <20200219042632.819101-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200219162339.16192-1-digetx@gmail.com>
+In-Reply-To: <20200219042632.819101-1-shinichiro.kawasaki@wdc.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 07:23:39PM +0300, Dmitry Osipenko wrote:
-> The gpt_sector=<sector> causes the GPT partition search to look at the
-> specified sector for a valid GPT header if the GPT is not found at the
-> beginning or the end of block device.
-> 
-> In particular this is needed for NVIDIA Tegra consumer-grade Android
-> devices in order to make them usable with the upstream kernel because
-> these devices use a proprietary / closed-source partition table format
-> for the EMMC and it's impossible to change the partition's format. Luckily
-> there is a GPT table in addition to the proprietary table, which is placed
-> in uncommon location of the EMMC storage and bootloader passes the
-> location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
-> 
-> This patch is based on the original work done by Colin Cross for the
-> downstream Android kernel.
+On Wed, Feb 19, 2020 at 01:26:32PM +0900, Shin'ichiro Kawasaki wrote:
+> +	/* Iterate partitions skipping the holder device at index 0 */
 
-I don't think a magic command line is the way to go.  The best would be
-to reverse-engineer the proprietary partition table format.  If that is
-too hard we can at least key off the odd GPT location based of it's
-magic number.
+s/holder/whole/ ?
+
+> +extern bool disk_has_partitions(struct gendisk *disk);
+
+No need for externs on function prototypes in headers.
