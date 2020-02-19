@@ -2,97 +2,125 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 560D1C34056
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 20:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB139C5ACC4
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 22:11:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 246DA24670
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 20:51:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582145461;
-	bh=elJqOZvyfQWvQ8In1AjZnSkYrHkr0otpJwRaZHCgpxo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=seSe95hcrZenHPOiBtOtpxdWVbjQ4PLMGfUjAWrmIjn20NMsckxQVOa1wW7mU6OuB
-	 8pWBeaNN0homyxuZ8L1iZW/N1CBtcsMdqzrzdXwlkZ0AE/vSt8rLuvRcSVlIU79Juo
-	 2lgp27arITvmSaquCsKUYaEwQX6+Qdg9DYlGiT3k=
+	by mail.kernel.org (Postfix) with ESMTP id AD089206EF
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 22:11:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fco2beCW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgBSUvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Feb 2020 15:51:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58082 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726645AbgBSUvA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Feb 2020 15:51:00 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727326AbgBSWLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Feb 2020 17:11:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33808 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727232AbgBSWLB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Feb 2020 17:11:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582150259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WJXeiw8Pc47ziMf9sllqy/XIXqOZqMkjIL0kGh5O1UI=;
+        b=fco2beCWpB15bSNVugH0zzS4nU5Ijwu1rWMGEJlS2mtvQCRgqu47HL/vUfehpDtxg/hSGq
+        bC31AXBxVTB3F9oo4aFy5rYVfZKbkyELXW7+Dvx463ru7vmKrno8DINGEDZs68Sg2EUkkP
+        FibnzbIJmCXl94mWEZ5GR99bYxEcIAk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-mzc_OQdGOmijSxTCyt1lLQ-1; Wed, 19 Feb 2020 17:10:55 -0500
+X-MC-Unique: mzc_OQdGOmijSxTCyt1lLQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9CBC924656;
-        Wed, 19 Feb 2020 20:50:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582145459;
-        bh=elJqOZvyfQWvQ8In1AjZnSkYrHkr0otpJwRaZHCgpxo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=W9zlWyXKb/CugInFr/h8yZlZWNm/5x9tvD/KWAIHPuEvsrHpTChlurGgY9L8raBoy
-         wCVWBwUJFkJs/eldR9pUoyDf7UuLF2zMc5co+/QiWjCncTpyha8w/AdC3seNQvEH0n
-         iRIJiEGNGesF863JJJ5xwD3RTPGZ3uzH2UU3i2sE=
-Date:   Thu, 20 Feb 2020 05:50:52 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Tim Walker <tim.t.walker@seagate.com>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
-Message-ID: <20200219205052.GB28509@redsun51.ssa.fujisawa.hgst.com>
-References: <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
- <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
- <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
- <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
- <20200219013137.GA31488@ming.t460p>
- <BYAPR04MB58165C6B400AE30986F988D5E7100@BYAPR04MB5816.namprd04.prod.outlook.com>
- <20200219021540.GC31488@ming.t460p>
- <BYAPR04MB5816DF16BC3720ABF286671EE7100@BYAPR04MB5816.namprd04.prod.outlook.com>
- <CANo=J15Wvm2R+vuLj6QQ5Vete507cA==5Rw=4vn3Z8npZ=2vww@mail.gmail.com>
- <CANo=J14GM=Uu7qWirtvgzjEKVCzLV0nZLOOPqD9M+nwOKrv7yQ@mail.gmail.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 936F713E2;
+        Wed, 19 Feb 2020 22:10:54 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EC7619C4F;
+        Wed, 19 Feb 2020 22:10:44 +0000 (UTC)
+Date:   Thu, 20 Feb 2020 06:10:36 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Ewan D. Milne" <emilne@redhat.com>
+Subject: Re: [PATCH] blk-mq: insert passthrough request into hctx->dispatch
+ directly
+Message-ID: <20200219221036.GA24522@ming.t460p>
+References: <20200215032140.4093-1-ming.lei@redhat.com>
+ <20200219163615.GE18377@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANo=J14GM=Uu7qWirtvgzjEKVCzLV0nZLOOPqD9M+nwOKrv7yQ@mail.gmail.com>
+In-Reply-To: <20200219163615.GE18377@infradead.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 11:28:46AM -0500, Tim Walker wrote:
-> Hi Ming-
+On Wed, Feb 19, 2020 at 08:36:15AM -0800, Christoph Hellwig wrote:
+> On Sat, Feb 15, 2020 at 11:21:40AM +0800, Ming Lei wrote:
+> > For some reason, device may be in one situation which can't handle
+> > FS request, so STS_RESOURCE is always returned and the FS request
+> > will be added to hctx->dispatch. However passthrough request may
+> > be required at that time for fixing the problem. If passthrough
+> > request is added to scheduler queue, there isn't any chance for
+> > blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
+> > Then the FS IO request may never be completed, and IO hang is caused.
+> > 
+> > So passthrough request has to be added to hctx->dispatch directly.
+> > 
+> > Fix this issue by inserting passthrough request into hctx->dispatch
+> > directly. Then it becomes consistent with original legacy IO request
+> > path, in which passthrough request is always added to q->queue_head.
 > 
-> >Will NVMe HDD support multiple NS?
+> Do you have a description of an actual problem this fixes?  Maybe even
+> a reproducer for blktests?
 > 
-> At this point it doesn't seem like an NVMe HDD could benefit from
-> multiple namespaces. However, a multiple actuator HDD can present the
-> actuators as independent channels that are capable of independent
-> media access. It seems that we would want them on separate namespaces,
-> or sets. I'd like to discuss the pros and cons of each, and which
-> would be better for system integration.
 
-If NVM Sets are not implemented, the host is not aware of resource
-separatation for each namespace.
+It is reported by one RH customer in the following test case:
 
-If you implement NVM Sets, two namespaces in different sets tells the host
-that the device has a backend resource partition (logical or physical)
-such that processing commands for one namespace will not affect the
-processing capabilities of the other. Sets define "noisy neighbor"
-domains.
+	1) Start IO on Emulex FC host
+	2) Fail one controller, wait 5 minutes
+	3) Bring controller back online
 
-Dual actuators sound like you have independent resources appropriate to
-report as NVM Sets, but that may depend on other implementation details.
+When we trace the problem, it is found that FS request started in device_add_disk()
+from scsi disk probe context stuck because scsi_queue_rq() always return
+STS_BUSY via scsi_setup_fs_cmnd() -> alua_prep_fn().
 
-The NVMe specification does not go far enough, though, since IO queues
-are always a shared resource. The host may implement a different IO
-queue policy such that they're not shared (you'd need at least one IO
-queue per set), but we don't currently do that.
+The kernel ALUA state is TRANSITIONING at that time, so it is reasonable to see
+BLK_TYPE_FS requests won't go anywhere because of the check in alua_prep_fn().
+
+However, the passthrough request(TEST UNIT READY) is submitted from alua_rtpg_work
+when the FS request can't be dispatched to LLD. And SCSI stack should
+have been allowed to handle this passthrough rquest. But it can't reach SCSI stack
+via .queue_rq() because blk-mq won't dispatch it until hctx->dispatch is
+empty.
+
+The legacy IO request code always added passthrough request into head of q->queue_head
+directly instead of scheduler queue or sw queue, so no such issue.
+
+So far not figured out one blktests test case, but the problem is real.
+
+BTW, I just found we need the extra following change:
+
+@@ -1301,7 +1301,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+                        q->mq_ops->commit_rqs(hctx);
+
+                spin_lock(&hctx->lock);
+-               list_splice_init(list, &hctx->dispatch);
++               list_splice_tail_init(list, &hctx->dispatch);
+                spin_unlock(&hctx->lock);
+
+Will post V2.
+
+
+Thanks,
+Ming
+
