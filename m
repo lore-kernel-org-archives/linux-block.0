@@ -2,129 +2,124 @@ Return-Path: <SRS0=ya0H=4H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8EDC34031
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 00:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B9E5C34031
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:32:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F120208E4
-	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 00:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10D76207FD
+	for <linux-block@archiver.kernel.org>; Wed, 19 Feb 2020 01:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="cfgAwvjv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cswxiv4S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgBSAYv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Feb 2020 19:24:51 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43571 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbgBSAYv (ORCPT
+        id S1726964AbgBSBcA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Feb 2020 20:32:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48422 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726761AbgBSBcA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Feb 2020 19:24:51 -0500
-Received: by mail-qt1-f195.google.com with SMTP id d18so15966824qtj.10
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2020 16:24:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=FhF0ZDyYKNk5Yq7ZCEqXSDJQMEKVIumdy/wollI5R68=;
-        b=cfgAwvjvb/VB7SWmcerqu/ZyUwshT0CVr5ZIulzf4plfCSpJdpPpyg07bgx30E6yhB
-         z1K0LyKRH7WtzU4F35eW72koqyztJDHsZN8bJ9rMZ9lbB7zGBTSt1oPUMHpIBVDrq0dt
-         7N572uEP/glYaRFIsRtr9BHWGeSLADfP65Pl6F10aYeOJHLfCDVLCLa4ekee3ry2JJGK
-         pDLuURBxTR78Pgr14za88DzQzMZU7tt70XODF8tpIfy/vPDiddCBn9YyXQGGl72HTlex
-         EWbGQ3lX7j/HtdS8cOJJ3fF6jdN2UFQYFMrMXXZydVyLn3A6gwFToRXzH1lRnOgem/YT
-         dVKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=FhF0ZDyYKNk5Yq7ZCEqXSDJQMEKVIumdy/wollI5R68=;
-        b=JQDBeVvkAJeSw0PMmiyX/5jU2cZdy7pUEEC3hF2mjyWWMtpfeFxSvVwrWnK/vk/fZS
-         d3IxN6cikVYJorpcJHVVJ+FBidiTXSTFI/4Xd+TQAUcQoI8RirHyuIco+01Ze4lmZ6eq
-         U9ySpX7liPMvgFHgsnf145W7Xgm4uRhkgNJGePK5nJHXuRCzZy2XAbyvkaeoXRjIXse9
-         M9rM8IrND/ONZhC/GOvUXoZ5KDDTLdZS6G6xKF/L7tHSkxjE8W8Yfh5tEqe/STWeQeZJ
-         ASEg4trdVOrJ0Vd6d7FYqvg53CcDFN9OohRO5cDIL6JIaBbYzYu0lLQRrZc4eWTWdnlN
-         q0ow==
-X-Gm-Message-State: APjAAAUjV6NG0Gx9ZStNMqe5ZoNVR5lC8s4DjLw3+Y+fMGkORVgv0RiO
-        FcFGkTZID8czO/1OcuyVbSm2fA==
-X-Google-Smtp-Source: APXvYqyi9lhP3wSZE+ti5Vo+9JmVlEjKnucnVmZUWRpTNqkLz64F+yn/m4F4y1SBatd06kYNJN4+DA==
-X-Received: by 2002:ac8:4419:: with SMTP id j25mr19800017qtn.378.1582071890465;
-        Tue, 18 Feb 2020 16:24:50 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id 132sm156980qkn.109.2020.02.18.16.24.49
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 18 Feb 2020 16:24:49 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1j4DAX-00037W-5U; Tue, 18 Feb 2020 20:24:49 -0400
-Date:   Tue, 18 Feb 2020 20:24:49 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jinpu Wang <jinpuwang@gmail.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>
-Subject: Re: [PATCH v8 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-Message-ID: <20200219002449.GA11943@ziepe.ca>
-References: <20200124204753.13154-1-jinpuwang@gmail.com>
- <CAHg0HuzLLHqp_76ThLhUdHGG_986Oxvvr15h_13T12eEWjyAxA@mail.gmail.com>
- <20200131165421.GB29820@ziepe.ca>
- <f657d371-3b23-e4b2-50b3-db47cd521e1f@kernel.dk>
- <CAD9gYJLVMVPjQcCj0aqbAW3CD86JQoFNvzJwGziRXT8B2UT0VQ@mail.gmail.com>
- <a1aaa047-3a44-11a7-19a1-e150a9df4616@kernel.dk>
- <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
+        Tue, 18 Feb 2020 20:32:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582075918;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zVYL+QbOz6z8x8H9e6MwpzZamAakZ5n5YLc7miQ2518=;
+        b=Cswxiv4SxDk0VNa22bM5LSLBvj0gl2ZGB7bM+Vrn3K10q49qEJPe+Zk1+K9dKK3HkArGXO
+        0vm7OrUh6m7P2GxrIvoCbvZQbfFNfMJ7DrtOs3yvDx4Io+9fByE6il342qZ4lMH0QuCrUT
+        bhMZFkkfIgJ7tQS9qf9Lvvo3ceQFVhI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-9ETsOWYJP5KwewucCzzY8g-1; Tue, 18 Feb 2020 20:31:51 -0500
+X-MC-Unique: 9ETsOWYJP5KwewucCzzY8g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2E78010C7;
+        Wed, 19 Feb 2020 01:31:50 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6167A5D9E5;
+        Wed, 19 Feb 2020 01:31:41 +0000 (UTC)
+Date:   Wed, 19 Feb 2020 09:31:37 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Tim Walker <tim.t.walker@seagate.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [LSF/MM/BPF TOPIC] NVMe HDD
+Message-ID: <20200219013137.GA31488@ming.t460p>
+References: <BYAPR04MB5816AA843E63FFE2EA1D5D23E71B0@BYAPR04MB5816.namprd04.prod.outlook.com>
+ <yq1blq3rxzj.fsf@oracle.com>
+ <CANo=J16cDBUDWdV7tdY33UO0UT0t-g7jRfMVTxZpePvLew7Mxg@mail.gmail.com>
+ <yq1r1yzqfyb.fsf@oracle.com>
+ <2d66bb0b-29ca-6888-79ce-9e3518ee4b61@suse.de>
+ <20200214144007.GD9819@redsun51.ssa.fujisawa.hgst.com>
+ <d043a58d-6584-1792-4433-ac2cc39526ca@suse.de>
+ <20200214170514.GA10757@redsun51.ssa.fujisawa.hgst.com>
+ <CANo=J17Rve2mMLb_yJNFK5m8wt5Wi4c+b=-a5BJ5kW3RaWuQVg@mail.gmail.com>
+ <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMGffEkLkwkd73Q+m46VeOw0UnzZ0EkZQF-QcSZjyqNcqigZPw@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200218174114.GA17609@redsun51.ssa.fujisawa.hgst.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 04:12:22PM +0100, Jinpu Wang wrote:
-> On Fri, Jan 31, 2020 at 6:49 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > On 1/31/20 10:28 AM, Jinpu Wang wrote:
-> > > Jens Axboe <axboe@kernel.dk> 于2020年1月31日周五 下午6:04写道：
-> > >>
-> > >> On 1/31/20 9:54 AM, Jason Gunthorpe wrote:
-> > >>> On Fri, Jan 31, 2020 at 05:50:44PM +0100, Danil Kipnis wrote:
-> > >>>> Hi Doug, Hi Jason, Hi Jens, Hi All,
-> > >>>>
-> > >>>> since we didn't get any new comments for the V8 prepared by Jack a
-> > >>>> week ago do you think rnbd/rtrs could be merged in the current merge
-> > >>>> window?
-> > >>>
-> > >>> No, the cut off for something large like this would be rc4ish
-> > >>
-> > >> Since it's been around for a while, I would have taken it in a bit
-> > >> later than that. But not now, definitely too late. If folks are
-> > >> happy with it, we can get it queued for 5.7.
-> > >>
-> > >
-> > > Thanks Jason, thanks Jens, then we will prepare later another round for 5.7
-> >
-> > It would also be really nice to see official sign-offs (reviews) from non
-> > ionos people...
+On Wed, Feb 19, 2020 at 02:41:14AM +0900, Keith Busch wrote:
+> On Tue, Feb 18, 2020 at 10:54:54AM -0500, Tim Walker wrote:
+> > With regards to our discussion on queue depths, it's common knowledge
+> > that an HDD choses commands from its internal command queue to
+> > optimize performance. The HDD looks at things like the current
+> > actuator position, current media rotational position, power
+> > constraints, command age, etc to choose the best next command to
+> > service. A large number of commands in the queue gives the HDD a
+> > better selection of commands from which to choose to maximize
+> > throughput/IOPS/etc but at the expense of the added latency due to
+> > commands sitting in the queue.
+> > 
+> > NVMe doesn't allow us to pull commands randomly from the SQ, so the
+> > HDD should attempt to fill its internal queue from the various SQs,
+> > according to the SQ servicing policy, so it can have a large number of
+> > commands to choose from for its internal command processing
+> > optimization.
 > 
-> Totally agree.
-> Hi Bart, hi Leon,
+> You don't need multiple queues for that. While the device has to fifo
+> fetch commands from a host's submission queue, it may reorder their
+> executuion and completion however it wants, which you can do with a
+> single queue.
+>  
+> > It seems to me that the host would want to limit the total number of
+> > outstanding commands to an NVMe HDD
 > 
-> Both of you spent quite some time to review the code, could you give a
-> Reviewed-by for some of the patches you've reviewed?
+> The host shouldn't have to decide on limits. NVMe lets the device report
+> it's queue count and depth. It should the device's responsibility to
 
-Anyone? I don't want to move ahead with a block driver without someone
-from the block community saying it is OK
+Will NVMe HDD support multiple NS? If yes, this queue depth isn't
+enough, given all NSs share this single host queue depth.
 
-Jason
+> report appropriate values that maximize iops within your latency limits,
+> and the host will react accordingly.
+
+Suppose NVMe HDD just wants to support single NS and there is single queue,
+if the device just reports one host queue depth, block layer IO sort/merge
+can only be done when there is device saturation feedback provided.
+
+So, looks either NS queue depth or per-NS device saturation feedback
+mechanism is needed, otherwise NVMe HDD may have to do internal IO
+sort/merge.
+
+
+Thanks,
+Ming
+
