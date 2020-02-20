@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FB6C11D00
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 22:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3A8C11D00
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 22:02:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF8B8208E4
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 22:00:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07EC2208E4
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 22:02:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="Kmj9oigm"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="1sM+flAa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729098AbgBTWAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 17:00:13 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:36225 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726670AbgBTWAM (ORCPT
+        id S1727801AbgBTWCl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 17:02:41 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:34380 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727786AbgBTWCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 17:00:12 -0500
-Received: by mail-qt1-f193.google.com with SMTP id t13so4077721qto.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 14:00:11 -0800 (PST)
+        Thu, 20 Feb 2020 17:02:41 -0500
+Received: by mail-qk1-f195.google.com with SMTP id c20so67310qkm.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 14:02:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=4DEb+MFtlfOkYpWfs64nM33/4kdQBlL8UrNBhh3ectk=;
-        b=Kmj9oigm0jMnd4HOhL2kj5adwwG8XTmckWqG+btnWkfj+uDXxwZkdqrxOQ7PGHF76d
-         UQIhwBsksdU7D+Tr0CtIQnWeoDw2S0FzAeaOZkKFaGQjh+4tG+7lcFKp1TJdyxwnWBvz
-         0xMlnq2i02KkLLLUS3e6GXooE84fiTc0bIa0MWZiFa5PTTiLv4F1ka6+J2bubbPVkwSF
-         irbntREuc6iemK8X0WglElHqFXvXyME57ic83jBhi08/Z35rZMunYsQcPNE+C4gQG3TA
-         oGV2OVyd97f+UK61/rT8CudV1HpMf+Y52tCRrkdnvwvKDGVKpsp7LtK+f5lf8R+fTbSD
-         4wUg==
+        bh=Qs+LhNiBMIj9A7PLEkqadpwwdn4t7ZJVTcZjDGn03PM=;
+        b=1sM+flAalAjdf9H+ABF4RBpnc7mgf/EB1PkQ3GIvPhatEPuYG/+kZZYytUx2breYo9
+         oBS4Cz3/NHUDHKrF1wClmlsU2wMQWRh9jUeUVFlKDnYU1XDy2DbPjMAN6/dFKk+WparC
+         n2mnFSbEJsFPwZS1Vkfj9gnphTLnT9mqRYcdYb3mcnuK5c108UQ0b24WLrAoGSNFpyha
+         iPLMyEc4PN5W+kfi2o4BOepzuEVVQ0MwF8HwWATiYKm8p4b2uSETdNaNTVOHwu7ULX5K
+         9cl6gc557oQYGhjYLQyYi1BtFt0PWyzSVcxVJSRFwVQAzbgf64CESMf7EXkdNMTvkNc/
+         T1Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=4DEb+MFtlfOkYpWfs64nM33/4kdQBlL8UrNBhh3ectk=;
-        b=WnSaICiF0KiAgVr8pmbI2YC/138tRt4WuPWw5X/YqCCXPreBnjlzAF8Heo8kkav+SN
-         jNZ8Gr8CDQOGhLvh9BDcmzr+e8eDBcfS8nab4fW0tthK/GXbCKMAMERralGnI1k6xNEB
-         rD1thjuBX6QbQGr23TR3TIJDZBQ4cQ7MtQYBJRIzqpolHP/0XPSUnBw/5Hn3Z+Qiktxg
-         0hgWDRLhrc8rIB0gPm+RQT6fva9Ji+mV8uG4opAz7RiqMGPvOG/Iq9IQgHhUAZfSYkyY
-         6+syih1muSTNwn9Nsxey5ptpqKm+MYuxjaqhjyJj0xb4XjJU8A4uUB/l7KKyKgKvNLxT
-         HyeA==
-X-Gm-Message-State: APjAAAU2D556g98u6ToCkWo5r154Ds7+gT1N0h8ZoweusOGbgiHvXDt5
-        XorOwI192bVXRZcJjagjpfybWg==
-X-Google-Smtp-Source: APXvYqzZ2IaTG8X1flSdo3+y5ECROeJuXsj6tBQM78xzv56U3N32QFxc89XdU6QS/J+WLZO9RtAtKw==
-X-Received: by 2002:ac8:72d6:: with SMTP id o22mr28347095qtp.174.1582236011362;
-        Thu, 20 Feb 2020 14:00:11 -0800 (PST)
+        bh=Qs+LhNiBMIj9A7PLEkqadpwwdn4t7ZJVTcZjDGn03PM=;
+        b=qVLCAyYhE6B+6/kdP7HQD2cS6To/089fjXlj5kGb9/hJpH02pizUv/y58a1Ff12o+/
+         hLc2eBY/RaRxXwIpKQFD6vPREfh64JGoRXFOWjMcmzz0CjtWUH117znrj/OUDRkgYgiK
+         HlY/5vChGUp/IE5OtW34Ed8WCQpbzde43mfqLVZxtW/f/xgXkt5wdax0X8RGzYu99JyU
+         P3Leb4iY/S5p+JwM6O7UzRJZIL+9PxNBAFR34IQtRVqFlNOL8oi4tTeIWtvBoqhmg7IV
+         I29dzvKeYlNvvE7ZidJvPu5uexCRbKGEJSIVRXLepI57QDTn/EkoTVH+CS5/skD0FF/j
+         g/mw==
+X-Gm-Message-State: APjAAAURoV7yUYtSlw49f22nHyabtrspUZx5xIounkTtuuIZBCsBBO0O
+        yi/60z9d+DdYgRF2NHQhVyyVPQ==
+X-Google-Smtp-Source: APXvYqzeLjYnxMcLPrrXE8eCyXI/Ol0Il3CHL5hbzaE2ieHBb3/wY1MEQ7PKwGJEA0oW/FVjRgCOZA==
+X-Received: by 2002:a05:620a:1037:: with SMTP id a23mr29030822qkk.82.1582236160287;
+        Thu, 20 Feb 2020 14:02:40 -0800 (PST)
 Received: from localhost ([2620:10d:c091:500::1:3504])
-        by smtp.gmail.com with ESMTPSA id t3sm513004qtc.8.2020.02.20.14.00.10
+        by smtp.gmail.com with ESMTPSA id e16sm518875qkl.32.2020.02.20.14.02.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2020 14:00:10 -0800 (PST)
-Date:   Thu, 20 Feb 2020 17:00:09 -0500
+        Thu, 20 Feb 2020 14:02:39 -0800 (PST)
+Date:   Thu, 20 Feb 2020 17:02:38 -0500
 From:   Johannes Weiner <hannes@cmpxchg.org>
 To:     Dan Schatzberg <schatzberg.dan@gmail.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
@@ -72,89 +72,30 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
         "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
         <linux-mm@kvack.org>
-Subject: Re: [PATCH v3 1/3] loop: Use worker per cgroup instead of kworker
-Message-ID: <20200220220009.GA68937@cmpxchg.org>
+Subject: Re: [PATCH v3 3/3] loop: Charge i/o to mem and blk cg
+Message-ID: <20200220220238.GB68937@cmpxchg.org>
 References: <cover.1582216294.git.schatzberg.dan@gmail.com>
- <118a1bd99d12f1980c7fc01ab732b40ffd8f0537.1582216294.git.schatzberg.dan@gmail.com>
+ <78060dcbf6578b4da6081f9f48b24b33726c5083.1582216295.git.schatzberg.dan@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <118a1bd99d12f1980c7fc01ab732b40ffd8f0537.1582216294.git.schatzberg.dan@gmail.com>
+In-Reply-To: <78060dcbf6578b4da6081f9f48b24b33726c5083.1582216295.git.schatzberg.dan@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 20, 2020 at 11:51:51AM -0500, Dan Schatzberg wrote:
-> Existing uses of loop device may have multiple cgroups reading/writing
-> to the same device. Simply charging resources for I/O to the backing
-> file could result in priority inversion where one cgroup gets
-> synchronously blocked, holding up all other I/O to the loop device.
+On Thu, Feb 20, 2020 at 11:51:53AM -0500, Dan Schatzberg wrote:
+> The current code only associates with the existing blkcg when aio is
+> used to access the backing file. This patch covers all types of i/o to
+> the backing file and also associates the memcg so if the backing file is
+> on tmpfs, memory is charged appropriately.
 > 
-> In order to avoid this priority inversion, we use a single workqueue
-> where each work item is a "struct loop_worker" which contains a queue of
-> struct loop_cmds to issue. The loop device maintains a tree mapping blk
-> css_id -> loop_worker. This allows each cgroup to independently make
-> forward progress issuing I/O to the backing file.
-> 
-> There is also a single queue for I/O associated with the rootcg which
-> can be used in cases of extreme memory shortage where we cannot allocate
-> a loop_worker.
-> 
-> The locking for the tree and queues is fairly heavy handed - we acquire
-> the per-loop-device spinlock any time either is accessed. The existing
-> implementation serializes all I/O through a single thread anyways, so I
-> don't believe this is any worse.
+> This patch also exports cgroup_get_e_css so it can be used by the loop
+> module.
 > 
 > Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
 
-FWIW, this looks good to me, please feel free to include:
+The cgroup bits look good to me.
 
 Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-
-I have only some minor style nitpicks (along with the other email I
-sent earlier on this patch), that would be nice to get fixed:
-
-> +static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
-> +{
-> +	struct rb_node **node = &(lo->worker_tree.rb_node), *parent = NULL;
-> +	struct loop_worker *cur_worker, *worker = NULL;
-> +	struct work_struct *work;
-> +	struct list_head *cmd_list;
-> +
-> +	spin_lock_irq(&lo->lo_lock);
-> +
-> +	if (!cmd->css)
-> +		goto queue_work;
-> +
-> +	node = &(lo->worker_tree.rb_node);
-
--> and . are > &, the parentheses aren't necessary.
-
-> +	while (*node) {
-> +		parent = *node;
-> +		cur_worker = container_of(*node, struct loop_worker, rb_node);
-> +		if ((long)cur_worker->css == (long)cmd->css) {
-
-The casts aren't necessary, but they made me doubt myself and look up
-the types. I wouldn't add them just to be symmetrical with the other
-arm of the branch.
-
-> +			worker = cur_worker;
-> +			break;
-> +		} else if ((long)cur_worker->css < (long)cmd->css) {
-> +			node = &((*node)->rb_left);
-> +		} else {
-> +			node = &((*node)->rb_right);
-
-The outer parentheses aren't necessary.
-
-> +		}
-> +	}
-> +	if (worker)
-> +		goto queue_work;
-> +
-> +	worker = kzalloc(sizeof(struct loop_worker), 
-> +			GFP_NOWAIT | __GFP_NOWARN);
-
-This fits on an 80 character line.
