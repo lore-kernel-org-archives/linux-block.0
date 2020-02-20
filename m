@@ -2,100 +2,162 @@ Return-Path: <SRS0=lp7R=4I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902B5C11D0C
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 17:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F6DC11D0C
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 18:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FA0D24682
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 17:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 097972467B
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 18:14:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LUdFldeg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uEXDpSnv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728356AbgBTRyo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 12:54:44 -0500
-Received: from mail-lf1-f49.google.com ([209.85.167.49]:37285 "EHLO
-        mail-lf1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727285AbgBTRyo (ORCPT
+        id S1728514AbgBTSO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 13:14:57 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:35060 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728506AbgBTSO5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 12:54:44 -0500
-Received: by mail-lf1-f49.google.com with SMTP id b15so3833701lfc.4
-        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 09:54:43 -0800 (PST)
+        Thu, 20 Feb 2020 13:14:57 -0500
+Received: by mail-ot1-f66.google.com with SMTP id r16so4580194otd.2
+        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 10:14:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EqMQTNTqAScrbbjAL00quzcLbXeMUXLVbynXt4e9wxY=;
-        b=LUdFldegpwqvpb6jUZ3KgoQ8St6ComRy2Mt0QI/Aro5+InOuut6omXAr9nQF3o2TGT
-         t8Rje9zNPB+Y70s2ziwN6pzj+GBEpkV/rj+BJvNjdp28MIoeLj+1ryQVtLHF44L1cElj
-         Fdmcu69yfiRlkdgybwGqgcdsYCwE0oNwuTzqYSVh4hXy5w1LwfsVrzdSuetsLJ3bp19V
-         hcU3wPT47l5uUfH5g7uN61Kbwnu99/puDW/sAY+BQHCP2flbDaG/hTysnOcQcpaznGVy
-         pTNhgGAGraAd+K2mXoQ4sfXQO/MBsz3Cee7NH71g9WoS+6nu0/qKW7/EQ9Eu1DGgnsoT
-         Dl0Q==
+        bh=uUKdgkaufxLmLYOt3TduZTiePIKaOkl8sejxXEeQJug=;
+        b=uEXDpSnvxNGx/1g8in8h2Lps6UF2cwI0Ci30lm3NqVXZaApTkzuDK+720dgSH9vb6k
+         KPzL7duyHh9m0BqEDV45tazOognY/d0scMRdl2OcG1JPE/lSbuZQK0NgSRFEE6JZ1ocE
+         bqLEMcVwBuFDRo16e9ImN9DFgGBbY4Rh3WKWen7Cz5Tan7f1NIIGTAN0UdCsrXlhKb2x
+         xp82sXN5MddaQ9Fo3jlxRRZOvEG5C3dmzkLPX1is1Moe0S017U8Ajd4vA0J68kr+ivdJ
+         DDHGyxImOHKFItW4eCZUYeAX2LdHOyh93fukcpNbkzLACAa56EL81Jnugc/MS1xxyks7
+         aVSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EqMQTNTqAScrbbjAL00quzcLbXeMUXLVbynXt4e9wxY=;
-        b=JIRtWlayngLa7xsVj6u0zXqsRjeYxGXDaSRPuqZsnNtks/+eydZ9U6Txyu2vGuAcnb
-         Q86SZTdDqnNVlM5sCdzNY0CjI1kU7MLaEw4yMqascPIDicGoh3yP7l5riFB+YOXmwDex
-         FBxVb7bTvxS0mpxVzMC9wcnEzP73hiGyqjQS5SKduA3TLTXYpBedXyxgY0leLHnmNt6W
-         nQl0hiZ0flIXkZDvEmI7157rFHQdhuJ9GMcNdvIAsa7ahmpb/1kTxM9MSe4RvXOt7GZl
-         KAT1a2EWruihU7gKNSPTUkCCeaE56QX/q7g6JDeujNvremmQ8r8btHGy4Q3ObHPOdJcF
-         lG8w==
-X-Gm-Message-State: APjAAAVy6DjckA9WbZfT5Bj4X7Tp1yhorkD1X0nnHCwy+BIDv8pCNcdg
-        GVgb230MM1BEDFPU+90trZT8MD+tyZrfhXz0EpnRTpTJiOw=
-X-Google-Smtp-Source: APXvYqw4jx+ECCaEc3pF2ddqAmUhWLsxs2tPv4F4B0Csslzt7ukoQ1EBe4t/LuTxKaPi4aNtoc+oNcCIYcIDitOBvUg=
-X-Received: by 2002:a19:6d13:: with SMTP id i19mr16812579lfc.6.1582221282402;
- Thu, 20 Feb 2020 09:54:42 -0800 (PST)
+        bh=uUKdgkaufxLmLYOt3TduZTiePIKaOkl8sejxXEeQJug=;
+        b=S2zrj8IHrKBvF3y8Ypfh69jbaOXK2yBWfUc0XuDoJyuTZfzS+jsMFng0/uJh7uBmSZ
+         0PQpXYLtQOxIpjZG+IGF/pbAAp6mqKjD/brLJpp7zTGdpha1kgC/G+pWFa+3gr6DZwwP
+         MhzW25OHkWtFjWh+cGfxUbBqNpC6QJTDy6fWAAtJOkDURQDwL95NdiSjrutcfAePgkfL
+         FUuWpPFpbadkop/ZT4hClMP/xPItCIRusDFaUKSzp+vOAdk1/lGM17TKuEUIiccv9V91
+         pSgkI8dArFAEELD9Dr+JaCCDULPQBfv+ChR21KyZmMVuLKEX3++XrBVsnbx603DvMRRZ
+         i5xg==
+X-Gm-Message-State: APjAAAWcTy+i3sof+2+AURX2j6fXIGMHi1bGD/x1hGNU7eyFjmPV0gqI
+        ymhsnHjgBIU05P+TnRxh19HamOWvjKplX2a0gwcDGA==
+X-Google-Smtp-Source: APXvYqwEhtHawQMBwvmDc5WZ+GbpmKPP7mgN5ZpRyswR3p1ZNH4wKythp6ijBG51PHDBpY+92/+km74sS2lSGrcqxRE=
+X-Received: by 2002:a05:6830:11:: with SMTP id c17mr24335278otp.360.1582222496058;
+ Thu, 20 Feb 2020 10:14:56 -0800 (PST)
 MIME-Version: 1.0
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
-In-Reply-To: <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Thu, 20 Feb 2020 23:24:31 +0530
-Message-ID: <CA+G9fYugQuAERqp3VXUFG-3QxXoF8bz7OSMh6WGSZcrGkbfDSQ@mail.gmail.com>
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
+References: <cover.1582216294.git.schatzberg.dan@gmail.com> <0a27b6fcbd1f7af104d7f4cf0adc6a31e0e7dd19.1582216294.git.schatzberg.dan@gmail.com>
+In-Reply-To: <0a27b6fcbd1f7af104d7f4cf0adc6a31e0e7dd19.1582216294.git.schatzberg.dan@gmail.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Thu, 20 Feb 2020 10:14:45 -0800
+Message-ID: <CALvZod5bDQvYHTMCHoWbhiEbcBs4KATv=QLdjjivJ33kb6ZY+w@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] mm: Charge active memcg when no mm is set
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 19 Feb 2020 at 21:54, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+On Thu, Feb 20, 2020 at 8:52 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
 >
-> On Thu, 13 Feb 2020 at 16:43, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> >
+> memalloc_use_memcg() worked for kernel allocations but was silently
+> ignored for user pages.
 >
-> Try to restore the value for the cache flush timeout, by updating the
-> define MMC_CACHE_FLUSH_TIMEOUT_MS to 10 * 60 * 1000".
+> This patch establishes a precedence order for who gets charged:
+>
+> 1. If there is a memcg associated with the page already, that memcg is
+>    charged. This happens during swapin.
+>
+> 2. If an explicit mm is passed, mm->memcg is charged. This happens
+>    during page faults, which can be triggered in remote VMs (eg gup).
+>
+> 3. Otherwise consult the current process context. If it has configured
+>    a current->active_memcg, use that.
 
-I have increased the timeout to 10 minutes but it did not help.
-Same error found.
-[  608.679353] mmc1: Card stuck being busy! mmc_poll_for_busy
-[  608.684964] mmc1: cache flush error -110
-[  608.689005] blk_update_request: I/O error, dev mmcblk1, sector
-4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
+What if css_tryget_online(current->active_memcg) in
+get_mem_cgroup_from_current() fails? Do we want to change this to
+css_tryget() and even if that fails should we fallback to
+root_mem_cgroup or current->mm->memcg?
 
-OTOH, What best i could do for my own experiment to revert all three patches and
-now the reported error gone and device mount successfully [1].
-
-List of patches reverted,
-  mmc: core: Specify timeouts for BKOPS and CACHE_FLUSH for eMMC
-  mmc: block: Use generic_cmd6_time when modifying
-    INAND_CMD38_ARG_EXT_CSD
-  mmc: core: Default to generic_cmd6_time as timeout in __mmc_switch()
-
-[1] https://lkft.validation.linaro.org/scheduler/job/1238275#L4346
-
-- Naresh
+> Otherwise, current->mm->memcg.
+>
+> Previously, if a NULL mm was passed to mem_cgroup_try_charge (case 3) it
+> would always charge the root cgroup. Now it looks up the current
+> active_memcg first (falling back to charging the root cgroup if not
+> set).
+>
+> Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+> Acked-by: Tejun Heo <tj@kernel.org>
+> ---
+>  mm/memcontrol.c | 11 ++++++++---
+>  mm/shmem.c      |  2 +-
+>  2 files changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 6f6dc8712e39..b174aff4f069 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -6317,7 +6317,8 @@ enum mem_cgroup_protection mem_cgroup_protected(struct mem_cgroup *root,
+>   * @compound: charge the page as compound or small page
+>   *
+>   * Try to charge @page to the memcg that @mm belongs to, reclaiming
+> - * pages according to @gfp_mask if necessary.
+> + * pages according to @gfp_mask if necessary. If @mm is NULL, try to
+> + * charge to the active memcg.
+>   *
+>   * Returns 0 on success, with *@memcgp pointing to the charged memcg.
+>   * Otherwise, an error code is returned.
+> @@ -6361,8 +6362,12 @@ int mem_cgroup_try_charge(struct page *page, struct mm_struct *mm,
+>                 }
+>         }
+>
+> -       if (!memcg)
+> -               memcg = get_mem_cgroup_from_mm(mm);
+> +       if (!memcg) {
+> +               if (!mm)
+> +                       memcg = get_mem_cgroup_from_current();
+> +               else
+> +                       memcg = get_mem_cgroup_from_mm(mm);
+> +       }
+>
+>         ret = try_charge(memcg, gfp_mask, nr_pages);
+>
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index c8f7540ef048..7c7f5acf89d6 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -1766,7 +1766,7 @@ static int shmem_getpage_gfp(struct inode *inode, pgoff_t index,
+>         }
+>
+>         sbinfo = SHMEM_SB(inode->i_sb);
+> -       charge_mm = vma ? vma->vm_mm : current->mm;
+> +       charge_mm = vma ? vma->vm_mm : NULL;
+>
+>         page = find_lock_entry(mapping, index);
+>         if (xa_is_value(page)) {
+> --
+> 2.17.1
+>
