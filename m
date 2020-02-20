@@ -2,128 +2,127 @@ Return-Path: <SRS0=lp7R=4I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42688C11D0C
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 20:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E390AC11D20
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 21:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 156AF20801
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 20:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B764924656
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 21:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6FB721H"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="m1KDQ49I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728936AbgBTUrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 15:47:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59575 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728618AbgBTUrd (ORCPT
+        id S1729075AbgBTVDr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 16:03:47 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:40680 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728993AbgBTVDq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 15:47:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582231652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aK0yEI9Rar14XcDftw8pchmWTs8uUSdp4e+KIXjLxZc=;
-        b=h6FB721HsRMMke6AXPE9+mLtzA42cY8SRHQ2pWjCnO35TgRJUHq+95Hnzn+gYGImPX5qEp
-        ps6PguKT9bCWGK7E6KqVx6ezNBZyTvUFl6WQuPUJe8wIOPFsgrPkIxfulk5HVnrJOf3kAc
-        w7NxqnL3FYhNrs9Gdlgt5dxUKfj72XE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-hd5FeaT1O3WS2VPoQovfcA-1; Thu, 20 Feb 2020 15:47:27 -0500
-X-MC-Unique: hd5FeaT1O3WS2VPoQovfcA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8230801E74;
-        Thu, 20 Feb 2020 20:47:25 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B96A487B34;
-        Thu, 20 Feb 2020 20:47:18 +0000 (UTC)
-Date:   Fri, 21 Feb 2020 04:47:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 2/8] blk-mq: Keep set->nr_hw_queues and
- set->map[].nr_queues in sync
-Message-ID: <20200220204713.GB28199@ming.t460p>
-References: <20200220024441.11558-1-bvanassche@acm.org>
- <20200220024441.11558-3-bvanassche@acm.org>
- <20200220100524.GA31206@ming.t460p>
- <37505ee7-fba6-1b25-64c4-f632280e8b70@acm.org>
+        Thu, 20 Feb 2020 16:03:46 -0500
+Received: by mail-qt1-f193.google.com with SMTP id v25so3949278qto.7
+        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 13:03:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6QH645NYVKdQbEm2dIlQdYX121ucp0jcY5IFqd2iTAM=;
+        b=m1KDQ49IVlT6YDlcrR6kEHfCL5+o2vBShdjFVu+ROsFCINUdPBhVp7ZfyQt8YkI4V1
+         ApmRefafOkHmPeBqAw+aOBORpbSSPQvei4ZebQKB6lbePikwbuyMsGeJXjPGkKyhKF37
+         9o1/9zImGJswylC3buBORrbYwImOCEp6dvqkw7OsG2kKvjpLcZYbIMBWEEJBGIfSfePm
+         lGuJBobkL/67AGpQYKeKwnKNQ1SI7SGZF6n4xEHA6Fr1dU2rHcyXW6iOC4YReVB3nvXP
+         1eTMKYwJmvRR0MRNpnHb4fLXuhiRnQktysIIIW6duWgeu98O/ehaOE4y54nOMfsUxX8A
+         5c/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6QH645NYVKdQbEm2dIlQdYX121ucp0jcY5IFqd2iTAM=;
+        b=FiAKx5Vwdxb9oILfSJAgTrGjih3Ow6K79xfKm6f9bZDjm0JrqbX/Xh/z3GQdzbLoOu
+         1L4EEFQQqZW2wfa1LmS0zXVW0OKzpkaDE7XPY3YStfJ1dFoUDRD/NuwXeHuqq4DhEMKz
+         wSIOBU1B1b+vJzN/1OreUKkXzYjtzz0RVtWCdFraWbia27XBISPSAyKCyNGQY1jjcZLh
+         cVeG85Gyu2KRUTATh9pN4+a1d9grmQIAU4CUXadmeK6KpOLoOpmwu/drCX3a6fXkqmed
+         G9cenYWACh/zEONEhWVlHZb784Skw4fABeJjB9leU+Da0a6fgYRvxOnG4HN64hAf/oRO
+         3eLQ==
+X-Gm-Message-State: APjAAAVIFJAla0DyGZY+nG2BSGFLhsfXVkbVe9h9VibaZ6ttqJXUbcpx
+        bS62E1q8mfMuexjzFSLO98YIww==
+X-Google-Smtp-Source: APXvYqysf1N+4rBFuAy/S4cj47nv2KlYs5KqccQLWtqnaJveOyCZVqgwo5POmZuC5JIHml5pKKa8hg==
+X-Received: by 2002:ac8:7258:: with SMTP id l24mr27935548qtp.154.1582232625787;
+        Thu, 20 Feb 2020 13:03:45 -0800 (PST)
+Received: from localhost ([2620:10d:c091:500::1:3504])
+        by smtp.gmail.com with ESMTPSA id h6sm420212qtr.33.2020.02.20.13.03.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2020 13:03:44 -0800 (PST)
+Date:   Thu, 20 Feb 2020 16:03:44 -0500
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Shakeel Butt <shakeelb@google.com>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Subject: Re: [PATCH v3 2/3] mm: Charge active memcg when no mm is set
+Message-ID: <20200220210344.GK54486@cmpxchg.org>
+References: <cover.1582216294.git.schatzberg.dan@gmail.com>
+ <0a27b6fcbd1f7af104d7f4cf0adc6a31e0e7dd19.1582216294.git.schatzberg.dan@gmail.com>
+ <CALvZod5bDQvYHTMCHoWbhiEbcBs4KATv=QLdjjivJ33kb6ZY+w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <37505ee7-fba6-1b25-64c4-f632280e8b70@acm.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CALvZod5bDQvYHTMCHoWbhiEbcBs4KATv=QLdjjivJ33kb6ZY+w@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 20, 2020 at 08:14:11AM -0800, Bart Van Assche wrote:
-> On 2/20/20 2:05 AM, Ming Lei wrote:
-> > On Wed, Feb 19, 2020 at 06:44:35PM -0800, Bart Van Assche wrote:
-> > > blk_mq_map_queues() and multiple .map_queues() implementations expect that
-> > > set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the number of hardware
-> > 
-> > Only single queue mapping expects set->map[HCTX_TYPE_DEFAULT].nr_queues
-> > to be set->nr_hw_queues. For multiple mapping, set->nr_hw_queues should
-> > be sum of each mapping's nr_queue.
-> 
-> That's how it should work but that doesn't match what I found in the kernel
-> tree. Here is an example of a .map_queues() implementation that depends on
-> .nr_queues being set before it is called:
-> 
-> static int scsi_map_queues(struct blk_mq_tag_set *set)
-> {
-> 	struct Scsi_Host *shost = container_of(set, struct Scsi_Host,
-> 					       tag_set);
-> 
-> 	if (shost->hostt->map_queues)
-> 		return shost->hostt->map_queues(shost);
-> 	return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
-> }
-> 
-> If shost->hostt->map_queues == NULL, the above function only works correctly
-> if .nr_queues is set before this function is called. Additionally,
-> scsi_map_queues() may call e.g. the following function:
-> 
-> static int qla2xxx_map_queues(struct Scsi_Host *shost)
-> {
-> 	int rc;
-> 	scsi_qla_host_t *vha = (scsi_qla_host_t *)shost->hostdata;
-> 	struct blk_mq_queue_map *qmap =
-> 		&shost->tag_set.map[HCTX_TYPE_DEFAULT];
-> 
-> 	if (USER_CTRL_IRQ(vha->hw) || !vha->hw->mqiobase)
-> 		rc = blk_mq_map_queues(qmap);
-> 	else
-> 		rc = blk_mq_pci_map_queues(qmap, vha->hw->pdev,
-> 			vha->irq_offset);
-> 	return rc;
-> }
-> 
-> Both blk_mq_map_queues() and blk_mq_pci_map_queues() assume that
-> blk_mq_queue_map.nr_queues is set before these functions are called.
+Hey Shakeel!
 
-Actually, I suggested to do the following way:
+On Thu, Feb 20, 2020 at 10:14:45AM -0800, Shakeel Butt wrote:
+> On Thu, Feb 20, 2020 at 8:52 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+> >
+> > memalloc_use_memcg() worked for kernel allocations but was silently
+> > ignored for user pages.
+> >
+> > This patch establishes a precedence order for who gets charged:
+> >
+> > 1. If there is a memcg associated with the page already, that memcg is
+> >    charged. This happens during swapin.
+> >
+> > 2. If an explicit mm is passed, mm->memcg is charged. This happens
+> >    during page faults, which can be triggered in remote VMs (eg gup).
+> >
+> > 3. Otherwise consult the current process context. If it has configured
+> >    a current->active_memcg, use that.
+> 
+> What if css_tryget_online(current->active_memcg) in
+> get_mem_cgroup_from_current() fails? Do we want to change this to
+> css_tryget() and even if that fails should we fallback to
+> root_mem_cgroup or current->mm->memcg?
 
-if (set->nr_maps == 1)
-	set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
+Good questions.
 
-then people won't be confused wrt. relation between set->nr_hw_queues
-and .nr_queues of each mapping.
+I think we can switch to css_tryget(). If a cgroup goes offline
+between issuing the IO and the loop layer executing that IO, the
+resources used could end up in the root instead of the closest
+ancestor of the offlined group. However, the risk of that actually
+happening and causing problems is probably pretty small, and the
+behavior isn't really worse than before Dan's patches.
 
-Thanks, 
-Ming
+Would you mind sending a separate patch for this? AFAICS similar
+concerns apply to all users of foreign charging.
 
+As for tryget failing: can that actually happen? AFAICS, all current
+users acquire a reference first (get_memcg_from_somewhere()) that they
+assign to current->active_memcg. We should probably codify this rule
+and do WARN_ON(!css_tryget()) /* current->active_memcg must hold a ref */
