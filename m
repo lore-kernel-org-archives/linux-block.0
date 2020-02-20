@@ -2,85 +2,118 @@ Return-Path: <SRS0=lp7R=4I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF17C11D04
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 11:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0162C11D07
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 12:05:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E892F24654
-	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 11:07:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7757B24656
+	for <linux-block@archiver.kernel.org>; Thu, 20 Feb 2020 12:05:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuKCozOh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgBTLHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 06:07:08 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:56276 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726215AbgBTLHI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 06:07:08 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 691A75058EBBDCA0161B;
-        Thu, 20 Feb 2020 19:07:04 +0800 (CST)
-Received: from [10.173.220.74] (10.173.220.74) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 20 Feb 2020 19:07:02 +0800
-Subject: Re: [PATCH] bdi: fix use-after-free for bdi device
-To:     Jan Kara <jack@suse.cz>
-CC:     Tejun Heo <tj@kernel.org>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <bvanassche@acm.org>
-References: <20200211140038.146629-1-yuyufen@huawei.com>
- <b7cd6193-586b-f4e0-9a5d-cc961eafaf81@huawei.com>
- <20200212213344.GE80993@mtj.thefacebook.com>
- <fd9d78b9-1119-27cc-fa74-04cb85d4f578@huawei.com>
- <20200213034818.GE88887@mtj.thefacebook.com>
- <fa6183c5-b92c-c431-37ab-09638f890f6c@huawei.com>
- <20200213135809.GH88887@mtj.thefacebook.com>
- <f369a99d-e794-0c1b-85cf-83b577fb0f46@huawei.com>
- <20200214140514.GL88887@mtj.thefacebook.com>
- <32a14db2-65e0-5d5c-6c53-45b3474d841d@huawei.com>
- <20200219125505.GP16121@quack2.suse.cz>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <59a8851e-7ba2-e70d-36d8-be47829a7581@huawei.com>
-Date:   Thu, 20 Feb 2020 19:07:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1727875AbgBTMFx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 07:05:53 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54963 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727298AbgBTMFw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Feb 2020 07:05:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582200351;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=J4Trzyi62hKNJZ+m1l9MJwIu+S3SlOuFeej9qw7Smqk=;
+        b=EuKCozOhSj6hURr923zfDfejuYzxnvGzmt9SFdV+d5nfEiAKs+lGtLRL9NSdUvKGj+/iBP
+        MJt4ZGP3pZDheib2S/1LlXxmR+S4i4K/ONWZA2RKFTTS2j2J+xKCFxX5v9g+sIOvRCsnOF
+        gZ/zphC/CMBgqdiyN8iMTNMnfT/eKsc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-_jp3uFUwNWKOS2GeqHQN6A-1; Thu, 20 Feb 2020 07:05:41 -0500
+X-MC-Unique: _jp3uFUwNWKOS2GeqHQN6A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D8AA801E67;
+        Thu, 20 Feb 2020 12:05:40 +0000 (UTC)
+Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ECD9160BE1;
+        Thu, 20 Feb 2020 12:05:36 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Salman Qazi <sqazi@google.com>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] block: Prevent hung_check firing during long sync IO
+Date:   Thu, 20 Feb 2020 20:05:27 +0800
+Message-Id: <20200220120527.15082-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200219125505.GP16121@quack2.suse.cz>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.74]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+submit_bio_wait() can be called from ioctl(BLKSECDISCARD), which
+may take long time to complete, as Salman mentioned, 4K BLKSECDISCARD
+takes up to 100 second on some devices. Also any block I/O operation
+that occurs after the BLKSECDISCARD is submitted will also potentially
+be affected by the hung task timeouts.
 
-On 2020/2/19 20:55, Jan Kara wrote:
-> Hi!
-> 
-> On Sat 15-02-20 21:54:08, Yufen Yu wrote:
+So prevent hung_check from firing by taking same approach used
+in blk_execute_rq(), and the wake-up interval is set as half the
+hung_check timer period, which keeps overhead low enough.
 
-> 
-> I've now noticed there's commit 68f23b8906 "memcg: fix a crash in wb_workfn
-> when a device disappears" from end of January which tries to address the
-> issue you're looking into. Now AFAIU the code is till somewhat racy after
-> that commit so I wanted to mention this mostly so that you fixup also the
-> new bdi_dev_name() while you're fixing blkg_dev_name().
-> 
-> Also I was wondering about one thing: If we really care about bdi->dev only
-> for the name, won't we be much better off with just copying the name to
-> bdi->name on registration? Sure it would consume a bit of memory for the
-> name copy but I don't think we really care and things would be IMO *much*
-> simpler that way... Yufen, Tejun, what do you think?
-> 
+Cc: Salman Qazi <sqazi@google.com>
+Cc: Jesse Barnes <jsbarnes@google.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Link: https://lkml.org/lkml/2020/2/12/1193
+Reported-by: Salman Qazi <sqazi@google.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-I think copying the name to bdi->name is also need protected by lock.
-Otherwise, the reader of bdi->name may read incorrect value when
-re-registion have not copy the name completely. Right? So, I also think
-using RCU to protect object lifetimes may be a better way.
+diff --git a/block/bio.c b/block/bio.c
+index 94d697217887..c9ce19a86de7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -17,6 +17,7 @@
+ #include <linux/cgroup.h>
+ #include <linux/blk-cgroup.h>
+ #include <linux/highmem.h>
++#include <linux/sched/sysctl.h>
+=20
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -1019,12 +1020,19 @@ static void submit_bio_wait_endio(struct bio *bio=
+)
+ int submit_bio_wait(struct bio *bio)
+ {
+ 	DECLARE_COMPLETION_ONSTACK_MAP(done, bio->bi_disk->lockdep_map);
++	unsigned long hang_check;
+=20
+ 	bio->bi_private =3D &done;
+ 	bio->bi_end_io =3D submit_bio_wait_endio;
+ 	bio->bi_opf |=3D REQ_SYNC;
+ 	submit_bio(bio);
+-	wait_for_completion_io(&done);
++
++	/* Prevent hang_check timer from firing at us during very long I/O */
++	hang_check =3D sysctl_hung_task_timeout_secs;
++	if (hang_check)
++		while (!wait_for_completion_io_timeout(&done, hang_check * (HZ/2)));
++	else
++		wait_for_completion_io(&done);
+=20
+ 	return blk_status_to_errno(bio->bi_status);
+ }
+--=20
+2.20.1
 
-Thanks,
-Yufen
