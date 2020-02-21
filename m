@@ -2,80 +2,66 @@ Return-Path: <SRS0=LczR=4J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9738C35640
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 05:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDA0C35641
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 07:16:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5683207FD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 05:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 691AF20801
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 07:16:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726244AbgBUFp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Feb 2020 00:45:56 -0500
-Received: from smtp.infotech.no ([82.134.31.41]:48826 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725800AbgBUFpz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Feb 2020 00:45:55 -0500
-X-Greylist: delayed 462 seconds by postgrey-1.27 at vger.kernel.org; Fri, 21 Feb 2020 00:45:55 EST
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 52A5A204190;
-        Fri, 21 Feb 2020 06:38:12 +0100 (CET)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id SqWLuvmLguZy; Fri, 21 Feb 2020 06:38:04 +0100 (CET)
-Received: from [192.168.48.23] (host-23-251-188-50.dyn.295.ca [23.251.188.50])
-        by smtp.infotech.no (Postfix) with ESMTPA id 4DB692040E4;
-        Fri, 21 Feb 2020 06:38:02 +0100 (CET)
-Reply-To: dgilbert@interlog.com
-To:     SCSI development list <linux-scsi@vger.kernel.org>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        David Sommerseth <davids@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Subject: [ANNOUNCE] lsscsi version 0.31 released
-Message-ID: <435f80a2-ab55-9df2-c59c-c1ec113461ff@interlog.com>
-Date:   Fri, 21 Feb 2020 00:37:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726100AbgBUHQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Feb 2020 02:16:32 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10666 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726045AbgBUHQc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Feb 2020 02:16:32 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0170ABA3D270B408D46D;
+        Fri, 21 Feb 2020 15:16:24 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 21 Feb 2020
+ 15:16:16 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <axboe@kernel.dk>, <arnd@arndb.de>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] block: scsi-ioctl: remove duplicated include <scsi/sg.h>
+Date:   Fri, 21 Feb 2020 15:16:00 +0800
+Message-ID: <20200221071600.17032-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.133.213.239]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-lsscsi is a command line utility that probes sysfs in Linux 2.6, 3,
-4 and 5 series kernels in order to list information about SCSI
-devices and SCSI hosts. The default format is one device (e.g. disk)
-per line. Other storage devices that use the SCSI subsystem such as
-SATA disks and USB keys are also listed. The previous version (0.30)
-added listings of NVMe namespaces (devices)
+Remove duplicated include.
 
-This version is mainly for bug fixes. Version 0.31 is available at:
-     http://sg.danny.cz/scsi/lsscsi.html
-More information can be found on that page including examples
-plus a Download and Build information section.
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ block/scsi_ioctl.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-ChangeLog:
-Version 0.31 2020/02/20 [svn: r160]
-   - fix issue where host managed ZBC devices don't
-     output their size. [Fix also for RBC and CD/DVD.]
-   - exclude NVMe listings when --classic given
-   - fix hex counting issues
-   - supply "-" for generic NVMe device one line output
-     so 'lsscsi -gb' output is consistent
-   - cleanup gcc-8 warnings, no cleanup needed for gcc-9
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index b4e73d5..20addda 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -37,8 +37,6 @@ const unsigned char scsi_command_size_tbl[8] =
+ };
+ EXPORT_SYMBOL(scsi_command_size_tbl);
+ 
+-#include <scsi/sg.h>
+-
+ static int sg_get_version(int __user *p)
+ {
+ 	static const int sg_version_num = 30527;
+-- 
+2.7.4
 
-Version 0.30 2018/06/12 [svn: r154]
-   - add support for NVMe devices and controllers
-   ....
-
-
-Doug Gilbert
 
