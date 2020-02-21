@@ -2,234 +2,145 @@ Return-Path: <SRS0=LczR=4J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FE1C3565A
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 11:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB118C35656
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 12:30:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 025AB208C4
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 11:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2ADA24650
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 12:30:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u+0X6p2l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DH263imK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728183AbgBULvL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Feb 2020 06:51:11 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:33739 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728143AbgBULvL (ORCPT
+        id S1728103AbgBUMah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Feb 2020 07:30:37 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:43699 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727063AbgBUMah (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Feb 2020 06:51:11 -0500
-Received: by mail-pf1-f202.google.com with SMTP id c72so1127195pfc.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Feb 2020 03:51:10 -0800 (PST)
+        Fri, 21 Feb 2020 07:30:37 -0500
+Received: by mail-pg1-f196.google.com with SMTP id u12so899290pgb.10
+        for <linux-block@vger.kernel.org>; Fri, 21 Feb 2020 04:30:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=nOCr5soMbFPN55gY83Au6v1ryHYW2yWXRYcaIBANmhA=;
-        b=u+0X6p2lyAiKGbiY9gwm5O8V+rmjbHiH10TU/uwZyq0BRDcfGEfXCSy1PcJmZpryHr
-         tg4ltEKt3wF8jNPsLhFjh/ibMVe2hrYnNxDr2xmEHNr7fK0JX7bqbW3XeiVG63eQRB67
-         kmuK7LEQtZYBzDfiCkwXeTB1UypzIeBUWs0ic17FbEM7MxNrMM+i87baAIdGK4CydrHQ
-         /XLAYoCY722lnRK8o2pHspjwibqPYhPtMy+cKDYUAWJICfch1AkK39ehV6cflt9wA/zE
-         kaDf6odcIMNj43OxL6Y7o1K6t833M5Yd0e6sAUdQxL5k+ma4FhoY9UfnhBEtyNx2dmvP
-         yTuA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=uyerPeK9P8LqDlV7LqFL68c1sT2T1cP6gBnBuIAjadc=;
+        b=DH263imKuVYHuV7EPkqh1eCSelnzcxPWxEzuOsU3MCY3TYDfuO7Nw2xSXuTBxCvKqU
+         PV4ReVe9Ez5GMFdMKV60cvkjNGSA30SJhBQERM6jcTGT7YyFOTx55Sn8jBN5jauV0mbO
+         PVlFmsHTaxcwByzlq653WpLCkV6XCuXOVqfmtnE899xmEZT8yck8t9Bg6na0TVR9qa6I
+         1q/y8RyuYd8LoGbJozNSNdjIWRYNapZrDW4+y8WoB6OJMeEL/DFJe4jSdjbGRZFDRsCo
+         NcLn+fhFFUU6iGm8zPJuscczpWxP7kC11r/MBHqAXx986E1VN/5ag6lTlXC2tdBcnOTO
+         Dg7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=nOCr5soMbFPN55gY83Au6v1ryHYW2yWXRYcaIBANmhA=;
-        b=p7WT88N+cp40uMfw6HYy9zwPmRK+9Z848pj6HVPBuu56Kd+PdywqI4+ou+58obKp/v
-         5Xkwj63ogMIVNsD4+Z8sxIxS8LC1nms3CAyzuuvukHufbZo0fO0N1qyl8m4/rSl1NgCC
-         aQiCuEgYanOJrI2j8F+6MCAOH4XTwiexocOXfsIiFDYToaqPUNur4npJaQeJsWLj2W6O
-         UpY4czrtU9sktqkjupvWyobGS0mjhAzJyXeqtiTYdWGsl2E9BVosccs8aEZZPrMZJdsV
-         vO9oYrYC4RqsevxSlNbeArVeB7B8BopYmlzcmh+fe9pBL/A3rCjZAIb86R3Es2i7MP6e
-         CMsQ==
-X-Gm-Message-State: APjAAAXWfEPh1MwoN67oxwaLgSfb8jABBDYjBbSnQFM/kdAAUGaBt/Td
-        RMWk+i7V6r0drvEPUfPkZ3j3bHAZonGwhC9zPXK241k9wxvV3URZgTojfYLz5u0/Rh55Nrm2saC
-        4FIv5wRBbL/tTY8T+5iCPrtcaoHXDlE7U13YxBe3IephVPNkZtI7Yn8s6CHqaJQ8v1Oic
-X-Google-Smtp-Source: APXvYqxVbqunElJvToNd5wB4499UQvmSu1yyZ640lQs5gM8um4rCTfvTKdosPvZp9Yt1E+ZVVs0/yI9vtLQ=
-X-Received: by 2002:a63:6d45:: with SMTP id i66mr19203216pgc.56.1582285870200;
- Fri, 21 Feb 2020 03:51:10 -0800 (PST)
-Date:   Fri, 21 Feb 2020 03:50:45 -0800
-In-Reply-To: <20200221115050.238976-1-satyat@google.com>
-Message-Id: <20200221115050.238976-5-satyat@google.com>
-Mime-Version: 1.0
-References: <20200221115050.238976-1-satyat@google.com>
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [PATCH v7 4/9] scsi: ufs: UFS driver v2.1 spec crypto additions
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=uyerPeK9P8LqDlV7LqFL68c1sT2T1cP6gBnBuIAjadc=;
+        b=H71pSy6ISv3RPRMK1y5602gaatfu1Gi/HXb6BX0X81BgigOV9iJn4YarFmvd2DBpH3
+         x3yOdtzDiD1gy8Mp/WOoGlGUapxESlC23JeCszLoz6pFvZtg0YsKRld8QFUjkdL42aXm
+         o8vWPkwOaU5ZJGV0uGSX+1neEjU4RC58GkuKqvSXpi1X0Umd7z0dtW1mMiV58SdaNwdQ
+         hl9anRfsEm0bEu0/w+AF7WJ+nFsNMJaxZwI1ouEKpB5IQSHZf+B76vt3X1siO0cAnKpP
+         olK9OCsIL//DqTRLkYdprFu0SKD/Jr1TCQCwieDzc2AkJQHtwW4du07M0udcCDqHOKlK
+         cVVQ==
+X-Gm-Message-State: APjAAAV0IyAiUoV9FZGZtRhatN6z+PwTe03V/DY4VcfQEsthFSST2oyE
+        j8mUk4Gbbp2urPKK2b0EAX4F2Q==
+X-Google-Smtp-Source: APXvYqy4UbSXqOZGpOmD7o9lFGwKmBa5kKvuV+uXccjEFuj1rsjXLaJzspJLLddDZl/DDXo6gKy6HQ==
+X-Received: by 2002:aa7:979a:: with SMTP id o26mr37568002pfp.257.1582288236069;
+        Fri, 21 Feb 2020 04:30:36 -0800 (PST)
+Received: from google.com ([2620:15c:201:0:7f8c:9d6e:20b8:e324])
+        by smtp.gmail.com with ESMTPSA id r12sm723387pgu.93.2020.02.21.04.30.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 04:30:35 -0800 (PST)
+Date:   Fri, 21 Feb 2020 04:30:30 -0800
 From:   Satya Tangirala <satyat@google.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org
-Cc:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
         Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Satya Tangirala <satyat@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 0/9] Inline Encryption Support
+Message-ID: <20200221123030.GA253045@google.com>
+References: <20200108140556.GB2896@infradead.org>
+ <20200108184305.GA173657@google.com>
+ <20200117085210.GA5473@infradead.org>
+ <20200201005341.GA134917@google.com>
+ <20200203091558.GA28527@infradead.org>
+ <20200204033915.GA122248@google.com>
+ <20200204145832.GA28393@infradead.org>
+ <20200204212110.GA122850@gmail.com>
+ <20200205073601.GA191054@sol.localdomain>
+ <20200205180541.GA32041@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200205180541.GA32041@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the crypto registers and structs defined in v2.1 of the JEDEC UFSHCI
-specification in preparation to add support for inline encryption to
-UFS.
+Hi Christoph,
 
-Signed-off-by: Satya Tangirala <satyat@google.com>
----
- drivers/scsi/ufs/ufshcd.c |  2 ++
- drivers/scsi/ufs/ufshcd.h |  5 +++
- drivers/scsi/ufs/ufshci.h | 67 +++++++++++++++++++++++++++++++++++++--
- 3 files changed, 72 insertions(+), 2 deletions(-)
+I sent out v7 of the patch series. It's at
+https://lore.kernel.org/linux-fscrypt/20200221115050.238976-1-satyat@google.com/T/#t
 
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index abd0e6b05f79..825d9eb34f10 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -4759,6 +4759,8 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
- 	case OCS_MISMATCH_RESP_UPIU_SIZE:
- 	case OCS_PEER_COMM_FAILURE:
- 	case OCS_FATAL_ERROR:
-+	case OCS_INVALID_CRYPTO_CONFIG:
-+	case OCS_GENERAL_CRYPTO_ERROR:
- 	default:
- 		result |= DID_ERROR << 16;
- 		dev_err(hba->dev,
-diff --git a/drivers/scsi/ufs/ufshcd.h b/drivers/scsi/ufs/ufshcd.h
-index 2ae6c7c8528c..978781c538c4 100644
---- a/drivers/scsi/ufs/ufshcd.h
-+++ b/drivers/scsi/ufs/ufshcd.h
-@@ -716,6 +716,11 @@ struct ufs_hba {
- 	 * for userspace to control the power management.
- 	 */
- #define UFSHCD_CAP_RPM_AUTOSUSPEND (1 << 6)
-+	/*
-+	 * This capability allows the host controller driver to use the
-+	 * inline crypto engine, if it is present
-+	 */
-+#define UFSHCD_CAP_CRYPTO (1 << 7)
- 
- 	struct devfreq *devfreq;
- 	struct ufs_clk_scaling clk_scaling;
-diff --git a/drivers/scsi/ufs/ufshci.h b/drivers/scsi/ufs/ufshci.h
-index c2961d37cc1c..c0651fe6dbbc 100644
---- a/drivers/scsi/ufs/ufshci.h
-+++ b/drivers/scsi/ufs/ufshci.h
-@@ -90,6 +90,7 @@ enum {
- 	MASK_64_ADDRESSING_SUPPORT		= 0x01000000,
- 	MASK_OUT_OF_ORDER_DATA_DELIVERY_SUPPORT	= 0x02000000,
- 	MASK_UIC_DME_TEST_MODE_SUPPORT		= 0x04000000,
-+	MASK_CRYPTO_SUPPORT			= 0x10000000,
- };
- 
- #define UFS_MASK(mask, offset)		((mask) << (offset))
-@@ -143,6 +144,7 @@ enum {
- #define DEVICE_FATAL_ERROR			0x800
- #define CONTROLLER_FATAL_ERROR			0x10000
- #define SYSTEM_BUS_FATAL_ERROR			0x20000
-+#define CRYPTO_ENGINE_FATAL_ERROR		0x40000
- 
- #define UFSHCD_UIC_HIBERN8_MASK	(UIC_HIBERNATE_ENTER |\
- 				UIC_HIBERNATE_EXIT)
-@@ -155,11 +157,13 @@ enum {
- #define UFSHCD_ERROR_MASK	(UIC_ERROR |\
- 				DEVICE_FATAL_ERROR |\
- 				CONTROLLER_FATAL_ERROR |\
--				SYSTEM_BUS_FATAL_ERROR)
-+				SYSTEM_BUS_FATAL_ERROR |\
-+				CRYPTO_ENGINE_FATAL_ERROR)
- 
- #define INT_FATAL_ERRORS	(DEVICE_FATAL_ERROR |\
- 				CONTROLLER_FATAL_ERROR |\
--				SYSTEM_BUS_FATAL_ERROR)
-+				SYSTEM_BUS_FATAL_ERROR |\
-+				CRYPTO_ENGINE_FATAL_ERROR)
- 
- /* HCS - Host Controller Status 30h */
- #define DEVICE_PRESENT				0x1
-@@ -318,6 +322,61 @@ enum {
- 	INTERRUPT_MASK_ALL_VER_21	= 0x71FFF,
- };
- 
-+/* CCAP - Crypto Capability 100h */
-+union ufs_crypto_capabilities {
-+	__le32 reg_val;
-+	struct {
-+		u8 num_crypto_cap;
-+		u8 config_count;
-+		u8 reserved;
-+		u8 config_array_ptr;
-+	};
-+};
-+
-+enum ufs_crypto_key_size {
-+	UFS_CRYPTO_KEY_SIZE_INVALID	= 0x0,
-+	UFS_CRYPTO_KEY_SIZE_128		= 0x1,
-+	UFS_CRYPTO_KEY_SIZE_192		= 0x2,
-+	UFS_CRYPTO_KEY_SIZE_256		= 0x3,
-+	UFS_CRYPTO_KEY_SIZE_512		= 0x4,
-+};
-+
-+enum ufs_crypto_alg {
-+	UFS_CRYPTO_ALG_AES_XTS			= 0x0,
-+	UFS_CRYPTO_ALG_BITLOCKER_AES_CBC	= 0x1,
-+	UFS_CRYPTO_ALG_AES_ECB			= 0x2,
-+	UFS_CRYPTO_ALG_ESSIV_AES_CBC		= 0x3,
-+};
-+
-+/* x-CRYPTOCAP - Crypto Capability X */
-+union ufs_crypto_cap_entry {
-+	__le32 reg_val;
-+	struct {
-+		u8 algorithm_id;
-+		u8 sdus_mask; /* Supported data unit size mask */
-+		u8 key_size;
-+		u8 reserved;
-+	};
-+};
-+
-+#define UFS_CRYPTO_CONFIGURATION_ENABLE (1 << 7)
-+#define UFS_CRYPTO_KEY_MAX_SIZE 64
-+/* x-CRYPTOCFG - Crypto Configuration X */
-+union ufs_crypto_cfg_entry {
-+	__le32 reg_val[32];
-+	struct {
-+		u8 crypto_key[UFS_CRYPTO_KEY_MAX_SIZE];
-+		u8 data_unit_size;
-+		u8 crypto_cap_idx;
-+		u8 reserved_1;
-+		u8 config_enable;
-+		u8 reserved_multi_host;
-+		u8 reserved_2;
-+		u8 vsb[2];
-+		u8 reserved_3[56];
-+	};
-+};
-+
- /*
-  * Request Descriptor Definitions
-  */
-@@ -339,6 +398,7 @@ enum {
- 	UTP_NATIVE_UFS_COMMAND		= 0x10000000,
- 	UTP_DEVICE_MANAGEMENT_FUNCTION	= 0x20000000,
- 	UTP_REQ_DESC_INT_CMD		= 0x01000000,
-+	UTP_REQ_DESC_CRYPTO_ENABLE_CMD	= 0x00800000,
- };
- 
- /* UTP Transfer Request Data Direction (DD) */
-@@ -358,6 +418,9 @@ enum {
- 	OCS_PEER_COMM_FAILURE		= 0x5,
- 	OCS_ABORTED			= 0x6,
- 	OCS_FATAL_ERROR			= 0x7,
-+	OCS_DEVICE_FATAL_ERROR		= 0x8,
-+	OCS_INVALID_CRYPTO_CONFIG	= 0x9,
-+	OCS_GENERAL_CRYPTO_ERROR	= 0xA,
- 	OCS_INVALID_COMMAND_STATUS	= 0x0F,
- 	MASK_OCS			= 0x0F,
- };
--- 
-2.25.0.265.gbab2e86ba0-goog
+It manages keyslots on a per-request basis now - I made it get keyslots
+in blk_mq_get_request, because that way I wouldn't have to worry about
+programming keys in an atomic context. What do you think of the new
+approach?
 
+On Wed, Feb 05, 2020 at 10:05:41AM -0800, Christoph Hellwig wrote:
+> On Tue, Feb 04, 2020 at 11:36:01PM -0800, Eric Biggers wrote:
+> > The vendor-specific SMC calls do seem to work in atomic context, at least on
+> > SDA845.  However, in ufshcd_program_key(), the calls to pm_runtime_get_sync()
+> > and ufshcd_hold() can also sleep.
+> > 
+> > I think we can move the pm_runtime_get_sync() to ufshcd_crypto_keyslot_evict(),
+> > since the block layer already ensures the device is not runtime-suspended while
+> > requests are being processed (see blk_queue_enter()).  I.e., keyslots can be
+> > evicted independently of any bio, but that's not the case for programming them.
+> 
+> Yes.
+> 
+> > That still leaves ufshcd_hold(), which is still needed to ungate the UFS clocks.
+> > It does accept an 'async' argument, which is used by ufshcd_queuecommand() to
+> > schedule work to ungate the clocks and return SCSI_MLQUEUE_HOST_BUSY.
+> > 
+> > So in blk_mq_dispatch_rq_list(), we could potentially try to acquire the
+> > keyslot, and if it can't be done because either none are available or because
+> > something else needs to be waited for, we can put the request back on the
+> > dispatch list -- similar to how failure to get a driver tag is handled.
+> 
+> Yes, that is what I had in mind.
+> 
+> > However, if I understand correctly, that would mean that all requests to the
+> > same hardware queue would be blocked whenever someone is waiting for a keyslot
+> > -- even unencrypted requests and requests for unrelated keyslots.
+> 
+> At least for an initial dumb implementation, yes.  But if we care enough
+> we can improve the code to check for the encrypted flag and only put
+> back encrypted flags in that case.
+> 
+> > It's possible that would still be fine for the Android use case, as vendors tend
+> > to add enough keyslots to work with Android, provided that they choose the
+> > fscrypt format that uses one key per encryption policy rather than one key per
+> > file.  I.e., it might be the case that no one waits for keyslots in practice
+> > anyway.  But, it seems it would be undesirable for a general Linux kernel
+> > framework, which could potentially be used with per-file keys or with hardware
+> > that only has a *very* small number of keyslots.
+> > 
+> > Another option would be to allocate the keyslot in blk_mq_get_request(), where
+> > sleeping is still allowed, but some merging was already done.
+> 
+> That is another good idea.  In blk_mq_get_request we acquire other
+> resources like the tag, so this would be a very logical places to
+> acquire the key slots.  We can should also be able to still merge into
+> the request while it is waiting.
