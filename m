@@ -2,103 +2,183 @@ Return-Path: <SRS0=LczR=4J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1473C35656
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 16:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B743FC35657
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 16:51:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84734208E4
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 16:34:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582302880;
-	bh=AeYy9W04Xju1SqpnxRal8094BuWJzVkZCpujWRx0g2Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0+VCGU/uC1skrB8sc1QxgAP6J7+gyIdM6NXNfc5g1Cv6vc7A2pqt6EDBWXpl+U+Rg
-	 zge/zn5ZpaKlroymfKa9ymiejqDnqK2xBKVTLVmmtvLxknGcB+JhoI+16ICDt/Xvc0
-	 8Vt1G4Pzd8m8e2zsmSGUHbUZungFQUlIP1gOmx90=
+	by mail.kernel.org (Postfix) with ESMTP id 8A598208C4
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 16:51:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dfTjZxKR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726423AbgBUQek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Feb 2020 11:34:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40478 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725957AbgBUQej (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Feb 2020 11:34:39 -0500
-Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4DCB120578;
-        Fri, 21 Feb 2020 16:34:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582302879;
-        bh=AeYy9W04Xju1SqpnxRal8094BuWJzVkZCpujWRx0g2Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gSB9SVQXMC/3CNGAwJJ14G8mmt8G4VhpJBzZbwCLU609YyX6angbsYcidPUQhtr7w
-         j2zEbBRyNJ6h8gJCePG5D948UaD6TmrVPids2l8D3Wd7NmLibwXxR3sphHeRA2xJSP
-         ds4qeZ8yBVyzLR7jQaQBQMuHci4vUUMRJHDGNP38=
-Date:   Sat, 22 Feb 2020 01:34:32 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Cc:     axboe@kernel.dk, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-        Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-Subject: Re: [PATCH v2 2/2] md: enable io polling
-Message-ID: <20200221163432.GA15420@redsun51.ssa.fujisawa.hgst.com>
-References: <20200211191729.4745-1-andrzej.jakowski@linux.intel.com>
- <20200211191729.4745-3-andrzej.jakowski@linux.intel.com>
- <20200211211334.GB3837@redsun51.ssa.fujisawa.hgst.com>
- <e9941d4d-c403-4177-526d-b3086207f31a@linux.intel.com>
- <20200212214207.GA6409@redsun51.ssa.fujisawa.hgst.com>
- <f516e2b2-1988-03ca-f966-5f26771717ff@linux.intel.com>
- <20200214192526.GA10991@redsun51.ssa.fujisawa.hgst.com>
- <db131d8e-b622-ec80-411e-2ca7643997a7@linux.intel.com>
+        id S1726681AbgBUQvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Feb 2020 11:51:13 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:36344 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbgBUQvN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Feb 2020 11:51:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=ljeDBtIhvMl7XkvIGfVYLN9gAQL27p/c67Gbwn9I/5c=; b=dfTjZxKR1/3QPd5yLOq9tyh5dh
+        WW35vcZB2LeZ6eSWMMJtyu+t6W9N1vf8XbRYXZTXLXsG0zAsq3E6Fp0njWa2+7VoAFOZqiHvIX95D
+        DrhMl8XWSo2HkJYCAjwc6doBR6qqvejseLhDyrvtjCf3SDd7UwRHJMOT1BWA7aH2k4uSyUW51Fno8
+        FUXtu+b4pQd5eJD1uokxaAHJ3XodWUhVHLeXqngqeJbPmdXASEZtE8X9lTE4wctYk1/OjAcVt6cbg
+        ASE1G6bB2VNJod5BBqDf6cpqLPT9NZRNoymmtrQuDlHLBLbANFzhRfdcnRfC11Ib1PDkxXJG7KRTg
+        DkdEiXbQ==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j5BWA-0008Cb-DS; Fri, 21 Feb 2020 16:51:10 +0000
+Subject: Re: [PATCH v7 3/9] block: blk-crypto-fallback for Inline Encryption
+To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org
+Cc:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+References: <20200221115050.238976-1-satyat@google.com>
+ <20200221115050.238976-4-satyat@google.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <9c81a71f-9322-7f89-fa3d-4511f162d085@infradead.org>
+Date:   Fri, 21 Feb 2020 08:51:09 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db131d8e-b622-ec80-411e-2ca7643997a7@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20200221115050.238976-4-satyat@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 21, 2020 at 08:25:47AM -0700, Andrzej Jakowski wrote:
-> Your proposal makes sense to me, yet still it requires significant rework
-> in generic_make_request(). I believe that generic_make_request() would 
-> have to return/store cookie for each subordinate bio. I'm wondering why 
-> cookie is needed for polling at all? From my understanding it looks 
-> like cookie info is used to find HW context which to poll on. Hybrid
-> polling uses it to find particular IO request and set its 'RQF_MQ_POLL_SLEPT'
-> flag. 
-
-The cookie encodes the hctx and tag of a submitted request, but the
-cookies is kind of broken if the original bio gets split:
-
-If the bio that created that request was split, the driver only knows to
-look for one tag and may end polling too early while chained bios remain
-outstanding. That is mostly okay since we'll just poll the same hctx
-again until all the chained bio's complete, but the tag we're polling
-for isn't associated with the original bio anymore.
-
-In case of hybrid sleep, if a new request is allocated with the same tag,
-the poll function will incorrectly sleep again, and set the "SLEPT"
-flag on someone else's request. It also looks like that may corrupt
-rq_flags since two threads may set it at the same time (this may
-actually be a real problem, but I haven't successfully made it happen
-yet).
-
-> Now, if we assume that cookie is not passed to polling function, poll_fn
-> would need to find HW context to poll on in different way. Perhaps reference
-> to it could be stored in request_queue itself?
-
-A device may provide many polled hardware contexts. Different threads
-may want to poll different contexts at the same time, so the poll_fn()
-needs to know which one. How would you encode that into the
-request_queue?
-
-> Polling in stackable block
-> drivers would be much simpler -- they would call polling for underlying MQ
-> device, which in turn would poll on correct HW context.
+On 2/21/20 3:50 AM, Satya Tangirala wrote:
+> Blk-crypto delegates crypto operations to inline encryption hardware when
+> available. The separately configurable blk-crypto-fallback contains a
+> software fallback to the kernel crypto API - when enabled, blk-crypto
+> will use this fallback for en/decryption when inline encryption hardware is
+> not available. This lets upper layers not have to worry about whether or
+> not the underlying device has support for inline encryption before
+> deciding to specify an encryption context for a bio, and also allows for
+> testing without actual inline encryption hardware. For more details, refer
+> to Documentation/block/inline-encryption.rst.
 > 
-> Does this approach sound reasonable? 
+> Signed-off-by: Satya Tangirala <satyat@google.com>
+> ---
+>  Documentation/block/index.rst             |   1 +
+>  Documentation/block/inline-encryption.rst | 162 ++++++
+>  block/Kconfig                             |  10 +
+>  block/Makefile                            |   1 +
+>  block/bio-integrity.c                     |   2 +-
+>  block/blk-crypto-fallback.c               | 673 ++++++++++++++++++++++
+>  block/blk-crypto-internal.h               |  32 +
+>  block/blk-crypto.c                        |  43 +-
+>  include/linux/blk-crypto.h                |  17 +-
+>  include/linux/blk_types.h                 |   6 +
+>  10 files changed, 938 insertions(+), 9 deletions(-)
+>  create mode 100644 Documentation/block/inline-encryption.rst
+>  create mode 100644 block/blk-crypto-fallback.c
+
+
+> diff --git a/Documentation/block/inline-encryption.rst b/Documentation/block/inline-encryption.rst
+> new file mode 100644
+> index 000000000000..02abea993975
+> --- /dev/null
+> +++ b/Documentation/block/inline-encryption.rst
+> @@ -0,0 +1,162 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=================
+> +Inline Encryption
+> +=================
+> +
+> +Background
+> +==========
+> +
+> +Inline encryption hardware sit logically between memory and the disk, and can
+
+                              sits
+
+> +en/decrypt data as it goes in/out of the disk. Inline encryption hardware have a
+
+                                                                             has
+
+> +fixed number of "keyslots" - slots into which encryption contexts (i.e. the
+> +encryption key, encryption algorithm, data unit size) can be programmed by the
+> +kernel at any time. Each request sent to the disk can be tagged with the index
+> +of a keyslot (and also a data unit number to act as an encryption tweak), and
+> +the inline encryption hardware will en/decrypt the data in the request with the
+> +encryption context programmed into that keyslot. This is very different from
+> +full disk encryption solutions like self encrypting drives/TCG OPAL/ATA
+> +Security standards, since with inline encryption, any block on disk could be
+> +encrypted with any encryption context the kernel chooses.
+> +
+> +
+> +Objective
+> +=========
+> +
+...
+> +
+> +
+> +Constraints and notes
+> +=====================
+> +
+> +- IE hardware have a limited number of "keyslots" that can be programmed
+
+                 has
+
+> +  with an encryption context (key, algorithm, data unit size, etc.) at any time.
+> +  One can specify a keyslot in a data request made to the device, and the
+> +  device will en/decrypt the data using the encryption context programmed into
+> +  that specified keyslot. When possible, we want to make multiple requests with
+> +  the same encryption context share the same keyslot.
+> +
+...
+> +
+> +
+> +Design
+> +======
+> +
+> +We add a :c:type:`struct bio_crypt_ctx` to :c:type:`struct bio` that can
+> +represent an encryption context, because we need to be able to pass this
+> +encryption context from the FS layer to the device driver to act upon.
+> +
+> +While IE hardware works on the notion of keyslots, the FS layer has no
+> +knowledge of keyslots - it simply wants to specify an encryption context to
+> +use while en/decrypting a bio.
+> +
+> +We introduce a keyslot manager (KSM) that handles the translation from
+> +encryption contexts specified by the FS to keyslots on the IE hardware.
+> +This KSM also serves as the way IE hardware can expose their capabilities to
+
+                                                          its
+
+> +upper layers. The generic mode of operation is: each device driver that wants
+> +to support IE will construct a KSM and set it up in its struct request_queue.
+> +Upper layers that want to use IE on this device can then use this KSM in
+> +the device's struct request_queue to translate an encryption context into
+> +a keyslot. The presence of the KSM in the request queue shall be used to mean
+> +that the device supports IE.
+> +
+...
+
+Hi Satya,
+ISTM that we disagree on whether "hardware" is singular or plural.  ;)
+
+My interface search foo (FWIW) says that "hardware" has no plural version.
+Anyway, my best evidence is in your intro/commit message, where it says:
+"when inline encryption hardware is not available",
+so it must be singular.  :)
+
+cheers.
+-- 
+~Randy
+
