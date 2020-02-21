@@ -2,107 +2,192 @@ Return-Path: <SRS0=LczR=4J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F01E8C11D00
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AC1C11D00
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 03:05:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCB4E2465D
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:50:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98FFA208CD
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 03:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729290AbgBUCuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 21:50:50 -0500
-Received: from mail-pj1-f48.google.com ([209.85.216.48]:39801 "EHLO
-        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729259AbgBUCuu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 21:50:50 -0500
-Received: by mail-pj1-f48.google.com with SMTP id e9so85649pjr.4
-        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 18:50:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=CraDicGBBtzqBCNndIjjvdIXByIW7/VwFt16R0kLFcc=;
-        b=VnyebXnN8TLQ+WbvVlYqJqldxOpoPpaK0/MZlYa/f19L3lTfuH0zNqTMCITpvS9dXt
-         +MssXQP8AWMKWgV20M6XfOXHGrOLYP2Jtnh+AVmv32+mwB6U9+Rx2grkQCLy4tax4LcF
-         Jr6wOTksPtiVcTS9dZYyuZTw1CMoKy+BG1JTMCTJFBRrDCLdArM2syCfGa3DlyuH+aqz
-         3kPfh49F8nIcaANSVk6fxpUXav3L0FvsxHjRwD4kO6nRJROZSkvkN8Grevhc466MlSSr
-         Z7mGX3bzODM58sy5vkP5utYiHW5zs9a53L5GX1uAVmywr+m5PrsU7gy3j1fKd6UgwtIu
-         pa0Q==
-X-Gm-Message-State: APjAAAUwsDg84e0069ArDuglN4+IZd8AJtUMAsh6dohWAmZ2S4K4T3vT
-        iIBB7+xl2MbyYTjyGO4J36Y=
-X-Google-Smtp-Source: APXvYqyFKX2KOP54WYYdCNfoLIrCmNr8IitjM5zs3IYxA48n8HD6McYjMTz87j82nG+g4MpVBgtopw==
-X-Received: by 2002:a17:902:341:: with SMTP id 59mr35810962pld.29.1582253448154;
-        Thu, 20 Feb 2020 18:50:48 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:e57a:a1b3:1a44:bb8c? ([2601:647:4000:d7:e57a:a1b3:1a44:bb8c])
-        by smtp.gmail.com with ESMTPSA id p4sm635493pgh.14.2020.02.20.18.50.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2020 18:50:47 -0800 (PST)
-Subject: Re: [PATCH v2 2/8] blk-mq: Keep set->nr_hw_queues and
- set->map[].nr_queues in sync
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
+        id S1729371AbgBUDFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 22:05:25 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:57364 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729280AbgBUDFY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Feb 2020 22:05:24 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 9E4FE2056280458B762B;
+        Fri, 21 Feb 2020 11:05:22 +0800 (CST)
+Received: from [10.173.220.74] (10.173.220.74) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 21 Feb 2020 11:05:13 +0800
+Subject: Re: [PATCH 1/4] block: fix use-after-free on cached last_lookup
+ partition
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-References: <20200220024441.11558-1-bvanassche@acm.org>
- <20200220024441.11558-3-bvanassche@acm.org>
- <20200220100524.GA31206@ming.t460p>
- <37505ee7-fba6-1b25-64c4-f632280e8b70@acm.org>
- <20200220204713.GB28199@ming.t460p>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <ee2ebbe9-6d95-461b-ba22-c7e51093ae5a@acm.org>
-Date:   Thu, 20 Feb 2020 18:50:46 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        "Hou Tao" <houtao1@huawei.com>
+References: <20200109062109.2313-1-ming.lei@redhat.com>
+ <20200109062109.2313-2-ming.lei@redhat.com>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <f2f8b3c9-db6b-a5b3-5d0b-91ed65404048@huawei.com>
+Date:   Fri, 21 Feb 2020 11:05:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200220204713.GB28199@ming.t460p>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200109062109.2313-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.220.74]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-02-20 12:47, Ming Lei wrote:
-> Actually, I suggested to do the following way:
-> 
-> if (set->nr_maps == 1)
-> 	set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
-> 
-> then people won't be confused wrt. relation between set->nr_hw_queues
-> and .nr_queues of each mapping.
+Hi Guys,
 
-Ah, thanks for the clarification. I will make that change.
+Did this patch have been forgotten? So, ping...
 
-Bart.
+Thanks,
+Yufen
+
+
+On 2020/1/9 14:21, Ming Lei wrote:
+> delete_partition() clears the cached last_lookup partition. However
+> the .last_lookup cache may be overwritten by one IO path after
+> it is cleared from delete_partition(). Then another IO path may
+> use the cached deleting partition after __delete_partition() is
+> called, then use-after-free is triggered on the cached partition.
+> 
+> Fixes the issue by the following approach:
+> 
+> 1) always get the partition's refcount via hd_struct_try_get() before
+> setting .last_lookup
+> 
+> 2) move clearing .last_lookup from delete_partition() to
+> __delete_partition() which is release handle of the partition's
+> percpu-refcount, so that no IO path can overwrite .last_lookup after it
+> is cleared in __delete_partition().
+> 
+> It is one candidate approach of Yufen's patch[1] which adds overhead
+> in fast path by indirect lookup which may introduce one extra cacheline
+> in IO path. Also this patch relies on percpu-refcount's protection, and
+> it is easier to understand and verify.
+> 
+> [1] https://lore.kernel.org/linux-block/20200109013551.GB9655@ming.t460p/T/#t
+> 
+> Reported-by: Yufen Yu <yuyufen@huawei.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Hou Tao <houtao1@huawei.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-core.c          | 12 ------------
+>   block/genhd.c             |  6 +++++-
+>   block/partition-generic.c | 10 +++++++++-
+>   include/linux/genhd.h     |  1 +
+>   4 files changed, 15 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 089e890ab208..79599f5fd5b7 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1365,18 +1365,6 @@ void blk_account_io_start(struct request *rq, bool new_io)
+>   		part_stat_inc(part, merges[rw]);
+>   	} else {
+>   		part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
+> -		if (!hd_struct_try_get(part)) {
+> -			/*
+> -			 * The partition is already being removed,
+> -			 * the request will be accounted on the disk only
+> -			 *
+> -			 * We take a reference on disk->part0 although that
+> -			 * partition will never be deleted, so we can treat
+> -			 * it as any other partition.
+> -			 */
+> -			part = &rq->rq_disk->part0;
+> -			hd_struct_get(part);
+> -		}
+>   		part_inc_in_flight(rq->q, part, rw);
+>   		rq->part = part;
+>   	}
+> diff --git a/block/genhd.c b/block/genhd.c
+> index ff6268970ddc..6029c94510f0 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -286,17 +286,21 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+>   	ptbl = rcu_dereference(disk->part_tbl);
+>   
+>   	part = rcu_dereference(ptbl->last_lookup);
+> -	if (part && sector_in_part(part, sector))
+> +	if (part && sector_in_part(part, sector) && hd_struct_try_get(part))
+>   		return part;
+>   
+>   	for (i = 1; i < ptbl->len; i++) {
+>   		part = rcu_dereference(ptbl->part[i]);
+>   
+>   		if (part && sector_in_part(part, sector)) {
+> +			if (!hd_struct_try_get(part))
+> +				goto exit;
+>   			rcu_assign_pointer(ptbl->last_lookup, part);
+>   			return part;
+>   		}
+>   	}
+> + exit:
+> +	hd_struct_get(&disk->part0);
+>   	return &disk->part0;
+>   }
+>   EXPORT_SYMBOL_GPL(disk_map_sector_rcu);
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 1d20c9cf213f..1739f750dbf2 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -262,6 +262,12 @@ static void delete_partition_work_fn(struct work_struct *work)
+>   void __delete_partition(struct percpu_ref *ref)
+>   {
+>   	struct hd_struct *part = container_of(ref, struct hd_struct, ref);
+> +	struct disk_part_tbl *ptbl =
+> +		rcu_dereference_protected(part->disk->part_tbl, 1);
+> +
+> +	rcu_assign_pointer(ptbl->last_lookup, NULL);
+> +	put_device(disk_to_dev(part->disk));
+> +
+>   	INIT_RCU_WORK(&part->rcu_work, delete_partition_work_fn);
+>   	queue_rcu_work(system_wq, &part->rcu_work);
+>   }
+> @@ -283,8 +289,9 @@ void delete_partition(struct gendisk *disk, int partno)
+>   	if (!part)
+>   		return;
+>   
+> +	get_device(disk_to_dev(disk));
+>   	rcu_assign_pointer(ptbl->part[partno], NULL);
+> -	rcu_assign_pointer(ptbl->last_lookup, NULL);
+> +
+>   	kobject_put(part->holder_dir);
+>   	device_del(part_to_dev(part));
+>   
+> @@ -349,6 +356,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+>   	p->nr_sects = len;
+>   	p->partno = partno;
+>   	p->policy = get_disk_ro(disk);
+> +	p->disk = disk;
+>   
+>   	if (info) {
+>   		struct partition_meta_info *pinfo = alloc_part_info(disk);
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 8bb63027e4d6..1b09cfe00aa3 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -130,6 +130,7 @@ struct hd_struct {
+>   	struct disk_stats dkstats;
+>   #endif
+>   	struct percpu_ref ref;
+> +	struct gendisk *disk;
+>   	struct rcu_work rcu_work;
+>   };
+>   
+> 
