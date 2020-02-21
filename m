@@ -2,44 +2,79 @@ Return-Path: <SRS0=LczR=4J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A874AC3565A
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 14:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3568C35657
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 14:20:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85FF82073A
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 14:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90FEF206EF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 14:20:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DZyV9UxL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728571AbgBUOMK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Feb 2020 09:12:10 -0500
-Received: from verein.lst.de ([213.95.11.211]:55615 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728455AbgBUOMK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Feb 2020 09:12:10 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1D93C68C4E; Fri, 21 Feb 2020 15:12:08 +0100 (CET)
-Date:   Fri, 21 Feb 2020 15:12:07 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [PATCH v2] block: Fix partition support for host aware zoned
- block devices
-Message-ID: <20200221141207.GA6968@lst.de>
-References: <20200221013708.911698-1-shinichiro.kawasaki@wdc.com>
+        id S1728477AbgBUOUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Feb 2020 09:20:20 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:36952 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728081AbgBUOUT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Feb 2020 09:20:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=LytBCHQtySSQHC//YYsk3cTp1SDQnnhLtWFiulJBZy8=; b=DZyV9UxLlQ1dXSvWlM5ACgoz8S
+        66UCzAs+/vDp19vCMf/XiGjrgq/QpQ5MSmVm/cq7+gbhKX2cMIX1taXRr/28lPIKdmzmh69nv04Ah
+        jwc9CKCejXv0Yp4mbSM/q3/tDIhqtMMSmNl9pu3s8tg24ZdjHzYMMgLs+rc7QJw5HNC07Z3yyMc8F
+        LrWSlmph5HCQzhVD6l+1jhZTBzUgoCltUXUStnxF/6+NXmWhqg6fe/7W9ZhC1tQlUPJRTzQ06pK5k
+        wVCnFwUDhQ7pTnQaf3ggXDyfYcZZNw61QTbu1cIlLeHfVXYoXnrImvysZ5JDQhd9ynz72vOhOetCJ
+        eJPdKzew==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j59AA-0005Lk-DL; Fri, 21 Feb 2020 14:20:18 +0000
+Date:   Fri, 21 Feb 2020 06:20:18 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v6 0/9] Inline Encryption Support
+Message-ID: <20200221142018.GA27636@infradead.org>
+References: <20200108184305.GA173657@google.com>
+ <20200117085210.GA5473@infradead.org>
+ <20200201005341.GA134917@google.com>
+ <20200203091558.GA28527@infradead.org>
+ <20200204033915.GA122248@google.com>
+ <20200204145832.GA28393@infradead.org>
+ <20200204212110.GA122850@gmail.com>
+ <20200205073601.GA191054@sol.localdomain>
+ <20200205180541.GA32041@infradead.org>
+ <20200221123030.GA253045@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200221013708.911698-1-shinichiro.kawasaki@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200221123030.GA253045@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On Fri, Feb 21, 2020 at 04:30:30AM -0800, Satya Tangirala wrote:
+> Hi Christoph,
+> 
+> I sent out v7 of the patch series. It's at
+> https://lore.kernel.org/linux-fscrypt/20200221115050.238976-1-satyat@google.com/T/#t
+> 
+> It manages keyslots on a per-request basis now - I made it get keyslots
+> in blk_mq_get_request, because that way I wouldn't have to worry about
+> programming keys in an atomic context. What do you think of the new
+> approach?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I'll try to review it soon, thanks!
