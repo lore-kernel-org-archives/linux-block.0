@@ -6,47 +6,56 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF72DC11D00
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01E8C11D00
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:50:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD9D02465D
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:49:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCB4E2465D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 02:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729290AbgBUCty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Feb 2020 21:49:54 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35639 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729259AbgBUCty (ORCPT
+        id S1729290AbgBUCuu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Feb 2020 21:50:50 -0500
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:39801 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729259AbgBUCuu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Feb 2020 21:49:54 -0500
-Received: by mail-pl1-f195.google.com with SMTP id g6so241670plt.2
-        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 18:49:53 -0800 (PST)
+        Thu, 20 Feb 2020 21:50:50 -0500
+Received: by mail-pj1-f48.google.com with SMTP id e9so85649pjr.4
+        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2020 18:50:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=m1KMU52mxmvCMQ9J5kSzI3ixvWAalEyGX2V5vvSz2/U=;
-        b=Z7sWWBITKUo926SW//D7RYWXnCg9qvCCGNNe4ZorH/QOH39poYXpPQ2RwYOQ9eUjxc
-         BdOin4KbLrz2RvcE4xQvSXayCQWORAqVtQ1CjFI/dO/sypSP92Whju9As0DT/1jR5gxf
-         eK7ATNcOS83QBHtuMv/IWhudqSVl4AVYw9tZS6hVAuI4X+QvO2evSr5h45dd8t0XO+CP
-         g3KEs0MOjDa85FLXKgCZYkpYvtudULM2VmfwfZfqtTDPxlUqSx5IZHt5Gik+iOtPmNdO
-         ekScz4FlNihFfZptRpoci6/cNOS5K3dxu2FJl+eWnamn8JP1gyA8R8dc3BE/4dJmL4vn
-         ObiQ==
-X-Gm-Message-State: APjAAAXWTrZAybAaJZ+xEjIhFFcRmkEWWN7XAkSS4pU6GXz1mH/t1DDI
-        S1oPwPq3a/+1eKkiVydsmNg=
-X-Google-Smtp-Source: APXvYqzQEnKu4fv8LPYxmmCMIDf+6m86NpRERPbEQJ6Drh9QP4b1Pzuts5bu8IBjZP61QlLzvjtFeA==
-X-Received: by 2002:a17:90b:4015:: with SMTP id ie21mr333177pjb.1.1582253393199;
-        Thu, 20 Feb 2020 18:49:53 -0800 (PST)
+        bh=CraDicGBBtzqBCNndIjjvdIXByIW7/VwFt16R0kLFcc=;
+        b=VnyebXnN8TLQ+WbvVlYqJqldxOpoPpaK0/MZlYa/f19L3lTfuH0zNqTMCITpvS9dXt
+         +MssXQP8AWMKWgV20M6XfOXHGrOLYP2Jtnh+AVmv32+mwB6U9+Rx2grkQCLy4tax4LcF
+         Jr6wOTksPtiVcTS9dZYyuZTw1CMoKy+BG1JTMCTJFBRrDCLdArM2syCfGa3DlyuH+aqz
+         3kPfh49F8nIcaANSVk6fxpUXav3L0FvsxHjRwD4kO6nRJROZSkvkN8Grevhc466MlSSr
+         Z7mGX3bzODM58sy5vkP5utYiHW5zs9a53L5GX1uAVmywr+m5PrsU7gy3j1fKd6UgwtIu
+         pa0Q==
+X-Gm-Message-State: APjAAAUwsDg84e0069ArDuglN4+IZd8AJtUMAsh6dohWAmZ2S4K4T3vT
+        iIBB7+xl2MbyYTjyGO4J36Y=
+X-Google-Smtp-Source: APXvYqyFKX2KOP54WYYdCNfoLIrCmNr8IitjM5zs3IYxA48n8HD6McYjMTz87j82nG+g4MpVBgtopw==
+X-Received: by 2002:a17:902:341:: with SMTP id 59mr35810962pld.29.1582253448154;
+        Thu, 20 Feb 2020 18:50:48 -0800 (PST)
 Received: from ?IPv6:2601:647:4000:d7:e57a:a1b3:1a44:bb8c? ([2601:647:4000:d7:e57a:a1b3:1a44:bb8c])
-        by smtp.gmail.com with ESMTPSA id g7sm959461pfq.33.2020.02.20.18.49.51
+        by smtp.gmail.com with ESMTPSA id p4sm635493pgh.14.2020.02.20.18.50.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2020 18:49:52 -0800 (PST)
-Subject: Re: [PATCH] block: Prevent hung_check firing during long sync IO
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        Jesse Barnes <jsbarnes@google.com>
-References: <20200220120527.15082-1-ming.lei@redhat.com>
+        Thu, 20 Feb 2020 18:50:47 -0800 (PST)
+Subject: Re: [PATCH v2 2/8] blk-mq: Keep set->nr_hw_queues and
+ set->map[].nr_queues in sync
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
+References: <20200220024441.11558-1-bvanassche@acm.org>
+ <20200220024441.11558-3-bvanassche@acm.org>
+ <20200220100524.GA31206@ming.t460p>
+ <37505ee7-fba6-1b25-64c4-f632280e8b70@acm.org>
+ <20200220204713.GB28199@ming.t460p>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -71,12 +80,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <1c59bb62-c350-b3ab-a2a1-05a3c8620120@acm.org>
-Date:   Thu, 20 Feb 2020 18:49:50 -0800
+Message-ID: <ee2ebbe9-6d95-461b-ba22-c7e51093ae5a@acm.org>
+Date:   Thu, 20 Feb 2020 18:50:46 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220120527.15082-1-ming.lei@redhat.com>
+In-Reply-To: <20200220204713.GB28199@ming.t460p>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,31 +94,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-02-20 04:05, Ming Lei wrote:
->  	submit_bio(bio);
-> -	wait_for_completion_io(&done);
-> +
-> +	/* Prevent hang_check timer from firing at us during very long I/O */
-> +	hang_check = sysctl_hung_task_timeout_secs;
-> +	if (hang_check)
-> +		while (!wait_for_completion_io_timeout(&done, hang_check * (HZ/2)));
-> +	else
-> +		wait_for_completion_io(&done);
->  
->  	return blk_status_to_errno(bio->bi_status);
->  }
+On 2020-02-20 12:47, Ming Lei wrote:
+> Actually, I suggested to do the following way:
+> 
+> if (set->nr_maps == 1)
+> 	set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
+> 
+> then people won't be confused wrt. relation between set->nr_hw_queues
+> and .nr_queues of each mapping.
 
-Please make this patch compliant with the kernel coding style.
-Checkpatch reports the following about the above patch:
-
-WARNING: line over 80 characters
-#152: FILE: block/bio.c:1032:
-+  while (!wait_for_completion_io_timeout(&done, hang_check * (HZ/2)));
-
-ERROR: trailing statements should be on next line
-#152: FILE: block/bio.c:1032:
-+  while (!wait_for_completion_io_timeout(&done, hang_check * (HZ/2)));
-
-Thanks,
+Ah, thanks for the clarification. I will make that change.
 
 Bart.
