@@ -5,56 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA20C35656
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 10:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256C1C3565A
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 10:47:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7FF124653
-	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 10:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6A0024656
+	for <linux-block@archiver.kernel.org>; Fri, 21 Feb 2020 10:47:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYYEMgUb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dafBZLTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728259AbgBUKrp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Feb 2020 05:47:45 -0500
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:41253 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728279AbgBUKrp (ORCPT
+        id S1728314AbgBUKrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Feb 2020 05:47:48 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:36166 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728280AbgBUKrr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Feb 2020 05:47:45 -0500
-Received: by mail-ed1-f67.google.com with SMTP id c26so1772076eds.8;
-        Fri, 21 Feb 2020 02:47:43 -0800 (PST)
+        Fri, 21 Feb 2020 05:47:47 -0500
+Received: by mail-ed1-f68.google.com with SMTP id j17so1800123edp.3;
+        Fri, 21 Feb 2020 02:47:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=20LtkCnNlK1mPf8j7tqkEHHS8HSE5F4m4aEzbLJkO9s=;
-        b=jYYEMgUbl6AYrq/iN6HBW71XpVAvklWoUtkQ26Ymbh/GFoiXSUtPrgYRQSdQRR01pH
-         wRRS4TCNFfrr4iCpzPZWY+w85I7UGDbNB/ZfzYYHYmHMrGi1bi3TOE4qONH8ch4UuoZi
-         4OLvYW66pD9A8bWTGzaHExR2DOozrsYmxmG6eilS1r55OgyF1umf6cObl+bcGWr2efsp
-         1XHqTZm7TJtYh7iBLwRxiJ8AAkpfGhWrp64PW6eefibBtiqdt64T1H2GGz1L+8QuyEow
-         f96Ko0E2GiL9rPqezaypErFu4jVovs221ulPR2L6TX8mrAd6qm+/481X4qWBpe3RWLXx
-         P6xQ==
+        bh=5LqOAK11viWDiZ73xXxl+8g89M5P1oyPwSH9BZ/09No=;
+        b=dafBZLTUyMJltF0IZE/xhsnusUwLWE3hmMO/FAzpfFfph4R0vhny3zX/mp97JwzPGM
+         UyofRMiwNPGbk9hRpFNy5Qds/YYgsy2EgKzL23h5p6Yizfrj20b5JXVb/qi8v4UfGOeI
+         EqkLFInHo7R9XdP9OMSHfOTyKRXYp6OkauHLux04l0ybjSCxI266ZI6r71kgo1hRFal0
+         YVYzjiFJ8GbmE5O+bAGKsdBLc9CGB+AUyyOx2Eq5/4uWpSKEUwTn/YCFvz/HakAwnCOi
+         pRv8Annb1xpJpbdHT5Uj7umt8f+49KfXqWOOGgWhLqvDzZw13WVOThNlIZ5bBMvU0TYi
+         pkSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=20LtkCnNlK1mPf8j7tqkEHHS8HSE5F4m4aEzbLJkO9s=;
-        b=AkreKJR1wl+XScY2OGlND7JgipoBhoB+gNl+IGzbBskhnn9+HhO8v0HEg6puGM+4wi
-         O5A32a0HJuTGdpmrtnWPl/i9F+UyOrnYX/s+caIPfFQwAxpA5MzABFnPaBx2GtYTTYUL
-         bGEBIbumbKB4zqW9a6dKdvpA+R0AHoOGH54HHJDo52K0A7ItC4eQiSNorFmeN9qg5ChE
-         o8Nh4C/RTYpiZi83qru4iwdBu8zPAZungZpSJax7uKWlP2jdjjwr3RpvAPQ9r3AUW4fj
-         Eb1qm3h3bligawLcFrLkrk0fTEvjNDugDqTkcMUsn+k7YaWNXx58nNCGVJaP05CDCoB5
-         SSfw==
-X-Gm-Message-State: APjAAAVVX12/bsuFuRBbjpakv9RoojVe59zBQwNJFiL5TXOPiGs9i4fE
-        1wbelXENoOPmFKuMEWMxqP58RsbW
-X-Google-Smtp-Source: APXvYqwRDgPzWgKwukXrbo9QLv8SLEWtZ3I13zGw/ZWeoNCGyEIg+N2gyL/fCmYDsWC/1RSgAJhq5w==
-X-Received: by 2002:a17:906:d927:: with SMTP id rn7mr34919302ejb.283.1582282062532;
-        Fri, 21 Feb 2020 02:47:42 -0800 (PST)
+        bh=5LqOAK11viWDiZ73xXxl+8g89M5P1oyPwSH9BZ/09No=;
+        b=iY+xKjGKiwXqELWQuhShOEsMHDVIkMP+caiK7sLQtXnD3NmaqGxq4cQgK/l5HZ+C+C
+         R4EJkdMHxFVPgMQgbv66MpF8t4V37N4dNOYAS527g5GFSwHS2TXiFf//hfn1k3lzcu6V
+         XZbYYM88b/Z/WqDcxraRsIcDkmpwvUSLZyvjRSSFT77RwLXzLNvnof+r7mv323YOZH/L
+         AGCk5X0el6aNq162G/NjOhYE8+GIgtK7BPWs15t+/xnS5FI0twZyjx8N4fjUKgAKEd28
+         I5VuOLqB3DH0AsrGBsymg4p7xOES+0MsDhKckrB9kteU2+Lwf3OPK3ioVRDBB13BuAC2
+         6x1g==
+X-Gm-Message-State: APjAAAUMlxcADv9oaHCZZ353squeDYqPgml1c9jKkGpBG2T+iKee1mwu
+        wZrfYmlj+oiG5X4sLFYIlufqPYL4
+X-Google-Smtp-Source: APXvYqwtyoYzqoTEAOAllVi1VBbH8ViUTw1btXA777+hDq77yo2cjNyjhwvxVI8yq0e8UFzhUu9ORw==
+X-Received: by 2002:a17:906:8306:: with SMTP id j6mr33355819ejx.105.1582282065677;
+        Fri, 21 Feb 2020 02:47:45 -0800 (PST)
 Received: from jwang-Latitude-5491.pb.local ([2001:1438:4010:2558:d8ec:cf8e:d7de:fb22])
-        by smtp.gmail.com with ESMTPSA id 2sm270594edv.87.2020.02.21.02.47.41
+        by smtp.gmail.com with ESMTPSA id 2sm270594edv.87.2020.02.21.02.47.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2020 02:47:42 -0800 (PST)
+        Fri, 21 Feb 2020 02:47:45 -0800 (PST)
 From:   Jack Wang <jinpuwang@gmail.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
@@ -62,9 +62,9 @@ Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, rpenyaev@suse.de,
         pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v9 18/25] block/rnbd: client: sysfs interface functions
-Date:   Fri, 21 Feb 2020 11:47:14 +0100
-Message-Id: <20200221104721.350-19-jinpuwang@gmail.com>
+Subject: [PATCH v9 21/25] block/rnbd: server: functionality for IO submission to file or block dev
+Date:   Fri, 21 Feb 2020 11:47:17 +0100
+Message-Id: <20200221104721.350-22-jinpuwang@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200221104721.350-1-jinpuwang@gmail.com>
 References: <20200221104721.350-1-jinpuwang@gmail.com>
@@ -75,41 +75,23 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This is the sysfs interface to rnbd block devices on client side:
-
-  /sys/devices/virtual/rnbd-client/ctl/
-    |- map_device
-    |  *** maps remote device
-    |
-    |- devices/
-       *** all mapped devices
-
-  /sys/block/rnbd<N>/rnbd/
-    |- unmap_device
-    |  *** unmaps device
-    |
-    |- state
-    |  *** device state
-    |
-    |- session
-    |  *** session name
-    |
-    |- mapping_path
-       *** path of the dev that was mapped on server
+This provides helper functions for IO submission to file or block dev.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt-sysfs.c | 619 ++++++++++++++++++++++++++++
- 1 file changed, 619 insertions(+)
- create mode 100644 drivers/block/rnbd/rnbd-clt-sysfs.c
+ drivers/block/rnbd/rnbd-srv-dev.c | 142 ++++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-srv-dev.h | 110 +++++++++++++++++++++++
+ 2 files changed, 252 insertions(+)
+ create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
+ create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
 new file mode 100644
-index 000000000000..94529b25f25c
+index 000000000000..ef8d35411b6d
 --- /dev/null
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -0,0 +1,619 @@
++++ b/drivers/block/rnbd/rnbd-srv-dev.c
+@@ -0,0 +1,142 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * RDMA Network Block Driver
@@ -118,617 +100,256 @@ index 000000000000..94529b25f25c
 + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
 + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
 + */
-+
 +#undef pr_fmt
 +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 +
-+#include <linux/types.h>
-+#include <linux/ctype.h>
-+#include <linux/parser.h>
-+#include <linux/module.h>
-+#include <linux/in6.h>
++#include "rnbd-srv-dev.h"
++#include "rnbd-log.h"
++
++struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
++				 struct bio_set *bs, rnbd_dev_io_fn io_cb)
++{
++	struct rnbd_dev *dev;
++	int ret;
++
++	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
++	if (!dev)
++		return ERR_PTR(-ENOMEM);
++
++	dev->blk_open_flags = flags;
++	dev->bdev = blkdev_get_by_path(path, flags, THIS_MODULE);
++	ret = PTR_ERR_OR_ZERO(dev->bdev);
++	if (ret)
++		goto err;
++
++	dev->blk_open_flags	= flags;
++	dev->io_cb		= io_cb;
++	bdevname(dev->bdev, dev->name);
++	dev->ibd_bio_set	= bs;
++
++	return dev;
++
++err:
++	kfree(dev);
++	return ERR_PTR(ret);
++}
++
++void rnbd_dev_close(struct rnbd_dev *dev)
++{
++	blkdev_put(dev->bdev, dev->blk_open_flags);
++	kfree(dev);
++}
++
++static void rnbd_dev_bi_end_io(struct bio *bio)
++{
++	struct rnbd_dev_blk_io *io = bio->bi_private;
++
++	io->dev->io_cb(io->priv, blk_status_to_errno(bio->bi_status));
++	bio_put(bio);
++}
++
++/**
++ *	rnbd_bio_map_kern	-	map kernel address into bio
++ *	@q: the struct request_queue for the bio
++ *	@data: pointer to buffer to map
++ *	@bs: bio_set to use.
++ *	@len: length in bytes
++ *	@gfp_mask: allocation flags for bio allocation
++ *
++ *	Map the kernel address into a bio suitable for io to a block
++ *	device. Returns an error pointer in case of error.
++ */
++static struct bio *rnbd_bio_map_kern(struct request_queue *q, void *data,
++				      struct bio_set *bs,
++				      unsigned int len, gfp_t gfp_mask)
++{
++	unsigned long kaddr = (unsigned long)data;
++	unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	unsigned long start = kaddr >> PAGE_SHIFT;
++	const int nr_pages = end - start;
++	int offset, i;
++	struct bio *bio;
++
++	bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
++	if (!bio)
++		return ERR_PTR(-ENOMEM);
++
++	offset = offset_in_page(kaddr);
++	for (i = 0; i < nr_pages; i++) {
++		unsigned int bytes = PAGE_SIZE - offset;
++
++		if (len <= 0)
++			break;
++
++		if (bytes > len)
++			bytes = len;
++
++		if (bio_add_pc_page(q, bio, virt_to_page(data), bytes,
++				    offset) < bytes) {
++			/* we don't support partial mappings */
++			bio_put(bio);
++			return ERR_PTR(-EINVAL);
++		}
++
++		data += bytes;
++		len -= bytes;
++		offset = 0;
++	}
++
++	bio->bi_end_io = bio_put;
++	return bio;
++}
++
++int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
++			size_t len, u32 bi_size, enum rnbd_io_flags flags,
++			short prio, void *priv)
++{
++	struct request_queue *q = bdev_get_queue(dev->bdev);
++	struct rnbd_dev_blk_io *io;
++	struct bio *bio;
++
++	/* check if the buffer is suitable for bdev */
++	if (WARN_ON(!blk_rq_aligned(q, (unsigned long)data, len)))
++		return -EINVAL;
++
++	/* Generate bio with pages pointing to the rdma buffer */
++	bio = rnbd_bio_map_kern(q, data, dev->ibd_bio_set, len, GFP_KERNEL);
++	if (IS_ERR(bio))
++		return PTR_ERR(bio);
++
++	io = container_of(bio, struct rnbd_dev_blk_io, bio);
++
++	io->dev		= dev;
++	io->priv	= priv;
++
++	bio->bi_end_io		= rnbd_dev_bi_end_io;
++	bio->bi_private		= io;
++	bio->bi_opf		= rnbd_to_bio_flags(flags);
++	bio->bi_iter.bi_sector	= sector;
++	bio->bi_iter.bi_size	= bi_size;
++	bio_set_prio(bio, prio);
++	bio_set_dev(bio, dev->bdev);
++
++	submit_bio(bio);
++
++	return 0;
++}
+diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
+new file mode 100644
+index 000000000000..4bd28aadb86f
+--- /dev/null
++++ b/drivers/block/rnbd/rnbd-srv-dev.h
+@@ -0,0 +1,110 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RDMA Network Block Driver
++ *
++ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
++ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
++ */
++#ifndef RNBD_SRV_DEV_H
++#define RNBD_SRV_DEV_H
++
 +#include <linux/fs.h>
-+#include <linux/uaccess.h>
-+#include <linux/device.h>
-+#include <rdma/ib.h>
-+#include <rdma/rdma_cm.h>
++#include "rnbd-proto.h"
 +
-+#include "rnbd-clt.h"
++typedef void rnbd_dev_io_fn(void *priv, int error);
 +
-+static struct device *rnbd_dev;
-+static struct class *rnbd_dev_class;
-+static struct kobject *rnbd_devs_kobj;
-+
-+enum {
-+	RNBD_OPT_ERR		= 0,
-+	RNBD_OPT_PATH		= 1 << 0,
-+	RNBD_OPT_DEV_PATH	= 1 << 1,
-+	RNBD_OPT_ACCESS_MODE	= 1 << 3,
-+	RNBD_OPT_SESSNAME	= 1 << 6,
++struct rnbd_dev {
++	struct block_device	*bdev;
++	struct bio_set		*ibd_bio_set;
++	fmode_t			blk_open_flags;
++	char			name[BDEVNAME_SIZE];
++	rnbd_dev_io_fn		*io_cb;
 +};
 +
-+static const unsigned int rnbd_opt_mandatory[] = {
-+	RNBD_OPT_PATH,
-+	RNBD_OPT_DEV_PATH,
-+	RNBD_OPT_SESSNAME,
++struct rnbd_dev_blk_io {
++	struct rnbd_dev *dev;
++	void		 *priv;
++	/* have to be last member for front_pad usage of bioset_init */
++	struct bio	bio;
 +};
 +
-+static const match_table_t rnbd_opt_tokens = {
-+	{RNBD_OPT_PATH,		"path=%s"	},
-+	{RNBD_OPT_DEV_PATH,	"device_path=%s"},
-+	{RNBD_OPT_ACCESS_MODE,	"access_mode=%s"},
-+	{RNBD_OPT_SESSNAME,	"sessname=%s"	},
-+	{RNBD_OPT_ERR,		NULL		},
-+};
++/**
++ * rnbd_dev_open() - Open a device
++ * @flags:	open flags
++ * @bs:		bio_set to use during block io,
++ * @io_cb:	is called when I/O finished
++ */
++struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
++				 struct bio_set *bs, rnbd_dev_io_fn io_cb);
 +
-+struct rnbd_map_options {
-+	char *sessname;
-+	struct rtrs_addr *paths;
-+	size_t *path_cnt;
-+	char *pathname;
-+	enum rnbd_access_mode *access_mode;
-+};
++/**
++ * rnbd_dev_close() - Close a device
++ */
++void rnbd_dev_close(struct rnbd_dev *dev);
 +
-+static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
-+				       struct rnbd_map_options *opt)
++static inline int rnbd_dev_get_logical_bsize(const struct rnbd_dev *dev)
 +{
-+	char *options, *sep_opt;
-+	char *p;
-+	substring_t args[MAX_OPT_ARGS];
-+	int opt_mask = 0;
-+	int token;
-+	int ret = -EINVAL;
-+	int i;
-+	int p_cnt = 0;
-+
-+	options = kstrdup(buf, GFP_KERNEL);
-+	if (!options)
-+		return -ENOMEM;
-+
-+	sep_opt = strstrip(options);
-+	while ((p = strsep(&sep_opt, " ")) != NULL) {
-+		if (!*p)
-+			continue;
-+
-+		token = match_token(p, rnbd_opt_tokens, args);
-+		opt_mask |= token;
-+
-+		switch (token) {
-+		case RNBD_OPT_SESSNAME:
-+			p = match_strdup(args);
-+			if (!p) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+			if (strlen(p) > NAME_MAX) {
-+				pr_err("map_device: sessname too long\n");
-+				ret = -EINVAL;
-+				kfree(p);
-+				goto out;
-+			}
-+			strlcpy(opt->sessname, p, NAME_MAX);
-+			kfree(p);
-+			break;
-+
-+		case RNBD_OPT_PATH:
-+			if (p_cnt >= max_path_cnt) {
-+				pr_err("map_device: too many (> %zu) paths provided\n",
-+				       max_path_cnt);
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+			p = match_strdup(args);
-+			if (!p) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+
-+			ret = rtrs_addr_to_sockaddr(p, strlen(p), RTRS_PORT,
-+						     &opt->paths[p_cnt]);
-+			if (ret) {
-+				pr_err("Can't parse path %s: %d\n", p, ret);
-+				kfree(p);
-+				goto out;
-+			}
-+
-+			p_cnt++;
-+
-+			kfree(p);
-+			break;
-+
-+		case RNBD_OPT_DEV_PATH:
-+			p = match_strdup(args);
-+			if (!p) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+			if (strlen(p) > NAME_MAX) {
-+				pr_err("map_device: Device path too long\n");
-+				ret = -EINVAL;
-+				kfree(p);
-+				goto out;
-+			}
-+			strlcpy(opt->pathname, p, NAME_MAX);
-+			kfree(p);
-+			break;
-+
-+		case RNBD_OPT_ACCESS_MODE:
-+			p = match_strdup(args);
-+			if (!p) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+
-+			if (!strcmp(p, "ro")) {
-+				*opt->access_mode = RNBD_ACCESS_RO;
-+			} else if (!strcmp(p, "rw")) {
-+				*opt->access_mode = RNBD_ACCESS_RW;
-+			} else if (!strcmp(p, "migration")) {
-+				*opt->access_mode = RNBD_ACCESS_MIGRATION;
-+			} else {
-+				pr_err("map_device: Invalid access_mode: '%s'\n",
-+				       p);
-+				ret = -EINVAL;
-+				kfree(p);
-+				goto out;
-+			}
-+
-+			kfree(p);
-+			break;
-+
-+		default:
-+			pr_err("map_device: Unknown parameter or missing value '%s'\n",
-+			       p);
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(rnbd_opt_mandatory); i++) {
-+		if ((opt_mask & rnbd_opt_mandatory[i])) {
-+			ret = 0;
-+		} else {
-+			pr_err("map_device: Parameters missing\n");
-+			ret = -EINVAL;
-+			break;
-+		}
-+	}
-+
-+out:
-+	*opt->path_cnt = p_cnt;
-+	kfree(options);
-+	return ret;
++	return bdev_logical_block_size(dev->bdev);
 +}
 +
-+static ssize_t state_show(struct kobject *kobj,
-+			  struct kobj_attribute *attr, char *page)
++static inline int rnbd_dev_get_phys_bsize(const struct rnbd_dev *dev)
 +{
-+	struct rnbd_clt_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+
-+	switch (dev->dev_state) {
-+	case DEV_STATE_INIT:
-+		return snprintf(page, PAGE_SIZE, "init\n");
-+	case DEV_STATE_MAPPED:
-+		/* TODO fix cli tool before changing to proper state */
-+		return snprintf(page, PAGE_SIZE, "open\n");
-+	case DEV_STATE_MAPPED_DISCONNECTED:
-+		/* TODO fix cli tool before changing to proper state */
-+		return snprintf(page, PAGE_SIZE, "closed\n");
-+	case DEV_STATE_UNMAPPED:
-+		return snprintf(page, PAGE_SIZE, "unmapped\n");
-+	default:
-+		return snprintf(page, PAGE_SIZE, "unknown\n");
-+	}
++	return bdev_physical_block_size(dev->bdev);
 +}
 +
-+static struct kobj_attribute rnbd_clt_state_attr = __ATTR_RO(state);
-+
-+static ssize_t mapping_path_show(struct kobject *kobj,
-+				 struct kobj_attribute *attr, char *page)
++static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
 +{
-+	struct rnbd_clt_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n", dev->pathname);
++	return queue_max_segments(bdev_get_queue(dev->bdev));
 +}
 +
-+static struct kobj_attribute rnbd_clt_mapping_path_attr =
-+	__ATTR_RO(mapping_path);
-+
-+static ssize_t access_mode_show(struct kobject *kobj,
-+				struct kobj_attribute *attr, char *page)
++static inline int rnbd_dev_get_max_hw_sects(const struct rnbd_dev *dev)
 +{
-+	struct rnbd_clt_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+
-+	return snprintf(page, PAGE_SIZE, "%s\n",
-+			rnbd_access_mode_str(dev->access_mode));
++	return queue_max_hw_sectors(bdev_get_queue(dev->bdev));
 +}
 +
-+static struct kobj_attribute rnbd_clt_access_mode =
-+	__ATTR_RO(access_mode);
-+
-+static ssize_t rnbd_clt_unmap_dev_show(struct kobject *kobj,
-+					struct kobj_attribute *attr, char *page)
++static inline int
++rnbd_dev_get_max_write_same_sects(const struct rnbd_dev *dev)
 +{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo <normal|force> > %s\n",
-+			 attr->attr.name);
++	return bdev_write_same(dev->bdev);
 +}
 +
-+static ssize_t rnbd_clt_unmap_dev_store(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 const char *buf, size_t count)
++static inline int rnbd_dev_get_secure_discard(const struct rnbd_dev *dev)
 +{
-+	struct rnbd_clt_dev *dev;
-+	char *opt, *options;
-+	bool force;
-+	int err;
-+
-+	opt = kstrdup(buf, GFP_KERNEL);
-+	if (!opt)
-+		return -ENOMEM;
-+
-+	options = strstrip(opt);
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+	if (sysfs_streq(options, "normal")) {
-+		force = false;
-+	} else if (sysfs_streq(options, "force")) {
-+		force = true;
-+	} else {
-+		rnbd_clt_err(dev,
-+			      "unmap_device: Invalid value: %s\n",
-+			      options);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	rnbd_clt_info(dev, "Unmapping device, option: %s.\n",
-+		       force ? "force" : "normal");
-+
-+	/*
-+	 * We take explicit module reference only for one reason: do not
-+	 * race with lockless rnbd_destroy_sessions().
-+	 */
-+	if (!try_module_get(THIS_MODULE)) {
-+		err = -ENODEV;
-+		goto out;
-+	}
-+	err = rnbd_clt_unmap_device(dev, force, &attr->attr);
-+	if (err) {
-+		if (err != -EALREADY)
-+			rnbd_clt_err(dev, "unmap_device: %d\n",  err);
-+		goto module_put;
-+	}
-+
-+	/*
-+	 * Here device can be vanished!
-+	 */
-+
-+	err = count;
-+
-+module_put:
-+	module_put(THIS_MODULE);
-+out:
-+	kfree(opt);
-+
-+	return err;
++	return blk_queue_secure_erase(bdev_get_queue(dev->bdev));
 +}
 +
-+static struct kobj_attribute rnbd_clt_unmap_device_attr =
-+	__ATTR(unmap_device, 0644, rnbd_clt_unmap_dev_show,
-+	       rnbd_clt_unmap_dev_store);
-+
-+static ssize_t rnbd_clt_resize_dev_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 char *page)
++static inline int rnbd_dev_get_max_discard_sects(const struct rnbd_dev *dev)
 +{
-+	return scnprintf(page, PAGE_SIZE,
-+			 "Usage: echo <new size in sectors> > %s\n",
-+			 attr->attr.name);
++	if (!blk_queue_discard(bdev_get_queue(dev->bdev)))
++		return 0;
++
++	return blk_queue_get_max_sectors(bdev_get_queue(dev->bdev),
++					 REQ_OP_DISCARD);
 +}
 +
-+static ssize_t rnbd_clt_resize_dev_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
++static inline int rnbd_dev_get_discard_granularity(const struct rnbd_dev *dev)
 +{
-+	int ret;
-+	unsigned long sectors;
-+	struct rnbd_clt_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+
-+	ret = kstrtoul(buf, 0, &sectors);
-+	if (ret)
-+		return ret;
-+
-+	ret = rnbd_clt_resize_disk(dev, (size_t)sectors);
-+	if (ret)
-+		return ret;
-+
-+	return count;
++	return bdev_get_queue(dev->bdev)->limits.discard_granularity;
 +}
 +
-+static struct kobj_attribute rnbd_clt_resize_dev_attr =
-+	__ATTR(resize, 0644, rnbd_clt_resize_dev_show,
-+	       rnbd_clt_resize_dev_store);
-+
-+static ssize_t rnbd_clt_remap_dev_show(struct kobject *kobj,
-+					struct kobj_attribute *attr, char *page)
++static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
 +{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo <1> > %s\n",
-+			 attr->attr.name);
++	return bdev_get_queue(dev->bdev)->limits.discard_alignment;
 +}
 +
-+static ssize_t rnbd_clt_remap_dev_store(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 const char *buf, size_t count)
-+{
-+	struct rnbd_clt_dev *dev;
-+	char *opt, *options;
-+	int err;
++/**
++ * rnbd_dev_submit_io() - Submit an I/O to the disk
++ * @dev:	device to that the I/O is submitted
++ * @sector:	address to read/write data to
++ * @data:	I/O data to write or buffer to read I/O date into
++ * @len:	length of @data
++ * @bi_size:	Amount of data that will be read/written
++ * @prio:       IO priority
++ * @priv:	private data passed to @io_fn
++ */
++int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
++			size_t len, u32 bi_size, enum rnbd_io_flags flags,
++			short prio, void *priv);
 +
-+	opt = kstrdup(buf, GFP_KERNEL);
-+	if (!opt)
-+		return -ENOMEM;
-+
-+	options = strstrip(opt);
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+	if (!sysfs_streq(options, "1")) {
-+		rnbd_clt_err(dev,
-+			      "remap_device: Invalid value: %s\n",
-+			      options);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+	err = rnbd_clt_remap_device(dev);
-+	if (likely(!err))
-+		err = count;
-+
-+out:
-+	kfree(opt);
-+
-+	return err;
-+}
-+
-+static struct kobj_attribute rnbd_clt_remap_device_attr =
-+	__ATTR(remap_device, 0644, rnbd_clt_remap_dev_show,
-+	       rnbd_clt_remap_dev_store);
-+
-+static ssize_t session_show(struct kobject *kobj, struct kobj_attribute *attr,
-+			    char *page)
-+{
-+	struct rnbd_clt_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n", dev->sess->sessname);
-+}
-+
-+static struct kobj_attribute rnbd_clt_session_attr =
-+	__ATTR_RO(session);
-+
-+static struct attribute *rnbd_dev_attrs[] = {
-+	&rnbd_clt_unmap_device_attr.attr,
-+	&rnbd_clt_resize_dev_attr.attr,
-+	&rnbd_clt_remap_device_attr.attr,
-+	&rnbd_clt_mapping_path_attr.attr,
-+	&rnbd_clt_state_attr.attr,
-+	&rnbd_clt_session_attr.attr,
-+	&rnbd_clt_access_mode.attr,
-+	NULL,
-+};
-+
-+void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
-+{
-+	/*
-+	 * The module_is_live() check is crucial and helps to avoid annoying
-+	 * sysfs warning raised in sysfs_remove_link(), when the whole sysfs
-+	 * path was just removed, see rnbd_close_sessions().
-+	 */
-+	if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
-+		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
-+}
-+
-+static struct kobj_type rnbd_dev_ktype = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_attrs  = rnbd_dev_attrs,
-+};
-+
-+static int rnbd_clt_add_dev_kobj(struct rnbd_clt_dev *dev)
-+{
-+	int ret;
-+	struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
-+
-+	ret = kobject_init_and_add(&dev->kobj, &rnbd_dev_ktype, gd_kobj, "%s",
-+				   "rnbd");
-+	if (ret)
-+		rnbd_clt_err(dev, "Failed to create device sysfs dir, err: %d\n",
-+			      ret);
-+
-+	return ret;
-+}
-+
-+static ssize_t rnbd_clt_map_device_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE,
-+			 "Usage: echo \"sessname=<name of the rtrs session> path=<[srcaddr@]dstaddr> [path=<[srcaddr@]dstaddr>] device_path=<full path on remote side> [access_mode=<ro|rw|migration>]\" > %s\n\naddr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]\n",
-+			 attr->attr.name);
-+}
-+
-+static int rnbd_clt_get_path_name(struct rnbd_clt_dev *dev, char *buf,
-+				   size_t len)
-+{
-+	int ret;
-+	char pathname[NAME_MAX], *s;
-+
-+	strlcpy(pathname, dev->pathname, sizeof(pathname));
-+	while ((s = strchr(pathname, '/')))
-+		s[0] = '!';
-+
-+	ret = snprintf(buf, len, "%s", pathname);
-+	if (ret >= len)
-+		return -ENAMETOOLONG;
-+
-+	return 0;
-+}
-+
-+static int rnbd_clt_add_dev_symlink(struct rnbd_clt_dev *dev)
-+{
-+	struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
-+	int ret;
-+
-+	ret = rnbd_clt_get_path_name(dev, dev->blk_symlink_name,
-+				      sizeof(dev->blk_symlink_name));
-+	if (ret) {
-+		rnbd_clt_err(dev, "Failed to get /sys/block symlink path, err: %d\n",
-+			      ret);
-+		goto out_err;
-+	}
-+
-+	ret = sysfs_create_link(rnbd_devs_kobj, gd_kobj,
-+				dev->blk_symlink_name);
-+	if (ret) {
-+		rnbd_clt_err(dev, "Creating /sys/block symlink failed, err: %d\n",
-+			      ret);
-+		goto out_err;
-+	}
-+
-+	return 0;
-+
-+out_err:
-+	dev->blk_symlink_name[0] = '\0';
-+	return ret;
-+}
-+
-+static ssize_t rnbd_clt_map_device_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct rnbd_clt_dev *dev;
-+	struct rnbd_map_options opt;
-+	int ret;
-+	char pathname[NAME_MAX];
-+	char sessname[NAME_MAX];
-+	enum rnbd_access_mode access_mode = RNBD_ACCESS_RW;
-+
-+	struct sockaddr_storage *addrs;
-+	struct rtrs_addr paths[6];
-+	size_t path_cnt;
-+
-+	opt.sessname = sessname;
-+	opt.paths = paths;
-+	opt.path_cnt = &path_cnt;
-+	opt.pathname = pathname;
-+	opt.access_mode = &access_mode;
-+	addrs = kcalloc(ARRAY_SIZE(paths) * 2, sizeof(*addrs), GFP_KERNEL);
-+	if (!addrs)
-+		return -ENOMEM;
-+
-+	for (path_cnt = 0; path_cnt < ARRAY_SIZE(paths); path_cnt++) {
-+		paths[path_cnt].src = &addrs[path_cnt * 2];
-+		paths[path_cnt].dst = &addrs[path_cnt * 2 + 1];
-+	}
-+
-+	ret = rnbd_clt_parse_map_options(buf, ARRAY_SIZE(paths), &opt);
-+	if (ret)
-+		goto out;
-+
-+	pr_info("Mapping device %s on session %s, (access_mode: %s)\n",
-+		pathname, sessname,
-+		rnbd_access_mode_str(access_mode));
-+
-+	dev = rnbd_clt_map_device(sessname, paths, path_cnt, pathname,
-+				   access_mode);
-+	if (IS_ERR(dev)) {
-+		ret = PTR_ERR(dev);
-+		goto out;
-+	}
-+
-+	ret = rnbd_clt_add_dev_kobj(dev);
-+	if (ret)
-+		goto unmap_dev;
-+
-+	ret = rnbd_clt_add_dev_symlink(dev);
-+	if (ret)
-+		goto unmap_dev;
-+
-+	kfree(addrs);
-+	return count;
-+
-+unmap_dev:
-+	rnbd_clt_unmap_device(dev, true, NULL);
-+out:
-+	kfree(addrs);
-+	return ret;
-+}
-+
-+static struct kobj_attribute rnbd_clt_map_device_attr =
-+	__ATTR(map_device, 0644,
-+	       rnbd_clt_map_device_show, rnbd_clt_map_device_store);
-+
-+static struct attribute *default_attrs[] = {
-+	&rnbd_clt_map_device_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group default_attr_group = {
-+	.attrs = default_attrs,
-+};
-+
-+static const struct attribute_group *default_attr_groups[] = {
-+	&default_attr_group,
-+	NULL,
-+};
-+
-+int rnbd_clt_create_sysfs_files(void)
-+{
-+	int err;
-+
-+	rnbd_dev_class = class_create(THIS_MODULE, "rnbd-client");
-+	if (IS_ERR(rnbd_dev_class))
-+		return PTR_ERR(rnbd_dev_class);
-+
-+	rnbd_dev = device_create_with_groups(rnbd_dev_class, NULL,
-+					      MKDEV(0, 0), NULL,
-+					      default_attr_groups, "ctl");
-+	if (IS_ERR(rnbd_dev)) {
-+		err = PTR_ERR(rnbd_dev);
-+		goto cls_destroy;
-+	}
-+	rnbd_devs_kobj = kobject_create_and_add("devices", &rnbd_dev->kobj);
-+	if (!rnbd_devs_kobj) {
-+		err = -ENOMEM;
-+		goto dev_destroy;
-+	}
-+
-+	return 0;
-+
-+dev_destroy:
-+	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+cls_destroy:
-+	class_destroy(rnbd_dev_class);
-+
-+	return err;
-+}
-+
-+void rnbd_clt_destroy_default_group(void)
-+{
-+	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
-+}
-+
-+void rnbd_clt_destroy_sysfs_files(void)
-+{
-+	kobject_del(rnbd_devs_kobj);
-+	kobject_put(rnbd_devs_kobj);
-+	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+	class_destroy(rnbd_dev_class);
-+}
++#endif /* RNBD_SRV_DEV_H */
 -- 
 2.17.1
 
