@@ -2,137 +2,105 @@ Return-Path: <SRS0=8cuF=4K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C77C35669
-	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 05:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2721C35671
+	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9AC2208C4
-	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 05:39:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582349950;
-	bh=tstnNHhaIvRVX4ExQFdDOhN9ZstDOzAqulx7HPJbK8Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=D7H3PadoPVYCsqeidHjLTFWbWNBwEuNF4N5S/pOybPZcMqQExPXWv+FUxyqmjafno
-	 ImLtE1zbAsI6Lrz2aYE0DTKrZU06cERsC/BJEoEP43L+XqFuMpE+VTFsqC6dYV9ApB
-	 a6/Dvbp3w0qTq3tFjnSvqYhkId5o4uiiqPX/v7do=
+	by mail.kernel.org (Postfix) with ESMTP id B126C20707
+	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:02:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YVAx23Jt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726198AbgBVFjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Feb 2020 00:39:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37930 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726053AbgBVFjH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Feb 2020 00:39:07 -0500
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9F502208C3;
-        Sat, 22 Feb 2020 05:39:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582349946;
-        bh=tstnNHhaIvRVX4ExQFdDOhN9ZstDOzAqulx7HPJbK8Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nQfM6CCgx+pVqyEwP92qBWdLJjAuuh7iZeR3ncbtvvgsiun0gVfKr9vYHUxYAxjFP
-         abj9rUQsDl68oqGY5yOTPK4sCVbNj+yNYvjFQxlcOdCuS2hCQWRqLguVjvPBGtdKF8
-         jOKekVc3QEjPSLZ+EsQDPvTSXf7tADwaIwl6OAh4=
-Date:   Fri, 21 Feb 2020 21:39:05 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v7 7/9] fscrypt: add inline encryption support
-Message-ID: <20200222053905.GC848@sol.localdomain>
-References: <20200221115050.238976-1-satyat@google.com>
- <20200221115050.238976-8-satyat@google.com>
+        id S1726310AbgBVRCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Feb 2020 12:02:10 -0500
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:37048 "EHLO
+        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726198AbgBVRCJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Feb 2020 12:02:09 -0500
+Received: by mail-pg1-f170.google.com with SMTP id z12so2673493pgl.4
+        for <linux-block@vger.kernel.org>; Sat, 22 Feb 2020 09:02:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=9bdfrL8vgJJE6beT0eW24qljrk/mrGGcMm61WERVUEc=;
+        b=YVAx23Jtk6he8xTbTGwVzZjsu3/5+hEBRHpiTFnGyhk0I5BNDNFAGj7ixUtykcImfT
+         b1iTpE5UBJ3DDBUwzf2ZJhBPuW2X4DIvJvL7pjAssdO4fY2V+usxDVfSh/hJPJHW0U/Q
+         ZqT+oOOHCyw5uwq4Yi/NRA77+NXOHiGdBBs71vBCFqDueAvc+mdw4BVN8KqO7lb7O2ov
+         vq2u9eG1MRo0527lvM8CKLIwykFF522EAAlQQd2O7ivpc7fwEJNJqFlTMRgNHAGDDkBe
+         k4VuhDO6JYo979r8EHdJUKULHrUTFxbIQRB/kVyKGz+c94WWLXCAk1lZAxxVBcjHHe0R
+         eqNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=9bdfrL8vgJJE6beT0eW24qljrk/mrGGcMm61WERVUEc=;
+        b=O+muAPBiNj2Oqe2hPsHxqHwvOPL3YwlmGLqfguMVTqyIUR0LD2wBWzjwbbPuBGEV8t
+         NPxa4mnMLGpXq6PhRuhDNfowX/K9xt1z1CyMtFUySOMaknMyzgYR+FM4ZB9tPy0+AMeG
+         QBB/ujnkoww8/YRMfFI42HNc5JQDzKk+lqCUxU26mclnlkwf+NZksyhNh+bFmv8Nn+Kf
+         YLUcFQ/+V1LBDnbLWyhqrfjyBgSV16vLbDHTW5r58ENUlTaUvmuzXnEmE5PXwPeKnI8L
+         sx4W7O0X3D/6R1AEo94lrY/hm6HkLitPveqIuF2NtdvZNko/F4vFN/k/pPGN1Hj9wPUM
+         2Yiw==
+X-Gm-Message-State: APjAAAVw8v4hKrthSkT1plQ+wGuRUAauJG1FtRQmBWFQpJ84vD//HKQH
+        1Q9oyINOw2Pq/v8VGYyNQ70pQTmLnBI=
+X-Google-Smtp-Source: APXvYqxsTZN7uoIUgZl+hw52kjC6oqk+H77lowOm7OWPP6srqhRJ6EzmFVv9hMzcS9vgQsDIS7M+Ng==
+X-Received: by 2002:a62:4e42:: with SMTP id c63mr43483047pfb.86.1582390928889;
+        Sat, 22 Feb 2020 09:02:08 -0800 (PST)
+Received: from ?IPv6:2605:e000:100e:8c61:a99e:da38:67d8:36ae? ([2605:e000:100e:8c61:a99e:da38:67d8:36ae])
+        by smtp.gmail.com with ESMTPSA id g13sm6373084pgh.82.2020.02.22.09.02.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Feb 2020 09:02:08 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.6-rc3
+Message-ID: <6afcdd61-2d0c-3059-4baf-4814c26c5885@kernel.dk>
+Date:   Sat, 22 Feb 2020 09:02:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200221115050.238976-8-satyat@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 21, 2020 at 03:50:48AM -0800, Satya Tangirala wrote:
-> diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-> index 65cb09fa6ead..7c157130c16a 100644
-> --- a/fs/crypto/keysetup.c
-> +++ b/fs/crypto/keysetup.c
-> @@ -19,6 +19,8 @@ struct fscrypt_mode fscrypt_modes[] = {
->  		.cipher_str = "xts(aes)",
->  		.keysize = 64,
->  		.ivsize = 16,
-> +		.blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_256_XTS,
-> +		.blk_crypto_dun_bytes_required = 8,
->  	},
->  	[FSCRYPT_MODE_AES_256_CTS] = {
->  		.friendly_name = "AES-256-CTS-CBC",
-> @@ -31,6 +33,8 @@ struct fscrypt_mode fscrypt_modes[] = {
->  		.cipher_str = "essiv(cbc(aes),sha256)",
->  		.keysize = 16,
->  		.ivsize = 16,
-> +		.blk_crypto_mode = BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
-> +		.blk_crypto_dun_bytes_required = 8,
->  	},
->  	[FSCRYPT_MODE_AES_128_CTS] = {
->  		.friendly_name = "AES-128-CTS-CBC",
-> @@ -43,6 +47,8 @@ struct fscrypt_mode fscrypt_modes[] = {
->  		.cipher_str = "adiantum(xchacha12,aes)",
->  		.keysize = 32,
->  		.ivsize = 32,
-> +		.blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
-> +		.blk_crypto_dun_bytes_required = 24,
->  	},
->  };
+Hi Linus,
 
-The DUN bytes required is actually determined by the IV generation method too.
-Currently fscrypt has the following combinations:
+Just a set of NVMe fixes via Keith, please pull!
 
-	AES-256-XTS: 8 bytes
-	AES-128-CBC-ESSIV: 8 bytes
-	Adiantum without DIRECT_KEY: 8 bytes
-	Adiantum with DIRECT_KEY: 24 bytes
 
-I.e., DIRECT_KEY is only allowed with Adiantum, but not required for it.
+  git://git.kernel.dk/linux-block.git block-5.6-2020-02-22
 
-So it's technically incorrect to always pass dun_bytes_required=24 for Adiantum.
 
-And it's conceivable that in the future we could add an fscrypt setting that
-uses AES-256-XTS with 16 IV bytes.  Such a setting wouldn't be usable with UFS
-inline encryption, yet the existing AES-256-XTS settings still would.
+----------------------------------------------------------------
+Andy Shevchenko (1):
+      nvme-pci: Use single IRQ vector for old Apple models
 
-So, how about instead of putting .blk_crypto_dun_bytes_required in the
-crypto_mode table, using logic like:
+Jens Axboe (1):
+      Merge branch 'nvme-5.6-rc3' of git://git.infradead.org/nvme into block-5.6
 
-	dun_bytes_required = 8;
-	if (flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY)
-		dun_bytes_required += 16;
+Keith Busch (1):
+      nvme: Fix uninitialized-variable warning
 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 3cd4fe6b845e..2331ff0464b2 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -1370,6 +1370,7 @@ extern int send_sigurg(struct fown_struct *fown);
->  #define SB_NODIRATIME	2048	/* Do not update directory access times */
->  #define SB_SILENT	32768
->  #define SB_POSIXACL	(1<<16)	/* VFS does not apply the umask */
-> +#define SB_INLINE_CRYPT	(1<<17)	/* inodes in SB use blk-crypto */
->  #define SB_KERNMOUNT	(1<<22) /* this is a kern_mount call */
->  #define SB_I_VERSION	(1<<23) /* Update inode I_version field */
->  #define SB_LAZYTIME	(1<<25) /* Update the on-disk [acm]times lazily */
+Logan Gunthorpe (1):
+      nvme-multipath: Fix memory leak with ana_log_buf
 
-This flag probably should be called "SB_INLINECRYPT" to match the mount option,
-which is "inlinecrypt" not "inline_crypt".
+Shyjumon N (1):
+      nvme/pci: Add sleep quirk for Samsung and Toshiba drives
 
-Also, the addition of this flag, along with the update to show_sb_opts() in
-fs/proc_namespace.c which I think is needed, maybe should go in a separate patch
-whose subject is prefixed with "fs: " to make it clearer to reviewers that this
-part is a VFS-level change.
+ drivers/nvme/host/core.c      |  2 +-
+ drivers/nvme/host/multipath.c |  1 +
+ drivers/nvme/host/pci.c       | 15 ++++++++++++++-
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
-- Eric
+-- 
+Jens Axboe
+
