@@ -7,63 +7,66 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2721C35671
-	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA48C35666
+	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B126C20707
-	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 650FE20702
+	for <linux-block@archiver.kernel.org>; Sat, 22 Feb 2020 17:03:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YVAx23Jt"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yXogiE0S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbgBVRCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Feb 2020 12:02:10 -0500
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:37048 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726198AbgBVRCJ (ORCPT
+        id S1726788AbgBVRDF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Feb 2020 12:03:05 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36677 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726767AbgBVRDE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Feb 2020 12:02:09 -0500
-Received: by mail-pg1-f170.google.com with SMTP id z12so2673493pgl.4
-        for <linux-block@vger.kernel.org>; Sat, 22 Feb 2020 09:02:09 -0800 (PST)
+        Sat, 22 Feb 2020 12:03:04 -0500
+Received: by mail-pf1-f195.google.com with SMTP id 185so2992997pfv.3
+        for <linux-block@vger.kernel.org>; Sat, 22 Feb 2020 09:03:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=9bdfrL8vgJJE6beT0eW24qljrk/mrGGcMm61WERVUEc=;
-        b=YVAx23Jtk6he8xTbTGwVzZjsu3/5+hEBRHpiTFnGyhk0I5BNDNFAGj7ixUtykcImfT
-         b1iTpE5UBJ3DDBUwzf2ZJhBPuW2X4DIvJvL7pjAssdO4fY2V+usxDVfSh/hJPJHW0U/Q
-         ZqT+oOOHCyw5uwq4Yi/NRA77+NXOHiGdBBs71vBCFqDueAvc+mdw4BVN8KqO7lb7O2ov
-         vq2u9eG1MRo0527lvM8CKLIwykFF522EAAlQQd2O7ivpc7fwEJNJqFlTMRgNHAGDDkBe
-         k4VuhDO6JYo979r8EHdJUKULHrUTFxbIQRB/kVyKGz+c94WWLXCAk1lZAxxVBcjHHe0R
-         eqNw==
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kF8JhkX2HWh1Npv57QwkjDRzaCi9+na52tWfqhkE7eM=;
+        b=yXogiE0SyCnqpPyHUdgH3qNUQvWA0UjkyFFsOx9WPdqvnhVYAnnOaCfjnIr6CRKj17
+         q+hwkaEVuy/PdBYFtKgc04sb7fJxOn+7iC5jtO0nFyxJ3/KLyJYrWXQxzlukqS4GPvYm
+         hBmQo4V2dWMdhSgi9JhcqIs9/vdNLlCfaW6AiR6XRs5Gu6twTl1pUmcwPU+3gM+F4n2P
+         IRGDZj0M7u7hr3bfqxFtWa3m10v5RbwM757eyqqCGX1hrddvniCFLgdUYcF1jO1OYS69
+         VfCrsrs8LX4+xgO2mpU/K9e23kRXvBU6CnFgegb3GMT7etXwZUmP2kZ2lgQQ047s/6EK
+         4oBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=9bdfrL8vgJJE6beT0eW24qljrk/mrGGcMm61WERVUEc=;
-        b=O+muAPBiNj2Oqe2hPsHxqHwvOPL3YwlmGLqfguMVTqyIUR0LD2wBWzjwbbPuBGEV8t
-         NPxa4mnMLGpXq6PhRuhDNfowX/K9xt1z1CyMtFUySOMaknMyzgYR+FM4ZB9tPy0+AMeG
-         QBB/ujnkoww8/YRMfFI42HNc5JQDzKk+lqCUxU26mclnlkwf+NZksyhNh+bFmv8Nn+Kf
-         YLUcFQ/+V1LBDnbLWyhqrfjyBgSV16vLbDHTW5r58ENUlTaUvmuzXnEmE5PXwPeKnI8L
-         sx4W7O0X3D/6R1AEo94lrY/hm6HkLitPveqIuF2NtdvZNko/F4vFN/k/pPGN1Hj9wPUM
-         2Yiw==
-X-Gm-Message-State: APjAAAVw8v4hKrthSkT1plQ+wGuRUAauJG1FtRQmBWFQpJ84vD//HKQH
-        1Q9oyINOw2Pq/v8VGYyNQ70pQTmLnBI=
-X-Google-Smtp-Source: APXvYqxsTZN7uoIUgZl+hw52kjC6oqk+H77lowOm7OWPP6srqhRJ6EzmFVv9hMzcS9vgQsDIS7M+Ng==
-X-Received: by 2002:a62:4e42:: with SMTP id c63mr43483047pfb.86.1582390928889;
-        Sat, 22 Feb 2020 09:02:08 -0800 (PST)
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kF8JhkX2HWh1Npv57QwkjDRzaCi9+na52tWfqhkE7eM=;
+        b=plGKjuynttvBq4cQfo/0ZdCxzwQ577xg5DTpJpCA4gmL4pevtXw1cG3ayGA7SHY1l2
+         4tm2GKhV6GRtqnzSKdKhpSf79VWr6v3O8iZ7SIlCYvEDv9hkaMnpkPIt8sS1a5hkmkJD
+         JAHU0JDC4ppA33vhrMrnCsWa56VZeF7lAQqG4BRf3UOeUAQSq5frNOKPI1XKmqURrcKn
+         yvY8160JnCm6Gg2ChM/I0DhxMCwY2X2ZWUEiI45q90DdQG6pCAg275tHzllZtrSxYsPl
+         btcp3k36YlMCtOLKfjhe9A8MohnATGqAfm4hYtSv5Ykayp69vnQ2rxLBoCp02F++XOSr
+         P7LA==
+X-Gm-Message-State: APjAAAWIjSP7kaRuuzhId4cXyJf24feajuC9Rr0G/sdZLQHbomUMTbpR
+        zbjbrti/DrtK683qHKn8NbSe+ykiNzc=
+X-Google-Smtp-Source: APXvYqz3z8jhhPJgEAtkVhG00ujd5ZNMyCTSyhh197A8gz3DCGS88xVF2YE5VX1RcQQIK+q6Y8D1pA==
+X-Received: by 2002:a63:f757:: with SMTP id f23mr3341616pgk.223.1582390983939;
+        Sat, 22 Feb 2020 09:03:03 -0800 (PST)
 Received: from ?IPv6:2605:e000:100e:8c61:a99e:da38:67d8:36ae? ([2605:e000:100e:8c61:a99e:da38:67d8:36ae])
-        by smtp.gmail.com with ESMTPSA id g13sm6373084pgh.82.2020.02.22.09.02.08
+        by smtp.gmail.com with ESMTPSA id r3sm7045330pfg.145.2020.02.22.09.03.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Feb 2020 09:02:08 -0800 (PST)
+        Sat, 22 Feb 2020 09:03:03 -0800 (PST)
+Subject: Re: [GIT PULL] Block fixes for 5.6-rc3
+From:   Jens Axboe <axboe@kernel.dk>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.6-rc3
-Message-ID: <6afcdd61-2d0c-3059-4baf-4814c26c5885@kernel.dk>
-Date:   Sat, 22 Feb 2020 09:02:06 -0800
+References: <6afcdd61-2d0c-3059-4baf-4814c26c5885@kernel.dk>
+Message-ID: <27c2d71a-948b-0333-8a81-bc7f8cedac0f@kernel.dk>
+Date:   Sat, 22 Feb 2020 09:03:01 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <6afcdd61-2d0c-3059-4baf-4814c26c5885@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,34 +75,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2/22/20 10:02 AM, Jens Axboe wrote:
+> Hi Linus,
+> 
+> Just a set of NVMe fixes via Keith, please pull!
+> 
+> 
+>   git://git.kernel.dk/linux-block.git block-5.6-2020-02-22
 
-Just a set of NVMe fixes via Keith, please pull!
+Forgot to push the tag, right pull URL is:
 
-
-  git://git.kernel.dk/linux-block.git block-5.6-2020-02-22
-
-
-----------------------------------------------------------------
-Andy Shevchenko (1):
-      nvme-pci: Use single IRQ vector for old Apple models
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.6-rc3' of git://git.infradead.org/nvme into block-5.6
-
-Keith Busch (1):
-      nvme: Fix uninitialized-variable warning
-
-Logan Gunthorpe (1):
-      nvme-multipath: Fix memory leak with ana_log_buf
-
-Shyjumon N (1):
-      nvme/pci: Add sleep quirk for Samsung and Toshiba drives
-
- drivers/nvme/host/core.c      |  2 +-
- drivers/nvme/host/multipath.c |  1 +
- drivers/nvme/host/pci.c       | 15 ++++++++++++++-
- 3 files changed, 16 insertions(+), 2 deletions(-)
+git://git.kernel.dk/linux-block.git tags/block-5.6-2020-02-22
 
 -- 
 Jens Axboe
