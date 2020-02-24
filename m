@@ -2,59 +2,60 @@ Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F28FFC38BF9
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F79C38BFA
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C76AD21D7E
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 399CE24649
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEpAdGo0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPtAbAQL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728171AbgBXWSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 17:18:07 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:36072 "EHLO
+        id S1728252AbgBXWSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 17:18:13 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:36088 "EHLO
         mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbgBXWSG (ORCPT
+        with ESMTP id S1728087AbgBXWSM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 17:18:06 -0500
-Received: by mail-qk1-f195.google.com with SMTP id f3so7243960qkh.3;
-        Mon, 24 Feb 2020 14:18:05 -0800 (PST)
+        Mon, 24 Feb 2020 17:18:12 -0500
+Received: by mail-qk1-f195.google.com with SMTP id f3so7244250qkh.3;
+        Mon, 24 Feb 2020 14:18:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tuG46v7pUNtXQODDHrjX+i51IKR3M2oYfS7laFORPp4=;
-        b=XEpAdGo026I77uzxt7/HRuwG0Z3ke5/JatppxUYtFyVC7CZO/badnU2tLHdHpc7SQs
-         LxRFS9iknH4NyfX/AQqvLkzYm0urksQlsKHuN5mQwQ2OSRx8CermDM7iWC9OTgoj7LDw
-         qpOIhqv5qlSSt4FWsAmR/8ZEEwtKaLN9TECZ6IGCtzzy+ulUSUz2nw1DP1/DSnxY5EcI
-         4hBqe8dOgP+t95iSSDy1aS67ojRZrqZiTQFfAFBxWBE1AayChECN+sXvulVRYglTIkEq
-         wzdtBxOaWYMUH+YEG9gFBXdZF41ySIe+aKtyt/pXvBIaw4SBHmwq0f9riXNn4n3sb5BN
-         Tc9w==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=SCkGRqTJz70QV81Hpnays5VS0skwnz1lHvPTyvLahTQ=;
+        b=LPtAbAQL+o6zGkxQYVl6oUm314BGitf+8dwHRfBTwvX2vCIWMWsdxtAx6cO5EURiDw
+         hT86AELE/sWFsqn9UE2P89uSDbn1Pcd+L92hHaxnAInur0nmUwg1wBcQ495+4XM5EjC1
+         tO9EoQDeJhaVKrF0wydjSdqi6PRYB+QUTgmBr899l6OOHs9b1EiWl6VS8He+h2WW/9G7
+         tWhj3S5Fw0ZbWtgq6sa+QVDF1vnINI+i2RL1yrpk2XdzXISlUSDia42BCLI6PAhbCocY
+         5S9Qq1UTq0TgT5HKK7tcjG32nutDmkHKGgw24VRqDVYre0dFT/dxZMP95KgmYJQxLARY
+         5CWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tuG46v7pUNtXQODDHrjX+i51IKR3M2oYfS7laFORPp4=;
-        b=AKTSMEWnoobCuDjZSE4A0lYqFEBWrpl927laELkCQ55HMteDvi8eVJL6rCBQhGtRM0
-         GZFjAyTONRvYIw6xZgMQ72AEuaT0BUBxz3MOBgUX9sFlj4CgInic/KUQsAyXExdk4VoS
-         46A75s9RG27vC1SMB59n8/zWV7G/ZqHkXKyVI+hWom6NVPbgN1GD3vHSoHlmrN5MFUzH
-         jYWGdxWy5YOU26ggD8rZ0tO5Uc2Vp521bQrsXjksL1/ebfRlLbM9+zWdxYg+Fa4Xj5VA
-         CFHe/Sto5nxr5LuxE9polZVxHEnKx3+JRYXttSZHujvzHEWdtcUL5b9vTA9bF8iy7tex
-         68nQ==
-X-Gm-Message-State: APjAAAXS+l7kOjWG1Sufjh5Xdri3ubZMLKvkfXX9y0z3Cni5OJVLK21D
-        tMVpBwbDZ0IYtkfK8oVf7Zs=
-X-Google-Smtp-Source: APXvYqwuPk7+hhjm59kepkZOFZVJxYndmI2m8lWGURnJAjQVfx6w4pZF1QXH2n28q2DSmYnrMolx/w==
-X-Received: by 2002:a37:7746:: with SMTP id s67mr51588255qkc.127.1582582684427;
-        Mon, 24 Feb 2020 14:18:04 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=SCkGRqTJz70QV81Hpnays5VS0skwnz1lHvPTyvLahTQ=;
+        b=RfvgqaFvtaXsK80Z+Om2oUpYC6NwNY3dFPge0YEkTW8TaQ+t2530jtpHzyLetjHvPB
+         2+IsNtW+6Ybc5c2Fnn4FMybqUsp12lD8bmSg07RGwGX8AC4XbWYF9Rs4RGTh4m/acuYm
+         Jk6hwxcsYzKzZJZtBe9LLRJwMPc388rjpv7kKZkHzcGzno97rSGzp48HWyVPVL524M+G
+         xzXyj+vdMNx7vap4MtMz/6rOszPqB6z5KWg8KwlMn9xnmJ6PhoVjFfNEVQIJY2JQ1ROK
+         p7LXgxIoXZAHeMBStxQwzL5P5ifDgnUKxgxqp11esZISGrXOGAOxrFEw4wpwwk09PzVk
+         /50w==
+X-Gm-Message-State: APjAAAVqL8bALWaNpmeqKLcWetTsM6BhAkeVKXKk3tMzIbw7enGB6MRA
+        GxB+VtdJn3hej5KJZetSGd0=
+X-Google-Smtp-Source: APXvYqxWDwQIhlfPU7vYI8DHfzyLzFKyJd3oBZ1Xvj/9j0Xcen+L3F9yigwUtJlebcEkS8YmknFljQ==
+X-Received: by 2002:a37:e0d:: with SMTP id 13mr36331326qko.145.1582582691321;
+        Mon, 24 Feb 2020 14:18:11 -0800 (PST)
 Received: from dschatzberg-fedora-PC0Y6AEN.thefacebook.com ([2620:10d:c091:500::2:b19b])
-        by smtp.gmail.com with ESMTPSA id o17sm6648870qtj.80.2020.02.24.14.18.02
+        by smtp.gmail.com with ESMTPSA id o17sm6648870qtj.80.2020.02.24.14.18.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 14:18:03 -0800 (PST)
+        Mon, 24 Feb 2020 14:18:10 -0800 (PST)
 From:   Dan Schatzberg <schatzberg.dan@gmail.com>
 Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
@@ -73,10 +74,12 @@ Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
         linux-mm@kvack.org (open list:CONTROL GROUP - MEMORY RESOURCE
         CONTROLLER (MEMCG))
-Subject: [PATCH v3 0/3] Charge loop device i/o to issuing cgroup
-Date:   Mon, 24 Feb 2020 17:17:44 -0500
-Message-Id: <cover.1582581887.git.schatzberg.dan@gmail.com>
+Subject: [PATCH v3 2/3] mm: Charge active memcg when no mm is set
+Date:   Mon, 24 Feb 2020 17:17:46 -0500
+Message-Id: <4456276af198412b2d41cd09d246cd20e0c6d22a.1582581887.git.schatzberg.dan@gmail.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <cover.1582581887.git.schatzberg.dan@gmail.com>
+References: <cover.1582581887.git.schatzberg.dan@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 To:     unlisted-recipients:; (no To-header on input)
@@ -85,92 +88,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Changes since V3:
+memalloc_use_memcg() worked for kernel allocations but was silently
+ignored for user pages.
 
-* Fix race on loop device destruction and deferred worker cleanup
-* Ensure charge on shmem_swapin_page works just like getpage
-* Minor style changes
+This patch establishes a precedence order for who gets charged:
 
-Changes since V2:
+1. If there is a memcg associated with the page already, that memcg is
+   charged. This happens during swapin.
 
-* Deferred destruction of workqueue items so in the common case there
-  is no allocation needed
+2. If an explicit mm is passed, mm->memcg is charged. This happens
+   during page faults, which can be triggered in remote VMs (eg gup).
 
-Changes since V1:
+3. Otherwise consult the current process context. If it has configured
+   a current->active_memcg, use that. Otherwise, current->mm->memcg.
 
-* Split out and reordered patches so cgroup charging changes are
-  separate from kworker -> workqueue change
+Previously, if a NULL mm was passed to mem_cgroup_try_charge (case 3) it
+would always charge the root cgroup. Now it looks up the current
+active_memcg first (falling back to charging the root cgroup if not
+set).
 
-* Add mem_css to struct loop_cmd to simplify logic
+Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Chris Down <chris@chrisdown.name>
+Reviewed-by: Shakeel Butt <shakeelb@google.com>
+Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+---
+ mm/memcontrol.c | 11 ++++++++---
+ mm/shmem.c      |  4 ++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-The loop device runs all i/o to the backing file on a separate kworker
-thread which results in all i/o being charged to the root cgroup. This
-allows a loop device to be used to trivially bypass resource limits
-and other policy. This patch series fixes this gap in accounting.
-
-A simple script to demonstrate this behavior on cgroupv2 machine:
-
-'''
-#!/bin/bash
-set -e
-
-CGROUP=/sys/fs/cgroup/test.slice
-LOOP_DEV=/dev/loop0
-
-if [[ ! -d $CGROUP ]]
-then
-    sudo mkdir $CGROUP
-fi
-
-grep oom_kill $CGROUP/memory.events
-
-# Set a memory limit, write more than that limit to tmpfs -> OOM kill
-sudo unshare -m bash -c "
-echo \$\$ > $CGROUP/cgroup.procs;
-echo 0 > $CGROUP/memory.swap.max;
-echo 64M > $CGROUP/memory.max;
-mount -t tmpfs -o size=512m tmpfs /tmp;
-dd if=/dev/zero of=/tmp/file bs=1M count=256" || true
-
-grep oom_kill $CGROUP/memory.events
-
-# Set a memory limit, write more than that limit through loopback
-# device -> no OOM kill
-sudo unshare -m bash -c "
-echo \$\$ > $CGROUP/cgroup.procs;
-echo 0 > $CGROUP/memory.swap.max;
-echo 64M > $CGROUP/memory.max;
-mount -t tmpfs -o size=512m tmpfs /tmp;
-truncate -s 512m /tmp/backing_file
-losetup $LOOP_DEV /tmp/backing_file
-dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
-losetup -D $LOOP_DEV" || true
-
-grep oom_kill $CGROUP/memory.events
-'''
-
-Naively charging cgroups could result in priority inversions through
-the single kworker thread in the case where multiple cgroups are
-reading/writing to the same loop device. This patch series does some
-minor modification to the loop driver so that each cgroup can make
-forward progress independently to avoid this inversion.
-
-With this patch series applied, the above script triggers OOM kills
-when writing through the loop device as expected.
-
-Dan Schatzberg (3):
-  loop: Use worker per cgroup instead of kworker
-  mm: Charge active memcg when no mm is set
-  loop: Charge i/o to mem and blk cg
-
- drivers/block/loop.c       | 246 +++++++++++++++++++++++++++++++------
- drivers/block/loop.h       |  14 ++-
- include/linux/memcontrol.h |   6 +
- kernel/cgroup/cgroup.c     |   1 +
- mm/memcontrol.c            |  11 +-
- mm/shmem.c                 |   4 +-
- 6 files changed, 235 insertions(+), 47 deletions(-)
-
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index d09776cd6e10..222e4aac0c85 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -6319,7 +6319,8 @@ enum mem_cgroup_protection mem_cgroup_protected(struct mem_cgroup *root,
+  * @compound: charge the page as compound or small page
+  *
+  * Try to charge @page to the memcg that @mm belongs to, reclaiming
+- * pages according to @gfp_mask if necessary.
++ * pages according to @gfp_mask if necessary. If @mm is NULL, try to
++ * charge to the active memcg.
+  *
+  * Returns 0 on success, with *@memcgp pointing to the charged memcg.
+  * Otherwise, an error code is returned.
+@@ -6363,8 +6364,12 @@ int mem_cgroup_try_charge(struct page *page, struct mm_struct *mm,
+ 		}
+ 	}
+ 
+-	if (!memcg)
+-		memcg = get_mem_cgroup_from_mm(mm);
++	if (!memcg) {
++		if (!mm)
++			memcg = get_mem_cgroup_from_current();
++		else
++			memcg = get_mem_cgroup_from_mm(mm);
++	}
+ 
+ 	ret = try_charge(memcg, gfp_mask, nr_pages);
+ 
+diff --git a/mm/shmem.c b/mm/shmem.c
+index c8f7540ef048..8664c97851f2 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -1631,7 +1631,7 @@ static int shmem_swapin_page(struct inode *inode, pgoff_t index,
+ {
+ 	struct address_space *mapping = inode->i_mapping;
+ 	struct shmem_inode_info *info = SHMEM_I(inode);
+-	struct mm_struct *charge_mm = vma ? vma->vm_mm : current->mm;
++	struct mm_struct *charge_mm = vma ? vma->vm_mm : NULL;
+ 	struct mem_cgroup *memcg;
+ 	struct page *page;
+ 	swp_entry_t swap;
+@@ -1766,7 +1766,7 @@ static int shmem_getpage_gfp(struct inode *inode, pgoff_t index,
+ 	}
+ 
+ 	sbinfo = SHMEM_SB(inode->i_sb);
+-	charge_mm = vma ? vma->vm_mm : current->mm;
++	charge_mm = vma ? vma->vm_mm : NULL;
+ 
+ 	page = find_lock_entry(mapping, index);
+ 	if (xa_is_value(page)) {
 -- 
 2.17.1
 
