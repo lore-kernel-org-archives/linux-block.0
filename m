@@ -2,113 +2,112 @@ Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60863C11D2F
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 16:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00866C11D2F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 16:40:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 354392080D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 16:33:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6E4C21556
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 16:40:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arQmCp17"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oNY2pE6b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727746AbgBXQd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 11:33:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54878 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727673AbgBXQd5 (ORCPT
+        id S1727426AbgBXQkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 11:40:15 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:35673 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727160AbgBXQkO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 11:33:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582562036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5+HqvnuYHetNq0Tag+VCE9fiZvP0g50u+wKBNq+GatA=;
-        b=arQmCp17B/dZTVXyFzAWFOjbaEXKQgvBpoZiqnccfUhqg8/dm4aF2IoyKmWOnoxyIN/4Hr
-        zbmTBWjOTRIfzQE8/MolLjKgi/IsFNr5BscN534yy1oNLkII4oJNv9z0apBpNLVuDvJ8+N
-        GZcPmmQI0ag5ElshYhEDODRWiQJAXo4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-_Vnof5yyNVuKsYY80tP8XQ-1; Mon, 24 Feb 2020 11:33:52 -0500
-X-MC-Unique: _Vnof5yyNVuKsYY80tP8XQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A37C107BAAA;
-        Mon, 24 Feb 2020 16:33:49 +0000 (UTC)
-Received: from ws.net.home (ovpn-204-202.brq.redhat.com [10.40.204.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C91E5D9E5;
-        Mon, 24 Feb 2020 16:33:45 +0000 (UTC)
-Date:   Mon, 24 Feb 2020 17:33:42 +0100
-From:   Karel Zak <kzak@redhat.com>
-To:     Stephen Warren <swarren@wwwdotorg.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Colin Cross <ccross@android.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>, linux-efi@vger.kernel.org,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] partitions/efi: Add 'gpt_sector' kernel cmdline
- parameter
-Message-ID: <20200224163342.d4acf224b56celup@ws.net.home>
-References: <20200219162339.16192-1-digetx@gmail.com>
- <20200219162738.GA10644@infradead.org>
- <f9e41108-7811-0deb-6977-be0f60e23b52@wwwdotorg.org>
+        Mon, 24 Feb 2020 11:40:14 -0500
+Received: by mail-il1-f195.google.com with SMTP id g12so8263806ild.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2020 08:40:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lIEGN7rDHGU+KfgWQjfUP7OUuyyUqLxOvYnNG3e/4Ik=;
+        b=oNY2pE6bCSISi6D2LFYDQPeJ/3RxCsmiru6s3X2PF8+pWyqdt7TTSBxjn2qNTejnF8
+         6Zycp2/akRa4PMxdjn8Hpg87bMxG4TNus1DlfKoUGE7rE6zcT/RJwd1+2DCPknFcVWWx
+         xGZ19GtHiCMljwBGC85gR8ZFJqOTjskoPbKsV6SIn6pK2CG8TTmPqx4/Dh5fsMhlEMCL
+         kX11nKT0ES0zHHWSRWZZJ3IkI1yUW6DfrS0Qv81vZgDbS3VGAO/hjf+9J/VFwbd0Hkcp
+         BhgpYtNuVkFwwHFtEXRH+yJA1v8JcjOjIXnZByQHWdB3r8M7XMFqLk8CXKS4cfaRr5KI
+         kK+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lIEGN7rDHGU+KfgWQjfUP7OUuyyUqLxOvYnNG3e/4Ik=;
+        b=NUtgsmIY5UYUIhm2sPwudc6SJCyOSfVfTZfmmiNGFiLwjCiDCtJ20mU3sSJd1ZuFS4
+         VURYDqwc68N6dxEJuZsgCV0xhlTJkexjTq1qMXRJ2cqD7uQNdnBiSZvCgvrkPlCi+9ic
+         GGsBOw1EJbfp45BMAOtD47XoLP9WGBnnO8ILRGE/3aa3l4eBRvzLOtBC1E7juEGMQl7E
+         1cbmcOuCmImHl+eSGsLZX51vgmI1ExPPiOR0sUESUviFT+MazTjPGfGul1Eod8N3RQLp
+         oyauMmSjlzBlVJGxfJ6RetmUXDD1yudmccwZpVTmxxmb9Swake/JE5ewW2MIuWcWmu5a
+         5ITg==
+X-Gm-Message-State: APjAAAWmWKJ/tp94Ve+jijNZmaXf97phzdSzoOpS3CaDEPg7VvLK6yZe
+        5/44AzFQP8jyfV7ersy6ssffWZa800w=
+X-Google-Smtp-Source: APXvYqw67ZTeubZhQ/BkGlIL1i5RL2SebkgEAuEpPkaMLB0jIuq8Ci3KzcUHsLBiX3crsgmuDSv2qw==
+X-Received: by 2002:a92:d185:: with SMTP id z5mr64684924ilz.132.1582562414272;
+        Mon, 24 Feb 2020 08:40:14 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o6sm4466620ilm.74.2020.02.24.08.40.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Feb 2020 08:40:13 -0800 (PST)
+Subject: Re: [PATCH] block/bio-integrity: simplify the way of calculate
+ nr_pages
+To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com
+References: <20200224131258.18156-1-bob.liu@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2116fbd7-58d4-6cba-2d37-b12a9138f546@kernel.dk>
+Date:   Mon, 24 Feb 2020 09:40:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f9e41108-7811-0deb-6977-be0f60e23b52@wwwdotorg.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200224131258.18156-1-bob.liu@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 09:59:54AM -0700, Stephen Warren wrote:
-> On 2/19/20 9:27 AM, Christoph Hellwig wrote:
-> > On Wed, Feb 19, 2020 at 07:23:39PM +0300, Dmitry Osipenko wrote:
-> > > The gpt_sector=<sector> causes the GPT partition search to look at the
-> > > specified sector for a valid GPT header if the GPT is not found at the
-> > > beginning or the end of block device.
-> > > 
-> > > In particular this is needed for NVIDIA Tegra consumer-grade Android
-> > > devices in order to make them usable with the upstream kernel because
-> > > these devices use a proprietary / closed-source partition table format
-> > > for the EMMC and it's impossible to change the partition's format. Luckily
-> > > there is a GPT table in addition to the proprietary table, which is placed
-> > > in uncommon location of the EMMC storage and bootloader passes the
-> > > location to kernel using "gpt gpt_sector=<sector>" cmdline parameters.
-> > > 
-> > > This patch is based on the original work done by Colin Cross for the
-> > > downstream Android kernel.
-> > 
-> > I don't think a magic command line is the way to go.  The best would be
-> > to reverse-engineer the proprietary partition table format.  If that is
-> > too hard we can at least key off the odd GPT location based of it's
-> > magic number.
+On 2/24/20 6:12 AM, Bob Liu wrote:
+> Remove unnecessary start/end variables.
+> 
+> Signed-off-by: Bob Liu <bob.liu@oracle.com>
+> ---
+>  block/bio-integrity.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index bf62c25..575df98 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -202,7 +202,6 @@ bool bio_integrity_prep(struct bio *bio)
+>  	struct blk_integrity *bi = blk_get_integrity(bio->bi_disk);
+>  	struct request_queue *q = bio->bi_disk->queue;
+>  	void *buf;
+> -	unsigned long start, end;
+>  	unsigned int len, nr_pages;
+>  	unsigned int bytes, offset, i;
+>  	unsigned int intervals;
+> @@ -241,9 +240,7 @@ bool bio_integrity_prep(struct bio *bio)
+>  		goto err_end_io;
+>  	}
+>  
+> -	end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> -	start = ((unsigned long) buf) >> PAGE_SHIFT;
+> -	nr_pages = end - start;
+> +	nr_pages = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
 
- +1
-
-> I thought that the backup GPT was always present in the standard location;
-
-If they have proprietary stuff on begin of the device and valid backup
-GPT at the end of the device then designer of this junk is crazy, because
-many GPT fdisk-like tools will try to recover from the backup header and 
-overwrite the unknown (invalid) stuff at the begin of the device...
-
-    Karel
-
+This is incorrect if you straddle a page boundary, the existing code is
+correct.
 
 -- 
- Karel Zak  <kzak@redhat.com>
- http://karelzak.blogspot.com
+Jens Axboe
 
