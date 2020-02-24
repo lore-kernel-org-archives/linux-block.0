@@ -2,137 +2,163 @@ Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDF4C35671
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 11:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E29AC11D2F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 11:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 412E02082F
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 11:31:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A61B2082F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 11:38:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A1zyTgOu";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Q2igZOrl"
+	dkim=pass (2048-bit key) header.d=inango-systems.com header.i=@inango-systems.com header.b="MhAaKCxK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbgBXLbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 06:31:36 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:30252 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727240AbgBXLbg (ORCPT
+        id S1727425AbgBXLin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 06:38:43 -0500
+Received: from mail.inango-systems.com ([178.238.230.57]:52694 "EHLO
+        mail.inango-sw.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbgBXLin (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 06:31:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1582543895; x=1614079895;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=N5vrQDbF/OQrDY4oIUK1WLAh97WGnta5GY/Jk+jMfxI=;
-  b=A1zyTgOugglkmTijQYwdtUBxqr6NpWE2TD1HGu2pBtflUt5AFzHwHVm5
-   T4Im73uU9NK2QZoM8Xc9LSlv3n3tRYzdrqTtPrgkgD6P633gQGYv/Z+oh
-   hnUKh4y1gSHTQWZ+HbOFs4+6A6Owe/C6vfuN+pkR3+V/dwySCy4DlNhjD
-   libdhexRosnKRoEoQOrcGZbJaKeC9iJsEDyerdPG22rem3xl3ancftXTV
-   tSuNP23JJGZUFnXOUBG5IjYZRETUdouPSeGRaZcRJMNSvKFZA9zC0W1bP
-   G/FZxV8B1cBlrFMQ612EMhB3bJr/fHSYatJhehx6kbn1HDDXOHALir0LE
-   w==;
-IronPort-SDR: AuFR0qHdVb9VKyVHK5zwMiGBXSIz8zjOIi7xfORzUDQkvChFsed9Cm/KWNkN32mQTqJr7iaEAZ
- ROX8xqlwqLc9A18Sjfws2VBJyF/tcTM8erNe8BDvIeFf/TcUeeshOjDD5aW51xsBIhjhfV/d4G
- O5q//6bCVPY8CVmeHAeeBlrc/BnCJE3zOqWqYubI0AvGjINxtEvgJJLrr5M9IV8qWu06EOBnTI
- csLeS199cdjTjOfNjLoTXhPG1xCIG4yoUak8a9uycO1tbL/0K+hLivNmsToQ1NMRiOmLs/1yFk
- h/o=
-X-IronPort-AV: E=Sophos;i="5.70,480,1574092800"; 
-   d="scan'208";a="238710888"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Feb 2020 19:31:35 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k26eL2kLsSpdTQ3uM0QiuExT0lObQBPvLq11uPO/S9v3Pg2zPmSBRodaMI77/K5EvvJi8RM5YXk06qoxec5F1dPLUaefWtGKG2vIX+xNRujxhyL6kjvAym3EPI+L5B59k/d3y/nD981Df6s0S/fsbFc9CSL3ut/gLUCs1OuwnLJp7Jne13hfrRnrEgXjjU8PV5O3un5ag6fVqrpiSb3S7mKa5uP7HtVCmLLSv7+UrrO2aSJRlkRSKR6li/pFW9Nviu3HjVYdEgBuCQgSc9alpBRAqHWfhv8u9rxm22stdguj7mCHTWpt6iXjLz/ak/7KkkjSGIUzxIM/ofI1854EqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N5vrQDbF/OQrDY4oIUK1WLAh97WGnta5GY/Jk+jMfxI=;
- b=lDt3w6ubJAPqDeSgVGa0auiUhPMIApdSsrRnVM3+IjXn961n7PGv1qAygg5EsAVls/eDxIfpL8ZHgqGkTufm5tBZ80EVp3FCzkr+ptIrIn+0aNWllwsvOX76oRcfeYiKuIMCF5sHs9aUOPeJ39dYWmOspNtCE8qrHnzYMSv+t0OS3wuJlCSEw3sVuGyuB43CIWot0XdYg8odlrxTSRfDSlKuPWNRAbl5IODo+RAvx8Pm6MzwP1DdUixAkQ5LiM906xS4D02yNifMxUC5v9Dxk3x94gPuqkLdqW1LC0r/OoSOVHUgaJa7Ya+eM4fd+6ECdtFTVtAJa4TR0e2jXV4q7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N5vrQDbF/OQrDY4oIUK1WLAh97WGnta5GY/Jk+jMfxI=;
- b=Q2igZOrlyUNsZSL0G+CmlpbdMlBe+nWZ837A7q3EeNkGUs2JDwHuuGzBg9+jF4aSIbbyn4QlX+kZ7K2p+rSgORdENZ2P3snQ5DEUH+Z4XFK1nI/sL7pXWNA1pI+1rOapxH4vClvkazMIUOzFkYGGS/IerBZJ/ecZWqoSr7FZp8s=
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com (2603:10b6:a03:106::21)
- by BYAPR04MB4632.namprd04.prod.outlook.com (2603:10b6:a03:13::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21; Mon, 24 Feb
- 2020 11:31:34 +0000
-Received: from BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fdf8:bd6f:b33d:c2df]) by BYAPR04MB5749.namprd04.prod.outlook.com
- ([fe80::fdf8:bd6f:b33d:c2df%3]) with mapi id 15.20.2750.021; Mon, 24 Feb 2020
- 11:31:34 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jth@kernel.org>
-Subject: Re: [PATCH v3 7/8] null_blk: Handle null_add_dev() failures properly
-Thread-Topic: [PATCH v3 7/8] null_blk: Handle null_add_dev() failures properly
-Thread-Index: AQHV6GY9vGIf+Ftcy02c9olu45CAZA==
-Date:   Mon, 24 Feb 2020 11:31:34 +0000
-Message-ID: <BYAPR04MB57498BB6E240CA5336F57C3E86EC0@BYAPR04MB5749.namprd04.prod.outlook.com>
-References: <20200221032243.9708-1-bvanassche@acm.org>
- <20200221032243.9708-8-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: f1f8de82-80e7-4704-42aa-08d7b91d1aa9
-x-ms-traffictypediagnostic: BYAPR04MB4632:
-x-microsoft-antispam-prvs: <BYAPR04MB46327A848F3A9949476DB4B786EC0@BYAPR04MB4632.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-forefront-prvs: 032334F434
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(366004)(136003)(396003)(346002)(39860400002)(189003)(199004)(86362001)(55016002)(4326008)(66556008)(66446008)(66946007)(64756008)(4744005)(5660300002)(54906003)(110136005)(316002)(66476007)(2906002)(9686003)(76116006)(52536014)(186003)(478600001)(33656002)(81156014)(8676002)(81166006)(71200400001)(8936002)(6506007)(53546011)(26005)(7696005);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4632;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /N3B+fY25vGWUS6vJIlfV7RQFycFGLMhF1Vu+LkWeAd9SwQicgd95IAFMG8VqNkkoaqouldr3DcHsLxSrMD95wHw50WNjZcdmcrZQQ+vGdzR9TAYDgtoW5xCHOsBe/UOemuloLD4GP2FizIitdR5YXjdqsiVsVdkpjCDqV5h5JR3VpScC9SQIMeTgFt4V39tH8Uy/2aYkGGmfUuA3mqYD+d8Rvg1iCLokhXEZj4PTjyK+s7PdB3T12Xplot9S8ceRPIkHiuS1L/4g+tU1tyH7Rv7X555Jou7t9566aLxp/pISwY5iTbo4e3QM+nvjxPWJNXue9+/3A+01KAg4KqMk6elVDQiofiZNjavGzhRwIaydIJdIZE+BHh3XqjzzYKydS8hvyfZC499GrA+0F10v/EFFaQ7dIt4mUZczxhlaNfnFQ20WvjSlZF+EashkFNy
-x-ms-exchange-antispam-messagedata: auV1Fsuxy6KA31tkt3a+4muTIw4WGbwVLy57SFMaXaHpr9y6qfg7jjgMzlfpR9BwUge0Je8n1m4oFaJzmTWubbBWGtjdzSItsZZVyKfcJEBDAD/LD+Pvn1l5hmIuh+Ql/QfuqDJr4DF4gH5SXiPzag==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 24 Feb 2020 06:38:43 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id C89711080215;
+        Mon, 24 Feb 2020 13:38:40 +0200 (IST)
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id Tk_QqCuKFQR9; Mon, 24 Feb 2020 13:38:40 +0200 (IST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.inango-sw.com (Postfix) with ESMTP id D147B10808D5;
+        Mon, 24 Feb 2020 13:38:39 +0200 (IST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.inango-sw.com D147B10808D5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inango-systems.com;
+        s=45A440E0-D841-11E8-B985-5FCC721607E0; t=1582544319;
+        bh=+tskScq4uIA9/TPrFKSW1RmSTzCHD1HXtfjqxrFsbFE=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=MhAaKCxKw3wcjYk2jSTLQEqlUfJjL0pDFFhUxpYohYorUAybcha+kbxcRw3jeMCkH
+         CJoZ2PVhyqs/Gss/Dqf0nH3u+4Sbs9kog60cuP3O5kSYBLJr/rJBKoGYPWfodQ1/G+
+         Km34EfwPHjpqI+52fz4LUVu7qHh2yWG9ejCE6TPTKzM3CzOTwNz3gfze14GgLWWcGW
+         /e1+ui1AdXK1rHtMAjPfuwZOSOVDE3T9AtxSFHb9EH88PfM8dgnH2NqdO28srur5hI
+         KJaW70RSa9HuivPsaoJyoATUvgN60y/Gscqly6wsbyPPOG/yrgkP1X5ri8IpPmwNtK
+         xvp34tyPd6s3Q==
+X-Virus-Scanned: amavisd-new at inango-sw.com
+Received: from mail.inango-sw.com ([127.0.0.1])
+        by localhost (mail.inango-sw.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 6d9Agr_Au4KF; Mon, 24 Feb 2020 13:38:39 +0200 (IST)
+Received: from mail.inango-sw.com (mail.inango-sw.com [172.17.220.3])
+        by mail.inango-sw.com (Postfix) with ESMTP id A834F1080215;
+        Mon, 24 Feb 2020 13:38:39 +0200 (IST)
+Date:   Mon, 24 Feb 2020 13:38:39 +0200 (IST)
+From:   Nikolai Merinov <n.merinov@inango-systems.com>
+To:     hch <hch@infradead.org>
+Cc:     Davidlohr Bueso <dave@stgolabs.net>, Jens Axboe <axboe@kernel.dk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Message-ID: <797777312.1324734.1582544319435.JavaMail.zimbra@inango-systems.com>
+In-Reply-To: <20200218185336.GA14242@infradead.org>
+References: <20181124162123.21300-1-n.merinov@inango-systems.com> <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org> <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com> <20200218185336.GA14242@infradead.org>
+Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
+ partition entry
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1f8de82-80e7-4704-42aa-08d7b91d1aa9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2020 11:31:34.7385
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: w6Hr4raOkqr8FCKH4rw99SWpDdcEV7GmNMcHvVNoEZt8kcjsbVTycTj9DrZN4K8LVYGqqpVewrtwlxaPIpyTgeAXRZbeMIBoGPeM0pz9TiM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4632
+Content-Type: multipart/mixed; 
+        boundary="----=_Part_1324732_122210119.1582544319433"
+X-Originating-IP: [172.17.220.3]
+X-Mailer: Zimbra 8.8.15_GA_3888 (ZimbraWebClient - GC80 (Linux)/8.8.15_GA_3890)
+Thread-Topic: partitions/efi: Fix partition name parsing in GUID partition entry
+Thread-Index: RHN8sBujnu07ZUv014i9wZGHW1Y/bw==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good to me.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-On 2/20/20 7:23 PM, Bart Van Assche wrote:=0A=
-> If null_add_dev() fails then null_del_dev() is called with a NULL argumen=
-t.=0A=
-> Make null_del_dev() handle this scenario correctly. This patch fixes the=
-=0A=
-> following KASAN complaint:=0A=
->=0A=
-> null-ptr-deref in null_del_dev+0x28/0x280 [null_blk]=0A=
-> Read of size 8 at addr 0000000000000000 by task find/1062=0A=
-=0A=
-=0A=
+------=_Part_1324732_122210119.1582544319433
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Hi Christoph, 
+
+> I'd rather use plain __le16 and le16_to_cpu here. Also the be 
+> variants seems to be entirely unused. 
+
+Looks like I misunderstood your comment from https://patchwork.kernel.org/patch/11309223/: 
+
+> Please add a an efi_char_from_cpu or similarly named helper 
+> to encapsulate this logic. 
+
+The "le16_to_cpu(ptes[i].partition_name[label_count])" call is the 
+full implementation of the "efi_char_from_cpu" logic. Do you want 
+to encapsulate "utf16_le_to_7bit_string" logic entirely like in
+the attached version?
+
+Regards,
+Nikolai
+
+------=_Part_1324732_122210119.1582544319433
+Content-Type: text/x-patch;
+ name=v4-0001-partitions-efi-Fix-partition-name-parsing-in-GUID.patch
+Content-Disposition: attachment;
+ filename=v4-0001-partitions-efi-Fix-partition-name-parsing-in-GUID.patch
+Content-Transfer-Encoding: base64
+
+RnJvbSA4NDJjZjIyZDZmNmY5MTg3MmJjYjA0YWM2YWJlNzc5NGZlZGUyM2ZkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWtvbGFpIE1lcmlub3YgPG4ubWVyaW5vdkBpbmFuZ28tc3lz
+dGVtcy5jb20+CkRhdGU6IFNhdCwgMjQgTm92IDIwMTggMjA6NDI6MjcgKzA1MDAKU3ViamVjdDog
+W1BBVENIIHY0XSBwYXJ0aXRpb25zL2VmaTogRml4IHBhcnRpdGlvbiBuYW1lIHBhcnNpbmcgaW4g
+R1VJRAogcGFydGl0aW9uIGVudHJ5CgpHVUlEIHBhcnRpdGlvbiBlbnRyeSBkZWZpbmVkIHRvIGhh
+dmUgYSBwYXJ0aXRpb24gbmFtZSBhcyAzNiBVVEYtMTZMRQpjb2RlIHVuaXRzLiBUaGlzIG1lYW5z
+IHRoYXQgb24gYmlnLWVuZGlhbiBwbGF0Zm9ybXMgQVNDSUkgc3ltYm9scwp3b3VsZCBiZSByZWFk
+IHdpdGggMHhYWDAwIGVmaV9jaGFyMTZfdCBjaGFyYWN0ZXIgY29kZS4gSW4gb3JkZXIgdG8KY29y
+cmVjdGx5IGV4dHJhY3QgQVNDSUkgY2hhcmFjdGVycyBmcm9tIGEgcGFydGl0aW9uIG5hbWUgZmll
+bGQgd2UKc2hvdWxkIGJlIGNvbnZlcnRlZCBmcm9tIDE2TEUgdG8gQ1BVIGFyY2hpdGVjdHVyZS4K
+ClRoZSBwcm9ibGVtIGV4aXN0cyBvbiBhbGwgYmlnIGVuZGlhbiBwbGF0Zm9ybXMuCgpTaWduZWQt
+b2ZmLWJ5OiBOaWtvbGFpIE1lcmlub3YgPG4ubWVyaW5vdkBpbmFuZ28tc3lzdGVtcy5jb20+CkZp
+eGVzOiBlZWM3ZWNmZWRlNzQgKCJnZW5oZCwgZWZpOiBhZGQgZWZpIHBhcnRpdGlvbiBtZXRhZGF0
+YSB0byBoZF9zdHJ1Y3RzIikKLS0tCiBibG9jay9wYXJ0aXRpb25zL2VmaS5jIHwgMzUgKysrKysr
+KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0KIGJsb2NrL3BhcnRpdGlvbnMvZWZpLmggfCAg
+MiArLQogMiBmaWxlcyBjaGFuZ2VkLCAyNyBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9ibG9jay9wYXJ0aXRpb25zL2VmaS5jIGIvYmxvY2svcGFydGl0aW9ucy9l
+ZmkuYwppbmRleCBkYjJmZWY3ZGZjNDcuLmQyNmEwNjU0ZDdjYSAxMDA2NDQKLS0tIGEvYmxvY2sv
+cGFydGl0aW9ucy9lZmkuYworKysgYi9ibG9jay9wYXJ0aXRpb25zL2VmaS5jCkBAIC02NTYsNiAr
+NjU2LDMwIEBAIHN0YXRpYyBpbnQgZmluZF92YWxpZF9ncHQoc3RydWN0IHBhcnNlZF9wYXJ0aXRp
+b25zICpzdGF0ZSwgZ3B0X2hlYWRlciAqKmdwdCwKICAgICAgICAgcmV0dXJuIDA7CiB9CiAKKy8q
+KgorICogdXRmMTZfbGVfdG9fN2JpdCgpOiBOYWl2ZWx5IGNvbnZlcnRzIFVURi0xNkxFIHN0cmlu
+ZyB0byA3Yml0IGNoYXJhY3RlcnMKKyAqIEBpbjogaW5wdXQgVVRGLTE2TEUgc3RyaW5nCisgKiBA
+c2l6ZTogc2l6ZSBvZiB0aGUgaW5wdXQgc3RyaW5nCisgKiBAb3V0OiBvdXRwdXQgc3RyaW5nIHB0
+ciwgc2hvdWxkIGJlIGNhcGFibGUgdG8gc3RvcmUgQHNpemUrMSBjaGFyYWN0ZXJzCisgKgorICog
+RGVzY3JpcHRpb246IENvbnZlcnRzIEBzaXplIFVURjE2LUxFIHN5bWJvbHMgZnJvbSBAaW4gc3Ry
+aW5nIHRvIDdiaXQKKyAqIGNoYXJhY3RlcnMgYW5kIHN0b3JlIHRoZW0gdG8gQG91dC4gQWRkcyB0
+cmFpbGluZyB6ZXJvIHRvIEBvdXQgYXJyYXkuCisgKi8KK3N0YXRpYyB2b2lkIHV0ZjE2X2xlX3Rv
+XzdiaXQoY29uc3QgX19sZTE2ICppbiwgdW5zaWduZWQgaW50IHNpemUsIHU4ICpvdXQpCit7CisJ
+dW5zaWduZWQgaW50IGkgPSAwOworCisJb3V0W3NpemVdID0gMDsKKwl3aGlsZSAoaSA8IHNpemUp
+IHsKKwkJdTggYyA9IGxlMTZfdG9fY3B1KGluW2ldKSAmIDB4ZmY7CisKKwkJaWYgKGMgJiYgIWlz
+cHJpbnQoYykpCisJCQljID0gJyEnOworCQlvdXRbaV0gPSBjOworCQlpKys7CisJfQorfQorCiAv
+KioKICAqIGVmaV9wYXJ0aXRpb24oc3RydWN0IHBhcnNlZF9wYXJ0aXRpb25zICpzdGF0ZSkKICAq
+IEBzdGF0ZTogZGlzayBwYXJzZWQgcGFydGl0aW9ucwpAQCAtNjkyLDcgKzcxNiw2IEBAIGludCBl
+ZmlfcGFydGl0aW9uKHN0cnVjdCBwYXJzZWRfcGFydGl0aW9ucyAqc3RhdGUpCiAKIAlmb3IgKGkg
+PSAwOyBpIDwgbGUzMl90b19jcHUoZ3B0LT5udW1fcGFydGl0aW9uX2VudHJpZXMpICYmIGkgPCBz
+dGF0ZS0+bGltaXQtMTsgaSsrKSB7CiAJCXN0cnVjdCBwYXJ0aXRpb25fbWV0YV9pbmZvICppbmZv
+OwotCQl1bnNpZ25lZCBsYWJlbF9jb3VudCA9IDA7CiAJCXVuc2lnbmVkIGxhYmVsX21heDsKIAkJ
+dTY0IHN0YXJ0ID0gbGU2NF90b19jcHUocHRlc1tpXS5zdGFydGluZ19sYmEpOwogCQl1NjQgc2l6
+ZSA9IGxlNjRfdG9fY3B1KHB0ZXNbaV0uZW5kaW5nX2xiYSkgLQpAQCAtNzEzLDE0ICs3MzYsOCBA
+QCBpbnQgZWZpX3BhcnRpdGlvbihzdHJ1Y3QgcGFyc2VkX3BhcnRpdGlvbnMgKnN0YXRlKQogCQkv
+KiBOYWl2ZWx5IGNvbnZlcnQgVVRGMTYtTEUgdG8gNyBiaXRzLiAqLwogCQlsYWJlbF9tYXggPSBt
+aW4oQVJSQVlfU0laRShpbmZvLT52b2xuYW1lKSAtIDEsCiAJCQkJQVJSQVlfU0laRShwdGVzW2ld
+LnBhcnRpdGlvbl9uYW1lKSk7Ci0JCWluZm8tPnZvbG5hbWVbbGFiZWxfbWF4XSA9IDA7Ci0JCXdo
+aWxlIChsYWJlbF9jb3VudCA8IGxhYmVsX21heCkgewotCQkJdTggYyA9IHB0ZXNbaV0ucGFydGl0
+aW9uX25hbWVbbGFiZWxfY291bnRdICYgMHhmZjsKLQkJCWlmIChjICYmICFpc3ByaW50KGMpKQot
+CQkJCWMgPSAnISc7Ci0JCQlpbmZvLT52b2xuYW1lW2xhYmVsX2NvdW50XSA9IGM7Ci0JCQlsYWJl
+bF9jb3VudCsrOwotCQl9CisJCXV0ZjE2X2xlX3RvXzdiaXQocHRlc1tpXS5wYXJ0aXRpb25fbmFt
+ZSwgbGFiZWxfbWF4LAorCQkJCSBpbmZvLT52b2xuYW1lKTsKIAkJc3RhdGUtPnBhcnRzW2kgKyAx
+XS5oYXNfaW5mbyA9IHRydWU7CiAJfQogCWtmcmVlKHB0ZXMpOwpkaWZmIC0tZ2l0IGEvYmxvY2sv
+cGFydGl0aW9ucy9lZmkuaCBiL2Jsb2NrL3BhcnRpdGlvbnMvZWZpLmgKaW5kZXggM2U4NTc2MTU3
+NTc1Li4wYjZkNWI3YmUxMTEgMTAwNjQ0Ci0tLSBhL2Jsb2NrL3BhcnRpdGlvbnMvZWZpLmgKKysr
+IGIvYmxvY2svcGFydGl0aW9ucy9lZmkuaApAQCAtODgsNyArODgsNyBAQCB0eXBlZGVmIHN0cnVj
+dCBfZ3B0X2VudHJ5IHsKIAlfX2xlNjQgc3RhcnRpbmdfbGJhOwogCV9fbGU2NCBlbmRpbmdfbGJh
+OwogCWdwdF9lbnRyeV9hdHRyaWJ1dGVzIGF0dHJpYnV0ZXM7Ci0JZWZpX2NoYXIxNl90IHBhcnRp
+dGlvbl9uYW1lWzcyIC8gc2l6ZW9mIChlZmlfY2hhcjE2X3QpXTsKKwlfX2xlMTYgcGFydGl0aW9u
+X25hbWVbNzIgLyBzaXplb2YgKF9fbGUxNildOwogfSBfX3BhY2tlZCBncHRfZW50cnk7CiAKIHR5
+cGVkZWYgc3RydWN0IF9ncHRfbWJyX3JlY29yZCB7Ci0tIAoyLjE3LjEKCg==
+------=_Part_1324732_122210119.1582544319433--
