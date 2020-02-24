@@ -2,120 +2,175 @@ Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC44C38BFA
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 21:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F28FFC38BF9
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D5DE2176D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 21:54:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582581249;
-	bh=aOO2lCKSp3VaKlzq/VAE3aJCP3FjGA4lRbfGB35tGgI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=tit45oURn+W1cCG4+ZSG/0lF79lUr/W7i2P0ReQFkqxRva3jMp2ZBV3CvlYWio+j3
-	 cX94GYlLrxDBAr/tC4LajSi2NeCApbhEZBg8vzstajcEsV4UVkdMzdg8F/Kc0NTj4k
-	 obsHLKkC1jDY01NWXyUzZyQPj9/ntgou7lp8gPSo=
+	by mail.kernel.org (Postfix) with ESMTP id C76AD21D7E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 22:18:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEpAdGo0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728228AbgBXVyI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 16:54:08 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37290 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727421AbgBXVyH (ORCPT
+        id S1728171AbgBXWSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 17:18:07 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:36072 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726651AbgBXWSG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 16:54:07 -0500
-Received: by mail-lf1-f68.google.com with SMTP id b15so7975572lfc.4
-        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2020 13:54:06 -0800 (PST)
+        Mon, 24 Feb 2020 17:18:06 -0500
+Received: by mail-qk1-f195.google.com with SMTP id f3so7243960qkh.3;
+        Mon, 24 Feb 2020 14:18:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5XuyignvH4d5GLfKgfJb+g8gkqcI95RWBR4W4WVX7AA=;
-        b=AtiEK30pYt+3beHkK87zyVbW+qDAYJlbkd0TiDCu6tlrTVZ0Twny1U+XoXYS9WKUX8
-         BpZqBNxHSI+1oBqNYdIeDY8EcwnbNkUkPmT0bLEzVPa7lfTFcBkAqimEh73dLdvyJ4uh
-         87cz/bQOr0vU6VwfEOKctFokpv/75L2FGtd3E=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tuG46v7pUNtXQODDHrjX+i51IKR3M2oYfS7laFORPp4=;
+        b=XEpAdGo026I77uzxt7/HRuwG0Z3ke5/JatppxUYtFyVC7CZO/badnU2tLHdHpc7SQs
+         LxRFS9iknH4NyfX/AQqvLkzYm0urksQlsKHuN5mQwQ2OSRx8CermDM7iWC9OTgoj7LDw
+         qpOIhqv5qlSSt4FWsAmR/8ZEEwtKaLN9TECZ6IGCtzzy+ulUSUz2nw1DP1/DSnxY5EcI
+         4hBqe8dOgP+t95iSSDy1aS67ojRZrqZiTQFfAFBxWBE1AayChECN+sXvulVRYglTIkEq
+         wzdtBxOaWYMUH+YEG9gFBXdZF41ySIe+aKtyt/pXvBIaw4SBHmwq0f9riXNn4n3sb5BN
+         Tc9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5XuyignvH4d5GLfKgfJb+g8gkqcI95RWBR4W4WVX7AA=;
-        b=q6dJUB6kKJoLpPV98sy7T1gJmah4HB7WL0s6Q/XTpUelR8lvcoIcY0+hhX4cQ5WgSQ
-         jCoQ1PSNhOYYjnYntnW0XyKdlfuxQemn/r+aaEMLsststtglT7wa0DmOckruY12BA0cq
-         4R05h3mq+GuGiP+ietSWsXSOtVtf7TuMN/EYWX6V7OwiI0Fi257OxCGXkHwshWNIRhia
-         NyauttAmHAUIksRq7ByiHnXQeyEesaEBkDt2e7m1dII7kfKueQ4eX5xR5PO2w8VxHZ7i
-         +yB3/wnTaeRBw5qAjuSNHrpkU/g8vENLlvPSMCKqnrMEq7fElYOmGemutYjFhfn3s6UM
-         uyRg==
-X-Gm-Message-State: APjAAAW1GQDrcKJX0ZOSqdjVo3niC9G4or6JmXtyNjLlBFjEVafhiPcb
-        Q192HDlqO7nuUFAJz/47haqjQq7flrM=
-X-Google-Smtp-Source: APXvYqyQbYkBxDEA5nwtdJs+n6a9ztKlgHw7vPISJShlYGOZc6VbdVGlTfnCWpLWxxlpx9plZBDjRQ==
-X-Received: by 2002:ac2:46c2:: with SMTP id p2mr11503421lfo.139.1582581244980;
-        Mon, 24 Feb 2020 13:54:04 -0800 (PST)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
-        by smtp.gmail.com with ESMTPSA id r20sm6168036lfi.91.2020.02.24.13.54.04
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2020 13:54:04 -0800 (PST)
-Received: by mail-lj1-f181.google.com with SMTP id o15so11813787ljg.6
-        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2020 13:54:04 -0800 (PST)
-X-Received: by 2002:a2e:909a:: with SMTP id l26mr30211282ljg.209.1582581243727;
- Mon, 24 Feb 2020 13:54:03 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tuG46v7pUNtXQODDHrjX+i51IKR3M2oYfS7laFORPp4=;
+        b=AKTSMEWnoobCuDjZSE4A0lYqFEBWrpl927laELkCQ55HMteDvi8eVJL6rCBQhGtRM0
+         GZFjAyTONRvYIw6xZgMQ72AEuaT0BUBxz3MOBgUX9sFlj4CgInic/KUQsAyXExdk4VoS
+         46A75s9RG27vC1SMB59n8/zWV7G/ZqHkXKyVI+hWom6NVPbgN1GD3vHSoHlmrN5MFUzH
+         jYWGdxWy5YOU26ggD8rZ0tO5Uc2Vp521bQrsXjksL1/ebfRlLbM9+zWdxYg+Fa4Xj5VA
+         CFHe/Sto5nxr5LuxE9polZVxHEnKx3+JRYXttSZHujvzHEWdtcUL5b9vTA9bF8iy7tex
+         68nQ==
+X-Gm-Message-State: APjAAAXS+l7kOjWG1Sufjh5Xdri3ubZMLKvkfXX9y0z3Cni5OJVLK21D
+        tMVpBwbDZ0IYtkfK8oVf7Zs=
+X-Google-Smtp-Source: APXvYqwuPk7+hhjm59kepkZOFZVJxYndmI2m8lWGURnJAjQVfx6w4pZF1QXH2n28q2DSmYnrMolx/w==
+X-Received: by 2002:a37:7746:: with SMTP id s67mr51588255qkc.127.1582582684427;
+        Mon, 24 Feb 2020 14:18:04 -0800 (PST)
+Received: from dschatzberg-fedora-PC0Y6AEN.thefacebook.com ([2620:10d:c091:500::2:b19b])
+        by smtp.gmail.com with ESMTPSA id o17sm6648870qtj.80.2020.02.24.14.18.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2020 14:18:03 -0800 (PST)
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list),
+        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
+        linux-mm@kvack.org (open list:CONTROL GROUP - MEMORY RESOURCE
+        CONTROLLER (MEMCG))
+Subject: [PATCH v3 0/3] Charge loop device i/o to issuing cgroup
+Date:   Mon, 24 Feb 2020 17:17:44 -0500
+Message-Id: <cover.1582581887.git.schatzberg.dan@gmail.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200224212352.8640-1-w@1wt.eu> <20200224212352.8640-2-w@1wt.eu>
-In-Reply-To: <20200224212352.8640-2-w@1wt.eu>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 24 Feb 2020 13:53:47 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
-Message-ID: <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
-Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 24, 2020 at 1:24 PM Willy Tarreau <w@1wt.eu> wrote:
->
-> Macro FDCS silently uses identifier "fdc" which may be either the
-> global one or a local one. Let's expand the macro to make this more
-> obvious.
+Changes since V3:
 
-Hmm. These macro expansions feel wrong to me.
+* Fix race on loop device destruction and deferred worker cleanup
+* Ensure charge on shmem_swapin_page works just like getpage
+* Minor style changes
 
-Or rather, they look right as a first step - and it's probably worth
-doing this just to have that "exact same code generation" step.
+Changes since V2:
 
-But I think there should be a second step (also with "exact same code
-generation") which then renames the driver-global "fdc" index as
-"current_fdc".
+* Deferred destruction of workqueue items so in the common case there
+  is no allocation needed
 
-That way you'll _really_ see when you use the global vs local ones.
-The local ones would continue to be just "fdc".
+Changes since V1:
 
-Because with just this patch, I don't think you actually get any more
-obvious whether it's the global or local "fdc" index that is used.
+* Split out and reordered patches so cgroup charging changes are
+  separate from kworker -> workqueue change
 
-So I'd like to see that second step that does the
+* Add mem_css to struct loop_cmd to simplify logic
 
-    -static int fdc;                 /* current fdc */
-    +static int current_fdc;
+The loop device runs all i/o to the backing file on a separate kworker
+thread which results in all i/o being charged to the root cgroup. This
+allows a loop device to be used to trivially bypass resource limits
+and other policy. This patch series fixes this gap in accounting.
 
-change.
+A simple script to demonstrate this behavior on cgroupv2 machine:
 
-We already call the global 'drive' variable 'current_drive', so it
-really is 'fdc' that is misnamed and ambiguous because it then has two
-different cases: the global 'fdc' and then the various shadowing local
-'fdc' variables (or function arguments).
+'''
+#!/bin/bash
+set -e
 
-Mind adding that too? Slightly less automatic, I agree, because then
-you really do have to disambiguate between the "is this the shadowed
-use of a local 'fdc'" case or the "this is the global 'fdc' use" case.
+CGROUP=/sys/fs/cgroup/test.slice
+LOOP_DEV=/dev/loop0
 
-Can coccinelle do that?
+if [[ ! -d $CGROUP ]]
+then
+    sudo mkdir $CGROUP
+fi
 
-                Linus
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit to tmpfs -> OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+dd if=/dev/zero of=/tmp/file bs=1M count=256" || true
+
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit through loopback
+# device -> no OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+truncate -s 512m /tmp/backing_file
+losetup $LOOP_DEV /tmp/backing_file
+dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
+losetup -D $LOOP_DEV" || true
+
+grep oom_kill $CGROUP/memory.events
+'''
+
+Naively charging cgroups could result in priority inversions through
+the single kworker thread in the case where multiple cgroups are
+reading/writing to the same loop device. This patch series does some
+minor modification to the loop driver so that each cgroup can make
+forward progress independently to avoid this inversion.
+
+With this patch series applied, the above script triggers OOM kills
+when writing through the loop device as expected.
+
+Dan Schatzberg (3):
+  loop: Use worker per cgroup instead of kworker
+  mm: Charge active memcg when no mm is set
+  loop: Charge i/o to mem and blk cg
+
+ drivers/block/loop.c       | 246 +++++++++++++++++++++++++++++++------
+ drivers/block/loop.h       |  14 ++-
+ include/linux/memcontrol.h |   6 +
+ kernel/cgroup/cgroup.c     |   1 +
+ mm/memcontrol.c            |  11 +-
+ mm/shmem.c                 |   4 +-
+ 6 files changed, 235 insertions(+), 47 deletions(-)
+
+-- 
+2.17.1
+
