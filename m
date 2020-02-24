@@ -8,54 +8,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA77C34031
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F46C34050
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 904CB21556
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0228021556
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:22:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ym7vmmJ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/QD2NWl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728614AbgBXXWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728602AbgBXXWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 24 Feb 2020 18:22:16 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:34453 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728575AbgBXXWO (ORCPT
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:39199 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728601AbgBXXWP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 18:22:14 -0500
-Received: by mail-lf1-f66.google.com with SMTP id l18so8158391lfc.1;
-        Mon, 24 Feb 2020 15:22:12 -0800 (PST)
+        Mon, 24 Feb 2020 18:22:15 -0500
+Received: by mail-lf1-f68.google.com with SMTP id n30so7318717lfh.6;
+        Mon, 24 Feb 2020 15:22:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=IXpxfmvhilbP5WN8bob/AjAFkA/qj/3CPWSZIMs8z6Y=;
-        b=Ym7vmmJ8qm8gK+2Wxoy8RGjsVbKgIlH7iMYNXINa2EFe43TOaXnBG18SB9AHqArHOo
-         fFhQH2ZoVcEBKpGEFhX9q/wjwN9YPd6zHoGXpF/oi01ScsWeZrlrX1oi5yCLP17x0esH
-         bNavvx1gQSaFZAzD5fUdhzOJ4kVYtZOu8zek/VAebKS3l3C+GQ0HoW/mxw2xGepJpvSL
-         dizegdTK9KrZb0Ny5dYc+uNxepw5eGi3n/lpgaluCjGMcAxqSyP7fLLYn2qVso5xYdlO
-         Kg4TtDu5K5owsT66DkGz8bj20rhJDGPmIK2AI8E5zdCfQmJJCPJPMeTfhYmnG0jKDXuM
-         lwYw==
+        bh=0WbwisyovPdHh7n4bXAVF0naVkmF9FhNybnanTU/DvE=;
+        b=L/QD2NWlOoATb3n4pe/WkpwegJ+eSQdE69qR5elj74A01FRPVQeTbbZaUvbB2T3aRK
+         XeuZrQq2UrK/jCsxi1FENcbGh3gTrieDZSgypUWGCBdPuqhJm7NkSoMFjvaFvvYy+fo5
+         CnoJ0e2ldWNZ8Z/wpoPJL64nTzvlNMVhIU9iTWlQR+4WR2u3Mv34U2Q34GkebPyLdeU3
+         16ffg4vzu8ajfSJPMmHBr3tWJKObFFiy3PtyaVQ2uhVxmXa0ZQ1zYGMiWYZHQWyobs+u
+         iSohkTigTMhiqitHrB/JWg7YD6/Q0ifjNk/uNwghpNGa/pd9p+0o+WEsiD5IN9k0Uyu8
+         ePqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IXpxfmvhilbP5WN8bob/AjAFkA/qj/3CPWSZIMs8z6Y=;
-        b=Rqd/tEUT2E/gEQZ7H9hiQgWEnUBg8pifqluDETCU6xhy8HxVe9cKoUI5LEwe80U24i
-         ShRMf0JDr3rjahYdCojCxpOWvdTHv/Ersm+RKRtKxq5/WA1NOjsnYF3UX6aF8kONwubk
-         cm+3+9MiXVzx4wmlVbP1BXpt9mLcuMwBlukJ9/4zVAyygZHUg1mQLxsgwBrXUaj/7/1Y
-         RSRXlY/2aTsa4s9NZdpa6ySe9F0jstdFNobQ/OUpvDM0mFP4dTwLmhfxIZdmm9EmeNYe
-         F/wP9cM9avhsxq1RWF43KoxPySGdTBU34RTj2AIlWaIW5cX9t0pEaRaX5I59VdRUl1gU
-         BiAw==
-X-Gm-Message-State: APjAAAVerYPur1fRIRuF3XK7MRU3GpWMPs275uQ+zq2XtEUa+JUvSxRX
-        hQRYH8pf+NBTxSk8AjOAdBo=
-X-Google-Smtp-Source: APXvYqyaSOMVAyYWLg+BwNmlN4ouHZqEywbZFRUw4YU69g0L569SWlhRcuY5w83WQV1G+snAuXD5kg==
-X-Received: by 2002:a19:8c4d:: with SMTP id i13mr28756053lfj.42.1582586531784;
-        Mon, 24 Feb 2020 15:22:11 -0800 (PST)
+        bh=0WbwisyovPdHh7n4bXAVF0naVkmF9FhNybnanTU/DvE=;
+        b=kGufi6nys0cJMsAU2tQmSLB3iPon5qNhKbUzr6CN2hbvaE1TrivaVCy1VQIMZ6ILCK
+         KWjnaFIYT7oqy2iF+yEZnJavq3prdAnKLQzgW7xqyujc4brp2YfU8oa8Ljhi6bEdJl7t
+         eIWf9yAZ+Q4luRRY5eSuncM7Y7vzni9mzx/U1dZ5vvp5/JoNnzKhDbkI2b6+eSd7KgVu
+         lCuyKtkOIA58L+yL2QK4RdQQDFT5ncY/WxVRbjsuiIVhVgwJIJ0B8IpDSci25QCjcQjz
+         EUtbKFQ+o6exGEIu2cVXGlkcbDW0q40fl00hKz87L5RniuSzf2JRkSWQxfp56MogF8t5
+         W9oA==
+X-Gm-Message-State: APjAAAW4TYekV1ECMXOh3WCUfHpEvRs6slC2ZYxmUwUy0I+P4YAIYOMn
+        ACHpAe5DYxTDp2Y69YTFU6s=
+X-Google-Smtp-Source: APXvYqxafMZRO9DsBweskGBjWJG4F055WbsYEBgXwBngwRHxDKevzJcykEixDVZfgY/3AbhgNCtnqA==
+X-Received: by 2002:ac2:5106:: with SMTP id q6mr12758402lfb.54.1582586532904;
+        Mon, 24 Feb 2020 15:22:12 -0800 (PST)
 Received: from localhost.localdomain (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
-        by smtp.gmail.com with ESMTPSA id r10sm8154071ljk.9.2020.02.24.15.22.10
+        by smtp.gmail.com with ESMTPSA id r10sm8154071ljk.9.2020.02.24.15.22.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 15:22:11 -0800 (PST)
+        Mon, 24 Feb 2020 15:22:12 -0800 (PST)
 From:   Dmitry Osipenko <digetx@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         Thierry Reding <thierry.reding@gmail.com>,
@@ -73,9 +73,9 @@ Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
         Gilles Grandou <gilles@grandou.net>,
         Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v1 1/3] mmc: core: Add raw_boot_mult field to mmc_ext_csd
-Date:   Tue, 25 Feb 2020 02:18:39 +0300
-Message-Id: <20200224231841.26550-2-digetx@gmail.com>
+Subject: [PATCH v1 2/3] mmc: block: Add mmc_bdev_to_card() helper
+Date:   Tue, 25 Feb 2020 02:18:40 +0300
+Message-Id: <20200224231841.26550-3-digetx@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20200224231841.26550-1-digetx@gmail.com>
 References: <20200224231841.26550-1-digetx@gmail.com>
@@ -86,43 +86,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to support parsing of NVIDIA Tegra Partition Table format, we
-need to know the BOOT_SIZE_MULT value of the Extended CSD register because
-NVIDIA's bootloader linearizes the boot0/boot1/main partitions into a
-single virtual space, and thus, all partition addresses are shifted by
-the size of boot0 + boot1 partitions.
+NVIDIA Tegra Partition Table takes into account MMC card's BOOT_SIZE_MULT
+parameter, and thus, the partition parser needs to retrieve that EXT_CSD
+value from the block device. This patch introduces new helper which takes
+block device for the input argument and returns corresponding MMC card.
 
 Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
 ---
- drivers/mmc/core/mmc.c   | 2 ++
- include/linux/mmc/card.h | 1 +
- 2 files changed, 3 insertions(+)
+ drivers/mmc/core/block.c | 14 ++++++++++++++
+ include/linux/mmc/card.h |  3 +++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index f6912ded652d..88e5b4224d3c 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -417,6 +417,8 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
- 		ext_csd[EXT_CSD_ERASE_TIMEOUT_MULT];
- 	card->ext_csd.raw_hc_erase_grp_size =
- 		ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE];
-+	card->ext_csd.raw_boot_mult =
-+		ext_csd[EXT_CSD_BOOT_MULT];
- 	if (card->ext_csd.rev >= 3) {
- 		u8 sa_shift = ext_csd[EXT_CSD_S_A_TIMEOUT];
- 		card->ext_csd.part_config = ext_csd[EXT_CSD_PART_CONFIG];
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 663d87924e5e..5d853450c764 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -301,6 +301,20 @@ static ssize_t force_ro_store(struct device *dev, struct device_attribute *attr,
+ 	return ret;
+ }
+ 
++struct mmc_card *mmc_bdev_to_card(struct block_device *bdev)
++{
++	struct mmc_blk_data *md;
++
++	if (bdev->bd_disk->major != MMC_BLOCK_MAJOR)
++		return NULL;
++
++	md = mmc_blk_get(bdev->bd_disk);
++	if (!md)
++		return NULL;
++
++	return md->queue.card;
++}
++
+ static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct mmc_blk_data *md = mmc_blk_get(bdev->bd_disk);
 diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
-index cf3780a6ccc4..90b1d83ce675 100644
+index 90b1d83ce675..daccb0cc25f8 100644
 --- a/include/linux/mmc/card.h
 +++ b/include/linux/mmc/card.h
-@@ -108,6 +108,7 @@ struct mmc_ext_csd {
- 	u8			raw_hc_erase_gap_size;	/* 221 */
- 	u8			raw_erase_timeout_mult;	/* 223 */
- 	u8			raw_hc_erase_grp_size;	/* 224 */
-+	u8			raw_boot_mult;		/* 226 */
- 	u8			raw_sec_trim_mult;	/* 229 */
- 	u8			raw_sec_erase_mult;	/* 230 */
- 	u8			raw_sec_feature_support;/* 231 */
+@@ -7,6 +7,7 @@
+ #ifndef LINUX_MMC_CARD_H
+ #define LINUX_MMC_CARD_H
+ 
++#include <linux/blkdev.h>
+ #include <linux/device.h>
+ #include <linux/mod_devicetable.h>
+ 
+@@ -324,4 +325,6 @@ bool mmc_card_is_blockaddr(struct mmc_card *card);
+ #define mmc_card_sd(c)		((c)->type == MMC_TYPE_SD)
+ #define mmc_card_sdio(c)	((c)->type == MMC_TYPE_SDIO)
+ 
++struct mmc_card *mmc_bdev_to_card(struct block_device *bdev);
++
+ #endif /* LINUX_MMC_CARD_H */
 -- 
 2.24.0
 
