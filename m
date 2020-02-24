@@ -2,108 +2,84 @@ Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CAE4C35671
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 13:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E45C11D2F
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 15:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CFF820828
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 13:13:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dXWYyb26"
+	by mail.kernel.org (Postfix) with ESMTP id 5414B20838
+	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 15:20:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbgBXNN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 08:13:26 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46298 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727378AbgBXNN0 (ORCPT
+        id S1727783AbgBXPUc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 10:20:32 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:39236 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727749AbgBXPUc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 08:13:26 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OD8TWE028070;
-        Mon, 24 Feb 2020 13:13:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=dJGr99zHD0Q9XFx6gtERb1B1C3O2MITBpTCUfAe3Tw4=;
- b=dXWYyb26qv+lUJiFVNbmkAb8v9k98kfgsiDzrZ0tmPm76Z+McTBBmq+nrQAYm15Tvusx
- snU4JBaAzWRCh73k4Cv6whHWTm3aQ+f3/d/Hv7v5xtQycWGhv/QHCu0jN2NdXzQMAt2W
- 03InSdrnNxKQbrDMsZMU3bcQQeA/wxA0+ayuCX3sKTRvyNBLXlagm0beFFbkAWzAm09w
- jCCRrmMjuUWSM+eiukRqY/O1WCmqqGNJayHVStfS6k/OTSa1QvJs9dI9N7FocBO0wXs9
- z3x4wfCOpPHDS4Ajum7Kk8S6qt/Dh6AgVQszsp8KF/lFFRRGDoxBpVL9YdC7W2X2MMCF gg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2yavxrf55b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Feb 2020 13:13:24 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01ODBsUO077515;
-        Mon, 24 Feb 2020 13:13:23 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2ybe116wxq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Feb 2020 13:13:23 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01ODDMBR023955;
-        Mon, 24 Feb 2020 13:13:22 GMT
-Received: from localhost.localdomain (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 24 Feb 2020 05:13:22 -0800
-From:   Bob Liu <bob.liu@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
-        Bob Liu <bob.liu@oracle.com>
-Subject: [PATCH] block/bio-integrity: simplify the way of calculate nr_pages
-Date:   Mon, 24 Feb 2020 21:12:58 +0800
-Message-Id: <20200224131258.18156-1-bob.liu@oracle.com>
-X-Mailer: git-send-email 2.9.5
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9540 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- suspectscore=1 malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240108
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9540 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 lowpriorityscore=0
- spamscore=0 clxscore=1015 suspectscore=1 bulkscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002240107
+        Mon, 24 Feb 2020 10:20:32 -0500
+Received: by mail-pf1-f195.google.com with SMTP id 84so5519946pfy.6
+        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2020 07:20:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WDCkjGM3fgtW4JPiMGZTVGouytm+nwZx0bWaIv/hYVo=;
+        b=ba1CO+08Yhhcpyh+okjqYADOHwpX5aGw9iAzq525IZ2jqUKRKWt1dME5+6+e7SzWjD
+         SQNLvsL5rOC2yfk/RjYI6DQnoijrq0k04z4P3kc83GSfU1W306HxAyQCfFGOKvL08s7n
+         BvyZTPLIG5cpiI6Hz4i7VVwiO90tujF+gPdpr0U4x1B4mP6njlDhqY8K7li4aYQySNBe
+         P4E6udQNQcgDDT5Gyql+1uBTOP1HQdfzZQ+Gn/esflxhcpKSlWSmmUL/CZ50v1EreVve
+         XKLzVLNlUuubbtpWZi39bSVXWp1aQxsjtdfoWKZcIGgR5cUPPriSB8vDv73ug7RHcKHM
+         O75g==
+X-Gm-Message-State: APjAAAXyANPioen0ba5x1bIbd16BCQlkEHWHFGoXKeqPnbzXhc8a3CGB
+        tilImERZ7DYMANERHMr1yvo=
+X-Google-Smtp-Source: APXvYqzs7yXo0KmypHmS8gZLODgtXGsVmL4xyKacEAl9PCoYaSRdGD/huT9qE8pSy9z5ACK9o8/jPg==
+X-Received: by 2002:a63:e007:: with SMTP id e7mr52628098pgh.414.1582557630427;
+        Mon, 24 Feb 2020 07:20:30 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:d7:af99:b4cf:6b17:1075? ([2601:647:4000:d7:af99:b4cf:6b17:1075])
+        by smtp.gmail.com with ESMTPSA id 188sm13214549pgf.24.2020.02.24.07.20.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Feb 2020 07:20:29 -0800 (PST)
+Subject: Re: [PATCH v3 4/8] null_blk: Suppress an UBSAN complaint triggered
+ when setting 'memory_backed'
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jth@kernel.org>
+References: <20200221032243.9708-1-bvanassche@acm.org>
+ <20200221032243.9708-5-bvanassche@acm.org>
+ <BYAPR04MB5749D28FD6A0B9A3EB58652C86EC0@BYAPR04MB5749.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <486df5d9-501c-b552-2f94-28d978f6bffb@acm.org>
+Date:   Mon, 24 Feb 2020 07:20:27 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <BYAPR04MB5749D28FD6A0B9A3EB58652C86EC0@BYAPR04MB5749.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove unnecessary start/end variables.
+On 2/24/20 3:28 AM, Chaitanya Kulkarni wrote:
+> On 2/20/20 7:23 PM, Bart Van Assche wrote:
+>> Although it is not clear to me why UBSAN complains when 'memory_backed'
+>> is set, this patch suppresses the UBSAN complaint that is triggered when
+>> setting that configfs attribute.
+>
+> Is it due to "An uninitialized bool will have indeterminate value and using
+> an indeterminate value is undefined behavior." ?
 
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
----
- block/bio-integrity.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+But where is the code that reads that boolean before it is set? I 
+haven't found it. Hence the comment in the patch description.
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index bf62c25..575df98 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -202,7 +202,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	struct blk_integrity *bi = blk_get_integrity(bio->bi_disk);
- 	struct request_queue *q = bio->bi_disk->queue;
- 	void *buf;
--	unsigned long start, end;
- 	unsigned int len, nr_pages;
- 	unsigned int bytes, offset, i;
- 	unsigned int intervals;
-@@ -241,9 +240,7 @@ bool bio_integrity_prep(struct bio *bio)
- 		goto err_end_io;
- 	}
- 
--	end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
--	start = ((unsigned long) buf) >> PAGE_SHIFT;
--	nr_pages = end - start;
-+	nr_pages = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
- 
- 	/* Allocate bio integrity payload and integrity vectors */
- 	bip = bio_integrity_alloc(bio, GFP_NOIO, nr_pages);
--- 
-2.9.5
-
+Bart.
