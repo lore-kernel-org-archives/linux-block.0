@@ -2,95 +2,67 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,TVD_SPACE_RATIO,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F9BC35E01
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 20:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3398C35E01
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 20:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 824CB20658
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 20:02:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Qf+LGa3v"
+	by mail.kernel.org (Postfix) with ESMTP id 87B032084E
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 20:24:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731615AbgBYUCS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 15:02:18 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:16699 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731480AbgBYUCR (ORCPT
+        id S1731685AbgBYUYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 15:24:34 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:46829 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731565AbgBYUYe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 15:02:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1582660937; x=1614196937;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=cWa6Fn7t0zpgUPTzyy7cZ2J7YPrWlvJCca1owelSg8I=;
-  b=Qf+LGa3vsYgn342XorIdZGTC3jMFPjjCaeD99AWOl6C+kOCwLeqAahSO
-   x0ajxIlgdbyFSHxU++u4zo7HW+Lq2JGfb7cpDPL2Ssf25LNOhq7Wq6zJg
-   9K290JmJBVqjMblEb7f6l5HimlE+/CqCmJL6wsYNvcVMbi0GWeNC968HX
-   E=;
-IronPort-SDR: 0CTfqoGrztyFkxdWl7N+5xyPS/L7yzb0LCX1wGufvVj4n5Lfie5aXLi34SDtZ1xsd6Elp+FXKS
- Vw9pMSA3ejrg==
-X-IronPort-AV: E=Sophos;i="5.70,485,1574121600"; 
-   d="scan'208";a="19066438"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 25 Feb 2020 20:02:14 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 23DF6A2E94;
-        Tue, 25 Feb 2020 20:02:11 +0000 (UTC)
-Received: from EX13D01UWB003.ant.amazon.com (10.43.161.94) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 25 Feb 2020 20:01:42 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
- EX13d01UWB003.ant.amazon.com (10.43.161.94) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 25 Feb 2020 20:01:42 +0000
-Received: from localhost (10.2.75.237) by mail-relay.amazon.com
- (10.43.162.232) with Microsoft SMTP Server id 15.0.1367.3 via Frontend
- Transport; Tue, 25 Feb 2020 20:01:42 +0000
-From:   Balbir Singh <sblbir@amazon.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>
-CC:     <axboe@kernel.dk>, <Chaitanya.Kulkarni@wdc.com>, <mst@redhat.com>,
-        <jejb@linux.ibm.com>, <hch@lst.de>,
-        Balbir Singh <sblbir@amazon.com>
-Subject: [PATCH v2 5/5] drivers/scsi/sd.c: Convert to use set_capacity_revalidate_and_notify
-Date:   Tue, 25 Feb 2020 20:01:29 +0000
-Message-ID: <20200225200129.6687-6-sblbir@amazon.com>
-X-Mailer: git-send-email 2.16.6
-In-Reply-To: <20200225200129.6687-1-sblbir@amazon.com>
+        Tue, 25 Feb 2020 15:24:34 -0500
+Received: by mail-ot1-f67.google.com with SMTP id g64so717309otb.13;
+        Tue, 25 Feb 2020 12:24:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=SarAUtwSg/du3J2AkC0iqKUiVmVTqsDv5t7WA8bnfZJvWzelWPe+bORPKJbA7yxEGV
+         aE8na/uE2+zJo9unRXvVxRxA3P2jhuQTGdc0iP6jcuXQZ9decqzCNMsd4mp7GXJxkxiK
+         4OPhbSwBTFqrKJw4HcXUlruDflQw/cLpR5/ud/U+ABmuKtFq06Y0hzCoy2+dKvEImDIS
+         mIv4yD82LiyLxst1iBRLaIrLFUUbg1IoOnaBdcMWi69/NfVvnkUic5SsFoopzTLk/KSM
+         l5tGpY9CrLnP7FVlVIqdOuHiNEfZ6dRHPJBiFrXBB/fH0kk35d3s9+yvOZn86EajREky
+         ArJQ==
+X-Gm-Message-State: APjAAAXV/pHYEyGWsWH+wrkPEnqTOsbD8pnD4WvyWmzttrUWdVEPNW5m
+        0m8AwX4IAjRSu727Ifa8zHM=
+X-Google-Smtp-Source: APXvYqx5EGiLCfIm35x2UQKiBboqPVfPqsypKW8ua6yYrgulykDBfuhSzfywyh1HFj30yx2LA9MC4A==
+X-Received: by 2002:a9d:76d6:: with SMTP id p22mr294967otl.37.1582662274074;
+        Tue, 25 Feb 2020 12:24:34 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id l8sm2643863otn.31.2020.02.25.12.24.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Feb 2020 12:24:33 -0800 (PST)
+Subject: Re: [PATCH v2 4/5] drivers/nvme/host/core.c: Convert to use
+ set_capacity_revalidate_and_notify
+To:     Balbir Singh <sblbir@amazon.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     axboe@kernel.dk, Chaitanya.Kulkarni@wdc.com, mst@redhat.com,
+        jejb@linux.ibm.com, hch@lst.de
 References: <20200225200129.6687-1-sblbir@amazon.com>
+ <20200225200129.6687-5-sblbir@amazon.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ef01984d-1052-70cf-f0b9-d46557c2af51@grimberg.me>
+Date:   Tue, 25 Feb 2020 12:24:31 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200225200129.6687-5-sblbir@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-block/genhd provides set_capacity_revalidate_and_notify() for sending RESIZE
-notifications via uevents. This notification is newly added to scsi sd.
-
-Signed-off-by: Balbir Singh <sblbir@amazon.com>
----
- drivers/scsi/sd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 8ca9299ffd36..707f47c0ec98 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3187,7 +3187,8 @@ static int sd_revalidate_disk(struct gendisk *disk)
- 
- 	sdkp->first_scan = 0;
- 
--	set_capacity(disk, logical_to_sectors(sdp, sdkp->capacity));
-+	set_capacity_revalidate_and_notify(disk,
-+		logical_to_sectors(sdp, sdkp->capacity), false);
- 	sd_config_write_same(sdkp);
- 	kfree(buffer);
- 
--- 
-2.16.6
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
