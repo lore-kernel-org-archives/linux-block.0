@@ -2,103 +2,175 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09944C35DF5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81500C35DF9
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 10:04:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D180B21556
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A2EA21744
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 10:04:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="hDN9ebhS"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="YmXZK+2W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729080AbgBYHVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 02:21:32 -0500
-Received: from mailgw01.mediatek.com ([210.61.82.183]:44357 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727114AbgBYHVc (ORCPT
+        id S1729882AbgBYKEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 05:04:38 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:16887 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729623AbgBYKEi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:21:32 -0500
-X-UUID: c48abae84cc14d3a9f6612981b2feae3-20200225
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=PlAFoeZLv3yl1DNrLtJ5lhwXHfBU7bpENIh3MZoxiYA=;
-        b=hDN9ebhS0qLFNFnIpNSWd+pVCu3tZtv8DLG1dzuO+lunq8we8otu7OCMl4ArxSpNat/j5KOOiwfRiL/dhoC43DIh4hDUzhThq3qRXyTnY8B0NjsEfL+dJ71lSLooFXET1z+hykUK6Ybc+GQVMLtMKms0AYJ4G23qqbbmvdk6FCI=;
-X-UUID: c48abae84cc14d3a9f6612981b2feae3-20200225
-Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
-        (envelope-from <stanley.chu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 215015611; Tue, 25 Feb 2020 15:21:26 +0800
-Received: from mtkcas09.mediatek.inc (172.21.101.178) by
- mtkmbs02n1.mediatek.inc (172.21.101.77) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Tue, 25 Feb 2020 15:19:33 +0800
-Received: from [172.21.84.99] (172.21.84.99) by mtkcas09.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Tue, 25 Feb 2020 15:21:12 +0800
-Message-ID: <1582615285.26304.93.camel@mtksdccf07>
-Subject: Re: [PATCH v7 6/9] scsi: ufs: Add inline encryption support to UFS
-From:   Stanley Chu <stanley.chu@mediatek.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        Satya Tangirala <satyat@google.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        <linux-ext4@vger.kernel.org>,
-        "Barani Muthukumaran" <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>,
-        "Ladvine D Almeida" <Ladvine.DAlmeida@synopsys.com>,
-        Parshuram Raju Thombare <pthombar@cadence.com>
-Date:   Tue, 25 Feb 2020 15:21:25 +0800
-In-Reply-To: <20200224233759.GC30288@infradead.org>
-References: <20200221115050.238976-1-satyat@google.com>
-         <20200221115050.238976-7-satyat@google.com>
-         <20200221172244.GC438@infradead.org> <20200221181109.GB925@sol.localdomain>
-         <1582465656.26304.69.camel@mtksdccf07>
-         <20200224233759.GC30288@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        Tue, 25 Feb 2020 05:04:38 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e54f0e80000>; Tue, 25 Feb 2020 02:03:20 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 25 Feb 2020 02:04:37 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 25 Feb 2020 02:04:37 -0800
+Received: from [10.21.133.51] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 25 Feb
+ 2020 10:04:35 +0000
+From:   Jon Hunter <jonathanh@nvidia.com>
+Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Bitan Biswas <bbiswas@nvidia.com>,
+        Adrian Hunter <adrian.hunter@intel.com>
+CC:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexei Starovoitov <ast@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        <lkft-triage@lists.linaro.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        John Stultz <john.stultz@linaro.org>,
+        Thierry Reding <treding@nvidia.com>
+References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
+ <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
+ <CA+G9fYugQuAERqp3VXUFG-3QxXoF8bz7OSMh6WGSZcrGkbfDSQ@mail.gmail.com>
+ <CAPDyKFo-vEO7zN_F+NqcKtnKmAo_deOZx3gYNiks3yTAQAjv-Q@mail.gmail.com>
+ <a602a27a-b960-ce56-c541-3b4b95f5dce2@nvidia.com>
+ <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
+Message-ID: <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
+Date:   Tue, 25 Feb 2020 10:04:33 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MTK:  N
-Content-Transfer-Encoding: base64
+In-Reply-To: <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1582625001; bh=DXvf4j96l957ii5IgxSstqBFHLUsNWzdiL/4ribmGBQ=;
+        h=X-PGP-Universal:From:Subject:To:CC:References:Message-ID:Date:
+         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=YmXZK+2Wxv4hJ3z1ofqFDa+CdPVumvTk7rk9zzFJ4nsH2sVpgrCIgkpLlbZmTbwwy
+         KWJDi1uXeivi46vK7RPEy60oyQ2Igq5bJ3pAvcrxxbkdHRI5eOBSu06CO9CdnPCSo4
+         uEx+TFt7QgwAT2UH14svOMSeb1vXqvuy6ZZx6rlm2WpnawaE0BqXhIj7eNHImOdaIb
+         jsTeJGCWSKV+uAc2lG+mrupgiBxd6ZeDpvEg9OQY64KG6RD6J2sJZHPhn6E+pk4Byh
+         lTmEvTxv0MbDlejw7aVjxEP0yBIbeqF5GmbvS+pmL43jkw3WEBTK0e3+n92/GsoZ1K
+         rXu4T/sni80xg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgQ2hyaXN0b3BoLA0KDQpPbiBNb24sIDIwMjAtMDItMjQgYXQgMTU6MzcgLTA4MDAsIENocmlz
-dG9waCBIZWxsd2lnIHdyb3RlOg0KPiBPbiBTdW4sIEZlYiAyMywgMjAyMCBhdCAwOTo0NzozNlBN
-ICswODAwLCBTdGFubGV5IENodSB3cm90ZToNCj4gPiBZZXMsIE1lZGlhVGVrIGlzIGtlZXBpbmcg
-d29yayBjbG9zZWx5IHdpdGggaW5saW5lIGVuY3J5cHRpb24gcGF0Y2ggc2V0cy4NCj4gPiBDdXJy
-ZW50bHkgdGhlIHY2IHZlcnNpb24gY2FuIHdvcmsgd2VsbCAod2l0aG91dA0KPiA+IFVGU0hDRF9R
-VUlSS19CUk9LRU5fQ1JZUFRPIHF1aXJrKSBhdCBsZWFzdCBpbiBvdXIgTVQ2Nzc5IFNvQyBwbGF0
-Zm9ybQ0KPiA+IHdoaWNoIGJhc2ljIFNvQyBzdXBwb3J0IGFuZCBzb21lIG90aGVyIHBlcmlwaGVy
-YWwgZHJpdmVycyBhcmUgdW5kZXINCj4gPiB1cHN0cmVhbWluZyBhcyBiZWxvdyBsaW5rLA0KPiA+
-IA0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC1tZWRpYXRl
-ay9saXN0Lz9zdGF0ZT0lDQo+ID4gMkEmcT02Nzc5JnNlcmllcz0mc3VibWl0dGVyPSZkZWxlZ2F0
-ZT0mYXJjaGl2ZT1ib3RoDQo+ID4gDQo+ID4gVGhlIGludGVncmF0aW9uIHdpdGggaW5saW5lIGVu
-Y3J5cHRpb24gcGF0Y2ggc2V0IG5lZWRzIHRvIHBhdGNoDQo+ID4gdWZzLW1lZGlhdGVrIGFuZCBw
-YXRjaGVzIGFyZSByZWFkeSBpbiBkb3duc3RyZWFtLiBXZSBwbGFuIHRvIHVwc3RyZWFtDQo+ID4g
-dGhlbSBzb29uIGFmdGVyIGlubGluZSBlbmNyeXB0aW9uIHBhdGNoIHNldHMgZ2V0IG1lcmdlZC4N
-Cj4gDQo+IFdoYXQgYW1vdW50IG9mIHN1cHBvcnQgZG8geW91IG5lZWQgaW4gdWZzLW1lZGlhdGVr
-PyAgSXQgc2VlbXMgbGlrZQ0KPiBwcmV0dHkgbXVjaCBldmVyeSB1ZnMgbG93LWxldmVsIGRyaXZl
-ciBuZWVkcyBzb21lIGtpbmQgb2Ygc3BlY2lmaWMNCj4gc3VwcG9ydCBub3csIHJpZ2h0PyAgSSB3
-b25kZXIgaWYgd2Ugc2hvdWxkIGluc3RlYWQgb3B0IGludG8gdGhlIHN1cHBvcnQNCj4gaW5zdGVh
-ZCBvZiBhbGwgdGhlIHF1aXJraW5nIGhlcmUuDQoNClRoZSBwYXRjaCBpbiB1ZnMtbWVkaWF0ZWsg
-aXMgYWltZWQgdG8gaXNzdWUgdmVuZG9yLXNwZWNpZmljIFNNQyBjYWxscw0KZm9yIGhvc3QgaW5p
-dGlhbGl6YXRpb24gYW5kIGNvbmZpZ3VyYXRpb24uIFRoaXMgaXMgYmVjYXVzZSBNZWRpYVRlayBV
-RlMNCmhvc3QgaGFzIHNvbWUgInNlY3VyZS1wcm90ZWN0ZWQiIHJlZ2lzdGVycy9mZWF0dXJlcyB3
-aGljaCBuZWVkIHRvIGJlDQphY2Nlc3NlZC9zd2l0Y2hlZCBpbiBzZWN1cmUgd29ybGQuIA0KDQpT
-dWNoIHByb3RlY3Rpb24gaXMgbm90IG1lbnRpb25lZCBieSBVRlNIQ0kgc3BlY2lmaWNhdGlvbnMg
-dGh1cyBpbmxpbmUNCmVuY3J5cHRpb24gcGF0Y2ggc2V0IGFzc3VtZXMgdGhhdCBldmVyeSByZWdp
-c3RlcnMgaW4gVUZTSENJIGNhbiBiZQ0KYWNjZXNzZWQgbm9ybWFsbHkgaW4ga2VybmVsLiBUaGlz
-IG1ha2VzIHNlbnNlIGFuZCBzdXJlbHkgdGhlIHBhdGNoc2V0DQpjYW4gd29yayBmaW5lIGluIGFu
-eSAic3RhbmRhcmQiIFVGUyBob3N0LiBIb3dldmVyIGlmIGhvc3QgaGFzIHNwZWNpYWwNCmRlc2ln
-biB0aGVuIGl0IGNhbiB3b3JrIG5vcm1hbGx5IG9ubHkgaWYgc29tZSB2ZW5kb3Itc3BlY2lmaWMg
-dHJlYXRtZW50DQppcyBhcHBsaWVkLg0KDQpJIHRoaW5rIG9uZSBvZiB0aGUgcmVhc29uIHRvIGFw
-cGx5IFVGU0hDRF9RVUlSS19CUk9LRU5fQ1JZUFRPIHF1aXJrIGluDQp1ZnMtcWNvbSBob3N0IGlz
-IHNpbWlsYXIgdG8gYWJvdmUgY2FzZS4NCg0KVGhhbmtzLA0KU3RhbmxleSBDaHUNCg0K
 
+On 24/02/2020 11:16, Ulf Hansson wrote:
+> + Adrian
+> 
+> On Fri, 21 Feb 2020 at 20:44, Bitan Biswas <bbiswas@nvidia.com> wrote:
+>>
+>> On 2/21/20 1:48 AM, Ulf Hansson wrote:
+>>> External email: Use caution opening links or attachments
+>>>
+>>>
+>>> On Thu, 20 Feb 2020 at 18:54, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>>>
+>>>> On Wed, 19 Feb 2020 at 21:54, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+>>>>>
+>>>>> On Thu, 13 Feb 2020 at 16:43, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>>>>>
+>>>>>
+>>>>> Try to restore the value for the cache flush timeout, by updating the
+>>>>> define MMC_CACHE_FLUSH_TIMEOUT_MS to 10 * 60 * 1000".
+>>>>
+>>>> I have increased the timeout to 10 minutes but it did not help.
+>>>> Same error found.
+>>>> [  608.679353] mmc1: Card stuck being busy! mmc_poll_for_busy
+>>>> [  608.684964] mmc1: cache flush error -110
+>>>> [  608.689005] blk_update_request: I/O error, dev mmcblk1, sector
+>>>> 4302400 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
+>>>>
+>>>> OTOH, What best i could do for my own experiment to revert all three patches and
+>>>> now the reported error gone and device mount successfully [1].
+>>>>
+>>>> List of patches reverted,
+>>>>    mmc: core: Specify timeouts for BKOPS and CACHE_FLUSH for eMMC
+>>>>    mmc: block: Use generic_cmd6_time when modifying
+>>>>      INAND_CMD38_ARG_EXT_CSD
+>>>>    mmc: core: Default to generic_cmd6_time as timeout in __mmc_switch()
+
+
+Reverting all the above also fixes the problem for me.
+
+>>   I find that from the commit the changes in mmc_flush_cache below is
+>> the cause.
+>>
+>> ##
+>> @@ -961,7 +963,8 @@ int mmc_flush_cache(struct mmc_card *card)
+>>                          (card->ext_csd.cache_size > 0) &&
+>>                          (card->ext_csd.cache_ctrl & 1)) {
+>>                  err = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
+>> -                               EXT_CSD_FLUSH_CACHE, 1, 0);
+>> +                                EXT_CSD_FLUSH_CACHE, 1,
+>> +                                MMC_CACHE_FLUSH_TIMEOUT_MS);
+
+
+I no longer see the issue on reverting the above hunk as Bitan suggested
+but now I see the following (which is expected) ...
+
+ WARNING KERN mmc1: unspecified timeout for CMD6 - use generic
+
+> Just as a quick sanity test, please try the below patch, which
+> restores the old cache flush timeout to 10min.
+> 
+> However, as I indicated above, this seems to be a problem that needs
+> to be fixed at in the host driver side. For the sdhci driver, there is
+> a bit of a tricky logic around how to deal with timeouts in
+> sdhci_send_command(). My best guess is that's where we should look
+> more closely (and I am doing that).
+> 
+> From: Ulf Hansson <ulf.hansson@linaro.org>
+> Date: Mon, 24 Feb 2020 11:43:33 +0100
+> Subject: [PATCH] mmc: core: Restore busy timeout for eMMC cache flushing
+> 
+> Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+> ---
+>  drivers/mmc/core/mmc_ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
+> index da425ee2d9bf..713e7dd6d028 100644
+> --- a/drivers/mmc/core/mmc_ops.c
+> +++ b/drivers/mmc/core/mmc_ops.c
+> @@ -21,7 +21,7 @@
+> 
+>  #define MMC_OPS_TIMEOUT_MS             (10 * 60 * 1000) /* 10min*/
+>  #define MMC_BKOPS_TIMEOUT_MS           (120 * 1000) /* 120s */
+> -#define MMC_CACHE_FLUSH_TIMEOUT_MS     (30 * 1000) /* 30s */
+> +#define MMC_CACHE_FLUSH_TIMEOUT_MS     (10 * 60 * 1000) /* 10min */
+
+This does not fix the problem for me.
+
+Jon
+
+-- 
+nvpublic
