@@ -1,84 +1,86 @@
-Return-Path: <SRS0=9TSA=4M=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E9FC35DE9
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5F1C35DEE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:20:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3E1821556
-	for <linux-block@archiver.kernel.org>; Mon, 24 Feb 2020 23:38:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tsH+RQq9"
+	by mail.kernel.org (Postfix) with ESMTP id A2A4520838
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727957AbgBXXiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 18:38:01 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:53606 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727081AbgBXXiB (ORCPT
+        id S1728316AbgBYAUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 19:20:10 -0500
+Received: from avon.wwwdotorg.org ([104.237.132.123]:53770 "EHLO
+        avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726651AbgBYAUK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 18:38:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=q86n0/Atkm4Y4ZtubbVGTblHU1TxdG/2icnoc8+Xwo0=; b=tsH+RQq9nsdWo8IIY9tkNpYUNU
-        XgrNdOr80eLKEtXvEFno8gvU4qBdtiN5909aTbWi0i4Mn192mp414I4f7ImjuKXsQEPhOibS7bTwU
-        cOsxCIWLp2zKT3TrsWxL2LBmNdhy2TDXl8m50nN4H1fo5ZuoIqjiPZzhYNjCMDBSq643wPIW66ATo
-        c2u37N+UIz34xOGA5lZnneTU0FiBG/QNqURtzRbfxDmVDDvcVQXxx2J9oSjbcL56/SnvF6ZaDdp5f
-        xwB90p+ijsqr/WHbcdu8Ex6TI2tXeVKVR+0eEXlgj0Omm7bgRLCdF0x20EQH304R+C2d0zp+9SCLy
-        d4HdDp4A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j6NIV-00021I-MY; Mon, 24 Feb 2020 23:37:59 +0000
-Date:   Mon, 24 Feb 2020 15:37:59 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Stanley Chu <stanley.chu@mediatek.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>,
-        Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>,
-        Parshuram Raju Thombare <pthombar@cadence.com>
-Subject: Re: [PATCH v7 6/9] scsi: ufs: Add inline encryption support to UFS
-Message-ID: <20200224233759.GC30288@infradead.org>
-References: <20200221115050.238976-1-satyat@google.com>
- <20200221115050.238976-7-satyat@google.com>
- <20200221172244.GC438@infradead.org>
- <20200221181109.GB925@sol.localdomain>
- <1582465656.26304.69.camel@mtksdccf07>
+        Mon, 24 Feb 2020 19:20:10 -0500
+Received: from [10.20.204.51] (unknown [216.228.112.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by avon.wwwdotorg.org (Postfix) with ESMTPSA id DD3721C03C9;
+        Mon, 24 Feb 2020 17:20:07 -0700 (MST)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.102.1 at avon.wwwdotorg.org
+Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>, linux-tegra@vger.kernel.org,
+        linux-block@vger.kernel.org, Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200224231841.26550-1-digetx@gmail.com>
+ <20200224231841.26550-4-digetx@gmail.com>
+From:   Stephen Warren <swarren@wwwdotorg.org>
+Message-ID: <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
+Date:   Mon, 24 Feb 2020 17:20:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1582465656.26304.69.camel@mtksdccf07>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200224231841.26550-4-digetx@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 23, 2020 at 09:47:36PM +0800, Stanley Chu wrote:
-> Yes, MediaTek is keeping work closely with inline encryption patch sets.
-> Currently the v6 version can work well (without
-> UFSHCD_QUIRK_BROKEN_CRYPTO quirk) at least in our MT6779 SoC platform
-> which basic SoC support and some other peripheral drivers are under
-> upstreaming as below link,
-> 
-> https://patchwork.kernel.org/project/linux-mediatek/list/?state=%
-> 2A&q=6779&series=&submitter=&delegate=&archive=both
-> 
-> The integration with inline encryption patch set needs to patch
-> ufs-mediatek and patches are ready in downstream. We plan to upstream
-> them soon after inline encryption patch sets get merged.
+On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
+> All NVIDIA Tegra devices use a special partition table format for the
+> internal storage partitioning. Most of Tegra devices have GPT partition
+> in addition to TegraPT, but some older Android consumer-grade devices do
+> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
+> in order to support these devices properly in the upstream kernel. This
+> patch adds support for NVIDIA Tegra Partition Table format that is used
+> at least by all NVIDIA Tegra20 and Tegra30 devices.
 
-What amount of support do you need in ufs-mediatek?  It seems like
-pretty much every ufs low-level driver needs some kind of specific
-support now, right?  I wonder if we should instead opt into the support
-instead of all the quirking here.
+> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
+
+> +static void __init tegra_boot_config_table_init(void)
+> +{
+> +	void __iomem *bct_base;
+> +	u16 pt_addr, pt_size;
+> +
+> +	bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
+
+This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot 
+Information Table) to a fixed location in IRAM, and there's some value 
+in the BIT that points to where the BCT is in IRAM. In practice, it 
+might work out that the BCT is always at the same place in IRAM, but 
+this certainly isn't guaranteed. I think there's code in U-Boot which 
+extracts the BCT location from the BIT? Yes, see 
+arch/arm/mach-tegra/ap.c:get_odmdata().
