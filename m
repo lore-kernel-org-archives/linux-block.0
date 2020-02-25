@@ -2,71 +2,74 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B815C35E01
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 17:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C19C35E01
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 18:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AE7C2084E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 17:14:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57F5E2176D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 18:02:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730720AbgBYROx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 12:14:53 -0500
-Received: from mx1.emlix.com ([188.40.240.192]:54140 "EHLO mx1.emlix.com"
+        id S1728847AbgBYSC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 13:02:29 -0500
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:31541 "EHLO 1wt.eu"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730460AbgBYROx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 12:14:53 -0500
-X-Greylist: delayed 319 seconds by postgrey-1.27 at vger.kernel.org; Tue, 25 Feb 2020 12:14:52 EST
-Received: from mailer.emlix.com (unknown [81.20.119.6])
-        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.emlix.com (Postfix) with ESMTPS id B27595F906;
-        Tue, 25 Feb 2020 18:09:32 +0100 (CET)
-From:   =?UTF-8?q?Daniel=20Gl=C3=B6ckner?= <dg@emlix.com>
-To:     Mike Snitzer <snitzer@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        =?UTF-8?q?Daniel=20Gl=C3=B6ckner?= <dg@emlix.com>
-Subject: [PATCH] dm integrity: reinitialize __bi_remaining when reusing bio
-Date:   Tue, 25 Feb 2020 18:07:44 +0100
-Message-Id: <20200225170744.10485-1-dg@emlix.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726953AbgBYSC3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Feb 2020 13:02:29 -0500
+Received: (from willy@localhost)
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 01PI2Jho001120;
+        Tue, 25 Feb 2020 19:02:19 +0100
+Date:   Tue, 25 Feb 2020 19:02:19 +0100
+From:   Willy Tarreau <w@1wt.eu>
+To:     Denis Efremov <efremov@linux.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
+Message-ID: <20200225180219.GA395@1wt.eu>
+References: <20200224212352.8640-1-w@1wt.eu>
+ <20200224212352.8640-2-w@1wt.eu>
+ <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
+ <28e72058-021d-6de0-477e-6038a10d96da@linux.com>
+ <20200225034529.GA8908@1wt.eu>
+ <c181b184-1785-b221-76fa-4313bbada09d@linux.com>
+ <20200225140207.GA31782@1wt.eu>
+ <10bc7df1-7a80-a05a-3434-ed0d668d0c6c@linux.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10bc7df1-7a80-a05a-3434-ed0d668d0c6c@linux.com>
+User-Agent: Mutt/1.6.1 (2016-04-27)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In cases where dec_in_flight has to requeue the integrity_bio_wait work
-to transfer the rest of the data, the __bi_remaining field of the bio
-might already have been decremented to zero. Reusing the bio without
-reinitializing that counter to 1 can then result in integrity_end_io
-being called too early when the BIO_CHAIN flag is set, f.ex. due to
-blk_queue_split. In our case this triggered the BUG() in
-blk_mq_end_request when the hardware signalled completion of the bio
-after integrity_end_io had modified it.
+On Tue, Feb 25, 2020 at 06:22:47PM +0300, Denis Efremov wrote:
+> I think that for the first attempt changing will be enough:
+> -static int fdc;                        /* current fdc */
+> +static int current_fdc;                        /* current fdc */
+> and
+> -#define FD_IOPORT fdc_state[fdc].address
+> +#define FD_IOPORT fdc_state[current_fdc].address
+> and for fd_setdor in ./arch/arm/include/asm/floppy.h
 
-Signed-off-by: Daniel Glöckner <dg@emlix.com>
----
- drivers/md/dm-integrity.c | 1 +
- 1 file changed, 1 insertion(+)
+So after a bit more digging, that should not be correct because:
+  - disk_change() uses a local "fdc" variable with expectations that
+    it will be used by fd_inb(FD_DIR)
+    
+  - set_dor() uses a local fdc argument that's used by
+    fd_outb(newdor, FD_DOR)
 
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index b225b3e445fa..8cea2978fc24 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -1438,6 +1438,7 @@ static void dec_in_flight(struct dm_integrity_io *dio)
- 		if (likely(!bio->bi_status) && unlikely(bio_sectors(bio) != dio->range.n_sectors)) {
- 			dio->range.logical_sector += dio->range.n_sectors;
- 			bio_advance(bio, dio->range.n_sectors << SECTOR_SHIFT);
-+			atomic_set(&bio->__bi_remaining, 1);
- 			INIT_WORK(&dio->work, integrity_bio_wait);
- 			queue_work(ic->wait_wq, &dio->work);
- 			return;
--- 
-2.17.1
+Here we have "fdc" hidden in:
+  - FD_DOR/FD_DIR (referencing FD_IOPORT) on x86
+  - fd_outb(), relying on fd_setdor() on ARM
 
+I'm now looking how to change fd_outb() to pass the fdc in argument,
+after all it's not that many places and that's exactly what we need.
+Maybe afterwards we'll figure that some of them are still wrong :-)
+
+Willy
