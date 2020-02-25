@@ -2,157 +2,97 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC95C35DF5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 11:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C968DC35E01
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 14:02:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D3E920CC7
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 11:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jcoG8NiU"
+	by mail.kernel.org (Postfix) with ESMTP id 7ACB324656
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 14:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730170AbgBYLlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 06:41:36 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:1756 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729178AbgBYLlg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 06:41:36 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e5507cc0000>; Tue, 25 Feb 2020 03:41:00 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 25 Feb 2020 03:41:35 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 25 Feb 2020 03:41:35 -0800
-Received: from [10.21.133.51] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 25 Feb
- 2020 11:41:33 +0000
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-From:   Jon Hunter <jonathanh@nvidia.com>
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Bitan Biswas <bbiswas@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>
-CC:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
+        id S1730340AbgBYOCR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 09:02:17 -0500
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:31526 "EHLO 1wt.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729952AbgBYOCQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:02:16 -0500
+Received: (from willy@localhost)
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 01PE27FN031971;
+        Tue, 25 Feb 2020 15:02:07 +0100
+Date:   Tue, 25 Feb 2020 15:02:07 +0100
+From:   Willy Tarreau <w@1wt.eu>
+To:     Denis Efremov <efremov@linux.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        <lkft-triage@lists.linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Thierry Reding <treding@nvidia.com>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
- <CA+G9fYugQuAERqp3VXUFG-3QxXoF8bz7OSMh6WGSZcrGkbfDSQ@mail.gmail.com>
- <CAPDyKFo-vEO7zN_F+NqcKtnKmAo_deOZx3gYNiks3yTAQAjv-Q@mail.gmail.com>
- <a602a27a-b960-ce56-c541-3b4b95f5dce2@nvidia.com>
- <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
- <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
-Message-ID: <f960aa98-5508-36fd-166d-7f41c7d85154@nvidia.com>
-Date:   Tue, 25 Feb 2020 11:41:31 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
+Message-ID: <20200225140207.GA31782@1wt.eu>
+References: <20200224212352.8640-1-w@1wt.eu>
+ <20200224212352.8640-2-w@1wt.eu>
+ <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
+ <28e72058-021d-6de0-477e-6038a10d96da@linux.com>
+ <20200225034529.GA8908@1wt.eu>
+ <c181b184-1785-b221-76fa-4313bbada09d@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1582630860; bh=kN3trSKoccgVaVoLzgLr6MddKiuYEMaFJBNPZvEzBt8=;
-        h=X-PGP-Universal:Subject:From:To:CC:References:Message-ID:Date:
-         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
-         X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=jcoG8NiUW+9/vpRg5f9yNJFSRtICczCMS8LRMfCL22Ns33XRFKglyjZTyZdFKI1m/
-         Xy7Qhvsmwo5Bfjzdk5oi2yuKlXEo2gDO8LdneqUJix7SjcERGs2iL0jOE1qcrBPSUG
-         Dp1vG4V4r4Usty1XFbQLi/KD8nM3x8k77voEA+fNzW+ATMmbQcgF71bxv9MrdBf8I5
-         o46ihG47nP8qEAeDJJTouOdZT5CJrbgU6eEar/y1qbXd4xyfdibd8AgzskBQIbMdaf
-         MBAdVvI0rxU6J67yhiPoMs2JbPAWJubD5/z4z2C1BCYRe29OpVgWjmLHYqEKUSljYQ
-         YIHTQOut/qpwQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c181b184-1785-b221-76fa-4313bbada09d@linux.com>
+User-Agent: Mutt/1.6.1 (2016-04-27)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 25/02/2020 10:04, Jon Hunter wrote:
-
-...
-
->>>   I find that from the commit the changes in mmc_flush_cache below is
->>> the cause.
->>>
->>> ##
->>> @@ -961,7 +963,8 @@ int mmc_flush_cache(struct mmc_card *card)
->>>                          (card->ext_csd.cache_size > 0) &&
->>>                          (card->ext_csd.cache_ctrl & 1)) {
->>>                  err = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
->>> -                               EXT_CSD_FLUSH_CACHE, 1, 0);
->>> +                                EXT_CSD_FLUSH_CACHE, 1,
->>> +                                MMC_CACHE_FLUSH_TIMEOUT_MS);
+On Tue, Feb 25, 2020 at 10:14:40AM +0300, Denis Efremov wrote:
 > 
 > 
-> I no longer see the issue on reverting the above hunk as Bitan suggested
-> but now I see the following (which is expected) ...
+> On 2/25/20 6:45 AM, Willy Tarreau wrote:
+> > On Tue, Feb 25, 2020 at 02:13:42AM +0300, Denis Efremov wrote:
+> >> On 2/25/20 12:53 AM, Linus Torvalds wrote:
+> >>> So I'd like to see that second step that does the
+> >>>
+> >>>     -static int fdc;                 /* current fdc */
+> >>>     +static int current_fdc;
+> >>>
+> >>> change.
+> >>>
+> >>> We already call the global 'drive' variable 'current_drive', so it
+> >>> really is 'fdc' that is misnamed and ambiguous because it then has two
+> >>> different cases: the global 'fdc' and then the various shadowing local
+> >>> 'fdc' variables (or function arguments).
+> >>>
+> >>> Mind adding that too? Slightly less automatic, I agree, because then
+> >>> you really do have to disambiguate between the "is this the shadowed
+> >>> use of a local 'fdc'" case or the "this is the global 'fdc' use" case.
+> > 
+> > I definitely agree. I first wanted to be sure the patches were acceptable
+> > as a principle, but disambiguating the variables is easy to do now.
 > 
->  WARNING KERN mmc1: unspecified timeout for CMD6 - use generic
+> Ok, I don't want to break in the middle of your changes in this case.
 
-For Tegra, the default timeout used when no timeout is specified for CMD6
-is 100mS. So hard-coding the following also appears to workaround the
-problem on Tegra ...
+So I started this and discovered the nice joke you were telling me
+about regarding FD_IOPORT which references fdc. Then the address
+registers FD_STATUS, FD_DATA, FD_DOR, FD_DIR, FD_DCR which are
+based on FD_IOPORT also depend on it.
 
-diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
-index 868653bc1555..5155e0240fca 100644
---- a/drivers/mmc/core/mmc_ops.c
-+++ b/drivers/mmc/core/mmc_ops.c
-@@ -992,7 +992,7 @@ int mmc_flush_cache(struct mmc_card *card)
-                        (card->ext_csd.cache_size > 0) &&
-                        (card->ext_csd.cache_ctrl & 1)) {
-                err = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
--                                EXT_CSD_FLUSH_CACHE, 1, 0);
-+                                EXT_CSD_FLUSH_CACHE, 1, 100);
-                if (err)
-                        pr_err("%s: cache flush error %d\n",
-                                        mmc_hostname(card->host), err);
+These ones are used by fd_outb() which is arch-dependent, so if we
+want to pass a third argument we have to change them all and make sure
+not to break them too much.
 
-So the problem appears to be causing by the timeout being too long rather
-than not long enough. 
+In addition the FD_* macros defined above are used by x86, and FD_DOR is
+also used by arm while all other archs hard-code all the values. ARM also
+uses floppy_selects[fdc] and new_dor... I'm starting to feel the trap here!
+I also feel a bit concerned that these are exported in uapi with a hard-coded
+0x3f0 base address. I'm just not sure how portable all of this is in
+the end :-/
 
-Looking more at the code, I think now that we are hitting the condition
-...
+Now I'm wondering, how far should we go and how much is it acceptable to
+change ? I'd rather not have "#define fdc current_fdc" just so that it
+builds, but on the other hand this problem clearly outlights the roots
+of the issue, which lies in "fdc" being silently accessed by macros with
+nobody noticing!
 
-diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
-index 868653bc1555..feae82b1ff35 100644
---- a/drivers/mmc/core/mmc_ops.c
-+++ b/drivers/mmc/core/mmc_ops.c
-@@ -579,8 +579,10 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
-         * the host to avoid HW busy detection, by converting to a R1 response
-         * instead of a R1B.
-         */
--       if (host->max_busy_timeout && (timeout_ms > host->max_busy_timeout))
-+       if (host->max_busy_timeout && (timeout_ms > host->max_busy_timeout)) {
-+               pr_warn("%s: timeout (%d) > max busy timeout (%d)", mmc_hostname(host), timeout_ms, host->max_busy_timeout);
-                use_r1b_resp = false;
-+       }
-
-
-With the above I see ...
-
- WARNING KERN mmc1: timeout (1600) > max busy timeout (672)
-
-So with the longer timeout we are not using/requesting the response.
-
-Cheers
-Jon
-
--- 
-nvpublic
+Willy
