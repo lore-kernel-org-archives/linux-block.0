@@ -2,125 +2,92 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF356C35E04
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 16:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290F7C35E04
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 16:43:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82EE52082F
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 16:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E26A920732
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 16:43:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="kWdhcXQK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Es0Ai5yj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730863AbgBYQYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 11:24:46 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14686 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729817AbgBYQYp (ORCPT
+        id S1730816AbgBYQnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 11:43:53 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:39085 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729536AbgBYQnx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 11:24:45 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e554a3f0000>; Tue, 25 Feb 2020 08:24:31 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 25 Feb 2020 08:24:44 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 25 Feb 2020 08:24:44 -0800
-Received: from [10.21.133.51] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 25 Feb
- 2020 16:24:41 +0000
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Faiz Abbas <faiz_abbas@ti.com>,
-        Sowjanya Komatineni <skomatineni@nvidia.com>
-CC:     Bitan Biswas <bbiswas@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        "Jens Axboe" <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        <lkft-triage@lists.linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Thierry Reding <treding@nvidia.com>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
- <CA+G9fYugQuAERqp3VXUFG-3QxXoF8bz7OSMh6WGSZcrGkbfDSQ@mail.gmail.com>
- <CAPDyKFo-vEO7zN_F+NqcKtnKmAo_deOZx3gYNiks3yTAQAjv-Q@mail.gmail.com>
- <a602a27a-b960-ce56-c541-3b4b95f5dce2@nvidia.com>
- <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
- <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
- <f960aa98-5508-36fd-166d-7f41c7d85154@nvidia.com>
- <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
-From:   Jon Hunter <jonathanh@nvidia.com>
-Message-ID: <0963b60f-15e7-4bc6-10df-6fc8003e4d42@nvidia.com>
-Date:   Tue, 25 Feb 2020 16:24:38 +0000
+        Tue, 25 Feb 2020 11:43:53 -0500
+Received: by mail-il1-f193.google.com with SMTP id w69so56374ilk.6
+        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2020 08:43:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ptuBikuvx1n72b69f5GFtZDCaDnREx2JRheiA6ifZ/E=;
+        b=Es0Ai5yjDOXrynnmjpTZm0+Anp7kBXgBGQIVFpzx37hZepTbICkrUSYrkPuYBz6rbG
+         UHSy7Ksm8jQU2QzexYbRyPAtMSPheLGmVn8lruBifATHnpmsHwPGUM9fQiv5lRMrknUl
+         WiwrgrUkMSOZkD5iNTEZ8A+4vkEKdKdUSaVpzCYs/caEFIuzxSBfwnvh+IMF72dhdleU
+         8RiVnjvxWx5WK0yD4WSfzzLbLLLVuDC0YGvkl/H31DlBD0IXMjXYRO/u7aR1nCCwlTH1
+         foKxJEluiuSl7WqTSEhDzy/MsodVN8MoMnp7BV2sTxcCj36767ht94/FbLiCRAATqQqA
+         28iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ptuBikuvx1n72b69f5GFtZDCaDnREx2JRheiA6ifZ/E=;
+        b=obIMO7m8BE94BzB9OxI0vhPYAJjl9n1d27W8C8QPXdJn31ZmPUYo/eft/19Fhw80Fo
+         OcjZwawZu+wrMJPMs4uH9D/+vsxMWbp8olrBWPq4LLKAMMwGcphYWKgV9mbmNxIBrlRp
+         Na3CsphFdbZFAWm68LfDX6fYC0VEBvySGwmYnb70ezKvU1OewlJPG2cgFqSDQxdfhPXS
+         HDxNXI36hCABGSQF5yXC2+OBUv+ZA9C0a8veA+owpXIAVHV+zyumFFTzshZfI952OKfB
+         L3vR8Rg8KdjCAPqrd0ieRpGrmS7ZgK9YhmXOqEcSTQW1I7wTDBpOvZ5Xrv4XDaTUFvnI
+         d1GQ==
+X-Gm-Message-State: APjAAAXvnxOOTE6xnyVhVLMF1bm0tEXKZiBQ1Q+eM/iKeYBpQ0b7HLO8
+        sG+9YpCZcdCRkUniNSl2d+Cz/g==
+X-Google-Smtp-Source: APXvYqxBKxRpHZ4VWxYc/SOhkA9+f1ToPdotu/ruZ4hbpJVvIQrAiXadwkKdiQKUnnEAKvTxmzC5eg==
+X-Received: by 2002:a92:405a:: with SMTP id n87mr67309416ila.299.1582649032564;
+        Tue, 25 Feb 2020 08:43:52 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id z8sm5632654ilk.9.2020.02.25.08.43.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2020 08:43:52 -0800 (PST)
+Subject: Re: [PATCH v2 1/1] null_blk: remove unused fields in 'nullb_cmd'
+To:     Dongli Zhang <dongli.zhang@oracle.com>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <20200224183911.22403-1-dongli.zhang@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ad83d8c0-4d3d-6cec-3e5a-70be9505c15b@kernel.dk>
+Date:   Tue, 25 Feb 2020 09:43:49 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200224183911.22403-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1582647871; bh=d+k2oADQBKeJHCExPW9X42DfdEf4wTEDT/QfdHMU5IM=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
-         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
-         X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=kWdhcXQKSJH4GXa6xSkXVhbj0mroRtOyJ6fnisSE9GfHmcEkd+fFWgatHxHs9IYib
-         TIT861jiVMWct2KGXdBFUnuz93ncHEEos7SfypX0n4Lb8z+0RL8QGT5xJWD75wupir
-         yz0sPoHdlKRuA1JlUgef7zx/r24mxhiIiuTPFFT08JwydZt+Skpkum8t5c6F2IhzXz
-         jKEYhTQyc2xHXPD8GHsN18TntYROuk+3yZd/5IUGoCfMszcdk9oFv4u+4gyjxVaEeZ
-         0EFR+RoPiIATIToqWkAMtrrtqId6IKNMS08ObahXZPI9ib6XI09J9/cGGQcqlsu8zP
-         VP3GAeLJ37K4g==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 25/02/2020 14:26, Ulf Hansson wrote:
-
-...
-
-> However, from the core point of view, the response is still requested,
-> only that we don't want the driver to wait for the card to stop
-> signaling busy. Instead we want to deal with that via "polling" from
-> the core.
+On 2/24/20 11:39 AM, Dongli Zhang wrote:
+> 'list', 'll_list' and 'csd' are no longer used.
 > 
-> This is a rather worrying behaviour, as it seems like the host driver
-> doesn't really follow this expectations from the core point of view.
-> And mmc_flush_cache() is not the only case, as we have erase, bkops,
-> sanitize, etc. Are all these working or not really well tested?
-
-I don't believe that they are well tested. We have a simple test to
-mount an eMMC partition, create a file, check the contents, remove the
-file and unmount. The timeouts always occur during unmounting.
-
-> Earlier, before my three patches, if the provided timeout_ms parameter
-> to __mmc_switch() was zero, which was the case for
-> mmc_mmc_flush_cache() - this lead to that __mmc_switch() simply
-> ignored validating host->max_busy_timeout, which was wrong. In any
-> case, this also meant that an R1B response was always used for
-> mmc_flush_cache(), as you also indicated above. Perhaps this is the
-> critical part where things can go wrong.
+> The 'list' is not used since it was introduced by commit f2298c0403b0
+> ("null_blk: multi queue aware block test driver").
 > 
-> BTW, have you tried erase commands for sdhci tegra driver? If those
-> are working fine, do you have any special treatments for these?
+> The 'll_list' is no longer used since commit 3c395a969acc ("null_blk: set a
+> separate timer for each command").
+> 
+> The 'csd' is no longer used since commit ce2c350b2cfe ("null_blk: use
+> blk_complete_request and blk_mq_complete_request").
 
-That I am not sure, but I will check.
-
-Cheers
-Jon
+Applied, thanks.
 
 -- 
-nvpublic
+Jens Axboe
+
