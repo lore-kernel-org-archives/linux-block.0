@@ -2,122 +2,104 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 976E5C35DEA
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C27C35DEE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:51:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66A90222D9
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79D5D2176D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MXbsLVZn"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="J0N6DOVF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728731AbgBYBf0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 20:35:26 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:45625 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728682AbgBYBf0 (ORCPT
+        id S1728529AbgBYBvJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 20:51:09 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:46469 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726962AbgBYBvI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 20:35:26 -0500
-Received: by mail-lf1-f66.google.com with SMTP id z5so8303786lfd.12;
-        Mon, 24 Feb 2020 17:35:24 -0800 (PST)
+        Mon, 24 Feb 2020 20:51:08 -0500
+Received: by mail-pf1-f195.google.com with SMTP id k29so6307095pfp.13
+        for <linux-block@vger.kernel.org>; Mon, 24 Feb 2020 17:51:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7KfeF9bj6ln8qqzpe7IEHDvXUKwiiT/ipxNgBi4uFME=;
-        b=MXbsLVZnsRrOiUyO+RyrtvqNQ3W25wfO2SG+jAz2GDo9XK5OnoEhcftf8feCiPrP/o
-         srGQYWWWGNYCr3om2YQsFdD/rsSHi+0A62kC+hkD9OMswCyO91Zwbx9y/juew9cNgOE3
-         rfSgxBlbT9XLepoOTw1IcnHpir7MQqP6TFzPtoJ6iOMDMJ1rhclVSwUxNNpJZyFt3b5x
-         815tKXst1OZnrsdAoD2iC/CIxTNOHV2BfXC2e9uvGXSgQOXIEmzB+lec7kHgADjMrr/U
-         qgGNLw1ts63mJJzZWy5EaDWPYdilzhuAS4p78kCVfOR1+hBuJDnDOUy7aqdaUd5o+Jgr
-         Y+jw==
+        bh=2k9qpBuuuwDw2T3HwPn6fsY7AmBYoepNeYi9RBrSZIg=;
+        b=J0N6DOVFZQKcZZdfWZm+UWtO92sTdkIVnAAh/smjNNVklUUqgSNJ4zt5XMqHGg38d1
+         Eo09Bw7+o9M06+gcBgZze04MnIt/Mp98zmXoCEJc9UMptBhbsU0bCCBObDmjMRJNtC+2
+         /Jrwz9f86WlbBvgc2cORkH6m7WV9lTULw3UYA2SMNNpnjXZC19wUsZMdO8ktuauVoHiN
+         qpAUY2sDpSuRrS13JrSeI53pzk1izyhoUMgHx7j1UClbw2iQs2KT1RfQlZ6CpR6/I5fK
+         tI1F3pLan6i+m0QjD3YQeeZOFmw5TFHe/NBBPwrgnPocwM7t4KF0unPk+pey6yHWQhXY
+         7DfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=7KfeF9bj6ln8qqzpe7IEHDvXUKwiiT/ipxNgBi4uFME=;
-        b=dNhHZuqg/8Qh2+QLqTdpDNknu6lsFN1VrntQK/wYG1494oxKNsDl+m5fOWSGtm25TS
-         OsRV599+/JUoo7luyIQY5FBFbJTgziQn+Hmr8EH9icypCJBe87hkAiD9TziroLwFeYZ7
-         nMKIHxLAthhpeKTxK61qaTPn5QF2BW3mb1v1ESjtNc6vRRnMG931CIFg8c4MUjBKQImj
-         OrbmDrtf5riqy2iJFlyN4Y+d7qeWbA9D+kik/FhBFgzpm/U5Veqo9Hwf2YpLjPvYckDH
-         GJSyVOdrb393gnNdtU5xtHuROaS+L46VoEQfwQRJl2nmHEh08HWZ/7loHWaXym+jlNxS
-         xfMQ==
-X-Gm-Message-State: APjAAAUPpZvdtq/X884aFFZIMPHbMie+y+5pmmlJE/GpG4hG7YlJtQtM
-        nW1PLhi9nUlYI2shjL7OeK42NBq3
-X-Google-Smtp-Source: APXvYqz/Z9/bQLbgH3q3d9zG8BlA3rujvO8lz+rf5xIvXdVWkiKCXHU2J1RhTI3+l112QMoW/cLkNQ==
-X-Received: by 2002:a19:48cf:: with SMTP id v198mr3243388lfa.68.1582594523870;
-        Mon, 24 Feb 2020 17:35:23 -0800 (PST)
-Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
-        by smtp.googlemail.com with ESMTPSA id 14sm6888501ljj.32.2020.02.24.17.35.22
+        bh=2k9qpBuuuwDw2T3HwPn6fsY7AmBYoepNeYi9RBrSZIg=;
+        b=rKSHWLK9lUWFQkcHjZYC0byA6rIMERc853Oy8s5+6RakgqKR9SVvX0czqOYXt6wSpD
+         kCkuqxaSTybfLqrgWM+zJiV0yCgzws6ythTmQ2ddcXMYgWy9X9sQPGRC/8gupPtB6l6X
+         PY29Je09gC4zYIZ9vZoBOiqRAPrjF30p4N0J0W6Hy1HaAcwNXzF+3Gn3iVlG8kCjY3jr
+         33/KkF3QBXaU5xhgMC4A5vH6Fj3J6FHMZW/6om+OX+JYjH4Zg05FPj/Cxo01MzKs/JoW
+         VJXBsj2f19I4vX6xZvgetRoJGc6LQIpNtcZ7BPr09bIBOxkksG26IFiaGrwVW4Mr4ZS9
+         ysng==
+X-Gm-Message-State: APjAAAXjJLuqOA5FjFQo33OGxlo2Bpf/yUtlwavzYdY3cM4fAJ/njJ7I
+        aIw2ooT+5PNcp2cFp8U6DgmVXA==
+X-Google-Smtp-Source: APXvYqz3zfiQQB/VGrY4InsjqM/xSsIbPyYOOT/YCwajRYsecoTy4G6pX/Ck76kHE0g4zS62MIGCSQ==
+X-Received: by 2002:a63:e011:: with SMTP id e17mr57460369pgh.49.1582595468005;
+        Mon, 24 Feb 2020 17:51:08 -0800 (PST)
+Received: from ?IPv6:2600:380:6c71:d0c:5c34:90d5:6c23:1c5c? ([2600:380:6c71:d0c:5c34:90d5:6c23:1c5c])
+        by smtp.gmail.com with ESMTPSA id g24sm14222518pfk.92.2020.02.24.17.51.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2020 17:35:23 -0800 (PST)
-Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
-To:     Stephen Warren <swarren@wwwdotorg.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>, linux-tegra@vger.kernel.org,
-        linux-block@vger.kernel.org, Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200224231841.26550-1-digetx@gmail.com>
- <20200224231841.26550-4-digetx@gmail.com>
- <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <69a76bbe-e088-6715-fefe-354dd4bc3ef2@gmail.com>
-Date:   Tue, 25 Feb 2020 04:35:21 +0300
+        Mon, 24 Feb 2020 17:51:07 -0800 (PST)
+Subject: Re: [PATCH V2] blk-mq: insert passthrough request into hctx->dispatch
+ directly
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Ewan D . Milne" <emilne@redhat.com>
+References: <20200225010432.29225-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b59035c5-aa41-88a8-d5ae-c53242b59e28@kernel.dk>
+Date:   Mon, 24 Feb 2020 18:51:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
+In-Reply-To: <20200225010432.29225-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-25.02.2020 03:20, Stephen Warren пишет:
-> On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
->> All NVIDIA Tegra devices use a special partition table format for the
->> internal storage partitioning. Most of Tegra devices have GPT partition
->> in addition to TegraPT, but some older Android consumer-grade devices do
->> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
->> in order to support these devices properly in the upstream kernel. This
->> patch adds support for NVIDIA Tegra Partition Table format that is used
->> at least by all NVIDIA Tegra20 and Tegra30 devices.
+On 2/24/20 6:04 PM, Ming Lei wrote:
+> For some reason, device may be in one situation which can't handle
+> FS request, so STS_RESOURCE is always returned and the FS request
+> will be added to hctx->dispatch. However passthrough request may
+> be required at that time for fixing the problem. If passthrough
+> request is added to scheduler queue, there isn't any chance for
+> blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
+> Then the FS IO request may never be completed, and IO hang is caused.
 > 
->> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
+> So passthrough request has to be added to hctx->dispatch directly
+> for fixing the IO hang.
 > 
->> +static void __init tegra_boot_config_table_init(void)
->> +{
->> +    void __iomem *bct_base;
->> +    u16 pt_addr, pt_size;
->> +
->> +    bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
+> Fix this issue by inserting passthrough request into hctx->dispatch
+> directly together withing adding FS request to the tail of
+> hctx->dispatch in blk_mq_dispatch_rq_list(). Actually we add FS request
+> to tail of hctx->dispatch at default, see blk_mq_request_bypass_insert().
 > 
-> This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot
-> Information Table) to a fixed location in IRAM, and there's some value
-> in the BIT that points to where the BCT is in IRAM. In practice, it
-> might work out that the BCT is always at the same place in IRAM, but
-> this certainly isn't guaranteed. I think there's code in U-Boot which
-> extracts the BCT location from the BIT? Yes, see
-> arch/arm/mach-tegra/ap.c:get_odmdata().
+> Then it becomes consistent with original legacy IO request
+> path, in which passthrough request is always added to q->queue_head.
 
-Thank you very much, I didn't know about that.
+Applied, thanks Ming.
 
-I checked whether Nexus 7 and A500 have a correct pointer in the BIT and
-they have it. I'll take it into account in v2, thank you again.
+-- 
+Jens Axboe
+
