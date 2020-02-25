@@ -2,248 +2,122 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7D2C35DEA
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 976E5C35DEA
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 020E021D7E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66A90222D9
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ID/X7Zq5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MXbsLVZn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728011AbgBYBEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 20:04:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34011 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727976AbgBYBEt (ORCPT
+        id S1728731AbgBYBf0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 20:35:26 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:45625 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728682AbgBYBf0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 20:04:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582592686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OBH8d8ylQG5OryHHN25h+Qf0CNgpmlVdxRJWYMumZO4=;
-        b=ID/X7Zq5eVygss9LOkJqqynbzibY8q2AZUyUY9OPRXXx+15TT1CiLZHNA/uAf+PU9CQJRy
-        nhLsDV1tQI7MLcytljIV5v34iL71BTyt31cRxi0Hx1zARSigSedfZNxJLqDDMjn5wRRYx1
-        ar1O/7NedJtQZnFxNTyy5U9YxHys6cU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-Kxy_V1qKPouJ0atuPPP73A-1; Mon, 24 Feb 2020 20:04:42 -0500
-X-MC-Unique: Kxy_V1qKPouJ0atuPPP73A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59856800D53;
-        Tue, 25 Feb 2020 01:04:41 +0000 (UTC)
-Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3253E1001B2C;
-        Tue, 25 Feb 2020 01:04:37 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Ewan D . Milne" <emilne@redhat.com>
-Subject: [PATCH V2] blk-mq: insert passthrough request into hctx->dispatch directly
-Date:   Tue, 25 Feb 2020 09:04:32 +0800
-Message-Id: <20200225010432.29225-1-ming.lei@redhat.com>
+        Mon, 24 Feb 2020 20:35:26 -0500
+Received: by mail-lf1-f66.google.com with SMTP id z5so8303786lfd.12;
+        Mon, 24 Feb 2020 17:35:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7KfeF9bj6ln8qqzpe7IEHDvXUKwiiT/ipxNgBi4uFME=;
+        b=MXbsLVZnsRrOiUyO+RyrtvqNQ3W25wfO2SG+jAz2GDo9XK5OnoEhcftf8feCiPrP/o
+         srGQYWWWGNYCr3om2YQsFdD/rsSHi+0A62kC+hkD9OMswCyO91Zwbx9y/juew9cNgOE3
+         rfSgxBlbT9XLepoOTw1IcnHpir7MQqP6TFzPtoJ6iOMDMJ1rhclVSwUxNNpJZyFt3b5x
+         815tKXst1OZnrsdAoD2iC/CIxTNOHV2BfXC2e9uvGXSgQOXIEmzB+lec7kHgADjMrr/U
+         qgGNLw1ts63mJJzZWy5EaDWPYdilzhuAS4p78kCVfOR1+hBuJDnDOUy7aqdaUd5o+Jgr
+         Y+jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7KfeF9bj6ln8qqzpe7IEHDvXUKwiiT/ipxNgBi4uFME=;
+        b=dNhHZuqg/8Qh2+QLqTdpDNknu6lsFN1VrntQK/wYG1494oxKNsDl+m5fOWSGtm25TS
+         OsRV599+/JUoo7luyIQY5FBFbJTgziQn+Hmr8EH9icypCJBe87hkAiD9TziroLwFeYZ7
+         nMKIHxLAthhpeKTxK61qaTPn5QF2BW3mb1v1ESjtNc6vRRnMG931CIFg8c4MUjBKQImj
+         OrbmDrtf5riqy2iJFlyN4Y+d7qeWbA9D+kik/FhBFgzpm/U5Veqo9Hwf2YpLjPvYckDH
+         GJSyVOdrb393gnNdtU5xtHuROaS+L46VoEQfwQRJl2nmHEh08HWZ/7loHWaXym+jlNxS
+         xfMQ==
+X-Gm-Message-State: APjAAAUPpZvdtq/X884aFFZIMPHbMie+y+5pmmlJE/GpG4hG7YlJtQtM
+        nW1PLhi9nUlYI2shjL7OeK42NBq3
+X-Google-Smtp-Source: APXvYqz/Z9/bQLbgH3q3d9zG8BlA3rujvO8lz+rf5xIvXdVWkiKCXHU2J1RhTI3+l112QMoW/cLkNQ==
+X-Received: by 2002:a19:48cf:: with SMTP id v198mr3243388lfa.68.1582594523870;
+        Mon, 24 Feb 2020 17:35:23 -0800 (PST)
+Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
+        by smtp.googlemail.com with ESMTPSA id 14sm6888501ljj.32.2020.02.24.17.35.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Feb 2020 17:35:23 -0800 (PST)
+Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
+To:     Stephen Warren <swarren@wwwdotorg.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>, linux-tegra@vger.kernel.org,
+        linux-block@vger.kernel.org, Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200224231841.26550-1-digetx@gmail.com>
+ <20200224231841.26550-4-digetx@gmail.com>
+ <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <69a76bbe-e088-6715-fefe-354dd4bc3ef2@gmail.com>
+Date:   Tue, 25 Feb 2020 04:35:21 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For some reason, device may be in one situation which can't handle
-FS request, so STS_RESOURCE is always returned and the FS request
-will be added to hctx->dispatch. However passthrough request may
-be required at that time for fixing the problem. If passthrough
-request is added to scheduler queue, there isn't any chance for
-blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
-Then the FS IO request may never be completed, and IO hang is caused.
+25.02.2020 03:20, Stephen Warren пишет:
+> On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
+>> All NVIDIA Tegra devices use a special partition table format for the
+>> internal storage partitioning. Most of Tegra devices have GPT partition
+>> in addition to TegraPT, but some older Android consumer-grade devices do
+>> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
+>> in order to support these devices properly in the upstream kernel. This
+>> patch adds support for NVIDIA Tegra Partition Table format that is used
+>> at least by all NVIDIA Tegra20 and Tegra30 devices.
+> 
+>> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
+> 
+>> +static void __init tegra_boot_config_table_init(void)
+>> +{
+>> +    void __iomem *bct_base;
+>> +    u16 pt_addr, pt_size;
+>> +
+>> +    bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
+> 
+> This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot
+> Information Table) to a fixed location in IRAM, and there's some value
+> in the BIT that points to where the BCT is in IRAM. In practice, it
+> might work out that the BCT is always at the same place in IRAM, but
+> this certainly isn't guaranteed. I think there's code in U-Boot which
+> extracts the BCT location from the BIT? Yes, see
+> arch/arm/mach-tegra/ap.c:get_odmdata().
 
-So passthrough request has to be added to hctx->dispatch directly
-for fixing the IO hang.
+Thank you very much, I didn't know about that.
 
-Fix this issue by inserting passthrough request into hctx->dispatch
-directly together withing adding FS request to the tail of
-hctx->dispatch in blk_mq_dispatch_rq_list(). Actually we add FS request
-to tail of hctx->dispatch at default, see blk_mq_request_bypass_insert().
-
-Then it becomes consistent with original legacy IO request
-path, in which passthrough request is always added to q->queue_head.
-
-Cc: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- adding FS request to the tail of hctx->dispatch in blk_mq_dispatch_rq_=
-list()
-	- pass our(RH) customer's test
-
- block/blk-flush.c    |  2 +-
- block/blk-mq-sched.c | 22 +++++++++++++++-------
- block/blk-mq.c       | 18 +++++++++++-------
- block/blk-mq.h       |  3 ++-
- 4 files changed, 29 insertions(+), 16 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 3f977c517960..5cc775bdb06a 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -412,7 +412,7 @@ void blk_insert_flush(struct request *rq)
- 	 */
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
--		blk_mq_request_bypass_insert(rq, false);
-+		blk_mq_request_bypass_insert(rq, false, false);
- 		return;
- 	}
-=20
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index ca22afd47b3d..856356b1619e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -361,13 +361,19 @@ static bool blk_mq_sched_bypass_insert(struct blk_m=
-q_hw_ctx *hctx,
- 				       bool has_sched,
- 				       struct request *rq)
- {
--	/* dispatch flush rq directly */
--	if (rq->rq_flags & RQF_FLUSH_SEQ) {
--		spin_lock(&hctx->lock);
--		list_add(&rq->queuelist, &hctx->dispatch);
--		spin_unlock(&hctx->lock);
-+	/*
-+	 * dispatch flush and passthrough rq directly
-+	 *
-+	 * passthrough request has to be added to hctx->dispatch directly.
-+	 * For some reason, device may be in one situation which can't
-+	 * handle FS request, so STS_RESOURCE is always returned and the
-+	 * FS request will be added to hctx->dispatch. However passthrough
-+	 * request may be required at that time for fixing the problem. If
-+	 * passthrough request is added to scheduler queue, there isn't any
-+	 * chance to dispatch it given we prioritize requests in hctx->dispatch=
-.
-+	 */
-+	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
- 		return true;
--	}
-=20
- 	if (has_sched)
- 		rq->rq_flags |=3D RQF_SORTED;
-@@ -391,8 +397,10 @@ void blk_mq_sched_insert_request(struct request *rq,=
- bool at_head,
-=20
- 	WARN_ON(e && (rq->tag !=3D -1));
-=20
--	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
-+	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
-+		blk_mq_request_bypass_insert(rq, at_head, false);
- 		goto run;
-+	}
-=20
- 	if (e && e->type->ops.insert_requests) {
- 		LIST_HEAD(list);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a12b1763508d..5e1e4151cb51 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -735,7 +735,7 @@ static void blk_mq_requeue_work(struct work_struct *w=
-ork)
- 		 * merge.
- 		 */
- 		if (rq->rq_flags & RQF_DONTPREP)
--			blk_mq_request_bypass_insert(rq, false);
-+			blk_mq_request_bypass_insert(rq, false, false);
- 		else
- 			blk_mq_sched_insert_request(rq, true, false, false);
- 	}
-@@ -1286,7 +1286,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *=
-q, struct list_head *list,
- 			q->mq_ops->commit_rqs(hctx);
-=20
- 		spin_lock(&hctx->lock);
--		list_splice_init(list, &hctx->dispatch);
-+		list_splice_tail_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
-=20
- 		/*
-@@ -1677,12 +1677,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx=
- *hctx, struct request *rq,
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
--void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
-+void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
-+				  bool run_queue)
- {
- 	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
-=20
- 	spin_lock(&hctx->lock);
--	list_add_tail(&rq->queuelist, &hctx->dispatch);
-+	if (at_head)
-+		list_add(&rq->queuelist, &hctx->dispatch);
-+	else
-+		list_add_tail(&rq->queuelist, &hctx->dispatch);
- 	spin_unlock(&hctx->lock);
-=20
- 	if (run_queue)
-@@ -1849,7 +1853,7 @@ static blk_status_t __blk_mq_try_issue_directly(str=
-uct blk_mq_hw_ctx *hctx,
- 	if (bypass_insert)
- 		return BLK_STS_RESOURCE;
-=20
--	blk_mq_request_bypass_insert(rq, run_queue);
-+	blk_mq_request_bypass_insert(rq, false, run_queue);
- 	return BLK_STS_OK;
- }
-=20
-@@ -1876,7 +1880,7 @@ static void blk_mq_try_issue_directly(struct blk_mq=
-_hw_ctx *hctx,
-=20
- 	ret =3D __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
- 	if (ret =3D=3D BLK_STS_RESOURCE || ret =3D=3D BLK_STS_DEV_RESOURCE)
--		blk_mq_request_bypass_insert(rq, true);
-+		blk_mq_request_bypass_insert(rq, false, true);
- 	else if (ret !=3D BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
-=20
-@@ -1910,7 +1914,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_h=
-w_ctx *hctx,
- 		if (ret !=3D BLK_STS_OK) {
- 			if (ret =3D=3D BLK_STS_RESOURCE ||
- 					ret =3D=3D BLK_STS_DEV_RESOURCE) {
--				blk_mq_request_bypass_insert(rq,
-+				blk_mq_request_bypass_insert(rq, false,
- 							list_empty(list));
- 				break;
- 			}
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index eaaca8fc1c28..c0fa34378eb2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -66,7 +66,8 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct=
- blk_mq_tags *tags,
-  */
- void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request =
-*rq,
- 				bool at_head);
--void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
-+void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
-+				  bool run_queue);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ct=
-x *ctx,
- 				struct list_head *list);
-=20
---=20
-2.20.1
-
+I checked whether Nexus 7 and A500 have a correct pointer in the BIT and
+they have it. I'll take it into account in v2, thank you again.
