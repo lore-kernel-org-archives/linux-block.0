@@ -2,116 +2,69 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2892C35E04
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 18:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A639BC35E04
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 19:12:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 889E62082F
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 18:27:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582655274;
-	bh=1ByXosMMDdYNeqtP69L/IiTPKKdM2qVjlS/Y1To24ko=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=NhUIxQGdoxOgabmhQ1vymwJONZz1Ci5JQpEbL7c0amI2WI1Qqbz2kXGoOTRTS+i6P
-	 +zM3lvKFwpUbkLkOrcStGZ8B11kSS+czm6utqvRsIPYInu/7hPqasBIBdt0lL7Veq0
-	 PSKEKt+urkP28cn70Wy9+WY+CKmKjHlDm2lFZWk0=
+	by mail.kernel.org (Postfix) with ESMTP id 6E99D21744
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 19:12:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eR6m2y21"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731530AbgBYS1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 13:27:54 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:39743 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727983AbgBYS1x (ORCPT
+        id S1730411AbgBYTM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 14:12:29 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:54336 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730222AbgBYTM3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 13:27:53 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n30so9680878lfh.6
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2020 10:27:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GuecmF1yO4tHT3TnahV50e2HzEnXvd8V5CGAOVbnplY=;
-        b=OqJ+vlEoWFx5gLSWgF61ab1/Q32WWhXbHNDXycmahm/2WHj3sW13PHAFhc/97Lcjm3
-         VSMQMXqHCzPkueoOB2jz8PRFLmWZY4M2AybZF6quz9J+a5EMqVT4V/ip8ce/YaL8wYWI
-         FnqkptEVf112Bjo5/UCNc1rFsaQgVSVoiz7xQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GuecmF1yO4tHT3TnahV50e2HzEnXvd8V5CGAOVbnplY=;
-        b=r2zHEc1fkqLav0ZAdbAwxFJnlgym1uOmR7zR6For0WX88gLnNQmA0GN5KK9Db6zyvE
-         vbjlY2mrx7RAVbG6oCw0dk7XWoZ7sckfrRsjHELGR3VF8zcwKqHj6dMynlHwpYFhpkRI
-         Qg7W1HSqnB5q3CalP7AAblj96VfMxQh/SVnQ7I94Wa13M+1jpgyEWtCt/LzGiNk2UYa/
-         whDrYX07pK+aSan8NbbY7NOMLbsB8ehBZdKDyROJqCXaZiC1EN6zlxioipoD//2frnEF
-         6HkJeo7mANfkgm0F0/YCwIOE/vJP1hiZBTH3zg1pApUdjbM3ov/dthN4bvHXEApEJkL5
-         7Huw==
-X-Gm-Message-State: APjAAAXzVkPXR9y9k3TTgz9VgY+TptBSPtrTLBMb4dIrv6oPL9PPdxsh
-        FMDNIW70CVHXOVfAjc8qFdMcfwu/KbQ=
-X-Google-Smtp-Source: APXvYqz2g4DnKFIS/2+fVs5ZHqoodcDjf2EAMy6rJwsn1CsolCekiW8+zMOfAcBNMW1DFT9G9zpcWQ==
-X-Received: by 2002:a05:6512:3041:: with SMTP id b1mr90262lfb.136.1582655271644;
-        Tue, 25 Feb 2020 10:27:51 -0800 (PST)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
-        by smtp.gmail.com with ESMTPSA id j7sm8314412ljg.25.2020.02.25.10.27.50
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2020 10:27:50 -0800 (PST)
-Received: by mail-lj1-f181.google.com with SMTP id y6so25666lji.0
-        for <linux-block@vger.kernel.org>; Tue, 25 Feb 2020 10:27:50 -0800 (PST)
-X-Received: by 2002:a05:651c:555:: with SMTP id q21mr193655ljp.241.1582655270148;
- Tue, 25 Feb 2020 10:27:50 -0800 (PST)
+        Tue, 25 Feb 2020 14:12:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=rp45Vp3X3f9JOZYoYwnHcSnai8pNgV6sfc45s8fO6bw=; b=eR6m2y21F4fNmObw5l/ZZRxypU
+        MuUElhJEF5AuRUSFNozGG+O794ZQIreVKIBi2eP6Nok5L4W2bIRfmghX0rOW7G1dV3aAo8ECLa6eq
+        yGICA8kcCMDgpny0GPiIsJ87qs9YaYmvSdV5EWFSBytUfLKOJl3MVHB/W+j8JL7O2astInhewpppt
+        TRguVp1uYuCW05mpn8nLMKJg782Z8B5sXA7I/QKockf9zXLYg9l2HOtOnAiKqgI23rzoFQa5Y4/Yv
+        056bwJJOpDM0lRc7fFQ/PoLQx2hnkDSOSG8BzXixvhq/7H710Wgx7NwE42PluApvFXaRLimBsYsXk
+        RSDvwXpA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j6fd0-0001Yv-M6; Tue, 25 Feb 2020 19:12:22 +0000
+Date:   Tue, 25 Feb 2020 11:12:22 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Daniel =?iso-8859-1?Q?Gl=F6ckner?= <dg@emlix.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [dm-devel] [PATCH] dm integrity: reinitialize __bi_remaining
+ when reusing bio
+Message-ID: <20200225191222.GA3908@infradead.org>
+References: <20200225170744.10485-1-dg@emlix.com>
 MIME-Version: 1.0
-References: <20200224212352.8640-1-w@1wt.eu> <20200224212352.8640-2-w@1wt.eu>
- <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
- <28e72058-021d-6de0-477e-6038a10d96da@linux.com> <20200225034529.GA8908@1wt.eu>
- <c181b184-1785-b221-76fa-4313bbada09d@linux.com> <20200225140207.GA31782@1wt.eu>
- <10bc7df1-7a80-a05a-3434-ed0d668d0c6c@linux.com> <CAHk-=wggnfCR2JcC-U9LxfeBo2UMagd-neEs8PwDHsGVfLfS=Q@mail.gmail.com>
- <20200225181541.GA1138@1wt.eu>
-In-Reply-To: <20200225181541.GA1138@1wt.eu>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 25 Feb 2020 10:27:34 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whyEQy771ixppPmMSYtPcFS5ZtqVWUYow8gWd=pMnATNA@mail.gmail.com>
-Message-ID: <CAHk-=whyEQy771ixppPmMSYtPcFS5ZtqVWUYow8gWd=pMnATNA@mail.gmail.com>
-Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200225170744.10485-1-dg@emlix.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 10:15 AM Willy Tarreau <w@1wt.eu> wrote:
->
-> On Tue, Feb 25, 2020 at 10:08:51AM -0800, Linus Torvalds wrote:
-> >
-> > So we can remove at least the FD_IOPORT mess from the header file, I bet.
-> >
-> > Worst case - if somebody finds some case that uses them, we can put it back.
->
-> I like that. And at least we'll know how they use it (likely without the
-> dependency on fdc).
+On Tue, Feb 25, 2020 at 06:07:44PM +0100, Daniel Glöckner wrote:
+> In cases where dec_in_flight has to requeue the integrity_bio_wait work
+> to transfer the rest of the data, the __bi_remaining field of the bio
+> might already have been decremented to zero. Reusing the bio without
+> reinitializing that counter to 1 can then result in integrity_end_io
+> being called too early when the BIO_CHAIN flag is set, f.ex. due to
+> blk_queue_split. In our case this triggered the BUG() in
+> blk_mq_end_request when the hardware signalled completion of the bio
+> after integrity_end_io had modified it.
+> 
+> Signed-off-by: Daniel Glöckner <dg@emlix.com>
 
-Note that the way uapi header files generally got created was by just
-moving header files that user space used mechanically. See for example
-commit 607ca46e97a1 ("UAPI: (Scripted) Disintegrate include/linux")
-which created most of them.
-
-There was no careful vetting of "this is the part that is used by user
-space". It was just a "these are the files user space has used".
-
-So it's not really a "the uapi files are set in stone and you can't
-change them". Instead, you should think of the uapi files as a big red
-blinking warning that says "sure, you can change them, but you need to
-be very careful and think about the fact that user space may be
-including this thing".
-
-So it's a "think hard about it" rather than a "don't go there".
-
-Of course, usually it's much _simpler_ to just "don't go there" ;)
-
-            Linus
+Drivers have no business poking into these internals.  If a bio is
+reused the caller needs to use bio_reset instead.
