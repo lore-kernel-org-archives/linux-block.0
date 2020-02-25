@@ -2,160 +2,103 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CEDC35DF8
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09944C35DF5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:21:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E82A421D7E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D180B21556
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:21:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="hDN9ebhS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728931AbgBYHOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 02:14:45 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:39335 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726039AbgBYHOo (ORCPT
+        id S1729080AbgBYHVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 02:21:32 -0500
+Received: from mailgw01.mediatek.com ([210.61.82.183]:44357 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727114AbgBYHVc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:14:44 -0500
-Received: by mail-lj1-f196.google.com with SMTP id o15so12850074ljg.6;
-        Mon, 24 Feb 2020 23:14:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:references:from:autocrypt:cc:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=X05EIkiCts74h+zonYzRVNbTK2o5/+i9BalHqUUjSzA=;
-        b=jmrXo6oEUJMNfn2FA/FKOg4I8G1i+aWTWTPXgao4q8SJh1fFd2J/LQyF3t/aT0j3so
-         FSIZQAZ2YBLtHDZfljUZJmBhzXD301Rq67sCWJ9L1qHNlQS1UjwF7s6mqILt+YCXrsGi
-         DtM0Ygcyqj8WnwZHDSNdkB4mW94OjmG3sahYxRZ21OFM1rCVUPluLJURgid5j1K2Kaw2
-         1E09SJvrbcV1S9mwrUZWJB0tKnq7tH/dzOBDQRSDV8jj047qG8IRkDjj8CcQnrEYt18w
-         m5E7iwNWov+RRdblMjBzTUxSc3jpNS4JLhk5pJ3PdajMgQgNWgyAe3Egz/qLQgtLaZAP
-         X83g==
-X-Gm-Message-State: APjAAAW6kw3GRRq3OARnud1bGVuKkYXxjcbzeM2ARTatW0RPcIBYoyIE
-        xIEGNOXUYLVY2ZufH2PkiV3Z+cWa
-X-Google-Smtp-Source: APXvYqyUhQt8pYHLSWfb1xTJWMmsdrZCNs5TGfsRrMjeKNlgcZk8FVg8sgcrYtT5D98eqKZrTfvGLg==
-X-Received: by 2002:a2e:9143:: with SMTP id q3mr31123286ljg.199.1582614882144;
-        Mon, 24 Feb 2020 23:14:42 -0800 (PST)
-Received: from [10.68.32.192] (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
-        by smtp.gmail.com with ESMTPSA id i5sm7266937ljj.29.2020.02.24.23.14.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2020 23:14:40 -0800 (PST)
-To:     Willy Tarreau <w@1wt.eu>
-References: <20200224212352.8640-1-w@1wt.eu> <20200224212352.8640-2-w@1wt.eu>
- <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
- <28e72058-021d-6de0-477e-6038a10d96da@linux.com>
- <20200225034529.GA8908@1wt.eu>
-From:   Denis Efremov <efremov@linux.com>
-Autocrypt: addr=efremov@linux.com; keydata=
- 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
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
-Message-ID: <c181b184-1785-b221-76fa-4313bbada09d@linux.com>
-Date:   Tue, 25 Feb 2020 10:14:40 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Tue, 25 Feb 2020 02:21:32 -0500
+X-UUID: c48abae84cc14d3a9f6612981b2feae3-20200225
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=PlAFoeZLv3yl1DNrLtJ5lhwXHfBU7bpENIh3MZoxiYA=;
+        b=hDN9ebhS0qLFNFnIpNSWd+pVCu3tZtv8DLG1dzuO+lunq8we8otu7OCMl4ArxSpNat/j5KOOiwfRiL/dhoC43DIh4hDUzhThq3qRXyTnY8B0NjsEfL+dJ71lSLooFXET1z+hykUK6Ybc+GQVMLtMKms0AYJ4G23qqbbmvdk6FCI=;
+X-UUID: c48abae84cc14d3a9f6612981b2feae3-20200225
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
+        (envelope-from <stanley.chu@mediatek.com>)
+        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
+        with ESMTP id 215015611; Tue, 25 Feb 2020 15:21:26 +0800
+Received: from mtkcas09.mediatek.inc (172.21.101.178) by
+ mtkmbs02n1.mediatek.inc (172.21.101.77) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Tue, 25 Feb 2020 15:19:33 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkcas09.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Tue, 25 Feb 2020 15:21:12 +0800
+Message-ID: <1582615285.26304.93.camel@mtksdccf07>
+Subject: Re: [PATCH v7 6/9] scsi: ufs: Add inline encryption support to UFS
+From:   Stanley Chu <stanley.chu@mediatek.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Eric Biggers <ebiggers@kernel.org>,
+        Satya Tangirala <satyat@google.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-ext4@vger.kernel.org>,
+        "Barani Muthukumaran" <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>,
+        "Ladvine D Almeida" <Ladvine.DAlmeida@synopsys.com>,
+        Parshuram Raju Thombare <pthombar@cadence.com>
+Date:   Tue, 25 Feb 2020 15:21:25 +0800
+In-Reply-To: <20200224233759.GC30288@infradead.org>
+References: <20200221115050.238976-1-satyat@google.com>
+         <20200221115050.238976-7-satyat@google.com>
+         <20200221172244.GC438@infradead.org> <20200221181109.GB925@sol.localdomain>
+         <1582465656.26304.69.camel@mtksdccf07>
+         <20200224233759.GC30288@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
 MIME-Version: 1.0
-In-Reply-To: <20200225034529.GA8908@1wt.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+SGkgQ2hyaXN0b3BoLA0KDQpPbiBNb24sIDIwMjAtMDItMjQgYXQgMTU6MzcgLTA4MDAsIENocmlz
+dG9waCBIZWxsd2lnIHdyb3RlOg0KPiBPbiBTdW4sIEZlYiAyMywgMjAyMCBhdCAwOTo0NzozNlBN
+ICswODAwLCBTdGFubGV5IENodSB3cm90ZToNCj4gPiBZZXMsIE1lZGlhVGVrIGlzIGtlZXBpbmcg
+d29yayBjbG9zZWx5IHdpdGggaW5saW5lIGVuY3J5cHRpb24gcGF0Y2ggc2V0cy4NCj4gPiBDdXJy
+ZW50bHkgdGhlIHY2IHZlcnNpb24gY2FuIHdvcmsgd2VsbCAod2l0aG91dA0KPiA+IFVGU0hDRF9R
+VUlSS19CUk9LRU5fQ1JZUFRPIHF1aXJrKSBhdCBsZWFzdCBpbiBvdXIgTVQ2Nzc5IFNvQyBwbGF0
+Zm9ybQ0KPiA+IHdoaWNoIGJhc2ljIFNvQyBzdXBwb3J0IGFuZCBzb21lIG90aGVyIHBlcmlwaGVy
+YWwgZHJpdmVycyBhcmUgdW5kZXINCj4gPiB1cHN0cmVhbWluZyBhcyBiZWxvdyBsaW5rLA0KPiA+
+IA0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC1tZWRpYXRl
+ay9saXN0Lz9zdGF0ZT0lDQo+ID4gMkEmcT02Nzc5JnNlcmllcz0mc3VibWl0dGVyPSZkZWxlZ2F0
+ZT0mYXJjaGl2ZT1ib3RoDQo+ID4gDQo+ID4gVGhlIGludGVncmF0aW9uIHdpdGggaW5saW5lIGVu
+Y3J5cHRpb24gcGF0Y2ggc2V0IG5lZWRzIHRvIHBhdGNoDQo+ID4gdWZzLW1lZGlhdGVrIGFuZCBw
+YXRjaGVzIGFyZSByZWFkeSBpbiBkb3duc3RyZWFtLiBXZSBwbGFuIHRvIHVwc3RyZWFtDQo+ID4g
+dGhlbSBzb29uIGFmdGVyIGlubGluZSBlbmNyeXB0aW9uIHBhdGNoIHNldHMgZ2V0IG1lcmdlZC4N
+Cj4gDQo+IFdoYXQgYW1vdW50IG9mIHN1cHBvcnQgZG8geW91IG5lZWQgaW4gdWZzLW1lZGlhdGVr
+PyAgSXQgc2VlbXMgbGlrZQ0KPiBwcmV0dHkgbXVjaCBldmVyeSB1ZnMgbG93LWxldmVsIGRyaXZl
+ciBuZWVkcyBzb21lIGtpbmQgb2Ygc3BlY2lmaWMNCj4gc3VwcG9ydCBub3csIHJpZ2h0PyAgSSB3
+b25kZXIgaWYgd2Ugc2hvdWxkIGluc3RlYWQgb3B0IGludG8gdGhlIHN1cHBvcnQNCj4gaW5zdGVh
+ZCBvZiBhbGwgdGhlIHF1aXJraW5nIGhlcmUuDQoNClRoZSBwYXRjaCBpbiB1ZnMtbWVkaWF0ZWsg
+aXMgYWltZWQgdG8gaXNzdWUgdmVuZG9yLXNwZWNpZmljIFNNQyBjYWxscw0KZm9yIGhvc3QgaW5p
+dGlhbGl6YXRpb24gYW5kIGNvbmZpZ3VyYXRpb24uIFRoaXMgaXMgYmVjYXVzZSBNZWRpYVRlayBV
+RlMNCmhvc3QgaGFzIHNvbWUgInNlY3VyZS1wcm90ZWN0ZWQiIHJlZ2lzdGVycy9mZWF0dXJlcyB3
+aGljaCBuZWVkIHRvIGJlDQphY2Nlc3NlZC9zd2l0Y2hlZCBpbiBzZWN1cmUgd29ybGQuIA0KDQpT
+dWNoIHByb3RlY3Rpb24gaXMgbm90IG1lbnRpb25lZCBieSBVRlNIQ0kgc3BlY2lmaWNhdGlvbnMg
+dGh1cyBpbmxpbmUNCmVuY3J5cHRpb24gcGF0Y2ggc2V0IGFzc3VtZXMgdGhhdCBldmVyeSByZWdp
+c3RlcnMgaW4gVUZTSENJIGNhbiBiZQ0KYWNjZXNzZWQgbm9ybWFsbHkgaW4ga2VybmVsLiBUaGlz
+IG1ha2VzIHNlbnNlIGFuZCBzdXJlbHkgdGhlIHBhdGNoc2V0DQpjYW4gd29yayBmaW5lIGluIGFu
+eSAic3RhbmRhcmQiIFVGUyBob3N0LiBIb3dldmVyIGlmIGhvc3QgaGFzIHNwZWNpYWwNCmRlc2ln
+biB0aGVuIGl0IGNhbiB3b3JrIG5vcm1hbGx5IG9ubHkgaWYgc29tZSB2ZW5kb3Itc3BlY2lmaWMg
+dHJlYXRtZW50DQppcyBhcHBsaWVkLg0KDQpJIHRoaW5rIG9uZSBvZiB0aGUgcmVhc29uIHRvIGFw
+cGx5IFVGU0hDRF9RVUlSS19CUk9LRU5fQ1JZUFRPIHF1aXJrIGluDQp1ZnMtcWNvbSBob3N0IGlz
+IHNpbWlsYXIgdG8gYWJvdmUgY2FzZS4NCg0KVGhhbmtzLA0KU3RhbmxleSBDaHUNCg0K
 
-
-On 2/25/20 6:45 AM, Willy Tarreau wrote:
-> On Tue, Feb 25, 2020 at 02:13:42AM +0300, Denis Efremov wrote:
->> On 2/25/20 12:53 AM, Linus Torvalds wrote:
->>> So I'd like to see that second step that does the
->>>
->>>     -static int fdc;                 /* current fdc */
->>>     +static int current_fdc;
->>>
->>> change.
->>>
->>> We already call the global 'drive' variable 'current_drive', so it
->>> really is 'fdc' that is misnamed and ambiguous because it then has two
->>> different cases: the global 'fdc' and then the various shadowing local
->>> 'fdc' variables (or function arguments).
->>>
->>> Mind adding that too? Slightly less automatic, I agree, because then
->>> you really do have to disambiguate between the "is this the shadowed
->>> use of a local 'fdc'" case or the "this is the global 'fdc' use" case.
-> 
-> I definitely agree. I first wanted to be sure the patches were acceptable
-> as a principle, but disambiguating the variables is easy to do now.
-
-Ok, I don't want to break in the middle of your changes in this case.
-
-> 
->>> Can coccinelle do that?
-> 
-> I could do it by hand, I did quite a bit of manual changes and checks
-> already and the driver is not that long.
-> 
->> Willy, if you don't want to spend your time with this code anymore I can
->> prepare pat?hes for the second step. I know coccinelle and could try
->> to automate this transformation. At first sight your patches look
->> good to me. I will answer to the top email after more accurate review.
-> 
-> OK, it's as you like. If you think you can do the change quickly, feel
-> free to do so, otherwise it should not take me more than one hour. In
-> any case as previously mentioned I still have the hardware in a usable
-> state if you want me to recheck anything.
-> 
-
-I also have working hardware to test your changes with the previous patch.
-However, double check is always welcome if you've got time for that. Please,
-send patches on top of these ones. 
-
-Thanks,
-Denis
