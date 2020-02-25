@@ -2,134 +2,160 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4561EC35DF5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 06:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CEDC35DF8
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:14:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1AD1E2082F
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 06:32:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pmua0/yc"
+	by mail.kernel.org (Postfix) with ESMTP id E82A421D7E
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 07:14:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbgBYGcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Feb 2020 01:32:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29168 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725783AbgBYGcT (ORCPT
+        id S1728931AbgBYHOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Feb 2020 02:14:45 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39335 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbgBYHOo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Feb 2020 01:32:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582612337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Eroig7D6vFEeaOGUxUXLrHwiaYEEbMGludUh5+B1tSI=;
-        b=Pmua0/ycORQK/CVAnmhEFhH/JcEoy3y28QOfuyYyiHMCrVCiQiH1kYktdnihfhxamZHxZu
-        VNh0lGK019ZWUokQLQWgAbwkJUafpGKzBoTb5FIkgSIAYycJ50ojBB/u3DXWWeK6lDfHrt
-        UWGrkpUgod+eP2rWNwlsl8OLJMpA+xc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-AzZP0QjNPPOpJYpRHPhvfw-1; Tue, 25 Feb 2020 01:32:15 -0500
-X-MC-Unique: AzZP0QjNPPOpJYpRHPhvfw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B56D8010CA;
-        Tue, 25 Feb 2020 06:32:14 +0000 (UTC)
-Received: from [10.10.124.80] (ovpn-124-80.rdu2.redhat.com [10.10.124.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96A681D6;
-        Tue, 25 Feb 2020 06:32:13 +0000 (UTC)
-Subject: Re: [PATCH 1/2] nbd: enable replace socket if only one connection is
- configured
-To:     Hou Pu <houpu.main@gmail.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-References: <20200219063107.25550-1-houpu@bytedance.com>
- <20200219063107.25550-2-houpu@bytedance.com>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        Hou Pu <houpu@bytedance.com>
-From:   Mike Christie <mchristi@redhat.com>
-Message-ID: <5E54BF6C.4060309@redhat.com>
-Date:   Tue, 25 Feb 2020 00:32:12 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
- Thunderbird/38.6.0
+        Tue, 25 Feb 2020 02:14:44 -0500
+Received: by mail-lj1-f196.google.com with SMTP id o15so12850074ljg.6;
+        Mon, 24 Feb 2020 23:14:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:references:from:autocrypt:cc:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=X05EIkiCts74h+zonYzRVNbTK2o5/+i9BalHqUUjSzA=;
+        b=jmrXo6oEUJMNfn2FA/FKOg4I8G1i+aWTWTPXgao4q8SJh1fFd2J/LQyF3t/aT0j3so
+         FSIZQAZ2YBLtHDZfljUZJmBhzXD301Rq67sCWJ9L1qHNlQS1UjwF7s6mqILt+YCXrsGi
+         DtM0Ygcyqj8WnwZHDSNdkB4mW94OjmG3sahYxRZ21OFM1rCVUPluLJURgid5j1K2Kaw2
+         1E09SJvrbcV1S9mwrUZWJB0tKnq7tH/dzOBDQRSDV8jj047qG8IRkDjj8CcQnrEYt18w
+         m5E7iwNWov+RRdblMjBzTUxSc3jpNS4JLhk5pJ3PdajMgQgNWgyAe3Egz/qLQgtLaZAP
+         X83g==
+X-Gm-Message-State: APjAAAW6kw3GRRq3OARnud1bGVuKkYXxjcbzeM2ARTatW0RPcIBYoyIE
+        xIEGNOXUYLVY2ZufH2PkiV3Z+cWa
+X-Google-Smtp-Source: APXvYqyUhQt8pYHLSWfb1xTJWMmsdrZCNs5TGfsRrMjeKNlgcZk8FVg8sgcrYtT5D98eqKZrTfvGLg==
+X-Received: by 2002:a2e:9143:: with SMTP id q3mr31123286ljg.199.1582614882144;
+        Mon, 24 Feb 2020 23:14:42 -0800 (PST)
+Received: from [10.68.32.192] (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
+        by smtp.gmail.com with ESMTPSA id i5sm7266937ljj.29.2020.02.24.23.14.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Feb 2020 23:14:40 -0800 (PST)
+To:     Willy Tarreau <w@1wt.eu>
+References: <20200224212352.8640-1-w@1wt.eu> <20200224212352.8640-2-w@1wt.eu>
+ <CAHk-=wi4R_nPdE4OuNW9daKFD4FpV74PkG4USHqub+nuvOWYFg@mail.gmail.com>
+ <28e72058-021d-6de0-477e-6038a10d96da@linux.com>
+ <20200225034529.GA8908@1wt.eu>
+From:   Denis Efremov <efremov@linux.com>
+Autocrypt: addr=efremov@linux.com; keydata=
+ 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
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 01/10] floppy: cleanup: expand macro FDCS
+Message-ID: <c181b184-1785-b221-76fa-4313bbada09d@linux.com>
+Date:   Tue, 25 Feb 2020 10:14:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200219063107.25550-2-houpu@bytedance.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200225034529.GA8908@1wt.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 02/19/2020 12:31 AM, Hou Pu wrote:
-> Nbd server with multiple connections could be upgraded since
-> 560bc4b (nbd: handle dead connections). But if only one conncection
-> is configured, after we take down nbd server, all inflight IO
-> would finally timeout and return error. We could requeue them
-> like what we do with multiple connections and wait for new socket
-> in submit path.
+
+
+On 2/25/20 6:45 AM, Willy Tarreau wrote:
+> On Tue, Feb 25, 2020 at 02:13:42AM +0300, Denis Efremov wrote:
+>> On 2/25/20 12:53 AM, Linus Torvalds wrote:
+>>> So I'd like to see that second step that does the
+>>>
+>>>     -static int fdc;                 /* current fdc */
+>>>     +static int current_fdc;
+>>>
+>>> change.
+>>>
+>>> We already call the global 'drive' variable 'current_drive', so it
+>>> really is 'fdc' that is misnamed and ambiguous because it then has two
+>>> different cases: the global 'fdc' and then the various shadowing local
+>>> 'fdc' variables (or function arguments).
+>>>
+>>> Mind adding that too? Slightly less automatic, I agree, because then
+>>> you really do have to disambiguate between the "is this the shadowed
+>>> use of a local 'fdc'" case or the "this is the global 'fdc' use" case.
 > 
-> Signed-off-by: Hou Pu <houpu@bytedance.com>
-> ---
->  drivers/block/nbd.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+> I definitely agree. I first wanted to be sure the patches were acceptable
+> as a principle, but disambiguating the variables is easy to do now.
+
+Ok, I don't want to break in the middle of your changes in this case.
+
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 78181908f0df..8e348c9c49a4 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -395,16 +395,19 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
->  	}
->  	config = nbd->config;
->  
-> -	if (config->num_connections > 1) {
-> +	if (config->num_connections > 1 ||
-> +	    (config->num_connections == 1 && nbd->tag_set.timeout)) {
->  		dev_err_ratelimited(nbd_to_dev(nbd),
->  				    "Connection timed out, retrying (%d/%d alive)\n",
->  				    atomic_read(&config->live_connections),
->  				    config->num_connections);
->  		/*
->  		 * Hooray we have more connections, requeue this IO, the submit
-> -		 * path will put it on a real connection.
-> +		 * path will put it on a real connection. Or if only one
-> +		 * connection is configured, the submit path will wait util
-> +		 * a new connection is reconfigured or util dead timeout.
->  		 */
-> -		if (config->socks && config->num_connections > 1) {
-> +		if (config->socks) {
->  			if (cmd->index < config->num_connections) {
->  				struct nbd_sock *nsock =
->  					config->socks[cmd->index];
-> @@ -747,8 +750,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
->  				 * and let the timeout stuff handle resubmitting
->  				 * this request onto another connection.
->  				 */
-> -				if (nbd_disconnected(config) ||
-> -				    config->num_connections <= 1) {
-> +				if (nbd_disconnected(config)) {
-
-I think you need to update the comment right above this chunk. It still
-mentions num_connections=1 working differently.
-
-
->  					cmd->status = BLK_STS_IOERR;
->  					goto out;
->  				}
-> @@ -825,7 +827,7 @@ static int find_fallback(struct nbd_device *nbd, int index)
->  
->  	if (config->num_connections <= 1) {
->  		dev_err_ratelimited(disk_to_dev(nbd->disk),
-> -				    "Attempted send on invalid socket\n");
-> +				    "Dead connection, failed to find a fallback\n");
->  		return new_index;
->  	}
->  
+>>> Can coccinelle do that?
+> 
+> I could do it by hand, I did quite a bit of manual changes and checks
+> already and the driver is not that long.
+> 
+>> Willy, if you don't want to spend your time with this code anymore I can
+>> prepare pat?hes for the second step. I know coccinelle and could try
+>> to automate this transformation. At first sight your patches look
+>> good to me. I will answer to the top email after more accurate review.
+> 
+> OK, it's as you like. If you think you can do the change quickly, feel
+> free to do so, otherwise it should not take me more than one hour. In
+> any case as previously mentioned I still have the hardware in a usable
+> state if you want me to recheck anything.
 > 
 
+I also have working hardware to test your changes with the previous patch.
+However, double check is always welcome if you've got time for that. Please,
+send patches on top of these ones. 
+
+Thanks,
+Denis
