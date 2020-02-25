@@ -2,85 +2,121 @@ Return-Path: <SRS0=qPv+=4N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5F1C35DEE
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B7CC35DEA
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2A4520838
-	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 280D22072D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Feb 2020 00:47:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e3CpIUF8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728316AbgBYAUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Feb 2020 19:20:10 -0500
-Received: from avon.wwwdotorg.org ([104.237.132.123]:53770 "EHLO
-        avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbgBYAUK (ORCPT
+        id S1728316AbgBYArr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Feb 2020 19:47:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28445 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727976AbgBYArr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Feb 2020 19:20:10 -0500
-Received: from [10.20.204.51] (unknown [216.228.112.24])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Mon, 24 Feb 2020 19:47:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582591666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ICiAd5RTJMpo+oDHnLgVnlN5Y5se7WK6hiOisylZkxg=;
+        b=e3CpIUF8mpcumy4czU4guE7Bd28jqblxbkRr448EeEp6+bur6IWvBlpCiSWjYz/XL7US4I
+        0BPQgWkw8aBMFh0+DKEVaXu+/Em7HEKEtjA7WgAeg5LSqkFXtZjkiYkxUIcB5+g0hwBJPr
+        iR6hlwHfxBZQz+5tMuIoyrza0RA6i3w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-c4VwVxjtNXiO5tOfgXB6fg-1; Mon, 24 Feb 2020 19:47:42 -0500
+X-MC-Unique: c4VwVxjtNXiO5tOfgXB6fg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by avon.wwwdotorg.org (Postfix) with ESMTPSA id DD3721C03C9;
-        Mon, 24 Feb 2020 17:20:07 -0700 (MST)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.102.1 at avon.wwwdotorg.org
-Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>, linux-tegra@vger.kernel.org,
-        linux-block@vger.kernel.org, Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200224231841.26550-1-digetx@gmail.com>
- <20200224231841.26550-4-digetx@gmail.com>
-From:   Stephen Warren <swarren@wwwdotorg.org>
-Message-ID: <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
-Date:   Mon, 24 Feb 2020 17:20:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B4AA18FE860;
+        Tue, 25 Feb 2020 00:47:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F46E909EF;
+        Tue, 25 Feb 2020 00:47:32 +0000 (UTC)
+Date:   Tue, 25 Feb 2020 08:47:27 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
+Subject: Re: [PATCH v3 2/8] blk-mq: Keep set->nr_hw_queues and
+ set->map[].nr_queues in sync
+Message-ID: <20200225004727.GA27445@ming.t460p>
+References: <20200221032243.9708-1-bvanassche@acm.org>
+ <20200221032243.9708-3-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20200224231841.26550-4-digetx@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200221032243.9708-3-bvanassche@acm.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
-> All NVIDIA Tegra devices use a special partition table format for the
-> internal storage partitioning. Most of Tegra devices have GPT partition
-> in addition to TegraPT, but some older Android consumer-grade devices do
-> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
-> in order to support these devices properly in the upstream kernel. This
-> patch adds support for NVIDIA Tegra Partition Table format that is used
-> at least by all NVIDIA Tegra20 and Tegra30 devices.
-
-> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
-
-> +static void __init tegra_boot_config_table_init(void)
-> +{
-> +	void __iomem *bct_base;
-> +	u16 pt_addr, pt_size;
+On Thu, Feb 20, 2020 at 07:22:37PM -0800, Bart Van Assche wrote:
+> blk_mq_map_queues() and multiple .map_queues() implementations expect that
+> set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the number of hardware
+> queues. Hence set .nr_queues before calling these functions. This patch
+> fixes the following kernel warning:
+> 
+> WARNING: CPU: 0 PID: 2501 at include/linux/cpumask.h:137
+> Call Trace:
+>  blk_mq_run_hw_queue+0x19d/0x350 block/blk-mq.c:1508
+>  blk_mq_run_hw_queues+0x112/0x1a0 block/blk-mq.c:1525
+>  blk_mq_requeue_work+0x502/0x780 block/blk-mq.c:775
+>  process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
+>  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+>  kthread+0x361/0x430 kernel/kthread.c:255
+> 
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jth@kernel.org>
+> Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
+> Fixes: ed76e329d74a ("blk-mq: abstract out queue map") # v5.0
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-mq.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f298500e6dda..a92444c077bc 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3023,6 +3023,14 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+>  
+>  static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+>  {
+> +	/*
+> +	 * blk_mq_map_queues() and multiple .map_queues() implementations
+> +	 * expect that set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the
+> +	 * number of hardware queues.
+> +	 */
+> +	if (set->nr_maps == 1)
+> +		set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
 > +
-> +	bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
+>  	if (set->ops->map_queues && !is_kdump_kernel()) {
+>  		int i;
+>  
+> 
 
-This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot 
-Information Table) to a fixed location in IRAM, and there's some value 
-in the BIT that points to where the BCT is in IRAM. In practice, it 
-might work out that the BCT is always at the same place in IRAM, but 
-this certainly isn't guaranteed. I think there's code in U-Boot which 
-extracts the BCT location from the BIT? Yes, see 
-arch/arm/mach-tegra/ap.c:get_odmdata().
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
+
