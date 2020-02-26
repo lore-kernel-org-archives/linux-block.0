@@ -2,176 +2,159 @@ Return-Path: <SRS0=LW4I=4O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C49C4BA0F
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFA5C4BA0E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:09:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3BF37222C2
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:40:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JiIsQRjn"
+	by mail.kernel.org (Postfix) with ESMTP id E1FDB2468A
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbgBZIkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Feb 2020 03:40:49 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:33514 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727823AbgBZIkt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Feb 2020 03:40:49 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01Q8dUX1013730;
-        Wed, 26 Feb 2020 08:40:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=CT6n6U935vcrUBg8uf+s666OpRuH6tq158bXwYwRJ/I=;
- b=JiIsQRjnXpNWR8RDOkYMWO7f8nH4LsVTW/PoyHxWI9bVbrFvFmxEWzIRosSEvjQB+ewL
- 25+kfTx/2rHQm7OKp7SyYb2Fdmdtm67VQ5zV1iqlr3Q3pKh7ZQfwkEVbRfLxDV5RRLv1
- R4fRjaz5X+P8xlVIItg1Z7kt/fM1zroNFhUdc2wGtbH8+JYfqDSS97ig4hVTo+Rz6MBq
- nq+dP4w8JefZ06LrVX3AL/kGGwB1XDXaRnlMqRCqFSImurjemUD5mtpvVP+RZy/2DFIE
- QgzXwDhhGCF7shfvapptPCBuF3PKvKsohh4bTqG3eHWJmqV0HaDpTmpTNrATd32Yoax3 Mg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2ydcsn9xp1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Feb 2020 08:40:46 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01Q8cBdD091499;
-        Wed, 26 Feb 2020 08:38:46 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2ydcs1hs1u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Feb 2020 08:38:45 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01Q8cikv010058;
-        Wed, 26 Feb 2020 08:38:44 GMT
-Received: from localhost.localdomain (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 26 Feb 2020 00:38:43 -0800
-From:   Bob Liu <bob.liu@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
-        linux-fsdevel@vger.kernel.org, darrick.wong@oracle.com,
-        io-uring@vger.kernel.org, Bob Liu <bob.liu@oracle.com>
-Subject: [PATCH 1/4] io_uring: add IORING_OP_READ{WRITE}V_PI cmd
-Date:   Wed, 26 Feb 2020 16:37:16 +0800
-Message-Id: <20200226083719.4389-2-bob.liu@oracle.com>
-X-Mailer: git-send-email 2.9.5
-In-Reply-To: <20200226083719.4389-1-bob.liu@oracle.com>
-References: <20200226083719.4389-1-bob.liu@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9542 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 phishscore=0 suspectscore=1 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002260065
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9542 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0
- suspectscore=1 impostorscore=0 clxscore=1015 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002260065
+        id S1726440AbgBZLJx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Feb 2020 06:09:53 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2466 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726408AbgBZLJx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Feb 2020 06:09:53 -0500
+Received: from LHREML714-CAH.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 6549A6E87B0A9156BA9C;
+        Wed, 26 Feb 2020 11:09:50 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ LHREML714-CAH.china.huawei.com (10.201.108.37) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Wed, 26 Feb 2020 11:09:50 +0000
+Received: from [127.0.0.1] (10.202.226.45) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5; Wed, 26 Feb
+ 2020 11:09:48 +0000
+Subject: Re: [PATCH RFC v5 00/11] blk-mq/scsi: Provide hostwide shared tags
+ for SCSI HBAs
+To:     Hannes Reinecke <hare@suse.de>
+CC:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        Ming Lei <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+References: <20191202153914.84722-1-hare@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <14b627ba-890c-ffe1-a648-7f22a4829372@huawei.com>
+Date:   Wed, 26 Feb 2020 11:09:46 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <20191202153914.84722-1-hare@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.45]
+X-ClientProxiedBy: lhreml708-chm.china.huawei.com (10.201.108.57) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add read and write with protect information command.
+On 02/12/2019 15:39, Hannes Reinecke wrote:
+> Hi all,
+> 
 
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
----
- fs/io_uring.c                 | 12 ++++++++++++
- include/linux/fs.h            |  1 +
- include/uapi/linux/io_uring.h |  2 ++
- 3 files changed, 15 insertions(+)
+JFYI, Sumit requested that we rebase this patchset for testing against 
+the latest kernel - it no longer applies for 5.6-rc. I'm going to do 
+that now and repost.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 562e3a1..c43d96a 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -630,12 +630,14 @@ static inline bool io_prep_async_work(struct io_kiocb *req,
- 
- 	switch (req->opcode) {
- 	case IORING_OP_WRITEV:
-+	case IORING_OP_WRITEV_PI:
- 	case IORING_OP_WRITE_FIXED:
- 		/* only regular files should be hashed for writes */
- 		if (req->flags & REQ_F_ISREG)
- 			do_hashed = true;
- 		/* fall-through */
- 	case IORING_OP_READV:
-+	case IORING_OP_READV_PI:
- 	case IORING_OP_READ_FIXED:
- 	case IORING_OP_SENDMSG:
- 	case IORING_OP_RECVMSG:
-@@ -1505,6 +1507,12 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 	kiocb->ki_pos = READ_ONCE(sqe->off);
- 	kiocb->ki_flags = iocb_flags(kiocb->ki_filp);
- 	kiocb->ki_hint = ki_hint_validate(file_write_hint(kiocb->ki_filp));
-+	if (req->opcode == IORING_OP_READV_PI ||
-+			req->opcode == IORING_OP_WRITEV_PI) {
-+		if (!(req->file->f_flags & O_DIRECT))
-+			return -EINVAL;
-+		kiocb->ki_flags |= IOCB_USE_PI;
-+	}
- 
- 	ioprio = READ_ONCE(sqe->ioprio);
- 	if (ioprio) {
-@@ -3065,10 +3073,12 @@ static int io_req_defer_prep(struct io_kiocb *req,
- 	case IORING_OP_NOP:
- 		break;
- 	case IORING_OP_READV:
-+	case IORING_OP_READV_PI:
- 	case IORING_OP_READ_FIXED:
- 		ret = io_read_prep(req, sqe, true);
- 		break;
- 	case IORING_OP_WRITEV:
-+	case IORING_OP_WRITEV_PI:
- 	case IORING_OP_WRITE_FIXED:
- 		ret = io_write_prep(req, sqe, true);
- 		break;
-@@ -3156,6 +3166,7 @@ static int io_issue_sqe(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 	case IORING_OP_NOP:
- 		ret = io_nop(req);
- 		break;
-+	case IORING_OP_READV_PI:
- 	case IORING_OP_READV:
- 	case IORING_OP_READ_FIXED:
- 		if (sqe) {
-@@ -3166,6 +3177,7 @@ static int io_issue_sqe(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		ret = io_read(req, nxt, force_nonblock);
- 		break;
- 	case IORING_OP_WRITEV:
-+	case IORING_OP_WRITEV_PI:
- 	case IORING_OP_WRITE_FIXED:
- 		if (sqe) {
- 			ret = io_write_prep(req, sqe, force_nonblock);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 98e0349..65fda07 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -314,6 +314,7 @@ enum rw_hint {
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
- #define IOCB_NOWAIT		(1 << 7)
-+#define IOCB_USE_PI		(1 << 8)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index a3300e1..98fa3f1 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -62,6 +62,8 @@ enum {
- 	IORING_OP_NOP,
- 	IORING_OP_READV,
- 	IORING_OP_WRITEV,
-+	IORING_OP_READV_PI,
-+	IORING_OP_WRITEV_PI,
- 	IORING_OP_FSYNC,
- 	IORING_OP_READ_FIXED,
- 	IORING_OP_WRITE_FIXED,
--- 
-2.9.5
+Thanks,
+John
+
+> here now is an updated version of the v2 patchset from John Garry,
+> including the suggestions and reviews from the mailing list.
+> John, apologies for hijacking your work :-)
+> 
+> For this version I've only added some slight modifications to Johns
+> original patch (renaming variables etc); the contentious separate sbitmap
+> allocation has been dropped in favour of Johns original version with pointers
+> to the embedded sbitmap.
+> 
+> But more importantly I've reworked the scheduler tag allocation after
+> discussions with Ming Lei.
+> 
+> Point is, hostwide shared tags can't really be resized; they surely
+> cannot be increased (as it's a hardware limitation), and even decreasing
+> is questionable as any modification here would affect all devices
+> served by this HBA.
+> 
+> Scheduler tags, OTOH, can be considered as per-queue, as the I/O scheduler
+> might want to look at all requests on all queues. As such the queue depth
+> is distinct from the actual queue depth of the tagset.
+> Seeing that it is distinct the depth can now be changed independently of
+> the underlying tagset, and there's no need ever to change the tagset itself.
+> 
+> I've also modified megaraid_sas, smartpqi and hpsa to take advantage of
+> host_tags.
+> 
+> Performance for megaraid_sas is on par with the original implementation,
+> with the added benefit that with this we should be able to handle cpu
+> hotplug properly.
+> 
+> Differences to v4:
+> - Rework scheduler tag allocations
+> - Revert back to the original implementation from John
+> 
+> Differences to v3:
+> - Include reviews from Ming Lei
+> 
+> Differences to v2:
+> - Drop embedded tag bitmaps
+> - Do not share scheduling tags
+> - Add patches for hpsa and smartpqi
+> 
+> Differences to v1:
+> - Use a shared sbitmap, and not a separate shared tags (a big change!)
+> 	- Drop request.shared_tag
+> - Add RB tags
+> 
+> Hannes Reinecke (7):
+>    blk-mq: rename blk_mq_update_tag_set_depth()
+>    blk-mq: add WARN_ON in blk_mq_free_rqs()
+>    blk-mq: move shared sbitmap into elevator queue
+>    scsi: Add template flag 'host_tagset'
+>    megaraid_sas: switch fusion adapters to MQ
+>    smartpqi: enable host tagset
+>    hpsa: enable host_tagset and switch to MQ
+> 
+> John Garry (3):
+>    blk-mq: Remove some unused function arguments
+>    blk-mq: Facilitate a shared sbitmap per tagset
+>    scsi: hisi_sas: Switch v3 hw to MQ
+> 
+> Ming Lei (1):
+>    blk-mq: rename BLK_MQ_F_TAG_SHARED as BLK_MQ_F_TAG_QUEUE_SHARED
+> 
+>   block/bfq-iosched.c                         |   4 +-
+>   block/blk-mq-debugfs.c                      |  12 +--
+>   block/blk-mq-sched.c                        |  22 +++++
+>   block/blk-mq-tag.c                          | 140 +++++++++++++++++++++-------
+>   block/blk-mq-tag.h                          |  27 ++++--
+>   block/blk-mq.c                              | 104 +++++++++++++++------
+>   block/blk-mq.h                              |   7 +-
+>   block/blk-sysfs.c                           |   7 ++
+>   block/kyber-iosched.c                       |   4 +-
+>   drivers/scsi/hisi_sas/hisi_sas.h            |   3 +-
+>   drivers/scsi/hisi_sas/hisi_sas_main.c       |  36 +++----
+>   drivers/scsi/hisi_sas/hisi_sas_v3_hw.c      |  86 +++++++----------
+>   drivers/scsi/hpsa.c                         |  44 ++-------
+>   drivers/scsi/hpsa.h                         |   1 -
+>   drivers/scsi/megaraid/megaraid_sas.h        |   1 -
+>   drivers/scsi/megaraid/megaraid_sas_base.c   |  65 ++++---------
+>   drivers/scsi/megaraid/megaraid_sas_fusion.c |  14 ++-
+>   drivers/scsi/scsi_lib.c                     |   2 +
+>   drivers/scsi/smartpqi/smartpqi_init.c       |  38 ++++++--
+>   include/linux/blk-mq.h                      |   7 +-
+>   include/linux/elevator.h                    |   3 +
+>   include/scsi/scsi_host.h                    |   3 +
+>   22 files changed, 380 insertions(+), 250 deletions(-)
+> 
 
