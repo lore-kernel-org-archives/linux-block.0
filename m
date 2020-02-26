@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A9BC4BA0E
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53811C4BA12
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0769624689
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 347762468D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728069AbgBZLLv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728072AbgBZLLv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 26 Feb 2020 06:11:51 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38474 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38420 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728040AbgBZLLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1728000AbgBZLLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Wed, 26 Feb 2020 06:11:50 -0500
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 8D321C62C27E8C8173FB;
+        by Forcepoint Email with ESMTP id 81F038A282C020EE2566;
         Wed, 26 Feb 2020 19:11:45 +0800 (CST)
 Received: from huawei.com (10.90.53.225) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Feb 2020
- 19:11:42 +0800
+ 19:11:41 +0800
 From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-fsdevel@vger.kernel.org>
 CC:     <tj@kernel.org>, <jack@suse.cz>, <bvanassche@acm.org>,
         <tytso@mit.edu>
-Subject: [PATCH v2 7/7] blk-wbt: replace bdi_dev_name() with bdi_get_dev_name()
-Date:   Wed, 26 Feb 2020 19:18:51 +0800
-Message-ID: <20200226111851.55348-8-yuyufen@huawei.com>
+Subject: [PATCH v2 5/7] bfq: fix potential kernel crash when print dev err info
+Date:   Wed, 26 Feb 2020 19:18:49 +0800
+Message-ID: <20200226111851.55348-6-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.16.2.dirty
 In-Reply-To: <20200226111851.55348-1-yuyufen@huawei.com>
 References: <20200226111851.55348-1-yuyufen@huawei.com>
@@ -44,55 +44,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-wb_timer_fn() can be called after bdi unregister. So, we get bdi
-device name by bdi_get_dev_name() to avoid use-after-free or null
-pointer deference for ->dev.
+We use bdi_get_dev_name() to get device name, avoiding
+use-after-free or NULL pointer reference for ->dev.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- include/trace/events/wbt.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/bfq-iosched.c         | 7 +++++--
+ include/linux/backing-dev.h | 2 ++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/trace/events/wbt.h b/include/trace/events/wbt.h
-index 9996420d7ec4..3fbf15565962 100644
---- a/include/trace/events/wbt.h
-+++ b/include/trace/events/wbt.h
-@@ -33,7 +33,7 @@ TRACE_EVENT(wbt_stat,
- 	),
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 00904611b8e4..8d41783d8e77 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -123,6 +123,7 @@
+ #include <linux/ioprio.h>
+ #include <linux/sbitmap.h>
+ #include <linux/delay.h>
++#include <linux/backing-dev.h>
  
- 	TP_fast_assign(
--		strlcpy(__entry->name, bdi_dev_name(bdi),
-+		bdi_get_dev_name(bdi, __entry->name,
- 			ARRAY_SIZE(__entry->name));
- 		__entry->rmean		= stat[0].mean;
- 		__entry->rmin		= stat[0].min;
-@@ -68,7 +68,7 @@ TRACE_EVENT(wbt_lat,
- 	),
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -4971,6 +4972,7 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
+ 	struct task_struct *tsk = current;
+ 	int ioprio_class;
+ 	struct bfq_data *bfqd = bfqq->bfqd;
++	char dname[BDI_DEV_NAME_LEN];
  
- 	TP_fast_assign(
--		strlcpy(__entry->name, bdi_dev_name(bdi),
-+		bdi_get_dev_name(bdi, __entry->name,
- 			ARRAY_SIZE(__entry->name));
- 		__entry->lat = div_u64(lat, 1000);
- 	),
-@@ -105,7 +105,7 @@ TRACE_EVENT(wbt_step,
- 	),
+ 	if (!bfqd)
+ 		return;
+@@ -4978,8 +4980,9 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
+ 	ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
+ 	switch (ioprio_class) {
+ 	default:
+-		dev_err(&bfqq->bfqd->queue->backing_dev_info->rcu_dev->dev,
+-			"bfq: bad prio class %d\n", ioprio_class);
++		bdi_get_dev_name(bfqq->bfqd->queue->backing_dev_info,
++				dname, BDI_DEV_NAME_LEN);
++		pr_err("bdi %s: bfq: bad prio class %d\n", dname, ioprio_class);
+ 		/* fall through */
+ 	case IOPRIO_CLASS_NONE:
+ 		/*
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 89d1cb7923f5..291db069f7da 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -19,6 +19,8 @@
+ #include <linux/backing-dev-defs.h>
+ #include <linux/slab.h>
  
- 	TP_fast_assign(
--		strlcpy(__entry->name, bdi_dev_name(bdi),
-+		bdi_get_dev_name(bdi, __entry->name,
- 			ARRAY_SIZE(__entry->name));
- 		__entry->msg	= msg;
- 		__entry->step	= step;
-@@ -141,7 +141,7 @@ TRACE_EVENT(wbt_timer,
- 	),
- 
- 	TP_fast_assign(
--		strlcpy(__entry->name, bdi_dev_name(bdi),
-+		bdi_get_dev_name(bdi, __entry->name,
- 			ARRAY_SIZE(__entry->name));
- 		__entry->status		= status;
- 		__entry->step		= step;
++#define BDI_DEV_NAME_LEN       32
++
+ static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+ {
+ 	kref_get(&bdi->refcnt);
 -- 
 2.16.2.dirty
 
