@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80933C4BA13
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DEBC4BA0E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6112824698
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E71E24689
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 11:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728048AbgBZLLt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728028AbgBZLLt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 26 Feb 2020 06:11:49 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38292 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38260 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727891AbgBZLLs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727954AbgBZLLs (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Wed, 26 Feb 2020 06:11:48 -0500
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6FC2E719D1F313B2E02F;
+        by Forcepoint Email with ESMTP id 5C21E9D6AA8E520C65F5;
         Wed, 26 Feb 2020 19:11:45 +0800 (CST)
 Received: from huawei.com (10.90.53.225) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Feb 2020
- 19:11:41 +0800
+ 19:11:39 +0800
 From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-fsdevel@vger.kernel.org>
 CC:     <tj@kernel.org>, <jack@suse.cz>, <bvanassche@acm.org>,
         <tytso@mit.edu>
-Subject: [PATCH v2 4/7] bdi: create a new function bdi_get_dev_name()
-Date:   Wed, 26 Feb 2020 19:18:48 +0800
-Message-ID: <20200226111851.55348-5-yuyufen@huawei.com>
+Subject: [PATCH v2 1/7] blk-wbt: use bdi_dev_name() to get device name
+Date:   Wed, 26 Feb 2020 19:18:45 +0800
+Message-ID: <20200226111851.55348-2-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.16.2.dirty
 In-Reply-To: <20200226111851.55348-1-yuyufen@huawei.com>
 References: <20200226111851.55348-1-yuyufen@huawei.com>
@@ -44,49 +44,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We prepare a new function bdi_get_dev_name() to copy device
-kobj->name into buffer passed by caller. The function is covered
-by RCU. Thus, caller can access ->dev and copy integral device name.
+Use the common interface bdi_dev_name() to get device name.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- include/linux/backing-dev.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ include/trace/events/wbt.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 67e429b203a1..89d1cb7923f5 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -514,4 +514,29 @@ static inline const char *bdi_dev_name(struct backing_dev_info *bdi)
- 	return dev_name(&bdi->rcu_dev->dev);
- }
+diff --git a/include/trace/events/wbt.h b/include/trace/events/wbt.h
+index 37342a13c9cb..9996420d7ec4 100644
+--- a/include/trace/events/wbt.h
++++ b/include/trace/events/wbt.h
+@@ -33,7 +33,7 @@ TRACE_EVENT(wbt_stat,
+ 	),
  
-+/**
-+ * bdi_get_dev_name - copy bdi device name into buffer
-+ * @bdi: target bdi
-+ * @dname: Where to copy the device name to
-+ * @len: size of destination buffer
-+ */
-+static inline void bdi_get_dev_name(struct backing_dev_info *bdi,
-+			char *dname, int len)
-+{
-+	struct bdi_rcu_device *rcu_dev;
-+
-+	if (!bdi) {
-+		strlcpy(dname, bdi_unknown_name, len);
-+		return;
-+	}
-+
-+	rcu_read_lock();
-+
-+	rcu_dev = rcu_dereference(bdi->rcu_dev);
-+	strlcpy(dname, rcu_dev ? dev_name(&rcu_dev->dev) :
-+			bdi_unknown_name, len);
-+
-+	rcu_read_unlock();
-+}
-+
- #endif	/* _LINUX_BACKING_DEV_H */
+ 	TP_fast_assign(
+-		strlcpy(__entry->name, dev_name(bdi->dev),
++		strlcpy(__entry->name, bdi_dev_name(bdi),
+ 			ARRAY_SIZE(__entry->name));
+ 		__entry->rmean		= stat[0].mean;
+ 		__entry->rmin		= stat[0].min;
+@@ -68,7 +68,7 @@ TRACE_EVENT(wbt_lat,
+ 	),
+ 
+ 	TP_fast_assign(
+-		strlcpy(__entry->name, dev_name(bdi->dev),
++		strlcpy(__entry->name, bdi_dev_name(bdi),
+ 			ARRAY_SIZE(__entry->name));
+ 		__entry->lat = div_u64(lat, 1000);
+ 	),
+@@ -105,7 +105,7 @@ TRACE_EVENT(wbt_step,
+ 	),
+ 
+ 	TP_fast_assign(
+-		strlcpy(__entry->name, dev_name(bdi->dev),
++		strlcpy(__entry->name, bdi_dev_name(bdi),
+ 			ARRAY_SIZE(__entry->name));
+ 		__entry->msg	= msg;
+ 		__entry->step	= step;
+@@ -141,7 +141,7 @@ TRACE_EVENT(wbt_timer,
+ 	),
+ 
+ 	TP_fast_assign(
+-		strlcpy(__entry->name, dev_name(bdi->dev),
++		strlcpy(__entry->name, bdi_dev_name(bdi),
+ 			ARRAY_SIZE(__entry->name));
+ 		__entry->status		= status;
+ 		__entry->step		= step;
 -- 
 2.16.2.dirty
 
