@@ -2,68 +2,81 @@ Return-Path: <SRS0=LW4I=4O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD3DC4BA13
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 15:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 992D7C4BA13
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 15:57:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17AC120637
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 15:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60E492467B
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 15:57:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LXgY2HyV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbgBZPqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Feb 2020 10:46:48 -0500
-Received: from wtarreau.pck.nerim.net ([62.212.114.60]:31596 "EHLO 1wt.eu"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728244AbgBZPqs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Feb 2020 10:46:48 -0500
-Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 01QFkesY002182;
-        Wed, 26 Feb 2020 16:46:40 +0100
-Date:   Wed, 26 Feb 2020 16:46:40 +0100
-From:   Willy Tarreau <w@1wt.eu>
-To:     Denis Efremov <efremov@linux.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 15/16] floppy: separate the FDC's base address from its
- registers
-Message-ID: <20200226154640.GB2054@1wt.eu>
-References: <20200224212352.8640-1-w@1wt.eu>
- <20200226080732.1913-1-w@1wt.eu>
- <20200226080732.1913-5-w@1wt.eu>
- <ab69fbdc-7ccb-05ef-6c25-7fb6ed6fce59@linux.com>
+        id S1728729AbgBZP53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Feb 2020 10:57:29 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:53260 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728725AbgBZP53 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Feb 2020 10:57:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=q6+/Qd2Y2JYGSuVZkpzMJBymUWB4oioDyaoc9EA54Mk=; b=LXgY2HyV62m0jZoriJzn9lW1Vo
+        1rcWuVS6DQyaDEyT8m1/KLrbKN+DKjK6bih5KPHbY+pNX3P1JcdIk4UcTZkyZmHVyWUuLbZzGvJkw
+        EmGuKm0Ss0qYMWC8JrCq8ttlOMOgmg80NINVJNFRzkotRIvbQ9Ejby2QJN1aO2aWGleI6pnBHVoxn
+        kdNVPOhsUpmkoTyzhKEVYzWscEIxwqWbThBQwtgQHrTbxlcm17f/TLO+tZaLPA/fQxBf5CF9DnTBy
+        nFySCmtHbzeRTJcRe/SOiQM7g0vULK3XTyVDzhGtDDSTkPAojrMopVqqRCLezZ27CY/s3yUWrQKSS
+        3Urlv3IQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j6z3w-00007H-7d; Wed, 26 Feb 2020 15:57:28 +0000
+Date:   Wed, 26 Feb 2020 07:57:28 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com, linux-fsdevel@vger.kernel.org,
+        darrick.wong@oracle.com, io-uring@vger.kernel.org
+Subject: Re: [PATCH 1/4] io_uring: add IORING_OP_READ{WRITE}V_PI cmd
+Message-ID: <20200226155728.GA32543@infradead.org>
+References: <20200226083719.4389-1-bob.liu@oracle.com>
+ <20200226083719.4389-2-bob.liu@oracle.com>
+ <6e466774-4dc5-861c-58b5-f0cc728bacff@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab69fbdc-7ccb-05ef-6c25-7fb6ed6fce59@linux.com>
-User-Agent: Mutt/1.6.1 (2016-04-27)
+In-Reply-To: <6e466774-4dc5-861c-58b5-f0cc728bacff@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 26, 2020 at 06:36:52PM +0300, Denis Efremov wrote:
-> > One place in the ARM code used to check if the port was equal to FD_DOR,
-> > this was changed to testing the register by applying a mask to the port,
-> > as was already done in the sparc code.
-> > 
-> > The sparc, m68k and parisc code could now be slightly cleaned up to
-> > benefit from the macro definitions above instead of the equivalent
-> > hard-coded values.
+On Wed, Feb 26, 2020 at 07:24:06AM -0700, Jens Axboe wrote:
+> On 2/26/20 1:37 AM, Bob Liu wrote:
+> > diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> > index a3300e1..98fa3f1 100644
+> > --- a/include/uapi/linux/io_uring.h
+> > +++ b/include/uapi/linux/io_uring.h
+> > @@ -62,6 +62,8 @@ enum {
+> >  	IORING_OP_NOP,
+> >  	IORING_OP_READV,
+> >  	IORING_OP_WRITEV,
+> > +	IORING_OP_READV_PI,
+> > +	IORING_OP_WRITEV_PI,
+> >  	IORING_OP_FSYNC,
+> >  	IORING_OP_READ_FIXED,
+> >  	IORING_OP_WRITE_FIXED,
 > 
-> Just to note for future ref: the mask (7) can be introduced as define
-> during future clean up of these magic constants.
+> So this one renumbers everything past IORING_OP_WRITEV, breaking the
+> ABI in a very bad way. I'm guessing that was entirely unintentional?
+> Any new command must go at the end of the list.
+> 
+> You're also not updating io_op_defs[] with the two new commands,
+> which means it won't compile at all. I'm guessing you tested this on
+> an older version of the kernel which didn't have io_op_defs[]?
 
-I'd rather not add it because if we finish to clean up the internal API,
-then we can have fd_outb(value, base, reg) and fd_inb(base, reg) where
-reg is one of FD_* and base the base address. In this context we don't
-need the mask anymore since the register is placed there verbatim.
-
-I do have another earlier patch which did just that, its just that I
-attacked the problem from the wrong side, resulting in too many changes
-at once for my taste. But I definitely see how we can finish that job
-and make everything almost elegant.
-
-Willy
+And the real question is why we need ops insted of just a flag and
+using previously reserved fields for the PI pointer.
