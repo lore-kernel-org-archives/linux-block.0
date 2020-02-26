@@ -2,99 +2,112 @@ Return-Path: <SRS0=LW4I=4O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE4FC4BA0A
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72805C4BA0A
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE80821556
-	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 493C5222C2
+	for <linux-block@archiver.kernel.org>; Wed, 26 Feb 2020 08:38:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d3S1VY0c"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k1gJKmYZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727267AbgBZIce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Feb 2020 03:32:34 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:38050 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727247AbgBZIce (ORCPT
+        id S1726764AbgBZIis (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Feb 2020 03:38:48 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:57220 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbgBZIis (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Feb 2020 03:32:34 -0500
-Received: by mail-pj1-f68.google.com with SMTP id j17so973665pjz.3;
-        Wed, 26 Feb 2020 00:32:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=HKTxLuQ5nhjrOrx+Thx+BTX7TOSnSPBtMS3eSGVhkfc=;
-        b=d3S1VY0cTXS2OKbI9CvTey2rVo473E0hs5wSs/r1y02/t+fCWs7V3EsfN26mbmQahv
-         36Qy3jmj4YAAqUO44HPvYwaMGb8EuChtKQXY2RuG76odOZMssHtE7+u2WPNujMXyo0I+
-         /vXVEThOBTyCXeYVIpgkAkc88R9AmluILKFbb1kuTlC3YnsFm01qmGTDsYkyG99rb7lT
-         cbk1PoL0AfD2/kSyW8SwxcoQOx7TJ5KMxrHAE9yZDPRFSOz1p5nX6Kpf7I1pQP/qF1Yf
-         N8pU/DEnAQXVyLLID2Sq2vrysUVAiqKMFnk24iZOAb/ZcD+ATXADs0FdTbOcqpQRw3GB
-         XC8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=HKTxLuQ5nhjrOrx+Thx+BTX7TOSnSPBtMS3eSGVhkfc=;
-        b=On/S6zNLZ93HxhJHuZnAmw1lY9KZMOWZdHPZuu9PD3Q1LVO8csxVhREbTkEU242b9U
-         JSIOukLmkLgX8EjlsRqWxzT1pQK0zQVfxrUqgBQwn+aR9Dm3xG8DlMLracg8QUJNWHoq
-         cHNHCi8KzlffLQPhHsOVZSuQqsuXfE8Fr88Nqyg5qai9+X1MMwc9K+gFjt0tnN/CDbA2
-         UhhF4WDYbLvVAUVpN8e4qbH0MHkraRP0nkin/agCRvV11IvnN4sAOIE4zc/zVVfY22Kt
-         u4olpj6FdZn6GPfYpfuoxqEg88mVa5C2cyO4+66j3IXkj+EjrYVcEy/IO0IeFokSPLS6
-         034A==
-X-Gm-Message-State: APjAAAX+CzzJyH95zhwMGG/wwpcjAL4AO+V/t2NKno+D2gATV7fthjVN
-        nwjm06avSUB9oIw4xDECQG8=
-X-Google-Smtp-Source: APXvYqygpuTaPFxu1B1czsjQ7Sq15hOZyc1nKhJ4FyNSYTbL7NwBkX7D374bnrLlaIiSbkRGXfYPFw==
-X-Received: by 2002:a17:90a:9284:: with SMTP id n4mr3756979pjo.69.1582705952985;
-        Wed, 26 Feb 2020 00:32:32 -0800 (PST)
-Received: from huyue2.ccdomain.com ([103.29.143.67])
-        by smtp.gmail.com with ESMTPSA id m18sm1649278pgd.39.2020.02.26.00.32.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Feb 2020 00:32:32 -0800 (PST)
-From:   Yue Hu <zbestahu@gmail.com>
-To:     minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        huyue2@yulong.com, zbestahu@163.com
-Subject: [PATCH] drivers/block/zram/zram_drv.c: remove WARN_ON_ONCE() in free_block_bdev()
-Date:   Wed, 26 Feb 2020 16:32:17 +0800
-Message-Id: <20200226083217.5720-1-zbestahu@gmail.com>
-X-Mailer: git-send-email 2.17.1.windows.2
+        Wed, 26 Feb 2020 03:38:48 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01Q8ci7S159127;
+        Wed, 26 Feb 2020 08:38:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=QPaeCoKjz0Hj1DSh69y7fdDukch0dAgnsq4X9qRIdnk=;
+ b=k1gJKmYZfkL8zdhTMAd3ZlyQPX33X2vUUCTVeS2anrA+vibpba4e2to7JXK0vgrNELs3
+ sa279arv+/E+rUXvro8f/zTCyP3ptwaBykfyyhda2XdMfFhVcZzPlNmvc/jFKodMoe4G
+ 1s9N+5JGIJRxbZOBqJd5eqpIuOtKUD0ZSGwkm31WxBq2QX968TmaHJGRBc9g89n/Jv/p
+ uYl2M4NrbhwA0KtUUmnyCFT89p0SpMMR/4nLf5Hvn4sT/RqpZCGqbEA3Tqf2qXONc7cQ
+ ZhBmiFf7Yz2tW0GGAMrBNf7NWHK6QHXI18o+ajUPZBSQq1tSUYGw7nBAlk2+FHumD3Gq mA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2ydct31ws9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Feb 2020 08:38:44 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01Q8cEiP091708;
+        Wed, 26 Feb 2020 08:38:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2ydcs1hs08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Feb 2020 08:38:44 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01Q8cfVl028122;
+        Wed, 26 Feb 2020 08:38:41 GMT
+Received: from localhost.localdomain (/114.88.246.185)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 26 Feb 2020 00:38:40 -0800
+From:   Bob Liu <bob.liu@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
+        linux-fsdevel@vger.kernel.org, darrick.wong@oracle.com,
+        io-uring@vger.kernel.org, Bob Liu <bob.liu@oracle.com>
+Subject: [RFC PATCH 0/4] userspace PI passthrough via io_uring
+Date:   Wed, 26 Feb 2020 16:37:15 +0800
+Message-Id: <20200226083719.4389-1-bob.liu@oracle.com>
+X-Mailer: git-send-email 2.9.5
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9542 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
+ mlxlogscore=550 mlxscore=0 phishscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002260065
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9542 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ phishscore=0 mlxlogscore=620 mlxscore=0 suspectscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002260065
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yue Hu <huyue2@yulong.com>
+This RFC provides a rough implementation of a mechanism to allow
+userspace to attach protection information (e.g. T10 DIF) data to a
+disk write and to receive the information alongside a disk read.
+The interface is an extension to the io_uring interface:
+two new commands (IORING_OP_READV{WRITEV}_PI) are provided.
+The last struct iovec in the arg list is interpreted to point to a buffer
+containing the the PI data.
 
-Currently, free_block_bdev() only happens after calling alloc_block_bdev()
-which will ensure blk_idx bit to be set using test_and_set_bit(). So no
-need to do WARN_ON_ONCE(!was_set) again when freeing.
+Patch #1 add two new commands to io_uring.
+Patch #2 introduces two helper funcs in bio-integrity.
+Patch #3 implement the PI passthrough in direct-io of block-dev.
+(Similar extensions may add to fs/direct-io.c and fs/maps/directio.c)
+Patch #4 add io_uring use space test case to liburing.
 
-Signed-off-by: Yue Hu <huyue2@yulong.com>
----
- drivers/block/zram/zram_drv.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Welcome any feedbacks.
+Thanks!
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1bdb579..61b10ab 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -570,10 +570,7 @@ static unsigned long alloc_block_bdev(struct zram *zram)
- 
- static void free_block_bdev(struct zram *zram, unsigned long blk_idx)
- {
--	int was_set;
--
--	was_set = test_and_clear_bit(blk_idx, zram->bitmap);
--	WARN_ON_ONCE(!was_set);
-+	clear_bit(blk_idx, zram->bitmap);
- 	atomic64_dec(&zram->stats.bd_count);
- }
- 
+There was attempt before[1], but was based on AIO at that time.
+[1] https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg27537.html
+
+Bob Liu (3):
+  io_uring: add IORING_OP_READ{WRITE}V_PI cmd
+  bio-integrity: introduce two funcs handle protect information
+  block_dev: support protect information passthrough
+
+ block/bio-integrity.c         | 77 +++++++++++++++++++++++++++++++++++++++++++
+ fs/block_dev.c                | 17 ++++++++++
+ fs/io_uring.c                 | 12 +++++++
+ include/linux/bio.h           | 14 ++++++++
+ include/linux/fs.h            |  1 +
+ include/uapi/linux/io_uring.h |  2 ++
+ 6 files changed, 123 insertions(+)
+
 -- 
-1.9.1
+2.9.5
 
