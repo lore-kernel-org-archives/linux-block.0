@@ -2,116 +2,100 @@ Return-Path: <SRS0=eQE1=4P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3497BC3F2C2
-	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 21:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A28CC3F2CB
+	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 22:31:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03BCA246A0
-	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 21:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F7B0246A3
+	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 22:31:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PD5AuIH9"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="unt1eg+w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729655AbgB0VZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Feb 2020 16:25:19 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:39568 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729852AbgB0VZS (ORCPT
+        id S1730193AbgB0Wbb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Feb 2020 17:31:31 -0500
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:61228 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729718AbgB0Wbb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Feb 2020 16:25:18 -0500
-Received: by mail-pj1-f66.google.com with SMTP id e9so330540pjr.4
-        for <linux-block@vger.kernel.org>; Thu, 27 Feb 2020 13:25:18 -0800 (PST)
+        Thu, 27 Feb 2020 17:31:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=zbiMEvwdKM/tvZAA5Qj434C9S081Ob3tK31bpwxJweM=;
-        b=PD5AuIH9YkPwMY1wk/M2YjcFyJ0ifFKkRpny5ZyGDYGn1QOO/zohITOuyJrm8SULUl
-         7i+MnHC+yUTXTPi9Ej+G5yNVS3jFkcc7VmG08QcNrBd6venEz216NN4gW5ri9dfRMEY5
-         T9q3N+SI14tw/2hmTyKa+XjXBZtxMwuu/SYW/t2qpCgLUResl8ne20dFgnF5Clkq+VPd
-         fKd4zMbXTcBkWMq/t3v6ItovAlemxDo+YGgs9x//wHp14jvdIoTrJr8E7cFsndG+SFrU
-         lQ3Su/cUXhsTRXyXiXcqdziWtx03q3ThazV8PbjImCgXZMy3x3k0A2xd3rU2TVHPaLCB
-         3Adg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=zbiMEvwdKM/tvZAA5Qj434C9S081Ob3tK31bpwxJweM=;
-        b=jO5Kt/GuK30VfYwJ2QZS6DczMoAPZo5LRqRBlE+Vba+z9AXO0X1ozhHDrJeP1mH9Yq
-         Bgj9F87Mz1VEwBGtJwb+3xKHHSVdN9hRJZgouwUsbx25OpMsHaextf+29YSmuAkRtESl
-         750bjPJjTsTGQ+hpOCfqe7X7o75nhSK5JQxsRDvEwqY5QnDe4JpnwZMLEcNUvTPV+SSf
-         i7JT+ZKZz+m/noSLGfy+oZnbvEdH9h7kwpaY8wg9MB0yft7M+dYpUpQliHieWmIvm+0K
-         EoYtIir//MzXzxKgjzx7jxKtL4AU2dZmj0MGdBeoDAR8YljXJesYNFIVZr9iVce1tq1y
-         pN7w==
-X-Gm-Message-State: APjAAAUJuBV8sfjKVCmqRTrZU6cgQJ6hviZBeuUNcoYOvME8gOJomsut
-        BboS9DUuyWHD8CbxhdLN7t3EHg==
-X-Google-Smtp-Source: APXvYqx9TDG0Lr2SN5dRxW/+L8a98eXpzWzxOnFNh71eBbIDihuNaU52qVET1Y7r5ElfIRGM27CypQ==
-X-Received: by 2002:a17:902:6907:: with SMTP id j7mr807838plk.88.1582838717243;
-        Thu, 27 Feb 2020 13:25:17 -0800 (PST)
-Received: from google.com ([2620:15c:201:0:7f8c:9d6e:20b8:e324])
-        by smtp.gmail.com with ESMTPSA id k9sm8493396pfh.153.2020.02.27.13.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2020 13:25:16 -0800 (PST)
-Date:   Thu, 27 Feb 2020 13:25:12 -0800
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v7 1/9] block: Keyslot Manager for Inline Encryption
-Message-ID: <20200227212512.GA162309@google.com>
-References: <20200221115050.238976-1-satyat@google.com>
- <20200221115050.238976-2-satyat@google.com>
- <20200221170434.GA438@infradead.org>
- <20200221173118.GA30670@infradead.org>
- <20200227181411.GB877@sol.localdomain>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1582842691; x=1614378691;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=uObpfsJDmihVgZnzlDTj5o7Ywc3QNpzXPVckbbWnw74=;
+  b=unt1eg+wtc0sCRUCkdl16CWjH1yF7/y8ThQyBLuIssPG1eg2AG7E6052
+   bZ3yzIO6xemldupFDWEnVRqXsbE58tbgxpGxkccE6CiczAmYRahxNxAeH
+   Es5FqgvzIyTItKuIDoyQG+G99YiHNu3k0F4eYMqXBokYC/D2a0UKmGB/P
+   Q=;
+IronPort-SDR: 5/rXP3wl4rOgsS34VYNAVuM5/ZludsOJikxutjMaTDc4GLRYE+pwdC2N/WRzkPzOtDqMJia7vV
+ TeVdZvDejueg==
+X-IronPort-AV: E=Sophos;i="5.70,493,1574121600"; 
+   d="scan'208";a="19601107"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 27 Feb 2020 22:31:27 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id 883CF2880B2;
+        Thu, 27 Feb 2020 22:31:23 +0000 (UTC)
+Received: from EX13D01UWB004.ant.amazon.com (10.43.161.157) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 27 Feb 2020 22:31:22 +0000
+Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
+ EX13d01UWB004.ant.amazon.com (10.43.161.157) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 27 Feb 2020 22:31:22 +0000
+Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
+ EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1497.006;
+ Thu, 27 Feb 2020 22:31:22 +0000
+From:   "Singh, Balbir" <sblbir@amazon.com>
+To:     "kbusch@kernel.org" <kbusch@kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "Chaitanya.Kulkarni@wdc.com" <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [PATCH v2 4/5] drivers/nvme/host/core.c: Convert to use
+ set_capacity_revalidate_and_notify
+Thread-Topic: [PATCH v2 4/5] drivers/nvme/host/core.c: Convert to use
+ set_capacity_revalidate_and_notify
+Thread-Index: AQHV7BZmVG7GS2zvD0eE2vmktqMGT6gtx0WAgAHb04A=
+Date:   Thu, 27 Feb 2020 22:31:22 +0000
+Message-ID: <1ed561abb467362b8ddf7949882b42e00d583a20.camel@amazon.com>
+References: <20200225200129.6687-1-sblbir@amazon.com>
+         <20200225200129.6687-5-sblbir@amazon.com>
+         <20200226180819.GA23813@redsun51.ssa.fujisawa.hgst.com>
+In-Reply-To: <20200226180819.GA23813@redsun51.ssa.fujisawa.hgst.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.161.45]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CBCA5387B812CE4B8DC82CCF484CAAFC@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200227181411.GB877@sol.localdomain>
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 10:14:11AM -0800, Eric Biggers wrote:
-> On Fri, Feb 21, 2020 at 09:31:18AM -0800, Christoph Hellwig wrote:
-> > On Fri, Feb 21, 2020 at 09:04:34AM -0800, Christoph Hellwig wrote:
-> > > Given that blk_ksm_get_slot_for_key returns a signed keyslot that
-> > > can return errors, and the only callers stores it in a signed variable
-> > > I think this function should take a signed slot as well, and the check
-> > > for a non-negative slot should be moved here from the only caller.
-> > 
-> > Actually looking over the code again I think it might be better to
-> > return only the error code (and that might actually be a blk_status_t),
-> > and then use an argument to return a pointer to the actual struct
-> > keyslot.  That gives us much easier to understand code and better
-> > type safety.
-> 
-> That doesn't make sense because the caller only cares about the keyslot number,
-> not the 'struct keyslot'.  The 'struct keyslot' is internal to
-> keyslot-manager.c, as it only contains keyslot management information.
-> 
-I think it does make some sense at least to make the keyslot type opaque
-to most of the system other than the driver itself (the driver will now
-have to call a function like blk_ksm_slot_idx_for_keyslot to actually get
-a keyslot number at the end of the day). Also this way, the keyslot manager
-can verify that the keyslot passed to blk_ksm_put_slot is actually part of
-that keyslot manager (and that somebody isn't releasing a slot number that
-was actually acquired from a different keyslot manager). I don't think
-it's much benefit or loss either way, but I already switched to passing
-pointers to struct keyslot around instead of ints, so I'll keep it that
-way unless you strongly feel that using ints in this case is better
-than struct keyslot *.
-> Your earlier suggestion of making blk_ksm_put_slot() be a no-op on a negative
-> keyslot number sounds fine though.
-> 
-> - Eric
+T24gVGh1LCAyMDIwLTAyLTI3IGF0IDAzOjA4ICswOTAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+T24gVHVlLCBGZWIgMjUsIDIwMjAgYXQgMDg6MDE6MjhQTSArMDAwMCwgQmFsYmlyIFNpbmdoIHdy
+b3RlOg0KPiA+IGJsb2NrL2dlbmhkIHByb3ZpZGVzIHNldF9jYXBhY2l0eV9yZXZhbGlkYXRlX2Fu
+ZF9ub3RpZnkoKSBmb3INCj4gPiBzZW5kaW5nIFJFU0laRSBub3RpZmljYXRpb25zIHZpYSB1ZXZl
+bnRzLiBUaGlzIG5vdGlmaWNhdGlvbiBpcw0KPiA+IG5ld2x5IGFkZGVkIHRvIE5WTUUgZGV2aWNl
+cw0KPiA+IA0KPiA+IFNpZ25lZC1vZmYtYnk6IEJhbGJpciBTaW5naCA8c2JsYmlyQGFtYXpvbi5j
+b20+DQo+IA0KPiBQYXRjaCBsb29rcyBmaW5lLiBQbGVhc2UgY2hhbmdlIHRoZSBjb21taXQgc3Vi
+amVjdCBwcmVmaXggdG8ganVzdCAibnZtZToiDQo+IHRvIG1hdGNoIHRoZSBsb2NhbCBzdHlsZSBh
+bmQgZm9yIGxlbmd0aCBjb25zdHJhaW50cyAodGhlIGNvbW1pdHRlciBtYXkNCj4gZG8gdGhpcyBp
+ZiB0aGV5IHdhbnQpLg0KPiANCj4gQWNrZWQtYnk6IEtlaXRoIEJ1c2NoIDxrYnVzY2hAa2VybmVs
+Lm9yZz4NCg0KU3VyZSB0aGFua3MhIFllcywgdGhhdCBtYWtlcyBzZW5zZS4NCg0KQmFsYmlyIFNp
+bmdoLg0K
