@@ -2,259 +2,84 @@ Return-Path: <SRS0=eQE1=4P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7144C4BA24
-	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 09:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BF3C35E1C
+	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 18:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E3CB24683
-	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 09:25:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VtMPzVUF"
+	by mail.kernel.org (Postfix) with ESMTP id 0BCA3246B7
+	for <linux-block@archiver.kernel.org>; Thu, 27 Feb 2020 18:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1582827255;
+	bh=DfvmaQgMZxcqfEpHuvrrlNTCaevj5uxdnW4bw4l/cwQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=03RSeMHG49brdZQCXK1/C9oFmeEWzsTzpKM5Y5wZjyZZXOWgRUFNxu3yAP8id/x1K
+	 +pAH5w6PR/kcX1G+XL/KLoggxxRoD8ypCb3XHUePFQ4PiAOmwFaAdTDWhW4usBdWyy
+	 4Hu8TcyGqaWanZmS64CFlSFqDldHNmumccrGiJas=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728635AbgB0JZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Feb 2020 04:25:39 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:43184 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728454AbgB0JZj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Feb 2020 04:25:39 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01R9NpfU034096;
-        Thu, 27 Feb 2020 09:25:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=8zQDK/9jHRAQFv7hVcZo9tYgIQ+A21KFnO314sYNNq0=;
- b=VtMPzVUFig/EpQoIyPmevr7a2HzESUZJ+FSg6qu2XhZ5M7/xS3YE7C2uI+YY5ouHrbv+
- XYmyIhwUbE5g+cGSDoE5VAspdWSSNlg0RVpehGuQKuaNZGbMqbxVggBNNi767eaOU9TX
- YbOl7EwhNJIHN7r/A86hL3r7CgQsxE6mjVW0p5tlqhaxIArnNejz/eV15Btn87VpWPtd
- 73GFH711TLr6BwCIUvELcszhDXuD1TR/ItcDCjYh6UW36Ef+BKHV1AZZCIh6BSInB/BL
- 6qMEZBmIR3ghfE+ffIVYg/5cyj2JGJje3EklnZ7kvJoVOAvZuvlTX85KmO5DvaY8q7vr CQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2ydcsnhkpu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Feb 2020 09:25:36 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01R9ECHV122368;
-        Thu, 27 Feb 2020 09:23:36 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2ydj4m0n3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Feb 2020 09:23:36 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01R9NZoU002791;
-        Thu, 27 Feb 2020 09:23:35 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 27 Feb 2020 01:23:35 -0800
-Subject: Re: [PATCH 2/4] bio-integrity: introduce two funcs handle protect
- information
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, linux-fsdevel@vger.kernel.org,
-        io-uring@vger.kernel.org
-References: <20200226083719.4389-1-bob.liu@oracle.com>
- <20200226083719.4389-3-bob.liu@oracle.com> <20200226160310.GA8044@magnolia>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <fb215042-6882-d51c-0ff9-a8d2487db08f@oracle.com>
-Date:   Thu, 27 Feb 2020 17:23:22 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1729308AbgB0SOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Feb 2020 13:14:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37036 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726877AbgB0SOO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Feb 2020 13:14:14 -0500
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 02F29246B0;
+        Thu, 27 Feb 2020 18:14:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582827253;
+        bh=DfvmaQgMZxcqfEpHuvrrlNTCaevj5uxdnW4bw4l/cwQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sT4dmVR9UsPbGMcknWI3bgOsjSvrPsgtUAmdt1lWngGDPvi6tYTXfp8zAlivAVVGE
+         Nodjsd6dayZE3c3DVdI5DxqXH1cs4fq2TQNuuy1ir3hHqyCE3C9nGSpbDbR7iyczgy
+         thWQWFpyhElDDeVDwp9+De4JDQO1/TZDUfWsjIts=
+Date:   Thu, 27 Feb 2020 10:14:11 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v7 1/9] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200227181411.GB877@sol.localdomain>
+References: <20200221115050.238976-1-satyat@google.com>
+ <20200221115050.238976-2-satyat@google.com>
+ <20200221170434.GA438@infradead.org>
+ <20200221173118.GA30670@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200226160310.GA8044@magnolia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 suspectscore=0
- spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002270075
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0
- suspectscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002270075
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200221173118.GA30670@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/27/20 12:03 AM, Darrick J. Wong wrote:
-> On Wed, Feb 26, 2020 at 04:37:17PM +0800, Bob Liu wrote:
->> Introduce two funcs handle protect information passthrough from
->> user space.
->>
->> iter_slice_protect_info() will slice the last segment as protect
->> information.
->>
->> bio_integrity_prep_from_iovec() attach the protect information to
->> a bio.
->>
->> Signed-off-by: Bob Liu <bob.liu@oracle.com>
->> ---
->>  block/bio-integrity.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  include/linux/bio.h   | 14 ++++++++++
->>  2 files changed, 91 insertions(+)
->>
->> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
->> index 575df98..0b22c5d 100644
->> --- a/block/bio-integrity.c
->> +++ b/block/bio-integrity.c
->> @@ -12,6 +12,7 @@
->>  #include <linux/bio.h>
->>  #include <linux/workqueue.h>
->>  #include <linux/slab.h>
->> +#include <linux/uio.h>
->>  #include "blk.h"
->>  
->>  #define BIP_INLINE_VECS	4
->> @@ -305,6 +306,53 @@ bool bio_integrity_prep(struct bio *bio)
->>  }
->>  EXPORT_SYMBOL(bio_integrity_prep);
->>  
->> +int bio_integrity_prep_from_iovec(struct bio *bio, struct iovec *pi_iov)
->> +{
->> +	struct blk_integrity *bi = blk_get_integrity(bio->bi_disk);
->> +	struct bio_integrity_payload *bip;
->> +	struct page *user_pi_page;
->> +	int nr_vec_page = 0;
->> +	int ret = 0, interval = 0;
->> +
->> +	if (!pi_iov || !pi_iov->iov_base)
->> +		return 1;
->> +
->> +	nr_vec_page = (pi_iov->iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
->> +	if (nr_vec_page > 1) {
->> +		printk("Now only support 1 page containing integrity "
->> +			"metadata, while requires %d pages.\n", nr_vec_page);
->> +		return 1;
+On Fri, Feb 21, 2020 at 09:31:18AM -0800, Christoph Hellwig wrote:
+> On Fri, Feb 21, 2020 at 09:04:34AM -0800, Christoph Hellwig wrote:
+> > Given that blk_ksm_get_slot_for_key returns a signed keyslot that
+> > can return errors, and the only callers stores it in a signed variable
+> > I think this function should take a signed slot as well, and the check
+> > for a non-negative slot should be moved here from the only caller.
 > 
-> I would've thought this would be -EINVAL or something given the -ENOMEM
-> below...?
-> 
->> +	}
->> +
->> +	interval = bio_integrity_intervals(bi, bio_sectors(bio));
->> +	if ((interval * bi->tuple_size) != pi_iov->iov_len)
->> +		return 1;
->> +
->> +	bip = bio_integrity_alloc(bio, GFP_NOIO, nr_vec_page);
->> +	if (IS_ERR(bip))
->> +		return PTR_ERR(bip);
->> +
->> +	bip->bip_iter.bi_size = pi_iov->iov_len;
->> +	bip->bio_iter = bio->bi_iter;
->> +	bip_set_seed(bip, bio->bi_iter.bi_sector);
->> +
->> +	if (bi->flags & BLK_INTEGRITY_IP_CHECKSUM)
->> +		bip->bip_flags |= BIP_IP_CHECKSUM;
->> +
->> +	ret = get_user_pages_fast((unsigned long)(pi_iov->iov_base), nr_vec_page,
->> +			op_is_write(bio_op(bio)) ?  FOLL_WRITE : 0,
->> +			&user_pi_page);
->> +	if (unlikely(ret < 0))
->> +		return 1;
->> +
->> +	ret = bio_integrity_add_page(bio, user_pi_page, pi_iov->iov_len, 0);
->> +	if (unlikely(ret != pi_iov->iov_len))
->> +		return -ENOMEM;
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL(bio_integrity_prep_from_iovec);
->> +
->>  /**
->>   * bio_integrity_verify_fn - Integrity I/O completion worker
->>   * @work:	Work struct stored in bio to be verified
->> @@ -378,6 +426,35 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
->>  }
->>  
->>  /**
->> + * iter_slice_protect_info
->> + *
->> + * Description: slice protection information from iter.
->> + * The last iovec contains protection information pass from user space.
-> 
-> What do the return values here mean?
-> 
+> Actually looking over the code again I think it might be better to
+> return only the error code (and that might actually be a blk_status_t),
+> and then use an argument to return a pointer to the actual struct
+> keyslot.  That gives us much easier to understand code and better
+> type safety.
 
-Will update.
+That doesn't make sense because the caller only cares about the keyslot number,
+not the 'struct keyslot'.  The 'struct keyslot' is internal to
+keyslot-manager.c, as it only contains keyslot management information.
 
-> Also kinda wondering about the slice & dice of the iovec here, but
-> <shrug> I guess this is RFC. :)
-> 
+Your earlier suggestion of making blk_ksm_put_slot() be a no-op on a negative
+keyslot number sounds fine though.
 
-Hmm, I also very hesitate to put it here or lib/iov_iter.c. 
-
-> --D
-> 
->> + */
->> +int iter_slice_protect_info(struct iov_iter *iter, int nr_pages,
->> +		struct iovec **pi_iov)
->> +{
->> +	size_t len = 0;
->> +
->> +	/* TBD: now only support one bio. */
->> +	if (!iter_is_iovec(iter) || nr_pages >= BIO_MAX_PAGES - 1)
->> +		return 1;
->> +
->> +	/* Last iovec contains protection information. */
->> +	iter->nr_segs--;
->> +	*pi_iov = (struct iovec *)(iter->iov + iter->nr_segs);
->> +
->> +	len = (*pi_iov)->iov_len;
->> +	if (len > 0 && len < iter->count) {
->> +		iter->count -= len;
->> +		return 0;
->> +	}
->> +
->> +	return 1;
->> +}
->> +EXPORT_SYMBOL(iter_slice_protect_info);
->> +
->> +/**
->>   * bio_integrity_trim - Trim integrity vector
->>   * @bio:	bio whose integrity vector to update
->>   *
->> diff --git a/include/linux/bio.h b/include/linux/bio.h
->> index 3cdb84c..6172b13 100644
->> --- a/include/linux/bio.h
->> +++ b/include/linux/bio.h
->> @@ -749,6 +749,8 @@ static inline bool bioset_initialized(struct bio_set *bs)
->>  extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
->>  extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
->>  extern bool bio_integrity_prep(struct bio *);
->> +extern int bio_integrity_prep_from_iovec(struct bio *bio, struct iovec *pi_iov);
->> +extern int iter_slice_protect_info(struct iov_iter *iter, int nr_pages, struct iovec **pi_iov);
->>  extern void bio_integrity_advance(struct bio *, unsigned int);
->>  extern void bio_integrity_trim(struct bio *);
->>  extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
->> @@ -778,6 +780,18 @@ static inline bool bio_integrity_prep(struct bio *bio)
->>  	return true;
->>  }
->>  
->> +static inline int bio_integrity_prep_from_iovec(struct bio *bio,
->> +		struct iovec *pi_iov)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline int iter_slice_protect_info(struct iov_iter *iter, int nr_pages,
->> +		struct iovec **pi_iov)
->> +{
->> +	return 0;
->> +}
->> +
->>  static inline int bio_integrity_clone(struct bio *bio, struct bio *bio_src,
->>  				      gfp_t gfp_mask)
->>  {
->> -- 
->> 2.9.5
->>
-
+- Eric
