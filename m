@@ -2,88 +2,68 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66592C3F2D2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 19:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB05C3F2CD
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 19:55:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 388C0246B0
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 19:44:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85C05246A3
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 19:55:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582919098;
-	bh=QGVjRtSvQfqJWUvi3mpt+fAVQFXPjfcS6Z8kvcvqNnY=;
-	h=Date:From:To:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
-	 References:List-ID:From;
-	b=Ia++0ZWIoQyd3/IdLpux7SnovJeZ0H0kNBZbUXbS9H86jMU8ULxp/URNQLv2VemhB
-	 L+8k+UkIITpMwdf+jDMBNQWKM4JimTZDM7GnSsaclXMIw9q5DJrHgYxq0XftxW73G8
-	 2NBARF1NbObjnZaRtw7GgVw2BS7VwMfTdGc9W3A8=
+	s=default; t=1582919711;
+	bh=VnhlLswStTjmBq7H9XxaPX/JSH2QRV9Ny3mxJ90xhTU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=ZLxIe4Yu1n6KZIxtA7cG+mvuDnqkZzjFDmjxKjODv+v1LQJIy7j3o9WUcu6W5VO8L
+	 AbKIzdLeWfRlhpxYjcV0zfz/J3IrAWjzgisy4ap+4YMeQoccnZSjn9GF8KQXY6ncwq
+	 l2KwWbeNapq8HV/MyZREqXZoL/rYrnxkDibouI78=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbgB1To5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 14:44:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58614 "EHLO mail.kernel.org"
+        id S1725730AbgB1TzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 14:55:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59884 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726046AbgB1To5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 14:44:57 -0500
-Received: from localhost (unknown [137.135.114.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8C147246B7;
-        Fri, 28 Feb 2020 19:44:56 +0000 (UTC)
+        id S1726969AbgB1TzI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Feb 2020 14:55:08 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.6-rc
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582919096;
-        bh=QGVjRtSvQfqJWUvi3mpt+fAVQFXPjfcS6Z8kvcvqNnY=;
-        h=Date:From:To:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
-         References:From;
-        b=FZST07ci0AfaSyoJ4bvOQT69mGMSjeuKI48DzIZB2Ho7Y0MWs5o50ZdAJjMvGUHeK
-         YO5FSpnSwGk3zeE/mce77nm5/awWwG9ro49Fqtd2xZyGJCxG8qSJYgCpa2DB769tW4
-         3U3eYRvebQCS9NWrCpuuVzApF29f/1JnNYQ+6qDg=
-Date:   Fri, 28 Feb 2020 19:44:55 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, stable@vger.kernel.org
-Cc:     <stable@vger.kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH] loop: avoid EAGAIN, if offset or block_size are changed
-In-Reply-To: <20200228043820.169288-1-jaegeuk@kernel.org>
-References: <20200228043820.169288-1-jaegeuk@kernel.org>
-Message-Id: <20200228194456.8C147246B7@mail.kernel.org>
+        s=default; t=1582919707;
+        bh=VnhlLswStTjmBq7H9XxaPX/JSH2QRV9Ny3mxJ90xhTU=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=IU7rC1BAs1b6ylHyNDXRXlhrPK5kbjOQe55gHbSPCmCHtCiZD2xvebLx+wq6H303i
+         +/5YAF5+iOLpaJcwmIkDy0T3uZH911yqk+xGQEiXN62zAfymgdO8aZ8YqCDhWaJ+oJ
+         998Lae2xa2akEVGp5ge07LcpTJpoLCDsZTP4S0+4=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20fc1cef-97db-f9be-e308-58e539b97298@kernel.dk>
+References: <20fc1cef-97db-f9be-e308-58e539b97298@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20fc1cef-97db-f9be-e308-58e539b97298@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.6-2020-02-28
+X-PR-Tracked-Commit-Id: 5b8ea58b6a338cb981670c4408225331aedb4b89
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2edc78b9a4b868d7bfee4f87ea29f2df19b6e955
+Message-Id: <158291970770.11737.14703358750997423301.pr-tracker-bot@kernel.org>
+Date:   Fri, 28 Feb 2020 19:55:07 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+The pull request you sent on Fri, 28 Feb 2020 11:44:21 -0700:
 
-[This is an automated email]
+> git://git.kernel.dk/linux-block.git tags/block-5.6-2020-02-28
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: 5db470e229e2 ("loop: drop caches if offset or block_size are changed").
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2edc78b9a4b868d7bfee4f87ea29f2df19b6e955
 
-The bot has tested the following trees: v5.5.6, v5.4.22, v4.19.106, v4.14.171.
-
-v5.5.6: Build OK!
-v5.4.22: Build OK!
-v4.19.106: Build OK!
-v4.14.171: Failed to apply! Possible dependencies:
-    3148ffbdb916 ("loop: use killable lock in ioctls")
-    550df5fdacff ("loop: Push loop_ctl_mutex down to loop_set_status()")
-    757ecf40b7e0 ("loop: Push loop_ctl_mutex down to loop_set_fd()")
-    85b0a54a82e4 ("loop: Move loop_reread_partitions() out of loop_ctl_mutex")
-    a13165441d58 ("loop: Push lo_ctl_mutex down into individual ioctls")
-    c371077000f4 ("loop: Push loop_ctl_mutex down to loop_change_fd()")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
+Thank you!
 
 -- 
-Thanks
-Sasha
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
