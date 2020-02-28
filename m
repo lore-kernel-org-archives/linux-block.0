@@ -2,122 +2,208 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DE7C3F2CD
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB395C3F2CD
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:16:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D1A82469C
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B44F1246B4
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:16:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IE8N0BuN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726277AbgB1XMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 18:12:08 -0500
-Received: from mga18.intel.com ([134.134.136.126]:17323 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725957AbgB1XMI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 18:12:08 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 15:12:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,497,1574150400"; 
-   d="scan'208";a="272824147"
-Received: from unknown (HELO [10.232.112.171]) ([10.232.112.171])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Feb 2020 15:12:06 -0800
-Subject: Re: [PATCH] block: sed-opal: Change the check condition for regular
- session validity
-To:     "Derrick, Jonathan" <jonathan.derrick@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "andrzej.jakowski@linux.intel.com" <andrzej.jakowski@linux.intel.com>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "Jakowski, Andrzej" <andrzej.jakowski@intel.com>
-References: <20200228224225.61368-1-revanth.rajashekar@intel.com>
- <558ea751133ec0407cd603bae27416042bd1e435.camel@intel.com>
- <68f27a5e-a39b-3c3e-dbb3-ce0c6b56f33c@intel.com>
- <2143472fa237e9c636143e4ae6aa2a989fa8984b.camel@intel.com>
-From:   "Rajashekar, Revanth" <revanth.rajashekar@intel.com>
-Message-ID: <81fcc5af-7599-739f-3b08-4e6cd05561da@intel.com>
-Date:   Fri, 28 Feb 2020 16:12:06 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+        id S1726418AbgB1XQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 18:16:22 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46826 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725957AbgB1XQW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Feb 2020 18:16:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582931780;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FFNtyPEO7ZLHkoemtDDIXS2+6UBUM9dbd+oueyee19E=;
+        b=IE8N0BuN2zLjG1R79ao46VJYi3KhZm8w4VXbg+5PLoFjOndQj+Erm5GFP0F93Bs0jT/3T2
+        X2LJP9NvWhly9KdKrYnNDj7sj7ijbkGLeSpyONbLSxZBVpElIrhQPZbzlwI076BdzKPeqN
+        qa5nnaDGUnCz0oAkyNLbUR+IABrQHWk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-KhxuM6SaPZK063QXXdeFHQ-1; Fri, 28 Feb 2020 18:16:13 -0500
+X-MC-Unique: KhxuM6SaPZK063QXXdeFHQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A40698017CC;
+        Fri, 28 Feb 2020 23:16:11 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFE4119756;
+        Fri, 28 Feb 2020 23:16:02 +0000 (UTC)
+Date:   Sat, 29 Feb 2020 07:15:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     yu kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        ajay.joshi@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        zhangxiaoxu5@huawei.com, luoshijie1@huawei.com
+Subject: Re: [PATCH V2] block: rename 'q->debugfs_dir' and
+ 'q->blk_trace->dir' in blk_unregister_queue()
+Message-ID: <20200228231557.GA18123@ming.t460p>
+References: <20200213081252.32395-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <2143472fa237e9c636143e4ae6aa2a989fa8984b.camel@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200213081252.32395-1-yukuai3@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Feb 13, 2020 at 04:12:52PM +0800, yu kuai wrote:
+> syzbot is reporting use after free bug in debugfs_remove[1].
+> 
+> This is because in request_queue, 'q->debugfs_dir' and
+> 'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
+> blk_mq_debugfs_unregister() will remove everything inside the dir.
+> 
+> With futher investigation of the reporduce repro, the problem can be
+> reporduced by following procedure:
+> 
+> 1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
+> create the dir.
+> 2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
+> 3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
+> will fail because the dir aready exist.
+> 4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
+> 5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
+> delete the files created in step 4.
+> 6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
+> And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
+> try to release the two files created in step 4, wich are aready released
+> in step 5.
+> 
+> thread1		         |kworker                   |thread2
+>  ----------------------- | ------------------------ | --------------------
+> loop_control_ioctl       |                          |
+>  loop_add                |                          |
+>   blk_mq_debugfs_register|                          |
+>    debugfs_create_dir    |                          |
+> loop_control_ioctl       |                          |
+>  loop_remove		 |                          |
+>   blk_release_queue      |                          |
+>    schedule_work         |                          |
+>                          |                          |loop_control_ioctl
+>                          |                          | loop_add
+>                          |                          |  ...
+>                          |                          |blk_trace_ioctl
+>                          |                          | __blk_trace_setup
+>                          |                          |   debugfs_create_file
+>                          |__blk_release_queue       |
+>                          | blk_mq_debugfs_unregister|
+>                          |  debugfs_remove_recursive|
+>                          |                          |loop_control_ioctl
+>                          |                          | loop_remove
+>                          |                          |  ...
+>                          |__blk_release_queue       |
+>                          | blk_trace_shutdown       |
+>                          |  debugfs_remove          |
+> 
+> commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
+> final release of request_queue to a workqueue, so, when loop_add() is
+> called again(step 3), __blk_release_queue() might not been called yet,
+> which causes the problem.
+> 
+> Fix the problem by renaming 'q->debugfs_dir' or 'q->blk_trace->dir'
+> in blk_unregister_queue() if they exist.
+> 
+> [1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
+> References: CVE-2019-19770
+> Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
+> Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
+> Signed-off-by: yu kuai <yukuai3@huawei.com>
+> ---
+> Changes in V2:
+>  add device name to the new dir name
+>  fix compile err when 'CONFIG_BLK_DEBUG_FS' is not enabled
+>  add treatment of 'q->blk_trace->dir'
+> 
+>  block/blk-sysfs.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+> 
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index fca9b158f4a0..1da8d4a4915a 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/blktrace_api.h>
+>  #include <linux/blk-mq.h>
+>  #include <linux/blk-cgroup.h>
+> +#include <linux/debugfs.h>
+>  
+>  #include "blk.h"
+>  #include "blk-mq.h"
+> @@ -1011,6 +1012,46 @@ int blk_register_queue(struct gendisk *disk)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_register_queue);
+>  
+> +#ifdef CONFIG_DEBUG_FS
+> +/*
+> + * blk_prepare_release_queue - rename q->debugfs_dir and q->blk_trace->dir
+> + * @q: request_queue of which the dir to be renamed belong to.
+> + *
+> + * Because the final release of request_queue is in a workqueue, the
+> + * cleanup might not been finished yet while the same device start to
+> + * create. It's not correct if q->debugfs_dir still exist while trying
+> + * to create a new one.
+> + */
+> +static void blk_prepare_release_queue(struct request_queue *q)
+> +{
+> +	struct dentry *new = NULL;
+> +	struct dentry **old = NULL;
+> +	char name[DNAME_INLINE_LEN];
+> +	int i = 0;
+> +
+> +#ifdef CONFIG_BLK_DEBUG_FS
+> +	if (!IS_ERR_OR_NULL(q->debugfs_dir))
+> +		old = &q->debugfs_dir;
+> +#endif
+> +#ifdef CONFIG_BLK_DEV_IO_TRACE
+> +	/* q->debugfs_dir and q->blk_trace->dir can't both exist */
+> +	if (q->blk_trace && !IS_ERR_OR_NULL(q->blk_trace->dir))
+> +		old = &q->blk_trace->dir;
+> +#endif
 
-On 2/28/2020 4:07 PM, Derrick, Jonathan wrote:
-> On Fri, 2020-02-28 at 16:01 -0700, Rajashekar, Revanth wrote:
->> Hi Jon,
->>
->> On 2/28/2020 3:57 PM, Derrick, Jonathan wrote:
->>> Hi Revanth
->>>
->>> On Fri, 2020-02-28 at 15:42 -0700, Revanth Rajashekar wrote:
->>>> This patch changes the check condition for the validity/authentication
->>>> of the session.
->>>>
->>>> 1. The Host Session Number(HSN) in the response should match the HSN for
->>>>    the session.
->>>> 2. The TPER Session Number(TSN) can never be less than 4096 for a regular
->>>>    session.
->>>>
->>>> Reference:
->>>> Section 3.2.2.1   of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
->>>> Section 3.3.7.1.1 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Architecture_Core_Spec_v2.01_r1.00.pdf
->>>>
->>>> Co-developed-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
->>>> Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
->>>> Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
->>>> ---
->>>>  block/opal_proto.h | 1 +
->>>>  block/sed-opal.c   | 2 +-
->>>>  2 files changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/block/opal_proto.h b/block/opal_proto.h
->>>> index 325cbba2465f..27740baad61d 100644
->>>> --- a/block/opal_proto.h
->>>> +++ b/block/opal_proto.h
->>>> @@ -36,6 +36,7 @@ enum opal_response_token {
->>>>
->>>>  #define DTAERROR_NO_METHOD_STATUS 0x89
->>>>  #define GENERIC_HOST_SESSION_NUM 0x41
->>>> +#define RSVD_TPER_SESSION_NUM	4096
->>> This seems confusing as it looks like 4096 the Reserved session rather
->>> than 0-4095.
->>> Can you name it appropriately?
->> Sure, do you think INIT_TPER_SESSION_NUM would be appropriate..?
-> Init could be confused with Initialize
-> Maybe MIN_TPER_SESSION_NUM or FIRST_... ?
-FIRST_TPER_SESSION_NUM sounds good for me :)
->
-> Thanks for thinking about this.
-Sure...
->
->>>>  #define TPER_SYNC_SUPPORTED 0x01
->>>>  #define MBR_ENABLED_MASK 0x10
->>>> diff --git a/block/sed-opal.c b/block/sed-opal.c
->>>> index 880cc57a5f6b..f2b61a868901 100644
->>>> --- a/block/sed-opal.c
->>>> +++ b/block/sed-opal.c
->>>> @@ -1056,7 +1056,7 @@ static int start_opal_session_cont(struct opal_dev *dev)
->>>>  	hsn = response_get_u64(&dev->parsed, 4);
->>>>  	tsn = response_get_u64(&dev->parsed, 5);
->>>>
->>>> -	if (hsn == 0 && tsn == 0) {
->>>> +	if (hsn != GENERIC_HOST_SESSION_NUM || tsn < RSVD_TPER_SESSION_NUM) {
->>>>  		pr_debug("Couldn't authenticate session\n");
->>>>  		return -EPERM;
->>>>  	}
->>>> --
->>>> 2.17.1
->>>>
+If blk_trace->dir isn't same with .debugfs_dir, you will just rename
+blk_trace->dir, this way can't avoid the failure in step3, can it?
+
+I understand that we just need to rename .debugfs_dir, meantime making
+sure blktrace code removes correct debugfs dir, is that enough for fixing
+this issue?
+
+> +	if (old == NULL)
+> +		return;
+> +	while (new == NULL) {
+> +		sprintf(name, "ready_to_remove_%s_%d",
+> +				kobject_name(q->kobj.parent), i++);
+> +		new = debugfs_rename(blk_debugfs_root, *old,
+> +				     blk_debugfs_root, name);
+> +	}
+
+The above code can be run concurrently with blktrace shutdown, so race might
+exit between the two code paths, then bt->dir may has been renamed or being
+renamed in debugfs_remove(bt->dir), can this function work as expected or
+correct?
+
+And there is dead loop risk, so suggest to not rename this way.
+
+
+Thanks, 
+Ming
+
