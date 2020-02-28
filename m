@@ -2,208 +2,192 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB395C3F2CD
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE41C3F2D2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:29:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B44F1246B4
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FE3F2469C
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:29:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IE8N0BuN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNDgSJVK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726418AbgB1XQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 18:16:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46826 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725957AbgB1XQW (ORCPT
+        id S1726525AbgB1X3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 18:29:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37291 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726490AbgB1X3l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 18:16:22 -0500
+        Fri, 28 Feb 2020 18:29:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582931780;
+        s=mimecast20190719; t=1582932580;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FFNtyPEO7ZLHkoemtDDIXS2+6UBUM9dbd+oueyee19E=;
-        b=IE8N0BuN2zLjG1R79ao46VJYi3KhZm8w4VXbg+5PLoFjOndQj+Erm5GFP0F93Bs0jT/3T2
-        X2LJP9NvWhly9KdKrYnNDj7sj7ijbkGLeSpyONbLSxZBVpElIrhQPZbzlwI076BdzKPeqN
-        qa5nnaDGUnCz0oAkyNLbUR+IABrQHWk=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6PtWV8fxzi90n4PsoftZyxS9zHARcIcs8u4peeRthO8=;
+        b=NNDgSJVK5Nd3vouiOu38dhn+g3zx21YlB88m0U62CiZsFcyYdlOlHxM13IPOPmqhdz9Lb4
+        T+Z1iA5hu5IrxNEIsmR0kXEG2jo9aVeFpKeJlP9+jjp4afi3JcRu8m6Vofk8jsEjeWUWE2
+        lBgHMd/M9UROkG51Y3YHWlM5SGDBoxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-KhxuM6SaPZK063QXXdeFHQ-1; Fri, 28 Feb 2020 18:16:13 -0500
-X-MC-Unique: KhxuM6SaPZK063QXXdeFHQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-212-lqu8145HMyy0QDc4UMXBDA-1; Fri, 28 Feb 2020 18:29:32 -0500
+X-MC-Unique: lqu8145HMyy0QDc4UMXBDA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A40698017CC;
-        Fri, 28 Feb 2020 23:16:11 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFE4119756;
-        Fri, 28 Feb 2020 23:16:02 +0000 (UTC)
-Date:   Sat, 29 Feb 2020 07:15:57 +0800
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7EAC1005510;
+        Fri, 28 Feb 2020 23:29:29 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5B0BA19E9C;
+        Fri, 28 Feb 2020 23:29:25 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
-To:     yu kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        ajay.joshi@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        zhangxiaoxu5@huawei.com, luoshijie1@huawei.com
-Subject: Re: [PATCH V2] block: rename 'q->debugfs_dir' and
- 'q->blk_trace->dir' in blk_unregister_queue()
-Message-ID: <20200228231557.GA18123@ming.t460p>
-References: <20200213081252.32395-1-yukuai3@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Chaitra P B <chaitra.basappa@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH V2 00/10] scsi: tracking device queue depth via sbitmap
+Date:   Sat, 29 Feb 2020 07:29:10 +0800
+Message-Id: <20200228232920.20960-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200213081252.32395-1-yukuai3@huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 04:12:52PM +0800, yu kuai wrote:
-> syzbot is reporting use after free bug in debugfs_remove[1].
-> 
-> This is because in request_queue, 'q->debugfs_dir' and
-> 'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
-> blk_mq_debugfs_unregister() will remove everything inside the dir.
-> 
-> With futher investigation of the reporduce repro, the problem can be
-> reporduced by following procedure:
-> 
-> 1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
-> create the dir.
-> 2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
-> 3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
-> will fail because the dir aready exist.
-> 4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
-> 5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
-> delete the files created in step 4.
-> 6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
-> And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
-> try to release the two files created in step 4, wich are aready released
-> in step 5.
-> 
-> thread1		         |kworker                   |thread2
->  ----------------------- | ------------------------ | --------------------
-> loop_control_ioctl       |                          |
->  loop_add                |                          |
->   blk_mq_debugfs_register|                          |
->    debugfs_create_dir    |                          |
-> loop_control_ioctl       |                          |
->  loop_remove		 |                          |
->   blk_release_queue      |                          |
->    schedule_work         |                          |
->                          |                          |loop_control_ioctl
->                          |                          | loop_add
->                          |                          |  ...
->                          |                          |blk_trace_ioctl
->                          |                          | __blk_trace_setup
->                          |                          |   debugfs_create_file
->                          |__blk_release_queue       |
->                          | blk_mq_debugfs_unregister|
->                          |  debugfs_remove_recursive|
->                          |                          |loop_control_ioctl
->                          |                          | loop_remove
->                          |                          |  ...
->                          |__blk_release_queue       |
->                          | blk_trace_shutdown       |
->                          |  debugfs_remove          |
-> 
-> commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
-> final release of request_queue to a workqueue, so, when loop_add() is
-> called again(step 3), __blk_release_queue() might not been called yet,
-> which causes the problem.
-> 
-> Fix the problem by renaming 'q->debugfs_dir' or 'q->blk_trace->dir'
-> in blk_unregister_queue() if they exist.
-> 
-> [1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
-> References: CVE-2019-19770
-> Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
-> Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
-> Signed-off-by: yu kuai <yukuai3@huawei.com>
-> ---
-> Changes in V2:
->  add device name to the new dir name
->  fix compile err when 'CONFIG_BLK_DEBUG_FS' is not enabled
->  add treatment of 'q->blk_trace->dir'
-> 
->  block/blk-sysfs.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index fca9b158f4a0..1da8d4a4915a 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -11,6 +11,7 @@
->  #include <linux/blktrace_api.h>
->  #include <linux/blk-mq.h>
->  #include <linux/blk-cgroup.h>
-> +#include <linux/debugfs.h>
->  
->  #include "blk.h"
->  #include "blk-mq.h"
-> @@ -1011,6 +1012,46 @@ int blk_register_queue(struct gendisk *disk)
->  }
->  EXPORT_SYMBOL_GPL(blk_register_queue);
->  
-> +#ifdef CONFIG_DEBUG_FS
-> +/*
-> + * blk_prepare_release_queue - rename q->debugfs_dir and q->blk_trace->dir
-> + * @q: request_queue of which the dir to be renamed belong to.
-> + *
-> + * Because the final release of request_queue is in a workqueue, the
-> + * cleanup might not been finished yet while the same device start to
-> + * create. It's not correct if q->debugfs_dir still exist while trying
-> + * to create a new one.
-> + */
-> +static void blk_prepare_release_queue(struct request_queue *q)
-> +{
-> +	struct dentry *new = NULL;
-> +	struct dentry **old = NULL;
-> +	char name[DNAME_INLINE_LEN];
-> +	int i = 0;
-> +
-> +#ifdef CONFIG_BLK_DEBUG_FS
-> +	if (!IS_ERR_OR_NULL(q->debugfs_dir))
-> +		old = &q->debugfs_dir;
-> +#endif
-> +#ifdef CONFIG_BLK_DEV_IO_TRACE
-> +	/* q->debugfs_dir and q->blk_trace->dir can't both exist */
-> +	if (q->blk_trace && !IS_ERR_OR_NULL(q->blk_trace->dir))
-> +		old = &q->blk_trace->dir;
-> +#endif
+Hi,
 
-If blk_trace->dir isn't same with .debugfs_dir, you will just rename
-blk_trace->dir, this way can't avoid the failure in step3, can it?
+scsi uses one global atomic variable to track queue depth for each
+LUN/request queue. This way can't scale well when there is lots of CPU
+cores and the disk is very fast. Broadcom guys has complained that their
+high end HBA can't reach top performance because .device_busy is
+operated in IO path.
 
-I understand that we just need to rename .debugfs_dir, meantime making
-sure blktrace code removes correct debugfs dir, is that enough for fixing
-this issue?
+Replace the atomic variable sdev->device_busy with sbitmap for
+tracking scsi device queue depth.
 
-> +	if (old == NULL)
-> +		return;
-> +	while (new == NULL) {
-> +		sprintf(name, "ready_to_remove_%s_%d",
-> +				kobject_name(q->kobj.parent), i++);
-> +		new = debugfs_rename(blk_debugfs_root, *old,
-> +				     blk_debugfs_root, name);
-> +	}
+Test on scsi_debug shows this way improve IOPS > 20%. Meantime
+the IOPS difference is just ~1% compared with bypassing .device_busy
+on scsi_debug via patches[1]
 
-The above code can be run concurrently with blktrace shutdown, so race might
-exit between the two code paths, then bt->dir may has been renamed or being
-renamed in debugfs_remove(bt->dir), can this function work as expected or
-correct?
+The 1st 6 patches moves percpu allocation hint into sbitmap, since
+the improvement by doing percpu allocation hint on sbitmap is observable.
+Meantime export helpers for SCSI.
 
-And there is dead loop risk, so suggest to not rename this way.
+Patch 7 and 8 prepares for the conversion by returning budget token
+from .get_budget callback, meantime passes the budget token to driver
+via 'struct blk_mq_queue_data' in .queue_rq().
+
+The last two patches changes SCSI for switching to track device queue
+depth via sbitmap.
+
+Broadcom Guys, please test this patchset and see if expected performance
+can be reached.
+
+Please comment and review!
+
+V2:
+	- fix one build failure
 
 
-Thanks, 
+thanks,
 Ming
+
+
+[1] https://lore.kernel.org/linux-block/20200119071432.18558-6-ming.lei@r=
+edhat.com/
+
+
+Ming Lei (10):
+  sbitmap: maintain allocation round_robin in sbitmap
+  sbitmap: add helpers for updating allocation hint
+  sbitmap: remove sbitmap_clear_bit_unlock
+  sbitmap: move allocation hint into sbitmap
+  sbitmap: export sbitmap_weight
+  sbitmap: add helper of sbitmap_calculate_shift
+  blk-mq: return budget token from .get_budget callback
+  blk-mq: pass budget token to dirver via blk_mq_queue_data
+  scsi: add scsi_device_busy() to read sdev->device_busy
+  scsi: replace sdev->device_busy with sbitmap
+
+ block/blk-mq-sched.c                 |  20 ++-
+ block/blk-mq.c                       |  37 +++--
+ block/blk-mq.h                       |  11 +-
+ block/kyber-iosched.c                |   3 +-
+ drivers/dma/idxd/device.c            |   2 +-
+ drivers/dma/idxd/submit.c            |   2 +-
+ drivers/message/fusion/mptsas.c      |   2 +-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c |   2 +-
+ drivers/scsi/scsi.c                  |   2 +
+ drivers/scsi/scsi_lib.c              |  47 +++---
+ drivers/scsi/scsi_priv.h             |   1 +
+ drivers/scsi/scsi_scan.c             |  21 ++-
+ drivers/scsi/scsi_sysfs.c            |   4 +-
+ drivers/scsi/sg.c                    |   2 +-
+ include/linux/blk-mq.h               |   5 +-
+ include/linux/sbitmap.h              |  84 +++++++----
+ include/scsi/scsi_cmnd.h             |   2 +
+ include/scsi/scsi_device.h           |   8 +-
+ lib/sbitmap.c                        | 213 +++++++++++++++------------
+ 19 files changed, 286 insertions(+), 182 deletions(-)
+
+Ming Lei (10):
+  sbitmap: maintain allocation round_robin in sbitmap
+  sbitmap: add helpers for updating allocation hint
+  sbitmap: remove sbitmap_clear_bit_unlock
+  sbitmap: move allocation hint into sbitmap
+  sbitmap: export sbitmap_weight
+  sbitmap: add helper of sbitmap_calculate_shift
+  blk-mq: return budget token from .get_budget callback
+  blk-mq: pass budget token to dirver via blk_mq_queue_data
+  scsi: add scsi_device_busy() to read sdev->device_busy
+  scsi: replace sdev->device_busy with sbitmap
+
+ block/blk-mq-sched.c                 |  20 ++-
+ block/blk-mq.c                       |  37 +++--
+ block/blk-mq.h                       |  11 +-
+ block/kyber-iosched.c                |   3 +-
+ drivers/dma/idxd/device.c            |   2 +-
+ drivers/dma/idxd/submit.c            |   2 +-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c |   2 +-
+ drivers/scsi/scsi.c                  |   2 +
+ drivers/scsi/scsi_lib.c              |  47 +++---
+ drivers/scsi/scsi_priv.h             |   1 +
+ drivers/scsi/scsi_scan.c             |  21 ++-
+ drivers/scsi/scsi_sysfs.c            |   4 +-
+ drivers/scsi/sg.c                    |   2 +-
+ include/linux/blk-mq.h               |   5 +-
+ include/linux/sbitmap.h              |  84 +++++++----
+ include/scsi/scsi_cmnd.h             |   2 +
+ include/scsi/scsi_device.h           |   8 +-
+ lib/sbitmap.c                        | 213 +++++++++++++++------------
+ 18 files changed, 285 insertions(+), 181 deletions(-)
+
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+Cc: Chaitra P B <chaitra.basappa@broadcom.com>
+Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+Cc: Shivasharan S <shivasharan.srikanteshwara@broadcom.com>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+--=20
+2.20.1
 
