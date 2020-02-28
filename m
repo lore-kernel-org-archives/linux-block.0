@@ -2,74 +2,80 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDBBC3F2D2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D37BCC3F2CD
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:38:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDDD22468A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:37:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4SbinEZ"
+	by mail.kernel.org (Postfix) with ESMTP id A87812468A
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:38:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbgB1Whj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 17:37:39 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40716 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbgB1Whj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 17:37:39 -0500
-Received: by mail-wm1-f68.google.com with SMTP id d138so3439738wmd.5
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2020 14:37:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=m/L2CFNFEJ5Ff3RcD+2vg+RFDRxj9z+ompwtLPqfUIQ=;
-        b=l4SbinEZFJqXMj7e39tvulvCuyM0M2J9c9l0qDdIC/6MtByij6kUnBgiAbQDSno5cv
-         qGWwOsqpSZdoeQUuOhorPzs7Rn7PylcT77/K74fvYGt3Kcq5ACxeVGTB7uaZHMpUaEUZ
-         2fn/yq0EEQ0bLBaPt7fNrn3IMXnKsud+7a7BrYu6Oz8WTTm9bFRx5weVcruD7wX+qLus
-         4Os6e75kSSj8xlzM3jQLFCcMV7q8hbiJajcJC3nZue2fnRT5ZYq2fdX3Lr/MkAeJZ/RN
-         G+ryLZHceaouWykUbsXhoRfZvvlw1Fv6vOC2ui/nSeQOhNdQpr5M5XVlLzEjEVeLF2P+
-         7COQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=m/L2CFNFEJ5Ff3RcD+2vg+RFDRxj9z+ompwtLPqfUIQ=;
-        b=Pwdk1sqanoEvOKJDajVTnjnS+Jm47qUMpsyL8ZXJUkWj5Jfb+/WCm4qNHxdRX9zQGp
-         rKzMnMOAWGg1SrSWxRpno+ghXNQQICBITjEVSnWqSDcirLqykcQ75r1Swzp/wAhFaAga
-         OjtVYzpuHvgilIqb1IpgcZKJXzvLdK4/IA9TXLph0pzjPJJiPK8s33KsiBweUQUrjs6R
-         UpCKWwXlPw6wDinZumyXEfldIE1gNc9LdnDBvTFzxYYn1S3GDt8YN73K9K7wIlWc211n
-         wdAUv9Ki0bYJGuQyvoR2RcIIQihadqQistYLWEYlGPtcmJq8g+8MX1iSz6915TZZiE8I
-         Xubg==
-X-Gm-Message-State: APjAAAU5V1L3OXSYOGhwAVoEamUKrhYoCCcb+6mN028olUzX9xKBa4PM
-        lo41776EZ/PmsesIoNtvrYjgNo/f
-X-Google-Smtp-Source: APXvYqxm4rmaN8LmhzToPK+8zLx2qkxauslE07eUH1wExyDLz/0IYrTQWNnSsKbmhVipiQBvpK2/5A==
-X-Received: by 2002:a1c:7203:: with SMTP id n3mr6637290wmc.119.1582929456557;
-        Fri, 28 Feb 2020 14:37:36 -0800 (PST)
-Received: from [10.20.1.199] (ivokamhome.ddns.nbis.net. [87.120.136.31])
-        by smtp.gmail.com with ESMTPSA id c11sm13876125wrp.51.2020.02.28.14.37.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 14:37:35 -0800 (PST)
-Subject: Re: [PATCH 2/6] block: use bio_{wouldblock,io}_error in
- direct_make_request
+        id S1726277AbgB1Wi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 17:38:58 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36288 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725957AbgB1Wi6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Feb 2020 17:38:58 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 2E503ABF4;
+        Fri, 28 Feb 2020 22:38:55 +0000 (UTC)
+Subject: Re: [PATCH 3/6] block: remove redundant setting of QUEUE_FLAG_DYING
 To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
 References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
- <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
-From:   Nikolay Borisov <n.borisov.lkml@gmail.com>
-Message-ID: <b826cad5-a9fc-3490-1782-0073a92fc815@gmail.com>
-Date:   Sat, 29 Feb 2020 00:37:34 +0200
+ <20200228150518.10496-4-guoqing.jiang@cloud.ionos.com>
+From:   Nikolay Borisov <nborisov@suse.com>
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ xsFNBFiKBz4BEADNHZmqwhuN6EAzXj9SpPpH/nSSP8YgfwoOqwrP+JR4pIqRK0AWWeWCSwmZ
+ T7g+RbfPFlmQp+EwFWOtABXlKC54zgSf+uulGwx5JAUFVUIRBmnHOYi/lUiE0yhpnb1KCA7f
+ u/W+DkwGerXqhhe9TvQoGwgCKNfzFPZoM+gZrm+kWv03QLUCr210n4cwaCPJ0Nr9Z3c582xc
+ bCUVbsjt7BN0CFa2BByulrx5xD9sDAYIqfLCcZetAqsTRGxM7LD0kh5WlKzOeAXj5r8DOrU2
+ GdZS33uKZI/kZJZVytSmZpswDsKhnGzRN1BANGP8sC+WD4eRXajOmNh2HL4P+meO1TlM3GLl
+ EQd2shHFY0qjEo7wxKZI1RyZZ5AgJnSmehrPCyuIyVY210CbMaIKHUIsTqRgY5GaNME24w7h
+ TyyVCy2qAM8fLJ4Vw5bycM/u5xfWm7gyTb9V1TkZ3o1MTrEsrcqFiRrBY94Rs0oQkZvunqia
+ c+NprYSaOG1Cta14o94eMH271Kka/reEwSZkC7T+o9hZ4zi2CcLcY0DXj0qdId7vUKSJjEep
+ c++s8ncFekh1MPhkOgNj8pk17OAESanmDwksmzh1j12lgA5lTFPrJeRNu6/isC2zyZhTwMWs
+ k3LkcTa8ZXxh0RfWAqgx/ogKPk4ZxOXQEZetkEyTFghbRH2BIwARAQABzSJOaWtvbGF5IEJv
+ cmlzb3YgPG5ib3Jpc292QHN1c2UuZGU+wsF4BBMBAgAiBQJYijkSAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRBxvoJG5T8oV/B6D/9a8EcRPdHg8uLEPywuJR8URwXzkofT5bZE
+ IfGF0Z+Lt2ADe+nLOXrwKsamhweUFAvwEUxxnndovRLPOpWerTOAl47lxad08080jXnGfYFS
+ Dc+ew7C3SFI4tFFHln8Y22Q9075saZ2yQS1ywJy+TFPADIprAZXnPbbbNbGtJLoq0LTiESnD
+ w/SUC6sfikYwGRS94Dc9qO4nWyEvBK3Ql8NkoY0Sjky3B0vL572Gq0ytILDDGYuZVo4alUs8
+ LeXS5ukoZIw1QYXVstDJQnYjFxYgoQ5uGVi4t7FsFM/6ykYDzbIPNOx49Rbh9W4uKsLVhTzG
+ BDTzdvX4ARl9La2kCQIjjWRg+XGuBM5rxT/NaTS78PXjhqWNYlGc5OhO0l8e5DIS2tXwYMDY
+ LuHYNkkpMFksBslldvNttSNei7xr5VwjVqW4vASk2Aak5AleXZS+xIq2FADPS/XSgIaepyTV
+ tkfnyreep1pk09cjfXY4A7qpEFwazCRZg9LLvYVc2M2eFQHDMtXsH59nOMstXx2OtNMcx5p8
+ 0a5FHXE/HoXz3p9bD0uIUq6p04VYOHsMasHqHPbsMAq9V2OCytJQPWwe46bBjYZCOwG0+x58
+ fBFreP/NiJNeTQPOa6FoxLOLXMuVtpbcXIqKQDoEte9aMpoj9L24f60G4q+pL/54ql2VRscK
+ d87BTQRYigc+ARAAyJSq9EFk28++SLfg791xOh28tLI6Yr8wwEOvM3wKeTfTZd+caVb9gBBy
+ wxYhIopKlK1zq2YP7ZjTP1aPJGoWvcQZ8fVFdK/1nW+Z8/NTjaOx1mfrrtTGtFxVBdSCgqBB
+ jHTnlDYV1R5plJqK+ggEP1a0mr/rpQ9dFGvgf/5jkVpRnH6BY0aYFPprRL8ZCcdv2DeeicOO
+ YMobD5g7g/poQzHLLeT0+y1qiLIFefNABLN06Lf0GBZC5l8hCM3Rpb4ObyQ4B9PmL/KTn2FV
+ Xq/c0scGMdXD2QeWLePC+yLMhf1fZby1vVJ59pXGq+o7XXfYA7xX0JsTUNxVPx/MgK8aLjYW
+ hX+TRA4bCr4uYt/S3ThDRywSX6Hr1lyp4FJBwgyb8iv42it8KvoeOsHqVbuCIGRCXqGGiaeX
+ Wa0M/oxN1vJjMSIEVzBAPi16tztL/wQtFHJtZAdCnuzFAz8ue6GzvsyBj97pzkBVacwp3/Mw
+ qbiu7sDz7yB0d7J2tFBJYNpVt/Lce6nQhrvon0VqiWeMHxgtQ4k92Eja9u80JDaKnHDdjdwq
+ FUikZirB28UiLPQV6PvCckgIiukmz/5ctAfKpyYRGfez+JbAGl6iCvHYt/wAZ7Oqe/3Cirs5
+ KhaXBcMmJR1qo8QH8eYZ+qhFE3bSPH446+5oEw8A9v5oonKV7zMAEQEAAcLBXwQYAQIACQUC
+ WIoHPgIbDAAKCRBxvoJG5T8oV1pyD/4zdXdOL0lhkSIjJWGqz7Idvo0wjVHSSQCbOwZDWNTN
+ JBTP0BUxHpPu/Z8gRNNP9/k6i63T4eL1xjy4umTwJaej1X15H8Hsh+zakADyWHadbjcUXCkg
+ OJK4NsfqhMuaIYIHbToi9K5pAKnV953xTrK6oYVyd/Rmkmb+wgsbYQJ0Ur1Ficwhp6qU1CaJ
+ mJwFjaWaVgUERoxcejL4ruds66LM9Z1Qqgoer62ZneID6ovmzpCWbi2sfbz98+kW46aA/w8r
+ 7sulgs1KXWhBSv5aWqKU8C4twKjlV2XsztUUsyrjHFj91j31pnHRklBgXHTD/pSRsN0UvM26
+ lPs0g3ryVlG5wiZ9+JbI3sKMfbdfdOeLxtL25ujs443rw1s/PVghphoeadVAKMPINeRCgoJH
+ zZV/2Z/myWPRWWl/79amy/9MfxffZqO9rfugRBORY0ywPHLDdo9Kmzoxoxp9w3uTrTLZaT9M
+ KIuxEcV8wcVjr+Wr9zRl06waOCkgrQbTPp631hToxo+4rA1jiQF2M80HAet65ytBVR2pFGZF
+ zGYYLqiG+mpUZ+FPjxk9kpkRYz61mTLSY7tuFljExfJWMGfgSg1OxfLV631jV1TcdUnx+h3l
+ Sqs2vMhAVt14zT8mpIuu2VNxcontxgVr1kzYA/tQg32fVRbGr449j1gw57BV9i0vww==
+Message-ID: <91bb5b27-5ab4-53a2-22a8-41aebb799e44@suse.com>
+Date:   Sat, 29 Feb 2020 00:38:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20200228150518.10496-4-guoqing.jiang@cloud.ionos.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -81,32 +87,27 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 28.02.20 г. 17:05 ч., Guoqing Jiang wrote:
-> Use the two functions to simplify code.
+> Previously, blk_cleanup_queue has called blk_set_queue_dying to set the
+> flag, no need to do it again.
 > 
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 > ---
->  block/blk-core.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  block/blk-core.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
 > diff --git a/block/blk-core.c b/block/blk-core.c
-> index fd43266029be..6d36c2ad40ba 100644
+> index 6d36c2ad40ba..883ffda216e4 100644
 > --- a/block/blk-core.c
 > +++ b/block/blk-core.c
-> @@ -1121,10 +1121,9 @@ blk_qc_t direct_make_request(struct bio *bio)
+> @@ -346,7 +346,6 @@ void blk_cleanup_queue(struct request_queue *q)
 >  
->  	if (unlikely(blk_queue_enter(q, nowait ? BLK_MQ_REQ_NOWAIT : 0))) {
->  		if (nowait && !blk_queue_dying(q))
-> -			bio->bi_status = BLK_STS_AGAIN;
-> +			bio_wouldblock_error(bio);
->  		else
-> -			bio->bi_status = BLK_STS_IOERR;
-> -		bio_endio(bio);
-> +			bio_io_error(bio);
->  		return BLK_QC_T_NONE;
->  	}
+>  	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
+>  	blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
+> -	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
 >  
+>  	/*
+>  	 * Drain all requests queued before DYING marking. Set DEAD flag to
 > 
 
-The code is functionally identical so:
 
 Reviewed-by: Nikolay Borisov <nborisov@suse.com>
