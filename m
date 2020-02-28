@@ -2,96 +2,93 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33EFC3F2D2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB0C8C3F2CD
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:44:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFD66246AC
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90D842469F
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgB1Wlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 17:41:31 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37568 "EHLO mx2.suse.de"
+        id S1726561AbgB1Wo1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 17:44:27 -0500
+Received: from mga12.intel.com ([192.55.52.136]:63115 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726151AbgB1Wlb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 17:41:31 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 70843ACB8;
-        Fri, 28 Feb 2020 22:41:28 +0000 (UTC)
-Subject: Re: [PATCH 6/6] block: cleanup comment for blk_flush_complete_seq
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
- <20200228150518.10496-7-guoqing.jiang@cloud.ionos.com>
-From:   Nikolay Borisov <nborisov@suse.com>
-Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <90d88639-efa4-ea77-74bf-bde7176f09b3@suse.com>
-Date:   Sat, 29 Feb 2020 00:41:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200228150518.10496-7-guoqing.jiang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1726400AbgB1Wo0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Feb 2020 17:44:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 14:44:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,497,1574150400"; 
+   d="scan'208";a="227686635"
+Received: from linux-machine.lm.intel.com ([10.232.116.103])
+  by orsmga007.jf.intel.com with ESMTP; 28 Feb 2020 14:44:25 -0800
+From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        =?UTF-8?q?Andrzej=20Jakowski=C2=BB?= <andrzej.jakowski@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Subject: [PATCH] block: sed-opal: Change the check condition for regular session validity
+Date:   Fri, 28 Feb 2020 15:42:25 -0700
+Message-Id: <20200228224225.61368-1-revanth.rajashekar@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch changes the check condition for the validity/authentication
+of the session.
 
+1. The Host Session Number(HSN) in the response should match the HSN for
+   the session.
+2. The TPER Session Number(TSN) can never be less than 4096 for a regular
+   session.
 
-On 28.02.20 г. 17:05 ч., Guoqing Jiang wrote:
-> Remove the comment about return value, since it is not valid after
-> commit 404b8f5a03d84 ("block: cleanup kick/queued handling").
-> 
-> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Reference:
+Section 3.2.2.1   of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
+Section 3.3.7.1.1 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Architecture_Core_Spec_v2.01_r1.00.pdf
 
-Obviously correct, given the function is void.
+Co-developed-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
+---
+ block/opal_proto.h | 1 +
+ block/sed-opal.c   | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Nikolay Borisov <nborisov@suse.com>
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index 325cbba2465f..27740baad61d 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -36,6 +36,7 @@ enum opal_response_token {
+
+ #define DTAERROR_NO_METHOD_STATUS 0x89
+ #define GENERIC_HOST_SESSION_NUM 0x41
++#define RSVD_TPER_SESSION_NUM	4096
+
+ #define TPER_SYNC_SUPPORTED 0x01
+ #define MBR_ENABLED_MASK 0x10
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 880cc57a5f6b..f2b61a868901 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1056,7 +1056,7 @@ static int start_opal_session_cont(struct opal_dev *dev)
+ 	hsn = response_get_u64(&dev->parsed, 4);
+ 	tsn = response_get_u64(&dev->parsed, 5);
+
+-	if (hsn == 0 && tsn == 0) {
++	if (hsn != GENERIC_HOST_SESSION_NUM || tsn < RSVD_TPER_SESSION_NUM) {
+ 		pr_debug("Couldn't authenticate session\n");
+ 		return -EPERM;
+ 	}
+--
+2.17.1
+
