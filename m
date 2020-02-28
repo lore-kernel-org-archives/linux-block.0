@@ -2,95 +2,96 @@ Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08BFC3F2CD
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 15:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 079B9C3F2D2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 16:12:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CDD92469D
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 15:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE8362467B
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 16:12:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Zhdt7xkg"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WhuZQwKf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727000AbgB1PGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 10:06:51 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:53261 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726805AbgB1PGv (ORCPT
+        id S1725827AbgB1QMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 11:12:21 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:56392 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725769AbgB1QMV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 10:06:51 -0500
-Received: by mail-pj1-f66.google.com with SMTP id i11so1345561pju.3
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2020 07:06:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=voOQUMSUyp79AXPbhWgsmJqdQXnoM8mfKBxzIse2Eeg=;
-        b=Zhdt7xkgJ9VZJueyLE++xHiOrxxZQ+G1QS4VkcKKyLRbgB1qxVtL0CY91rKDrZKeAH
-         W2y7JT1wQczPoGFCePuFmYI/Wk7IhbjW9mRlBmvfTmg8sSRVGV78UALFwlEJZoSpNyux
-         pfcEsMPPJxLuK2ZuXjHwNja6tqrs03dl+1kuw6AtFuJycwjAp/hrcyAOFAFQBhJiyILf
-         cldamZX9Udjbm8w7iwMrOiFKXd23K+wvuMjgr8n+SEhhnbX/wTW2dgjbHyulgrKlx4aQ
-         HAnhJj0ij+tp2WUpEUUZXBSUXHFqejeKr2Kellxza4PluS4g5+Srg82UuTZpTP3qX/Mn
-         cgMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=voOQUMSUyp79AXPbhWgsmJqdQXnoM8mfKBxzIse2Eeg=;
-        b=cxvQnvYVKmOCyJl4MG5O3iIDxpdNjKHT2I1l1byBLVQ4h/miEHAlYg44NFKEzTTm++
-         XcPGB0RRoLIfEFuFM9mNXjwUcBtoSAfLaFK2w3RrzVFrBb0x3psWuuXPYRrPO7+a9iwV
-         qZCo6Q9yLT6ioyVFvCItGL9sDyomMzJIOyN9CqzqVe4eTZ4o/CjjkB6ogyhqCnHNw7qz
-         i1m6C4um2gIEDvfRyT9md9W6atfrqSc1xzhl9lQ5IOLL6J6QDjfG8S2QVdv/u8qvdt3C
-         xHRrnEONxDmPcXRHMhet5kVVKOjLBpn5lvoeF+0C7ZSKoJqeg/R4AVjRbqkL+WUWK4Cw
-         MUUg==
-X-Gm-Message-State: APjAAAU76OSXOodIGjT/VHYyNwZ7hMrWbn4X6vr0m6CTOFQcpmM2ClcT
-        Y5fXdhdHAMRcVVYOnacRE4Kfs559IVvJ64ua
-X-Google-Smtp-Source: APXvYqzHfpvAeoRSoHzcdFjuAJlpzhN0oMFqxLB6tBpfEaVxb7vCfstb6AsaMKol4mnXNzC75xs1wA==
-X-Received: by 2002:a17:902:7e05:: with SMTP id b5mr4362514plm.219.1582902408945;
-        Fri, 28 Feb 2020 07:06:48 -0800 (PST)
-Received: from nb01257.pb.local ([240e:82:3:5b12:940:b7e:a31d:58eb])
-        by smtp.gmail.com with ESMTPSA id y1sm7621912pgs.74.2020.02.28.07.06.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2020 07:06:48 -0800 (PST)
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH 6/6] block: cleanup comment for blk_flush_complete_seq
-Date:   Fri, 28 Feb 2020 16:05:18 +0100
-Message-Id: <20200228150518.10496-7-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
-References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
+        Fri, 28 Feb 2020 11:12:21 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01SG8rIV177523;
+        Fri, 28 Feb 2020 16:12:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=GQ+GrrZZEREBJ6pZFtKFK5HH2nQizyRqJ6jwWaZJ0mw=;
+ b=WhuZQwKfpJtcGOrJZy9N6Fy2Q4eiwf0Sg0H08ce6knPITTwm2FfcxLK8KH52S++tB0A1
+ RoJm+ToeRMSrARomC+8G1gSJS1aGNOOuTIh14G24ER44WhQEkkfViOLv2LIC8WnHobkg
+ Ui7Crgt3NfFQ6HndrIegiCd3b7dhuDkCADcG/MUYwbZ12wChhNqDgG7Tuc9fShlbwci7
+ SR5Gk9cxXOrmmXvCLd984a2y1JY9tDpJyWozkRf5cqAnn5CjXERPgBetgGeONpzL90dm
+ HqgAaWcIn4V2GLikzg+uYlDAeDE0Iep0TEApbkmWz6/8iZrDa39Q9BEclkyxrYWTUxtn bA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2ydct3ksbx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Feb 2020 16:12:08 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01SG8E6d063741;
+        Fri, 28 Feb 2020 16:12:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2ydj4r5gvy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Feb 2020 16:12:07 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01SGC66t022907;
+        Fri, 28 Feb 2020 16:12:07 GMT
+Received: from kadam (/129.205.23.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 28 Feb 2020 08:12:06 -0800
+Date:   Fri, 28 Feb 2020 19:11:58 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] loop: Fix IS_ERR() vs NULL bugs in loop_prepare_queue()
+Message-ID: <20200228161158.GC4118@kadam>
+References: <20200228141350.iaviwnry3z4ipjqe@kili.mountain>
+ <c106c6ec-7171-3586-d5c5-5c14e386b3d5@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c106c6ec-7171-3586-d5c5-5c14e386b3d5@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9545 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 suspectscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=894 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002280128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9545 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ phishscore=0 mlxlogscore=973 mlxscore=0 suspectscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002280128
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the comment about return value, since it is not valid after
-commit 404b8f5a03d84 ("block: cleanup kick/queued handling").
+On Fri, Feb 28, 2020 at 07:25:58AM -0700, Jens Axboe wrote:
+> On 2/28/20 7:13 AM, Dan Carpenter wrote:
+> > The alloc_workqueue() function returns NULL on error, it never returns
+> > error pointers.
+> > 
+> > Fixes: 29dab2122492 ("loop: use worker per cgroup instead of kworker")
+> 
+> I can't seem to find this commit?
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- block/blk-flush.c | 3 ---
- 1 file changed, 3 deletions(-)
+I guess this went through Andrew Morton's tree.  I'll resend to him.
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 963ae56d5aae..46fd6e83dd79 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -160,9 +160,6 @@ static void blk_account_io_flush(struct request *rq)
-  *
-  * CONTEXT:
-  * spin_lock_irq(fq->mq_flush_lock)
-- *
-- * RETURNS:
-- * %true if requests were added to the dispatch queue, %false otherwise.
-  */
- static void blk_flush_complete_seq(struct request *rq,
- 				   struct blk_flush_queue *fq,
--- 
-2.17.1
+regards,
+dan carpenter
 
