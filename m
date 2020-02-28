@@ -6,28 +6,27 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5ABC3F2D2
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33EFC3F2D2
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:41:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 095012468A
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFD66246AC
+	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 22:41:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgB1Wkp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 17:40:45 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37148 "EHLO mx2.suse.de"
+        id S1726627AbgB1Wlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 17:41:31 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37568 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726151AbgB1Wkp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 17:40:45 -0500
+        id S1726151AbgB1Wlb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Feb 2020 17:41:31 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C2276ABF4;
-        Fri, 28 Feb 2020 22:40:42 +0000 (UTC)
-Subject: Re: [PATCH 5/6] block: remove unneeded argument from
- blk_alloc_flush_queue
+        by mx2.suse.de (Postfix) with ESMTP id 70843ACB8;
+        Fri, 28 Feb 2020 22:41:28 +0000 (UTC)
+Subject: Re: [PATCH 6/6] block: cleanup comment for blk_flush_complete_seq
 To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
 References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
- <20200228150518.10496-6-guoqing.jiang@cloud.ionos.com>
+ <20200228150518.10496-7-guoqing.jiang@cloud.ionos.com>
 From:   Nikolay Borisov <nborisov@suse.com>
 Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
  xsFNBFiKBz4BEADNHZmqwhuN6EAzXj9SpPpH/nSSP8YgfwoOqwrP+JR4pIqRK0AWWeWCSwmZ
@@ -71,12 +70,12 @@ Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
  KIuxEcV8wcVjr+Wr9zRl06waOCkgrQbTPp631hToxo+4rA1jiQF2M80HAet65ytBVR2pFGZF
  zGYYLqiG+mpUZ+FPjxk9kpkRYz61mTLSY7tuFljExfJWMGfgSg1OxfLV631jV1TcdUnx+h3l
  Sqs2vMhAVt14zT8mpIuu2VNxcontxgVr1kzYA/tQg32fVRbGr449j1gw57BV9i0vww==
-Message-ID: <3c2c56af-4714-cccc-33ab-74c3e848cdcd@suse.com>
-Date:   Sat, 29 Feb 2020 00:40:41 +0200
+Message-ID: <90d88639-efa4-ea77-74bf-bde7176f09b3@suse.com>
+Date:   Sat, 29 Feb 2020 00:41:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200228150518.10496-6-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20200228150518.10496-7-guoqing.jiang@cloud.ionos.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -88,10 +87,11 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 28.02.20 г. 17:05 ч., Guoqing Jiang wrote:
-> Remove 'q' from arguments since it is not used anymore after
-> commit 7e992f847a08e ("block: remove non mq parts from the
-> flush code").
+> Remove the comment about return value, since it is not valid after
+> commit 404b8f5a03d84 ("block: cleanup kick/queued handling").
 > 
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+
+Obviously correct, given the function is void.
 
 Reviewed-by: Nikolay Borisov <nborisov@suse.com>
