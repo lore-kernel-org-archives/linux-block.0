@@ -1,378 +1,93 @@
-Return-Path: <SRS0=/0DQ=4Q=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=t5dV=4R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4E3C3F2D3
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D37BAC3F2D2
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAB9D2469C
-	for <linux-block@archiver.kernel.org>; Fri, 28 Feb 2020 23:30:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMQ82+B/"
+	by mail.kernel.org (Postfix) with ESMTP id AB93924672
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgB1Xab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 18:30:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21161 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726561AbgB1Xab (ORCPT
+        id S1726621AbgB2C0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 21:26:18 -0500
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:41834 "EHLO
+        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbgB2C0S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 18:30:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582932629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YNirpvSklIIdah2sC5h7VgXF/Vtwy4NgWlnpUX3i0go=;
-        b=EMQ82+B/Ko8Zgq2dau/LsglRqABXXLmdak0G5Ld0eFTjimW+ZJnz3xWoeDWC9oDuyMkI+q
-        YBNhVjAzyqOHtx1qrgy7Sb0Som8aMs4n4AcqtaAycKSrmLA0iGK8a/OEF8mdiZ/af1OaXD
-        b6jB6utYN0ywCwvy4vmJFEzpSLoQXxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-YOarZEngPCSuglUyrcok7g-1; Fri, 28 Feb 2020 18:30:25 -0500
-X-MC-Unique: YOarZEngPCSuglUyrcok7g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E7188017DF;
-        Fri, 28 Feb 2020 23:30:23 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9137C60BF1;
-        Fri, 28 Feb 2020 23:30:22 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Chaitra P B <chaitra.basappa@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        "Ewan D . Milne" <emilne@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH V2 10/10] scsi: replace sdev->device_busy with sbitmap
-Date:   Sat, 29 Feb 2020 07:29:20 +0800
-Message-Id: <20200228232920.20960-11-ming.lei@redhat.com>
-In-Reply-To: <20200228232920.20960-1-ming.lei@redhat.com>
-References: <20200228232920.20960-1-ming.lei@redhat.com>
+        Fri, 28 Feb 2020 21:26:18 -0500
+Received: by mail-pg1-f170.google.com with SMTP id b1so2439507pgm.8
+        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2020 18:26:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=561rWRZzzFFUOwdsqB0gUShGDB8hnIUSi++qgSQaL7I=;
+        b=fePQt66hL98cts2rxJWWAho3cMYaShlxCg1MNUISC4om+OEhvCU8XVTDCn9WaWHnnn
+         AD1ajYzcNl+hWyZXWr7Wbc8Y7LRsNBh0FRoi02ltzOnWp8auzBgUxR0K7tzSYAPG5xQC
+         5LayNgiW7GdhZ9mnbU1OXiTCxHcFGkwpKWcosHtx6oFsQw6sgXWlphdQZiRh/HgEWZ0k
+         NG0QF1DgQNxW1u9OJEIY2XcESd0G19SBLGdqNt5opI8BJS6DOyhCYv10kbmFjrhLFgBm
+         KpVqaM3xnmieyjIKxBS8RYIvBAe+H5vJuvRSQHwY8NCTQu07UeGo3YdB4qEYxvtEX1Mq
+         bXBw==
+X-Gm-Message-State: APjAAAU/cEmD2JudJV9pzpx+OOla0Y2AzJVAVugj5GjUZ5GR7Wj6Nr2l
+        +CwYMFlfdADFXGqOvZf/pvFwgtjcAoE=
+X-Google-Smtp-Source: APXvYqxR6A4PZOpwyIrsL+rLoVbM3Tqif+CF94R5HjCfnjIMMayRGXxLj/WAuigRp7Jn033QTlaM+w==
+X-Received: by 2002:a65:63d1:: with SMTP id n17mr6947333pgv.298.1582943176764;
+        Fri, 28 Feb 2020 18:26:16 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:d7:34a0:1fb8:34d0:e7e7? ([2601:647:4000:d7:34a0:1fb8:34d0:e7e7])
+        by smtp.gmail.com with ESMTPSA id 5sm12663664pfx.163.2020.02.28.18.26.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Feb 2020 18:26:16 -0800 (PST)
+Subject: Re: [PATCH 2/6] block: use bio_{wouldblock,io}_error in
+ direct_make_request
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
+ <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <c5b3a8e2-dd86-d163-b808-7de518cf154a@acm.org>
+Date:   Fri, 28 Feb 2020 18:26:14 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-scsi uses one global atomic variable to track queue depth for each
-LUN/request queue.
+On 2020-02-28 07:05, Guoqing Jiang wrote:
+> Use the two functions to simplify code.
 
-This way doesn't scale well when there is lots of CPU cores and the
-disk is very fast. It has been observed that IOPS is affected a lot
-by tracking queue depth via sdev->device_busy in IO path.
-
-So replace the atomic variable sdev->device_busy with sbitmap for
-tracking scsi device queue depth.
-
-Test shows that IOPS difference is just ~1% compared with bypassing
-device queue depth on scsi_debug by applying patches [1]. Meantime
-IOPS is improved > 20% compared with linus tree.
-
-Follows test steps:
-
-1) test machine(32 logical CPU cores)
-	Thread(s) per core:  2
-	Core(s) per socket:  8
-	Socket(s):           2
-	NUMA node(s):        2
-	Model name:          Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-
-2) setup scsi_debug:
-modprobe scsi_debug virtual_gb=3D128 max_luns=3D1 submit_queues=3D32 dela=
-y=3D0 max_queue=3D256
-
-3) fio script:
-fio --rw=3Drandread --size=3D128G --direct=3D1 --ioengine=3Dlibaio --iode=
-pth=3D2048 \
-	--numjobs=3D32 --bs=3D4k --group_reporting=3D1 --group_reporting=3D1 --r=
-untime=3D60 \
-	--loops=3D10000 --name=3Djob1 --filename=3D/dev/sdN
-
-[1] https://lore.kernel.org/linux-block/20200119071432.18558-6-ming.lei@r=
-edhat.com/
-
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Sathya Prakash <sathya.prakash@broadcom.com>
-Cc: Chaitra P B <chaitra.basappa@broadcom.com>
-Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Sumit Saxena <sumit.saxena@broadcom.com>
-Cc: Shivasharan S <shivasharan.srikanteshwara@broadcom.com>
-Cc: Ewan D. Milne <emilne@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi.c        |  2 ++
- drivers/scsi/scsi_lib.c    | 37 ++++++++++++++++++-------------------
- drivers/scsi/scsi_priv.h   |  1 +
- drivers/scsi/scsi_scan.c   | 21 +++++++++++++++++++--
- drivers/scsi/scsi_sysfs.c  |  2 ++
- include/scsi/scsi_cmnd.h   |  2 ++
- include/scsi/scsi_device.h |  5 +++--
- 7 files changed, 47 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index 4b9fdfab77d9..62771a92db9b 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -245,6 +245,8 @@ int scsi_change_queue_depth(struct scsi_device *sdev,=
- int depth)
- 	if (sdev->request_queue)
- 		blk_set_queue_depth(sdev->request_queue, depth);
-=20
-+	sbitmap_resize(&sdev->budget_map, sdev->queue_depth);
-+
- 	return sdev->queue_depth;
- }
- EXPORT_SYMBOL(scsi_change_queue_depth);
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index a3474b418602..e7fbf3a9a6aa 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -354,7 +354,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, str=
-uct scsi_cmnd *cmd)
- 	if (starget->can_queue > 0)
- 		atomic_dec(&starget->target_busy);
-=20
--	atomic_dec(&sdev->device_busy);
-+	sbitmap_put(&sdev->budget_map, cmd->budget_token);
- }
-=20
- static void scsi_kick_queue(struct request_queue *q)
-@@ -1274,19 +1274,17 @@ scsi_prep_state_check(struct scsi_device *sdev, s=
-truct request *req)
- }
-=20
- /*
-- * scsi_dev_queue_ready: if we can send requests to sdev, return 1 else
-- * return 0.
-- *
-- * Called with the queue_lock held.
-+ * scsi_dev_queue_ready: if we can send requests to sdev, assign one tok=
-en
-+ * and return the token else return -1.
-  */
- static inline int scsi_dev_queue_ready(struct request_queue *q,
- 				  struct scsi_device *sdev)
- {
--	unsigned int busy;
-+	int token;
-=20
--	busy =3D atomic_inc_return(&sdev->device_busy) - 1;
-+	token =3D sbitmap_get(&sdev->budget_map);
- 	if (atomic_read(&sdev->device_blocked)) {
--		if (busy)
-+		if (token >=3D 0)
- 			goto out_dec;
-=20
- 		/*
-@@ -1298,13 +1296,11 @@ static inline int scsi_dev_queue_ready(struct req=
-uest_queue *q,
- 				   "unblocking device at zero depth\n"));
- 	}
-=20
--	if (busy >=3D sdev->queue_depth)
--		goto out_dec;
--
--	return 1;
-+	return token;
- out_dec:
--	atomic_dec(&sdev->device_busy);
--	return 0;
-+	if (token >=3D 0)
-+		sbitmap_put(&sdev->budget_map, token);
-+	return -1;
- }
-=20
- /*
-@@ -1624,16 +1620,17 @@ static void scsi_mq_put_budget(struct blk_mq_hw_c=
-tx *hctx, int budget_token)
- 	struct request_queue *q =3D hctx->queue;
- 	struct scsi_device *sdev =3D q->queuedata;
-=20
--	atomic_dec(&sdev->device_busy);
-+	sbitmap_put(&sdev->budget_map, budget_token);
- }
-=20
- static int scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q =3D hctx->queue;
- 	struct scsi_device *sdev =3D q->queuedata;
-+	int token =3D scsi_dev_queue_ready(q, sdev);
-=20
--	if (scsi_dev_queue_ready(q, sdev))
--		return 0;
-+	if (token >=3D 0)
-+		return token;
-=20
- 	if (scsi_device_busy(sdev) =3D=3D 0 && !scsi_device_blocked(sdev))
- 		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-@@ -1677,6 +1674,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_=
-ctx *hctx,
- 		blk_mq_start_request(req);
- 	}
-=20
-+	cmd->budget_token =3D bd->budget_token;
-+
- 	cmd->flags &=3D SCMD_PRESERVED_FLAGS;
- 	if (sdev->simple_tags)
- 		cmd->flags |=3D SCMD_TAGGED;
-@@ -1701,12 +1700,12 @@ static blk_status_t scsi_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
- 	if (scsi_target(sdev)->can_queue > 0)
- 		atomic_dec(&scsi_target(sdev)->target_busy);
- out_put_budget:
--	scsi_mq_put_budget(hctx, 0);
-+	scsi_mq_put_budget(hctx, bd->budget_token);
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		break;
- 	case BLK_STS_RESOURCE:
--		if (atomic_read(&sdev->device_busy) ||
-+		if (sbitmap_any_bit_set(&sdev->budget_map) ||
- 		    scsi_device_blocked(sdev))
- 			ret =3D BLK_STS_DEV_RESOURCE;
- 		break;
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index 25b0aaaf5ae8..f6856a946542 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -5,6 +5,7 @@
- #include <linux/device.h>
- #include <linux/async.h>
- #include <scsi/scsi_device.h>
-+#include <linux/sbitmap.h>
-=20
- struct request_queue;
- struct request;
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-index 058079f915f1..27b64c82d26b 100644
---- a/drivers/scsi/scsi_scan.c
-+++ b/drivers/scsi/scsi_scan.c
-@@ -215,6 +215,7 @@ static void scsi_unlock_floptical(struct scsi_device =
-*sdev,
- static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 					   u64 lun, void *hostdata)
- {
-+	unsigned int depth;
- 	struct scsi_device *sdev;
- 	int display_failure_msg =3D 1, ret;
- 	struct Scsi_Host *shost =3D dev_to_shost(starget->dev.parent);
-@@ -277,8 +278,23 @@ static struct scsi_device *scsi_alloc_sdev(struct sc=
-si_target *starget,
- 	WARN_ON_ONCE(!blk_get_queue(sdev->request_queue));
- 	sdev->request_queue->queuedata =3D sdev;
-=20
--	scsi_change_queue_depth(sdev, sdev->host->cmd_per_lun ?
--					sdev->host->cmd_per_lun : 1);
-+	depth =3D sdev->host->cmd_per_lun ?: 1;
-+
-+	/*
-+	 * Use .can_queue as budget map's depth because we have to
-+	 * support adjusting queue depth from sysfs. Meantime use
-+	 * default device queue depth to figure out sbitmap shift
-+	 * since we use this queue depth most of times.
-+	 */
-+	if (sbitmap_init_node(&sdev->budget_map, sdev->host->can_queue,
-+				sbitmap_calculate_shift(depth),
-+				GFP_KERNEL, sdev->request_queue->node,
-+				false, true)) {
-+		put_device(&starget->dev);
-+		kfree(sdev);
-+	}
-+
-+	scsi_change_queue_depth(sdev, depth);
-=20
- 	scsi_sysfs_device_initialize(sdev);
-=20
-@@ -980,6 +996,7 @@ static int scsi_add_lun(struct scsi_device *sdev, uns=
-igned char *inq_result,
- 		scsi_attach_vpd(sdev);
-=20
- 	sdev->max_queue_depth =3D sdev->queue_depth;
-+	WARN_ON_ONCE(sdev->max_queue_depth > sdev->budget_map.depth);
- 	sdev->sdev_bflags =3D *bflags;
-=20
- 	/*
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index d6cb5a0a03f2..835566b805fb 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -466,6 +466,8 @@ static void scsi_device_dev_release_usercontext(struc=
-t work_struct *work)
- 	/* NULL queue means the device can't be used */
- 	sdev->request_queue =3D NULL;
-=20
-+	sbitmap_free(&sdev->budget_map);
-+
- 	mutex_lock(&sdev->inquiry_mutex);
- 	vpd_pg0 =3D rcu_replace_pointer(sdev->vpd_pg0, vpd_pg0,
- 				       lockdep_is_held(&sdev->inquiry_mutex));
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index a2849bb9cd19..e6f750f43889 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -76,6 +76,8 @@ struct scsi_cmnd {
-=20
- 	int eh_eflags;		/* Used by error handlr */
-=20
-+	int budget_token;
-+
- 	/*
- 	 * This is set to jiffies as it was when the command was first
- 	 * allocated.  It is used to time how long the command has
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index 09caf6f2f528..cdc1f28ec57f 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -8,6 +8,7 @@
- #include <linux/blkdev.h>
- #include <scsi/scsi.h>
- #include <linux/atomic.h>
-+#include <linux/sbitmap.h>
-=20
- struct device;
- struct request_queue;
-@@ -106,7 +107,7 @@ struct scsi_device {
- 	struct list_head    siblings;   /* list of all devices on this host */
- 	struct list_head    same_target_siblings; /* just the devices sharing s=
-ame target id */
-=20
--	atomic_t device_busy;		/* commands actually active on LLDD */
-+	struct sbitmap budget_map;
- 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
-=20
- 	spinlock_t list_lock;
-@@ -586,7 +587,7 @@ static inline int scsi_device_supports_vpd(struct scs=
-i_device *sdev)
-=20
- static inline int scsi_device_busy(struct scsi_device *sdev)
- {
--	return atomic_read(&sdev->device_busy);
-+	return sbitmap_weight(&sdev->budget_map);
- }
-=20
- #define MODULE_ALIAS_SCSI_DEVICE(type) \
---=20
-2.20.1
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
