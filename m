@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D37BAC3F2D2
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369B5C3F2D1
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:27:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB93924672
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1213424672
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:27:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgB2C0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 21:26:18 -0500
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:41834 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726603AbgB2C0S (ORCPT
+        id S1726627AbgB2C1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Feb 2020 21:27:13 -0500
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:55061 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbgB2C1N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 21:26:18 -0500
-Received: by mail-pg1-f170.google.com with SMTP id b1so2439507pgm.8
-        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2020 18:26:17 -0800 (PST)
+        Fri, 28 Feb 2020 21:27:13 -0500
+Received: by mail-pj1-f42.google.com with SMTP id dw13so2014673pjb.4
+        for <linux-block@vger.kernel.org>; Fri, 28 Feb 2020 18:27:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=561rWRZzzFFUOwdsqB0gUShGDB8hnIUSi++qgSQaL7I=;
-        b=fePQt66hL98cts2rxJWWAho3cMYaShlxCg1MNUISC4om+OEhvCU8XVTDCn9WaWHnnn
-         AD1ajYzcNl+hWyZXWr7Wbc8Y7LRsNBh0FRoi02ltzOnWp8auzBgUxR0K7tzSYAPG5xQC
-         5LayNgiW7GdhZ9mnbU1OXiTCxHcFGkwpKWcosHtx6oFsQw6sgXWlphdQZiRh/HgEWZ0k
-         NG0QF1DgQNxW1u9OJEIY2XcESd0G19SBLGdqNt5opI8BJS6DOyhCYv10kbmFjrhLFgBm
-         KpVqaM3xnmieyjIKxBS8RYIvBAe+H5vJuvRSQHwY8NCTQu07UeGo3YdB4qEYxvtEX1Mq
-         bXBw==
-X-Gm-Message-State: APjAAAU/cEmD2JudJV9pzpx+OOla0Y2AzJVAVugj5GjUZ5GR7Wj6Nr2l
-        +CwYMFlfdADFXGqOvZf/pvFwgtjcAoE=
-X-Google-Smtp-Source: APXvYqxR6A4PZOpwyIrsL+rLoVbM3Tqif+CF94R5HjCfnjIMMayRGXxLj/WAuigRp7Jn033QTlaM+w==
-X-Received: by 2002:a65:63d1:: with SMTP id n17mr6947333pgv.298.1582943176764;
-        Fri, 28 Feb 2020 18:26:16 -0800 (PST)
+        bh=73Eja54bpnHEIMsF24bht+8ZnF1ImiqPub4SIQp+l3k=;
+        b=SfuLO+tdZWgf89rU8uGHTlac8fW1n8hF8CiZZmv2IHeMOkDq39IZ5adDaRJYrkmqME
+         QS5fcYvn67HKFQYVFEirkkMpPOQPKNiur5+frZA6t+jd80lgYlTKVKjL+L2cqpWpizHU
+         GZ0nO9sOocRKCJpx2gF3zxscwOw4x0BhptDE0DCD5DvgngQqkgtlSBmKCwLqXsX560bQ
+         m9mMyUpghJVAT0qryJTsnHFUAFlGLYGBRQ7ilO5UdnYYg4t45hInv7hLNrsx0h17JyYY
+         SpP7FbqtaYoZLQy9GR5ONsrU0RNKjwhNWhDquRI7l1iMH7UmjbbtuKT9RBoRNUwoPkin
+         cRxA==
+X-Gm-Message-State: APjAAAVpHCcD/gzcYA7tZjGAozxrytg1+tIBB9nYrgFAY695R7vULutF
+        q3zECtnLjYcemoU/lz6VMjZwh7tpaPs=
+X-Google-Smtp-Source: APXvYqwMhCWyW+sruwC7DNwPXfQiNm0uTOhXYyvdoilciF+ppdOBMcvXViALG8ZXpv07ugTEjcaNLA==
+X-Received: by 2002:a17:902:8d93:: with SMTP id v19mr6957453plo.327.1582943231963;
+        Fri, 28 Feb 2020 18:27:11 -0800 (PST)
 Received: from ?IPv6:2601:647:4000:d7:34a0:1fb8:34d0:e7e7? ([2601:647:4000:d7:34a0:1fb8:34d0:e7e7])
-        by smtp.gmail.com with ESMTPSA id 5sm12663664pfx.163.2020.02.28.18.26.15
+        by smtp.gmail.com with ESMTPSA id q8sm3624267pje.2.2020.02.28.18.27.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 18:26:16 -0800 (PST)
-Subject: Re: [PATCH 2/6] block: use bio_{wouldblock,io}_error in
- direct_make_request
+        Fri, 28 Feb 2020 18:27:11 -0800 (PST)
+Subject: Re: [PATCH 3/6] block: remove redundant setting of QUEUE_FLAG_DYING
 To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
 References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
- <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
+ <20200228150518.10496-4-guoqing.jiang@cloud.ionos.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -72,12 +71,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <c5b3a8e2-dd86-d163-b808-7de518cf154a@acm.org>
-Date:   Fri, 28 Feb 2020 18:26:14 -0800
+Message-ID: <41332096-d092-1abb-d323-5a8728958191@acm.org>
+Date:   Fri, 28 Feb 2020 18:27:10 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200228150518.10496-3-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20200228150518.10496-4-guoqing.jiang@cloud.ionos.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,7 +86,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-02-28 07:05, Guoqing Jiang wrote:
-> Use the two functions to simplify code.
+> Previously, blk_cleanup_queue has called blk_set_queue_dying to set the
+> flag, no need to do it again.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-
