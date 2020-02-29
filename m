@@ -2,176 +2,147 @@ Return-Path: <SRS0=t5dV=4R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6886EC3F2C6
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 16:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98363C3F2C6
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 23:06:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 367AA20866
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 16:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A49A24672
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 23:06:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="n80DV95u";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="n8bV17AZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727383AbgB2QjC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Feb 2020 11:39:02 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:40942 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727349AbgB2QjC (ORCPT
+        id S1727254AbgB2XGg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Feb 2020 18:06:36 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:44940 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726786AbgB2XGg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Feb 2020 11:39:02 -0500
-Received: by mail-lj1-f195.google.com with SMTP id 143so6836313ljj.7;
-        Sat, 29 Feb 2020 08:39:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=p/EJnUXjKK9tSG671VjWXjth9Z02XftSAg9w+XBqvv4=;
-        b=nTg53mvGV9xu7jQvAUd8wTlUspQWJI+qHEBUb+iEDHCVnmflm4xbn/G2WKNOfg2+3p
-         U/UBT/mb4yAytkY2dgZpzLU1jfFd9JWDp8NRyVE3WWRVivQuazBSPIQFGdcDmO1XFGPJ
-         HlR7Lq1fiAHv4GByoxf9Q5U/Cv8TMk5pG5REcCIhlhaKffB4FG6Pg/ZTw4VOvjMyJBy/
-         xo7D5NssD5tctLJ6MVqP3wrGUT30mGmbxdNptx4BegiXdlKnQLyg1AxESqtud8OM92s4
-         4P5xclJc4u4ZEX5yNz+3ige/lNpb0Qtn14YoebOwZzZ9we3NXcVox3DVKBGtD/teiY8c
-         5+QA==
-X-Gm-Message-State: ANhLgQ3kvVxVW4rTWv+j1c1HCTstK2Ay+8EntiKkrmaJwzz2DuwUtDqH
-        vAqR4N0M3FPzya/5Q+ie7JmisrC3
-X-Google-Smtp-Source: ADFU+vu916QxtadFDu/uNc0ia7G4UFr7VdQm1jCz/Bso/ErgTlLNSp28DqJb8izvr3p5fx/XBTksmQ==
-X-Received: by 2002:a2e:9a0e:: with SMTP id o14mr2818777lji.63.1582994339307;
-        Sat, 29 Feb 2020 08:38:59 -0800 (PST)
-Received: from [10.68.32.192] (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
-        by smtp.gmail.com with ESMTPSA id 19sm7287556lfp.86.2020.02.29.08.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Feb 2020 08:38:58 -0800 (PST)
-To:     Willy Tarreau <w@1wt.eu>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200224212352.8640-1-w@1wt.eu> <20200226080732.1913-1-w@1wt.eu>
- <20200226080732.1913-2-w@1wt.eu>
-From:   Denis Efremov <efremov@linux.com>
-Autocrypt: addr=efremov@linux.com; keydata=
- mQINBFsJUXwBEADDnzbOGE/X5ZdHqpK/kNmR7AY39b/rR+2Wm/VbQHV+jpGk8ZL07iOWnVe1
- ZInSp3Ze+scB4ZK+y48z0YDvKUU3L85Nb31UASB2bgWIV+8tmW4kV8a2PosqIc4wp4/Qa2A/
- Ip6q+bWurxOOjyJkfzt51p6Th4FTUsuoxINKRMjHrs/0y5oEc7Wt/1qk2ljmnSocg3fMxo8+
- y6IxmXt5tYvt+FfBqx/1XwXuOSd0WOku+/jscYmBPwyrLdk/pMSnnld6a2Fp1zxWIKz+4VJm
- QEIlCTe5SO3h5sozpXeWS916VwwCuf8oov6706yC4MlmAqsQpBdoihQEA7zgh+pk10sCvviX
- FYM4gIcoMkKRex/NSqmeh3VmvQunEv6P+hNMKnIlZ2eJGQpz/ezwqNtV/przO95FSMOQxvQY
- 11TbyNxudW4FBx6K3fzKjw5dY2PrAUGfHbpI3wtVUNxSjcE6iaJHWUA+8R6FLnTXyEObRzTS
- fAjfiqcta+iLPdGGkYtmW1muy/v0juldH9uLfD9OfYODsWia2Ve79RB9cHSgRv4nZcGhQmP2
- wFpLqskh+qlibhAAqT3RQLRsGabiTjzUkdzO1gaNlwufwqMXjZNkLYu1KpTNUegx3MNEi2p9
- CmmDxWMBSMFofgrcy8PJ0jUnn9vWmtn3gz10FgTgqC7B3UvARQARAQABtCFEZW5pcyBFZnJl
- bW92IDxlZnJlbW92QGxpbnV4LmNvbT6JAlcEEwEIAEECGwMFCQPCZwAFCwkIBwIGFQoJCAsC
- BBYCAwECHgECF4AWIQR2VAM2ApQN8ZIP5AO1IpWwM1AwHwUCW3qdrQIZAQAKCRC1IpWwM1Aw
- HwF5D/sHp+jswevGj304qvG4vNnbZDr1H8VYlsDUt+Eygwdg9eAVSVZ8yr9CAu9xONr4Ilr1
- I1vZRCutdGl5sneXr3JBOJRoyH145ExDzQtHDjqJdoRHyI/QTY2l2YPqH/QY1hsLJr/GKuRi
- oqUJQoHhdvz/NitR4DciKl5HTQPbDYOpVfl46i0CNvDUsWX7GjMwFwLD77E+wfSeOyXpFc2b
- tlC9sVUKtkug1nAONEnP41BKZwJ/2D6z5bdVeLfykOAmHoqWitCiXgRPUg4Vzc/ysgK+uKQ8
- /S1RuUA83KnXp7z2JNJ6FEcivsbTZd7Ix6XZb9CwnuwiKDzNjffv5dmiM+m5RaUmLVVNgVCW
- wKQYeTVAspfdwJ5j2gICY+UshALCfRVBWlnGH7iZOfmiErnwcDL0hLEDlajvrnzWPM9953i6
- fF3+nr7Lol/behhdY8QdLLErckZBzh+tr0RMl5XKNoB/kEQZPUHK25b140NTSeuYGVxAZg3g
- 4hobxbOGkzOtnA9gZVjEWxteLNuQ6rmxrvrQDTcLTLEjlTQvQ0uVK4ZeDxWxpECaU7T67khA
- ja2B8VusTTbvxlNYbLpGxYQmMFIUF5WBfc76ipedPYKJ+itCfZGeNWxjOzEld4/v2BTS0o02
- 0iMx7FeQdG0fSzgoIVUFj6durkgch+N5P1G9oU+H37kCDQRbCVF8ARAA3ITFo8OvvzQJT2cY
- nPR718Npm+UL6uckm0Jr0IAFdstRZ3ZLW/R9e24nfF3A8Qga3VxJdhdEOzZKBbl1nadZ9kKU
- nq87te0eBJu+EbcuMv6+njT4CBdwCzJnBZ7ApFpvM8CxIUyFAvaz4EZZxkfEpxaPAivR1Sa2
- 2x7OMWH/78laB6KsPgwxV7fir45VjQEyJZ5ac5ydG9xndFmb76upD7HhV7fnygwf/uIPOzNZ
- YVElGVnqTBqisFRWg9w3Bqvqb/W6prJsoh7F0/THzCzp6PwbAnXDedN388RIuHtXJ+wTsPA0
- oL0H4jQ+4XuAWvghD/+RXJI5wcsAHx7QkDcbTddrhhGdGcd06qbXe2hNVgdCtaoAgpCEetW8
- /a8H+lEBBD4/iD2La39sfE+dt100cKgUP9MukDvOF2fT6GimdQ8TeEd1+RjYyG9SEJpVIxj6
- H3CyGjFwtIwodfediU/ygmYfKXJIDmVpVQi598apSoWYT/ltv+NXTALjyNIVvh5cLRz8YxoF
- sFI2VpZ5PMrr1qo+DB1AbH00b0l2W7HGetSH8gcgpc7q3kCObmDSa3aTGTkawNHzbceEJrL6
- mRD6GbjU4GPD06/dTRIhQatKgE4ekv5wnxBK6v9CVKViqpn7vIxiTI9/VtTKndzdnKE6C72+
- jTwSYVa1vMxJABtOSg8AEQEAAYkCPAQYAQgAJhYhBHZUAzYClA3xkg/kA7UilbAzUDAfBQJb
- CVF8AhsMBQkDwmcAAAoJELUilbAzUDAfB8cQALnqSjpnPtFiWGfxPeq4nkfCN8QEAjb0Rg+a
- 3fy1LiquAn003DyC92qphcGkCLN75YcaGlp33M/HrjrK1cttr7biJelb5FncRSUZqbbm0Ymj
- U4AKyfNrYaPz7vHJuijRNUZR2mntwiKotgLV95yL0dPyZxvOPPnbjF0cCtHfdKhXIt7Syzjb
- M8k2fmSF0FM+89/hP11aRrs6+qMHSd/s3N3j0hR2Uxsski8q6x+LxU1aHS0FFkSl0m8SiazA
- Gd1zy4pXC2HhCHstF24Nu5iVLPRwlxFS/+o3nB1ZWTwu8I6s2ZF5TAgBfEONV5MIYH3fOb5+
- r/HYPye7puSmQ2LCXy7X5IIsnAoxSrcFYq9nGfHNcXhm5x6WjYC0Kz8l4lfwWo8PIpZ8x57v
- gTH1PI5R4WdRQijLxLCW/AaiuoEYuOLAoW481XtZb0GRRe+Tm9z/fCbkEveyPiDK7oZahBM7
- QdWEEV8mqJoOZ3xxqMlJrxKM9SDF+auB4zWGz5jGzCDAx/0qMUrVn2+v8i4oEKW6IUdV7axW
- Nk9a+EF5JSTbfv0JBYeSHK3WRklSYLdsMRhaCKhSbwo8Xgn/m6a92fKd3NnObvRe76iIEMSw
- 60iagNE6AFFzuF/GvoIHb2oDUIX4z+/D0TBWH9ADNptmuE+LZnlPUAAEzRgUFtlN5LtJP8ph
-Subject: Re: [PATCH 12/16] floppy: remove incomplete support for second FDC
- from ARM code
-Message-ID: <5a753f4c-5e30-ccf9-ab26-a3a1a1d7ff4c@linux.com>
-Date:   Sat, 29 Feb 2020 19:38:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200226080732.1913-2-w@1wt.eu>
-Content-Type: text/plain; charset=utf-8
+        Sat, 29 Feb 2020 18:06:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1583017596; x=1614553596;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=edSB/1G+n1nOn3Y0Ks3inR7WYwepd+2OZterQ+RNMK4=;
+  b=n80DV95udPJTn131n4aYY+qV3B2wzWSR8EhQbQlDuZ5eS+pxY56rXDQ5
+   3XquWJL1Vj4/cl/0dgqApcKB8gClaFISvBocWO/Dr8XPgyY0goyhEQOWP
+   tuwaSTM1KY8x9sSTr4AiCO5B3j6mWzy4ubSc1653Fy7zW0aIdLB9aZWlS
+   fap18/grgtcIIeocOlj1WmmCfznEmSI5yQ/QzapObyVbIegR7BPC23IPV
+   rfo+b6rMU7d16xUMvPxFfgB2/KBmCMtJItvlLDFoacX/B37+2EIdO3CTj
+   WUJ6wVH0M0KwdKnfIZxnUpg2BCLlEtclv8bTVj6IM+6Vczk4LPuAekW/Z
+   w==;
+IronPort-SDR: SY6Li5x5J514cmvKwyE3uLR4zZkzltyPm8HIGWx7lxWin1OiFG/EwNOOaEQ1KdD1xNJZtV0gBo
+ yQj928s69QEqqHxc10PP87GHPf9HRaQtV4gZJO5FxfSfWVHjvOJWaYo8MSvW44M1ZDJN+aBMNA
+ zJXgRHpGeLLhUjoON8sRPa/hjXvVrsRZ8wrWeWyeHccrLDyeicUpMgF6BgUKLW0YOaDfV2eF2l
+ DMvFGOyb3RjAdL3iZZ4yVCr1sMiBO8XGNxtLUtLeU3BQDq84Kjuvj2gPfub406bdYQbs0C8Az+
+ uFY=
+X-IronPort-AV: E=Sophos;i="5.70,501,1574092800"; 
+   d="scan'208";a="131596349"
+Received: from mail-mw2nam10lp2107.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.107])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Mar 2020 07:06:35 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qn8IWBi+0zIAx83ohm15u8shVPLFNBXdYntaeuoDENLRA27khumQe5C0wDNA9MJ1QACY13GcvquJwbsOnNxSZ+1+4ledi8RdLmR4ADjfUvZUg/9o3JpGQynP/SZpDANJnvKb1Kxcal0Ikm1eA/8zxW4OJkS8cUYj2luvj2a0nV8hhc47G+fqWK1ukBZdvuCbE/gZH2LGpLAT/tBxDLPnDIf3soMf1rH2pF3ydWrRgkz06PCMqirGDf80kyBFhe6+FsyOmQVpUsuYmEYO8hcqXfRoF8+oFPctGxRJZNk9mLNsbbnm9153bfOsRedTPgrnpp7f4uEgrnyDb9P5Q0SxQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5xNoGJ11sipe8TYlgyhOr+icjCy7ptg4Zztidl0Lg0Y=;
+ b=laCpCxD+o7AogqcPP9OcDc2KyfU5y6D8Pom2LkERDBonQsC0iwk2s60IhRZ8kSk811quQ6VeEOmbdDdyxgd/245F9yriHvs/F899f1xsJ/JgCDVfh4iTTlsrJELMRGfRl5+F7V71MvaCqHsYkdtySFNJFmuRBopjURdcV3irVUd9AIZLA/zcEriuuQcRmPHOPN0E9oTSG4Ao2J+0hDiC43i8AkYSqv04AcEpyBAWBdofxSXlFj82cgl8+UJ6WqF2wLEa5MPaAhzn7UxZ2pRTTWZTSYKya9vze+lf1PLBRjnumpNYXQqt3yj/r1e23/bOBStT5pTE+9W01H9AgUP+qQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5xNoGJ11sipe8TYlgyhOr+icjCy7ptg4Zztidl0Lg0Y=;
+ b=n8bV17AZuD6LJ6KHQE+kYHqURHnqR8uUuwUkJruPrBwL0LM1ONQS3QcnXXDtpKtEWLCpRY+9N8IBCg5PumDM2S6Z9KcHY99Y5uJHKf22Umt5wOv2aDDXBXul18LZUWruv60nV7xQPM9/gXwDsblN4XTsYpY+511eTR7h3uhIXzQ=
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com (2603:10b6:a03:106::21)
+ by BYAPR04MB4568.namprd04.prod.outlook.com (2603:10b6:a03:16::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15; Sat, 29 Feb
+ 2020 23:06:32 +0000
+Received: from BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fdf8:bd6f:b33d:c2df]) by BYAPR04MB5749.namprd04.prod.outlook.com
+ ([fe80::fdf8:bd6f:b33d:c2df%3]) with mapi id 15.20.2772.018; Sat, 29 Feb 2020
+ 23:06:32 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/6] block: fix comment for blk_cloned_rq_check_limits
+Thread-Topic: [PATCH 1/6] block: fix comment for blk_cloned_rq_check_limits
+Thread-Index: AQHV7kiooKMYyZywCEaC5GI+K+ZGAg==
+Date:   Sat, 29 Feb 2020 23:06:32 +0000
+Message-ID: <BYAPR04MB57491D9E8F0F1C8623220A7B86E90@BYAPR04MB5749.namprd04.prod.outlook.com>
+References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
+ <20200228150518.10496-2-guoqing.jiang@cloud.ionos.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 128304ab-8d5e-4968-1ac0-08d7bd6c0475
+x-ms-traffictypediagnostic: BYAPR04MB4568:
+x-microsoft-antispam-prvs: <BYAPR04MB456877637977FB02811183EB86E90@BYAPR04MB4568.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:873;
+x-forefront-prvs: 03283976A6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(189003)(199004)(52536014)(5660300002)(4744005)(66946007)(55016002)(53546011)(110136005)(8936002)(6506007)(316002)(478600001)(9686003)(86362001)(4326008)(186003)(71200400001)(81166006)(76116006)(33656002)(81156014)(66446008)(8676002)(66556008)(64756008)(66476007)(7696005)(2906002)(26005);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4568;H:BYAPR04MB5749.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ueKLGgg820ZJL5Zspu6ven4cUa65Fbf9unLl19ETewO4FS+w0W+Gpgmx92KIf0alZ+uQvJ/oxWaLnGX5j92cum5FzGB+h5mh8D58uFrBGLQZpKzezzgG2MpDr/j9A2z60BjRxtsDWJJDPYSdOpRC1KmZmKSVlKX2yYIcMy2WvMIw//ztdo/p1mG5svJ8FOrGLXnymetoE0FcNDz3PDVlTYGdlbzhAhb1KRmnmeAEIYDRRuYxEVzijVCG4WuHzyPsQQvR+XuH+cVAl6AV/lySOcEiiOrwCaAmP5hZHp3ilNMilpPZchcMweKo0db8VyRcMKutfyBKHF0P/zR1yxyDbUs6kOeZl2XqleYD/PN/7cjsSLrU+SMdoXQT58tIvt5caMRhkAQgz3jfoDIF2leQLOWChaMq8TjNgU7rv3WlMDuYbqvjGDmOYyYIuopJFeqr
+x-ms-exchange-antispam-messagedata: 1FwPxk5xk/3DBhWIhuCTf2FDWquUd5I2dFyNsFm17CzOAZhjXaZ0ROa+WMV/r/VsxMaTJjtkAtgZ9ct8bz4sJCJIFgcaZjDO73j0FyNV6l65B5GbpsLNWTllDm2HToQa8yRBEhnJ7EJjbe4IWLaSLA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 128304ab-8d5e-4968-1ac0-08d7bd6c0475
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Feb 2020 23:06:32.3506
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Vs20R0IhbiIPSVRDztr9BNQsUNcO5ManplVDD/vaZHKI2SjCMPwsFLgT+ZIdJXLzYiKElP4eVB3YeHXDmKeDPqQxAKS7t3qgkqwtX3zlEDQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4568
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 2/26/20 11:07 AM, Willy Tarreau wrote:
-> The ARM code was written with the apparent hope to one day support
-> a second FDC except that the code was incomplete and only touches
-> the first one, which is also reflected by N_FDC==1. However this
-> made its fd_outb() macro artificially depend on the global or local
-> "fdc" variable.
-> 
-> Let's get rid of this and make it explicit it doesn't rely on this
-> variable anymore.
-> 
-> Signed-off-by: Willy Tarreau <w@1wt.eu>
-> ---
->  arch/arm/include/asm/floppy.h | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/floppy.h b/arch/arm/include/asm/floppy.h
-> index 4655652..f683953 100644
-> --- a/arch/arm/include/asm/floppy.h
-> +++ b/arch/arm/include/asm/floppy.h
-> @@ -50,17 +50,16 @@ static inline int fd_dma_setup(void *data, unsigned int length,
->   * to a non-zero track, and then restoring it to track 0.  If an error occurs,
->   * then there is no floppy drive present.       [to be put back in again]
->   */
-> -static unsigned char floppy_selects[2][4] =
-> +static unsigned char floppy_selects[4] =
->  {
->  	{ 0x10, 0x21, 0x23, 0x33 },
-> -	{ 0x10, 0x21, 0x23, 0x33 }
->  };
->  
-
-You need remove curly braces here, e.g.
-static unsigned char floppy_selects[4] =
-{
-	0x10, 0x21, 0x23, 0x33
-};
-
->  #define fd_setdor(dor)								\
->  do {										\
->  	int new_dor = (dor);							\
->  	if (new_dor & 0xf0)							\
-> -		new_dor = (new_dor & 0x0c) | floppy_selects[fdc][new_dor & 3];	\
-> +		new_dor = (new_dor & 0x0c) | floppy_selects[new_dor & 3];	\
->  	else									\
->  		new_dor &= 0x0c;						\
->  	outb(new_dor, FD_DOR);							\
-> @@ -84,9 +83,9 @@ do {										\
->   */
->  static void driveswap(int *ints, int dummy, int dummy2)
->  {
-> -	floppy_selects[0][0] ^= floppy_selects[0][1];
-> -	floppy_selects[0][1] ^= floppy_selects[0][0];
-> -	floppy_selects[0][0] ^= floppy_selects[0][1];
-> +	floppy_selects[0] ^= floppy_selects[1];
-> +	floppy_selects[1] ^= floppy_selects[0];
-> +	floppy_selects[0] ^= floppy_selects[1];
-
-What do you think about using swap macro (kernel.h) here?
-
->  }
->  
->  #define EXTRA_FLOPPY_PARAMS ,{ "driveswap", &driveswap, NULL, 0, 0 }
-> 
-
-Denis
+Looks good to me.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+On 02/28/2020 07:06 AM, Guoqing Jiang wrote:=0A=
+> Since the later description mentioned "checked against the new queue=0A=
+> limits", so make the change to avoid confusion.=0A=
+>=0A=
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>=0A=
+> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>=0A=
+> ---=0A=
+>   block/blk-core.c | 2 +-=0A=
+>   1 file changed, 1 insertion(+), 1 deletion(-)=0A=
+>=0A=
+> diff --git a/block/blk-core.c b/block/blk-core.c=0A=
+> index 089e890ab208..fd43266029be 100644=0A=
+> --- a/block/blk-core.c=0A=
+> +++ b/block/blk-core.c=0A=
+> @@ -1203,7 +1203,7 @@ EXPORT_SYMBOL(submit_bio);=0A=
+>=0A=
+>   /**=0A=
+>    * blk_cloned_rq_check_limits - Helper function to check a cloned reque=
+st=0A=
+> - *                              for new the queue limits=0A=
+> + *                              for the new queue limits=0A=
+>    * @q:  the queue=0A=
+>    * @rq: the request being checked=0A=
+>    *=0A=
+>=0A=
+=0A=
