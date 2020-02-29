@@ -6,83 +6,111 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E3FC3F2D1
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5C4C3F2C6
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 14:14:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66D12246A8
-	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 02:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69B1824680
+	for <linux-block@archiver.kernel.org>; Sat, 29 Feb 2020 14:14:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgB2CvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Feb 2020 21:51:13 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50588 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726046AbgB2CvN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Feb 2020 21:51:13 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B90E63DB0D87F8AAB135;
-        Sat, 29 Feb 2020 10:51:08 +0800 (CST)
-Received: from [127.0.0.1] (10.173.220.66) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Sat, 29 Feb 2020
- 10:50:58 +0800
-Subject: Re: [PATCH V2] block: rename 'q->debugfs_dir' and 'q->blk_trace->dir'
- in blk_unregister_queue()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <chaitanya.kulkarni@wdc.com>,
-        <damien.lemoal@wdc.com>, <bvanassche@acm.org>,
-        <dhowells@redhat.com>, <asml.silence@gmail.com>,
-        <ajay.joshi@wdc.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
-        <zhangxiaoxu5@huawei.com>, <luoshijie1@huawei.com>
-References: <20200213081252.32395-1-yukuai3@huawei.com>
- <20200228231557.GA18123@ming.t460p>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <96287511-a121-02f5-c5e0-24873fd30179@huawei.com>
-Date:   Sat, 29 Feb 2020 10:50:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727050AbgB2OOE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Feb 2020 09:14:04 -0500
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:31908 "EHLO 1wt.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727049AbgB2OOE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Feb 2020 09:14:04 -0500
+Received: (from willy@localhost)
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 01TEDsh9023477;
+        Sat, 29 Feb 2020 15:13:54 +0100
+Date:   Sat, 29 Feb 2020 15:13:54 +0100
+From:   Willy Tarreau <w@1wt.eu>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 00/10] floppy driver cleanups (deobfuscation)
+Message-ID: <20200229141354.GA23095@1wt.eu>
+References: <20200224212352.8640-1-w@1wt.eu>
+ <0f5effb1-b228-dd00-05bc-de5801ce4626@linux.com>
+ <CAHk-=whd_Wpi1-TGcooUTE+z-Z-f32n2vFQANszvAou_Fopvzw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200228231557.GA18123@ming.t460p>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.173.220.66]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whd_Wpi1-TGcooUTE+z-Z-f32n2vFQANszvAou_Fopvzw@mail.gmail.com>
+User-Agent: Mutt/1.6.1 (2016-04-27)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/2/29 7:15, Ming Lei wrote:
-> If blk_trace->dir isn't same with .debugfs_dir, you will just rename
-> blk_trace->dir, this way can't avoid the failure in step3, can it?
-Thank you for your response!
-It's true that the problem still exist if they are not the same£¨I
-thougt they can't both exist£©. Perhaps I can do the renaming for both.
-> 
-> I understand that we just need to rename .debugfs_dir, meantime making
-> sure blktrace code removes correct debugfs dir, is that enough for fixing
-> this issue?
-> 
->> +	if (old == NULL)
->> +		return;
->> +	while (new == NULL) {
->> +		sprintf(name, "ready_to_remove_%s_%d",
->> +				kobject_name(q->kobj.parent), i++);
->> +		new = debugfs_rename(blk_debugfs_root, *old,
->> +				     blk_debugfs_root, name);
->> +	}
-> The above code can be run concurrently with blktrace shutdown, so race might
-> exit between the two code paths, then bt->dir may has been renamed or being
-> renamed in debugfs_remove(bt->dir), can this function work as expected or
-> correct?
-To avoid the race, I think we can take the lock 'blk_trace_mutex' while
-renaming 'bt->dir'.
-> 
-> And there is dead loop risk, so suggest to not rename this way.
-The deap loop will exist if 'debugfs_rename' keep failing for some
-reason. I thougt about setting a limit for max loop count, however, It's
-probably not a good solution.
+Hi Linus,
 
-Thanks!
-Yu Kuai
+On Wed, Feb 26, 2020 at 09:49:05AM -0800, Linus Torvalds wrote:
+> On Wed, Feb 26, 2020 at 6:57 AM Denis Efremov <efremov@linux.com> wrote:
+> >
+> > If Linus has no objections (regarding his review) I would prefer to
+> > accept 1-10 patches rather to resend them again. They seems complete
+> > to me as the first step.
 > 
+> I have no objections, and the patches 11-16 seem to have addressed all
+> my "I wish.." concerns too (except for the "we should rewrite or
+> sunset the driver entirely"). Looks fine to me.
 
+So I continued to work on this cleanup and regardless of the side I
+attacked this hill, it progressively stalled once I got closer to
+the interrupt and delayed work stuff. I understood the root cause of
+the problem, it's actually double:
+
+  - single interrupt for multiple FDCs : this means we need to have
+    some global context to know what we're working with. It is not
+    completely true because we could very well have a list of pending
+    operations per FDC to scan on interrupt and update them when the
+    interrupt strikes and the FDC reports a completion. I noticed that
+    raw_cmd, raw_buffer, inr, current_req, _floppy, plus a number of
+    function pointers used to handle delayed work should in fact be
+    per-FDC if we didn't want to change them at run time ;
+
+  - single DMA channel for multiple FDCs : regardless of what could
+    be done for the interrupt above, we're still stuck with a single
+    DMA setup at once, which requires to issue reset_fdc() here and
+    there, making it clear we can't work with multiple FDCs in parallel.
+
+Given the number of places where such global variables are set, I'm
+not totally confident in the fact that nowhere we keep a setting
+that was assigned for the FDC in the previous request. For example
+a spurious (or late) interrupt could slightly affect the fdc_state[]
+and maybe even emit FD_SENSEI to the current controller. Also this
+comment in floppy_interrupt() made me realize the driver pre-dates
+SMP support:
+
+ /* It is OK to emit floppy commands because we are in an interrupt
+  * handler here, and thus we have to fear no interference of other
+  * activity.
+  */
+
+It seems that changing the current FDC is still only protected by
+the fdc_busy bit, but that the interrupt handler doesn't check
+if anything is expected before touching bits related to current_fdc.
+
+All this made me wonder if we really want to continue to maintain the
+support for multiple FDCs. I checked all archs, and only x86, alpha
+and powerpc support more than one FDC, 2 to be precise (hence up to
+8 drives). I have the impression that if we keep a single FDC we'll
+have a cleaner code that doesn't need to change global settings under
+us when doing resets or scans. So I don't know if that's something
+interesting to pursue.
+
+I also noticed that a lot of global variables are inter-dependent and
+should probably be moved to fdc_state[] so that what's per-FDC is now
+more explicit, except that this struct is exposed to userland via
+the FDGETFDCSTAT ioctl (but that could be changed so that the fdc_state
+is just a struct inside a per-fdc larger struct).
+
+At least now I get a better picture of the little ROI felt trying to
+clean this, and I don't think that even a complete rewrite as you
+suggested would address all the issues at all.
+
+So if you or Denis think there's some value in me continuing to explore
+one of these areas, I can continue, otherwise I can simply resend the
+last part of my series with the few missing Cc and be done with it.
+
+Willy
