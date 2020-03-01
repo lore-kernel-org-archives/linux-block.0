@@ -2,114 +2,120 @@ Return-Path: <SRS0=IUku=4S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B061C3F2CD
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 00:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7045EC3F2CD
+	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 01:02:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55C2524649
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 00:51:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FAFD24649
+	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 01:02:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lG7S6XXe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbgCAAvb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Feb 2020 19:51:31 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:36961 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726786AbgCAAvb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Feb 2020 19:51:31 -0500
-Received: by mail-pg1-f193.google.com with SMTP id z12so3518146pgl.4;
-        Sat, 29 Feb 2020 16:51:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=jjQYNcChfS8b6fyG58HJdvB3o/9S7zKVTkI+Dke9420=;
-        b=IONIqEhxdtNHoXlDhS3N2WS2HCXyND/sk+nlTtIuQjAeE7cif+nJDpOJ75rDZWhsyk
-         RAHs8to/V0Od8OSkQ0ZdqtTqZAhW7uNDGCjCgkNIXXy3fh6NtCepNwi4d5QTQg5Nh03B
-         7FeRz3SYx+eHO0Iv9f7Lq6zC9REp6ziGBnLz9JkEGVN8URJkT+ShrzdnFj2Op/Z9ATh7
-         jPVyDDepRilzcPlQO+l2hZ9yLFHlSCByc0mKeDnQO9L6CWy8HAXLPEiPaDRtQbKfspC0
-         F/2ohFzvM38R5+m9wK6cj6Jaqqe1g0QMTaypha2DEpX1S2t513v7Myg+Tt0Ga4tM1ZNB
-         v6XQ==
-X-Gm-Message-State: APjAAAUo5KGGg7knESLrIgJynQpZlI0T0ix4eJ439vGX8eIIy7El3ORe
-        WVIKD1ccAoUXu0wtlJUCvt0=
-X-Google-Smtp-Source: APXvYqzuzcmGrR9iZFgiKBL9fyYB4ikTIN3CUUfo48QlKqGHhbRQY9RD71em9V4BT8XYNpyfV/cqOw==
-X-Received: by 2002:a63:1e5e:: with SMTP id p30mr12750919pgm.112.1583023890354;
-        Sat, 29 Feb 2020 16:51:30 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:bd83:6f94:8c5:942d? ([2601:647:4000:d7:bd83:6f94:8c5:942d])
-        by smtp.gmail.com with ESMTPSA id iq3sm7126612pjb.0.2020.02.29.16.51.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Feb 2020 16:51:29 -0800 (PST)
-Subject: Re: [PATCH v9 05/25] RDMA/rtrs: client: private header with client
- structs and functions
-To:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        leon@kernel.org, dledford@redhat.com, jgg@ziepe.ca,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        rpenyaev@suse.de, pankaj.gupta@cloud.ionos.com
-References: <20200221104721.350-1-jinpuwang@gmail.com>
- <20200221104721.350-6-jinpuwang@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <eb1759a7-c51b-eaeb-f353-4b948b1d64e3@acm.org>
-Date:   Sat, 29 Feb 2020 16:51:28 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727162AbgCABCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Feb 2020 20:02:24 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44253 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726786AbgCABCY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Feb 2020 20:02:24 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48VQ3d0nRPz9sPk;
+        Sun,  1 Mar 2020 12:02:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1583024542;
+        bh=xX60jEJHQ8TOGfr7Bks8ppZYAvilikoA7iG7IgOAA/0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lG7S6XXeWk9UcFIVfgK5YOIKonm6UnYNpoSOItxvNM470yA8PYTrcMrkx+EBv0iqT
+         zT1z8cl3lCahvltsxOlY+xWZxhGhfZIr1SlVQotk0+zL0l6l8+0xIUfh2PlqDLovxc
+         00QsBDrF/PdFu3/DdPuXsn0HgJ1VuUS9+Db0Pj9GQYbylasVe+AJnvfkIYZdW1hSVC
+         b2Zt2wdF1rWMwg9XvO5l2VIvzWmtxZDL8YIkGu3QmSq/o4SMwfDDyXb91X8Lis4TkS
+         3blCBmCczfceShTQlzCBenuWE13PqYdGN0rF0u9smEroL+r6c4Qb7rElyDfpQTJ85a
+         T9b0yNd3JfxQg==
+Date:   Sun, 1 Mar 2020 12:02:19 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH resend] loop: Fix IS_ERR() vs NULL bugs in
+ loop_prepare_queue()
+Message-ID: <20200301120219.22d92d73@canb.auug.org.au>
+In-Reply-To: <20200228172136.h5dvwvrg5yfywxss@kili.mountain>
+References: <c106c6ec-7171-3586-d5c5-5c14e386b3d5@kernel.dk>
+        <20200228172136.h5dvwvrg5yfywxss@kili.mountain>
 MIME-Version: 1.0
-In-Reply-To: <20200221104721.350-6-jinpuwang@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/i6Tur=gNYxaKV0D4z4Cotes";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-02-21 02:47, Jack Wang wrote:
-> +struct rtrs_clt {
-> +	struct list_head   /* __rcu */ paths_list;
+--Sig_/i6Tur=gNYxaKV0D4z4Cotes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The commented out __rcu is confusing. Please remove it and add an
-elaborate comment if paths_list is a list head with nonstandard behavior.
+Hi all,
 
-> +#define PERMIT_SIZE(clt) (sizeof(struct rtrs_permit) + (clt)->pdu_sz)
-> +#define GET_PERMIT(clt, idx) ((clt)->permits + PERMIT_SIZE(clt) * (idx))
+On Fri, 28 Feb 2020 20:21:36 +0300 Dan Carpenter <dan.carpenter@oracle.com>=
+ wrote:
+>
+> The alloc_workqueue() function returns NULL on error, it never returns
+> error pointers.
+>=20
+> Fixes: 29dab2122492 ("loop: use worker per cgroup instead of kworker")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Acked-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+> ---
+> Resending because this goes through your -mm tree, Andrew.  The
+> get_maintainer.pl script lead me astray.
+>=20
+>  drivers/block/loop.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index da8ec0b9d909..a31ca5e04fae 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -897,7 +897,7 @@ static int loop_prepare_queue(struct loop_device *lo)
+>  					WQ_UNBOUND | WQ_FREEZABLE |
+>  					WQ_MEM_RECLAIM,
+>  					lo->lo_number);
+> -	if (IS_ERR(lo->workqueue))
+> +	if (!lo->workqueue)
+>  		return -ENOMEM;
+> =20
+>  	return 0;
 
-Can these macros be changed into inline functions?
+Added to linux-next from tomorrow (in case Andrew has better things to
+do with his weekend :-)).
 
-> +static inline void rtrs_clt_decrease_inflight(struct rtrs_clt_stats *s)
-> +{
-> +	atomic_dec(&s->inflight);
-> +}
+--=20
+Cheers,
+Stephen Rothwell
 
-The name of this function is longer than its implementation. Consider to
-inline this function.
+--Sig_/i6Tur=gNYxaKV0D4z4Cotes
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
-Bart.
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl5bCZsACgkQAVBC80lX
+0GxlMgf/bCW6+K3FJmw7izRTxCApIyjOzBT5pvkC9bnCD7ymNZlTRsRjBrK4rXQP
+/Dt8hXSox5yW3SFkh6TuMkxLVk4NMPWSCg1HH9zHANLbcwA6/ZJTg0VzrywxCP71
+2A0d7r3MFuK92+NLb84yvz5+q3RfIi1x0+1KvDmtO/9aWbt2yWdicfJu2ZAPUqvY
+pCYJZ1g3Y5u7O9cfpazteWKCpn2k0uEtAkosPUx6YkZmQnVvf9w8oMisU3Ke7oVz
+VbkkIKJ1+2m/4YgwfFtRZpozWUY8YHvmReaEKNkJ1ZBhY6hiQ+dA075sgWDbket0
+pv1Ou9g7BZhzNGTrihXkopxI/f5pAw==
+=NCTl
+-----END PGP SIGNATURE-----
+
+--Sig_/i6Tur=gNYxaKV0D4z4Cotes--
