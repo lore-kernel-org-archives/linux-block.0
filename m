@@ -2,73 +2,73 @@ Return-Path: <SRS0=IUku=4S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D69C3F2CD
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 16:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F152AC3F2CD
+	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 16:48:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA89321775
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 16:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C368621775
+	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 16:48:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="F2YXMoKq"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ZBzixAfo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726561AbgCAQli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Mar 2020 11:41:38 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:34190 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726359AbgCAQli (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Mar 2020 11:41:38 -0500
-Received: by mail-pl1-f196.google.com with SMTP id j7so3218286plt.1
-        for <linux-block@vger.kernel.org>; Sun, 01 Mar 2020 08:41:37 -0800 (PST)
+        id S1726448AbgCAQsU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Mar 2020 11:48:20 -0500
+Received: from mail-pg1-f180.google.com ([209.85.215.180]:41728 "EHLO
+        mail-pg1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbgCAQsU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Mar 2020 11:48:20 -0500
+Received: by mail-pg1-f180.google.com with SMTP id b1so4165164pgm.8
+        for <linux-block@vger.kernel.org>; Sun, 01 Mar 2020 08:48:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8bGDCa12B+o0c1dRJnWIXM2nG15xjDmQgWbNrAUXWKM=;
-        b=F2YXMoKqp+dfcI5qgFGx7idxzb4afSC3sQLps2iB+OhuKHYrEU+VvQQbI15gEfAiyl
-         tzqqj0hiywtdfqltaZnKlQTaqVAg6JsxgUayNY92EKJ7nqFW4H2xCQKMtQqohKx3XSuq
-         gF0/xYNroePJuDseyBBMPJKImAw2jzVnDAuUC0I9cWtK1Kr0dY+y5DOuQg24a5RzGExy
-         HllwklBd4D7nhRJNEWSL736PIxVQBxC2YuOOEtLqF01pMl3v0/ykKTI01bZKUfV/yn1l
-         sOAYZs9WPnLPtjSgdueVKU0AVIfzsHYUo3BPvueSJElt9z23rMD+yexoUW6iiehJ8TkQ
-         iEhQ==
+        bh=g0M58whjeevKdNXpdqVuYM9fLOXElDGn7qTZGQfCpLc=;
+        b=ZBzixAfoW7WmW3k4veje1nP6j7A0PbP70J3pBahDWYAkQepaC1HdpmvegIivTe96u7
+         nL8IqXA2TTurZuZw8xUBpm9m86Mf4frvkPvVdKyyijynSMNmoNS1jf38kPU16SzI7iwV
+         sazXhhjEKnEYqXGQ9lxNWYBwZSJ7ESUCJAKn2ZjfsIHceaNhJkQuGmL/+Qq9+HLLWAkK
+         9CeatbRgsT8f/Hp+O/dBu8VysrzeqwLz+6hGsp743FzySflgyAkGKq+a4fLZxCWTxLCK
+         6/iejuiHvwFQBkVgnqdgVlPT72tyBiX3ax2G6Pl4SGpWmH3Y3e0raZcbrHr/Du4gsHLP
+         gWQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=8bGDCa12B+o0c1dRJnWIXM2nG15xjDmQgWbNrAUXWKM=;
-        b=mciG5907PEamnnf7Z1b7IxLfvfsfWUgwhzzhrbm14pdnh7rOD3z5aK7laHpYpQRdrw
-         Fu2O1yEq8Zr6daJJuhHLWpyYsLkRI6w+Xidt7VSI4HEmAiWqlVp9wn+6g+cTyl1HkuMx
-         y8nidnUGlFFx5VWP8Q8xLRHYWOtkhxuziNs42zuzi+0uy99+0dpatrzjvemzUHZfbx3Q
-         vigu6gmv+pUpFMXaST3YkubUomYdvd02CLBkmat50MbJAQe5I3jZzDpZUHKE3e/FrDRB
-         Ub0EolZA+3B1Vk688LlzMQPpHih6mSN7lkGc/sx+OABQ10br1JNGjs4JWDc6IqSJ3uXd
-         zAsg==
-X-Gm-Message-State: APjAAAX641Xcbs9QZyT4wZIukoD5xVBgNKuKbWiFm7Bjh/3btKPx1rzo
-        vZaaSn2JBtcKucUveZeg6szJGopU96N5Ww==
-X-Google-Smtp-Source: APXvYqxzrFvOfu0ighlpZ66ZMsKEQVlfayZ8aWe6lOQ7F53DXQPVPanvtcbSw7bAnYgHKcgQVVo19Q==
-X-Received: by 2002:a17:90a:37e7:: with SMTP id v94mr15781999pjb.37.1583080896517;
-        Sun, 01 Mar 2020 08:41:36 -0800 (PST)
+        bh=g0M58whjeevKdNXpdqVuYM9fLOXElDGn7qTZGQfCpLc=;
+        b=O9HwCI7r2pnrQWva4qzgMrTFHcsyAlUHeNgQSym3wMOgUfrm6vI7VLMC7vQGlY9wOf
+         Dzvbq8y2hPmweiRX4E3GyauHRpkEQi1+F0fsjnLB3W2qGk5D8lq9A+AkdOqIMoO+XOlU
+         414vEcit2kbsHN0/3fgXLNg6izE10wrAIimu8akyrjVP0su3fb/713UigKSYCNzkXjV8
+         oM/+6SMUxiR/YTeEZzagU28UidmF6X3xG+WXMyWy9Ww/UXGR41x6sVlRPt8byeS1CgUn
+         j4SFV47Ao3TohV9jpukY1t35cFDaVrUVAKRgYfl3vD0QB6sDvJ0WgtSRVLvRwJqUTgYv
+         lN3w==
+X-Gm-Message-State: APjAAAU2p21+9XYConY+oPE3/e5IIgjqAaxfNmTjyIj9hqKwvyHzmUFF
+        09Bl0UMP4QqbLtwYoCD2uRrhkQCzuYc7Cg==
+X-Google-Smtp-Source: APXvYqyy8gMaaU2bOqh2gT3/oA8RPnAFi6lL6hpOxoO7r07XA6qTcXwJt4LDDJ6aUp0qQH9cG0lsfw==
+X-Received: by 2002:a62:ce8b:: with SMTP id y133mr14256717pfg.172.1583081298859;
+        Sun, 01 Mar 2020 08:48:18 -0800 (PST)
 Received: from ?IPv6:240e:82:3:5b12:940:b7e:a31d:58eb? ([240e:82:3:5b12:940:b7e:a31d:58eb])
-        by smtp.gmail.com with ESMTPSA id y18sm17408165pfe.19.2020.03.01.08.41.23
+        by smtp.gmail.com with ESMTPSA id q11sm18054980pff.111.2020.03.01.08.47.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Mar 2020 08:41:35 -0800 (PST)
-Subject: Re: [PATCH 4/6] block: remove obsolete comments for
- _blk/blk_rq_prep_clone
-To:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
+        Sun, 01 Mar 2020 08:48:18 -0800 (PST)
+Subject: Re: [PATCH 5/6] block: remove unneeded argument from
+ blk_alloc_flush_queue
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20200228150518.10496-1-guoqing.jiang@cloud.ionos.com>
- <20200228150518.10496-5-guoqing.jiang@cloud.ionos.com>
- <4e6fcb8b-f07b-55bb-362b-c58ed03df7c0@acm.org>
+ <20200228150518.10496-6-guoqing.jiang@cloud.ionos.com>
+ <BYAPR04MB5749C18C7B3A998958A1A9F186E90@BYAPR04MB5749.namprd04.prod.outlook.com>
 From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <1aa30dde-9f70-7b90-cd76-d58909b2e7bb@cloud.ionos.com>
-Date:   Sun, 1 Mar 2020 17:41:10 +0100
+Message-ID: <9889b6a4-928b-7ba0-54c5-ec2d0276ab81@cloud.ionos.com>
+Date:   Sun, 1 Mar 2020 17:47:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <4e6fcb8b-f07b-55bb-362b-c58ed03df7c0@acm.org>
+In-Reply-To: <BYAPR04MB5749C18C7B3A998958A1A9F186E90@BYAPR04MB5749.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,62 +77,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
 
-Thanks for your review.
 
-On 2/29/20 3:34 AM, Bart Van Assche wrote:
-> On 2020-02-28 07:05, Guoqing Jiang wrote:
->> Both cmd and sense had been moved to scsi_request, so remove
->> the related comments to avoid confusion.
->>
->> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
->> ---
->>   block/blk-core.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 883ffda216e4..9094fd7d1b01 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1583,7 +1583,6 @@ EXPORT_SYMBOL_GPL(blk_rq_unprep_clone);
->>   
->>   /*
->>    * Copy attributes of the original request to the clone request.
->> - * The actual data parts (e.g. ->cmd, ->sense) are not copied.
->>    */
->>   static void __blk_rq_prep_clone(struct request *dst, struct request *src)
->>   {
+On 3/1/20 12:19 AM, Chaitanya Kulkarni wrote:
+> Looks good, except I did not count but please verify the
+> patch subject length, otherwise looks good.
 > 
-> Although the removed comment is outdated, the new comment is not useful.
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > 
-> How about inlining __blk_rq_prep_clone() into its only caller and
-> removing the comment above that function entirely?It's not clear to me
-> why the code inside __blk_rq_prep_clone() ever was put into a separate
-> function.
 
-Not sure about it, the original code was introduced in commit b0fd271d5fba0
-("block: add request clone interface (v2)"), maybe author preferred to use
-a function to copy attributes from src request to dst request.
-
-I will make the change based on your suggestion if no one objects it.
-
-> 
->>    *
->>    * Description:
->>    *     Clones bios in @rq_src to @rq, and copies attributes of @rq_src to @rq.
->> - *     The actual data parts of @rq_src (e.g. ->cmd, ->sense)
->> - *     are not copied, and copying such parts is the caller's responsibility.
->>    *     Also, pages which the original bios are pointing to are not copied
->>    *     and the cloned bios just point same pages.
->>    *     So cloned bios must be completed before original bios, which means
-> 
-> Adding a comment that explains that some but not all struct request
-> members are copied and also why would be welcome.
-
-I think we need care about the actual data parts of request, I guess all the
-actual data parts had been moved into scsi_request, but my understanding could
-probably be wrong.
+Thanks for your review, I assume it is fine since checkpatch didn't complain.
 
 Thanks,
 Guoqing
