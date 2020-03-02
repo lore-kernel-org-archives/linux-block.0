@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEAB2C3F2D1
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7DEC3F2D1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:58:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9583E217F4
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF5CB21775
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Kw0yDXjS"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="d+DRBDf9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727334AbgCBOjp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 09:39:45 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44609 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727181AbgCBOjo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 09:39:44 -0500
-Received: by mail-io1-f67.google.com with SMTP id u17so6783963iog.11
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 06:39:44 -0800 (PST)
+        id S1727405AbgCBO6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 09:58:54 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:36980 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727407AbgCBO6x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 09:58:53 -0500
+Received: by mail-il1-f194.google.com with SMTP id a6so9561220ilc.4
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 06:58:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=M5K5V10b3zmzbHGxJ8mvxWaKndtERoQvtnRDMNpTBGA=;
-        b=Kw0yDXjSHy8q2H5TZkLpNs+ZS2bsFqtcR0hXiyeDBPyWEtupfWGV25c6Us68B9e8x7
-         Xut0YgXwMREznB0rwuY5+xJsokXReM9k/GHHgACt+lLC+LJBBHGyN986cOpbDOd8k1zg
-         8erERBGk7UzPrFSzMhe8YOXp8wsCOqtzFTPltFEaLMy0uDmlRvsyuYcDwtywS8A+Gd49
-         hl3KBOgnjBkZCL2e8cOe/VfdwmMDiKhr87/Bd29RHElEY9UUroL19laVYkfqWdcpH2PX
-         sjAwgk9w5shZJ4xt33e6n47yeUGee+P3tUBZBJDpvtgcyq/MA4w1RS4xP1drSRVOebQX
-         qMnw==
+        bh=cG4KsHZknk99RFAGLY2oUd12iQAqEbe0ngzbaTgxBLs=;
+        b=d+DRBDf95wOhIma41cTAJGdPgDW+Dp7ZGUVmhK86PIS6GGy+8+4wxd6vVd8cMFTxRN
+         TrB6Di0ODdvMFlE6L3MiH90+4JSMzRuBCHECqG/UFx/E5CNXTQXL0dnBOthwKX6QT2dA
+         zPM7nR18XM7G5tG5W+b5E3U6WUSHbjBFQR4FczIfwfu/I5ehmRdfNeAqQPsvTh12RCzl
+         9E5b8lfBOs4di9iXeCD1TEPGFUyyqXyguVaJkP40q0JtP5HUl9yENvlLHTO3wrsL1LLF
+         1lHhK1AuiG5BTqMZrgkfdLaj7VBGClnd2EN6pTanzL9cNP0+3BWbu9InSwX4/3kMy3jG
+         ox1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=M5K5V10b3zmzbHGxJ8mvxWaKndtERoQvtnRDMNpTBGA=;
-        b=N1MMJrjI4PX/8xl49XbwiFeqyuZMuEiARzmwsDJ6N3aIMaGNOjVZofa52lhZCIpeXF
-         diDagByAnxhPOyCjtqK3tiC3xyOchXGpQ4f4wPDFuZvXM68NMzFh/BW8RFFeOSKk/Fdl
-         ZBqCnqFb3uMWQokS7OhXHsoN9/W1ap1mn5/zchWTlivdxWRhZXmIgpImQaobeYi/bXJR
-         jIgEJfxroEXtLqdc18kVp8Jl56qu5CbyvGafviAA5UE4vCt5AQRv7t6s6iclHQ+0SkPQ
-         QbonDiFB5IZvgoN/5uPKhtj9mYzF476fxk4nrxXxKurFoj5WQKyw1puCBE+NRkf/5wi6
-         Y4Bw==
-X-Gm-Message-State: APjAAAU1iuIgNH/KS9LZUoSoUY2Equ3H7aZLT/jVCsOY369mqPtwSdob
-        MJ8I6PHDyBM26ZPjuj5082TsBPyYmNJTraUjUx6/hw==
-X-Google-Smtp-Source: APXvYqzPDwXk3WCzABHMvcgaPJJsWbrYSGIkg/3K/TRZsETJirhY4Lm7x3RDLsfTvFSiFlzA2avzIfjEv7sHBiZYmVw=
-X-Received: by 2002:a6b:fc0b:: with SMTP id r11mr5949276ioh.298.1583159984321;
- Mon, 02 Mar 2020 06:39:44 -0800 (PST)
+        bh=cG4KsHZknk99RFAGLY2oUd12iQAqEbe0ngzbaTgxBLs=;
+        b=Z8jyyYsqau7raoIGaq9JmSmJ1aiDmY1eXub/UA4CWiC6b3arXgWo80iFOFANXph1F7
+         qVUYrIWIksiPRPXB9bnNN//deDc+htOd6I32cPirWPC1cb3BGBNgwAHvyisbjCHtX/19
+         tqbPzROLQHpMH0xkgpwHyxK0IIgCeL3KkN86zP284TtolYcIztUNGIs9OQOOuZ5XWK09
+         QLuVvHDxTBvuNjCYWVVIVxOD0+cdY/W3EjJnzNWWKoJ4euU452awaJf+cJzF4aKCHhAN
+         kLt7rry6k71Pj4JF3IYSC+gSuOB2xBVmLzU+naBNIAvkDchNLEfiN/Y6JZ0NMMVcgBw6
+         Kr1A==
+X-Gm-Message-State: APjAAAVRcC48tyaTyxIrA9+fHnoXptJW7q/I7Q3vpSfsG4tnT91b9Kdq
+        nuh3FMWTdL8Tw1Z0WPwZwI3iIEf0yI0TgAQTMricmg==
+X-Google-Smtp-Source: APXvYqzrdXEjLFBQzui9YPT8H0wMTdTYQjUtGiULMNldXhahY4Q5ydkZR7S7q2efjkrij8R52Foz1s0IrydUfWKsakc=
+X-Received: by 2002:a92:af08:: with SMTP id n8mr16230470ili.217.1583161132897;
+ Mon, 02 Mar 2020 06:58:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-11-jinpuwang@gmail.com>
- <c97843fa-84c4-ff7e-3b72-af3b916c059a@acm.org>
-In-Reply-To: <c97843fa-84c4-ff7e-3b72-af3b916c059a@acm.org>
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-18-jinpuwang@gmail.com>
+ <16e946dd-b244-594b-937e-689f2f23614e@acm.org>
+In-Reply-To: <16e946dd-b244-594b-937e-689f2f23614e@acm.org>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 2 Mar 2020 15:39:33 +0100
-Message-ID: <CAMGffEncP5NaQtHwQPO1WRKEvTrEmJXX6_UHA1R0++qgu-Nu=A@mail.gmail.com>
-Subject: Re: [PATCH v9 10/25] RDMA/rtrs: server: main functionality
+Date:   Mon, 2 Mar 2020 15:58:42 +0100
+Message-ID: <CAMGffEnrX0+ktLPOocEt6kOYJ93F1yOYYCwrvnZQuWVCQG3qRQ@mail.gmail.com>
+Subject: Re: [PATCH v9 17/25] block/rnbd: client: main functionality
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -74,90 +74,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 1, 2020 at 2:42 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Sun, Mar 1, 2020 at 3:46 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
 > On 2020-02-21 02:47, Jack Wang wrote:
-> > +int rtrs_srv_get_sess_name(struct rtrs_srv *srv, char *sessname, size_t len)
+> > +/**
+> > + * rnbd_get_cpu_qlist() - finds a list with HW queues to be rerun
+> > + * @sess:    Session to find a queue for
+> > + * @cpu:     Cpu to start the search from
+> > + *
+> > + * Description:
+> > + *     Each CPU has a list of HW queues, which needs to be rerun.  If a list
+> > + *     is not empty - it is marked with a bit.  This function finds first
+> > + *     set bit in a bitmap and returns corresponding CPU list.
+> > + */
+> > +static struct rnbd_cpu_qlist *
+> > +rnbd_get_cpu_qlist(struct rnbd_clt_session *sess, int cpu)
 > > +{
-> > +     struct rtrs_srv_sess *sess;
-> > +     int err = -ENOTCONN;
+> > +     int bit;
 > > +
-> > +     mutex_lock(&srv->paths_mutex);
-> > +     list_for_each_entry(sess, &srv->paths_list, s.entry) {
-> > +             if (sess->state != RTRS_SRV_CONNECTED)
-> > +                     continue;
-> > +             memcpy(sessname, sess->s.sessname,
-> > +                    min_t(size_t, sizeof(sess->s.sessname), len));
-> > +             err = 0;
-> > +             break;
+> > +     /* First half */
+> > +     bit = find_next_bit(sess->cpu_queues_bm, nr_cpu_ids, cpu);
+> > +     if (bit < nr_cpu_ids) {
+> > +             return per_cpu_ptr(sess->cpu_queues, bit);
+> > +     } else if (cpu != 0) {
+> > +             /* Second half */
+> > +             bit = find_next_bit(sess->cpu_queues_bm, cpu, 0);
+> > +             if (bit < cpu)
+> > +                     return per_cpu_ptr(sess->cpu_queues, bit);
 > > +     }
-> > +     mutex_unlock(&srv->paths_mutex);
 > > +
-> > +     return err;
+> > +     return NULL;
 > > +}
-> > +EXPORT_SYMBOL(rtrs_srv_get_sess_name);
 >
-> Please make sure that the returned string is '\0'-terminated, e.g. by
-> using strlcpy().
-Ok.
+> Please make the "first half" and "second half" comments unambiguous. To
+> me it seems like the code under "first half" searches through the second
+> half of the bitmap and that the code under "second half" searches
+> through the first half of the bitmap.
+Ok, will improve the comments, say searching  "cpu to nr_cpu_ids" and "0 to cpu"
 >
-> > +static int rtrs_rdma_do_accept(struct rtrs_srv_sess *sess,
-> > +                            struct rdma_cm_id *cm_id)
+> > +     /**
+> > +      * That is simple percpu variable which stores cpu indeces, which are
+> > +      * incremented on each access.  We need that for the sake of fairness
+> > +      * to wake up queues in a round-robin manner.
+> > +      */
+>
+> Please start block comments with "/*".
+ok
+>
+> > +static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
+> > +     __releases(&sess_lock)
+> > +     __acquires(&sess_lock)
 > > +{
-> > +     struct rtrs_srv *srv = sess->srv;
-> > +     struct rtrs_msg_conn_rsp msg;
-> > +     struct rdma_conn_param param;
-> > +     int err;
-> > +
-> > +     param = (struct rdma_conn_param) {
-> > +     .rnr_retry_count = 7,
-> > +     .private_data = &msg,
-> > +     .private_data_len = sizeof(msg),
-> > +     };
-> > +
-> > +     msg = (struct rtrs_msg_conn_rsp) {
-> > +     .magic = cpu_to_le16(RTRS_MAGIC),
-> > +     .version = cpu_to_le16(RTRS_PROTO_VER),
-> > +     .queue_depth = cpu_to_le16(srv->queue_depth),
-> > +     .max_io_size = cpu_to_le32(max_chunk_size - MAX_HDR_SIZE),
-> > +     .max_hdr_size = cpu_to_le32(MAX_HDR_SIZE),
-> > +     };
-> > +
-> > +     if (always_invalidate)
-> > +             msg.flags = cpu_to_le32(RTRS_MSG_NEW_RKEY_F);
-> > +
-> > +     err = rdma_accept(cm_id, &param);
-> > +     if (err)
-> > +             pr_err("rdma_accept(), err: %d\n", err);
-> > +
-> > +     return err;
-> > +}
+> > +     DEFINE_WAIT_FUNC(wait, autoremove_wake_function);
 >
-> Please indent the members in the structure assignments.
-ok.
->
-> > +static int rtrs_rdma_do_reject(struct rdma_cm_id *cm_id, int errno)
-> > +{
-> > +     struct rtrs_msg_conn_rsp msg;
-> > +     int err;
-> > +
-> > +     msg = (struct rtrs_msg_conn_rsp) {
-> > +     .magic = cpu_to_le16(RTRS_MAGIC),
-> > +     .version = cpu_to_le16(RTRS_PROTO_VER),
-> > +     .errno = cpu_to_le16(errno),
-> > +     };
-> > +
-> > +     err = rdma_reject(cm_id, &msg, sizeof(msg));
-> > +     if (err)
-> > +             pr_err("rdma_reject(), err: %d\n", err);
-> > +
-> > +     /* Bounce errno back */
-> > +     return errno;
-> > +}
->
-> Same comment for this function.
-Ok, thanks Bart
+> Please use DEFINE_WAIT() instead of open-coding it.
+ok
 >
 > Thanks,
 >
 > Bart.
+
+Thanks!
