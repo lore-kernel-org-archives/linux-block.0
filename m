@@ -2,99 +2,97 @@ Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4460CC3F2D5
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE11C3F2D1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:21:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C096246A1
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DEA0246BE
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:21:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="m/hQqlwl"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="bjgepMjf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbgCBJRs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 04:17:48 -0500
-Received: from mailgw01.mediatek.com ([210.61.82.183]:32062 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726144AbgCBJRs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 04:17:48 -0500
-X-UUID: f41c14b013444c8b8059cd4b70c15acd-20200302
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=Tm2dGLrDuwKIqwWQ0m6yCuCCVqgYcKl6heBDIiRcfnw=;
-        b=m/hQqlwlZqZcCb/1QUp0UCExNYbrk9++KsBF02NmBy/z0LHTDcXsjFrTuG1Zf3urS9X368of4Ko+LS0URaE24EUuO7V75ePvrrl8slLb7iiq+MjRAcUPr8//p0xJT6OkDqOd4GCkNnoFx4lylvtBkyXV4fqCQ5hG4JDNusRWGwU=;
-X-UUID: f41c14b013444c8b8059cd4b70c15acd-20200302
-Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
-        (envelope-from <stanley.chu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1936260261; Mon, 02 Mar 2020 17:17:43 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs02n1.mediatek.inc (172.21.101.77) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Mon, 2 Mar 2020 17:15:37 +0800
-Received: from [172.21.84.99] (172.21.84.99) by mtkcas07.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Mon, 2 Mar 2020 17:17:04 +0800
-Message-ID: <1583140656.10509.2.camel@mtksdccf07>
-Subject: Re: [PATCH v7 6/9] scsi: ufs: Add inline encryption support to UFS
-From:   Stanley Chu <stanley.chu@mediatek.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang =?UTF-8?Q?=28=E7=8E=8B=E5=9C=8B=E9=B4=BB=29?= 
-        <kuohong.wang@mediatek.com>, Kim Boojin <boojin.kim@samsung.com>,
-        Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>,
-        Parshuram Raju Thombare <pthombar@cadence.com>
-Date:   Mon, 2 Mar 2020 17:17:36 +0800
-In-Reply-To: <1582699394.26304.96.camel@mtksdccf07>
-References: <20200221115050.238976-1-satyat@google.com>
-         <20200221115050.238976-7-satyat@google.com>
-         <20200221172244.GC438@infradead.org> <20200221181109.GB925@sol.localdomain>
-         <1582465656.26304.69.camel@mtksdccf07>
-         <20200224233759.GC30288@infradead.org>
-         <1582615285.26304.93.camel@mtksdccf07> <20200226011206.GD114977@gmail.com>
-         <1582699394.26304.96.camel@mtksdccf07>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        id S1727327AbgCBJVo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 04:21:44 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:43676 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727316AbgCBJVo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 04:21:44 -0500
+Received: by mail-io1-f65.google.com with SMTP id n21so10681615ioo.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 01:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OEFkAcOGrFGZ9vC9gz7pgwP4iGIBCbBAbgqfhx1gxTw=;
+        b=bjgepMjfTFKXiH1y1++pYmtaMgK1a0pm8g+Ft3bErJmRX5ndF/6c1HPBfqB7wtFxjY
+         DHMWCTs/SdahAbFmr+r4WGKUqRK2cyniIbH2M63ygpdtoCxbQ2BsrkT/n6SSs7C6yidl
+         glVje2Z6MqVA4pYo7ozPfH6s6Wab5g8Sk8iTFMQ+06NdrJ4ODeG/JpTN2/PbNEhl04zB
+         2ufG1v660T3sJwb1KFARccsdBu6L5s6QKGya6JjWjFOCDCGejKBQCBacT+CW6xZRYhrM
+         uNyNc09KXk+RfMP5vC9Y9ohoYS4QcNmOe0ihBiYvjXAiRFiDPORbEB772+kDOpE2wrMw
+         LVZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OEFkAcOGrFGZ9vC9gz7pgwP4iGIBCbBAbgqfhx1gxTw=;
+        b=KBVrmE93J7MNJ92HDZAUPxGZXnjxRkAow8t7L9JZpcPoYE7DHL/HGr2ZdZU1qocoAZ
+         yRdqDGtx6PEPpBqBEq40PJpkXCAcbmYC39zaChdQYfiXSuAmjhZbK4g4BDFDOk4R/954
+         iH5lzTDou/iiuTV+lRYjxX+wEgjIeDFzHNm3/7QZbO5Ip8huhA9/5k2dpEr20uBSSD7S
+         ZxRuGME2tCLo8U5DQPNLq2TRnEwWb7eAom/NgfXJ1ZNfGigMwJuKcU7lWE9h/k9b89c3
+         VMoDiN6cDfzsjNRBSmtAUNnlE9hd/lkrawmRA35lFuXc3p0cs3X5vAQPHhmHEhdHGl2W
+         VwlA==
+X-Gm-Message-State: APjAAAVfMwMtssnrcy/BAdngw/83nPSsYfsE4zCDC/lzAp9OuBS41xcy
+        HIaemfjXy0rRKe6XI7Vqs9YCJqv2gsYOKztJVpmT+Q==
+X-Google-Smtp-Source: APXvYqw3sGCat8h4DoLmpdadvgGUNsDTGZi83wNh/OG/n1D9udk1A3xJIq3u1cRwZ/fnRXsnHyS9RofYxs6lCYqbjeM=
+X-Received: by 2002:a02:3b24:: with SMTP id c36mr13317752jaa.23.1583140904123;
+ Mon, 02 Mar 2020 01:21:44 -0800 (PST)
 MIME-Version: 1.0
-X-MTK:  N
-Content-Transfer-Encoding: base64
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-4-jinpuwang@gmail.com>
+ <60d1b3e1-2da6-90ae-1e0b-1c313ffbd9b0@acm.org>
+In-Reply-To: <60d1b3e1-2da6-90ae-1e0b-1c313ffbd9b0@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 2 Mar 2020 10:21:33 +0100
+Message-ID: <CAMGffEm5vueNV7jW8hTWT3SR2qgPTNuRZg7k3kDGu-KGAcLqKw@mail.gmail.com>
+Subject: Re: [PATCH v9 03/25] RDMA/rtrs: private headers with rtrs protocol
+ structs and helpers
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgRXJpYyBhbmQgYWxsLA0KDQpPbiBXZWQsIDIwMjAtMDItMjYgYXQgMTQ6NDMgKzA4MDAsIFN0
-YW5sZXkgQ2h1IHdyb3RlOg0KPiBIaSBFcmljLA0KPiANCj4gT24gVHVlLCAyMDIwLTAyLTI1IGF0
-IDE3OjEyIC0wODAwLCBFcmljIEJpZ2dlcnMgd3JvdGU6DQoNCj4gPiANCj4gPiBJJ20gbm90IHN1
-cmUgYWJvdXQgdGhlIFVGUyBjb250cm9sbGVycyBmcm9tIFN5bm9wc3lzLCBDYWRlbmNlLCBvciBT
-YW1zdW5nLCBhbGwNCj4gPiBvZiB3aGljaCBhcHBhcmVudGx5IGhhdmUgaW1wbGVtZW50ZWQgc29t
-ZSBmb3JtIG9mIHRoZSBjcnlwdG8gc3VwcG9ydCB0b28uICBCdXQgSQ0KPiA+IHdvdWxkbid0IGdl
-dCBteSBob3BlcyB1cCB0aGF0IGV2ZXJ5b25lIGZvbGxvd2VkIHRoZSBVRlMgc3RhbmRhcmQgcHJl
-Y2lzZWx5Lg0KPiA+IA0KPiA+IFNvIGlmIHRoZXJlIGFyZSBubyBvYmplY3Rpb25zLCBJTU8gd2Ug
-c2hvdWxkIG1ha2UgdGhlIGNyeXB0byBzdXBwb3J0IG9wdC1pbi4NCj4gPiANCj4gPiBUaGF0IG1h
-a2VzIGl0IGV2ZW4gbW9yZSBpbXBvcnRhbnQgdG8gdXBzdHJlYW0gdGhlIGNyeXB0byBzdXBwb3J0
-IGZvciBzcGVjaWZpYw0KPiA+IGhhcmR3YXJlIGxpa2UgdWZzLXFjb20gYW5kIHVmcy1tZWRpYXRl
-aywgc2luY2Ugb3RoZXJ3aXNlIHRoZSB1ZnNoY2QtY3J5cHRvIGNvZGUNCj4gPiB3b3VsZCBiZSB1
-bnVzYWJsZSBldmVuIHRoZW9yZXRpY2FsbHkuICBJJ20gdm9sdW50ZWVyaW5nIHRvIGhhbmRsZSB1
-ZnMtcWNvbSB3aXRoDQo+ID4gaHR0cHM6Ly9sa21sLmtlcm5lbC5vcmcvbGludXgtYmxvY2svMjAy
-MDAxMTAwNjE2MzQuNDY3NDItMS1lYmlnZ2Vyc0BrZXJuZWwub3JnLy4NCj4gPiBTdGFubGV5LCBj
-b3VsZCB5b3Ugc2VuZCBvdXQgdWZzLW1lZGlhdGVrIHN1cHBvcnQgYXMgYW4gUkZDIHNvIHBlb3Bs
-ZSBjYW4gc2VlDQo+ID4gYmV0dGVyIHdoYXQgaXQgaW52b2x2ZXM/DQo+IA0KPiBTdXJlLCBJIHdp
-bGwgc2VuZCBvdXQgb3VyIFJGQyBwYXRjaGVzLiBQbGVhc2UgYWxsb3cgbWUgc29tZSB0aW1lIGZv
-cg0KPiBzdWJtaXNzaW9uLg0KDQpUaGUgdWZzLW1lZGlhdGVrIFJGQyBwYXRjaCBpcyB1cGxvYWRl
-ZCBhcw0KaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wYXRjaC8xMTQxNTA1MS8NCg0KVGhp
-cyBwYXRjaCBpcyByZWJhc2VkIHRvIHRoZSBsYXRlc3Qgd2lwLWlubGluZS1lbmNyeXB0aW9uIGJy
-YW5jaCBpbg0KRXJpYyBCaWdnZXJzJ3MgZ2l0Og0KaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIv
-c2NtL2xpbnV4L2tlcm5lbC9naXQvZWJpZ2dlcnMvbGludXguZ2l0Lw0KDQpUaGFua3MsDQpTdGFu
-bGV5IENodQ0K
-
+On Sun, Mar 1, 2020 at 1:37 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-02-21 02:46, Jack Wang wrote:
+> > +enum rtrs_imm_type {
+> > +     RTRS_IO_REQ_IMM       = 0, /* client to server */
+> > +     RTRS_IO_RSP_IMM       = 1, /* server to client */
+> > +     RTRS_IO_RSP_W_INV_IMM = 2, /* server to client */
+> > +
+> > +     RTRS_HB_MSG_IMM = 8, /* HB: HeartBeat */
+> > +     RTRS_HB_ACK_IMM = 9,
+> > +
+> > +     RTRS_LAST_IMM,
+> > +};
+>
+> This is the first time in this header file that the abbreviation "hb" is
+> used. Please add a comment that explains what this abbreviation stands for.
+>
+> Thanks,
+>
+> Bart.
+Will do, thank you
