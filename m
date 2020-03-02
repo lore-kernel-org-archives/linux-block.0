@@ -2,182 +2,462 @@ Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AEFC3F2D2
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 13:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCB4C3F2D1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 13:20:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E87E21739
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 13:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C34782173E
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 13:20:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pNieg9sN"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="eZL/uUpn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727543AbgCBNLM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 08:11:12 -0500
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:48610 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727107AbgCBNLM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 08:11:12 -0500
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 022DAw2L071227;
-        Mon, 2 Mar 2020 07:10:58 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1583154658;
-        bh=WOSq9y6rCEhZW0FkxG8Whfp5Agrr46Y+r+ygfnL02xw=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=pNieg9sNQ290W0dYPDFpOF7XgGdxgmgR2vVpUc+sBfUnDB5XNEZd3qy8A4PuIksow
-         8rL1aeWYSS/6x9+ptkPFp+M53stnAM6DhaEAAmFqVs1MWCcjxm+Ww2Iae+abI1/F/W
-         Ew4Lt08ky++b4OzDhnvfniXD82VXugif3ZhPe26s=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 022DAwK9065900
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 2 Mar 2020 07:10:58 -0600
-Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Mon, 2 Mar
- 2020 07:10:57 -0600
-Received: from localhost.localdomain (10.64.41.19) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Mon, 2 Mar 2020 07:10:57 -0600
-Received: from [10.24.69.157] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by localhost.localdomain (8.15.2/8.15.2) with ESMTP id 022DAqtk053018;
-        Mon, 2 Mar 2020 07:10:53 -0600
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Jon Hunter <jonathanh@nvidia.com>,
-        Bitan Biswas <bbiswas@nvidia.com>
-CC:     Sowjanya Komatineni <skomatineni@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        <lkft-triage@lists.linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Thierry Reding <treding@nvidia.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Kishon <kishon@ti.com>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFqqhxC-pmV_j8PLY-D=AbqCAbiipAAHXLpJ4N_BiYYOFw@mail.gmail.com>
- <CA+G9fYugQuAERqp3VXUFG-3QxXoF8bz7OSMh6WGSZcrGkbfDSQ@mail.gmail.com>
- <CAPDyKFo-vEO7zN_F+NqcKtnKmAo_deOZx3gYNiks3yTAQAjv-Q@mail.gmail.com>
- <a602a27a-b960-ce56-c541-3b4b95f5dce2@nvidia.com>
- <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
- <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
- <f960aa98-5508-36fd-166d-7f41c7d85154@nvidia.com>
- <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
- <0963b60f-15e7-4bc6-10df-6fc8003e4d42@nvidia.com>
- <CAPDyKFq5NoeHEBK3sv3yOSD2+pm9FueH1gaTyPq0j7GLfa6vnA@mail.gmail.com>
-From:   Faiz Abbas <faiz_abbas@ti.com>
-Message-ID: <34fd84d7-387b-b6f3-7fb3-aa490909e205@ti.com>
-Date:   Mon, 2 Mar 2020 18:42:45 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727595AbgCBNUy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 08:20:54 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:33359 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727578AbgCBNUy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 08:20:54 -0500
+Received: by mail-io1-f67.google.com with SMTP id r15so2823365iog.0
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 05:20:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FtUNsuTFhkTJADYM6m2GSE9/VGJ4A97Ui/PEG/1wv7U=;
+        b=eZL/uUpnRY9ABd9vRZ3lN+WP4CHQJDcsL3wsM3GOwK9eO3Xgacsd3UC2iHshsLep8h
+         n4Daw/bhlfv1zYX4qoQLU1uptQZuq3CM8YN/K6oxY7zDdPYz2GqbPwiTXkdBZOeriZ+C
+         Cs34MuZheBOeAO35HS8/c69mWAAcrylZYEzweSiMicSn2DuMSekI2ZoXytkIvpAM/Xu4
+         bwdStYXTYijpnJ8aiUeyldEIS7fluip1aUYOubJCR08Q6v3qT81LSZyl7ll/ANE5iJ6v
+         liy3LvcopIcGqqNliFt/UCcMKkwhISAyFZl7J2yzaJBOSPS6yU8bbHd+Xq5tuKl8F2T4
+         /crw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FtUNsuTFhkTJADYM6m2GSE9/VGJ4A97Ui/PEG/1wv7U=;
+        b=FnxMpcO6Et43+Opa2cGxPVlUImdIngz8YeQdblFSuvj+jHpDXU9vfK5cNcvAs83HQr
+         6UcwN+OaMVc9dGCFrLN0UkcK36RxF9sG10UCl7Y6sK1T1pk46XeU65ND1+NqRMLia0x2
+         LAGgI9K6j891kAQRlcwJvmYF+Jw7Taqf+VzeoxhEdwBX82+3+Eg0pppa+MYwx1rXT2mC
+         b2rBSZSGTOp80MDGcfxn2etS8cJ2xTRAYqJtf3RCMlfmoamUBlS//AOAluw6xS3QAhBz
+         g7ZwazOrQdjNqbJXKXYmZVKF4JsjjJog3QacSnCCn9KmXyT4rEjhSUcbES5+8FTJhM46
+         xREA==
+X-Gm-Message-State: APjAAAUUSUkdzysyKysxMx9Q9Xj0M29iH+Sa0eExHnfoa2uxjtTN93oI
+        Vk0LVUmFGXgJCT4bjqY2XCiqa8hXCgcMlC/WFQcF
+X-Google-Smtp-Source: APXvYqwUPKr4cETLsRyMXKvmm4AwQ7LrTWDGxwVKns/OA19d5S0jOeCPk5uZwaTrjwr1H9Ax7B+ESA+fqWsW4Xbf8C0=
+X-Received: by 2002:a5e:c111:: with SMTP id v17mr7024701iol.300.1583155251966;
+ Mon, 02 Mar 2020 05:20:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAPDyKFq5NoeHEBK3sv3yOSD2+pm9FueH1gaTyPq0j7GLfa6vnA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-7-jinpuwang@gmail.com>
+ <c3c8fbcc-0028-9b23-8eff-3b5f1f60e652@acm.org>
+In-Reply-To: <c3c8fbcc-0028-9b23-8eff-3b5f1f60e652@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Mon, 2 Mar 2020 14:20:41 +0100
+Message-ID: <CAHg0HuxJgjQca3Vy7nbcVKs0bUoj=-Uqoa5DOzYoqRHQ6Vph7A@mail.gmail.com>
+Subject: Re: [PATCH v9 06/25] RDMA/rtrs: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de,
+        pankaj.gupta@cloud.ionos.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Uffe,
+On Sun, Mar 1, 2020 at 2:33 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-02-21 02:47, Jack Wang wrote:
+> > +     rcu_read_lock();
+> > +     list_for_each_entry_rcu(sess, &clt->paths_list, s.entry)
+> > +             connected |= (READ_ONCE(sess->state) == RTRS_CLT_CONNECTED);
+> > +     rcu_read_unlock();
+>
+> Are the parentheses around the comparison necessary?
+Looks not. Will drop.
 
-On 26/02/20 8:51 pm, Ulf Hansson wrote:
-> + Anders, Kishon
-> 
-> On Tue, 25 Feb 2020 at 17:24, Jon Hunter <jonathanh@nvidia.com> wrote:
->>
->>
->> On 25/02/2020 14:26, Ulf Hansson wrote:
->>
->> ...
->>
->>> However, from the core point of view, the response is still requested,
->>> only that we don't want the driver to wait for the card to stop
->>> signaling busy. Instead we want to deal with that via "polling" from
->>> the core.
->>>
->>> This is a rather worrying behaviour, as it seems like the host driver
->>> doesn't really follow this expectations from the core point of view.
->>> And mmc_flush_cache() is not the only case, as we have erase, bkops,
->>> sanitize, etc. Are all these working or not really well tested?
->>
->> I don't believe that they are well tested. We have a simple test to
->> mount an eMMC partition, create a file, check the contents, remove the
->> file and unmount. The timeouts always occur during unmounting.
->>
->>> Earlier, before my three patches, if the provided timeout_ms parameter
->>> to __mmc_switch() was zero, which was the case for
->>> mmc_mmc_flush_cache() - this lead to that __mmc_switch() simply
->>> ignored validating host->max_busy_timeout, which was wrong. In any
->>> case, this also meant that an R1B response was always used for
->>> mmc_flush_cache(), as you also indicated above. Perhaps this is the
->>> critical part where things can go wrong.
->>>
->>> BTW, have you tried erase commands for sdhci tegra driver? If those
->>> are working fine, do you have any special treatments for these?
->>
->> That I am not sure, but I will check.
-> 
-> Great, thanks. Looking forward to your report.
-> 
-> So, from my side, me and Anders Roxell, have been collaborating on
-> testing the behaviour on a TI Beagleboard x15 (remotely with limited
-> debug options), which is using the sdhci-omap variant. I am trying to
-> get hold of an Nvidia jetson-TX2, but not found one yet. These are the
-> conclusions from the observed behaviour on the Beagleboard for the
-> CMD6 cache flush command.
-> 
-> First, the reported host->max_busy_timeout is 2581 (ms) for the
-> sdhci-omap driver in this configuration.
-> 
-> 1. As we all know by now, the cache flush command (CMD6) fails with
-> -110 currently. This is when MMC_CACHE_FLUSH_TIMEOUT_MS is set to 30 *
-> 1000 (30s), which means __mmc_switch() drops the MMC_RSP_BUSY flag
-> from the command.
-> 
-> 2. Changing the MMC_CACHE_FLUSH_TIMEOUT_MS to 2000 (2s), means that
-> the MMC_RSP_BUSY flag becomes set by __mmc_switch, because of the
-> timeout_ms parameter is less than max_busy_timeout (2000 <  2581).
-> Then everything works fine.
-> 
-> 3. Updating the code to again use 30s as the
-> MMC_CACHE_FLUSH_TIMEOUT_MS, but instead forcing the MMC_RSP_BUSY to be
-> set, even when the timeout_ms becomes greater than max_busy_timeout.
-> This also works fine.
-> 
-> Clearly this indicates a problem that I think needs to be addressed in
-> the sdhci driver. However, of course I can revert the three discussed
-> patches to fix the problem, but that would only hide the issues and I
-> am sure we would then get back to this issue, sooner or later.
-> 
-> To fix the problem in the sdhci driver, I would appreciate if someone
-> from TI and Nvidia can step in to help, as I don't have the HW on my
-> desk.
-> 
-> Comments or other ideas of how to move forward?
-> 
+> > +static struct rtrs_permit *
+> > +__rtrs_get_permit(struct rtrs_clt *clt, enum rtrs_clt_con_type con_type)
+> > +{
+> > +     size_t max_depth = clt->queue_depth;
+> > +     struct rtrs_permit *permit;
+> > +     int cpu, bit;
+> > +
+> > +     /* Combined with cq_vector, we pin the IO to the the cpu it comes */
+>
+> This comment is confusing. Please clarify this comment. All I see below
+> is that preemption is disabled. I don't see pinning of I/O to the CPU of
+> the caller.
+The comment is addressing a use-case of the driver: The user can
+assign (under /proc/irq/) the irqs of the HCA cq_vectors "one-to-one"
+to each cpu. This will "force" the driver to process io response on
+the same cpu the io has been submitted on.
+In the code below only preemption is disabled. This can lead to the
+situation that callers from different cpus will grab the same bit,
+since find_first_zero_bit is not atomic. But then the
+test_and_set_bit_lock will fail for all the callers but one, so that
+they will loop again. This way an explicit spinlock is not required.
+Will extend the comment.
 
-Sorry I missed this earlier.
+> > +     cpu = get_cpu();
+> > +     do {
+> > +             bit = find_first_zero_bit(clt->permits_map, max_depth);
+> > +             if (unlikely(bit >= max_depth)) {
+> > +                     put_cpu();
+> > +                     return NULL;
+> > +             }
+> > +
+> > +     } while (unlikely(test_and_set_bit_lock(bit, clt->permits_map)));
+> > +     put_cpu();
+> > +
+> > +     permit = GET_PERMIT(clt, bit);
+> > +     WARN_ON(permit->mem_id != bit);
+> > +     permit->cpu_id = cpu;
+> > +     permit->con_type = con_type;
+> > +
+> > +     return permit;
+> > +}
+>
+> Please remove the blank line before "} while (...)".
+OK.
 
-I don't have an X15 with me here but I'm trying to set one up in our
-remote farm. In the meantime, I tried to reproduce this issue on two
-platforms (dra72-evm and am57xx-evm) and wasn't able to see the issue
-because those eMMC's don't even have a cache. I will keep you updated
-when I do get a board with a eMMC that has a cache.
+> > +void rtrs_clt_put_permit(struct rtrs_clt *clt, struct rtrs_permit *permit)
+> > +{
+> > +     if (WARN_ON(!test_bit(permit->mem_id, clt->permits_map)))
+> > +             return;
+> > +
+> > +     __rtrs_put_permit(clt, permit);
+> > +
+> > +     /*
+> > +      * Putting a permit is a barrier, so we will observe
+> > +      * new entry in the wait list, no worries.
+> > +      */
+> > +     if (waitqueue_active(&clt->permits_wait))
+> > +             wake_up(&clt->permits_wait);
+> > +}
+> > +EXPORT_SYMBOL(rtrs_clt_put_permit);
+>
+> The comment in the above function is not only confusing but it also
+> fails to explain why it is safe to guard wake_up() with a
+> waitqueue_active() check. How about changing that comment into the
+> following:
+>
+> rtrs_clt_get_permit() adds itself to the &clt->permits_wait list before
+> calling schedule(). So if rtrs_clt_get_permit() is sleeping it must have
+> added itself to &clt->permits_wait before __rtrs_put_permit() finished.
+> Hence it is safe to guard wake_up() with a waitqueue_active() test.
+Yes, this is definitely more clear.
 
-Is there a way to reproduce this CMD6 issue with another operation?
+> > +static int rtrs_post_send_rdma(struct rtrs_clt_con *con,
+> > +                             struct rtrs_clt_io_req *req,
+> > +                             struct rtrs_rbuf *rbuf, u32 off,
+> > +                             u32 imm, struct ib_send_wr *wr)
+> > +{
+> > +     struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
+> > +     enum ib_send_flags flags;
+> > +     struct ib_sge sge;
+> > +
+> > +     if (unlikely(!req->sg_size)) {
+> > +             rtrs_wrn(con->c.sess,
+> > +                      "Doing RDMA Write failed, no data supplied\n");
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     /* user data and user message in the first list element */
+> > +     sge.addr   = req->iu->dma_addr;
+> > +     sge.length = req->sg_size;
+> > +     sge.lkey   = sess->s.dev->ib_pd->local_dma_lkey;
+> > +
+> > +     /*
+> > +      * From time to time we have to post signalled sends,
+> > +      * or send queue will fill up and only QP reset can help.
+> > +      */
+> > +     flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
+> > +                     0 : IB_SEND_SIGNALED;
+> > +
+> > +     ib_dma_sync_single_for_device(sess->s.dev->ib_dev, req->iu->dma_addr,
+> > +                                   req->sg_size, DMA_TO_DEVICE);
+> > +
+> > +     return rtrs_iu_post_rdma_write_imm(&con->c, req->iu, &sge, 1,
+> > +                                         rbuf->rkey, rbuf->addr + off,
+> > +                                         imm, flags, wr);
+> > +}
+>
+> I don't think that posting a signalled send from time to time is
+> sufficient to prevent send queue overflow. Please address Jason's
+> comment from January 7th: "Not quite. If the SQ depth is 16 and you post
+> 16 things and then signal the last one, you *cannot* post new work until
+> you see the completion. More SQ space *ONLY* becomes available upon
+> receipt of a completion. This is why you can't have an unsignaled SQ."
 
-Thanks,
-Faiz
+> See also https://lore.kernel.org/linux-rdma/20200107182528.GB26174@ziepe.ca/
+In our case we set the send queue of each QP belonging to one
+"session" to the one supported by the hardware (max_qp_wr) which is
+around 5K on our hardware. The queue depth of our "session" is 512.
+Those 512 are "shared" by all the QPs (number of CPUs on client side)
+belonging to that session. So we have at most 512 and 512/num_cpus on
+average inflights on each QP. We never experienced send queue full
+event in any of our performance tests or production usage. The
+alternative would be to count submitted requests and completed
+requests, check the difference before submission and wait if the
+difference multiplied by the queue depth of "session" exceeds the max
+supported by the hardware. The check will require quite some code and
+will most probably affect performance. I do not think it is worth it
+to introduce a code path which is triggered only on a condition which
+is known to never become true.
+Jason, do you think it's necessary to implement such tracking?
+
+>
+> > +static void rtrs_clt_init_req(struct rtrs_clt_io_req *req,
+> > +                                  struct rtrs_clt_sess *sess,
+> > +                                  rtrs_conf_fn *conf,
+> > +                                  struct rtrs_permit *permit, void *priv,
+> > +                                  const struct kvec *vec, size_t usr_len,
+> > +                                  struct scatterlist *sg, size_t sg_cnt,
+> > +                                  size_t data_len, int dir)
+> > +{
+> > +     struct iov_iter iter;
+> > +     size_t len;
+> > +
+> > +     req->permit = permit;
+> > +     req->in_use = true;
+> > +     req->usr_len = usr_len;
+> > +     req->data_len = data_len;
+> > +     req->sglist = sg;
+> > +     req->sg_cnt = sg_cnt;
+> > +     req->priv = priv;
+> > +     req->dir = dir;
+> > +     req->con = rtrs_permit_to_clt_con(sess, permit);
+> > +     req->conf = conf;
+> > +     req->need_inv = false;
+> > +     req->need_inv_comp = false;
+> > +     req->inv_errno = 0;
+> > +
+> > +     iov_iter_kvec(&iter, READ, vec, 1, usr_len);
+> > +     len = _copy_from_iter(req->iu->buf, usr_len, &iter);
+> > +     WARN_ON(len != usr_len);
+> > +
+> > +     reinit_completion(&req->inv_comp);
+> > +}
+>
+> It is hard to verify whether the above function initializes all fields
+> of 'req' or not. Consider changing the 'req' member assignments into
+> something like *req = (struct rtrs_clt_io_req){ .permit = permit, ... };
+OK.
+
+> > +static int rtrs_post_rdma_write_sg(struct rtrs_clt_con *con,
+> > +                                 struct rtrs_clt_io_req *req,
+> > +                                 struct rtrs_rbuf *rbuf,
+> > +                                 u32 size, u32 imm)
+> > +{
+> > +     struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
+> > +     struct ib_sge *sge = req->sge;
+> > +     enum ib_send_flags flags;
+> > +     struct scatterlist *sg;
+> > +     size_t num_sge;
+> > +     int i;
+> > +
+> > +     for_each_sg(req->sglist, sg, req->sg_cnt, i) {
+> > +             sge[i].addr   = sg_dma_address(sg);
+> > +             sge[i].length = sg_dma_len(sg);
+> > +             sge[i].lkey   = sess->s.dev->ib_pd->local_dma_lkey;
+> > +     }
+> > +     sge[i].addr   = req->iu->dma_addr;
+> > +     sge[i].length = size;
+> > +     sge[i].lkey   = sess->s.dev->ib_pd->local_dma_lkey;
+> > +
+> > +     num_sge = 1 + req->sg_cnt;
+> > +
+> > +     /*
+> > +      * From time to time we have to post signalled sends,
+> > +      * or send queue will fill up and only QP reset can help.
+> > +      */
+> > +     flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
+> > +                     0 : IB_SEND_SIGNALED;
+> > +
+> > +     ib_dma_sync_single_for_device(sess->s.dev->ib_dev, req->iu->dma_addr,
+> > +                                   size, DMA_TO_DEVICE);
+> > +
+> > +     return rtrs_iu_post_rdma_write_imm(&con->c, req->iu, sge, num_sge,
+> > +                                         rbuf->rkey, rbuf->addr, imm,
+> > +                                         flags, NULL);
+> > +}
+>
+> Same comment here. Posting a signalled send from time to time is not
+> sufficient to prevent send queue overflow.
+See above.
+
+>
+> > +             memset(&rwr, 0, sizeof(rwr));
+> > +             rwr.wr.next = NULL;
+> > +             rwr.wr.opcode = IB_WR_REG_MR;
+> > +             rwr.wr.wr_cqe = &fast_reg_cqe;
+> > +             rwr.wr.num_sge = 0;
+> > +             rwr.mr = req->mr;
+> > +             rwr.key = req->mr->rkey;
+> > +             rwr.access = (IB_ACCESS_LOCAL_WRITE |
+> > +                           IB_ACCESS_REMOTE_WRITE);
+>
+> How about changing the above code into rwr = (struct ib_reg_wr){.wr = {
+> ... }, ... };?
+>
+Can be done, thanks.
+
+> > +static int rtrs_rdma_route_resolved(struct rtrs_clt_con *con)
+> > +{
+> > +     struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
+> > +     struct rtrs_clt *clt = sess->clt;
+> > +     struct rtrs_msg_conn_req msg;
+> > +     struct rdma_conn_param param;
+> > +
+> > +     int err;
+> > +
+> > +     memset(&param, 0, sizeof(param));
+> > +     param.retry_count = 7;
+> > +     param.rnr_retry_count = 7;
+> > +     param.private_data = &msg;
+> > +     param.private_data_len = sizeof(msg);
+> > +
+> > +     /*
+> > +      * Those two are the part of struct cma_hdr which is shared
+> > +      * with private_data in case of AF_IB, so put zeroes to avoid
+> > +      * wrong validation inside cma.c on receiver side.
+> > +      */
+> > +     msg.__cma_version = 0;
+> > +     msg.__ip_version = 0;
+> > +     msg.magic = cpu_to_le16(RTRS_MAGIC);
+> > +     msg.version = cpu_to_le16(RTRS_PROTO_VER);
+> > +     msg.cid = cpu_to_le16(con->c.cid);
+> > +     msg.cid_num = cpu_to_le16(sess->s.con_num);
+> > +     msg.recon_cnt = cpu_to_le16(sess->s.recon_cnt);
+> > +     uuid_copy(&msg.sess_uuid, &sess->s.uuid);
+> > +     uuid_copy(&msg.paths_uuid, &clt->paths_uuid);
+> > +
+> > +     err = rdma_connect(con->c.cm_id, &param);
+> > +     if (err)
+> > +             rtrs_err(clt, "rdma_connect(): %d\n", err);
+> > +
+> > +     return err;
+> > +}
+>
+> Please use structure assignment instead of memset() followed by a series
+> of member assignments.
+OK
+
+> > +static inline bool xchg_sessions(struct rtrs_clt_sess __rcu **rcu_ppcpu_path,
+> > +                              struct rtrs_clt_sess *sess,
+> > +                              struct rtrs_clt_sess *next)
+> > +{
+> > +     struct rtrs_clt_sess **ppcpu_path;
+> > +
+> > +     /* Call cmpxchg() without sparse warnings */
+> > +     ppcpu_path = (typeof(ppcpu_path))rcu_ppcpu_path;
+> > +     return (sess == cmpxchg(ppcpu_path, sess, next));
+> > +}
+>
+> Did checkpatch report for the above code that "return is not a function"?
+No it didn't... But we can remove the parentheses.
+
+> > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
+> > +                                   struct rtrs_addr *addr)
+> > +{
+> > +     struct rtrs_clt *clt = sess->clt;
+> > +
+> > +     mutex_lock(&clt->paths_mutex);
+> > +     clt->paths_num++;
+> > +
+> > +     /*
+> > +      * Firstly increase paths_num, wait for GP and then
+> > +      * add path to the list.  Why?  Since we add path with
+> > +      * !CONNECTED state explanation is similar to what has
+> > +      * been written in rtrs_clt_remove_path_from_arr().
+> > +      */
+> > +     synchronize_rcu();
+> > +
+> > +     list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
+> > +     mutex_unlock(&clt->paths_mutex);
+> > +}
+>
+> At least in the Linux kernel keeping track of the number of elements in
+> a list is considered bad practice. What prevents removal of the
+> 'paths_num' counter?
+
+We need paths_num for our failover and multipath (load balancing)
+mechanism. We use the list of paths as a ring. We want to choose the
+"next" path for every new IO (i.e. round robin or path with minimal
+number of inflights). I.e. if there is only one path then we always
+choose it. If sending fails then we want to try resending the IO on
+every other path but only once. Only for that reason (try sending an
+IO on every possible path once) we need that paths_num variable. In
+other words: we have that do_each_path/while_each_path macro, which
+must make a full loop over the list of paths before failing but not
+loop for ever. This loop can happen in parallel with path adding and
+removal. Only traversing the list is not enough: we want to prevent
+going over the list more than one time:
+ 693 #define do_each_path(path, clt, it) {                                   \
+ 694         path_it_init(it, clt);                                          \
+ 695         rcu_read_lock();                                                \
+ 696         for ((it)->i = 0; ((path) = ((it)->next_path)(it)) &&           \
+ 697                           (it)->i < (it)->clt->paths_num;               \
+ 698              (it)->i++)
+
+> > +static void rtrs_clt_dev_release(struct device *dev)
+> > +{
+> > +     struct rtrs_clt *clt  = container_of(dev, struct rtrs_clt, dev);
+> > +
+> > +     kfree(clt);
+> > +}
+>
+> Please surround the assignment operator with only a single space at each
+> side.
+OK
+>
+> > +int rtrs_clt_remove_path_from_sysfs(struct rtrs_clt_sess *sess,
+> > +                                  const struct attribute *sysfs_self)
+> > +{
+> > +     struct rtrs_clt *clt = sess->clt;
+> > +     enum rtrs_clt_state old_state;
+> > +     bool changed;
+> > +
+> > +     /*
+> > +      * That can happen only when userspace tries to remove path
+> > +      * very early, when rtrs_clt_open() is not yet finished.
+> > +      */
+> > +     if (!clt->opened)
+> > +             return -EBUSY;
+> > +
+> > +     /*
+> > +      * Continue stopping path till state was changed to DEAD or
+> > +      * state was observed as DEAD:
+> > +      * 1. State was changed to DEAD - we were fast and nobody
+> > +      *    invoked rtrs_clt_reconnect(), which can again start
+> > +      *    reconnecting.
+> > +      * 2. State was observed as DEAD - we have someone in parallel
+> > +      *    removing the path.
+> > +      */
+> > +     do {
+> > +             rtrs_clt_close_conns(sess, true);
+> > +     } while (!(changed = rtrs_clt_change_state_get_old(sess,
+> > +                                                         RTRS_CLT_DEAD,
+> > +                                                         &old_state)) &&
+> > +                old_state != RTRS_CLT_DEAD);
+>
+> Did checkpatch ask not to use an assignment in the while-loop condition?
+No, checkpatch seems to be fine with it. But looks we can move the
+assignment into the loop.
+
+Thank you,
+Danil
+
+>
+> Thanks,
+>
+> Bart.
