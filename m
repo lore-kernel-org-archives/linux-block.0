@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9135FC3F2D4
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20944C3F2D2
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:41:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6568E246B6
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:40:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6633246B9
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="L4hx1DGI"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="M7W8aiCm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727336AbgCBIkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 03:40:05 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43600 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727181AbgCBIkF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 03:40:05 -0500
-Received: by mail-io1-f66.google.com with SMTP id n21so10560450ioo.10
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 00:40:05 -0800 (PST)
+        id S1727190AbgCBIlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 03:41:06 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:44774 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727130AbgCBIlG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 03:41:06 -0500
+Received: by mail-io1-f67.google.com with SMTP id u17so5623818iog.11
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 00:41:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=jze/FNhRDKWjQlWtmwCDYRnX1I7Prg2i7AZY5w7Cpnc=;
-        b=L4hx1DGIp97F0xxeWLytLuL4nJiy+neZad2J/X/6mysuwRtntVOGCZ2Z8ePsY8+2LG
-         rLHYtJKJK0K+vAZPGyGiB8sSUPeybyNDaLppd6wJUqMuXS9KiTrwLqPUCfJbV+hOTtpS
-         lGZpF2q/BAEDhXtBG00f0LOlfd74B18n6EXVCJ/3hA8MVmju1WIfYzG8Vw6El2w3pss+
-         kYpd+jUw/qEw24KZkssrZ3iwlq0kQo7QikDqKzA5y+AATKqj3/6S+jyyRzUttVhJwKsd
-         ykVpohjBaF2bh147oajPIbD53I4wxK6IyRuYi3PrcuU9Xei3nCVDRYtLwINnKKEwnfhw
-         O4aA==
+        bh=znDykxtr//NDIlhowGoWPFI3eztJdhSeIq38YAOTiiE=;
+        b=M7W8aiCmgwrfaz+gDty91LRdyQSoicDe0WAchfKn+BdArmTRba+bIQ+Yf39m51ayEK
+         sMJ4C1xNSgqWjU3iqRvExkcGUcuRWWIT125O1mYOla58bg9rttoqwmVKNOHuCszEZwca
+         mPjLHvfsKZBh/YhjsFQ8FX9IGXe0P4MvSvwwpI1FYPdBGODVMG+DAgbvQA9aKUgjDdNU
+         jDKgPf/p7rMkQAnAb1zZlPifVP8DXxA/Zk3EdS0cjQDmZfuXRviZOwqmETqP6AShhRSD
+         vX3EqLCqlb0QTFfEtItcnFj8S07eOtN3IBclP3E5Ynrdj2q391TVYUB9W5NWYPNMn6T2
+         JDUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=jze/FNhRDKWjQlWtmwCDYRnX1I7Prg2i7AZY5w7Cpnc=;
-        b=Ff7F7MXi3dopoOYonYmvvOojaWE3qTFBCep4bqA3ckb9v5xsawtQP5vEtPC2exPHm/
-         fkAX2ddaa3pyvoe0EsTKuI7S2X+9nkGdp09OTjY3CB6rx1eoTFzdqY+z44G00K55mytV
-         banJEoCeEKSNcSn/zYulVep3xDbkQGwwTF1asYE++pOmweyQm7cCOSvyAhEthhP9vK4l
-         1IgON7/gBJ26Ai5EZvGHzYreJ9GNjSBgY0HjujgM71r2DU2HjxURejIVUBeZxzQ8DKT8
-         cS62o9xVpiPUQO6Z4dD3Xvg3txJh36TNgrOtMo4+K1Axdl5AUrvzHCosrtdgoeHCcVxb
-         uoqA==
-X-Gm-Message-State: APjAAAVuKA/7lXohBSOsljhA6P/Buci21kd6mQi+WNmK0idIGNOogad6
-        c2s8/pd51l9aGmeArck0g0cc9o2jJEWEO2FSUuunjQ==
-X-Google-Smtp-Source: APXvYqwkAZnv7X7wfECu0vOH3IDGQx0c6Y1SH7wYI0ImzAr2Ut9SF0aBLXkSTjk245yZEeo6zHkpzb77qe6NwX/9Yz4=
-X-Received: by 2002:a6b:6e02:: with SMTP id d2mr12431680ioh.22.1583138404966;
- Mon, 02 Mar 2020 00:40:04 -0800 (PST)
+        bh=znDykxtr//NDIlhowGoWPFI3eztJdhSeIq38YAOTiiE=;
+        b=DBVbhdycudK3M7FFZeTThF8lFEURCK9GAIKV03VLXJuhlS1dOWg4rla2tVVhWPIirJ
+         +4eTWMw6/AbB63T0RlMxNFxR6oG8gy/R1BbTcReF4kk30tYnxIDx1Z1ZuknGL39Ps9yk
+         4CGgn8inrmkoYlC/x6WceMIyuEEAYf4uM1HgQ+h7ULUVfupVjgBnsOENS451UaWSyH6+
+         f3sHW122v/VPpeWV/znfKjvDo+9R5ttxNTng64SykZn+uHqVbvQbAwmxJ1GzQ23kwlEV
+         4wy1FjJJUHXhvjBCJEnGQ9e0oORSECZ2UMtcT2Ablnp3QxGrJYLQq7AjQIbzyB+5Ory9
+         T6IA==
+X-Gm-Message-State: APjAAAXDOxbJUNNZOLbybsYdxIGhz+MXNFLGHY4fXaG7YjaPG8FncASb
+        bg2ts5ggQswmvqI9A7OsT8KTojonSSD9wYeuNbA2MQ==
+X-Google-Smtp-Source: APXvYqyAdsp4OUJymd+XtlLl2K+rjOJ5Qrqzgi3xEXm71gubY76ZqA8+kmaGRbPCkWGkZPjXQtNG5iiaV96Zn/I8FN8=
+X-Received: by 2002:a6b:6814:: with SMTP id d20mr12237388ioc.71.1583138464653;
+ Mon, 02 Mar 2020 00:41:04 -0800 (PST)
 MIME-Version: 1.0
-References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-3-jinpuwang@gmail.com>
- <e1d8d2ca-78cf-f3ee-2286-1c96e5cfefc7@acm.org>
-In-Reply-To: <e1d8d2ca-78cf-f3ee-2286-1c96e5cfefc7@acm.org>
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-5-jinpuwang@gmail.com>
+ <91708531-46f2-3593-ae08-383a36feea5c@acm.org>
+In-Reply-To: <91708531-46f2-3593-ae08-383a36feea5c@acm.org>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 2 Mar 2020 09:39:56 +0100
-Message-ID: <CAMGffE=X6s0DSKL2c-AmBa6_shvJggNJ0aqCx0C9SbLh-fR3nw@mail.gmail.com>
-Subject: Re: [PATCH v9 02/25] RDMA/rtrs: public interface header to establish
- RDMA connections
+Date:   Mon, 2 Mar 2020 09:40:56 +0100
+Message-ID: <CAMGffEk-F26zN56BHKvWS_ma1A36SBoC8n2sApiR2UFWSjBPMw@mail.gmail.com>
+Subject: Re: [PATCH v9 04/25] RDMA/rtrs: core: lib functions shared between
+ client and server modules
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -75,47 +75,92 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 1, 2020 at 1:31 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Sun, Mar 1, 2020 at 1:47 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
-> On 2020-02-21 02:46, Jack Wang wrote:
-> > +/**
-> > + * enum rtrs_clt_con_type() type of ib connection to use with a given
-> > + * rtrs_permit
-> > + * @USR_CON - use connection reserved vor "service" messages
-> > + * @IO_CON - use a connection reserved for IO
-> > + */
+> On 2020-02-21 02:47, Jack Wang wrote:
+> > +     wr = (struct ib_recv_wr) {
+> > +     .wr_cqe  = &iu->cqe,
+> > +     .sg_list = &list,
+> > +     .num_sge = 1,
+> > +     };
 >
-> vor -> for?
+> The indentation of the above code looks weird to me.
+>
+> > +     wr = (struct ib_recv_wr) {
+> > +     .wr_cqe  = cqe,
+> > +     };
+>
+> Same comment here.
+>
+> > +     wr = (struct ib_send_wr) {
+> > +     .wr_cqe     = &iu->cqe,
+> > +     .sg_list    = &list,
+> > +     .num_sge    = 1,
+> > +     .opcode     = IB_WR_SEND,
+> > +     .send_flags = IB_SEND_SIGNALED,
+> > +     };
+>
+> And here.
+>
+> > +     wr = (struct ib_rdma_wr) {
+> > +     .wr.wr_cqe        = &iu->cqe,
+> > +     .wr.sg_list       = sge,
+> > +     .wr.num_sge       = num_sge,
+> > +     .rkey             = rkey,
+> > +     .remote_addr      = rdma_addr,
+> > +     .wr.opcode        = IB_WR_RDMA_WRITE_WITH_IMM,
+> > +     .wr.ex.imm_data = cpu_to_be32(imm_data),
+> > +     .wr.send_flags  = flags,
+> > +     };
+>
+> And here too.
+>
+> > +     /*
+> > +      * If one of the sges has 0 size, the operation will fail with an
+> > +      * length error
+> > +      */
+>
+> "an length error" -> "a length error"?
+>
+> > +     wr = (struct ib_send_wr) {
+> > +     .wr_cqe = cqe,
+> > +     .send_flags     = flags,
+> > +     .opcode = IB_WR_RDMA_WRITE_WITH_IMM,
+> > +     .ex.imm_data    = cpu_to_be32(imm_data),
+> > +     };
+>
+> Please indent struct members.
+>
+> > +int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len)
+> > +{
+> > +     int cnt;
+> > +
+> > +     switch (addr->sa_family) {
+> > +     case AF_IB:
+> > +             cnt = scnprintf(buf, len, "gid:%pI6",
+> > +                     &((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
+> > +             return cnt;
+> > +     case AF_INET:
+> > +             cnt = scnprintf(buf, len, "ip:%pI4",
+> > +                     &((struct sockaddr_in *)addr)->sin_addr);
+> > +             return cnt;
+> > +     case AF_INET6:
+> > +             cnt = scnprintf(buf, len, "ip:%pI6c",
+> > +                       &((struct sockaddr_in6 *)addr)->sin6_addr);
+> > +             return cnt;
+> > +     }
+> > +     cnt = scnprintf(buf, len, "<invalid address family>");
+> > +     pr_err("Invalid address family\n");
+> > +     return cnt;
+> > +}
+> > +EXPORT_SYMBOL(sockaddr_to_str);
+>
+> Please remove the 'cnt' variable from the above function.
+>
+> Thanks,
+>
+> Bart.
 
-right, will fix. German version -.-
->
->
-> > +enum rtrs_clt_con_type {
-> > +     RTRS_USR_CON,
-> > +     RTRS_IO_CON
-> > +};
->
-> The name "USR" is confusing. How about changing this into "ADMIN"?
+Will fix them all,
 
-Sounds good.
->
->
-> > +/*
-> > + * Here goes RTRS server API
-> > + */
->
-> How about splitting this header file into one header file for the client
-> API and another header file for the server API? I expect that most users
-> will only include one of these header files but not both.
-The initial RFC, we did have 2 separate headers, one for the client
-and one for the server, due to the fact most users
-will only include one of the headers.
-https://lore.kernel.org/linux-block/1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com/
-
-Later we've made rtrs can be more flexible, in a way user can load
-client and server on the same server at the same time, and both
-headers are merged to one.
-
-I appreciate your feedback, thanks Bart!
-
-Regards!
+Thanks!
