@@ -2,165 +2,99 @@ Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20944C3F2D2
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:41:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4460CC3F2D5
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:17:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6633246B9
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C096246A1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 09:17:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="M7W8aiCm"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="m/hQqlwl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbgCBIlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 03:41:06 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44774 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727130AbgCBIlG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 03:41:06 -0500
-Received: by mail-io1-f67.google.com with SMTP id u17so5623818iog.11
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 00:41:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=znDykxtr//NDIlhowGoWPFI3eztJdhSeIq38YAOTiiE=;
-        b=M7W8aiCmgwrfaz+gDty91LRdyQSoicDe0WAchfKn+BdArmTRba+bIQ+Yf39m51ayEK
-         sMJ4C1xNSgqWjU3iqRvExkcGUcuRWWIT125O1mYOla58bg9rttoqwmVKNOHuCszEZwca
-         mPjLHvfsKZBh/YhjsFQ8FX9IGXe0P4MvSvwwpI1FYPdBGODVMG+DAgbvQA9aKUgjDdNU
-         jDKgPf/p7rMkQAnAb1zZlPifVP8DXxA/Zk3EdS0cjQDmZfuXRviZOwqmETqP6AShhRSD
-         vX3EqLCqlb0QTFfEtItcnFj8S07eOtN3IBclP3E5Ynrdj2q391TVYUB9W5NWYPNMn6T2
-         JDUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=znDykxtr//NDIlhowGoWPFI3eztJdhSeIq38YAOTiiE=;
-        b=DBVbhdycudK3M7FFZeTThF8lFEURCK9GAIKV03VLXJuhlS1dOWg4rla2tVVhWPIirJ
-         +4eTWMw6/AbB63T0RlMxNFxR6oG8gy/R1BbTcReF4kk30tYnxIDx1Z1ZuknGL39Ps9yk
-         4CGgn8inrmkoYlC/x6WceMIyuEEAYf4uM1HgQ+h7ULUVfupVjgBnsOENS451UaWSyH6+
-         f3sHW122v/VPpeWV/znfKjvDo+9R5ttxNTng64SykZn+uHqVbvQbAwmxJ1GzQ23kwlEV
-         4wy1FjJJUHXhvjBCJEnGQ9e0oORSECZ2UMtcT2Ablnp3QxGrJYLQq7AjQIbzyB+5Ory9
-         T6IA==
-X-Gm-Message-State: APjAAAXDOxbJUNNZOLbybsYdxIGhz+MXNFLGHY4fXaG7YjaPG8FncASb
-        bg2ts5ggQswmvqI9A7OsT8KTojonSSD9wYeuNbA2MQ==
-X-Google-Smtp-Source: APXvYqyAdsp4OUJymd+XtlLl2K+rjOJ5Qrqzgi3xEXm71gubY76ZqA8+kmaGRbPCkWGkZPjXQtNG5iiaV96Zn/I8FN8=
-X-Received: by 2002:a6b:6814:: with SMTP id d20mr12237388ioc.71.1583138464653;
- Mon, 02 Mar 2020 00:41:04 -0800 (PST)
-MIME-Version: 1.0
-References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-5-jinpuwang@gmail.com>
- <91708531-46f2-3593-ae08-383a36feea5c@acm.org>
-In-Reply-To: <91708531-46f2-3593-ae08-383a36feea5c@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 2 Mar 2020 09:40:56 +0100
-Message-ID: <CAMGffEk-F26zN56BHKvWS_ma1A36SBoC8n2sApiR2UFWSjBPMw@mail.gmail.com>
-Subject: Re: [PATCH v9 04/25] RDMA/rtrs: core: lib functions shared between
- client and server modules
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+        id S1727123AbgCBJRs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 04:17:48 -0500
+Received: from mailgw01.mediatek.com ([210.61.82.183]:32062 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726144AbgCBJRs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 04:17:48 -0500
+X-UUID: f41c14b013444c8b8059cd4b70c15acd-20200302
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=Tm2dGLrDuwKIqwWQ0m6yCuCCVqgYcKl6heBDIiRcfnw=;
+        b=m/hQqlwlZqZcCb/1QUp0UCExNYbrk9++KsBF02NmBy/z0LHTDcXsjFrTuG1Zf3urS9X368of4Ko+LS0URaE24EUuO7V75ePvrrl8slLb7iiq+MjRAcUPr8//p0xJT6OkDqOd4GCkNnoFx4lylvtBkyXV4fqCQ5hG4JDNusRWGwU=;
+X-UUID: f41c14b013444c8b8059cd4b70c15acd-20200302
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
+        (envelope-from <stanley.chu@mediatek.com>)
+        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
+        with ESMTP id 1936260261; Mon, 02 Mar 2020 17:17:43 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs02n1.mediatek.inc (172.21.101.77) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Mon, 2 Mar 2020 17:15:37 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Mon, 2 Mar 2020 17:17:04 +0800
+Message-ID: <1583140656.10509.2.camel@mtksdccf07>
+Subject: Re: [PATCH v7 6/9] scsi: ufs: Add inline encryption support to UFS
+From:   Stanley Chu <stanley.chu@mediatek.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        Satya Tangirala <satyat@google.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang =?UTF-8?Q?=28=E7=8E=8B=E5=9C=8B=E9=B4=BB=29?= 
+        <kuohong.wang@mediatek.com>, Kim Boojin <boojin.kim@samsung.com>,
+        Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>,
+        Parshuram Raju Thombare <pthombar@cadence.com>
+Date:   Mon, 2 Mar 2020 17:17:36 +0800
+In-Reply-To: <1582699394.26304.96.camel@mtksdccf07>
+References: <20200221115050.238976-1-satyat@google.com>
+         <20200221115050.238976-7-satyat@google.com>
+         <20200221172244.GC438@infradead.org> <20200221181109.GB925@sol.localdomain>
+         <1582465656.26304.69.camel@mtksdccf07>
+         <20200224233759.GC30288@infradead.org>
+         <1582615285.26304.93.camel@mtksdccf07> <20200226011206.GD114977@gmail.com>
+         <1582699394.26304.96.camel@mtksdccf07>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
+MIME-Version: 1.0
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 1, 2020 at 1:47 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-02-21 02:47, Jack Wang wrote:
-> > +     wr = (struct ib_recv_wr) {
-> > +     .wr_cqe  = &iu->cqe,
-> > +     .sg_list = &list,
-> > +     .num_sge = 1,
-> > +     };
->
-> The indentation of the above code looks weird to me.
->
-> > +     wr = (struct ib_recv_wr) {
-> > +     .wr_cqe  = cqe,
-> > +     };
->
-> Same comment here.
->
-> > +     wr = (struct ib_send_wr) {
-> > +     .wr_cqe     = &iu->cqe,
-> > +     .sg_list    = &list,
-> > +     .num_sge    = 1,
-> > +     .opcode     = IB_WR_SEND,
-> > +     .send_flags = IB_SEND_SIGNALED,
-> > +     };
->
-> And here.
->
-> > +     wr = (struct ib_rdma_wr) {
-> > +     .wr.wr_cqe        = &iu->cqe,
-> > +     .wr.sg_list       = sge,
-> > +     .wr.num_sge       = num_sge,
-> > +     .rkey             = rkey,
-> > +     .remote_addr      = rdma_addr,
-> > +     .wr.opcode        = IB_WR_RDMA_WRITE_WITH_IMM,
-> > +     .wr.ex.imm_data = cpu_to_be32(imm_data),
-> > +     .wr.send_flags  = flags,
-> > +     };
->
-> And here too.
->
-> > +     /*
-> > +      * If one of the sges has 0 size, the operation will fail with an
-> > +      * length error
-> > +      */
->
-> "an length error" -> "a length error"?
->
-> > +     wr = (struct ib_send_wr) {
-> > +     .wr_cqe = cqe,
-> > +     .send_flags     = flags,
-> > +     .opcode = IB_WR_RDMA_WRITE_WITH_IMM,
-> > +     .ex.imm_data    = cpu_to_be32(imm_data),
-> > +     };
->
-> Please indent struct members.
->
-> > +int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len)
-> > +{
-> > +     int cnt;
-> > +
-> > +     switch (addr->sa_family) {
-> > +     case AF_IB:
-> > +             cnt = scnprintf(buf, len, "gid:%pI6",
-> > +                     &((struct sockaddr_ib *)addr)->sib_addr.sib_raw);
-> > +             return cnt;
-> > +     case AF_INET:
-> > +             cnt = scnprintf(buf, len, "ip:%pI4",
-> > +                     &((struct sockaddr_in *)addr)->sin_addr);
-> > +             return cnt;
-> > +     case AF_INET6:
-> > +             cnt = scnprintf(buf, len, "ip:%pI6c",
-> > +                       &((struct sockaddr_in6 *)addr)->sin6_addr);
-> > +             return cnt;
-> > +     }
-> > +     cnt = scnprintf(buf, len, "<invalid address family>");
-> > +     pr_err("Invalid address family\n");
-> > +     return cnt;
-> > +}
-> > +EXPORT_SYMBOL(sockaddr_to_str);
->
-> Please remove the 'cnt' variable from the above function.
->
-> Thanks,
->
-> Bart.
+SGkgRXJpYyBhbmQgYWxsLA0KDQpPbiBXZWQsIDIwMjAtMDItMjYgYXQgMTQ6NDMgKzA4MDAsIFN0
+YW5sZXkgQ2h1IHdyb3RlOg0KPiBIaSBFcmljLA0KPiANCj4gT24gVHVlLCAyMDIwLTAyLTI1IGF0
+IDE3OjEyIC0wODAwLCBFcmljIEJpZ2dlcnMgd3JvdGU6DQoNCj4gPiANCj4gPiBJJ20gbm90IHN1
+cmUgYWJvdXQgdGhlIFVGUyBjb250cm9sbGVycyBmcm9tIFN5bm9wc3lzLCBDYWRlbmNlLCBvciBT
+YW1zdW5nLCBhbGwNCj4gPiBvZiB3aGljaCBhcHBhcmVudGx5IGhhdmUgaW1wbGVtZW50ZWQgc29t
+ZSBmb3JtIG9mIHRoZSBjcnlwdG8gc3VwcG9ydCB0b28uICBCdXQgSQ0KPiA+IHdvdWxkbid0IGdl
+dCBteSBob3BlcyB1cCB0aGF0IGV2ZXJ5b25lIGZvbGxvd2VkIHRoZSBVRlMgc3RhbmRhcmQgcHJl
+Y2lzZWx5Lg0KPiA+IA0KPiA+IFNvIGlmIHRoZXJlIGFyZSBubyBvYmplY3Rpb25zLCBJTU8gd2Ug
+c2hvdWxkIG1ha2UgdGhlIGNyeXB0byBzdXBwb3J0IG9wdC1pbi4NCj4gPiANCj4gPiBUaGF0IG1h
+a2VzIGl0IGV2ZW4gbW9yZSBpbXBvcnRhbnQgdG8gdXBzdHJlYW0gdGhlIGNyeXB0byBzdXBwb3J0
+IGZvciBzcGVjaWZpYw0KPiA+IGhhcmR3YXJlIGxpa2UgdWZzLXFjb20gYW5kIHVmcy1tZWRpYXRl
+aywgc2luY2Ugb3RoZXJ3aXNlIHRoZSB1ZnNoY2QtY3J5cHRvIGNvZGUNCj4gPiB3b3VsZCBiZSB1
+bnVzYWJsZSBldmVuIHRoZW9yZXRpY2FsbHkuICBJJ20gdm9sdW50ZWVyaW5nIHRvIGhhbmRsZSB1
+ZnMtcWNvbSB3aXRoDQo+ID4gaHR0cHM6Ly9sa21sLmtlcm5lbC5vcmcvbGludXgtYmxvY2svMjAy
+MDAxMTAwNjE2MzQuNDY3NDItMS1lYmlnZ2Vyc0BrZXJuZWwub3JnLy4NCj4gPiBTdGFubGV5LCBj
+b3VsZCB5b3Ugc2VuZCBvdXQgdWZzLW1lZGlhdGVrIHN1cHBvcnQgYXMgYW4gUkZDIHNvIHBlb3Bs
+ZSBjYW4gc2VlDQo+ID4gYmV0dGVyIHdoYXQgaXQgaW52b2x2ZXM/DQo+IA0KPiBTdXJlLCBJIHdp
+bGwgc2VuZCBvdXQgb3VyIFJGQyBwYXRjaGVzLiBQbGVhc2UgYWxsb3cgbWUgc29tZSB0aW1lIGZv
+cg0KPiBzdWJtaXNzaW9uLg0KDQpUaGUgdWZzLW1lZGlhdGVrIFJGQyBwYXRjaCBpcyB1cGxvYWRl
+ZCBhcw0KaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wYXRjaC8xMTQxNTA1MS8NCg0KVGhp
+cyBwYXRjaCBpcyByZWJhc2VkIHRvIHRoZSBsYXRlc3Qgd2lwLWlubGluZS1lbmNyeXB0aW9uIGJy
+YW5jaCBpbg0KRXJpYyBCaWdnZXJzJ3MgZ2l0Og0KaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIv
+c2NtL2xpbnV4L2tlcm5lbC9naXQvZWJpZ2dlcnMvbGludXguZ2l0Lw0KDQpUaGFua3MsDQpTdGFu
+bGV5IENodQ0K
 
-Will fix them all,
-
-Thanks!
