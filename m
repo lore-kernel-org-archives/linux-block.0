@@ -2,84 +2,85 @@ Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B869AC3F2D1
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E98ECC3F2D1
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 855F924676
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B48D62166E
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:37:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KT22H+M9"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="jWhtjW8b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726204AbgCBORx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 09:17:53 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:39906 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726925AbgCBORv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 09:17:51 -0500
-Received: by mail-io1-f66.google.com with SMTP id h3so11651244ioj.6
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 06:17:49 -0800 (PST)
+        id S1727178AbgCBOh4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 09:37:56 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40470 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727170AbgCBOhx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 09:37:53 -0500
+Received: by mail-io1-f65.google.com with SMTP id m22so5375213ioj.7
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 06:37:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=a0tBhZvtllQvUWUp6ZQPztoGNFVwtv7YcFVARrMmvDg=;
-        b=KT22H+M9A+/N+EaDP0Po6iV8/MsUrppvM/g1dXtkaygzEgRudsTB+xHOuiVBrQ6+ym
-         EZImuro2nvNgQvxmb2YrX3Xq1AvLyAzZtTD+M2cBIUl6sddpsm5iDrMgO/IrNFnsz81k
-         acDPEGwkloN1LhVw9h2hvB5loaBWm/2aisCK7XEvFaoZmgzINFPYkwyXVbQ7aK9939mU
-         kX08pOawvjJUVbTiTpO9hFLefonqdROKfrPomv+r+kvIHvt+aR5qTkY2Tur0Fdf+7YX+
-         XHH95Ob16H4KfCW9Sy6Q9WzLIOWbnODpWh61JNBmj71bk+Ap6vC0owQ1JSTwgF4EvTiI
-         /0MA==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fmChl07tCnnnsdQkbYOcsmPILzyShLh33qBmgjXyxkA=;
+        b=jWhtjW8byNV5i6zYn7TLRszuxZRXo+KsJDCRQNqMJxy4mxFW6SnjBqFPbllWCdiz1Z
+         vSZtoEf4aWL9hhjLep45IC4+bNTaq9pt5eKC+7nuCeFX4LdBjvaVVZYOKBto5dDPmc+T
+         ApyO6v+VFuYhFl9pSTY5dcurg8VNvxgwjDPcQQzBC3ydlusa+PlxEggxirhemmvaspww
+         fJvqe0xyjFt8IX75KsbYqUodLnB1+D7tUCfuLt7iLqbBoM1gvEDYAArmW/dIVo6votI7
+         onnLTrXtd0ivQoMl0j1nvFrpMKbS4PY52CbGZ5FhNEgTkJ5KFzYSyzINWwRgMG06rjZi
+         mncw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=a0tBhZvtllQvUWUp6ZQPztoGNFVwtv7YcFVARrMmvDg=;
-        b=JvmR5a3J/r+A5aY/K2eYfW1difoR5/cj6ImXt3fnxx5vHoFQeDUvLcKQbWUPRzWCus
-         Uk0hv1f8WyBGeXfrG37aNCGEhqtfNXpe2NEUqg84L7jMpJza7eK6n3D5IRxWlAvHIxRq
-         UQGI5xO1rvOG/7Km7PgOUw7nb2wshVKUQQpmIBnDAaBvJlbeSLJP+jClY3gf+O8YSs2I
-         6Wc76TmBjc8ad/5BvPYUhdlzqaNquyGg1J41Uhk8vB21UCWWJt6hy4zExsHOggeuDL7x
-         SY+Lu1A9gPa1Rwgfe234IOSHaJIWMHathMVAwdweIy+OPZgbjjKQbsVKv1x9/DmpueXB
-         6Egw==
-X-Gm-Message-State: APjAAAUtA/79OrvoGMGV8XH/Q6QhvavBhQGBT9wnQNrFD8QuBUPZh/my
-        +K6s0xPKiG5eZzks9rzwHyWozg==
-X-Google-Smtp-Source: APXvYqx3YVHyUAM1aPAByzs4DZtc1emIuOG1m7mpL/Ib4m6txxnpN5VXkKNSeh1FSb5OckpPmF/y1A==
-X-Received: by 2002:a5e:8e46:: with SMTP id r6mr7092279ioo.50.1583158669229;
-        Mon, 02 Mar 2020 06:17:49 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id n81sm3879057ili.28.2020.03.02.06.17.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2020 06:17:48 -0800 (PST)
-Subject: Re: [PATCH] block: Remove used kblockd_schedule_work_on()
-To:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-References: <20200302132408.15954-1-dwagner@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <843612ae-c5ae-39af-63eb-dc861948a7e7@kernel.dk>
-Date:   Mon, 2 Mar 2020 07:17:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fmChl07tCnnnsdQkbYOcsmPILzyShLh33qBmgjXyxkA=;
+        b=uTHI0PTwBAnWc684jK5p7EQ/IjiPbhxnov2AkpPxZEKd88gIjhi9562XRBU4FleUYn
+         brr7U8W2ivRhfnugzV7A0RAotmT77/5KRQOwTXeM1qkXfvlLHROhsxlCz8I52PKEj2zy
+         z+zXMzi+yIPeDmNzFQDGi2BZRtJ3qvuUmfJQn9CbDwErSE/OCSEwPdY8b6o1OD20pBwN
+         n3eg9OGzYtMC3QBt9Tl5spFOUMv4oSQZz3w+muQidcXcpeBtSjcIDX3uiZufylWgsaJy
+         ZeBFa55F4Opxf3Vr+YPmxO/TExVZvkR+4VOjVrvcFvJPc6I5NOuOdsB0YUrsUeD1XXn6
+         eJLw==
+X-Gm-Message-State: APjAAAUv551Y9Kd0fpcKnlxcYBXh7iugB6mufkCfxphJUhbZQhY6gCHB
+        NXNmdmproOHuLa/36Bj3eftCloJSIs/eqc4BTHmFT/l3
+X-Google-Smtp-Source: APXvYqwpTrVreRlhOJstucnPx7hIH1xJIKArYs7wGfkg+h8SN/KzbOrQMY8TYI6vLJO0hKUh/OE4DxkfB83yk2X5bx4=
+X-Received: by 2002:a6b:5a06:: with SMTP id o6mr12550360iob.54.1583159871960;
+ Mon, 02 Mar 2020 06:37:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200302132408.15954-1-dwagner@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-2-jinpuwang@gmail.com>
+ <8131773d-cf6e-9c1d-faad-a250f7135432@acm.org>
+In-Reply-To: <8131773d-cf6e-9c1d-faad-a250f7135432@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 2 Mar 2020 15:37:41 +0100
+Message-ID: <CAMGffEn5tPDCsGZNMO9wZE6RGJ+VKM4mTp4ynjW13CKrv+Fh3Q@mail.gmail.com>
+Subject: Re: [PATCH v9 01/25] sysfs: export sysfs_remove_file_self()
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>,
+        Roman Pen <roman.penyaev@profitbricks.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/2/20 6:24 AM, Daniel Wagner wrote:
-> Commit ee63cfa7fc19 ("block: add kblockd_schedule_work_on()")
-> introduced the helper in 2016. Remove it because since then no caller
-> was added.
-
-Applied, thanks.
-
--- 
-Jens Axboe
-
+On Sun, Mar 1, 2020 at 1:24 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-02-21 02:46, Jack Wang wrote:
+> > Function is going to be used in transport over RDMA module
+> > in subsequent patches, so export it to GPL modules.
+>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Thanks Bart!
