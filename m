@@ -1,129 +1,285 @@
-Return-Path: <SRS0=IUku=4S=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76579C3F2CD
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 23:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DB8C3F2D4
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:00:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BA6A246B6
-	for <linux-block@archiver.kernel.org>; Sun,  1 Mar 2020 23:09:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sxTPbIe4"
+	by mail.kernel.org (Postfix) with ESMTP id 167B0246C8
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 08:00:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726880AbgCAXJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Mar 2020 18:09:14 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:42355 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbgCAXJN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Mar 2020 18:09:13 -0500
-Received: by mail-lj1-f195.google.com with SMTP id d10so9650226ljl.9;
-        Sun, 01 Mar 2020 15:09:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Iq/KgsrwSxvpby2goIRSH5cRmhkTMkp2al5Cysx8Mb8=;
-        b=sxTPbIe4c0Af60ar6aopox61tDGdoAuteIgqFp7R5KXi86Vy1mfYhYNHGsK14ibx3a
-         mcMFmdbVr7glbJp7SCAeuMCo6reqCCND/4iXa2mqVx4u3dob92i6T/iQ3BthiNKhcFAt
-         Vjpg/Fqx5zZp4gBvqmr5YZv6N/iIhSxMNQjUGLbZPFNZCFxIcInoMtXoKT9hmdben2lV
-         wRWSl/rgp4Ex+aijp7Wl7zGPIEUfYYKfdiSnOIS2hoZLB9lbmeGHZuf3B83sKOfBdKqZ
-         E5tc0YE9L59eEy6QLd5bGrnexepaa+S91WaccPZwuNj3jpRmtAuvtH4n9Fx9aGuRRHij
-         OkMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Iq/KgsrwSxvpby2goIRSH5cRmhkTMkp2al5Cysx8Mb8=;
-        b=m2f6xhH/rzk3TVkpBOg2dpHUTKcv/6d8WkbJ+JANYlxSeaSiKRMapzX1g8lvrmD3tg
-         NwGjp7PzklEtyJOCZlrnanCOa4WNVRDSDNg0c1uCKM78O0DfhkbB/vS6kO72umrjHMzd
-         IRAQA3MBHFIHKnv5AUx0HarGIwbzVVXQ1VEttbrPov/sxee7RD1VQ13qKL1UO55qJDrM
-         G7a2fnPjEKIm3kyOQDb10qz0Om5v6fiQGAGtfCBsyOdGI48KLh5pH0AiB3n9xY1XkMsZ
-         3r22/FbpKdCXLKrQniv13aUB4RtyEOqXaUsUaZJOIxjfwJWAqowldI3IHcCeETxqeCoq
-         SC/Q==
-X-Gm-Message-State: ANhLgQ3HqFPaiiFHiLPBSxFGu1OO1K2TI6Q2HIUN76IqvJpuIZpQJ/Cv
-        jR9d3nEC2PqXnJ7Upy3McCaUGEz/
-X-Google-Smtp-Source: ADFU+vvVUAThE91+zafUv8AYR5mKTxcSsZQoMmBQquYfQex92iJVJ4aUm5nQ5wDKyofWYP7XnhhrXg==
-X-Received: by 2002:a2e:8490:: with SMTP id b16mr9849000ljh.282.1583104151055;
-        Sun, 01 Mar 2020 15:09:11 -0800 (PST)
-Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
-        by smtp.googlemail.com with ESMTPSA id f14sm9401803lfh.40.2020.03.01.15.09.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Mar 2020 15:09:09 -0800 (PST)
-Subject: Re: [PATCH v1 1/3] mmc: core: Add raw_boot_mult field to mmc_ext_csd
-To:     Avri Altman <Avri.Altman@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>
-Cc:     "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20200224231841.26550-1-digetx@gmail.com>
- <20200224231841.26550-2-digetx@gmail.com>
- <MN2PR04MB699121991FCB80BE39FC106FFCE60@MN2PR04MB6991.namprd04.prod.outlook.com>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <0fb5f6ec-8aa0-3bc8-e6cc-8e061c401839@gmail.com>
-Date:   Mon, 2 Mar 2020 02:09:08 +0300
+        id S1727141AbgCBIAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 03:00:14 -0500
+Received: from mail1.windriver.com ([147.11.146.13]:54755 "EHLO
+        mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727385AbgCBIAO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 03:00:14 -0500
+X-Greylist: delayed 14590 seconds by postgrey-1.27 at vger.kernel.org; Mon, 02 Mar 2020 03:00:02 EST
+Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com [147.11.189.40])
+        by mail1.windriver.com (8.15.2/8.15.2) with ESMTPS id 0223towc025562
+        (version=TLSv1 cipher=AES256-SHA bits=256 verify=FAIL);
+        Sun, 1 Mar 2020 19:55:50 -0800 (PST)
+Received: from [128.224.162.175] (128.224.162.175) by ALA-HCA.corp.ad.wrs.com
+ (147.11.189.50) with Microsoft SMTP Server (TLS) id 14.3.487.0; Sun, 1 Mar
+ 2020 19:55:49 -0800
+To:     Christoph Hellwig <hch@lst.de>, <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>,
+        <bvanassche@acm.org>, <keith.busch@intel.com>,
+        <tglx@linutronix.de>, <mwilck@suse.com>, <yuyufen@huawei.com>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, He Zhe <Zhe.He@windriver.com>
+From:   He Zhe <zhe.he@windriver.com>
+Subject: disk revalidation updates and OOM
+Message-ID: <93b395e6-5c3f-0157-9572-af0f9094dbd7@windriver.com>
+Date:   Mon, 2 Mar 2020 11:55:44 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <MN2PR04MB699121991FCB80BE39FC106FFCE60@MN2PR04MB6991.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [128.224.162.175]
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-01.03.2020 13:50, Avri Altman пишет:
-> Hi,
->>
->>
->> In order to support parsing of NVIDIA Tegra Partition Table format, we
->> need to know the BOOT_SIZE_MULT value of the Extended CSD register
->> because
->> NVIDIA's bootloader linearizes the boot0/boot1/main partitions into a
->> single virtual space, and thus, all partition addresses are shifted by
->> the size of boot0 + boot1 partitions.
->>
->> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
->> ---
->>  drivers/mmc/core/mmc.c   | 2 ++
->>  include/linux/mmc/card.h | 1 +
->>  2 files changed, 3 insertions(+)
->>
->> diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
->> index f6912ded652d..88e5b4224d3c 100644
->> --- a/drivers/mmc/core/mmc.c
->> +++ b/drivers/mmc/core/mmc.c
->> @@ -417,6 +417,8 @@ static int mmc_decode_ext_csd(struct mmc_card
->> *card, u8 *ext_csd)
->>                 ext_csd[EXT_CSD_ERASE_TIMEOUT_MULT];
->>         card->ext_csd.raw_hc_erase_grp_size =
->>                 ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE];
->> +       card->ext_csd.raw_boot_mult =
->> +               ext_csd[EXT_CSD_BOOT_MULT];
-> You might want at this point multiply it by 128K,
-> And get rid of: part_size = ext_csd[EXT_CSD_BOOT_MULT] << 17;
-> Below...
+Hi,
 
-But it's not a *raw* _boot_mult anymore then. I'm not sure that it will
-be a worthwhile change.
+Since the following commit
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.5/disk-revalidate&id=6917d0689993f46d97d40dd66c601d0fd5b1dbdd
+until now(v5.6-rc4),
+
+If we start udisksd service of systemd(v244), systemd-udevd will scan /dev/hdc
+(the cdrom device created by default in qemu(v4.2.0)). systemd-udevd will
+endlessly run and cause OOM.
+
+
+
+It works well by reverting the following series of commits.
+
+979c690d block: move clearing bd_invalidated into check_disk_size_change
+f0b870d block: remove (__)blkdev_reread_part as an exported API
+142fe8f block: fix bdev_disk_changed for non-partitioned devices
+a1548b6 block: move rescan_partitions to fs/block_dev.c
+6917d06 block: merge invalidate_partitions into rescan_partitions
+
+
+
+I found the number of some block events increase thousands per second.
+
+root@qemux86:~# perf top -e block:*
+9 block:block_touch_buffer
+2 block:block_dirty_buffer
+0 block:block_rq_requeue
+307K block:block_rq_complete
+174K block:block_rq_insert
+174K block:block_rq_issue
+0 block:block_bio_bounce
+0 block:block_bio_complete
+2 block:block_bio_backmerge
+0 block:block_bio_frontmerge
+9 block:block_bio_queue
+7 block:block_getrq
+0 block:block_sleeprq
+4 block:block_plug
+4 block:block_unplug
+0 block:block_split
+0 block:block_bio_remap
+0 block:block_rq_remap
+
+
+
+Here is the strace log from systemd-udevd. It repeats the following actions
+endlessly.
+
+epoll_wait(3, [{EPOLLIN, {u32=6274288, u64=6274288}}], 2, -1) = 1                                                                           
+clock_gettime64(CLOCK_REALTIME, {tv_sec=1582858384, tv_nsec=264944457}) = 0                                                                 
+clock_gettime64(CLOCK_MONOTONIC, {tv_sec=146, tv_nsec=493809949}) = 0                                                                       
+clock_gettime64(CLOCK_BOOTTIME, {tv_sec=146, tv_nsec=502760142}) = 0                                                                        
+recvmsg(14, {msg_name={sa_family=AF_NETLINK, nl_pid=-206275536, nl_groups=00000000}, msg_namelen=128->12, msg_iov=[{iov_base={{len=1969383786
+getrandom("\x05\xca\xeb\xf4\x3f\x01\xb8\x0f\x7c\x89\xf9\x4b\x46\x73\x9b\xd5", 16, GRND_NONBLOCK) = 16                                       
+clock_gettime64(CLOCK_MONOTONIC, {tv_sec=146, tv_nsec=613235420}) = 0                                                                       
+openat(AT_FDCWD, "/dev/hdc", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC) = 6                                                      
+flock(6, LOCK_SH|LOCK_NB)               = 0                                                                                                 
+openat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/block/hdc/uevent", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = 15                     
+fstat64(15, {st_mode=S_IFREG|0644, st_size=4096, ...}) = 0                                                                                  
+fstat64(15, {st_mode=S_IFREG|0644, st_size=4096, ...}) = 0                                                                                  
+read(15, "MAJOR=22\nMINOR=0\nDEVNAME=hdc\nDEV"..., 4096) = 42
+read(15, "", 4096)                      = 0
+close(15)                               = 0
+openat(AT_FDCWD, "/run/udev/data/b22:0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = 15
+fstat64(15, {st_mode=S_IFREG|0644, st_size=34, ...}) = 0
+fstat64(15, {st_mode=S_IFREG|0644, st_size=34, ...}) = 0
+read(15, "I:4680519\nE:ID_FS_TYPE=\nG:system"..., 4096) = 34
+read(15, "", 4096)                      = 0
+close(15)                               = 0
+getrandom("\x22\xda\x6d\x9d\x97\x44\xcc\x2d\x82\x52\x00\xb4\x7b\x75\x8d\x6a", 16, GRND_NONBLOCK) = 16
+openat(AT_FDCWD, "/proc/cmdline", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = 15
+fstat64(15, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+read(15, "root=/dev/vda rw  console=ttyS0 "..., 1024) = 118
+ioctl(15, TCGETS, 0xbfb8b7ec)           = -1 ENOTTY (Inappropriate ioctl for device)
+read(15, "", 1024)                      = 0
+close(15)                               = 0
+openat(AT_FDCWD, "/proc/cmdline", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = 15
+fstat64(15, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+read(15, "root=/dev/vda rw  console=ttyS0 "..., 1024) = 118
+ioctl(15, TCGETS, 0xbfb8b7ec)           = -1 ENOTTY (Inappropriate ioctl for device)
+read(15, "", 1024)                      = 0
+close(15)                               = 0
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "pci0000:00", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "0000:00:01.1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "ide1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "1.0", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "block", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+close(16)                               = 0
+access("/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/block/uevent", F_OK) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "pci0000:00", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "0000:00:01.1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "ide1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "1.0", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+close(15)                               = 0
+access("/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/uevent", F_OK) = 0
+openat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/uevent", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = 15
+fstat64(15, {st_mode=S_IFREG|0644, st_size=4096, ...}) = 0
+fstat64(15, {st_mode=S_IFREG|0644, st_size=4096, ...}) = 0
+read(15, "DRIVER=ide-cdrom\nMEDIA=cdrom\nDRI"..., 4096) = 64
+read(15, "", 4096)                      = 0
+close(15)                               = 0
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/subsystem", "../../../../../bus/ide", 4096) = 22
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/run/udev/data/+ide:1.0", O_RDONLY|O_LARGEFILE|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "pci0000:00", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "0000:00:01.1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "ide1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+close(16)                               = 0
+access("/sys/devices/pci0000:00/0000:00:01.1/ide1/uevent", F_OK) = 0
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/subsystem", 0x5f5b30, 4096) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "pci0000:00", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "0000:00:01.1", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+close(15)                               = 0
+access("/sys/devices/pci0000:00/0000:00:01.1/uevent", F_OK) = 0
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/subsystem", "../../../bus/pci", 4096) = 16
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+openat(15, "pci0000:00", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(15)                               = 0
+close(16)                               = 0
+access("/sys/devices/pci0000:00/uevent", F_OK) = 0
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/subsystem", 0x5f5b30, 4096) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15                                                                
+openat(15, "sys", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 16
+fstat64(16, {st_mode=S_IFDIR|0555, st_size=0, ...}) = 0
+close(15)                               = 0
+openat(16, "devices", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+close(16)                               = 0
+close(15)                               = 0
+access("/sys/devices/uevent", F_OK)     = -1 ENOENT (No such file or directory)
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/block/hdc/driver", 0x5f5b30, 4096) = -1 ENOENT (No such file or director)
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/1.0/driver", "../../../../../bus/ide/drivers/i"..., 4096) = 40
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/ide1/driver", 0x5f5b30, 4096) = -1 ENOENT (No such file or directory)
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/0000:00:01.1/driver", "../../../bus/pci/drivers/PIIX_ID"..., 4096) = 33
+readlinkat(AT_FDCWD, "/sys/devices/pci0000:00/driver", 0x5f5b30, 4096) = -1 ENOENT (No such file or directory)
+lstat64("/dev/hdc", {st_mode=S_IFBLK|0660, st_rdev=makedev(0x16, 0), ...}) = 0
+utimensat_time64(AT_FDCWD, "/dev/hdc", NULL, 0) = 0
+lstat64("/dev/block/22:0", {st_mode=S_IFLNK|0777, st_size=6, ...}) = 0
+readlinkat(AT_FDCWD, "/dev/block/22:0", "../hdc", 4096) = 6
+utimensat_time64(AT_FDCWD, "/dev/block/22:0", NULL, AT_SYMLINK_NOFOLLOW) = 0
+stat64("/run/udev/tags/systemd", {st_mode=S_IFDIR|0755, st_size=720, ...}) = 0
+openat(AT_FDCWD, "/run/udev/tags/systemd/b22:0", O_RDONLY|O_LARGEFILE|O_NOFOLLOW|O_CLOEXEC|O_PATH) = 15
+fstat64(15, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+utimensat_time64(AT_FDCWD, "/proc/self/fd/15", NULL, 0) = 0
+close(15)                               = 0
+stat64("/run/udev/data", {st_mode=S_IFDIR|0755, st_size=4180, ...}) = 0
+umask(077)                              = 022
+getpid()                                = 404
+clock_gettime64(CLOCK_MONOTONIC, {tv_sec=147, tv_nsec=105469823}) = 0
+openat(AT_FDCWD, "/run/udev/data/.#b22:03qtXsM", O_RDWR|O_CREAT|O_EXCL|O_LARGEFILE|O_CLOEXEC, 0600) = 15
+umask(022)                              = 077
+fcntl64(15, F_GETFL)                    = 0x8002 (flags O_RDWR|O_LARGEFILE)
+fchmod(15, 0644)                        = 0
+fstat64(15, {st_mode=S_IFREG|0644, st_size=0, ...}) = 0
+write(15, "I:4680519\nE:ID_FS_TYPE=\nG:system"..., 34) = 34
+rename("/run/udev/data/.#b22:03qtXsM", "/run/udev/data/b22:0") = 0
+close(15)                               = 0
+close(6)                                = 0
+sendmsg(14, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=0x000002}, msg_namelen=12, msg_iov=[{iov_base={{len=1969383788, type=0x65648
+write(7, "", 0)                         = 0
+epoll_wait(3, [{EPOLLIN, {u32=6274288, u64=6274288}}], 2, -1) = 1
+
+
+
+Thanks,
+Zhe
