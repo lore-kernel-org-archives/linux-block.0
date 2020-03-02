@@ -2,85 +2,140 @@ Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4684C3F2D7
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD0CC3F2CD
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 15:02:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A4D4217F4
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 14:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4117222B48
+	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 15:02:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="HdCEra2I"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TDUydw2h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727279AbgCBO7T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 09:59:19 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:37027 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727170AbgCBO7T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 09:59:19 -0500
-Received: by mail-il1-f194.google.com with SMTP id a6so9562484ilc.4
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 06:59:17 -0800 (PST)
+        id S1727264AbgCBPCB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 10:02:01 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:43306 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726997AbgCBPCB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 10:02:01 -0500
+Received: by mail-io1-f66.google.com with SMTP id n21so11816752ioo.10
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 07:01:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sYkZC+H0cclejhwnu9ybKgEGURqGTDULgNJyOMe/aZs=;
-        b=HdCEra2IzdfQAQEBA7Agqn/vJJa/CGaerdl9UrJGEi6izanHXQsrt/RuKJIkiac1Fv
-         HHd8gPxzkzeXH35TOn9AZmvG/5Wm7jriHCBv0UW1Pdtf/MfhPRUoUvsK5h98tL1HH+JG
-         lIV5MmCsnF4XFf37ufrpmKTXUH+sMeFx7a8/4EVc4Ly7vciXfDu0t/ijOk19sEWCrb3N
-         gbmC6WcQ1zDdA7t7aeYbuqG20B+IEjmXmGQF9h4rF6e0vG9UfWudYWRxR5AMLWa/D2LT
-         k45gtvTeizB7XsVpx03CAs9rrqV7AT9Tqcame9BMBcW4ApIp77OSIF/4jsmBWJylnu9p
-         csaw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qihmoD83dlx2UdkzRIwQHSPZTcBU16FDDrjf79PR52Q=;
+        b=TDUydw2hE8MW4D+0jWYJtk1e43FYbSEytENeZvXaGDktl8liVT6Gt3MjGljbvgqZuc
+         RG3JsCgP6s5FzljK2gyZk+KC6ys91+kQPzt7dTUHvPBq8I7NrfkAU0cb0hBlwz+Ge3tg
+         M2j+mcS/odv3zIEjQS/9mQjUPxK9YaklNgK735WfBY7DzsUOJtGcjnP008qPzWBFEyH3
+         vLlW9PnADh1RbKD7+HlGLvGFbq/BI/ShF+9cfcx6Ir+fzbnieNCBp7uhiX3oiyvZv6QI
+         98jA+WEomtVfg35H0DyayPrv6wes0hqJP2OLXaasthDUQGGdFbRhtSoZHOb/yM9/BFO/
+         yLiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sYkZC+H0cclejhwnu9ybKgEGURqGTDULgNJyOMe/aZs=;
-        b=U5v/YQ+hFf9FKcbHQd1dgrVu9O9BPAcuRDgsABk8g+K/ZghEg3J6ZojBVBNYfW0D5p
-         tCjVXwCgRPv4yAeXikrLl7pO+8v2LJNHpF3Zv/XeW4eeOt2bUT3Ozw2nw2/hw8O2AxKH
-         S53pBzHmteGKFcQSS3+fukiJcvL45Lz+BicaQhBf8nHtOkiFOk1qvfXkjzJObXzB75tU
-         86XElJjfOgeT7AnCA14L9MT2CVAyQtnS8+sXgVQslmOcCegkzOjP4PqH77h1PSKhpWE0
-         nZ8QY/J8We6tLrnPsr5Pmkh2LnB0vjx+SrkW4pAGWZU3Ia6emVbHsBlvllz1R0iohSvt
-         b7Pg==
-X-Gm-Message-State: ANhLgQ1mmynUcqTlQzSEYTWgxGKjxsWU3R3VhDBQIgzlHeUUPGoKcfow
-        VVTxsJGZLlSH9LFJ+kXXYLBZmAtcML0C0lBYuul/2RXX
-X-Google-Smtp-Source: ADFU+vumyIWWKcoN+ffBvEV/Func4aa1zUSwHnUK9EmvZwaPhmcivVqZOJ/95Vk7oLaIEuf0IM/h35yvLCdVyAU5ywM=
-X-Received: by 2002:a92:811c:: with SMTP id e28mr69574ild.22.1583161156724;
- Mon, 02 Mar 2020 06:59:16 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qihmoD83dlx2UdkzRIwQHSPZTcBU16FDDrjf79PR52Q=;
+        b=X/iX1cOe0QMOx1Vz5Ey5LgJ3MoU6mTdEjaJLlovjLyX7v6/Rf8QjGjMzuGgGWZKM1e
+         IL+U4+YBNuFS0RTEPuj5WmtWrANEUxnYUmPtf0TVqmvZoRuiF/y8WDKCRD7jIGFHCtZU
+         oNxjFOqfsetL5YwD0URktB8AdvuACZVLIF5ml2+41YSuii9azywRkQiD/oB2Z2rFQ8Gy
+         xQo66UZfhOESVvK42TMdhpbRpDcESmcxPskaX48QxJlUgW7FQAqRvv6qJ4Abi8pV3TGK
+         YWOgJISh6fO3iPdVU/wUGN11P2JQR3+GNUDNaVFiNJS/59J1FjKeqXsMkp+G4lhGQl23
+         c6+w==
+X-Gm-Message-State: APjAAAWzaBl0kupfQBakfFbB5ZMekjmcipTaqeookTKeuiIId3MDbTk5
+        0XRToj/lyrmyIWdktnoYNZLYgg43w0o=
+X-Google-Smtp-Source: APXvYqz+bd8MGcypER7i3EmoVclQ6zpfDlSJx9wXSgMOBjhSW63XSciAIHNogDjdKWORAk/mwF6C2g==
+X-Received: by 2002:a6b:400b:: with SMTP id k11mr13507493ioa.256.1583161318801;
+        Mon, 02 Mar 2020 07:01:58 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id q21sm4275591ion.73.2020.03.02.07.01.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2020 07:01:58 -0800 (PST)
+Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
+ bcache_device_init()
+To:     Michal Hocko <mhocko@kernel.org>, Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        hare@suse.de, mkoutny@suse.com, Oleg Nesterov <oleg@redhat.com>
+References: <20200302093450.48016-1-colyli@suse.de>
+ <20200302093450.48016-2-colyli@suse.de>
+ <20200302122748.GH4380@dhcp22.suse.cz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <429df503-00b7-a433-5f6f-08b3f232a1bf@kernel.dk>
+Date:   Mon, 2 Mar 2020 08:01:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-17-jinpuwang@gmail.com>
- <6aa73b1c-b47a-c239-f8bb-33a44a3c4d97@acm.org>
-In-Reply-To: <6aa73b1c-b47a-c239-f8bb-33a44a3c4d97@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 2 Mar 2020 15:59:06 +0100
-Message-ID: <CAMGffEmSg_hdWjHSYREo4b_aESbwby_dTEMRVs6YBTbXSOEK5Q@mail.gmail.com>
-Subject: Re: [PATCH v9 16/25] block/rnbd: client: private header with client
- structs and functions
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200302122748.GH4380@dhcp22.suse.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 1, 2020 at 3:26 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-02-21 02:47, Jack Wang wrote:
-> > This header describes main structs and functions used by rnbd-client
-> > module, mainly for managing RNBD sessions and mapped block devices,
-> > creating and destroying sysfs entries.
->
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Thanks Bart!
+On 3/2/20 5:27 AM, Michal Hocko wrote:
+> [Cc Oleg]
+> 
+> On Mon 02-03-20 17:34:49, Coly Li wrote:
+>> When cache device and cached device are registered simuteneously and
+>> register_cache() firstly acquires bch_register_lock. register_bdev()
+>> has to wait before register_cache() finished, it might be a very long
+>> time.
+>>
+>> If the registration is from udev rules in system boot up time, and
+>> registration is not completed before udev timeout (default 180s), the
+>> registration process will be killed by udevd. Then the following calls
+>> to kthread_run() or kthread_create() will fail due to the pending
+>> signal (they are implemented this way at this moment).
+>>
+>> For boot time, this is not good, because it means a cache device with
+>> huge cached data will always fail in boot time, just because it
+>> spends too much time to check its internal meta data (btree and dirty
+>> sectors).
+>>
+>> The failure for cache device registration is solved by previous
+>> patches, but failure due to timeout also exists in cached device
+>> registration. As the above text explains, cached device registration
+>> may also be timeout if it is blocked by a timeout cache device
+>> registration process. Then in the following code path,
+>>     bioset_init() <= bcache_device_init() <= cached_dev_init() <=
+>>     register_bdev() <= register_bcache()
+>> bioset_init() will fail because internally kthread_create() will fail
+>> for pending signal in the following code path,
+>>     bioset_init() => alloc_workqueue() => init_rescuer() =>
+>>     kthread_create()
+>>
+>> Maybe fix kthread_create() and kthread_run() is better method, but at
+>> this moment a fast workaroudn is to flush pending signals before
+>> calling bioset_init() in bcache_device_init().
+> 
+> I cannot really comment on the bcache part because I am not familiar
+> with the code. It is quite surprising to see an initialization taking
+> that long though.
+> 
+> Anyway
+> 
+>> This patch calls flush_signals() in bcache_device_init() if there is
+>> pending signal for current process. It avoids bcache registration
+>> failure in system boot up time due to bcache udev rule timeout.
+> 
+> this sounds like a wrong way to address the issue. Killing the udev
+> worker is a userspace policy and the kernel shouldn't simply ignore it.
+> Is there any problem to simply increase the timeout on the system which
+> uses a large bcache?
+
+On top of that, what if signals were sent for other reasons than just
+terminate it? Flushing a fatal signal from "some task" seems bad enough
+on its own, but we could be losing others as well.
+
+Coly, this seems like a very bad idea. And the same goes for the
+existing flush_signals() in bcache. It's just not the right way to deal
+with it, and it could be causing other issues.
+
+-- 
+Jens Axboe
+
