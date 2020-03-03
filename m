@@ -2,97 +2,107 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8696CC3F2D1
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 19:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E2EC3F2C6
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 21:12:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58289208C3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 19:19:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01DFB20848
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 21:12:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="Vaq2dpQ6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730122AbgCCTTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 14:19:10 -0500
-Received: from mga05.intel.com ([192.55.52.43]:62948 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730009AbgCCTTK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Mar 2020 14:19:10 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Mar 2020 11:19:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,511,1574150400"; 
-   d="scan'208";a="229040957"
-Received: from linux-machine.lm.intel.com ([10.232.116.103])
-  by orsmga007.jf.intel.com with ESMTP; 03 Mar 2020 11:19:09 -0800
-From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
-To:     <linux-block@vger.kernel.org>
-Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>,
-        =?UTF-8?q?Andrzej=20Jakowski=C2=BB?= <andrzej.jakowski@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Subject: [PATCH v2] block: sed-opal: Change the check condition for regular session validity
-Date:   Tue,  3 Mar 2020 12:17:00 -0700
-Message-Id: <20200303191700.66667-1-revanth.rajashekar@intel.com>
-X-Mailer: git-send-email 2.17.1
+        id S1732393AbgCCVML (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 16:12:11 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:39745 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732378AbgCCVML (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 16:12:11 -0500
+Received: by mail-qk1-f196.google.com with SMTP id e16so4939610qkl.6
+        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2020 13:12:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7+rNtwc3taKkaB/BWsH2V4WaM282d/1lxQTUPD2UwBw=;
+        b=Vaq2dpQ6rRdONuhCdFMMR0HIfubWJbWCLbfZAgsNTqg4O4a09poVhXrEDLD6zjcY2d
+         JHE5rF3BUUX8kanVAjUnZstP8kVKl6NOyub5rx/sigjkTvtzMZwQju5RSqiIHr0xTglJ
+         2XdntdihhYKdZ8mMsB8XpF2WWHqXYDkc9kmL/5LwtYFuGHNBHrvJOdhIRBvOk4AbYhJH
+         FLGlhYiCG/JIkt5HTj6gUBPdQ1wAHEYLr38JyZX0UdaSWZP8FWIZUOoqww8aM4n63EnC
+         OhS2fedbCHLv9tvXQ61E2DpZ6hWMeeMSQy+NjbNGLGxG0J1+qbz86OIFXIULffqy2fH0
+         wF7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7+rNtwc3taKkaB/BWsH2V4WaM282d/1lxQTUPD2UwBw=;
+        b=TP5xmCC3JCGfc2XMtp+tHWZrhMPv3naNeksldn2i7ZMhX4yWZC8OarQgj36T/GGL1I
+         aerOtVGnItcsfWjl/+c7459vUlSuIqQfmczWUatyut7pCZBRR9kps9yLuxMieAJNJaFY
+         XyPjrDft2Z8FhL2RlORfVP1hmwjDnvHQ94gVqiXlPHNOUqhTRFaYdNIT9diNYy8CbuAI
+         d8AOB5ga8JrXo9YNyD3PgXe1U5c4UMCGuq4CEH++JTjEzzpKvrsKqQXqwS56OJqzo9VD
+         4mklTI7DjVwQumzdi4qAX+DfSUAPDdL6DRNcvGrP//XealdoHuTPnfc/An7fHMTA9XyG
+         45jg==
+X-Gm-Message-State: ANhLgQ3L/wXRKCb3xE6Cd+2e0kZlcSDYzi4/D8otLGzFG4tHDtX0Zwbv
+        OlcNT12mbkqq69DVDFjvvDUkPFK/xJI=
+X-Google-Smtp-Source: ADFU+vvlY9Ns+7ioJ4OLOFRK0oVo13JpxjmwUkzD16hudS4jYTmPzIRaQp3gLzV3hcGOiM36kwE9PA==
+X-Received: by 2002:ae9:e104:: with SMTP id g4mr5777015qkm.133.1583269930094;
+        Tue, 03 Mar 2020 13:12:10 -0800 (PST)
+Received: from [192.168.1.106] ([107.15.81.208])
+        by smtp.gmail.com with ESMTPSA id c13sm7034032qtv.37.2020.03.03.13.12.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Mar 2020 13:12:09 -0800 (PST)
+Subject: Re: [PATCH 1/2] nbd: enable replace socket if only one connection is
+ configured
+To:     Hou Pu <houpu.main@gmail.com>, axboe@kernel.dk, mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        Hou Pu <houpu@bytedance.com>
+References: <20200228064030.16780-1-houpu@bytedance.com>
+ <20200228064030.16780-2-houpu@bytedance.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <3b6ae210-f942-b74d-1e53-768c7e8c3675@toxicpanda.com>
+Date:   Tue, 3 Mar 2020 16:12:08 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200228064030.16780-2-houpu@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch changes the check condition for the validity/authentication
-of the session.
+On 2/28/20 1:40 AM, Hou Pu wrote:
+> Nbd server with multiple connections could be upgraded since
+> 560bc4b (nbd: handle dead connections). But if only one conncection
+> is configured, after we take down nbd server, all inflight IO
+> would finally timeout and return error. We could requeue them
+> like what we do with multiple connections and wait for new socket
+> in submit path.
+> 
+> Signed-off-by: Hou Pu <houpu@bytedance.com>
+> ---
+>   drivers/block/nbd.c | 17 +++++++++--------
+>   1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 78181908f0df..83070714888b 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -395,16 +395,19 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>   	}
+>   	config = nbd->config;
+>   
+> -	if (config->num_connections > 1) {
+> +	if (config->num_connections > 1 ||
+> +	    (config->num_connections == 1 && nbd->tag_set.timeout)) {
 
-1. The Host Session Number(HSN) in the response should match the HSN for
-   the session.
-2. The TPER Session Number(TSN) can never be less than 4096 for a regular
-   session.
+This is every connection, do you mean to couple this with dead_conn_timeout? 
+Thanks,
 
-Reference:
-Section 3.2.2.1   of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
-Section 3.3.7.1.1 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Architecture_Core_Spec_v2.01_r1.00.pdf
-
-Co-developed-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
----
-
-Changes in v2:
-	Rename definition RSVD_TPER_SESSION_NUM -> FIRST_TPER_SESSION_NUM
-
- block/opal_proto.h | 1 +
- block/sed-opal.c   | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index 325cbba2465f..b486b3ec7dc4 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -36,6 +36,7 @@ enum opal_response_token {
-
- #define DTAERROR_NO_METHOD_STATUS 0x89
- #define GENERIC_HOST_SESSION_NUM 0x41
-+#define FIRST_TPER_SESSION_NUM	4096
-
- #define TPER_SYNC_SUPPORTED 0x01
- #define MBR_ENABLED_MASK 0x10
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 880cc57a5f6b..daafadbb88ca 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1056,7 +1056,7 @@ static int start_opal_session_cont(struct opal_dev *dev)
- 	hsn = response_get_u64(&dev->parsed, 4);
- 	tsn = response_get_u64(&dev->parsed, 5);
-
--	if (hsn == 0 && tsn == 0) {
-+	if (hsn != GENERIC_HOST_SESSION_NUM || tsn < FIRST_TPER_SESSION_NUM) {
- 		pr_debug("Couldn't authenticate session\n");
- 		return -EPERM;
- 	}
---
-2.17.1
-
+Josef
