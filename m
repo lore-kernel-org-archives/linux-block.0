@@ -2,83 +2,173 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C1FC3F2CD
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 13:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7561FC3F2D7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 13:52:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69E1420838
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 13:49:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583243390;
-	bh=3GkkYYOhjilByBKM7RFVLaFFg+hkdhng4kDg5fw0tfg=;
-	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
-	b=Qw+cMzNDOsjeNvpt3WEUcrrvpAYNtU133X54ETknx77Uq+G3pZpkUIp7UpKQceKxl
-	 seQs8U5cdZ1q4CiG2Wr6rvClpDk5Vo1yKvqs2TWY42xa9T3wlsiBdSb/tO/GVgZOyj
-	 8xlDu4WLIpdQ2IE+ioCnWlFtrJ74vkvsL8Elv8iE=
+	by mail.kernel.org (Postfix) with ESMTP id 4CA3320675
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 13:52:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Aw0IQZ28"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbgCCNtt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 08:49:49 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:45566 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728368AbgCCNtt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 08:49:49 -0500
-Received: by mail-qk1-f195.google.com with SMTP id z12so3346922qkg.12
-        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2020 05:49:49 -0800 (PST)
+        id S1728537AbgCCNwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 08:52:32 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:35360 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728124AbgCCNwc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 08:52:32 -0500
+Received: by mail-io1-f65.google.com with SMTP id h8so3657409iob.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2020 05:52:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uz9ZkTp64z0X/ACJNPIEoKy0v9bgGueRFOMP31d3iZk=;
-        b=N+UifCr4rbmpavWiDA1poWMPxqaD3t2YfrgA4142dJb/IWXdkO6adSu65bPfF1a6+n
-         2Cul+eU8g53jFMJFCIxcwpM7oMN95IJLAlJS+Ug3ep0BeilA9bBDzJp6g/5IA3b3N4lm
-         7I14NhaZjLcxzPUFUXmhEOdmW5BCiQHrz3H8o8iUZs6snnZvPT1Dd1nNhvrY2FL5u/Dd
-         /BMoXYTIvjM8IGvlL5TUZ/RMdkyI7xhKYT897dNc0+qsOdpzRXxbQuUfa26PojWqF2J/
-         UubReICSXtE6tTAbVc1TlqOapYalW4ATKTC5xvm1zlIrs89+SwFGC0TKc3YmJCnNoWj4
-         X/9w==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RsaB7aI6JfGPKibl7BIAvnspwpP++p9kooMzUODQUoU=;
+        b=Aw0IQZ282cXDa/7NVHMaW5GXYynSdjwNWJ1g6TxIAtd6jqb02tOEiT3R/RtPU4hXlJ
+         Li35BUERNyKcBlmNMszm7PvGJO/jj4wzrCRAnvUBR4kVPu2poKiqnWKxU9+M2Ea8JDI0
+         1BFd3lwr4hg3mH+XpPyiEg965popPd0igO4fp3/wPDlaqAArYjsEqchSGYRWeubNprc0
+         OAgrEJE2zWEHweKyFDRavueGSU4Zn3OMvZELZRWkwSMiA1kACZL+sTLuzAZ6gQZEKDLM
+         bAeWbWOJ5x8dv4aEWtcScPcKbP7eKk9hGWJ1zFjhd6qaLAl31tgBwVc+GNaUx+cr5oYu
+         FnKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=uz9ZkTp64z0X/ACJNPIEoKy0v9bgGueRFOMP31d3iZk=;
-        b=FstMkvScKS4mvoxyUOx3QMz4I3icf+cn1unvC2nxfNCiC5qir9Nh1IiBs/GyxGl9xs
-         H4oah1BQ0dRvZ4JNXpDndJGVkb47gArNXKXNku/5T/55PwtI2AzK+Ku8Pgx7swA4Nilf
-         WzBJLvWlMD73r/GsAIKfVRkOsUc4QXRju6CB9XphS08BtHegZF7ma6noGzpI+XVTJfh9
-         tSl5PrNszFTYCQcUcNV9pYPmLeIKCvhovg0CgD2EmqHU8w4BdMa7+yK9N5Qx0p1YR8qB
-         x6FHV0CviwuT5sVhKUNEhu+zhm/Y4bNKM6ZoDL3J8MFIn+9gRKEOwDgMgL7ef24cZwQO
-         XGWw==
-X-Gm-Message-State: ANhLgQ034FG/pcV4KvHGmQmbfM2XR/GJ1NF6LBF28YNSFnhCJO65u90a
-        3rZybWlSddt14lcZgdnTfWjDLnxKcdc=
-X-Google-Smtp-Source: ADFU+vuIgPyvRVH6pASOPQ86TebTvFPVkz6VBzW5TSRzPaVX4JoGM1CnK+Bk/rN2WoQKCsWx7OYusA==
-X-Received: by 2002:a05:620a:21c4:: with SMTP id h4mr4120561qka.382.1583243388544;
-        Tue, 03 Mar 2020 05:49:48 -0800 (PST)
-Received: from localhost ([2620:10d:c091:500::7f70])
-        by smtp.gmail.com with ESMTPSA id z194sm12223042qkb.28.2020.03.03.05.49.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 05:49:47 -0800 (PST)
-Date:   Tue, 3 Mar 2020 08:49:47 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-iocost: remove duplicated lines in comments
-Message-ID: <20200303134947.GB186184@mtj.thefacebook.com>
-References: <20200227013845.GA14895@192.168.3.9>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RsaB7aI6JfGPKibl7BIAvnspwpP++p9kooMzUODQUoU=;
+        b=bDoqOex8A8z/F/I0JI1rFbw+hw0QeVhhCWSiWVyfC14osx3/C8rR0Jonc+5nk5L9CT
+         7l35IZkhGffQKpT7E9HEIezscliPOjlirBBe34TozkdQninm3FCe9D6K2D2uH/O1/W7Q
+         w7VFq7FdhfLpoOPTo0gXBR9wCwTsvNqGYs6GiyQ9NXEGBpkLMRbfEJEbWxzSZLr+1kip
+         9gy5FH/aRLePPpjMOgEBkY5J8GhLv8r5ARvbrPzfe+bMkw8bv3OcGnYaF46+MmoY0G0t
+         lp8BVYQDnHpYftbiPm6eW01TLUR2LXH+N1Fs87pGRzQVq8p6I+BrwUAebhXWsiK8TOTi
+         N9YQ==
+X-Gm-Message-State: ANhLgQ3t0kXAlAbrudOFoMcagpC1JTW6SxNKfOtE8Ht7inOMM6sg4n0m
+        Xvf94LR0EQdyLW/O3/2Fp2EwwAO90v7clyLKIZ4T7A==
+X-Google-Smtp-Source: ADFU+vuE72M8zReWyu2gq7IKzot41hiIfMb4AtsvCptUtp9qi1c/BPKPknDhsk0Doi26liWD/gMUlJfyUfRTXPgmyec=
+X-Received: by 2002:a02:cd83:: with SMTP id l3mr4157186jap.10.1583243550517;
+ Tue, 03 Mar 2020 05:52:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200227013845.GA14895@192.168.3.9>
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-4-jinpuwang@gmail.com>
+ <20200303094516.GJ121803@unreal>
+In-Reply-To: <20200303094516.GJ121803@unreal>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Tue, 3 Mar 2020 14:52:19 +0100
+Message-ID: <CAMGffEmHB2z=JHG=92Ki_TaBZ8JXv6r0iZr7QF-pKyuRo=C9cA@mail.gmail.com>
+Subject: Re: [PATCH v9 03/25] RDMA/rtrs: private headers with rtrs protocol
+ structs and helpers
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 09:38:46AM +0800, Weiping Zhang wrote:
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+On Tue, Mar 3, 2020 at 10:45 AM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> On Fri, Feb 21, 2020 at 11:46:59AM +0100, Jack Wang wrote:
+> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> >
+> > These are common private headers with rtrs protocol structures,
+> > logging, sysfs and other helper functions, which are used on
+> > both client and server sides.
+> >
+> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > ---
+> >  drivers/infiniband/ulp/rtrs/rtrs-log.h |  28 ++
+> >  drivers/infiniband/ulp/rtrs/rtrs-pri.h | 401 +++++++++++++++++++++++++
+> >  2 files changed, 429 insertions(+)
+> >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-log.h
+> >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> >
+> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-log.h b/drivers/infiniband/ulp/rtrs/rtrs-log.h
+> > new file mode 100644
+> > index 000000000000..53c785b992f2
+> > --- /dev/null
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-log.h
+> > @@ -0,0 +1,28 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +/*
+> > + * RDMA Transport Layer
+> > + *
+> > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
+> > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
+> > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> > + */
+> > +#ifndef RTRS_LOG_H
+> > +#define RTRS_LOG_H
+> > +
+> > +#define rtrs_log(fn, obj, fmt, ...)                          \
+> > +     fn("<%s>: " fmt, obj->sessname, ##__VA_ARGS__)
+> > +
+> > +#define rtrs_err(obj, fmt, ...)      \
+> > +     rtrs_log(pr_err, obj, fmt, ##__VA_ARGS__)
+> > +#define rtrs_err_rl(obj, fmt, ...)   \
+> > +     rtrs_log(pr_err_ratelimited, obj, fmt, ##__VA_ARGS__)
+> > +#define rtrs_wrn(obj, fmt, ...)      \
+> > +     rtrs_log(pr_warn, obj, fmt, ##__VA_ARGS__)
+> > +#define rtrs_wrn_rl(obj, fmt, ...) \
+> > +     rtrs_log(pr_warn_ratelimited, obj, fmt, ##__VA_ARGS__)
+> > +#define rtrs_info(obj, fmt, ...) \
+> > +     rtrs_log(pr_info, obj, fmt, ##__VA_ARGS__)
+> > +#define rtrs_info_rl(obj, fmt, ...) \
+> > +     rtrs_log(pr_info_ratelimited, obj, fmt, ##__VA_ARGS__)
+> > +
+> > +#endif /* RTRS_LOG_H */
+> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-pri.h b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> > new file mode 100644
+> > index 000000000000..aecf01a7d8dc
+> > --- /dev/null
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> > @@ -0,0 +1,401 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +/*
+> > + * RDMA Transport Layer
+> > + *
+> > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
+> > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
+> > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> > + */
+> > +
+> > +#ifndef RTRS_PRI_H
+> > +#define RTRS_PRI_H
+> > +
+> > +#include <linux/uuid.h>
+> > +#include <rdma/rdma_cm.h>
+> > +#include <rdma/ib_verbs.h>
+> > +#include <rdma/ib.h>
+> > +
+> > +#include "rtrs.h"
+> > +
+> > +#define RTRS_PROTO_VER_MAJOR 2
+> > +#define RTRS_PROTO_VER_MINOR 0
+>
+> I think that Jason once said that new submission starts from "1".
+> There is no RTRS_PROTO_VER_MAJOR == 1 in the wild.
+sorry, v2 protocol is already in our production, we can simple change back to v1
 
-Acked-by: Tejun Heo <tj@kernel.org>
 
-Thanks.
+> > +#define STAT_ATTR(type, stat, print, reset)                          \
+> > +STAT_STORE_FUNC(type, stat, reset)                                   \
+> > +STAT_SHOW_FUNC(type, stat, print)                                    \
+> > +static struct kobj_attribute stat##_attr = __ATTR_RW(stat)
+>
+> It is very strange that you needed to implement _store()/_show() primitives.
+> Why is that?
+We define the MICRO to save some line of code when implementing the
+stats like rdma/reconects/etc, sess rtrs-clt-sysfs.c/srts-srv-sysfs.c
 
--- 
-tejun
+Thanks!
