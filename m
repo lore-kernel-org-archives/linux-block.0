@@ -2,167 +2,69 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1C0C3F2CD
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 09:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373BAC3F2D7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 11:09:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12781214D8
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 09:57:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583229438;
-	bh=gAxKZOyNPR2fcthCAZ/bwdTPjRoBd+d4u/B7FZInYzY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Ie4a+T5SYPXcrh9PUgjUVt+Dv4I9NhQRZbuY6yCSDXges7zeLBtQrtZqub1sgAyoF
-	 syFQYYMOmuWr2DcD19mMrNXlw6ostHYr+ymAkywOub8Z005B6PfPUmpn/uwQvrhktX
-	 +BNjZIxWXgmfcnZ0645XuNjM9fbA034ZTJQ/dfm0=
+	by mail.kernel.org (Postfix) with ESMTP id 1A61E20674
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 11:09:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727897AbgCCJ5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 04:57:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50954 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726694AbgCCJ5R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Mar 2020 04:57:17 -0500
-Received: from localhost (unknown [193.47.165.251])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BFFA320866;
-        Tue,  3 Mar 2020 09:57:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583229436;
-        bh=gAxKZOyNPR2fcthCAZ/bwdTPjRoBd+d4u/B7FZInYzY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1BREo6ZkWhvu6YkFsWwFqWOUjD5jPGqEy5MHUOFWe+P57bbSt7UF89QTR9WlnI4pJ
-         ZZEl98JdoDdakCHtA8mAP/cYeBilveeaXg89Ob6XcFBSIM29n0dY8vmdiiGUJE3UGD
-         Ze5B6KB3P+O0Cbmx+0hy4LT+a2On8wU3dAEhR/p0=
-Date:   Tue, 3 Mar 2020 11:57:13 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jack Wang <jinpuwang@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, dledford@redhat.com, jgg@ziepe.ca,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        rpenyaev@suse.de, pankaj.gupta@cloud.ionos.com
-Subject: Re: [PATCH v9 04/25] RDMA/rtrs: core: lib functions shared between
- client and server modules
-Message-ID: <20200303095713.GK121803@unreal>
-References: <20200221104721.350-1-jinpuwang@gmail.com>
- <20200221104721.350-5-jinpuwang@gmail.com>
+        id S1728777AbgCCLJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 06:09:22 -0500
+Received: from relay10.mail.gandi.net ([217.70.178.230]:35497 "EHLO
+        relay10.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728173AbgCCLJW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 06:09:22 -0500
+Received: from nexussix.ar.arcelik (unknown [84.44.14.226])
+        (Authenticated sender: cengiz@kernel.wtf)
+        by relay10.mail.gandi.net (Postfix) with ESMTPSA id DE573240020;
+        Tue,  3 Mar 2020 11:07:41 +0000 (UTC)
+From:   Cengiz Can <cengiz@kernel.wtf>
+To:     kbusch@kernel.org
+Cc:     Chaitanya.Kulkarni@wdc.com, axboe@kernel.dk, helgaas@kernel.org,
+        jack@suse.cz, linux-block@vger.kernel.org, stable@vger.kernel.org,
+        tristmd@gmail.com, Cengiz Can <cengiz@kernel.wtf>
+Subject: Re: [PATCH] blktrace: Protect q->blk_trace with RCU
+Date:   Tue,  3 Mar 2020 14:07:32 +0300
+Message-Id: <20200303110731.65552-1-cengiz@kernel.wtf>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200302220639.GA2393@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200302220639.GA2393@dhcp-10-100-145-180.wdl.wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200221104721.350-5-jinpuwang@gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 21, 2020 at 11:47:00AM +0100, Jack Wang wrote:
-> From: Jack Wang <jinpu.wang@cloud.ionos.com>
->
-> This is a set of library functions existing as a rtrs-core module,
-> used by client and server modules.
->
-> Mainly these functions wrap IB and RDMA calls and provide a bit higher
-> abstraction for implementing of RTRS protocol on client or server
-> sides.
->
-> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> ---
->  drivers/infiniband/ulp/rtrs/rtrs.c | 594 +++++++++++++++++++++++++++++
->  1 file changed, 594 insertions(+)
->  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
+Added a reassignment into the NULL check block to fix the issue.
 
-<...>
+Fixes: c780e86dd48 ("blktrace: Protect q->blk_trace with RCU")
 
-> +
-> +static void dev_free(struct kref *ref)
-> +{
-> +	struct rtrs_rdma_dev_pd *pool;
-> +	struct rtrs_ib_dev *dev;
-> +
-> +	dev = container_of(ref, typeof(*dev), ref);
-> +	pool = dev->pool;
-> +
-> +	mutex_lock(&pool->mutex);
-> +	list_del(&dev->entry);
-> +	mutex_unlock(&pool->mutex);
-> +
-> +	if (pool->ops && pool->ops->deinit)
-> +		pool->ops->deinit(dev);
-> +
-> +	ib_dealloc_pd(dev->ib_pd);
-> +
-> +	if (pool->ops && pool->ops->free)
-> +		pool->ops->free(dev);
-> +	else
-> +		kfree(dev);
-> +}
-> +
-> +int rtrs_ib_dev_put(struct rtrs_ib_dev *dev)
-> +{
-> +	return kref_put(&dev->ref, dev_free);
-> +}
-> +EXPORT_SYMBOL(rtrs_ib_dev_put);
-> +
-> +static int rtrs_ib_dev_get(struct rtrs_ib_dev *dev)
-> +{
-> +	return kref_get_unless_zero(&dev->ref);
-> +}
-> +
-> +struct rtrs_ib_dev *
-> +rtrs_ib_dev_find_or_add(struct ib_device *ib_dev,
-> +			 struct rtrs_rdma_dev_pd *pool)
-> +{
-> +	struct rtrs_ib_dev *dev;
-> +
-> +	mutex_lock(&pool->mutex);
+Signed-off-by: Cengiz Can <cengiz@kernel.wtf>
+---
+ kernel/trace/blktrace.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The scope of this mutex is unclear, you protected everything here with
-this mutex, but in dev_free() you guarded list_del() only.
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 4560878f0bac..29ea88f10b87 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1896,8 +1896,10 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+ 	}
 
-> +	list_for_each_entry(dev, &pool->list, entry) {
-> +		if (dev->ib_dev->node_guid == ib_dev->node_guid &&
-> +		    rtrs_ib_dev_get(dev))
-> +			goto out_unlock;
-> +	}
-> +	if (pool->ops && pool->ops->alloc)
-> +		dev = pool->ops->alloc();
-> +	else
-> +		dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-> +	if (IS_ERR_OR_NULL(dev))
-> +		goto out_err;
-> +
-> +	kref_init(&dev->ref);
-> +	dev->pool = pool;
-> +	dev->ib_dev = ib_dev;
-> +	dev->ib_pd = ib_alloc_pd(ib_dev, pool->pd_flags);
-> +	if (IS_ERR(dev->ib_pd))
-> +		goto out_free_dev;
-> +
-> +	if (pool->ops && pool->ops->init && pool->ops->init(dev))
-> +		goto out_free_pd;
-> +
-> +	list_add(&dev->entry, &pool->list);
-> +out_unlock:
-> +	mutex_unlock(&pool->mutex);
-> +	return dev;
-> +
-> +out_free_pd:
-> +	ib_dealloc_pd(dev->ib_pd);
-> +out_free_dev:
-> +	if (pool->ops && pool->ops->free)
-> +		pool->ops->free(dev);
-> +	else
-> +		kfree(dev);
-> +out_err:
-> +	mutex_unlock(&pool->mutex);
-> +	return NULL;
-> +}
-> +EXPORT_SYMBOL(rtrs_ib_dev_find_or_add);
-> --
-> 2.17.1
->
+ 	ret = 0;
+-	if (bt == NULL)
++	if (bt == NULL) {
+ 		ret = blk_trace_setup_queue(q, bdev);
++		bt = q->blk_trace;
++	}
+
+ 	if (ret == 0) {
+ 		if (attr == &dev_attr_act_mask)
+--
+2.25.1
+
