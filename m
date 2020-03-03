@@ -1,85 +1,129 @@
-Return-Path: <SRS0=QOfo=4T=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B21CC3F2D7
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 22:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D186C3F2D8
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:08:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E949A24677
-	for <linux-block@archiver.kernel.org>; Mon,  2 Mar 2020 22:06:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583186803;
-	bh=DBWsXqGHLqbWM19myRI8pkA7NilUBhZVQTVIxy54ZFw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lPPBKTwrLZ7jHyA3VD4EAQ0SExKBIZd4LgNe/ANYUCTQVMB/3JfLzaxqpx8VX3lX9
-	 FmqI68JCTwRXshkyozsRzU567TVk17qQgEuChy4fl3NE9P91q4BcWUYHPpaW14uR6D
-	 iMUo4vVv28jZQTK/43nog/IEOa0V5ZyTC0265Ktc=
+	by mail.kernel.org (Postfix) with ESMTP id 5C9412465E
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:08:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726579AbgCBWGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 17:06:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34760 "EHLO mail.kernel.org"
+        id S1726981AbgCCBIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 20:08:17 -0500
+Received: from mx2.suse.de ([195.135.220.15]:35178 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725781AbgCBWGm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Mar 2020 17:06:42 -0500
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D3EA214DB;
-        Mon,  2 Mar 2020 22:06:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583186801;
-        bh=DBWsXqGHLqbWM19myRI8pkA7NilUBhZVQTVIxy54ZFw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S9FT8ZgoSRNU3Kf+Bd2/2T2H+ilAzfmGVaV+PWl0Rul9qndkjLKwFmXdOy9Tzbn4Y
-         gPEPd9hNsmjbE7jiU36goDIBELBg75KAM5aipI2dhxlI3W5MiC281yQu1nCgZ3PYuV
-         CbEnPoaWK/cITbXIV9yvUimH0zClTxvftYD1CPj0=
-Date:   Mon, 2 Mar 2020 14:06:39 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "tristmd@gmail.com" <tristmd@gmail.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] blktrace: Protect q->blk_trace with RCU
-Message-ID: <20200302220639.GA2393@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200302204057.GA128531@google.com>
- <BYAPR04MB574957E5116240523362B1DC86E70@BYAPR04MB5749.namprd04.prod.outlook.com>
+        id S1726773AbgCCBIQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Mar 2020 20:08:16 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id A39B1AD3F;
+        Tue,  3 Mar 2020 01:08:14 +0000 (UTC)
+Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
+ bcache_device_init()
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Oleg Nesterov <oleg@redhat.com>, Michal Hocko <mhocko@kernel.org>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        hare@suse.de, mkoutny@suse.com
+References: <20200302093450.48016-1-colyli@suse.de>
+ <20200302093450.48016-2-colyli@suse.de>
+ <20200302122748.GH4380@dhcp22.suse.cz> <20200302134919.GB9769@redhat.com>
+ <48c6480a-3b26-fb7f-034d-923f9b8875f1@suse.de>
+ <dfcd5b4d-592d-fe2a-5c25-ac22729b479e@kernel.dk>
+ <2e4898f0-0c2b-9320-b925-456a85ebdea0@suse.de>
+ <64c2a8e9-1dc9-f81d-1c11-d9c4e7e0fd2b@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+Organization: SUSE Labs
+Message-ID: <c763699f-108a-f323-dbf1-235cf27b21e4@suse.de>
+Date:   Tue, 3 Mar 2020 09:08:08 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB574957E5116240523362B1DC86E70@BYAPR04MB5749.namprd04.prod.outlook.com>
+In-Reply-To: <64c2a8e9-1dc9-f81d-1c11-d9c4e7e0fd2b@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 02, 2020 at 09:19:33PM +0000, Chaitanya Kulkarni wrote:
-> By any chance will the following patch be able to get rid of
-> the warning ?
+On 2020/3/3 4:33 上午, Jens Axboe wrote:
+> On 3/2/20 10:32 AM, Coly Li wrote:
+>> On 2020/3/3 1:19 上午, Jens Axboe wrote:
+>>> On 3/2/20 10:16 AM, Coly Li wrote:
+>>>> On 2020/3/2 9:49 下午, Oleg Nesterov wrote:
+>>>>> On 03/02, Michal Hocko wrote:
+>>>>>>
+>>>>>> I cannot really comment on the bcache part because I am not familiar
+>>>>>> with the code.
+>>>>>
+>>>>> same here...
+>>>>>
+>>>>>>> This patch calls flush_signals() in bcache_device_init() if there is
+>>>>>>> pending signal for current process. It avoids bcache registration
+>>>>>>> failure in system boot up time due to bcache udev rule timeout.
+>>>>>>
+>>>>>> this sounds like a wrong way to address the issue. Killing the udev
+>>>>>> worker is a userspace policy and the kernel shouldn't simply ignore it.
+>>>>>
+>>>>> Agreed. If nothing else, if a userspace process has pending SIKILL then
+>>>>> flush_signals() is very wrong.
+>>>>>
+>>>>>> Btw. Oleg, I have noticed quite a lot of flush_signals usage in the
+>>>>>> drivers land and I have really hard time to understand their purpose.
+>>>>>
+>>>>> Heh. I bet most if not all users of flush_signals() are simply wrong.
+>>>>>
+>>>>>> What is the actual valid usage of this function?
+>>>>>
+>>>>> I thinks it should die... It was used by kthreads, but today
+>>>>> signal_pending() == T is only possible if kthread does allow_signal(),
+>>>>> and in this case it should probably use kernel_dequeue_signal().
+>>>>>
+>>>>>
+>>>>> Say, io_sq_thread(). Why does it do
+>>>>>
+>>>>> 		if (signal_pending(current))
+>>>>> 			flush_signals(current);
+>>>>>
+>>>>> afaics this kthread doesn't use allow_signal/allow_kernel_signal, this
+>>>>> means that signal_pending() must be impossible even if this kthread sleeps
+>>>>> in TASK_INTERRUPTIBLE state. Add Jens.
+>>>>
+>>>> Hi Oleg,
+>>>>
+>>>> Can I use disallow_signal() before the registration begins and use
+>>>> allow_signal() after the registration done. Is this a proper way to
+>>>> ignore the signal sent by udevd for timeout ?
+>>>>
+>>>> For me the above method seems to solve my problem too.
+>>>
+>>> Really seems to me like you're going about this all wrong. The issue is
+>>> that systemd is killing the startup, because it's taking too long. Don't
+>>> try and work around that, ensure the timeout is appropriate.
+>>>
+>>
+>> Copied. Then let me try how to make event_timeout works on my udevd. If
+>> it works without other side effect, I will revert existing
+>> flush_signals() patches.
 > 
-> index 4560878f0bac..889555910555 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1895,9 +1895,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct 
-> device *dev,
->                  goto out_unlock_bdev;
->          }
+> Thanks, this one, right?
 > 
-> -       ret = 0;
-> -       if (bt == NULL)
-> -               ret = blk_trace_setup_queue(q, bdev);
-> +       ret = bt == NULL ? blk_trace_setup_queue(q, bdev) : 0;
+> commit 0b96da639a4874311e9b5156405f69ef9fc3bef8
+> Author: Coly Li <colyli@suse.de>
+> Date:   Thu Feb 13 22:12:05 2020 +0800
 > 
->          if (ret == 0) {
->                  if (attr == &dev_attr_act_mask)
+>     bcache: ignore pending signals when creating gc and allocator thread
+> 
+> because that definitely needs to be reverted.
+> 
 
-That looks the same thing as what created the warning, just more
-compact.
+Yes, please revert this commit. Thank you.
 
-I think the right thing to do is update bt to the one allocated from a
-successful blk_trace_setup_queue().
+-- 
+
+Coly Li
