@@ -2,128 +2,99 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D186C3F2D8
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A9DEC3F2CD
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:22:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C9412465E
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00B7A24673
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 01:22:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ZutnBTfm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726981AbgCCBIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Mar 2020 20:08:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35178 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726773AbgCCBIQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Mar 2020 20:08:16 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id A39B1AD3F;
-        Tue,  3 Mar 2020 01:08:14 +0000 (UTC)
+        id S1726752AbgCCBWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Mar 2020 20:22:44 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:41272 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726970AbgCCBWo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Mar 2020 20:22:44 -0500
+Received: by mail-pl1-f194.google.com with SMTP id t14so536676plr.8
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2020 17:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=WhEbWlEmBKMzZH7U4arFlyV9m+JED9PJgjCzvpK9LXQ=;
+        b=ZutnBTfm9noQCdOa74+CERuz4XFanQntuWQtkiUcGTpbm41K8u6QSpv/GfXI4d3FeU
+         bLRuMHvrTRcFBJTL8czu2dM4loKNWn/yQ1dPQH/tFWkqUHWi3rDyYt7aaOyokT9aZU1F
+         Yl3gEkNS26QZJV6PtRyBda5Eq+0Y3fimbRMh++KxMdDhXeuzxIP0F/GhygZKhCZ53BWh
+         LEkhZGFgVg/JmeGAy5eiifoOZHQs639InLCbHkU6VMuChhugVqhj0ShKH/wWw5LIeBun
+         WVu4d7t8aPFXbWOTdpBC+9coeXwlYRfcU6pSY5J9v622Q+gP3V6dAi57nGfkSqjyMoHS
+         1QGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WhEbWlEmBKMzZH7U4arFlyV9m+JED9PJgjCzvpK9LXQ=;
+        b=HfnZdlmVuRzI7Blyqw113MrN6ZFdoeARelGzoaBKRZXXK1hlho86vXcxv4faIoQXms
+         RIihoERAQObyo6loBqBZjao5/M70I1x5U5860GLmI/xvwUxc8DyV1gdyacOfd+oNu7B3
+         LpUjyPiBbg9uz86vPLCyY0XrqENBMLfbzKihRi7bVLnpGyjkoZ6sDymTxm/X2qwQ2Cfb
+         5YcT/IDwzS1TQ7zIAMze9YYs0XH/Go9vOscpQezey0Xd3m8nkAHHqYpAkAZUC/W36aza
+         zDSEelyio5ezJsT78q+zp/IAeuB2HlcVIaeetZrarPmuKwZ6uLsyIcHhLGgRTPwnH2qT
+         NmNg==
+X-Gm-Message-State: ANhLgQ0bwG1bQP4+B9/e+THEpw1T6ObnFzcI8bcXuaQVQ2zc9LOZ0xFR
+        jBOBs8S/LChComff/k/zZGeNbQ==
+X-Google-Smtp-Source: ADFU+vvjc8kH/pghWZM6ALz+P4Vb4hgqPjnWt2UwzIjPMkIz29sZFUY8hCTKtif0S1tbnc/LppnnlA==
+X-Received: by 2002:a17:90b:378d:: with SMTP id mz13mr1370790pjb.191.1583198563475;
+        Mon, 02 Mar 2020 17:22:43 -0800 (PST)
+Received: from ?IPv6:240e:82:3:5b12:940:b7e:a31d:58eb? ([240e:82:3:5b12:940:b7e:a31d:58eb])
+        by smtp.gmail.com with ESMTPSA id g19sm22044114pfh.134.2020.03.02.17.22.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2020 17:22:42 -0800 (PST)
 Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
  bcache_device_init()
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Oleg Nesterov <oleg@redhat.com>, Michal Hocko <mhocko@kernel.org>,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        hare@suse.de, mkoutny@suse.com
+To:     Coly Li <colyli@suse.de>, Michal Hocko <mhocko@kernel.org>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, hare@suse.de, mkoutny@suse.com,
+        Oleg Nesterov <oleg@redhat.com>, Christoph Hellwig <hch@lst.de>
 References: <20200302093450.48016-1-colyli@suse.de>
  <20200302093450.48016-2-colyli@suse.de>
- <20200302122748.GH4380@dhcp22.suse.cz> <20200302134919.GB9769@redhat.com>
- <48c6480a-3b26-fb7f-034d-923f9b8875f1@suse.de>
- <dfcd5b4d-592d-fe2a-5c25-ac22729b479e@kernel.dk>
- <2e4898f0-0c2b-9320-b925-456a85ebdea0@suse.de>
- <64c2a8e9-1dc9-f81d-1c11-d9c4e7e0fd2b@kernel.dk>
-From:   Coly Li <colyli@suse.de>
-Organization: SUSE Labs
-Message-ID: <c763699f-108a-f323-dbf1-235cf27b21e4@suse.de>
-Date:   Tue, 3 Mar 2020 09:08:08 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ <20200302122748.GH4380@dhcp22.suse.cz>
+ <29a1c9fa-46e2-af5f-9531-c25dbb0a3dca@suse.de>
+ <20200302134048.GK4380@dhcp22.suse.cz>
+ <cc759569-e79e-a1a0-3019-0e07dd6957cb@suse.de>
+ <20200302172840.GQ4380@dhcp22.suse.cz>
+ <5693a819-e323-3232-2048-413566c2254f@suse.de>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <495d18c6-3776-33c7-c48b-bb85b31c3a96@cloud.ionos.com>
+Date:   Tue, 3 Mar 2020 02:22:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <64c2a8e9-1dc9-f81d-1c11-d9c4e7e0fd2b@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5693a819-e323-3232-2048-413566c2254f@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/3/3 4:33 上午, Jens Axboe wrote:
-> On 3/2/20 10:32 AM, Coly Li wrote:
->> On 2020/3/3 1:19 上午, Jens Axboe wrote:
->>> On 3/2/20 10:16 AM, Coly Li wrote:
->>>> On 2020/3/2 9:49 下午, Oleg Nesterov wrote:
->>>>> On 03/02, Michal Hocko wrote:
->>>>>>
->>>>>> I cannot really comment on the bcache part because I am not familiar
->>>>>> with the code.
->>>>>
->>>>> same here...
->>>>>
->>>>>>> This patch calls flush_signals() in bcache_device_init() if there is
->>>>>>> pending signal for current process. It avoids bcache registration
->>>>>>> failure in system boot up time due to bcache udev rule timeout.
->>>>>>
->>>>>> this sounds like a wrong way to address the issue. Killing the udev
->>>>>> worker is a userspace policy and the kernel shouldn't simply ignore it.
->>>>>
->>>>> Agreed. If nothing else, if a userspace process has pending SIKILL then
->>>>> flush_signals() is very wrong.
->>>>>
->>>>>> Btw. Oleg, I have noticed quite a lot of flush_signals usage in the
->>>>>> drivers land and I have really hard time to understand their purpose.
->>>>>
->>>>> Heh. I bet most if not all users of flush_signals() are simply wrong.
->>>>>
->>>>>> What is the actual valid usage of this function?
->>>>>
->>>>> I thinks it should die... It was used by kthreads, but today
->>>>> signal_pending() == T is only possible if kthread does allow_signal(),
->>>>> and in this case it should probably use kernel_dequeue_signal().
->>>>>
->>>>>
->>>>> Say, io_sq_thread(). Why does it do
->>>>>
->>>>> 		if (signal_pending(current))
->>>>> 			flush_signals(current);
->>>>>
->>>>> afaics this kthread doesn't use allow_signal/allow_kernel_signal, this
->>>>> means that signal_pending() must be impossible even if this kthread sleeps
->>>>> in TASK_INTERRUPTIBLE state. Add Jens.
->>>>
->>>> Hi Oleg,
->>>>
->>>> Can I use disallow_signal() before the registration begins and use
->>>> allow_signal() after the registration done. Is this a proper way to
->>>> ignore the signal sent by udevd for timeout ?
->>>>
->>>> For me the above method seems to solve my problem too.
->>>
->>> Really seems to me like you're going about this all wrong. The issue is
->>> that systemd is killing the startup, because it's taking too long. Don't
->>> try and work around that, ensure the timeout is appropriate.
->>>
+Hi Coly,
+
+On 3/2/20 6:47 PM, Coly Li wrote:
+>> I have a vague recollection that there are mutlitple timeouts and
+>> setting only some is not sufficient.
 >>
->> Copied. Then let me try how to make event_timeout works on my udevd. If
->> it works without other side effect, I will revert existing
->> flush_signals() patches.
-> 
-> Thanks, this one, right?
-> 
-> commit 0b96da639a4874311e9b5156405f69ef9fc3bef8
-> Author: Coly Li <colyli@suse.de>
-> Date:   Thu Feb 13 22:12:05 2020 +0800
-> 
->     bcache: ignore pending signals when creating gc and allocator thread
-> 
-> because that definitely needs to be reverted.
-> 
+> Let me try out how to extend udevd timeout.
 
-Yes, please revert this commit. Thank you.
+Not sure if this link [1] helps or not, just FYI.
 
--- 
+[1] https://github.com/jonathanunderwood/mdraid-safe-timeouts
 
-Coly Li
+Thanks,
+Guoqing
