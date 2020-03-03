@@ -2,127 +2,83 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D864BC3F2CD
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 14:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71214C3F2D1
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 16:03:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA54220838
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 14:49:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPGoMhDg"
+	by mail.kernel.org (Postfix) with ESMTP id 3944F20CC7
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 16:03:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583251392;
+	bh=mAPL8cqY6aXXbfCNzxczZ75FlqrGyHFN6d6MOwnBNRQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=FId/DYwV0/xITKolng+rY9JeCg8j71NYMee+Hb8MMi94j2j/2dFLM+tQIF3tRssi1
+	 VezjVqxKpnVyAv2EfjSpJtrPd3/VJqKWkT5t0PaTSeKQ+J/q1udZh3QacbEsdIOd/5
+	 JOVHAhYm1kAorpMt82JYYYwhJp9ITIXMI2p7wjpw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729633AbgCCOta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 09:49:30 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34212 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729572AbgCCOt3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Mar 2020 09:49:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583246969;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZAMz9trEBbggImBzI8TwjqrfBpm7beP6aWAuQ0+PcZA=;
-        b=ZPGoMhDg8GOXz6SKNnzZmOJ5cPWrhyRoDnmBE8rDNa5gM6jptzUCIKjlAPgMF/SN2TZ5vX
-        0M5thhMSvaiPAYtLDU2UU0yZ5721nG9obZBjdnScImUl3PSNuHF/R5KQcWi/hoeR6Ixs52
-        QwB9IE/SKcyNvd/K9c/AMmIu7hUsi9k=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-i58ipQ9qODSWrEiQQOuHZA-1; Tue, 03 Mar 2020 09:49:27 -0500
-X-MC-Unique: i58ipQ9qODSWrEiQQOuHZA-1
-Received: by mail-qv1-f72.google.com with SMTP id o18so2198315qvk.9
-        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2020 06:49:27 -0800 (PST)
+        id S1730068AbgCCQDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 11:03:11 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50658 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729680AbgCCQDL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 11:03:11 -0500
+Received: by mail-wm1-f67.google.com with SMTP id a5so3886288wmb.0;
+        Tue, 03 Mar 2020 08:03:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ZAMz9trEBbggImBzI8TwjqrfBpm7beP6aWAuQ0+PcZA=;
-        b=fqrVDKzi5rTfR0XOnAPYfWEE+xBL/bLctE2fgQ3E/jse7K+pjvEid6nAaZSqOnNWln
-         SnaMItfpDB/o0JXb9nRObAeRKMADBFBdqu4rPdwARL1cFm6Hg8kMCkjstnMEUvfvOt4Y
-         iOJM/AGllOFhTnRYpttVl/AoSR2yI7HFYom6FkAQa7Mph/MNcNnbEjhWahUMxDzW8CDW
-         slCxI1uOYRC3MiQW0qx8ZgUSHfXB3rlDVdFhbJKOiZDdEsVmUXwNFQicyWdN7xJXO5qq
-         6SYUliLtq1ypbxT6RfaCGHuuW+TGdonn7Jc6/sqpE+GD44VFYuhTrgBclJENCui+4cLX
-         Xl5g==
-X-Gm-Message-State: ANhLgQ3g2tHQ6wpxyJsii+4voRCM3yLnjcFHhQ9GqZYnx/T8Fm+5hV5Y
-        iiL+i/hmjOSKiI669iR+wm9oxCaXJXpZwYbgLuCy1WTli7nd8Uyd6nbwlqmI2Yeua11E9n73oXt
-        GiD7B399/QU290mB438kLijo=
-X-Received: by 2002:a0c:f692:: with SMTP id p18mr4372494qvn.61.1583246967038;
-        Tue, 03 Mar 2020 06:49:27 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsyjBrEg2YMLlS4Ny5GGY4zKEspwxCc/KeO/4ULBZu3vu5BQGOxB/vGW3jXL4KM69SWf9Bpkw==
-X-Received: by 2002:a0c:f692:: with SMTP id p18mr4372474qvn.61.1583246966856;
-        Tue, 03 Mar 2020 06:49:26 -0800 (PST)
-Received: from redhat.com (bzq-79-180-48-224.red.bezeqint.net. [79.180.48.224])
-        by smtp.gmail.com with ESMTPSA id g8sm3079010qke.1.2020.03.03.06.49.23
+        bh=6cZqu3E9qwQ8IPoe9SjNtyIoE9lo8mbH7ak38NmV4nA=;
+        b=UlwXEAXHEK7drZROOZtj6cF8p55t6O1hz4h/pSYNsYnuMOdEJIhZF5a/7VcaEhK3GZ
+         PATbZAFZTAUblFxs9201+urb8mjbRFcdWv9YzLWPi4hK7NJAj5TEd9d3cIA78Gfl/40M
+         Oefbzqs1Ade6wTMq4tiAduTcCO0PHIl+oQtGPv9Ct3R9JnIDX/UpvrtQS51QBp+OUgc2
+         0Ppr/Jf5FhZUYv7CONCpZ5y++wiv9dL4TKanlfpFMK/kyzDH4mpf2Uu5FQ2xuqoHjHrY
+         xe5jsem9efb2fAqly07QyS+A3CQxmpAzchOO5fpsgxv2gkxpSyUfcHyvsng+A3jyYjOV
+         +2nQ==
+X-Gm-Message-State: ANhLgQ36tj6XalON0uj+ihgXfCUG6oHXU8VXfGBjEFrKj/DcqapLTFRk
+        QeDzz+pQLx7CHBrVVNK0cNf/4qDfS6c=
+X-Google-Smtp-Source: ADFU+vtAui0vb0XSCCDXURHL23TZuPcyxH8PWxzLV8B/zZLm+upolIJdf0K8iOtdvHs+UeyJqXROKw==
+X-Received: by 2002:a05:600c:21da:: with SMTP id x26mr5164698wmj.66.1583251389685;
+        Tue, 03 Mar 2020 08:03:09 -0800 (PST)
+Received: from localhost (ip-37-188-163-134.eurotel.cz. [37.188.163.134])
+        by smtp.gmail.com with ESMTPSA id f17sm13788616wrm.3.2020.03.03.08.03.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2020 06:49:26 -0800 (PST)
-Date:   Tue, 3 Mar 2020 09:49:21 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-Subject: Re: [PATCH 0/2] virtio-blk: improve handling of DMA mapping failures
-Message-ID: <20200303094909-mutt-send-email-mst@kernel.org>
-References: <20200213123728.61216-1-pasic@linux.ibm.com>
- <20200303151252.59d45e86.pasic@linux.ibm.com>
+        Tue, 03 Mar 2020 08:03:08 -0800 (PST)
+Date:   Tue, 3 Mar 2020 17:03:07 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Oleg Nesterov <oleg@redhat.com>
+Cc:     Coly Li <colyli@suse.de>, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        hare@suse.de, mkoutny@suse.com
+Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
+ bcache_device_init()
+Message-ID: <20200303160307.GI4380@dhcp22.suse.cz>
+References: <20200302093450.48016-1-colyli@suse.de>
+ <20200302093450.48016-2-colyli@suse.de>
+ <20200302122748.GH4380@dhcp22.suse.cz>
+ <20200302134919.GB9769@redhat.com>
+ <20200303080544.GW4380@dhcp22.suse.cz>
+ <20200303121918.GA27520@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200303151252.59d45e86.pasic@linux.ibm.com>
+In-Reply-To: <20200303121918.GA27520@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 03, 2020 at 03:12:52PM +0100, Halil Pasic wrote:
-> On Thu, 13 Feb 2020 13:37:26 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > Two patches are handling new edge cases introduced by doing DMA mappings
-> > (which can fail) in virtio core.
-> > 
-> > I stumbled upon this while stress testing I/O for Protected Virtual
-> > Machines. I deliberately chose a tiny swiotlb size and have generated
-> > load with fio. With more than one virtio-blk disk in use I experienced
-> > hangs.
-> > 
-> > The goal of this series is to fix those hangs.
-> > 
-> > Halil Pasic (2):
-> >   virtio-blk: fix hw_queue stopped on arbitrary error
-> >   virtio-blk: improve virtqueue error to BLK_STS
-> > 
-> >  drivers/block/virtio_blk.c | 17 ++++++++++++-----
-> >  1 file changed, 12 insertions(+), 5 deletions(-)
-> > 
-> > 
-> > base-commit: 39bed42de2e7d74686a2d5a45638d6a5d7e7d473
-> 
-> ping
-> 
-> Hi Michael, hi Jason,
-> 
-> I got some favorable reviews for this, but AFAIK I got nothing form the
-> maintainers yet.
-> 
-> Is some of you going to pick these?
-> 
-> Regards,
-> Halil
+On Tue 03-03-20 13:19:18, Oleg Nesterov wrote:
+[...]
+> but I am not sure this optmization makes sense.
 
-I've queued this, thanks!
+I would much rather start with a clarification on what should be use
+what shouldn't. Because as of now, people tend to copy patterns which
+are broken or simply do not make any sense at all.
 
+-- 
+Michal Hocko
+SUSE Labs
