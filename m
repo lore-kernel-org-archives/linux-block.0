@@ -2,139 +2,128 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC22C3F2C6
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 05:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3167CC3F2C6
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 07:22:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B969215A4
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 05:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E8F621739
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 07:22:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725897AbgCCF5W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 00:57:22 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:52095 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725845AbgCCF5W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 00:57:22 -0500
-Received: by mail-pj1-f67.google.com with SMTP id l8so858112pjy.1;
-        Mon, 02 Mar 2020 21:57:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=yo+dRABTent3gLV01eNpbbUuwD5LriWTxo0eVCxvitI=;
-        b=bYdYb+fOmZungJVGXjhM9Igk6TLCVJm1RKob39vvvMvpnBmTsT8aZXAJ7COGJxGHfC
-         WMInzof4uBn1wVSZTSgtfUI9NL3ksfCliSviz+etQ4FU1aml8aoTdacKCQmTHSyXPRJg
-         6YHRQWbhALPEUdnPqnT1Bwz3je+4JjHSJCqiVrSS5hnwYnP/0u9MbNK1KHbLFGYYhjPZ
-         BqNTVywRDyonErL5KVR4koZv40PB7GSFWOkmRA2nB9kNExECeNUAqg9ej00kFVO66v4p
-         3FADuT/HQx/6HcJz/9VLcTmS6vWZtPUa5E/zx+TjAIifen/eoQra/AR/4TgAWzVYJrot
-         KRBw==
-X-Gm-Message-State: ANhLgQ1vZFskPosf1cwiUtlTFr3X4uw0pnSnPQev0BqfkXrdJ4IUb7Bh
-        tXPoH/IzDnp/kjocL/d4yTc=
-X-Google-Smtp-Source: ADFU+vuLo+fbJdzafAO81GBOO8Np+dvuSM0iWkucvcFxJeUnfaS5noqjbikr/TtXpSYc5OnHV4txYQ==
-X-Received: by 2002:a17:90a:230d:: with SMTP id f13mr2307642pje.128.1583215041029;
-        Mon, 02 Mar 2020 21:57:21 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:5909:8e52:fd69:e98d? ([2601:647:4000:d7:5909:8e52:fd69:e98d])
-        by smtp.gmail.com with ESMTPSA id b15sm22930323pft.58.2020.03.02.21.57.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2020 21:57:19 -0800 (PST)
-Subject: Re: [PATCH v9 20/25] block/rnbd: server: main functionality
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>, rpenyaev@suse.de,
-        pankaj.gupta@cloud.ionos.com
-References: <20200221104721.350-1-jinpuwang@gmail.com>
- <20200221104721.350-21-jinpuwang@gmail.com>
- <33864f54-62af-cb5f-45fa-55a283dcd434@acm.org>
- <CAHg0HuwvdYNB=C4yi4_tXeOWkj9rjTsV0B59Ea+_axLAuZ98Zg@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <a44246c5-bfc0-a95c-eeb8-8183fc858574@acm.org>
-Date:   Mon, 2 Mar 2020 21:57:17 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727528AbgCCHWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 02:22:23 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59622 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727340AbgCCHWX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Mar 2020 02:22:23 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 0755FB1C5;
+        Tue,  3 Mar 2020 07:22:21 +0000 (UTC)
+Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
+ bcache_device_init()
+To:     Coly Li <colyli@suse.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Oleg Nesterov <oleg@redhat.com>, Michal Hocko <mhocko@kernel.org>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        mkoutny@suse.com
+References: <20200302093450.48016-1-colyli@suse.de>
+ <20200302093450.48016-2-colyli@suse.de>
+ <20200302122748.GH4380@dhcp22.suse.cz> <20200302134919.GB9769@redhat.com>
+ <48c6480a-3b26-fb7f-034d-923f9b8875f1@suse.de>
+ <dfcd5b4d-592d-fe2a-5c25-ac22729b479e@kernel.dk>
+ <2e4898f0-0c2b-9320-b925-456a85ebdea0@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <3e6b36e3-72eb-30e4-c99d-40665ea31725@suse.de>
+Date:   Tue, 3 Mar 2020 08:22:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAHg0HuwvdYNB=C4yi4_tXeOWkj9rjTsV0B59Ea+_axLAuZ98Zg@mail.gmail.com>
+In-Reply-To: <2e4898f0-0c2b-9320-b925-456a85ebdea0@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-03-02 01:58, Danil Kipnis wrote:
-> On Sun, Mar 1, 2020 at 3:58 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On 3/2/20 6:32 PM, Coly Li wrote:
+> On 2020/3/3 1:19 上午, Jens Axboe wrote:
+[ ..
+>> What if someone else tried to kill the startup? It'd be pretty
+>> frustrating that it was impossible, just because signals were blocked or
+>> flushed. The assumption that systemd is the ONLY task that would want to
+>> kill it is flawed.
 >>
->> On 2020-02-21 02:47, Jack Wang wrote:
->>> +static int dev_search_path_set(const char *val, const struct kernel_param *kp)
->>> +{
->>> +     char *dup;
->>> +
->>> +     if (strlen(val) >= sizeof(dev_search_path))
->>> +             return -EINVAL;
->>> +
->>> +     dup = kstrdup(val, GFP_KERNEL);
->>> +
->>> +     if (dup[strlen(dup) - 1] == '\n')
->>> +             dup[strlen(dup) - 1] = '\0';
->>> +
->>> +     strlcpy(dev_search_path, dup, sizeof(dev_search_path));
->>> +
->>> +     kfree(dup);
->>> +     pr_info("dev_search_path changed to '%s'\n", dev_search_path);
->>> +
->>> +     return 0;
->>> +}
->>
->> It is not necessary in this function to do memory allocation. Something
->> like the following (untested) code should be sufficient:
->>
->>         const char *p = strrchr(val, '\n') ? : val + strlen(val);
->>
->>         snprintf(dev_search_path, sizeof(dev_search_path), "%.*s",
->>                 (int)(p - val), val);
->>
->> How are concurrent attempts to change dev_search_path serialized?
->>
-> Hi Bart,
 > 
-> thanks a lot for your comments. Will try to avoid the allocation. The
-> module parameter is readonly. It's only set during module init - I
-> guess we don't need to handle concurrent access?
+> Indeed now the bcache registration can not be killed. I guess it is
+> because the mutex lock held during the metadata checking.
+> Sure I will look at how to extend udevd timeout value now, and ask for
+> help later.
+> 
+Please check if the bcache registration really needs to be synchronous.
+What exactly do you gain from having a return value (which, seeing
+that's a simple write() to a sysfs attribute, is probably ignored anyway)?
+To my understanding, the bcache registration process creates the actual
+bcache device, which in itself will generate a udev event.
+So the existence of the bcache device will already signal a successful
+completion of the registration process.
+Hence it should be possible to shift the actual bcache registration to a
+kworker, and have the 'write()' call completed after schedule_work() (or
+equivalents) are called.
+That would circumvent the problem, no?
 
-Right, if this function is only called during module init there is no
-need to worry about concurrency.
+Cheers,
 
-Bart.
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
