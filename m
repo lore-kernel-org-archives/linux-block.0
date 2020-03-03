@@ -2,80 +2,123 @@ Return-Path: <SRS0=QBb8=4U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C54C3F2CD
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 07:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB07C3F2CD
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 08:05:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24D2C21741
-	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 07:37:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 945D9215A4
+	for <linux-block@archiver.kernel.org>; Tue,  3 Mar 2020 08:05:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583222748;
+	bh=Gsnkwl68GRRuE02ktAwqg4Iwgud/T+DNQDJklBNTAWE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vhyCywxHf1Zy0yJpUiItEH1gqdamr7r1E830DeyXN9P2a3C80nSRhUimSIQL1mzLn
+	 zcDNXF6us8GFP1Zip7NQnLh8+L/lz9tzYSO3RWJLuj09Skc7NJyx405Fl/odSDx9yw
+	 fbhtdioDdyayjMLAGJ+Rb65CjGdSKUT6p/jVSpsQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725765AbgCCHhE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 02:37:04 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:40497 "EHLO
-        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725440AbgCCHhE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 02:37:04 -0500
-X-Originating-IP: 84.44.14.226
-Received: from nexussix.ar.arcelik (unknown [84.44.14.226])
-        (Authenticated sender: cengiz@kernel.wtf)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 99C28FF805;
-        Tue,  3 Mar 2020 07:37:00 +0000 (UTC)
-From:   Cengiz Can <cengiz@kernel.wtf>
-To:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Cengiz Can <cengiz@kernel.wtf>
-Subject: [PATCH] blktrace: fix dereference after null check
-Date:   Tue,  3 Mar 2020 10:33:59 +0300
-Message-Id: <20200303073358.57799-1-cengiz@kernel.wtf>
-X-Mailer: git-send-email 2.25.1
+        id S1727709AbgCCIFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 03:05:48 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39317 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727659AbgCCIFr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 03:05:47 -0500
+Received: by mail-wm1-f66.google.com with SMTP id j1so360188wmi.4;
+        Tue, 03 Mar 2020 00:05:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VN8h+lNVWgJupwZ7sOqHZQrZrplobWHWydFd7tUhWVQ=;
+        b=JW1dmdeTaYEYlh/4d5poi49UMxcf63snIivKpHEDycZW8dp2PVzpiBH46xdKpZ+9M8
+         cR91g2QYT1HcVCMABi46x5h16F7sALD1THnjVd8EAlF5f7GEwfxveeJHENSVZFid3Sjk
+         qUB9Ye2k6ct7tvfWosd5DIgYSyNcfuCMjT6sUhlixs3a3Ke0AmcngBsYlPFonacBzRAJ
+         ir55DjjGVjPQMxpg8UZArUWoffZXabU1gUT9VhURi6NvmEkScSRVic9OxRmZlTrg8HJ3
+         +7Z47hjm2OOg11z0xE2X4vADjkWLJV8A8oziDhdesK0RIoxbiYqd1i/mDFpuAFUViLay
+         fGMg==
+X-Gm-Message-State: ANhLgQ1yjDsVEfethzOjRUBoWhWhQntUWLn47dPIIMxfieL6n9PNyQDh
+        uWR1/OYjWqcpAYN7QUDu/Kq3R0pG
+X-Google-Smtp-Source: ADFU+vvLJyjWPR1wVF+Ou2sWSs56ROHDul5N7S06Nse67CGwupqRTW4bBDR4X3SIU6KCrhBqlTJYnw==
+X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr3066952wmi.118.1583222746120;
+        Tue, 03 Mar 2020 00:05:46 -0800 (PST)
+Received: from localhost (prg-ext-pat.suse.com. [213.151.95.130])
+        by smtp.gmail.com with ESMTPSA id n3sm2857589wmc.27.2020.03.03.00.05.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2020 00:05:45 -0800 (PST)
+Date:   Tue, 3 Mar 2020 09:05:44 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Oleg Nesterov <oleg@redhat.com>
+Cc:     Coly Li <colyli@suse.de>, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        hare@suse.de, mkoutny@suse.com
+Subject: Re: [PATCH 1/2] bcache: ignore pending signals in
+ bcache_device_init()
+Message-ID: <20200303080544.GW4380@dhcp22.suse.cz>
+References: <20200302093450.48016-1-colyli@suse.de>
+ <20200302093450.48016-2-colyli@suse.de>
+ <20200302122748.GH4380@dhcp22.suse.cz>
+ <20200302134919.GB9769@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200302134919.GB9769@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There was a recent change in blktrace.c that added a RCU protection to
-`q->blk_trace` in order to fix a use-after-free issue during access.
+On Mon 02-03-20 14:49:19, Oleg Nesterov wrote:
+> On 03/02, Michal Hocko wrote:
+> >
+> > I cannot really comment on the bcache part because I am not familiar
+> > with the code.
+> 
+> same here...
+> 
+> > > This patch calls flush_signals() in bcache_device_init() if there is
+> > > pending signal for current process. It avoids bcache registration
+> > > failure in system boot up time due to bcache udev rule timeout.
+> >
+> > this sounds like a wrong way to address the issue. Killing the udev
+> > worker is a userspace policy and the kernel shouldn't simply ignore it.
+> 
+> Agreed. If nothing else, if a userspace process has pending SIKILL then
+> flush_signals() is very wrong.
+> 
+> > Btw. Oleg, I have noticed quite a lot of flush_signals usage in the
+> > drivers land and I have really hard time to understand their purpose.
+> 
+> Heh. I bet most if not all users of flush_signals() are simply wrong.
+> 
+> > What is the actual valid usage of this function?
+> 
+> I thinks it should die...
 
-However the change missed an edge case that can lead to dereferencing of
-`bt` pointer even when it's NULL:
+Can we simply deprecate it and add a big fat comment explaning why this
+is wrong interface to use?
 
-```
-        bt->act_mask = value; // bt can still be NULL here
-```
-
-Added a reassignment into the NULL check block to fix the issue.
-
-Fixes: c780e86dd48 ("blktrace: Protect q->blk_trace with RCU")
-
-Signed-off-by: Cengiz Can <cengiz@kernel.wtf>
----
- Huge thanks goes to Steven Rostedt for his assistance.
-
- kernel/trace/blktrace.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 4560878f0bac..29ea88f10b87 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1896,8 +1896,10 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	}
-
- 	ret = 0;
--	if (bt == NULL)
-+	if (bt == NULL) {
- 		ret = blk_trace_setup_queue(q, bdev);
-+		bt = q->blk_trace;
-+	}
-
- 	if (ret == 0) {
- 		if (attr == &dev_attr_act_mask)
---
-2.25.1
-
+So what about this?
+diff --git a/kernel/signal.c b/kernel/signal.c
+index 9ad8dea93dbb..8a895e565e84 100644
+--- a/kernel/signal.c
++++ b/kernel/signal.c
+@@ -465,7 +465,13 @@ void flush_sigqueue(struct sigpending *queue)
+ }
+ 
+ /*
+- * Flush all pending signals for this kthread.
++ * Flush all pending signals for this kthread. Please note that this interface
++ * shouldn't be used and in fact it is DEPRECATED.
++ * Existing users should be double checked because most of them are likely
++ * obsolete. Kernel threads are not on the receiving end of signal delivery
++ * unless they explicitly request that by allow_signal() and in that case
++ * flush_signals is almost always a bug because signal should be processed
++ * by kernel_dequeue_signal rather than dropping them on the floor.
+  */
+ void flush_signals(struct task_struct *t)
+ {
+-- 
+Michal Hocko
+SUSE Labs
