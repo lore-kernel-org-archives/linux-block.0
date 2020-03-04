@@ -2,175 +2,72 @@ Return-Path: <SRS0=k6TP=4V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5319FC3F2CD
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 11:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE284C3F2D7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 11:07:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AE5621739
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 11:03:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WpK3G4QK"
+	by mail.kernel.org (Postfix) with ESMTP id 982B521739
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 11:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387844AbgCDLDp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 06:03:45 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40990 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387772AbgCDLDp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 06:03:45 -0500
-Received: by mail-io1-f68.google.com with SMTP id m25so1891704ioo.8
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2020 03:03:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Q0MNUugxNOB9PNZNnFXJRnN79OSV2TqgeUFSgJz6T10=;
-        b=WpK3G4QKaz2Am0sHfilC2HnOPlllxn5TFzlitbR5g8sXe0WK3/i0FwvTcLsa0BXPPc
-         kkZjX+og6wYXVy4P5psMUhF8QyUtKUQHRtd+L9Qc5C7alUPzjOH0Nvf5Y6f+OQPCrzcB
-         D5fCK371R7XObq1bj6FhhXmCkPCOzSt3MckefTXeyA4p+4PxT6Y76NMxmwwdfbPGaxzj
-         NUmeGMym2GaWTbM6ykLsk8Fme3vZq7bBu+vWZ4TQv81bYsff0YOqEv0zQfhJQw/iUyP/
-         LFisWKg5W4/h11xEHHioHXvCNu24xQHlDSempv0Xb4LJS9eMLFL06aAwiKWZNUSVQgWr
-         0iIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q0MNUugxNOB9PNZNnFXJRnN79OSV2TqgeUFSgJz6T10=;
-        b=s0T/YGVURkrhi/4mfSYZfMncChzigieqiBKFv51dvxg+nndpgb7vX/mHZCiIxN89DM
-         XpGr5fju4buclTLUoBQnwO+9lOmHi00GHKW0dXop2nvU1iv0/yCRZTYu1bEUV3cBnNLu
-         cpeGAh3QZhTGZ0D1T8OhuWV2hdtNwq/NFtE+G9dBjUjAZe+KG8CVckZ1JoecH8V+TKod
-         Fgckqih+T8qkVIUU626treIDczPiD1scpVcEROUHsPiVl5a1A/szkpHNuDPZgg6nbeYG
-         OwnJbA/wl+aFCUNtr0rros2JVq4FWZ9cemp8ZqMie8W0vxGaKiITgr8lEdJDdP1/diLG
-         Mj+g==
-X-Gm-Message-State: ANhLgQ2igVQxalgq6yiI3PAajEI+FtUYrylwOxYvKZET23XOhx1g/bSI
-        LqLq2f+pQVGNuvsyYPl3XxCnyZRvZewZy6AQvVmxrg==
-X-Google-Smtp-Source: ADFU+vsbS9cxjs/JjZOgEB8mC4yLiaZdNxcUXVKkNgXvHKBTWiphajRHf7urDUhrXldgWHliP1tpFAICTcZwCNPnxmE=
-X-Received: by 2002:a05:6602:1508:: with SMTP id g8mr1748973iow.22.1583319823331;
- Wed, 04 Mar 2020 03:03:43 -0800 (PST)
+        id S2388030AbgCDLHU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 06:07:20 -0500
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:43609 "EHLO
+        relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387774AbgCDLHU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 06:07:20 -0500
+Received: from webmail.gandi.net (webmail14.sd4.0x35.net [10.200.201.14])
+        (Authenticated sender: cengiz@kernel.wtf)
+        by relay5-d.mail.gandi.net (Postfix) with ESMTPA id BBC721C0018;
+        Wed,  4 Mar 2020 11:07:17 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-11-jinpuwang@gmail.com>
- <20200303113740.GM121803@unreal> <CAMGffEmEeK37QCr8uiABjOrC-48nETTv0fxHWE0S0s=j6bPbGQ@mail.gmail.com>
- <20200303165906.GO121803@unreal>
-In-Reply-To: <20200303165906.GO121803@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 4 Mar 2020 12:03:32 +0100
-Message-ID: <CAMGffEk9LSgVQtzmBHiFYdnqgcQPXk_TV5W8pKyU5fy=ap0dTg@mail.gmail.com>
-Subject: Re: [PATCH v9 10/25] RDMA/rtrs: server: main functionality
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 04 Mar 2020 14:07:17 +0300
+From:   Cengiz Can <cengiz@kernel.wtf>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ingo Molnar <mingo@redhat.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blktrace: fix dereference after null check
+In-Reply-To: <20200303091436.2e7ab191@gandalf.local.home>
+References: <20200303073358.57799-1-cengiz@kernel.wtf>
+ <20200303091436.2e7ab191@gandalf.local.home>
+Message-ID: <950cfb6c63a0ab33ff2b4bb33cfa3567@kernel.wtf>
+X-Sender: cengiz@kernel.wtf
+User-Agent: Roundcube Webmail/1.3.8
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 3, 2020 at 5:59 PM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Tue, Mar 03, 2020 at 05:41:27PM +0100, Jinpu Wang wrote:
-> > On Tue, Mar 3, 2020 at 12:37 PM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > On Fri, Feb 21, 2020 at 11:47:06AM +0100, Jack Wang wrote:
-> > > > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > >
-> > > > This is main functionality of rtrs-server module, which accepts
-> > > > set of RDMA connections (so called rtrs session), creates/destroys
-> > > > sysfs entries associated with rtrs session and notifies upper layer
-> > > > (user of RTRS API) about RDMA requests or link events.
-> > > >
-> > > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > > ---
-> > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 2164 ++++++++++++++++++++++++
-> > > >  1 file changed, 2164 insertions(+)
-> > > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > >
-> > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > > new file mode 100644
-> > > > index 000000000000..e60ee6dd675d
-> > > > --- /dev/null
-> > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > > > @@ -0,0 +1,2164 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > > +/*
-> > > > + * RDMA Transport Layer
-> > > > + *
-> > > > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> > > > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> > > > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> > > > + */
-> > > > +
-> > > > +#undef pr_fmt
-> > > > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-> > > > +
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/mempool.h>
-> > > > +
-> > > > +#include "rtrs-srv.h"
-> > > > +#include "rtrs-log.h"
-> > > > +
-> > > > +MODULE_DESCRIPTION("RDMA Transport Server");
-> > > > +MODULE_LICENSE("GPL");
-> > > > +
-> > > > +/* Must be power of 2, see mask from mr->page_size in ib_sg_to_pages() */
-> > > > +#define DEFAULT_MAX_CHUNK_SIZE (128 << 10)
-> > > > +#define DEFAULT_SESS_QUEUE_DEPTH 512
-> > > > +#define MAX_HDR_SIZE PAGE_SIZE
-> > > > +#define MAX_SG_COUNT ((MAX_HDR_SIZE - sizeof(struct rtrs_msg_rdma_read)) \
-> > > > +                   / sizeof(struct rtrs_sg_desc))
-> > > > +
-> > > > +/* We guarantee to serve 10 paths at least */
-> > > > +#define CHUNK_POOL_SZ 10
-> > > > +
-> > > > +static struct rtrs_rdma_dev_pd dev_pd;
-> > > > +static mempool_t *chunk_pool;
-> > > > +struct class *rtrs_dev_class;
-> > > > +
-> > > > +static int __read_mostly max_chunk_size = DEFAULT_MAX_CHUNK_SIZE;
-> > > > +static int __read_mostly sess_queue_depth = DEFAULT_SESS_QUEUE_DEPTH;
-> > > > +
-> > > > +static bool always_invalidate = true;
-> > > > +module_param(always_invalidate, bool, 0444);
-> > > > +MODULE_PARM_DESC(always_invalidate,
-> > > > +              "Invalidate memory registration for contiguous memory regions before accessing.");
-> > > > +
-> > > > +module_param_named(max_chunk_size, max_chunk_size, int, 0444);
-> > > > +MODULE_PARM_DESC(max_chunk_size,
-> > > > +              "Max size for each IO request, when change the unit is in byte (default: "
-> > > > +              __stringify(DEFAULT_MAX_CHUNK_SIZE) "KB)");
-> > > > +
-> > > > +module_param_named(sess_queue_depth, sess_queue_depth, int, 0444);
-> > > > +MODULE_PARM_DESC(sess_queue_depth,
-> > > > +              "Number of buffers for pending I/O requests to allocate per session. Maximum: "
-> > > > +              __stringify(MAX_SESS_QUEUE_DEPTH) " (default: "
-> > > > +              __stringify(DEFAULT_SESS_QUEUE_DEPTH) ")");
-> > >
-> > > We don't like module parameters in the RDMA.
-> > Hi Leon,
-> >
-> > These paramters are affecting resouce usage/performance, I think would
-> > be good to have them as module parameters,
-> > so admin could choose based their needs.
->
-> It is premature optimization before second user comes, also it is
-> based on the assumption that everyone uses modules, which is not true.
-The idea to have module parameters is to cover more use cases, IMHO.
+On 2020-03-03 17:14, Steven Rostedt wrote:
+> 
+> Note, you should probably add a note in your change log that this issue 
+> was
+> found by Coverity. Sometimes static analyzers have a tag of some kind 
+> that
+> they would like patches that fix the issues they discover to be in the
+> change log. This way they can track the fixes that are found by the 
+> tool.
+> 
 
-Even you builtin the module to the kernel, you can still change the
-module parameters
-by passing the "moduls_name.paramters" in kernel command line, eg:
-kvm.nx_huge_pages=true
->
-> Thanks
-Thanks
+I have added the Coverity issue ID and relevant notes to mark it. 
+Thanks.
+
+> 
+> As I said in the other email, the above assignment still needs RCU
+> annotation:
+> 
+> 		bt = rcu_dereference_protected(q->blk_trace,
+> 				lockdep_is_held(&q->blk_trace_mutex));
+
+I missed that. Thanks for reminding. TIL.
+
+Please check PATCH-v2.
+
+-- 
+Cengiz Can
+@cengiz_io
