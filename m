@@ -2,100 +2,140 @@ Return-Path: <SRS0=k6TP=4V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B85C3F2D1
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E182C3F2D7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7285421D56
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583341546;
-	bh=1+DglH2uThysUvnGM8zZCA2dvGMU+M93V9n272VCqSQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=No9lidRJBERBjJ5LPWIXBAiJXRNzE3ISj0T1IMilZzIJv7WXpvSj0d3HvkRSApiVs
-	 hzISf3Px+zyrmAtUdImIbAO4GlqzTtVopETPayJpst3+BOmCvC6aPr/i36uVSAAhwH
-	 5b+oieVUSCb+XODB0EU25klq4FEOcdsmJcRt1izg=
+	by mail.kernel.org (Postfix) with ESMTP id E555921775
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:08:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GUJPwqEx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727137AbgCDRFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 12:05:46 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:39262 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726561AbgCDRFp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 12:05:45 -0500
-Received: by mail-qt1-f195.google.com with SMTP id e13so1903841qts.6;
-        Wed, 04 Mar 2020 09:05:45 -0800 (PST)
+        id S1726748AbgCDRIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 12:08:39 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:37149 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729750AbgCDRIj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 12:08:39 -0500
+Received: by mail-pl1-f195.google.com with SMTP id b8so1277664plx.4
+        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2020 09:08:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rm/wY9qTRCYlSnYi7ajYS41w3MJHXh7lvSvmNYrIYmY=;
-        b=lf2V1wlJt8iXzR7OvwB4+2OOnWEpUGUjD33V+3a3QzABSqB2wUIYpXrNVNACOJ4Qdn
-         1BhXqlhH7TJLGETDcDQ/jgsz97xoVEs80+CkKXxndvYQnIfoMWvDjnYCJsO8FaKAgQy+
-         oR9V/M8IpiCK1U9MMsaGvhn/zsjweFjovgRBnVpDc6arygzLlm2PMkUVvKYNQSw6NieJ
-         RBvLIqWXt+aD1rcpe6CuZjGG6SixxA3rH0FFtRxZrC+DR10cHn3T0KV4otNJ2qI8m6QD
-         bw7y1rdA3mZAks9//JR4NxMZh5LdKXtu5jPWM7cEdBf6i83XDYextg4LrcJtTpYGrM5Z
-         vlCA==
+        d=chromium.org; s=google;
+        h=mime-version:content-transfer-encoding:in-reply-to:references
+         :subject:from:cc:to:date:message-id:user-agent;
+        bh=8GdpXC83WnCwjUZvBp/s6/1q0gpiaE1ET3LFQ1vYx80=;
+        b=GUJPwqExB2W8m+wmfFej1Wu0jR+PqqrCLePScvd+ZRdg7ISZyrv04lA8ojqKla2HR4
+         OXxi9a/E+2lNMDcu4q1y4jtP/+Yg6bNBjIqn8+1mXHmeBiq4ROu6dcgGVofhgA9zC5Bd
+         RkduMTmCkRF8RZeOmAm5CVUtKSEbIH5S20aV4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=rm/wY9qTRCYlSnYi7ajYS41w3MJHXh7lvSvmNYrIYmY=;
-        b=aqp4lTFMRTv005sY3TOrjTmAAvD2fkeE+25GfpYBVPUIh/QgsZupEXx4r6gOCtqdDc
-         MLtJtH6a/jMVEfrdGus9kby6ILJrWu3nX7zJ7fQ2UamE92ll3lmC4d6hnwXr7UHC/awE
-         SVKRUDp7jxnP4CweCICkDh6tOR/pdzrbck7Vu3sRdgKdLjZ8Z1YQdo8On/ffcH4SaAXS
-         CVfaHrnBMXDrTx5oCHUFo0k/aVdZE6mx+Hw4c66cYYplVNnV+2ZhGR7cCWS7VUAdPZ73
-         zKM9yoZEbupOTFvbWQYPVSf6Q2nInEitVKsiu/3UcXXQXcWGFB7n0fPb7A/8AEZNTe/C
-         Dv8Q==
-X-Gm-Message-State: ANhLgQ2Hyv0lk3JZidOAXwpd00JrG8jFhkShMm2u5zsKks/WZ6+7zgx0
-        ETS7wiw8HkHvSnu6NURpsZp0zTORqjc=
-X-Google-Smtp-Source: ADFU+vvOynOG/87P2m7w78DeEu27ls/UoQfjeinD++wR/z+tOJMImGK0FlkzzMclryg4RqKHCh85xw==
-X-Received: by 2002:ac8:8c6:: with SMTP id y6mr3322931qth.388.1583341545015;
-        Wed, 04 Mar 2020 09:05:45 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:16fa])
-        by smtp.gmail.com with ESMTPSA id 65sm14206261qtc.4.2020.03.04.09.05.44
+        h=x-gm-message-state:mime-version:content-transfer-encoding
+         :in-reply-to:references:subject:from:cc:to:date:message-id
+         :user-agent;
+        bh=8GdpXC83WnCwjUZvBp/s6/1q0gpiaE1ET3LFQ1vYx80=;
+        b=jKyrdW/DyjmUhkblD4W9xxK8iUZZo21NmM6oHCmm1hiB3YIh9C9zYvNQBS2LqJZOmX
+         23uSs0IdXE7y0eLkkbADXGEbYDl2iTIw4esaxtzYvhp3ffyM5tbR8/hu2fx9Bu267Hts
+         68/gwYVT0v45Urqj5RxT6CrbJsrMaGHf07UjUYcBCXedxsR+648WrE4MvE3mlTib+MEr
+         tJD/eU32p0cEbbWTTz00Nfv4nejpq4B5WWfRduS+GNcnhWexq49P/hCWHaiu8Rn9Qrs1
+         rihhQfwiwrug5Gh2x9xk/cPd4ff+0gfXOyiUA+NCPt2qUz6RTiLKSKvoxo4L5Wbrk/XY
+         dC+w==
+X-Gm-Message-State: ANhLgQ0GGAMl6kdaZ1ZhXjEdm8zr8yG7+rtZjB0I56adpWlkvu7TqoJZ
+        R0stjbjTrMWmD12SeAFqIe27h8Xba0o=
+X-Google-Smtp-Source: ADFU+vtszHZ6sornx7c90TueL5qrMGJwPll/DLOlPUNlKhSDATQ9GE1wQfzBIuK1624Xb/HV/K7YCw==
+X-Received: by 2002:a17:902:a511:: with SMTP id s17mr3702792plq.317.1583341716406;
+        Wed, 04 Mar 2020 09:08:36 -0800 (PST)
+Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id q66sm30352538pfq.27.2020.03.04.09.08.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2020 09:05:44 -0800 (PST)
-Date:   Wed, 4 Mar 2020 12:05:43 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, jack@suse.cz, bvanassche@acm.org,
-        tytso@mit.edu, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 3/7] bdi: protect device lifetime with RCU
-Message-ID: <20200304170543.GJ189690@mtj.thefacebook.com>
-References: <20200226111851.55348-1-yuyufen@huawei.com>
- <20200226111851.55348-4-yuyufen@huawei.com>
+        Wed, 04 Mar 2020 09:08:35 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200226111851.55348-4-yuyufen@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200304064942.371978-3-ebiggers@kernel.org>
+References: <20200304064942.371978-1-ebiggers@kernel.org> <20200304064942.371978-3-ebiggers@kernel.org>
+Subject: Re: [RFC PATCH v2 2/4] arm64: dts: sdm845: add Inline Crypto Engine registers and clock
+From:   Stephen Boyd <swboyd@chromium.org>
+Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Andy Gross <agross@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Can Guo <cang@codeaurora.org>,
+        Elliot Berman <eberman@codeaurora.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>, linux-arm-msm@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Date:   Wed, 04 Mar 2020 09:08:34 -0800
+Message-ID: <158334171487.7173.5606223900174949177@swboyd.mtv.corp.google.com>
+User-Agent: alot/0.9
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Quoting Eric Biggers (2020-03-03 22:49:40)
+> diff --git a/arch/arm64/boot/dts/qcom/sdm845.dtsi b/arch/arm64/boot/dts/q=
+com/sdm845.dtsi
+> index d42302b8889b..dd6b4e596fcf 100644
+> --- a/arch/arm64/boot/dts/qcom/sdm845.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sdm845.dtsi
+> @@ -1367,7 +1367,9 @@ system-cache-controller@1100000 {
+>                 ufs_mem_hc: ufshc@1d84000 {
+>                         compatible =3D "qcom,sdm845-ufshc", "qcom,ufshc",
+>                                      "jedec,ufs-2.0";
+> -                       reg =3D <0 0x01d84000 0 0x2500>;
+> +                       reg =3D <0 0x01d84000 0 0x2500>,
+> +                             <0 0 0 0>,
+> +                             <0 0x01d90000 0 0x8000>;
 
-It might be better to put this patch at the end rather than in the
-middle so that when this patch is applied things are actually fixed.
+Nothing against this patch but the binding for ufs is really awful. It
+doesn't indicate what the order of registers are, doesn't list what clks
+are supposed to be there, has weird microamp properties that make no
+sense, and has a freq-table-hz property that is almost always full of
+zeroes because the driver is written in some weird qcom specific way.
 
-> +struct bdi_rcu_device {
-> +	struct device dev;
-> +	struct rcu_head rcu_head;
-> +};
+It would be great to fix this binding and convert it to YAML so that we
+can drop the cruft and clearly describe why this patch needs to
+introduce a reg property that is all zeroes.
 
-(cc'ing Greg)
+>                         interrupts =3D <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
+>                         phys =3D <&ufs_mem_phy_lanes>;
+>                         phy-names =3D "ufsphy";
+> @@ -1387,7 +1389,8 @@ ufs_mem_hc: ufshc@1d84000 {
+>                                 "ref_clk",
+>                                 "tx_lane0_sync_clk",
+>                                 "rx_lane0_sync_clk",
+> -                               "rx_lane1_sync_clk";
+> +                               "rx_lane1_sync_clk",
+> +                               "ice_core_clk";
 
-Greg, block layer switches association between backing_device_info and
-its struct device and needs to protect it with RCU. Yufen did so by
-introducing a wrapping struct around struct device like above. Do you
-think it'd make sense to just embed rcu_head into struct device and
-let put_device() to RCU release by default?
+Would be great to drop _clk postfix on all of these.
 
-Thanks.
+>                         clocks =3D
+>                                 <&gcc GCC_UFS_PHY_AXI_CLK>,
+>                                 <&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
+> @@ -1396,7 +1399,8 @@ ufs_mem_hc: ufshc@1d84000 {
+>                                 <&rpmhcc RPMH_CXO_CLK>,
+>                                 <&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
+>                                 <&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
+> -                               <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
+> +                               <&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>,
+> +                               <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
+>                         freq-table-hz =3D
+>                                 <50000000 200000000>,
+>                                 <0 0>,
+> @@ -1405,7 +1409,8 @@ ufs_mem_hc: ufshc@1d84000 {
+>                                 <0 0>,
+>                                 <0 0>,
+>                                 <0 0>,
+> -                               <0 0>;
+> +                               <0 0>,
+> +                               <0 300000000>;
 
--- 
-tejun
+This can probably be done with assigned-clock-rates, but the driver is
+bad.
