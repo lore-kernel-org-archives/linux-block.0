@@ -2,167 +2,100 @@ Return-Path: <SRS0=k6TP=4V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778C1C3F2D7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B85C3F2D1
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A96D22B48
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:04:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SLHEESA+"
+	by mail.kernel.org (Postfix) with ESMTP id 7285421D56
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583341546;
+	bh=1+DglH2uThysUvnGM8zZCA2dvGMU+M93V9n272VCqSQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=No9lidRJBERBjJ5LPWIXBAiJXRNzE3ISj0T1IMilZzIJv7WXpvSj0d3HvkRSApiVs
+	 hzISf3Px+zyrmAtUdImIbAO4GlqzTtVopETPayJpst3+BOmCvC6aPr/i36uVSAAhwH
+	 5b+oieVUSCb+XODB0EU25klq4FEOcdsmJcRt1izg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726748AbgCDREw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 12:04:52 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34570 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729633AbgCDREw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 12:04:52 -0500
-Received: by mail-pf1-f194.google.com with SMTP id y21so1269904pfp.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2020 09:04:51 -0800 (PST)
+        id S1727137AbgCDRFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 12:05:46 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:39262 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726561AbgCDRFp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 12:05:45 -0500
+Received: by mail-qt1-f195.google.com with SMTP id e13so1903841qts.6;
+        Wed, 04 Mar 2020 09:05:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:content-transfer-encoding:in-reply-to:references
-         :subject:from:cc:to:date:message-id:user-agent;
-        bh=+ou/OdAfTiHYp4j2KMmUahM1JBJV325ndgSFeza38do=;
-        b=SLHEESA+7k3EclcR1c45IiMJT4Fv3sBySnsgP7jdnPR9aF8PtoMUSZ54awwT2KgbLF
-         vyjd5lzwQ2FjtXJ6/bOztSJIxL2FQ6NE+mSwaK2e/q0Dvi9b5yeIKYcM2vZdODv+5fD9
-         9s+E5guANFSaHOZjuHleUMTwkW2pozVzi7v+g=
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rm/wY9qTRCYlSnYi7ajYS41w3MJHXh7lvSvmNYrIYmY=;
+        b=lf2V1wlJt8iXzR7OvwB4+2OOnWEpUGUjD33V+3a3QzABSqB2wUIYpXrNVNACOJ4Qdn
+         1BhXqlhH7TJLGETDcDQ/jgsz97xoVEs80+CkKXxndvYQnIfoMWvDjnYCJsO8FaKAgQy+
+         oR9V/M8IpiCK1U9MMsaGvhn/zsjweFjovgRBnVpDc6arygzLlm2PMkUVvKYNQSw6NieJ
+         RBvLIqWXt+aD1rcpe6CuZjGG6SixxA3rH0FFtRxZrC+DR10cHn3T0KV4otNJ2qI8m6QD
+         bw7y1rdA3mZAks9//JR4NxMZh5LdKXtu5jPWM7cEdBf6i83XDYextg4LrcJtTpYGrM5Z
+         vlCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:content-transfer-encoding
-         :in-reply-to:references:subject:from:cc:to:date:message-id
-         :user-agent;
-        bh=+ou/OdAfTiHYp4j2KMmUahM1JBJV325ndgSFeza38do=;
-        b=SKB+1XSHgtpBDw9M0KFNqnKT8IgudWrNuEWJQJxZxdXH9Cqkc+9sLEVtVfVO6YYMi0
-         zFL6MV5ABnOXAeLvhpyzrZG1sMGwkXpWjpIJ67WvOeTOJggkLZE2e8zV1J9MrVS4M6fs
-         DKjlW4mtkMU3itcbmrpNGYkm074VRXKQjsZD3X+DwmqMPDZZ7Mq5t/Uht48UnxRPlmN8
-         IK7/fCbqrzxJ0RFY4pgouLGI6GW16C0MhmB8NGYn9VoGMIOTHpWatLAhtjC6TBkeIjp8
-         nis0MVV21CH+bn/Sat+s01Ns1ILwitHfKWr/Dk/OQvFOURX/GWEXSsdn859zaJhnfwSN
-         4jkQ==
-X-Gm-Message-State: ANhLgQ3SgF7VB+CCeW81ZT+uaZrsz2I1nzhWxPUYNpPTw5dg/JQES8e7
-        CXYu2JIsOYdsb9kr0N1G/LrbmIrbM7Q=
-X-Google-Smtp-Source: ADFU+vsqNg1+yh+/sD1uGquKOupANCVFksOVini3LC+fUYE3d/JepP8yCmd7cxFAe18RcCRpmNdiTA==
-X-Received: by 2002:a63:f752:: with SMTP id f18mr3426343pgk.196.1583341490800;
-        Wed, 04 Mar 2020 09:04:50 -0800 (PST)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id b15sm29092475pft.58.2020.03.04.09.04.50
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=rm/wY9qTRCYlSnYi7ajYS41w3MJHXh7lvSvmNYrIYmY=;
+        b=aqp4lTFMRTv005sY3TOrjTmAAvD2fkeE+25GfpYBVPUIh/QgsZupEXx4r6gOCtqdDc
+         MLtJtH6a/jMVEfrdGus9kby6ILJrWu3nX7zJ7fQ2UamE92ll3lmC4d6hnwXr7UHC/awE
+         SVKRUDp7jxnP4CweCICkDh6tOR/pdzrbck7Vu3sRdgKdLjZ8Z1YQdo8On/ffcH4SaAXS
+         CVfaHrnBMXDrTx5oCHUFo0k/aVdZE6mx+Hw4c66cYYplVNnV+2ZhGR7cCWS7VUAdPZ73
+         zKM9yoZEbupOTFvbWQYPVSf6Q2nInEitVKsiu/3UcXXQXcWGFB7n0fPb7A/8AEZNTe/C
+         Dv8Q==
+X-Gm-Message-State: ANhLgQ2Hyv0lk3JZidOAXwpd00JrG8jFhkShMm2u5zsKks/WZ6+7zgx0
+        ETS7wiw8HkHvSnu6NURpsZp0zTORqjc=
+X-Google-Smtp-Source: ADFU+vvOynOG/87P2m7w78DeEu27ls/UoQfjeinD++wR/z+tOJMImGK0FlkzzMclryg4RqKHCh85xw==
+X-Received: by 2002:ac8:8c6:: with SMTP id y6mr3322931qth.388.1583341545015;
+        Wed, 04 Mar 2020 09:05:45 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:16fa])
+        by smtp.gmail.com with ESMTPSA id 65sm14206261qtc.4.2020.03.04.09.05.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2020 09:04:50 -0800 (PST)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 04 Mar 2020 09:05:44 -0800 (PST)
+Date:   Wed, 4 Mar 2020 12:05:43 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, jack@suse.cz, bvanassche@acm.org,
+        tytso@mit.edu, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 3/7] bdi: protect device lifetime with RCU
+Message-ID: <20200304170543.GJ189690@mtj.thefacebook.com>
+References: <20200226111851.55348-1-yuyufen@huawei.com>
+ <20200226111851.55348-4-yuyufen@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200304064942.371978-2-ebiggers@kernel.org>
-References: <20200304064942.371978-1-ebiggers@kernel.org> <20200304064942.371978-2-ebiggers@kernel.org>
-Subject: Re: [RFC PATCH v2 1/4] firmware: qcom_scm: Add support for programming inline crypto keys
-From:   Stephen Boyd <swboyd@chromium.org>
-Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Date:   Wed, 04 Mar 2020 09:04:49 -0800
-Message-ID: <158334148941.7173.15031605009318265979@swboyd.mtv.corp.google.com>
-User-Agent: alot/0.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200226111851.55348-4-yuyufen@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Quoting Eric Biggers (2020-03-03 22:49:39)
-> diff --git a/drivers/firmware/qcom_scm.c b/drivers/firmware/qcom_scm.c
-> index 059bb0fbae9e..7fb9f606250f 100644
-> --- a/drivers/firmware/qcom_scm.c
-> +++ b/drivers/firmware/qcom_scm.c
-> @@ -926,6 +927,101 @@ int qcom_scm_ocmem_unlock(enum qcom_scm_ocmem_clien=
-t id, u32 offset, u32 size)
-[...]
-> +
-> +/**
-> + * qcom_scm_ice_set_key() - Set an inline encryption key
-> + * @index: the keyslot into which to set the key
-> + * @key: the key to program
-> + * @key_size: the size of the key in bytes
-> + * @cipher: the encryption algorithm the key is for
-> + * @data_unit_size: the encryption data unit size, i.e. the size of each
-> + *                 individual plaintext and ciphertext.  Given in 512-by=
-te
-> + *                 units, e.g. 1 =3D 512 bytes, 8 =3D 4096 bytes, etc.
-> + *
-> + * Program a key into a keyslot of Qualcomm ICE (Inline Crypto Engine), =
-where it
-> + * can then be used to encrypt/decrypt UFS I/O requests inline.
-> + *
-> + * The UFSHCI standard defines a standard way to do this, but it doesn't=
- work on
-> + * these SoCs; only this SCM call does.
-> + *
-> + * Return: 0 on success; -errno on failure.
-> + */
-> +int qcom_scm_ice_set_key(u32 index, const u8 *key, int key_size,
-> +                        enum qcom_scm_ice_cipher cipher, int data_unit_s=
-ize)
+Hello,
 
-Why not make key_size and data_unit_size unsigned?
+It might be better to put this patch at the end rather than in the
+middle so that when this patch is applied things are actually fixed.
 
-> +{
-> +       struct qcom_scm_desc desc =3D {
-> +               .svc =3D QCOM_SCM_SVC_ES,
-> +               .cmd =3D QCOM_SCM_ES_CONFIG_SET_ICE_KEY,
-> +               .arginfo =3D QCOM_SCM_ARGS(5, QCOM_SCM_VAL, QCOM_SCM_RW,
-> +                                        QCOM_SCM_VAL, QCOM_SCM_VAL,
-> +                                        QCOM_SCM_VAL),
-> +               .args[0] =3D index,
-> +               .args[2] =3D key_size,
-> +               .args[3] =3D cipher,
-> +               .args[4] =3D data_unit_size,
-> +               .owner =3D ARM_SMCCC_OWNER_SIP,
-> +       };
-> +       u8 *keybuf;
-> +       dma_addr_t key_phys;
-> +       int ret;
-> +
-> +       keybuf =3D kmemdup(key, key_size, GFP_KERNEL);
+> +struct bdi_rcu_device {
+> +	struct device dev;
+> +	struct rcu_head rcu_head;
+> +};
 
-Is this to make the key physically contiguous? Probably worth a comment
-to help others understand why this is here.
+(cc'ing Greg)
 
-> +       if (!keybuf)
-> +               return -ENOMEM;
-> +
-> +       key_phys =3D dma_map_single(__scm->dev, keybuf, key_size, DMA_TO_=
-DEVICE);
-> +       if (dma_mapping_error(__scm->dev, key_phys)) {
-> +               ret =3D -ENOMEM;
-> +               goto out;
-> +       }
-> +       desc.args[1] =3D key_phys;
-> +
-> +       ret =3D qcom_scm_call(__scm->dev, &desc, NULL);
-> +
-> +       dma_unmap_single(__scm->dev, key_phys, key_size, DMA_TO_DEVICE);
-> +out:
-> +       kzfree(keybuf);
+Greg, block layer switches association between backing_device_info and
+its struct device and needs to protect it with RCU. Yufen did so by
+introducing a wrapping struct around struct device like above. Do you
+think it'd make sense to just embed rcu_head into struct device and
+let put_device() to RCU release by default?
 
-And this is because we want to clear key contents out of the slab? What
-about if the dma_map_single() bounces to a bounce buffer? I think that
-isn't going to happen because __scm->dev is just some firmware device
-that doesn't require bounce buffers but it's worth another comment to
-clarify this.
+Thanks.
 
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL(qcom_scm_ice_set_key);
-> +
->  /**
->   * qcom_scm_hdcp_available() - Check if secure environment supports HDCP.
->   *
+-- 
+tejun
