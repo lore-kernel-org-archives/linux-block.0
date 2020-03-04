@@ -5,53 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF91DC3F2D1
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 03:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C62C3F2D1
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 03:12:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D5E22146E
-	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 03:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DFEC208C3
+	for <linux-block@archiver.kernel.org>; Wed,  4 Mar 2020 03:12:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="qIyK/K+i"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="O6mF9GbT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387690AbgCDDCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Mar 2020 22:02:04 -0500
-Received: from mailgw01.mediatek.com ([210.61.82.183]:33631 "EHLO
+        id S2387459AbgCDDM1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Mar 2020 22:12:27 -0500
+Received: from mailgw01.mediatek.com ([210.61.82.183]:39422 "EHLO
         mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2387497AbgCDDCD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 22:02:03 -0500
-X-UUID: 4df1d395fb454d3b8cdf396264a9eb7b-20200304
+        with ESMTP id S2387398AbgCDDM1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Mar 2020 22:12:27 -0500
+X-UUID: 5d9cb5feac8e4259ba7b1a46bfa0517a-20200304
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
         h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=qsn5ZtkxofEPhSlSyo8Sta1tKWHmr79ZpPp6bUCSBTY=;
-        b=qIyK/K+i1U4ffA9hwcy+e1Tk1jLVJs9UVNXiANBBiuzwL1kmcEJkVeqSYanXulr0Mpg6DWwwQnvFr0AQZefEhMgdwPRXlE/f7PGnip1biURZt5DRyOnkVBIKmBzQ4CWNb04UEP+qxVwbpFiTffku+wjSJYfOKYR0oyfWblf45Ao=;
-X-UUID: 4df1d395fb454d3b8cdf396264a9eb7b-20200304
-Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw01.mediatek.com
+        b=O6mF9GbTYg3/U0O2uHd8IUGywS/WyPCyEhT9S2wLrY+qe4qwWXRTUtL18guPa1SVZo6ihIGjy4sTdWoF3PBTNZgRXZyTGVFqPiZJYi672+XXqH5jhquz0obYmjBirf1oKxnFhPGbo089h5Si2IRPqux7OU5XFn0gToXtdA4904Q=;
+X-UUID: 5d9cb5feac8e4259ba7b1a46bfa0517a-20200304
+Received: from mtkcas09.mediatek.inc [(172.21.101.178)] by mailgw01.mediatek.com
         (envelope-from <light.hsieh@mediatek.com>)
         (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1197573145; Wed, 04 Mar 2020 11:01:58 +0800
-Received: from mtkcas08.mediatek.inc (172.21.101.126) by
+        with ESMTP id 1104357860; Wed, 04 Mar 2020 11:12:20 +0800
+Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
  mtkmbs08n2.mediatek.inc (172.21.101.56) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Wed, 4 Mar 2020 11:00:48 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
+ 15.0.1395.4; Wed, 4 Mar 2020 11:11:10 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by MTKCAS06.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Wed, 4 Mar 2020 11:02:36 +0800
+ Transport; Wed, 4 Mar 2020 11:09:47 +0800
 From:   <light.hsieh@mediatek.com>
 To:     <ulf.hansson@linaro.org>
 CC:     <linux-mediatek@lists.infradead.org>, <axboe@kernel.dk>,
         <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kuohong.wang@mediatek.com>, <stanley.chu@mediatek.com>,
         Light Hsieh <light.hsieh@mediatek.com>
-Subject: [PATCH v1 1/3] mmc: record wp_grp_size and boot_wp_status
-Date:   Wed, 4 Mar 2020 11:01:53 +0800
-Message-ID: <1583290915-9858-2-git-send-email-light.hsieh@mediatek.com>
+Subject: [RESEND PATCH v1 1/3] mmc: record wp_grp_size and boot_wp_status
+Date:   Wed, 4 Mar 2020 11:12:15 +0800
+Message-ID: <1583291537-15053-2-git-send-email-light.hsieh@mediatek.com>
 X-Mailer: git-send-email 1.8.1.1.dirty
-In-Reply-To: <1583290915-9858-1-git-send-email-light.hsieh@mediatek.com>
-References: <1583290915-9858-1-git-send-email-light.hsieh@mediatek.com>
+In-Reply-To: <1583291537-15053-1-git-send-email-light.hsieh@mediatek.com>
+References: <1583291537-15053-1-git-send-email-light.hsieh@mediatek.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-SNTS-SMTP: BE8DA5EFDB8B220B59A5896EAFC5D140C2664D312E7DDEE9885A0E2320CB6CD52000:8
+X-TM-SNTS-SMTP: EF3CC1366C200503190F9B55F614E6A974DDF1E539B2458F696DA0060AB324932000:8
 X-MTK:  N
 Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
