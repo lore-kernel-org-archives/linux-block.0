@@ -2,127 +2,175 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF65C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A1FC3F2CD
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:26:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD6B2208C3
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F97F2146E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:26:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ZXpXJ9Vu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbgCELEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 06:04:32 -0500
-Received: from mx2.suse.de ([195.135.220.15]:60320 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725903AbgCELEc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Mar 2020 06:04:32 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 5EF60AFA0;
-        Thu,  5 Mar 2020 11:04:29 +0000 (UTC)
-Subject: Re: [PATCH] xen/blkfront: fix ring info addressing
-To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20200305100331.16790-1-jgross@suse.com>
- <20200305104935.GU24458@Air-de-Roger.citrite.net>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <20915d12-665e-bd23-2685-d2ec7e015679@suse.com>
-Date:   Thu, 5 Mar 2020 12:04:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726170AbgCEL0O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 06:26:14 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:34703 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbgCEL0O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 06:26:14 -0500
+Received: by mail-io1-f68.google.com with SMTP id z190so6072981iof.1
+        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2020 03:26:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LMFwKGCJmork/D34ePiU1Gk+yq0aYO7+KssBBPz9BoY=;
+        b=ZXpXJ9VuT1+s587bYyN9TQN/vpGp1uggR49Kd4y+qJlUA0jmCkVVokmWTTHqJleo3v
+         TDSW6O5Iak6Xw8H8yDvjLrpcLj7MLtby0Qjm7uOBAkNdk+WH+8NqPpDsneDGg688yGtz
+         0YVaDm0+nJgUXSiFwjlpd2vFHzc/VqceoLMM43GpJz/8gjSSXL2ewhhHEBFl1NsbWDAi
+         u20q2a6TzZebWwFzHdYjBNk93xIXbNpHf5mmv3uv6abOzA+8SedPUyRRPwNEfnC4lgZW
+         W2s8V3WyIK3mlbNydAI3ZcCi9d3EWqmUpyb0ZYHt/AZchUybVTFZveAc2pk1G+ni0gYl
+         +USg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LMFwKGCJmork/D34ePiU1Gk+yq0aYO7+KssBBPz9BoY=;
+        b=R4e/iLw4tjznK7K373fkSMsgMjTN6yWIySyu1Mc4LsIHtVzEeYa8aznz9IAMv02uoA
+         8KvzVt0htW8nnVbCZn3GDeku0oWoVF2rNoJQcZHz464miwpbepoYyUh3FcX+GHiaujFP
+         CL65xromAkss6iEuYVIoak4KVKTG9j+FGx4/BfDZC9/ZUul3U+2/t/fXDXj7bY4kxcys
+         yT1QRZpKLVJMrBEDtdc4weueSsDFDoWu8fuuap7yV0ngSjDfZ/vpmUYsu0ek/ut5xDAh
+         aWgdqSrzPeJ1QFmPY/8YE/UR0AMYFvkh6HhbJuvLeZWnQM8pbXF6GQxvnzr7IgHa+xeZ
+         Z5FQ==
+X-Gm-Message-State: ANhLgQ1ITziNPERlEjM5DLBGfB0ZbgPI7cYqM38Bv+sXYMc0/EW0I3kg
+        1iobtwJ59TKDaPjZ9+uu0eG8ToqQFQjyBhIb8d7iKw==
+X-Google-Smtp-Source: ADFU+vtXjbGcb0DKhlaCszXkVvnK6QpDlV8W5GvHjv4GySpQgfC9oNsiivY5dsAyFymbC2m8WWsr0dcTFC6e+SbjMsY=
+X-Received: by 2002:a05:6602:1508:: with SMTP id g8mr6134106iow.22.1583407573161;
+ Thu, 05 Mar 2020 03:26:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200305104935.GU24458@Air-de-Roger.citrite.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-7-jinpuwang@gmail.com>
+ <c3c8fbcc-0028-9b23-8eff-3b5f1f60e652@acm.org> <CAHg0HuxJgjQca3Vy7nbcVKs0bUoj=-Uqoa5DOzYoqRHQ6Vph7A@mail.gmail.com>
+ <597777e7-ac5a-5fc4-c1f7-3ffa5876a6f2@acm.org> <CAMGffEmbV1YL4O860EswBKm2UHBYP_cgqMFYFVc2AdHnAFeu+g@mail.gmail.com>
+ <20200304164903.GF31668@ziepe.ca>
+In-Reply-To: <20200304164903.GF31668@ziepe.ca>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Thu, 5 Mar 2020 12:26:01 +0100
+Message-ID: <CAMGffEncbGXhFLDxZJp957c7vmV4vCaTZFUVKwqDROFikCTLPg@mail.gmail.com>
+Subject: Re: [PATCH v9 06/25] RDMA/rtrs: client: main functionality
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.03.20 11:49, Roger Pau Monné wrote:
-> On Thu, Mar 05, 2020 at 11:03:31AM +0100, Juergen Gross wrote:
->> Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
->> actual use case") made struct blkfront_ring_info size dynamic. This is
->> fine when running with only one queue, but with multiple queues the
->> addressing of the single queues has to be adapted as the structs are
->> allocated in an array.
-> 
-> Thanks, and sorry for not catching this during review.
-> 
->>
->> Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->>   drivers/block/xen-blkfront.c | 82 ++++++++++++++++++++++++--------------------
->>   1 file changed, 45 insertions(+), 37 deletions(-)
->>
->> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
->> index e2ad6bba2281..a8d4a3838e5d 100644
->> --- a/drivers/block/xen-blkfront.c
->> +++ b/drivers/block/xen-blkfront.c
->> @@ -213,6 +213,7 @@ struct blkfront_info
->>   	struct blk_mq_tag_set tag_set;
->>   	struct blkfront_ring_info *rinfo;
->>   	unsigned int nr_rings;
->> +	unsigned int rinfo_size;
->>   	/* Save uncomplete reqs and bios for migration. */
->>   	struct list_head requests;
->>   	struct bio_list bio_list;
->> @@ -259,6 +260,21 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
->>   static void blkfront_gather_backend_features(struct blkfront_info *info);
->>   static int negotiate_mq(struct blkfront_info *info);
->>   
->> +#define rinfo_ptr(rinfo, off) \
->> +	(struct blkfront_ring_info *)((unsigned long)(rinfo) + (off))
->                                        ^ void * would seem more natural IMO.
-> 
-> Also if you use void * you don't need the extra (struct
-> blkfront_ring_info *) cast I think?
+On Wed, Mar 4, 2020 at 5:49 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Wed, Mar 04, 2020 at 05:43:24PM +0100, Jinpu Wang wrote:
+> > On Tue, Mar 3, 2020 at 5:04 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> > >
+> > > On 3/2/20 5:20 AM, Danil Kipnis wrote:
+> > > > On Sun, Mar 1, 2020 at 2:33 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> > > >> On 2020-02-21 02:47, Jack Wang wrote:
+> > > >>> +static struct rtrs_permit *
+> > > >>> +__rtrs_get_permit(struct rtrs_clt *clt, enum rtrs_clt_con_type con_type)
+> > > >>> +{
+> > > >>> +     size_t max_depth = clt->queue_depth;
+> > > >>> +     struct rtrs_permit *permit;
+> > > >>> +     int cpu, bit;
+> > > >>> +
+> > > >>> +     /* Combined with cq_vector, we pin the IO to the the cpu it comes */
+> > > >>
+> > > >> This comment is confusing. Please clarify this comment. All I see below
+> > > >> is that preemption is disabled. I don't see pinning of I/O to the CPU of
+> > > >> the caller.
+> > > > The comment is addressing a use-case of the driver: The user can
+> > > > assign (under /proc/irq/) the irqs of the HCA cq_vectors "one-to-one"
+> > > > to each cpu. This will "force" the driver to process io response on
+> > > > the same cpu the io has been submitted on.
+> > > > In the code below only preemption is disabled. This can lead to the
+> > > > situation that callers from different cpus will grab the same bit,
+> > > > since find_first_zero_bit is not atomic. But then the
+> > > > test_and_set_bit_lock will fail for all the callers but one, so that
+> > > > they will loop again. This way an explicit spinlock is not required.
+> > > > Will extend the comment.
+> > >
+> > > If the purpose of get_cpu() and put_cpu() calls is to serialize code
+> > > against other threads, please use locking instead of disabling
+> > > preemption. This will help tools that verify locking like lockdep and
+> > > the kernel thread sanitizer (https://github.com/google/ktsan/wiki).
+> > We can look into it, but I'm afraid converting to spinlock might have
+> > a performance impact.
+>
+> I very much dislike seeing people inventing locking, rarely is it done
+> right. Making assumptions about IRQ scheduling in a driver seems
+> really sketchy.
+>
+> Why do you need preemption disabled when using an atomic varient of
+> test_and_set_bit anyhow? It is atomic, just loop?
 
-Yes, can change that.
+We have to admit, the code snip is from null_blk, get_tag function,
+not invented by us.
+the get_cpu/put_cpu was added to get/save the current cpu_id, which
+can be removed around the do-while loop.,
+we only need to raw_smp_processor_id to get current cpu, we use it
+later to pick which connection to use.
 
-> I however think this macro is kind of weird, since it's just doing an
-> addition. I would rather have that calculation in get_rinfo and code
-> for_each_rinfo on top of that.
+Bart asked in the past,  we missed that, thanks Jason for bringing up it.
 
-I wanted to avoid the multiplication in the rather common
-for_each_rinfo() usage.
+>
+> > > >> I don't think that posting a signalled send from time to time is
+> > > >> sufficient to prevent send queue overflow. Please address Jason's
+> > > >> comment from January 7th: "Not quite. If the SQ depth is 16 and you post
+> > > >> 16 things and then signal the last one, you *cannot* post new work until
+> > > >> you see the completion. More SQ space *ONLY* becomes available upon
+> > > >> receipt of a completion. This is why you can't have an unsignaled SQ."
+> > > >
+> > > >> See also https://lore.kernel.org/linux-rdma/20200107182528.GB26174@ziepe.ca/
+> > > > In our case we set the send queue of each QP belonging to one
+> > > > "session" to the one supported by the hardware (max_qp_wr) which is
+> > > > around 5K on our hardware. The queue depth of our "session" is 512.
+> > > > Those 512 are "shared" by all the QPs (number of CPUs on client side)
+> > > > belonging to that session. So we have at most 512 and 512/num_cpus on
+> > > > average inflights on each QP. We never experienced send queue full
+> > > > event in any of our performance tests or production usage. The
+> > > > alternative would be to count submitted requests and completed
+> > > > requests, check the difference before submission and wait if the
+> > > > difference multiplied by the queue depth of "session" exceeds the max
+> > > > supported by the hardware. The check will require quite some code and
+> > > > will most probably affect performance. I do not think it is worth it
+> > > > to introduce a code path which is triggered only on a condition which
+> > > > is known to never become true.
+> > > > Jason, do you think it's necessary to implement such tracking?
+> > >
+> > > Please either make sure that send queues do not overflow by providing
+> > > enough space for 512 in-flight requests fit or implement tracking for
+> > > the number of in-flight requests.
+> > We do have enough space for send queue.
+>
+> You have to do something to provably guarantee the send q cannot
+> overflow. send q overflow is defined as calling post_send before a
+> poll_cq has confirmed space is available for send.
+>
+> Jason
+Shouldn't the cq api handle that already,  with IB_POLL_SOFTIRQ,
+poll cq is done on very softirq run, so send queue space should be reclaimed
+fast enough, with IB_POLL_WORKQUEUE, when cq->com_handler get called,
+the ib_cq_poll_work will do the poll_cq, together with extra
+send_queue size reserved,
+the send queue can not overflow!
 
-> 
-> I agree this might be a question of taste, so I'm not going to insist
-> but that would reduce the number of helpers from 3 to 2.
-> 
->> +
->> +#define for_each_rinfo(info, rinfo, idx)				\
->> +	for (rinfo = info->rinfo, idx = 0;				\
->> +	     idx < info->nr_rings;					\
->> +	     idx++, rinfo = rinfo_ptr(rinfo, info->rinfo_size))
-> 
-> I think the above is missing proper parentheses around macro
-> parameters.
-
-rinfo and idx are simple variables, so I don't think they need
-parentheses. info maybe. But just seeing it now: naming the
-parameter "rinfo" and trying to access info->rinfo isn't a good
-idea. It is working only as I always use "rinfo" as the pointer.
-
-> 
->> +
->> +static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
->> +					    unsigned int i)
-> 
-> inline attribute might be appropriate here.
-
-See "the inline disease" in the kernel's coding style.
-
-
-Juergen
-
+Thanks Jason for your input!
