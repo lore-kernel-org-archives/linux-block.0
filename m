@@ -2,189 +2,314 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A617C3F2D7
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1C2C3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A5162146E
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:40:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="d9zKSr3n"
+	by mail.kernel.org (Postfix) with ESMTP id 461DE2073B
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbgCELkR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 06:40:17 -0500
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:42702 "EHLO
-        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725816AbgCELkR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 06:40:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1583408416;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=rWfFlcPyjHJXPAlfpsMYZNMKC3g+tqMBgYd0nwObWMs=;
-  b=d9zKSr3nr7qt5+8NdOfQpeIv7eocLEiHe9+mt8ugTUt7wbneemwc1Inl
-   +wiy/mFm4j8U7e9bVvYonNAYpQOT70+9jnKUMtXw1jv1spplneVSmoq5U
-   EujuM1CPJTQ/zVNTZPHMpme63U5iXwxmpQ/6Fw8i4DMNp+av9AZn7ntLZ
-   o=;
-Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: IvvKxSg4dbeFbcCMb8mQg2hmNKN1dHBlv+hvJ5k3KFzLFrCUo54nSohVm1Nj9rwnVth2BJNI2x
- JPI6ajaUbFkFZkjmq5ELJNIuDQnJREtod5GEE0DAVNLzS2QjoYqf39Aqrjh5n4i0ckGXafk57+
- 2o2KJs1bj6VUCj/ZnsetHXwDt6gEzKRo39oFksYnKVKsFne/J+GIhh9stUxLlPpJcGbu7AM9YR
- 1f8O2R+xmwDcisfR2+SyZ8jIV2Hect5f8YyO0WH5ivNcnTuhJnwG5NSsUkSOn7qV4JsNMBVpAT
- mXA=
-X-SBRS: 2.7
-X-MesageID: 13798198
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.70,517,1574139600"; 
-   d="scan'208";a="13798198"
-Date:   Thu, 5 Mar 2020 12:40:10 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        id S1727077AbgCELkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 06:40:49 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48070 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727052AbgCELkt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 06:40:49 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 54379AC44;
+        Thu,  5 Mar 2020 11:40:46 +0000 (UTC)
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] xen/blkfront: fix ring info addressing
-Message-ID: <20200305114010.GV24458@Air-de-Roger.citrite.net>
-References: <20200305100331.16790-1-jgross@suse.com>
- <20200305104935.GU24458@Air-de-Roger.citrite.net>
- <20915d12-665e-bd23-2685-d2ec7e015679@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20915d12-665e-bd23-2685-d2ec7e015679@suse.com>
-X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
- AMSPEX02CL01.citrite.net (10.69.22.125)
+Subject: [PATCH v2] xen/blkfront: fix ring info addressing
+Date:   Thu,  5 Mar 2020 12:40:44 +0100
+Message-Id: <20200305114044.20235-1-jgross@suse.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 05, 2020 at 12:04:27PM +0100, Jürgen Groß wrote:
-> On 05.03.20 11:49, Roger Pau Monné wrote:
-> > On Thu, Mar 05, 2020 at 11:03:31AM +0100, Juergen Gross wrote:
-> > > Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
-> > > actual use case") made struct blkfront_ring_info size dynamic. This is
-> > > fine when running with only one queue, but with multiple queues the
-> > > addressing of the single queues has to be adapted as the structs are
-> > > allocated in an array.
-> > 
-> > Thanks, and sorry for not catching this during review.
-> > 
-> > > 
-> > > Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
-> > > Signed-off-by: Juergen Gross <jgross@suse.com>
-> > > ---
-> > >   drivers/block/xen-blkfront.c | 82 ++++++++++++++++++++++++--------------------
-> > >   1 file changed, 45 insertions(+), 37 deletions(-)
-> > > 
-> > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > > index e2ad6bba2281..a8d4a3838e5d 100644
-> > > --- a/drivers/block/xen-blkfront.c
-> > > +++ b/drivers/block/xen-blkfront.c
-> > > @@ -213,6 +213,7 @@ struct blkfront_info
-> > >   	struct blk_mq_tag_set tag_set;
-> > >   	struct blkfront_ring_info *rinfo;
-> > >   	unsigned int nr_rings;
-> > > +	unsigned int rinfo_size;
-> > >   	/* Save uncomplete reqs and bios for migration. */
-> > >   	struct list_head requests;
-> > >   	struct bio_list bio_list;
-> > > @@ -259,6 +260,21 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
-> > >   static void blkfront_gather_backend_features(struct blkfront_info *info);
-> > >   static int negotiate_mq(struct blkfront_info *info);
-> > > +#define rinfo_ptr(rinfo, off) \
-> > > +	(struct blkfront_ring_info *)((unsigned long)(rinfo) + (off))
-> >                                        ^ void * would seem more natural IMO.
-> > 
-> > Also if you use void * you don't need the extra (struct
-> > blkfront_ring_info *) cast I think?
-> 
-> Yes, can change that.
-> 
-> > I however think this macro is kind of weird, since it's just doing an
-> > addition. I would rather have that calculation in get_rinfo and code
-> > for_each_rinfo on top of that.
-> 
-> I wanted to avoid the multiplication in the rather common
-> for_each_rinfo() usage.
+Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
+actual use case") made struct blkfront_ring_info size dynamic. This is
+fine when running with only one queue, but with multiple queues the
+addressing of the single queues has to be adapted as the structs are
+allocated in an array.
 
-Can you undef it afterwards then? I don't think it's supposed to be
-used by the rest of the file.
+Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
+Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+V2:
+- get rid of rinfo_ptr() helper
+- use proper parenthesis in for_each_rinfo()
+- rename rinfo parameter of for_each_rinfo()
+---
+ drivers/block/xen-blkfront.c | 79 +++++++++++++++++++++++---------------------
+ 1 file changed, 42 insertions(+), 37 deletions(-)
 
-> 
-> > 
-> > I agree this might be a question of taste, so I'm not going to insist
-> > but that would reduce the number of helpers from 3 to 2.
-> > 
-> > > +
-> > > +#define for_each_rinfo(info, rinfo, idx)				\
-> > > +	for (rinfo = info->rinfo, idx = 0;				\
-> > > +	     idx < info->nr_rings;					\
-> > > +	     idx++, rinfo = rinfo_ptr(rinfo, info->rinfo_size))
-> > 
-> > I think the above is missing proper parentheses around macro
-> > parameters.
-> 
-> rinfo and idx are simple variables, so I don't think they need
-> parentheses. info maybe. But just seeing it now: naming the
-> parameter "rinfo" and trying to access info->rinfo isn't a good
-> idea. It is working only as I always use "rinfo" as the pointer.
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index e2ad6bba2281..8e844da826db 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -213,6 +213,7 @@ struct blkfront_info
+ 	struct blk_mq_tag_set tag_set;
+ 	struct blkfront_ring_info *rinfo;
+ 	unsigned int nr_rings;
++	unsigned int rinfo_size;
+ 	/* Save uncomplete reqs and bios for migration. */
+ 	struct list_head requests;
+ 	struct bio_list bio_list;
+@@ -259,6 +260,18 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
+ static void blkfront_gather_backend_features(struct blkfront_info *info);
+ static int negotiate_mq(struct blkfront_info *info);
+ 
++#define for_each_rinfo(info, ptr, idx)				\
++	for ((ptr) = (info)->rinfo, (idx) = 0;			\
++	     (idx) < (info)->nr_rings;				\
++	     (idx)++, (ptr) = (void *)(ptr) + (info)->rinfo_size)
++
++static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
++					    unsigned int i)
++{
++	BUG_ON(i >= info->nr_rings);
++	return (void *)info->rinfo + i * info->rinfo_size;
++}
++
+ static int get_id_from_freelist(struct blkfront_ring_info *rinfo)
+ {
+ 	unsigned long free = rinfo->shadow_free;
+@@ -883,8 +896,7 @@ static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct blkfront_info *info = hctx->queue->queuedata;
+ 	struct blkfront_ring_info *rinfo = NULL;
+ 
+-	BUG_ON(info->nr_rings <= qid);
+-	rinfo = &info->rinfo[qid];
++	rinfo = get_rinfo(info, qid);
+ 	blk_mq_start_request(qd->rq);
+ 	spin_lock_irqsave(&rinfo->ring_lock, flags);
+ 	if (RING_FULL(&rinfo->ring))
+@@ -1181,6 +1193,7 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
+ static void xlvbd_release_gendisk(struct blkfront_info *info)
+ {
+ 	unsigned int minor, nr_minors, i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	if (info->rq == NULL)
+ 		return;
+@@ -1188,8 +1201,7 @@ static void xlvbd_release_gendisk(struct blkfront_info *info)
+ 	/* No more blkif_request(). */
+ 	blk_mq_stop_hw_queues(info->rq);
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 
+ 		/* No more gnttab callback work. */
+ 		gnttab_cancel_free_callback(&rinfo->callback);
+@@ -1339,6 +1351,7 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
+ static void blkif_free(struct blkfront_info *info, int suspend)
+ {
+ 	unsigned int i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	/* Prevent new requests being issued until we fix things up. */
+ 	info->connected = suspend ?
+@@ -1347,8 +1360,8 @@ static void blkif_free(struct blkfront_info *info, int suspend)
+ 	if (info->rq)
+ 		blk_mq_stop_hw_queues(info->rq);
+ 
+-	for (i = 0; i < info->nr_rings; i++)
+-		blkif_free_ring(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i)
++		blkif_free_ring(rinfo);
+ 
+ 	kvfree(info->rinfo);
+ 	info->rinfo = NULL;
+@@ -1775,6 +1788,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 	int err;
+ 	unsigned int i, max_page_order;
+ 	unsigned int ring_page_order;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	if (!info)
+ 		return -ENODEV;
+@@ -1788,9 +1802,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 	if (err)
+ 		goto destroy_blkring;
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
+-
++	for_each_rinfo(info, rinfo, i) {
+ 		/* Create shared ring, alloc event channel. */
+ 		err = setup_blkring(dev, rinfo);
+ 		if (err)
+@@ -1815,7 +1827,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 
+ 	/* We already got the number of queues/rings in _probe */
+ 	if (info->nr_rings == 1) {
+-		err = write_per_ring_nodes(xbt, &info->rinfo[0], dev->nodename);
++		err = write_per_ring_nodes(xbt, info->rinfo, dev->nodename);
+ 		if (err)
+ 			goto destroy_blkring;
+ 	} else {
+@@ -1837,10 +1849,10 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 			goto abort_transaction;
+ 		}
+ 
+-		for (i = 0; i < info->nr_rings; i++) {
++		for_each_rinfo(info, rinfo, i) {
+ 			memset(path, 0, pathsize);
+ 			snprintf(path, pathsize, "%s/queue-%u", dev->nodename, i);
+-			err = write_per_ring_nodes(xbt, &info->rinfo[i], path);
++			err = write_per_ring_nodes(xbt, rinfo, path);
+ 			if (err) {
+ 				kfree(path);
+ 				goto destroy_blkring;
+@@ -1868,9 +1880,8 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 		goto destroy_blkring;
+ 	}
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
++	for_each_rinfo(info, rinfo, i) {
+ 		unsigned int j;
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
+ 
+ 		for (j = 0; j < BLK_RING_SIZE(info); j++)
+ 			rinfo->shadow[j].req.u.rw.id = j + 1;
+@@ -1900,6 +1911,7 @@ static int negotiate_mq(struct blkfront_info *info)
+ {
+ 	unsigned int backend_max_queues;
+ 	unsigned int i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	BUG_ON(info->nr_rings);
+ 
+@@ -1911,20 +1923,16 @@ static int negotiate_mq(struct blkfront_info *info)
+ 	if (!info->nr_rings)
+ 		info->nr_rings = 1;
+ 
+-	info->rinfo = kvcalloc(info->nr_rings,
+-			       struct_size(info->rinfo, shadow,
+-					   BLK_RING_SIZE(info)),
+-			       GFP_KERNEL);
++	info->rinfo_size = struct_size(info->rinfo, shadow,
++				       BLK_RING_SIZE(info));
++	info->rinfo = kvcalloc(info->nr_rings, info->rinfo_size, GFP_KERNEL);
+ 	if (!info->rinfo) {
+ 		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
+ 		info->nr_rings = 0;
+ 		return -ENOMEM;
+ 	}
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo;
+-
+-		rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		INIT_LIST_HEAD(&rinfo->indirect_pages);
+ 		INIT_LIST_HEAD(&rinfo->grants);
+ 		rinfo->dev_info = info;
+@@ -2017,6 +2025,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	int rc;
+ 	struct bio *bio;
+ 	unsigned int segs;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	blkfront_gather_backend_features(info);
+ 	/* Reset limits changed by blk_mq_update_nr_hw_queues(). */
+@@ -2024,9 +2033,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	segs = info->max_indirect_segments ? : BLKIF_MAX_SEGMENTS_PER_REQUEST;
+ 	blk_queue_max_segments(info->rq, segs / GRANTS_PER_PSEG);
+ 
+-	for (r_index = 0; r_index < info->nr_rings; r_index++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[r_index];
+-
++	for_each_rinfo(info, rinfo, r_index) {
+ 		rc = blkfront_setup_indirect(rinfo);
+ 		if (rc)
+ 			return rc;
+@@ -2036,10 +2043,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	/* Now safe for us to use the shared ring */
+ 	info->connected = BLKIF_STATE_CONNECTED;
+ 
+-	for (r_index = 0; r_index < info->nr_rings; r_index++) {
+-		struct blkfront_ring_info *rinfo;
+-
+-		rinfo = &info->rinfo[r_index];
++	for_each_rinfo(info, rinfo, r_index) {
+ 		/* Kick any other new requests queued since we resumed */
+ 		kick_pending_request_queues(rinfo);
+ 	}
+@@ -2072,13 +2076,13 @@ static int blkfront_resume(struct xenbus_device *dev)
+ 	struct blkfront_info *info = dev_get_drvdata(&dev->dev);
+ 	int err = 0;
+ 	unsigned int i, j;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	dev_dbg(&dev->dev, "blkfront_resume: %s\n", dev->nodename);
+ 
+ 	bio_list_init(&info->bio_list);
+ 	INIT_LIST_HEAD(&info->requests);
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		struct bio_list merge_bio;
+ 		struct blk_shadow *shadow = rinfo->shadow;
+ 
+@@ -2337,6 +2341,7 @@ static void blkfront_connect(struct blkfront_info *info)
+ 	unsigned int binfo;
+ 	char *envp[] = { "RESIZE=1", NULL };
+ 	int err, i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	switch (info->connected) {
+ 	case BLKIF_STATE_CONNECTED:
+@@ -2394,8 +2399,8 @@ static void blkfront_connect(struct blkfront_info *info)
+ 						    "physical-sector-size",
+ 						    sector_size);
+ 	blkfront_gather_backend_features(info);
+-	for (i = 0; i < info->nr_rings; i++) {
+-		err = blkfront_setup_indirect(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i) {
++		err = blkfront_setup_indirect(rinfo);
+ 		if (err) {
+ 			xenbus_dev_fatal(info->xbdev, err, "setup_indirect at %s",
+ 					 info->xbdev->otherend);
+@@ -2416,8 +2421,8 @@ static void blkfront_connect(struct blkfront_info *info)
+ 
+ 	/* Kick pending requests. */
+ 	info->connected = BLKIF_STATE_CONNECTED;
+-	for (i = 0; i < info->nr_rings; i++)
+-		kick_pending_request_queues(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i)
++		kick_pending_request_queues(rinfo);
+ 
+ 	device_add_disk(&info->xbdev->dev, info->gd, NULL);
+ 
+@@ -2652,9 +2657,9 @@ static void purge_persistent_grants(struct blkfront_info *info)
+ {
+ 	unsigned int i;
+ 	unsigned long flags;
++	struct blkfront_ring_info *rinfo;
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		struct grant *gnt_list_entry, *tmp;
+ 
+ 		spin_lock_irqsave(&rinfo->ring_lock, flags);
+-- 
+2.16.4
 
-Dereferences of info and the increase of idx should have parentheses
-IMO.
-
-You could rename the rinfo parameter to entry or some such.
-
-> > 
-> > > +
-> > > +static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
-> > > +					    unsigned int i)
-> > 
-> > inline attribute might be appropriate here.
-> 
-> See "the inline disease" in the kernel's coding style.
-
-This function has two lines, so I think it's suitable to be inlined:
-"A reasonable rule of thumb is to not put inline at functions that
-have more than 3 lines of code in them"
-
-I bet the compiler would do this already, but I think adding inline
-here is fine according to coding style.
-
-Thanks, Roger.
