@@ -2,126 +2,173 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB41EC3F2CE
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F66C3F2CE
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:30:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FEBB21556
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:22:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583371335;
-	bh=GXtkI8GHtNEGzy7ip0euMrm6b4Z/soQCpKFX2ibdJPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Vm177YtcKxu1pDqGY52YKRgV3fvpRviMWbjfY//RSo7KEoT1eDFXGBKL0MqcW4yyI
-	 zuDP9PqLGDxEJenCrgH1VecZ0GH9dFjXLmQDNyykc+Y4nv7KOr7SUB+mwJNpnQDhvj
-	 xnnaUWapzZiLcBt121rPnJVJhOI9DuSr3dE4eFT0=
+	by mail.kernel.org (Postfix) with ESMTP id E93E620866
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:30:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="LC5kWgn4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725797AbgCEBWO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 20:22:14 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:33352 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725308AbgCEBWO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 20:22:14 -0500
-Received: by mail-qk1-f195.google.com with SMTP id p62so3758445qkb.0;
-        Wed, 04 Mar 2020 17:22:13 -0800 (PST)
+        id S1725777AbgCEBaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 20:30:13 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:45077 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbgCEBaN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 20:30:13 -0500
+Received: by mail-pl1-f193.google.com with SMTP id b22so1870553pls.12
+        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2020 17:30:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=mkRpzA3P6Y6jkl5RHlE/gdhWCOjS5JJwXY+64DkVtvk=;
-        b=IVvswKI5FcePlVqii0KjisuzTyaE4hqtQPii6g5g7nzs8TSHRPj5cGrUJFRbJaWHe3
-         lCP5b4rix2ph1ZnASZSCehCkGWQMHL+OnwA5poKq5sxMo2NSNEEThKlZUXwx5iOcGHzR
-         Y6xrSiJs35ipRGZPDQTWtckK+xMgUH7Wd1HED1w8m0rx+f9q6vs3q24LH9WSNB2wkkwT
-         /OnoOOnNSM1JqGRz48WsogumYeQSqCRpczkkstha1ztw413GHh741CFeP08pwRl5tARJ
-         2TKLZBCMzTKl0DDbXTlIEQ1r2Gd3VmrBkvxn/ljkl4gdpgCUZoN2kX9vkpdhbOzQw3NN
-         hYhQ==
+        bh=2thFv659sj5d5Ni5yvxP9gN4h9QVhmEBZCNJK4/mccw=;
+        b=LC5kWgn4gVrcc3CXLwwUflPsmsrXBAFgvX6JoZ19giCkmkr9PCA8UdwIEqJy/Akoq1
+         j6bMTALPVmIrLpToXZNyjrMh2MjA6z+fcI+2Ggn/BZxvjrEkmdi4ARMDB9fXDmBXcNcf
+         6LUt2pjTI3biJBSQyuZop/+KpDpscB2RX1dFyF33KC5Ts9UF54BjgceFI8owpjDZa3iw
+         SGALYYVoR+lQxsUrITkJ9KinfidM5Kwz+L2GWZGfr8zF9+jjhVSoCe1gYYrfcnd9dQXh
+         8ioecMxkIa/w/MxVQnWgEQ52BgzYC3yhmNOLG8XXzs/mtmJj9EXU8mzxHMWdbBRrEV77
+         mgMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=mkRpzA3P6Y6jkl5RHlE/gdhWCOjS5JJwXY+64DkVtvk=;
-        b=GVIxknnOB6XuE1i0SpH7UaVjpvu3r6jv2LYqciUE0IkSISrqTZsSJsFHRLhnzr7ysY
-         HGBRKNKHgpDYBSvc0nPymF8AnVxQjvr3VAsxG0P0OrZMyyYCWP1dRMTSvqBAWdKWnkxG
-         BU5y08JYMcQLfKcP7YG9dcuxpGjDkuxVUixYlRDFm8EaXxbi97YnboJeIr5Qi8YxAJdY
-         JreuMdXq+qLjqJs1ZkbU7j5Rlgi8Oam7U6QFZhVGwr7t+RNlsQIO/4mGvvSShdB1U7i0
-         WlNe8s/n7LklqhtAL7bvSWm30Bn/JDBIQu8xjAl7/TkHZ3Q+2iEkRAXiH5tPE25+5dfZ
-         Yt6Q==
-X-Gm-Message-State: ANhLgQ2QltdHMZs4+COcas2kxndFxqAdFHekwI7suMnXu9F6xuVEsuyp
-        W2+hlhT31cYm8jX3V64dIEM=
-X-Google-Smtp-Source: ADFU+vv/q/xU9Iic5X8zYiNPGWfhthYWWHcfoAeZJTBukjahlC8x9E825Q5m3MW7qjNgyUSLYWwOgQ==
-X-Received: by 2002:a05:620a:16d0:: with SMTP id a16mr5895817qkn.296.1583371333145;
-        Wed, 04 Mar 2020 17:22:13 -0800 (PST)
-Received: from localhost ([71.172.127.161])
-        by smtp.gmail.com with ESMTPSA id c204sm15065044qke.2.2020.03.04.17.22.12
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2thFv659sj5d5Ni5yvxP9gN4h9QVhmEBZCNJK4/mccw=;
+        b=XJgkjnCUZycMZlfekBrnieN+ZioxPl4vwGVQUI5IVWLwW/ZtA2V01OM6GBnnKunWmx
+         o2zGLQSJfUAsZY5W3mSkUpTWK5q1XjvuzdOmTvAZjDWdchZ2YsyJxVbizBjnrOK096sS
+         mARZ0H24WcI66BLx6KA5Vxu3OSQ2IVNhG/BCzKVrBMJnv+ui7pvHePKjGJ/YJC3AGwmu
+         AlBHJaV5PJxry9HyQB61dlj87Z36+tw3I0J8NYGX7zAYjn5P/Y9OQ9Mtz9X2iPLYQm/2
+         eW5Y4dveSYy9QSgi7XZf0U1kmXuO0dnpeAQZH7M1C7nIcNCxG85AASpMcjtwWqwbqwKr
+         ZC6w==
+X-Gm-Message-State: ANhLgQ03UstWw8qM/rYuJfFS2uWjK8eUW1Cp+zXifsbVJVflPPm4UhDo
+        9+OFhmovNZO/0AVjeK/k6uCtCg==
+X-Google-Smtp-Source: ADFU+vt+xtLO79oB84p7YASWE2WmLbGoCdm+hk/v+HYCths5SJYrRkJ4dp6xdWmregj7/mqFdlCLeQ==
+X-Received: by 2002:a17:90a:2e05:: with SMTP id q5mr5788717pjd.68.1583371812000;
+        Wed, 04 Mar 2020 17:30:12 -0800 (PST)
+Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
+        by smtp.gmail.com with ESMTPSA id a71sm14651551pfa.117.2020.03.04.17.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2020 17:22:12 -0800 (PST)
-Date:   Wed, 4 Mar 2020 20:22:11 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        jack@suse.cz, bvanassche@acm.org, tytso@mit.edu
-Subject: Re: [PATCH v2 3/7] bdi: protect device lifetime with RCU
-Message-ID: <20200305012211.GA33199@mtj.duckdns.org>
-References: <20200226111851.55348-1-yuyufen@huawei.com>
- <20200226111851.55348-4-yuyufen@huawei.com>
- <20200304170543.GJ189690@mtj.thefacebook.com>
- <20200304172221.GA1864270@kroah.com>
- <20200304185056.GM189690@mtj.thefacebook.com>
- <20200304200559.GA1906005@kroah.com>
+        Wed, 04 Mar 2020 17:30:11 -0800 (PST)
+Date:   Wed, 4 Mar 2020 17:30:10 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH blktests V2 2/3] nvme: test target cntlid min cntlid max
+Message-ID: <20200305013010.GA293405@vader>
+References: <20200215013831.6715-1-chaitanya.kulkarni@wdc.com>
+ <20200215013831.6715-3-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200304200559.GA1906005@kroah.com>
+In-Reply-To: <20200215013831.6715-3-chaitanya.kulkarni@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Wed, Mar 04, 2020 at 09:05:59PM +0100, Greg Kroah-Hartman wrote:
-> > Lifetime rules in block layer are kinda nebulous. Some of it comes
-> > from the fact that some objects are reused. Instead of the usual,
-> > create-use-release, they get repurposed to be associated with
-> > something else. When looking at such an object from some paths, we
-> > don't necessarily have ownership of all of the members.
+On Fri, Feb 14, 2020 at 05:38:30PM -0800, Chaitanya Kulkarni wrote:
+> The new testcases exercises newly added cntlid [min|max] attributes
+> for NVMeOF target.
 > 
-> That's horrid, it's not like block devices are on some "fast path" for
-> tear-down, we should do it correctly.
-
-Yeah, it got retrofitted umpteenth times from the really early days. I
-don't think much of it is intentionally designed to be this way.
-
-> > > backing_device_info?  Are these being destroyed/used so often that rcu
-> > > really is the best solution and the existing reference counting doesn't
-> > > work properly?
-> > 
-> > It's more that there are entry points which can only ensure that just
-> > the top level object is valid and the member objects might be going or
-> > coming as we're looking at it.
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+>  tests/nvme/033     | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/nvme/033.out |  4 +++
+>  2 files changed, 65 insertions(+)
+>  create mode 100755 tests/nvme/033
+>  create mode 100644 tests/nvme/033.out
 > 
-> That's not ok, a "member object" can only be valid if you have a
-> reference to it.  If you remove the object, you then drop the reference,
-> shouldn't that be the correct thing to do?
+> diff --git a/tests/nvme/033 b/tests/nvme/033
+> new file mode 100755
+> index 0000000..49f2fa1
+> --- /dev/null
+> +++ b/tests/nvme/033
+> @@ -0,0 +1,61 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +# Copyright (c) 2017-2018 Western Digital Corporation or its affiliates.
+> +#
+> +# Test NVMeOF target cntlid[min|max] attributes.
+> +
+> +. tests/nvme/rc
+> +
+> +DESCRIPTION="Test NVMeOF target cntlid[min|max] attributes"
+> +QUICK=1
+> +
+> +PORT=""
+> +NVMEDEV=""
+> +LOOP_DEV=""
+> +FILE_PATH="$TMPDIR/img"
+> +SUBSYS_NAME="blktests-subsystem-1"
+> +
+> +_have_cid_min_max()
+> +{
+> +	local cid_min=14
+> +	local cid_max=15
+> +
+> +	_setup_nvmet
+> +	truncate -s 1G "${FILE_PATH}"
+> +	LOOP_DEV="$(losetup -f --show "${FILE_PATH}")"
+> +
+> +	# we can only know skip reason when we create a subsys
+> +	 _create_nvmet_subsystem "${SUBSYS_NAME}" "${LOOP_DEV}" \
+> +		"91fdba0d-f87b-4c25-b80f-db7be1418b9e" ${cid_min} ${cid_max}
+> +}
 
-I mean, it depends. There are two layers of objects and the top level
-object has two stacked lifetime rules. The "active" usage pins
-everything as usual. The "shallower" usage only has full access to the
-top level and when it reaches down into members it needs a different
-mechanism to ensure its validity. Given a clean slate, I don't think
-we'd go for this design for these objects but the usage isn't
-fundamentally broken.
+Sorry, I wasn't ignoring these patches, they just made me realize that
+we really do need a way to skip a test from the test function itself, so
+I wanted to implement that first. Could you try rebasing on my skip-test
+branch (https://github.com/osandov/blktests/tree/skip-test) and
+reworking this so you don't have to split the setup between requires()
+and test()?
 
-Idk, for the problem at hand, the choice is between patching it up by
-copying the name and RCU protecting ->dev access at least for now.
-Both are nasty in their own ways but copying does have a smaller blast
-radius. So, copy for now?
-
-Thanks.
-
--- 
-tejun
+> +
+> +requires() {
+> +	_have_program nvme && _have_modules loop nvme-loop nvmet && \
+> +		_have_configfs && _have_cid_min_max
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	PORT="$(_create_nvmet_port "loop")"
+> +	_add_nvmet_subsys_to_port "${PORT}" "${SUBSYS_NAME}"
+> +
+> +	nvme connect -t loop -n "${SUBSYS_NAME}"
+> +
+> +	udevadm settle
+> +
+> +	NVMEDEV="$(_find_nvme_loop_dev)"
+> +	nvme id-ctrl /dev/"${NVMEDEV}"n1 | grep cntlid | tr -s ' ' ' '
+> +
+> +	nvme disconnect -n "${SUBSYS_NAME}"
+> +
+> +	_remove_nvmet_subsystem_from_port "${PORT}" "${SUBSYS_NAME}"
+> +	_remove_nvmet_subsystem "${SUBSYS_NAME}"
+> +	_remove_nvmet_port "${PORT}"
+> +
+> +	losetup -d "${LOOP_DEV}"
+> +
+> +	rm "${FILE_PATH}"
+> +
+> +	echo "Test complete"
+> +}
+> diff --git a/tests/nvme/033.out b/tests/nvme/033.out
+> new file mode 100644
+> index 0000000..b1b0d15
+> --- /dev/null
+> +++ b/tests/nvme/033.out
+> @@ -0,0 +1,4 @@
+> +Running nvme/033
+> +cntlid : e
+> +NQN:blktests-subsystem-1 disconnected 1 controller(s)
+> +Test complete
+> -- 
+> 2.22.1
+> 
