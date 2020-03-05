@@ -2,208 +2,330 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2482C3F2CE
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 02:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731A8C3F2CE
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 03:06:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 903562084E
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 02:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 311792073D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 03:06:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PyRWwJvp"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Dz66BdH9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725844AbgCECsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 21:48:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23567 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725838AbgCECsY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 21:48:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583376503;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=prh2UH0i3OjQTv34/sRknvYn8MyOlonHeS7xML10Ef4=;
-        b=PyRWwJvpdAacmk28W4XfhejMePBhmQ+05X5QEhaEtQ7ACOriTf21iF/1c0qFwzJ16tXDEM
-        peNEoAK7XSGoPn/QhY8tNRKgwPyC+SR4m3Rc0S7rpVaJf1z0CdlL0aEagFGRMIMQjy9MYL
-        LpFIOGkXWtYIPam5a6y6xMFEYek7C+g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-rIvp_3crNaWcqLaWaS3LOA-1; Wed, 04 Mar 2020 21:48:19 -0500
-X-MC-Unique: rIvp_3crNaWcqLaWaS3LOA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B214802B63;
-        Thu,  5 Mar 2020 02:48:18 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C78A790CD1;
-        Thu,  5 Mar 2020 02:48:12 +0000 (UTC)
-Date:   Thu, 5 Mar 2020 10:48:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        id S1725807AbgCEDGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 22:06:02 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:12909 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725797AbgCEDGC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 22:06:02 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e606c6f0001>; Wed, 04 Mar 2020 19:05:19 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 04 Mar 2020 19:06:00 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 04 Mar 2020 19:06:00 -0800
+Received: from [10.2.174.88] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 5 Mar
+ 2020 03:05:59 +0000
+Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
+From:   Sowjanya Komatineni <skomatineni@nvidia.com>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+CC:     Jon Hunter <jonathanh@nvidia.com>,
+        Bitan Biswas <bbiswas@nvidia.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: commit 01e99aeca397 causes longer runtime of block/004
-Message-ID: <20200305024808.GA26733@ming.t460p>
-References: <20200304023842.gu37d4mzfbseiscw@shindev.dhcp.fujisawa.hgst.com>
- <20200304034644.GA23012@ming.t460p>
- <20200304061137.l4hdqdt2dvs7dxgz@shindev.dhcp.fujisawa.hgst.com>
- <20200304095344.GA10390@ming.t460p>
- <20200305011900.2rtgtmclovmr2fbw@shindev.dhcp.fujisawa.hgst.com>
+        Alexei Starovoitov <ast@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        <lkft-triage@lists.linaro.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        John Stultz <john.stultz@linaro.org>,
+        Faiz Abbas <faiz_abbas@ti.com>,
+        Thierry Reding <treding@nvidia.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Kishon <kishon@ti.com>
+References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
+ <CAPDyKFrXQgtHa4gLaKUi_F0rs4FMBai3Y_+TcHZR_zpkb0B4QQ@mail.gmail.com>
+ <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com>
+ <f960aa98-5508-36fd-166d-7f41c7d85154@nvidia.com>
+ <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
+ <0963b60f-15e7-4bc6-10df-6fc8003e4d42@nvidia.com>
+ <CAPDyKFq5NoeHEBK3sv3yOSD2+pm9FueH1gaTyPq0j7GLfa6vnA@mail.gmail.com>
+ <34fd84d7-387b-b6f3-7fb3-aa490909e205@ti.com>
+ <CAPDyKFrrO4noYqdxWL9Y8Nx75LopbDudKGMotkGbGcAF1oq==w@mail.gmail.com>
+ <5e9b5646-bd48-e55b-54ee-1c2c41fc9218@nvidia.com>
+ <CAPDyKFqpNo_4OePBR1KnJNO=kR8XEqbcsEd=icSceSdDH+Rk1Q@mail.gmail.com>
+ <757853cf-987e-f6b6-9259-b4560a031692@nvidia.com>
+ <d12fe142-7e72-ab58-33ab-17817e35096f@nvidia.com>
+ <c216f131-6f83-c9c9-9d17-8d44ec06972d@nvidia.com>
+ <87ad7586-9569-4276-044a-adb64e84ca15@nvidia.com>
+ <a0962e0b-0f1d-9f32-f6e9-92f69f93167f@nvidia.com>
+ <57ddddc2-3ee8-d867-bba0-0dd9929ba37d@nvidia.com>
+Message-ID: <7c753d80-8aec-808c-c496-15fc841cf44d@nvidia.com>
+Date:   Wed, 4 Mar 2020 19:06:11 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200305011900.2rtgtmclovmr2fbw@shindev.dhcp.fujisawa.hgst.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <57ddddc2-3ee8-d867-bba0-0dd9929ba37d@nvidia.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1583377519; bh=yoXVGJwpDfbITheh44MJc7mZQsxjU1PCYgpzSXeVgY0=;
+        h=X-PGP-Universal:Subject:From:To:CC:References:Message-ID:Date:
+         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Transfer-Encoding:
+         Content-Language;
+        b=Dz66BdH9ZvKJX319vHWLbYzHg20mxYW2p9ChLFXyC574I8WlqmVBt9TXgQwVEZ37/
+         xxVpVg+7JkSMC9CKA18iSxk6e8TivlTPD0jhUx2vIbWtMgRWfDROiusCIGsfxtp93y
+         jaN34Kw8tYLrktdnQTzxMLa+61UNbvGoM1pnMA5H5H0mz7cp/mf27HpJkFfe5Q83Ou
+         T5oCPUBuYxeeP1ZKYzm1H9cBe4BFmLHyFqKW0aSpyYCu9e8TE+6Vo9dLlZmqAQEFtX
+         YzpMNjRJrQmE3EdzKQBrM7kIaHXGwdAFQvBZ6eTcefjkEalv3+7sFdRXyhzjDfsW/1
+         8rtGzwxlUjasg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Shinichiro,
 
-On Thu, Mar 05, 2020 at 01:19:02AM +0000, Shinichiro Kawasaki wrote:
-> On Mar 04, 2020 / 17:53, Ming Lei wrote:
-> > On Wed, Mar 04, 2020 at 06:11:37AM +0000, Shinichiro Kawasaki wrote:
-> > > On Mar 04, 2020 / 11:46, Ming Lei wrote:
-> > > > On Wed, Mar 04, 2020 at 02:38:43AM +0000, Shinichiro Kawasaki wrote:
-> > > > > I noticed that blktests block/004 takes longer runtime with 5.6-rc4 than
-> > > > > 5.6-rc3, and found that the commit 01e99aeca397 ("blk-mq: insert passthrough
-> > > > > request into hctx->dispatch directly") triggers it.
-> > > > > 
-> > > > > The longer runtime was observed with dm-linear device which maps SATA SMR HDD
-> > > > > connected via AHCI. It was not observed with dm-linear on SAS/SATA SMR HDDs
-> > > > > connected via SAS-HBA. Not observed with dm-linear on non-SMR HDDs either.
-> > > > > 
-> > > > > Before the commit, block/004 took around 130 seconds. After the commit, it takes
-> > > > > around 300 seconds. I need to dig in further details to understand why the
-> > > > > commit makes the test case longer.
-> > > > > 
-> > > > > The test case block/004 does "flush intensive workload". Is this longer runtime
-> > > > > expected?
-> > > > 
-> > > > The following patch might address this issue:
-> > > > 
-> > > > https://lore.kernel.org/linux-block/20200207190416.99928-1-sqazi@google.com/#t
-> > > > 
-> > > > Please test and provide us the result.
-> > > > 
-> > > > thanks,
-> > > > Ming
-> > > >
-> > > 
-> > > Hi Ming,
-> > > 
-> > > I applied the patch to 5.6-rc4 but I observed the longer runtime of block/004.
-> > > Still it takes around 300 seconds.
-> > 
-> > Hello Shinichiro,
-> > 
-> > block/004 only sends 1564 sync randwrite, and seems 130s has been slow
-> > enough.
-> > 
-> > There are two related effect in that commit for your issue:
-> > 
-> > 1) 'at_head' is applied in blk_mq_sched_insert_request() for flush
-> > request
-> > 
-> > 2) all IO is added back to tail of hctx->dispatch after .queue_rq()
-> > returns STS_RESOURCE
-> > 
-> > Seems it is more related with 2) given you can't reproduce the issue on 
-> > SAS.
-> > 
-> > So please test the following two patches, and see which one makes a
-> > difference for you.
-> > 
-> > BTW, both two looks not reasonable, just for narrowing down the issue.
-> > 
-> > 1) patch 1
-> > 
-> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > index 856356b1619e..86137c75283c 100644
-> > --- a/block/blk-mq-sched.c
-> > +++ b/block/blk-mq-sched.c
-> > @@ -398,7 +398,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
-> >  	WARN_ON(e && (rq->tag != -1));
-> >  
-> >  	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
-> > -		blk_mq_request_bypass_insert(rq, at_head, false);
-> > +		blk_mq_request_bypass_insert(rq, true, false);
-> >  		goto run;
-> >  	}
-> 
-> Ming, thank you for the trial patches.
-> This "patch 1" reduced the runtime, as short as rc3.
-> 
-> > 
-> > 
-> > 2) patch 2
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index d92088dec6c3..447d5cb39832 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1286,7 +1286,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-> >  			q->mq_ops->commit_rqs(hctx);
-> >  
-> >  		spin_lock(&hctx->lock);
-> > -		list_splice_tail_init(list, &hctx->dispatch);
-> > +		list_splice_init(list, &hctx->dispatch);
-> >  		spin_unlock(&hctx->lock);
-> >  
-> >  		/*
-> 
-> This patch 2 didn't reduce the runtime.
-> 
-> Wish this report helps.
-
-Your feedback does help, then please test the following patch:
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 5cc775bdb06a..68957802f96f 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -334,7 +334,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	flush_rq->rq_disk = first_rq->rq_disk;
- 	flush_rq->end_io = flush_end_io;
- 
--	blk_flush_queue_rq(flush_rq, false);
-+	blk_flush_queue_rq(flush_rq, true);
- }
- 
- static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d92088dec6c3..56d61b693f2e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -724,6 +724,8 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 	spin_unlock_irq(&q->requeue_lock);
- 
- 	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
-+		bool at_head = !!(rq->rq_flags & RQF_SOFTBARRIER);
-+
- 		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
- 			continue;
- 
-@@ -735,9 +737,9 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 		 * merge.
- 		 */
- 		if (rq->rq_flags & RQF_DONTPREP)
--			blk_mq_request_bypass_insert(rq, false, false);
-+			blk_mq_request_bypass_insert(rq, at_head, false);
- 		else
--			blk_mq_sched_insert_request(rq, true, false, false);
-+			blk_mq_sched_insert_request(rq, at_head, false, false);
- 	}
- 
- 	while (!list_empty(&rq_list)) {
-
-Thanks,
-Ming
-
+On 3/4/20 4:20 PM, Sowjanya Komatineni wrote:
+>
+> On 3/4/20 2:35 PM, Sowjanya Komatineni wrote:
+>>
+>> On 3/4/20 9:51 AM, Sowjanya Komatineni wrote:
+>>>
+>>> On 3/4/20 9:26 AM, Sowjanya Komatineni wrote:
+>>>>
+>>>> On 3/4/20 9:21 AM, Sowjanya Komatineni wrote:
+>>>>>
+>>>>> On 3/4/20 8:56 AM, Sowjanya Komatineni wrote:
+>>>>>>
+>>>>>> On 3/4/20 2:18 AM, Ulf Hansson wrote:
+>>>>>>> External email: Use caution opening links or attachments
+>>>>>>>
+>>>>>>>
+>>>>>>> [...]
+>>>>>>>
+>>>>>>>> So, from my side, me and Anders Roxell, have been collaborating on
+>>>>>>>> testing the behaviour on a TI Beagleboard x15 (remotely with=20
+>>>>>>>> limited
+>>>>>>>> debug options), which is using the sdhci-omap variant. I am=20
+>>>>>>>> trying to
+>>>>>>>> get hold of an Nvidia jetson-TX2, but not found one yet. These=20
+>>>>>>>> are the
+>>>>>>>> conclusions from the observed behaviour on the Beagleboard for the
+>>>>>>>> CMD6 cache flush command.
+>>>>>>>>
+>>>>>>>> First, the reported host->max_busy_timeout is 2581 (ms) for the
+>>>>>>>> sdhci-omap driver in this configuration.
+>>>>>>>>
+>>>>>>>> 1. As we all know by now, the cache flush command (CMD6) fails=20
+>>>>>>>> with
+>>>>>>>> -110 currently. This is when MMC_CACHE_FLUSH_TIMEOUT_MS is set=20
+>>>>>>>> to 30 *
+>>>>>>>> 1000 (30s), which means __mmc_switch() drops the MMC_RSP_BUSY flag
+>>>>>>>> from the command.
+>>>>>>>>
+>>>>>>>> 2. Changing the MMC_CACHE_FLUSH_TIMEOUT_MS to 2000 (2s), means=20
+>>>>>>>> that
+>>>>>>>> the MMC_RSP_BUSY flag becomes set by __mmc_switch, because of the
+>>>>>>>> timeout_ms parameter is less than max_busy_timeout (2000 < 2581).
+>>>>>>>> Then everything works fine.
+>>>>>>>>
+>>>>>>>> 3. Updating the code to again use 30s as the
+>>>>>>>> MMC_CACHE_FLUSH_TIMEOUT_MS, but instead forcing the=20
+>>>>>>>> MMC_RSP_BUSY to be
+>>>>>>>> set, even when the timeout_ms becomes greater than=20
+>>>>>>>> max_busy_timeout.
+>>>>>>>> This also works fine.
+>>>>>>>>
+>>>>>>>> Clearly this indicates a problem that I think needs to be=20
+>>>>>>>> addressed in
+>>>>>>>> the sdhci driver. However, of course I can revert the three=20
+>>>>>>>> discussed
+>>>>>>>> patches to fix the problem, but that would only hide the issues=20
+>>>>>>>> and I
+>>>>>>>> am sure we would then get back to this issue, sooner or later.
+>>>>>>>>
+>>>>>>>> To fix the problem in the sdhci driver, I would appreciate if=20
+>>>>>>>> someone
+>>>>>>>> from TI and Nvidia can step in to help, as I don't have the HW=20
+>>>>>>>> on my
+>>>>>>>> desk.
+>>>>>>>>
+>>>>>>>> Comments or other ideas of how to move forward?
+>>>>>>> [...]
+>>>>>>>
+>>>>>>>> Hi Ulf,
+>>>>>>>>
+>>>>>>>> I could repro during suspend on Jetson TX1/TX2 as when it does=20
+>>>>>>>> mmc flush cache.
+>>>>>>> Okay, great.
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Timeout I see is for switch status CMD13 after sending CMD6 as=20
+>>>>>>>> device side CMD6 is still inflight while host sends CMD13 as we=20
+>>>>>>>> are using R1 response type with timeout_ms changes to 30s.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Earlier we used timeout_ms of 0 for CMD6 flush cache, and with=20
+>>>>>>>> it uses R1B response type and host will wait for busy state=20
+>>>>>>>> followed by response from device for CMD6 and then data lines=20
+>>>>>>>> go High.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Now with timeout_ms changed to 30s, we use R1 response and SW=20
+>>>>>>>> waits for busy by checking for DAT0 line to go High.
+>>>>>>> If I understand correctly, because of the timeout now set to 30s,
+>>>>>>> MMC_RSP_BUSY becomes disabled in __mmc_switch() for your case in
+>>>>>>> sdhci-tegra as well?
+>>>>>> Yes
+>>>>>>>
+>>>>>>> In other words, mmc_poll_for_busy() is being called, which in your
+>>>>>>> case means the ->card_busy() host ops (set to sdhci_card_busy() in
+>>>>>>> your case) will be invoked to wait for the card to stop signal=20
+>>>>>>> busy on
+>>>>>>> DAT0.
+>>>>>>>
+>>>>>>> This indicates to me, that the ->card_busy() ops returns zero to
+>>>>>>> inform that the card is *not* busy, even if the card actually=20
+>>>>>>> signals
+>>>>>>> busy? Is that correct?
+>>>>>> Yes
+>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> With R1B type, host design after sending command at end of=20
+>>>>>>>> completion after end bit waits for 2 cycles for data line to go=20
+>>>>>>>> low (busy state from device) and waits for response cycles=20
+>>>>>>>> after which data lines will go back high and then we issue=20
+>>>>>>>> switch status CMD13.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> With R1 type, host after sending command and at end of=20
+>>>>>>>> completion after end bit, DATA lines will go high immediately=20
+>>>>>>>> as its R1 type and switch status CMD13 gets issued but by this=20
+>>>>>>>> time it looks like CMD6 on device side is still in flight for=20
+>>>>>>>> sending status and data.
+>>>>>>> So, yes, using R1 instead of R1B triggers a different behaviour,=20
+>>>>>>> but
+>>>>>>> according to the eMMC spec it's perfectly allowed to issue a CMD13
+>>>>>>> even if the card signals busy on DAT0. The CMD13 is not using=20
+>>>>>>> the DATA
+>>>>>>> lines, so this should work.
+>>>>>>>
+>>>>>>> If I understand correctly, your driver (and controller?) has issues
+>>>>>>> with coping with this scenario. Is it something that can be fixed?
+>>>>>>>
+>>>>>>>>
+>>>>>>>> 30s timeout is the wait time for data0 line to go high and=20
+>>>>>>>> mmc_busy_status will return success right away with R1 response=20
+>>>>>>>> type and SW sends switch status CMD13 but during that time on=20
+>>>>>>>> device side looks like still processing CMD6 as we are not=20
+>>>>>>>> waiting for enough time when we use R1 response type.
+>>>>>>> Right, as stated above, isn't sdhci_card_busy() working for your=20
+>>>>>>> case?
+>>>>>>> Can we fix it?
+>>>>>>
+>>>>>> sdhci_card_busy() returned 0 indicating its not busy.
+>>>>>>
+>>>>>> Based on our host design, When CMD6 is issued with R1 type, we=20
+>>>>>> program it as NO_RESPONSE and with this command complete=20
+>>>>>> interrupt happens right at end bit of command and there will be=20
+>>>>>> no transfer complete interrupt.
+>>>>> *[Correction] Based on our host design, When CMD6 is issued with=20
+>>>>> R1 type as we program it as NO_RESPONSE and with this command=20
+>>>>> complete interrupt happens right at end bit of command and there=20
+>>>>> will be no transfer complete interrupt.
+>>>>
+>>>> Sorry to correct wordings, I meant sdhci driver programs response=20
+>>>> type as NO_RESPONSE for CMD6.
+>>>>
+>>>> When CMD6 is issued with R1 type and as NO_RESPONSE, Based on our=20
+>>>> host design=C2=A0 command complete interrupt happens right at end bit =
+of=20
+>>>> command and there will be no transfer complete interrupt.
+>>>>
+>>>>
+>>> Sorry for confusion. Please ignore above on response. it is using=20
+>>> SHORT response for R1. So SW poll should be working.
+>>>
+>>> Will get back on checking on host design side internally.
+>>>
+>> Hi Ulf,
+>>
+>> Verified internally regarding the busy state over DATA0 Our host=20
+>> design has known minor bug where command complete interrupt is=20
+>> asserted after waiting for busy cycles from device.So because of this=20
+>> polling for card_busy() returns 0 (DAT0 line High) immediately as=20
+>> waiting for busy is taken care during command complete interrupt in=20
+>> host design. This behavior is same for R1 and R1B.
+>>
+>>
+>>>>>>
+>>>>>> When CMD6 is issued with R1B type, we program is as R1B=20
+>>>>>> RESP_SHORT and with this command complete is end bit of device=20
+>>>>>> resp and transfer complete interrupt will be when DAT0 LOW -> HIGH.
+>>>>>>
+>>>>>> Regardless of R1/R1B, device side CMD6 will always have busy=20
+>>>>>> state on D0 and response on CMD lines.
+>>>>>>
+>>>>>> There will be 2 clock cycles period after sending CMD6 for device=20
+>>>>>> to send busy state on data0.
+>>>>>>
+>>>>>> In case of R1 type, after sending command DAT will stay high and=20
+>>>>>> looks like we are polling for busy early before busy state has=20
+>>>>>> started and sending CMD13 while device is busy and sending=20
+>>>>>> response on CMD line is causing timeout.
+>>>>>>
+>>>>>> Probably with this specific case of CMD6 with R1 type, to wait=20
+>>>>>> for card busy we should poll for DAT0 to go Low first and then to=20
+>>>>>> go High??
+>>>>>>
+>>>>>>>
+>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> Actually we always use R1B with CMD6 as per spec.
+>>>>>>> I fully agree that R1B is preferable, but it's not against the=20
+>>>>>>> spec to
+>>>>>>> send CMD13 to poll for busy.
+>>>>>>>
+>>>>>>> Moreover, we need to cope with the scenario when the host has
+>>>>>>> specified a maximum timeout that isn't sufficiently long enough for
+>>>>>>> the requested operation. Do you have another proposal for how to
+>>>>>>> manage this, but disabling MMC_RSP_BUSY?
+>>>>>>>
+>>>>>>> Let's assume you driver would get a R1B for the CMD6 (we force it),
+>>>>>>> then what timeout would the driver be using if we would set
+>>>>>>> cmd.busy_timeout to 30ms?
+>>>>>>>
+>>
+> Sorry didn't understood clearly. Are you asking with 30s timeout,=20
+> whats the data timeout counter used?
+>
+> Because of above mentioned issue on our host where CMD interrupt=20
+> happens after busy state, poll for busy returns right away as not busy.
+>
+> So issuing CMD13 after CMD6-R1 followed by busy poll should be=20
+> working. But weird that with small delay of 1ms or debug print before=20
+> CMD13 it doesn't timeout and works all the time.
+>
+>
+With R1B for CMD6, busy detection timeout on our host is 11s (data=20
+timeout count =3D 0xE)
+>>>>>>> Kind regards
+>>>>>>> Uffe
