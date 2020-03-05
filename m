@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F0AC3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A38C3F2D7
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:22:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B73C20870
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:19:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F7962072D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:22:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583428775;
-	bh=qByTAWT7bl0J6/edNlwDbsUX9/OFfv2Y7B+vvlVndss=;
+	s=default; t=1583428923;
+	bh=REpsYXfZCjqkDDB8VV0pmsaiEOHyUa6o40zKlxKoOQc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=KpMLxZw+CRxdw8ZKBmE0Ta0wM6XuI6jHhMW4Jfb8QMge9MrOVq0jsitINTNU6qNv1
-	 3782HdFzGu9Olb0eY5LNHw8rCgJc1ZBeYB4Yf/84WykEgu4Ivy6R438tEmlo7hg+gk
-	 YPFzBMFzis/bgMlsNx4039uVGulQgglq7MmK+HCo=
+	b=H6YAlYQ09U3jZpTLGwEA3esjpfGzj9B1EVcb7G+grJGl8ZlXQb75qf4mxMXz+4oum
+	 e85STCssD87/LQeXhakhuF7HEhwz64z/A6ewvzBfg08ozr9Bm1HBKS/jkpr/FWZZin
+	 er4YdJsgb6YrBmMAlXTPjJyN2Zv6Me7QOc+EsGmE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgCERTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 12:19:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41670 "EHLO mail.kernel.org"
+        id S1727552AbgCEROG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 12:14:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39906 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727933AbgCERPF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Mar 2020 12:15:05 -0500
+        id S1727502AbgCEROE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 12:14:04 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 27B1D20848;
-        Thu,  5 Mar 2020 17:15:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 55855208CD;
+        Thu,  5 Mar 2020 17:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583428505;
-        bh=qByTAWT7bl0J6/edNlwDbsUX9/OFfv2Y7B+vvlVndss=;
+        s=default; t=1583428443;
+        bh=REpsYXfZCjqkDDB8VV0pmsaiEOHyUa6o40zKlxKoOQc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=peK9GphUCu2SQ/UQ7KxrI0TzzZ+fOUDZkDE4y/ZTCs1vm3twfI4FnK0XwUaoEgVp9
-         lUCvmvmwus/hVMmVz6JdA+DVzs5VJ+fIkFCVl7XqgXvYMNjpXGtSx+KHAo/JGu9jtC
-         TBDwUhpZd58zET3m9Qy0CJq9oXadYr42uwvprioQ=
+        b=nAE97QvM7w/N/0PnJjEfkG/ok4C4ALes3PnZZ7T4wMgK4In4EVyV8D0GvkJGsRY4/
+         n798FIa9bwfsWfIviUkZTMbvB/zFWqRgIiLVyy4ScUXyZjM0ESWywrt5SCk9BsDNdO
+         jzkTuR1zDRyTE3SGtyri3erQPkwt7rimN0CXqVtY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>,
@@ -45,12 +45,12 @@ Cc:     Ming Lei <ming.lei@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         "Ewan D . Milne" <emilne@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 35/58] blk-mq: insert passthrough request into hctx->dispatch directly
-Date:   Thu,  5 Mar 2020 12:13:56 -0500
-Message-Id: <20200305171420.29595-35-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 39/67] blk-mq: insert passthrough request into hctx->dispatch directly
+Date:   Thu,  5 Mar 2020 12:12:40 -0500
+Message-Id: <20200305171309.29118-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200305171420.29595-1-sashal@kernel.org>
-References: <20200305171420.29595-1-sashal@kernel.org>
+In-Reply-To: <20200305171309.29118-1-sashal@kernel.org>
+References: <20200305171309.29118-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -97,10 +97,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  4 files changed, 29 insertions(+), 16 deletions(-)
 
 diff --git a/block/blk-flush.c b/block/blk-flush.c
-index b1f0a1ac505c9..5aa6fada22598 100644
+index 3f977c517960e..5cc775bdb06ac 100644
 --- a/block/blk-flush.c
 +++ b/block/blk-flush.c
-@@ -399,7 +399,7 @@ void blk_insert_flush(struct request *rq)
+@@ -412,7 +412,7 @@ void blk_insert_flush(struct request *rq)
  	 */
  	if ((policy & REQ_FSEQ_DATA) &&
  	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
@@ -152,10 +152,10 @@ index ca22afd47b3dc..856356b1619e8 100644
  	if (e && e->type->ops.insert_requests) {
  		LIST_HEAD(list);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ec791156e9ccd..3c1abab1fdf52 100644
+index 323c9cb28066b..329df7986bf60 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -761,7 +761,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+@@ -727,7 +727,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
  		 * merge.
  		 */
  		if (rq->rq_flags & RQF_DONTPREP)
@@ -164,7 +164,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  		else
  			blk_mq_sched_insert_request(rq, true, false, false);
  	}
-@@ -1313,7 +1313,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+@@ -1278,7 +1278,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
  			q->mq_ops->commit_rqs(hctx);
  
  		spin_lock(&hctx->lock);
@@ -173,7 +173,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  		spin_unlock(&hctx->lock);
  
  		/*
-@@ -1668,12 +1668,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+@@ -1629,12 +1629,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
   * Should only be used carefully, when the caller knows we want to
   * bypass a potential IO scheduler on the target device.
   */
@@ -192,7 +192,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  	spin_unlock(&hctx->lock);
  
  	if (run_queue)
-@@ -1863,7 +1867,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1824,7 +1828,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
  	if (bypass_insert)
  		return BLK_STS_RESOURCE;
  
@@ -201,7 +201,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  	return BLK_STS_OK;
  }
  
-@@ -1879,7 +1883,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1840,7 +1844,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
  
  	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
  	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
@@ -210,7 +210,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  	else if (ret != BLK_STS_OK)
  		blk_mq_end_request(rq, ret);
  
-@@ -1913,7 +1917,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1874,7 +1878,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
  		if (ret != BLK_STS_OK) {
  			if (ret == BLK_STS_RESOURCE ||
  					ret == BLK_STS_DEV_RESOURCE) {
@@ -220,7 +220,7 @@ index ec791156e9ccd..3c1abab1fdf52 100644
  				break;
  			}
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 32c62c64e6c2b..f2075978db500 100644
+index eaaca8fc1c287..c0fa34378eb2f 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
 @@ -66,7 +66,8 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
