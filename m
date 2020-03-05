@@ -2,149 +2,156 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 798E1C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3E9C3F2D7
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C67020848
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 657E4208C3
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JLFvXCWs"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="QhyhVYCP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727268AbgCEKOP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 05:14:15 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:38108 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727304AbgCEKOP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 05:14:15 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 025A7mv2038879;
-        Thu, 5 Mar 2020 10:13:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=SGXNoWNlZVLnSYJIxa2/4WB0jyZ02hYC4NTOct1cKkQ=;
- b=JLFvXCWsTdaT86bZXB2zn8XjFgTtkJFosOBxbYl+jtJTDwQFO4EpD1WYdi3aWJ7FL1YW
- 9FbJUMo4I0omrJiwDpGwmlpGvH68jzzALWaUDhfqSVmyPkWwi/PC1xEM0ZNXiVdeG1a4
- 8Y0glEHr5VwcbOvDYKAt2GFV9JOoxJ9iDV29kNGHiUzyWIkdgfrA+e9KZWCDmMM1BM8w
- uqAIZg2H5XW6VFAEW1FaVHXc0Id6yxv55s7t4F6ziMf5iKvvJ8TfqlIakpBlxMo+HB6K
- 9pqrF575lSX0ietRKXPNhzozvi4npitTINZHJW4oWF6hw2b/XIoi+RzYKrFSHshyKtFG rQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2yffcuv8vb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Mar 2020 10:13:38 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 025ACuAd064867;
-        Thu, 5 Mar 2020 10:13:38 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2yg1rus3dv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Mar 2020 10:13:37 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 025ADYBw000924;
-        Thu, 5 Mar 2020 10:13:34 GMT
-Received: from [192.168.1.14] (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 05 Mar 2020 02:13:34 -0800
-Subject: Re: [PATCH v2] blktrace: fix dereference after null check
-To:     Cengiz Can <cengiz@kernel.wtf>, Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200304105818.11781-1-cengiz@kernel.wtf>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <dd82137a-5152-7c93-a632-ac1766286be5@oracle.com>
-Date:   Thu, 5 Mar 2020 18:13:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1726101AbgCEK4w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 05:56:52 -0500
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:40468 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbgCEK4w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 05:56:52 -0500
+X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Thu, 05 Mar 2020 05:56:51 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1583405811;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fiq5TS2rlNJ42Y85HoM0ccjXqRxqSGHUjMll3s1okX8=;
+  b=QhyhVYCPxjIiCGz7yuSr87oij+PunddrxTnSKAgPiIXrFQxmXu5Jh+SI
+   dexJ0zERx7lRe5vFUDE1761+3FJ2VycBWjjBAUFQdEL+QO2qCRp8uWyvA
+   oUuLUcFe76mkP9qJHbhOIIZI6XK/EwAJ1Ji2LQvr+pu2aiDGr84CjPqGh
+   U=;
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+  roger.pau@citrix.com designates 162.221.158.21 as permitted
+  sender) identity=mailfrom; client-ip=162.221.158.21;
+  receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="roger.pau@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+  ip4:168.245.78.127 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+  envelope-from="roger.pau@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: iO84YcsxxS335XjMZn+9MjGhNsbK+YU+eCuQfCy4OEwl49wy+VHz976hS/9bOaohiwTjSrivnO
+ x3TfegmAg/7LogMve+gRCSAg+BG0Emc27M6MVGXQAWC6bVPlhU4NnJfpNGO82JGPZW5IFLtKzx
+ 3jV3y7PA+z1QZuPwup0i0yZpHKHNKqkOPFAYV47AHDo8PZoQ/CZmMTQHpqMip//8P9os3BAmk+
+ hIOnXJ0iVA6feNh2XdiceeL2Yf/FF9FnoC+F1X21XKfRKSZrmSIbnjsvdAGyQ+Y8Fjq8Y7vfyy
+ 4zo=
+X-SBRS: 2.7
+X-MesageID: 13795980
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.70,517,1574139600"; 
+   d="scan'208";a="13795980"
+Date:   Thu, 5 Mar 2020 11:49:35 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Juergen Gross <jgross@suse.com>
+CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] xen/blkfront: fix ring info addressing
+Message-ID: <20200305104935.GU24458@Air-de-Roger.citrite.net>
+References: <20200305100331.16790-1-jgross@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20200304105818.11781-1-cengiz@kernel.wtf>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
- suspectscore=2 malwarescore=0 adultscore=0 spamscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003050064
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 bulkscore=0
- adultscore=0 suspectscore=2 spamscore=0 malwarescore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003050063
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20200305100331.16790-1-jgross@suse.com>
+X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
+ AMSPEX02CL01.citrite.net (10.69.22.125)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/20 6:58 PM, Cengiz Can wrote:
-> There was a recent change in blktrace.c that added a RCU protection to
-> `q->blk_trace` in order to fix a use-after-free issue during access.
-> 
-> However the change missed an edge case that can lead to dereferencing of
-> `bt` pointer even when it's NULL:
-> 
-> Coverity static analyzer marked this as a FORWARD_NULL issue with CID
-> 1460458.
-> 
-> ```
-> /kernel/trace/blktrace.c: 1904 in sysfs_blk_trace_attr_store()
-> 1898            ret = 0;
-> 1899            if (bt == NULL)
-> 1900                    ret = blk_trace_setup_queue(q, bdev);
-> 1901
-> 1902            if (ret == 0) {
-> 1903                    if (attr == &dev_attr_act_mask)
->>>>     CID 1460458:  Null pointer dereferences  (FORWARD_NULL)
->>>>     Dereferencing null pointer "bt".
-> 1904                            bt->act_mask = value;
-> 1905                    else if (attr == &dev_attr_pid)
-> 1906                            bt->pid = value;
-> 1907                    else if (attr == &dev_attr_start_lba)
-> 1908                            bt->start_lba = value;
-> 1909                    else if (attr == &dev_attr_end_lba)
-> ```
-> 
-> Added a reassignment with RCU annotation to fix the issue.
-> 
-> Fixes: c780e86dd48 ("blktrace: Protect q->blk_trace with RCU")
-> 
-> Signed-off-by: Cengiz Can <cengiz@kernel.wtf>
+On Thu, Mar 05, 2020 at 11:03:31AM +0100, Juergen Gross wrote:
+> Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
+> actual use case") made struct blkfront_ring_info size dynamic. This is
+> fine when running with only one queue, but with multiple queues the
+> addressing of the single queues has to be adapted as the structs are
+> allocated in an array.
 
-This version looks good to me, thanks.
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
+Thanks, and sorry for not catching this during review.
 
+> 
+> Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 > ---
+>  drivers/block/xen-blkfront.c | 82 ++++++++++++++++++++++++--------------------
+>  1 file changed, 45 insertions(+), 37 deletions(-)
 > 
->     Patch Changelog
->     * v2: Added RCU annotation to assignment
-> 
->  kernel/trace/blktrace.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 4560878f0bac..ca39dc3230cb 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1896,8 +1896,11 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
->  	}
-> 
->  	ret = 0;
-> -	if (bt == NULL)
-> +	if (bt == NULL) {
->  		ret = blk_trace_setup_queue(q, bdev);
-> +		bt = rcu_dereference_protected(q->blk_trace,
-> +				lockdep_is_held(&q->blk_trace_mutex));
-> +	}
-> 
->  	if (ret == 0) {
->  		if (attr == &dev_attr_act_mask)
-> --
-> 2.25.1
-> 
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> index e2ad6bba2281..a8d4a3838e5d 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -213,6 +213,7 @@ struct blkfront_info
+>  	struct blk_mq_tag_set tag_set;
+>  	struct blkfront_ring_info *rinfo;
+>  	unsigned int nr_rings;
+> +	unsigned int rinfo_size;
+>  	/* Save uncomplete reqs and bios for migration. */
+>  	struct list_head requests;
+>  	struct bio_list bio_list;
+> @@ -259,6 +260,21 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
+>  static void blkfront_gather_backend_features(struct blkfront_info *info);
+>  static int negotiate_mq(struct blkfront_info *info);
+>  
+> +#define rinfo_ptr(rinfo, off) \
+> +	(struct blkfront_ring_info *)((unsigned long)(rinfo) + (off))
+                                      ^ void * would seem more natural IMO.
 
+Also if you use void * you don't need the extra (struct
+blkfront_ring_info *) cast I think?
+
+I however think this macro is kind of weird, since it's just doing an
+addition. I would rather have that calculation in get_rinfo and code
+for_each_rinfo on top of that.
+
+I agree this might be a question of taste, so I'm not going to insist
+but that would reduce the number of helpers from 3 to 2.
+
+> +
+> +#define for_each_rinfo(info, rinfo, idx)				\
+> +	for (rinfo = info->rinfo, idx = 0;				\
+> +	     idx < info->nr_rings;					\
+> +	     idx++, rinfo = rinfo_ptr(rinfo, info->rinfo_size))
+
+I think the above is missing proper parentheses around macro
+parameters.
+
+> +
+> +static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
+> +					    unsigned int i)
+
+inline attribute might be appropriate here.
+
+Thanks, Roger.
