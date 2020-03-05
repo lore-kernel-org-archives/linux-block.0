@@ -2,137 +2,184 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DEBC3F2CD
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 08:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3B9C3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF9E721556
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 08:47:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA8092073D
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O1WVPPJn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJa1TBCZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgCEIr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 03:47:59 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39929 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725816AbgCEIr7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 03:47:59 -0500
-Received: by mail-wr1-f65.google.com with SMTP id y17so5929532wrn.6;
-        Thu, 05 Mar 2020 00:47:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nHoooDzcvgLf3wA/4Y6elltfrU93wND/F+5GY/7SXsU=;
-        b=O1WVPPJnWowWB92YgIjXmfothJbjvlguldeZhHFsERRGuVUKYAPlcj64gVzAsLkpft
-         gOF1/ifekicBqUNPbNbYoWktBhd3Y7r6Id/JZLL8SG8V69egXV045S18m+XPI4ai55Nq
-         MeWDPLq1UgU74a7j0piEmLId+wAKKeZ72XeTYKXsHuVhs2bZBg6ZPSIbGXyLLTwLXDHJ
-         sbR/97zDVWuFWIaq4EH7TvwWC95s7Xyu0osCOzO8HR44l4XOtJHOQONfHlpiy4d4cE6C
-         41eeIYEhWgW6JXwKcB6kvTEQwAclC9qF10qX0aOfi+uZDrkNi1tyXs6L56FS/wN7Gyww
-         YQgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nHoooDzcvgLf3wA/4Y6elltfrU93wND/F+5GY/7SXsU=;
-        b=O2eg99hz1O6ZAno2fZbkEDSLCqsTZSEkgC24x1fNIBEptqHh/9xpPygZp9rQ5C2xJ2
-         lV6j32TvCeEuB8YRGxxoro9TZZ6vUy6AXZncBN/qgEnA25ts2w0gGHq/up5bdYTKfXg4
-         utAr3hJBYD67tr0RibNtq19lTW0b8+7PQWNufZsIM0Tn5n4OUd/0U4fyWu9VWdrXeS4E
-         n3Uab1/zIHl/smWCauUeYD0AnSedGttHoI4/CGQADm7B2MM/zp7t0VJyVQlufTKM9Qv7
-         sfx4lSZcioZ+I6KmPriHu2/6xNM226mjQVStTnGHUZCrM86e6VTBaCu/sXemZk50Zp6X
-         uCvA==
-X-Gm-Message-State: ANhLgQ3Ys4lQQ7F2C8KMhoJY3OQvvc4izj3GCPHeROmQXtbQ3TvqEcJt
-        2Icn8kfnKYdVOp9MdPmVqNzfPmzg/LJN1qSyz7SKs/pQ
-X-Google-Smtp-Source: ADFU+vu0oIGU7UqAZgATTFYpNQhrOGcwfgrI+9b0TmG/qVc7O4x6ZZe6+R7ww7PQa0Khi6GKv1ggMyUPxlyrI6YeOqI=
-X-Received: by 2002:adf:9501:: with SMTP id 1mr2832663wrs.426.1583398076809;
- Thu, 05 Mar 2020 00:47:56 -0800 (PST)
+        id S1725880AbgCEJoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 04:44:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56313 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725877AbgCEJod (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 04:44:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583401472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V/PKEdiUcAz2ikXbUB4Ni1dB5vTzbzOfPHLE0XSlVd0=;
+        b=WJa1TBCZmoePsSul+E0bSs7MHXR9l0n4qbn7j1GbVLc/XcQPNGeUALWFuNxkuiy1pSK8k4
+        M6IA7p/bnA87Tv1JbQwqjbYIjxJ331+FcK8aZYdwXXWHfHwos4UQRtjHm+2kvO0xIJqCP8
+        qbntG/DnopU4mHnQxaDOge1JbonjAVA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-YduF2yF8NsaNldiSx489uA-1; Thu, 05 Mar 2020 04:44:31 -0500
+X-MC-Unique: YduF2yF8NsaNldiSx489uA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCA36108443B;
+        Thu,  5 Mar 2020 09:44:29 +0000 (UTC)
+Received: from [10.43.17.55] (unknown [10.43.17.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A76EC90795;
+        Thu,  5 Mar 2020 09:44:22 +0000 (UTC)
+Subject: Re: [dm-devel] [git pull] device mapper fixes for 5.6-rc5
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Snitzer <snitzer@redhat.com>
+Cc:     Theodore Ts'o <tytso@mit.edu>,
+        linux-block <linux-block@vger.kernel.org>, dm-devel@redhat.com,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Alasdair G Kergon <agk@redhat.com>
+References: <20200304150257.GA19885@redhat.com>
+ <CAHk-=wgP=q648JXn8Hd9q7DuNaOEpLmxQp2W3RO3vkaD2CS_9g@mail.gmail.com>
+ <20200304192335.GA24296@redhat.com>
+ <CAHk-=wjdzxSGRLVHheRd1WA_FhsAMEV5pOwy08x8NaMG7ty8DQ@mail.gmail.com>
+From:   Zdenek Kabelac <zkabelac@redhat.com>
+Organization: Red Hat
+Message-ID: <7493a5fb-e267-6aaa-286b-16472ac8a5ca@redhat.com>
+Date:   Thu, 5 Mar 2020 10:44:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200304105818.11781-1-cengiz@kernel.wtf>
-In-Reply-To: <20200304105818.11781-1-cengiz@kernel.wtf>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Thu, 5 Mar 2020 16:47:45 +0800
-Message-ID: <CACVXFVOQLFb7doDSqPxyV-C3au3RfO5YacNzOWv9XOXm+4dE6A@mail.gmail.com>
-Subject: Re: [PATCH v2] blktrace: fix dereference after null check
-To:     Cengiz Can <cengiz@kernel.wtf>
-Cc:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAHk-=wjdzxSGRLVHheRd1WA_FhsAMEV5pOwy08x8NaMG7ty8DQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 4, 2020 at 6:59 PM Cengiz Can <cengiz@kernel.wtf> wrote:
->
-> There was a recent change in blktrace.c that added a RCU protection to
-> `q->blk_trace` in order to fix a use-after-free issue during access.
->
-> However the change missed an edge case that can lead to dereferencing of
-> `bt` pointer even when it's NULL:
->
-> Coverity static analyzer marked this as a FORWARD_NULL issue with CID
-> 1460458.
->
-> ```
-> /kernel/trace/blktrace.c: 1904 in sysfs_blk_trace_attr_store()
-> 1898            ret = 0;
-> 1899            if (bt == NULL)
-> 1900                    ret = blk_trace_setup_queue(q, bdev);
-> 1901
-> 1902            if (ret == 0) {
-> 1903                    if (attr == &dev_attr_act_mask)
-> >>>     CID 1460458:  Null pointer dereferences  (FORWARD_NULL)
-> >>>     Dereferencing null pointer "bt".
-> 1904                            bt->act_mask = value;
-> 1905                    else if (attr == &dev_attr_pid)
-> 1906                            bt->pid = value;
-> 1907                    else if (attr == &dev_attr_start_lba)
-> 1908                            bt->start_lba = value;
-> 1909                    else if (attr == &dev_attr_end_lba)
-> ```
->
-> Added a reassignment with RCU annotation to fix the issue.
->
-> Fixes: c780e86dd48 ("blktrace: Protect q->blk_trace with RCU")
->
-> Signed-off-by: Cengiz Can <cengiz@kernel.wtf>
-> ---
->
->     Patch Changelog
->     * v2: Added RCU annotation to assignment
->
->  kernel/trace/blktrace.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 4560878f0bac..ca39dc3230cb 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1896,8 +1896,11 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
->         }
->
->         ret = 0;
-> -       if (bt == NULL)
-> +       if (bt == NULL) {
->                 ret = blk_trace_setup_queue(q, bdev);
-> +               bt = rcu_dereference_protected(q->blk_trace,
-> +                               lockdep_is_held(&q->blk_trace_mutex));
-> +       }
->
->         if (ret == 0) {
->                 if (attr == &dev_attr_act_mask)
-> --
-> 2.25.1
->
+Dne 04. 03. 20 v 20:34 Linus Torvalds napsal(a):
+>=20
+>=20
+> On Wed, Mar 4, 2020, 13:23 Mike Snitzer <snitzer@redhat.com=20
+> <mailto:snitzer@redhat.com>> wrote:
+>=20
+>=20
+>     These versions are for userspace's benefit (be it lvm2, cryptsetup,
+>     multipath-tools, etc).=C2=A0 But yes, these versions are bogus even=
+ for
+>     that -- primarily because it requires userspace to know when a
+>     particular feature/fix it cares about was introduced.=C2=A0 In addi=
+tion: if
+>     fixes, that also bump version, are marked for stable@ then we're qu=
+ickly
+>     in versioning hell -- which is why I always try to decouple version
+>     bumps from fixes.
+>=20
+>=20
+> Yeah, I think the drm people used to have a version number too, and it'=
+s not=20
+> just fixes getting backported to stable - it's distro kernels taking ch=
+anges=20
+> for new hardware without taking other parts etc.
+>=20
+> So the versioning ends up not ever working reliably anyway - the same w=
+ay that=20
+> you can't use the kernel version number to determine what system calls =
+are=20
+> available.
+>=20
+> So versions can not ever be anything more than informational, and it's =
+usually=20
+> just very confusing to have multiple different version numbers (ie "I'm=
+=20
+> running kernel v5.4, and my driver abc version is 1.4.2a" is *not* in t=
+he=20
+> least helpful).
+>=20
+>     Others have suggested setting feature flags.=C2=A0 I expect you'd h=
+ate those
+>     too.=C2=A0 I suspect I quickly would too given flag bits are finite=
+ and
+>     really tedious to deal with.
+>=20
+>=20
+> It also leads to some people then thinking it's ok to remove features (=
+perhaps=20
+> to reimplement them differently) if they only clear the feature bit.
+>=20
+> And no, it's not how kernel interfaces work. We keep the interfaces eve=
+n if=20
+> the internals change.
+>=20
+> So I've been suggesting that people just freeze the version, or remove =
+the=20
+> interface entirely is possible.
+>=20
+> Because otherwise it's just a source of problems, where user space migh=
+t=20
+> refuse to do something that the kernel supports because of some silly v=
+ersion=20
+> check...
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Hi
 
--- 
-Ming Lei
+POV of lvm2 developer - there are 2 things to solve - 1st. is the introdu=
+ction=20
+of a new 'features'. The 2nd. is usability/stability of certain version o=
+f dm=20
+targets - so when we later discover some combination of device stack are =
+not=20
+safe to use (can lead to significant lose of user's data) lvm2 adds check=
+ for=20
+this.
+
+The reason for complexity comes from fact - numerous distribution use ver=
+sion
+of kernel X.Y.Z while they can have much new DM target version as it's mu=
+ch=20
+more simple to backport new DM into older version.
+
+Nothing is clearly 'perfect', there is no ideal solution to cover all=20
+combination of all kernel backports - but current separate versioning str=
+eam
+of DM targets added to kernel versioning, which i.e. lvm2 also is trackin=
+g,=20
+adds more hints for safe decision (as the safety of user's data is the mo=
+st=20
+important here)  and allows various distributions to 'somehow reasonably'=
+=20
+handle backporting of bugfixes.
+
+So if there would be 'feature flag' list provided by DM target - there st=
+ill=20
+should be visible which version of implemented flag is that - as when the=
+ new=20
+feature is added - it's not always 'perfect' - sometimes we discover q bu=
+g=20
+quite late in the process of new feature introduction - so the plain fact=
+=20
+'featureXYZ' is present unfortunately doesn't always mean it's usable.
+Sometimes even 'fixing' one bug may introduce a new problem we discover a=
+gain=20
+later (testing combinations of device stacks is really madness of its own=
+...)
+
+
+Zdenek
+
