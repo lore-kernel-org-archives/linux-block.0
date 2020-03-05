@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665B8C3F2D8
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 617B8C3F2D7
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 402C320848
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B28520848
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbgCEL7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 06:59:08 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11156 "EHLO huawei.com"
+        id S1727414AbgCEL7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 06:59:09 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11157 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727425AbgCEL7I (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1727433AbgCEL7I (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 5 Mar 2020 06:59:08 -0500
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id E919BC609428AFABC565;
+        by Forcepoint Email with ESMTP id F23322E2E1AC7615B8D7;
         Thu,  5 Mar 2020 19:59:04 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 19:58:54 +0800
+ 14.3.439.0; Thu, 5 Mar 2020 19:58:55 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
@@ -33,10 +33,11 @@ To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <shivasharan.srikanteshwara@broadcom.com>
 CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
         <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
+        Hannes Reinecke <hare@suse.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH RFC v6 04/10] blk-mq: Facilitate a shared sbitmap per tagset
-Date:   Thu, 5 Mar 2020 19:54:34 +0800
-Message-ID: <1583409280-158604-5-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
+Date:   Thu, 5 Mar 2020 19:54:38 +0800
+Message-ID: <1583409280-158604-9-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
 References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
@@ -49,274 +50,234 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some SCSI HBAs (such as HPSA, megaraid, mpt3sas, hisi_sas_v3 ..) support
-multiple reply queues with single hostwide tags.
+From: Hannes Reinecke <hare@suse.com>
 
-In addition, these drivers want to use interrupt assignment in
-pci_alloc_irq_vectors(PCI_IRQ_AFFINITY). However, as discussed in [0],
-CPU hotplug may cause in-flight IO completion to not be serviced when an
-interrupt is shutdown.
+Fusion adapters can steer completions to individual queues, and
+we now have support for shared host-wide tags.
+So we can enable multiqueue support for fusion adapters and
+drop the hand-crafted interrupt affinity settings.
 
-To solve that problem, Ming's patchset to drain hctx's should ensure no
-IOs are missed in-flight [1].
-
-However, to take advantage of that patchset, we need to map the HBA HW
-queues to blk mq hctx's; to do that, we need to expose the HBA HW queues.
-
-In making that transition, the per-SCSI command request tags are no
-longer unique per Scsi host - they are just unique per hctx. As such, the
-HBA LLDD would have to generate this tag internally, which has a certain
-performance overhead.
-
-However another problem is that blk mq assumes the host may accept
-(Scsi_host.can_queue * #hw queue) commands. In [2], we removed the Scsi
-host busy counter, which would stop the LLDD being sent more than
-.can_queue commands; however, we should still ensure that the block layer
-does not issue more than .can_queue commands to the Scsi host.
-
-To solve this problem, introduce a shared sbitmap per blk_mq_tag_set,
-which may be requested at init time.
-
-New flag BLK_MQ_F_TAG_HCTX_SHARED should be set when requesting the
-tagset to indicate whether the shared sbitmap should be used.
-
-Even when BLK_MQ_F_TAG_HCTX_SHARED is set, we still allocate a full set of
-tags and requests per hctx; the reason for this is that if we only allocate
-tags and requests for a single hctx - like hctx0 - we may break block
-drivers which expect a request be associated with a specific hctx, i.e.
-not hctx0.
-
-This is based on work originally from Ming Lei in [3] and from Bart's
-suggestion in [4].
-
-[0] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
-[1] https://lore.kernel.org/linux-block/20191014015043.25029-1-ming.lei@redhat.com/
-[2] https://lore.kernel.org/linux-scsi/20191025065855.6309-1-ming.lei@redhat.com/
-[3] https://lore.kernel.org/linux-block/20190531022801.10003-1-ming.lei@redhat.com/
-[4] https://lore.kernel.org/linux-block/ff77beff-5fd9-9f05-12b6-826922bace1f@huawei.com/T/#m3db0a602f095cbcbff27e9c884d6b4ae826144be
-
+Signed-off-by: Hannes Reinecke <hare@suse.com>
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- block/blk-mq-tag.c     | 36 ++++++++++++++++++++++++++++++++++--
- block/blk-mq-tag.h     | 10 +++++++++-
- block/blk-mq.c         | 28 ++++++++++++++++++++++++++--
- block/blk-mq.h         |  5 +++++
- include/linux/blk-mq.h |  3 +++
- 5 files changed, 77 insertions(+), 5 deletions(-)
+ drivers/scsi/megaraid/megaraid_sas.h        |  1 -
+ drivers/scsi/megaraid/megaraid_sas_base.c   | 59 +++++++--------------
+ drivers/scsi/megaraid/megaraid_sas_fusion.c | 24 +++++----
+ 3 files changed, 32 insertions(+), 52 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index b153ecf8c5c6..dd704118fe83 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -220,7 +220,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 	 * We can hit rq == NULL here, because the tagging functions
- 	 * test and set the bit before assigning ->rqs[].
- 	 */
--	if (rq && rq->q == hctx->queue)
-+	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
- 		return iter_data->fn(hctx, rq, iter_data->data, reserved);
- 	return true;
- }
-@@ -444,6 +444,7 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
- 		     round_robin, node))
- 		goto free_bitmap_tags;
+diff --git a/drivers/scsi/megaraid/megaraid_sas.h b/drivers/scsi/megaraid/megaraid_sas.h
+index 83d8c4cb1ad5..04ef440073f1 100644
+--- a/drivers/scsi/megaraid/megaraid_sas.h
++++ b/drivers/scsi/megaraid/megaraid_sas.h
+@@ -2261,7 +2261,6 @@ enum MR_PERF_MODE {
  
-+	/* We later overwrite these in case of per-set shared sbitmap */
- 	tags->bitmap_tags = &tags->__bitmap_tags;
- 	tags->breserved_tags = &tags->__breserved_tags;
+ struct megasas_instance {
  
-@@ -453,7 +454,32 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
- 	return -ENOMEM;
- }
+-	unsigned int *reply_map;
+ 	__le32 *producer;
+ 	dma_addr_t producer_h;
+ 	__le32 *consumer;
+diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
+index fd4b5ac6ac5b..cb788a14e35e 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_base.c
++++ b/drivers/scsi/megaraid/megaraid_sas_base.c
+@@ -37,6 +37,7 @@
+ #include <linux/poll.h>
+ #include <linux/vmalloc.h>
+ #include <linux/irq_poll.h>
++#include <linux/blk-mq-pci.h>
  
--struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
-+bool blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *tag_set)
-+{
-+	unsigned int depth = tag_set->queue_depth - tag_set->reserved_tags;
-+	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(tag_set->flags);
-+	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
-+	int node = tag_set->numa_node;
-+
-+	if (bt_alloc(&tag_set->__bitmap_tags, depth, round_robin, node))
-+		return false;
-+	if (bt_alloc(&tag_set->__breserved_tags, tag_set->reserved_tags,
-+		     round_robin, node))
-+		goto free_bitmap_tags;
-+	return true;
-+free_bitmap_tags:
-+	sbitmap_queue_free(&tag_set->__bitmap_tags);
-+	return false;
-+}
-+
-+void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *tag_set)
-+{
-+	sbitmap_queue_free(&tag_set->__bitmap_tags);
-+	sbitmap_queue_free(&tag_set->__breserved_tags);
-+}
-+
-+struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
-+				     unsigned int total_tags,
- 				     unsigned int reserved_tags,
- 				     int node, int alloc_policy)
- {
-@@ -480,6 +506,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 
- void blk_mq_free_tags(struct blk_mq_tags *tags)
- {
-+	/* Do not use tags->{bitmap, breserved}_tags */
- 	sbitmap_queue_free(&tags->__bitmap_tags);
- 	sbitmap_queue_free(&tags->__breserved_tags);
- 	kfree(tags);
-@@ -538,6 +565,11 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -3114,6 +3115,19 @@ megasas_bios_param(struct scsi_device *sdev, struct block_device *bdev,
  	return 0;
  }
  
-+void blk_mq_tag_resize_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int size)
++static int megasas_map_queues(struct Scsi_Host *shost)
 +{
-+	sbitmap_queue_resize(&set->__bitmap_tags, size - set->reserved_tags);
++	struct megasas_instance *instance;
++
++	instance = (struct megasas_instance *)shost->hostdata;
++
++	if (!instance->smp_affinity_enable)
++		return 0;
++
++	return blk_mq_pci_map_queues(&shost->tag_set.map[HCTX_TYPE_DEFAULT],
++			instance->pdev, instance->low_latency_index_start);
 +}
 +
+ static void megasas_aen_polling(struct work_struct *work);
+ 
  /**
-  * blk_mq_unique_tag() - return a tag that is unique queue-wide
-  * @rq: request for which to compute a unique tag
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 4f866a39b926..0a57e4f041a9 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -25,7 +25,12 @@ struct blk_mq_tags {
+@@ -3422,8 +3436,10 @@ static struct scsi_host_template megasas_template = {
+ 	.eh_timed_out = megasas_reset_timer,
+ 	.shost_attrs = megaraid_host_attrs,
+ 	.bios_param = megasas_bios_param,
++	.map_queues = megasas_map_queues,
+ 	.change_queue_depth = scsi_change_queue_depth,
+ 	.max_segment_size = 0xffffffff,
++	.host_tagset = 1,
  };
  
+ /**
+@@ -5707,34 +5723,6 @@ megasas_setup_jbod_map(struct megasas_instance *instance)
+ 		instance->use_seqnum_jbod_fp = false;
+ }
  
--extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
-+extern bool blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *tag_set);
-+extern void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *tag_set);
-+extern struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *tag_set,
-+					    unsigned int nr_tags,
-+					    unsigned int reserved_tags,
-+					    int node, int alloc_policy);
- extern void blk_mq_free_tags(struct blk_mq_tags *tags);
+-static void megasas_setup_reply_map(struct megasas_instance *instance)
+-{
+-	const struct cpumask *mask;
+-	unsigned int queue, cpu, low_latency_index_start;
+-
+-	low_latency_index_start = instance->low_latency_index_start;
+-
+-	for (queue = low_latency_index_start; queue < instance->msix_vectors; queue++) {
+-		mask = pci_irq_get_affinity(instance->pdev, queue);
+-		if (!mask)
+-			goto fallback;
+-
+-		for_each_cpu(cpu, mask)
+-			instance->reply_map[cpu] = queue;
+-	}
+-	return;
+-
+-fallback:
+-	queue = low_latency_index_start;
+-	for_each_possible_cpu(cpu) {
+-		instance->reply_map[cpu] = queue;
+-		if (queue == (instance->msix_vectors - 1))
+-			queue = low_latency_index_start;
+-		else
+-			queue++;
+-	}
+-}
+-
+ /**
+  * megasas_get_device_list -	Get the PD and LD device list from FW.
+  * @instance:			Adapter soft state
+@@ -6157,8 +6145,6 @@ static int megasas_init_fw(struct megasas_instance *instance)
+ 			goto fail_init_adapter;
+ 	}
  
- extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
-@@ -34,6 +39,9 @@ extern void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
- extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_tags **tags,
- 					unsigned int depth, bool can_grow);
-+extern void blk_mq_tag_resize_shared_sbitmap(struct blk_mq_tag_set *set,
-+					     unsigned int size);
-+
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 375f5064c183..d10e24bee7d9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2126,7 +2126,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
+-	megasas_setup_reply_map(instance);
+-
+ 	dev_info(&instance->pdev->dev,
+ 		"current msix/online cpus\t: (%d/%d)\n",
+ 		instance->msix_vectors, (unsigned int)num_online_cpus());
+@@ -6792,6 +6778,9 @@ static int megasas_io_attach(struct megasas_instance *instance)
+ 	host->max_id = MEGASAS_MAX_DEV_PER_CHANNEL;
+ 	host->max_lun = MEGASAS_MAX_LUN;
+ 	host->max_cmd_len = 16;
++	if (instance->adapter_type != MFI_SERIES && instance->msix_vectors > 0)
++		host->nr_hw_queues = instance->msix_vectors -
++			instance->low_latency_index_start;
  
--	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
-+	tags = blk_mq_init_tags(set, nr_tags, reserved_tags, node,
- 				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
- 	if (!tags)
- 		return NULL;
-@@ -2980,8 +2980,10 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 	/*
+ 	 * Notify the mid-layer about the new controller
+@@ -6959,11 +6948,6 @@ static inline int megasas_alloc_mfi_ctrl_mem(struct megasas_instance *instance)
+  */
+ static int megasas_alloc_ctrl_mem(struct megasas_instance *instance)
+ {
+-	instance->reply_map = kcalloc(nr_cpu_ids, sizeof(unsigned int),
+-				      GFP_KERNEL);
+-	if (!instance->reply_map)
+-		return -ENOMEM;
+-
+ 	switch (instance->adapter_type) {
+ 	case MFI_SERIES:
+ 		if (megasas_alloc_mfi_ctrl_mem(instance))
+@@ -6980,8 +6964,6 @@ static int megasas_alloc_ctrl_mem(struct megasas_instance *instance)
+ 
  	return 0;
- 
- out_unwind:
--	while (--i >= 0)
-+	while (--i >= 0) {
- 		blk_mq_free_rq_map(set->tags[i]);
-+		set->tags[i] = NULL;
-+	}
- 
+  fail:
+-	kfree(instance->reply_map);
+-	instance->reply_map = NULL;
  	return -ENOMEM;
  }
-@@ -3147,11 +3149,28 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (ret)
- 		goto out_free_mq_map;
  
-+	if (blk_mq_is_sbitmap_shared(set)) {
-+		if (!blk_mq_init_shared_sbitmap(set)) {
-+			ret = -ENOMEM;
-+			goto out_free_mq_rq_maps;
-+		}
-+
-+		for (i = 0; i < set->nr_hw_queues; i++) {
-+			struct blk_mq_tags *tags = set->tags[i];
-+
-+			tags->bitmap_tags = &set->__bitmap_tags;
-+			tags->breserved_tags = &set->__breserved_tags;
-+		}
-+	}
-+
- 	mutex_init(&set->tag_list_lock);
- 	INIT_LIST_HEAD(&set->tag_list);
- 
- 	return 0;
- 
-+out_free_mq_rq_maps:
-+	for (i = 0; i < set->nr_hw_queues; i++)
-+		blk_mq_free_rq_map(set->tags[i]);
- out_free_mq_map:
- 	for (i = 0; i < set->nr_maps; i++) {
- 		kfree(set->map[i].mq_map);
-@@ -3170,6 +3189,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- 	for (i = 0; i < set->nr_hw_queues; i++)
- 		blk_mq_free_map_and_requests(set, i);
- 
-+	if (blk_mq_is_sbitmap_shared(set))
-+		blk_mq_exit_shared_sbitmap(set);
-+
- 	for (j = 0; j < set->nr_maps; j++) {
- 		kfree(set->map[j].mq_map);
- 		set->map[j].mq_map = NULL;
-@@ -3206,6 +3228,8 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		if (!hctx->sched_tags) {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
- 							false);
-+			if (!ret && blk_mq_is_sbitmap_shared(set))
-+				blk_mq_tag_resize_shared_sbitmap(set, nr);
- 		} else {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
- 							nr, true);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 10bfdfb494fa..dde2d29f0ce5 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -158,6 +158,11 @@ struct blk_mq_alloc_data {
- 	struct blk_mq_hw_ctx *hctx;
- };
- 
-+static inline bool blk_mq_is_sbitmap_shared(struct blk_mq_tag_set *tag_set)
-+{
-+	return tag_set->flags & BLK_MQ_F_TAG_HCTX_SHARED;
-+}
-+
- static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data *data)
+@@ -6994,7 +6976,6 @@ static int megasas_alloc_ctrl_mem(struct megasas_instance *instance)
+  */
+ static inline void megasas_free_ctrl_mem(struct megasas_instance *instance)
  {
- 	if (data->flags & BLK_MQ_REQ_INTERNAL)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index ab1618007600..f9db604c3b10 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -245,6 +245,8 @@ struct blk_mq_tag_set {
- 	unsigned int		flags;
- 	void			*driver_data;
+-	kfree(instance->reply_map);
+ 	if (instance->adapter_type == MFI_SERIES) {
+ 		if (instance->producer)
+ 			dma_free_coherent(&instance->pdev->dev, sizeof(u32),
+@@ -7682,8 +7663,6 @@ megasas_resume(struct pci_dev *pdev)
+ 			goto fail_reenable_msix;
+ 	}
  
-+	struct sbitmap_queue	__bitmap_tags;
-+	struct sbitmap_queue	__breserved_tags;
- 	struct blk_mq_tags	**tags;
+-	megasas_setup_reply_map(instance);
+-
+ 	if (instance->adapter_type != MFI_SERIES) {
+ 		megasas_reset_reply_desc(instance);
+ 		if (megasas_ioc_init_fusion(instance)) {
+diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+index b2ad96564484..b7adf800a958 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
++++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+@@ -373,24 +373,24 @@ megasas_get_msix_index(struct megasas_instance *instance,
+ {
+ 	int sdev_busy;
  
- 	struct mutex		tag_list_lock;
-@@ -388,6 +390,7 @@ struct blk_mq_ops {
- enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_QUEUE_SHARED	= 1 << 1,
-+	BLK_MQ_F_TAG_HCTX_SHARED	= 1 << 2,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+-	/* nr_hw_queue = 1 for MegaRAID */
+-	struct blk_mq_hw_ctx *hctx =
+-		scmd->device->request_queue->queue_hw_ctx[0];
++	struct blk_mq_hw_ctx *hctx = scmd->request->mq_hctx;
+ 
+ 	sdev_busy = atomic_read(&hctx->nr_active);
+ 
+ 	if (instance->perf_mode == MR_BALANCED_PERF_MODE &&
+-	    sdev_busy > (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH))
++	    sdev_busy > (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH)) {
+ 		cmd->request_desc->SCSIIO.MSIxIndex =
+ 			mega_mod64((atomic64_add_return(1, &instance->high_iops_outstanding) /
+ 					MR_HIGH_IOPS_BATCH_COUNT), instance->low_latency_index_start);
+-	else if (instance->msix_load_balance)
++	} else if (instance->msix_load_balance) {
+ 		cmd->request_desc->SCSIIO.MSIxIndex =
+ 			(mega_mod64(atomic64_add_return(1, &instance->total_io_count),
+ 				instance->msix_vectors));
+-	else
+-		cmd->request_desc->SCSIIO.MSIxIndex =
+-			instance->reply_map[raw_smp_processor_id()];
++	} else {
++		u32 tag = blk_mq_unique_tag(scmd->request);
++
++		cmd->request_desc->SCSIIO.MSIxIndex = blk_mq_unique_tag_to_hwq(tag) + instance->low_latency_index_start;
++	}
+ }
+ 
+ /**
+@@ -3384,7 +3384,7 @@ megasas_build_and_issue_cmd_fusion(struct megasas_instance *instance,
+ {
+ 	struct megasas_cmd_fusion *cmd, *r1_cmd = NULL;
+ 	union MEGASAS_REQUEST_DESCRIPTOR_UNION *req_desc;
+-	u32 index;
++	u32 index, blk_tag, unique_tag;
+ 
+ 	if ((megasas_cmd_type(scmd) == READ_WRITE_LDIO) &&
+ 		instance->ldio_threshold &&
+@@ -3400,7 +3400,9 @@ megasas_build_and_issue_cmd_fusion(struct megasas_instance *instance,
+ 		return SCSI_MLQUEUE_HOST_BUSY;
+ 	}
+ 
+-	cmd = megasas_get_cmd_fusion(instance, scmd->request->tag);
++	unique_tag = blk_mq_unique_tag(scmd->request);
++	blk_tag = blk_mq_unique_tag_to_tag(unique_tag);
++	cmd = megasas_get_cmd_fusion(instance, blk_tag);
+ 
+ 	if (!cmd) {
+ 		atomic_dec(&instance->fw_outstanding);
+@@ -3441,7 +3443,7 @@ megasas_build_and_issue_cmd_fusion(struct megasas_instance *instance,
+ 	 */
+ 	if (cmd->r1_alt_dev_handle != MR_DEVHANDLE_INVALID) {
+ 		r1_cmd = megasas_get_cmd_fusion(instance,
+-				(scmd->request->tag + instance->max_fw_cmds));
++				(blk_tag + instance->max_fw_cmds));
+ 		megasas_prepare_secondRaid1_IO(instance, cmd, r1_cmd);
+ 	}
+ 
 -- 
 2.17.1
 
