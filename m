@@ -2,184 +2,311 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3B9C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEC7C3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA8092073D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJa1TBCZ"
+	by mail.kernel.org (Postfix) with ESMTP id D9878208CD
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbgCEJoe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 04:44:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56313 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725877AbgCEJod (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 04:44:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583401472;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V/PKEdiUcAz2ikXbUB4Ni1dB5vTzbzOfPHLE0XSlVd0=;
-        b=WJa1TBCZmoePsSul+E0bSs7MHXR9l0n4qbn7j1GbVLc/XcQPNGeUALWFuNxkuiy1pSK8k4
-        M6IA7p/bnA87Tv1JbQwqjbYIjxJ331+FcK8aZYdwXXWHfHwos4UQRtjHm+2kvO0xIJqCP8
-        qbntG/DnopU4mHnQxaDOge1JbonjAVA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-YduF2yF8NsaNldiSx489uA-1; Thu, 05 Mar 2020 04:44:31 -0500
-X-MC-Unique: YduF2yF8NsaNldiSx489uA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCA36108443B;
-        Thu,  5 Mar 2020 09:44:29 +0000 (UTC)
-Received: from [10.43.17.55] (unknown [10.43.17.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A76EC90795;
-        Thu,  5 Mar 2020 09:44:22 +0000 (UTC)
-Subject: Re: [dm-devel] [git pull] device mapper fixes for 5.6-rc5
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Mike Snitzer <snitzer@redhat.com>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        linux-block <linux-block@vger.kernel.org>, dm-devel@redhat.com,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Alasdair G Kergon <agk@redhat.com>
-References: <20200304150257.GA19885@redhat.com>
- <CAHk-=wgP=q648JXn8Hd9q7DuNaOEpLmxQp2W3RO3vkaD2CS_9g@mail.gmail.com>
- <20200304192335.GA24296@redhat.com>
- <CAHk-=wjdzxSGRLVHheRd1WA_FhsAMEV5pOwy08x8NaMG7ty8DQ@mail.gmail.com>
-From:   Zdenek Kabelac <zkabelac@redhat.com>
-Organization: Red Hat
-Message-ID: <7493a5fb-e267-6aaa-286b-16472ac8a5ca@redhat.com>
-Date:   Thu, 5 Mar 2020 10:44:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAHk-=wjdzxSGRLVHheRd1WA_FhsAMEV5pOwy08x8NaMG7ty8DQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+        id S1727002AbgCEKDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 05:03:35 -0500
+Received: from mx2.suse.de ([195.135.220.15]:45202 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725937AbgCEKDf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 05:03:35 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 1FA98B2DE;
+        Thu,  5 Mar 2020 10:03:33 +0000 (UTC)
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] xen/blkfront: fix ring info addressing
+Date:   Thu,  5 Mar 2020 11:03:31 +0100
+Message-Id: <20200305100331.16790-1-jgross@suse.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dne 04. 03. 20 v 20:34 Linus Torvalds napsal(a):
->=20
->=20
-> On Wed, Mar 4, 2020, 13:23 Mike Snitzer <snitzer@redhat.com=20
-> <mailto:snitzer@redhat.com>> wrote:
->=20
->=20
->     These versions are for userspace's benefit (be it lvm2, cryptsetup,
->     multipath-tools, etc).=C2=A0 But yes, these versions are bogus even=
- for
->     that -- primarily because it requires userspace to know when a
->     particular feature/fix it cares about was introduced.=C2=A0 In addi=
-tion: if
->     fixes, that also bump version, are marked for stable@ then we're qu=
-ickly
->     in versioning hell -- which is why I always try to decouple version
->     bumps from fixes.
->=20
->=20
-> Yeah, I think the drm people used to have a version number too, and it'=
-s not=20
-> just fixes getting backported to stable - it's distro kernels taking ch=
-anges=20
-> for new hardware without taking other parts etc.
->=20
-> So the versioning ends up not ever working reliably anyway - the same w=
-ay that=20
-> you can't use the kernel version number to determine what system calls =
-are=20
-> available.
->=20
-> So versions can not ever be anything more than informational, and it's =
-usually=20
-> just very confusing to have multiple different version numbers (ie "I'm=
-=20
-> running kernel v5.4, and my driver abc version is 1.4.2a" is *not* in t=
-he=20
-> least helpful).
->=20
->     Others have suggested setting feature flags.=C2=A0 I expect you'd h=
-ate those
->     too.=C2=A0 I suspect I quickly would too given flag bits are finite=
- and
->     really tedious to deal with.
->=20
->=20
-> It also leads to some people then thinking it's ok to remove features (=
-perhaps=20
-> to reimplement them differently) if they only clear the feature bit.
->=20
-> And no, it's not how kernel interfaces work. We keep the interfaces eve=
-n if=20
-> the internals change.
->=20
-> So I've been suggesting that people just freeze the version, or remove =
-the=20
-> interface entirely is possible.
->=20
-> Because otherwise it's just a source of problems, where user space migh=
-t=20
-> refuse to do something that the kernel supports because of some silly v=
-ersion=20
-> check...
+Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
+actual use case") made struct blkfront_ring_info size dynamic. This is
+fine when running with only one queue, but with multiple queues the
+addressing of the single queues has to be adapted as the structs are
+allocated in an array.
 
-Hi
+Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+ drivers/block/xen-blkfront.c | 82 ++++++++++++++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 37 deletions(-)
 
-POV of lvm2 developer - there are 2 things to solve - 1st. is the introdu=
-ction=20
-of a new 'features'. The 2nd. is usability/stability of certain version o=
-f dm=20
-targets - so when we later discover some combination of device stack are =
-not=20
-safe to use (can lead to significant lose of user's data) lvm2 adds check=
- for=20
-this.
-
-The reason for complexity comes from fact - numerous distribution use ver=
-sion
-of kernel X.Y.Z while they can have much new DM target version as it's mu=
-ch=20
-more simple to backport new DM into older version.
-
-Nothing is clearly 'perfect', there is no ideal solution to cover all=20
-combination of all kernel backports - but current separate versioning str=
-eam
-of DM targets added to kernel versioning, which i.e. lvm2 also is trackin=
-g,=20
-adds more hints for safe decision (as the safety of user's data is the mo=
-st=20
-important here)  and allows various distributions to 'somehow reasonably'=
-=20
-handle backporting of bugfixes.
-
-So if there would be 'feature flag' list provided by DM target - there st=
-ill=20
-should be visible which version of implemented flag is that - as when the=
- new=20
-feature is added - it's not always 'perfect' - sometimes we discover q bu=
-g=20
-quite late in the process of new feature introduction - so the plain fact=
-=20
-'featureXYZ' is present unfortunately doesn't always mean it's usable.
-Sometimes even 'fixing' one bug may introduce a new problem we discover a=
-gain=20
-later (testing combinations of device stacks is really madness of its own=
-...)
-
-
-Zdenek
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index e2ad6bba2281..a8d4a3838e5d 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -213,6 +213,7 @@ struct blkfront_info
+ 	struct blk_mq_tag_set tag_set;
+ 	struct blkfront_ring_info *rinfo;
+ 	unsigned int nr_rings;
++	unsigned int rinfo_size;
+ 	/* Save uncomplete reqs and bios for migration. */
+ 	struct list_head requests;
+ 	struct bio_list bio_list;
+@@ -259,6 +260,21 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
+ static void blkfront_gather_backend_features(struct blkfront_info *info);
+ static int negotiate_mq(struct blkfront_info *info);
+ 
++#define rinfo_ptr(rinfo, off) \
++	(struct blkfront_ring_info *)((unsigned long)(rinfo) + (off))
++
++#define for_each_rinfo(info, rinfo, idx)				\
++	for (rinfo = info->rinfo, idx = 0;				\
++	     idx < info->nr_rings;					\
++	     idx++, rinfo = rinfo_ptr(rinfo, info->rinfo_size))
++
++static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
++					    unsigned int i)
++{
++	BUG_ON(i >= info->nr_rings);
++	return rinfo_ptr(info->rinfo, i * info->rinfo_size);
++}
++
+ static int get_id_from_freelist(struct blkfront_ring_info *rinfo)
+ {
+ 	unsigned long free = rinfo->shadow_free;
+@@ -883,8 +899,7 @@ static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct blkfront_info *info = hctx->queue->queuedata;
+ 	struct blkfront_ring_info *rinfo = NULL;
+ 
+-	BUG_ON(info->nr_rings <= qid);
+-	rinfo = &info->rinfo[qid];
++	rinfo = get_rinfo(info, qid);
+ 	blk_mq_start_request(qd->rq);
+ 	spin_lock_irqsave(&rinfo->ring_lock, flags);
+ 	if (RING_FULL(&rinfo->ring))
+@@ -1181,6 +1196,7 @@ static int xlvbd_alloc_gendisk(blkif_sector_t capacity,
+ static void xlvbd_release_gendisk(struct blkfront_info *info)
+ {
+ 	unsigned int minor, nr_minors, i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	if (info->rq == NULL)
+ 		return;
+@@ -1188,8 +1204,7 @@ static void xlvbd_release_gendisk(struct blkfront_info *info)
+ 	/* No more blkif_request(). */
+ 	blk_mq_stop_hw_queues(info->rq);
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 
+ 		/* No more gnttab callback work. */
+ 		gnttab_cancel_free_callback(&rinfo->callback);
+@@ -1339,6 +1354,7 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
+ static void blkif_free(struct blkfront_info *info, int suspend)
+ {
+ 	unsigned int i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	/* Prevent new requests being issued until we fix things up. */
+ 	info->connected = suspend ?
+@@ -1347,8 +1363,8 @@ static void blkif_free(struct blkfront_info *info, int suspend)
+ 	if (info->rq)
+ 		blk_mq_stop_hw_queues(info->rq);
+ 
+-	for (i = 0; i < info->nr_rings; i++)
+-		blkif_free_ring(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i)
++		blkif_free_ring(rinfo);
+ 
+ 	kvfree(info->rinfo);
+ 	info->rinfo = NULL;
+@@ -1775,6 +1791,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 	int err;
+ 	unsigned int i, max_page_order;
+ 	unsigned int ring_page_order;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	if (!info)
+ 		return -ENODEV;
+@@ -1788,9 +1805,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 	if (err)
+ 		goto destroy_blkring;
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
+-
++	for_each_rinfo(info, rinfo, i) {
+ 		/* Create shared ring, alloc event channel. */
+ 		err = setup_blkring(dev, rinfo);
+ 		if (err)
+@@ -1815,7 +1830,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 
+ 	/* We already got the number of queues/rings in _probe */
+ 	if (info->nr_rings == 1) {
+-		err = write_per_ring_nodes(xbt, &info->rinfo[0], dev->nodename);
++		err = write_per_ring_nodes(xbt, info->rinfo, dev->nodename);
+ 		if (err)
+ 			goto destroy_blkring;
+ 	} else {
+@@ -1837,10 +1852,10 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 			goto abort_transaction;
+ 		}
+ 
+-		for (i = 0; i < info->nr_rings; i++) {
++		for_each_rinfo(info, rinfo, i) {
+ 			memset(path, 0, pathsize);
+ 			snprintf(path, pathsize, "%s/queue-%u", dev->nodename, i);
+-			err = write_per_ring_nodes(xbt, &info->rinfo[i], path);
++			err = write_per_ring_nodes(xbt, rinfo, path);
+ 			if (err) {
+ 				kfree(path);
+ 				goto destroy_blkring;
+@@ -1868,9 +1883,8 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 		goto destroy_blkring;
+ 	}
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
++	for_each_rinfo(info, rinfo, i) {
+ 		unsigned int j;
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
+ 
+ 		for (j = 0; j < BLK_RING_SIZE(info); j++)
+ 			rinfo->shadow[j].req.u.rw.id = j + 1;
+@@ -1900,6 +1914,7 @@ static int negotiate_mq(struct blkfront_info *info)
+ {
+ 	unsigned int backend_max_queues;
+ 	unsigned int i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	BUG_ON(info->nr_rings);
+ 
+@@ -1911,20 +1926,16 @@ static int negotiate_mq(struct blkfront_info *info)
+ 	if (!info->nr_rings)
+ 		info->nr_rings = 1;
+ 
+-	info->rinfo = kvcalloc(info->nr_rings,
+-			       struct_size(info->rinfo, shadow,
+-					   BLK_RING_SIZE(info)),
+-			       GFP_KERNEL);
++	info->rinfo_size = struct_size(info->rinfo, shadow,
++				       BLK_RING_SIZE(info));
++	info->rinfo = kvcalloc(info->nr_rings, info->rinfo_size, GFP_KERNEL);
+ 	if (!info->rinfo) {
+ 		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
+ 		info->nr_rings = 0;
+ 		return -ENOMEM;
+ 	}
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo;
+-
+-		rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		INIT_LIST_HEAD(&rinfo->indirect_pages);
+ 		INIT_LIST_HEAD(&rinfo->grants);
+ 		rinfo->dev_info = info;
+@@ -2017,6 +2028,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	int rc;
+ 	struct bio *bio;
+ 	unsigned int segs;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	blkfront_gather_backend_features(info);
+ 	/* Reset limits changed by blk_mq_update_nr_hw_queues(). */
+@@ -2024,9 +2036,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	segs = info->max_indirect_segments ? : BLKIF_MAX_SEGMENTS_PER_REQUEST;
+ 	blk_queue_max_segments(info->rq, segs / GRANTS_PER_PSEG);
+ 
+-	for (r_index = 0; r_index < info->nr_rings; r_index++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[r_index];
+-
++	for_each_rinfo(info, rinfo, r_index) {
+ 		rc = blkfront_setup_indirect(rinfo);
+ 		if (rc)
+ 			return rc;
+@@ -2036,10 +2046,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 	/* Now safe for us to use the shared ring */
+ 	info->connected = BLKIF_STATE_CONNECTED;
+ 
+-	for (r_index = 0; r_index < info->nr_rings; r_index++) {
+-		struct blkfront_ring_info *rinfo;
+-
+-		rinfo = &info->rinfo[r_index];
++	for_each_rinfo(info, rinfo, r_index) {
+ 		/* Kick any other new requests queued since we resumed */
+ 		kick_pending_request_queues(rinfo);
+ 	}
+@@ -2072,13 +2079,13 @@ static int blkfront_resume(struct xenbus_device *dev)
+ 	struct blkfront_info *info = dev_get_drvdata(&dev->dev);
+ 	int err = 0;
+ 	unsigned int i, j;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	dev_dbg(&dev->dev, "blkfront_resume: %s\n", dev->nodename);
+ 
+ 	bio_list_init(&info->bio_list);
+ 	INIT_LIST_HEAD(&info->requests);
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		struct bio_list merge_bio;
+ 		struct blk_shadow *shadow = rinfo->shadow;
+ 
+@@ -2337,6 +2344,7 @@ static void blkfront_connect(struct blkfront_info *info)
+ 	unsigned int binfo;
+ 	char *envp[] = { "RESIZE=1", NULL };
+ 	int err, i;
++	struct blkfront_ring_info *rinfo;
+ 
+ 	switch (info->connected) {
+ 	case BLKIF_STATE_CONNECTED:
+@@ -2394,8 +2402,8 @@ static void blkfront_connect(struct blkfront_info *info)
+ 						    "physical-sector-size",
+ 						    sector_size);
+ 	blkfront_gather_backend_features(info);
+-	for (i = 0; i < info->nr_rings; i++) {
+-		err = blkfront_setup_indirect(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i) {
++		err = blkfront_setup_indirect(rinfo);
+ 		if (err) {
+ 			xenbus_dev_fatal(info->xbdev, err, "setup_indirect at %s",
+ 					 info->xbdev->otherend);
+@@ -2416,8 +2424,8 @@ static void blkfront_connect(struct blkfront_info *info)
+ 
+ 	/* Kick pending requests. */
+ 	info->connected = BLKIF_STATE_CONNECTED;
+-	for (i = 0; i < info->nr_rings; i++)
+-		kick_pending_request_queues(&info->rinfo[i]);
++	for_each_rinfo(info, rinfo, i)
++		kick_pending_request_queues(rinfo);
+ 
+ 	device_add_disk(&info->xbdev->dev, info->gd, NULL);
+ 
+@@ -2652,9 +2660,9 @@ static void purge_persistent_grants(struct blkfront_info *info)
+ {
+ 	unsigned int i;
+ 	unsigned long flags;
++	struct blkfront_ring_info *rinfo;
+ 
+-	for (i = 0; i < info->nr_rings; i++) {
+-		struct blkfront_ring_info *rinfo = &info->rinfo[i];
++	for_each_rinfo(info, rinfo, i) {
+ 		struct grant *gnt_list_entry, *tmp;
+ 
+ 		spin_lock_irqsave(&rinfo->ring_lock, flags);
+-- 
+2.16.4
 
