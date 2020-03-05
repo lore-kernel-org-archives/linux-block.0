@@ -2,192 +2,215 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11041C3F2D9
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEEFC3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 12:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3FA620848
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0181A2146E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 12:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583410594;
+	bh=roosBaQC1wc0P0te4EN646OO0+no/9nDa2qx6cZDWKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=PMKmZUAgftqwr2NaTYu+/5268vyoEJbLDuPMTCbc7eJJbzDW+wvkX+t4Ncv+7dAgp
+	 4D6wkvK3wy1+YSMvIg3sppccybqjUMDngDFIQjytilg++xF11VSKB92laO5zU5uIdm
+	 Bmr/3OoecxsypGNI1IdqZPr1KgfUDnu7gVrGhTIw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727427AbgCEL7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 06:59:13 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11155 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727273AbgCEL7I (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Mar 2020 06:59:08 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id E1343CA14452D41E5429;
-        Thu,  5 Mar 2020 19:59:04 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 19:58:56 +0800
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
-        <bvanassche@acm.org>, <hare@suse.de>, <don.brace@microsemi.com>,
-        <sumit.saxena@broadcom.com>, <hch@infradead.org>,
-        <kashyap.desai@broadcom.com>,
-        <shivasharan.srikanteshwara@broadcom.com>
-CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>
-Subject: [PATCH RFC v6 10/10] hpsa: enable host_tagset and switch to MQ
-Date:   Thu, 5 Mar 2020 19:54:40 +0800
-Message-ID: <1583409280-158604-11-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
+        id S1725897AbgCEMQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 07:16:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47156 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725893AbgCEMQd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 07:16:33 -0500
+Received: from localhost (unknown [193.47.165.251])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5500520658;
+        Thu,  5 Mar 2020 12:16:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583410591;
+        bh=roosBaQC1wc0P0te4EN646OO0+no/9nDa2qx6cZDWKI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xKYo6xsItyf/qYmZVGkfhatPcSULvvwCGv0Au7U8Hn27a/89scd3ag9WlqjuBzBi4
+         t4AYDU21U2xbsJ5elhzrdAlnzf3SZm8kf3VobdvWbGd7WSDcOlueO7xX4DT+1hH5a0
+         d5+lKgYN5wFbT9LrOvrm3Z9q+Il1DDWWv/UFzB10=
+Date:   Thu, 5 Mar 2020 14:16:28 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Subject: Re: [PATCH v9 10/25] RDMA/rtrs: server: main functionality
+Message-ID: <20200305121628.GD184088@unreal>
+References: <20200221104721.350-1-jinpuwang@gmail.com>
+ <20200221104721.350-11-jinpuwang@gmail.com>
+ <20200303113740.GM121803@unreal>
+ <CAMGffEmEeK37QCr8uiABjOrC-48nETTv0fxHWE0S0s=j6bPbGQ@mail.gmail.com>
+ <20200303165906.GO121803@unreal>
+ <CAMGffEk9LSgVQtzmBHiFYdnqgcQPXk_TV5W8pKyU5fy=ap0dTg@mail.gmail.com>
+ <20200305080019.GB184088@unreal>
+ <CAHg0Huyc=pn1=WSKGLjm+c8AcchyQ8q7JS-0ToQyiBRgpGG=jA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHg0Huyc=pn1=WSKGLjm+c8AcchyQ8q7JS-0ToQyiBRgpGG=jA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+On Thu, Mar 05, 2020 at 01:01:08PM +0100, Danil Kipnis wrote:
+> On Thu, 5 Mar 2020, 09:00 Leon Romanovsky, <leon@kernel.org> wrote:
+>
+> > On Wed, Mar 04, 2020 at 12:03:32PM +0100, Jinpu Wang wrote:
+> > > On Tue, Mar 3, 2020 at 5:59 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > >
+> > > > On Tue, Mar 03, 2020 at 05:41:27PM +0100, Jinpu Wang wrote:
+> > > > > On Tue, Mar 3, 2020 at 12:37 PM Leon Romanovsky <leon@kernel.org>
+> > wrote:
+> > > > > >
+> > > > > > On Fri, Feb 21, 2020 at 11:47:06AM +0100, Jack Wang wrote:
+> > > > > > > From: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > > > > > >
+> > > > > > > This is main functionality of rtrs-server module, which accepts
+> > > > > > > set of RDMA connections (so called rtrs session),
+> > creates/destroys
+> > > > > > > sysfs entries associated with rtrs session and notifies upper
+> > layer
+> > > > > > > (user of RTRS API) about RDMA requests or link events.
+> > > > > > >
+> > > > > > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > > > > > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > > > > > > ---
+> > > > > > >  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 2164
+> > ++++++++++++++++++++++++
+> > > > > > >  1 file changed, 2164 insertions(+)
+> > > > > > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > >
+> > > > > > > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > > new file mode 100644
+> > > > > > > index 000000000000..e60ee6dd675d
+> > > > > > > --- /dev/null
+> > > > > > > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > > > > > > @@ -0,0 +1,2164 @@
+> > > > > > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > > > > > +/*
+> > > > > > > + * RDMA Transport Layer
+> > > > > > > + *
+> > > > > > > + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights
+> > reserved.
+> > > > > > > + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights
+> > reserved.
+> > > > > > > + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> > > > > > > + */
+> > > > > > > +
+> > > > > > > +#undef pr_fmt
+> > > > > > > +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__)
+> > ": " fmt
+> > > > > > > +
+> > > > > > > +#include <linux/module.h>
+> > > > > > > +#include <linux/mempool.h>
+> > > > > > > +
+> > > > > > > +#include "rtrs-srv.h"
+> > > > > > > +#include "rtrs-log.h"
+> > > > > > > +
+> > > > > > > +MODULE_DESCRIPTION("RDMA Transport Server");
+> > > > > > > +MODULE_LICENSE("GPL");
+> > > > > > > +
+> > > > > > > +/* Must be power of 2, see mask from mr->page_size in
+> > ib_sg_to_pages() */
+> > > > > > > +#define DEFAULT_MAX_CHUNK_SIZE (128 << 10)
+> > > > > > > +#define DEFAULT_SESS_QUEUE_DEPTH 512
+> > > > > > > +#define MAX_HDR_SIZE PAGE_SIZE
+> > > > > > > +#define MAX_SG_COUNT ((MAX_HDR_SIZE - sizeof(struct
+> > rtrs_msg_rdma_read)) \
+> > > > > > > +                   / sizeof(struct rtrs_sg_desc))
+> > > > > > > +
+> > > > > > > +/* We guarantee to serve 10 paths at least */
+> > > > > > > +#define CHUNK_POOL_SZ 10
+> > > > > > > +
+> > > > > > > +static struct rtrs_rdma_dev_pd dev_pd;
+> > > > > > > +static mempool_t *chunk_pool;
+> > > > > > > +struct class *rtrs_dev_class;
+> > > > > > > +
+> > > > > > > +static int __read_mostly max_chunk_size =
+> > DEFAULT_MAX_CHUNK_SIZE;
+> > > > > > > +static int __read_mostly sess_queue_depth =
+> > DEFAULT_SESS_QUEUE_DEPTH;
+> > > > > > > +
+> > > > > > > +static bool always_invalidate = true;
+> > > > > > > +module_param(always_invalidate, bool, 0444);
+> > > > > > > +MODULE_PARM_DESC(always_invalidate,
+> > > > > > > +              "Invalidate memory registration for contiguous
+> > memory regions before accessing.");
+> > > > > > > +
+> > > > > > > +module_param_named(max_chunk_size, max_chunk_size, int, 0444);
+> > > > > > > +MODULE_PARM_DESC(max_chunk_size,
+> > > > > > > +              "Max size for each IO request, when change the
+> > unit is in byte (default: "
+> > > > > > > +              __stringify(DEFAULT_MAX_CHUNK_SIZE) "KB)");
+> > > > > > > +
+> > > > > > > +module_param_named(sess_queue_depth, sess_queue_depth, int,
+> > 0444);
+> > > > > > > +MODULE_PARM_DESC(sess_queue_depth,
+> > > > > > > +              "Number of buffers for pending I/O requests to
+> > allocate per session. Maximum: "
+> > > > > > > +              __stringify(MAX_SESS_QUEUE_DEPTH) " (default: "
+> > > > > > > +              __stringify(DEFAULT_SESS_QUEUE_DEPTH) ")");
+> > > > > >
+> > > > > > We don't like module parameters in the RDMA.
+> > > > > Hi Leon,
+> > > > >
+> > > > > These paramters are affecting resouce usage/performance, I think
+> > would
+> > > > > be good to have them as module parameters,
+> > > > > so admin could choose based their needs.
+> > > >
+> > > > It is premature optimization before second user comes, also it is
+> > > > based on the assumption that everyone uses modules, which is not true.
+> > > The idea to have module parameters is to cover more use cases, IMHO.
+> > >
+> > > Even you builtin the module to the kernel, you can still change the
+> > > module parameters
+> > > by passing the "moduls_name.paramters" in kernel command line, eg:
+> > > kvm.nx_huge_pages=true
+> >
+> > I know about that, but it doesn't make them helpful.
+> >
+> > Thanks
+> >
+> Hi Leon,
+>
+> Queue_depth and max_chunksize parameters control the tradeoff between
+> throuput performance and memory consumption. We do use them to set
+> different values for storages equipped with SSDs (fast) and on storages
+> equipped with HDDs (slow). The last parameter always_invaldate enforces the
+> invalidation of an rdma buffer before its hand over to the block layer. We
+> set it to no in our datacenters, since they are closed and malicious
+> clients are not a threat in our scenario. In general case it defaults to
+> yes, as requested by Jason. Our admins need to have control over those
+> control knobs somehow... We could make sysfs entries out of them or
+> something, but would it really make sense?
 
-The smart array HBAs can steer interrupt completion, so this
-patch switches the implementation to use multiqueue and enables
-'host_tagset' as the HBA has a shared host-wide tagset.
+blk_queue_nonrot() inside your code?
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
----
- drivers/scsi/hpsa.c | 44 +++++++-------------------------------------
- drivers/scsi/hpsa.h |  1 -
- 2 files changed, 7 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 1a4ddfacb458..a1d0e41a240a 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -974,6 +974,7 @@ static struct scsi_host_template hpsa_driver_template = {
- 	.shost_attrs = hpsa_shost_attrs,
- 	.max_sectors = 2048,
- 	.no_write_same = 1,
-+	.host_tagset = 1,
- };
- 
- static inline u32 next_command(struct ctlr_info *h, u8 q)
-@@ -1138,12 +1139,14 @@ static void dial_up_lockup_detection_on_fw_flash_complete(struct ctlr_info *h,
- static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
- 	struct CommandList *c, int reply_queue)
- {
-+	u32 blk_tag = blk_mq_unique_tag(c->scsi_cmd->request);
-+
- 	dial_down_lockup_detection_during_fw_flash(h, c);
- 	atomic_inc(&h->commands_outstanding);
- 	if (c->device)
- 		atomic_inc(&c->device->commands_outstanding);
- 
--	reply_queue = h->reply_map[raw_smp_processor_id()];
-+	reply_queue = blk_mq_unique_tag_to_hwq(blk_tag);
- 	switch (c->cmd_type) {
- 	case CMD_IOACCEL1:
- 		set_ioaccel1_performant_mode(h, c, reply_queue);
-@@ -5632,8 +5635,6 @@ static int hpsa_scsi_queue_command(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
- 	/* Get the ptr to our adapter structure out of cmd->host. */
- 	h = sdev_to_hba(cmd->device);
- 
--	BUG_ON(cmd->request->tag < 0);
--
- 	dev = cmd->device->hostdata;
- 	if (!dev) {
- 		cmd->result = DID_NO_CONNECT << 16;
-@@ -5809,7 +5810,7 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
- 	sh->hostdata[0] = (unsigned long) h;
- 	sh->irq = pci_irq_vector(h->pdev, 0);
- 	sh->unique_id = sh->irq;
--
-+	sh->nr_hw_queues = h->msix_vectors > 0 ? h->msix_vectors : 1;
- 	h->scsi_host = sh;
- 	return 0;
- }
-@@ -5835,7 +5836,8 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
-  */
- static int hpsa_get_cmd_index(struct scsi_cmnd *scmd)
- {
--	int idx = scmd->request->tag;
-+	u32 blk_tag = blk_mq_unique_tag(scmd->request);
-+	int idx = blk_mq_unique_tag_to_tag(blk_tag);
- 
- 	if (idx < 0)
- 		return idx;
-@@ -7435,26 +7437,6 @@ static void hpsa_disable_interrupt_mode(struct ctlr_info *h)
- 	h->msix_vectors = 0;
- }
- 
--static void hpsa_setup_reply_map(struct ctlr_info *h)
--{
--	const struct cpumask *mask;
--	unsigned int queue, cpu;
--
--	for (queue = 0; queue < h->msix_vectors; queue++) {
--		mask = pci_irq_get_affinity(h->pdev, queue);
--		if (!mask)
--			goto fallback;
--
--		for_each_cpu(cpu, mask)
--			h->reply_map[cpu] = queue;
--	}
--	return;
--
--fallback:
--	for_each_possible_cpu(cpu)
--		h->reply_map[cpu] = 0;
--}
--
- /* If MSI/MSI-X is supported by the kernel we will try to enable it on
-  * controllers that are capable. If not, we use legacy INTx mode.
-  */
-@@ -7851,9 +7833,6 @@ static int hpsa_pci_init(struct ctlr_info *h)
- 	if (err)
- 		goto clean1;
- 
--	/* setup mapping between CPU and reply queue */
--	hpsa_setup_reply_map(h);
--
- 	err = hpsa_pci_find_memory_BAR(h->pdev, &h->paddr);
- 	if (err)
- 		goto clean2;	/* intmode+region, pci */
-@@ -8579,7 +8558,6 @@ static struct workqueue_struct *hpsa_create_controller_wq(struct ctlr_info *h,
- 
- static void hpda_free_ctlr_info(struct ctlr_info *h)
- {
--	kfree(h->reply_map);
- 	kfree(h);
- }
- 
-@@ -8588,14 +8566,6 @@ static struct ctlr_info *hpda_alloc_ctlr_info(void)
- 	struct ctlr_info *h;
- 
- 	h = kzalloc(sizeof(*h), GFP_KERNEL);
--	if (!h)
--		return NULL;
--
--	h->reply_map = kcalloc(nr_cpu_ids, sizeof(*h->reply_map), GFP_KERNEL);
--	if (!h->reply_map) {
--		kfree(h);
--		return NULL;
--	}
- 	return h;
- }
- 
-diff --git a/drivers/scsi/hpsa.h b/drivers/scsi/hpsa.h
-index f8c88fc7b80a..ea4a609e3eb7 100644
---- a/drivers/scsi/hpsa.h
-+++ b/drivers/scsi/hpsa.h
-@@ -161,7 +161,6 @@ struct bmic_controller_parameters {
- #pragma pack()
- 
- struct ctlr_info {
--	unsigned int *reply_map;
- 	int	ctlr;
- 	char	devname[8];
- 	char    *product_name;
--- 
-2.17.1
-
+>
+> Thank you,
+> Danil
+>
+> > >
+> > > > Thanks
+> > > Thanks
+> >
