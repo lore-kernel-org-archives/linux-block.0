@@ -2,111 +2,186 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD37C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 20:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE74DC3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 21:04:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 985D82072D
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 20:43:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QO00FYAP"
+	by mail.kernel.org (Postfix) with ESMTP id AE66420684
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 21:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbgCEUnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 15:43:09 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33316 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726080AbgCEUnJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 15:43:09 -0500
-Received: by mail-io1-f66.google.com with SMTP id r15so8012612iog.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2020 12:43:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K+E8Uy+fBw/gh0nu1wLPFsLlAAWTt9S6/ny9LuQwDCk=;
-        b=QO00FYAP80gFlnAl/2izdrLs57u2D9HT6jeMy2jT8IJZ00MvsCRpYMrR8GU7doHvUI
-         6eTb+gVBX2QOOZOZE6/JRJOsscpRzWVzHoz5rbfegXEmZFRBLrs535y23DRBwzYpzKRs
-         yYISl+wAUCrtJHIv1OArKmUbI6XKyFB0hK4WqTeLu5SAdChBAk4eLwCN5E9Hq/1B96SE
-         aX4nzpp1eL0MeuF3Xxlufcvnn2Cz+opeQ61syEiQ9bsHv0LcNsJjSniFOxUF+kiarlpH
-         dp6RgdLzUypkBgWAfDoqyehybF1hN2UowVmdvdwQdP9/1lqSk2YqiAaOecvpB7MqHSYQ
-         5oig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K+E8Uy+fBw/gh0nu1wLPFsLlAAWTt9S6/ny9LuQwDCk=;
-        b=GV0kKEZASAv3GSxR8QAE58oPPBNYU4ReJ6O3XPZoR4KiLahAxCvrZhrEaP+wnf8ivY
-         RYWUX9F85fuWMre7aN26/43dROGUhhG0X47ee8h0nEjbfFXMI5+zMPXOkoXL8xflvQeG
-         9ncN2ArGH1V10tN0EMKGHK9KNebICRrk0CuPhxyoFXUDpuLYhSlA5D6jdJK59LNom7Rt
-         DYEHYZxxGrEQGySFrLYPwry1V6x/7Gr6z2GV9v6BEVj6gpzIJKR2xf2wH8wAncJg4DBC
-         AvBb2y7Ckmr+zGvtuJDmPjyzWDUVa0+2ixTKK8NCNQwbd05kOrIY1dGohFvCvMZMHvdd
-         T6ww==
-X-Gm-Message-State: ANhLgQ2cOu0QazqTOHl4ySthfIOAhJzDeGS1hKf5EJ7luhecmzInju7/
-        JgEbIJXsbqvLRvUPrXURzCO0rQ==
-X-Google-Smtp-Source: ADFU+vsg6Vx5j+mQUD7KDzZWDaDV9fBiG168AJM8hU2Ibf4OZYImC2B1YX0K/3FJt5xcZ/NuarDTEg==
-X-Received: by 2002:a6b:7f01:: with SMTP id l1mr208223ioq.146.1583440986476;
-        Thu, 05 Mar 2020 12:43:06 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id g3sm1074323ilb.53.2020.03.05.12.43.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2020 12:43:05 -0800 (PST)
-Subject: Re: [PATCH v2] blktrace: fix dereference after null check
-To:     Cengiz Can <cengiz@kernel.wtf>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200304105818.11781-1-cengiz@kernel.wtf>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e6fe9883-2f51-a249-c5d2-ce11f6b449da@kernel.dk>
-Date:   Thu, 5 Mar 2020 13:43:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726099AbgCEVES (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 16:04:18 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42698 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726092AbgCEVES (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 16:04:18 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 016C9ACC6;
+        Thu,  5 Mar 2020 21:04:15 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id EFAF41E0FC2; Thu,  5 Mar 2020 22:04:14 +0100 (CET)
+Date:   Thu, 5 Mar 2020 22:04:14 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] loop: avoid EAGAIN, if offset or block_size are changed
+Message-ID: <20200305210414.GA1678@quack2.suse.cz>
+References: <20190518004751.18962-1-jaegeuk@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200304105818.11781-1-cengiz@kernel.wtf>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190518004751.18962-1-jaegeuk@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/20 3:58 AM, Cengiz Can wrote:
-> There was a recent change in blktrace.c that added a RCU protection to
-> `q->blk_trace` in order to fix a use-after-free issue during access.
+On Fri 17-05-19 17:47:51, Jaegeuk Kim wrote:
+> This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
+> to drop stale pages resulting in wrong data access.
 > 
-> However the change missed an edge case that can lead to dereferencing of
-> `bt` pointer even when it's NULL:
-> 
-> Coverity static analyzer marked this as a FORWARD_NULL issue with CID
-> 1460458.
-> 
-> ```
-> /kernel/trace/blktrace.c: 1904 in sysfs_blk_trace_attr_store()
-> 1898            ret = 0;
-> 1899            if (bt == NULL)
-> 1900                    ret = blk_trace_setup_queue(q, bdev);
-> 1901
-> 1902            if (ret == 0) {
-> 1903                    if (attr == &dev_attr_act_mask)
->>>>     CID 1460458:  Null pointer dereferences  (FORWARD_NULL)
->>>>     Dereferencing null pointer "bt".
-> 1904                            bt->act_mask = value;
-> 1905                    else if (attr == &dev_attr_pid)
-> 1906                            bt->pid = value;
-> 1907                    else if (attr == &dev_attr_start_lba)
-> 1908                            bt->start_lba = value;
-> 1909                    else if (attr == &dev_attr_end_lba)
-> ```
-> 
-> Added a reassignment with RCU annotation to fix the issue.
+> Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
 
-Applied, thanks.
+...
 
+> ---
+>  drivers/block/loop.c | 44 +++++++++++++++++---------------------------
+>  1 file changed, 17 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 102d79575895..7c7d2d9c47d0 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1212,6 +1212,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	kuid_t uid = current_uid();
+>  	struct block_device *bdev;
+>  	bool partscan = false;
+> +	bool drop_caches = false;
+>  
+>  	err = mutex_lock_killable(&loop_ctl_mutex);
+>  	if (err)
+> @@ -1232,10 +1233,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	}
+>  
+>  	if (lo->lo_offset != info->lo_offset ||
+> -	    lo->lo_sizelimit != info->lo_sizelimit) {
+> -		sync_blockdev(lo->lo_device);
+> -		kill_bdev(lo->lo_device);
+> -	}
+> +	    lo->lo_sizelimit != info->lo_sizelimit)
+> +		drop_caches = true;
+
+I don't think this solution of moving buffer cache invalidation after loop
+device is updated is really correct.
+
+If there's any dirty data in the buffer cache, god knows where it ends
+up being written after the loop device is reconfigured. Think e.g. of a
+file offset being changed. It may not be even possible to write it if say
+block size increased and we have now improperly sized buffers in the buffer
+cache...
+
+Frankly, I have rather limited sympathy to someone trying to reconfigure a
+loop device while it is in use. Is there any sane usecase? I'd be inclined
+to just use a similar trick as we did with LOOP_SET_FD and allow these
+changes only if the caller has the loop device open exclusively or we are
+able to upgrade to exclusive open. As otherwise say mounted filesystem on
+top of loop device being reconfigured is very likely to be in serious
+trouble (e.g. it's impossible to fully invalidate buffer cache in that
+case).
+
+But that's probably somewhat tangential to the problem you have. For your
+case I don't really see a race-free way to invalidate buffer cache and
+update loop configuration - the best I can see is to flush & invalidate
+the cache, freeze the bdev so that new data cannot be read into the
+buffer cache, check the cache is still empty - if yes, go ahead. If not,
+unfreeze and try again...
+
+								Honza
+
+>  	/* I/O need to be drained during transfer transition */
+>  	blk_mq_freeze_queue(lo->lo_queue);
+> @@ -1265,14 +1264,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  
+>  	if (lo->lo_offset != info->lo_offset ||
+>  	    lo->lo_sizelimit != info->lo_sizelimit) {
+> -		/* kill_bdev should have truncated all the pages */
+> -		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
+> -			err = -EAGAIN;
+> -			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+> -				__func__, lo->lo_number, lo->lo_file_name,
+> -				lo->lo_device->bd_inode->i_mapping->nrpages);
+> -			goto out_unfreeze;
+> -		}
+>  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+>  			err = -EFBIG;
+>  			goto out_unfreeze;
+> @@ -1317,6 +1308,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  		bdev = lo->lo_device;
+>  		partscan = true;
+>  	}
+> +
+> +	/* truncate stale pages cached by previous operations */
+> +	if (!err && drop_caches) {
+> +		sync_blockdev(lo->lo_device);
+> +		kill_bdev(lo->lo_device);
+> +	}
+>  out_unlock:
+>  	mutex_unlock(&loop_ctl_mutex);
+>  	if (partscan)
+> @@ -1498,6 +1495,7 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+>  
+>  static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  {
+> +	bool drop_caches = false;
+>  	int err = 0;
+>  
+>  	if (lo->lo_state != Lo_bound)
+> @@ -1506,23 +1504,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
+>  		return -EINVAL;
+>  
+> -	if (lo->lo_queue->limits.logical_block_size != arg) {
+> -		sync_blockdev(lo->lo_device);
+> -		kill_bdev(lo->lo_device);
+> -	}
+> +	if (lo->lo_queue->limits.logical_block_size != arg)
+> +		drop_caches = true;
+>  
+>  	blk_mq_freeze_queue(lo->lo_queue);
+> -
+> -	/* kill_bdev should have truncated all the pages */
+> -	if (lo->lo_queue->limits.logical_block_size != arg &&
+> -			lo->lo_device->bd_inode->i_mapping->nrpages) {
+> -		err = -EAGAIN;
+> -		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+> -			__func__, lo->lo_number, lo->lo_file_name,
+> -			lo->lo_device->bd_inode->i_mapping->nrpages);
+> -		goto out_unfreeze;
+> -	}
+> -
+>  	blk_queue_logical_block_size(lo->lo_queue, arg);
+>  	blk_queue_physical_block_size(lo->lo_queue, arg);
+>  	blk_queue_io_min(lo->lo_queue, arg);
+> @@ -1530,6 +1515,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  out_unfreeze:
+>  	blk_mq_unfreeze_queue(lo->lo_queue);
+>  
+> +	/* truncate stale pages cached by previous operations */
+> +	if (drop_caches) {
+> +		sync_blockdev(lo->lo_device);
+> +		kill_bdev(lo->lo_device);
+> +	}
+>  	return err;
+>  }
+>  
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
