@@ -2,76 +2,237 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEF0C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 16:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F0AC3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:19:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8737A208CD
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 16:11:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tow7fovI"
+	by mail.kernel.org (Postfix) with ESMTP id 5B73C20870
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 17:19:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583428775;
+	bh=qByTAWT7bl0J6/edNlwDbsUX9/OFfv2Y7B+vvlVndss=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=KpMLxZw+CRxdw8ZKBmE0Ta0wM6XuI6jHhMW4Jfb8QMge9MrOVq0jsitINTNU6qNv1
+	 3782HdFzGu9Olb0eY5LNHw8rCgJc1ZBeYB4Yf/84WykEgu4Ivy6R438tEmlo7hg+gk
+	 YPFzBMFzis/bgMlsNx4039uVGulQgglq7MmK+HCo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726162AbgCEQLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 11:11:41 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:40164 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbgCEQLk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 11:11:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Uen6VLar276Fa0qz/XOKv1RvuUuLbo9suzCz5NScJNI=; b=tow7fovI56zU/zHIFBvyQFjPvu
-        oxu7I0rkCiFvKuf0jEyycgSOkgif2ymuw5tLBs0Iv2NiEPVqH11+DMB5tD5Y1H5n5aG/6Y8W7Z8/g
-        I9rzwwornx2tBwTtWTg7Jy50rRRciiS730r/9jfMQuw/uB3cN+ipx7Q+YO+vTUh+5OgwpnmMwOvPd
-        xjsFxPMQlR8JlJEeUjcvs7Uk/1Dg1af47nYqVfza4SpnXum9WuKlu4VGLvQsHemNL/GQhsJkzwJID
-        JJsVbxURX6EkP2HNco5kV4mp9mkq4B9IciJaI9mhKj378teu4MbbrEbnSAeqCsMgEfix3nL3UWdSI
-        wvQ8JOIw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j9t63-00054F-6B; Thu, 05 Mar 2020 16:11:39 +0000
-Date:   Thu, 5 Mar 2020 08:11:39 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
+        id S1726956AbgCERTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 12:19:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41670 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727933AbgCERPF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 12:15:05 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 27B1D20848;
+        Thu,  5 Mar 2020 17:15:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583428505;
+        bh=qByTAWT7bl0J6/edNlwDbsUX9/OFfv2Y7B+vvlVndss=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=peK9GphUCu2SQ/UQ7KxrI0TzzZ+fOUDZkDE4y/ZTCs1vm3twfI4FnK0XwUaoEgVp9
+         lUCvmvmwus/hVMmVz6JdA+DVzs5VJ+fIkFCVl7XqgXvYMNjpXGtSx+KHAo/JGu9jtC
+         TBDwUhpZd58zET3m9Qy0CJq9oXadYr42uwvprioQ=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
         Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v7 1/9] block: Keyslot Manager for Inline Encryption
-Message-ID: <20200305161139.GA19270@infradead.org>
-References: <20200221115050.238976-1-satyat@google.com>
- <20200221115050.238976-2-satyat@google.com>
- <20200221170434.GA438@infradead.org>
- <20200221173118.GA30670@infradead.org>
- <20200227181411.GB877@sol.localdomain>
- <20200227212512.GA162309@google.com>
+        "Ewan D . Milne" <emilne@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 35/58] blk-mq: insert passthrough request into hctx->dispatch directly
+Date:   Thu,  5 Mar 2020 12:13:56 -0500
+Message-Id: <20200305171420.29595-35-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200305171420.29595-1-sashal@kernel.org>
+References: <20200305171420.29595-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200227212512.GA162309@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 01:25:12PM -0800, Satya Tangirala wrote:
-> I think it does make some sense at least to make the keyslot type opaque
-> to most of the system other than the driver itself (the driver will now
-> have to call a function like blk_ksm_slot_idx_for_keyslot to actually get
-> a keyslot number at the end of the day). Also this way, the keyslot manager
-> can verify that the keyslot passed to blk_ksm_put_slot is actually part of
-> that keyslot manager (and that somebody isn't releasing a slot number that
-> was actually acquired from a different keyslot manager). I don't think
-> it's much benefit or loss either way, but I already switched to passing
-> pointers to struct keyslot around instead of ints, so I'll keep it that
-> way unless you strongly feel that using ints in this case is better
-> than struct keyslot *.
+From: Ming Lei <ming.lei@redhat.com>
 
-Exactly.  This provides a little type safety.
+[ Upstream commit 01e99aeca3979600302913cef3f89076786f32c8 ]
+
+For some reason, device may be in one situation which can't handle
+FS request, so STS_RESOURCE is always returned and the FS request
+will be added to hctx->dispatch. However passthrough request may
+be required at that time for fixing the problem. If passthrough
+request is added to scheduler queue, there isn't any chance for
+blk-mq to dispatch it given we prioritize requests in hctx->dispatch.
+Then the FS IO request may never be completed, and IO hang is caused.
+
+So passthrough request has to be added to hctx->dispatch directly
+for fixing the IO hang.
+
+Fix this issue by inserting passthrough request into hctx->dispatch
+directly together withing adding FS request to the tail of
+hctx->dispatch in blk_mq_dispatch_rq_list(). Actually we add FS request
+to tail of hctx->dispatch at default, see blk_mq_request_bypass_insert().
+
+Then it becomes consistent with original legacy IO request
+path, in which passthrough request is always added to q->queue_head.
+
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-flush.c    |  2 +-
+ block/blk-mq-sched.c | 22 +++++++++++++++-------
+ block/blk-mq.c       | 18 +++++++++++-------
+ block/blk-mq.h       |  3 ++-
+ 4 files changed, 29 insertions(+), 16 deletions(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index b1f0a1ac505c9..5aa6fada22598 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -399,7 +399,7 @@ void blk_insert_flush(struct request *rq)
+ 	 */
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+-		blk_mq_request_bypass_insert(rq, false);
++		blk_mq_request_bypass_insert(rq, false, false);
+ 		return;
+ 	}
+ 
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index ca22afd47b3dc..856356b1619e8 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -361,13 +361,19 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 				       bool has_sched,
+ 				       struct request *rq)
+ {
+-	/* dispatch flush rq directly */
+-	if (rq->rq_flags & RQF_FLUSH_SEQ) {
+-		spin_lock(&hctx->lock);
+-		list_add(&rq->queuelist, &hctx->dispatch);
+-		spin_unlock(&hctx->lock);
++	/*
++	 * dispatch flush and passthrough rq directly
++	 *
++	 * passthrough request has to be added to hctx->dispatch directly.
++	 * For some reason, device may be in one situation which can't
++	 * handle FS request, so STS_RESOURCE is always returned and the
++	 * FS request will be added to hctx->dispatch. However passthrough
++	 * request may be required at that time for fixing the problem. If
++	 * passthrough request is added to scheduler queue, there isn't any
++	 * chance to dispatch it given we prioritize requests in hctx->dispatch.
++	 */
++	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
+ 		return true;
+-	}
+ 
+ 	if (has_sched)
+ 		rq->rq_flags |= RQF_SORTED;
+@@ -391,8 +397,10 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 
+ 	WARN_ON(e && (rq->tag != -1));
+ 
+-	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
++	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
++		blk_mq_request_bypass_insert(rq, at_head, false);
+ 		goto run;
++	}
+ 
+ 	if (e && e->type->ops.insert_requests) {
+ 		LIST_HEAD(list);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ec791156e9ccd..3c1abab1fdf52 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -761,7 +761,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 		 * merge.
+ 		 */
+ 		if (rq->rq_flags & RQF_DONTPREP)
+-			blk_mq_request_bypass_insert(rq, false);
++			blk_mq_request_bypass_insert(rq, false, false);
+ 		else
+ 			blk_mq_sched_insert_request(rq, true, false, false);
+ 	}
+@@ -1313,7 +1313,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			q->mq_ops->commit_rqs(hctx);
+ 
+ 		spin_lock(&hctx->lock);
+-		list_splice_init(list, &hctx->dispatch);
++		list_splice_tail_init(list, &hctx->dispatch);
+ 		spin_unlock(&hctx->lock);
+ 
+ 		/*
+@@ -1668,12 +1668,16 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+-void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
++				  bool run_queue)
+ {
+ 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+ 
+ 	spin_lock(&hctx->lock);
+-	list_add_tail(&rq->queuelist, &hctx->dispatch);
++	if (at_head)
++		list_add(&rq->queuelist, &hctx->dispatch);
++	else
++		list_add_tail(&rq->queuelist, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+ 
+ 	if (run_queue)
+@@ -1863,7 +1867,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (bypass_insert)
+ 		return BLK_STS_RESOURCE;
+ 
+-	blk_mq_request_bypass_insert(rq, run_queue);
++	blk_mq_request_bypass_insert(rq, false, run_queue);
+ 	return BLK_STS_OK;
+ }
+ 
+@@ -1879,7 +1883,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+ 	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+-		blk_mq_request_bypass_insert(rq, true);
++		blk_mq_request_bypass_insert(rq, false, true);
+ 	else if (ret != BLK_STS_OK)
+ 		blk_mq_end_request(rq, ret);
+ 
+@@ -1913,7 +1917,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		if (ret != BLK_STS_OK) {
+ 			if (ret == BLK_STS_RESOURCE ||
+ 					ret == BLK_STS_DEV_RESOURCE) {
+-				blk_mq_request_bypass_insert(rq,
++				blk_mq_request_bypass_insert(rq, false,
+ 							list_empty(list));
+ 				break;
+ 			}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 32c62c64e6c2b..f2075978db500 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -66,7 +66,8 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+  */
+ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 				bool at_head);
+-void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
++				  bool run_queue);
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 				struct list_head *list);
+ 
+-- 
+2.20.1
+
