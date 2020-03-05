@@ -6,31 +6,31 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A6BC3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DE4C3F2D7
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:53:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3304D20848
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:53:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 014F920848
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 11:53:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgCELxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 06:53:01 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51168 "EHLO mx2.suse.de"
+        id S1726979AbgCELxC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 06:53:02 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51160 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726990AbgCELxB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Mar 2020 06:53:01 -0500
+        id S1726894AbgCELxC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 5 Mar 2020 06:53:02 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 50CCFAFA0;
+        by mx2.suse.de (Postfix) with ESMTP id 500F8AF00;
         Thu,  5 Mar 2020 11:52:59 +0000 (UTC)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Omar Sandoval <osandov@osandov.com>
 Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         James Smart <james.smart@broadcom.com>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 1/3] nvme: enable ANA support
-Date:   Thu,  5 Mar 2020 12:52:37 +0100
-Message-Id: <20200305115239.29794-2-hare@suse.de>
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 3/3] tests/nvme/034: Add a test for the fcloop driver
+Date:   Thu,  5 Mar 2020 12:52:39 +0100
+Message-Id: <20200305115239.29794-4-hare@suse.de>
 X-Mailer: git-send-email 2.13.7
 In-Reply-To: <20200305115239.29794-1-hare@suse.de>
 References: <20200305115239.29794-1-hare@suse.de>
@@ -39,136 +39,220 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add ANA support functions and update _create_nvmet_ns() to
-accept an additional ANA grpid parameter.
+Add a test for the in-kernel fcloop driver. Despite being a loop
+driver it still requires an actual FC card to run this test.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- tests/nvme/rc | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
+ common/fcloop      |  58 +++++++++++++++++++++++++
+ tests/nvme/034     | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/034.out |   3 ++
+ 3 files changed, 183 insertions(+)
+ create mode 100644 common/fcloop
+ create mode 100644 tests/nvme/034
+ create mode 100644 tests/nvme/034.out
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 40f0413..72e33c1 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -14,7 +14,7 @@ group_device_requires() {
- 	_test_dev_is_nvme
- }
- 
--NVMET_CFS="/sys/kernel/config/nvmet/"
-+NVMET_CFS="/sys/kernel/config/nvmet"
- 
- _test_dev_is_nvme() {
- 	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q nvme; then
-@@ -90,6 +90,7 @@ _create_nvmet_port() {
- 
- 	mkdir "${NVMET_CFS}/ports/${port}"
- 	echo "${trtype}" > "${NVMET_CFS}/ports/${port}/addr_trtype"
-+	echo "${port}" > "${NVMET_CFS}/ports/${port}/addr_traddr"
- 
- 	echo "${port}"
- }
-@@ -99,6 +100,62 @@ _remove_nvmet_port() {
- 	rmdir "${NVMET_CFS}/ports/${port}"
- }
- 
-+_create_nvmet_anagroup() {
-+	local port="$1"
-+	local port_cfs="${NVMET_CFS}/ports/${port}"
-+	local grpid
+diff --git a/common/fcloop b/common/fcloop
+new file mode 100644
+index 0000000..b9a1ce7
+--- /dev/null
++++ b/common/fcloop
+@@ -0,0 +1,58 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++#
++# fcloop helper functions.
 +
-+	for ((grpid = 1; ; grpid++)); do
-+		if [[ ! -e "${port_cfs}/ana_groups/${grpid}" ]]; then
-+			break
-+		fi
-+	done
++. common/shellcheck
 +
-+	mkdir "${port_cfs}/ana_groups/${grpid}"
++_nvme_fcloop_add_rport() {
++	local local_wwnn="$1"
++	local local_wwpn="$2"
++	local remote_wwnn="$3"
++	local remote_wwpn="$4"
++	local loopctl=/sys/class/fcloop/ctl
 +
-+	echo "${grpid}"
++	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn},lpwwnn=${local_wwnn},lpwwpn=${local_wwpn},roles=0x60" > ${loopctl}/add_remote_port
 +}
 +
-+_remove_nvmet_anagroup() {
-+	local port="$1"
-+	local grpid="$2"
-+	local ana_cfs="${NVMET_CFS}/ports/${port}/ana_groups/${grpid}"
++_nvme_fcloop_del_rport() {
++	local local_wwnn="$1"
++	local local_wwpn="$2"
++	local remote_wwnn="$3"
++	local remote_wwpn="$4"
++	local loopctl=/sys/class/fcloop/ctl
 +
-+	rmdir "${ana_cfs}"
++	echo "wwnn=${remote_wwnn},wwpn=${remote_wwpn}" > ${loopctl}/del_remote_port
 +}
 +
-+_set_nvmet_anagroup_state() {
-+	local port="$1"
-+	local grpid="$2"
-+	local state="$3"
-+	local ana_cfs="${NVMET_CFS}/ports/${port}/ana_groups/${grpid}"
++_nvme_fcloop_add_lport() {
++	local wwnn="$1"
++	local wwpn="$2"
++	local loopctl=/sys/class/fcloop/ctl
 +
-+	echo "${state}" > "${ana_cfs}/ana_state"
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/add_local_port
 +}
 +
-+_display_ana_state() {
-+	local nvmet_subsystem="$1"
-+	local grpid state cntlid
++_nvme_fcloop_del_lport() {
++	local wwnn="$1"
++	local wwpn="$2"
++	local loopctl=/sys/class/fcloop/ctl
 +
-+	for nvme in /sys/class/nvme/* ; do
-+		[ -f ${nvme}/subsysnqn ] || continue
-+		subsys="$(cat "${nvme}/subsysnqn")"
-+		if [ "${subsys}" != "${nvmet_subsystem}" ] ; then
-+			continue
-+		fi
-+		cntlid="$(cat "${nvme}/cntlid")"
-+		for c in ${nvme}/nvme* ; do
-+			if [ ! -d ${c} ] ; then
-+				echo "${cntlid}: ANA disabled"
-+				continue
-+			fi
-+			grpid="$(cat "${c}/ana_grpid")"
-+			state="$(cat "${c}/ana_state")"
-+			echo "${cntlid}: grpid ${grpid} state ${state}"
-+		done
-+	done
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_local_port
 +}
 +
- _create_nvmet_ns() {
- 	local nvmet_subsystem="$1"
- 	local nsid="$2"
-@@ -106,14 +163,22 @@ _create_nvmet_ns() {
- 	local uuid="00000000-0000-0000-0000-000000000000"
- 	local subsys_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
- 	local ns_path="${subsys_path}/namespaces/${nsid}"
-+	local ana_grpid
- 
--	if [[ $# -eq 4 ]]; then
-+	if [[ $# -ge 4 ]]; then
- 		uuid="$4"
- 	fi
- 
-+	if [[ $# -eq 5 ]]; then
-+		ana_grpid="$5"
-+	fi
++_nvme_fcloop_add_tport() {
++	local wwnn="$1"
++	local wwpn="$2"
++	local loopctl=/sys/class/fcloop/ctl
 +
- 	mkdir "${ns_path}"
- 	printf "%s" "${blkdev}" > "${ns_path}/device_path"
- 	printf "%s" "${uuid}" > "${ns_path}/device_uuid"
-+	if [ -n "${ana_grpid}" ] ; then
-+		printf "%s" "${ana_grpid}" > "${ns_path}/ana_grpid"
-+	fi
- 	printf 1 > "${ns_path}/enable"
- }
- 
-@@ -121,11 +186,12 @@ _create_nvmet_subsystem() {
- 	local nvmet_subsystem="$1"
- 	local blkdev="$2"
- 	local uuid=$3
-+	local ana_grpid=$4
- 	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
- 
- 	mkdir -p "${cfs_path}"
- 	echo 1 > "${cfs_path}/attr_allow_any_host"
--	_create_nvmet_ns "${nvmet_subsystem}" "1" "${blkdev}" "${uuid}"
-+	_create_nvmet_ns "${nvmet_subsystem}" "1" "${blkdev}" "${uuid}" "${ana_grpid}"
- }
- 
- _remove_nvmet_ns() {
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/add_target_port
++}
++
++_nvme_fcloop_del_tport() {
++	local wwnn="$1"
++	local wwpn="$2"
++	local loopctl=/sys/class/fcloop/ctl
++
++	echo "wwnn=${wwnn},wwpn=${wwpn}" > ${loopctl}/del_target_port
++}
+diff --git a/tests/nvme/034 b/tests/nvme/034
+new file mode 100644
+index 0000000..1a197f2
+--- /dev/null
++++ b/tests/nvme/034
+@@ -0,0 +1,122 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++# Copyright (C) 2018 Johannes Thumshirn, Hannes Reinecke, SUSE Linux GmbH
++#
++# Reproducer for nvme-fcloop
++#
++
++. tests/nvme/rc
++. common/fcloop
++
++DESCRIPTION="create nvme-fcloop with two ports and connect/disconnect"
++
++requires() {
++	_have_program nvme && \
++		_have_modules loop nvme-fcloop nvmet nvmet-fc && \
++		_have_configfs
++}
++
++test() {
++	local subsys="blktests-subsystem-1"
++	local remote_wwnn1="0x100140111111dbcc"
++	local remote_wwpn1="0x200140111111dbcc"
++	local remote_wwnn2="0x100140111111dbcd"
++	local remote_wwpn2="0x200140111111dbcd"
++	local host_wwnn1="0x100140111111dac8"
++	local host_wwpn1="0x200140111111dac8"
++	local host_wwnn2="0x100140111111dac9"
++	local host_wwpn2="0x200140111111dac9"
++
++	echo "Running ${TEST_NAME}"
++
++	modprobe nvmet-fc
++	modprobe nvme-fcloop
++
++	_nvme_fcloop_add_tport ${remote_wwnn1} ${remote_wwpn1}
++	_nvme_fcloop_add_tport ${remote_wwnn2} ${remote_wwpn2}
++
++	_nvme_fcloop_add_lport ${host_wwnn1} ${host_wwpn1}
++	_nvme_fcloop_add_lport ${host_wwnn2} ${host_wwpn2}
++
++	_nvme_fcloop_add_rport ${host_wwnn1} ${host_wwpn1} \
++		${remote_wwnn1} ${remote_wwpn1}
++	_nvme_fcloop_add_rport ${host_wwnn2} ${host_wwpn2} \
++		${remote_wwnn2} ${remote_wwpn2}
++
++	local port1
++	port1=$(_create_nvmet_port "fc")
++	ag1="$(_create_nvmet_anagroup "${port1}")"
++
++	local port2
++	port2=$(_create_nvmet_port "fc")
++	ag2="$(_create_nvmet_anagroup "${port2}")"
++
++	local remote_traddr1
++	remote_traddr1=$(printf "nn-%s:pn-%s" "${remote_wwnn1}" "${remote_wwpn1}")
++	echo fc > /sys/kernel/config/nvmet/ports/${port1}/addr_adrfam
++	echo "${remote_traddr1}" > /sys/kernel/config/nvmet/ports/${port1}/addr_traddr
++
++	local remote_traddr2
++	remote_traddr2=$(printf "nn-%s:pn-%s" "${remote_wwnn2}" "${remote_wwpn2}")
++	echo fc > /sys/kernel/config/nvmet/ports/${port2}/addr_adrfam
++	echo "${remote_traddr2}" > /sys/kernel/config/nvmet/ports/${port2}/addr_traddr
++
++	truncate -s 1G "$TMPDIR/img"
++
++	local loop_dev
++	loop_dev="$(losetup -f --show "$TMPDIR/img")"
++
++	_create_nvmet_subsystem "${subsys}" "${loop_dev}" \
++		"91fdba0d-f87b-4c25-b80f-db7be1418b9e" "1"
++	_add_nvmet_subsys_to_port "${port1}" "${subsys}"
++	_add_nvmet_subsys_to_port "${port2}" "${subsys}"
++
++	_set_nvmet_anagroup_state "${port2}" "1" "inaccessible"
++	_set_nvmet_anagroup_state "${port2}" "2" "optimized"
++
++	local host_traddr1
++	host_traddr1=$(printf "nn-%s:pn-%s" "${host_wwnn1}" "${host_wwpn1}")
++
++	nvme connect -t fc -a "${remote_traddr1}"  -w "${host_traddr1}" \
++		-n "${subsys}"
++
++	local host_traddr2
++	host_traddr2=$(printf "nn-%s:pn-%s" "${host_wwnn2}" "${host_wwpn2}")
++
++	nvme connect -t fc -a "${remote_traddr2}"  -w "${host_traddr2}" \
++		-n "${subsys}"
++
++	nvmedev="$(_find_nvme_ns 91fdba0d-f87b-4c25-b80f-db7be1418b9e)"
++
++	# Allow I/O to settle
++	udevadm settle
++
++	nvme disconnect -n "${subsys}"
++
++	_remove_nvmet_subsystem_from_port "${port1}" "${subsys}"
++	_remove_nvmet_subsystem_from_port "${port2}" "${subsys}"
++	_remove_nvmet_subsystem "${subsys}"
++	_remove_nvmet_anagroup "${port1}" "${ag1}"
++	_remove_nvmet_port "${port1}"
++	_remove_nvmet_anagroup "${port2}" "${ag2}"
++	_remove_nvmet_port "${port2}"
++
++	losetup -d "$loop_dev"
++	rm "$TMPDIR/img"
++
++	# Fixme: need to wait for RCU grace period
++	sleep 5
++
++	_nvme_fcloop_del_rport "${host_wwnn1}" "${host_wwpn1}" \
++		"${remote_wwnn1}" "${remote_wwpn1}"
++	_nvme_fcloop_del_rport "${host_wwnn2}" "${host_wwpn2}" \
++		"${remote_wwnn2}" "${remote_wwpn2}"
++
++	_nvme_fcloop_del_tport "${remote_wwnn1}" "${remote_wwpn1}"
++	_nvme_fcloop_del_tport "${remote_wwnn2}" "${remote_wwpn2}"
++
++	_nvme_fcloop_del_lport "${host_wwnn1}" "${host_wwpn1}"
++	_nvme_fcloop_del_lport "${host_wwnn2}" "${host_wwpn2}"
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/034.out b/tests/nvme/034.out
+new file mode 100644
+index 0000000..832d645
+--- /dev/null
++++ b/tests/nvme/034.out
+@@ -0,0 +1,3 @@
++Running nvme/034
++NQN:blktests-subsystem-1 disconnected 2 controller(s)
++Test complete
 -- 
 2.13.7
 
