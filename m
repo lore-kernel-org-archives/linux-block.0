@@ -2,106 +2,106 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1A1C3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C1FC3F2CE
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:51:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FC92207FD
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:35:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 675282084E
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 01:51:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="yLKg1ZbL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TP+aujmf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725810AbgCEBf5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Mar 2020 20:35:57 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:45359 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbgCEBf5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 20:35:57 -0500
-Received: by mail-pl1-f196.google.com with SMTP id b22so1876386pls.12
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2020 17:35:56 -0800 (PST)
+        id S1725877AbgCEBvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Mar 2020 20:51:52 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45007 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725852AbgCEBvw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Mar 2020 20:51:52 -0500
+Received: by mail-wr1-f65.google.com with SMTP id n7so5000881wrt.11;
+        Wed, 04 Mar 2020 17:51:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MWBxTBVyBawGGVRmXbELavgcbIojnxDVCCWuyKiswCw=;
-        b=yLKg1ZbLF97TTdN/8Ij0wrvW/Au5gymv49TtRjrzhIUpdnNHXn3tB4BQl6X7CKbOO4
-         7VELbNQvy9ZxXNuv+8pluxsTETP3R8f9f6GSBKNcWB0FuxZzUcz4L3/uWYUeHHaycIlo
-         FM8yZ0HZXRrfMR5B6GCMcMtn3lKYF+d2u3WoOM11lV/Q9GTYZXtS0geCTqEkEAgNy7Lv
-         ewHA8Er4ENxtpTuBFccQ9rhTWekLLzPmh7Ywry+Xa2HpYm2WxKFg+S7bDR5kp7hsNoC2
-         k20fxGTrGv5Pe+3RpplEd4NnHVLr/OW1e4c5VSWdS4eVh37gjtLqZnHXwO9FDjq3aSO5
-         C+oQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YMsHVgBMpB6xZxkyUx2XvzHBpwWocp0SkiRH0EL4DrA=;
+        b=TP+aujmfjbNebM8C57RgZvGmaGI0udNnwXD1VfG82E28gu2ypSabiftNSeVSOrxAfq
+         RVO7rmB2+JXgt3LaJv2gVNCkCHZfzfxnDEMWYLtIKlmzbEUxo/nGrxG60bJTpI2Y++IU
+         9Oxu94imBc9Pdgltp19ZJlgFRpRvjDsDXExktpx9x0bsTdf5K7gKgZFKfIdvcLAr/ga0
+         scMVN2iq0A6MIHsrLnJOKWfO8rkEW2BxVVFcUw1wzobueV7NJpng9a4SXK1+KPxKNBE4
+         eZFwgMWSmweTDPYfyIYRKGDOrvbPc9IqVBmVKEnD2Smgtt2mBJu5CiXHqFj44s5XhYp5
+         8LVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MWBxTBVyBawGGVRmXbELavgcbIojnxDVCCWuyKiswCw=;
-        b=VdpP8fXE0BS4ieoZpn8chd0/QYgCf0rSHBw9+KyJpxiyL3qIc564iJeUcJ4xxmZcI7
-         32sFBjJTjT8PMU0xxPW/HkdvGysqJU7BKmPpMYuFhP2z4+BOQLXuBkPAYB80HvqkGHj5
-         SXNS2rLAtnu7ewAHsU9IQSnO752fP2qey2S9V9WlE9VKE8Fn7YuvWsSib894KtMDI05v
-         V/jASzcU0GVUEt5uXK9DMFYQ4ndECHh1EkVuJtLaMOUJ38CwzCkOqQqqmurE3Oltwpvc
-         XEsYV7CkU098aHVObAIm32soA6YI4PwgiOAadwLDIQhXPauUjO5jq55OWn+yud8O2rai
-         XosA==
-X-Gm-Message-State: ANhLgQ03N1sivQnSyNdq7PgOQIf11MXZXL0DUu5Cvv/t43WP0w1WXLnU
-        rpXAg0bbSd9tawQSiD7vJdbMRw==
-X-Google-Smtp-Source: ADFU+vugx3g1fv1w1XqhBKngRgRC0hMKVPGsDadWWjNcXt+M3hhFhYWM+qJczI5JvTF26Prd38vAyQ==
-X-Received: by 2002:a17:90a:8d81:: with SMTP id d1mr5824523pjo.63.1583372155885;
-        Wed, 04 Mar 2020 17:35:55 -0800 (PST)
-Received: from vader ([2601:602:8b80:8e0:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id a31sm14586085pgl.58.2020.03.04.17.35.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2020 17:35:55 -0800 (PST)
-Date:   Wed, 4 Mar 2020 17:35:54 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Sun Ke <sunke32@huawei.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com
-Subject: Re: [PATCH blktests] nbd/003: improve the test
-Message-ID: <20200305013554.GC293405@vader>
-References: <20200224042728.31886-1-sunke32@huawei.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YMsHVgBMpB6xZxkyUx2XvzHBpwWocp0SkiRH0EL4DrA=;
+        b=QmIo5Hv8pVGGvFk5hMeHspJaESl2fgCG12UmWr0SjcfxZchQL7zX7YMjDNg6CAap79
+         Mt2miNUDxsoecbB67zRy6plk+hW4vvtHAisYY8pqc3M9p1lj3OIHq1CT6+1twHxhWBiK
+         N83kLrQQDynfjWgx0KlCqLLLCX70KXMj+uvYI9BF4TvuVWGuGkN0ktHLLao9yR6CsV5T
+         EJrXvc5coMai/0qIyaFgHyEPox7yE/Yg46RnWCnY8+ayn72f/6zMoc1bXimE6EU8EeFh
+         RAN9hykKoUNBGPCbPQUkw8hAKJPBEL+IjXuqLtIfKQsbfZaek+S8QkeLXtCtoTz2yC1G
+         1d8w==
+X-Gm-Message-State: ANhLgQ0GGoAqQcpA5T6kniQlxXgkKjjaijdfJzVovUP64ASpD99v5A8w
+        9vl/t2ycSzDxo+XmtnFaienwPxlBjCmBhduJhHI=
+X-Google-Smtp-Source: ADFU+vveDOkJ/hpWrsPkW+Zmz6E+YWx9N+SYAWkPkgKagACA2aFMZnSW4whrtmyf++JUgMR1Vo86FkRYxt5m5iJZIYs=
+X-Received: by 2002:adf:9282:: with SMTP id 2mr7341773wrn.124.1583373110116;
+ Wed, 04 Mar 2020 17:51:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200224042728.31886-1-sunke32@huawei.com>
+References: <20200302220639.GA2393@dhcp-10-100-145-180.wdl.wdc.com> <20200303110731.65552-1-cengiz@kernel.wtf>
+In-Reply-To: <20200303110731.65552-1-cengiz@kernel.wtf>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Thu, 5 Mar 2020 09:51:36 +0800
+Message-ID: <CACVXFVNe4dLFyhaP9BKyR4bdS+zpskFLttPfQMDY0O5RvE0GMA@mail.gmail.com>
+Subject: Re: [PATCH] blktrace: Protect q->blk_trace with RCU
+To:     Cengiz Can <cengiz@kernel.wtf>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bjorn Helgaas <helgaas@kernel.org>, Jan Kara <jack@suse.cz>,
+        linux-block <linux-block@vger.kernel.org>,
+        stable <stable@vger.kernel.org>, tristmd@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 24, 2020 at 12:27:28PM +0800, Sun Ke wrote:
-> Modify the DESCRIPTION, remove the umount and add rm.
-> 
-> Signed-off-by: Sun Ke <sunke32@huawei.com>
+On Tue, Mar 3, 2020 at 8:37 PM Cengiz Can <cengiz@kernel.wtf> wrote:
+>
+> Added a reassignment into the NULL check block to fix the issue.
+>
+> Fixes: c780e86dd48 ("blktrace: Protect q->blk_trace with RCU")
+>
+> Signed-off-by: Cengiz Can <cengiz@kernel.wtf>
 > ---
->  tests/nbd/003 | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/nbd/003 b/tests/nbd/003
-> index 57fb63a..49ca30e 100644
-> --- a/tests/nbd/003
-> +++ b/tests/nbd/003
-> @@ -7,7 +7,7 @@
->  
->  . tests/nbd/rc
->  
-> -DESCRIPTION="mount/unmount concurrently with NBD_CLEAR_SOCK"
-> +DESCRIPTION="connected by ioctl, mount/unmount concurrently with NBD_CLEAR_SOCK"
->  QUICK=1
->  
->  requires() {
-> @@ -23,8 +23,8 @@ test() {
->  
->  	mkdir -p "${TMPDIR}/mnt"
->  	src/mount_clear_sock /dev/nbd0 "${TMPDIR}/mnt" ext4 5000
-> -	umount "${TMPDIR}/mnt" > /dev/null 2>&1
+>  kernel/trace/blktrace.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 4560878f0bac..29ea88f10b87 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -1896,8 +1896,10 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+>         }
+>
+>         ret = 0;
+> -       if (bt == NULL)
+> +       if (bt == NULL) {
+>                 ret = blk_trace_setup_queue(q, bdev);
+> +               bt = q->blk_trace;
 
-Is the umount causing problems?
+I'd suggest to use the following line for avoiding RCU warning:
 
->  
->  	nbd-client -d /dev/nbd0 >> "$FULL" 2>&1
-> +	rm -rf "${TMPDIR}/mnt"
+   bt = rcu_dereference_protected(q->blk_trace,
+                                       lockdep_is_held(&q->blk_trace_mutex));
 
-The test harness already removes the TMPDIR directory. Why is this
-necessary?
+Otherwise, the patch looks fine for me:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming Lei
