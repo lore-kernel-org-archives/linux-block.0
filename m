@@ -2,136 +2,76 @@ Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D174FC3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 15:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEF0C3F2D1
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 16:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2C9B21556
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 15:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8737A208CD
+	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 16:11:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=eikelenboom.it header.i=@eikelenboom.it header.b="Jz13duDq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tow7fovI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbgCEP5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 10:57:03 -0500
-Received: from server.eikelenboom.it ([91.121.65.215]:56748 "EHLO
-        server.eikelenboom.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726164AbgCEP5C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 10:57:02 -0500
-X-Greylist: delayed 594 seconds by postgrey-1.27 at vger.kernel.org; Thu, 05 Mar 2020 10:57:02 EST
+        id S1726162AbgCEQLl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 11:11:41 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:40164 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbgCEQLk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 11:11:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=eikelenboom.it; s=20180706; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=7zaRKGsS0ZE69bPjVfBfvoMx3pCqo5nNA7n4fl7ujvw=; b=Jz13duDqLs43Wm1XWWqVFYDdVi
-        uowHRKPtI85xiEhqC1CHiWIVqwu5o8osd2w3ocR/lktYKldMi/jWfzSYsehwW7zq6dHMTyWbdu9of
-        OcmlvvPoZNMZ8i2Bb0effUlmmp2LE+ytNWqNMJMjKcWcOxVSE0totMaCx8pF35QZpVMA=;
-Received: from ip4da85049.direct-adsl.nl ([77.168.80.73]:54264 helo=[172.16.1.50])
-        by server.eikelenboom.it with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <linux@eikelenboom.it>)
-        id 1j9skC-0005zf-Kp; Thu, 05 Mar 2020 16:49:04 +0100
-Subject: Re: [Xen-devel] [PATCH v2] xen/blkfront: fix ring info addressing
-To:     =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20200305114044.20235-1-jgross@suse.com>
- <20200305124255.GW24458@Air-de-Roger.citrite.net>
- <c2c1573a-8c98-4a99-64fb-1346ee724d08@suse.com>
-From:   Sander Eikelenboom <linux@eikelenboom.it>
-Message-ID: <68f09f4e-180f-0fb7-c329-f3f03be72eb6@eikelenboom.it>
-Date:   Thu, 5 Mar 2020 16:47:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Uen6VLar276Fa0qz/XOKv1RvuUuLbo9suzCz5NScJNI=; b=tow7fovI56zU/zHIFBvyQFjPvu
+        oxu7I0rkCiFvKuf0jEyycgSOkgif2ymuw5tLBs0Iv2NiEPVqH11+DMB5tD5Y1H5n5aG/6Y8W7Z8/g
+        I9rzwwornx2tBwTtWTg7Jy50rRRciiS730r/9jfMQuw/uB3cN+ipx7Q+YO+vTUh+5OgwpnmMwOvPd
+        xjsFxPMQlR8JlJEeUjcvs7Uk/1Dg1af47nYqVfza4SpnXum9WuKlu4VGLvQsHemNL/GQhsJkzwJID
+        JJsVbxURX6EkP2HNco5kV4mp9mkq4B9IciJaI9mhKj378teu4MbbrEbnSAeqCsMgEfix3nL3UWdSI
+        wvQ8JOIw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j9t63-00054F-6B; Thu, 05 Mar 2020 16:11:39 +0000
+Date:   Thu, 5 Mar 2020 08:11:39 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v7 1/9] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200305161139.GA19270@infradead.org>
+References: <20200221115050.238976-1-satyat@google.com>
+ <20200221115050.238976-2-satyat@google.com>
+ <20200221170434.GA438@infradead.org>
+ <20200221173118.GA30670@infradead.org>
+ <20200227181411.GB877@sol.localdomain>
+ <20200227212512.GA162309@google.com>
 MIME-Version: 1.0
-In-Reply-To: <c2c1573a-8c98-4a99-64fb-1346ee724d08@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200227212512.GA162309@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/03/2020 14:40, Jürgen Groß wrote:
-> On 05.03.20 13:42, Roger Pau Monné wrote:
->> On Thu, Mar 05, 2020 at 12:40:44PM +0100, Juergen Gross wrote:
->>> Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
->>> actual use case") made struct blkfront_ring_info size dynamic. This is
->>> fine when running with only one queue, but with multiple queues the
->>> addressing of the single queues has to be adapted as the structs are
->>> allocated in an array.
->>>
->>> Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
->>> Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
->>> Signed-off-by: Juergen Gross <jgross@suse.com>
->>> ---
->>> V2:
->>> - get rid of rinfo_ptr() helper
->>> - use proper parenthesis in for_each_rinfo()
->>> - rename rinfo parameter of for_each_rinfo()
->>> ---
->>>   drivers/block/xen-blkfront.c | 79 +++++++++++++++++++++++---------------------
->>>   1 file changed, 42 insertions(+), 37 deletions(-)
->>>
->>> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
->>> index e2ad6bba2281..8e844da826db 100644
->>> --- a/drivers/block/xen-blkfront.c
->>> +++ b/drivers/block/xen-blkfront.c
->>> @@ -213,6 +213,7 @@ struct blkfront_info
->>>   	struct blk_mq_tag_set tag_set;
->>>   	struct blkfront_ring_info *rinfo;
->>>   	unsigned int nr_rings;
->>> +	unsigned int rinfo_size;
->>>   	/* Save uncomplete reqs and bios for migration. */
->>>   	struct list_head requests;
->>>   	struct bio_list bio_list;
->>> @@ -259,6 +260,18 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo);
->>>   static void blkfront_gather_backend_features(struct blkfront_info *info);
->>>   static int negotiate_mq(struct blkfront_info *info);
->>>   
->>> +#define for_each_rinfo(info, ptr, idx)				\
->>> +	for ((ptr) = (info)->rinfo, (idx) = 0;			\
->>> +	     (idx) < (info)->nr_rings;				\
->>> +	     (idx)++, (ptr) = (void *)(ptr) + (info)->rinfo_size)
->>> +
->>> +static struct blkfront_ring_info *get_rinfo(struct blkfront_info *info,
->>
->> I still think inline should be added here, but I don't have such a
->> strong opinion to block the patch on it.
-> 
-> I can add it if you like that better. Won't make much difference in the
-> end.
-> 
->> Also, info should be constified AFAICT.
-> 
-> Yes.
-> 
->>
->> With at least info constified:
->>
->> Acked-by: Roger Pau Monné <roger.pau@citrix.com>
->>
->> Can you queue this through the Xen tree?
-> 
-> Sure.
-> 
-> 
-> Juergen
-> 
+On Thu, Feb 27, 2020 at 01:25:12PM -0800, Satya Tangirala wrote:
+> I think it does make some sense at least to make the keyslot type opaque
+> to most of the system other than the driver itself (the driver will now
+> have to call a function like blk_ksm_slot_idx_for_keyslot to actually get
+> a keyslot number at the end of the day). Also this way, the keyslot manager
+> can verify that the keyslot passed to blk_ksm_put_slot is actually part of
+> that keyslot manager (and that somebody isn't releasing a slot number that
+> was actually acquired from a different keyslot manager). I don't think
+> it's much benefit or loss either way, but I already switched to passing
+> pointers to struct keyslot around instead of ints, so I'll keep it that
+> way unless you strongly feel that using ints in this case is better
+> than struct keyslot *.
 
-Just tested v2 and it works for me, thanks !
-
---
-Sander
-
+Exactly.  This provides a little type safety.
