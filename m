@@ -2,209 +2,149 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC03C10F26
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 312CEC10DCE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:15:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D596F2084E
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2D482084E
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:15:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L1atKqdq"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pgZjSnHI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726359AbgCFLPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 06:15:06 -0500
-Received: from mail-vs1-f45.google.com ([209.85.217.45]:42861 "EHLO
-        mail-vs1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726240AbgCFLPG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 06:15:06 -0500
-Received: by mail-vs1-f45.google.com with SMTP id w142so1244768vsw.9
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 03:15:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RALxsLUaehfVlQvSftzg+Fa2mm4tOh4KA3MkWJBS1Wg=;
-        b=L1atKqdq+Sd3Hdsm7/3Om3qiUD7MEXQHhdSIB02f2vHyUBzfwL2ntphoeKdPS7HqWu
-         GA1SbtTT3XMAjS8DIFx8wap0iOQBn1/esVAlZXpsMH+VnW1fczqEj/9jqaj7+yVI08Qh
-         qLTtmUC74LNea1rG+hK+S6YrvexWiAw8V1nZJtL0Ocb9uYyoIJePnirVSj9JDaP5+fYX
-         NbY8kq90JZkrsmJ01kQ7amgyp0caa+m58V0KYtLyujSkMOpNETuUbQxPDNEHB3KoeFGD
-         oRURHTtpkyxUfc+fFB2nuuvhIssCHI13ejkYu6GfL5Hu+jnvJGooTG2Tc+l98n0UgCke
-         hKiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RALxsLUaehfVlQvSftzg+Fa2mm4tOh4KA3MkWJBS1Wg=;
-        b=L45ByTcDxArmYWacbIxxN1q8a5dAFqYaEJf9bzTP34GAFR/iGdGazfgT+uuT78fKu0
-         qHJFJs3jmCGg0k9GXtNwpdUGzAQbcXk5dMaZzDidQeHTQA7p+wXdZRcnp33TZ7knKeAh
-         twqVDDXWnsOb6t1CUDHeR8S3tpDng3skOCJTStHyMLWFOhNm++rugINplbrtts1sYj82
-         dW1mVo4Wb+jOcW2OBbcTh4XeyhO62NpP7sOCx2L/mNPnFMa/gmZl3mynaIeIpmqm8sxQ
-         pASVqE8jZBeh2oCeYS4G0FrPrqCefxXvQKpnYRE9n0oi2TvSqPdic1zndaonsMPJy2pp
-         17Rw==
-X-Gm-Message-State: ANhLgQ1Xh5+HKjcpCZf0ZCKvFVAGoMViXhM3sMwkzsvZA0DSupMj1UBU
-        VikeijH+0GhOvHIYtmXNrkB4M3Xb+BdYjEaQMsareA==
-X-Google-Smtp-Source: ADFU+vu5ic0WXuqQCkTpsuPEoSJuLGAvJotbaObBa+yxHqWEywYiNwpxOLlyc0d5So2Sg6BN1yJw/KM7oGHOxKOCHCc=
-X-Received: by 2002:a67:7fd0:: with SMTP id a199mr1838473vsd.200.1583493304009;
- Fri, 06 Mar 2020 03:15:04 -0800 (PST)
+        id S1726245AbgCFLPp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 06:15:45 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:56130 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726212AbgCFLPp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 06:15:45 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 026B85Vl066611;
+        Fri, 6 Mar 2020 11:15:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=8cpphzaFJ1oOB2Ybb8mTHxcBaBMTt7AnX0lldDCaqgY=;
+ b=pgZjSnHI4zGe9nzlW2ouFUBm9RFpBm+FxCOjDULD/r8OoiPsjlnQNX7Q1jHrSHQF1Ul8
+ uUW6lZRnso5UMoaRQ+E9NxfzetpjS+zedMyGsLkMZOPZRnc13jb6VQPB3XC23yaRizee
+ Jd32M14LBlVRTnIZX8iHk/otneYk4r9i+ccV8COhjE10O3U8ssjYR/dy1Ur+CqZ7ZDkN
+ II+GrbXajhXkK0rC9sj5I5KN9+iG2Rq5BCFwP+nmxXknJuwyMw4/9397CJecKPFF0gGS
+ oALNrhbp9W7L1+a4n8XrcargEyh5k99c1PRh19mtXDImBkop/nCVJeAkHwN2QSVhY866 WA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2ykgys1cn1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Mar 2020 11:15:37 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 026BE2eA117321;
+        Fri, 6 Mar 2020 11:15:36 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2yg1h5md0x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Mar 2020 11:15:36 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 026BFY1j000922;
+        Fri, 6 Mar 2020 11:15:35 GMT
+Received: from bostrovs-us.us.oracle.com (/10.152.32.65)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 06 Mar 2020 03:15:34 -0800
+Subject: Re: [PATCH v3] xen/blkfront: fix ring info addressing
+To:     Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20200305155129.28326-1-jgross@suse.com>
+From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Autocrypt: addr=boris.ostrovsky@oracle.com; keydata=
+ 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
+ Jg6OxFYd01z+a+oL
+Message-ID: <53eef7b9-f4c5-0c84-4df7-f5599bb477e3@oracle.com>
+Date:   Fri, 6 Mar 2020 06:15:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <6523119a-50ac-973a-d1cd-ab1569259411@nvidia.com> <f960aa98-5508-36fd-166d-7f41c7d85154@nvidia.com>
- <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
- <0963b60f-15e7-4bc6-10df-6fc8003e4d42@nvidia.com> <CAPDyKFq5NoeHEBK3sv3yOSD2+pm9FueH1gaTyPq0j7GLfa6vnA@mail.gmail.com>
- <34fd84d7-387b-b6f3-7fb3-aa490909e205@ti.com> <CAPDyKFrrO4noYqdxWL9Y8Nx75LopbDudKGMotkGbGcAF1oq==w@mail.gmail.com>
- <5e9b5646-bd48-e55b-54ee-1c2c41fc9218@nvidia.com> <CAPDyKFqpNo_4OePBR1KnJNO=kR8XEqbcsEd=icSceSdDH+Rk1Q@mail.gmail.com>
- <757853cf-987e-f6b6-9259-b4560a031692@nvidia.com> <d12fe142-7e72-ab58-33ab-17817e35096f@nvidia.com>
- <c216f131-6f83-c9c9-9d17-8d44ec06972d@nvidia.com> <87ad7586-9569-4276-044a-adb64e84ca15@nvidia.com>
- <a0962e0b-0f1d-9f32-f6e9-92f69f93167f@nvidia.com> <57ddddc2-3ee8-d867-bba0-0dd9929ba37d@nvidia.com>
- <CAPDyKFqZSd9E3+16yFsmpee2JsbRJ-DGThxx7NJHu6UE00Xi1Q@mail.gmail.com> <26ee7225-9483-4664-c2d7-b5cefeadcd4b@nvidia.com>
-In-Reply-To: <26ee7225-9483-4664-c2d7-b5cefeadcd4b@nvidia.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Fri, 6 Mar 2020 12:14:27 +0100
-Message-ID: <CAPDyKFqwVQDEnPNi33mc9ycTxpaT1cRLejbR3Ja4c8dha4gFRw@mail.gmail.com>
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Sowjanya Komatineni <skomatineni@nvidia.com>
-Cc:     Jon Hunter <jonathanh@nvidia.com>,
-        Bitan Biswas <bbiswas@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Faiz Abbas <faiz_abbas@ti.com>,
-        Thierry Reding <treding@nvidia.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Kishon <kishon@ti.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200305155129.28326-1-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9551 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ suspectscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003060080
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9551 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 lowpriorityscore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003060080
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[...]
 
-> >>>>>>>>>
-> >>>>>>>>> Actually we always use R1B with CMD6 as per spec.
-> >>>>>>>> I fully agree that R1B is preferable, but it's not against the
-> >>>>>>>> spec to
-> >>>>>>>> send CMD13 to poll for busy.
-> >>>>>>>>
-> >>>>>>>> Moreover, we need to cope with the scenario when the host has
-> >>>>>>>> specified a maximum timeout that isn't sufficiently long enough for
-> >>>>>>>> the requested operation. Do you have another proposal for how to
-> >>>>>>>> manage this, but disabling MMC_RSP_BUSY?
-> >>>>>>>>
-> >>>>>>>> Let's assume you driver would get a R1B for the CMD6 (we force it),
-> >>>>>>>> then what timeout would the driver be using if we would set
-> >>>>>>>> cmd.busy_timeout to 30ms?
-> >>>>>>>>
-> >> Sorry didn't understood clearly. Are you asking with 30s timeout, whats
-> >> the data timeout counter used?
-> > Yes. It seems like it will pick the maximum, which is 11s?
-> yes
 
-Okay, thanks!
-
-> >
-> >> Because of above mentioned issue on our host where CMD interrupt happens
-> >> after busy state, poll for busy returns right away as not busy.
-> > I see.
-> >
-> >> So issuing CMD13 after CMD6-R1 followed by busy poll should be working.
-> >> But weird that with small delay of 1ms or debug print before CMD13 it
-> >> doesn't timeout and works all the time.
-> > I have digested the information you provided in these emails. Let me
-> > summarize it, to see if I have understood correctly.
-> >
-> > 1.
-> > Your controller can't distinguish between R1 and R1B because of a
-> > limitation in the HW. So, in both cases you need to wait for the card
-> > to stop signal busy, before the controller can give an IRQ to notify
-> > that the R1 response has been received. Correct?
-> >
-> > In this context, I am wondering if sdhci_send_command(), really
-> > conforms to these requirements. For example, depending on if the CMD6
-> > has MMC_RSP_BUSY or not, it may pick either SDHCI_CMD_RESP_SHORT or
-> > SDHCI_CMD_RESP_SHORT_BUSY.
-> >
-> > Does this work as expected for your case?
-> Design team re-verified internally and bug where HW waits for busy state
-> before IRQ is only for R1B and R1 is spec compliant.
+On 3/5/20 10:51 AM, Juergen Gross wrote:
+> Commit 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to
+> actual use case") made struct blkfront_ring_info size dynamic. This is
+> fine when running with only one queue, but with multiple queues the
+> addressing of the single queues has to be adapted as the structs are
+> allocated in an array.
 >
-> So, with R1, CMD complete is generated after response received.
-
-Okay.
-
-So, the issue we see for CMD6 with R1, is a software problem that we
-should be able to fix.
-
+> Fixes: 0265d6e8ddb890 ("xen/blkfront: limit allocated memory size to actual use case")
+> Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+> Tested-by: Sander Eikelenboom <linux@eikelenboom.it>
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 >
-> With R1B, CMD complete and xfer complete both are generated after
-> response received + device busy (max timeout of 11s)
-> DATA timeout interrupt will be asserted incase if HW busy detection fails.
->
-> With R1B we may see DATA Timeout if operation takes more than max busy
-> timeout of 11s.
 
-Okay, I see.
 
->
-> > 2.
-> > Assuming my interpretation of the above is somewhat correct. Then you
-> > always need to set a busy timeout for R1/R1B responses in the
-> > controller. The maximum timeout seems to be 11s long. Obviously, this
-> > isn't enough for all cases, such as cache flushing and erase, for
-> > example. So, what can we do to support a longer timeouts than 11s?
-> > Would it be possible to disable the HW timeout, if the requested
-> > timeout is longer than 11s and use a SW timeout instead?
-> >
-> > Kind regards
-> > Uffe
->
-> For erase long operations we have register bit to enable for infinite
-> busy wait mode where host controller would be monitoring until card is busy.
 
-Alright, that sounds great!
+Applied to for-linus-5.6b.
 
->
-> But so far for emmc devices we used on our platforms, we haven't seen
-> cache flush taking more than 11s.
-
-I understand that 11s is probably fine to use, for most cases.
-
-However, it's not spec compliant, as for some operations there are
-simply no timeout specified. BKOPS, cache flush, sanitize are cases
-like this - and then 11s is definitely not sufficient.
-
->
-> Will get back on possibility of disabling HW timeout and using SW timeout..
-
-Thanks!
-
-I would like to get the regression fixed asap, but I also would like
-to avoid reverting patches, unless really necessary. May I propose the
-following two options.
-
-1. Find out why polling with ->card_busy() or CMD13, for a CMD6 with
-an R1 response doesn't work - and then fix that behaviour.
-
-2. Set the mmc->max_busy_timeout to zero for sdhci-tegra, which makes
-the core to always use R1B for CMD6 (and erase). This also means that
-when the cmd->busy_timeout becomes longer than 11s, sdhci-tegra must
-disable the HW busy timeout and just wait "forever".
-
-If you decide for 2, you can add the software timeout support on top,
-but make that can be considered as a next step of an improvement,
-rather than needed as fix. Note that, I believe there are some support
-for software timeout already in the sdhci core, maybe you need to
-tweak it a bit for your case, I don't know.
-
-Kind regards
-Uffe
+-boris
