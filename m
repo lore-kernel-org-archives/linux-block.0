@@ -2,123 +2,118 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0613FC10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 12:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB907C10F27
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 13:34:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6BDE2072A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 12:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DAD02166E
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 13:34:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShIPKgee"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="CnuwD6IW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbgCFM2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 07:28:19 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51753 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726307AbgCFM2S (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 07:28:18 -0500
-Received: by mail-wm1-f65.google.com with SMTP id a132so2204283wme.1;
-        Fri, 06 Mar 2020 04:28:17 -0800 (PST)
+        id S1727487AbgCFNda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 08:33:30 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:42583 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727485AbgCFNda (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 08:33:30 -0500
+Received: by mail-io1-f68.google.com with SMTP id q128so2056918iof.9
+        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 05:33:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Rf+ut+vZ0rkmAH/Rce7x5xKiOiWUHGb8d9Igi14P9Lw=;
-        b=ShIPKgeeGOieT6zOaPe7N1NG1+rDBuRiuiFsuB2sNIxLmjxU9SVQI4d5nMsN1AbIVS
-         Vj77ogg71rIo51YRkAdwbdDOmP+FWH2OvCvPbbjly0b3JNScZFUdVpvifLABRMIdHsRs
-         AgeuXspkx0YFf8DeEY1JgjOBFXWe7GMl40w1X8BDvK2HSZLkny2GA3w3vuyzqUkd+Acl
-         qy8fbSC3OlK/xw2XRYiwMGLBrHkXzEskdV9DOmDB9m8LnoE+rSzCce4SWfMg3xyBhGCM
-         2O5fFRiPd6QYwyZxzPzqx5VRlefFdTggo6oGEdf3kX9uMaNFbEJTuc2VeWshTgWVn4y2
-         dbZQ==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eOgNubgvkB+PFv8kOH/Puf/i8J9C6TgnMdeObKC0G2g=;
+        b=CnuwD6IW/Zj53S5DiPzKIfnMKa/2r1EcNlAgSe9glmmT8Dz0m8kk6f5EXlxqU6EzyZ
+         mHLtw+Abz96XpzRUkGL5je/otVL2uYAZoDsTKunKgf/xpx8kjyRo9pcmDFE6mAP8fO9V
+         mueONh6C/wKb/LWPZu4Hdf0Bl8OsiCmwHnErMVBen8fF6arV3fy9gKO/WaH7tUFop3Ho
+         qEQ8aiDu8qPDQJKDRoZitYf6oco+48StXcNdVR3/cfT3qataUpYFk0FklCmKHJEmHu2E
+         BzPulcoOlL4cT/T4WzOjfpizhpWd2VsqDq0YAS9Nk66hdDcBYRDiq5gKi3pLRtKk4Ktn
+         3Dog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Rf+ut+vZ0rkmAH/Rce7x5xKiOiWUHGb8d9Igi14P9Lw=;
-        b=X1pPTR/F/Zek1c1eO/Z95iAWMUmeT1HLoCQ+8lfI9MKqZisVW7l1G6AfPs29TDdkof
-         ObXZ1fkaJ6+HwiPbLh6Wyk9D7rcOSmhT4AF5IglnERZVc929ZgjVN5tecfTmtLPqW/Yl
-         oHKp1AfiJ12hYmT2EX4zlkBwPZg8p16fzW2ZeUjyrjrdCOJA2URMNpnBv+u+NsQzkp+8
-         y4juGsJ2qU7ZkpLJNruhG6dcpUTpmZfOVrYJSmGONp7KdDH5vBQv3hTFzN6scXBlEm3E
-         UQYRhFcycvBo2B8X8fJ6z3ERYP27ItGRzo7wN2U5Fguuq8PF8iIpUgopqoycQ7QAIVkE
-         WJuQ==
-X-Gm-Message-State: ANhLgQ1YJLBNnMQz59ABNee1wkQSmyVzItYXQzd+Cy39Oe4nFI4e15es
-        kpUnSgFydPNdC5K/57Ou+xw=
-X-Google-Smtp-Source: ADFU+vundmXwCIOo1hsTfe/Ixwo+XAdsK/Si1RgR3BqBdiUhttzsZkQCvxzoZMNDXR/i7Il3mpTZ7Q==
-X-Received: by 2002:a7b:cc6a:: with SMTP id n10mr3829347wmj.170.1583497696717;
-        Fri, 06 Mar 2020 04:28:16 -0800 (PST)
-Received: from carlo-arch.lan ([2001:b07:6469:6bad:29c8:57ea:bea1:b9b1])
-        by smtp.gmail.com with ESMTPSA id c62sm13763876wmd.7.2020.03.06.04.28.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 04:28:16 -0800 (PST)
-From:   Carlo Nonato <carlo.nonato95@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        Kwon Je Oh <kwonje.oh2@gmail.com>
-Subject: [PATCH BUGFIX] block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()
-Date:   Fri,  6 Mar 2020 13:27:31 +0100
-Message-Id: <20200306122731.5945-1-carlo.nonato95@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eOgNubgvkB+PFv8kOH/Puf/i8J9C6TgnMdeObKC0G2g=;
+        b=m9tu+r4BTTDjfGoyyRWp1Ui/mN1AQPpRmugMbP9GL3SGgQ0vdlddar7HrSTqd6VRE6
+         lzd8ypMgMKgQhp7WorV/oZQSApDti9OvJI+JsQUhEFanQE9dK07BY1lCZ55HMmcHCftd
+         Nc+/WXhTjgtFDR1yN4TYajJN4PFDX0XzLOKVsV1NXVxOJx0TQgxdXX+sC8mLULG9m8RB
+         ojl7/RWeshLyK9cTDa/xR0bDhv8vGVbceYKeTqwa+UctiCexVBJJWSOcet2LYcfX20gr
+         gYBMcAhNzJXcldUi1d+liPVKgv9yb3LbEYMhTE/92fQZzgHHI+iXLRuuiSweOnRhInzH
+         mbng==
+X-Gm-Message-State: ANhLgQ1jVr8FuiXQmpZ6DfaYR0qkJubDM9mNz8y8ZwtyU1n6b3QwrFfo
+        cgcQ3GyLyJ/uk2hG42IsL6pmrTCEdTB7swQFqzhCEg==
+X-Google-Smtp-Source: ADFU+vvh8femgnXWgeDBLCi2J965f7nTs4zoQBV4JhSVb97H+FBR5UyAbx/Rxb9RCxt0jHVlP14KqqDS1RaBkaqCqwI=
+X-Received: by 2002:a05:6638:e8b:: with SMTP id p11mr2935174jas.11.1583501609095;
+ Fri, 06 Mar 2020 05:33:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200221104721.350-1-jinpuwang@gmail.com> <20200221104721.350-7-jinpuwang@gmail.com>
+ <c3c8fbcc-0028-9b23-8eff-3b5f1f60e652@acm.org> <CAHg0HuxJgjQca3Vy7nbcVKs0bUoj=-Uqoa5DOzYoqRHQ6Vph7A@mail.gmail.com>
+ <597777e7-ac5a-5fc4-c1f7-3ffa5876a6f2@acm.org> <CAMGffEmbV1YL4O860EswBKm2UHBYP_cgqMFYFVc2AdHnAFeu+g@mail.gmail.com>
+ <20200304164903.GF31668@ziepe.ca> <CAMGffEncbGXhFLDxZJp957c7vmV4vCaTZFUVKwqDROFikCTLPg@mail.gmail.com>
+ <20200305132748.GH31668@ziepe.ca> <CAMGffEkYvTit0Zv6HMDaUgo8kLEOLs_8vex7p1qgVeUDUxa4XA@mail.gmail.com>
+ <20200305135455.GI31668@ziepe.ca>
+In-Reply-To: <20200305135455.GI31668@ziepe.ca>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Fri, 6 Mar 2020 14:33:18 +0100
+Message-ID: <CAMGffE=hmJiAeKvPH_YimbqmAHvW3Cy0W_d5qqgnr-HEdXHw7Q@mail.gmail.com>
+Subject: Re: [PATCH v9 06/25] RDMA/rtrs: client: main functionality
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jack Wang <jinpuwang@gmail.com>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bfq_find_set_group() function takes as input a blkcg (which represents
-a cgroup) and retrieves the corresponding bfq_group, then it updates the
-bfq internal group hierarchy (see comments inside the function for why
-this is needed) and finally it returns the bfq_group.
-In the hierarchy update cycle, the pointer holding the correct bfq_group
-that has to be returned is mistakenly used to traverse the hierarchy
-bottom to top, meaning that in each iteration it gets overwritten with the
-parent of the current group. Since the update cycle stops at root's
-children (depth = 2), the overwrite becomes a problem only if the blkcg
-describes a cgroup at a hierarchy level deeper than that (depth > 2). In
-this case the root's child that happens to be also an ancestor of the
-correct bfq_group is returned. The main consequence is that processes
-contained in a cgroup at depth greater than 2 are wrongly placed in the
-group described above by BFQ.
+On Thu, Mar 5, 2020 at 2:54 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Thu, Mar 05, 2020 at 02:37:59PM +0100, Jinpu Wang wrote:
+> > On Thu, Mar 5, 2020 at 2:27 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Thu, Mar 05, 2020 at 12:26:01PM +0100, Jinpu Wang wrote:
+> > >
+> > > > We have to admit, the code snip is from null_blk, get_tag function,
+> > > > not invented by us.
+> > > > the get_cpu/put_cpu was added to get/save the current cpu_id, which
+> > > > can be removed around the do-while loop.,
+> > > > we only need to raw_smp_processor_id to get current cpu, we use it
+> > > > later to pick which connection to use.
+> > >
+> > > Be careful copying crazy core code into drivers..
+> > >
+> > > > > You have to do something to provably guarantee the send q cannot
+> > > > > overflow. send q overflow is defined as calling post_send before a
+> > > > > poll_cq has confirmed space is available for send.
+> > >
+> > > > Shouldn't the cq api handle that already,  with IB_POLL_SOFTIRQ,
+> > > > poll cq is done on very softirq run, so send queue space should be reclaimed
+> > > > fast enough, with IB_POLL_WORKQUEUE, when cq->com_handler get called,
+> > > > the ib_cq_poll_work will do the poll_cq, together with extra
+> > > > send_queue size reserved,
+> > > > the send queue can not overflow!
+> > >
+> > > Somehow that doesn't sound like 'provably guarentee' - that is some
+> > > statistical argument..
+> > Could you give an example which meets the "provably guarantee",
+> > seems most of the driver is based on the cq API.
+>
+> You are supposed to directly keep track of completions and not issue
+> sends until completions are seen.
+>
+> Jason
+ok, got it!
 
-This commits fixes this problem by using a different bfq_group pointer in
-the update cycle in order to avoid the overwrite of the variable holding
-the original group reference.
-
-Reported-by: Kwon Je Oh <kwonje.oh2@gmail.com>
-Signed-off-by: Carlo Nonato <carlo.nonato95@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-cgroup.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 09b69a3ed..f0ff6654a 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -610,12 +610,13 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
- 	 */
- 	entity = &bfqg->entity;
- 	for_each_entity(entity) {
--		bfqg = container_of(entity, struct bfq_group, entity);
--		if (bfqg != bfqd->root_group) {
--			parent = bfqg_parent(bfqg);
-+		struct bfq_group *curr_bfqg = container_of(entity,
-+						struct bfq_group, entity);
-+		if (curr_bfqg != bfqd->root_group) {
-+			parent = bfqg_parent(curr_bfqg);
- 			if (!parent)
- 				parent = bfqd->root_group;
--			bfq_group_set_parent(bfqg, parent);
-+			bfq_group_set_parent(curr_bfqg, parent);
- 		}
- 	}
- 
--- 
-2.25.1
-
+Thanks
