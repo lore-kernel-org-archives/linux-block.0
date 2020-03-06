@@ -2,146 +2,112 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98EAC10F00
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 09:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A41D9C10F00
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 09:25:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C5EF2072A
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 09:11:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79B072070A
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 09:25:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583486755;
+	bh=hvYtDxfTdSO0IQqKG8VvKQf8ALSlcBw1u60NrHZfw3I=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=prHvDB2VdIku7/ApCdWoyRKFpMzwpgzGkKIJ/MwnrF+7Xvm/QM/Rf69KbOQ0ECoUV
+	 XQRXWo9855HxCP+4i5qat8VKlZiaWfsGpp3p8IBfUxX2kNFD+j57Msq3mM2x8sDh58
+	 WIPbPuW0rKMSV3iCnh1JjZ7793nVCqpJWE6mUIYs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725935AbgCFJLu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 04:11:50 -0500
-Received: from relay.sw.ru ([185.231.240.75]:56530 "EHLO relay.sw.ru"
+        id S1725873AbgCFJZy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 04:25:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40288 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725927AbgCFJLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Mar 2020 04:11:50 -0500
-Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1jA90m-0002l2-Cd; Fri, 06 Mar 2020 12:11:16 +0300
-Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
- REQ_OP_WRITE_ZEROES
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-To:     axboe@kernel.dk
-Cc:     martin.petersen@oracle.com, bob.liu@oracle.com,
-        darrick.wong@oracle.com, agk@redhat.com, snitzer@redhat.com,
-        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
-        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
- <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
-Message-ID: <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
-Date:   Fri, 6 Mar 2020 12:11:14 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1725923AbgCFJZy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Mar 2020 04:25:54 -0500
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8BB392070A
+        for <linux-block@vger.kernel.org>; Fri,  6 Mar 2020 09:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583486752;
+        bh=hvYtDxfTdSO0IQqKG8VvKQf8ALSlcBw1u60NrHZfw3I=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=c28pCLtRg8NNN6/aBw+kh86LkT3kNDSnBm73GPEyOkjimeyO62dVNbgRjtJqsSMC/
+         8kXd7cKEJ8fJFtMLlMIdnxOozHP91eUqvE9eYB3e8hree15nSD8fVvq6zAA+BmGvSY
+         TLD3wqMwCC4H7OpDu8+V3ktvGu1+Y/BsIguj2CJ4=
+Received: by mail-wm1-f41.google.com with SMTP id e26so1547895wme.5
+        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 01:25:52 -0800 (PST)
+X-Gm-Message-State: ANhLgQ1CJqG2X+lQxbKwLF6zX3BMX+98Wjd7iEtf6HeQKj9VMPNCkShj
+        8X9N4BELqlpLHcWzne7R4lWRiaUs/baj0E5hP863Xw==
+X-Google-Smtp-Source: ADFU+vsiyg11BS62UthU1DW47ddgMms6y8DgTIrlz1HDnwUZjnbKuVKNBjcLEX+qom4x416GqrFQoi0ZM1Q9AF44P2k=
+X-Received: by 2002:a7b:cb93:: with SMTP id m19mr3131678wmi.133.1583486751063;
+ Fri, 06 Mar 2020 01:25:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20181124162123.21300-1-n.merinov@inango-systems.com>
+ <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org>
+ <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
+ <20200218185336.GA14242@infradead.org> <797777312.1324734.1582544319435.JavaMail.zimbra@inango-systems.com>
+ <20200224170813.GA27403@infradead.org> <711479725.2305.1583484191776.JavaMail.zimbra@inango-systems.com>
+In-Reply-To: <711479725.2305.1583484191776.JavaMail.zimbra@inango-systems.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 6 Mar 2020 10:25:39 +0100
+X-Gmail-Original-Message-ID: <CAKv+Gu8ufmONSU8SX=NaAZBAKuD4Coo19z6e2MJ7BegsseJ63A@mail.gmail.com>
+Message-ID: <CAKv+Gu8ufmONSU8SX=NaAZBAKuD4Coo19z6e2MJ7BegsseJ63A@mail.gmail.com>
+Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
+ partition entry
+To:     Nikolai Merinov <n.merinov@inango-systems.com>
+Cc:     hch <hch@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping
+On Fri, 6 Mar 2020 at 09:43, Nikolai Merinov
+<n.merinov@inango-systems.com> wrote:
+>
+> Hi Christoph,
+>
+> Should I perform any other steps in order to get this change in the master?
+>
 
-On 13.02.2020 10:55, Kirill Tkhai wrote:
-> Hi, Jens,
-> 
-> could you please provide some comments on this? I sent v1 two months ago,
-> and it would be great to know your vision of the functionality and
-> the approach and whether it is going to go to block tree.
-> 
-> Thanks,
-> Kirill
-> 
-> On 13.02.2020 10:39, Kirill Tkhai wrote:
->> (was "[PATCH block v2 0/3] block: Introduce REQ_NOZERO flag
->>       for REQ_OP_WRITE_ZEROES operation";
->>  was "[PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE
->>       to reflect extents allocation in block device internals")
->>
->> v7: Two comments changed.
->>
->> v6: req_op() cosmetic change.
->>
->> v5: Kill dm|md patch, which disables REQ_ALLOCATE for these devices.
->>     Disable REQ_ALLOCATE for all stacking devices instead of this.
->>
->> v4: Correct argument for mddev_check_write_zeroes().
->>
->> v3: Rename REQ_NOZERO to REQ_ALLOCATE.
->>     Split helpers to separate patches.
->>     Add a patch, disabling max_allocate_sectors inheritance for dm.
->>
->> v2: Introduce new flag for REQ_OP_WRITE_ZEROES instead of
->>     introduction a new operation as suggested by Martin K. Petersen.
->>     Removed ext4-related patch to focus on block changes
->>     for now.
->>
->> Information about continuous extent placement may be useful
->> for some block devices. Say, distributed network filesystems,
->> which provide block device interface, may use this information
->> for better blocks placement over the nodes in their cluster,
->> and for better performance. Block devices, which map a file
->> on another filesystem (loop), may request the same length extent
->> on underlining filesystem for less fragmentation and for batching
->> allocation requests. Also, hypervisors like QEMU may use this
->> information for optimization of cluster allocations.
->>
->> This patchset introduces REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES,
->> which makes a block device to allocate blocks instead of actual
->> blocks zeroing. This may be used for forwarding user's fallocate(0)
->> requests into block device internals. E.g., in loop driver this
->> will result in allocation extents in backing-file, so subsequent
->> write won't fail by the reason of no available space. Distributed
->> network filesystems will be able to assign specific servers for
->> specific extents, so subsequent write will be more efficient.
->>
->> Patches [1-3/6] are preparation on helper functions, patch [4/6]
->> introduces REQ_ALLOCATE flag and implements all the logic,
->> patch [5/6] adds one more helper, patch [6/6] adds loop
->> as the first user of the flag.
->>
->> Note, that here is only block-related patches, example of usage
->> for ext4 with a performance numbers may be seen in [1].
->>
->> [1] https://lore.kernel.org/linux-ext4/157599697369.12112.10138136904533871162.stgit@localhost.localdomain/T/#me5bdd5cc313e14de615d81bea214f355ae975db0
->> ---
->>
->> Kirill Tkhai (6):
->>       block: Add @flags argument to bdev_write_zeroes_sectors()
->>       block: Pass op_flags into blk_queue_get_max_sectors()
->>       block: Introduce blk_queue_get_max_write_zeroes_sectors()
->>       block: Add support for REQ_ALLOCATE flag
->>       block: Add blk_queue_max_allocate_sectors()
->>       loop: Add support for REQ_ALLOCATE
->>
->>
->>  block/blk-core.c                    |    6 +++---
->>  block/blk-lib.c                     |   17 ++++++++++-------
->>  block/blk-merge.c                   |    9 ++++++---
->>  block/blk-settings.c                |   17 +++++++++++++++++
->>  drivers/block/loop.c                |   20 +++++++++++++-------
->>  drivers/md/dm-kcopyd.c              |    2 +-
->>  drivers/target/target_core_iblock.c |    4 ++--
->>  fs/block_dev.c                      |    4 ++++
->>  include/linux/blk_types.h           |    6 ++++++
->>  include/linux/blkdev.h              |   34 ++++++++++++++++++++++++++--------
->>  10 files changed, 88 insertions(+), 31 deletions(-)
->>
->> --
->> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
->> Reviewed-by: Bob Liu <bob.liu@oracle.com>
->>
-> 
+I can take it via the EFI tree with an ack from Dave.
 
+
+>
+> ----- Original Message -----
+> > From: "hch" <hch@infradead.org>
+> > To: "n merinov" <n.merinov@inango-systems.com>
+> > Cc: "hch" <hch@infradead.org>, "Davidlohr Bueso" <dave@stgolabs.net>, "Jens Axboe" <axboe@kernel.dk>, "Ard Biesheuvel"
+> > <ardb@kernel.org>, "linux-efi" <linux-efi@vger.kernel.org>, "linux-block" <linux-block@vger.kernel.org>, "linux-kernel"
+> > <linux-kernel@vger.kernel.org>
+> > Sent: Monday, February 24, 2020 10:08:13 PM
+> > Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID partition entry
+>
+> > On Mon, Feb 24, 2020 at 01:38:39PM +0200, Nikolai Merinov wrote:
+> >> Hi Christoph,
+> >>
+> >> > I'd rather use plain __le16 and le16_to_cpu here. Also the be
+> >> > variants seems to be entirely unused.
+> >>
+> >> Looks like I misunderstood your comment from
+> >> https://patchwork.kernel.org/patch/11309223/:
+> >>
+> >> > Please add a an efi_char_from_cpu or similarly named helper
+> >> > to encapsulate this logic.
+> >>
+> >> The "le16_to_cpu(ptes[i].partition_name[label_count])" call is the
+> >> full implementation of the "efi_char_from_cpu" logic. Do you want
+> >> to encapsulate "utf16_le_to_7bit_string" logic entirely like in
+> >> the attached version?
+> >
+> > I think I though of just the inner loop, but your new version looks even
+> > better, so:
+> >
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
