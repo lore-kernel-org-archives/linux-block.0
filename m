@@ -8,53 +8,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48177C3F2D1
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC38C3F2D8
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06F7D208C3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16D74207FD
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEd2EIN4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BrQ3TxdT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727002AbgCFCNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726766AbgCFCNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 5 Mar 2020 21:13:23 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:33230 "EHLO
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:33239 "EHLO
         mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbgCFCNH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 21:13:07 -0500
-Received: by mail-lf1-f65.google.com with SMTP id c20so630111lfb.0;
-        Thu, 05 Mar 2020 18:13:02 -0800 (PST)
+        with ESMTP id S1726957AbgCFCNI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 21:13:08 -0500
+Received: by mail-lf1-f65.google.com with SMTP id c20so630224lfb.0;
+        Thu, 05 Mar 2020 18:13:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6fBsNpwxirlLBsQl2Ip9xujXHyZWAzo7LH/DWxJOyZI=;
-        b=qEd2EIN4JtQoJQMgbUv9PjhBs8sez8cMMU73Uq6uBwOQWk3OZALJtP+48S+Dz8RykO
-         9bcH0WDoOKbV2juYL6FpSztGjBlKJqrErI09y29pDh6tqL7PjWvspZ3yCl8yu50v8VTt
-         ELE74hJLYNxhJA0GwYzDSM/tG8eoc69OR41LkHXph1tb8kRV80VVMwzpWZkho9kPsok3
-         qReQTGSRQOMHlvkns8sysozPzYe82QIsbQvW7aaO48+OSWmO7dLkpaBiXamYlvN2whPi
-         +SfSHcKZZgSBe4+K+Mvx84d5wdlfouY8lTDVOm6rUtyfUUccBZGYThGnYGR19CxDMa91
-         tCcA==
+        bh=MD6xGZ4xORI+tNtNZZDwyKjUfBMMQlzk74IcvklWY7A=;
+        b=BrQ3TxdTprBb4eSSxaLqFHnbM/+U/tPxgTJ0glnciTf2irzC04pjVRWt7vvn4hbJqz
+         R4F6J6rcZ7+l+ykEC+mQ3kO+Q3CoD6BxRy5tdG+YJYtrC3FOTCGkAF1WHNv/MXaqYpE6
+         VhE4e63Mrgm5Mtkfc69IJf9BRDMbRwN7RiM8jYSgA4+exS4J9/lb1RdC7JOe6oAj0b3X
+         O+PPZl4Dccgdc63LBnCBlkjQN6oquHz6yX0hJGkPAy1XB+L0dF+oiWnH5UFLDwRpTc4m
+         g0WGUL8HBLYuLueiE8jA2FyCiWw17MvCexPCeywvHs8B0tPYFjiStQZEuadWjYdBnW2R
+         nOCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6fBsNpwxirlLBsQl2Ip9xujXHyZWAzo7LH/DWxJOyZI=;
-        b=dMqjIxqpyaeuXNND/EsTg5mj4xGyfoeUTShoI3Cnggd3TYGHCKidyVNBNh/icGmHN5
-         xjjmhyza2Jtrbt3mAxLnIPjGfA3qINV+LbTHCwhjaU+z1aKEKB4AzvhTWsU0EUawNVhg
-         GDbcElnIppVVuciEciYQn2otG1d5NbbvtbSPphEBWL2Z2gah85/btqWdLvYHzSBF3Jpt
-         5gG9sDgnq3lUQvjxClBq3cYQiRDSrtoP3nmdl/yI7tsaFxG4wfyXQebpH1v8DfVt9nZI
-         fuYZxOCb99taRjyTA0LehXCGg0iNO4eY2PlAQH2uQuxWCVNKsw/g1W6nPSQGp2FXyKUQ
-         0d7w==
-X-Gm-Message-State: ANhLgQ07WTmsguzdkpseIJ0WD7BpsyX9X5l0oNjVXlrpvLsx56cxN4qh
-        tE4gos5NN/Jq4djrlDSzmfg=
-X-Google-Smtp-Source: ADFU+vsJurWf58I1kW0S/OZ9ntAfvk/N8FlYZ8rnIgtDD1nHx34BGVpEZ/ZwWNySFP4FxYxucMB93w==
-X-Received: by 2002:a19:9155:: with SMTP id y21mr428993lfj.28.1583460781822;
-        Thu, 05 Mar 2020 18:13:01 -0800 (PST)
+        bh=MD6xGZ4xORI+tNtNZZDwyKjUfBMMQlzk74IcvklWY7A=;
+        b=GyYC1LiWJttDATKZbSfKPi4Rs1yVq+hjf21xhfRxOG5uLCUgYbbYxPw0aKaobIHNoT
+         vWq9FbZXZKLzjCs6LVuNJx0aKmBc5PhbeswkIkIB6iTWukyZaMvtbUx8y/d7KK04YKpq
+         FX7BPby1bMddElQEKxm048RY1Qd/+HXHCc0M07AaRiyfzCkqEaysjx8l74Dc13SVV1mw
+         QZI4kZDqG64oEGnB7wBpIeat8RR0RkxXJSCeh77I5Wi1qvZx2oTK8pwTkOrUixBg3Tk9
+         AulSTpkG+JJ/WRLTxlgxOTh8sPyF/lF7TxNinL+kgElG400/mIQjCYIlHrGVpSmsV1a/
+         1Xpg==
+X-Gm-Message-State: ANhLgQ0kHH3abbh/zmfHm7DGJn4OqI3OvlZgN+uyu5v9NxcF/cgAP/oP
+        K82or6v7RvVa86mUwhOWtEk=
+X-Google-Smtp-Source: ADFU+vveYHEwu/jjmm9qd6Po2zGPfAIH8wer39yJagxuJWLIFc8zFnHZhdGONFQQjYKpeMQxDY9Fcg==
+X-Received: by 2002:a05:6512:203c:: with SMTP id s28mr404120lfs.117.1583460785364;
+        Thu, 05 Mar 2020 18:13:05 -0800 (PST)
 Received: from localhost.localdomain (94-29-39-224.dynamic.spd-mgts.ru. [94.29.39.224])
-        by smtp.gmail.com with ESMTPSA id l11sm10592772lfg.87.2020.03.05.18.13.00
+        by smtp.gmail.com with ESMTPSA id l11sm10592772lfg.87.2020.03.05.18.13.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2020 18:13:01 -0800 (PST)
+        Thu, 05 Mar 2020 18:13:04 -0800 (PST)
 From:   Dmitry Osipenko <digetx@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         Thierry Reding <thierry.reding@gmail.com>,
@@ -72,9 +72,9 @@ Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
         Gilles Grandou <gilles@grandou.net>,
         Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/8] partitions: Introduce NVIDIA Tegra Partition Table
-Date:   Fri,  6 Mar 2020 05:12:15 +0300
-Message-Id: <20200306021220.22097-4-digetx@gmail.com>
+Subject: [PATCH v2 6/8] mmc: block: Add MMC_QUIRK_RESCAN_MAIN_BLKDEV
+Date:   Fri,  6 Mar 2020 05:12:18 +0300
+Message-Id: <20200306021220.22097-7-digetx@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200306021220.22097-1-digetx@gmail.com>
 References: <20200306021220.22097-1-digetx@gmail.com>
@@ -85,856 +85,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All NVIDIA Tegra devices use a special partition table format for the
-internal storage partitioning. Most of Tegra devices have GPT partition
-in addition to TegraPT, but some older Android consumer-grade devices do
-not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
-in order to support these devices properly in the upstream kernel. This
-patch adds support for NVIDIA Tegra Partition Table format that is used
-at least by all NVIDIA Tegra20 and Tegra30 devices.
+NVIDIA Tegra Partition Table location isn't restricted by the main eMMC
+partition. This patch introduces new MMC-card quirk which is needed by
+some NVIDIA Tegra devices in order to set up partition table if it is
+stored on a eMMC boot partition.
+
+The tegra-partition parser will read out FS partition table from the eMMC
+boot partition and stash it for the main eMMC partition. In this case
+block device of the main eMMC partition needs to be re-scanned in order
+to assign the stashed partition table to the main MMC block device by
+tegra-partition parser.
+
+This patch adds new MMC card flag that is applied by tegra-partition
+parser to the scanned MMC card if partition table is found on a boot
+eMMC partition. This flag tells MMC_BLOCK core that main MMC partition
+needs to be re-scanned once all block devices of the MMC card are
+instantiated.
 
 Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
 ---
- arch/arm/mach-tegra/tegra.c   |  54 ++++
- block/partitions/Kconfig      |   9 +
- block/partitions/Makefile     |   1 +
- block/partitions/check.c      |   4 +
- block/partitions/tegra.c      | 510 ++++++++++++++++++++++++++++++++++
- block/partitions/tegra.h      |  83 ++++++
- include/soc/tegra/bootdata.h  |  46 +++
- include/soc/tegra/common.h    |   9 +
- include/soc/tegra/partition.h |  18 ++
- 9 files changed, 734 insertions(+)
- create mode 100644 block/partitions/tegra.c
- create mode 100644 block/partitions/tegra.h
- create mode 100644 include/soc/tegra/bootdata.h
- create mode 100644 include/soc/tegra/partition.h
+ drivers/mmc/core/block.c | 31 +++++++++++++++++++++++++++++++
+ include/linux/mmc/card.h |  1 +
+ 2 files changed, 32 insertions(+)
 
-diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
-index eeacff626546..fc3b5013f7a9 100644
---- a/arch/arm/mach-tegra/tegra.c
-+++ b/arch/arm/mach-tegra/tegra.c
-@@ -28,7 +28,9 @@
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index ec69b613ee92..2c2bec114fd6 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2955,6 +2955,27 @@ static void mmc_blk_remove_debugfs(struct mmc_card *card,
  
- #include <linux/firmware/trusted_foundations.h>
+ #endif /* CONFIG_DEBUG_FS */
  
-+#include <soc/tegra/bootdata.h>
- #include <soc/tegra/fuse.h>
-+#include <soc/tegra/partition.h>
- #include <soc/tegra/pmc.h>
- 
- #include <asm/firmware.h>
-@@ -62,9 +64,61 @@ u32 tegra_uart_config[3] = {
- 	0,
- };
- 
-+static void __init tegra_boot_config_table_init(void)
++static int mmc_blk_rescan_disk(struct mmc_blk_data *md)
 +{
-+	struct tegra30_boot_config_table __iomem *t30_bct;
-+	struct tegra20_boot_config_table __iomem *t20_bct;
-+	struct tegra20_boot_info_table   __iomem *t20_bit;
-+	u32 iram_end   = TEGRA_IRAM_BASE + TEGRA_IRAM_SIZE;
-+	u32 iram_start = TEGRA_IRAM_BASE;
-+	u32 pt_addr, pt_size, bct_size;
++	struct block_device *bdev;
 +
-+	t20_bit = IO_ADDRESS(TEGRA_IRAM_BASE);
-+
-+	if (of_machine_is_compatible("nvidia,tegra20")) {
-+		bct_size = sizeof(*t20_bct);
-+
-+		if (t20_bit->bct_size != bct_size ||
-+		    t20_bit->bct_ptr < iram_start ||
-+		    t20_bit->bct_ptr > iram_end - bct_size)
-+			return;
-+
-+		t20_bct = IO_ADDRESS(t20_bit->bct_ptr);
-+
-+		if (t20_bct->boot_data_version != TEGRA_BOOTDATA_VERSION_T20)
-+			return;
-+
-+		pt_addr = t20_bct->partition_table_logical_sector_address;
-+		pt_size = t20_bct->partition_table_num_logical_sectors;
-+
-+	} else if (of_machine_is_compatible("nvidia,tegra30")) {
-+		bct_size = sizeof(*t30_bct);
-+
-+		if (t20_bit->bct_size != bct_size ||
-+		    t20_bit->bct_ptr < iram_start ||
-+		    t20_bit->bct_ptr > iram_end - bct_size)
-+			return;
-+
-+		t30_bct = IO_ADDRESS(t20_bit->bct_ptr);
-+
-+		if (t30_bct->boot_data_version != TEGRA_BOOTDATA_VERSION_T30)
-+			return;
-+
-+		pt_addr = t30_bct->partition_table_logical_sector_address;
-+		pt_size = t30_bct->partition_table_num_logical_sectors;
-+	} else {
-+		return;
++	bdev = blkdev_get_by_dev(disk_devt(md->disk), FMODE_READ | FMODE_EXCL,
++				 md);
++	if (IS_ERR(bdev)) {
++		pr_err("%s: %s: failed to get block device\n",
++		       __func__, md->disk->disk_name);
++		return PTR_ERR(bdev);
 +	}
 +
-+	pr_info("%s: BCT found in IRAM\n", __func__);
++	mutex_lock(&bdev->bd_mutex);
++	bdev_disk_changed(bdev, false);
++	mutex_unlock(&bdev->bd_mutex);
 +
-+	tegra_partition_table_setup(pt_addr, pt_size);
++	blkdev_put(bdev, FMODE_READ | FMODE_EXCL);
++
++	return 0;
 +}
 +
- static void __init tegra_init_early(void)
+ static int mmc_blk_probe(struct mmc_card *card)
  {
- 	of_register_trusted_foundations();
-+	tegra_boot_config_table_init();
- 	tegra_cpu_reset_handler_init();
- 	call_firmware_op(l2x0_init);
- }
-diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-index 702689a628f0..d3c5c6ad6d58 100644
---- a/block/partitions/Kconfig
-+++ b/block/partitions/Kconfig
-@@ -268,3 +268,12 @@ config CMDLINE_PARTITION
- 	help
- 	  Say Y here if you want to read the partition table from bootargs.
- 	  The format for the command line is just like mtdparts.
-+
-+config TEGRA_PARTITION
-+	bool "NVIDIA Tegra Partition support" if PARTITION_ADVANCED
-+	default y if ARCH_TEGRA
-+	depends on ARCH_TEGRA || COMPILE_TEST
-+	select MMC_BLOCK
-+	help
-+	  Say Y here if you would like to be able to read the hard disk
-+	  partition table format used by NVIDIA Tegra machines.
-diff --git a/block/partitions/Makefile b/block/partitions/Makefile
-index 2f276b677c81..807319883a18 100644
---- a/block/partitions/Makefile
-+++ b/block/partitions/Makefile
-@@ -21,3 +21,4 @@ obj-$(CONFIG_IBM_PARTITION) += ibm.o
- obj-$(CONFIG_EFI_PARTITION) += efi.o
- obj-$(CONFIG_KARMA_PARTITION) += karma.o
- obj-$(CONFIG_SYSV68_PARTITION) += sysv68.o
-+obj-$(CONFIG_TEGRA_PARTITION) += tegra.o
-diff --git a/block/partitions/check.c b/block/partitions/check.c
-index ffe408fead0c..91268773b6ce 100644
---- a/block/partitions/check.c
-+++ b/block/partitions/check.c
-@@ -36,6 +36,7 @@
- #include "karma.h"
- #include "sysv68.h"
- #include "cmdline.h"
-+#include "tegra.h"
+ 	struct mmc_blk_data *md, *part_md;
+@@ -2998,6 +3019,16 @@ static int mmc_blk_probe(struct mmc_card *card)
+ 			goto out;
+ 	}
  
- int warn_no_part = 1; /*This is ugly: should make genhd removable media aware*/
- 
-@@ -108,6 +109,9 @@ static int (*check_part[])(struct parsed_partitions *) = {
- #endif
- #ifdef CONFIG_SYSV68_PARTITION
- 	sysv68_partition,
-+#endif
-+#ifdef CONFIG_TEGRA_PARTITION
-+	tegra_partition,
- #endif
- 	NULL
- };
-diff --git a/block/partitions/tegra.c b/block/partitions/tegra.c
-new file mode 100644
-index 000000000000..6f150a7e3275
---- /dev/null
-+++ b/block/partitions/tegra.c
-@@ -0,0 +1,510 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * NVIDIA Tegra Partition Table
-+ *
-+ * Copyright (C) 2020 GRATE-DRIVER project
-+ * Copyright (C) 2020 Dmitry Osipenko <digetx@gmail.com>
-+ *
-+ * Credits for the partition table format:
-+ *
-+ *   Andrey Danin <danindrey@mail.ru>       (Toshiba AC100 TegraPT format)
-+ *   Gilles Grandou <gilles@grandou.net>    (Toshiba AC100 TegraPT format)
-+ *   Ryan Grachek <ryan@edited.us>          (Google TV "Molly" TegraPT format)
-+ *   Stephen Warren <swarren@wwwdotorg.org> (Useful suggestions about eMMC/etc)
-+ */
-+
-+#define pr_fmt(fmt) "tegra-partition: " fmt
-+
-+#include <linux/blkdev.h>
-+#include <linux/kernel.h>
-+#include <linux/of.h>
-+#include <linux/sizes.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+
-+#include <linux/mmc/blkdev.h>
-+#include <linux/mmc/card.h>
-+#include <linux/mmc/host.h>
-+
-+#include <soc/tegra/common.h>
-+#include <soc/tegra/partition.h>
-+
-+#include "check.h"
-+#include "tegra.h"
-+
-+#define TEGRA_PT_SECTOR_SZ	(TEGRA_PT_LOGICAL_SECTOR_SIZE / SECTOR_SIZE)
-+#define TEGRA_PT_SECTOR(s)	(TEGRA_PT_SECTOR_SZ * (s))
-+
-+#define TEGRA_PT_INFO(ptp, fmt, ...)					\
-+	pr_info("%s: " fmt,						\
-+		(ptp)->state->bdev->bd_disk->disk_name, ##__VA_ARGS__)
-+
-+#define TEGRA_PT_ERR(ptp, fmt, ...)					\
-+	pr_err("%s: " fmt,						\
-+		(ptp)->state->bdev->bd_disk->disk_name, ##__VA_ARGS__)
-+
-+#define TEGRA_PT_PARSE_ERR(ptp, fmt, ...)				\
-+	TEGRA_PT_ERR(ptp, "sector %llu: invalid " fmt,			\
-+		     (ptp)->sector, ##__VA_ARGS__)
-+
-+struct tegra_partition_table_parser {
-+	struct tegra_partition_table *pt;
-+	struct parsed_partitions *state;
-+	bool pt_entry_checked;
-+	sector_t sector;
-+	int boot_offset;
-+	u32 dev_instance;
-+	u32 dev_id;
-+};
-+
-+union tegra_partition_table_u {
-+	struct tegra_partition_table pt;
-+	u8 pt_parts[TEGRA_PT_SECTOR_SZ][SECTOR_SIZE];
-+};
-+
-+struct tegra_partition_type {
-+	unsigned int type;
-+	char *name;
-+};
-+
-+static sector_t tegra_pt_sector_address;
-+static sector_t tegra_pt_sectors_num;
-+
-+void tegra_partition_table_setup(sector_t logical_sector_address,
-+				 sector_t logical_sectors_num)
-+{
-+	tegra_pt_sector_address = TEGRA_PT_SECTOR(logical_sector_address);
-+	tegra_pt_sectors_num    = TEGRA_PT_SECTOR(logical_sectors_num);
-+
-+	pr_info("initialized to sector = %llu sectors_num = %llu\n",
-+		tegra_pt_sector_address, tegra_pt_sectors_num);
-+}
-+
-+/*
-+ * Some partitions are very sensitive, changing data on them may brick device.
-+ *
-+ * For more details about partitions see:
-+ *
-+ *  "https://docs.nvidia.com/jetson/l4t/Tegra Linux Driver Package Development Guide/part_config.html"
-+ */
-+static const char * const partitions_blacklist[] = {
-+	"BCT", "EBT", "EKS", "GP1", "GPT", "MBR", "PT",
-+};
-+
-+static bool tegra_partition_name_match(struct tegra_partition *p,
-+				       const char *name)
-+{
-+	return !strncmp(p->partition_name, name, TEGRA_PT_NAME_SIZE);
-+}
-+
-+static bool tegra_partition_skip(struct tegra_partition *p,
-+				 struct tegra_partition_table_parser *ptp,
-+				 sector_t sector)
-+{
-+	unsigned int i;
-+
-+	/* skip eMMC boot partitions */
-+	if (sector < ptp->boot_offset)
-+		return true;
-+
-+	for (i = 0; i < ARRAY_SIZE(partitions_blacklist); i++) {
-+		if (tegra_partition_name_match(p, partitions_blacklist[i]))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static const struct tegra_partition_type tegra_partition_expected_types[] = {
-+	{ .type = TEGRA_PT_PART_TYPE_BCT,	.name = "BCT", },
-+	{ .type = TEGRA_PT_PART_TYPE_EBT,	.name = "EBT", },
-+	{ .type = TEGRA_PT_PART_TYPE_PT,	.name = "PT",  },
-+	{ .type = TEGRA_PT_PART_TYPE_GP1,	.name = "GP1", },
-+	{ .type = TEGRA_PT_PART_TYPE_GPT,	.name = "GPT", },
-+	{ .type = TEGRA_PT_PART_TYPE_GENERIC,	.name = NULL,  },
-+};
-+
-+static int tegra_partition_type_valid(struct tegra_partition_table_parser *ptp,
-+				      struct tegra_partition *p)
-+{
-+	const struct tegra_partition_type *ptype;
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(tegra_partition_expected_types); i++) {
-+		ptype = &tegra_partition_expected_types[i];
-+
-+		if (ptype->name && !tegra_partition_name_match(p, ptype->name))
-+			continue;
-+
-+		if (p->part_info.partition_type == ptype->type)
-+			return 0;
-+
-+		/*
-+		 * Unsure about all possible types, let's emit error and
-+		 * allow to continue for now.
-+		 */
-+		if (!ptype->name)
-+			return 1;
-+	}
-+
-+	return -1;
-+}
-+
-+static bool tegra_partition_valid(struct tegra_partition_table_parser *ptp,
-+				  struct tegra_partition *p,
-+				  struct tegra_partition *prev,
-+				  sector_t sector,
-+				  sector_t size)
-+{
-+	struct tegra_partition_info *prev_pi = &prev->part_info;
-+	sector_t sect_end = TEGRA_PT_SECTOR(prev_pi->logical_sector_address +
-+					    prev_pi->logical_sectors_num);
-+	char *type, name[2][TEGRA_PT_NAME_SIZE + 1];
-+	int err;
-+
-+	strscpy(name[0], p->partition_name,    sizeof(name[0]));
-+	strscpy(name[1], prev->partition_name, sizeof(name[1]));
-+
-+	/* validate expected partition name/type */
-+	err = tegra_partition_type_valid(ptp, p);
-+	if (err) {
-+		TEGRA_PT_PARSE_ERR(ptp, "partition_type: [%s] partition_type=%u\n",
-+				   name[0], p->part_info.partition_type);
-+		if (err < 0)
-+			return false;
-+	}
-+
-+	/* validate partition table BCT addresses */
-+	if (tegra_partition_name_match(p, "PT")) {
-+		if (sector != tegra_pt_sector_address &&
-+		    size   != tegra_pt_sectors_num) {
-+			TEGRA_PT_PARSE_ERR(ptp, "PT location: sector=%llu size=%llu\n",
-+					   sector, size);
-+			return false;
-+		}
-+
-+		if (ptp->pt_entry_checked) {
-+			TEGRA_PT_PARSE_ERR(ptp, "(duplicated) PT\n");
-+			return false;
-+		}
-+
-+		ptp->pt_entry_checked = true;
-+	}
-+
-+	if (sector + size < sector) {
-+		TEGRA_PT_PARSE_ERR(ptp, "size: [%s] integer overflow sector=%llu size=%llu\n",
-+				   name[0], sector, size);
-+		return false;
-+	}
-+
-+	/* validate allocation_policy=sequential (absolute unsupported) */
-+	if (p != prev && sect_end > sector) {
-+		TEGRA_PT_PARSE_ERR(ptp, "allocation_policy: [%s] end=%llu [%s] sector=%llu size=%llu\n",
-+				   name[1], sect_end, name[0], sector, size);
-+		return false;
-+	}
-+
-+	if (ptp->dev_instance != p->mount_info.device_instance) {
-+		TEGRA_PT_PARSE_ERR(ptp, "device_instance: [%s] device_instance=%u|%u\n",
-+				   name[0], ptp->dev_instance,
-+				   p->mount_info.device_instance);
-+		return false;
-+	}
-+
-+	if (ptp->dev_id != p->mount_info.device_id) {
-+		TEGRA_PT_PARSE_ERR(ptp, "device_id: [%s] device_id=%u|%u\n",
-+				   name[0], ptp->dev_id,
-+				   p->mount_info.device_id);
-+		return false;
-+	}
-+
-+	if (p->partition_id > 127) {
-+		TEGRA_PT_PARSE_ERR(ptp, "partition_id: [%s] partition_id=%u\n",
-+				   name[0], p->partition_id);
-+		return false;
-+	}
-+
-+	sect_end = get_capacity(ptp->state->bdev->bd_disk);
-+
-+	/* eMMC boot partitions are below ptp->boot_offset */
-+	if (sector < ptp->boot_offset) {
-+		sect_end += ptp->boot_offset;
-+		type = "boot";
-+	} else {
-+		sector -= ptp->boot_offset;
-+		type = "main";
-+	}
-+
-+	/* validate size */
-+	if (!size || sector + size > sect_end) {
-+		TEGRA_PT_PARSE_ERR(ptp, "size: [%s] %s partition boot_offt=%d end=%llu sector=%llu size=%llu\n",
-+				   name[0], type, ptp->boot_offset, sect_end,
-+				   sector, size);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool tegra_partitions_parse(struct tegra_partition_table_parser *ptp,
-+				   bool check_only)
-+{
-+	struct parsed_partitions *state = ptp->state;
-+	struct tegra_partition_table *pt = ptp->pt;
-+	sector_t sector, size;
-+	int i, slot = 1;
-+
-+	ptp->pt_entry_checked = false;
-+
-+	for (i = 0; i < pt->secure.num_partitions; i++) {
-+		struct tegra_partition *p = &pt->partitions[i];
-+		struct tegra_partition *prev = &pt->partitions[max(i - 1, 0)];
-+		struct tegra_partition_info *pi = &p->part_info;
-+
-+		if (slot == state->limit && !check_only)
-+			break;
-+
-+		sector = TEGRA_PT_SECTOR(pi->logical_sector_address);
-+		size   = TEGRA_PT_SECTOR(pi->logical_sectors_num);
-+
-+		if (!tegra_partition_valid(ptp, p, prev, sector, size))
-+			return false;
-+
-+		if (check_only ||
-+		    tegra_partition_skip(p, ptp, sector))
-+			continue;
-+
-+		put_partition(state, slot++, sector - ptp->boot_offset, size);
-+	}
-+
-+	if (!ptp->pt_entry_checked) {
-+		TEGRA_PT_PARSE_ERR(ptp, "PT: table entry not found\n");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool
-+tegra_partition_table_parsed(struct tegra_partition_table_parser *ptp)
-+{
-+	if (ptp->pt->secure.num_partitions == 0 ||
-+	    ptp->pt->secure.num_partitions > TEGRA_PT_MAX_PARTITIONS) {
-+		TEGRA_PT_PARSE_ERR(ptp, "num_partitions=%u\n",
-+				   ptp->pt->secure.num_partitions);
-+		return false;
-+	}
-+
-+	return tegra_partitions_parse(ptp, true) &&
-+	       tegra_partitions_parse(ptp, false);
-+}
-+
-+static int
-+tegra_partition_table_insec_hdr_valid(struct tegra_partition_table_parser *ptp)
-+{
-+	if (ptp->pt->insecure.magic   != TEGRA_PT_MAGIC ||
-+	    ptp->pt->insecure.version != TEGRA_PT_VERSION) {
-+		TEGRA_PT_PARSE_ERR(ptp, "insecure header: magic=0x%llx ver=0x%x\n",
-+				   ptp->pt->insecure.magic,
-+				   ptp->pt->insecure.version);
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static int
-+tegra_partition_table_sec_hdr_valid(struct tegra_partition_table_parser *ptp)
-+{
-+	size_t pt_size = ptp->pt->secure.num_partitions;
-+
-+	pt_size *= sizeof(ptp->pt->partitions[0]);
-+	pt_size += TEGRA_PT_HEADER_SZ;
-+
-+	if (ptp->pt->secure.magic   != TEGRA_PT_MAGIC ||
-+	    ptp->pt->secure.version != TEGRA_PT_VERSION ||
-+	    ptp->pt->secure.length  != ptp->pt->insecure.length ||
-+	    ptp->pt->secure.length  < pt_size) {
-+		TEGRA_PT_PARSE_ERR(ptp, "secure header: magic=0x%llx ver=0x%x length=%u|%u|%zu\n",
-+				   ptp->pt->secure.magic,
-+				   ptp->pt->secure.version,
-+				   ptp->pt->secure.length,
-+				   ptp->pt->insecure.length,
-+				   pt_size);
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static int
-+tegra_partition_table_unencrypted(struct tegra_partition_table_parser *ptp)
-+{
-+	/* AES IV, all zeros if unencrypted */
-+	if (ptp->pt->secure.random_data[0] || ptp->pt->secure.random_data[1] ||
-+	    ptp->pt->secure.random_data[2] || ptp->pt->secure.random_data[3]) {
-+		pr_err_once("encrypted partition table unsupported\n");
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static const u32 tegra20_sdhci_bases[TEGRA_PT_SDHCI_DEVICE_INSTANCES] = {
-+	0xc8000000, 0xc8000200, 0xc8000400, 0xc8000600,
-+};
-+
-+static const u32 tegra30_sdhci_bases[TEGRA_PT_SDHCI_DEVICE_INSTANCES] = {
-+	0x78000000, 0x78000200, 0x78000400, 0x78000600,
-+};
-+
-+static const struct of_device_id tegra_sdhci_match[] = {
-+	{ .compatible = "nvidia,tegra20-sdhci", .data = tegra20_sdhci_bases, },
-+	{ .compatible = "nvidia,tegra30-sdhci", .data = tegra30_sdhci_bases, },
-+	{}
-+};
-+
-+static int
-+tegra_partition_table_emmc_boot_offset(struct tegra_partition_table_parser *ptp)
-+{
-+	struct mmc_card *card = mmc_bdev_to_card(ptp->state->bdev);
-+	const struct of_device_id *matched;
-+	const u32 *sdhci_bases;
-+	u32 sdhci_base;
-+	unsigned int i;
-+	int err;
-+
-+	/* filter out unexpected/untested boot sources */
-+	if (!card || card->ext_csd.rev < 3 ||
-+	    !mmc_card_is_blockaddr(card) ||
-+	     mmc_card_is_removable(card->host))
-+		return -1;
-+
-+	/* skip everything unrelated to Tegra eMMC */
-+	matched = of_match_node(tegra_sdhci_match, card->host->parent->of_node);
-+	if (!matched)
-+		return -1;
-+
-+	sdhci_bases = matched->data;
-+
-+	/* figure out SDHCI instance ID by the base address */
-+	err = of_property_read_u32_index(card->host->parent->of_node,
-+					 "reg", 0, &sdhci_base);
-+	if (err)
-+		return -1;
-+
-+	for (i = 0; i < TEGRA_PT_SDHCI_DEVICE_INSTANCES; i++) {
-+		if (sdhci_base == sdhci_bases[i])
-+			break;
-+	}
-+
-+	if (i == TEGRA_PT_SDHCI_DEVICE_INSTANCES)
-+		return -1;
-+
-+	ptp->dev_id       = TEGRA_PT_SDHCI_DEVICE_ID;
-+	ptp->dev_instance = i;
-+
 +	/*
-+	 * eMMC storage has two special boot partitions in addition to the
-+	 * main one.  NVIDIA's bootloader linearizes eMMC boot0->boot1->main
-+	 * accesses, this means that the partition table addresses are shifted
-+	 * by the size of boot partitions.  In accordance with the eMMC
-+	 * specification, the boot partition size is calculated as follows:
-+	 *
-+	 *	boot partition size = 128K byte x BOOT_SIZE_MULT
-+	 *
-+	 * This function returns number of sectors occupied by the both boot
-+	 * partitions.
++	 * Quirk for NVIDIA Tegra devices that store FS partition table
++	 * on a boot partition.  Tegra-partition scanner found partition
++	 * table on a boot MMC partition and stashed it for the main MMC
++	 * partition if MMC_QUIRK_RESCAN_MAIN_BLKDEV is set, and thus,
++	 * the main partition needs to be re-scanned.
 +	 */
-+	return card->ext_csd.raw_boot_mult * SZ_128K /
-+	       SECTOR_SIZE * MMC_NUM_BOOT_PARTITION;
-+}
++	if (card->quirks & MMC_QUIRK_RESCAN_MAIN_BLKDEV)
++		mmc_blk_rescan_disk(md);
 +
-+static int tegra_read_partition_table(struct tegra_partition_table_parser *ptp)
-+{
-+	union tegra_partition_table_u *ptu = (typeof(ptu))ptp->pt;
-+	unsigned int i;
-+	Sector sect;
-+	void *part;
-+
-+	for (i = 0; i < ARRAY_SIZE(ptu->pt_parts); i++) {
-+		/*
-+		 * Partition table takes at maximum 4096 bytes, but
-+		 * read_part_sector() guarantees only that SECTOR_SIZE will
-+		 * be read at minimum.
-+		 */
-+		part = read_part_sector(ptp->state, ptp->sector + i, &sect);
-+		if (!part) {
-+			TEGRA_PT_ERR(ptp, "failed to read sector %llu\n",
-+				     ptp->sector + i);
-+			return 0;
-+		}
-+
-+		memcpy(ptu->pt_parts[i], part, SECTOR_SIZE);
-+		put_dev_sector(sect);
-+	}
-+
-+	return 1;
-+}
-+
-+int tegra_partition(struct parsed_partitions *state)
-+{
-+	struct tegra_partition_table_parser ptp = { .state = state };
-+	sector_t end_sector;
-+	int ret = 0;
-+
-+	if (!soc_is_tegra())
-+		return 0;
-+
-+	ptp.boot_offset = tegra_partition_table_emmc_boot_offset(&ptp);
-+	if (ptp.boot_offset < 0)
-+		return 0;
-+
-+	if (tegra_pt_sector_address < ptp.boot_offset) {
-+		TEGRA_PT_INFO(&ptp,
-+			      "scanning eMMC boot partitions unimplemented\n");
-+		return 0;
-+	}
-+
-+	ptp.pt = kmalloc(sizeof(*ptp.pt), GFP_KERNEL);
-+	if (!ptp.pt)
-+		return 0;
-+
-+	ptp.sector = tegra_pt_sector_address - ptp.boot_offset;
-+	end_sector = ptp.sector + tegra_pt_sectors_num;
-+
-+	/*
-+	 * Partition table is duplicated till the end_sector.
-+	 * If first table is corrupted, we will try next.
-+	 */
-+	while (ptp.sector < end_sector) {
-+		ret = tegra_read_partition_table(&ptp);
-+		if (!ret)
-+			goto next_sector;
-+
-+		ret = tegra_partition_table_insec_hdr_valid(&ptp);
-+		if (!ret)
-+			goto next_sector;
-+
-+		ret = tegra_partition_table_unencrypted(&ptp);
-+		if (!ret)
-+			goto next_sector;
-+
-+		ret = tegra_partition_table_sec_hdr_valid(&ptp);
-+		if (!ret)
-+			goto next_sector;
-+
-+		ret = tegra_partition_table_parsed(&ptp);
-+		if (ret)
-+			break;
-+next_sector:
-+		ptp.sector += TEGRA_PT_SECTOR_SZ;
-+	}
-+
-+	if (ret == 1)
-+		strlcat(state->pp_buf, "\n", PAGE_SIZE);
-+
-+	kfree(ptp.pt);
-+
-+	return ret;
-+}
-diff --git a/block/partitions/tegra.h b/block/partitions/tegra.h
-new file mode 100644
-index 000000000000..f76a84dedfc6
---- /dev/null
-+++ b/block/partitions/tegra.h
-@@ -0,0 +1,83 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __FS_PART_TEGRA_H__
-+#define __FS_PART_TEGRA_H__
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+#define TEGRA_PT_MAGIC				0xffffffff8f9e8d8bULL
-+#define TEGRA_PT_VERSION			0x100
-+#define TEGRA_PT_LOGICAL_SECTOR_SIZE		4096
-+#define TEGRA_PT_AES_HASH_SIZE			4
-+#define TEGRA_PT_NAME_SIZE			4
-+
-+#define TEGRA_PT_SDHCI_DEVICE_ID		18
-+#define TEGRA_PT_SDHCI_DEVICE_INSTANCES		4
-+
-+#define TEGRA_PT_PART_TYPE_BCT			1
-+#define TEGRA_PT_PART_TYPE_EBT			2
-+#define TEGRA_PT_PART_TYPE_PT			3
-+#define TEGRA_PT_PART_TYPE_GENERIC		6
-+#define TEGRA_PT_PART_TYPE_GP1			9
-+#define TEGRA_PT_PART_TYPE_GPT			10
-+
-+#define TEGRA_PT_HEADER_SZ						\
-+	(sizeof(struct tegra_partition_header_insecure) +		\
-+	 sizeof(struct tegra_partition_header_secure))			\
-+
-+#define TEGRA_PT_MAX_PARTITIONS						\
-+	((TEGRA_PT_LOGICAL_SECTOR_SIZE - TEGRA_PT_HEADER_SZ) /		\
-+	 sizeof(struct tegra_partition))
-+
-+struct tegra_partition_mount_info {
-+	u32 device_id;
-+	u32 device_instance;
-+	u32 device_attr;
-+	u8  mount_path[TEGRA_PT_NAME_SIZE];
-+	u32 file_system_type;
-+	u32 file_system_attr;
-+} __packed;
-+
-+struct tegra_partition_info {
-+	u32 partition_attr;
-+	u32 __pad1;
-+	u64 logical_sector_address;
-+	u64 logical_sectors_num;
-+	u64 __pad2[2];
-+	u32 partition_type;
-+	u32 __pad3;
-+} __packed;
-+
-+struct tegra_partition {
-+	u32 partition_id;
-+	u8  partition_name[TEGRA_PT_NAME_SIZE];
-+	struct tegra_partition_mount_info mount_info;
-+	struct tegra_partition_info part_info;
-+} __packed;
-+
-+struct tegra_partition_header_insecure {
-+	u64 magic;
-+	u32 version;
-+	u32 length;
-+	u32 signature[TEGRA_PT_AES_HASH_SIZE];
-+} __packed;
-+
-+struct tegra_partition_header_secure {
-+	u32 random_data[TEGRA_PT_AES_HASH_SIZE];
-+	u64 magic;
-+	u32 version;
-+	u32 length;
-+	u32 num_partitions;
-+	u32 __pad;
-+} __packed;
-+
-+struct tegra_partition_table {
-+	struct tegra_partition_header_insecure insecure;
-+	struct tegra_partition_header_secure secure;
-+	struct tegra_partition partitions[TEGRA_PT_MAX_PARTITIONS];
-+} __packed;
-+
-+int tegra_partition(struct parsed_partitions *state);
-+
-+#endif /* __FS_PART_TEGRA_H__ */
-diff --git a/include/soc/tegra/bootdata.h b/include/soc/tegra/bootdata.h
-new file mode 100644
-index 000000000000..7be207cb2519
---- /dev/null
-+++ b/include/soc/tegra/bootdata.h
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef __SOC_TEGRA_BOOTDATA_H__
-+#define __SOC_TEGRA_BOOTDATA_H__
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+#define TEGRA_BOOTDATA_VERSION_T20	NVBOOT_BOOTDATA_VERSION(0x2, 0x1)
-+#define TEGRA_BOOTDATA_VERSION_T30	NVBOOT_BOOTDATA_VERSION(0x3, 0x1)
-+
-+#define NVBOOT_BOOTDATA_VERSION(a, b)	((((a) & 0xffff) << 16) | \
-+					  ((b) & 0xffff))
-+#define NVBOOT_CMAC_AES_HASH_LENGTH	4
-+
-+struct tegra20_boot_info_table {
-+	u32 unused_data1[14];
-+	u32 bct_size;
-+	u32 bct_ptr;
-+} __packed;
-+
-+struct tegra20_boot_config_table {
-+	u32 crypto_hash[NVBOOT_CMAC_AES_HASH_LENGTH];
-+	u32 random_aes_blk[NVBOOT_CMAC_AES_HASH_LENGTH];
-+	u32 boot_data_version;
-+	u32 unused_data1[712];
-+	u32 unused_consumer_data1;
-+	u16 partition_table_logical_sector_address;
-+	u16 partition_table_num_logical_sectors;
-+	u32 unused_consumer_data[294];
-+	u32 unused_data[3];
-+} __packed;
-+
-+struct tegra30_boot_config_table {
-+	u32 crypto_hash[NVBOOT_CMAC_AES_HASH_LENGTH];
-+	u32 random_aes_blk[NVBOOT_CMAC_AES_HASH_LENGTH];
-+	u32 boot_data_version;
-+	u32 unused_data1[1016];
-+	u32 unused_consumer_data1;
-+	u16 partition_table_logical_sector_address;
-+	u16 partition_table_num_logical_sectors;
-+	u32 unused_consumer_data[502];
-+	u32 unused_data[3];
-+} __packed;
-+
-+#endif /* __SOC_TEGRA_BOOTDATA_H__ */
-diff --git a/include/soc/tegra/common.h b/include/soc/tegra/common.h
-index 98027a76ce3d..744280ecab5f 100644
---- a/include/soc/tegra/common.h
-+++ b/include/soc/tegra/common.h
-@@ -6,6 +6,15 @@
- #ifndef __SOC_TEGRA_COMMON_H__
- #define __SOC_TEGRA_COMMON_H__
+ 	/* Add two debugfs entries */
+ 	mmc_blk_add_debugfs(card, md);
  
-+#include <linux/types.h>
-+
-+#ifdef CONFIG_ARCH_TEGRA
- bool soc_is_tegra(void);
-+#else
-+static inline bool soc_is_tegra(void)
-+{
-+	return false;
-+}
-+#endif
+diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
+index 90b1d83ce675..550d50e57cc4 100644
+--- a/include/linux/mmc/card.h
++++ b/include/linux/mmc/card.h
+@@ -270,6 +270,7 @@ struct mmc_card {
+ #define MMC_QUIRK_BROKEN_IRQ_POLLING	(1<<11)	/* Polling SDIO_CCCR_INTx could create a fake interrupt */
+ #define MMC_QUIRK_TRIM_BROKEN	(1<<12)		/* Skip trim */
+ #define MMC_QUIRK_BROKEN_HPI	(1<<13)		/* Disable broken HPI support */
++#define MMC_QUIRK_RESCAN_MAIN_BLKDEV	(1<<14)	/* Main partition needs to be re-scanned after instantiating all partitions */
  
- #endif /* __SOC_TEGRA_COMMON_H__ */
-diff --git a/include/soc/tegra/partition.h b/include/soc/tegra/partition.h
-new file mode 100644
-index 000000000000..9a7cbc20dbff
---- /dev/null
-+++ b/include/soc/tegra/partition.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef __SOC_TEGRA_PARTITION_H__
-+#define __SOC_TEGRA_PARTITION_H__
-+
-+#include <linux/types.h>
-+
-+#ifdef CONFIG_TEGRA_PARTITION
-+void tegra_partition_table_setup(sector_t logical_sector_address,
-+				 sector_t logical_sectors_num);
-+#else
-+static inline void tegra_partition_table_setup(sector_t logical_sector_address,
-+					       sector_t logical_sectors_num)
-+{
-+}
-+#endif
-+
-+#endif /* __SOC_TEGRA_PARTITION_H__ */
+ 	bool			reenable_cmdq;	/* Re-enable Command Queue */
+ 
 -- 
 2.25.1
 
