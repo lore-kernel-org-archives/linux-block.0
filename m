@@ -2,122 +2,61 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33570C10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF8CC10F00
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 17:04:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11A8620848
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:53:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F5A7206E2
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 17:04:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726259AbgCFQxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 11:53:01 -0500
-Received: from avon.wwwdotorg.org ([104.237.132.123]:42428 "EHLO
-        avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbgCFQxB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 11:53:01 -0500
-Received: from [10.20.204.51] (unknown [216.228.112.24])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by avon.wwwdotorg.org (Postfix) with ESMTPSA id DD1AD1C01BF;
-        Fri,  6 Mar 2020 09:52:58 -0700 (MST)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.102.1 at avon.wwwdotorg.org
-Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <20200224231841.26550-1-digetx@gmail.com>
- <20200224231841.26550-4-digetx@gmail.com>
- <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
- <CAPDyKFoXnoukjH_2cM=f0DGHBHS6kVUQSYOa_5ffQppC7VOn2A@mail.gmail.com>
- <824a4d5f-8280-8860-3e80-68188a13aa3d@gmail.com>
- <CAPDyKFric6pZbJ5-2qkwAFoeJ0c0kcha99zHJ12AUrWO6FQmgg@mail.gmail.com>
-From:   Stephen Warren <swarren@wwwdotorg.org>
-Message-ID: <6fe6d262-c6b0-52d8-0150-4c32a4c36cbd@wwwdotorg.org>
-Date:   Fri, 6 Mar 2020 09:52:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727052AbgCFRE0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 12:04:26 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:36116 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726083AbgCFRE0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 12:04:26 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jAGOX-006OO2-9c; Fri, 06 Mar 2020 17:04:17 +0000
+Date:   Fri, 6 Mar 2020 17:04:17 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        lsf-pc <lsf-pc@lists.linuxfoundation.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [LSFMMBPF TOPIC] Killing LSFMMBPF
+Message-ID: <20200306170417.GX23230@ZenIV.linux.org.uk>
+References: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
+ <20200306160548.GB25710@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <CAPDyKFric6pZbJ5-2qkwAFoeJ0c0kcha99zHJ12AUrWO6FQmgg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200306160548.GB25710@bombadil.infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/6/20 6:37 AM, Ulf Hansson wrote:
-> On Wed, 4 Mar 2020 at 18:09, Dmitry Osipenko <digetx@gmail.com> wrote:
->>
->> 04.03.2020 19:36, Ulf Hansson пишет:
->>> On Tue, 25 Feb 2020 at 01:20, Stephen Warren <swarren@wwwdotorg.org> wrote:
->>>>
->>>> On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
->>>>> All NVIDIA Tegra devices use a special partition table format for the
->>>>> internal storage partitioning. Most of Tegra devices have GPT partition
->>>>> in addition to TegraPT, but some older Android consumer-grade devices do
->>>>> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
->>>>> in order to support these devices properly in the upstream kernel. This
->>>>> patch adds support for NVIDIA Tegra Partition Table format that is used
->>>>> at least by all NVIDIA Tegra20 and Tegra30 devices.
->>>>
->>>>> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
->>>>
->>>>> +static void __init tegra_boot_config_table_init(void)
->>>>> +{
->>>>> +     void __iomem *bct_base;
->>>>> +     u16 pt_addr, pt_size;
->>>>> +
->>>>> +     bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
->>>>
->>>> This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot
->>>> Information Table) to a fixed location in IRAM, and there's some value
->>>> in the BIT that points to where the BCT is in IRAM. In practice, it
->>>> might work out that the BCT is always at the same place in IRAM, but
->>>> this certainly isn't guaranteed. I think there's code in U-Boot which
->>>> extracts the BCT location from the BIT? Yes, see
->>>> arch/arm/mach-tegra/ap.c:get_odmdata().
->>>
->>> So, have you considered using the command line partition option,
->>> rather than adding yet another partition scheme to the kernel?
->>>
->>> In principle, you would let the boot loader scan for the partitions,
->>> likely from machine specific code in U-boot. Then you append these to
->>> the kernel command line and let block/partitions/cmdline.c scan for
->>> it.
->>
->> The bootloader is usually locked-down on a consumer Tegra machines (it's
->> signed / encrypted).
-> 
-> Right, you are you talking about this from a developer point of view,
-> not from an end product user?
-> 
-> I mean, for sure you can upgrade the bootloader on Nvidia products? No, really?
+On Fri, Mar 06, 2020 at 08:05:48AM -0800, Matthew Wilcox wrote:
 
-For developer-oriented products like Jetson developer kits, you can 
-upgrade the bootloader, and luckily they haven't used this partition 
-table format for many versions.
+> > 4) Presentations.  90% of the conference is 1-2 people standing at the front
+> > of the room, talking to a room of 20-100 people, with only a few people in
+> > the audience who cares.  We do our best to curate the presentations so we're
+> > not wasting peoples time, but in the end I don't care what David Howells is
+> > doing with mount, I trust him to do the right thing and he really just needs
+> > to trap Viro in a room to work it out, he doesn't need all of us.
+> 
+> ... and allow the other 3-5 people who're interested or affected the
+> opportunity to sit in.  Like a mailing list, but higher bandwidth.
 
-However, commercial Android products typically have secure boot enabled, 
-so you can't replace the bootloader unless you know the secure boot 
-keys, which only the manufacturer knows. Dmitry is working on 
-re-purposing such products.
+Latency can be more unpleasant, actually - you try to discuss something between
+3 people, when one is in .uk, another - in .us (east coast) and the third one -
+in ,au (also east coast).  Timezone deltas - 5 hours and 8 hours, in opposite
+directions...  Incidentally, that was about mount, with me and David being
+two of participants; I somewhat hoped to get that sorted out at LSF, but Ian
+won't be there anyway.  OTOH, that's just an 8 hours delta...
