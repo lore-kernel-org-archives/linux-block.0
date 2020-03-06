@@ -2,171 +2,102 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 748A6C10F26
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 13:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32840C10DCE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D3D22084E
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 13:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0059B20848
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:01:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o41Jqr5J"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bEAHGGsN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbgCFNiC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 08:38:02 -0500
-Received: from mail-vk1-f193.google.com ([209.85.221.193]:41758 "EHLO
-        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbgCFNiC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 08:38:02 -0500
-Received: by mail-vk1-f193.google.com with SMTP id y201so592169vky.8
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 05:38:01 -0800 (PST)
+        id S1726382AbgCFOBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 09:01:19 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:46139 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbgCFOBT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 09:01:19 -0500
+Received: by mail-io1-f67.google.com with SMTP id f3so2124911ioc.13
+        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 06:01:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=pRT33IXafqSAr33qlx5s+Y+vRzyqKbOBrTN3ps1thPQ=;
-        b=o41Jqr5JyVJfTo5kWfFMhZB6OVZvxSSgEV43vr8hiKBBdUTzzbSHcILHK7E46FqCV1
-         zGC+1sXbOK83HkqScxPrT6ygSj3chMcPk56a4HEO1Hp+bQXUDtH7V2yqvRnGeZW5pe9P
-         jZW98ry2S97rX+M3h+lwfREUocO47zlFRvfuZAsA4yxvw+5elom8/uXei4G2XdQr9NTQ
-         KXEg/Hceo7Z1r5ffwG0Aj+jD3m3pPpd818wWRijHKlVbTZn970ZtZdrv5e9UWWjnH9I5
-         EMuEM90i5rNHhgH7P/cUgCRy/H0vpyq37zemCZXiDEbx1/fl29EQtXHEes0aFeL5V+MZ
-         OW7Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=AWXTIoNVi4PmeX46l4KNCpC/lKX/W4g0cGjnMBlBabQ=;
+        b=bEAHGGsNghxj8J2XZ+vEC4dVLlFBj0NK3HWR5S+2uOR9wjYWcsBPXMothiN91WUBLm
+         60wlMf2kd2Xa8o7GkPIatBTQFdzMHAnWcpeyMyWIpdv3fGSlySIif5QJKC8buBZiwuDa
+         mHs4PlCikyk6sF98eoW0eTZs/CTOnYq8bXeHujLNG2/3pXTlRvvMKZD/CcYyjLR/NSeR
+         d+1a35P7OtbRmsmbYKBhcPPodZwfrwY2EOukQFKFRQCEhVmFPcpSYHekdXFe3fapeKax
+         DMImB+ZrteJFkGFEL2TgU2+d81UvdNf0yTvCbC2kau2Tutl44MCG1zfmIGsA58FAdH3Q
+         WoNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pRT33IXafqSAr33qlx5s+Y+vRzyqKbOBrTN3ps1thPQ=;
-        b=eqCnFOP1wux3LwEtEkzvjHiJyUxjiGmXWFC6NDEVbPxfnEgN7ax+9nuasi7jMROty/
-         Ef8AuO3F1qrXQXk57uJ95Ieun1FMqXS888z02/9HprJC9nosuRjBiTyQ4+btuRrMu30S
-         KglUMvOyktedWAFxqkteVDhyYle1YFRd7oTQO9bm+iMEratV1gFT8S7HMOmib41LaQLg
-         SEbESgNvvxCkrnqpI7F5/UPC+3BOvyDIimr3m1oUOGYHv+qpZii50Nko7rttlKaPKTWc
-         8UIwu3xWxvKeARfz+rbR1Ie7dqhOlz+A8d01aKAqwB8AiLt2b1fX5p8sM6IdnF7Z57Ai
-         skrA==
-X-Gm-Message-State: ANhLgQ1gt/NNhSZ2JJegkMWrqEV3f3O/LThV0xo3ApAebyKcd9Zmd5OI
-        Z0dKjz/xCFaF1ft2d3oiRp8Og74pGp/GifgJlXKEXTT8
-X-Google-Smtp-Source: ADFU+vtBfU7t/GedoLeNXV1o80D5EdpGUw8N8UHHXFMxpqbi5jvG1O+FqFD5DalVaczgtf9BTkYBUVQZYJtuWD5NAnw=
-X-Received: by 2002:a1f:78c5:: with SMTP id t188mr1669349vkc.43.1583501881058;
- Fri, 06 Mar 2020 05:38:01 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AWXTIoNVi4PmeX46l4KNCpC/lKX/W4g0cGjnMBlBabQ=;
+        b=bzUaawW1sVWxiPNCVAIwzqBmGR39e3w9RWcVQ1+uIPv8CLoveaQl1G2qJQ8t0hhk0o
+         vkQRovSLALukbCJxPoVo6FQOHE5oQIi6WHteTq9EaanOMcIMDNJILw5SNO0BI6lisukU
+         Jir7Gz5G+Iu1LvonK2BdaJNCfWEB0LLOtE+c8bck3KlPIt8J0SiENC8rVLELTidn6hVt
+         /tgBhae8mNmwgNgeSJLKNnUCJARKqXYss1Diw2lHCkNc1ZSOu+eUY9MpTvSuc1W0UirL
+         VlM2rxF72UIi4hPLFHPIoFCe0VNdDe4U7lHnGPSqfNUPYlCTmemahJ2C9yOlKVS+OnzZ
+         GZ3A==
+X-Gm-Message-State: ANhLgQ2cnHuCSF6Jc5DZt3xGz6ExaYeYbAJzFY+a/0lctplIT26VGS5F
+        2hGb1uurb0K6htBTwqEPGnPWCQ==
+X-Google-Smtp-Source: ADFU+vsnbO6wc+MqayVXq5o+cuIvNennIgyjYnSjIeTIJjHArSUhi9gqCOum4BkReUdddYI2gFw8Ng==
+X-Received: by 2002:a02:a415:: with SMTP id c21mr3058353jal.45.1583503278541;
+        Fri, 06 Mar 2020 06:01:18 -0800 (PST)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id b19sm6586986ior.43.2020.03.06.06.01.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Mar 2020 06:01:18 -0800 (PST)
+Subject: Re: [PATCH BUGFIX] block, bfq: fix overwrite of bfq_group pointer in
+ bfq_find_set_group()
+To:     Carlo Nonato <carlo.nonato95@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        Kwon Je Oh <kwonje.oh2@gmail.com>
+References: <20200306122731.5945-1-carlo.nonato95@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a5e49715-6098-41d5-f964-9e6c4ff5e602@kernel.dk>
+Date:   Fri, 6 Mar 2020 07:01:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200224231841.26550-1-digetx@gmail.com> <20200224231841.26550-4-digetx@gmail.com>
- <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org> <CAPDyKFoXnoukjH_2cM=f0DGHBHS6kVUQSYOa_5ffQppC7VOn2A@mail.gmail.com>
- <824a4d5f-8280-8860-3e80-68188a13aa3d@gmail.com>
-In-Reply-To: <824a4d5f-8280-8860-3e80-68188a13aa3d@gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Fri, 6 Mar 2020 14:37:24 +0100
-Message-ID: <CAPDyKFric6pZbJ5-2qkwAFoeJ0c0kcha99zHJ12AUrWO6FQmgg@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
-To:     Dmitry Osipenko <digetx@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200306122731.5945-1-carlo.nonato95@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 4 Mar 2020 at 18:09, Dmitry Osipenko <digetx@gmail.com> wrote:
->
-> 04.03.2020 19:36, Ulf Hansson =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > On Tue, 25 Feb 2020 at 01:20, Stephen Warren <swarren@wwwdotorg.org> wr=
-ote:
-> >>
-> >> On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
-> >>> All NVIDIA Tegra devices use a special partition table format for the
-> >>> internal storage partitioning. Most of Tegra devices have GPT partiti=
-on
-> >>> in addition to TegraPT, but some older Android consumer-grade devices=
- do
-> >>> not or GPT is placed in a wrong sector, and thus, the TegraPT is need=
-ed
-> >>> in order to support these devices properly in the upstream kernel. Th=
-is
-> >>> patch adds support for NVIDIA Tegra Partition Table format that is us=
-ed
-> >>> at least by all NVIDIA Tegra20 and Tegra30 devices.
-> >>
-> >>> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.=
-c
-> >>
-> >>> +static void __init tegra_boot_config_table_init(void)
-> >>> +{
-> >>> +     void __iomem *bct_base;
-> >>> +     u16 pt_addr, pt_size;
-> >>> +
-> >>> +     bct_base =3D IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSE=
-T;
-> >>
-> >> This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot
-> >> Information Table) to a fixed location in IRAM, and there's some value
-> >> in the BIT that points to where the BCT is in IRAM. In practice, it
-> >> might work out that the BCT is always at the same place in IRAM, but
-> >> this certainly isn't guaranteed. I think there's code in U-Boot which
-> >> extracts the BCT location from the BIT? Yes, see
-> >> arch/arm/mach-tegra/ap.c:get_odmdata().
-> >
-> > So, have you considered using the command line partition option,
-> > rather than adding yet another partition scheme to the kernel?
-> >
-> > In principle, you would let the boot loader scan for the partitions,
-> > likely from machine specific code in U-boot. Then you append these to
-> > the kernel command line and let block/partitions/cmdline.c scan for
-> > it.
->
-> The bootloader is usually locked-down on a consumer Tegra machines (it's
-> signed / encrypted).
+On 3/6/20 5:27 AM, Carlo Nonato wrote:
+> The bfq_find_set_group() function takes as input a blkcg (which represents
+> a cgroup) and retrieves the corresponding bfq_group, then it updates the
+> bfq internal group hierarchy (see comments inside the function for why
+> this is needed) and finally it returns the bfq_group.
+> In the hierarchy update cycle, the pointer holding the correct bfq_group
+> that has to be returned is mistakenly used to traverse the hierarchy
+> bottom to top, meaning that in each iteration it gets overwritten with the
+> parent of the current group. Since the update cycle stops at root's
+> children (depth = 2), the overwrite becomes a problem only if the blkcg
+> describes a cgroup at a hierarchy level deeper than that (depth > 2). In
+> this case the root's child that happens to be also an ancestor of the
+> correct bfq_group is returned. The main consequence is that processes
+> contained in a cgroup at depth greater than 2 are wrongly placed in the
+> group described above by BFQ.
+> 
+> This commits fixes this problem by using a different bfq_group pointer in
+> the update cycle in order to avoid the overwrite of the variable holding
+> the original group reference.
 
-Right, you are you talking about this from a developer point of view,
-not from an end product user?
+Applied, thanks.
 
-I mean, for sure you can upgrade the bootloader on Nvidia products? No, rea=
-lly?
+-- 
+Jens Axboe
 
->
-> Technically, it should be possible to chain-load some custom secondary
-> bootloader instead of a kernel image, but this is not very practical
-> because now:
->
-> 1. There is a need to make a custom bootloader and it is quite a lot of
-> work.
->
-> 2. You'll have to tell everybody that a custom booloader may need to be
-> used in order to get a working eMMC.
-
-Yeah, I get the point. It's not an optimal situation, but I assume
-it's about informing developers. They can cope with this, no?
-
->
-> 3. NVIDIA's bootloader already passes a command line parameter to kernel
-> for locating GPT entry, but this hack is not acceptable for the upstream
-> kernel.
-
-Well, I am just worried that we will end up with one partition format
-per vendor/product, that wouldn't scale very well.
-
-In any case, from mmc point of view I am less concerned, we can find a
-way to support the needed bits. I just need to review the series more
-carefully and provide some comments. :-)
-
-However, before I do that, I would like to hear Jens opinion about
-adding a new partition format, so I don't waste my time here.
-
-Kind regards
-Uffe
