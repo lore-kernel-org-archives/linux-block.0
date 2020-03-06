@@ -2,137 +2,122 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9908C3F2D6
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33570C10DCE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:53:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92640206E2
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:31:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="Sa9/tVXX"
+	by mail.kernel.org (Postfix) with ESMTP id 11A8620848
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:53:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726650AbgCFQbt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 11:31:49 -0500
-Received: from mail-qt1-f169.google.com ([209.85.160.169]:38222 "EHLO
-        mail-qt1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbgCFQbt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 11:31:49 -0500
-Received: by mail-qt1-f169.google.com with SMTP id e20so2136805qto.5
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 08:31:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UUSOJf+zzacEOEP9td3eEtXJWkTaibOb7Kq1LOm7AIg=;
-        b=Sa9/tVXXId0i+ZkGnCOQqMm/YwmWBR6mR5Ert555HnfoqDYeWAyStfmeKNig1vQ6lT
-         JSU6LwefTLFnXO059CxcX5hoSrgXp3DK+ZvC8+0f2Ndb9Oh8zKuNn8QjdZ5YIBpwsN1A
-         Y3b6owF+xPxDq3J2FpHKeYk4ACb7Z6VDzWTXGRU5cN+PRbM1SVWIOGaL2iDpJP0XNXG1
-         6r0Con0dYegUQQcNrLBwhemitVup6gffpqAolIUljsz710Bol1blQvCKg+k+eSNFdzHT
-         u67YAxGd0FuG40KNnSbaPS/hNPtqCiccdXcDxhu9d4e9ozFh/hYCI31Uv9Qd0AalNCla
-         E1JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UUSOJf+zzacEOEP9td3eEtXJWkTaibOb7Kq1LOm7AIg=;
-        b=NaHM+VqvPvSI54yPArupzo3m/R9a6JU+h7yomrclEX8/KueVeItwoWSa5CjbLL2zXQ
-         eqxL86C1MGEV8BJYZEYlF6xEgLF0FLNO4NzHM6qD2co3Aeux1txzXgklim8aobWLdRtK
-         sTap1VnyY6ouB62EOT2sk4v/wJrkqE4swKi3ru679XZBJ8AehmzGd85OhbYGTm2uEcqW
-         AwPp0LjcPA0Uz+RHFbgcxewCkPVWfyfk/CYrSV8fdUaGZxOQrr8suCHDLlCwMjZsiPYh
-         ftLgPekepVjbaj/YmTlngfNHR8pXnNDcK483w20fqYkw4D4dr30vb6YKkWdYgVVa1P4l
-         JDbA==
-X-Gm-Message-State: ANhLgQ0jObO4PQwRrhIxDN16ffy0YYO1R/Kd1QKcHBZcMj6/ZcWqR9aK
-        oWKWYjHViGcAtr8oZ9F4fS//PUwK47k=
-X-Google-Smtp-Source: ADFU+vvDeMAzUoSiB4u1rD7bbt/71U5nIFGqZVf2AiNnhdP0rj/eFgB6XllAkXoq6eYBnOKu7Yp1Gg==
-X-Received: by 2002:ac8:3027:: with SMTP id f36mr3638204qte.76.1583512307131;
-        Fri, 06 Mar 2020 08:31:47 -0800 (PST)
-Received: from [192.168.1.106] ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id 17sm995481qkm.105.2020.03.06.08.31.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Mar 2020 08:31:46 -0800 (PST)
-Subject: Re: [LSFMMBPF TOPIC] Killing LSFMMBPF
-To:     Christian Brauner <christian.brauner@ubuntu.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     lsf-pc <lsf-pc@lists.linuxfoundation.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-References: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
- <1583511310.3653.33.camel@HansenPartnership.com>
- <20200306162858.zy6u3tvutxvf27yw@wittgenstein>
-From:   Josef Bacik <josef@toxicpanda.com>
-Message-ID: <e928fa83-3076-8c7a-7c99-91bf63f3c8ee@toxicpanda.com>
-Date:   Fri, 6 Mar 2020 11:31:45 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+        id S1726259AbgCFQxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 11:53:01 -0500
+Received: from avon.wwwdotorg.org ([104.237.132.123]:42428 "EHLO
+        avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726083AbgCFQxB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 11:53:01 -0500
+Received: from [10.20.204.51] (unknown [216.228.112.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by avon.wwwdotorg.org (Postfix) with ESMTPSA id DD1AD1C01BF;
+        Fri,  6 Mar 2020 09:52:58 -0700 (MST)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.102.1 at avon.wwwdotorg.org
+Subject: Re: [PATCH v1 3/3] partitions: Introduce NVIDIA Tegra Partition Table
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20200224231841.26550-1-digetx@gmail.com>
+ <20200224231841.26550-4-digetx@gmail.com>
+ <44c22925-a14e-96d0-1f93-1979c0c60525@wwwdotorg.org>
+ <CAPDyKFoXnoukjH_2cM=f0DGHBHS6kVUQSYOa_5ffQppC7VOn2A@mail.gmail.com>
+ <824a4d5f-8280-8860-3e80-68188a13aa3d@gmail.com>
+ <CAPDyKFric6pZbJ5-2qkwAFoeJ0c0kcha99zHJ12AUrWO6FQmgg@mail.gmail.com>
+From:   Stephen Warren <swarren@wwwdotorg.org>
+Message-ID: <6fe6d262-c6b0-52d8-0150-4c32a4c36cbd@wwwdotorg.org>
+Date:   Fri, 6 Mar 2020 09:52:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200306162858.zy6u3tvutxvf27yw@wittgenstein>
+In-Reply-To: <CAPDyKFric6pZbJ5-2qkwAFoeJ0c0kcha99zHJ12AUrWO6FQmgg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/6/20 11:28 AM, Christian Brauner wrote:
-> On Fri, Mar 06, 2020 at 08:15:10AM -0800, James Bottomley wrote:
->> On Fri, 2020-03-06 at 09:35 -0500, Josef Bacik wrote:
->>> Many people have suggested this elsewhere, but I think we really need
->>> to seriously consider it.  Most of us all go to the Linux Plumbers
->>> conference.  We could accomplish our main goals with Plumbers without
->>> having to deal with all of the above problems.
+On 3/6/20 6:37 AM, Ulf Hansson wrote:
+> On Wed, 4 Mar 2020 at 18:09, Dmitry Osipenko <digetx@gmail.com> wrote:
 >>
->> [I'm on the Plumbers PC, but not speaking for them, just making general
->> observations based on my long history helping to run Plumbers]
+>> 04.03.2020 19:36, Ulf Hansson пишет:
+>>> On Tue, 25 Feb 2020 at 01:20, Stephen Warren <swarren@wwwdotorg.org> wrote:
+>>>>
+>>>> On 2/24/20 4:18 PM, Dmitry Osipenko wrote:
+>>>>> All NVIDIA Tegra devices use a special partition table format for the
+>>>>> internal storage partitioning. Most of Tegra devices have GPT partition
+>>>>> in addition to TegraPT, but some older Android consumer-grade devices do
+>>>>> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
+>>>>> in order to support these devices properly in the upstream kernel. This
+>>>>> patch adds support for NVIDIA Tegra Partition Table format that is used
+>>>>> at least by all NVIDIA Tegra20 and Tegra30 devices.
+>>>>
+>>>>> diff --git a/arch/arm/mach-tegra/tegra.c b/arch/arm/mach-tegra/tegra.c
+>>>>
+>>>>> +static void __init tegra_boot_config_table_init(void)
+>>>>> +{
+>>>>> +     void __iomem *bct_base;
+>>>>> +     u16 pt_addr, pt_size;
+>>>>> +
+>>>>> +     bct_base = IO_ADDRESS(TEGRA_IRAM_BASE) + TEGRA_IRAM_BCT_OFFSET;
+>>>>
+>>>> This shouldn't be hard-coded. IIRC, the boot ROM writes a BIT (Boot
+>>>> Information Table) to a fixed location in IRAM, and there's some value
+>>>> in the BIT that points to where the BCT is in IRAM. In practice, it
+>>>> might work out that the BCT is always at the same place in IRAM, but
+>>>> this certainly isn't guaranteed. I think there's code in U-Boot which
+>>>> extracts the BCT location from the BIT? Yes, see
+>>>> arch/arm/mach-tegra/ap.c:get_odmdata().
+>>>
+>>> So, have you considered using the command line partition option,
+>>> rather than adding yet another partition scheme to the kernel?
+>>>
+>>> In principle, you would let the boot loader scan for the partitions,
+>>> likely from machine specific code in U-boot. Then you append these to
+>>> the kernel command line and let block/partitions/cmdline.c scan for
+>>> it.
 >>
->> Plumbers has basically reached the size where we can't realistically
->> expand without moving to the bigger venues and changing our evening
->> events ... it's already been a huge struggle in Lisbon and Halifax
->> trying to find a Restaurant big enough for the closing party.
->>
->> The other reason for struggling to keep Plumbers around 500 is that the
->> value of simply running into people and having an accidental hallway
->> track, which is seen as a huge benefit of plumbers, starts diminishing.
->>   In fact, having a working hallway starts to become a problem as well
->> as we go up in numbers (plus in that survey we keep sending out those
->> who reply don't want plumbers to grow too much in size).
->>
->> The other problem is content: you're a 3 day 4 track event and we're a
->> 3 day 6 track event.  We get enough schedule angst from 6 tracks ... 10
->> would likely become hugely difficult.  If we move to 5 days, we'd have
->> to shove the Maintainer Summit on the Weekend (you can explain that one
->> to Linus) but we'd still be in danger of the day 4 burn out people used
->> to complain about when OLS and KS were co-located.
->>
->> So, before you suggest Plumbers as the magic answer consider that the
->> problems you cite below don't magically go away, they just become
->> someone else's headache.
->>
->> That's not to say this isn't a good idea, it's just to execute it we'd
->> have to transform Plumbers and we should have a community conversation
->> about that involving the current Plumbers PC before deciding it's the
->> best option.
+>> The bootloader is usually locked-down on a consumer Tegra machines (it's
+>> signed / encrypted).
 > 
-> It's unlikely that this could still be done given that we're also facing
-> a little uncertainty for Plumbers. It seems like a lot of additional
-> syncing would be needed.
-> But the main concern I have is that co-locating both is probably quite
-> challenging for anyone attending both especially when organizing
-> something like a microconference.
+> Right, you are you talking about this from a developer point of view,
+> not from an end product user?
 > 
+> I mean, for sure you can upgrade the bootloader on Nvidia products? No, really?
 
-Yeah I want to be clear I'm not talking about this years conference, I'm talking 
-about future conferences and if/how we want to make changes.
+For developer-oriented products like Jetson developer kits, you can 
+upgrade the bootloader, and luckily they haven't used this partition 
+table format for many versions.
 
-I picked plumbers because by-in-large the overlap between plumbers attendance 
-and LSFMMBPF attendance is pretty large, but obviously it doesn't have to be 
-just that.  Ted and others have suggested having a larger more inclusive 
-conference opposite of plumbers, which I think is a really cool idea.  Thanks,
-
-Josef
+However, commercial Android products typically have secure boot enabled, 
+so you can't replace the bootloader unless you know the secure boot 
+keys, which only the manufacturer knows. Dmitry is working on 
+re-purposing such products.
