@@ -2,112 +2,90 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA9BC10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE854C10F27
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:29:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D50D72073B
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:25:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583511951;
-	bh=YD7E31Aexg+OqXAcWfWJ0ofDgqY5kLfUVMXH5WOWi+o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=koHXDl20I2tmjo9qcD+0/Eb7oLdBpddsvw/zIkFLzq+EqT9fV8CgYrL7X9/UQd5uW
-	 RI4dKXhSCm4gT3HIh+7SVhBP05GhsD0Al58eh/LG3IBRmIsRpd1Lmz0/swflYSI3Ty
-	 BeDNmvRWVW3k5ydyvz/hywpPq8n5UeP8LU2/TniU=
+	by mail.kernel.org (Postfix) with ESMTP id 8A871206E2
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 16:29:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbgCFQZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 11:25:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57442 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726167AbgCFQZv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Mar 2020 11:25:51 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B155B20658;
-        Fri,  6 Mar 2020 16:25:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583511950;
-        bh=YD7E31Aexg+OqXAcWfWJ0ofDgqY5kLfUVMXH5WOWi+o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cQ5JFSNr+dsXHT0VBEHl6D29tc2aPCx7S1va4mKn+5SQxWG/BErwPdFTUIwyBxsmN
-         QQ9jDomqSQMEkGxN1ZhAcWzXfyrprONWO1JPCrHxGuxvIV4PvvJhgreE3qAi1UrJ/6
-         oE37rlumGF15D9T01A5lvNhSjEGWE40uzwknhunk=
-Date:   Fri, 6 Mar 2020 17:25:47 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        jack@suse.cz, bvanassche@acm.org, tytso@mit.edu
-Subject: Re: [PATCH v2 3/7] bdi: protect device lifetime with RCU
-Message-ID: <20200306162547.GB3838587@kroah.com>
-References: <20200226111851.55348-1-yuyufen@huawei.com>
- <20200226111851.55348-4-yuyufen@huawei.com>
- <20200304170543.GJ189690@mtj.thefacebook.com>
- <20200304172221.GA1864270@kroah.com>
- <20200304185056.GM189690@mtj.thefacebook.com>
- <20200304200559.GA1906005@kroah.com>
- <20200305012211.GA33199@mtj.duckdns.org>
+        id S1726300AbgCFQ3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 11:29:04 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:60305 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726231AbgCFQ3E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 11:29:04 -0500
+Received: from ip-109-40-130-104.web.vodafone.de ([109.40.130.104] helo=wittgenstein)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <christian.brauner@ubuntu.com>)
+        id 1jAFqN-0000CM-K3; Fri, 06 Mar 2020 16:28:59 +0000
+Date:   Fri, 6 Mar 2020 17:28:58 +0100
+From:   Christian Brauner <christian.brauner@ubuntu.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        lsf-pc <lsf-pc@lists.linuxfoundation.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [LSFMMBPF TOPIC] Killing LSFMMBPF
+Message-ID: <20200306162858.zy6u3tvutxvf27yw@wittgenstein>
+References: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
+ <1583511310.3653.33.camel@HansenPartnership.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200305012211.GA33199@mtj.duckdns.org>
+In-Reply-To: <1583511310.3653.33.camel@HansenPartnership.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 04, 2020 at 08:22:11PM -0500, Tejun Heo wrote:
-> Hello,
+On Fri, Mar 06, 2020 at 08:15:10AM -0800, James Bottomley wrote:
+> On Fri, 2020-03-06 at 09:35 -0500, Josef Bacik wrote:
+> > Many people have suggested this elsewhere, but I think we really need
+> > to seriously consider it.  Most of us all go to the Linux Plumbers
+> > conference.  We could accomplish our main goals with Plumbers without
+> > having to deal with all of the above problems.
 > 
-> On Wed, Mar 04, 2020 at 09:05:59PM +0100, Greg Kroah-Hartman wrote:
-> > > Lifetime rules in block layer are kinda nebulous. Some of it comes
-> > > from the fact that some objects are reused. Instead of the usual,
-> > > create-use-release, they get repurposed to be associated with
-> > > something else. When looking at such an object from some paths, we
-> > > don't necessarily have ownership of all of the members.
-> > 
-> > That's horrid, it's not like block devices are on some "fast path" for
-> > tear-down, we should do it correctly.
+> [I'm on the Plumbers PC, but not speaking for them, just making general
+> observations based on my long history helping to run Plumbers]
 > 
-> Yeah, it got retrofitted umpteenth times from the really early days. I
-> don't think much of it is intentionally designed to be this way.
+> Plumbers has basically reached the size where we can't realistically
+> expand without moving to the bigger venues and changing our evening
+> events ... it's already been a huge struggle in Lisbon and Halifax
+> trying to find a Restaurant big enough for the closing party.
 > 
-> > > > backing_device_info?  Are these being destroyed/used so often that rcu
-> > > > really is the best solution and the existing reference counting doesn't
-> > > > work properly?
-> > > 
-> > > It's more that there are entry points which can only ensure that just
-> > > the top level object is valid and the member objects might be going or
-> > > coming as we're looking at it.
-> > 
-> > That's not ok, a "member object" can only be valid if you have a
-> > reference to it.  If you remove the object, you then drop the reference,
-> > shouldn't that be the correct thing to do?
+> The other reason for struggling to keep Plumbers around 500 is that the
+> value of simply running into people and having an accidental hallway
+> track, which is seen as a huge benefit of plumbers, starts diminishing.
+>  In fact, having a working hallway starts to become a problem as well
+> as we go up in numbers (plus in that survey we keep sending out those
+> who reply don't want plumbers to grow too much in size).
 > 
-> I mean, it depends. There are two layers of objects and the top level
-> object has two stacked lifetime rules. The "active" usage pins
-> everything as usual. The "shallower" usage only has full access to the
-> top level and when it reaches down into members it needs a different
-> mechanism to ensure its validity. Given a clean slate, I don't think
-> we'd go for this design for these objects but the usage isn't
-> fundamentally broken.
+> The other problem is content: you're a 3 day 4 track event and we're a
+> 3 day 6 track event.  We get enough schedule angst from 6 tracks ... 10
+> would likely become hugely difficult.  If we move to 5 days, we'd have
+> to shove the Maintainer Summit on the Weekend (you can explain that one
+> to Linus) but we'd still be in danger of the day 4 burn out people used
+> to complain about when OLS and KS were co-located.
 > 
-> Idk, for the problem at hand, the choice is between patching it up by
-> copying the name and RCU protecting ->dev access at least for now.
-> Both are nasty in their own ways but copying does have a smaller blast
-> radius. So, copy for now?
+> So, before you suggest Plumbers as the magic answer consider that the
+> problems you cite below don't magically go away, they just become
+> someone else's headache.
+> 
+> That's not to say this isn't a good idea, it's just to execute it we'd
+> have to transform Plumbers and we should have a community conversation
+> about that involving the current Plumbers PC before deciding it's the
+> best option.
 
-Yes, copy for now, don't mess with RCU and the struct device lifetime,
-that is not going to solve anything.
-
-I'll put the "fix the lifetime rules in the block layer" on my todo
-list, at the bottom :(
-
-thanks,
-
-greg k-h
+It's unlikely that this could still be done given that we're also facing
+a little uncertainty for Plumbers. It seems like a lot of additional
+syncing would be needed.
+But the main concern I have is that co-locating both is probably quite
+challenging for anyone attending both especially when organizing
+something like a microconference.
