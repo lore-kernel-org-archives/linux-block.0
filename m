@@ -2,119 +2,91 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986A3C10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 10:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32CBC10DCE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:01:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 654A4207FD
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 10:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583489696;
-	bh=JrMs07MY2g+UKb5EDRgE23qQsFrvwRFqTNqqEh89w9I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=SprLRZsaghr6XWMDnnEXd5YG8HU6fpc+KWYhBJ9N2R3/KqckGn8S8FR/FTclpcS3I
-	 x/C8QKN7eGcRP8NQZ2SRkMDoAlLCA3NLfxorsC3DVnKG44v62jszQ9/9Jc/OsEb5Ya
-	 CEtEnID7jDLrEWI1EFWU9eSZmhuZgT8yeAdD2YV8=
+	by mail.kernel.org (Postfix) with ESMTP id BF8EC20726
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:01:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbgCFKOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 05:14:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50820 "EHLO mail.kernel.org"
+        id S1726257AbgCFLBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 06:01:13 -0500
+Received: from mga09.intel.com ([134.134.136.24]:30780 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726162AbgCFKOz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Mar 2020 05:14:55 -0500
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ACF2D2070A
-        for <linux-block@vger.kernel.org>; Fri,  6 Mar 2020 10:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583489694;
-        bh=JrMs07MY2g+UKb5EDRgE23qQsFrvwRFqTNqqEh89w9I=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=tsejcwBp81Lz6i+Tb9oWqeV/vCHSpsJjg/9htKHt+VDcm28uprrv+cXYJJXcZDGmG
-         O88SRyhooFMIq6c8bl36S7aQReYQKI/Ymdu0tpr276VUzCJ6ufeN/ZAspKA6P6Dy1X
-         +x6+kfFK85OQEXfM0RijBDFp4m82j1JwNnToL4O0=
-Received: by mail-wm1-f50.google.com with SMTP id j1so1728075wmi.4
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 02:14:54 -0800 (PST)
-X-Gm-Message-State: ANhLgQ1ocHRzdlbnmTMKPPrNHSn16X+FJ6OKJR9CmPzc0KVdhKwdkmjs
-        zbZa5XKtQPIU879KkmT05oXdqV5wMDegm9zEeTB2mw==
-X-Google-Smtp-Source: ADFU+vsFANSACzYGytLz08mb68pZbS2PCm3O8i7TdajdJ592AHhe7xTjYxrFq3+qMx59PCDEw8uloFEVf2JUd1CVHok=
-X-Received: by 2002:a1c:9d43:: with SMTP id g64mr3184759wme.62.1583489692927;
- Fri, 06 Mar 2020 02:14:52 -0800 (PST)
+        id S1726069AbgCFLBM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Mar 2020 06:01:12 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 03:01:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,521,1574150400"; 
+   d="scan'208";a="287944100"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 06 Mar 2020 03:01:09 -0800
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1jAAj6-000Gjf-Kx; Fri, 06 Mar 2020 19:01:08 +0800
+Date:   Fri, 6 Mar 2020 19:00:43 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     kbuild-all@lists.01.org, Jens Axboe <axboe@kernel.dk>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 8/8] partitions/tegra: Implement eMMC boot partitions
+ scanning
+Message-ID: <202003061845.PTOvqArZ%lkp@intel.com>
+References: <20200306021220.22097-9-digetx@gmail.com>
 MIME-Version: 1.0
-References: <20181124162123.21300-1-n.merinov@inango-systems.com>
- <20191224092119.4581-1-n.merinov@inango-systems.com> <20200108133926.GC4455@infradead.org>
- <26f7bd89f212f68b03a4b207e96d8702c9049015.1578910723.git.n.merinov@inango-systems.com>
- <20200218185336.GA14242@infradead.org> <797777312.1324734.1582544319435.JavaMail.zimbra@inango-systems.com>
- <20200224170813.GA27403@infradead.org> <711479725.2305.1583484191776.JavaMail.zimbra@inango-systems.com>
- <CAKv+Gu8ufmONSU8SX=NaAZBAKuD4Coo19z6e2MJ7BegsseJ63A@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8ufmONSU8SX=NaAZBAKuD4Coo19z6e2MJ7BegsseJ63A@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 6 Mar 2020 11:14:41 +0100
-X-Gmail-Original-Message-ID: <CAKv+Gu_22KX4q7SJxEQ_tUcWDXHrFOdFj2jmXxFR_04KawQXnA@mail.gmail.com>
-Message-ID: <CAKv+Gu_22KX4q7SJxEQ_tUcWDXHrFOdFj2jmXxFR_04KawQXnA@mail.gmail.com>
-Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID
- partition entry
-To:     Nikolai Merinov <n.merinov@inango-systems.com>
-Cc:     hch <hch@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200306021220.22097-9-digetx@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 6 Mar 2020 at 10:25, Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> On Fri, 6 Mar 2020 at 09:43, Nikolai Merinov
-> <n.merinov@inango-systems.com> wrote:
-> >
-> > Hi Christoph,
-> >
-> > Should I perform any other steps in order to get this change in the master?
-> >
->
-> I can take it via the EFI tree with an ack from Dave.
->
+Hi Dmitry,
 
-... or actually, I'm sure Dave is fine with it, so I'll just queue it
-in efi/next directly (with Christoph's ack)
+I love your patch! Perhaps something to improve:
 
->
-> >
-> > ----- Original Message -----
-> > > From: "hch" <hch@infradead.org>
-> > > To: "n merinov" <n.merinov@inango-systems.com>
-> > > Cc: "hch" <hch@infradead.org>, "Davidlohr Bueso" <dave@stgolabs.net>, "Jens Axboe" <axboe@kernel.dk>, "Ard Biesheuvel"
-> > > <ardb@kernel.org>, "linux-efi" <linux-efi@vger.kernel.org>, "linux-block" <linux-block@vger.kernel.org>, "linux-kernel"
-> > > <linux-kernel@vger.kernel.org>
-> > > Sent: Monday, February 24, 2020 10:08:13 PM
-> > > Subject: Re: [PATCH v3] partitions/efi: Fix partition name parsing in GUID partition entry
-> >
-> > > On Mon, Feb 24, 2020 at 01:38:39PM +0200, Nikolai Merinov wrote:
-> > >> Hi Christoph,
-> > >>
-> > >> > I'd rather use plain __le16 and le16_to_cpu here. Also the be
-> > >> > variants seems to be entirely unused.
-> > >>
-> > >> Looks like I misunderstood your comment from
-> > >> https://patchwork.kernel.org/patch/11309223/:
-> > >>
-> > >> > Please add a an efi_char_from_cpu or similarly named helper
-> > >> > to encapsulate this logic.
-> > >>
-> > >> The "le16_to_cpu(ptes[i].partition_name[label_count])" call is the
-> > >> full implementation of the "efi_char_from_cpu" logic. Do you want
-> > >> to encapsulate "utf16_le_to_7bit_string" logic entirely like in
-> > >> the attached version?
-> > >
-> > > I think I though of just the inner loop, but your new version looks even
-> > > better, so:
-> > >
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
+[auto build test WARNING on tegra/for-next]
+[also build test WARNING on block/for-next linus/master v5.6-rc4 next-20200305]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+
+url:    https://github.com/0day-ci/linux/commits/Dmitry-Osipenko/Introduce-NVIDIA-Tegra-Partition-Tablex/20200306-124106
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux.git for-next
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-174-g094d5a94-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> block/partitions/tegra.c:491:53: sparse: sparse: Using plain integer as NULL pointer
+
+vim +491 block/partitions/tegra.c
+
+   488	
+   489	int tegra_partition(struct parsed_partitions *state)
+   490	{
+ > 491		struct tegra_partition_table_parser ptp = { 0 };
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
