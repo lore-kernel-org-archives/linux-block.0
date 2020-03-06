@@ -1,187 +1,143 @@
-Return-Path: <SRS0=t5UG=4W=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE74DC3F2D1
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 21:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD95C3F2D7
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE66420684
-	for <linux-block@archiver.kernel.org>; Thu,  5 Mar 2020 21:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4523E2073D
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 02:13:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsCV181M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726099AbgCEVES (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Mar 2020 16:04:18 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42698 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726092AbgCEVES (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 5 Mar 2020 16:04:18 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 016C9ACC6;
-        Thu,  5 Mar 2020 21:04:15 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id EFAF41E0FC2; Thu,  5 Mar 2020 22:04:14 +0100 (CET)
-Date:   Thu, 5 Mar 2020 22:04:14 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, stable@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH] loop: avoid EAGAIN, if offset or block_size are changed
-Message-ID: <20200305210414.GA1678@quack2.suse.cz>
-References: <20190518004751.18962-1-jaegeuk@kernel.org>
+        id S1727053AbgCFCNH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Mar 2020 21:13:07 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:37382 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726958AbgCFCNG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Mar 2020 21:13:06 -0500
+Received: by mail-lf1-f66.google.com with SMTP id j11so608109lfg.4;
+        Thu, 05 Mar 2020 18:13:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=w0YlAmpluZ5D3NO8kHqv749YNcVtvXYMv+8BYDY6gX8=;
+        b=hsCV181MEGJLDvWFZgWaLAlN9Hm3d50nlxh66iesrGVhHMN/vPEJQCqd8pCEt89nZj
+         k9vnx8idWPoKXIuVKzj94SopvJdroGM4O78DMBVhgn0XUfPaF4UKLDEQCv4IYWeOZPmh
+         8p0dkM7QyNLUr6Ym7ytwv8hv8JliSDIZ/+jwgZrTIlugMk4SmZ87ieBMvaaYvUCuq1hL
+         IlCPwObpeVNxe/zYwj79BnOzV7BW2/x5vP4E3Dj5vWfR6blv6OuBfVTpb7GbrJme0S/w
+         sORm7nKocKEfJK1pp7iuUai5ACEJbonceSysClu2m1TbqtUE1pRm63UWMSu23UhVYkJs
+         QYCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=w0YlAmpluZ5D3NO8kHqv749YNcVtvXYMv+8BYDY6gX8=;
+        b=gT4zwPCFTmkmjDAQPM0J9DDlc+V/P7gjek+G8p+5Vkth7iDVT/SLM/czKRqy0+hrT9
+         myRepiC37/o5qLx7RLa6+l/YpRex/4QZ9sxJyfOWQiBVRlTU8DmqS51o7I4FwCk1IT4X
+         1/OaVe/4cxQ/FzhEDWoqF5pl3nJGiehoQLAPZdiltuy/tEnqrrpdM31eDE1sPJ0XwwGZ
+         ut+EUV+0xX0gzDZb0Bvy+1y1Gf0cyIXa4OrwNuqjd/5+2OljlEhpFaAw+wAuRqDiRNca
+         yweDBtuwCf63TMP3WqriVIn6oO5+z31k/+YN92YkOg3C2Ad0PQ/R1nwuHIitdhL3WfOm
+         cCTA==
+X-Gm-Message-State: ANhLgQ1qK1duVFinpsIWlpKPicTKoeO3iyo9/okRU5DGuqBCVspIIQD9
+        3a0ttB1lxsG7dOTXO3N/+UM=
+X-Google-Smtp-Source: ADFU+vuGmr3S9NwjJoS2M2yUJSkaF54dmtDYx9pIkC8T+YfNRrdI6CbLbMiYb5BqQbR8gHCZiMAOKw==
+X-Received: by 2002:ac2:454f:: with SMTP id j15mr416289lfm.20.1583460782961;
+        Thu, 05 Mar 2020 18:13:02 -0800 (PST)
+Received: from localhost.localdomain (94-29-39-224.dynamic.spd-mgts.ru. [94.29.39.224])
+        by smtp.gmail.com with ESMTPSA id l11sm10592772lfg.87.2020.03.05.18.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2020 18:13:02 -0800 (PST)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Stephen Warren <swarren@wwwdotorg.org>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 4/8] mmc: block: Add mmc_bdev_to_part_type() helper
+Date:   Fri,  6 Mar 2020 05:12:16 +0300
+Message-Id: <20200306021220.22097-5-digetx@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200306021220.22097-1-digetx@gmail.com>
+References: <20200306021220.22097-1-digetx@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190518004751.18962-1-jaegeuk@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 17-05-19 17:47:51, Jaegeuk Kim wrote:
-> This patch tries to avoid EAGAIN due to nrpages!=0 that was originally trying
-> to drop stale pages resulting in wrong data access.
-> 
-> Report: https://bugs.chromium.org/p/chromium/issues/detail?id=938958#c38
+NVIDIA Tegra Partition Table parser needs to know eMMC boot partition ID
+that is associated with the block device in order to validate and parse
+partition table properly. This patch adds new mmc_bdev_to_part_type()
+helper which takes block device for the input and returns a corresponding
+MMC card partition ID (part_type).
 
-...
+This is needed by tegra-partition parser in order to distinguish boot0
+eMMC partition from boot1.
 
-> ---
->  drivers/block/loop.c | 44 +++++++++++++++++---------------------------
->  1 file changed, 17 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 102d79575895..7c7d2d9c47d0 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1212,6 +1212,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  	kuid_t uid = current_uid();
->  	struct block_device *bdev;
->  	bool partscan = false;
-> +	bool drop_caches = false;
->  
->  	err = mutex_lock_killable(&loop_ctl_mutex);
->  	if (err)
-> @@ -1232,10 +1233,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  	}
->  
->  	if (lo->lo_offset != info->lo_offset ||
-> -	    lo->lo_sizelimit != info->lo_sizelimit) {
-> -		sync_blockdev(lo->lo_device);
-> -		kill_bdev(lo->lo_device);
-> -	}
-> +	    lo->lo_sizelimit != info->lo_sizelimit)
-> +		drop_caches = true;
+Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+---
+ drivers/mmc/core/block.c   | 16 ++++++++++++++++
+ include/linux/mmc/blkdev.h |  1 +
+ 2 files changed, 17 insertions(+)
 
-I don't think this solution of moving buffer cache invalidation after loop
-device is updated is really correct.
-
-If there's any dirty data in the buffer cache, god knows where it ends
-up being written after the loop device is reconfigured. Think e.g. of a
-file offset being changed. It may not be even possible to write it if say
-block size increased and we have now improperly sized buffers in the buffer
-cache...
-
-Frankly, I have rather limited sympathy to someone trying to reconfigure a
-loop device while it is in use. Is there any sane usecase? I'd be inclined
-to just use a similar trick as we did with LOOP_SET_FD and allow these
-changes only if the caller has the loop device open exclusively or we are
-able to upgrade to exclusive open. As otherwise say mounted filesystem on
-top of loop device being reconfigured is very likely to be in serious
-trouble (e.g. it's impossible to fully invalidate buffer cache in that
-case).
-
-But that's probably somewhat tangential to the problem you have. For your
-case I don't really see a race-free way to invalidate buffer cache and
-update loop configuration - the best I can see is to flush & invalidate
-the cache, freeze the bdev so that new data cannot be read into the
-buffer cache, check the cache is still empty - if yes, go ahead. If not,
-unfreeze and try again...
-
-								Honza
-
->  	/* I/O need to be drained during transfer transition */
->  	blk_mq_freeze_queue(lo->lo_queue);
-> @@ -1265,14 +1264,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  
->  	if (lo->lo_offset != info->lo_offset ||
->  	    lo->lo_sizelimit != info->lo_sizelimit) {
-> -		/* kill_bdev should have truncated all the pages */
-> -		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
-> -			err = -EAGAIN;
-> -			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-> -				__func__, lo->lo_number, lo->lo_file_name,
-> -				lo->lo_device->bd_inode->i_mapping->nrpages);
-> -			goto out_unfreeze;
-> -		}
->  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
->  			err = -EFBIG;
->  			goto out_unfreeze;
-> @@ -1317,6 +1308,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  		bdev = lo->lo_device;
->  		partscan = true;
->  	}
-> +
-> +	/* truncate stale pages cached by previous operations */
-> +	if (!err && drop_caches) {
-> +		sync_blockdev(lo->lo_device);
-> +		kill_bdev(lo->lo_device);
-> +	}
->  out_unlock:
->  	mutex_unlock(&loop_ctl_mutex);
->  	if (partscan)
-> @@ -1498,6 +1495,7 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
->  
->  static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
->  {
-> +	bool drop_caches = false;
->  	int err = 0;
->  
->  	if (lo->lo_state != Lo_bound)
-> @@ -1506,23 +1504,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
->  	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
->  		return -EINVAL;
->  
-> -	if (lo->lo_queue->limits.logical_block_size != arg) {
-> -		sync_blockdev(lo->lo_device);
-> -		kill_bdev(lo->lo_device);
-> -	}
-> +	if (lo->lo_queue->limits.logical_block_size != arg)
-> +		drop_caches = true;
->  
->  	blk_mq_freeze_queue(lo->lo_queue);
-> -
-> -	/* kill_bdev should have truncated all the pages */
-> -	if (lo->lo_queue->limits.logical_block_size != arg &&
-> -			lo->lo_device->bd_inode->i_mapping->nrpages) {
-> -		err = -EAGAIN;
-> -		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-> -			__func__, lo->lo_number, lo->lo_file_name,
-> -			lo->lo_device->bd_inode->i_mapping->nrpages);
-> -		goto out_unfreeze;
-> -	}
-> -
->  	blk_queue_logical_block_size(lo->lo_queue, arg);
->  	blk_queue_physical_block_size(lo->lo_queue, arg);
->  	blk_queue_io_min(lo->lo_queue, arg);
-> @@ -1530,6 +1515,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
->  out_unfreeze:
->  	blk_mq_unfreeze_queue(lo->lo_queue);
->  
-> +	/* truncate stale pages cached by previous operations */
-> +	if (drop_caches) {
-> +		sync_blockdev(lo->lo_device);
-> +		kill_bdev(lo->lo_device);
-> +	}
->  	return err;
->  }
->  
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 36d84a8e182c..2cee57c7388d 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -321,6 +321,22 @@ struct mmc_card *mmc_bdev_to_card(struct block_device *bdev)
+ 	return md->queue.card;
+ }
+ 
++int mmc_bdev_to_part_type(struct block_device *bdev)
++{
++	struct mmc_blk_data *md;
++	struct mmc_card *card;
++
++	card = mmc_bdev_to_card(bdev);
++	if (!card)
++		return -EINVAL;
++
++	md = mmc_blk_get(bdev->bd_disk);
++	if (!md)
++		return -EINVAL;
++
++	return md->part_type;
++}
++
+ static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct mmc_blk_data *md = mmc_blk_get(bdev->bd_disk);
+diff --git a/include/linux/mmc/blkdev.h b/include/linux/mmc/blkdev.h
+index 67608c58de70..24e73ac02b4b 100644
+--- a/include/linux/mmc/blkdev.h
++++ b/include/linux/mmc/blkdev.h
+@@ -9,5 +9,6 @@ struct block_device;
+ struct mmc_card;
+ 
+ struct mmc_card *mmc_bdev_to_card(struct block_device *bdev);
++int mmc_bdev_to_part_type(struct block_device *bdev);
+ 
+ #endif /* LINUX_MMC_BLOCK_DEVICE_H */
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.25.1
+
