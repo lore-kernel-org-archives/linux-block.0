@@ -6,69 +6,66 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32840C10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B077C10F26
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0059B20848
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:01:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42EE820848
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 14:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bEAHGGsN"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="R6D2fwgY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbgCFOBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 09:01:19 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46139 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgCFOBT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 09:01:19 -0500
-Received: by mail-io1-f67.google.com with SMTP id f3so2124911ioc.13
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 06:01:19 -0800 (PST)
+        id S1726498AbgCFOfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 09:35:45 -0500
+Received: from mail-qv1-f41.google.com ([209.85.219.41]:34074 "EHLO
+        mail-qv1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726185AbgCFOfp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 09:35:45 -0500
+Received: by mail-qv1-f41.google.com with SMTP id o18so1015665qvf.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 06:35:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AWXTIoNVi4PmeX46l4KNCpC/lKX/W4g0cGjnMBlBabQ=;
-        b=bEAHGGsNghxj8J2XZ+vEC4dVLlFBj0NK3HWR5S+2uOR9wjYWcsBPXMothiN91WUBLm
-         60wlMf2kd2Xa8o7GkPIatBTQFdzMHAnWcpeyMyWIpdv3fGSlySIif5QJKC8buBZiwuDa
-         mHs4PlCikyk6sF98eoW0eTZs/CTOnYq8bXeHujLNG2/3pXTlRvvMKZD/CcYyjLR/NSeR
-         d+1a35P7OtbRmsmbYKBhcPPodZwfrwY2EOukQFKFRQCEhVmFPcpSYHekdXFe3fapeKax
-         DMImB+ZrteJFkGFEL2TgU2+d81UvdNf0yTvCbC2kau2Tutl44MCG1zfmIGsA58FAdH3Q
-         WoNA==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=gPp/JOqSfFor2drm+SXytCIq/9gBWBTnvgG0JC6dgNM=;
+        b=R6D2fwgYCDJTLwCQ+Pv/dbaRa7A1QbxEYJ0FaGXrlUmQ0jE3K8WZZQ2+tGjrrmujzN
+         SSy0cbS/K5s9EbOvpYY+tuPSmNKsFKDYdL8jbgzxQBRWZBn3RRdpJ3kk4tvVlY6DOULE
+         nSB8pwI3jeTb7Phe1gUrVCG07Og1a7xsaUh9QuBhysVmGyRIMS96HDDBGSZCzj+mvEbo
+         qmh4WOhUeYUk5TMdC65+a7f5f8E+cbZOz5jaqlYJlZNJ71vMRGi5htZWUPvn0Zsm91Yx
+         MjFCxBtQ8deY5Y+57kwuvxdhumqCEff45QD4a7zc9VKE2UShFJXV1+ADY/u8mzaRYGKd
+         8UWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AWXTIoNVi4PmeX46l4KNCpC/lKX/W4g0cGjnMBlBabQ=;
-        b=bzUaawW1sVWxiPNCVAIwzqBmGR39e3w9RWcVQ1+uIPv8CLoveaQl1G2qJQ8t0hhk0o
-         vkQRovSLALukbCJxPoVo6FQOHE5oQIi6WHteTq9EaanOMcIMDNJILw5SNO0BI6lisukU
-         Jir7Gz5G+Iu1LvonK2BdaJNCfWEB0LLOtE+c8bck3KlPIt8J0SiENC8rVLELTidn6hVt
-         /tgBhae8mNmwgNgeSJLKNnUCJARKqXYss1Diw2lHCkNc1ZSOu+eUY9MpTvSuc1W0UirL
-         VlM2rxF72UIi4hPLFHPIoFCe0VNdDe4U7lHnGPSqfNUPYlCTmemahJ2C9yOlKVS+OnzZ
-         GZ3A==
-X-Gm-Message-State: ANhLgQ2cnHuCSF6Jc5DZt3xGz6ExaYeYbAJzFY+a/0lctplIT26VGS5F
-        2hGb1uurb0K6htBTwqEPGnPWCQ==
-X-Google-Smtp-Source: ADFU+vsnbO6wc+MqayVXq5o+cuIvNennIgyjYnSjIeTIJjHArSUhi9gqCOum4BkReUdddYI2gFw8Ng==
-X-Received: by 2002:a02:a415:: with SMTP id c21mr3058353jal.45.1583503278541;
-        Fri, 06 Mar 2020 06:01:18 -0800 (PST)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id b19sm6586986ior.43.2020.03.06.06.01.17
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=gPp/JOqSfFor2drm+SXytCIq/9gBWBTnvgG0JC6dgNM=;
+        b=ZZLTJTx1rl/8/uXYWogtiGyumr+6fzB24Q8BvcXfftYg+PuSN410Qc78VDR1GkWHB1
+         73wrAtP89b5plQhsl3ysnixV5f4HpMTc2r8XM5/VbUpTHHqQDgSAiBxF+y8tgraASrw9
+         59Bx8YFIZPtC35QlvrmY02PSchBqur0sTVYZDWiTEVi5Ubl0/UOqVod1uyh58PNrv7Bk
+         LD5P7CQZNsBTku9+7vl9K6t6EIttZlnpBTqlS5eW0PvJ/w0wGLXkFqbEVUp1fs9a1tO4
+         NLKipoznLXwuuWFwV74ggQOm7s46q+kuFHMYK2sj+A+inxq7dergbLMigjpetHJtHP61
+         EuZQ==
+X-Gm-Message-State: ANhLgQ3IEbCCSnZWsORVePXHCS6uWUuZjb3eY0UhBRc/ReKwDg1E3T2x
+        XfW0/e6gOMrZfk5O1i0vczXS/M2mUkE=
+X-Google-Smtp-Source: ADFU+vuiL+duZGFstvBs9+qO3GxDUlu6yzHhQvnhTM1IVcevwWXdla3BuQCPBcBBX3IASwIQ5PjI6A==
+X-Received: by 2002:ad4:41cf:: with SMTP id a15mr3142478qvq.125.1583505343378;
+        Fri, 06 Mar 2020 06:35:43 -0800 (PST)
+Received: from [192.168.1.106] ([107.15.81.208])
+        by smtp.gmail.com with ESMTPSA id i1sm12426803qtg.31.2020.03.06.06.35.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Mar 2020 06:01:18 -0800 (PST)
-Subject: Re: [PATCH BUGFIX] block, bfq: fix overwrite of bfq_group pointer in
- bfq_find_set_group()
-To:     Carlo Nonato <carlo.nonato95@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
-        Kwon Je Oh <kwonje.oh2@gmail.com>
-References: <20200306122731.5945-1-carlo.nonato95@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a5e49715-6098-41d5-f964-9e6c4ff5e602@kernel.dk>
-Date:   Fri, 6 Mar 2020 07:01:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Fri, 06 Mar 2020 06:35:42 -0800 (PST)
+To:     lsf-pc <lsf-pc@lists.linuxfoundation.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+From:   Josef Bacik <josef@toxicpanda.com>
+Subject: [LSFMMBPF TOPIC] Killing LSFMMBPF
+Message-ID: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
+Date:   Fri, 6 Mar 2020 09:35:41 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200306122731.5945-1-carlo.nonato95@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -76,28 +73,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/6/20 5:27 AM, Carlo Nonato wrote:
-> The bfq_find_set_group() function takes as input a blkcg (which represents
-> a cgroup) and retrieves the corresponding bfq_group, then it updates the
-> bfq internal group hierarchy (see comments inside the function for why
-> this is needed) and finally it returns the bfq_group.
-> In the hierarchy update cycle, the pointer holding the correct bfq_group
-> that has to be returned is mistakenly used to traverse the hierarchy
-> bottom to top, meaning that in each iteration it gets overwritten with the
-> parent of the current group. Since the update cycle stops at root's
-> children (depth = 2), the overwrite becomes a problem only if the blkcg
-> describes a cgroup at a hierarchy level deeper than that (depth > 2). In
-> this case the root's child that happens to be also an ancestor of the
-> correct bfq_group is returned. The main consequence is that processes
-> contained in a cgroup at depth greater than 2 are wrongly placed in the
-> group described above by BFQ.
-> 
-> This commits fixes this problem by using a different bfq_group pointer in
-> the update cycle in order to avoid the overwrite of the variable holding
-> the original group reference.
+Hello,
 
-Applied, thanks.
+This has been a topic that I've been thinking about a lot recently, mostly 
+because of the giant amount of work that has been organizing LSFMMBPF.  I was 
+going to wait until afterwards to bring it up, hoping that maybe it was just me 
+being done with the whole process and that time would give me a different 
+perspective, but recent discussions has made it clear I'm not the only one.
 
--- 
-Jens Axboe
+LSFMMBPF is not useful to me personally, and not an optimal use of the 
+communities time.  The things that we want to get out of LSFMMBPF are (generally)
+
+1) Reach consensus on any multi-subsystem contentious changes that have come up 
+over the past year.
+
+2) Inform our fellow developers of new things that we are working on that we 
+would like help with, or need to think about for the upcoming year.
+
+3) "Hallway track".  We are after all a community, and I for one like spending 
+time with developers that I don't get to interact with on a daily basis.
+
+4) Provide a way to help integrate new developers into the community with face 
+time.  It is far easier to work with people once you can put a face to a name, 
+and this is especially valuable for new developers.
+
+These are all really good goals, and why we love the idea of LSFMMBPF.  But 
+having attended these things every year for the last 13 years, it has become 
+less and less of these things, at least from my perspective.  A few problems (as 
+I see them) are
+
+1) The invitation process.  We've tried many different things, and I think we 
+generally do a good job here, but the fact is if I don't know somebody I'm not 
+going to give them a very high rating, making it difficult to actually bring in 
+new people.
+
+2) There are so many of us.  Especially with the addition of the BPF crowd we 
+are now larger than ever.  This makes problem #1 even more apparent, even if I 
+weighted some of the new people higher who's slot should they take instead?  I 
+have 0 problems finding 20 people in the FS community who should absolutely be 
+in the room.  But now I'm trying to squeeze in 1-5 extra people.  Propagate that 
+across all the tracks and now we're at an extra 20ish people.
+
+3) Half the people I want to talk to aren't even in the room.  This may be a 
+uniquely file system track problem, but most of my work is in btrfs, and I want 
+to talk to my fellow btrfs developers.  But again, we're trying to invite an 
+entire community, so many of them simply don't request invitations, or just 
+don't get invited.
+
+3) Sponsorships.  This is still the best way to get to all of the core 
+developers, so we're getting more and more sponsors in order to buy their slots 
+to get access to people.  This is working as intended, and I'm not putting down 
+our awesome sponsors, but this again adds to the amount of people that are 
+showing up at what is supposed to be a working conference.
+
+4) Presentations.  90% of the conference is 1-2 people standing at the front of 
+the room, talking to a room of 20-100 people, with only a few people in the 
+audience who cares.  We do our best to curate the presentations so we're not 
+wasting peoples time, but in the end I don't care what David Howells is doing 
+with mount, I trust him to do the right thing and he really just needs to trap 
+Viro in a room to work it out, he doesn't need all of us.
+
+5) Actually planning this thing.  I have been on the PC for at least the last 5 
+years, and this year I'm running the whole thing.  We specifically laid out 
+plans to rotate in new blood so this sort of thing stopped happening, and this 
+year we've done a good job of that.  However it is a giant amount of work for 
+anybody involved, especially for the whole conference chair.  Add in something 
+like COVID-19 to the mix and now I just want to burn the whole thing to the 
+ground.  Planning this thing is not free, it does require work and effort.
+
+So what do I propose?  I propose we kill LSFMMBPF.
+
+Many people have suggested this elsewhere, but I think we really need to 
+seriously consider it.  Most of us all go to the Linux Plumbers conference.  We 
+could accomplish our main goals with Plumbers without having to deal with all of 
+the above problems.
+
+1) The invitation process.  This goes away.  The people/companies that want to 
+discuss things with the rest of us can all get to plumbers the normal way.  We 
+get new blood that we may miss through the invitation process because they can 
+simply register for Plumbers on their own.
+
+2) Presentations.  We can have track miniconfs where we still curate talks, but 
+there could be much less of them and we could just use the time to do what 
+LSFMMBPF was meant to do, put us all in a room so we can hack on things together.
+
+3) BOFs.  Now all of the xfs/btrfs/ext4 guys can show up, because again they 
+don't have to worry about some invitation process, and now real meetings can 
+happen between people that really want to talk to each other face to face.
+
+4) Planning becomes much simpler.  I've organized miniconf's at plumbers before, 
+it is far simpler than LSFMMBPF.  You only have to worry about one thing, is 
+this presentation useful.  I no longer have to worry about am I inviting the 
+right people, do we have enough money to cover the space.  Is there enough space 
+for everybody?  Etc.
+
+I think this is worth a discussion at the very least.  Maybe killing LSFMMBPF is 
+too drastic, maybe there are some other ideas that would address the same 
+problems.  I'd love to hear the whole communities thoughts on this, because 
+after all this is supposed to be a community event, and we should all be heard. 
+Thanks,
 
