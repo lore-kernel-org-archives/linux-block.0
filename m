@@ -2,91 +2,113 @@ Return-Path: <SRS0=yWSg=4X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E32CBC10DCE
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B037C10DCE
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:12:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF8EC20726
-	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:01:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AC5C2073B
+	for <linux-block@archiver.kernel.org>; Fri,  6 Mar 2020 11:12:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726257AbgCFLBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 06:01:13 -0500
-Received: from mga09.intel.com ([134.134.136.24]:30780 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726069AbgCFLBM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Mar 2020 06:01:12 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2020 03:01:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,521,1574150400"; 
-   d="scan'208";a="287944100"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Mar 2020 03:01:09 -0800
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1jAAj6-000Gjf-Kx; Fri, 06 Mar 2020 19:01:08 +0800
-Date:   Fri, 6 Mar 2020 19:00:43 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     kbuild-all@lists.01.org, Jens Axboe <axboe@kernel.dk>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 8/8] partitions/tegra: Implement eMMC boot partitions
- scanning
-Message-ID: <202003061845.PTOvqArZ%lkp@intel.com>
-References: <20200306021220.22097-9-digetx@gmail.com>
+        id S1726140AbgCFLMM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 06:12:12 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2514 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726129AbgCFLMM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Mar 2020 06:12:12 -0500
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 207A84D45544E5D3D868;
+        Fri,  6 Mar 2020 11:12:10 +0000 (GMT)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Fri, 6 Mar 2020 11:12:09 +0000
+Received: from [127.0.0.1] (10.202.226.45) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Fri, 6 Mar 2020
+ 11:12:09 +0000
+Subject: Re: [PATCH RFC v6 06/10] scsi: Add template flag 'host_tagset'
+To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hare@suse.de>, <don.brace@microsemi.com>,
+        <sumit.saxena@broadcom.com>, <hch@infradead.org>,
+        <kashyap.desai@broadcom.com>,
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
+ <1583409280-158604-7-git-send-email-john.garry@huawei.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f59950ce-9813-3811-d903-75ef493e2d4a@huawei.com>
+Date:   Fri, 6 Mar 2020 11:12:08 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200306021220.22097-9-digetx@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1583409280-158604-7-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.45]
+X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Dmitry,
+On 05/03/2020 11:54, John Garry wrote:
+> From: Hannes Reinecke <hare@suse.com>
+> 
+> Add a host template flag 'host_tagset' so hostwide tagset can be
+> shared on multiple reply queues after the SCSI device's reply queue
+> is converted to blk-mq hw queue.
 
-I love your patch! Perhaps something to improve:
+We should also change the comment about Scsi_host.nr_hw_queues in 
+include/scsi/scsi_host.h also, like this:
 
-[auto build test WARNING on tegra/for-next]
-[also build test WARNING on block/for-next linus/master v5.6-rc4 next-20200305]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+* Note: it is assumed that each hardware queue has a queue depth of
+* can_queue. In other words, the total queue depth per host
+-* is nr_hw_queues * can_queue.
++* is nr_hw_queues * can_queue. However, in the case of .host_tagset
++* being set, the total queue depth per host is can_queue.
 
-url:    https://github.com/0day-ci/linux/commits/Dmitry-Osipenko/Introduce-NVIDIA-Tegra-Partition-Tablex/20200306-124106
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tegra/linux.git for-next
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-174-g094d5a94-dirty
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+>   drivers/scsi/scsi_lib.c  | 2 ++
+>   include/scsi/scsi_host.h | 3 +++
+>   2 files changed, 5 insertions(+)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 610ee41fa54c..84788ccc2672 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1901,6 +1901,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>   	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>   	shost->tag_set.flags |=
+>   		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
+> +	if (shost->hostt->host_tagset)
+> +		shost->tag_set.flags |= BLK_MQ_F_TAG_HCTX_SHARED;
+>   	shost->tag_set.driver_data = shost;
+>   
+>   	return blk_mq_alloc_tag_set(&shost->tag_set);
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index f577647bf5f2..4fd0af0883dd 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -429,6 +429,9 @@ struct scsi_host_template {
+>   	/* True if the low-level driver supports blk-mq only */
+>   	unsigned force_blk_mq:1;
+>   
+> +	/* True if the host uses host-wide tagspace */
+> +	unsigned host_tagset:1;
+> +
+>   	/*
+>   	 * Countdown for host blocking with no commands outstanding.
+>   	 */
+> 
 
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> block/partitions/tegra.c:491:53: sparse: sparse: Using plain integer as NULL pointer
-
-vim +491 block/partitions/tegra.c
-
-   488	
-   489	int tegra_partition(struct parsed_partitions *state)
-   490	{
- > 491		struct tegra_partition_table_parser ptp = { 0 };
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
