@@ -2,115 +2,115 @@ Return-Path: <SRS0=wE/y=4Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0A1C3F2C6
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E620C10F00
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:14:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7DF12075A
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:12:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50A6D2073C
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:14:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="lILO1w8M";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="lILO1w8M"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="q2ezQDl6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726139AbgCGTMW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Mar 2020 14:12:22 -0500
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:48764 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726116AbgCGTMV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 7 Mar 2020 14:12:21 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id D37C58EE0FD;
-        Sat,  7 Mar 2020 11:12:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1583608340;
-        bh=OTExqST3EIQqKYzie7fnIaR9F29Rbki864Xhub7443Q=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=lILO1w8M5X5MwVyf0UEV37EwwviKKsvMyy4/5iphxqtCwYMOHDpAIjCX1N3HBcACW
-         paVYE2nnpzAA6emW6A2rS2m1Ngr4nuk0SD5mL3oP0zYojh+pQUZsbn82C/A2ycnNej
-         EUvA3YXNlXdt1T6udIPdWAR2Rz05afODy1IufW54=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id jvVAu3loizWQ; Sat,  7 Mar 2020 11:12:20 -0800 (PST)
-Received: from [153.66.254.194] (unknown [50.35.76.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id E099B8EE0D7;
-        Sat,  7 Mar 2020 11:12:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1583608340;
-        bh=OTExqST3EIQqKYzie7fnIaR9F29Rbki864Xhub7443Q=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=lILO1w8M5X5MwVyf0UEV37EwwviKKsvMyy4/5iphxqtCwYMOHDpAIjCX1N3HBcACW
-         paVYE2nnpzAA6emW6A2rS2m1Ngr4nuk0SD5mL3oP0zYojh+pQUZsbn82C/A2ycnNej
-         EUvA3YXNlXdt1T6udIPdWAR2Rz05afODy1IufW54=
-Message-ID: <1583608338.20291.28.camel@HansenPartnership.com>
-Subject: Re: [LSFMMBPF TOPIC] LSFMMBPF 2020 COVID-19 status update
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        lsf-pc <lsf-pc@lists.linuxfoundation.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-Date:   Sat, 07 Mar 2020 11:12:18 -0800
-In-Reply-To: <20200307185420.GG2236@42.do-not-panic.com>
-References: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
-         <20200306155611.GA167883@mit.edu>
-         <20200307185420.GG2236@42.do-not-panic.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
+        id S1726180AbgCGTOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Mar 2020 14:14:18 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:51811 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726138AbgCGTOS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Mar 2020 14:14:18 -0500
+Received: by mail-pj1-f66.google.com with SMTP id l8so2523113pjy.1
+        for <linux-block@vger.kernel.org>; Sat, 07 Mar 2020 11:14:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=0PJ7lqAt0N6ePb+6DkzQ8KhyWW4ojoGxpG4tp/+VjeI=;
+        b=q2ezQDl6qPppxhXDYAOTmDrcIRbCbFkfOB4mJou9K6OUUScCxQGdnJfDW5a9BC2R7O
+         g0trPtqAPXsbeOa9gngyXkaTWercbZTlqDL7HOQbRJaU5OT2pG0j094Wd9DMS/kZ7/F5
+         dz4oZ8JEVmNVrB7UCgimbcCnO3XgB7FDvvwzMHiqFs30mWLmjVmSTQaA3t7SSPorW41N
+         zPOLfCA5FLnMzg2hKocUDdVnKYSfm39x7Gc/ExD8nGPGsRqytRfEHXRC1mePwzSU57VO
+         /3CK0W8GINE6u4yjKTgHNu6Kg7cZODgCaEtCEhKF7FKtgFWAoUqF9jo99yTWEk5/qJMa
+         NOhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=0PJ7lqAt0N6ePb+6DkzQ8KhyWW4ojoGxpG4tp/+VjeI=;
+        b=rbWVuJ4jAmmH06mncNa2A8C+0vB6M2guUh5M7peT4z4gpLKBLqi19UtbMVDtW0l+j6
+         15ks/7hye1iTNXdVeDuju4iHFDK/YUtfSy1uiac9dz3rFYK301SI/zJy7bYlXRExToIh
+         6p1KYhS7O4CfzXJzsADu3sIzEEQrtTDMPDBfGURKXRPPZUVYhg+kCIn2SHOB3GNsG0wx
+         fEUBjuEuKijKcXpYDIftMjjaM2XEHgJ3OEJHNE3EaiLD2e0Wy0veusIP4dIN+1M8oXXz
+         vwrl9RGjjCaGI7flisFYmNWVhCV4rEbJn1UYDEsbT3d2v10xz6DquBp2YKilpE4HLl4x
+         +wNA==
+X-Gm-Message-State: ANhLgQ2Tm5goIbcR0/O+aVV+UGqrmzlTDDc9v6KiyCy5RSTijplRGBO+
+        J1eQ1DxeyTpomhyBeuTpW//N3f0hTlc=
+X-Google-Smtp-Source: ADFU+vtSGXymYu0V6H6KvLk+hwyl48mhWC3b/KczWAM7XFvFRi6VNKLBqJMsHlRjJRwH+/PWlP8SQw==
+X-Received: by 2002:a17:90a:1596:: with SMTP id m22mr9984759pja.73.1583608455557;
+        Sat, 07 Mar 2020 11:14:15 -0800 (PST)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id r24sm14455457pfg.61.2020.03.07.11.14.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 07 Mar 2020 11:14:15 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.6-rc
+Message-ID: <fa40d7d0-75b7-b30d-7f00-4346c33dd17e@kernel.dk>
+Date:   Sat, 7 Mar 2020 12:14:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 2020-03-07 at 18:54 +0000, Luis Chamberlain wrote:
-> On Fri, Mar 06, 2020 at 10:56:11AM -0500, Theodore Y. Ts'o wrote:
-> > Should we have LSF/MM/BPF in 2020 and COVID-19?
-[...]
-> If we have to learn from efforts required to continue on with the in
-> light of the risks, we can look at what SCALE 18 is doing, taking
-> place right now in Pasadena [1], their page lists a list of proactive
-> measures required on their part to help alleviate fears and just good
-> best practices at this point in time.
+Hi Linus,
 
-I agree Scale18x is the poster child for following WHO advice to the
-letter, but there are crucial differences:
+Here are a few fixes that should go into this release. This pull request
+contains:
 
-   1. Scale18x has a lot of local attendees, so the conference can go
-      ahead somewhat easily with local content and local attendees.  We
-      have no-one for LSF/MM/BPF in Palm Springs.
-   2. Scale18x did have some issues with non-local content because of
-      corporate travel bans.  The whole of LSF/MM/BPF is non-local content
-      and would thus be significantly disrupted.
+- Revert of a bad bcache patch from this merge window
 
-The big problem with 2. is that a lot of corporate policies at the
-moment are unconsidered blanket bans.  Even corporations who do
-consider better might still be stricter than the WHO advice.  So my
-company, IBM, is saying events >1000 cancel and events <1000 use your
-own discretion provided they're promising to obey all the health
-guidelines.  If I'd been presenting at Scale18x I'd have had to cancel,
-even though under our guidelines I can still go to LSF/MM/BPF
+- Removed unused function (Daniel)
 
-> The landscape seems positive, if we want, to move forward in Palm
-> Springs then.
+- Fixup for the blktrace fix from Jan from this release (Cengiz)
 
-For a counter example, just look at the LF Member summit which was due
-to happen just after Scale18x:
+- Fix of deeper level bfqq overwrite in BFQ (Carlo)
 
-https://events.linuxfoundation.org/lf-member-summit/
+Please pull!
 
-and that's a smaller event than Scale18x.  Remember too that the LF
-runs LSF/MM so if they decide to cancel, there's not much the
-organizing committee can do about it.
 
-James
+  git://git.kernel.dk/linux-block.git tags/block-5.6-2020-03-07
+
+
+----------------------------------------------------------------
+Carlo Nonato (1):
+      block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()
+
+Cengiz Can (1):
+      blktrace: fix dereference after null check
+
+Daniel Wagner (1):
+      block: Remove used kblockd_schedule_work_on()
+
+Jens Axboe (1):
+      Revert "bcache: ignore pending signals when creating gc and allocator thread"
+
+ block/bfq-cgroup.c        |  9 +++++----
+ block/blk-core.c          |  6 ------
+ drivers/md/bcache/alloc.c | 18 ++----------------
+ drivers/md/bcache/btree.c | 13 -------------
+ include/linux/blkdev.h    |  1 -
+ kernel/trace/blktrace.c   |  5 ++++-
+ 6 files changed, 11 insertions(+), 41 deletions(-)
+
+-- 
+Jens Axboe
 
