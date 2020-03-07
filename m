@@ -2,115 +2,68 @@ Return-Path: <SRS0=wE/y=4Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E620C10F00
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0655FC3F2C6
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 20:25:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50A6D2073C
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 19:14:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="q2ezQDl6"
+	by mail.kernel.org (Postfix) with ESMTP id CFFD22073C
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 20:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583612707;
+	bh=wjlzMUKw+o2Kj+Ks3J2doyQ5SEaGG9RrxTJNbSvHOSY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=xRQ/uv7M0v4UerqUEjFSIGeF6uED3KufyYxnsZPX3NN2t6Ukrl43mIvKjcFQXQulh
+	 nh8/ZFWtlnP0L89PsXH1r/Wze+4QlzowZnjElAebgjKyZhP0fIK3XYBLhno1+/8GSE
+	 mN0SPS3rcCmVNaJJ2PzdkK+ZoVFoyr09cjU1/zzg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726180AbgCGTOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Mar 2020 14:14:18 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:51811 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbgCGTOS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Mar 2020 14:14:18 -0500
-Received: by mail-pj1-f66.google.com with SMTP id l8so2523113pjy.1
-        for <linux-block@vger.kernel.org>; Sat, 07 Mar 2020 11:14:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=0PJ7lqAt0N6ePb+6DkzQ8KhyWW4ojoGxpG4tp/+VjeI=;
-        b=q2ezQDl6qPppxhXDYAOTmDrcIRbCbFkfOB4mJou9K6OUUScCxQGdnJfDW5a9BC2R7O
-         g0trPtqAPXsbeOa9gngyXkaTWercbZTlqDL7HOQbRJaU5OT2pG0j094Wd9DMS/kZ7/F5
-         dz4oZ8JEVmNVrB7UCgimbcCnO3XgB7FDvvwzMHiqFs30mWLmjVmSTQaA3t7SSPorW41N
-         zPOLfCA5FLnMzg2hKocUDdVnKYSfm39x7Gc/ExD8nGPGsRqytRfEHXRC1mePwzSU57VO
-         /3CK0W8GINE6u4yjKTgHNu6Kg7cZODgCaEtCEhKF7FKtgFWAoUqF9jo99yTWEk5/qJMa
-         NOhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=0PJ7lqAt0N6ePb+6DkzQ8KhyWW4ojoGxpG4tp/+VjeI=;
-        b=rbWVuJ4jAmmH06mncNa2A8C+0vB6M2guUh5M7peT4z4gpLKBLqi19UtbMVDtW0l+j6
-         15ks/7hye1iTNXdVeDuju4iHFDK/YUtfSy1uiac9dz3rFYK301SI/zJy7bYlXRExToIh
-         6p1KYhS7O4CfzXJzsADu3sIzEEQrtTDMPDBfGURKXRPPZUVYhg+kCIn2SHOB3GNsG0wx
-         fEUBjuEuKijKcXpYDIftMjjaM2XEHgJ3OEJHNE3EaiLD2e0Wy0veusIP4dIN+1M8oXXz
-         vwrl9RGjjCaGI7flisFYmNWVhCV4rEbJn1UYDEsbT3d2v10xz6DquBp2YKilpE4HLl4x
-         +wNA==
-X-Gm-Message-State: ANhLgQ2Tm5goIbcR0/O+aVV+UGqrmzlTDDc9v6KiyCy5RSTijplRGBO+
-        J1eQ1DxeyTpomhyBeuTpW//N3f0hTlc=
-X-Google-Smtp-Source: ADFU+vtSGXymYu0V6H6KvLk+hwyl48mhWC3b/KczWAM7XFvFRi6VNKLBqJMsHlRjJRwH+/PWlP8SQw==
-X-Received: by 2002:a17:90a:1596:: with SMTP id m22mr9984759pja.73.1583608455557;
-        Sat, 07 Mar 2020 11:14:15 -0800 (PST)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id r24sm14455457pfg.61.2020.03.07.11.14.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Mar 2020 11:14:15 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.6-rc
-Message-ID: <fa40d7d0-75b7-b30d-7f00-4346c33dd17e@kernel.dk>
-Date:   Sat, 7 Mar 2020 12:14:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726138AbgCGUZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Mar 2020 15:25:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40788 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726174AbgCGUZF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 7 Mar 2020 15:25:05 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.6-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583612705;
+        bh=wjlzMUKw+o2Kj+Ks3J2doyQ5SEaGG9RrxTJNbSvHOSY=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=GZtWiGo4q4nZ5vT2itQNrxmBFKUUG3JlsjPnTLho2YZHYGlx1BsCHY8WQsKGdl/bW
+         2rgsvUfuhN+zv9Yq9ivMCzgP2zJtpo60uUj83KIxs6Z1wAQ0mS9HwzhVR0pbb+NwdK
+         yIAoel25Y8F6+ZKQ6nAPbqoaKcJWbpStZEbgeBUg=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <fa40d7d0-75b7-b30d-7f00-4346c33dd17e@kernel.dk>
+References: <fa40d7d0-75b7-b30d-7f00-4346c33dd17e@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <fa40d7d0-75b7-b30d-7f00-4346c33dd17e@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.6-2020-03-07
+X-PR-Tracked-Commit-Id: 14afc59361976c0ba39e3a9589c3eaa43ebc7e1d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5dfcc13902bfb6d252b84e234bfc4cdba76c1069
+Message-Id: <158361270525.17903.18326796371824410936.pr-tracker-bot@kernel.org>
+Date:   Sat, 07 Mar 2020 20:25:05 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+The pull request you sent on Sat, 7 Mar 2020 12:14:14 -0700:
 
-Here are a few fixes that should go into this release. This pull request
-contains:
+> git://git.kernel.dk/linux-block.git tags/block-5.6-2020-03-07
 
-- Revert of a bad bcache patch from this merge window
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5dfcc13902bfb6d252b84e234bfc4cdba76c1069
 
-- Removed unused function (Daniel)
-
-- Fixup for the blktrace fix from Jan from this release (Cengiz)
-
-- Fix of deeper level bfqq overwrite in BFQ (Carlo)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/block-5.6-2020-03-07
-
-
-----------------------------------------------------------------
-Carlo Nonato (1):
-      block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()
-
-Cengiz Can (1):
-      blktrace: fix dereference after null check
-
-Daniel Wagner (1):
-      block: Remove used kblockd_schedule_work_on()
-
-Jens Axboe (1):
-      Revert "bcache: ignore pending signals when creating gc and allocator thread"
-
- block/bfq-cgroup.c        |  9 +++++----
- block/blk-core.c          |  6 ------
- drivers/md/bcache/alloc.c | 18 ++----------------
- drivers/md/bcache/btree.c | 13 -------------
- include/linux/blkdev.h    |  1 -
- kernel/trace/blktrace.c   |  5 ++++-
- 6 files changed, 11 insertions(+), 41 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
