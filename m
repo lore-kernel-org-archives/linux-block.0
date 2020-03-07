@@ -2,184 +2,124 @@ Return-Path: <SRS0=wE/y=4Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3100C10F25
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 03:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4839BC10F00
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 03:54:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7327D2070E
-	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 03:14:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWZbawBN"
+	by mail.kernel.org (Postfix) with ESMTP id 2661F206D7
+	for <linux-block@archiver.kernel.org>; Sat,  7 Mar 2020 03:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726259AbgCGDOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Mar 2020 22:14:48 -0500
-Received: from mail-yw1-f48.google.com ([209.85.161.48]:37876 "EHLO
-        mail-yw1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726245AbgCGDOs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 22:14:48 -0500
-Received: by mail-yw1-f48.google.com with SMTP id i1so39350ywf.4;
-        Fri, 06 Mar 2020 19:14:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aZEHHT6lAR6svoMasB13SgNuVP0MyXR1N2GanpY6GnE=;
-        b=JWZbawBN+AvkFClWdbF9gaYKLkGD+MiEj3bA/grN4IT7mezq5F8r8qyrWuvH6DJyAd
-         k1NpQCsqIzkRn9yPsH7Yt8jY6O+71AS5vYRqRTcjD9ZuSjjUa0Dq6pQ2H8laXyATOUn4
-         HDg3yOA6C1H/+qoRlczbbGnt8ThWPfmV7uou6jiw5aHaPE6PoI/3We+RpiizN1/ESjcL
-         r7hk4JX7OuGRu/yyiT8TsP3RACXbcBqTVhtszcj3LwEqlv5s0eyvNg9YlT8/gwkCK+g6
-         UX4A8E+EWrVbzDefMxHkx4JoOPQgmLWDNTMe/zVW6gO+T7/z4pQ43Od8UewolW59znzh
-         8SjQ==
+        id S1726397AbgCGDyO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Mar 2020 22:54:14 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:49014 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbgCGDyO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Mar 2020 22:54:14 -0500
+Received: by mail-io1-f72.google.com with SMTP id z12so2849710iom.15
+        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2020 19:54:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aZEHHT6lAR6svoMasB13SgNuVP0MyXR1N2GanpY6GnE=;
-        b=BNi/rN9ER2qDm+OaS7WiJgvRklTBDya5H/vIsEXFuDkDricUby8+Xfr57pjdYwggoV
-         Y3Pjvi4ov41834qmZ0HMx/YTvWT/DA0gimA+YM89tIluDsB8SPOuGb3Gq/RsvYBndcXQ
-         OM8BlMHtmI9itzZArvBCzyKgSoVPqH/iKU14IOfw20/DaAPMnPUKyapqtxIrNnUA52aR
-         s0p0ZvMzN3TyflEA3NqjOzWLwPIiZEpHmfa2RaDtkpARGddBY81goHze1RCzdsiJ1pIU
-         ROj9n1r5/B8dZ/9aGLhwHCFmLm1UJeG5p9nhtYwFfF34Zxtl7OG3+kRkqGXnCgQbrb/F
-         vrDw==
-X-Gm-Message-State: ANhLgQ146Nf20Tlal6AhQrE1UCmKOWfRKppLRA11HyGnpDdmupYmgP2m
-        p25oRVgVBXZ+He7fde1SnB5EHJbREEsMppgzDIgrnYNh
-X-Google-Smtp-Source: ADFU+vv1lbhShZquHVK69ApmFg8EyJmgI9xs6Kpib/27Oz8EplISUurSto5A/rirLzgeUMlkWQzIJWqDS4ECqgOsgQA=
-X-Received: by 2002:a25:e805:: with SMTP id k5mr7218096ybd.14.1583550886710;
- Fri, 06 Mar 2020 19:14:46 -0800 (PST)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=esyWbH1Gj/R54x9zfOlnXI9LhxcAna8EcNnnF2nLEZs=;
+        b=HXjFl+tXZujsePIU5jADqXqmP5TbT4pbxu+5jc3fqx6JcAM5/4LUQMmyWtsWcCUgT8
+         GhGjhSYaqz5bAIU7PWItFnALMA641sfdaIcAfglMGr1vb3V5glKe2IQVbA5mtmFddsSS
+         Qn3XG2arA7hDiE2I7RFUDh3ZvfhHLYBnUbql+v3mV1GgYHt+sGco+vgUi1PLPHtuwJCb
+         gGc9MARkexzpNyDm67e81b/fCeulvwUi0BKwcsMJ45qTIaJ01O+CxpUs0sF7HDGp2sKm
+         lQ+xHh/IOvHF58ysqyoa9Qty680wLPpdPm7Oc6+dB5/yhZw9QpazQxwPMqX2IWaBAZxi
+         hcUg==
+X-Gm-Message-State: ANhLgQ1RELdy5QDda+Y/NArQ5owUsAUsRS0sFiOgVieI23ysA6HcSLff
+        V5EiN/YH/7erwOhFevTbyYadSyKToU7KjGPtGhBdOBpZvvha
+X-Google-Smtp-Source: ADFU+vvMTAoPYSJdt0NqjeATWdk3ATQuBZJY8iF7dnyUzRDhkPyMGfMUAN60SOi43wEZNbEKenUPvO9/8JJD9SkaCKNsAwL1rAdJ
 MIME-Version: 1.0
-References: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
-In-Reply-To: <b506a373-c127-b92e-9824-16e8267fc910@toxicpanda.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 6 Mar 2020 21:14:35 -0600
-Message-ID: <CAH2r5ms6epOL0sXRfNNTM_J=K-dnGYNS_wK1rgw1VBqipM6kxQ@mail.gmail.com>
-Subject: Re: [LSFMMBPF TOPIC] Killing LSFMMBPF
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     lsf-pc <lsf-pc@lists.linuxfoundation.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>, bpf@vger.kernel.org,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>
+X-Received: by 2002:a5d:905a:: with SMTP id v26mr5532361ioq.77.1583553253718;
+ Fri, 06 Mar 2020 19:54:13 -0800 (PST)
+Date:   Fri, 06 Mar 2020 19:54:13 -0800
+In-Reply-To: <000000000000d5529b05a03b2251@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002bc0ca05a03bb963@google.com>
+Subject: Re: general protection fault in __loop_clr_fd
+From:   syzbot <syzbot+3967212746d25888b189@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't forget about Vault - there were some very useful hallway
-discussions at Vault this year as well ... even if a bit smaller than
-it should be ...
+syzbot has found a reproducer for the following crash on:
 
-On Fri, Mar 6, 2020 at 8:36 AM Josef Bacik <josef@toxicpanda.com> wrote:
->
-> Hello,
->
-> This has been a topic that I've been thinking about a lot recently, mostly
-> because of the giant amount of work that has been organizing LSFMMBPF.  I was
-> going to wait until afterwards to bring it up, hoping that maybe it was just me
-> being done with the whole process and that time would give me a different
-> perspective, but recent discussions has made it clear I'm not the only one.
->
-> LSFMMBPF is not useful to me personally, and not an optimal use of the
-> communities time.  The things that we want to get out of LSFMMBPF are (generally)
->
-> 1) Reach consensus on any multi-subsystem contentious changes that have come up
-> over the past year.
->
-> 2) Inform our fellow developers of new things that we are working on that we
-> would like help with, or need to think about for the upcoming year.
->
-> 3) "Hallway track".  We are after all a community, and I for one like spending
-> time with developers that I don't get to interact with on a daily basis.
->
-> 4) Provide a way to help integrate new developers into the community with face
-> time.  It is far easier to work with people once you can put a face to a name,
-> and this is especially valuable for new developers.
->
-> These are all really good goals, and why we love the idea of LSFMMBPF.  But
-> having attended these things every year for the last 13 years, it has become
-> less and less of these things, at least from my perspective.  A few problems (as
-> I see them) are
->
-> 1) The invitation process.  We've tried many different things, and I think we
-> generally do a good job here, but the fact is if I don't know somebody I'm not
-> going to give them a very high rating, making it difficult to actually bring in
-> new people.
->
-> 2) There are so many of us.  Especially with the addition of the BPF crowd we
-> are now larger than ever.  This makes problem #1 even more apparent, even if I
-> weighted some of the new people higher who's slot should they take instead?  I
-> have 0 problems finding 20 people in the FS community who should absolutely be
-> in the room.  But now I'm trying to squeeze in 1-5 extra people.  Propagate that
-> across all the tracks and now we're at an extra 20ish people.
->
-> 3) Half the people I want to talk to aren't even in the room.  This may be a
-> uniquely file system track problem, but most of my work is in btrfs, and I want
-> to talk to my fellow btrfs developers.  But again, we're trying to invite an
-> entire community, so many of them simply don't request invitations, or just
-> don't get invited.
->
-> 3) Sponsorships.  This is still the best way to get to all of the core
-> developers, so we're getting more and more sponsors in order to buy their slots
-> to get access to people.  This is working as intended, and I'm not putting down
-> our awesome sponsors, but this again adds to the amount of people that are
-> showing up at what is supposed to be a working conference.
->
-> 4) Presentations.  90% of the conference is 1-2 people standing at the front of
-> the room, talking to a room of 20-100 people, with only a few people in the
-> audience who cares.  We do our best to curate the presentations so we're not
-> wasting peoples time, but in the end I don't care what David Howells is doing
-> with mount, I trust him to do the right thing and he really just needs to trap
-> Viro in a room to work it out, he doesn't need all of us.
->
-> 5) Actually planning this thing.  I have been on the PC for at least the last 5
-> years, and this year I'm running the whole thing.  We specifically laid out
-> plans to rotate in new blood so this sort of thing stopped happening, and this
-> year we've done a good job of that.  However it is a giant amount of work for
-> anybody involved, especially for the whole conference chair.  Add in something
-> like COVID-19 to the mix and now I just want to burn the whole thing to the
-> ground.  Planning this thing is not free, it does require work and effort.
->
-> So what do I propose?  I propose we kill LSFMMBPF.
->
-> Many people have suggested this elsewhere, but I think we really need to
-> seriously consider it.  Most of us all go to the Linux Plumbers conference.  We
-> could accomplish our main goals with Plumbers without having to deal with all of
-> the above problems.
->
-> 1) The invitation process.  This goes away.  The people/companies that want to
-> discuss things with the rest of us can all get to plumbers the normal way.  We
-> get new blood that we may miss through the invitation process because they can
-> simply register for Plumbers on their own.
->
-> 2) Presentations.  We can have track miniconfs where we still curate talks, but
-> there could be much less of them and we could just use the time to do what
-> LSFMMBPF was meant to do, put us all in a room so we can hack on things together.
->
-> 3) BOFs.  Now all of the xfs/btrfs/ext4 guys can show up, because again they
-> don't have to worry about some invitation process, and now real meetings can
-> happen between people that really want to talk to each other face to face.
->
-> 4) Planning becomes much simpler.  I've organized miniconf's at plumbers before,
-> it is far simpler than LSFMMBPF.  You only have to worry about one thing, is
-> this presentation useful.  I no longer have to worry about am I inviting the
-> right people, do we have enough money to cover the space.  Is there enough space
-> for everybody?  Etc.
->
-> I think this is worth a discussion at the very least.  Maybe killing LSFMMBPF is
-> too drastic, maybe there are some other ideas that would address the same
-> problems.  I'd love to hear the whole communities thoughts on this, because
-> after all this is supposed to be a community event, and we should all be heard.
-> Thanks,
->
+HEAD commit:    770fbb32 Add linux-next specific files for 20200228
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=141e2ae3e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=576314276bce4ad5
+dashboard link: https://syzkaller.appspot.com/bug?extid=3967212746d25888b189
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=177ae1fde00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178fdfa1e00000
 
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+3967212746d25888b189@syzkaller.appspotmail.com
 
--- 
-Thanks,
+general protection fault, probably for non-canonical address 0xdffffc0000000021: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000108-0x000000000000010f]
+CPU: 0 PID: 10149 Comm: blkid Not tainted 5.6.0-rc3-next-20200228-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:workqueue_sysfs_unregister kernel/workqueue.c:5691 [inline]
+RIP: 0010:destroy_workqueue+0x2e/0x6b0 kernel/workqueue.c:4351
+Code: 49 89 fe 41 55 41 54 55 53 48 83 ec 08 e8 8a 6a 26 00 49 8d be 08 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 e0 05 00 00 49 8b 9e 08 01 00 00 48 85 db 74 19
+RSP: 0018:ffffc90002f27c30 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000002 RCX: 0000000000000000
+RDX: 0000000000000021 RSI: ffffffff814c2af6 RDI: 0000000000000108
+RBP: ffff8882189978f0 R08: ffff888096c505c0 R09: fffffbfff185270a
+R10: fffffbfff1852709 R11: ffffffff8c29384f R12: ffff888218997800
+R13: ffff88808dc478a0 R14: 0000000000000000 R15: ffff88808dc47680
+FS:  00007fd99f56e740(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f3095dcd000 CR3: 00000000a4478000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ loop_unprepare_queue drivers/block/loop.c:891 [inline]
+ __loop_clr_fd+0x185/0x1280 drivers/block/loop.c:1210
+ lo_release+0x1ad/0x1e7 drivers/block/loop.c:1928
+ __blkdev_put+0x509/0x690 fs/block_dev.c:1896
+ blkdev_close+0x86/0xb0 fs/block_dev.c:1965
+ __fput+0x2da/0x850 fs/file_table.c:280
+ task_work_run+0x13f/0x1b0 kernel/task_work.c:113
+ tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+ exit_to_usermode_loop+0x2fa/0x360 arch/x86/entry/common.c:165
+ prepare_exit_to_usermode arch/x86/entry/common.c:196 [inline]
+ syscall_return_slowpath arch/x86/entry/common.c:279 [inline]
+ do_syscall_64+0x672/0x790 arch/x86/entry/common.c:305
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x7fd99ee762b0
+Code: 40 75 0b 31 c0 48 83 c4 08 e9 0c ff ff ff 48 8d 3d c5 32 08 00 e8 c0 07 02 00 83 3d 45 a3 2b 00 00 75 10 b8 03 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 ce 8a 01 00 48 89 04 24
+RSP: 002b:00007ffc0a7acc98 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 00007fd99ee762b0
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000164a030
+R13: 0000000000000000 R14: 0000000000000003 R15: 0000000000000005
+Modules linked in:
+---[ end trace 607b7fe0e8c7e1ae ]---
+RIP: 0010:workqueue_sysfs_unregister kernel/workqueue.c:5691 [inline]
+RIP: 0010:destroy_workqueue+0x2e/0x6b0 kernel/workqueue.c:4351
+Code: 49 89 fe 41 55 41 54 55 53 48 83 ec 08 e8 8a 6a 26 00 49 8d be 08 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 e0 05 00 00 49 8b 9e 08 01 00 00 48 85 db 74 19
+RSP: 0018:ffffc90002f27c30 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000002 RCX: 0000000000000000
+RDX: 0000000000000021 RSI: ffffffff814c2af6 RDI: 0000000000000108
+RBP: ffff8882189978f0 R08: ffff888096c505c0 R09: fffffbfff185270a
+R10: fffffbfff1852709 R11: ffffffff8c29384f R12: ffff888218997800
+R13: ffff88808dc478a0 R14: 0000000000000000 R15: ffff88808dc47680
+FS:  00007fd99f56e740(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f3095dcd000 CR3: 00000000a4478000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Steve
