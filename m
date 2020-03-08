@@ -2,121 +2,181 @@ Return-Path: <SRS0=O/R4=4Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1260C10DCE
-	for <linux-block@archiver.kernel.org>; Sun,  8 Mar 2020 11:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF3DC10F28
+	for <linux-block@archiver.kernel.org>; Sun,  8 Mar 2020 13:12:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A6C0206D7
-	for <linux-block@archiver.kernel.org>; Sun,  8 Mar 2020 11:00:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=windriversystems.onmicrosoft.com header.i=@windriversystems.onmicrosoft.com header.b="PhS0lJ0+"
+	by mail.kernel.org (Postfix) with ESMTP id 0F02120866
+	for <linux-block@archiver.kernel.org>; Sun,  8 Mar 2020 13:12:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgCHLAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Mar 2020 07:00:37 -0400
-Received: from mail-mw2nam10on2088.outbound.protection.outlook.com ([40.107.94.88]:56032
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726314AbgCHLAg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 8 Mar 2020 07:00:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PUiKG5YI1j/1X1V7IuE/tOkZrlRh/IEs9SrM9u7FRMBsh6tuQXnH+v6rfGuw8IkgRx7YiOENa1oth0DqWpzUBfzA1+Jpz/ZNdHEkgvOzXozR0+kz8mdAIjU4yyYWKh5Ufm7NQyEGJsVknoKZksMrP1/vyrfaHeRwwj0SGQXzEndHcRpWkXOoKMh0u+TMdFixzHBmuqJ+hA42JqGTYyWEMyjj2wfdvao3P1uKGoY97hZqbX+bLW3mJqH08LId6rd8lmUEfaq+zLdZalrTzKoMFL+BSnrjQM/KXTuQ7IWatLEzAdfjpJncJMrC/rNrxcKsU7EvXEBhX6JLyYrAJvhipg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LuZG5yLy5hkqrG2+ryYDLstFKB0BZli946FwuMowuk4=;
- b=B8Hbcgtv5gz/Rw9T28wh0tfV6FCaqU6KCgG1MWTvC1rj06hukYK0+gZ5IKxKxOOTG2J59c5RB4PbpOEtGBmyBoM64v/IeFc9jY4cxsvkHtr6PPZ45KZV0rk9n/sO+JIqfcvmGaFEYqcG9DCNTY4OE7dKs91DxLvHS4TaT3QDUpVWJxXbzfxmHcpGvaIjRRon1ChXNcgxpx9/4dD0x6xCouxuG6dz2Q/3a5WIAd8UVuxMAQVoXICB2MVhgrXToklRih17ZNg+ouHunq/KYdzi6qQpr8gu6EHd2Q0SIdvWJmwny5s9Z00gonDcJORmONpGQrvAxtFLLCikIEle2gZ76g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=windriversystems.onmicrosoft.com;
- s=selector2-windriversystems-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LuZG5yLy5hkqrG2+ryYDLstFKB0BZli946FwuMowuk4=;
- b=PhS0lJ0+bm8Svz1cB9rhyPwE/dkTHAelrVV8H2YhZ7ApwkMev13hppjjgDtokaR8tn1eb05V6agYnUTEaVFQKdyhGuMEc9Bd8fmBT+oKi4rvNEsk9fmVwrjsxIgxGjjy2/B2F87Z7xOgrxacu0a9pa0Ry+lm3IvBFSrdYga/dzw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Zhe.He@windriver.com; 
-Received: from SN6PR11MB3360.namprd11.prod.outlook.com (2603:10b6:805:c8::30)
- by SN6PR11MB3437.namprd11.prod.outlook.com (2603:10b6:805:db::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15; Sun, 8 Mar
- 2020 11:00:33 +0000
-Received: from SN6PR11MB3360.namprd11.prod.outlook.com
- ([fe80::d852:181d:278b:ba9d]) by SN6PR11MB3360.namprd11.prod.outlook.com
- ([fe80::d852:181d:278b:ba9d%5]) with mapi id 15.20.2772.019; Sun, 8 Mar 2020
- 11:00:32 +0000
-Subject: Re: disk revalidation updates and OOM
-To:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, viro@zeniv.linux.org.uk,
-        bvanassche@acm.org, keith.busch@intel.com, tglx@linutronix.de,
-        mwilck@suse.com, yuyufen@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <93b395e6-5c3f-0157-9572-af0f9094dbd7@windriver.com>
- <20200304133738.GF21048@quack2.suse.cz> <20200304162625.GA11616@lst.de>
- <20200307142950.GA26325@lst.de>
-From:   He Zhe <zhe.he@windriver.com>
-Message-ID: <071c4f38-df7b-b094-1bd0-436fcdb05767@windriver.com>
-Date:   Sun, 8 Mar 2020 19:00:22 +0800
+        id S1726296AbgCHNM2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Mar 2020 09:12:28 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:37611 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726267AbgCHNM2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Mar 2020 09:12:28 -0400
+Received: by mail-lf1-f67.google.com with SMTP id j11so5451777lfg.4;
+        Sun, 08 Mar 2020 06:12:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=+Vaw8bBmhQ+Z1j0Ys0keo38e9WfzBC59wAMA1/zMo7M=;
+        b=Txy16obncE/vJyksDQoyAU5+AeUI405AcniLUMknR9DQrnwCnkl2/v3ySKnnRzJU4I
+         N7A7vimXZRPokotJQPTEdBhSfnFDE4ihok5ooMK6bTyAdLKmpjyQgc+N3pZ/f5QBNGFP
+         xLYzOhwTVez5oYqv8KXAufA+D9MQr4uRHLLznBqXbuPZSnIl70cPW9DuMjvLRxnlTWhN
+         Rmautr+eMvtXFRkO2jcwzqTMBovqtDZuxV636ON/F3x7hRIIwT8OSAMB1qlvYZUByO49
+         Nb6ikfWUYqGLGaGpF1zgl37SZrcwto7HRDh11aXRkBWaBzVSa/tBX0PWQWwtt0SIeNQh
+         W5CQ==
+X-Gm-Message-State: ANhLgQ07XQR3nSLyxpMv27t44gmdpAMUggv+44+AZUjNYsQkr4XCxYZg
+        K/QeWyWdFnD3Nj4oiMzzBdQo4Tck
+X-Google-Smtp-Source: ADFU+vu8i7qwxHwe2gMem9pPl8kj5/T4GBw4+shSXE5nvQ1O+12xxDO6jG3O1gXQRsNdtZ696XFKUw==
+X-Received: by 2002:ac2:4906:: with SMTP id n6mr6959117lfi.163.1583673144118;
+        Sun, 08 Mar 2020 06:12:24 -0700 (PDT)
+Received: from [10.68.32.192] (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
+        by smtp.gmail.com with ESMTPSA id z23sm17092713ljg.99.2020.03.08.06.12.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Mar 2020 06:12:23 -0700 (PDT)
+To:     Willy Tarreau <w@1wt.eu>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Ian Molton <spyro@f2s.com>,
+        Russell King <linux@armlinux.org.uk>
+References: <20200301195555.11154-1-w@1wt.eu>
+From:   Denis Efremov <efremov@linux.com>
+Autocrypt: addr=efremov@linux.com; keydata=
+ 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
+Subject: Re: [PATCH v2 0/6] floppy: make use of the local/global fdc explicit
+Message-ID: <e925dc3d-53d3-b656-8c17-470ada66f3f7@linux.com>
+Date:   Sun, 8 Mar 2020 16:12:22 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200307142950.GA26325@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: HK2PR02CA0134.apcprd02.prod.outlook.com
- (2603:1096:202:16::18) To SN6PR11MB3360.namprd11.prod.outlook.com
- (2603:10b6:805:c8::30)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [128.224.162.175] (60.247.85.82) by HK2PR02CA0134.apcprd02.prod.outlook.com (2603:1096:202:16::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16 via Frontend Transport; Sun, 8 Mar 2020 11:00:28 +0000
-X-Originating-IP: [60.247.85.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fe39727a-faef-42d4-f457-08d7c34fec07
-X-MS-TrafficTypeDiagnostic: SN6PR11MB3437:
-X-Microsoft-Antispam-PRVS: <SN6PR11MB343709C7D2538599CB7AA9288FE10@SN6PR11MB3437.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 03361FCC43
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(366004)(189003)(199004)(66556008)(66946007)(31686004)(2906002)(31696002)(8676002)(66476007)(81166006)(498600001)(2616005)(53546011)(16576012)(4326008)(956004)(81156014)(110136005)(6486002)(7416002)(5660300002)(26005)(52116002)(36756003)(16526019)(6666004)(186003)(86362001)(8936002)(4744005)(6706004)(78286006);DIR:OUT;SFP:1101;SCL:1;SRVR:SN6PR11MB3437;H:SN6PR11MB3360.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: windriver.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EMV6psR3ME9wCJHdQH0h+AQczgriakLmBcI1QX/TfLFhemnWM+CoblgJaBSluRhk6B+Tmf+35EHP5E0TBCga4LTYjGuOuyCB8WDqnYaeLRhnEqlEdQ/AUUT5Ut74vhRPCbMZwrWnhb3m5da1ccQh9zFcduHkXdkWc90V/rdtXOrQm8mLa9h4xpbcCzHA4/5+MG7yr72QI8lgwzi7YJD1aUlyoDZlCjkb4lsxxV1chBrq+atOIwzqxBCJTxssw1fW7jDPlTsm27AIsh/ogvLmXtiXOXxc4s0pTZRoMZe38KTZoZJvp5q1ttO2Ho9opcS9VzuHijifPQcvgMzY82qp+moK0jaAcG7nac2xdB+aklaDe9hiMbCgrpSyeIVEOoHTlcH4ekep878xky7Fsb/QwpLpuSXvhjCLP1S0eevZTaOHH4P08IMDmVB3r6P6T+Br5sYQSv50rKuWVAedQ+QDpzYs+Tsky6kk7itBdJ+HCSdKMPwV0XwvOV6lU9VITAJVUXLi0A24wd1HOE1+LC+PMsWogdVu5c+qEoEmEZE3XeE=
-X-MS-Exchange-AntiSpam-MessageData: pmnz9DZOeEGRVSefxRD64iFVL9fYPQnmNEHMBZbBVg1/KoyDqG9G5m0V/fvffdS3gBuRkS0ZcfdhpTEvOiR6TDe6x6T4UYoZ/5PAFl5BRzrM1RGfOJUT0Ews9YBs9kYnJpA+cucMZEnhKnENQdi6OA==
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe39727a-faef-42d4-f457-08d7c34fec07
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2020 11:00:32.7290
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ThtOb61jj6gVJ7W+0dHau3OpiBZqArKG4bWjQgsHUgGBemXSqTlwXDInCIcdqEvwREjxhuiydr3tBQJ5UNpvMQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB3437
+In-Reply-To: <20200301195555.11154-1-w@1wt.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
+On 3/1/20 10:55 PM, Willy Tarreau wrote:
+> This is an update to the first minimal cleanup of the floppy driver in
+> order to make use of the FDC number explicit so as to avoid bugs like
+> the one fixed by 2e90ca68 ("floppy: check FDC index for errors before
+> assigning it").
+> 
+> The purpose of this patchset is to rename the "fdc" global variable to
+> "current_fdc" as Linus suggested and adjust the macros which rely on it
+> depending on their context.
+> 
+> The most problematic part at this step are the FD_* macros derived
+> from FD_IOPORT, itself referencing the fdc to get its base address.
+> These are exclusively used by fd_outb() and fd_inb(). However on ARM
+> FD_DOR is also used to compare the register based on the port, hence
+> a small change in the ARM specific code to only check the register
+> without relying on this hidden memory access.
+> 
+> In order to avoid touching the fd_outb() and fd_inb() macros/functions
+> on all supported architectures, a new set of fdc_outb()/fdc_inb()
+> functions was added to the driver to call the former after adding
+> the register to the FDC's base address.
+> 
+> There are still opportunities for more cleanup, though it's uncertain
+> they're welcome in this old driver :
+>   - the base address and register can be passed separately to fd_outb()
+>     and fd_inb() in order to simplify register retrieval in some archs;
+> 
+>   - a dozen of functions in the driver implicitly depend on current_fdc
+>     while passing it as an argument makes the driver a bit more readable
+>     but that represents less than half of the code and doesn't address
+>     all the readability concerns;
+> 
+>   - a test was done to limit support to a single FDC, but after these
+>     cleanups it doesn't provide any significant benefit in terms of code
+>     readability.
+> 
+> These patches are to be applied on top of Denis' floppy-next branch.
+> 
+> v2:
+>   - CC arch maintainers in ARM patches
+>   - fixed issues after Denis' review:
+>       - extra braces in floppy.h in declaration of floppy_selects[]
+>       - missing parenthesis in fd_outb() macro to silence a warning
+>       - used the swap() macro in driveswap()
+> Willy Tarreau (6):
 
-On 3/7/20 10:29 PM, Christoph Hellwig wrote:
-> So I looked into this, and if it was just the uevent this
-> should have been fixed in:
->
-> "block: don't send uevent for empty disk when not invalidating"
->
-> from Eric Biggers in December.  Does the problem still occur with that
-> patch applied?
+Applied, thanks!
+https://github.com/evdenis/linux-floppy/commits/floppy-next
 
-Yes, it occurs with that patch. The patch that introduces the issue and the one
-you mentioned above both went in in v5.5-rc1. I found this issue in v5.5
-release.
+Ian, Russell, I hope you don't mind if these patches will go through
+the single tree. If you have any comments, please, write.
 
-Thanks,
-Zhe
+Tested:
+[x] Eye-checked the changes
+[x] Checked that kernel builds after every commit on x86, arm (rpc_defconfig)
+[x] Checked that there is no binary difference on x86
+ 
+>   floppy: remove dead code for drives scanning on ARM
+[x] Checked that there is no dead code left unnoticed
 
+>   floppy: remove incomplete support for second FDC from ARM code
+>   floppy: prepare ARM code to simplify base address separation
+>   floppy: introduce new functions fdc_inb() and fdc_outb()
+>   floppy: separate the FDC's base address from its registers
+>   floppy: rename the global "fdc" variable to "current_fdc"
+> 
+>  arch/arm/include/asm/floppy.h |  88 ++-----------
+>  drivers/block/floppy.c        | 284 ++++++++++++++++++++++--------------------
+>  include/uapi/linux/fdreg.h    |  18 +--
+>  3 files changed, 168 insertions(+), 222 deletions(-)
+> 
 
+Denis
