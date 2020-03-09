@@ -2,230 +2,301 @@ Return-Path: <SRS0=ZA/H=42=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21A3C18E5A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 14:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1754CC10F27
+	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 14:27:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB51C21D56
-	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 14:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7BAE20578
+	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 14:27:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pSzTMYzW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B7mGMZnP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbgCIOGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Mar 2020 10:06:12 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:46750 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726233AbgCIOGL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Mar 2020 10:06:11 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 029E61p8032736;
-        Mon, 9 Mar 2020 09:06:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1583762761;
-        bh=OBEMkMtQkZWkB6dMggM3oEJ5U6LXoaCTY0euFw3mrjU=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=pSzTMYzWMpM2XCn827dB74GvBmR/MeCOvSM/xd9U+ieliB2FMQBfSt4W0NIpzpgnp
-         vvRdhv4fV33n+uhaPeE1xZN/0EeQiavn/OdXdgXGVgpwj3OFozEsD2Eq21PwL4x2VB
-         OgOayw1urwCW6SXQMpRtGAInQ8fD9TVcEyRFe8Vg=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 029E619H049757;
-        Mon, 9 Mar 2020 09:06:01 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Mon, 9 Mar
- 2020 09:06:00 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Mon, 9 Mar 2020 09:06:01 -0500
-Received: from [10.24.69.157] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 029E5tgQ059978;
-        Mon, 9 Mar 2020 09:05:56 -0500
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Sowjanya Komatineni <skomatineni@nvidia.com>
-CC:     Jon Hunter <jonathanh@nvidia.com>,
-        Bitan Biswas <bbiswas@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        <lkft-triage@lists.linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Thierry Reding <treding@nvidia.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Kishon <kishon@ti.com>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFokE6x0mn+v5B9=so-SyrdTn0JBU8Mrp3Zdu6kSaCie2g@mail.gmail.com>
- <0963b60f-15e7-4bc6-10df-6fc8003e4d42@nvidia.com>
- <CAPDyKFq5NoeHEBK3sv3yOSD2+pm9FueH1gaTyPq0j7GLfa6vnA@mail.gmail.com>
- <34fd84d7-387b-b6f3-7fb3-aa490909e205@ti.com>
- <CAPDyKFrrO4noYqdxWL9Y8Nx75LopbDudKGMotkGbGcAF1oq==w@mail.gmail.com>
- <5e9b5646-bd48-e55b-54ee-1c2c41fc9218@nvidia.com>
- <CAPDyKFqpNo_4OePBR1KnJNO=kR8XEqbcsEd=icSceSdDH+Rk1Q@mail.gmail.com>
- <757853cf-987e-f6b6-9259-b4560a031692@nvidia.com>
- <d12fe142-7e72-ab58-33ab-17817e35096f@nvidia.com>
- <c216f131-6f83-c9c9-9d17-8d44ec06972d@nvidia.com>
- <87ad7586-9569-4276-044a-adb64e84ca15@nvidia.com>
- <a0962e0b-0f1d-9f32-f6e9-92f69f93167f@nvidia.com>
- <57ddddc2-3ee8-d867-bba0-0dd9929ba37d@nvidia.com>
- <CAPDyKFqZSd9E3+16yFsmpee2JsbRJ-DGThxx7NJHu6UE00Xi1Q@mail.gmail.com>
- <26ee7225-9483-4664-c2d7-b5cefeadcd4b@nvidia.com>
- <CAPDyKFqwVQDEnPNi33mc9ycTxpaT1cRLejbR3Ja4c8dha4gFRw@mail.gmail.com>
-From:   Faiz Abbas <faiz_abbas@ti.com>
-Message-ID: <a67b2831-3eff-545a-de67-102dffe4a0d9@ti.com>
-Date:   Mon, 9 Mar 2020 19:37:45 +0530
+        id S1726520AbgCIO1S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Mar 2020 10:27:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50134 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726515AbgCIO1S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Mar 2020 10:27:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583764036;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZPkjLKOfKoWwfRVNYyM+HmWPGqv7QTvfA9oc0uqL+DM=;
+        b=B7mGMZnPI6EKLYL4m5V9qg19YH3hkNaXTx50pIgxFmLlzrl1GpDNSXQsKvAzvKkd9sh43i
+        +q7veaLeAdlJSAIZIOjs6V2tose4HrtPo5G258CJPT2AeFW3iRpMTeLqTJWliXvq3Z/pLg
+        OjhBIBOKLmBbbSkE2ltoZGHHhTW8Q/I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-_7dH1zBaORGB_FJctz3Qyg-1; Mon, 09 Mar 2020 10:27:12 -0400
+X-MC-Unique: _7dH1zBaORGB_FJctz3Qyg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 580AA8010E8;
+        Mon,  9 Mar 2020 14:27:11 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-211.rdu2.redhat.com [10.10.123.211])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A1CAF73875;
+        Mon,  9 Mar 2020 14:27:03 +0000 (UTC)
+Subject: =?UTF-8?Q?Re=3a_=e2=9d=8c_FAIL=3a_Test_report_for_kernel_5=2e6=2e0-?=
+ =?UTF-8?Q?rc4-61a0925=2ecki_=28mainline=2ekernel=2eorg=29?=
+To:     linux-block@vger.kernel.org
+Cc:     CKI Project <cki-project@redhat.com>,
+        Memory Management <mm-qe@redhat.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        LTP Mailing List <ltp@lists.linux.it>,
+        Xiong Zhou <xzhou@redhat.com>
+References: <cki.FEFA879F6B.TFTZ93YIF0@redhat.com>
+From:   Rachel Sibley <rasibley@redhat.com>
+Message-ID: <ba09351f-0a5a-824a-dbf2-021360581cd7@redhat.com>
+Date:   Mon, 9 Mar 2020 10:27:02 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAPDyKFqwVQDEnPNi33mc9ycTxpaT1cRLejbR3Ja4c8dha4gFRw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <cki.FEFA879F6B.TFTZ93YIF0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Uffe,
+(cc'ing linux-block@vger.kernel.org)
 
-On 06/03/20 4:44 pm, Ulf Hansson wrote:
-> [...]
-> 
->>>>>>>>>>>
->>>>>>>>>>> Actually we always use R1B with CMD6 as per spec.
->>>>>>>>>> I fully agree that R1B is preferable, but it's not against the
->>>>>>>>>> spec to
->>>>>>>>>> send CMD13 to poll for busy.
->>>>>>>>>>
->>>>>>>>>> Moreover, we need to cope with the scenario when the host has
->>>>>>>>>> specified a maximum timeout that isn't sufficiently long enough for
->>>>>>>>>> the requested operation. Do you have another proposal for how to
->>>>>>>>>> manage this, but disabling MMC_RSP_BUSY?
->>>>>>>>>>
->>>>>>>>>> Let's assume you driver would get a R1B for the CMD6 (we force it),
->>>>>>>>>> then what timeout would the driver be using if we would set
->>>>>>>>>> cmd.busy_timeout to 30ms?
->>>>>>>>>>
->>>> Sorry didn't understood clearly. Are you asking with 30s timeout, whats
->>>> the data timeout counter used?
->>> Yes. It seems like it will pick the maximum, which is 11s?
->> yes
-> 
-> Okay, thanks!
-> 
->>>
->>>> Because of above mentioned issue on our host where CMD interrupt happens
->>>> after busy state, poll for busy returns right away as not busy.
->>> I see.
->>>
->>>> So issuing CMD13 after CMD6-R1 followed by busy poll should be working.
->>>> But weird that with small delay of 1ms or debug print before CMD13 it
->>>> doesn't timeout and works all the time.
->>> I have digested the information you provided in these emails. Let me
->>> summarize it, to see if I have understood correctly.
->>>
->>> 1.
->>> Your controller can't distinguish between R1 and R1B because of a
->>> limitation in the HW. So, in both cases you need to wait for the card
->>> to stop signal busy, before the controller can give an IRQ to notify
->>> that the R1 response has been received. Correct?
->>>
->>> In this context, I am wondering if sdhci_send_command(), really
->>> conforms to these requirements. For example, depending on if the CMD6
->>> has MMC_RSP_BUSY or not, it may pick either SDHCI_CMD_RESP_SHORT or
->>> SDHCI_CMD_RESP_SHORT_BUSY.
->>>
->>> Does this work as expected for your case?
->> Design team re-verified internally and bug where HW waits for busy state
->> before IRQ is only for R1B and R1 is spec compliant.
->>
->> So, with R1, CMD complete is generated after response received.
-> 
-> Okay.
-> 
-> So, the issue we see for CMD6 with R1, is a software problem that we
-> should be able to fix.
-> 
->>
->> With R1B, CMD complete and xfer complete both are generated after
->> response received + device busy (max timeout of 11s)
->> DATA timeout interrupt will be asserted incase if HW busy detection fails.
->>
->> With R1B we may see DATA Timeout if operation takes more than max busy
->> timeout of 11s.
-> 
-> Okay, I see.
-> 
->>
->>> 2.
->>> Assuming my interpretation of the above is somewhat correct. Then you
->>> always need to set a busy timeout for R1/R1B responses in the
->>> controller. The maximum timeout seems to be 11s long. Obviously, this
->>> isn't enough for all cases, such as cache flushing and erase, for
->>> example. So, what can we do to support a longer timeouts than 11s?
->>> Would it be possible to disable the HW timeout, if the requested
->>> timeout is longer than 11s and use a SW timeout instead?
->>>
->>> Kind regards
->>> Uffe
->>
->> For erase long operations we have register bit to enable for infinite
->> busy wait mode where host controller would be monitoring until card is busy.
-> 
-> Alright, that sounds great!
-> 
->>
->> But so far for emmc devices we used on our platforms, we haven't seen
->> cache flush taking more than 11s.
-> 
-> I understand that 11s is probably fine to use, for most cases.
-> 
-> However, it's not spec compliant, as for some operations there are
-> simply no timeout specified. BKOPS, cache flush, sanitize are cases
-> like this - and then 11s is definitely not sufficient.
-> 
->>
->> Will get back on possibility of disabling HW timeout and using SW timeout..
-> 
-> Thanks!
-> 
-> I would like to get the regression fixed asap, but I also would like
-> to avoid reverting patches, unless really necessary. May I propose the
-> following two options.
-> 
-> 1. Find out why polling with ->card_busy() or CMD13, for a CMD6 with
-> an R1 response doesn't work - and then fix that behaviour.
-> 
-> 2. Set the mmc->max_busy_timeout to zero for sdhci-tegra, which makes
-> the core to always use R1B for CMD6 (and erase). This also means that
-> when the cmd->busy_timeout becomes longer than 11s, sdhci-tegra must
-> disable the HW busy timeout and just wait "forever".
-> 
-> If you decide for 2, you can add the software timeout support on top,
-> but make that can be considered as a next step of an improvement,
-> rather than needed as fix. Note that, I believe there are some support
-> for software timeout already in the sdhci core, maybe you need to
-> tweak it a bit for your case, I don't know.
-> 
+Hello,
 
-I was able to reproduce the issue on sdhci-omap with your patch applied.
+We are seeing a kernel panic triggered with LTP and xfstests against a re=
+cent commit for mainline,
+wanted to share in case it's not already known.
 
-In our case, the dat0 line never comes back up when trying to send a
-CMD6 with R1. It needs an R1b to work properly. I also set
-mmc->max_busy_timeout to 0 and that made it work as well.
+Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/lin=
+ux.git
+  Commit: 61a09258f2e5 - Merge tag 'for-linus' of git://git.kernel.org/pu=
+b/scm/linux/kernel/git/rdma/rdma
 
-I wanna try it out with other R1b commands like erase to see if it works
-properly if the delay is actually very long.
+We have also seen it with 2c523b344dfa and 378fee2e6b12 commits as well.
+
+LTP: https://cki-artifacts.s3.us-east-2.amazonaws.com/datawarehouse/2020/=
+03/08/477469/x86_64_1_console.log
+xfstests: https://cki-artifacts.s3.us-east-2.amazonaws.com/datawarehouse/=
+2020/03/08/477469/x86_64_4_console.log
+
+[-- MARK -- Sun Mar  8 02:45:00 2020]
+[  762.315610] BUG: kernel NULL pointer dereference, address: 00000000000=
+00158
+[  762.323385] #PF: supervisor read access in kernel mode
+[  762.329119] #PF: error_code(0x0000) - not-present page
+[  762.334853] PGD 0 P4D 0
+[  762.337680] Oops: 0000 [#1] SMP PTI
+[  762.341575] CPU: 9 PID: 87 Comm: kworker/9:1 Not tainted 5.6.0-rc4-61a=
+0925.cki #1
+[  762.349927] Hardware name: Cisco Systems, Inc. UCS-E160DP-M1/K9/UCS-E1=
+60DP-M1/K9, BIOS UCSED.1.5.0.2.051520131757 05/15/2013
+[  762.362453] Workqueue: cgroup_destroy css_killed_work_fn
+[  762.368387] RIP: 0010:bfq_bfqq_expire+0x1c/0x940
+[  762.373540] Code: 01 00 00 c7 80 f8 00 00 00 01 00 00 00 c3 66 66 66 6=
+6 90 41 57 41 56 41 55 41 54 41 89 cc 55 48 89 fd 53 48 89 f3 48 83 ec 28=
+=20
+<8b> be 58 01 00 00 65 48 8b 04 25 28 00 00 00 48 89 44 24 20 31 c0
+[  762.394500] RSP: 0018:ffff9927c03bbd50 EFLAGS: 00010086
+[  762.400331] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000=
+0000004
+[  762.408301] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8965a=
+3913800
+[  762.416270] RBP: ffff8965a3913800 R08: ffff896592d41098 R09: ffff89657=
+aa8df00
+[  762.424233] R10: 0000000000000000 R11: ffff89657aa8df00 R12: 000000000=
+0000004
+[  762.432200] R13: ffff89659f0cd9b0 R14: ffff8965a3913bf0 R15: ffff89659=
+f0cd898
+[  762.440175] FS:  0000000000000000(0000) GS:ffff8965a7c40000(0000) knlG=
+S:0000000000000000
+[  762.449211] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  762.455622] CR2: 0000000000000158 CR3: 000000065afc6003 CR4: 000000000=
+00606e0
+[  762.463599] Call Trace:
+[  762.466341]  ? bfq_idle_extract+0x40/0xb0
+[  762.470821]  bfq_bfqq_move+0x14f/0x160
+[  762.475011]  bfq_pd_offline+0xd3/0xf0
+[  762.479112]  blkg_destroy+0x52/0xf0
+[  762.483005]  blkcg_destroy_blkgs+0x4f/0xa0
+[  762.487582]  css_killed_work_fn+0x4d/0xd0
+[  762.492066]  process_one_work+0x1b5/0x360
+[  762.496547]  worker_thread+0x50/0x3c0
+[  762.500641]  kthread+0xf9/0x130
+[  762.504153]  ? process_one_work+0x360/0x360
+[  762.508813]  ? kthread_park+0x90/0x90
+[  762.512909]  ret_from_fork+0x35/0x40
 
 Thanks,
-Faiz
+Rachel
+
+On 3/7/20 9:59 PM, CKI Project wrote:
+>=20
+> Hello,
+>=20
+> We ran automated tests on a recent commit from this kernel tree:
+>=20
+>         Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/to=
+rvalds/linux.git
+>              Commit: 61a09258f2e5 - Merge tag 'for-linus' of git://git.=
+kernel.org/pub/scm/linux/kernel/git/rdma/rdma
+>=20
+> The results of these automated tests are provided below.
+>=20
+>      Overall result: FAILED (see details below)
+>               Merge: OK
+>             Compile: OK
+>               Tests: FAILED
+>=20
+> All kernel binaries, config files, and logs are available for download =
+here:
+>=20
+>    https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=3D=
+datawarehouse/2020/03/08/477469
+>=20
+> One or more kernel tests failed:
+>=20
+>      x86_64:
+>       =E2=9D=8C LTP
+>       =E2=9D=8C xfstests - ext4
+>=20
+> We hope that these logs can help you find the problem quickly. For the =
+full
+> detail on our testing procedures, please scroll to the bottom of this m=
+essage.
+>=20
+> Please reply to this email if you have any questions about the tests th=
+at we
+> ran or if you have any suggestions on how to make future tests more eff=
+ective.
+>=20
+>          ,-.   ,-.
+>         ( C ) ( K )  Continuous
+>          `-',-.`-'   Kernel
+>            ( I )     Integration
+>             `-'
+> _______________________________________________________________________=
+_______
+>=20
+> Compile testing
+> ---------------
+>=20
+> We compiled the kernel for 1 architecture:
+>=20
+>      x86_64:
+>        make options: -j30 INSTALL_MOD_STRIP=3D1 targz-pkg
+>=20
+>=20
+> Hardware testing
+> ----------------
+> We booted each kernel and ran the following tests:
+>=20
+>    x86_64:
+>      Host 1:
+>         =E2=9C=85 Boot test
+>         =E2=9C=85 Podman system integration test - as root
+>         =E2=9C=85 Podman system integration test - as user
+>         =E2=9D=8C LTP
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Loopdev Sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: memfd_create
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 AMTU (Abstract Machine Test Utility=
+)
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking bridge: sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Ethernet drivers sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking MACsec: sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking socket: fuzz
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking sctp-auth: sockopts test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking: igmp conformance test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking route: pmtu
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking route_func - local
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking route_func - forward
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking TCP: keepalive test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking UDP: socket
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking tunnel: geneve basic tes=
+t
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking tunnel: gre basic
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 L2TP basic test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking tunnel: vxlan basic
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking ipsec: basic netns - tra=
+nsport
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking ipsec: basic netns - tun=
+nel
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 audit: audit testsuite test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 httpd: mod_ssl smoke sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 tuned: tune-processes-through-perf
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 pciutils: sanity smoke test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 ALSA PCM loopback test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 ALSA Control (mixer) Userspace Elem=
+ent test
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: SCSI VPD
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 trace: ftrace/tracer
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 CIFS Connectathon
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 POSIX pjd-fstest suite=
+s
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 jvm - DaCapo Benchmark=
+ Suite
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 jvm - jcstress tests
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Memory function: kaslr
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 LTP: openposix test su=
+ite
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Networking vnic: ipvla=
+n/basic
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 iotop: sanity
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Usex - version 1.9-29
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: dm/common
+>=20
+>      Host 2:
+>         =E2=9C=85 Boot test
+>         =E2=9C=85 Storage SAN device stress - mpt3sas driver
+>=20
+>      Host 3:
+>         =E2=9C=85 Boot test
+>         =E2=9C=85 Storage SAN device stress - megaraid_sas
+>=20
+>      Host 4:
+>         =E2=9C=85 Boot test
+>         =E2=9D=8C xfstests - ext4
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 xfstests - xfs
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 selinux-policy: serge-testsuite
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 lvm thinp sanity
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 storage: software RAID testing
+>         =E2=9A=A1=E2=9A=A1=E2=9A=A1 stress: stress-ng
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 IOMMU boot test
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 IPMI driver test
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 IPMItool loop stress t=
+est
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 power-management: cpup=
+ower/sanity test
+>         =F0=9F=9A=A7 =E2=9A=A1=E2=9A=A1=E2=9A=A1 Storage blktests
+>=20
+>    Test sources: https://github.com/CKI-project/tests-beaker
+>      =F0=9F=92=9A Pull requests are welcome for new tests or improvemen=
+ts to existing tests!
+>=20
+> Waived tests
+> ------------
+> If the test run included waived tests, they are marked with =F0=9F=9A=A7=
+. Such tests are
+> executed but their results are not taken into account. Tests are waived=
+ when
+> their results are not reliable enough, e.g. when they're just introduce=
+d or are
+> being fixed.
+>=20
+> Testing timeout
+> ---------------
+> We aim to provide a report within reasonable timeframe. Tests that have=
+n't
+> finished running yet are marked with =E2=8F=B1.
+>=20
+>=20
+
