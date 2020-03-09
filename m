@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CD9C3F2C6
-	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 21:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DF7C10F25
+	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 21:00:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40D6324654
-	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 21:00:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1673524655
+	for <linux-block@archiver.kernel.org>; Mon,  9 Mar 2020 21:00:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pKWB8q3J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CwY51pQe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbgCIVAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Mar 2020 17:00:01 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:43763 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbgCIVAB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Mar 2020 17:00:01 -0400
-Received: by mail-qk1-f194.google.com with SMTP id q18so10699995qki.10
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 14:00:00 -0700 (PDT)
+        id S1726169AbgCIVAI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Mar 2020 17:00:08 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:38414 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726118AbgCIVAI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Mar 2020 17:00:08 -0400
+Received: by mail-qt1-f194.google.com with SMTP id e20so8148355qto.5
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 14:00:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=DI7uxpfBO6HHZsVr+alAd8q8w11ZcjhTyNN3pgPmuzY=;
-        b=pKWB8q3JXMbGkjWxPXClfe64nR8RCJuOcCagxWsukz/2vfNgSpYW3tATHThBO7efA5
-         B3U1VZjDWeAlP38bdhQDEyexmve2TOdXi+TJh0uZDEHjCz82T+X/iuYxEcv228/cqDBg
-         QAtQLtR4bXE073qbSmiMnNUIz8YQWVFU47JF6B64G1UDRSgni7NzNgjVCWYvgwmz0UoU
-         lu4j1oPrVitqHVNEE5qI3rbpCapoSev5aCg/LcraurBWQ/dEm9BiW2kPyxIMBVni0zvu
-         I1g9cn0HeIc6QY2FXPyWKOInxFZNQ8GOxV89ae+R3H56jLbR7GkuA29r3ThXqn4Lq4TW
-         QcWw==
+        bh=Eo8BqRWS0MDAd2X0hX24tFqp+etLwq4ENOt+rs73JAE=;
+        b=CwY51pQeCKqR2U2VMRLihY3CyeG73e6jt1E3yChROfsUK3i+ZB1it4L4miriI8O/5X
+         RNe4/KezMPxafmp0Dx/az2gElONR8d78BUjQCqtXPIkh3kCDhY5ICzkQsgjKl4hTtEX8
+         j5OVBuLndQqDYdKkuqpwzRcvjk6drIC+dUXlpUtK5rnE1QejD3vhclwfFOGHmYn/ji0X
+         JWksPCOi0gfc/veyq5OuCiIflwtZLf1Av4jfw5dLK7Brh+Mhd0XcctWMLgKtSqp6zuA+
+         jrdCisXxAlGV5/Sl3KxBDzfcZ4yP2rWDlSeZeyByj1tMg/KAZUI3qaIDvuQ17DZwvsKn
+         0SZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=DI7uxpfBO6HHZsVr+alAd8q8w11ZcjhTyNN3pgPmuzY=;
-        b=NdJix7GoD1txmv90goIGVZFLNB2T4OugphedML+Hh8qdhk9E7cMUykKWEaY40pwsIN
-         S58pRzga7qZcN4gdSFa7ZFt1V43jYMEYHgnNr8//ZYgSjRxTjul8nRZj1DrZD1//oiuG
-         sL3PunBccOAmvizRSp4H28cNRzwRslrmasmSsDv2aoCvfBZGCJT/N0zZF0d64ei4S3Vz
-         mtOPol0/q5P/V6fHAIPsfBINB4CcKBHP01Ni4ExdK0Y8PiHNIjTI2eI2QAwurBBpOZ86
-         AUspUJM7vOrjLahbpujiymRk1uk7/roX497h5BH++DjkmYxxrxWx1pyC8cn3F2EN2B1F
-         gKcQ==
-X-Gm-Message-State: ANhLgQ2VahFZ8kkCSIf+wx0ANAnxa68sHQ2LOGlnWUsDsl1S/FwnFqA7
-        N7lpnjVcaS95afy2YUWJEaeDmKxI8fE=
-X-Google-Smtp-Source: ADFU+vuDuqo6hC70nm5zC7WMhQkSgeyZnDTEml6Jkk2Tsvbrq6wMx56kT7Q5SDjUL0i1Ib2q2EsSRw==
-X-Received: by 2002:a37:634d:: with SMTP id x74mr10674090qkb.254.1583787599890;
-        Mon, 09 Mar 2020 13:59:59 -0700 (PDT)
+        bh=Eo8BqRWS0MDAd2X0hX24tFqp+etLwq4ENOt+rs73JAE=;
+        b=nwW2kxt7gf12MpKGfQUa4GhDq0oW4zKei1vUmRuD5DWjpgH9t51gNRMk/5Va8Edydj
+         UAti6hxR4swibW0I3GInmlZwyR9p+IWpXw7xkg7u+yk//HwcVOlntrZg33b9pV1IVSyO
+         FgzVcetAI94tkcGfoKCw7l2H5pUA7S5hjyduKkx0TAASG8J9IwiQfDw/hRL2/DNgctz0
+         74NuZisN2ZNLVvkw9Bx31JaXVCwdm0lcBlU7jElewKZIpjDUaT750UZOTtkEW3w0akYS
+         krIIYl0XdeQ+PGRAVybWcw2jUt4SuYlIcpOIIAvHN3cggeB/aW/D9twHTJ0kBL2ns789
+         r+mg==
+X-Gm-Message-State: ANhLgQ2iy5hN2feeZUbNfKHLZiltNZn5ktY3zRYuik/mTqo9tYnWU4Jv
+        u9DeNNqSNtM3DzECab0wBA7Mb6BSuD8=
+X-Google-Smtp-Source: ADFU+vvQuVwfNpBVRXOWcZqbnnm3ZmeunIqyJ54duIElRuqtJb/gzEj0Zjhdw9gSEEF+L37JC+H59w==
+X-Received: by 2002:ac8:7cb0:: with SMTP id z16mr16506051qtv.276.1583787604875;
+        Mon, 09 Mar 2020 14:00:04 -0700 (PDT)
 Received: from localhost ([2620:10d:c091:480::4078])
-        by smtp.gmail.com with ESMTPSA id l8sm89441qth.3.2020.03.09.13.59.59
+        by smtp.gmail.com with ESMTPSA id 207sm3967594qkf.69.2020.03.09.14.00.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 13:59:59 -0700 (PDT)
+        Mon, 09 Mar 2020 14:00:04 -0700 (PDT)
 From:   Jes Sorensen <jes.sorensen@gmail.com>
 X-Google-Original-From: Jes Sorensen <Jes.Sorensen@gmail.com>
 To:     linux-block@vger.kernel.org
 Cc:     kernel-team@fb.com, mmullins@fb.com, josef@toxicpanda.com,
         Jes Sorensen <jsorensen@fb.com>
-Subject: [PATCH 6/7] blk-stat: Make bucket function take latency as an additional argument
-Date:   Mon,  9 Mar 2020 16:59:30 -0400
-Message-Id: <20200309205931.24256-7-Jes.Sorensen@gmail.com>
+Subject: [PATCH 7/7] block: Introduce blk-mq latency stats
+Date:   Mon,  9 Mar 2020 16:59:31 -0400
+Message-Id: <20200309205931.24256-8-Jes.Sorensen@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309205931.24256-1-Jes.Sorensen@gmail.com>
 References: <20200309205931.24256-1-Jes.Sorensen@gmail.com>
@@ -75,114 +75,266 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jes Sorensen <jsorensen@fb.com>
 
-This is useful for tracking request latencies, which will be
-introduced in the follow-on patch.
+This uses the blk-stat infrastructure to collect latency statistics
+for read/write/discard requests. Stats are accounted in us using 32
+buckets, which should give up to approximately 35 minutes for the
+highest bucket.
+
+Stats are only collecting once enabled, and the data structures are
+released again if stats for the device are disabled.
+
+This is enabled on a per device level by
+ $ echo 1 > /sys/block/<device>/queue/latstat
+Latency stats are read from /sys/block/<device>/queue/latency
+ $ cat /sys/block/sda/queue/latency
+ read: 0 0 0 1 1 29 97 119 120 99 113 126 165 226 266 116 19 17 4 1 0 0 0 0 0 0 0 0 0 0 0 0
+ write: 0 0 0 0 0 12 259 91 234 218 347 448 285 564 263 211 319 205 36 6 15 0 0 0 0 0 0 0 0 0 0 0
+ discard: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 Signed-off-by: Jes Sorensen <jsorensen@fb.com>
 ---
- block/blk-mq.c   | 6 +++---
- block/blk-stat.c | 4 ++--
- block/blk-stat.h | 6 +++---
- block/blk-wbt.c  | 2 +-
- 4 files changed, 9 insertions(+), 9 deletions(-)
+ block/blk-mq.c         | 54 ++++++++++++++++++++++++
+ block/blk-stat.h       |  3 ++
+ block/blk-sysfs.c      | 96 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  6 +++
+ 4 files changed, 159 insertions(+)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 04652e59b0e9..a1e4c444a10b 100644
+index a1e4c444a10b..5472842f6077 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -43,7 +43,7 @@
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
--static int blk_mq_poll_stats_bkt(const struct request *rq)
-+static int blk_mq_poll_stats_bkt(const struct request *rq, u64 value)
- {
- 	int ddir, sectors, bucket;
- 
-@@ -63,7 +63,7 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
- /*
-  * 8 buckets for each of read, write, and discard
-  */
--int blk_req_stats_bkt(const struct request *rq)
-+int blk_req_stats_bkt(const struct request *rq, u64 value)
- {
- 	int grp, bucket;
- 
-@@ -3475,7 +3475,7 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
- 	 * than ~10 usec. We do use the stats for the relevant IO size
- 	 * if available which does lead to better estimates.
- 	 */
--	bucket = blk_mq_poll_stats_bkt(rq);
-+	bucket = blk_mq_poll_stats_bkt(rq, 0);
- 	if (bucket < 0)
- 		return ret;
- 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index dd5c9c8989a5..812af84b6d1b 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -68,7 +68,7 @@ void blk_stat_add(struct request *rq, u64 now)
- 		if (!blk_stat_is_active(cb))
- 			continue;
- 
--		bucket = cb->bucket_fn(rq);
-+		bucket = cb->bucket_fn(rq, value);
- 		if (bucket < 0)
- 			continue;
- 
-@@ -103,7 +103,7 @@ static void blk_stat_timer_fn(struct timer_list *t)
- 
- struct blk_stat_callback *
- blk_stat_alloc_callback(void (*timer_fn)(struct blk_stat_callback *),
--			int (*bucket_fn)(const struct request *),
-+			int (*bucket_fn)(const struct request *, u64),
- 			unsigned int buckets, void *data)
- {
- 	struct blk_stat_callback *cb;
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index d23090b53e12..51abad3775a9 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -37,7 +37,7 @@ struct blk_stat_callback {
- 	 * should be accounted under. Return -1 for no bucket for this
- 	 * request.
- 	 */
--	int (*bucket_fn)(const struct request *);
-+	int (*bucket_fn)(const struct request *, u64);
- 
- 	/**
- 	 * @buckets: Number of statistics buckets.
-@@ -83,7 +83,7 @@ void blk_stat_enable_accounting(struct request_queue *q);
-  */
- struct blk_stat_callback *
- blk_stat_alloc_callback(void (*timer_fn)(struct blk_stat_callback *),
--			int (*bucket_fn)(const struct request *),
-+			int (*bucket_fn)(const struct request *, u64),
- 			unsigned int buckets, void *data);
- 
- /**
-@@ -168,7 +168,7 @@ void blk_rq_stat_add(struct blk_rq_stat *, u64, u64);
- void blk_rq_stat_sum(struct blk_rq_stat *, struct blk_rq_stat *);
- void blk_rq_stat_init(struct blk_rq_stat *);
- 
--int blk_req_stats_bkt(const struct request *rq);
-+int blk_req_stats_bkt(const struct request *rq, u64 value);
- void blk_req_stats_cb(struct blk_stat_callback *cb);
- void blk_req_stats_free(struct request_queue *q);
- #endif
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 8641ba9793c5..9593f7ae3e31 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -669,7 +669,7 @@ u64 wbt_default_latency_nsec(struct request_queue *q)
- 		return 75000000ULL;
+@@ -112,6 +112,60 @@ void blk_req_stats_free(struct request_queue *q)
+ 	}
  }
  
--static int wbt_data_dir(const struct request *rq)
-+static int wbt_data_dir(const struct request *rq, u64 value)
- {
- 	const int op = req_op(rq);
++/*
++ * With 32 buckets for latencies, kernel counts latency in ns, but
++ * bucket on us. This should give us roughly 35 minutes of range.
++ * If we reduce to 28 buckets and the limit would be about 2 minutes.
++ */
++int blk_latency_stats_bkt(const struct request *rq, u64 value)
++{
++	int grp, bucket, index;
++
++	if (!value)
++		return -1;
++
++	grp = op_stat_group(req_op(rq));
++
++	index = ilog2(value / NSEC_PER_USEC);
++	if (index >= (BLK_LATENCY_STATS_BKTS / 3))
++		index = (BLK_LATENCY_STATS_BKTS / 3) - 1;
++
++	bucket = 3 * index + grp;
++
++	return bucket;
++}
++
++/*
++ * Copy out the stats to their official location
++ */
++void blk_latency_stats_cb(struct blk_stat_callback *cb)
++{
++	struct request_queue *q = cb->data;
++	int bucket;
++
++	for (bucket = 0; bucket < BLK_LATENCY_STATS_BKTS; bucket++) {
++		if (cb->stat[bucket].nr_samples) {
++			q->latency_stat[bucket].nr_samples +=
++				cb->stat[bucket].nr_samples;
++		}
++	}
++
++	if (!blk_stat_is_active(cb))
++		blk_stat_activate_msecs(cb, 200);
++}
++
++void blk_latency_stats_free(struct request_queue *q)
++{
++	if (test_bit(QUEUE_FLAG_LATENCYSTATS, &q->queue_flags)) {
++		blk_stat_remove_callback(q, q->latency_cb);
++		blk_queue_flag_clear(QUEUE_FLAG_LATENCYSTATS, q);
++		blk_stat_free_callback(q->latency_cb);
++		q->latency_cb = NULL;
++		kfree(q->latency_stat);
++		q->latency_stat = NULL;
++	}
++}
++
+ /*
+  * Check if any of the ctx, dispatch list or elevator
+  * have pending work in this hardware queue.
+diff --git a/block/blk-stat.h b/block/blk-stat.h
+index 51abad3775a9..4b991b95271c 100644
+--- a/block/blk-stat.h
++++ b/block/blk-stat.h
+@@ -171,4 +171,7 @@ void blk_rq_stat_init(struct blk_rq_stat *);
+ int blk_req_stats_bkt(const struct request *rq, u64 value);
+ void blk_req_stats_cb(struct blk_stat_callback *cb);
+ void blk_req_stats_free(struct request_queue *q);
++int blk_latency_stats_bkt(const struct request *rq, u64 value);
++void blk_latency_stats_cb(struct blk_stat_callback *cb);
++void blk_latency_stats_free(struct request_queue *q);
+ #endif
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index b1469b3ce511..96ec0191e748 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -613,6 +613,88 @@ static ssize_t queue_reqstat_store(struct request_queue *q, const char *page,
+ 	goto out;
+ }
  
++static ssize_t queue_latency_show(struct request_queue *q, char *p)
++{
++	char name[3][8] = {"read", "write", "discard"};
++	int bkt, off, i;
++
++	if (!q->latency_stat)
++		return -ENODEV;
++
++	/*
++	 * 64 bit decimal is max 20 characters + 1 whitespace, which
++	 * totals a max of 672 characters per read/write/discard line,
++	 * not counting the prefix. This easily keeps us within a 4KB
++	 * page of output.
++	 */
++	off = 0;
++	for (i = 0; i < 3; i++) {
++		off += sprintf(p + off, "%s: ", name[i]);
++		for (bkt = 0; bkt < (BLK_LATENCY_STATS_BKTS / 3); bkt++) {
++			off += sprintf(p + off, "%u ",
++				       q->latency_stat[i + 3 * bkt].nr_samples);
++		}
++
++		off += sprintf(p + off, "\n");
++	}
++	return off;
++}
++
++static ssize_t queue_latstat_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(test_bit(QUEUE_FLAG_LATENCYSTATS,
++				       &q->queue_flags), page);
++}
++
++static ssize_t queue_latstat_store(struct request_queue *q, const char *page,
++				    size_t size)
++{
++	unsigned long latstat_on;
++	ssize_t ret;
++
++	ret = queue_var_store(&latstat_on, page, size);
++	if (ret < 0)
++		return ret;
++
++	if (latstat_on) {
++		if (!q->latency_stat) {
++			q->latency_stat = kcalloc(BLK_LATENCY_STATS_BKTS,
++						  sizeof(struct blk_rq_stat),
++						  GFP_KERNEL);
++			if (!q->latency_stat) {
++				ret = -ENOMEM;
++				goto err_out;
++			}
++			q->latency_cb =
++				blk_stat_alloc_callback(blk_latency_stats_cb,
++							blk_latency_stats_bkt,
++							BLK_LATENCY_STATS_BKTS,
++							q);
++			if (!q->latency_cb) {
++				ret = -ENOMEM;
++				goto err_out;
++			}
++		}
++		if (!blk_queue_flag_test_and_set(QUEUE_FLAG_LATENCYSTATS, q))
++			blk_stat_add_callback(q, q->latency_cb);
++		if (!blk_stat_is_active(q->latency_cb))
++			blk_stat_activate_msecs(q->latency_cb, 100);
++	} else {
++		blk_latency_stats_free(q);
++	}
++
++ out:
++	return ret;
++ err_out:
++	if (q->latency_cb) {
++		blk_stat_free_callback(q->latency_cb);
++		q->latency_cb = NULL;
++	}
++	kfree(q->latency_stat);
++	q->latency_stat = NULL;
++	goto out;
++}
++
+ static struct queue_sysfs_entry queue_requests_entry = {
+ 	.attr = {.name = "nr_requests", .mode = 0644 },
+ 	.show = queue_requests_show,
+@@ -822,6 +904,17 @@ static struct queue_sysfs_entry queue_stat_entry = {
+ 	.show = queue_stat_show,
+ };
+ 
++static struct queue_sysfs_entry queue_latency_entry = {
++	.attr = {.name = "latency", .mode = 0444 },
++	.show = queue_latency_show,
++};
++
++static struct queue_sysfs_entry queue_latstat_entry = {
++	.attr = {.name = "latstat", .mode = 0644 },
++	.show = queue_latstat_show,
++	.store = queue_latstat_store,
++};
++
+ static struct attribute *queue_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+@@ -863,6 +956,8 @@ static struct attribute *queue_attrs[] = {
+ #endif
+ 	&queue_reqstat_entry.attr,
+ 	&queue_stat_entry.attr,
++	&queue_latency_entry.attr,
++	&queue_latstat_entry.attr,
+ 	NULL,
+ };
+ 
+@@ -974,6 +1069,7 @@ static void __blk_release_queue(struct work_struct *work)
+ {
+ 	struct request_queue *q = container_of(work, typeof(*q), release_work);
+ 
++	blk_latency_stats_free(q);
+ 	blk_req_stats_free(q);
+ 
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1731c4ec4d34..fd5fab43bda3 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -56,6 +56,8 @@ struct blk_stat_callback;
+ /* Must be consistent with blk_part_stats_bkt() */
+ #define BLK_REQ_STATS_BKTS (3 * 8)
+ 
++#define BLK_LATENCY_STATS_BKTS (3 * 32)
++
+ /*
+  * Maximum number of blkcg policies allowed to be registered concurrently.
+  * Defined here to simplify include dependency.
+@@ -486,6 +488,9 @@ struct request_queue {
+ 	struct blk_stat_callback	*reqstat_cb;
+ 	struct blk_rq_stat	*req_stat;
+ 
++	struct blk_stat_callback	*latency_cb;
++	struct blk_rq_stat	*latency_stat;
++
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 
+@@ -619,6 +624,7 @@ struct request_queue {
+ #define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
+ #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+ #define QUEUE_FLAG_REQSTATS	28	/* request stats enabled if set */
++#define QUEUE_FLAG_LATENCYSTATS	29	/* latency stats enabled if set */
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP))
 -- 
 2.17.1
 
