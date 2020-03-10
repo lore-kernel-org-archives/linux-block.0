@@ -7,24 +7,24 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF01C10F27
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F375C18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FEC3215A4
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 766B521D56
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbgCJQal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 12:30:41 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:35456 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726395AbgCJQak (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1726825AbgCJQak (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 10 Mar 2020 12:30:40 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35482 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726703AbgCJQaj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Mar 2020 12:30:39 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id AAB0846DB4A5C061FC87;
+        by Forcepoint Email with ESMTP id B99CE405C853ED6677D0;
         Wed, 11 Mar 2020 00:30:33 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 11 Mar 2020 00:30:27 +0800
+ 14.3.487.0; Wed, 11 Mar 2020 00:30:24 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <hare@suse.de>,
@@ -34,9 +34,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <virtualization@lists.linux-foundation.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: [PATCH RFC v2 11/24] hpsa: move hpsa_hba_inquiry after scsi_add_host()
-Date:   Wed, 11 Mar 2020 00:25:37 +0800
-Message-ID: <1583857550-12049-12-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v2 01/24] scsi: add 'nr_reserved_cmds' field to the SCSI host template
+Date:   Wed, 11 Mar 2020 00:25:27 +0800
+Message-ID: <1583857550-12049-2-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
 References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
@@ -49,85 +49,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+From: Hannes Reinecke <hare@suse.com>
 
-Move hpsa_hba_inquiry to after scsi_add_host() so that the host
-is fully initialized.
+Add a new field 'nr_reserved_cmds' to the SCSI host template to
+instruct the block layer to set aside a tag space for reserved
+commands.
 
 Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/hpsa.c | 37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ drivers/scsi/scsi_lib.c  | 1 +
+ include/scsi/scsi_host.h | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 1a4ddfacb458..703f824584fe 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -5814,6 +5814,22 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
- 	return 0;
- }
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 610ee41fa54c..2967325df7a0 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1896,6 +1896,7 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+ 		shost->tag_set.ops = &scsi_mq_ops_no_commit;
+ 	shost->tag_set.nr_hw_queues = shost->nr_hw_queues ? : 1;
+ 	shost->tag_set.queue_depth = shost->can_queue;
++	shost->tag_set.reserved_tags = shost->nr_reserved_cmds;
+ 	shost->tag_set.cmd_size = cmd_size;
+ 	shost->tag_set.numa_node = NUMA_NO_NODE;
+ 	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index f577647bf5f2..3f860c8ad623 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -599,6 +599,12 @@ struct Scsi_Host {
+ 	 * is nr_hw_queues * can_queue.
+ 	 */
+ 	unsigned nr_hw_queues;
++
++	/*
++	 * Number of reserved commands, if any.
++	 */
++	unsigned nr_reserved_cmds;
++
+ 	unsigned active_mode:2;
+ 	unsigned unchecked_isa_dma:1;
  
-+static void hpsa_hba_inquiry(struct ctlr_info *h)
-+{
-+	int rc;
-+
-+#define HBA_INQUIRY_BYTE_COUNT 64
-+	h->hba_inquiry_data = kmalloc(HBA_INQUIRY_BYTE_COUNT, GFP_KERNEL);
-+	if (!h->hba_inquiry_data)
-+		return;
-+	rc = hpsa_scsi_do_inquiry(h, RAID_CTLR_LUNID, 0,
-+		h->hba_inquiry_data, HBA_INQUIRY_BYTE_COUNT);
-+	if (rc != 0) {
-+		kfree(h->hba_inquiry_data);
-+		h->hba_inquiry_data = NULL;
-+	}
-+}
-+
- static int hpsa_scsi_add_host(struct ctlr_info *h)
- {
- 	int rv;
-@@ -5823,6 +5839,9 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
- 		dev_err(&h->pdev->dev, "scsi_add_host failed\n");
- 		return rv;
- 	}
-+
-+	hpsa_hba_inquiry(h);
-+
- 	scsi_scan_host(h->scsi_host);
- 	return 0;
- }
-@@ -7899,22 +7918,6 @@ static int hpsa_pci_init(struct ctlr_info *h)
- 	return err;
- }
- 
--static void hpsa_hba_inquiry(struct ctlr_info *h)
--{
--	int rc;
--
--#define HBA_INQUIRY_BYTE_COUNT 64
--	h->hba_inquiry_data = kmalloc(HBA_INQUIRY_BYTE_COUNT, GFP_KERNEL);
--	if (!h->hba_inquiry_data)
--		return;
--	rc = hpsa_scsi_do_inquiry(h, RAID_CTLR_LUNID, 0,
--		h->hba_inquiry_data, HBA_INQUIRY_BYTE_COUNT);
--	if (rc != 0) {
--		kfree(h->hba_inquiry_data);
--		h->hba_inquiry_data = NULL;
--	}
--}
--
- static int hpsa_init_reset_devices(struct pci_dev *pdev, u32 board_id)
- {
- 	int rc, i;
-@@ -8810,8 +8813,6 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Turn the interrupts on so we can service requests */
- 	h->access.set_intr_mask(h, HPSA_INTR_ON);
- 
--	hpsa_hba_inquiry(h);
--
- 	h->lastlogicals = kzalloc(sizeof(*(h->lastlogicals)), GFP_KERNEL);
- 	if (!h->lastlogicals)
- 		dev_info(&h->pdev->dev,
 -- 
 2.17.1
 
