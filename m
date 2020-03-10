@@ -7,21 +7,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C687C10F27
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BD2C10F27
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D89E20848
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A822215A4
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727220AbgCJQas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 12:30:48 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:35576 "EHLO huawei.com"
+        id S1726633AbgCJQbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 12:31:41 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35778 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726708AbgCJQar (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 12:30:47 -0400
+        id S1727092AbgCJQap (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Mar 2020 12:30:45 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id E035BB331E97050D0D15;
-        Wed, 11 Mar 2020 00:30:33 +0800 (CST)
+        by Forcepoint Email with ESMTP id 00CF6BD5A10424B2E4AA;
+        Wed, 11 Mar 2020 00:30:34 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
  14.3.487.0; Wed, 11 Mar 2020 00:30:25 +0800
@@ -34,9 +34,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <virtualization@lists.linux-foundation.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: [PATCH RFC v2 05/24] csiostor: use reserved command for LUN reset
-Date:   Wed, 11 Mar 2020 00:25:31 +0800
-Message-ID: <1583857550-12049-6-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v2 04/24] scsi: Add scsi_{get, put}_reserved_cmd()
+Date:   Wed, 11 Mar 2020 00:25:30 +0800
+Message-ID: <1583857550-12049-5-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
 References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
@@ -49,176 +49,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+From: Hannes Reinecke <hare@suse.com>
 
-When issuing a LUN reset we should be using a reserved command
-to avoid overwriting the original command.
+Implement a function to allocate a SCSI command from the reserved
+tag pool using the host-wide reserved command queue.
 
 Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/csiostor/csio_init.c |  3 +-
- drivers/scsi/csiostor/csio_scsi.c | 49 +++++++++++++++++++------------
- 2 files changed, 32 insertions(+), 20 deletions(-)
+ drivers/scsi/scsi_lib.c  | 30 ++++++++++++++++++++++++++++++
+ include/scsi/scsi_cmnd.h |  3 +++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/drivers/scsi/csiostor/csio_init.c b/drivers/scsi/csiostor/csio_init.c
-index 8dea7d53788a..3848289485c9 100644
---- a/drivers/scsi/csiostor/csio_init.c
-+++ b/drivers/scsi/csiostor/csio_init.c
-@@ -621,7 +621,8 @@ csio_shost_init(struct csio_hw *hw, struct device *dev,
- 	/* Link common lnode to this lnode */
- 	ln->dev_num = (shost->host_no << 16);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index e809b0e30a11..af4f56cd0093 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1927,6 +1927,36 @@ void scsi_mq_destroy_tags(struct Scsi_Host *shost)
+ 	blk_mq_free_tag_set(&shost->tag_set);
+ }
  
--	shost->can_queue = CSIO_MAX_QUEUE;
-+	shost->can_queue = CSIO_MAX_QUEUE - 1;
-+	shost->nr_reserved_cmds = 1;
- 	shost->this_id = -1;
- 	shost->unique_id = shost->host_no;
- 	shost->max_cmd_len = 16; /* Max CDB length supported */
-diff --git a/drivers/scsi/csiostor/csio_scsi.c b/drivers/scsi/csiostor/csio_scsi.c
-index 00cf33573136..9eacdb3d4f07 100644
---- a/drivers/scsi/csiostor/csio_scsi.c
-+++ b/drivers/scsi/csiostor/csio_scsi.c
-@@ -2057,10 +2057,13 @@ csio_tm_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
- static int
- csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- {
--	struct csio_lnode *ln = shost_priv(cmnd->device->host);
-+	struct scsi_cmnd *reset_cmnd;
-+	struct scsi_device *sdev = cmnd->device;
-+	struct Scsi_Host *shost = sdev->host;
-+	struct csio_lnode *ln = shost_priv(sdev->host);
- 	struct csio_hw *hw = csio_lnode_to_hw(ln);
- 	struct csio_scsim *scsim = csio_hw_to_scsim(hw);
--	struct csio_rnode *rn = (struct csio_rnode *)(cmnd->device->hostdata);
-+	struct csio_rnode *rn = (struct csio_rnode *)(sdev->hostdata);
- 	struct csio_ioreq *ioreq = NULL;
- 	struct csio_scsi_qset *sqset;
- 	unsigned long flags;
-@@ -2073,13 +2076,13 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 		goto fail;
++struct scsi_cmnd *scsi_get_reserved_cmd(struct Scsi_Host *shost)
++{
++	struct scsi_cmnd *scmd;
++	struct request *rq;
++
++	if (WARN_ON(!shost->reserved_cmd_q))
++		return NULL;
++
++	rq = blk_mq_alloc_request(shost->reserved_cmd_q,
++				  REQ_OP_DRV_OUT | REQ_NOWAIT,
++				  BLK_MQ_REQ_RESERVED);
++	if (IS_ERR(rq))
++		return NULL;
++	WARN_ON(rq->tag == -1);
++	scmd = blk_mq_rq_to_pdu(rq);
++	scmd->request = rq;
++
++	return scmd;
++}
++EXPORT_SYMBOL_GPL(scsi_get_reserved_cmd);
++
++void scsi_put_reserved_cmd(struct scsi_cmnd *scmd)
++{
++	struct request *rq = blk_mq_rq_from_pdu(scmd);
++
++	if (blk_mq_rq_is_reserved(rq))
++		blk_mq_free_request(rq);
++}
++EXPORT_SYMBOL_GPL(scsi_put_reserved_cmd);
++
+ /**
+  * scsi_device_from_queue - return sdev associated with a request_queue
+  * @q: The request queue to return the sdev from
+diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+index a2849bb9cd19..82a4499539b3 100644
+--- a/include/scsi/scsi_cmnd.h
++++ b/include/scsi/scsi_cmnd.h
+@@ -159,6 +159,9 @@ static inline struct scsi_driver *scsi_cmd_to_driver(struct scsi_cmnd *cmd)
+ 	return *(struct scsi_driver **)cmd->request->rq_disk->private_data;
+ }
  
- 	csio_dbg(hw, "Request to reset LUN:%llu (ssni:0x%x tgtid:%d)\n",
--		      cmnd->device->lun, rn->flowid, rn->scsi_id);
-+		      sdev->lun, rn->flowid, rn->scsi_id);
++struct scsi_cmnd *scsi_get_reserved_cmd(struct Scsi_Host *shost);
++void scsi_put_reserved_cmd(struct scsi_cmnd *);
++
+ extern void scsi_put_command(struct scsi_cmnd *);
+ extern void scsi_finish_command(struct scsi_cmnd *cmd);
  
- 	if (!csio_is_lnode_ready(ln)) {
- 		csio_err(hw,
- 			 "LUN reset cannot be issued on non-ready"
- 			 " local node vnpi:0x%x (LUN:%llu)\n",
--			 ln->vnp_flowid, cmnd->device->lun);
-+			 ln->vnp_flowid, sdev->lun);
- 		goto fail;
- 	}
- 
-@@ -2099,17 +2102,22 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 		csio_err(hw,
- 			 "LUN reset cannot be issued on non-ready"
- 			 " remote node ssni:0x%x (LUN:%llu)\n",
--			 rn->flowid, cmnd->device->lun);
-+			 rn->flowid, sdev->lun);
- 		goto fail;
- 	}
- 
-+	reset_cmnd = scsi_get_reserved_cmd(shost);
-+	if (!reset_cmnd) {
-+		csio_err(hw, "No free TMF request\n");
-+		goto fail;
-+	}
- 	/* Get a free ioreq structure - SM is already set to uninit */
- 	ioreq = csio_get_scsi_ioreq_lock(hw, scsim);
- 
- 	if (!ioreq) {
- 		csio_err(hw, "Out of IO request elements. Active # :%d\n",
- 			 scsim->stats.n_active);
--		goto fail;
-+		goto fail_ret_cmnd;
- 	}
- 
- 	sqset			= &hw->sqset[ln->portid][smp_processor_id()];
-@@ -2119,11 +2127,11 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	ioreq->iq_idx		= sqset->iq_idx;
- 	ioreq->eq_idx		= sqset->eq_idx;
- 
--	csio_scsi_cmnd(ioreq)	= cmnd;
--	cmnd->host_scribble	= (unsigned char *)ioreq;
--	cmnd->SCp.Status	= 0;
-+	csio_scsi_cmnd(ioreq)	= reset_cmnd;
-+	reset_cmnd->host_scribble	= (unsigned char *)ioreq;
-+	reset_cmnd->SCp.Status	= 0;
- 
--	cmnd->SCp.Message	= FCP_TMF_LUN_RESET;
-+	reset_cmnd->SCp.Message	= FCP_TMF_LUN_RESET;
- 	ioreq->tmo		= CSIO_SCSI_LUNRST_TMO_MS / 1000;
- 
- 	/*
-@@ -2140,7 +2148,7 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	sld.level = CSIO_LEV_LUN;
- 	sld.lnode = ioreq->lnode;
- 	sld.rnode = ioreq->rnode;
--	sld.oslun = cmnd->device->lun;
-+	sld.oslun = sdev->lun;
- 
- 	spin_lock_irqsave(&hw->lock, flags);
- 	/* Kick off TM SM on the ioreq */
-@@ -2156,14 +2164,14 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	csio_dbg(hw, "Waiting max %d secs for LUN reset completion\n",
- 		    count * (CSIO_SCSI_TM_POLL_MS / 1000));
- 	/* Wait for completion */
--	while ((((struct scsi_cmnd *)csio_scsi_cmnd(ioreq)) == cmnd)
-+	while ((((struct scsi_cmnd *)csio_scsi_cmnd(ioreq)) == reset_cmnd)
- 								&& count--)
- 		msleep(CSIO_SCSI_TM_POLL_MS);
- 
- 	/* LUN reset timed-out */
--	if (((struct scsi_cmnd *)csio_scsi_cmnd(ioreq)) == cmnd) {
-+	if (((struct scsi_cmnd *)csio_scsi_cmnd(ioreq)) == reset_cmnd) {
- 		csio_err(hw, "LUN reset (%d:%llu) timed out\n",
--			 cmnd->device->id, cmnd->device->lun);
-+			 sdev->id, sdev->lun);
- 
- 		spin_lock_irq(&hw->lock);
- 		csio_scsi_drvcleanup(ioreq);
-@@ -2174,11 +2182,12 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	}
- 
- 	/* LUN reset returned, check cached status */
--	if (cmnd->SCp.Status != FW_SUCCESS) {
-+	if (reset_cmnd->SCp.Status != FW_SUCCESS) {
- 		csio_err(hw, "LUN reset failed (%d:%llu), status: %d\n",
--			 cmnd->device->id, cmnd->device->lun, cmnd->SCp.Status);
--		goto fail;
-+			 sdev->id, sdev->lun, reset_cmnd->SCp.Status);
-+		goto fail_ret_cmnd;
- 	}
-+	scsi_put_reserved_cmd(reset_cmnd);
- 
- 	/* LUN reset succeeded, Start aborting affected I/Os */
- 	/*
-@@ -2196,7 +2205,7 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	if (retval != 0) {
- 		csio_err(hw,
- 			 "Attempt to abort I/Os during LUN reset of %llu"
--			 " returned %d\n", cmnd->device->lun, retval);
-+			 " returned %d\n", sdev->lun, retval);
- 		/* Return I/Os back to active_q */
- 		spin_lock_irq(&hw->lock);
- 		list_splice_tail_init(&local_q, &scsim->active_q);
-@@ -2207,12 +2216,14 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
- 	CSIO_INC_STATS(rn, n_lun_rst);
- 
- 	csio_info(hw, "LUN reset occurred (%d:%llu)\n",
--		  cmnd->device->id, cmnd->device->lun);
-+		  sdev->id, sdev->lun);
- 
- 	return SUCCESS;
- 
- fail_ret_ioreq:
- 	csio_put_scsi_ioreq_lock(hw, scsim, ioreq);
-+fail_ret_cmnd:
-+	scsi_put_reserved_cmd(reset_cmnd);
- fail:
- 	CSIO_INC_STATS(rn, n_lun_rst_fail);
- 	return FAILED;
 -- 
 2.17.1
 
