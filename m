@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF44C10DCE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1D9C10F27
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95FF72467D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 838CE24655
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726170AbgCJE0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 00:26:43 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38949 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbgCJE0n (ORCPT
+        id S1726156AbgCJE0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 00:26:45 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:54714 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbgCJE0o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 00:26:43 -0400
-Received: by mail-pg1-f196.google.com with SMTP id s2so5728516pgv.6
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 21:26:42 -0700 (PDT)
+        Tue, 10 Mar 2020 00:26:44 -0400
+Received: by mail-pj1-f65.google.com with SMTP id np16so849221pjb.4
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 21:26:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IzlOKrcv2Oe/XzzP6feQVhs2X9Bl/DPBL5XHFlPOVT4=;
-        b=sw+iwCkgVK55onAxkg0Y11mpHW/8B1iUNKAH4PBREFT716vkP+yQgX3E5KpbjRLzw9
-         90FiZDFtQsjInpsPrgLN/Fpu/rKcSQLX2uPveZ8en1PG/399WUpN3LCuhv/wms1XsAM/
-         amPMlMSUFUzocGUp9ZlUQWJ6uhiKZekr7AseCQ6YD3Jj9ZY503vSNL/qPqyRS3StI7ZF
-         iy1jtnE9Fq21FsF4+4k39F8XRwFajwwavkOP8+DGL1yaI/823pOR1222wBE8mswVdj/4
-         ChMTuX3Qli0YK9k9WeUJ7+hvW1jGVbSGM5zW+uZkzHpvZawyhAvR4mU+lEH+FQgLsP8E
-         N95A==
-X-Gm-Message-State: ANhLgQ1kXbrLxljIlRVeGQlQYcUS1BFwV+eXjW4nUN6CnZKxgZAFrcib
-        szMsHj64Fn2aU8HdeHKCPLU=
-X-Google-Smtp-Source: ADFU+vs7YOFt7+yv4k8GafzbTijftZDi38oKlPg+vmxJXW/t16zogIi98+gR7awjfPU0hmNM5wVsJw==
-X-Received: by 2002:a62:64c9:: with SMTP id y192mr2877289pfb.26.1583814402023;
-        Mon, 09 Mar 2020 21:26:42 -0700 (PDT)
+        bh=8mTOjj/SAPVGUe6HsUeMd9PBV5Q14D6oy8rjmuu96T8=;
+        b=N6wmZP1ClHWjHb8a63AMo1TWJrbjlotwlnv87Omiip4rEFjL7mddt27MVUxcnSKldO
+         l3IoyhTe5Xsb30Woyqw6WqMWanm2PGcxeHVYWNZvYENt4XJPeS0adPFk+8y9vBXE574S
+         oej9rtc3OgK4cF6cn5wUA7FetgYDpGVFfZnaJ3LdV4T2ZFc6+hLTOF5huqEqkOc0pBe9
+         lIaz9eKBXY+EhPNOmoktCyFN9aC2u+AzD9U3dvW1q5RBJNxZfqRAeHneyvqobZRESiFg
+         N7sWEAPSgRetadn4nwKniqcFjbTGJt1tI30Ay7/J+qOh8o1XtnC27QdatUgDlmThixT9
+         Qi9Q==
+X-Gm-Message-State: ANhLgQ3em6c2Od6iAIbOg5mK2KK4bMv5w0Ur8SriENy4L597OYHSp38e
+        vkcvVHz8NhBITZp4v54rv1U=
+X-Google-Smtp-Source: ADFU+vtOe+zvlv5jiM8Xatbz5keHItbgLxJSNPRZOa+O1984+6zFpheb0cBtA//qnoNtiW4U0Gz8sg==
+X-Received: by 2002:a17:90a:22a9:: with SMTP id s38mr619747pjc.3.1583814403591;
+        Mon, 09 Mar 2020 21:26:43 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:c0e4:71da:7a83:2357])
-        by smtp.gmail.com with ESMTPSA id l189sm5963240pga.64.2020.03.09.21.26.40
+        by smtp.gmail.com with ESMTPSA id l189sm5963240pga.64.2020.03.09.21.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 21:26:41 -0700 (PDT)
+        Mon, 09 Mar 2020 21:26:42 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -48,11 +48,10 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Christoph Hellwig <hch@infradead.org>,
         Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH v4 7/8] null_blk: Handle null_add_dev() failures properly
-Date:   Mon,  9 Mar 2020 21:26:22 -0700
-Message-Id: <20200310042623.20779-8-bvanassche@acm.org>
+        Johannes Thumshirn <jth@kernel.org>
+Subject: [PATCH v4 8/8] null_blk: Add support for init_hctx() fault injection
+Date:   Mon,  9 Mar 2020 21:26:23 -0700
+Message-Id: <20200310042623.20779-9-bvanassche@acm.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200310042623.20779-1-bvanassche@acm.org>
 References: <20200310042623.20779-1-bvanassche@acm.org>
@@ -63,53 +62,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If null_add_dev() fails then null_del_dev() is called with a NULL argument.
-Make null_del_dev() handle this scenario correctly. This patch fixes the
-following KASAN complaint:
-
-null-ptr-deref in null_del_dev+0x28/0x280 [null_blk]
-Read of size 8 at addr 0000000000000000 by task find/1062
-
-Call Trace:
- dump_stack+0xa5/0xe6
- __kasan_report.cold+0x65/0x99
- kasan_report+0x16/0x20
- __asan_load8+0x58/0x90
- null_del_dev+0x28/0x280 [null_blk]
- nullb_group_drop_item+0x7e/0xa0 [null_blk]
- client_drop_item+0x53/0x80 [configfs]
- configfs_rmdir+0x395/0x4e0 [configfs]
- vfs_rmdir+0xb6/0x220
- do_rmdir+0x238/0x2c0
- __x64_sys_unlinkat+0x75/0x90
- do_syscall_64+0x6f/0x2f0
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
+This makes it possible to test the error path in blk_mq_realloc_hw_ctxs()
+and also several error paths in null_blk.
 
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jth@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/null_blk_main.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/block/null_blk_main.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 80d3dcb8722c..d21c82c8863f 100644
+index d21c82c8863f..89bb16a99007 100644
 --- a/drivers/block/null_blk_main.c
 +++ b/drivers/block/null_blk_main.c
-@@ -1469,7 +1469,12 @@ static const struct blk_mq_ops null_mq_ops = {
+@@ -23,6 +23,7 @@
+ #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
+ static DECLARE_FAULT_ATTR(null_timeout_attr);
+ static DECLARE_FAULT_ATTR(null_requeue_attr);
++static DECLARE_FAULT_ATTR(null_init_hctx_attr);
+ #endif
  
- static void null_del_dev(struct nullb *nullb)
- {
--	struct nullb_device *dev = nullb->dev;
-+	struct nullb_device *dev;
+ static inline u64 mb_per_tick(int mbps)
+@@ -101,6 +102,9 @@ module_param_string(timeout, g_timeout_str, sizeof(g_timeout_str), 0444);
+ 
+ static char g_requeue_str[80];
+ module_param_string(requeue, g_requeue_str, sizeof(g_requeue_str), 0444);
 +
-+	if (!nullb)
-+		return;
++static char g_init_hctx_str[80];
++module_param_string(init_hctx, g_init_hctx_str, sizeof(g_init_hctx_str), 0444);
+ #endif
+ 
+ static int g_queue_mode = NULL_Q_MQ;
+@@ -1451,6 +1455,11 @@ static int null_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
+ 	struct nullb *nullb = hctx->queue->queuedata;
+ 	struct nullb_queue *nq;
+ 
++#ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
++	if (g_init_hctx_str[0] && should_fail(&null_init_hctx_attr, 1))
++		return -EFAULT;
++#endif
 +
-+	dev = nullb->dev;
- 
- 	ida_simple_remove(&nullb_indexes, nullb->index);
- 
+ 	nq = &nullb->queues[hctx_idx];
+ 	hctx->driver_data = nq;
+ 	null_init_queue(nullb, nq);
+@@ -1683,6 +1692,8 @@ static bool null_setup_fault(void)
+ 		return false;
+ 	if (!__null_setup_fault(&null_requeue_attr, g_requeue_str))
+ 		return false;
++	if (!__null_setup_fault(&null_init_hctx_attr, g_init_hctx_str))
++		return false;
+ #endif
+ 	return true;
+ }
