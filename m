@@ -2,99 +2,114 @@ Return-Path: <SRS0=5EYj=43=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD2FC10DCE
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 21:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F832C10DCE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 21:40:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 36F5E215A4
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 21:09:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BFF32253D
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 21:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583876425;
+	bh=2+jDH4kDyuHQzpzFEB7OLFpaoFg+zPVBPm0XhdjGSIU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=WlvFYVIxS8AoESnLQ0DG8vIC1tG4qfzggwlYbwSOJR0AUzeW0oRaiWeNmok3LlCcw
+	 tpFu+VfZq/Fw3KaEJocj7xOSWJKNExJv3iUv77HDdQEdQycVkZpfBEHTpDNbeUwxkr
+	 dozZc40oVnynRRVD4f0PkMxvUeqwnLcZkVlwEYP8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbgCJVJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 17:09:01 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2547 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726268AbgCJVJB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 17:09:01 -0400
-Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id B0422B53C758ABD6007B;
-        Tue, 10 Mar 2020 21:08:59 +0000 (GMT)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Tue, 10 Mar 2020 21:08:59 +0000
-Received: from [127.0.0.1] (10.210.167.10) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 10 Mar
- 2020 21:08:57 +0000
-Subject: Re: [PATCH RFC v2 02/24] scsi: allocate separate queue for reserved
- commands
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <hare@suse.de>,
-        <ming.lei@redhat.com>, <bvanassche@acm.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
- <1583857550-12049-3-git-send-email-john.garry@huawei.com>
- <20200310183243.GA14549@infradead.org>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <79cf4341-f2a2-dcc9-be0d-2efc6e83028a@huawei.com>
-Date:   Tue, 10 Mar 2020 21:08:56 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726733AbgCJVkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 17:40:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37552 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726268AbgCJVkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Mar 2020 17:40:21 -0400
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 296F7222C4;
+        Tue, 10 Mar 2020 21:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583876420;
+        bh=2+jDH4kDyuHQzpzFEB7OLFpaoFg+zPVBPm0XhdjGSIU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=g+kyGN2TSnZAY2YysV5uxYbL62/eIXhhTjzlw03MpPtCaHRYMMbMZxJep7q6XKLSJ
+         AeWq6OoOotR/RGD4lXtx2IeMHYbvd8RqR5ziAwC2097ZRwQk4m1iY5XV0InpiQT6cZ
+         buiEtZK9C/UCPMq8bUKa8aXvHFgmHV9Vqsubmk48=
+Received: by mail-lj1-f177.google.com with SMTP id g12so3667197ljj.3;
+        Tue, 10 Mar 2020 14:40:20 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ3e5UAKSnngdj1JoneI0aaHP/xHKlXbSyoOFUu9eOTt0Et1Ya9c
+        560ArSPQOEzvkn83gT2IHJ1UBB9biC03kxTLEYk=
+X-Google-Smtp-Source: ADFU+vtILP3spILDIllI01MAqsStV3WJqlRqXX/qau7gyy5AXdBFui1+JVKYKhGUgEewWYU9uUPVpSVmmokl/oZ53sc=
+X-Received: by 2002:a05:651c:1182:: with SMTP id w2mr119990ljo.235.1583876418295;
+ Tue, 10 Mar 2020 14:40:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200310183243.GA14549@infradead.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.167.10]
-X-ClientProxiedBy: lhreml726-chm.china.huawei.com (10.201.108.77) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <158290150891.4423.13566449569964563258.stgit@buzz> <7133c4fb-38d5-cf1f-e259-e12b50efcb32@oracle.com>
+In-Reply-To: <7133c4fb-38d5-cf1f-e259-e12b50efcb32@oracle.com>
+From:   Song Liu <song@kernel.org>
+Date:   Tue, 10 Mar 2020 14:40:07 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW6xJeX3=0j69_hdaUnYXPm7VeaXHB06JM=fRZsxPweQng@mail.gmail.com>
+Message-ID: <CAPhsuW6xJeX3=0j69_hdaUnYXPm7VeaXHB06JM=fRZsxPweQng@mail.gmail.com>
+Subject: Re: [PATCH] block: keep bdi->io_pages in sync with max_sectors_kb for
+ stacked devices
+To:     Bob Liu <bob.liu@oracle.com>
+Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/03/2020 18:32, Christoph Hellwig wrote:
-> On Wed, Mar 11, 2020 at 12:25:28AM +0800, John Garry wrote:
->> From: Hannes Reinecke <hare@suse.com>
->>
->> Allocate a separate 'reserved_cmd_q' for sending reserved commands.
-> 
-> Why?  Reserved command specifically are not in any way tied to queues.
-> .
-> 
+On Mon, Mar 2, 2020 at 4:16 AM Bob Liu <bob.liu@oracle.com> wrote:
+>
+> On 2/28/20 10:51 PM, Konstantin Khlebnikov wrote:
+> > Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
+> > size based on read-ahead setting") removes unneeded split of read requests.
+> >
+> > Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they setup
+> > limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
+> > Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
+> >
+> > This patch updates io_pages after merging limits in disk_stack_limits().
+> >
+> > Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
+> > the same problem for device-mapper devices, this one fixes MD RAIDs.
+> >
+> > Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> > ---
+> >  block/blk-settings.c |    2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index c8eda2e7b91e..66c45fd79545 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -664,6 +664,8 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+> >               printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
+> >                      top, bottom);
+> >       }
+> > +
+> > +     t->backing_dev_info->io_pages = t->limits.max_sectors >> (PAGE_SHIFT-9);
+> >  }
+> >  EXPORT_SYMBOL(disk_stack_limits);
+> >
+> >
+>
+> Nitpick.. (PAGE_SHIFT - 9)
+> Reviewed-by: Bob Liu <bob.liu@oracle.com>
 
-So the v1 series used a combination of the sdev queue and the per-host 
-reserved_cmd_q. Back then you questioned using the sdev queue for virtio 
-scsi, and the unconfirmed conclusion was to use a common per-host q. 
-This is the best link I can find now:
+Thanks for the fix. I fixed it based on the comments and applied it to md-next.
 
-https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg83177.html
+Jens, I picked the patch to md-next because md is the only user of
+disk_stack_limits().
 
-"
+Please let me know if you prefer routing it via the block tree.
 
- >> My implementation actually allows for per-device reserved tags (eg for
- >> virtio). But some drivers require to use internal commands prior to any
- >> device setup, so they have to use a separate reserved command queue 
-just to
- >> be able to allocate tags.
- >
- > Why would virtio-scsi need per-device reserved commands?  It 
-currently uses
- > a global mempool to allocate the reset commands.
- >
-Oh, I'm perfectly fine with dropping the per-device reserved commands,
-and use the host-wide queue in general.
-It turns out most of the drivers use it that way already.
-Will be doing so for the next iteration.
-
-"
-
-Cheers
+Thanks,
+Song
