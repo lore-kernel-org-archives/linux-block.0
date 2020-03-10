@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B072AC10F27
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43361C10DCE
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 97E9E2467D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B4652467D
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 04:26:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725947AbgCJE0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 00:26:35 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39099 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbgCJE0e (ORCPT
+        id S1726088AbgCJE0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 00:26:36 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42054 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbgCJE0g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 00:26:34 -0400
-Received: by mail-pf1-f193.google.com with SMTP id w65so5330191pfb.6
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 21:26:34 -0700 (PDT)
+        Tue, 10 Mar 2020 00:26:36 -0400
+Received: by mail-pg1-f196.google.com with SMTP id h8so5725599pgs.9
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2020 21:26:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MvC1aHs2ZO2D9gn92BQxEAYcuOjaomxwwJJ0YEkOIfU=;
-        b=B2l/xZkuK2vkdiWYVvX2b212oZtpjsdbvrOZTQcOaSNOWP6A63Jpxn/3CKdsReUloa
-         FCZofTs8AS+qn+4kH4O8ujb3PMt4tYS8QBJhJHFxZ9Uw3mwcOjhUiGSZHK3zCEtVQp6L
-         Vubrmw1MvzvHikVKb3LD0W8KzXrlcHxcNQ2f7LslAWbjOj/HCXuTlB1NZ0BnJ3d5ervN
-         EhhP25S0nZ9d3Q2vTwCnI6SAGi/Db2zBHyQAKw0Tc2xj0+4jAZ+pWQa5g3XYjdzkr34/
-         Kw9JMQL1WGSMQyCoN73uZx8fRnyfPcV1yQg7fyo18PGaFgDYXT5vLAm6/MftEjkohqGU
-         qPKQ==
-X-Gm-Message-State: ANhLgQ082QUALLKdi84wgMJO7ulx7oe0qe+Y6F5zL3itnUHooON0+1o0
-        6FkLDKzptSHcaWWej4EFPnA=
-X-Google-Smtp-Source: ADFU+vtFvnWubtiWoLEWUJglWijivKHSEOna4kvfO/nnm2zB4zp7rY7UBc+/avnRFqAERN6S6/ni6w==
-X-Received: by 2002:aa7:8bdd:: with SMTP id s29mr19220929pfd.208.1583814393686;
-        Mon, 09 Mar 2020 21:26:33 -0700 (PDT)
+        bh=eeNWQoDeiYeeNaUURvR0kvKyoP6OSHq9F5/Cz7NmbPg=;
+        b=SMnrEm7VRFb6uK0YAKzEZ5LQGd1rGHB40+jvNxatNq+wBzzL0FpOSzpXiqUZEz/sVY
+         YeAwCsNONN/zcyobKFGcQZFmOReoXZd5vsBEy8ISm0Jbc1QP0XBYXFSP1xbVm+DQHDEm
+         r2d/rZzxLZ2bwwTMlM9t5TKrhBvIcGxW9ZA9B1B0zcE5J/9eUJjHtiWNJy/1X0yTPNB1
+         trK3rYjWz40vdWHNfb7Lov6dRq4VMGTaDg7cSxR4uWItcR+wkmkRI0KPG9hzFg/hb3e5
+         9YCMf4egXhtYh5mjq+1pXS/CBYDKAlAAAmksguxwhhEEwpXoiHrP/cHGtPbN5s+P+x/2
+         w7Ag==
+X-Gm-Message-State: ANhLgQ1KwLuRyPJGRy0Ki9gM/3ru9qOPiwnPNWzktko7WH3nE14gFSkX
+        KnJi6Mc75UCtwewJjfklBec=
+X-Google-Smtp-Source: ADFU+vvf6fdYPM4H/7OTutdw86c9Xdv+lAui2GukHyQON5q64bYM0PGkv7DAZS6AFFh2AmT764M9Nw==
+X-Received: by 2002:aa7:958e:: with SMTP id z14mr19973136pfj.235.1583814395222;
+        Mon, 09 Mar 2020 21:26:35 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:c0e4:71da:7a83:2357])
-        by smtp.gmail.com with ESMTPSA id l189sm5963240pga.64.2020.03.09.21.26.32
+        by smtp.gmail.com with ESMTPSA id l189sm5963240pga.64.2020.03.09.21.26.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2020 21:26:32 -0700 (PDT)
+        Mon, 09 Mar 2020 21:26:34 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>,
         Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jth@kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-Subject: [PATCH v4 2/8] blk-mq: Keep set->nr_hw_queues and set->map[].nr_queues in sync
-Date:   Mon,  9 Mar 2020 21:26:17 -0700
-Message-Id: <20200310042623.20779-3-bvanassche@acm.org>
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH v4 3/8] blk-mq: Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()
+Date:   Mon,  9 Mar 2020 21:26:18 -0700
+Message-Id: <20200310042623.20779-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200310042623.20779-1-bvanassche@acm.org>
 References: <20200310042623.20779-1-bvanassche@acm.org>
@@ -64,49 +63,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_map_queues() and multiple .map_queues() implementations expect that
-set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the number of hardware
-queues. Hence set .nr_queues before calling these functions. This patch
-fixes the following kernel warning:
+q->nr_hw_queues must only be updated once it is known that
+blk_mq_realloc_hw_ctxs() has succeeded. Otherwise it can happen that
+reallocation fails and that q->nr_hw_queues is larger than the number of
+allocated hardware queues. This patch fixes the following crash if
+increasing the number of hardware queues fails:
 
-WARNING: CPU: 0 PID: 2501 at include/linux/cpumask.h:137
+BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x775/0x810
+Write of size 8 at addr 0000000000000118 by task check/977
+
+CPU: 3 PID: 977 Comm: check Not tainted 5.6.0-rc1-dbg+ #8
+Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
 Call Trace:
- blk_mq_run_hw_queue+0x19d/0x350 block/blk-mq.c:1508
- blk_mq_run_hw_queues+0x112/0x1a0 block/blk-mq.c:1525
- blk_mq_requeue_work+0x502/0x780 block/blk-mq.c:775
- process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
- worker_thread+0x98/0xe40 kernel/workqueue.c:2415
- kthread+0x361/0x430 kernel/kthread.c:255
+ dump_stack+0xa5/0xe6
+ __kasan_report.cold+0x65/0x99
+ kasan_report+0x16/0x20
+ check_memory_region+0x140/0x1b0
+ memset+0x28/0x40
+ blk_mq_map_swqueue+0x775/0x810
+ blk_mq_update_nr_hw_queues+0x468/0x710
+ nullb_device_submit_queues_store+0xf7/0x1a0 [null_blk]
+ configfs_write_file+0x1c4/0x250 [configfs]
+ __vfs_write+0x4c/0x90
+ vfs_write+0x145/0x2c0
+ ksys_write+0xd7/0x180
+ __x64_sys_write+0x47/0x50
+ do_syscall_64+0x6f/0x2f0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jth@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-Fixes: ed76e329d74a ("blk-mq: abstract out queue map") # v5.0
+Cc: Keith Busch <kbusch@kernel.org>
+Fixes: ac0d6b926e74 ("block: Reduce the amount of memory required per request queue")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/blk-mq.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7a16d61e3cd3..f174b6ad94cb 100644
+index f174b6ad94cb..41f7264e51c9 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -3027,6 +3027,14 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 
- static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- {
-+	/*
-+	 * blk_mq_map_queues() and multiple .map_queues() implementations
-+	 * expect that set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the
-+	 * number of hardware queues.
-+	 */
-+	if (set->nr_maps == 1)
-+		set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
-+
- 	if (set->ops->map_queues && !is_kdump_kernel()) {
- 		int i;
- 
+@@ -2828,7 +2828,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+ 			       sizeof(*hctxs));
+ 		q->queue_hw_ctx = new_hctxs;
+-		q->nr_hw_queues = set->nr_hw_queues;
+ 		kfree(hctxs);
+ 		hctxs = new_hctxs;
+ 	}
