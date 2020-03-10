@@ -7,24 +7,24 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16996C18E5A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF01C10F27
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEECE215A4
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FEC3215A4
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbgCJQb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 12:31:56 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11208 "EHLO huawei.com"
+        id S1726977AbgCJQal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 12:30:41 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35456 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726703AbgCJQao (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 12:30:44 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 723D63DE2991F21402A8;
-        Wed, 11 Mar 2020 00:30:38 +0800 (CST)
+        id S1726395AbgCJQak (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Mar 2020 12:30:40 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id AAB0846DB4A5C061FC87;
+        Wed, 11 Mar 2020 00:30:33 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 11 Mar 2020 00:30:29 +0800
+ 14.3.487.0; Wed, 11 Mar 2020 00:30:27 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <hare@suse.de>,
@@ -34,9 +34,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <virtualization@lists.linux-foundation.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: [PATCH RFC v2 17/24] aacraid: move scsi_add_host()
-Date:   Wed, 11 Mar 2020 00:25:43 +0800
-Message-ID: <1583857550-12049-18-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v2 11/24] hpsa: move hpsa_hba_inquiry after scsi_add_host()
+Date:   Wed, 11 Mar 2020 00:25:37 +0800
+Message-ID: <1583857550-12049-12-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
 References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
@@ -51,58 +51,83 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Hannes Reinecke <hare@suse.de>
 
-Move the call to scsi_add_host() so that the Scsi_Host structure
-is initialized before any I/O is sent.
+Move hpsa_hba_inquiry to after scsi_add_host() so that the host
+is fully initialized.
 
 Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/aacraid/linit.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ drivers/scsi/hpsa.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/scsi/aacraid/linit.c b/drivers/scsi/aacraid/linit.c
-index ee6bc2f9b80a..0e084b09615d 100644
---- a/drivers/scsi/aacraid/linit.c
-+++ b/drivers/scsi/aacraid/linit.c
-@@ -1676,6 +1676,9 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	shost->unique_id = unique_id;
- 	shost->max_cmd_len = 16;
- 	shost->use_cmd_list = 1;
-+	shost->max_id = MAXIMUM_NUM_CONTAINERS;
-+	shost->max_lun = AAC_MAX_LUN;
-+	shost->sg_tablesize = HBA_MAX_SG_SEPARATE;
+diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
+index 1a4ddfacb458..703f824584fe 100644
+--- a/drivers/scsi/hpsa.c
++++ b/drivers/scsi/hpsa.c
+@@ -5814,6 +5814,22 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
+ 	return 0;
+ }
  
- 	if (aac_cfg_major == AAC_CHARDEV_NEEDS_REINIT)
- 		aac_init_char();
-@@ -1740,6 +1743,10 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto out_deinit;
- 	}
- 
-+	error = scsi_add_host(shost, &pdev->dev);
-+	if (error)
-+		goto out_deinit;
++static void hpsa_hba_inquiry(struct ctlr_info *h)
++{
++	int rc;
 +
- 	aac->maximum_num_channels = aac_drivers[index].channels;
- 	error = aac_get_adapter_info(aac);
- 	if (error < 0)
-@@ -1798,18 +1805,8 @@ static int aac_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (!aac->sa_firmware && aac_drivers[index].quirks & AAC_QUIRK_SRC)
- 		aac_intr_normal(aac, 0, 2, 0, NULL);
++#define HBA_INQUIRY_BYTE_COUNT 64
++	h->hba_inquiry_data = kmalloc(HBA_INQUIRY_BYTE_COUNT, GFP_KERNEL);
++	if (!h->hba_inquiry_data)
++		return;
++	rc = hpsa_scsi_do_inquiry(h, RAID_CTLR_LUNID, 0,
++		h->hba_inquiry_data, HBA_INQUIRY_BYTE_COUNT);
++	if (rc != 0) {
++		kfree(h->hba_inquiry_data);
++		h->hba_inquiry_data = NULL;
++	}
++}
++
+ static int hpsa_scsi_add_host(struct ctlr_info *h)
+ {
+ 	int rv;
+@@ -5823,6 +5839,9 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
+ 		dev_err(&h->pdev->dev, "scsi_add_host failed\n");
+ 		return rv;
+ 	}
++
++	hpsa_hba_inquiry(h);
++
+ 	scsi_scan_host(h->scsi_host);
+ 	return 0;
+ }
+@@ -7899,22 +7918,6 @@ static int hpsa_pci_init(struct ctlr_info *h)
+ 	return err;
+ }
  
--	/*
--	 * dmb - we may need to move the setting of these parms somewhere else once
--	 * we get a fib that can report the actual numbers
--	 */
--	shost->max_lun = AAC_MAX_LUN;
+-static void hpsa_hba_inquiry(struct ctlr_info *h)
+-{
+-	int rc;
 -
- 	pci_set_drvdata(pdev, shost);
- 
--	error = scsi_add_host(shost, &pdev->dev);
--	if (error)
--		goto out_deinit;
+-#define HBA_INQUIRY_BYTE_COUNT 64
+-	h->hba_inquiry_data = kmalloc(HBA_INQUIRY_BYTE_COUNT, GFP_KERNEL);
+-	if (!h->hba_inquiry_data)
+-		return;
+-	rc = hpsa_scsi_do_inquiry(h, RAID_CTLR_LUNID, 0,
+-		h->hba_inquiry_data, HBA_INQUIRY_BYTE_COUNT);
+-	if (rc != 0) {
+-		kfree(h->hba_inquiry_data);
+-		h->hba_inquiry_data = NULL;
+-	}
+-}
 -
- 	aac_scan_host(aac);
+ static int hpsa_init_reset_devices(struct pci_dev *pdev, u32 board_id)
+ {
+ 	int rc, i;
+@@ -8810,8 +8813,6 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Turn the interrupts on so we can service requests */
+ 	h->access.set_intr_mask(h, HPSA_INTR_ON);
  
- 	pci_enable_pcie_error_reporting(pdev);
+-	hpsa_hba_inquiry(h);
+-
+ 	h->lastlogicals = kzalloc(sizeof(*(h->lastlogicals)), GFP_KERNEL);
+ 	if (!h->lastlogicals)
+ 		dev_info(&h->pdev->dev,
 -- 
 2.17.1
 
