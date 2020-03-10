@@ -7,21 +7,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E17C18E5A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B3FC18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56FB721D7E
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1D60215A4
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 16:32:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727590AbgCJQbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 12:31:48 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:35780 "EHLO huawei.com"
+        id S1727631AbgCJQb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 12:31:57 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35668 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727097AbgCJQap (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 12:30:45 -0400
+        id S1727075AbgCJQao (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Mar 2020 12:30:44 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 079F44E3E4A0CD650864;
-        Wed, 11 Mar 2020 00:30:34 +0800 (CST)
+        by Forcepoint Email with ESMTP id EE4AD346438384E4A2EA;
+        Wed, 11 Mar 2020 00:30:33 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
  14.3.487.0; Wed, 11 Mar 2020 00:30:24 +0800
@@ -34,9 +34,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <virtualization@lists.linux-foundation.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: [PATCH RFC v2 02/24] scsi: allocate separate queue for reserved commands
-Date:   Wed, 11 Mar 2020 00:25:28 +0800
-Message-ID: <1583857550-12049-3-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v2 03/24] blk-mq: Implement blk_mq_rq_is_reserved()
+Date:   Wed, 11 Mar 2020 00:25:29 +0800
+Message-ID: <1583857550-12049-4-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
 References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
@@ -51,65 +51,51 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Hannes Reinecke <hare@suse.com>
 
-Allocate a separate 'reserved_cmd_q' for sending reserved commands.
+Add function to check if a blk-mq request is from the reserved pool
 
 Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/scsi_lib.c  | 17 ++++++++++++++++-
- include/scsi/scsi_host.h |  1 +
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ block/blk-mq.c         | 13 +++++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 2967325df7a0..e809b0e30a11 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1881,6 +1881,7 @@ struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev)
- int scsi_mq_setup_tags(struct Scsi_Host *shost)
- {
- 	unsigned int cmd_size, sgl_size;
-+	int ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d92088dec6c3..603c60a1956c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -269,6 +269,19 @@ static inline bool blk_mq_need_time_stamp(struct request *rq)
+ 	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS)) || rq->q->elevator;
+ }
  
- 	sgl_size = max_t(unsigned int, sizeof(struct scatterlist),
- 				scsi_mq_inline_sgl_size(shost));
-@@ -1904,11 +1905,25 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
- 	shost->tag_set.driver_data = shost;
- 
--	return blk_mq_alloc_tag_set(&shost->tag_set);
-+	ret = blk_mq_alloc_tag_set(&shost->tag_set);
-+	if (ret)
-+		return ret;
++/**
++ * blk_mq_rq_is_reserved - Check if a request has a reserved tag
++ *
++ * @rq: Request to check
++ */
++bool blk_mq_rq_is_reserved(struct request *rq)
++{
++	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
 +
-+	if (shost->nr_reserved_cmds) {
-+		shost->reserved_cmd_q = blk_mq_init_queue(&shost->tag_set);
-+		if (IS_ERR(shost->reserved_cmd_q)) {
-+			blk_mq_free_tag_set(&shost->tag_set);
-+			ret = PTR_ERR(shost->reserved_cmd_q);
-+			shost->reserved_cmd_q = NULL;
-+		}
-+	}
-+	return ret;
- }
- 
- void scsi_mq_destroy_tags(struct Scsi_Host *shost)
++	return blk_mq_tag_is_reserved(hctx->tags, rq->tag);
++}
++EXPORT_SYMBOL_GPL(blk_mq_rq_is_reserved);
++
+ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 		unsigned int tag, unsigned int op, u64 alloc_time_ns)
  {
-+	if (shost->reserved_cmd_q)
-+		blk_cleanup_queue(shost->reserved_cmd_q);
- 	blk_mq_free_tag_set(&shost->tag_set);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 11cfd6470b1a..8bdc35ac4a63 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -548,6 +548,8 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ 	return rq + 1;
  }
  
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 3f860c8ad623..2258a4f7b4d8 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -604,6 +604,7 @@ struct Scsi_Host {
- 	 * Number of reserved commands, if any.
- 	 */
- 	unsigned nr_reserved_cmds;
-+	struct request_queue *reserved_cmd_q;
- 
- 	unsigned active_mode:2;
- 	unsigned unchecked_isa_dma:1;
++bool blk_mq_rq_is_reserved(struct request *rq);
++
+ #define queue_for_each_hw_ctx(q, hctx, i)				\
+ 	for ((i) = 0; (i) < (q)->nr_hw_queues &&			\
+ 	     ({ hctx = (q)->queue_hw_ctx[i]; 1; }); (i)++)
 -- 
 2.17.1
 
