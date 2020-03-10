@@ -2,347 +2,167 @@ Return-Path: <SRS0=5EYj=43=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DC5C10F27
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 08:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6496BC10F27
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 09:47:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 191782253D
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 08:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38F1024681
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 09:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP/hFnyM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rgJxAW3t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726273AbgCJIIC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 04:08:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49963 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725919AbgCJIIC (ORCPT
+        id S1726211AbgCJJrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 05:47:12 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:26501 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726202AbgCJJrM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 04:08:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583827679;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xlxKBNJR8eAt1iS6rVCQQWt0YeGZoOdZTHbNDyCAkiA=;
-        b=cP/hFnyMqrkTZuu9Z9qvzuGsS+sm4Rj9PuNrJTN7LmNoKeKnfh9ANQnrEzSP3EiNRduNiU
-        E+PuBawPB2P8Y+k8yQ1jcn5ELjpYUaWVPKb2vbLY09FTHj++IeuYDplTbptWz7R4fQXcw5
-        vsFtCTWrM6jY0MR6X2bFS1MqfI0dTKg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-Px9AhRBhOxCB-7UBMZKVxA-1; Tue, 10 Mar 2020 04:07:56 -0400
-X-MC-Unique: Px9AhRBhOxCB-7UBMZKVxA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2258800D4E;
-        Tue, 10 Mar 2020 08:07:54 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-35.pek2.redhat.com [10.72.8.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 607D660BF3;
-        Tue, 10 Mar 2020 08:07:48 +0000 (UTC)
-Date:   Tue, 10 Mar 2020 16:07:44 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: commit 01e99aeca397 causes longer runtime of block/004
-Message-ID: <20200310080744.GA7618@ming.t460p>
-References: <20200305011900.2rtgtmclovmr2fbw@shindev.dhcp.fujisawa.hgst.com>
- <20200305024808.GA26733@ming.t460p>
- <20200306060622.t2jl7qkzvkwvvcbx@shindev.dhcp.fujisawa.hgst.com>
- <20200306081309.GA29683@ming.t460p>
- <20200307010222.gtrwivafqe2254i6@shindev.dhcp.fujisawa.hgst.com>
- <20200307041343.GB20579@ming.t460p>
- <20200309000715.sqgsssrauzmmpli2@shindev.dhcp.fujisawa.hgst.com>
- <20200309161430.GA4871@ming.t460p>
- <BYAPR04MB5816C428F1E23B1030579887E7FF0@BYAPR04MB5816.namprd04.prod.outlook.com>
- <20200310055417.o3jghx4sl5xtztci@shindev.dhcp.fujisawa.hgst.com>
+        Tue, 10 Mar 2020 05:47:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1583833633; x=1615369633;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GyC1mD96+zGq46P5GliCSzs31JbPFVwVSe4iMip55ZQ=;
+  b=rgJxAW3t1k09l98+mauju1MsXC5px6pimWOJIjX8NpqYNVUFRHZ5E29Y
+   52RvJVMwpiV2S/1n42GBzpyO3dh8eoIN4O7O8zmcz2hPGPFZmO/DWptEi
+   Rx3kr9HomAyPyguheEzx3CSrwaEcXBBpIi0K7gZ9nurR1vIFAbQYlj63s
+   fCAapORcmC0LIqIUOWyeY426oe3gy9k6a4dRLBH9E3JLkhB7D09ckwAlQ
+   qiv5qyk4d/MeI/phDd3US+uh7tMV6lW3wCLjvxjI6FxJi97MEqT61HRal
+   BDLuIkGTDPpoGZ3XSyaKDec69vxlIq8INg2wLwalGdmb0PWOGzOAVOF6R
+   A==;
+IronPort-SDR: Qj7ETQC9aWIrIUXM82ZHJVTmyOEYEF0IKdPf4GzXjhokYTqrXm1lVmFIRPmTS/PeQ7wML54lyE
+ BmVVngzZS96V18UqbG/bbjROO3JP5Zlh/kmbdnotXiK/ukAfX36ro0UnPSAeeld0OjhKYaAcVI
+ VlAuDR9KvyqTzyoV6EZ0EoPk0m2ubY7lD3OnHgYk6NNDrq8G2YRuZ2iIUXZ9tB54imsLZK1ERS
+ by2lOI2KQi8zSihzAMQaObM1V7g22wdKUmeBXzEy5qD/sOGz/5OvpTS+Vca/M0xRPVSpUAr8R1
+ u9c=
+X-IronPort-AV: E=Sophos;i="5.70,536,1574092800"; 
+   d="scan'208";a="234082772"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Mar 2020 17:47:13 +0800
+IronPort-SDR: 7GkqxOTxxvCl8nR5LHtF+zvCaPzTHlowqVeqXU97gzZaNUjNpT1pQ/RQp4qC1vcTaNyEw6V4/E
+ 9ln2XBpfY1Czhbd8qotTEIiq9TR/VrLIWBybcVH+yyFn83Evd0DEhdtNh8c1vrd+E/IGuZJRs3
+ bbW1NAh88G6lzEJD/B7WEdBErNUm3w8lBInW02mdXL7nwBBGNo0ivJ8Duv0f96ER/XVIU/kbMO
+ z7sESn+KB/Bi3i4GuwyChbL8MUVS7mIBFNfzwM1/5L/Q36AHfL4C5qOnStq4oQqAEgiN0qw+Mh
+ rcYF8uGljnxA9/hpjwl85nHb
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2020 02:38:52 -0700
+IronPort-SDR: DjILSwMrU4PEVbUV49zhF+G1O6ErZ0CzqmHdWEVU9CHGrNa5/I3GXNKXIuGYN5lYgM6924q5hP
+ 9PyuP6hEM/BCz9wbn4iETlhaj/NeOUhs8JrLHZ/bpRNR4jY7Fwl2Y9buy7dUOOjp45zBmwQpCp
+ Rd1LETfk53vKN+eyqH/AynGpSbZ3EfScHmvcIEPwia1dQvMCn3/QLsXc6QrnMyk05o7IOXxcXu
+ d583+t66Q3Xyps8wdiYutaOxTmp5DJRh9Iuebb8XOyRUNhJqdNAZ2s59ZlNNXtBwl1r422MhuM
+ XLk=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 10 Mar 2020 02:47:10 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 00/11] Introduce Zone Append for writing to zoned block devices
+Date:   Tue, 10 Mar 2020 18:46:42 +0900
+Message-Id: <20200310094653.33257-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200310055417.o3jghx4sl5xtztci@shindev.dhcp.fujisawa.hgst.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 05:54:18AM +0000, Shinichiro Kawasaki wrote:
-> Ming, thank you for sharing the log files and analysis.
-> 
-> On Mar 10, 2020 / 03:07, Damien Le Moal wrote:
-> > On 2020/03/10 1:14, Ming Lei wrote:
-> > > On Mon, Mar 09, 2020 at 12:07:16AM +0000, Shinichiro Kawasaki wrote:
-> > >> On Mar 07, 2020 / 12:13, Ming Lei wrote:
-> > >>> On Sat, Mar 07, 2020 at 01:02:23AM +0000, Shinichiro Kawasaki wrote:
-> > >>>> On Mar 06, 2020 / 16:13, Ming Lei wrote:
-> > >>>>> On Fri, Mar 06, 2020 at 06:06:23AM +0000, Shinichiro Kawasaki wrote:
-> > >>>>>> On Mar 05, 2020 / 10:48, Ming Lei wrote:
-> > >>>>>>> Hi Shinichiro,
-> > >>>>>>>
-> > >>>>>>> On Thu, Mar 05, 2020 at 01:19:02AM +0000, Shinichiro Kawasaki wrote:
-> > >>>>>>>> On Mar 04, 2020 / 17:53, Ming Lei wrote:
-> > >>>>>>>>> On Wed, Mar 04, 2020 at 06:11:37AM +0000, Shinichiro Kawasaki wrote:
-> > >>>>>>>>>> On Mar 04, 2020 / 11:46, Ming Lei wrote:
-> > >>>>>>>>>>> On Wed, Mar 04, 2020 at 02:38:43AM +0000, Shinichiro Kawasaki wrote:
-> > >>>>>>>>>>>> I noticed that blktests block/004 takes longer runtime with 5.6-rc4 than
-> > >>>>>>>>>>>> 5.6-rc3, and found that the commit 01e99aeca397 ("blk-mq: insert passthrough
-> > >>>>>>>>>>>> request into hctx->dispatch directly") triggers it.
-> > >>>>>>>>>>>>
-> > >>>>>>>>>>>> The longer runtime was observed with dm-linear device which maps SATA SMR HDD
-> > >>>>>>>>>>>> connected via AHCI. It was not observed with dm-linear on SAS/SATA SMR HDDs
-> > >>>>>>>>>>>> connected via SAS-HBA. Not observed with dm-linear on non-SMR HDDs either.
-> > >>>>>>>>>>>>
-> > >>>>>>>>>>>> Before the commit, block/004 took around 130 seconds. After the commit, it takes
-> > >>>>>>>>>>>> around 300 seconds. I need to dig in further details to understand why the
-> > >>>>>>>>>>>> commit makes the test case longer.
-> > >>>>>>>>>>>>
-> > >>>>>>>>>>>> The test case block/004 does "flush intensive workload". Is this longer runtime
-> > >>>>>>>>>>>> expected?
-> > >>>>>>>>>>>
-> > >>>>>>>>>>> The following patch might address this issue:
-> > >>>>>>>>>>>
-> > >>>>>>>>>>> https://lore.kernel.org/linux-block/20200207190416.99928-1-sqazi@google.com/#t
-> > >>>>>>>>>>>
-> > >>>>>>>>>>> Please test and provide us the result.
-> > >>>>>>>>>>>
-> > >>>>>>>>>>> thanks,
-> > >>>>>>>>>>> Ming
-> > >>>>>>>>>>>
-> > >>>>>>>>>>
-> > >>>>>>>>>> Hi Ming,
-> > >>>>>>>>>>
-> > >>>>>>>>>> I applied the patch to 5.6-rc4 but I observed the longer runtime of block/004.
-> > >>>>>>>>>> Still it takes around 300 seconds.
-> > >>>>>>>>>
-> > >>>>>>>>> Hello Shinichiro,
-> > >>>>>>>>>
-> > >>>>>>>>> block/004 only sends 1564 sync randwrite, and seems 130s has been slow
-> > >>>>>>>>> enough.
-> > >>>>>>>>>
-> > >>>>>>>>> There are two related effect in that commit for your issue:
-> > >>>>>>>>>
-> > >>>>>>>>> 1) 'at_head' is applied in blk_mq_sched_insert_request() for flush
-> > >>>>>>>>> request
-> > >>>>>>>>>
-> > >>>>>>>>> 2) all IO is added back to tail of hctx->dispatch after .queue_rq()
-> > >>>>>>>>> returns STS_RESOURCE
-> > >>>>>>>>>
-> > >>>>>>>>> Seems it is more related with 2) given you can't reproduce the issue on 
-> > >>>>>>>>> SAS.
-> > >>>>>>>>>
-> > >>>>>>>>> So please test the following two patches, and see which one makes a
-> > >>>>>>>>> difference for you.
-> > >>>>>>>>>
-> > >>>>>>>>> BTW, both two looks not reasonable, just for narrowing down the issue.
-> > >>>>>>>>>
-> > >>>>>>>>> 1) patch 1
-> > >>>>>>>>>
-> > >>>>>>>>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > >>>>>>>>> index 856356b1619e..86137c75283c 100644
-> > >>>>>>>>> --- a/block/blk-mq-sched.c
-> > >>>>>>>>> +++ b/block/blk-mq-sched.c
-> > >>>>>>>>> @@ -398,7 +398,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
-> > >>>>>>>>>  	WARN_ON(e && (rq->tag != -1));
-> > >>>>>>>>>  
-> > >>>>>>>>>  	if (blk_mq_sched_bypass_insert(hctx, !!e, rq)) {
-> > >>>>>>>>> -		blk_mq_request_bypass_insert(rq, at_head, false);
-> > >>>>>>>>> +		blk_mq_request_bypass_insert(rq, true, false);
-> > >>>>>>>>>  		goto run;
-> > >>>>>>>>>  	}
-> > >>>>>>>>
-> > >>>>>>>> Ming, thank you for the trial patches.
-> > >>>>>>>> This "patch 1" reduced the runtime, as short as rc3.
-> > >>>>>>>>
-> > >>>>>>>>>
-> > >>>>>>>>>
-> > >>>>>>>>> 2) patch 2
-> > >>>>>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > >>>>>>>>> index d92088dec6c3..447d5cb39832 100644
-> > >>>>>>>>> --- a/block/blk-mq.c
-> > >>>>>>>>> +++ b/block/blk-mq.c
-> > >>>>>>>>> @@ -1286,7 +1286,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-> > >>>>>>>>>  			q->mq_ops->commit_rqs(hctx);
-> > >>>>>>>>>  
-> > >>>>>>>>>  		spin_lock(&hctx->lock);
-> > >>>>>>>>> -		list_splice_tail_init(list, &hctx->dispatch);
-> > >>>>>>>>> +		list_splice_init(list, &hctx->dispatch);
-> > >>>>>>>>>  		spin_unlock(&hctx->lock);
-> > >>>>>>>>>  
-> > >>>>>>>>>  		/*
-> > >>>>>>>>
-> > >>>>>>>> This patch 2 didn't reduce the runtime.
-> > >>>>>>>>
-> > >>>>>>>> Wish this report helps.
-> > >>>>>>>
-> > >>>>>>> Your feedback does help, then please test the following patch:
-> > >>>>>>
-> > >>>>>> Hi Ming, thank you for the patch. I applied it on top of rc4 and confirmed
-> > >>>>>> it reduces the runtime as short as rc3. Good.
-> > >>>>>
-> > >>>>> Hi Shinichiro,
-> > >>>>>
-> > >>>>> Thanks for your test!
-> > >>>>>
-> > >>>>> Then I think the following change should make the difference actually,
-> > >>>>> you may double check that and confirm if it is that.
-> > >>>>>
-> > >>>>>> @@ -334,7 +334,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
-> > >>>>>>  	flush_rq->rq_disk = first_rq->rq_disk;
-> > >>>>>>  	flush_rq->end_io = flush_end_io;
-> > >>>>>>  
-> > >>>>>> -	blk_flush_queue_rq(flush_rq, false);
-> > >>>>>> +	blk_flush_queue_rq(flush_rq, true);
-> > >>>>
-> > >>>> Yes, with this the one line change above only, the runtime was reduced.
-> > >>>>
-> > >>>>>
-> > >>>>> However, the flush request is added to tail of dispatch queue[1] for long time.
-> > >>>>> 0cacba6cf825 ("blk-mq-sched: bypass the scheduler for flushes entirely")
-> > >>>>> and its predecessor(all mq scheduler start patches) changed to add flush request
-> > >>>>> to front of dispatch queue for blk-mq by ignoring 'add_queue' parameter of
-> > >>>>> blk_mq_sched_insert_flush(). That change may be by accident, and not sure it is
-> > >>>>> correct.
-> > >>>>>
-> > >>>>> I guess once flush rq is added to tail of dispatch queue in block/004,
-> > >>>>> in which lots of FS request may stay in hctx->dispatch because of low
-> > >>>>> AHCI queue depth, then we may take a bit long for flush rq to be
-> > >>>>> submitted to LLD.
-> > >>>>>
-> > >>>>> I'd suggest to root cause/understand the issue given it isn't obvious
-> > >>>>> correct to queue flush rq at front of dispatch queue, so could you collect
-> > >>>>> the following trace via the following script with/without the single line
-> > >>>>> patch?
-> > >>>>
-> > >>>> Thank you for the thoughts for the correct design. I have taken the two traces,
-> > >>>> with and without the one liner patch above. The gzip archived trace files have
-> > >>>> 1.6MB size. It looks too large to post to the list. Please let me know how you
-> > >>>> want the trace files shared.
-> > >>>
-> > >>> I didn't thought the trace can be so big given the ios should be just
-> > >>> 256 * 64(1564).
-> > >>>
-> > >>> You may put the log somewhere in Internet, cloud storage, web, or
-> > >>> whatever. Then just provides us the link.
-> > >>>
-> > >>> Or if you can't find a place to hold it, just send to me, and I will put
-> > >>> it in my RH people web link.
-> > >>
-> > >> I have sent another e-mail only to you attaching the log files gziped.
-> > >> Your confirmation will be appreciated.
-> > > 
-> > > Yeah, I got the log, and it has been put in the following link:
-> > > 
-> > > http://people.redhat.com/minlei/tests/logs/blktests_block_004_perf_degrade.tar.gz
-> > > 
-> > > Also I have run some analysis, and block/004 basically call pwrite() &
-> > > fsync() in each job.
-> > > 
-> > > 1) v5.6-rc kernel
-> > > - write rq average latency: 0.091s 
-> > > - flush rq average latency: 0.018s
-> > > - average issue times of write request: 1.978  //how many trace_block_rq_issue() is called for one rq
-> > > - average issue times of flush request: 1.052
-> > > 
-> > > 2) v5.6-rc patched kernel
-> > > - write rq average latency: 0.031
-> > > - flush rq average latency: 0.035
-> > > - average issue times of write request: 1.466
-> > > - average issue times of flush request: 1.610
-> > > 
-> > > 
-> > > block/004 starts 64 jobs and AHCI's queue can become saturated easily,
-> > > then BLK_MQ_S_SCHED_RESTART should be set, so write request in dispatch
-> > > queue can only move on after one request is completed.
-> > > 
-> > > Looks the flush request takes shorter time than normal write IO.
-> > > If flush request is added to front of dispatch queue, the next normal
-> > > write IO could be queued to lld quicker than adding to tail of dispatch
-> > > queue.
-> > > trace_block_rq_issue() is called more than one time is because of
-> > > AHCI or the drive's implementation. It usually means that
-> > > host->hostt->queuecommand() fails for several times when queuing one
-> > > single request. For AHCI, I understand it shouldn't fail normally given
-> > > we guarantee that the actual queue depth is <= either LUN or host's
-> > > queue depth. Maybe it depends on your SMR's implementation about handling
-> > > flush/write IO. Could you check why .queuecommand() fails in block/004?
-> 
-> I put some debug prints and confirmed that the .queuecommand function is
-> ata_scsi_queuecmd() and it returns SCSI_MLQUEUE_DEVICE_BUSY because
-> ata_std_qc_defer() returns ATA_DEFER_LINK. The comment of ata_std_qc_defer()
-> notes that "Non-NCQ commands cannot run with any other command, NCQ or not.  As
-> upper layer only knows the queue depth, we are responsible for maintaining
-> exclusion.  This function checks whether a new command @qc can be issued." Then
-> I guess .queuecommand() fails because is that Non-NCQ flush command and NCQ
-> write command are waiting the completion each other.
+The upcoming NVMe ZNS Specification will define a new type of write
+command for zoned block devices, zone append.
 
-OK, got it.
+When when writing to a zoned block device using zone append, the start
+sector of the write is pointing at the start LBA of the zone to write to.
+Upon completion the block device will respond with the position the data
+has been placed in the zone. This from a high level perspective can be
+seen like a file system's block allocator, where the user writes to a
+file and the file-system takes care of the data placement on the device.
 
-> 
-> > 
-> > Indeed, that is weird that queuecommand fails. There is nothing SMR specific in
-> > the AHCI code beside disk probe checks. So write & flush handling does not
-> > differ between SMR and regular disks. The same applies to the drive side. write
-> > and flush commands are the normal commands, no change at all. The only
-> > difference being the sequential write constraint which the drive honors by not
-> > executing the queued write command out of order. But there are no constraint for
-> > flush on SMR, so we get whatever the drive does, that is, totally drive dependent.
-> > 
-> > I wonder if the issue may be with the particular AHCI chipset used for this test.
-> > 
-> > > 
-> > > Also can you provide queue flags via the following command?
-> > > 
-> > > 	cat /sys/kernel/debug/block/sdN/state
-> 
-> The state sysfs attribute was as follows:
-> 
-> SAME_COMP|IO_STAT|ADD_RANDOM|INIT_DONE|WC|STATS|REGISTERED|SCSI_PASSTHROUGH|26
-> 
-> It didn't change before and after the block/004 run.
-> 
-> 
-> > > 
-> > > I understand flush request should be slower than normal write, however
-> > > looks not true in this hardware.
-> > 
-> > Probably due to the fact that since the writes are sequential, there is a lot of
-> > drive internal optimization that can be done to minimize the cost of flush
-> > (internal data streaming from cache to media, media-cache use, etc) That is true
-> > for regular disks too. And all of this is highly dependent on the hardware
-> > implementation.
-> 
-> This discussion tempted me to take closer look in the traces. And I noticed that
-> number of flush commands issued is different with and without the patch.
-> 
->                         | without patch | with patch
-> ------------------------+---------------+------------
-> block_getrq: rwbs=FWS   |      32640    |   32640
-> block_rq_issue: rwbs=FF |      32101    |    7593
+In order to fully exploit the new zone append command in file-systems and
+other interfaces above the block layer, we choose to emulate zone append
+in SCSI and null_blk. This way we can have a single write path for both
+file-systems and other interfaces above the block-layer, like io_uring on
+zoned block devices, without having to care too much about the underlying
+characteristics of the device itself.
 
-Looks issued flush request is too many given the flush machinery
-should avoid to queue duplicated flush requests.
+The emulation works by providing a cache of each zone's write pointer, so
+zone append issued to the disk can be translated to a write with a
+starting LBA of the write pointer. This LBA is used as input zone number
+for the write pointer lookup in the zone write pointer offset cache and
+the cached offset is then added to the LBA to get the actual position to
+write the data. In SCSI we then turn the REQ_OP_ZONE_APPEND request into a
+WRITE(16) command. Upon successful completion of the WRITE(16), the cache
+will be updated to the new write pointer location and the written sector
+will be noted in the request. On error the cache entry will be marked as
+invalid and on the next write an update of the write pointer will be
+scheduled, before issuing the actual write.
 
-I will investigate the flush code a bit.
+In order to reduce memory consumption, the only cached item is the offset
+of the write pointer from the start of the zone, everything else can be
+calculated. On an example drive with 52156 zones, the additional memory
+consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
+pages. The performance impact is neglectable for a spinning drive.
 
-> 
-> Without the patch, flush command is issued between two write commands. With the
-> patch, some write commands are executed without flush between them.
-> 
-> I wonder how the requeue list position of flush command (head vs tail) changes
-> the number of flush commands to issue.
-> 
-> Another weird thing is number of block_getrq traces of flush (rwds=FWS). It
-> doubles number of writes (256 * 64 = 16320). I will chase this further.
+For null_blk the emulation is way simpler, as null_blk's zoned block
+device emulation support already caches the write pointer position, so we
+only need to report the position back to the upper layers. Additional
+caching is not needed here.
 
-Indeed, not see such issue when I run the test on kvm ahci.
+Testing has been conducted by translating RWF_APPEND DIOs into
+REQ_OP_ZONE_APPEND commands in the block device's direct I/O function and
+injecting errors by bypassing the block layer interface and directly
+writing to the disc via the SCSI generic interface.
 
+The whole series is relative to Jens' block-5.6 branch 14afc5936197
+("block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()").
 
-Thanks,
-Ming
+Damien Le Moal (2):
+  null_blk: Support REQ_OP_ZONE_APPEND
+  block: Introduce zone write pointer offset caching
+
+Johannes Thumshirn (8):
+  block: provide fallbacks for blk_queue_zone_is_seq and
+    blk_queue_zone_no
+  block: introduce bio_add_append_page
+  block: introduce BLK_STS_ZONE_RESOURCE
+  block: introduce blk_req_zone_write_trylock
+  block: factor out requeue handling from dispatch code
+  block: delay un-dispatchable request
+  scsi: sd_zbc: factor out sanity checks for zoned commands
+  scsi: sd_zbc: emulate ZONE_APPEND commands
+
+Keith Busch (1):
+  block: Introduce REQ_OP_ZONE_APPEND
+
+ block/bio.c                    |  41 +++-
+ block/blk-core.c               |  49 +++++
+ block/blk-map.c                |   2 +-
+ block/blk-mq.c                 |  54 +++++-
+ block/blk-settings.c           |  16 ++
+ block/blk-sysfs.c              |  15 +-
+ block/blk-zoned.c              |  83 +++++++-
+ block/blk.h                    |   4 +-
+ drivers/block/null_blk_main.c  |   9 +-
+ drivers/block/null_blk_zoned.c |  21 +-
+ drivers/scsi/scsi_lib.c        |   1 +
+ drivers/scsi/sd.c              |  28 ++-
+ drivers/scsi/sd.h              |  35 +++-
+ drivers/scsi/sd_zbc.c          | 344 +++++++++++++++++++++++++++++++--
+ include/linux/bio.h            |   3 +-
+ include/linux/blk_types.h      |  14 ++
+ include/linux/blkdev.h         |  42 +++-
+ 17 files changed, 701 insertions(+), 60 deletions(-)
+
+-- 
+2.24.1
 
