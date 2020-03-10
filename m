@@ -2,207 +2,102 @@ Return-Path: <SRS0=5EYj=43=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31110C18E5A
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 23:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B00C18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 23:09:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D9BA622522
-	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 23:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7711021D56
+	for <linux-block@archiver.kernel.org>; Tue, 10 Mar 2020 23:09:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="XJ9muEYN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P7OIjeCd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbgCJXH2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 19:07:28 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15764 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726325AbgCJXH2 (ORCPT
+        id S1727648AbgCJXJD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Mar 2020 19:09:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25895 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726325AbgCJXJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 19:07:28 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e681d540000>; Tue, 10 Mar 2020 16:05:56 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 10 Mar 2020 16:07:26 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 10 Mar 2020 16:07:26 -0700
-Received: from [10.2.175.232] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 10 Mar
- 2020 23:07:26 +0000
-Subject: Re: LKFT: arm x15: mmc1: cache flush error -110
-From:   Sowjanya Komatineni <skomatineni@nvidia.com>
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-CC:     Jon Hunter <jonathanh@nvidia.com>,
-        Bitan Biswas <bbiswas@nvidia.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        <lkft-triage@lists.linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        John Stultz <john.stultz@linaro.org>,
-        Faiz Abbas <faiz_abbas@ti.com>,
-        Thierry Reding <treding@nvidia.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Kishon <kishon@ti.com>
-References: <CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com>
- <CAPDyKFqpNo_4OePBR1KnJNO=kR8XEqbcsEd=icSceSdDH+Rk1Q@mail.gmail.com>
- <757853cf-987e-f6b6-9259-b4560a031692@nvidia.com>
- <d12fe142-7e72-ab58-33ab-17817e35096f@nvidia.com>
- <c216f131-6f83-c9c9-9d17-8d44ec06972d@nvidia.com>
- <87ad7586-9569-4276-044a-adb64e84ca15@nvidia.com>
- <a0962e0b-0f1d-9f32-f6e9-92f69f93167f@nvidia.com>
- <57ddddc2-3ee8-d867-bba0-0dd9929ba37d@nvidia.com>
- <CAPDyKFqZSd9E3+16yFsmpee2JsbRJ-DGThxx7NJHu6UE00Xi1Q@mail.gmail.com>
- <26ee7225-9483-4664-c2d7-b5cefeadcd4b@nvidia.com>
- <CAPDyKFqwVQDEnPNi33mc9ycTxpaT1cRLejbR3Ja4c8dha4gFRw@mail.gmail.com>
- <0301bbd5-8d4d-4a77-42c7-8a1391c2d60a@nvidia.com>
- <CAPDyKFp93H0=ttazofW9NMBtL5VnjB4PdkwN0FDCtWR0pMHrPA@mail.gmail.com>
- <f01b5533-124a-d978-a90a-9c9c6235fb65@nvidia.com>
- <CAPDyKFqJjsuHect-azQKO8cCoq5JJQrZ=eShsdLHq97NXgXnuQ@mail.gmail.com>
- <227d9f08-582e-fd79-e1dc-7695bddd162d@nvidia.com>
- <2456654f-2724-0b6d-8936-afa05f345344@nvidia.com>
-Message-ID: <df939962-2cb4-1c36-0baf-d82e3527d05a@nvidia.com>
-Date:   Tue, 10 Mar 2020 16:10:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Tue, 10 Mar 2020 19:09:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583881742;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wkPE+IhNE5fdZSVJ5cOurXqU2RwW85UEqdhYtpKuSmI=;
+        b=P7OIjeCdhomfAZCkqNQpxSWIXl4mIvMk7O7JYCkEJFE7SazXFBjoy1NNlGokG+4s2cfTQs
+        tZHqXJRneG8zoWZqBprCrqjznuEP/7KidhBG5eP14oEqyrGbpazdOYyK+2DM25L4IVUCls
+        03e5+FMEV7rsOIpaFpCiWvTwwYUoFuI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-ai_V4I1sODC8ESQzccoL5A-1; Tue, 10 Mar 2020 19:08:58 -0400
+X-MC-Unique: ai_V4I1sODC8ESQzccoL5A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5DFA184C810;
+        Tue, 10 Mar 2020 23:08:50 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B50BB10013A1;
+        Tue, 10 Mar 2020 23:08:40 +0000 (UTC)
+Date:   Wed, 11 Mar 2020 07:08:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        hare@suse.de, bvanassche@acm.org, hch@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH RFC v2 01/24] scsi: add 'nr_reserved_cmds' field to the
+ SCSI host template
+Message-ID: <20200310230835.GA16056@ming.t460p>
+References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
+ <1583857550-12049-2-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <2456654f-2724-0b6d-8936-afa05f345344@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1583881556; bh=s2lqu2Qb+lzPYNuF4JDNZZl1RA8ol5t2e1LCzQ5m3A8=;
-        h=X-PGP-Universal:Subject:From:To:CC:References:Message-ID:Date:
-         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
-         X-ClientProxiedBy:Content-Type:Content-Transfer-Encoding:
-         Content-Language;
-        b=XJ9muEYNewkGZ9hcoejyeLhZp00hBoFfUIYt2JHCEjGwx00h3V8GL+FW3Hti7FJCN
-         iLfacS8b1WgsPEFuNjpQx7TIk2dZ0LzbT8245qsecrovMhHNs4n/TRYHsDuRLg+y/1
-         d03IiayVciDad20rwdAJS/E16cc1xjHhgYLVuGl3VLZBtJF6ZuQqcRYr/Hl60x4U1k
-         rBbMBFHckKTRt9OYLMZi/0fRbKuro4AsGbMOBBqIPl4v77uD2UoqSW6kBetGQRdNYO
-         FHWp2ttKUUZ3plXoaKg8saoQkVH60d1uWJ1auRYTxxE7rI5zhlTlkkOeMe0syytRza
-         0p/J5TxFr8OPQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1583857550-12049-2-git-send-email-john.garry@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Mar 11, 2020 at 12:25:27AM +0800, John Garry wrote:
+> From: Hannes Reinecke <hare@suse.com>
+> 
+> Add a new field 'nr_reserved_cmds' to the SCSI host template to
+> instruct the block layer to set aside a tag space for reserved
+> commands.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_lib.c  | 1 +
+>  include/scsi/scsi_host.h | 6 ++++++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 610ee41fa54c..2967325df7a0 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1896,6 +1896,7 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>  		shost->tag_set.ops = &scsi_mq_ops_no_commit;
+>  	shost->tag_set.nr_hw_queues = shost->nr_hw_queues ? : 1;
+>  	shost->tag_set.queue_depth = shost->can_queue;
+> +	shost->tag_set.reserved_tags = shost->nr_reserved_cmds;
 
-On 3/10/20 2:59 PM, Sowjanya Komatineni wrote:
->
-> On 3/10/20 10:27 AM, Sowjanya Komatineni wrote:
->>
->> On 3/10/20 10:09 AM, Ulf Hansson wrote:
->>> External email: Use caution opening links or attachments
->>>
->>>
->>> [...]
->>>
->>>>>>> I would like to get the regression fixed asap, but I also would 
->>>>>>> like
->>>>>>> to avoid reverting patches, unless really necessary. May I 
->>>>>>> propose the
->>>>>>> following two options.
->>>>>>>
->>>>>>> 1. Find out why polling with ->card_busy() or CMD13, for a CMD6 
->>>>>>> with
->>>>>>> an R1 response doesn't work - and then fix that behaviour.
->>>>>>>
->>>>>>> 2. Set the mmc->max_busy_timeout to zero for sdhci-tegra, which 
->>>>>>> makes
->>>>>>> the core to always use R1B for CMD6 (and erase). This also means 
->>>>>>> that
->>>>>>> when the cmd->busy_timeout becomes longer than 11s, sdhci-tegra 
->>>>>>> must
->>>>>>> disable the HW busy timeout and just wait "forever".
->>>>>>>
->>>>>>> If you decide for 2, you can add the software timeout support on 
->>>>>>> top,
->>>>>>> but make that can be considered as a next step of an improvement,
->>>>>>> rather than needed as fix. Note that, I believe there are some 
->>>>>>> support
->>>>>>> for software timeout already in the sdhci core, maybe you need to
->>>>>>> tweak it a bit for your case, I don't know.
->>>>>>>
->>>>>>> Kind regards
->>>>>>> Uffe
->>>>>> Hi Uffe
->>>>>>
->>>>>> Will go with 2nd option and will send patches out when ready.
->>>>> Okay, good.
->>>>>
->>>>>> BTW, Tegra host also supports SDHCI_QUIRK_DATA_TIMEOUT_USES_SDCLK 
->>>>>> for
->>>>>> data timeout based on host clock when using finite mode (HW busy
->>>>>> detection based on DATA TIMEOUT count value when cmd operation 
->>>>>> timeout
->>>>>> is < 11s for tegra host).
->>>>>>
->>>>>> So, looks like we cant set host max_busy_timeout to 0 for Tegra 
->>>>>> host to
->>>>>> force R1B during SWITCH and SLEEP_AWAKE.
->>>>>>
->>>>>> So, was thinking to introduce host capability 
->>>>>> MMC_CAP2_LONG_WAIT_HW_BUSY
->>>>>> which can be used for hosts supporting long or infinite HW busy wait
->>>>>> detection and will update mmc and mmc_ops drivers to not allow 
->>>>>> convert
->>>>>> R1B to R1B for hosts with this capability during SLEEP_AWAKE and 
->>>>>> SWITCH.
->>>>> That seems reasonable, it becomes probably both easier and clearer by
->>>>> adding a new host cap.
->>>>>
->>>>> In any case, let me help out and cook a patch for this for the core
->>>>> part (I leave the sdhci change to you). It may be a bit tricky,
->>>>> especially since I have currently queued a bunch of new changes for
->>>>> v5.7, that enables more users of mmc_poll_for_busy() in the core.
->>>>> Maybe I need to temporarily drop them, so we can fix these problems
->>>>> first. I will check.
->>>>>
->>>>> Probably, I would also name the cap MMC_CAP_HW_NEED_RSP_BUSY, as that
->>>>> seems to be describing the common problem we have for sdhci
->>>>> omap/tegra.
->>>>>
->>>>> Finally, it seems like MMC_CAP_WAIT_WHILE_BUSY should be set for
->>>>> sdhci- tegra, so while at it, perhaps you can cook a patch for 
->>>>> that as
->>>>> well.
->>>>>
->>>>> Kind regards
->>>>> Uffe
->>>> OK, I sent v1 yesterday. Please ignore them then.
->>> Oh, I haven't seen them. In any case, I am ignoring them.
->>>
->>>> Will send out patches only for HW busy wait modes program based on cmd
->>>> timeout and WAIT_WHILE_BUSY enabled.
->>> Great, thanks!
->>>
->>> Please help test the series I just posted as well, if you have the
->>> time ofcourse.
->>>
->>> Kind regards
->>> Uffe
->>
->> Sure,
->>
->> Thanks
->>
->> Sowjanya
->
->
-> mmc_sleep() also needs update to force R1B when host sets capability 
-> MMC_CAP_NEED_RSP_BUSY
->
->
-Tested patches and they work good.
+You reserve tags for special usage, meantime the whole queue depth
+isn't increased, that means the tags for IO request is decreased given
+reserved tags can't be used for IO, so IO performance may be effected.
+
+If not the case, please explain a bit in commit log.
+
+Thanks,
+Ming
 
