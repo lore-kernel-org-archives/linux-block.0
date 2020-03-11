@@ -2,171 +2,162 @@ Return-Path: <SRS0=mBf9=44=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AD0C10F25
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 03:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CBBC10F27
+	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 04:03:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64C7121D56
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 03:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20F71222C3
+	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 04:03:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i7cjaa4x";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Fdl9ciNr"
+	dkim=pass (1024-bit key) header.d=windriversystems.onmicrosoft.com header.i=@windriversystems.onmicrosoft.com header.b="oqzQpnQI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727702AbgCKDsF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Mar 2020 23:48:05 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:52667 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727659AbgCKDsF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Mar 2020 23:48:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1583898485; x=1615434485;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=HTX1YJZYArn98vtMKPz+/XNH0ZAzYHVgJmpvlXbXyC4=;
-  b=i7cjaa4xVH4y8ufRLoLGz+oiObKaMOiaHyMUKg6fXaXicCsTVp4z7k3f
-   S4ZBjGEBL3UdRGoViCI65QZQqlW1kRXjdjXvCGIdVjilsQHtcFPZ2HkTR
-   WdILfEZftam2ElVjGWETSH+Gu9ZH89EERpZ6RH3390IXS4eHL3AjeFoye
-   9GIemmhC/SztyQEOF5I3ndjmh9GWyRTHSDfRFV9BILxzdvo0TLKcKBXbe
-   5GkjYvB2uOkqAtDr3ZJaa7A6SoYTbgF/V7bxrudZrgAwENBgBD23RB57q
-   n08krNwLzUz2AAqTx0A/zCDH3OfAVf6v4rjU6lL1oDb/Khk47rYtLtI72
-   g==;
-IronPort-SDR: flAW0wlUXdOlxJP17y9mqPYTaM/M7NvWVdwBBAYowd5kFLgeJUm7ZFDbf1+Syimu2INe1MUS+F
- b7Cz62hzSlr7fzuy78fXBYAFw+P3uOqz59+Jg7oLVZF7JHUJKXewq4AACNDUjF/eKbY+vN3n9A
- 4qT5ApLKeQdhfHlOit2SLc1KUYhm4KT1/jZhX3GJVYz3LMmjxIdPjifmm1zlX6v7WE05AQxvZw
- TzC7dEQ8AoO6XD3Op714gLW/cJ71RW1OzGsGVIx4UO98MBDlXXXrU5j97Q5u3mfcsxGzQb4npS
- 1Os=
-X-IronPort-AV: E=Sophos;i="5.70,539,1574092800"; 
-   d="scan'208";a="133584651"
-Received: from mail-dm6nam11lp2174.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.174])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Mar 2020 11:48:03 +0800
+        id S1726000AbgCKEDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Mar 2020 00:03:55 -0400
+Received: from mail-eopbgr770072.outbound.protection.outlook.com ([40.107.77.72]:35150
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725379AbgCKEDz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Mar 2020 00:03:55 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jCq1ItM74jvZmevWsIQSUUgD3OpjrorWta2WonUCyP3wroQBaGHmbFG2VGvEKHe7W9Z3ItyEQBzfxG/0a+WJsGHR18Iq/ttuwdOqNILuJ+R/nb6v+3fiVYVDHsPC1MX7TUsWAO11LKfq9QxeIp83Lj1xaJuYRSnR0vWFonvAqrwo6LbtIK1qY2osq3XWTi1sn8TO2UWmp8WGwMVLJakl1yBneJR23fp2RkEEaFFCHPKEVEGvKy8Jtlq6fM2y60ybaeYylB4APkYU3SiEbsYoUELG0Ud4PU8Qz0TL9STEHBCPuzgBQGa40dN9DkRTBNPxUXhktUmTZEbDFnO51Bj+vw==
+ b=a/knOl/+cZEbv2jPXy/ozNPU7/U9u2/+kADOd839FMdTZbt75Dx0YRyo+nK90tJuIGNXMwykPfvA2yiA0KsID9s5oZtozN+NRo5MHzGDQWThs61z9dF9hPm/CVXVvdKj5CjA4Zh7G0JokVpScaTb5FOsNAigzNjXYHCMat15oi337G7m8GqXC9ty4Hem25iyLWxmNYddub/nyBThffntIcxNaK3wXyWSiKFL+qs8An/7MglQeHSkEL5yKXNFeMY2JWAeqMOlsqqCJp2QU9PQTU6woifB/EHFedM0z9Cqqgb/I0yQJUugjDXMGzRU9cd8YvmOlasdEj92oKS9Qr8sWA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=prgW4ymH586Jia4Es0jVZ7qxUIHePrDqjEHhfGRQOn4=;
- b=IGezAQHR5iMdOmLpWNW8qzliRwRr6GBdP6/FheasfG/2LfuT4eKQTIEdbd8fN0RWYvqy56mUh5b3KKH+mkITflnb/q4iNWpETnswOjfpLBaqflZ1nGtu7L+ucHZKVZvc87pnt3EgNmCrjWWBFzbWIFmkjroiEK46nZ8EMjeKiV8TDg9oqfGMqEjdcmy+Bt97rWT66cSFPT09NHRqdSgP9ENwkOFAxA8Ow5/qJHqghZGMd9ZAlGmq+jh36tuCIhdVS2KiLumzaqhlE7M6AT0x7/7iVHOLuI9CqhsSfWMPBF0stYrKO2ybXW06F79D7H1Y1WF/Cc5kVucan9I/aeZzZw==
+ bh=wnqGGJ/YZIcJnZUnivCOZ7zrQrNsQLPkFMGyTpbbaGo=;
+ b=Nn/DXQjhcFkdX8Rq3nHaqR9Lw/qnZvNv+7K9sPmRIGObkjxBvnv+uVaWu6ArELqWxpxnYQw/KH2Xl9jYbBItfzttYTKmJ70AFdb66inD9KiSjJk0zp8X6wX+oXa3rosttlN2W8zNMHVFR/jLWptgFuthG42kCQA6NpM84yd7wrViNjt22RZfUUWe2cQ6w9YUtgmURS5c3+Ohs3zvRdeoSiq1QFafDAKJnh2PhO9YrhpFOSBMF92nOep1RkgUx+w8hLpUi9ilinOo+eRCwzEiNbHAEZc6B5A7gIfxBNEb952EjVaypIv8egsYVbV7FbxYbns5x2z/fxkbZwlOR5Ffmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ d=windriversystems.onmicrosoft.com;
+ s=selector2-windriversystems-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=prgW4ymH586Jia4Es0jVZ7qxUIHePrDqjEHhfGRQOn4=;
- b=Fdl9ciNruiWyg+lhv7ZZi/dhn8RafWrE6p8YfId/DKcJek1C8fYBUQ6vfTLiinrly7fu91XNL7KoyQqZ6GS0VaEx6xmtYFSAlDdh9inbc+H0EIBGzBn5gqtdFjBZiekjB2lXY4mDjjfXice8S32LNkd05PlWT/Ngl7NJi6lbTWk=
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com (2603:10b6:a03:10e::16)
- by BYAPR04MB5400.namprd04.prod.outlook.com (2603:10b6:a03:cb::28) with
+ bh=wnqGGJ/YZIcJnZUnivCOZ7zrQrNsQLPkFMGyTpbbaGo=;
+ b=oqzQpnQI3LhAzA69iB28hRQoz7zGbsh1TnPC7HL5yD/iUhX9ZkJYVNkUz6wqzoRr/kHVXuanm13PMwcWq06fN7+apZj/BDM/oVm70+B3XRjs199ly3j8OJQ9bUvNSE9S76nsz9QX4ej5ug+f4oBTnpBtFdhX3MEiggcDo5qVWMg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Zhe.He@windriver.com; 
+Received: from SN6PR11MB3360.namprd11.prod.outlook.com (2603:10b6:805:c8::30)
+ by SN6PR11MB3326.namprd11.prod.outlook.com (2603:10b6:805:bc::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.17; Wed, 11 Mar
- 2020 03:48:02 +0000
-Received: from BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::6daf:1b7c:1a61:8cb2]) by BYAPR04MB5816.namprd04.prod.outlook.com
- ([fe80::6daf:1b7c:1a61:8cb2%6]) with mapi id 15.20.2793.013; Wed, 11 Mar 2020
- 03:48:02 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "dgilbert@interlog.com" <dgilbert@interlog.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        Ryan Attard <ryanattard@ryanattard.info>
-Subject: Re: [PATCH 1/1 RESEND] Allow non-root users to perform ZBC commands.
-Thread-Topic: [PATCH 1/1 RESEND] Allow non-root users to perform ZBC commands.
-Thread-Index: AQHV7MkPT+ILs7gef0yFYcD78Zslhg==
-Date:   Wed, 11 Mar 2020 03:48:02 +0000
-Message-ID: <BYAPR04MB5816FF7BB34C0E94CCB9AB86E7FC0@BYAPR04MB5816.namprd04.prod.outlook.com>
-References: <20200226170518.92963-1-ryanattard@ryanattard.info>
- <20200226170518.92963-2-ryanattard@ryanattard.info>
- <yq17dzrr3gy.fsf@oracle.com>
-Accept-Language: en-US
+ 2020 04:03:52 +0000
+Received: from SN6PR11MB3360.namprd11.prod.outlook.com
+ ([fe80::d852:181d:278b:ba9d]) by SN6PR11MB3360.namprd11.prod.outlook.com
+ ([fe80::d852:181d:278b:ba9d%5]) with mapi id 15.20.2793.013; Wed, 11 Mar 2020
+ 04:03:52 +0000
+Subject: Re: disk revalidation updates and OOM
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     jack@suse.cz, Jens Axboe <axboe@kernel.dk>,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org, keith.busch@intel.com,
+        tglx@linutronix.de, mwilck@suse.com, yuyufen@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <93b395e6-5c3f-0157-9572-af0f9094dbd7@windriver.com>
+ <20200310074018.GB26381@lst.de>
+ <75865e17-48f8-a63a-3a29-f995115ffcfc@windriver.com>
+ <20200310162647.GA6361@lst.de>
+From:   He Zhe <zhe.he@windriver.com>
+Message-ID: <f48683d9-7854-ba5f-da3a-7ef987a539b8@windriver.com>
+Date:   Wed, 11 Mar 2020 12:03:43 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200310162647.GA6361@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [199.255.47.9]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 99a14f2b-63ba-4eb2-eaab-08d7c56effac
-x-ms-traffictypediagnostic: BYAPR04MB5400:
-x-microsoft-antispam-prvs: <BYAPR04MB5400B035749AB7321FB26CF7E7FC0@BYAPR04MB5400.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0339F89554
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(346002)(366004)(136003)(376002)(396003)(199004)(9686003)(2906002)(6506007)(86362001)(5660300002)(478600001)(33656002)(54906003)(6916009)(7696005)(316002)(66446008)(53546011)(91956017)(66946007)(4326008)(26005)(186003)(8676002)(66556008)(55016002)(81166006)(52536014)(81156014)(8936002)(66476007)(71200400001)(76116006)(64756008)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5400;H:BYAPR04MB5816.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: R7cLlWi3cwAXjgxLBa30wNq+Vaa+UHwZfFSWFE3Rh8peKiJsR6Mc5Yl7KvE8ebai7F/GRslt1RjwKciWx0eLRNukjY2UhoEbeJ4QIFBrNPMx4u4Iv0uimXUAvCMyhLO302VSHqGhgt5j81ppjdrPzBrhIvdH/17w69hIbw2J4Rabqo9oArhPLBeUNrtc2eVwQjdfXX7yX2dQE/vNyHA/w5Z/ulbk8oQENPVhN+qtJZN0e5ukwLo0au3ImrJ8XuDmxagR6UCTn6hcDyGDzbRPLTOzoabIcwScufIcppN2J7kfhT1WRZd79Ju8be3fM97SomesbBfSImoYEdOeekgZbAMjsTPYybzU1pxt5DJqDFGFJlj2vW3qcnHV5F7BrGYPIBPTEmXVr/tywJK49IgUnSG78wRmuPg9DqjLluiPg8MfUB9ndcL7I2gI/cmzTVQJ61DRyJZoMOa0gfru8KioeSND/i+oV0YsQAnAnvF/KcjrQk2kbE5qT1MMfriQyfTb
-x-ms-exchange-antispam-messagedata: 3u0ypyd8g57Y0Dq/P9/ZH+MYjjlvjHDBYAIFYtcyBM4bxS9yaeiAUTzVTuTaDw8hDazhuGkYmtLPf5qVmsBh6mfixGThzfEVxXGfsqleZemFQwBBVk8ixZEIJ7pCw0d5tuu3VgrMTxzNQmwyesOpGQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HK2PR04CA0089.apcprd04.prod.outlook.com
+ (2603:1096:202:15::33) To SN6PR11MB3360.namprd11.prod.outlook.com
+ (2603:10b6:805:c8::30)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99a14f2b-63ba-4eb2-eaab-08d7c56effac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2020 03:48:02.0762
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [128.224.162.175] (60.247.85.82) by HK2PR04CA0089.apcprd04.prod.outlook.com (2603:1096:202:15::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16 via Frontend Transport; Wed, 11 Mar 2020 04:03:48 +0000
+X-Originating-IP: [60.247.85.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b9d315c3-787b-4613-0f20-08d7c57135d2
+X-MS-TrafficTypeDiagnostic: SN6PR11MB3326:
+X-Microsoft-Antispam-PRVS: <SN6PR11MB33262F37B1467137265B66E28FFC0@SN6PR11MB3326.namprd11.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0339F89554
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(366004)(376002)(396003)(39850400004)(346002)(136003)(199004)(7416002)(5660300002)(478600001)(66946007)(2616005)(66556008)(31696002)(16576012)(316002)(53546011)(6666004)(956004)(66476007)(86362001)(4326008)(16526019)(186003)(6706004)(36756003)(6916009)(52116002)(8936002)(2906002)(31686004)(81166006)(81156014)(8676002)(6486002)(26005)(78286006);DIR:OUT;SFP:1101;SCL:1;SRVR:SN6PR11MB3326;H:SN6PR11MB3360.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: windriver.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6nhI65631lvmXxV54X7imbeEedGahUGyggZJkItO8E7twz4cMjuXh1GFiDkuLSC6Q1V6m1ih+8jTyRjtgUqUS1HxvTgXdB2uYEuL1VUuwusaq0d/r+K0Q4bYtTiAfI0d0K9z+QfXSJJOAvkFtQCUsItCDyDOh7a7vgmK3tuCvb3ceF5VaMe3LqeKKUaLDMzTrwutzvyrOuuvnOTRXJIvU2ZExUe7xpBWtoGB9z5NVfl9LC5Yu0vbuAm/r5QmtLvMlMg/sEZZPqJJwJMTAYRRfNUImuQ/FnHYRmOYpEzNr6p74wMgC8WnlerCejx663n0CGOYeXsMkCur62incy607yZNhemSP1Qs+i9bCvXtdFbCeknN99i/ViucD1KD1tDh/HhHBu8b6dLbWi/GEZptNFfp4YRk30kzQFo0BYbvpY3j60Zg7bOmBR3BJpVEeqoV8EghzaBXjhqslSbRuiz3qlvwwLAdXz4SFXuvZ35aQUOjwlUFGKodztlPvKxfortLbVQd4pxGpFWg0yEgk/QpiIAsewxx8vPNhEY8IdoivIM=
+X-MS-Exchange-AntiSpam-MessageData: BedbGS+2nS9CO5QJBC7eE+rsTzoovuNbosfvHruMKaYtqRuNtvex4Eg7TZ98mDnwEG+VWnFWmLRv7b+6ufhl4ZKlf8I8porx1mhDwdlphNwK3fYxBy+LJtwg4XiiQh/7VST0eNghLeRdiaDitpst7Q==
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9d315c3-787b-4613-0f20-08d7c57135d2
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 04:03:52.3618
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oGkBwca2bR9NWaeCzIe7McxvjfCT4TDDijOLkgPDf97p70bv28iiPFy4h90M5nqKQ1LDnLVhj34nVnnlK/B0uA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5400
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0NvsCwhHK+tkhvM0pSwpSIkl0TzcWUyIgQzdqImYoFZ/YvAxllf3B98HBXfciHWHhIKhXZZJJz3MKhb7Z/EJvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB3326
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/03/11 12:10, Martin K. Petersen wrote:=0A=
-> =0A=
-> Damien: Please opine.=0A=
-=0A=
-My apologies. This one slipped through the cracks...=0A=
-=0A=
->> Allow users with read permissions to issue REPORT ZONE commands and=0A=
->> users with write permissions to manage zones on block devices supporting=
-=0A=
->> the ZBC specification.=0A=
-=0A=
-I think this is fine for SG_IO ioctls since other SG_IO commands with an im=
-pact=0A=
-on the device data (write) can be done without CAP_SYS_ADMIN as required by=
-=0A=
-block device file ioctl.=0A=
-=0A=
->>=0A=
->> Signed-off-by: Ryan Attard <ryanattard@ryanattard.info>=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
->> ---=0A=
->>  block/scsi_ioctl.c | 4 ++++=0A=
->>  1 file changed, 4 insertions(+)=0A=
->>=0A=
->> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c=0A=
->> index b4e73d5dd5c2..ef722f04f88a 100644=0A=
->> --- a/block/scsi_ioctl.c=0A=
->> +++ b/block/scsi_ioctl.c=0A=
->> @@ -193,6 +193,10 @@ static void blk_set_cmd_filter_defaults(struct blk_=
-cmd_filter *filter)=0A=
->>  	__set_bit(GPCMD_LOAD_UNLOAD, filter->write_ok);=0A=
->>  	__set_bit(GPCMD_SET_STREAMING, filter->write_ok);=0A=
->>  	__set_bit(GPCMD_SET_READ_AHEAD, filter->write_ok);=0A=
->> +=0A=
->> +	/* ZBC Commands */=0A=
->> +	__set_bit(ZBC_OUT, filter->write_ok);=0A=
->> +	__set_bit(ZBC_IN, filter->read_ok);=0A=
->>  }=0A=
->>  =0A=
->>  int blk_verify_command(unsigned char *cmd, fmode_t mode)=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+
+
+On 3/11/20 12:26 AM, Christoph Hellwig wrote:
+> On Tue, Mar 10, 2020 at 11:30:27PM +0800, He Zhe wrote:
+>>> So this is the exact requirement of commits to be reverted from a bisect
+>>> or just a first guess?
+>> Many commits failed to build or boot during bisection.
+>>
+>> At least the following four have to be reverted to make it work.
+>>
+>> 979c690d block: move clearing bd_invalidated into check_disk_size_change
+>> f0b870d block: remove (__)blkdev_reread_part as an exported API
+>> 142fe8f block: fix bdev_disk_changed for non-partitioned devices
+>> a1548b6 block: move rescan_partitions to fs/block_dev.c
+> Just to make sure we are on the same page:  if you revert all four it
+> works, if you rever all but
+>
+> a1548b6 block: move rescan_partitions to fs/block_dev.c
+>
+> it doesn't?
+
+After reverting 142fe8f, rescan_partitions would be called in block/ioctl.c
+and cause a build failure. So I need to also revert a1548b6 to provide
+rescan_partitions.
+
+OR if I manually add the following diff instead of reverting a1548b6, then yes,
+it works too.
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 8d724d11c8f5..bac562604cd0 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -192,6 +192,7 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
+  * acquire bd_mutex. This API should be used in case that
+  * caller has held bd_mutex already.
+  */
++extern int rescan_partitions(struct gendisk *disk, struct block_device *bdev, bool invalidate);
+ int __blkdev_reread_part(struct block_device *bdev)
+ {
+        struct gendisk *disk = bdev->bd_disk;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index ec10dacd18d0..30da0bc85c31 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1508,7 +1508,7 @@ EXPORT_SYMBOL(bd_set_size);
+
+ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
+
+-static int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
++int rescan_partitions(struct gendisk *disk, struct block_device *bdev,
+                bool invalidate)
+ {
+        int ret;
+
+
+Zhe
+
+
