@@ -2,219 +2,87 @@ Return-Path: <SRS0=mBf9=44=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E80C10F27
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 05:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBE6C10F25
+	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 06:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B5E7208C4
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 05:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA25721655
+	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 06:22:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lWwM3q+w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728286AbgCKFH2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Mar 2020 01:07:28 -0400
-Received: from smtprelay0184.hostedemail.com ([216.40.44.184]:42538 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728271AbgCKFH1 (ORCPT
+        id S1726923AbgCKGWp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Mar 2020 02:22:45 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:49002 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725976AbgCKGWo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Mar 2020 01:07:27 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay06.hostedemail.com (Postfix) with ESMTP id D286418223249;
-        Wed, 11 Mar 2020 05:07:25 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: work52_236f7ea7b4c4a
-X-Filterd-Recvd-Size: 7640
-Received: from joe-laptop.perches.com (unknown [47.151.143.254])
-        (Authenticated sender: joe@perches.com)
-        by omf16.hostedemail.com (Postfix) with ESMTPA;
-        Wed, 11 Mar 2020 05:07:23 +0000 (UTC)
-From:   Joe Perches <joe@perches.com>
-To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH -next 020/491] XEN HYPERVISOR INTERFACE: Use fallthrough;
-Date:   Tue, 10 Mar 2020 21:51:34 -0700
-Message-Id: <93cb221f897e6d5d37539d9a8dcf8be7797bd401.1583896348.git.joe@perches.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1583896344.git.joe@perches.com>
-References: <cover.1583896344.git.joe@perches.com>
+        Wed, 11 Mar 2020 02:22:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pf947Sz8KajuMchFemWX1Gjf7sTMlNiajIDEANCcWHc=; b=lWwM3q+wSWfi640WOScA7e/8Ff
+        bzpTUf1/fPZx31bOeQW126dE72TeZqb7YX3wbzSYKbh/h51bj9HZiTPzFsemYAGr5daIQMGtzB558
+        bBD3oFuz3vrYx1G3GkQ1Bzs/w+3/dUQwnJu6fo/6RbAUcFFIGlSviUGWHH8WWNAWZAoxYA+ubqBdM
+        0FNsqU3cBEZ1b+nOigEMUE5KXNeSgwISnCQKu0QqLGxSRvUK+6Dw0N3vRYruheqYFDwjQZnh52qHF
+        mE7APR5cTlxmp/a80cO1ifELTyeq//ECkDOMnj/ezFRFhz8S4WGKI7dFyQvA7KMVWnersGOqE5odO
+        HYyvXOZA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jBulA-0001TU-6S; Wed, 11 Mar 2020 06:22:28 +0000
+Date:   Tue, 10 Mar 2020 23:22:28 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, hare@suse.de,
+        ming.lei@redhat.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH RFC v2 02/24] scsi: allocate separate queue for reserved
+ commands
+Message-ID: <20200311062228.GA13522@infradead.org>
+References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
+ <1583857550-12049-3-git-send-email-john.garry@huawei.com>
+ <20200310183243.GA14549@infradead.org>
+ <79cf4341-f2a2-dcc9-be0d-2efc6e83028a@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <79cf4341-f2a2-dcc9-be0d-2efc6e83028a@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the various uses of fallthrough comments to fallthrough;
+On Tue, Mar 10, 2020 at 09:08:56PM +0000, John Garry wrote:
+> On 10/03/2020 18:32, Christoph Hellwig wrote:
+> > On Wed, Mar 11, 2020 at 12:25:28AM +0800, John Garry wrote:
+> > > From: Hannes Reinecke <hare@suse.com>
+> > > 
+> > > Allocate a separate 'reserved_cmd_q' for sending reserved commands.
+> > 
+> > Why?  Reserved command specifically are not in any way tied to queues.
+> > .
+> > 
+> 
+> So the v1 series used a combination of the sdev queue and the per-host
+> reserved_cmd_q. Back then you questioned using the sdev queue for virtio
+> scsi, and the unconfirmed conclusion was to use a common per-host q. This is
+> the best link I can find now:
+> 
+> https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg83177.html
 
-Done via script
-Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
-
-Signed-off-by: Joe Perches <joe@perches.com>
----
- drivers/block/xen-blkfront.c               | 5 ++---
- drivers/net/xen-netfront.c                 | 2 +-
- drivers/pci/xen-pcifront.c                 | 2 +-
- drivers/scsi/xen-scsifront.c               | 2 +-
- drivers/xen/pvcalls-front.c                | 2 +-
- drivers/xen/xen-acpi-memhotplug.c          | 2 +-
- drivers/xen/xen-pciback/xenbus.c           | 2 +-
- drivers/xen/xen-scsiback.c                 | 2 +-
- drivers/xen/xenbus/xenbus_probe_frontend.c | 6 ++----
- 9 files changed, 11 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 9df516..fb07ee1 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1402,7 +1402,6 @@ static enum blk_req_status blkif_rsp_to_req_status(int rsp)
- 	case BLKIF_RSP_EOPNOTSUPP:
- 		return REQ_EOPNOTSUPP;
- 	case BLKIF_RSP_ERROR:
--		/* Fallthrough. */
- 	default:
- 		return REQ_ERROR;
- 	}
-@@ -1642,7 +1641,7 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 				info->feature_flush = 0;
- 				xlvbd_flush(info);
- 			}
--			/* fall through */
-+			fallthrough;
- 		case BLKIF_OP_READ:
- 		case BLKIF_OP_WRITE:
- 			if (unlikely(bret->status != BLKIF_RSP_OKAY))
-@@ -2480,7 +2479,7 @@ static void blkback_changed(struct xenbus_device *dev,
- 	case XenbusStateClosed:
- 		if (dev->state == XenbusStateClosed)
- 			break;
--		/* fall through */
-+		fallthrough;
- 	case XenbusStateClosing:
- 		if (info)
- 			blkfront_closing(info);
-diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
-index 482c6c..2001606 100644
---- a/drivers/net/xen-netfront.c
-+++ b/drivers/net/xen-netfront.c
-@@ -2038,7 +2038,7 @@ static void netback_changed(struct xenbus_device *dev,
- 	case XenbusStateClosed:
- 		if (dev->state == XenbusStateClosed)
- 			break;
--		/* Fall through - Missed the backend's CLOSING state. */
-+		fallthrough;	/* Missed the backend's CLOSING state */
- 	case XenbusStateClosing:
- 		xenbus_frontend_closed(dev);
- 		break;
-diff --git a/drivers/pci/xen-pcifront.c b/drivers/pci/xen-pcifront.c
-index d1b16c..093ab8 100644
---- a/drivers/pci/xen-pcifront.c
-+++ b/drivers/pci/xen-pcifront.c
-@@ -1103,7 +1103,7 @@ static void __ref pcifront_backend_changed(struct xenbus_device *xdev,
- 	case XenbusStateClosed:
- 		if (xdev->state == XenbusStateClosed)
- 			break;
--		/* fall through - Missed the backend's CLOSING state. */
-+		fallthrough;	/* Missed the backend's CLOSING state */
- 	case XenbusStateClosing:
- 		dev_warn(&xdev->dev, "backend going away!\n");
- 		pcifront_try_disconnect(pdev);
-diff --git a/drivers/scsi/xen-scsifront.c b/drivers/scsi/xen-scsifront.c
-index f0068e..259fc248 100644
---- a/drivers/scsi/xen-scsifront.c
-+++ b/drivers/scsi/xen-scsifront.c
-@@ -1111,7 +1111,7 @@ static void scsifront_backend_changed(struct xenbus_device *dev,
- 	case XenbusStateClosed:
- 		if (dev->state == XenbusStateClosed)
- 			break;
--		/* fall through - Missed the backend's Closing state */
-+		fallthrough;	/* Missed the backend's Closing state */
- 	case XenbusStateClosing:
- 		scsifront_disconnect(info);
- 		break;
-diff --git a/drivers/xen/pvcalls-front.c b/drivers/xen/pvcalls-front.c
-index 57592a6..0fccf0 100644
---- a/drivers/xen/pvcalls-front.c
-+++ b/drivers/xen/pvcalls-front.c
-@@ -1260,7 +1260,7 @@ static void pvcalls_front_changed(struct xenbus_device *dev,
- 		if (dev->state == XenbusStateClosed)
- 			break;
- 		/* Missed the backend's CLOSING state */
--		/* fall through */
-+		fallthrough;
- 	case XenbusStateClosing:
- 		xenbus_frontend_closed(dev);
- 		break;
-diff --git a/drivers/xen/xen-acpi-memhotplug.c b/drivers/xen/xen-acpi-memhotplug.c
-index 745721..f914b72 100644
---- a/drivers/xen/xen-acpi-memhotplug.c
-+++ b/drivers/xen/xen-acpi-memhotplug.c
-@@ -229,7 +229,7 @@ static void acpi_memory_device_notify(acpi_handle handle, u32 event, void *data)
- 	case ACPI_NOTIFY_BUS_CHECK:
- 		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
- 			"\nReceived BUS CHECK notification for device\n"));
--		/* Fall Through */
-+		fallthrough;
- 	case ACPI_NOTIFY_DEVICE_CHECK:
- 		if (event == ACPI_NOTIFY_DEVICE_CHECK)
- 			ACPI_DEBUG_PRINT((ACPI_DB_INFO,
-diff --git a/drivers/xen/xen-pciback/xenbus.c b/drivers/xen/xen-pciback/xenbus.c
-index 833b2d..a108740 100644
---- a/drivers/xen/xen-pciback/xenbus.c
-+++ b/drivers/xen/xen-pciback/xenbus.c
-@@ -544,7 +544,7 @@ static void xen_pcibk_frontend_changed(struct xenbus_device *xdev,
- 		xenbus_switch_state(xdev, XenbusStateClosed);
- 		if (xenbus_dev_is_online(xdev))
- 			break;
--		/* fall through - if not online */
-+		fallthrough;	/* if not online */
- 	case XenbusStateUnknown:
- 		dev_dbg(&xdev->dev, "frontend is gone! unregister device\n");
- 		device_unregister(&xdev->dev);
-diff --git a/drivers/xen/xen-scsiback.c b/drivers/xen/xen-scsiback.c
-index ba0942e..9daef2 100644
---- a/drivers/xen/xen-scsiback.c
-+++ b/drivers/xen/xen-scsiback.c
-@@ -1184,7 +1184,7 @@ static void scsiback_frontend_changed(struct xenbus_device *dev,
- 		xenbus_switch_state(dev, XenbusStateClosed);
- 		if (xenbus_dev_is_online(dev))
- 			break;
--		/* fall through - if not online */
-+		fallthrough;	/* if not online */
- 	case XenbusStateUnknown:
- 		device_unregister(&dev->dev);
- 		break;
-diff --git a/drivers/xen/xenbus/xenbus_probe_frontend.c b/drivers/xen/xenbus/xenbus_probe_frontend.c
-index 8a1650..708917 100644
---- a/drivers/xen/xenbus/xenbus_probe_frontend.c
-+++ b/drivers/xen/xenbus/xenbus_probe_frontend.c
-@@ -402,13 +402,11 @@ static void xenbus_reset_frontend(char *fe, char *be, int be_state)
- 	case XenbusStateConnected:
- 		xenbus_printf(XBT_NIL, fe, "state", "%d", XenbusStateClosing);
- 		xenbus_reset_wait_for_backend(be, XenbusStateClosing);
--		/* fall through */
--
-+		fallthrough;
- 	case XenbusStateClosing:
- 		xenbus_printf(XBT_NIL, fe, "state", "%d", XenbusStateClosed);
- 		xenbus_reset_wait_for_backend(be, XenbusStateClosed);
--		/* fall through */
--
-+		fallthrough;
- 	case XenbusStateClosed:
- 		xenbus_printf(XBT_NIL, fe, "state", "%d", XenbusStateInitialising);
- 		xenbus_reset_wait_for_backend(be, XenbusStateInitWait);
--- 
-2.24.0
-
+That was just a question on why virtio uses the per-device tags, which
+didn't look like it made any sense.  What I'm worried about here is
+mixing up the concept of reserved tags in the tagset, and queues to use
+them.  Note that we already have the scsi_get_host_dev to allocate
+a scsi_device and thus a request_queue for the host itself.  That seems
+like the better interface to use a tag for a host wide command vs
+introducing a parallel path.
