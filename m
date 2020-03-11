@@ -2,240 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by archive.lwn.net (Postfix) with ESMTP id 77CCB7E2DD
-	for <lwn-linux-block@archive.lwn.net>; Wed, 11 Mar 2020 16:13:14 +0000 (UTC)
+	by archive.lwn.net (Postfix) with ESMTP id 758627DE57
+	for <lwn-linux-block@archive.lwn.net>; Wed, 11 Mar 2020 15:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730100AbgCKQNM (ORCPT <rfc822;lwn-linux-block@archive.lwn.net>);
-        Wed, 11 Mar 2020 12:13:12 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35963 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730196AbgCKQNL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Mar 2020 12:13:11 -0400
-Received: by mail-wr1-f65.google.com with SMTP id s5so3404054wrg.3
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2020 09:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=MoQIAhcbi4rdn1RsqOU3+CFdLFSNg7VnGnkI+FVzxSE=;
-        b=aPwrE0IBn0Kfk+Bkzx/Ch3bynMAmLxL+elrznmw917FjCeDwBQlcZaXzpuYNehOgjn
-         WXi701eppx7YYLAFz6JP639QyA8+oThXLJI4xmLUAC+11vTa56YYedpZLrVeCYhr9cuP
-         DV5YcZ6/CIEX4Y9lcP+OY4rQjzfbTLK9l2ZT0pjjd/vd2dkkcb9wEWkl0eje/9NaXkxE
-         MC35qsWullK+5q5XZAItEmYwBTE3PV9OLNv3HVGcxD2EpWJ721/7wMAO5o9wWBjqokF6
-         sXvdCKsMfdmFuyJowFUyFEsbYTw/VBBI7FjWvi/Ga6LY3DGKiIUV2q/P/gFiz6i1So61
-         iYUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=MoQIAhcbi4rdn1RsqOU3+CFdLFSNg7VnGnkI+FVzxSE=;
-        b=Col5zopwX6SR6tPlmcwN5Ik+DJ0gEUzG9oXyzeuwxZ4OOfIv0uRH5QkjOqZzogOn2+
-         0/DaKmy1ZQGzZx+DtuDnhJ1M2p82R94Hb1KK1e8QfXku94b0jXAAG7RnrSHL2C+bs2xc
-         YPHBtXCreZ1tfZqA7aOvNYBtb0YeCYhp5KuuWLNhM7f6n7XOrNphfiaS6f0+8ZGMAPeF
-         Z17wBF5g5OXOWHXEefw6yjNgSlWWQYzI3V5pHd6xtehRRIFIRXWERLFmBqzMS6N0pTaz
-         w8Wkofxcir5HejFfswZ81GU1soityCsBU0w5K3d6qs5lrdhiqpFQTbK6AclV2XOTaMbe
-         wn/A==
-X-Gm-Message-State: ANhLgQ3Vlu0KF6RZ+bbdYpALyQQFbr3/YItRYNAP3EM1O1EldBizMV0N
-        o4Lm/xWB0CSyU19SxfzA5sr0PsWQ7jQ=
-X-Google-Smtp-Source: ADFU+vt77HcuXE1btXJ3qLaCKHkOzO7TJeH0EZqCac025/+ZjAWHSHPk8rS5sTiJq5YD1bvxFZfELA==
-X-Received: by 2002:adf:9087:: with SMTP id i7mr5157324wri.120.1583943188646;
-        Wed, 11 Mar 2020 09:13:08 -0700 (PDT)
-Received: from jwang-Latitude-5491.fritz.box ([2001:16b8:4963:f600:4938:8f65:9543:5ec9])
-        by smtp.gmail.com with ESMTPSA id v13sm2739332wru.47.2020.03.11.09.13.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 09:13:08 -0700 (PDT)
-From:   Jack Wang <jinpu.wang@cloud.ionos.com>
-To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
-        jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, rpenyaev@suse.de,
-        pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v10 17/26] block/rnbd: client: private header with client structs and functions
-Date:   Wed, 11 Mar 2020 17:12:31 +0100
-Message-Id: <20200311161240.30190-18-jinpu.wang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
+        id S1730197AbgCKPzC (ORCPT <rfc822;lwn-linux-block@archive.lwn.net>);
+        Wed, 11 Mar 2020 11:55:02 -0400
+Received: from verein.lst.de ([213.95.11.211]:60118 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730053AbgCKPzC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Mar 2020 11:55:02 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 90D1268B05; Wed, 11 Mar 2020 16:54:58 +0100 (CET)
+Date:   Wed, 11 Mar 2020 16:54:58 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     He Zhe <zhe.he@windriver.com>
+Cc:     Christoph Hellwig <hch@lst.de>, jack@suse.cz,
+        Jens Axboe <axboe@kernel.dk>, viro@zeniv.linux.org.uk,
+        bvanassche@acm.org, keith.busch@intel.com, tglx@linutronix.de,
+        mwilck@suse.com, yuyufen@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: disk revalidation updates and OOM
+Message-ID: <20200311155458.GA24376@lst.de>
+References: <93b395e6-5c3f-0157-9572-af0f9094dbd7@windriver.com> <20200310074018.GB26381@lst.de> <75865e17-48f8-a63a-3a29-f995115ffcfc@windriver.com> <20200310162647.GA6361@lst.de> <f48683d9-7854-ba5f-da3a-7ef987a539b8@windriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f48683d9-7854-ba5f-da3a-7ef987a539b8@windriver.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
-Archived-At: <http://archive.lwn.net:8080/linux-block/20200311161240.30190-18-jinpu.wang@cloud.ionos.com/>
+Archived-At: <http://archive.lwn.net:8080/linux-block/20200311155458.GA24376@lst.de/>
 List-Archive: <http://archive.lwn.net:8080/linux-block/>
 List-Post: <mailto:linux-block@vger.kernel.org>
 
-This header describes main structs and functions used by rnbd-client
-module, mainly for managing RNBD sessions and mapped block devices,
-creating and destroying sysfs entries.
+On Wed, Mar 11, 2020 at 12:03:43PM +0800, He Zhe wrote:
+> >> 979c690d block: move clearing bd_invalidated into check_disk_size_change
+> >> f0b870d block: remove (__)blkdev_reread_part as an exported API
+> >> 142fe8f block: fix bdev_disk_changed for non-partitioned devices
+> >> a1548b6 block: move rescan_partitions to fs/block_dev.c
+> > Just to make sure we are on the same page:  if you revert all four it
+> > works, if you rever all but
+> >
+> > a1548b6 block: move rescan_partitions to fs/block_dev.c
+> >
+> > it doesn't?
+> 
+> After reverting 142fe8f, rescan_partitions would be called in block/ioctl.c
+> and cause a build failure. So I need to also revert a1548b6 to provide
+> rescan_partitions.
+> 
+> OR if I manually add the following diff instead of reverting a1548b6, then yes,
+> it works too.
 
-Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/rnbd/rnbd-clt.h | 148 ++++++++++++++++++++++++++++++++++
- 1 file changed, 148 insertions(+)
- create mode 100644 drivers/block/rnbd/rnbd-clt.h
+Ok, so 142fe8f is good except for the build failure.
 
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-new file mode 100644
-index 000000000000..276a3220f78f
---- /dev/null
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -0,0 +1,148 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * RDMA Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-+ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-+ */
-+
-+#ifndef RNBD_CLT_H
-+#define RNBD_CLT_H
-+
-+#include <linux/wait.h>
-+#include <linux/in.h>
-+#include <linux/inet.h>
-+#include <linux/blk-mq.h>
-+#include <linux/refcount.h>
-+
-+#include "rtrs.h"
-+#include "rnbd-proto.h"
-+#include "rnbd-log.h"
-+
-+#define BMAX_SEGMENTS 29
-+#define RECONNECT_DELAY 30
-+#define MAX_RECONNECTS -1
-+
-+enum rnbd_clt_dev_state {
-+	DEV_STATE_INIT,
-+	DEV_STATE_MAPPED,
-+	DEV_STATE_MAPPED_DISCONNECTED,
-+	DEV_STATE_UNMAPPED,
-+};
-+
-+struct rnbd_iu_comp {
-+	wait_queue_head_t wait;
-+	int errno;
-+};
-+
-+struct rnbd_iu {
-+	union {
-+		struct request *rq; /* for block io */
-+		void *buf; /* for user messages */
-+	};
-+	struct rtrs_permit	*permit;
-+	union {
-+		/* use to send msg associated with a dev */
-+		struct rnbd_clt_dev *dev;
-+		/* use to send msg associated with a sess */
-+		struct rnbd_clt_session *sess;
-+	};
-+	struct scatterlist	sglist[BMAX_SEGMENTS];
-+	struct work_struct	work;
-+	int			errno;
-+	struct rnbd_iu_comp	comp;
-+	atomic_t		refcount;
-+};
-+
-+struct rnbd_cpu_qlist {
-+	struct list_head	requeue_list;
-+	spinlock_t		requeue_lock;
-+	unsigned int		cpu;
-+};
-+
-+struct rnbd_clt_session {
-+	struct list_head        list;
-+	struct rtrs_clt        *rtrs;
-+	wait_queue_head_t       rtrs_waitq;
-+	bool                    rtrs_ready;
-+	struct rnbd_cpu_qlist	__percpu
-+				*cpu_queues;
-+	DECLARE_BITMAP(cpu_queues_bm, NR_CPUS);
-+	int	__percpu	*cpu_rr; /* per-cpu var for CPU round-robin */
-+	atomic_t		busy;
-+	int			queue_depth;
-+	u32			max_io_size;
-+	struct blk_mq_tag_set	tag_set;
-+	struct mutex		lock; /* protects state and devs_list */
-+	struct list_head        devs_list; /* list of struct rnbd_clt_dev */
-+	refcount_t		refcount;
-+	char			sessname[NAME_MAX];
-+	u8			ver; /* protocol version */
-+};
-+
-+/**
-+ * Submission queues.
-+ */
-+struct rnbd_queue {
-+	struct list_head	requeue_list;
-+	unsigned long		in_list;
-+	struct rnbd_clt_dev	*dev;
-+	struct blk_mq_hw_ctx	*hctx;
-+};
-+
-+struct rnbd_clt_dev {
-+	struct rnbd_clt_session	*sess;
-+	struct request_queue	*queue;
-+	struct rnbd_queue	*hw_queues;
-+	u32			device_id;
-+	/* local Idr index - used to track minor number allocations. */
-+	u32			clt_device_id;
-+	struct mutex		lock;
-+	enum rnbd_clt_dev_state	dev_state;
-+	char			pathname[NAME_MAX];
-+	enum rnbd_access_mode	access_mode;
-+	bool			read_only;
-+	bool			rotational;
-+	u32			max_hw_sectors;
-+	u32			max_write_same_sectors;
-+	u32			max_discard_sectors;
-+	u32			discard_granularity;
-+	u32			discard_alignment;
-+	u16			secure_discard;
-+	u16			physical_block_size;
-+	u16			logical_block_size;
-+	u16			max_segments;
-+	size_t			nsectors;
-+	u64			size;		/* device size in bytes */
-+	struct list_head        list;
-+	struct gendisk		*gd;
-+	struct kobject		kobj;
-+	char			blk_symlink_name[NAME_MAX];
-+	refcount_t		refcount;
-+	struct work_struct	unmap_on_rmmod_work;
-+};
-+
-+/* rnbd-clt.c */
-+
-+struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
-+					   struct rtrs_addr *paths,
-+					   size_t path_cnt,
-+					   const char *pathname,
-+					   enum rnbd_access_mode access_mode);
-+int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
-+			   const struct attribute *sysfs_self);
-+
-+int rnbd_clt_remap_device(struct rnbd_clt_dev *dev);
-+int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize);
-+
-+/* rnbd-clt-sysfs.c */
-+
-+int rnbd_clt_create_sysfs_files(void);
-+
-+void rnbd_clt_destroy_sysfs_files(void);
-+void rnbd_clt_destroy_default_group(void);
-+
-+void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
-+
-+#endif /* RNBD_CLT_H */
--- 
-2.17.1
-
+Do 142fe8f and 979c690d work with the build fix applied? (f0b870d
+shouldn't be interesting for this case).
