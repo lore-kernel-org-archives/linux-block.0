@@ -6,69 +6,66 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D88C2BB1D
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0B7C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:57:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC203206E7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:55:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0253206E7
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nP6/WLI/"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AVrW7+rS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727456AbgCLNzD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 09:55:03 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37808 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgCLNzC (ORCPT
+        id S1727072AbgCLN5a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 09:57:30 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38858 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727007AbgCLN5a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 09:55:02 -0400
-Received: by mail-io1-f68.google.com with SMTP id k4so5758883ior.4
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:55:02 -0700 (PDT)
+        Thu, 12 Mar 2020 09:57:30 -0400
+Received: by mail-io1-f66.google.com with SMTP id c25so5127405ioi.5
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cToFEtVUE7Ch+tt4XDUBJXMv4CHtAMLqOw63rT85I/c=;
-        b=nP6/WLI/WsIOf+1zptS2XUXHgM4MDLa8+uqf5HvQU7qxSsF029TVjIqbWUlDNGSAeB
-         oVy9tnq6L7kjYwKWR75T3+o8lKY9GFeiuqVEx5Lz3Vt47VQ2K3BM5bYTNGslhzBp1Rrf
-         kpcX+LwALPmR6rXCFCQn0/uxqseNDRfHs2bdr5KAF5Ll5vRnXMlGCmMjyIkCZ4EU+GH5
-         1lwAoEsZJ9QmnMlNnX70KCh0e5eEPtictp78Kx2YmnpKQ/pO27jH6PItl0dh5iVu6gp6
-         hKRue9NlzIj9ofk7oECvEjEPwe5tGUR47Xnv+XH2rBMfMevm9Zxrbj3KbitNV9vs23fy
-         znuw==
+        bh=PmCzpDN/NMRhyTEmPMiyBIQCmmnvomJEacJijlrbzM4=;
+        b=AVrW7+rSwrTmOjEOzng0oQCcIDCWV2si013XLwgHe6kixGzc7dstefqkGGSrsRVsAa
+         FJE5c8jj9IlF0m0dMAhvHAI8L2U5z6bsisEYr8MliPCpIKguC+xfFP8F0WTnFm4+b0bq
+         Fifux4zNzTJyMwxaYofa0zz8c/fczmTMV72sT6ZMw2K/qkUWZFqYOeB4JqKYqXOoDy7G
+         m/lS4YnuTImXVHmsWTGe4vzNuDCRyyv0A6mKgrn7VmUN3Ao6sR9KYbWhRQSAUju2PiMf
+         TRnCHWJ9L0Q9+VL2EyBZ5TsRl92cRG+4ULNLFYL+96dQGAluT2xt8/JIWGS0S5p/BZ2g
+         j/dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=cToFEtVUE7Ch+tt4XDUBJXMv4CHtAMLqOw63rT85I/c=;
-        b=svVT5gtAtV6L/RkHFQt7ykA+SpC/UOYDc23UO4pZahJzw4MEM7h/Ch16WEyqn1J0A/
-         D1RkTtgZMwRWeUT1HW5z3ZDXpukSJeHa9lMVgm+ZuTFbNEMqGovG77zq9Ao30XZPeHGu
-         vLtITW+hyr/Yt9UcbChlSzpriKcnug8yPWKt1o0DBe8+z/Cxaw9KE8dyCyupqmiyg8vK
-         g4Cqa2qOvdH+imsPvTfD+Xzp/DzWw6g4onLkb6KlaGSsVl5TgFZgOw5xkWbP3pR7do3f
-         P7jVwIWl8inQZxrjktQCfuEzbQ0e4b3fqdEUV8FLJyNpM3R3W5juAmrR+eSSTB7LedHt
-         ejOA==
-X-Gm-Message-State: ANhLgQ0rZMAfwTkMo/4+7GlWfmWLNgJvOvNgCoz5k9KZ7Gtx5H7N7jR5
-        9HAzrHwjGZxvoX/s5sAtJatcmz7YKWaonQ==
-X-Google-Smtp-Source: ADFU+vvaAp9Y3yBZ/nmn+XwUZzrMACmfwA/BaaZfZ2bmO6Rj35fqEwpIYvKHtA62Ozr7lVRlp42Gkw==
-X-Received: by 2002:a05:6638:921:: with SMTP id 1mr8293503jak.110.1584021300362;
-        Thu, 12 Mar 2020 06:55:00 -0700 (PDT)
+        bh=PmCzpDN/NMRhyTEmPMiyBIQCmmnvomJEacJijlrbzM4=;
+        b=fd6fLSFYROkU0miTIVaS1u+A0no+mc4f4Cn2TN69yxmQfxl8pIVZlW/w0H0bPSJDD6
+         G+f9wem4o3o9rGUwbUs0rO6BexeDNQWrQuInrht+oD5wRl7ez7Kxu7MBIHWAZujDekca
+         OMtixMpwNadH/ldxCCSc30+aMoZ196yHRMOK/bXIk0mhhb0enVEkoSMF8CobvDaEJZlk
+         PWrGhrLyOZPw+sUBZ7/OtTCjKQrzpr0qV2h3zcdcTLdmuoL3aiQgsW/1TA6LVSuNSUeX
+         czfF5nj6pIRGFDrFsNHD8M468EF7IoDaNlKeOO9uUE82xmnPHJIS7+hXl9TjEAl12+oe
+         gmSQ==
+X-Gm-Message-State: ANhLgQ3TMVgzVkEvJ3pmYRri6Q83zooef3F08IiEIPDTjXGeTcFSJufN
+        YO5UxoOChtbiPXNiS9Ixfa2mmA==
+X-Google-Smtp-Source: ADFU+vv2B+H/3LrqYARnBvPi2opWl74wLabWcxLtVxSOKqH6WxbIDjQIp2v88SeHkhRQtUCt0kQj6w==
+X-Received: by 2002:a5d:9708:: with SMTP id h8mr7755881iol.141.1584021448333;
+        Thu, 12 Mar 2020 06:57:28 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k20sm8515402ilg.45.2020.03.12.06.54.58
+        by smtp.gmail.com with ESMTPSA id r29sm8822455ilk.76.2020.03.12.06.57.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2020 06:54:59 -0700 (PDT)
-Subject: Re: [PATCH v2] block: Fix partition support for host aware zoned
- block devices
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <20200221013708.911698-1-shinichiro.kawasaki@wdc.com>
+        Thu, 12 Mar 2020 06:57:27 -0700 (PDT)
+Subject: Re: [PATCH 1/1] null_blk: describe the usage of fault injection param
+To:     Dongli Zhang <dongli.zhang@oracle.com>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <20200304191644.25220-1-dongli.zhang@oracle.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7bfa45fd-2ad5-be7d-b486-e778d44b3209@kernel.dk>
-Date:   Thu, 12 Mar 2020 07:54:58 -0600
+Message-ID: <052ba0ac-e0ec-9607-e5c8-acbee8ab6162@kernel.dk>
+Date:   Thu, 12 Mar 2020 07:57:26 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200221013708.911698-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20200304191644.25220-1-dongli.zhang@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,21 +74,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/20/20 6:37 PM, Shin'ichiro Kawasaki wrote:
-> Commit b72053072c0b ("block: allow partitions on host aware zone
-> devices") introduced the helper function disk_has_partitions() to check
-> if a given disk has valid partitions. However, since this function result
-> directly depends on the disk partition table length rather than the
-> actual existence of valid partitions in the table, it returns true even
-> after all partitions are removed from the disk. For host aware zoned
-> block devices, this results in zone management support to be kept
-> disabled even after removing all partitions.
+On 3/4/20 12:16 PM, Dongli Zhang wrote:
+> As null_blk is a very good start point to test block layer, this patch adds
+> description and comments to 'timeout' and 'requeue' to explain how to use
+> fault injection with null_blk.
 > 
-> Fix this by changing disk_has_partitions() to walk through the partition
-> table entries and return true if and only if a valid non-zero size
-> partition is found.
+> The nvme has similar with nvme_core.fail_request in the form of comment.
 
-Applied for 5.6, thanks.
+This doesn't apply to for-5.7/drivers, care to resend?
 
 -- 
 Jens Axboe
