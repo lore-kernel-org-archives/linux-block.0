@@ -2,109 +2,122 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 736E9C10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9CFC10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46FFD206E9
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B160206EB
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:03:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="f6V4M7Hj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbgCLLvQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 07:51:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55572 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726044AbgCLLvQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 07:51:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 55507AE44;
-        Thu, 12 Mar 2020 11:51:14 +0000 (UTC)
-Subject: Re: [Question] IO is split by block layer when size is larger than 4k
-To:     Feng Li <lifeng1519@gmail.com>, linux-block@vger.kernel.org,
-        ming.lei@redhat.com
-References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <f7963269-bf90-9b1d-2ac4-bf324d5462e5@suse.de>
-Date:   Thu, 12 Mar 2020 12:51:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726395AbgCLMDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 08:03:04 -0400
+Received: from mail-qv1-f66.google.com ([209.85.219.66]:38866 "EHLO
+        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726302AbgCLMDE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Mar 2020 08:03:04 -0400
+Received: by mail-qv1-f66.google.com with SMTP id p60so2435811qva.5
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 05:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=g1Wdzvpjgq0rmXr47VZEoreiXSWsPwwFS/Fg+1mqi9I=;
+        b=f6V4M7Hj/YKRgFvnQ0ip1pwXT/78X97E4YMfS3/VrzK3Dc9eizGIcR05Sb+2NADqtC
+         j/ZGjHCtaX/0DSsBpUED0TJCcyC3MjcD/3wuKE/qrEiQ1roSL7/LFdD4HqGNG8CORa7u
+         wJHJp6PcbrXDdqjM6PGcCeoy40bnT52dACFfAGtHnMWLDiAfAXgCsbzQmzRQAdrvzXEG
+         CYKssZ+zrnfq6xM0TGQ5KhgU+rNcqPoUq5etc6Gb/HpoPEThuzHg2LbYr5PgS5IL7wK8
+         AA3Mi7oUwJCp2UB7a00mC6qImnG6RV1wFF0P8IIxs1HsFz0srIM4/UAn+Pk27Wqdsel6
+         DYIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=g1Wdzvpjgq0rmXr47VZEoreiXSWsPwwFS/Fg+1mqi9I=;
+        b=CgXRo1zB9Yd6u/UnZsPgHiXgoPIswiB+J0wUiL2Nbka6akJYYwqKu4tqf9ZCbvGZ/e
+         v9qFz4wT/hHJxm1eco2Ov0RIBTX5Rljar+TeZJYRHQlc3uZT4BIM10k8YzUE1w2Dnx53
+         CQauIyRVqFaDJx0QZ5ATnTyur+1no2UDywv3XQmdsMq05sCIWCrS9l/M7lDdJbhxf8yS
+         mNlF4ztOaGMj1wzaIF4v5HwMSIgA+JwbVJA2Jsf0J4TUyrMME3n3gXYXoVvsi11q2/K+
+         qsLRRauivIYKhCnNL1LrMoUdkbj0pf9mCACRAH/g2LasRPm7CLVfVJXB5OKr2B+fctKT
+         WnHg==
+X-Gm-Message-State: ANhLgQ3K3SFIwy5Aqy918FakDV0AliEVDf2LhKEwVVQZez/7gyb+SzRI
+        yKu3AZjyGxOEElgjqmiDOjKRyQ==
+X-Google-Smtp-Source: ADFU+vtcfzf9wRVww1Ak9MPTXQ7fpkzfVrarAblgpse0DpS7sRPucb1fwZUXlmxYkAKCsOzJdNKfCA==
+X-Received: by 2002:a0c:ffd3:: with SMTP id h19mr6933623qvv.166.1584014582927;
+        Thu, 12 Mar 2020 05:03:02 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id w204sm14610945qkb.133.2020.03.12.05.03.00
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 12 Mar 2020 05:03:01 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jCMYG-0004u9-4k; Thu, 12 Mar 2020 09:03:00 -0300
+Date:   Thu, 12 Mar 2020 09:03:00 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Subject: Re: [PATCH v10 13/26] RDMA/rtrs: include client and server modules
+ into kernel compilation
+Message-ID: <20200312120300.GJ31668@ziepe.ca>
+References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
+ <20200311161240.30190-14-jinpu.wang@cloud.ionos.com>
+ <20200311190313.GI31668@ziepe.ca>
+ <CAHg0HuxHq7_hEkYjpT7-o9w3_T5WVvot2cGLnDp1_mB62Xd40Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHg0HuxHq7_hEkYjpT7-o9w3_T5WVvot2cGLnDp1_mB62Xd40Q@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/12/20 12:13 PM, Feng Li wrote:
-> Hi experts,
+On Thu, Mar 12, 2020 at 11:50:59AM +0100, Danil Kipnis wrote:
+> On Wed, Mar 11, 2020 at 8:03 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Wed, Mar 11, 2020 at 05:12:27PM +0100, Jack Wang wrote:
+> > > Add rtrs Makefile, Kconfig and also corresponding lines into upper
+> > > layer infiniband/ulp files.
+> > >
+> > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> > >  drivers/infiniband/Kconfig           |  1 +
+> > >  drivers/infiniband/ulp/Makefile      |  1 +
+> > >  drivers/infiniband/ulp/rtrs/Kconfig  | 27 +++++++++++++++++++++++++++
+> > >  drivers/infiniband/ulp/rtrs/Makefile | 15 +++++++++++++++
+> > >  4 files changed, 44 insertions(+)
+> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Kconfig
+> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Makefile
+> >
+> > How is this using ib_devices without having a struct ib_client ?
+> Hi Jason,
 > 
-> May I ask a question about block layer?
-> When running fio in guest os, I find a 256k IO is split into the page
-> by page in bio, saved in bvecs.
-> And virtio-blk just put the bio_vec one by one in the available
-> descriptor table.
-> 
-It isn't 'split', it's using _one_ bio containing bvecs, where each bvec
-consists of one page.
+> After we resolved address using rdma_resolve_add() we access the
+> ib_device from rdma_cm_id. The ib_device has been registered on
+> rdma_cm module load in cma_init(). The handle device removal through
+> RDMA_CM_EVENT_DEVICE_REMOVAL.
 
-'split' for the blocklayer means that a single I/O is split into several
-bios, which I dont' think is the case here. Or?
+Hmm.. I actually don't know if this flow works OK in rdma cm or not..
 
-Cheers,
+Actually I expect if I look at rdma cm, I'll find it is broken..
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+However, it does sound like a reasonable approach, so nothing to do
+here.
+
+Jason
