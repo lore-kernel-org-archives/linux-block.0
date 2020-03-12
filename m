@@ -2,377 +2,143 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C416C4CECE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BF6C4CECE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:13:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 225B8206F1
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:10:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="J5dhMgwU"
+	by mail.kernel.org (Postfix) with ESMTP id D14632072F
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:13:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584033233;
+	bh=BPG48TPqtRCN1POin+ar/Y8OdH+YM9+i/QbSi/sR7Do=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=2sbt/JobC+iKlb4ATKFIJpJiz9Lz5n/coo8ANgpSLB56RhKS+J9XzlzAQ+hn3Vpa6
+	 7xdk/uefKzEL+CdfiKeNcmn6w0juryxSr+zW8NYjzBsN781fUYM886RPM/HIAZWZne
+	 dDRZr2cqMMN86sNWsecp7OxMxc3WgWrtD84BznOg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726464AbgCLRKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 13:10:20 -0400
-Received: from mail-il1-f193.google.com ([209.85.166.193]:43313 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726530AbgCLRKS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 13:10:18 -0400
-Received: by mail-il1-f193.google.com with SMTP id d14so5657009ilq.10
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 10:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8QTDOsXgr5uhoUaVYF7jJUlB22rDwaMpfiZJJ6Mk4+Q=;
-        b=J5dhMgwUULL6IWKxyuzrB7YQ8XVvgUoNyfuSsQxnVJd4IsLsr3V5xe9HkWHdR3/SFQ
-         oILGpqHzzcD6orog4IdcuUwEed+41VD7dp/KRVBdeovNbcK9NV0pV/tybE232dqRURge
-         7AmRreflg6bc7x3GJbps2Xy7s+DkmE53LsP4KUjef1mKG0TjzxWWJjTIW4uPAgdSdIGY
-         Lcews/f3mXXcRRZpPkagGx11/4/9TH3qZJLN2WCtxdwCtnQD98h0U29QQSxC6W8Wu2BF
-         DbNEHfOX7eeFdbiz1OceMllKP4hUbqjjYUma/GGnwkEr6EBqrGn4v+IrKSPCFXy+xMNh
-         IFow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8QTDOsXgr5uhoUaVYF7jJUlB22rDwaMpfiZJJ6Mk4+Q=;
-        b=YKQ78JtUArn14mUGMvMpiLAqb5NfxnJr5CQJUwFpG+I04uw/pt4s4YHc19tfESjdE6
-         61C6B60eWapMc0TGQqggv3jRgyz5g3rVNWuF59+pLu1Mx9tt5K+BGtpjukDqoUQicU5t
-         BCuK3z6ytoDzu3c0dedST5vuC+xj/u4BIKX6XbdOkyax2pgxNq3isJti7MyXbJGwtI2e
-         imi1hgILGJJ8u4bB23cY/HWf36HDa7wVlC9QNe2lwnLe/CLSYWAtlxWGkxlfs5ZAm98o
-         KKjb4I+HEAAaDqWULOV9/Kjj3KgQdXbrsJQDqvsN12ot2y7EeFQBX3mFlUNtEMr3kqo7
-         yhFA==
-X-Gm-Message-State: ANhLgQ3rNEYQVXZucrMD4Ub1yiy844fMr8TDijMm76lg5EZ1GH7aaDwc
-        W2cwG/Cdnvh5O8j0knpbYpQ/UPAAeP7Z4seQdIeX
-X-Google-Smtp-Source: ADFU+vtTJQNiYZ30j6luiGizk9A5IrmVmgKY41vAfZKrgF60S3fbgo1XsRsXGvDiBwZDrKuDBztt44BgIc3d4PODtJY=
-X-Received: by 2002:a92:8b8b:: with SMTP id i133mr8830314ild.307.1584033017288;
- Thu, 12 Mar 2020 10:10:17 -0700 (PDT)
+        id S1726385AbgCLRNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 13:13:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50848 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726299AbgCLRNw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Mar 2020 13:13:52 -0400
+Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 73573206F1;
+        Thu, 12 Mar 2020 17:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584033231;
+        bh=BPG48TPqtRCN1POin+ar/Y8OdH+YM9+i/QbSi/sR7Do=;
+        h=From:To:Cc:Subject:Date:From;
+        b=2B8O2BW6Ry+GQJme51DprU73qgUTwaumfQ0PlOUup5JRm9w2MxT/GimYgcPvyB8u+
+         RjU3MdET32B8RRvb8j6PMNN3A9Xu0HrDBbSXIqiTtDVYCQRgANKxoioElpWlOSEh2U
+         CGNUuot008Ss+7rqKmkRQyYoDNSr4fCLSueEAPiw=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Andy Gross <agross@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Can Guo <cang@codeaurora.org>,
+        Elliot Berman <eberman@codeaurora.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Satya Tangirala <satyat@google.com>
+Subject: [RFC PATCH v3 0/4] Inline crypto support on DragonBoard 845c
+Date:   Thu, 12 Mar 2020 10:12:55 -0700
+Message-Id: <20200312171259.151442-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
- <20200311161240.30190-7-jinpu.wang@cloud.ionos.com> <20200311190156.GH31668@ziepe.ca>
-In-Reply-To: <20200311190156.GH31668@ziepe.ca>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 12 Mar 2020 18:10:06 +0100
-Message-ID: <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com>
-Subject: Re: [PATCH v10 06/26] RDMA/rtrs: client: main functionality
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jason,
+Hello,
 
-On Wed, Mar 11, 2020 at 8:01 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Mar 11, 2020 at 05:12:20PM +0100, Jack Wang wrote:
-> > +static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_sess *sess)
-> > +{
-> > +     struct rtrs_clt *clt = sess->clt;
-> > +     struct rtrs_clt_sess *next;
-> > +     bool wait_for_grace = false;
-> > +     int cpu;
-> > +
-> > +     mutex_lock(&clt->paths_mutex);
-> > +     list_del_rcu(&sess->s.entry);
-> > +
-> > +     /* Make sure everybody observes path removal. */
-> > +     synchronize_rcu();
-> > +
-> > +     /*
-> > +      * At this point nobody sees @sess in the list, but still we have
-> > +      * dangling pointer @pcpu_path which _can_ point to @sess.  Since
-> > +      * nobody can observe @sess in the list, we guarantee that IO path
-> > +      * will not assign @sess to @pcpu_path, i.e. @pcpu_path can be equal
-> > +      * to @sess, but can never again become @sess.
-> > +      */
-> > +
-> > +     /*
-> > +      * Decrement paths number only after grace period, because
-> > +      * caller of do_each_path() must firstly observe list without
-> > +      * path and only then decremented paths number.
-> > +      *
-> > +      * Otherwise there can be the following situation:
-> > +      *    o Two paths exist and IO is coming.
-> > +      *    o One path is removed:
-> > +      *      CPU#0                          CPU#1
-> > +      *      do_each_path():                rtrs_clt_remove_path_from_arr():
-> > +      *          path = get_next_path()
-> > +      *          ^^^                            list_del_rcu(path)
-> > +      *          [!CONNECTED path]              clt->paths_num--
-> > +      *                                              ^^^^^^^^^
-> > +      *          load clt->paths_num                 from 2 to 1
-> > +      *                    ^^^^^^^^^
-> > +      *                    sees 1
-> > +      *
-> > +      *      path is observed as !CONNECTED, but do_each_path() loop
-> > +      *      ends, because expression i < clt->paths_num is false.
-> > +      */
-> > +     clt->paths_num--;
-> > +
-> > +     /*
-> > +      * Get @next connection from current @sess which is going to be
-> > +      * removed.  If @sess is the last element, then @next is NULL.
-> > +      */
-> > +     next = list_next_or_null_rr_rcu(&clt->paths_list, &sess->s.entry,
-> > +                                     typeof(*next), s.entry);
->
-> calling rcu list iteration without holding rcu_lock is wrong
-This function (add_path) along with the corresponding
-remove_path_from_arr() are the only functions modifying the
-paths_list. In both functions paths_mutex is taken so that they are
-serialized. Since the modification of the paths_list is protected by
-the mutex, the rcu_read_lock is superfluous here.
+This patchset implements UFS inline crypto support on the DragonBoard
+845c, using the Qualcomm Inline Crypto Engine (ICE) that's present on
+the Snapdragon 845 SoC.
 
->
-> > +     /*
-> > +      * @pcpu paths can still point to the path which is going to be
-> > +      * removed, so change the pointer manually.
-> > +      */
-> > +     for_each_possible_cpu(cpu) {
-> > +             struct rtrs_clt_sess __rcu **ppcpu_path;
-> > +
-> > +             ppcpu_path = per_cpu_ptr(clt->pcpu_path, cpu);
-> > +             if (rcu_dereference(*ppcpu_path) != sess)
->
-> calling rcu_dereference without holding rcu_lock is wrong.
-We only need a READ_ONCE semantic here. ppcpu_path is pointing to the
-last path used for an IO and is used for the round robin multipath
-policy. I guess the call can be changed to rcu_dereference_raw to
-avoid rcu_lockdep warning. The round-robin algorithm has been reviewed
-by Paul E. McKenney, he wrote a litmus test for it:
-https://lkml.org/lkml/2018/5/28/2080.
+This is based on top of the patchset "[PATCH v8 00/11] Inline Encryption
+Support" by Satya Tangirala, which adds support for the UFS standard
+inline crypto, the block layer changes needed to use inline crypto, and
+support for inline crypto in fscrypt (ext4 and f2fs encryption).  Link:
+https://lore.kernel.org/r/20200312080253.3667-1-satyat@google.com
 
->
-> > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
-> > +                                   struct rtrs_addr *addr)
-> > +{
-> > +     struct rtrs_clt *clt = sess->clt;
-> > +
-> > +     mutex_lock(&clt->paths_mutex);
-> > +     clt->paths_num++;
-> > +
-> > +     /*
-> > +      * Firstly increase paths_num, wait for GP and then
-> > +      * add path to the list.  Why?  Since we add path with
-> > +      * !CONNECTED state explanation is similar to what has
-> > +      * been written in rtrs_clt_remove_path_from_arr().
-> > +      */
-> > +     synchronize_rcu();
->
-> This makes no sense to me. RCU readers cannot observe the element in
-> the list without also observing paths_num++
-Paths_num is only used to make sure a reader doesn't look for a
-CONNECTED path in the list for ever - instead he makes at most
-paths_num attempts. The reader can in fact observe paths_num++ without
-observing new element in the paths_list, but this is OK. When adding a
-new path we first increase the paths_num and them add the element to
-the list to make sure the reader will also iterate over it. When
-removing the path - the logic is opposite: we first remove element
-from the list and only then decrement the paths_num.
+This new patchset is mostly a RFC showing hardware inline crypto working
+on a publicly available development board that runs the mainline Linux
+kernel.  While patches 1-2 could be applied now, patches 3-4 depend on
+the main "Inline Encryption Support" patchset being merged first.
 
->
-> Please check all your RCU stuff carefully.
+Most of the logic needed to use ICE is already handled by ufshcd-crypto
+and the blk-crypto framework, which are introduced by the "Inline
+Encryption Support" patchset.  Therefore, this new patchset just adds
+the vendor-specific parts.  I also only implemented support for version
+3 of the ICE hardware, which seems to be easier to use than older
+versions; and for now I only implemented UFS support, not eMMC.  (Note
+that unlike UFS, the eMMC crypto standard hasn't yet published, and I
+haven't yet found any upstream SoC that supports eMMC crypto.)
 
-We do our best :]
+Due to these factors and others, I was able to greatly simplify the
+driver from the vendor's original.  It works fine in testing with
+fscrypt and with a blk-crypto self-test I'm also working on.
 
->
-> > +static void rtrs_clt_close_work(struct work_struct *work)
-> > +{
-> > +     struct rtrs_clt_sess *sess;
-> > +
-> > +     sess = container_of(work, struct rtrs_clt_sess, close_work);
-> > +
-> > +     cancel_delayed_work_sync(&sess->reconnect_dwork);
-> > +     rtrs_clt_stop_and_destroy_conns(sess);
-> > +     /*
-> > +      * Sounds stupid, huh?  No, it is not.  Consider this sequence:
->
-> It sounds stupid because it is stupid. cancel_work is a giant race if
-> some other action hasn't been taken to block parallel threads from
-> calling queue_work before calling cancel_work.
-Will double check. It might be possible to avoid the second call to
-the cancel_delayed_work_sync().
+This driver also works nearly as-is on Snapdragon 765 and Snapdragon
+865, which are very recent SoCs, having just been announced in Dec 2019
+(though these newer SoCs currently lack upstream kernel support).
 
->
-> > +static struct rtrs_clt *alloc_clt(const char *sessname, size_t paths_num,
-> > +                               short port, size_t pdu_sz, void *priv,
-> > +                               void  (*link_ev)(void *priv, enum rtrs_clt_link_ev ev),
-> > +                               unsigned int max_segments,
-> > +                               unsigned int reconnect_delay_sec,
-> > +                               unsigned int max_reconnect_attempts)
-> > +{
-> > +     struct rtrs_clt *clt;
-> > +     int err;
-> > +
-> > +     if (!paths_num || paths_num > MAX_PATHS_NUM)
-> > +             return ERR_PTR(-EINVAL);
-> > +
-> > +     if (strlen(sessname) >= sizeof(clt->sessname))
-> > +             return ERR_PTR(-EINVAL);
-> > +
-> > +     clt = kzalloc(sizeof(*clt), GFP_KERNEL);
-> > +     if (!clt)
-> > +             return ERR_PTR(-ENOMEM);
-> > +
-> > +     clt->pcpu_path = alloc_percpu(typeof(*clt->pcpu_path));
-> > +     if (!clt->pcpu_path) {
-> > +             kfree(clt);
-> > +             return ERR_PTR(-ENOMEM);
-> > +     }
-> > +
-> > +     uuid_gen(&clt->paths_uuid);
-> > +     INIT_LIST_HEAD_RCU(&clt->paths_list);
-> > +     clt->paths_num = paths_num;
-> > +     clt->paths_up = MAX_PATHS_NUM;
-> > +     clt->port = port;
-> > +     clt->pdu_sz = pdu_sz;
-> > +     clt->max_segments = max_segments;
-> > +     clt->reconnect_delay_sec = reconnect_delay_sec;
-> > +     clt->max_reconnect_attempts = max_reconnect_attempts;
-> > +     clt->priv = priv;
-> > +     clt->link_ev = link_ev;
-> > +     clt->mp_policy = MP_POLICY_MIN_INFLIGHT;
-> > +     strlcpy(clt->sessname, sessname, sizeof(clt->sessname));
-> > +     init_waitqueue_head(&clt->permits_wait);
-> > +     mutex_init(&clt->paths_ev_mutex);
-> > +     mutex_init(&clt->paths_mutex);
-> > +
-> > +     clt->dev.class = rtrs_clt_dev_class;
-> > +     clt->dev.release = rtrs_clt_dev_release;
-> > +     dev_set_name(&clt->dev, "%s", sessname);
->
-> Missing error check on dev_set_name
+This patchset is also available in git at:
+    Repo: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+    Tag: db845c-crypto-v3
 
-Will fix.
->
-> > +     err = device_register(&clt->dev);
-> > +     if (err)
-> > +             goto percpu_free;
->
-> Wrong error unwind, read the kdoc for device_register
-Thanks for pointing out, will convert the error handling to put_device().
+Changed v2 => v3:
+    - Rebased onto the v8 inline encryption patchset.  Now the driver
+      has to opt into inline crypto support rather than opting out.
+    - Switched qcom_scm_ice_set_key() to use dma_alloc_coherent()
+      so that we can reliably zeroing the key without assuming that
+      bounce buffers aren't used.  Also added a comment.
+    - Made the key_size and data_unit_size arguments to
+      qcom_scm_ice_set_key() be 'u32' instead of 'int'.
 
->
-> > +     err = rtrs_clt_create_sysfs_root_folders(clt);
->
-> sysfs creation that is not done as part of device_regsiter races with
-> udev.
-We only use device_register() to create
-/sys/class/rtrs_client/<sessionname> sysfs directory. We then create
-some folders and files inside this directory (i.e. paths/,
-multipath_policy, etc.). Do you mean that the uevent is generated
-before we create those subdirectories? How can the creation of this
-subdirectories and files be integrated into the device_register()
-call?
+Changed v1 => v2:
+    - Rebased onto the v7 inline encryption patchset.
+    - Account for all the recent qcom_scm changes.
+    - Don't ignore errors from ->program_key().
+    - Don't dereference NULL hba->vops.
+    - Dropped the patch that added UFSHCD_QUIRK_BROKEN_CRYPTO, as this
+      flag is now included in the main inline encryption patchset.
+    - Many other cleanups.
 
->
-> > +     if (err)
-> > +             goto dev_unregister;
->
-> > +     return clt;
-> > +
-> > +dev_unregister:
-> > +     device_unregister(&clt->dev);
->
-> Wrong error unwind
-Device_register succeeded before, so we do device_unregister in error path...
-Will fix the wrong kfree(clt) and use put_device instead.
+Eric Biggers (4):
+  firmware: qcom_scm: Add support for programming inline crypto keys
+  arm64: dts: sdm845: add Inline Crypto Engine registers and clock
+  scsi: ufs: add program_key() variant op
+  scsi: ufs-qcom: add Inline Crypto Engine support
 
->
-> > +percpu_free:
-> > +     free_percpu(clt->pcpu_path);
-> > +     kfree(clt);
-> > +     return ERR_PTR(err);
-> > +}
->
-> > +struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
-> > +                              const char *sessname,
-> > +                              const struct rtrs_addr *paths,
-> > +                              size_t paths_num,
-> > +                              u16 port,
-> > +                              size_t pdu_sz, u8 reconnect_delay_sec,
-> > +                              u16 max_segments,
-> > +                              s16 max_reconnect_attempts)
-> > +{
-> > +     struct rtrs_clt_sess *sess, *tmp;
-> > +     struct rtrs_clt *clt;
-> > +     int err, i;
-> > +
-> > +     clt = alloc_clt(sessname, paths_num, port, pdu_sz, ops->priv,
-> > +                     ops->link_ev,
-> > +                     max_segments, reconnect_delay_sec,
-> > +                     max_reconnect_attempts);
-> > +     if (IS_ERR(clt)) {
-> > +             err = PTR_ERR(clt);
-> > +             goto out;
-> > +     }
-> > +     for (i = 0; i < paths_num; i++) {
-> > +             struct rtrs_clt_sess *sess;
-> > +
-> > +             sess = alloc_sess(clt, &paths[i], nr_cpu_ids,
-> > +                               max_segments);
-> > +             if (IS_ERR(sess)) {
-> > +                     err = PTR_ERR(sess);
-> > +                     goto close_all_sess;
-> > +             }
-> > +             list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
-> > +
-> > +             err = init_sess(sess);
-> > +             if (err)
-> > +                     goto close_all_sess;
-> > +
-> > +             err = rtrs_clt_create_sess_files(sess);
-> > +             if (err)
-> > +                     goto close_all_sess;
-> > +     }
-> > +     err = alloc_permits(clt);
-> > +     if (err)
-> > +             goto close_all_sess;
-> > +     err = rtrs_clt_create_sysfs_root_files(clt);
-> > +     if (err)
-> > +             goto close_all_sess;
-> > +
-> > +     /*
-> > +      * There is a race if someone decides to completely remove just
-> > +      * newly created path using sysfs entry.  To avoid the race we
-> > +      * use simple 'opened' flag, see rtrs_clt_remove_path_from_sysfs().
-> > +      */
-> > +     clt->opened = true;
->
-> A race solution without locks?
-We wanted to make sure that a path belonging to a session currently
-being established can't be removed from sysfs before the establishment
-is finished.
+ MAINTAINERS                          |   2 +-
+ arch/arm64/boot/dts/qcom/sdm845.dtsi |  13 +-
+ drivers/firmware/qcom_scm.c          | 101 +++++++++++
+ drivers/firmware/qcom_scm.h          |   4 +
+ drivers/scsi/ufs/Kconfig             |   1 +
+ drivers/scsi/ufs/Makefile            |   4 +-
+ drivers/scsi/ufs/ufs-qcom-ice.c      | 244 +++++++++++++++++++++++++++
+ drivers/scsi/ufs/ufs-qcom.c          |  12 +-
+ drivers/scsi/ufs/ufs-qcom.h          |  27 +++
+ drivers/scsi/ufs/ufshcd-crypto.c     |  33 ++--
+ drivers/scsi/ufs/ufshcd.h            |   3 +
+ include/linux/qcom_scm.h             |  19 +++
+ 12 files changed, 444 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/scsi/ufs/ufs-qcom-ice.c
 
->
-> > +
-> > +     /* Do not let module be unloaded if client is alive */
-> > +     __module_get(THIS_MODULE);
->
-> Very strange.
-Will check.
->
-> > +static int __init rtrs_client_init(void)
-> > +{
-> > +     pr_info("Loading module %s, proto %s\n",
-> > +             KBUILD_MODNAME, RTRS_PROTO_VER_STRING);
->
-> No prints like this please
-Will drop the print.
->
-> Jason
+-- 
+2.25.1
+
