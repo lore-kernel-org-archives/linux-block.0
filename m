@@ -6,69 +6,71 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C7AC10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54457C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 14:00:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56667206E7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:59:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 273A520663
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 14:00:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lYsAIgpb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HbQtAGWB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbgCLN7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 09:59:05 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46114 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727309AbgCLN7F (ORCPT
+        id S1727194AbgCLOA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 10:00:26 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34409 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbgCLOA0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 09:59:05 -0400
-Received: by mail-io1-f68.google.com with SMTP id v3so5725671iom.13
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:59:03 -0700 (PDT)
+        Thu, 12 Mar 2020 10:00:26 -0400
+Received: by mail-io1-f67.google.com with SMTP id h131so5787716iof.1
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 07:00:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zTlRjOseOyMl3jA93cw2svqgh39qVO6h8t5eEoRUrVo=;
-        b=lYsAIgpbcxx8SyvblMkx/gqzdjPUpxHVZp0Dozn1TdX7jJ8RQPhY2EwwwEdBEyHa8d
-         Y2gf31DfsSkF7s3R223GoIa2un+DhsqKFjRvsa/WQ+9TOrg5E6+addic6Cun63qFANKl
-         iWoAtz9SVjo/ElFiLWNu2BBeLEjBqFxD2wKjXiVJNM6OSmg8z4YyFtvwLih298dgQ9J5
-         hMEtwF85V61rzlO/ek+yM/ca//+W7WHyMEFYm75krEDSKIdSG9WUYFLZjSX1m1vP6Lem
-         h9pom7Dm0Zpc99cwOv6MnGhQqjfOgqal+zocU2kX70zR+3lY5APB5+mrD77vj8pCzXQm
-         MQCA==
+        bh=BB7+HmZ8n9xtOnZvmip1O8s6xRT1TqxCLXiFq9TEIAw=;
+        b=HbQtAGWBBa4WFv90X5xRKxAct4BfLuIDN0UBXvcvzQBsrgp/fhsSIf49Ddwv2Qdzgr
+         a0HQqNzmwbV6LWk7avu1xo5OlJIM5KFeoPlh8HTZvgipMG7EbKUAPI67VjBEfbOYec0/
+         +1jxLmKpx0J0k5VX3Z3SuJ1VBG3Fw+Fd4A0dmcMEWkmEG5fhq77DO0VJm12LXIH8nKDL
+         +KRoHburJXpgtlgCoZhCEBS/xTCyxZqXJXbllAAktGG3HbyMw2XbVoUsx1yEbdz/4uj9
+         ss3ZuV2FxwcuuWN8ogbzgOnhJHw0sWfWp2KDC2rFkTq+UTVkRtQTBxjBCs4fQ2Y3F/sb
+         rzMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=zTlRjOseOyMl3jA93cw2svqgh39qVO6h8t5eEoRUrVo=;
-        b=DJaSczyvUNi+xCNiI3aYj9VlzV/6Kcm7I+iByK9IbTjxiSAj+UftJC6tA2HbjaGsW9
-         /dRkTHN2Z5GEz00b67IUiG9bvMWDLaAq7d39uhzg792Iimh6bzTKDz19Yeb4EXxskCG7
-         7FbfKWvqi3/7aq7FcwSnZ2BaWZcFWKtKkLCUQZplvITuvJnXCZAG0eBM20XLR9bRV6+Z
-         v1pCTTH/AiGHE5XUc0OXbierQAe0fhOCLcAdvPfBA1EGhnTSVBpKvf0jNqyfimazQPaC
-         34KxZ5MNhjaUa6G+PK+sxUhOUMIHwnrm08YwsgrMS1zM6zz5VlUH0K+fUgVc2qskLQ2m
-         UEkA==
-X-Gm-Message-State: ANhLgQ03/Bhb6mlpyEiUDG12QPvyXG1OhPMn/Uhdxk1Ocu12cdlGmdmh
-        s9QDNSLG/y8lhelRvZY8dH4r5w==
-X-Google-Smtp-Source: ADFU+vtPZYlapRmWvw2pq53TpFm31JI0b2TqwVD7oq2luQRkfS8WUZ+EDaoteFpLJanNoCHbIZDoLg==
-X-Received: by 2002:a5d:8cd3:: with SMTP id k19mr8072733iot.123.1584021543117;
-        Thu, 12 Mar 2020 06:59:03 -0700 (PDT)
+        bh=BB7+HmZ8n9xtOnZvmip1O8s6xRT1TqxCLXiFq9TEIAw=;
+        b=V1EZKdjuETv34ZeROO+WAchbfyjiCBAXN5LIkBdXXKRC535wUGCXuFIpUPe2D0UeH2
+         WpPOQYZ9m9gz1fgAg8lXlEkL74RWTmWhZekZ0rbo4Ksji7IOIB8UwKULxLVldfVtjUvt
+         qzZuDwzovv8j10jZpPC7c6ka21gjO69DDE25XqplB8/DqAf/m0iSHmku6gQGKJblk/eo
+         zQOmKKagOyQRBGcgeW8QRyFIR9ghfcP4nO06ia67RYcd0Byl9A0DWmSL4ugEBnDdfN0g
+         /XsaeBd9ad9RWYc6nhma6fF9xCAt/Y9rpR3aLzTDIJ5jicvCXOLQuUpkNDb7xv2X2pmv
+         4KKQ==
+X-Gm-Message-State: ANhLgQ0Zkcj/2EFNnzTN4LvGDO9jpMiGTxcUBeJTyqlPtgsiizuno6Xm
+        62kudJFSbBtph+x3naFTcZCgeQ==
+X-Google-Smtp-Source: ADFU+vsA+Mmlc+tJTk8PDsfWdHVWeWgKrzr3WbtfHBMG/50Dtmx6D4T+huc9NZA+UCf9n5hZ8fye6Q==
+X-Received: by 2002:a5d:9708:: with SMTP id h8mr7766968iol.141.1584021625421;
+        Thu, 12 Mar 2020 07:00:25 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id o76sm3746593ili.18.2020.03.12.06.59.02
+        by smtp.gmail.com with ESMTPSA id n26sm15074921ioo.9.2020.03.12.07.00.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2020 06:59:02 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] nbd: requeue request if only one connection is
- configured
-To:     Hou Pu <houpu.main@gmail.com>, josef@toxicpanda.com,
-        mchristi@redhat.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        Hou Pu <houpu@bytedance.com>
-References: <20200228064030.16780-1-houpu@bytedance.com>
+        Thu, 12 Mar 2020 07:00:24 -0700 (PDT)
+Subject: Re: [PATCH v2] block: sed-opal: Change the check condition for
+ regular session validity
+To:     Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        linux-block@vger.kernel.org
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        =?UTF-8?Q?Andrzej_Jakowski=c2=bb?= <andrzej.jakowski@intel.com>,
+        Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+References: <20200303191700.66667-1-revanth.rajashekar@intel.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b407f0d1-f07c-4d6b-9657-bb296557ff50@kernel.dk>
-Date:   Thu, 12 Mar 2020 07:59:01 -0600
+Message-ID: <3817f650-18be-653b-9bc0-c90f279c2813@kernel.dk>
+Date:   Thu, 12 Mar 2020 08:00:23 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200228064030.16780-1-houpu@bytedance.com>
+In-Reply-To: <20200303191700.66667-1-revanth.rajashekar@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,29 +79,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/27/20 11:40 PM, Hou Pu wrote:
-> Hello,
+On 3/3/20 12:17 PM, Revanth Rajashekar wrote:
+> This patch changes the check condition for the validity/authentication
+> of the session.
 > 
-> NBD server could be upgraded if we have multiple connections.
-> But if we have only one connection, after we take down NBD server,
-> all inflight IO could finally timeout and return error. These
-> patches fix this using current reconfiguration framework.
+> 1. The Host Session Number(HSN) in the response should match the HSN for
+>    the session.
+> 2. The TPER Session Number(TSN) can never be less than 4096 for a regular
+>    session.
 > 
-> I noticed that Mike has following patchset
-> 
-> nbd: local daemon restart support
-> https://lore.kernel.org/linux-block/5DD41C49.3080209@redhat.com/
-> 
-> It add another netlink interface (NBD_ATTR_SWAP_SOCKETS) and requeue
-> request immediately after recongirure/swap socket. It do not need to
-> wait for timeout to fire and requeue in timeout handler, which seems more
-> like an improvement. Let fix this in current framework first.
-> 
-> Changes compared to v2:
-> Fix comments in nbd_read_stat() to be aligned with the code change
-> suggested by Mike Christie.
+> Reference:
+> Section 3.2.2.1   of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
+> Section 3.3.7.1.1 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Architecture_Core_Spec_v2.01_r1.00.pdf
 
-Applied for 5.7.
+Applied, thanks.
 
 -- 
 Jens Axboe
