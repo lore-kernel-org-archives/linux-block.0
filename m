@@ -2,78 +2,70 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 287D2C2BB1D
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69D1C1975A
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:43:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 000B6206E7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F44D206E7
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:43:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="q21WvNG+"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FcsGjv1N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727390AbgCLNko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 09:40:44 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:43300 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727208AbgCLNkn (ORCPT
+        id S1727282AbgCLNn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 09:43:29 -0400
+Received: from mail-il1-f196.google.com ([209.85.166.196]:33041 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727007AbgCLNn2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 09:40:43 -0400
-Received: by mail-il1-f195.google.com with SMTP id d14so4947125ilq.10
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:40:40 -0700 (PDT)
+        Thu, 12 Mar 2020 09:43:28 -0400
+Received: by mail-il1-f196.google.com with SMTP id k29so5520913ilg.0
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:43:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6fRFcMHQQvgXUMu9ji5eLUkSQJ3mpFpcehi61CBMmK0=;
-        b=q21WvNG+GvuYoEsq+TO9ASqezouRrFYukS0qs9+/FVkQ/489coT/AQ8ax1hFwqHRJU
-         MRhWI8dBvnOqOCK8t7K4nymV9ovnw2DZ6ITSGhPcQl9cZO6PZEj2yf52T8wlLvemuVxF
-         F/ioKw6MzcvahxTLKevhohlkvYngYaJYf8uDkmlqredqzJAnozwoBnCdnnC8RI79G1Ug
-         LMnNNfOeiZFkQQuOGDJl1NkUIAaMwERSX0o0ZZVRxHuhsVXTFuTO/Q+s6c8Cn4boo6Ip
-         Mk6LYop6Mw/YDwISqv03OiREVPKhgO/nwF4l77xSI5oZ+exFIKxvT+PwyJBbPdHIqVnl
-         lUJw==
+        bh=NPTa2DflPeoozczKhuwuYiSso61K4dwMqagMX+owpOk=;
+        b=FcsGjv1N8FbgLKFIzemkUq6qvx6M4AUtbc52XKP4njti7Mhk2ihmO93yXTIAhtHbA4
+         6p/Qzmq373EQViBOfbdEr1kuH9lHH5z9acBfB33ltkv20iCtjU/AfrFj3E28tPfEUFv0
+         j5geE0+zpf1pbFeNGD7Jn0Dq5Zz+aN2rC60b2Q8p7/v5zY8u1GyvReSkiuG2Ny6+FhG0
+         0gtWvv9lbqt9VY1mByEtVzqVtgb5CMay6ay/71/hPep4N1wmg3kcyxrC2UJGFROsIlM8
+         CQwXeyLjwlzz47rJrk0kKfnnME7BgNQ/+yt9HWiuFcXnG5yWxLRR3ZRK01K6Z2TPgfsf
+         W+Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6fRFcMHQQvgXUMu9ji5eLUkSQJ3mpFpcehi61CBMmK0=;
-        b=KKtVP/rRpjTkthDOQgegNoIZkLJMPcJWNmclR7R34jHTBPEwU/mQzGN6kIF8iQSoNl
-         FM6IB9LOIeSfnHRMousU1jjaFJGK8Wr199gt9Ba1ItJcY/ewMdUBLVFZrgWARhWkB3p3
-         cbrGeTDtXgV67owBTrYdM4SBGj0PMnLjT9dymav2LeeVqCLyMivEBAPqG9EnR2u6tnC2
-         8ZNElQrJjyW8ednXT8b6ZslVn42V9u0KMA0oOmQKJSFI4d+eGkWRiIqgfO8ZCerKdq3w
-         Rw41AYTxSOiwH7V9zLVObyvQIKhT7nSNVYxkIDUNQ+Mz7qHM6EBNuT5XnNe6EH99GUST
-         jnBw==
-X-Gm-Message-State: ANhLgQ0suJcY2MU329IjJNdko8sexo5NcROVeMj3EVeqeQRmxU6QO6Ot
-        C0xH9jJdnd20SfDegW9ZJJDWcA==
-X-Google-Smtp-Source: ADFU+vvEvnILZdmJhTtPhXDESn8Hgad55q7JHk/nlWdWJ6hY9yEkpLu3FDp2aj8u4ZaG/1zMS5fIZA==
-X-Received: by 2002:a92:c851:: with SMTP id b17mr2678052ilq.194.1584020440417;
-        Thu, 12 Mar 2020 06:40:40 -0700 (PDT)
+        bh=NPTa2DflPeoozczKhuwuYiSso61K4dwMqagMX+owpOk=;
+        b=BmxuSGz3SPYuErLdzf982MLXIfQcGlx2gGLJz+eq2+S7EJuP8sSeR1nlaCd8oV4pE6
+         i94CDgS3HRnRLcU6FRIvFk6XpbjWZZ3WRG2PrJ7sc7GFxkxQ8G+GIavd5dDdAxIebCXA
+         8Lyp+dYVWu3DbE+s6oKMT0BsOJ8DmWawkjj21eygY+vCJzBp2BGppMls/GSMYnD3IMvz
+         8sqd0NDuCI0Sit+s88MBbs4jJpEMdYKfDjFuCbzFUksG86Y6QsjN7Bo4aUjWdzdzsyCg
+         juubQgcFo3J1JSThOAyh1ESuuiBWvAaEqvfwdrT1PLA1u2neCgA7PdI2o69EPkDw3Bjw
+         KZrg==
+X-Gm-Message-State: ANhLgQ0zohxpojN6tVeCyKebGxCNGjlgfKbc6jGJJZQS7X5rDv+G3K42
+        ux+nKJMUwU5+ViUoFG3SCyNOhC4aRRSO2g==
+X-Google-Smtp-Source: ADFU+vsQ2AjzK/w62Bef1ByMc472YwZpWRSNP5xoWoZT2TxEmXPd9MbfIwCImEh+plBbFI2+Ov0cGA==
+X-Received: by 2002:a92:1b59:: with SMTP id b86mr7981254ilb.291.1584020608005;
+        Thu, 12 Mar 2020 06:43:28 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id g88sm1381275ila.47.2020.03.12.06.40.39
+        by smtp.gmail.com with ESMTPSA id m18sm19516468ila.54.2020.03.12.06.43.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2020 06:40:39 -0700 (PDT)
-Subject: Re: [PATCH] block: keep bdi->io_pages in sync with max_sectors_kb for
- stacked devices
-To:     Song Liu <song@kernel.org>, Bob Liu <bob.liu@oracle.com>
-Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-        linux-block@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Dmitry Monakhov <dmtrmonakhov@yandex-team.ru>
-References: <158290150891.4423.13566449569964563258.stgit@buzz>
- <7133c4fb-38d5-cf1f-e259-e12b50efcb32@oracle.com>
- <CAPhsuW6xJeX3=0j69_hdaUnYXPm7VeaXHB06JM=fRZsxPweQng@mail.gmail.com>
+        Thu, 12 Mar 2020 06:43:27 -0700 (PDT)
+Subject: Re: [PATCH V2 0/6] Some cleanups for blk-core.c and blk-flush.c
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Cc:     linux-block@vger.kernel.org
+References: <20200309214138.30770-1-guoqing.jiang@cloud.ionos.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ecc07195-872b-1c49-d423-873cfd7243fe@kernel.dk>
-Date:   Thu, 12 Mar 2020 07:40:39 -0600
+Message-ID: <4ebef2ce-7a28-c256-f0b0-720cbd3a2636@kernel.dk>
+Date:   Thu, 12 Mar 2020 07:43:26 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAPhsuW6xJeX3=0j69_hdaUnYXPm7VeaXHB06JM=fRZsxPweQng@mail.gmail.com>
+In-Reply-To: <20200309214138.30770-1-guoqing.jiang@cloud.ionos.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,53 +74,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/10/20 3:40 PM, Song Liu wrote:
-> On Mon, Mar 2, 2020 at 4:16 AM Bob Liu <bob.liu@oracle.com> wrote:
->>
->> On 2/28/20 10:51 PM, Konstantin Khlebnikov wrote:
->>> Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
->>> size based on read-ahead setting") removes unneeded split of read requests.
->>>
->>> Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they setup
->>> limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
->>> Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
->>>
->>> This patch updates io_pages after merging limits in disk_stack_limits().
->>>
->>> Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
->>> the same problem for device-mapper devices, this one fixes MD RAIDs.
->>>
->>> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
->>> ---
->>>  block/blk-settings.c |    2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/block/blk-settings.c b/block/blk-settings.c
->>> index c8eda2e7b91e..66c45fd79545 100644
->>> --- a/block/blk-settings.c
->>> +++ b/block/blk-settings.c
->>> @@ -664,6 +664,8 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
->>>               printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
->>>                      top, bottom);
->>>       }
->>> +
->>> +     t->backing_dev_info->io_pages = t->limits.max_sectors >> (PAGE_SHIFT-9);
->>>  }
->>>  EXPORT_SYMBOL(disk_stack_limits);
->>>
->>>
->>
->> Nitpick.. (PAGE_SHIFT - 9)
->> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+On 3/9/20 3:41 PM, Guoqing Jiang wrote:
+> V2:
 > 
-> Thanks for the fix. I fixed it based on the comments and applied it to md-next.
+> * collected Reviewed-by tags for some patches.
+> * remove __blk_rq_prep_clone and move the impletation to the only caller.
 > 
-> Jens, I picked the patch to md-next because md is the only user of
-> disk_stack_limits().
+> V1:
 > 
-> Please let me know if you prefer routing it via the block tree.
+> Hi,
+> 
+> This patchset updates code and comment in blk-core.c and blk-flush.c.
+> The first patch had been sent before, now update it with the Reviewed-by
+> tag from Bart.
 
-That's fine, thanks.
+Applied for 5.7, thanks.
 
 -- 
 Jens Axboe
