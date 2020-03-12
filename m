@@ -2,113 +2,102 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA49DC4CECE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 19:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E24A9C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 20:42:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6EBC206F1
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 19:05:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584039945;
-	bh=my91C/jpabKL61IYm+d7tPUONoO7E840xofpkYps+Bc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=eyzzi5sWsfdYldGalWIYQAs/V29A7wZTXZYDazIpkvBxn5OPrcfDZxNoXNy5phoq6
-	 34SUpo8fKd1oBQ7K7XxKxXXhfw6b5/X09y14Y3nDx2MKhTB15QiiGCccCuKh45mcHf
-	 qOe3vczzeC624WIlpr3RAFjbnqz28zYT4vOnxXgY=
+	by mail.kernel.org (Postfix) with ESMTP id B0C1B206CD
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 20:42:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vgkRU/t3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726504AbgCLTFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 15:05:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37454 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725268AbgCLTFo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 15:05:44 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 318BA206EB;
-        Thu, 12 Mar 2020 19:05:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584039943;
-        bh=my91C/jpabKL61IYm+d7tPUONoO7E840xofpkYps+Bc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0WnQv7+f8ZOYA4nFCP9HwikH/A1QktgZc35LyjF1xdqo3lha0nKrwIrhZErO85J83
-         Ke3yWRz79xKxL2Lv3B4Hg7+dj1VMMMjd4QfSjEFWeYIO7YdcRv3ZJSzUn6Lbb7qWhO
-         bwlNM38ll0vu8kJEuawx4jLLuxzU3zKucv9ACB38=
-Date:   Thu, 12 Mar 2020 12:05:41 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>
-Cc:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        "bjorn.andersson@linaro.org" <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [RFC PATCH v3 4/4] scsi: ufs-qcom: add Inline Crypto Engine
- support
-Message-ID: <20200312190541.GB6470@sol.localdomain>
-References: <20200312171259.151442-1-ebiggers@kernel.org>
- <20200312171259.151442-5-ebiggers@kernel.org>
- <BY5PR02MB65778B0D07AA92F6AB5E39E8FFFD0@BY5PR02MB6577.namprd02.prod.outlook.com>
+        id S1726706AbgCLUm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 16:42:58 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48566 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbgCLUm6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Mar 2020 16:42:58 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CKfANY136710;
+        Thu, 12 Mar 2020 20:42:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=23rZ+8zZxe1JeZH6FM88sMD941d28e/gBOsTaM2azZg=;
+ b=vgkRU/t3wtyw/PhgPQicGtp6GxUFOs3bMZieXMUCPN6cfvV7ptBuXc35ICd0mRmqw9j6
+ MSvpiMQdeA6k1qFK/QPqzhLaEv/SBDRv8HDO1mTBNhFngrnmgxh42BkKI3WSM+8+M+aC
+ q6RTmYnv2/NrA/sRD9lhIvEsGFhYV/jT6Aq3VzxrOnbtwDh3MJasMhzxV3n6cG2gqzFX
+ S5vtiY+ShVSN1kXReLy7ksmesYYzE2B+suwAAdd8BZ1d8sQv4WzdYLB+UM5WffTM4ufY
+ aO3LvcbhnOmJtUhYgVsZYFEBpOXXYQ4iEEOj7hXykHZD1fjJzm0qnEXNqWWK43tH7CRq yA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2yqtaermh5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 20:42:56 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CKe03I156185;
+        Thu, 12 Mar 2020 20:42:56 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2yqtabwmty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 20:42:56 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CKgs5g020995;
+        Thu, 12 Mar 2020 20:42:55 GMT
+Received: from dhcp-10-211-46-13.usdhcp.oraclecorp.com (/10.211.46.13)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Mar 2020 13:42:54 -0700
+Subject: Re: [PATCH 1/1] null_blk: describe the usage of fault injection param
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <20200304191644.25220-1-dongli.zhang@oracle.com>
+ <052ba0ac-e0ec-9607-e5c8-acbee8ab6162@kernel.dk>
+From:   dongli.zhang@oracle.com
+Organization: Oracle Corporation
+Message-ID: <38dfc76c-efb8-5447-c8e8-4c0079dbb55f@oracle.com>
+Date:   Thu, 12 Mar 2020 13:42:53 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR02MB65778B0D07AA92F6AB5E39E8FFFD0@BY5PR02MB6577.namprd02.prod.outlook.com>
+In-Reply-To: <052ba0ac-e0ec-9607-e5c8-acbee8ab6162@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 suspectscore=3
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003120103
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=3
+ mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003120103
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Barani,
 
-On Thu, Mar 12, 2020 at 06:21:02PM +0000, Barani Muthukumaran wrote:
-> Hi Eric,
+
+On 3/12/20 6:57 AM, Jens Axboe wrote:
+> On 3/4/20 12:16 PM, Dongli Zhang wrote:
+>> As null_blk is a very good start point to test block layer, this patch adds
+>> description and comments to 'timeout' and 'requeue' to explain how to use
+>> fault injection with null_blk.
+>>
+>> The nvme has similar with nvme_core.fail_request in the form of comment.
 > 
-> I am confused on why you are trying to re-implement functions already present
-> within the crypto_vops. Is there a reason why the ICE driver cannot register
-> for KSM with its own function for keyslot_program and keyslot_evict and
-> register for crypto_vops with its own functions for
-> 'init/enable/disable/suspend/resume/debug'. Given that the ufs-crypto has the
-> interface to do this why do we have to re-implement the same functionality
-> with another set of functions. In addition in the future if for performance
-> reasons (with per-file keys) we have to use passthrough KSM and use
-> prepare/complete_lrbp_crypto that can easily be added as well.
+> This doesn't apply to for-5.7/drivers, care to resend?
 > 
-> IMO the crypto_vops is a clean way for vendors to override the default
-> functionality rather than using direct function calls from within the UFS
-> driver and this can easily be extended for eMMC.
 
-ufshcd_hba_crypto_variant_ops doesn't exist in the patchset for upstream.
+I would resend based on for-5.7/drivers.
 
-We had to add ufshcd_hba_crypto_variant_ops out-of-tree to the Android common
-kernels to unblock vendors implementing their drivers this year, because we
-didn't know exactly what functionality they'd need.  So we just had to guess and
-add ~10 different operations just in case people needed them.  (Note that some
-or all of these may go away next year, once we see what was actually used.)
+Thank you very much!
 
-That's not acceptable for upstream.  For upstream we can only add variant
-operations that are actually used by in-tree drivers.
-
-So far the only hardware support actually proposed upstream are my patch for
-ufs-qcom, and Stanley's patch for ufs-mediatek.  ufs-qcom only needs
-->program_key(), and ufs-mediatek doesn't need any new variant op.
-
-So, that's why only ->program_key() has been proposed upstream thus far: it's
-the minimal functionality that's been demonstrated to be needed.
-
-Of course, if someone actually posts patches to support hardware that diverges
-from the UFS standard in new and "exciting" ways (whether it's another vendor's
-hardware or future Qualcomm hardware) then they'll need to post any variant
-operation(s) they need.  They need to be targetted to only the specific quirk(s)
-needed, so that drivers don't have to unnecessarily re-implement stuff.
-
-- Eric
+Dongli Zhang
