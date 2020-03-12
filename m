@@ -2,500 +2,307 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42598C5ACC0
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF83C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:25:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7451206F1
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584033238;
-	bh=vVr3h4fJv5bx6VKxrxmNOCwOHLNIWwESaYtx3Uc+Lv4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=DV+gn7N4hBClhgKj7AnjySWDoVGEtgN/OyGy8N2hgz9vya+nlmpcT0m7EZiOVNAgB
-	 k/dFhubtWkU+k1r3hSc71aX2btRWaFcVaK6fyZX57NcWM04eXAHTv6s0N06kB2gT1F
-	 +J7xPnUbNAjqFsZgrl8bfHKDagazhVZoAZNaxQuM=
+	by mail.kernel.org (Postfix) with ESMTP id DAAAC20716
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 17:25:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Fd0ZdpYd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726423AbgCLRN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 13:13:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50892 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726426AbgCLRNy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 13:13:54 -0400
-Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A671920739;
-        Thu, 12 Mar 2020 17:13:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584033234;
-        bh=vVr3h4fJv5bx6VKxrxmNOCwOHLNIWwESaYtx3Uc+Lv4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ri1DAaZVJUZOcWIquSuaKSY7fc4k2F/+cKmCPDN+xS0JBKIVINz37M7LmGmTQY4rs
-         /lAQTjHgkleVm8VbtL0NbXCzU8qUtnJhsagdnR/HquE2a69WRXveiZAnhWkJl7If6V
-         eTqWm8gQYwNVF5bjxWOMacZilrCsYD1UYarIUQEE=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-Subject: [RFC PATCH v3 4/4] scsi: ufs-qcom: add Inline Crypto Engine support
-Date:   Thu, 12 Mar 2020 10:12:59 -0700
-Message-Id: <20200312171259.151442-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200312171259.151442-1-ebiggers@kernel.org>
-References: <20200312171259.151442-1-ebiggers@kernel.org>
+        id S1726299AbgCLRZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 13:25:21 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:38751 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726194AbgCLRZV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Mar 2020 13:25:21 -0400
+Received: by mail-qt1-f193.google.com with SMTP id e20so5021489qto.5
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 10:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=3I4BcKbwDgC4vdY7SeTcDelPRCNOJF9vAmzCTbFTATU=;
+        b=Fd0ZdpYdDkTWlh+VloYYrGDdixz8YO3L+2Akq7knHnrdAPUQNUZFoVyrCeo02FiKnE
+         QQnTAfEP+QrGLGatyQ+s8FSWC1elVku63MontnSvcxVosG0l73qbTbHCA5XXu0WXS+rI
+         i8GUqPoPfoxuBnXRufdPIgo9AvwtWigCpQTaglULeZx4BuOhDip5cFZkJ1+xTbw0duSS
+         q5JjH5ClyrhEbPJSRD5EgX2/2MoGpd75i1el/GsuuDywtyNqbR993KoYOznZjFzAD5nN
+         PdTtvI1Zcd8tp4/epXfdkG9enQfRqKhjemrTM/QXzsptdU5l/nGU8HjGeEvECzxNlPip
+         VioQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=3I4BcKbwDgC4vdY7SeTcDelPRCNOJF9vAmzCTbFTATU=;
+        b=S94cR0GWPO8PldGVWtc37Ozy/T9Vndp53QfPcMtvbx2JI+1c4RSMV2DuiRVGN/oC0u
+         uvu2i1cpbdtzNReDOty3YM9nwjFfXGC6FNWGOYyPcRiZEhwi3FfwqeBWLyeEhdI1a11S
+         GX0/QRallhAh5zs3/1dh6Kd9jiQUsFrvJGxagPuQanRDqxUUkW6+FN7H8Ky31pr7Z08i
+         Mzkyq4/AfhTQMqnaHXTUQVMVrvxDFOPS0+fdWp+aB5gDQlqbeRm91XNjfJQsObiYBZIF
+         YChJ8uYmkUCOhvAyL89omuPB/fi461EeEEqWlkNqfIwgqGzn7bUFOuzeEL28/UHcNMh/
+         FtcQ==
+X-Gm-Message-State: ANhLgQ2HjzDqszVEJM8HCpuCtEx7ehbSWMlq0baNF314v7PTAWdJohU3
+        EjW2gyK5TaS68b1RCnjRryJ7PQ==
+X-Google-Smtp-Source: ADFU+vtjcpu0B5fdIhByXCSw7Sql34cX0QuCM74cecvBReRgPPnzL00bLjPxdC1HE6wwwSvIj2ArXQ==
+X-Received: by 2002:ac8:4784:: with SMTP id k4mr193389qtq.78.1584033918531;
+        Thu, 12 Mar 2020 10:25:18 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id x22sm6367315qki.54.2020.03.12.10.25.17
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 12 Mar 2020 10:25:18 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jCRa9-000120-H8; Thu, 12 Mar 2020 14:25:17 -0300
+Date:   Thu, 12 Mar 2020 14:25:17 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Subject: Re: [PATCH v10 06/26] RDMA/rtrs: client: main functionality
+Message-ID: <20200312172517.GU31668@ziepe.ca>
+References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
+ <20200311161240.30190-7-jinpu.wang@cloud.ionos.com>
+ <20200311190156.GH31668@ziepe.ca>
+ <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Mar 12, 2020 at 06:10:06PM +0100, Danil Kipnis wrote:
+> Hi Jason,
+> 
+> On Wed, Mar 11, 2020 at 8:01 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Wed, Mar 11, 2020 at 05:12:20PM +0100, Jack Wang wrote:
+> > > +static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_sess *sess)
+> > > +{
+> > > +     struct rtrs_clt *clt = sess->clt;
+> > > +     struct rtrs_clt_sess *next;
+> > > +     bool wait_for_grace = false;
+> > > +     int cpu;
+> > > +
+> > > +     mutex_lock(&clt->paths_mutex);
+> > > +     list_del_rcu(&sess->s.entry);
+> > > +
+> > > +     /* Make sure everybody observes path removal. */
+> > > +     synchronize_rcu();
+> > > +
+> > > +     /*
+> > > +      * At this point nobody sees @sess in the list, but still we have
+> > > +      * dangling pointer @pcpu_path which _can_ point to @sess.  Since
+> > > +      * nobody can observe @sess in the list, we guarantee that IO path
+> > > +      * will not assign @sess to @pcpu_path, i.e. @pcpu_path can be equal
+> > > +      * to @sess, but can never again become @sess.
+> > > +      */
+> > > +
+> > > +     /*
+> > > +      * Decrement paths number only after grace period, because
+> > > +      * caller of do_each_path() must firstly observe list without
+> > > +      * path and only then decremented paths number.
+> > > +      *
+> > > +      * Otherwise there can be the following situation:
+> > > +      *    o Two paths exist and IO is coming.
+> > > +      *    o One path is removed:
+> > > +      *      CPU#0                          CPU#1
+> > > +      *      do_each_path():                rtrs_clt_remove_path_from_arr():
+> > > +      *          path = get_next_path()
+> > > +      *          ^^^                            list_del_rcu(path)
+> > > +      *          [!CONNECTED path]              clt->paths_num--
+> > > +      *                                              ^^^^^^^^^
+> > > +      *          load clt->paths_num                 from 2 to 1
+> > > +      *                    ^^^^^^^^^
+> > > +      *                    sees 1
+> > > +      *
+> > > +      *      path is observed as !CONNECTED, but do_each_path() loop
+> > > +      *      ends, because expression i < clt->paths_num is false.
+> > > +      */
+> > > +     clt->paths_num--;
+> > > +
+> > > +     /*
+> > > +      * Get @next connection from current @sess which is going to be
+> > > +      * removed.  If @sess is the last element, then @next is NULL.
+> > > +      */
+> > > +     next = list_next_or_null_rr_rcu(&clt->paths_list, &sess->s.entry,
+> > > +                                     typeof(*next), s.entry);
+> >
+> > calling rcu list iteration without holding rcu_lock is wrong
+> This function (add_path) along with the corresponding
+> remove_path_from_arr() are the only functions modifying the
+> paths_list. In both functions paths_mutex is taken so that they are
+> serialized. Since the modification of the paths_list is protected by
+> the mutex, the rcu_read_lock is superfluous here.
 
-Add support for Qualcomm Inline Crypto Engine (ICE) to ufs-qcom.
+Then don't use the _rcu functions.
 
-The standards-compliant parts, such as querying the crypto capabilities
-and enabling crypto for individual UFS requests, are already handled by
-ufshcd-crypto.c, which itself is wired into the blk-crypto framework.
-However, ICE requires vendor-specific init, enable, and resume logic,
-and it requires that keys be programmed and evicted by vendor-specific
-SMC calls.  Make the ufs-qcom driver handle these details.
+> >
+> > > +     /*
+> > > +      * @pcpu paths can still point to the path which is going to be
+> > > +      * removed, so change the pointer manually.
+> > > +      */
+> > > +     for_each_possible_cpu(cpu) {
+> > > +             struct rtrs_clt_sess __rcu **ppcpu_path;
+> > > +
+> > > +             ppcpu_path = per_cpu_ptr(clt->pcpu_path, cpu);
+> > > +             if (rcu_dereference(*ppcpu_path) != sess)
+> >
+> > calling rcu_dereference without holding rcu_lock is wrong.
+> We only need a READ_ONCE semantic here. ppcpu_path is pointing to the
+> last path used for an IO and is used for the round robin multipath
+> policy. I guess the call can be changed to rcu_dereference_raw to
+> avoid rcu_lockdep warning. The round-robin algorithm has been reviewed
+> by Paul E. McKenney, he wrote a litmus test for it:
+> https://lkml.org/lkml/2018/5/28/2080.
 
-I tested this on Dragonboard 845c, which is a publicly available
-development board that uses the Snapdragon 845 SoC and runs the upstream
-Linux kernel.  This is the same SoC used in the Pixel 3 and Pixel 3 XL
-phones.  This testing included (among other things) verifying that the
-expected ciphertext was produced, both manually using ext4 encryption
-and automatically using a block layer self-test I've written.
+You can't call rcu expecting functions without holding the rcu lock -
+use READ_ONCE/etc if that is what is really going on
 
-This driver also works nearly as-is on Snapdragon 765 and Snapdragon
-865, which are very recent SoCs, having just been announced in Dec 2019
-(though these newer SoCs currently lack upstream kernel support).
+> >
+> > > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
+> > > +                                   struct rtrs_addr *addr)
+> > > +{
+> > > +     struct rtrs_clt *clt = sess->clt;
+> > > +
+> > > +     mutex_lock(&clt->paths_mutex);
+> > > +     clt->paths_num++;
+> > > +
+> > > +     /*
+> > > +      * Firstly increase paths_num, wait for GP and then
+> > > +      * add path to the list.  Why?  Since we add path with
+> > > +      * !CONNECTED state explanation is similar to what has
+> > > +      * been written in rtrs_clt_remove_path_from_arr().
+> > > +      */
+> > > +     synchronize_rcu();
+> >
+> > This makes no sense to me. RCU readers cannot observe the element in
+> > the list without also observing paths_num++
+> Paths_num is only used to make sure a reader doesn't look for a
+> CONNECTED path in the list for ever - instead he makes at most
+> paths_num attempts. The reader can in fact observe paths_num++ without
+> observing new element in the paths_list, but this is OK. When adding a
+> new path we first increase the paths_num and them add the element to
+> the list to make sure the reader will also iterate over it. When
+> removing the path - the logic is opposite: we first remove element
+> from the list and only then decrement the paths_num.
 
-This is based very loosely on the vendor-provided driver in the kernel
-source code for the Pixel 3, but I've greatly simplified it.  Also, for
-now I've only included support for major version 3 of ICE, since that's
-all I have the hardware to test with the mainline kernel.  Plus it
-appears that version 3 is easier to use than older versions of ICE.
+I don't understand how this explains why synchronize_rcu would be need
+here.
 
-For now, only allow using AES-256-XTS.  The hardware also declares
-support for AES-128-XTS, AES-{128,256}-ECB, and AES-{128,256}-CBC
-(BitLocker variant).  But none of these others are really useful, and
-they'd need to be individually tested to be sure they worked properly.
+> > > +static void rtrs_clt_close_work(struct work_struct *work)
+> > > +{
+> > > +     struct rtrs_clt_sess *sess;
+> > > +
+> > > +     sess = container_of(work, struct rtrs_clt_sess, close_work);
+> > > +
+> > > +     cancel_delayed_work_sync(&sess->reconnect_dwork);
+> > > +     rtrs_clt_stop_and_destroy_conns(sess);
+> > > +     /*
+> > > +      * Sounds stupid, huh?  No, it is not.  Consider this sequence:
+> >
+> > It sounds stupid because it is stupid. cancel_work is a giant race if
+> > some other action hasn't been taken to block parallel threads from
+> > calling queue_work before calling cancel_work.
+> Will double check. It might be possible to avoid the second call to
+> the cancel_delayed_work_sync().
 
-This commit also changes the name of the loadable module from "ufs-qcom"
-to "ufs_qcom", as this is necessary to compile it from multiple source
-files (unless we were to rename ufs-qcom.c).
+I would have guessed first call.. Before doing cancel_work something
+must have prevented new work from being created.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- MAINTAINERS                     |   2 +-
- drivers/scsi/ufs/Kconfig        |   1 +
- drivers/scsi/ufs/Makefile       |   4 +-
- drivers/scsi/ufs/ufs-qcom-ice.c | 244 ++++++++++++++++++++++++++++++++
- drivers/scsi/ufs/ufs-qcom.c     |  12 +-
- drivers/scsi/ufs/ufs-qcom.h     |  27 ++++
- 6 files changed, 287 insertions(+), 3 deletions(-)
- create mode 100644 drivers/scsi/ufs/ufs-qcom-ice.c
+> > > +     err = rtrs_clt_create_sysfs_root_folders(clt);
+> >
+> > sysfs creation that is not done as part of device_regsiter races with
+> > udev.
+> We only use device_register() to create
+> /sys/class/rtrs_client/<sessionname> sysfs directory. We then create
+> some folders and files inside this directory (i.e. paths/,
+> multipath_policy, etc.). Do you mean that the uevent is generated
+> before we create those subdirectories? How can the creation of this
+> subdirectories and files be integrated into the device_register()
+> call?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a0d86490c2c62..d0df7738fcb88 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2202,7 +2202,7 @@ F:	drivers/pci/controller/dwc/pcie-qcom.c
- F:	drivers/phy/qualcomm/
- F:	drivers/power/*/msm*
- F:	drivers/reset/reset-qcom-*
--F:	drivers/scsi/ufs/ufs-qcom.*
-+F:	drivers/scsi/ufs/ufs-qcom*
- F:	drivers/spi/spi-qup.c
- F:	drivers/spi/spi-geni-qcom.c
- F:	drivers/spi/spi-qcom-qspi.c
-diff --git a/drivers/scsi/ufs/Kconfig b/drivers/scsi/ufs/Kconfig
-index c69f1b49167b0..7d1260988ab2b 100644
---- a/drivers/scsi/ufs/Kconfig
-+++ b/drivers/scsi/ufs/Kconfig
-@@ -99,6 +99,7 @@ config SCSI_UFS_DWC_TC_PLATFORM
- config SCSI_UFS_QCOM
- 	tristate "QCOM specific hooks to UFS controller platform driver"
- 	depends on SCSI_UFSHCD_PLATFORM && ARCH_QCOM
-+	select QCOM_SCM
- 	select RESET_CONTROLLER
- 	help
- 	  This selects the QCOM specific additions to UFSHCD platform driver.
-diff --git a/drivers/scsi/ufs/Makefile b/drivers/scsi/ufs/Makefile
-index 197e178f44bce..13fda1b697b2a 100644
---- a/drivers/scsi/ufs/Makefile
-+++ b/drivers/scsi/ufs/Makefile
-@@ -3,7 +3,9 @@
- obj-$(CONFIG_SCSI_UFS_DWC_TC_PCI) += tc-dwc-g210-pci.o ufshcd-dwc.o tc-dwc-g210.o
- obj-$(CONFIG_SCSI_UFS_DWC_TC_PLATFORM) += tc-dwc-g210-pltfrm.o ufshcd-dwc.o tc-dwc-g210.o
- obj-$(CONFIG_SCSI_UFS_CDNS_PLATFORM) += cdns-pltfrm.o
--obj-$(CONFIG_SCSI_UFS_QCOM) += ufs-qcom.o
-+obj-$(CONFIG_SCSI_UFS_QCOM) += ufs_qcom.o
-+ufs_qcom-y += ufs-qcom.o
-+ufs_qcom-$(CONFIG_SCSI_UFS_CRYPTO) += ufs-qcom-ice.o
- obj-$(CONFIG_SCSI_UFSHCD) += ufshcd-core.o
- ufshcd-core-y				+= ufshcd.o ufs-sysfs.o
- ufshcd-core-$(CONFIG_SCSI_UFS_BSG)	+= ufs_bsg.o
-diff --git a/drivers/scsi/ufs/ufs-qcom-ice.c b/drivers/scsi/ufs/ufs-qcom-ice.c
-new file mode 100644
-index 0000000000000..b2c592003d1a2
---- /dev/null
-+++ b/drivers/scsi/ufs/ufs-qcom-ice.c
-@@ -0,0 +1,244 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Qualcomm ICE (Inline Crypto Engine) support.
-+ *
-+ * Copyright (c) 2014-2019, The Linux Foundation. All rights reserved.
-+ * Copyright (c) 2019 Google LLC
-+ */
-+
-+#include <linux/platform_device.h>
-+#include <linux/qcom_scm.h>
-+
-+#include "ufshcd-crypto.h"
-+#include "ufs-qcom.h"
-+
-+#define AES_256_XTS_KEY_SIZE			64
-+
-+/* QCOM ICE registers */
-+
-+#define QCOM_ICE_REG_CONTROL			0x0000
-+#define QCOM_ICE_REG_RESET			0x0004
-+#define QCOM_ICE_REG_VERSION			0x0008
-+#define QCOM_ICE_REG_FUSE_SETTING		0x0010
-+#define QCOM_ICE_REG_PARAMETERS_1		0x0014
-+#define QCOM_ICE_REG_PARAMETERS_2		0x0018
-+#define QCOM_ICE_REG_PARAMETERS_3		0x001C
-+#define QCOM_ICE_REG_PARAMETERS_4		0x0020
-+#define QCOM_ICE_REG_PARAMETERS_5		0x0024
-+
-+/* QCOM ICE v3.X only */
-+#define QCOM_ICE_GENERAL_ERR_STTS		0x0040
-+#define QCOM_ICE_INVALID_CCFG_ERR_STTS		0x0030
-+#define QCOM_ICE_GENERAL_ERR_MASK		0x0044
-+
-+/* QCOM ICE v2.X only */
-+#define QCOM_ICE_REG_NON_SEC_IRQ_STTS		0x0040
-+#define QCOM_ICE_REG_NON_SEC_IRQ_MASK		0x0044
-+
-+#define QCOM_ICE_REG_NON_SEC_IRQ_CLR		0x0048
-+#define QCOM_ICE_REG_STREAM1_ERROR_SYNDROME1	0x0050
-+#define QCOM_ICE_REG_STREAM1_ERROR_SYNDROME2	0x0054
-+#define QCOM_ICE_REG_STREAM2_ERROR_SYNDROME1	0x0058
-+#define QCOM_ICE_REG_STREAM2_ERROR_SYNDROME2	0x005C
-+#define QCOM_ICE_REG_STREAM1_BIST_ERROR_VEC	0x0060
-+#define QCOM_ICE_REG_STREAM2_BIST_ERROR_VEC	0x0064
-+#define QCOM_ICE_REG_STREAM1_BIST_FINISH_VEC	0x0068
-+#define QCOM_ICE_REG_STREAM2_BIST_FINISH_VEC	0x006C
-+#define QCOM_ICE_REG_BIST_STATUS		0x0070
-+#define QCOM_ICE_REG_BYPASS_STATUS		0x0074
-+#define QCOM_ICE_REG_ADVANCED_CONTROL		0x1000
-+#define QCOM_ICE_REG_ENDIAN_SWAP		0x1004
-+#define QCOM_ICE_REG_TEST_BUS_CONTROL		0x1010
-+#define QCOM_ICE_REG_TEST_BUS_REG		0x1014
-+
-+/* BIST ("built-in self-test"?) status flags */
-+#define QCOM_ICE_BIST_STATUS_MASK		0xF0000000
-+
-+#define QCOM_ICE_FUSE_SETTING_MASK		0x1
-+#define QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK	0x2
-+#define QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK	0x4
-+
-+#define qcom_ice_writel(host, val, reg)	\
-+	writel((val), (host)->ice_mmio + (reg))
-+#define qcom_ice_readl(host, reg)	\
-+	readl((host)->ice_mmio + (reg))
-+
-+static bool qcom_ice_supported(struct ufs_qcom_host *host)
-+{
-+	struct device *dev = host->hba->dev;
-+	u32 regval = qcom_ice_readl(host, QCOM_ICE_REG_VERSION);
-+	int major = regval >> 24;
-+	int minor = (regval >> 16) & 0xFF;
-+	int step = regval & 0xFFFF;
-+
-+	/* For now this driver only supports ICE version 3. */
-+	if (major != 3) {
-+		dev_warn(dev, "Unsupported ICE version: v%d.%d.%d\n",
-+			 major, minor, step);
-+		return false;
-+	}
-+
-+	dev_info(dev, "Found QC Inline Crypto Engine (ICE) v%d.%d.%d\n",
-+		 major, minor, step);
-+
-+	/* If fuses are blown, ICE might not work in the standard way. */
-+	regval = qcom_ice_readl(host, QCOM_ICE_REG_FUSE_SETTING);
-+	if (regval & (QCOM_ICE_FUSE_SETTING_MASK |
-+		      QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK |
-+		      QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK)) {
-+		dev_warn(dev, "Fuses are blown; ICE is unusable!\n");
-+		return false;
-+	}
-+	return true;
-+}
-+
-+int ufs_qcom_ice_init(struct ufs_qcom_host *host)
-+{
-+	struct ufs_hba *hba = host->hba;
-+	struct device *dev = hba->dev;
-+	struct platform_device *pdev = to_platform_device(dev);
-+	struct resource *res;
-+	int err;
-+
-+	if (!(ufshcd_readl(hba, REG_CONTROLLER_CAPABILITIES) &
-+	      MASK_CRYPTO_SUPPORT))
-+		return 0;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
-+	if (!res) {
-+		dev_warn(dev, "ICE registers not found\n");
-+		goto disable;
-+	}
-+
-+	if (!qcom_scm_ice_available()) {
-+		dev_warn(dev, "ICE SCM interface not found\n");
-+		goto disable;
-+	}
-+
-+	host->ice_mmio = devm_ioremap_resource(dev, res);
-+	if (IS_ERR(host->ice_mmio)) {
-+		dev_err(dev, "Failed to map ICE registers; err=%d\n", err);
-+		return err;
-+	}
-+
-+	if (!qcom_ice_supported(host))
-+		goto disable;
-+
-+	return 0;
-+
-+disable:
-+	dev_warn(dev, "Disabling inline encryption support\n");
-+	hba->caps &= ~UFSHCD_CAP_CRYPTO;
-+	return 0;
-+}
-+
-+static void qcom_ice_low_power_mode_enable(struct ufs_qcom_host *host)
-+{
-+	u32 regval;
-+
-+	regval = qcom_ice_readl(host, QCOM_ICE_REG_ADVANCED_CONTROL);
-+	/*
-+	 * Enable low power mode sequence
-+	 * [0]-0, [1]-0, [2]-0, [3]-E, [4]-0, [5]-0, [6]-0, [7]-0
-+	 */
-+	regval |= 0x7000;
-+	qcom_ice_writel(host, regval, QCOM_ICE_REG_ADVANCED_CONTROL);
-+}
-+
-+static void qcom_ice_optimization_enable(struct ufs_qcom_host *host)
-+{
-+	u32 regval;
-+
-+	/* ICE Optimizations Enable Sequence */
-+	regval = qcom_ice_readl(host, QCOM_ICE_REG_ADVANCED_CONTROL);
-+	regval |= 0xD807100;
-+	/* ICE HPG requires delay before writing */
-+	udelay(5);
-+	qcom_ice_writel(host, regval, QCOM_ICE_REG_ADVANCED_CONTROL);
-+	udelay(5);
-+}
-+
-+int ufs_qcom_ice_enable(struct ufs_qcom_host *host)
-+{
-+	if (!(host->hba->caps & UFSHCD_CAP_CRYPTO))
-+		return 0;
-+	qcom_ice_low_power_mode_enable(host);
-+	qcom_ice_optimization_enable(host);
-+	return ufs_qcom_ice_resume(host);
-+}
-+
-+/* Poll until all BIST bits are reset */
-+static int qcom_ice_wait_bist_status(struct ufs_qcom_host *host)
-+{
-+	int count;
-+	u32 reg;
-+
-+	for (count = 0; count < 100; count++) {
-+		reg = qcom_ice_readl(host, QCOM_ICE_REG_BIST_STATUS);
-+		if (!(reg & QCOM_ICE_BIST_STATUS_MASK))
-+			break;
-+		udelay(50);
-+	}
-+	if (reg)
-+		return -ETIMEDOUT;
-+	return 0;
-+}
-+
-+int ufs_qcom_ice_resume(struct ufs_qcom_host *host)
-+{
-+	int err;
-+
-+	if (!(host->hba->caps & UFSHCD_CAP_CRYPTO))
-+		return 0;
-+
-+	err = qcom_ice_wait_bist_status(host);
-+	if (err) {
-+		dev_err(host->hba->dev, "BIST status error (%d)\n", err);
-+		return err;
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * Program a key into a QC ICE keyslot, or evict a keyslot.  QC ICE requires
-+ * vendor-specific SCM calls for this; it doesn't support the standard way.
-+ */
-+int ufs_qcom_ice_program_key(struct ufs_hba *hba,
-+			     const union ufs_crypto_cfg_entry *cfg, int slot)
-+{
-+	union ufs_crypto_cap_entry cap;
-+	union {
-+		u8 bytes[AES_256_XTS_KEY_SIZE];
-+		u32 words[AES_256_XTS_KEY_SIZE / sizeof(u32)];
-+	} key;
-+	int i;
-+	int err;
-+
-+	if (!(cfg->config_enable & UFS_CRYPTO_CONFIGURATION_ENABLE))
-+		return qcom_scm_ice_invalidate_key(slot);
-+
-+	/* Only AES-256-XTS has been tested so far. */
-+	cap = hba->crypto_cap_array[cfg->crypto_cap_idx];
-+	if (cap.algorithm_id != UFS_CRYPTO_ALG_AES_XTS ||
-+	    cap.key_size != UFS_CRYPTO_KEY_SIZE_256) {
-+		dev_err_ratelimited(hba->dev,
-+				    "Unhandled crypto capability; algorithm_id=%d, key_size=%d\n",
-+				    cap.algorithm_id, cap.key_size);
-+		return -EINVAL;
-+	}
-+
-+	memcpy(key.bytes, cfg->crypto_key, AES_256_XTS_KEY_SIZE);
-+
-+	/*
-+	 * ICE (or maybe the SCM call?) byte-swaps the 32-bit words of the key.
-+	 * So we have to do the same, in order for the final key be correct.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(key.words); i++)
-+		__cpu_to_be32s(&key.words[i]);
-+
-+	err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
-+				   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-+				   cfg->data_unit_size);
-+	memzero_explicit(&key, sizeof(key));
-+	return err;
-+}
-diff --git a/drivers/scsi/ufs/ufs-qcom.c b/drivers/scsi/ufs/ufs-qcom.c
-index c69c29a1ceb90..5b3fbbbb7c0af 100644
---- a/drivers/scsi/ufs/ufs-qcom.c
-+++ b/drivers/scsi/ufs/ufs-qcom.c
-@@ -365,7 +365,7 @@ static int ufs_qcom_hce_enable_notify(struct ufs_hba *hba,
- 		/* check if UFS PHY moved from DISABLED to HIBERN8 */
- 		err = ufs_qcom_check_hibern8(hba);
- 		ufs_qcom_enable_hw_clk_gating(hba);
--
-+		ufs_qcom_ice_enable(host);
- 		break;
- 	default:
- 		dev_err(hba->dev, "%s: invalid status %d\n", __func__, status);
-@@ -616,6 +616,10 @@ static int ufs_qcom_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
- 			return err;
- 	}
- 
-+	err = ufs_qcom_ice_resume(host);
-+	if (err)
-+		return err;
-+
- 	hba->is_sys_suspended = false;
- 	return 0;
- }
-@@ -1011,6 +1015,7 @@ static void ufs_qcom_set_caps(struct ufs_hba *hba)
- 	hba->caps |= UFSHCD_CAP_CLK_GATING | UFSHCD_CAP_HIBERN8_WITH_CLK_GATING;
- 	hba->caps |= UFSHCD_CAP_CLK_SCALING;
- 	hba->caps |= UFSHCD_CAP_AUTO_BKOPS_SUSPEND;
-+	hba->caps |= UFSHCD_CAP_CRYPTO;
- 
- 	if (host->hw_ver.major >= 0x2) {
- 		host->caps = UFS_QCOM_CAP_QUNIPRO |
-@@ -1238,6 +1243,10 @@ static int ufs_qcom_init(struct ufs_hba *hba)
- 	ufs_qcom_set_caps(hba);
- 	ufs_qcom_advertise_quirks(hba);
- 
-+	err = ufs_qcom_ice_init(host);
-+	if (err)
-+		goto out_variant_clear;
-+
- 	ufs_qcom_setup_clocks(hba, true, POST_CHANGE);
- 
- 	if (hba->dev->id < MAX_UFS_QCOM_HOSTS)
-@@ -1651,6 +1660,7 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
- 	.resume			= ufs_qcom_resume,
- 	.dbg_register_dump	= ufs_qcom_dump_dbg_regs,
- 	.device_reset		= ufs_qcom_device_reset,
-+	.program_key		= ufs_qcom_ice_program_key,
- };
- 
- /**
-diff --git a/drivers/scsi/ufs/ufs-qcom.h b/drivers/scsi/ufs/ufs-qcom.h
-index 2d95e7cc71874..97247d17e258a 100644
---- a/drivers/scsi/ufs/ufs-qcom.h
-+++ b/drivers/scsi/ufs/ufs-qcom.h
-@@ -227,6 +227,9 @@ struct ufs_qcom_host {
- 	void __iomem *dev_ref_clk_ctrl_mmio;
- 	bool is_dev_ref_clk_enabled;
- 	struct ufs_hw_version hw_ver;
-+#ifdef CONFIG_SCSI_UFS_CRYPTO
-+	void __iomem *ice_mmio;
-+#endif
- 
- 	u32 dev_ref_clk_en_mask;
- 
-@@ -264,4 +267,28 @@ static inline bool ufs_qcom_cap_qunipro(struct ufs_qcom_host *host)
- 		return false;
- }
- 
-+/* ufs-qcom-ice.c */
-+
-+#ifdef CONFIG_SCSI_UFS_CRYPTO
-+int ufs_qcom_ice_init(struct ufs_qcom_host *host);
-+int ufs_qcom_ice_enable(struct ufs_qcom_host *host);
-+int ufs_qcom_ice_resume(struct ufs_qcom_host *host);
-+int ufs_qcom_ice_program_key(struct ufs_hba *hba,
-+			     const union ufs_crypto_cfg_entry *cfg, int slot);
-+#else
-+static inline int ufs_qcom_ice_init(struct ufs_qcom_host *host)
-+{
-+	return 0;
-+}
-+static inline int ufs_qcom_ice_enable(struct ufs_qcom_host *host)
-+{
-+	return 0;
-+}
-+static inline int ufs_qcom_ice_resume(struct ufs_qcom_host *host)
-+{
-+	return 0;
-+}
-+#define ufs_qcom_ice_program_key NULL
-+#endif /* !CONFIG_SCSI_UFS_CRYPTO */
-+
- #endif /* UFS_QCOM_H_ */
--- 
-2.25.1
+Yes the uevent..
 
+Limited types of sysfs files can be created with the group scheme.
+
+Others need to manipulate the uevent unfortunately, see how ib device
+registration works
+
+> > > +struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+> > > +                              const char *sessname,
+> > > +                              const struct rtrs_addr *paths,
+> > > +                              size_t paths_num,
+> > > +                              u16 port,
+> > > +                              size_t pdu_sz, u8 reconnect_delay_sec,
+> > > +                              u16 max_segments,
+> > > +                              s16 max_reconnect_attempts)
+> > > +{
+> > > +     struct rtrs_clt_sess *sess, *tmp;
+> > > +     struct rtrs_clt *clt;
+> > > +     int err, i;
+> > > +
+> > > +     clt = alloc_clt(sessname, paths_num, port, pdu_sz, ops->priv,
+> > > +                     ops->link_ev,
+> > > +                     max_segments, reconnect_delay_sec,
+> > > +                     max_reconnect_attempts);
+> > > +     if (IS_ERR(clt)) {
+> > > +             err = PTR_ERR(clt);
+> > > +             goto out;
+> > > +     }
+> > > +     for (i = 0; i < paths_num; i++) {
+> > > +             struct rtrs_clt_sess *sess;
+> > > +
+> > > +             sess = alloc_sess(clt, &paths[i], nr_cpu_ids,
+> > > +                               max_segments);
+> > > +             if (IS_ERR(sess)) {
+> > > +                     err = PTR_ERR(sess);
+> > > +                     goto close_all_sess;
+> > > +             }
+> > > +             list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
+> > > +
+> > > +             err = init_sess(sess);
+> > > +             if (err)
+> > > +                     goto close_all_sess;
+> > > +
+> > > +             err = rtrs_clt_create_sess_files(sess);
+> > > +             if (err)
+> > > +                     goto close_all_sess;
+> > > +     }
+> > > +     err = alloc_permits(clt);
+> > > +     if (err)
+> > > +             goto close_all_sess;
+> > > +     err = rtrs_clt_create_sysfs_root_files(clt);
+> > > +     if (err)
+> > > +             goto close_all_sess;
+> > > +
+> > > +     /*
+> > > +      * There is a race if someone decides to completely remove just
+> > > +      * newly created path using sysfs entry.  To avoid the race we
+> > > +      * use simple 'opened' flag, see rtrs_clt_remove_path_from_sysfs().
+> > > +      */
+> > > +     clt->opened = true;
+> >
+> > A race solution without locks?
+> We wanted to make sure that a path belonging to a session currently
+> being established can't be removed from sysfs before the establishment
+> is finished.
+
+There are still no locks, so this solution to races is probably racey.
+
+Jason
