@@ -6,66 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0B7C10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:57:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C7AC10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:59:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0253206E7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:57:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56667206E7
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 13:59:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AVrW7+rS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lYsAIgpb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727072AbgCLN5a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 09:57:30 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38858 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727007AbgCLN5a (ORCPT
+        id S1727365AbgCLN7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 09:59:05 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46114 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727309AbgCLN7F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 09:57:30 -0400
-Received: by mail-io1-f66.google.com with SMTP id c25so5127405ioi.5
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:57:28 -0700 (PDT)
+        Thu, 12 Mar 2020 09:59:05 -0400
+Received: by mail-io1-f68.google.com with SMTP id v3so5725671iom.13
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 06:59:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PmCzpDN/NMRhyTEmPMiyBIQCmmnvomJEacJijlrbzM4=;
-        b=AVrW7+rSwrTmOjEOzng0oQCcIDCWV2si013XLwgHe6kixGzc7dstefqkGGSrsRVsAa
-         FJE5c8jj9IlF0m0dMAhvHAI8L2U5z6bsisEYr8MliPCpIKguC+xfFP8F0WTnFm4+b0bq
-         Fifux4zNzTJyMwxaYofa0zz8c/fczmTMV72sT6ZMw2K/qkUWZFqYOeB4JqKYqXOoDy7G
-         m/lS4YnuTImXVHmsWTGe4vzNuDCRyyv0A6mKgrn7VmUN3Ao6sR9KYbWhRQSAUju2PiMf
-         TRnCHWJ9L0Q9+VL2EyBZ5TsRl92cRG+4ULNLFYL+96dQGAluT2xt8/JIWGS0S5p/BZ2g
-         j/dA==
+        bh=zTlRjOseOyMl3jA93cw2svqgh39qVO6h8t5eEoRUrVo=;
+        b=lYsAIgpbcxx8SyvblMkx/gqzdjPUpxHVZp0Dozn1TdX7jJ8RQPhY2EwwwEdBEyHa8d
+         Y2gf31DfsSkF7s3R223GoIa2un+DhsqKFjRvsa/WQ+9TOrg5E6+addic6Cun63qFANKl
+         iWoAtz9SVjo/ElFiLWNu2BBeLEjBqFxD2wKjXiVJNM6OSmg8z4YyFtvwLih298dgQ9J5
+         hMEtwF85V61rzlO/ek+yM/ca//+W7WHyMEFYm75krEDSKIdSG9WUYFLZjSX1m1vP6Lem
+         h9pom7Dm0Zpc99cwOv6MnGhQqjfOgqal+zocU2kX70zR+3lY5APB5+mrD77vj8pCzXQm
+         MQCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=PmCzpDN/NMRhyTEmPMiyBIQCmmnvomJEacJijlrbzM4=;
-        b=fd6fLSFYROkU0miTIVaS1u+A0no+mc4f4Cn2TN69yxmQfxl8pIVZlW/w0H0bPSJDD6
-         G+f9wem4o3o9rGUwbUs0rO6BexeDNQWrQuInrht+oD5wRl7ez7Kxu7MBIHWAZujDekca
-         OMtixMpwNadH/ldxCCSc30+aMoZ196yHRMOK/bXIk0mhhb0enVEkoSMF8CobvDaEJZlk
-         PWrGhrLyOZPw+sUBZ7/OtTCjKQrzpr0qV2h3zcdcTLdmuoL3aiQgsW/1TA6LVSuNSUeX
-         czfF5nj6pIRGFDrFsNHD8M468EF7IoDaNlKeOO9uUE82xmnPHJIS7+hXl9TjEAl12+oe
-         gmSQ==
-X-Gm-Message-State: ANhLgQ3TMVgzVkEvJ3pmYRri6Q83zooef3F08IiEIPDTjXGeTcFSJufN
-        YO5UxoOChtbiPXNiS9Ixfa2mmA==
-X-Google-Smtp-Source: ADFU+vv2B+H/3LrqYARnBvPi2opWl74wLabWcxLtVxSOKqH6WxbIDjQIp2v88SeHkhRQtUCt0kQj6w==
-X-Received: by 2002:a5d:9708:: with SMTP id h8mr7755881iol.141.1584021448333;
-        Thu, 12 Mar 2020 06:57:28 -0700 (PDT)
+        bh=zTlRjOseOyMl3jA93cw2svqgh39qVO6h8t5eEoRUrVo=;
+        b=DJaSczyvUNi+xCNiI3aYj9VlzV/6Kcm7I+iByK9IbTjxiSAj+UftJC6tA2HbjaGsW9
+         /dRkTHN2Z5GEz00b67IUiG9bvMWDLaAq7d39uhzg792Iimh6bzTKDz19Yeb4EXxskCG7
+         7FbfKWvqi3/7aq7FcwSnZ2BaWZcFWKtKkLCUQZplvITuvJnXCZAG0eBM20XLR9bRV6+Z
+         v1pCTTH/AiGHE5XUc0OXbierQAe0fhOCLcAdvPfBA1EGhnTSVBpKvf0jNqyfimazQPaC
+         34KxZ5MNhjaUa6G+PK+sxUhOUMIHwnrm08YwsgrMS1zM6zz5VlUH0K+fUgVc2qskLQ2m
+         UEkA==
+X-Gm-Message-State: ANhLgQ03/Bhb6mlpyEiUDG12QPvyXG1OhPMn/Uhdxk1Ocu12cdlGmdmh
+        s9QDNSLG/y8lhelRvZY8dH4r5w==
+X-Google-Smtp-Source: ADFU+vtPZYlapRmWvw2pq53TpFm31JI0b2TqwVD7oq2luQRkfS8WUZ+EDaoteFpLJanNoCHbIZDoLg==
+X-Received: by 2002:a5d:8cd3:: with SMTP id k19mr8072733iot.123.1584021543117;
+        Thu, 12 Mar 2020 06:59:03 -0700 (PDT)
 Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r29sm8822455ilk.76.2020.03.12.06.57.27
+        by smtp.gmail.com with ESMTPSA id o76sm3746593ili.18.2020.03.12.06.59.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Mar 2020 06:57:27 -0700 (PDT)
-Subject: Re: [PATCH 1/1] null_blk: describe the usage of fault injection param
-To:     Dongli Zhang <dongli.zhang@oracle.com>, linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-References: <20200304191644.25220-1-dongli.zhang@oracle.com>
+        Thu, 12 Mar 2020 06:59:02 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] nbd: requeue request if only one connection is
+ configured
+To:     Hou Pu <houpu.main@gmail.com>, josef@toxicpanda.com,
+        mchristi@redhat.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        Hou Pu <houpu@bytedance.com>
+References: <20200228064030.16780-1-houpu@bytedance.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <052ba0ac-e0ec-9607-e5c8-acbee8ab6162@kernel.dk>
-Date:   Thu, 12 Mar 2020 07:57:26 -0600
+Message-ID: <b407f0d1-f07c-4d6b-9657-bb296557ff50@kernel.dk>
+Date:   Thu, 12 Mar 2020 07:59:01 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304191644.25220-1-dongli.zhang@oracle.com>
+In-Reply-To: <20200228064030.16780-1-houpu@bytedance.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,14 +77,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/20 12:16 PM, Dongli Zhang wrote:
-> As null_blk is a very good start point to test block layer, this patch adds
-> description and comments to 'timeout' and 'requeue' to explain how to use
-> fault injection with null_blk.
+On 2/27/20 11:40 PM, Hou Pu wrote:
+> Hello,
 > 
-> The nvme has similar with nvme_core.fail_request in the form of comment.
+> NBD server could be upgraded if we have multiple connections.
+> But if we have only one connection, after we take down NBD server,
+> all inflight IO could finally timeout and return error. These
+> patches fix this using current reconfiguration framework.
+> 
+> I noticed that Mike has following patchset
+> 
+> nbd: local daemon restart support
+> https://lore.kernel.org/linux-block/5DD41C49.3080209@redhat.com/
+> 
+> It add another netlink interface (NBD_ATTR_SWAP_SOCKETS) and requeue
+> request immediately after recongirure/swap socket. It do not need to
+> wait for timeout to fire and requeue in timeout handler, which seems more
+> like an improvement. Let fix this in current framework first.
+> 
+> Changes compared to v2:
+> Fix comments in nbd_read_stat() to be aligned with the code change
+> suggested by Mike Christie.
 
-This doesn't apply to for-5.7/drivers, care to resend?
+Applied for 5.7.
 
 -- 
 Jens Axboe
