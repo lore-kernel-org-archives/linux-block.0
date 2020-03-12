@@ -2,108 +2,140 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD38C1975A
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 10:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5FAC10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:13:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7E0720716
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 10:51:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63E3120674
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:13:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="auCZLFTc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3huMklB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgCLKvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 06:51:12 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:35955 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726028AbgCLKvL (ORCPT
+        id S1726971AbgCLLNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 07:13:55 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:45395 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbgCLLNz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 06:51:11 -0400
-Received: by mail-io1-f66.google.com with SMTP id d15so5173269iog.3
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 03:51:11 -0700 (PDT)
+        Thu, 12 Mar 2020 07:13:55 -0400
+Received: by mail-pg1-f194.google.com with SMTP id m15so2906583pgv.12
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 04:13:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qjAuioxvdSttFV8/uVgl2ySO5YtKGSq0eHvNHm8enGU=;
-        b=auCZLFTcTwKttSO25Xt2kAi/Cvul/awOhSQ64kpTxYERzNyUMeMmxzFNVIuMOq8Diw
-         DE7Tb6AOPVaYJSVtPe/ryFyWNdDKau30M7KYoo+7sCENNOGvw0M+V36wj7pL8+cqM1iz
-         omgL38+rPF+ZVb/izk+qCugy5WXmXRPSL0XcnOOsDYKTqHMwH6INEcqon+pz09fx0EIj
-         1e7R0eTTL0KGz9xenRWbP99VvdOrJIZfzGrsENGE4dI72ty3rWcqP8VN83WKfqHqtcX5
-         hOKgoLZarTbFrLBYR7pzDwCKu0gN7qKD1ltHNAd66Ui6RkI1nifDPJE5E592rM4rsMcf
-         jDMA==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=s4xrk+HnF+jfJtmkVe1G8qQIgd/9nFoSdLjc5Ywv17I=;
+        b=D3huMklBWXR0LzlF/SWFEuBHBJOYRDGs3Sr7+BOTChuVfaz/eTLBjETqGaoozwvLbg
+         sklQywuzXuEn1OBLDlEEq4VZ04MQK6CxOf414HWybDe6amld+y9F92aAZ31Zt6gG/CGU
+         Yl3ZcE5tKTwNpuouGl3o4MB3Tw8qOLb2xzgKWI/LdrrknDd44l7PsNJ1nHKfZ5U0IyPt
+         TnwItpffDOJ7DaoJVw2q7AGmnZ2o/rEZgMUw+X7l3FnZhOS++wiR23sQFS903qvTpcXI
+         VRbMcOX9nPKeEZzw2Z3Ho1JP2h2V1AW9Z1BM+avzrwOrmwVvYSiQeWdHoPfklk8AaiV9
+         wyeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qjAuioxvdSttFV8/uVgl2ySO5YtKGSq0eHvNHm8enGU=;
-        b=NwxQCvuVRQObwkQ394V7GRJVfbxTbpK/hEVjvh/StkOT8GIWGvWScVFj2nPb7xaFbS
-         zN+IGoKUddlJ6sBx8LL8Dhyy2GdbUbeUanClwfniLkMDC4dpcQwduR3j6CqHG8KlRfcW
-         9JjXOPCeeDkO0cImJ0X8hB0uAOkZm8g0QtCVpKRB1qosVNLUoJ4qLBDQtWUU6yqJEyWo
-         c9nCCLn7zJs7dRS6Ss4IXuEfRlTjuyV1RD0bMpHCqed7US8toZpyA0znJAodO3G7uSo8
-         uS5iJUiyegtJpRwnlkcWhkQ/lvkjnx9fXTzxXLvyAAA+WlniAHP3RTDmh+7F97XhYHrY
-         w95A==
-X-Gm-Message-State: ANhLgQ14yKTVQCqTGSEAxG57xD5yZ/Xt36sYF1Osb3GwJ1npbHSKUju2
-        0m/lWF9OG9UZGxHejAdLwQVsya03yj3VjPnmiteI
-X-Google-Smtp-Source: ADFU+vt3PcoogJOf+pM0V1s9XOOS4yrCSX9h/tPds/8RkOInKK0/aS/aW2c1dcMZGlCffx8ZpkrIzHaJRU3pDhcw8Ic=
-X-Received: by 2002:a6b:d008:: with SMTP id x8mr6733628ioa.87.1584010270623;
- Thu, 12 Mar 2020 03:51:10 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=s4xrk+HnF+jfJtmkVe1G8qQIgd/9nFoSdLjc5Ywv17I=;
+        b=ioheGHjOV+XU/Ofk8Ja/+hLhryAOvS5MNNsqLkjYEOAhNVm6PJvOFJECJ6TiYwiimI
+         gZHXCj9ekQOCPuyFFJV/NdB+HzMj4zzFSdBNa+gl9rOTZd2jtSqq1+36lOwfmqIlqdDG
+         GjgKCe5ZQJAsCJCLvpSHLKjbK3kpW+jKRbemmhkBQZQty2AI7TUbbI6FIBy6SXGYIV2Y
+         NUJvJRgwEN5xbHVDMT0m05hGOlpKKkxI6i0/ioPr64SxuLa+juBRlA8BblLIsGynAmMx
+         2FfJWKBFqr5/R7q5mBqYfj5ildL8+0+VRJ5sxD8eeS6wDb6t940mQTWVErUw8xf7Hh5D
+         6HgQ==
+X-Gm-Message-State: ANhLgQ0JvzzUAPHt/5+9EPcwlMIo7pzX4An4oqfi+kwtOrcJLsq1Ii4i
+        WFGgpspFFx/f6UT8sm9VqKR1T8ltuh5RE+jr4AJ4o6Vm2rO6fQ==
+X-Google-Smtp-Source: ADFU+vu/1rY1p1Vi8eGsEQ/fUspiElwE2MS4gbX100gS319EQsWBVL9FEmDjZyGAylNeI5+oPigluH++b5/K4vAzEtI=
+X-Received: by 2002:a65:67d9:: with SMTP id b25mr7460895pgs.190.1584011634489;
+ Thu, 12 Mar 2020 04:13:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
- <20200311161240.30190-14-jinpu.wang@cloud.ionos.com> <20200311190313.GI31668@ziepe.ca>
-In-Reply-To: <20200311190313.GI31668@ziepe.ca>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 12 Mar 2020 11:50:59 +0100
-Message-ID: <CAHg0HuxHq7_hEkYjpT7-o9w3_T5WVvot2cGLnDp1_mB62Xd40Q@mail.gmail.com>
-Subject: Re: [PATCH v10 13/26] RDMA/rtrs: include client and server modules
- into kernel compilation
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Thu, 12 Mar 2020 19:13:28 +0800
+Message-ID: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
+Subject: [Question] IO is split by block layer when size is larger than 4k
+To:     linux-block@vger.kernel.org, ming.lei@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 11, 2020 at 8:03 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Mar 11, 2020 at 05:12:27PM +0100, Jack Wang wrote:
-> > Add rtrs Makefile, Kconfig and also corresponding lines into upper
-> > layer infiniband/ulp files.
-> >
-> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > ---
-> >  drivers/infiniband/Kconfig           |  1 +
-> >  drivers/infiniband/ulp/Makefile      |  1 +
-> >  drivers/infiniband/ulp/rtrs/Kconfig  | 27 +++++++++++++++++++++++++++
-> >  drivers/infiniband/ulp/rtrs/Makefile | 15 +++++++++++++++
-> >  4 files changed, 44 insertions(+)
-> >  create mode 100644 drivers/infiniband/ulp/rtrs/Kconfig
-> >  create mode 100644 drivers/infiniband/ulp/rtrs/Makefile
->
-> How is this using ib_devices without having a struct ib_client ?
-Hi Jason,
+Hi experts,
 
-After we resolved address using rdma_resolve_add() we access the
-ib_device from rdma_cm_id. The ib_device has been registered on
-rdma_cm module load in cma_init(). The handle device removal through
-RDMA_CM_EVENT_DEVICE_REMOVAL.
+May I ask a question about block layer?
+When running fio in guest os, I find a 256k IO is split into the page
+by page in bio, saved in bvecs.
+And virtio-blk just put the bio_vec one by one in the available
+descriptor table.
 
-Best,
-Danil
+So if my backend device does not support iovector
+opertion(preadv/pwritev), then IO is issued to a low layer page by
+page.
+My question is: why doesn't the bio save multi-pages in one bio_vec?
 
+the /dev/vdb is a vhost-user-blk-pci device from spdk or virtio-blk-pci device.
+fio config is:
+[global]
+name=fio-rand-read
+rw=randread
+ioengine=libaio
+direct=1
+numjobs=1
+iodepth=1
+bs=256K
+[file1]
+filename=/dev/vdb
 
->
-> Jason
+Traceing result like this:
+
+/usr/share/bcc/tools/stackcount -K  -T  '__blockdev_direct_IO'
+return 378048
+ /usr/share/bcc/tools/stackcount -K  -T 'bio_add_page'
+return 5878
+I can get:
+378048/5878 = 64
+256k/4k=64.
+
+__blockdev_direct_IO splits 256k to 64 parts.
+
+The /dev/vdb queue properties is as follows:
+
+[root@t1 00:10:42 queue]$find . | while read f;do echo "$f = $(cat $f)";done
+./nomerges = 0
+./logical_block_size = 512
+./rq_affinity = 1
+./discard_zeroes_data = 0
+./max_segments = 126
+./unpriv_sgio = 0
+./max_segment_size = 4294967295
+./rotational = 1
+./scheduler = none
+./read_ahead_kb = 128
+./max_hw_sectors_kb = 2147483647
+./discard_granularity = 0
+./discard_max_bytes = 0
+./write_same_max_bytes = 0
+./max_integrity_segments = 0
+./max_sectors_kb = 512
+./physical_block_size = 512
+./add_random = 0
+./nr_requests = 128
+./minimum_io_size = 512
+./hw_sector_size = 512
+./optimal_io_size
+
+Sometimes the part io size is bigger than 4k.
+some logs:
+id: 0 size: 4096
+...
+id: 57 size: 4096
+id: 58 size: 24576
+
+Why does this happen?
+
+kernel version:
+1. 3.10.0-1062.1.2.el7
+2. 5.3
+
+Thanks in advance.
