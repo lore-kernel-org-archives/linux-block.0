@@ -1,217 +1,96 @@
-Return-Path: <SRS0=mBf9=44=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A487C2BAEE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 23:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C463C0044D
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 03:18:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 062AF206BE
-	for <linux-block@archiver.kernel.org>; Wed, 11 Mar 2020 23:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1F3820755
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 03:18:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qQKGWHsU"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QyXVk2aw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731507AbgCKX47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Mar 2020 19:56:59 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:44669 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731399AbgCKX47 (ORCPT
+        id S2387712AbgCLDSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Mar 2020 23:18:20 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:44138 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387453AbgCLDSU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Mar 2020 19:56:59 -0400
-Received: by mail-pl1-f202.google.com with SMTP id c7so2230754plr.11
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2020 16:56:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=AZPvh30KFy43kEyQxHv/V8BBQfdFAAHiyFrKXoYvQuk=;
-        b=qQKGWHsUgueSRuYYMEeO9BJHhAqNhnEDm4a4u2vIWrV7QPwxnMvqGBbrOV1hFNvnFi
-         Wv4JNNWBAZQMPQVwJQgHqNRIwVYd1TTCgkwSpP54uV3FgDlV1+mvI+NOWGkhv3nyLG0v
-         LfVITDV/O88Vbx+AiFKkLTL9x5GLbwiKpgWh0f+JDOQDjwq6fSqFbqVqpNBIbNu1+zqi
-         ujvkyMhj4Y1zwsxrql4z1biEcYbJKEFsTtRQDjtunklUG28jYob32PKKJsDeLKXxVye4
-         vGrUCKd64tFQYO13tF7S67Gze+k4+C86w4F1UhTuWs5vnGRS566m/hilIdx7gvEHK6T6
-         1//A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=AZPvh30KFy43kEyQxHv/V8BBQfdFAAHiyFrKXoYvQuk=;
-        b=pfIm/EXZkWEWP0B+BEoVCH/MMST9kYYq6ad+EpQmrybsohmu1Cn/mwGqSbAXcWX/19
-         IDtLqfvzKZh24oSZZywbshqkY8vfo2YoAN6xi7GF7Rt4qkks7YuCq297SyD1AYIJtT1m
-         kTDs+ivNLDLSaU+d5MbGhsMdVwzKZZMIKznekGJvlr1T3PeAwPtTXZDLU/J+R3WMJUSF
-         vVqVVhBZkcBcpnJAPyGgd0rIgScE3kZe/Ek+6/4iSZAvfEpKZrnQARhWsf4XrBEkHZ21
-         0r4z5SJo7R0EdDvDGczXmToPacoN6NtZ3EgOMMA5J1/YQtZJX7iEgKOiCTVryWqov0mR
-         9TzA==
-X-Gm-Message-State: ANhLgQ2WU0n7t+BRWAHGyAfc1TCyk+7tkbkSEO1RPAAiC1ehvFeYuEwO
-        pd3Wb0TfQYId+6LfF7cXHj0/DF/nLFVQ6ngE
-X-Google-Smtp-Source: ADFU+vsGYMhXTgL/gZ5yx4VyViO6yE42G1cxQ//ozErPQaXqA7QqLze49WYhyRqfOIKsiOTk+DtFaoj77v0RiABu
-X-Received: by 2002:a63:6b8a:: with SMTP id g132mr4899758pgc.359.1583971017911;
- Wed, 11 Mar 2020 16:56:57 -0700 (PDT)
-Date:   Wed, 11 Mar 2020 16:56:53 -0700
-Message-Id: <20200311235653.141701-1-rammuthiah@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [PATCH] Inline contents of BLK_MQ_VIRTIO config
-From:   Ram Muthiah <rammuthiah@google.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@android.com, Ram Muthiah <rammuthiah@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 11 Mar 2020 23:18:20 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02C3BaNS146920;
+        Thu, 12 Mar 2020 03:15:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=p5IfXvS/P3WbGDOKAj9bk3Y/A1Ox++n5S6ue07kJMls=;
+ b=QyXVk2awPv3hozaHbeLZr70IpymUcwrhVelT8UtyH9mEtaMiqHfUd7GN1IAzIhxp0mUB
+ D3Aqstj/hFWWiwn2w9k9DuRTAZ8tO522UfAHb8Om7pmPtuUVDIDC2xraoaJQsVQKBzOa
+ FctYSB3IZ5gh5OkuPBzREjbPb+DGPMOvQI2B+A77CgvHXW3NyXdI9BnxGiga9c75VefR
+ ZdPbpk9PGrTsQT6epMizRAqRy0u8XDGUfvocLwlLoxnmbWKkmozZd5TR9X1evTqAVZIw
+ MWPEbIZDyJhPuteuw3va7q/pbmabxGU2nOOXpuA/07NjTHwn36Ki8mCJnbMrtzXTYPSq Ug== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2ym31uq4vb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 03:15:37 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02C37HIu011734;
+        Thu, 12 Mar 2020 03:15:37 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2yp8p5npfq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Mar 2020 03:15:36 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02C3FY43031972;
+        Thu, 12 Mar 2020 03:15:35 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 11 Mar 2020 20:15:34 -0700
+To:     Ryan Attard <ryanattard@ryanattard.info>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, dgilbert@interlog.com, jejb@linux.vnet.ibm.com,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 1/1 RESEND] Allow non-root users to perform ZBC commands.
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20200226170518.92963-1-ryanattard@ryanattard.info>
+        <20200226170518.92963-2-ryanattard@ryanattard.info>
+Date:   Wed, 11 Mar 2020 23:15:31 -0400
+In-Reply-To: <20200226170518.92963-2-ryanattard@ryanattard.info> (Ryan
+        Attard's message of "Wed, 26 Feb 2020 11:05:19 -0600")
+Message-ID: <yq1blp29sbw.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=932
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003120014
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 lowpriorityscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003120014
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The config contains one symbol and is a dep of only two configs.
-Inlined this symbol so that it's built in by the two configs
-which need it and deleted the config.
 
-Signed-off-by: Ram Muthiah <rammuthiah@google.com>
----
- block/Kconfig                 |  5 ----
- block/Makefile                |  1 -
- block/blk-mq-virtio.c         | 46 -----------------------------------
- include/linux/blk-mq-virtio.h | 43 +++++++++++++++++++++++++++++---
- 4 files changed, 39 insertions(+), 56 deletions(-)
- delete mode 100644 block/blk-mq-virtio.c
+Ryan,
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 3bc76bb113a0..953744daff7c 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -203,11 +203,6 @@ config BLK_MQ_PCI
- 	depends on BLOCK && PCI
- 	default y
- 
--config BLK_MQ_VIRTIO
--	bool
--	depends on BLOCK && VIRTIO
--	default y
--
- config BLK_MQ_RDMA
- 	bool
- 	depends on BLOCK && INFINIBAND
-diff --git a/block/Makefile b/block/Makefile
-index 1a43750f4b01..709695f54150 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -29,7 +29,6 @@ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY_T10)	+= t10-pi.o
- obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
--obj-$(CONFIG_BLK_MQ_VIRTIO)	+= blk-mq-virtio.o
- obj-$(CONFIG_BLK_MQ_RDMA)	+= blk-mq-rdma.o
- obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
- obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
-diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
-deleted file mode 100644
-index 488341628256..000000000000
---- a/block/blk-mq-virtio.c
-+++ /dev/null
-@@ -1,46 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * Copyright (c) 2016 Christoph Hellwig.
-- */
--#include <linux/device.h>
--#include <linux/blk-mq.h>
--#include <linux/blk-mq-virtio.h>
--#include <linux/virtio_config.h>
--#include <linux/module.h>
--#include "blk-mq.h"
--
--/**
-- * blk_mq_virtio_map_queues - provide a default queue mapping for virtio device
-- * @qmap:	CPU to hardware queue map.
-- * @vdev:	virtio device to provide a mapping for.
-- * @first_vec:	first interrupt vectors to use for queues (usually 0)
-- *
-- * This function assumes the virtio device @vdev has at least as many available
-- * interrupt vetors as @set has queues.  It will then queuery the vector
-- * corresponding to each queue for it's affinity mask and built queue mapping
-- * that maps a queue to the CPUs that have irq affinity for the corresponding
-- * vector.
-- */
--int blk_mq_virtio_map_queues(struct blk_mq_queue_map *qmap,
--		struct virtio_device *vdev, int first_vec)
--{
--	const struct cpumask *mask;
--	unsigned int queue, cpu;
--
--	if (!vdev->config->get_vq_affinity)
--		goto fallback;
--
--	for (queue = 0; queue < qmap->nr_queues; queue++) {
--		mask = vdev->config->get_vq_affinity(vdev, first_vec + queue);
--		if (!mask)
--			goto fallback;
--
--		for_each_cpu(cpu, mask)
--			qmap->mq_map[cpu] = qmap->queue_offset + queue;
--	}
--
--	return 0;
--fallback:
--	return blk_mq_map_queues(qmap);
--}
--EXPORT_SYMBOL_GPL(blk_mq_virtio_map_queues);
-diff --git a/include/linux/blk-mq-virtio.h b/include/linux/blk-mq-virtio.h
-index 687ae287e1dc..b3ddb8b6da76 100644
---- a/include/linux/blk-mq-virtio.h
-+++ b/include/linux/blk-mq-virtio.h
-@@ -1,11 +1,46 @@
- /* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2016 Christoph Hellwig.
-+ */
- #ifndef _LINUX_BLK_MQ_VIRTIO_H
- #define _LINUX_BLK_MQ_VIRTIO_H
- 
--struct blk_mq_queue_map;
--struct virtio_device;
-+#include <linux/blk-mq.h>
-+#include <linux/virtio_config.h>
- 
--int blk_mq_virtio_map_queues(struct blk_mq_queue_map *qmap,
--		struct virtio_device *vdev, int first_vec);
-+/**
-+ * blk_mq_virtio_map_queues - provide a default queue mapping for virtio device
-+ * @qmap:	CPU to hardware queue map.
-+ * @vdev:	virtio device to provide a mapping for.
-+ * @first_vec:	first interrupt vectors to use for queues (usually 0)
-+ *
-+ * This function assumes the virtio device @vdev has at least as many available
-+ * interrupt vetors as @set has queues.  It will then queuery the vector
-+ * corresponding to each queue for it's affinity mask and built queue mapping
-+ * that maps a queue to the CPUs that have irq affinity for the corresponding
-+ * vector.
-+ */
-+static inline int blk_mq_virtio_map_queues(struct blk_mq_queue_map *qmap,
-+		struct virtio_device *vdev, int first_vec)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	if (!vdev->config->get_vq_affinity)
-+		goto fallback;
-+
-+	for (queue = 0; queue < qmap->nr_queues; queue++) {
-+		mask = vdev->config->get_vq_affinity(vdev, first_vec + queue);
-+		if (!mask)
-+			goto fallback;
-+
-+		for_each_cpu(cpu, mask)
-+			qmap->mq_map[cpu] = qmap->queue_offset + queue;
-+	}
-+
-+	return 0;
-+fallback:
-+	return blk_mq_map_queues(qmap);
-+}
- 
- #endif /* _LINUX_BLK_MQ_VIRTIO_H */
+> Allow users with read permissions to issue REPORT ZONE commands and
+> users with write permissions to manage zones on block devices
+> supporting the ZBC specification.
+
+Applied to 5.7/scsi-queue, thanks!
+
 -- 
-2.25.1.481.gfbce0eb801-goog
-
+Martin K. Petersen	Oracle Linux Engineering
