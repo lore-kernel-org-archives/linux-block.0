@@ -2,122 +2,99 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9CFC10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816E5C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:10:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B160206EB
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F8C7206FA
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 12:10:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="f6V4M7Hj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DBFG0drK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726395AbgCLMDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 08:03:04 -0400
-Received: from mail-qv1-f66.google.com ([209.85.219.66]:38866 "EHLO
-        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726302AbgCLMDE (ORCPT
+        id S1726302AbgCLMKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 08:10:17 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:36367 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbgCLMKR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 08:03:04 -0400
-Received: by mail-qv1-f66.google.com with SMTP id p60so2435811qva.5
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 05:03:03 -0700 (PDT)
+        Thu, 12 Mar 2020 08:10:17 -0400
+Received: by mail-pj1-f42.google.com with SMTP id l41so2587213pjb.1
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 05:10:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=g1Wdzvpjgq0rmXr47VZEoreiXSWsPwwFS/Fg+1mqi9I=;
-        b=f6V4M7Hj/YKRgFvnQ0ip1pwXT/78X97E4YMfS3/VrzK3Dc9eizGIcR05Sb+2NADqtC
-         j/ZGjHCtaX/0DSsBpUED0TJCcyC3MjcD/3wuKE/qrEiQ1roSL7/LFdD4HqGNG8CORa7u
-         wJHJp6PcbrXDdqjM6PGcCeoy40bnT52dACFfAGtHnMWLDiAfAXgCsbzQmzRQAdrvzXEG
-         CYKssZ+zrnfq6xM0TGQ5KhgU+rNcqPoUq5etc6Gb/HpoPEThuzHg2LbYr5PgS5IL7wK8
-         AA3Mi7oUwJCp2UB7a00mC6qImnG6RV1wFF0P8IIxs1HsFz0srIM4/UAn+Pk27Wqdsel6
-         DYIA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=vy2n5NLy4xxeHaOT5IV+2cRebGf34zNVVuHAtfA0XVE=;
+        b=DBFG0drKwkjP7JdKAYbsXYq6vEBqhyBD6TCQI6UlcrtbAmm/FcNKecul+8w6BLPGN1
+         G6EliGVexITzn19f2Ef9CAQmPXnCwIhVMTBqjwl9AN/2OX7NayJZoDh7ImPWwDlVjA/F
+         GgOEAvjfTVPpCUe+6o7ZwvLnlZwfWlPstP27j8FuB7fVnwVb090NyB6Jev5c7ZzIPbWh
+         RBcfsM2k+/ghchFHhaQ086epBW7J0raR/XtUoGx/XCWgIzuLCH+N6mGBgyAYL4BgAndo
+         OuA5CRELF7zHjtfaKcZ0AaIn8E5d6xfugN/ctWEz0nJpPoF5tl5msGQrKI+1DHB+QMIg
+         RxSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=g1Wdzvpjgq0rmXr47VZEoreiXSWsPwwFS/Fg+1mqi9I=;
-        b=CgXRo1zB9Yd6u/UnZsPgHiXgoPIswiB+J0wUiL2Nbka6akJYYwqKu4tqf9ZCbvGZ/e
-         v9qFz4wT/hHJxm1eco2Ov0RIBTX5Rljar+TeZJYRHQlc3uZT4BIM10k8YzUE1w2Dnx53
-         CQauIyRVqFaDJx0QZ5ATnTyur+1no2UDywv3XQmdsMq05sCIWCrS9l/M7lDdJbhxf8yS
-         mNlF4ztOaGMj1wzaIF4v5HwMSIgA+JwbVJA2Jsf0J4TUyrMME3n3gXYXoVvsi11q2/K+
-         qsLRRauivIYKhCnNL1LrMoUdkbj0pf9mCACRAH/g2LasRPm7CLVfVJXB5OKr2B+fctKT
-         WnHg==
-X-Gm-Message-State: ANhLgQ3K3SFIwy5Aqy918FakDV0AliEVDf2LhKEwVVQZez/7gyb+SzRI
-        yKu3AZjyGxOEElgjqmiDOjKRyQ==
-X-Google-Smtp-Source: ADFU+vtcfzf9wRVww1Ak9MPTXQ7fpkzfVrarAblgpse0DpS7sRPucb1fwZUXlmxYkAKCsOzJdNKfCA==
-X-Received: by 2002:a0c:ffd3:: with SMTP id h19mr6933623qvv.166.1584014582927;
-        Thu, 12 Mar 2020 05:03:02 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id w204sm14610945qkb.133.2020.03.12.05.03.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 12 Mar 2020 05:03:01 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jCMYG-0004u9-4k; Thu, 12 Mar 2020 09:03:00 -0300
-Date:   Thu, 12 Mar 2020 09:03:00 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Subject: Re: [PATCH v10 13/26] RDMA/rtrs: include client and server modules
- into kernel compilation
-Message-ID: <20200312120300.GJ31668@ziepe.ca>
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
- <20200311161240.30190-14-jinpu.wang@cloud.ionos.com>
- <20200311190313.GI31668@ziepe.ca>
- <CAHg0HuxHq7_hEkYjpT7-o9w3_T5WVvot2cGLnDp1_mB62Xd40Q@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=vy2n5NLy4xxeHaOT5IV+2cRebGf34zNVVuHAtfA0XVE=;
+        b=DoPKlLZzIiEk3FFsV/2sGtjELo5kyBQGXJaPv4pCgtqVZNN8oVLXPhJkeL11XNlzyu
+         iBmNcBJqZAjMLjahcSgO0cpGCw+e68KUNywomB0f/u9THzm9yj7fxKKhHnruY7gbgNLH
+         38ZPgJpcRkal7Kf9/IJgBSHLWeItXbbkLxd6f7gBBb+us/1Ci9L+QfOvX8NLTTjrWHnF
+         Ds0Z3HVf35kdkqN7fdcbWb7OGWCGDrbX4aYRMbR60glW8lzlqf2G969hTXGXvMaMudAD
+         SPn4pJNaEl+k14gD0C230qEP21D6hK+4t6Clf1w05S0chwwsx8biB3B/tNgvVR1VTrRk
+         tVIg==
+X-Gm-Message-State: ANhLgQ0WYKGo+aJBiEvk6mg0Y6qqFio6vpA5dnFsFHdHFIaMoaHSwyy6
+        frWgIw658gK1WuJ7saTl73yVAMvN1UF6GvPb9Eo=
+X-Google-Smtp-Source: ADFU+vtdWyHu34mT/l6awb0ZY3IDbFaknaatAZaqVazfUbQ2J96Y8JasuQbuixyZGQWP/xbvMXSH0+xSISkW0EXIFVY=
+X-Received: by 2002:a17:90a:c244:: with SMTP id d4mr3799820pjx.133.1584015015910;
+ Thu, 12 Mar 2020 05:10:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHg0HuxHq7_hEkYjpT7-o9w3_T5WVvot2cGLnDp1_mB62Xd40Q@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
+ <f7963269-bf90-9b1d-2ac4-bf324d5462e5@suse.de>
+In-Reply-To: <f7963269-bf90-9b1d-2ac4-bf324d5462e5@suse.de>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Thu, 12 Mar 2020 20:09:49 +0800
+Message-ID: <CAEK8JBDKR9AYy9_-uWhjUParRT7s9qGciXsCw-riCBN8UMCGOw@mail.gmail.com>
+Subject: Re: [Question] IO is split by block layer when size is larger than 4k
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 11:50:59AM +0100, Danil Kipnis wrote:
-> On Wed, Mar 11, 2020 at 8:03 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+Ok, thanks for the clarification.
+I mean each bvec consists of one page.
+It's not good for virtio backend.
+
+Hannes Reinecke <hare@suse.de> =E4=BA=8E2020=E5=B9=B43=E6=9C=8812=E6=97=A5=
+=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:51=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 3/12/20 12:13 PM, Feng Li wrote:
+> > Hi experts,
 > >
-> > On Wed, Mar 11, 2020 at 05:12:27PM +0100, Jack Wang wrote:
-> > > Add rtrs Makefile, Kconfig and also corresponding lines into upper
-> > > layer infiniband/ulp files.
-> > >
-> > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > >  drivers/infiniband/Kconfig           |  1 +
-> > >  drivers/infiniband/ulp/Makefile      |  1 +
-> > >  drivers/infiniband/ulp/rtrs/Kconfig  | 27 +++++++++++++++++++++++++++
-> > >  drivers/infiniband/ulp/rtrs/Makefile | 15 +++++++++++++++
-> > >  4 files changed, 44 insertions(+)
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Kconfig
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Makefile
+> > May I ask a question about block layer?
+> > When running fio in guest os, I find a 256k IO is split into the page
+> > by page in bio, saved in bvecs.
+> > And virtio-blk just put the bio_vec one by one in the available
+> > descriptor table.
 > >
-> > How is this using ib_devices without having a struct ib_client ?
-> Hi Jason,
-> 
-> After we resolved address using rdma_resolve_add() we access the
-> ib_device from rdma_cm_id. The ib_device has been registered on
-> rdma_cm module load in cma_init(). The handle device removal through
-> RDMA_CM_EVENT_DEVICE_REMOVAL.
-
-Hmm.. I actually don't know if this flow works OK in rdma cm or not..
-
-Actually I expect if I look at rdma cm, I'll find it is broken..
-
-However, it does sound like a reasonable approach, so nothing to do
-here.
-
-Jason
+> It isn't 'split', it's using _one_ bio containing bvecs, where each bvec
+> consists of one page.
+>
+> 'split' for the blocklayer means that a single I/O is split into several
+> bios, which I dont' think is the case here. Or?
+>
+> Cheers,
+>
+> Hannes
+> --
+> Dr. Hannes Reinecke                        Kernel Storage Architect
+> hare@suse.de                                      +49 911 74053 688
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+> HRB 36809 (AG N=C3=BCrnberg), GF: Felix Imend=C3=B6rffer
