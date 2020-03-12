@@ -2,140 +2,109 @@ Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5FAC10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 736E9C10DCE
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:51:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 63E3120674
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:13:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3huMklB"
+	by mail.kernel.org (Postfix) with ESMTP id 46FFD206E9
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 11:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726971AbgCLLNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 07:13:55 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:45395 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgCLLNz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 07:13:55 -0400
-Received: by mail-pg1-f194.google.com with SMTP id m15so2906583pgv.12
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 04:13:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=s4xrk+HnF+jfJtmkVe1G8qQIgd/9nFoSdLjc5Ywv17I=;
-        b=D3huMklBWXR0LzlF/SWFEuBHBJOYRDGs3Sr7+BOTChuVfaz/eTLBjETqGaoozwvLbg
-         sklQywuzXuEn1OBLDlEEq4VZ04MQK6CxOf414HWybDe6amld+y9F92aAZ31Zt6gG/CGU
-         Yl3ZcE5tKTwNpuouGl3o4MB3Tw8qOLb2xzgKWI/LdrrknDd44l7PsNJ1nHKfZ5U0IyPt
-         TnwItpffDOJ7DaoJVw2q7AGmnZ2o/rEZgMUw+X7l3FnZhOS++wiR23sQFS903qvTpcXI
-         VRbMcOX9nPKeEZzw2Z3Ho1JP2h2V1AW9Z1BM+avzrwOrmwVvYSiQeWdHoPfklk8AaiV9
-         wyeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=s4xrk+HnF+jfJtmkVe1G8qQIgd/9nFoSdLjc5Ywv17I=;
-        b=ioheGHjOV+XU/Ofk8Ja/+hLhryAOvS5MNNsqLkjYEOAhNVm6PJvOFJECJ6TiYwiimI
-         gZHXCj9ekQOCPuyFFJV/NdB+HzMj4zzFSdBNa+gl9rOTZd2jtSqq1+36lOwfmqIlqdDG
-         GjgKCe5ZQJAsCJCLvpSHLKjbK3kpW+jKRbemmhkBQZQty2AI7TUbbI6FIBy6SXGYIV2Y
-         NUJvJRgwEN5xbHVDMT0m05hGOlpKKkxI6i0/ioPr64SxuLa+juBRlA8BblLIsGynAmMx
-         2FfJWKBFqr5/R7q5mBqYfj5ildL8+0+VRJ5sxD8eeS6wDb6t940mQTWVErUw8xf7Hh5D
-         6HgQ==
-X-Gm-Message-State: ANhLgQ0JvzzUAPHt/5+9EPcwlMIo7pzX4An4oqfi+kwtOrcJLsq1Ii4i
-        WFGgpspFFx/f6UT8sm9VqKR1T8ltuh5RE+jr4AJ4o6Vm2rO6fQ==
-X-Google-Smtp-Source: ADFU+vu/1rY1p1Vi8eGsEQ/fUspiElwE2MS4gbX100gS319EQsWBVL9FEmDjZyGAylNeI5+oPigluH++b5/K4vAzEtI=
-X-Received: by 2002:a65:67d9:: with SMTP id b25mr7460895pgs.190.1584011634489;
- Thu, 12 Mar 2020 04:13:54 -0700 (PDT)
+        id S1726310AbgCLLvQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 07:51:16 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55572 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726044AbgCLLvQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Mar 2020 07:51:16 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 55507AE44;
+        Thu, 12 Mar 2020 11:51:14 +0000 (UTC)
+Subject: Re: [Question] IO is split by block layer when size is larger than 4k
+To:     Feng Li <lifeng1519@gmail.com>, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <f7963269-bf90-9b1d-2ac4-bf324d5462e5@suse.de>
+Date:   Thu, 12 Mar 2020 12:51:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-From:   Feng Li <lifeng1519@gmail.com>
-Date:   Thu, 12 Mar 2020 19:13:28 +0800
-Message-ID: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
-Subject: [Question] IO is split by block layer when size is larger than 4k
-To:     linux-block@vger.kernel.org, ming.lei@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi experts,
+On 3/12/20 12:13 PM, Feng Li wrote:
+> Hi experts,
+> 
+> May I ask a question about block layer?
+> When running fio in guest os, I find a 256k IO is split into the page
+> by page in bio, saved in bvecs.
+> And virtio-blk just put the bio_vec one by one in the available
+> descriptor table.
+> 
+It isn't 'split', it's using _one_ bio containing bvecs, where each bvec
+consists of one page.
 
-May I ask a question about block layer?
-When running fio in guest os, I find a 256k IO is split into the page
-by page in bio, saved in bvecs.
-And virtio-blk just put the bio_vec one by one in the available
-descriptor table.
+'split' for the blocklayer means that a single I/O is split into several
+bios, which I dont' think is the case here. Or?
 
-So if my backend device does not support iovector
-opertion(preadv/pwritev), then IO is issued to a low layer page by
-page.
-My question is: why doesn't the bio save multi-pages in one bio_vec?
+Cheers,
 
-the /dev/vdb is a vhost-user-blk-pci device from spdk or virtio-blk-pci device.
-fio config is:
-[global]
-name=fio-rand-read
-rw=randread
-ioengine=libaio
-direct=1
-numjobs=1
-iodepth=1
-bs=256K
-[file1]
-filename=/dev/vdb
-
-Traceing result like this:
-
-/usr/share/bcc/tools/stackcount -K  -T  '__blockdev_direct_IO'
-return 378048
- /usr/share/bcc/tools/stackcount -K  -T 'bio_add_page'
-return 5878
-I can get:
-378048/5878 = 64
-256k/4k=64.
-
-__blockdev_direct_IO splits 256k to 64 parts.
-
-The /dev/vdb queue properties is as follows:
-
-[root@t1 00:10:42 queue]$find . | while read f;do echo "$f = $(cat $f)";done
-./nomerges = 0
-./logical_block_size = 512
-./rq_affinity = 1
-./discard_zeroes_data = 0
-./max_segments = 126
-./unpriv_sgio = 0
-./max_segment_size = 4294967295
-./rotational = 1
-./scheduler = none
-./read_ahead_kb = 128
-./max_hw_sectors_kb = 2147483647
-./discard_granularity = 0
-./discard_max_bytes = 0
-./write_same_max_bytes = 0
-./max_integrity_segments = 0
-./max_sectors_kb = 512
-./physical_block_size = 512
-./add_random = 0
-./nr_requests = 128
-./minimum_io_size = 512
-./hw_sector_size = 512
-./optimal_io_size
-
-Sometimes the part io size is bigger than 4k.
-some logs:
-id: 0 size: 4096
-...
-id: 57 size: 4096
-id: 58 size: 24576
-
-Why does this happen?
-
-kernel version:
-1. 3.10.0-1062.1.2.el7
-2. 5.3
-
-Thanks in advance.
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
