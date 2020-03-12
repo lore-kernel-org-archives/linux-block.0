@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9D1C5ACBF
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 15:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBFEC5ACBF
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 15:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6038206E7
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 15:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9E192067C
+	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 15:20:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HG0UWaUT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T/4LYR/a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727977AbgCLPUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 11:20:16 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:38700 "EHLO
+        id S1727999AbgCLPUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 11:20:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38740 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727459AbgCLPUP (ORCPT
+        with ESMTP id S1727459AbgCLPUU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 11:20:15 -0400
+        Thu, 12 Mar 2020 11:20:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=hMpMs5/uCHisOGza6BAoVgV7XqUrMgBsdg7vYtAzuK0=; b=HG0UWaUTkqqumruRAlbqkIO1nd
-        RlITBTdPZSgSkBd82NCcufwBn6pwYp/zrl22TCXoUbPs3gDMXGBLHIIOJjWZpCTHwRHwBs2CXKYdY
-        3It/kHl/Kvl7PMlWNmmvz4P1C2yECd79Io7RogjL3a04UM2wzSIcbNf6wrKqR3Pd8sASmDroYxYeX
-        9j4Uc1Wn+w2FA9OahcOTyR1CAWX+Ye7ntwmjHyzOBgFFtXcKGwsjjPMjJmf1o4CeQZlTE/CsujTwx
-        iJNTZcVfD5UmZf5ibFFTgzaCaemZhhGtgDLacxZXVpZ0IllNA2E1Ml/HZF8WN2t8bM+Lg5kcdD1Rb
-        yFT3QPMA==;
+        bh=ABEU/z7lsXGuGe1amIkhjXTbw805aSLYXuvorFP/c3k=; b=T/4LYR/akk9J+gFFrv/ViLv2an
+        JbyCsYuHTCufoMBEiaU1qhf95fHWQ70Uur5ME2p4xxztO2ZqecS5iPT+dxt0vTuJYlJq0TPnGmuPY
+        Ej3CfkeKY/YiRPsuLhefs4KfJHPTfuqTmd6Cz6woBT6OZBGOVBSO7jtE1n8GxdHuWuyim5QhEug3o
+        Wv1U4ziLSqadY5UiLruOkuUFU1N2b6u7b3iVNvBoawleHe9VMPBOLCDZEyO+rHiseWSCYaDO3tbuv
+        g1r5Hn1T9rIwko5J3R5mzRW00u5kuEebPFsJUplpkPMLBTcfeYc85zvlLwFxEorVeTXp/BjHhMo/f
+        eyDiq9AQ==;
 Received: from [2001:4bb8:184:5cad:8026:d98c:a056:3e33] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jCPd8-0007sJ-Lp; Thu, 12 Mar 2020 15:20:15 +0000
+        id 1jCPdE-0007uv-38; Thu, 12 Mar 2020 15:20:20 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-scsi@vger.kernel.org, linux-ext4@vger.kernel.org,
         reiserfs-devel@vger.kernel.org
-Subject: [PATCH 11/21] block: remove warn_no_part
-Date:   Thu, 12 Mar 2020 16:19:29 +0100
-Message-Id: <20200312151939.645254-12-hch@lst.de>
+Subject: [PATCH 13/21] block: remove block/partitions/karma.h
+Date:   Thu, 12 Mar 2020 16:19:31 +0100
+Message-Id: <20200312151939.645254-14-hch@lst.de>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200312151939.645254-1-hch@lst.de>
 References: <20200312151939.645254-1-hch@lst.de>
@@ -54,80 +54,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The warn_no_part is initialized to 1 and never changed.  Remove
-it and execute the code keyed off from it unconditionally.
+Just move the single define to block/partitions/karma.c.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/partitions/amiga.c | 10 ++++------
- block/partitions/check.c |  7 ++-----
- block/partitions/check.h |  3 ---
- 3 files changed, 6 insertions(+), 14 deletions(-)
+ block/partitions/karma.c | 3 ++-
+ block/partitions/karma.h | 6 ------
+ 2 files changed, 2 insertions(+), 7 deletions(-)
+ delete mode 100644 block/partitions/karma.h
 
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 560936617d9c..7fecc760b78f 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -42,9 +42,8 @@ int amiga_partition(struct parsed_partitions *state)
- 			goto rdb_done;
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			if (warn_no_part)
--				pr_err("Dev %s: unable to read RDB block %d\n",
--				       bdevname(state->bdev, b), blk);
-+			pr_err("Dev %s: unable to read RDB block %d\n",
-+			       bdevname(state->bdev, b), blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-@@ -85,9 +84,8 @@ int amiga_partition(struct parsed_partitions *state)
- 		blk *= blksize;	/* Read in terms partition table understands */
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			if (warn_no_part)
--				pr_err("Dev %s: unable to read partition block %d\n",
--				       bdevname(state->bdev, b), blk);
-+			pr_err("Dev %s: unable to read partition block %d\n",
-+			       bdevname(state->bdev, b), blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-diff --git a/block/partitions/check.c b/block/partitions/check.c
-index ffe408fead0c..8fe46881ef63 100644
---- a/block/partitions/check.c
-+++ b/block/partitions/check.c
-@@ -37,8 +37,6 @@
- #include "sysv68.h"
- #include "cmdline.h"
+diff --git a/block/partitions/karma.c b/block/partitions/karma.c
+index 59812d705c3d..4d93512f4bd4 100644
+--- a/block/partitions/karma.c
++++ b/block/partitions/karma.c
+@@ -8,9 +8,10 @@
+  */
  
--int warn_no_part = 1; /*This is ugly: should make genhd removable media aware*/
--
- static int (*check_part[])(struct parsed_partitions *) = {
- 	/*
- 	 * Probe partition formats with tables at disk address 0
-@@ -186,9 +184,8 @@ check_partition(struct gendisk *hd, struct block_device *bdev)
- 	/* The partition is unrecognized. So report I/O errors if there were any */
- 		res = err;
- 	if (res) {
--		if (warn_no_part)
--			strlcat(state->pp_buf,
--				" unable to read partition table\n", PAGE_SIZE);
-+		strlcat(state->pp_buf,
-+			" unable to read partition table\n", PAGE_SIZE);
- 		printk(KERN_INFO "%s", state->pp_buf);
- 	}
+ #include "check.h"
+-#include "karma.h"
+ #include <linux/compiler.h>
  
-diff --git a/block/partitions/check.h b/block/partitions/check.h
-index 0fcf80117887..19852b494e93 100644
---- a/block/partitions/check.h
-+++ b/block/partitions/check.h
-@@ -50,6 +50,3 @@ put_partition(struct parsed_partitions *p, int n, sector_t from, sector_t size)
- 		strlcat(p->pp_buf, tmp, PAGE_SIZE);
- 	}
- }
++#define KARMA_LABEL_MAGIC		0xAB56
++
+ int karma_partition(struct parsed_partitions *state)
+ {
+ 	int i;
+diff --git a/block/partitions/karma.h b/block/partitions/karma.h
+deleted file mode 100644
+index 1b5eec57ee0c..000000000000
+--- a/block/partitions/karma.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- *  fs/partitions/karma.h
+- */
 -
--extern int warn_no_part;
--
+-#define KARMA_LABEL_MAGIC		0xAB56
 -- 
 2.24.1
 
