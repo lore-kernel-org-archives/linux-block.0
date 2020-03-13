@@ -2,58 +2,79 @@ Return-Path: <SRS0=f2tN=46=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1625FC4CECE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 14:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC3E8C10DCE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 15:17:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB596206FA
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 14:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A92BB20749
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 15:17:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726836AbgCMOTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Mar 2020 10:19:47 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:57018 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726528AbgCMOTq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Mar 2020 10:19:46 -0400
-Received: from callcc.thunk.org (pool-72-93-95-157.bstnma.fios.verizon.net [72.93.95.157])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 02DEJc1W025673
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Mar 2020 10:19:39 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 6AA70420E5E; Fri, 13 Mar 2020 10:19:38 -0400 (EDT)
-Date:   Fri, 13 Mar 2020 10:19:38 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ext4@vger.kernel.org, reiserfs-devel@vger.kernel.org
-Subject: Re: [PATCH 02/21] block: remove __bdevname
-Message-ID: <20200313141938.GD225435@mit.edu>
-References: <20200312151939.645254-1-hch@lst.de>
- <20200312151939.645254-3-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200312151939.645254-3-hch@lst.de>
+        id S1726571AbgCMPRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Mar 2020 11:17:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39262 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726420AbgCMPR3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Mar 2020 11:17:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id ACF7AAE35;
+        Fri, 13 Mar 2020 15:17:28 +0000 (UTC)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Guenther Roeck <linux@roeck-us.net>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] sata_fsl: fixup compilation errors
+Date:   Fri, 13 Mar 2020 16:17:22 +0100
+Message-Id: <20200313151722.74659-1-hare@suse.de>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 04:19:20PM +0100, Christoph Hellwig wrote:
-> There is no good reason for __bdevname to exist.  Just open code
-> printing the string in the callers.  For three of them the format
-> string can be trivially merged into existing printk statements,
-> and in init/do_mounts.c we can at least do the scnprintf once at
-> the start of the function, and unconditional of CONFIG_BLOCK to
-> make the output for tiny configfs a little more helpful.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fixup compilation errors introduced by the libata DPRINTK rewrite.
 
-Acked-by: Theodore Ts'o <tytso@mit.edu> # for ext4
+Fixes: d9cbc6ab0938 ("sata_fsl: move DPRINTK to ata debugging")
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/ata/sata_fsl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/ata/sata_fsl.c b/drivers/ata/sata_fsl.c
+index 730f6701052c..45c15c4e9f8a 100644
+--- a/drivers/ata/sata_fsl.c
++++ b/drivers/ata/sata_fsl.c
+@@ -315,7 +315,7 @@ static void fsl_sata_set_irq_coalescing(struct ata_host *host,
+ 		"%s: interrupt coalescing, count = 0x%x, ticks = %x\n",
+ 		__func__, intr_coalescing_count, intr_coalescing_ticks);
+ 	dev_dbg(host->dev,
+-		"%s: ICC register status: (hcr base: 0x%x) = 0x%x\n",
++		"%s: ICC register status: (hcr base: 0x%p) = 0x%x\n",
+ 		__func__, hcr_base, ioread32(hcr_base + ICC));
+ }
+ 
+@@ -1381,7 +1381,7 @@ static int sata_fsl_init_controller(struct ata_host *host)
+ 	 * callback, that should also initiate the OOB, COMINIT sequence
+ 	 */
+ 
+-	ata_port_dbg(ap, "HStatus = 0x%x HControl = 0x%x\n",
++	dev_dbg(host->dev, "HStatus = 0x%x HControl = 0x%x\n",
+ 		     ioread32(hcr_base + HSTATUS),
+ 		     ioread32(hcr_base + HCONTROL));
+ 
+@@ -1462,7 +1462,7 @@ static int sata_fsl_probe(struct platform_device *ofdev)
+ 		iowrite32(temp | TRANSCFG_RX_WATER_MARK, csr_base + TRANSCFG);
+ 	}
+ 
+-	ata_port_dbg(ap, "@reset i/o = 0x%x\n", ioread32(csr_base + TRANSCFG));
++	dev_dbg(&ofdev->dev, "@reset i/o = 0x%x\n", ioread32(csr_base + TRANSCFG));
+ 
+ 	host_priv = kzalloc(sizeof(struct sata_fsl_host_priv), GFP_KERNEL);
+ 	if (!host_priv)
+-- 
+2.16.4
+
