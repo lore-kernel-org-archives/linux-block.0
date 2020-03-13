@@ -1,125 +1,89 @@
-Return-Path: <SRS0=va7b=45=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=f2tN=46=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0883AC10DCE
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 22:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98731C10DCE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 00:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4931206CD
-	for <linux-block@archiver.kernel.org>; Thu, 12 Mar 2020 22:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DBAF206EB
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 00:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ecEYYmaR"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dBdEuzW4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbgCLWvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Mar 2020 18:51:53 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:31580 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726513AbgCLWvw (ORCPT
+        id S1726971AbgCMAzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Mar 2020 20:55:01 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:36576 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726620AbgCMAzB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Mar 2020 18:51:52 -0400
+        Thu, 12 Mar 2020 20:55:01 -0400
+Received: by mail-pl1-f193.google.com with SMTP id g2so882420plo.3
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2020 17:55:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1584053513; x=1615589513;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=APmuTEj00jSwH9UdKFoz86SYSwY6N2q5esvdw5Bdl+o=;
-  b=ecEYYmaRVNMS+YIAPUNaFPu4KOI9ow4wXEonCS4K5gw22JkwEjqyNCfj
-   ThnppnmJ9xKzs8xK32WjQ7/YHF3PH36ejOUcqnWCakDGeye545GjBBXdI
-   NxMn91IyDjlQdKJe6tvy5ziR3KXSTBUQvrzHZGDE96zy1Un8pdtWiliHv
-   w=;
-IronPort-SDR: ugjucCAlacrlOlBoX7R+p/ruO8wypS9aieV7ZL/kdFBMiPo3e2F7WuMI4vhcZCTvJ8GlrtvpiT
- e4ImMoCq71Cg==
-X-IronPort-AV: E=Sophos;i="5.70,546,1574121600"; 
-   d="scan'208";a="22562882"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 12 Mar 2020 22:51:50 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id C14F3A277A;
-        Thu, 12 Mar 2020 22:51:46 +0000 (UTC)
-Received: from EX13D01UWB001.ant.amazon.com (10.43.161.75) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 12 Mar 2020 22:51:46 +0000
-Received: from EX13D01UWB002.ant.amazon.com (10.43.161.136) by
- EX13d01UWB001.ant.amazon.com (10.43.161.75) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 12 Mar 2020 22:51:45 +0000
-Received: from EX13D01UWB002.ant.amazon.com ([10.43.161.136]) by
- EX13d01UWB002.ant.amazon.com ([10.43.161.136]) with mapi id 15.00.1497.006;
- Thu, 12 Mar 2020 22:51:45 +0000
-From:   "Singh, Balbir" <sblbir@amazon.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "Chaitanya.Kulkarni@wdc.com" <Chaitanya.Kulkarni@wdc.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "mst@redhat.com" <mst@redhat.com>
-Subject: Re: [PATCH v2 0/5] Add support for block disk resize notification
-Thread-Topic: [PATCH v2 0/5] Add support for block disk resize notification
-Thread-Index: AQHV+MDObGy8ubWnEEm2OFraTMxGPw==
-Date:   Thu, 12 Mar 2020 22:51:45 +0000
-Message-ID: <3c43712ebbd3d4e5c301677a17ec7a301487faa4.camel@amazon.com>
-References: <20200225200129.6687-1-sblbir@amazon.com>
-         <f2b805c1a420a07aa9449ee0ef77766a10e9ff20.camel@amazon.com>
-         <05bb1606-4cf1-dba3-22a0-5f8624b43767@kernel.dk>
-In-Reply-To: <05bb1606-4cf1-dba3-22a0-5f8624b43767@kernel.dk>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.162.115]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FAD689968AC0AB42B571A46AC6393DEB@amazon.com>
-Content-Transfer-Encoding: base64
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KukQCqFuQ52iEK7w5avP5xTjmDq5q5jmKUrg/HJnFFA=;
+        b=dBdEuzW4dXmH1//0aac/JzhJiPT/Jv6GgevIgxkCudRIIbGZ+PrZ0mGhYKid2dLDs1
+         5vD8jsk43pBEcmLDcYXADKomszFsjabrjmqo0Io6kP9tuP28QeU8d/tO5Y2iMDpCB5yG
+         bIOghGnbhbFbfmq+yYy8jSa35I3EEsQJnLZ4BmOq6ex+LQY5GdbVIZjN56poUwFKuNjK
+         q9mFBEdgKW+lFyv9eqLAGTkQHlItXCwKO8FgRJ8itTFFhat50M2SRQ05u3buz10uU0q5
+         3RtgXV7V7MtA6oiJH8Vp9IibKjnCPM8uamzKoWQi7kQi0oc8Ha4QjNP66KveXpEkFO1h
+         XAng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KukQCqFuQ52iEK7w5avP5xTjmDq5q5jmKUrg/HJnFFA=;
+        b=jiTIU4HmFWwiB1wDY0OkBcIKPlJZQNTxk7xoK6yDycNtTCZzLl5BcD0YjoUGXuqsc/
+         X8gIm4/k+vAUE6Qv7rXi1FY3b0XDw2Y1FryBCUm6M0BbGwD8eAJcJMqa3a+eQap/9MG7
+         HMTlCQCekd2Lcx0f4mj3roZRrEmc3Y1EbP7JlRIX3q0T+OWt+4/xerCV0fmeE2weLEC2
+         1S45NjyrX9WDQsN/kItc1noapx9IHq1hXIVDGtAMO2+UttEacxv9iJXUxKDoupJ3E/cO
+         y0WD/IWAYa7cffmqnBQiUAdgCHq14gCnLGQ0RP0+J7Qs54Xn5mK6uA3fO/k/lbfNtQs1
+         20Xw==
+X-Gm-Message-State: ANhLgQ0H60Vk+0uoOAHcGlvBFyN7nmUKMGzhErVPxnZFhbn81/UkjyPO
+        +qOFk5/0bsV5phS6ObSsARgjoQyNw+CY0A==
+X-Google-Smtp-Source: ADFU+vtriuTwZMI7JXVCGxL/TV/G9dsfdzB1UhBFu3cGl6VpfY3w8Pf1oXpu+vw4qJPCoAfm4Pt0Jg==
+X-Received: by 2002:a17:90a:198b:: with SMTP id 11mr7256074pji.23.1584060900474;
+        Thu, 12 Mar 2020 17:55:00 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id p7sm10138453pjp.1.2020.03.12.17.54.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Mar 2020 17:54:59 -0700 (PDT)
+Subject: Re: [PATCH for-5.7/drivers v2 1/1] null_blk: describe the usage of
+ fault injection param
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200312220140.12233-1-dongli.zhang@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3937ffef-5b24-6b11-fac7-172a7e654374@kernel.dk>
+Date:   Thu, 12 Mar 2020 18:54:58 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <20200312220140.12233-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDIwLTAzLTEyIGF0IDA4OjA2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiAN
-Cj4gT24gMy8yLzIwIDk6MDMgUE0sIFNpbmdoLCBCYWxiaXIgd3JvdGU6DQo+ID4gT24gVHVlLCAy
-MDIwLTAyLTI1IGF0IDIwOjAxICswMDAwLCBCYWxiaXIgU2luZ2ggd3JvdGU6DQo+ID4gPiBBbGxv
-dyBibG9jay9nZW5oZCB0byBub3RpZnkgdXNlciBzcGFjZSBhYm91dCBkaXNrIHNpemUgY2hhbmdl
-cyB1c2luZyBhDQo+ID4gPiBuZXcgaGVscGVyIHNldF9jYXBhY2l0eV9yZXZhbGlkYXRlX2FuZF9u
-b3RpZnkoKSwgd2hpY2ggaXMgYSB3cmFwcGVyDQo+ID4gPiBvbiB0b3Agb2Ygc2V0X2NhcGFjaXR5
-KCkuIHNldF9jYXBhY2l0eV9yZXZhbGlkYXRlX2FuZF9ub3RpZnkoKSB3aWxsIG9ubHkNCj4gPiA+
-IG5vdGlmeQ0KPiA+ID4gaWZmIHRoZSBjdXJyZW50IGNhcGFjaXR5IG9yIHRoZSB0YXJnZXQgY2Fw
-YWNpdHkgaXMgbm90IHplcm8gYW5kIHRoZQ0KPiA+ID4gY2FwYWNpdHkgcmVhbGx5IGNoYW5nZXMu
-DQo+ID4gPiANCj4gPiA+IEJhY2tncm91bmQ6DQo+ID4gPiANCj4gPiA+IEFzIGEgcGFydCBvZiBh
-IHBhdGNoIHRvIGFsbG93IHNlbmRpbmcgdGhlIFJFU0laRSBldmVudCBvbiBkaXNrIGNhcGFjaXR5
-DQo+ID4gPiBjaGFuZ2UsIENocmlzdG9waCAoaGNoQGxzdC5kZSkgcmVxdWVzdGVkIHRoYXQgdGhl
-IHBhdGNoIGJlIG1hZGUgZ2VuZXJpYw0KPiA+ID4gYW5kIHRoZSBoYWNrcyBmb3IgdmlydGlvIGJs
-b2NrIGFuZCB4ZW4gYmxvY2sgZGV2aWNlcyBiZSByZW1vdmVkIGFuZA0KPiA+ID4gbWVyZ2VkIHZp
-YSBhIGdlbmVyaWMgaGVscGVyLg0KPiA+ID4gDQo+ID4gPiBUaGlzIHNlcmllcyBjb25zaXN0cyBv
-ZiA1IGNoYW5nZXMuIFRoZSBmaXJzdCBvbmUgYWRkcyB0aGUgYmFzaWMNCj4gPiA+IHN1cHBvcnQg
-Zm9yIGNoYW5naW5nIHRoZSBzaXplIGFuZCBub3RpZnlpbmcuIFRoZSBmb2xsb3cgdXAgcGF0Y2hl
-cw0KPiA+ID4gYXJlIHBlciBibG9jayBzdWJzeXN0ZW0gY2hhbmdlcy4gT3RoZXIgYmxvY2sgZHJp
-dmVycyBjYW4gYWRkIHRoZWlyDQo+ID4gPiBjaGFuZ2VzIGFzIG5lY2Vzc2FyeSBvbiB0b3Agb2Yg
-dGhpcyBzZXJpZXMuIFNpbmNlIG5vdCBhbGwgZGV2aWNlcw0KPiA+ID4gYXJlIHJlc2l6YWJsZSwg
-dGhlIGRlZmF1bHQgd2FzIHRvIGFkZCBhIG5ldyBBUEkgYW5kIGxldCB1c2Vycw0KPiA+ID4gc2xv
-d2x5IGNvbnZlcnQgb3ZlciBhcyBuZWVkZWQuDQo+ID4gPiANCj4gPiA+IFRlc3Rpbmc6DQo+ID4g
-PiAxLiBJIGRpZCBzb21lIGJhc2ljIHRlc3Rpbmcgd2l0aCBhbiBOVk1FIGRldmljZSwgYnkgcmVz
-aXppbmcgaXQgaW4NCj4gPiA+IHRoZSBiYWNrZW5kIGFuZCBlbnN1cmVkIHRoYXQgdWRldmQgcmVj
-ZWl2ZWQgdGhlIGV2ZW50Lg0KPiA+ID4gDQo+ID4gPiANCj4gPiA+IENoYW5nZWxvZyB2MjoNCj4g
-PiA+IC0gUmVuYW1lIGRpc2tfc2V0X2NhcGFjaXR5IHRvIHNldF9jYXBhY2l0eV9yZXZhbGlkYXRl
-X2FuZF9ub3RpZnkNCj4gPiA+IC0gc2V0X2NhcGFjaXR5X3JldmFsaWRhdGVfYW5kX25vdGlmeSBj
-YW4gY2FsbCByZXZhbGlkYXRlIGRpc2sNCj4gPiA+ICAgaWYgbmVlZGVkLCBhIG5ldyBib29sIHBh
-cmFtZXRlciBpcyBwYXNzZWQgKHN1Z2dlc3RlZCBieSBCb2IgTGl1KQ0KPiA+ID4gDQo+ID4gDQo+
-ID4gUGluZz8gSXQncyBub3QgYW4gdXJnZW50IHBhdGNoc2V0LCBJIGFtIGhhcHB5IHRvIHdhaXQg
-aWYgbm90aGluZyBlbHNlIGlzDQo+ID4gbmVlZGVkLg0KPiANCj4gSXQgZG9lc24ndCBhcHBseSB0
-byB0aGUgNS43IGJyYW5jaGVzLCBjYW4geW91IHJlc2VuZCBhZ2FpbnN0IGZvci01LjcvYmxvY2s/
-DQo+IA0KDQpUaGFua3MsIEknbGwgdGFrZSBhIGxvb2suIEkgdXNlZCB0aGUgbGF0ZXN0IG5leHQg
-KG5leHQtMjAyMDAzMTIpIGFuZCByZWJhc2VkDQpvbiBpdC4gSSBnb3QgYSB0aHJlZSB3YXkgbWVy
-Z2Ugc3VjY2VzcyBvbiB4ZW4tYmxrZnJvbnQNCg0KVXNpbmcgaW5kZXggaW5mbyB0byByZWNvbnN0
-cnVjdCBhIGJhc2UgdHJlZS4uLg0KTSAgICAgICBkcml2ZXJzL2Jsb2NrL3hlbi1ibGtmcm9udC5j
-DQpGYWxsaW5nIGJhY2sgdG8gcGF0Y2hpbmcgYmFzZSBhbmQgMy13YXkgbWVyZ2UuLi4NCg0KSSBw
-cmVzdW1lIHlvdSBhcmUgcnVubmluZyBpbnRvIHRoZSBzYW1lIHRoaW5nLg0KDQpJIHdpbGwgcmVz
-ZW5kIHRoZSBwYXRjaGVzIG9uIHRvcCBvZiBuZXh0IHNob3J0bHkNCg0KQmFsYmlyDQoNCg==
+On 3/12/20 4:01 PM, Dongli Zhang wrote:
+> As null_blk is a very good start point to test block layer, this patch
+> adds description and comments to 'timeout', 'requeue' and 'init_hctx' to
+> explain how to use fault injection with null_blk.
+> 
+> The nvme has similar with nvme_core.fail_request in the form of comment.
+
+Applied, thanks.
+
+-- 
+Jens Axboe
+
