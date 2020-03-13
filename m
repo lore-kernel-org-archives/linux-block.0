@@ -2,176 +2,157 @@ Return-Path: <SRS0=f2tN=46=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8868C4CECE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 12:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C03D5C10DCE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 13:09:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A3002074A
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 12:25:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="X0u7MC7z"
+	by mail.kernel.org (Postfix) with ESMTP id 9BD682073E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 13:09:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726461AbgCMMZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Mar 2020 08:25:48 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40908 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726395AbgCMMZs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Mar 2020 08:25:48 -0400
-Received: by mail-qt1-f194.google.com with SMTP id n5so7263665qtv.7
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2020 05:25:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=UYkrJkTJICopbxYzp++SFM74P6/flqGz7rA5nih6jT8=;
-        b=X0u7MC7zFyh5xyepGzwJbWENntur09JgsCJjUH1zi3fWGFsZuVUp8mzxNbM8+RfpGG
-         za6OCQLKw5saqKocV+2OFAMXKcDB4W0bbakAXLmR4m/CR41WvTAIodezZTfsV7+/VZnB
-         jy/MWqftbbYkXgRJfJYxVQYqL+sRnTKHTzxUB6AQ8pyAVquRKRX1sFT2jl1Xy2XN0p6D
-         w+PXxzy5X85hFVRAxOcfPkjzlrPvxao1oI2cgh8J19IAGvLCDQrn+RKdKSoZuNwAdXks
-         hgpW1Hc+gie/oPoMzTph1HCYSD1lZRB3zVsnma7syoneAd/zF2bPDTQW7ewRyNYAtT5r
-         qDoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UYkrJkTJICopbxYzp++SFM74P6/flqGz7rA5nih6jT8=;
-        b=PHPF2b9I/BeyR155C3+H/64HcWZy7K2Ii6rnHDeZYpe8qFO8Wmd/Vvakc/xTdjq0xC
-         F3OuqHCbCTqUc4VPzT+JzSLvYmA7o95toFo96mcGNBtrfrc7JnjCTutVrudxCa/1P3jt
-         vJW/VTCVwpwEvlLXbhRgvFPmhnBk3lWzgMs4PDw7b4EBNjf07icwlgwoMKadVOJppi0v
-         C8pphiCZsLA1VB9a7gjEEV1iw/SO3J9AUvnxvmaGdotTAK6VT+se/MXGzsRRB9vgvE6k
-         2KVssjOa7k7L4BVhTTyk1FFtAqMAQp/3+W9v0NEMuFDQzstTTBHJYa+wB666KjSQd1jY
-         YHXA==
-X-Gm-Message-State: ANhLgQ1nRq1P6aVVqmnia4SvShOKjbJ+moD545QyRht2XiHF79TQcVoV
-        QlW3jnDs8VdaSwLVmEz/Gq6E+A==
-X-Google-Smtp-Source: ADFU+vsxTqFe+oK2/EvGE6ldN25W6mGBLsKd+HpEd2Z9sCC1RFpsSCnD4w4G26P+HmM6mx/SXXCkgg==
-X-Received: by 2002:ac8:775a:: with SMTP id g26mr12000153qtu.125.1584102347455;
-        Fri, 13 Mar 2020 05:25:47 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id 82sm16865838qko.91.2020.03.13.05.25.46
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 13 Mar 2020 05:25:46 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jCjNq-0001ws-7z; Fri, 13 Mar 2020 09:25:46 -0300
-Date:   Fri, 13 Mar 2020 09:25:46 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Subject: Re: [PATCH v10 06/26] RDMA/rtrs: client: main functionality
-Message-ID: <20200313122546.GC31668@ziepe.ca>
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
- <20200311161240.30190-7-jinpu.wang@cloud.ionos.com>
- <20200311190156.GH31668@ziepe.ca>
- <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com>
- <20200312172517.GU31668@ziepe.ca>
- <CAHg0HuxmjWu2V6gN=OTsv3v6aYxDkQN=z4F4gMYAu5Wwvp1qGg@mail.gmail.com>
+        id S1726495AbgCMNJp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Mar 2020 09:09:45 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35946 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726216AbgCMNJp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Mar 2020 09:09:45 -0400
+Received: from dhcp-172-16-24-104.sw.ru ([172.16.24.104])
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1jCk3f-0006yi-J9; Fri, 13 Mar 2020 16:08:59 +0300
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+To:     axboe@kernel.dk
+Cc:     martin.petersen@oracle.com, bob.liu@oracle.com,
+        darrick.wong@oracle.com, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
+ <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+ <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+Message-ID: <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
+Date:   Fri, 13 Mar 2020 16:08:58 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHg0HuxmjWu2V6gN=OTsv3v6aYxDkQN=z4F4gMYAu5Wwvp1qGg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 13, 2020 at 01:18:23PM +0100, Danil Kipnis wrote:
-> > > > calling rcu list iteration without holding rcu_lock is wrong
-> > > This function (add_path) along with the corresponding
-> > > remove_path_from_arr() are the only functions modifying the
-> > > paths_list. In both functions paths_mutex is taken so that they are
-> > > serialized. Since the modification of the paths_list is protected by
-> > > the mutex, the rcu_read_lock is superfluous here.
-> >
-> > Then don't use the _rcu functions.
-> We need to traverse rcu list in the update-side of the code. According
-> to the whatisRCU.rst "if list_for_each_entry_rcu() instance might be
-> used by update-side code...then an additional lockdep expression can
-> be added to its list of arguments..." The would be our case since we
-> always hold a lock when doing this, but I don't see a corresponding
-> API. We can just surround the statement with
-> rcu_readlock/rcu_readunlock to avoid the warning.
+I just don't understand the reason nothing happens :(
+I see newly-sent patches comes fast into block tree.
+But there is only silence... I grepped over Documentation,
+and there is no special rules about block tree. So,
+it looks like standard rules should be applyable.
 
-The only case where you can avoid RCU is if the code is already
-holding a lock preventing writes to the list, in which case you use
-the normal list iterator.
+Some comments? Some requests for reworking? Some personal reasons to ignore my patches?
 
-> > > > > +     /*
-> > > > > +      * @pcpu paths can still point to the path which is going to be
-> > > > > +      * removed, so change the pointer manually.
-> > > > > +      */
-> > > > > +     for_each_possible_cpu(cpu) {
-> > > > > +             struct rtrs_clt_sess __rcu **ppcpu_path;
-> > > > > +
-> > > > > +             ppcpu_path = per_cpu_ptr(clt->pcpu_path, cpu);
-> > > > > +             if (rcu_dereference(*ppcpu_path) != sess)
-> > > >
-> > > > calling rcu_dereference without holding rcu_lock is wrong.
-> > > We only need a READ_ONCE semantic here. ppcpu_path is pointing to the
-> > > last path used for an IO and is used for the round robin multipath
-> > > policy. I guess the call can be changed to rcu_dereference_raw to
-> > > avoid rcu_lockdep warning. The round-robin algorithm has been reviewed
-> > > by Paul E. McKenney, he wrote a litmus test for it:
-> > > https://lkml.org/lkml/2018/5/28/2080.
-> >
-> > You can't call rcu expecting functions without holding the rcu lock -
-> > use READ_ONCE/etc if that is what is really going on
+On 06.03.2020 12:11, Kirill Tkhai wrote:
+> ping
+> 
+> On 13.02.2020 10:55, Kirill Tkhai wrote:
+>> Hi, Jens,
+>>
+>> could you please provide some comments on this? I sent v1 two months ago,
+>> and it would be great to know your vision of the functionality and
+>> the approach and whether it is going to go to block tree.
+>>
+>> Thanks,
+>> Kirill
+>>
+>> On 13.02.2020 10:39, Kirill Tkhai wrote:
+>>> (was "[PATCH block v2 0/3] block: Introduce REQ_NOZERO flag
+>>>       for REQ_OP_WRITE_ZEROES operation";
+>>>  was "[PATCH RFC 0/3] block,ext4: Introduce REQ_OP_ASSIGN_RANGE
+>>>       to reflect extents allocation in block device internals")
+>>>
+>>> v7: Two comments changed.
+>>>
+>>> v6: req_op() cosmetic change.
+>>>
+>>> v5: Kill dm|md patch, which disables REQ_ALLOCATE for these devices.
+>>>     Disable REQ_ALLOCATE for all stacking devices instead of this.
+>>>
+>>> v4: Correct argument for mddev_check_write_zeroes().
+>>>
+>>> v3: Rename REQ_NOZERO to REQ_ALLOCATE.
+>>>     Split helpers to separate patches.
+>>>     Add a patch, disabling max_allocate_sectors inheritance for dm.
+>>>
+>>> v2: Introduce new flag for REQ_OP_WRITE_ZEROES instead of
+>>>     introduction a new operation as suggested by Martin K. Petersen.
+>>>     Removed ext4-related patch to focus on block changes
+>>>     for now.
+>>>
+>>> Information about continuous extent placement may be useful
+>>> for some block devices. Say, distributed network filesystems,
+>>> which provide block device interface, may use this information
+>>> for better blocks placement over the nodes in their cluster,
+>>> and for better performance. Block devices, which map a file
+>>> on another filesystem (loop), may request the same length extent
+>>> on underlining filesystem for less fragmentation and for batching
+>>> allocation requests. Also, hypervisors like QEMU may use this
+>>> information for optimization of cluster allocations.
+>>>
+>>> This patchset introduces REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES,
+>>> which makes a block device to allocate blocks instead of actual
+>>> blocks zeroing. This may be used for forwarding user's fallocate(0)
+>>> requests into block device internals. E.g., in loop driver this
+>>> will result in allocation extents in backing-file, so subsequent
+>>> write won't fail by the reason of no available space. Distributed
+>>> network filesystems will be able to assign specific servers for
+>>> specific extents, so subsequent write will be more efficient.
+>>>
+>>> Patches [1-3/6] are preparation on helper functions, patch [4/6]
+>>> introduces REQ_ALLOCATE flag and implements all the logic,
+>>> patch [5/6] adds one more helper, patch [6/6] adds loop
+>>> as the first user of the flag.
+>>>
+>>> Note, that here is only block-related patches, example of usage
+>>> for ext4 with a performance numbers may be seen in [1].
+>>>
+>>> [1] https://lore.kernel.org/linux-ext4/157599697369.12112.10138136904533871162.stgit@localhost.localdomain/T/#me5bdd5cc313e14de615d81bea214f355ae975db0
+>>> ---
+>>>
+>>> Kirill Tkhai (6):
+>>>       block: Add @flags argument to bdev_write_zeroes_sectors()
+>>>       block: Pass op_flags into blk_queue_get_max_sectors()
+>>>       block: Introduce blk_queue_get_max_write_zeroes_sectors()
+>>>       block: Add support for REQ_ALLOCATE flag
+>>>       block: Add blk_queue_max_allocate_sectors()
+>>>       loop: Add support for REQ_ALLOCATE
+>>>
+>>>
+>>>  block/blk-core.c                    |    6 +++---
+>>>  block/blk-lib.c                     |   17 ++++++++++-------
+>>>  block/blk-merge.c                   |    9 ++++++---
+>>>  block/blk-settings.c                |   17 +++++++++++++++++
+>>>  drivers/block/loop.c                |   20 +++++++++++++-------
+>>>  drivers/md/dm-kcopyd.c              |    2 +-
+>>>  drivers/target/target_core_iblock.c |    4 ++--
+>>>  fs/block_dev.c                      |    4 ++++
+>>>  include/linux/blk_types.h           |    6 ++++++
+>>>  include/linux/blkdev.h              |   34 ++++++++++++++++++++++++++--------
+>>>  10 files changed, 88 insertions(+), 31 deletions(-)
+>>>
+>>> --
+>>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+>>> Reviewed-by: Bob Liu <bob.liu@oracle.com>
+>>>
+>>
+> 
 
-> Look's people are using rcu_dereference_protected when dereferencing
-> rcu pointer in update-side and have an explicit lock to protect it, as
-> we do. Will dig into it next week.
-
-Yes, that is right too
-
-> > > > > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
-> > > > > +                                   struct rtrs_addr *addr)
-> > > > > +{
-> > > > > +     struct rtrs_clt *clt = sess->clt;
-> > > > > +
-> > > > > +     mutex_lock(&clt->paths_mutex);
-> > > > > +     clt->paths_num++;
-> > > > > +
-> > > > > +     /*
-> > > > > +      * Firstly increase paths_num, wait for GP and then
-> > > > > +      * add path to the list.  Why?  Since we add path with
-> > > > > +      * !CONNECTED state explanation is similar to what has
-> > > > > +      * been written in rtrs_clt_remove_path_from_arr().
-> > > > > +      */
-> > > > > +     synchronize_rcu();
-> > > >
-> > > > This makes no sense to me. RCU readers cannot observe the element in
-> > > > the list without also observing paths_num++
-> > > Paths_num is only used to make sure a reader doesn't look for a
-> > > CONNECTED path in the list for ever - instead he makes at most
-> > > paths_num attempts. The reader can in fact observe paths_num++ without
-> > > observing new element in the paths_list, but this is OK. When adding a
-> > > new path we first increase the paths_num and them add the element to
-> > > the list to make sure the reader will also iterate over it. When
-> > > removing the path - the logic is opposite: we first remove element
-> > > from the list and only then decrement the paths_num.
-> >
-> > I don't understand how this explains why synchronize_rcu would be need
-> > here.
-> It is needed here so that readers who read the old (smaller) value of
-> paths_num and are iterating over the list of paths will have a chance
-> to reach the new path we are about to insert. Basically it is here to
-> be symmetrical with the removal procedure: remove path,
-> syncronize_rcu, path_num--.
-
-How do readers see the paths_num before it is inserted into the list?
-
-Jason
