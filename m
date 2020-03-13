@@ -2,112 +2,114 @@ Return-Path: <SRS0=f2tN=46=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24B8C5ACC0
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 18:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1147C2BB1D
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 19:43:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A6AA20716
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 18:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B71E9206EB
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 19:43:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="Mw+VFPC1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLmZhN2g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbgCMSrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Mar 2020 14:47:35 -0400
-Received: from mail-qt1-f173.google.com ([209.85.160.173]:44695 "EHLO
-        mail-qt1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727064AbgCMSrf (ORCPT
+        id S1726543AbgCMTnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Mar 2020 15:43:50 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:40458 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726477AbgCMTnu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Mar 2020 14:47:35 -0400
-Received: by mail-qt1-f173.google.com with SMTP id h16so8412056qtr.11
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2020 11:47:34 -0700 (PDT)
+        Fri, 13 Mar 2020 15:43:50 -0400
+Received: by mail-qt1-f194.google.com with SMTP id n5so8625621qtv.7
+        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2020 12:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=mj7rGF7ON3Eo/FvVmngslw/F8fURXQu1EMn3nTTBUPQ=;
-        b=Mw+VFPC1w0UbdRMWSYVpgl8XZWcn/xyU7HjgZBjymT1LdxHLk54OdU9J7RryeWrV6G
-         pmCAsvxCw6XBIrR2Z5DSa9CfEeJcGKuh/zQ62J5GrmsM23BnS/TkQOWWIGVCT/cPUhnP
-         mm/zvQEUeE+q3yK42lamLdvqmphm2Ot6wWUJv1CQBEctQWHl5XrvfaJBRTO78Y/uEQWX
-         1l7qCdw3dlmrC8UvDgfJkqLAkCDAm4l7/mSIUZHe+CJjQxziWFJmZIyA+x8UAD/HVCqX
-         kJqpDXv5yS7j0ShkpKY8fpwCpz07OokC7FALZ+xhU7HVgk00IIS+O4y9al6ahGYBMuiP
-         ykgA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=ggG97PMSFtpsrNjyvM6qaaI0TkTeIbIfJ8gHIBPy3iw=;
+        b=QLmZhN2gOWV8dz/BPa0tRXjbumSbMTvYedK+AQNZ6Fzv2rVt1A+FOQygFFQsLMXsid
+         9Q9pfiQiwzk2iAx2WWmYVLvfso6sxp33Y7GaYX+je+NCQIHqardDmg0HmaXwmlubMNKK
+         e9L3t96sYJTta0EMPhoPVNpRUtopBaw9hoEMDKUVO6N5kCPR8sqzpVQJIkcR+E6tbMSK
+         euoPUMtw+YkJsM4PmE4/sxU1Jq+dOJfnYNAIEvhxvKcFv4s5TBU95TeJtawR2q6WJ5nJ
+         rThDuPqRHO7gnDMMPNy8v4nT4KRicbl+tCisIOdJ5RnGO2ByweqoZ7jjYPFrSf2pskVX
+         RenQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=mj7rGF7ON3Eo/FvVmngslw/F8fURXQu1EMn3nTTBUPQ=;
-        b=OJfoTSCD5t0V8KvA8dI8G9fPaFemdJE31Q64UxQtyJ1ebFD3/4VQJj7e7bbG5FZEUn
-         B3bJwpbL5J2JBJQIiBeRimgn2wuFvqhGiSbm3RgovJjZ9sgmjvZF71grqiEIXt64uEGl
-         D/+Quy1jcVDXGcFlNFG6fqzhZhvNjiuoNXg4LyLnz4MvHWyjarSvvj5fitNFBL9jevpN
-         fTtRtPNuazLlIp2htYsoJ9oyTXH56seCPgYQ2q59lOkCR9sX7jxfCinX8mKjwp+OnNox
-         PimF+GAgce7sgUDp5vzzzKIgnAa+zLyXhUuTSX/93idryJElpQb/hn1kbwRk7XTv95yG
-         Tkjg==
-X-Gm-Message-State: ANhLgQ0M9pH63pwwvKivvmZieZDBw6hvfYn6JMGTGdSPDnv4Qv4vFi83
-        cObKnx+ew/SDutmPoW/0jRkElg==
-X-Google-Smtp-Source: ADFU+vt5NDaayPMUHsXSY8k4ZwE0SyPb1aBxsDRcUQaLRF+uXaXF3f1cbfLoYMcPhiB48Es6cJN9Mg==
-X-Received: by 2002:aed:2202:: with SMTP id n2mr14466967qtc.4.1584125254322;
-        Fri, 13 Mar 2020 11:47:34 -0700 (PDT)
-Received: from [192.168.1.106] ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id w1sm14917915qkc.117.2020.03.13.11.47.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Mar 2020 11:47:33 -0700 (PDT)
-To:     lsf-pc <lsf-pc@lists.linuxfoundation.org>
-Cc:     Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvme@vger.kernel.org" <linux-nvme@vger.kernel.org>
-From:   Josef Bacik <josef@toxicpanda.com>
-Subject: LSF/MM/BPF 2020: Postponement announcement
-Message-ID: <e4f390c7-3b25-67c8-5d6d-d7e87ba1c072@toxicpanda.com>
-Date:   Fri, 13 Mar 2020 14:47:32 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ggG97PMSFtpsrNjyvM6qaaI0TkTeIbIfJ8gHIBPy3iw=;
+        b=rrAVwsbMYhEncxtZG0fh0RhlikhDTkcGsbOBdOBiGQDpJC+7qjOP732lj8Re4YC+NB
+         ZolVKZgHHHfje1oebOPzXN9hprKXvvhAbn3m8hkwXQbqRuN+6OuWl/FRtWrCXFS1ZeBu
+         kRhtx02cNCDjRwsuW9EC4qJm1E9tj9MfvmaxLbigiG32g7OYFy/xMG6gdq6QIxopo+u8
+         weIZziyHFywDNG2ESMLs0NUxiGQbbohzYO0E9H1u2nRJtg/pEj4U+JWOPefNEA9ggEEy
+         1gm/x7B+GNm0Oq51/gdtUWXi8p11LoWIIuQkgdiZbj9nS1NzEn4W8ssmdaNQkPJlb+wk
+         Y0Vg==
+X-Gm-Message-State: ANhLgQ3JLlPE5DsADatrtqIuwV4Yw8yW966j+dBYPrr52ykbSWAwtJ/m
+        tB4yxlHCXnHMhExMAFUkmAs=
+X-Google-Smtp-Source: ADFU+vv1uk6zK8YSIzT+gB4C0gde/Msf/gzpVKsXwrz497FmbQqlnf502eYsMctmP/MmvubvnrESiw==
+X-Received: by 2002:aed:32e7:: with SMTP id z94mr14163378qtd.382.1584128629191;
+        Fri, 13 Mar 2020 12:43:49 -0700 (PDT)
+Received: from localhost.localdomain ([129.10.122.21])
+        by smtp.gmail.com with ESMTPSA id w30sm6102140qtw.21.2020.03.13.12.43.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 13 Mar 2020 12:43:48 -0700 (PDT)
+From:   Changming Liu <charley.ashbringer@gmail.com>
+X-Google-Original-From: Changming Liu <liu.changm@northeastern.edu>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        Changming Liu <liu.changm@northeastern.edu>
+Subject: [PATCH] block: fix integer overflow in blk_ioctl_discard()
+Date:   Fri, 13 Mar 2020 15:43:01 -0400
+Message-Id: <1584128581-31058-1-git-send-email-liu.changm@northeastern.edu>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+The the sum of two uint64_t integers, start and len, might overflow. This leads to bypassing the check in "start + len > i_size_read(bdev->bd_inode)", and passed to truncate_inode_pages_range() as the 3rd parameter.
 
-Unfortunately given the escalating nature of the response to COVID-19 we are
-making the decision to change the original LSF/MM/BPF dates in April 2020.  We
-currently do not have concrete plans about how we will reschedule, the Linux
-Foundation is working very hard at getting us alternative dates as we speak.
-Once the new plans are concretely made we will notify everyone again with the
-new plans.
+To fix this, also in accord with the patch 22dd6d356628bccb1a83e12212ec2934f4444e2c, the sum of these 2 integers are stored in another variable, and compared with start to make sure it will not overflow. Otherwise return -EINVAL properly.
 
-The tentative plan is to keep the attendees as they are if we reschedule within
-2020.  This includes anybody that declined for travel related concerns.  We will
-re-send all invitations again to the original invitees so it's clear that you
-have been invited.
+Signed-off-by: Changming Liu <liu.changm@northeastern.edu>
+---
+ block/ioctl.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-If we have to reschedule into 2021 then we will redo the CFP once we are closer
-to the actual date again and redo all of the invites and topics so we're as up
-to date as possible with the current state of the community.
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 127194b..4347d1f 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -207,7 +207,7 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg, unsigned long flags)
+ {
+ 	uint64_t range[2];
+-	uint64_t start, len;
++	uint64_t start, len, end;
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct address_space *mapping = bdev->bd_inode->i_mapping;
+ 
+@@ -223,14 +223,17 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 
+ 	start = range[0];
+ 	len = range[1];
++  end = start + len - 1;
+ 
+ 	if (start & 511)
+ 		return -EINVAL;
+ 	if (len & 511)
+ 		return -EINVAL;
+-
+-	if (start + len > i_size_read(bdev->bd_inode))
++	if (end >= (uint64_t)i_size_read(bdev->bd_inode))
+ 		return -EINVAL;
++  if(end < start)
++    return -EINVAL;
++
+ 	truncate_inode_pages_range(mapping, start, start + len - 1);
+ 	return blkdev_issue_discard(bdev, start >> 9, len >> 9,
+ 				    GFP_KERNEL, flags);
+-- 
+2.7.4
 
-We will keep the current program committee and I will continue to chair until we
-have the next LSF/MM/BPF.
-
-Thank you on behalf of the program committee:
-
-         Josef Bacik (Filesystems)
-         Amir Goldstein (Filesystems)
-         Martin K. Petersen (Storage)
-         Omar Sandoval (Storage)
-         Michal Hocko (MM)
-         Dan Williams (MM)
-         Alexei Starovoitov (BPF)
-         Daniel Borkmann (BPF)
