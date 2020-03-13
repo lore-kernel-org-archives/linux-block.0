@@ -3,101 +3,322 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4DBC10DCE
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 11:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BC7C10DCE
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 12:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C822820724
-	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 11:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC5A220724
+	for <linux-block@archiver.kernel.org>; Fri, 13 Mar 2020 12:18:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCsuoAgA"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="LdNNpa2x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbgCML3w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Mar 2020 07:29:52 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36895 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726492AbgCML3w (ORCPT
+        id S1726550AbgCMMSf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Mar 2020 08:18:35 -0400
+Received: from mail-il1-f194.google.com ([209.85.166.194]:46201 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726479AbgCMMSf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Mar 2020 07:29:52 -0400
-Received: by mail-io1-f67.google.com with SMTP id k4so8995991ior.4
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2020 04:29:50 -0700 (PDT)
+        Fri, 13 Mar 2020 08:18:35 -0400
+Received: by mail-il1-f194.google.com with SMTP id e8so8639396ilc.13
+        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2020 05:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=PoMJmL1hnneo2X5SSA9aG8mLu/s7Lqr0F3n7IPTI+3I=;
-        b=TCsuoAgA16VfGLqWrxwK92fMnelLGfJ6UM+ghAKatLatdLRXx/6AF/FaRxqEW2GBey
-         85J/T3jApJQAebtm85xBCudeMnizqiVmEvt0AKY3r/MZ67TYL/yrqzeWoBajXzvruDdE
-         jHXMWIA7ELrY/ibXLZxIBbpSDpJiUiA2nv7yce15gbMoOR3F34c+KU+JiJfVMf0LgGnu
-         pO7W+OmvqEARsGwWl8nV08DOcShvg5+431I/UaWWUiJS1botO2R1PG3gaAT6UOLO/fPL
-         9/Aj+SHoda4J21X7jxEpb2xQKH8JxMVW+oJ5x8+5h/ejyp5BzzyI652jS7nrdylN0urT
-         c2BA==
+        bh=r7ST00huZYUeo/fS6kEvpdxOYRKGflJTP8aqRKHEY20=;
+        b=LdNNpa2xCSBm+HSukQPY1iweNG/j1+i+Upzp1UEFDyc/tmrY3kbGhfsdDmxhR5XaqP
+         gsY6BsRf9qzmObMDRHm0XIrwofZJnX1lZXeTNLlEydIy1VL8+uHY/WxGmz7KMQelNLa/
+         gMQxkOvhBGseSEWMA8uZOYnLvC7DOwhtSUxb5bO7zBfRb8i0nW5iYrscdsTtjERLdqNt
+         RI9xNpHtDHuHAhBg7kxp0C4N4CYDk2oVkjC6l/1TaCzu7eFXjVDHonirEuj+0vDcR01P
+         AlBSoyRk4dV0SVtewatP5YGhkmlmVaEnDD9Nnt19snAjTyK2doLFATAvUhcTQpwec/jc
+         zX0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=PoMJmL1hnneo2X5SSA9aG8mLu/s7Lqr0F3n7IPTI+3I=;
-        b=Vak9bm4Le5fcmhwKes9y30SQIOT+lREAPp2hPXKCommxWWQZ8mK3ptew1YKz6W9r+k
-         UOD5rkitSvVvWEWvCwJMq78QxjcPcu7PXr+MMqmdu7JINLff5XdvZxjQJZ7NeiNn7Nyl
-         K6vGLBHn106/2rT7euz3w8JLGhwY++lJPYQZ0G7SI0yj2lqmzrZhJuq9Q3XScBo6KUE6
-         BJgDrILIpyeTXd/Pv3zZivz6gS1SOLAMVRiGwqF8rw+queolB8ylohng4brjmtfTBL6P
-         QPuL3kgkUNkRkH0Z9tyJ4jZRvZJelyM7h1wOeyzUiaouJUFsEMQv0pCVJ5s2aEF04lbT
-         v/vg==
-X-Gm-Message-State: ANhLgQ0542+dlBYb8VOHIb240t6Nznk8cHXl/hwFY0LYwCXz78V27dDM
-        dDj4gVMw2IhKhBbJDPFPXmI5EjuVNLi/F+KYmVE=
-X-Google-Smtp-Source: ADFU+vslRAaDjBcQEc5evPtf5FaenUKJEM2egGZk75hkSAx/ZXDN7M2d2HUaVgWHXua/POZ82w1bxrhz2uM0aZlZJvc=
-X-Received: by 2002:a6b:784a:: with SMTP id h10mr8283286iop.64.1584098989678;
- Fri, 13 Mar 2020 04:29:49 -0700 (PDT)
+        bh=r7ST00huZYUeo/fS6kEvpdxOYRKGflJTP8aqRKHEY20=;
+        b=pNCVyx/CEUSg0APm8kVFcY6G/R0f5Mwh9oj4HUAtYhgsD6kR+Dz2YBRzvzm+Mqr1BK
+         OH0amTqmYSofmj05Pc8kvmK8WR7iCahNWZWDvIBdAu2Yho3tAHVZk490ZBJTm9JvU1jC
+         N4XTBP+RJ34MiTQx4rDJS4N89bnIIUAAoyQT1VY+aDJDsxUF9qN6acDxUSAH1RRDS9Ow
+         NMG0gMRf6MQGXmINKIfFfVYA8jeraSqmrKok+cpMaSwnrqnLRuR1HSHqVDSFKoK7x5ih
+         +sttyDdgqnk5xYUynVI4/9h29sjaU9nZ/I5DaDSRh71S7naw5bLJMG4i4j2DkZk9++Mu
+         NG4g==
+X-Gm-Message-State: ANhLgQ2NPkKub2JpVu4+QtCOR21E2mumqFHLWrEk9UdqB2h+pWWzHzq1
+        blPZJxKG7sKVeeFxCmEgWjyc5DKoam6ffILixIH6
+X-Google-Smtp-Source: ADFU+vv1KXqgocUuWLvBd9Z6WyCV+ZtXs+wse0G9xaLeTtAmGbdI0kdkpV8DtopAWz+to1zHKJxMXtXtoO9IJuLVd3M=
+X-Received: by 2002:a92:8b8b:: with SMTP id i133mr12694437ild.307.1584101913875;
+ Fri, 13 Mar 2020 05:18:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200228064030.16780-1-houpu@bytedance.com> <b407f0d1-f07c-4d6b-9657-bb296557ff50@kernel.dk>
-In-Reply-To: <b407f0d1-f07c-4d6b-9657-bb296557ff50@kernel.dk>
-From:   Hou Pu <houpu.main@gmail.com>
-Date:   Fri, 13 Mar 2020 19:29:38 +0800
-Message-ID: <CAKHcvQidfK_04_BxLL_kVBC7e7+eeAfSX=W=8Xyi-HNU0NQ0OQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] nbd: requeue request if only one connection is configured
-To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Mike Christie <mchristi@redhat.com>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        Hou Pu <houpu@bytedance.com>
+References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
+ <20200311161240.30190-7-jinpu.wang@cloud.ionos.com> <20200311190156.GH31668@ziepe.ca>
+ <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com> <20200312172517.GU31668@ziepe.ca>
+In-Reply-To: <20200312172517.GU31668@ziepe.ca>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Fri, 13 Mar 2020 13:18:23 +0100
+Message-ID: <CAHg0HuxmjWu2V6gN=OTsv3v6aYxDkQN=z4F4gMYAu5Wwvp1qGg@mail.gmail.com>
+Subject: Re: [PATCH v10 06/26] RDMA/rtrs: client: main functionality
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 9:59 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 2/27/20 11:40 PM, Hou Pu wrote:
-> > Hello,
-> >
-> > NBD server could be upgraded if we have multiple connections.
-> > But if we have only one connection, after we take down NBD server,
-> > all inflight IO could finally timeout and return error. These
-> > patches fix this using current reconfiguration framework.
-> >
-> > I noticed that Mike has following patchset
-> >
-> > nbd: local daemon restart support
-> > https://lore.kernel.org/linux-block/5DD41C49.3080209@redhat.com/
-> >
-> > It add another netlink interface (NBD_ATTR_SWAP_SOCKETS) and requeue
-> > request immediately after recongirure/swap socket. It do not need to
-> > wait for timeout to fire and requeue in timeout handler, which seems more
-> > like an improvement. Let fix this in current framework first.
-> >
-> > Changes compared to v2:
-> > Fix comments in nbd_read_stat() to be aligned with the code change
-> > suggested by Mike Christie.
->
-> Applied for 5.7.
+Hi Jason,
 
-Thanks.
-And also thanks Josef and Mike for the review.
+On Thu, Mar 12, 2020 at 6:25 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Thu, Mar 12, 2020 at 06:10:06PM +0100, Danil Kipnis wrote:
+> > Hi Jason,
+> >
+> > On Wed, Mar 11, 2020 at 8:01 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Wed, Mar 11, 2020 at 05:12:20PM +0100, Jack Wang wrote:
+> > > > +static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_sess *sess)
+> > > > +{
+> > > > +     struct rtrs_clt *clt = sess->clt;
+> > > > +     struct rtrs_clt_sess *next;
+> > > > +     bool wait_for_grace = false;
+> > > > +     int cpu;
+> > > > +
+> > > > +     mutex_lock(&clt->paths_mutex);
+> > > > +     list_del_rcu(&sess->s.entry);
+> > > > +
+> > > > +     /* Make sure everybody observes path removal. */
+> > > > +     synchronize_rcu();
+> > > > +
+> > > > +     /*
+> > > > +      * At this point nobody sees @sess in the list, but still we have
+> > > > +      * dangling pointer @pcpu_path which _can_ point to @sess.  Since
+> > > > +      * nobody can observe @sess in the list, we guarantee that IO path
+> > > > +      * will not assign @sess to @pcpu_path, i.e. @pcpu_path can be equal
+> > > > +      * to @sess, but can never again become @sess.
+> > > > +      */
+> > > > +
+> > > > +     /*
+> > > > +      * Decrement paths number only after grace period, because
+> > > > +      * caller of do_each_path() must firstly observe list without
+> > > > +      * path and only then decremented paths number.
+> > > > +      *
+> > > > +      * Otherwise there can be the following situation:
+> > > > +      *    o Two paths exist and IO is coming.
+> > > > +      *    o One path is removed:
+> > > > +      *      CPU#0                          CPU#1
+> > > > +      *      do_each_path():                rtrs_clt_remove_path_from_arr():
+> > > > +      *          path = get_next_path()
+> > > > +      *          ^^^                            list_del_rcu(path)
+> > > > +      *          [!CONNECTED path]              clt->paths_num--
+> > > > +      *                                              ^^^^^^^^^
+> > > > +      *          load clt->paths_num                 from 2 to 1
+> > > > +      *                    ^^^^^^^^^
+> > > > +      *                    sees 1
+> > > > +      *
+> > > > +      *      path is observed as !CONNECTED, but do_each_path() loop
+> > > > +      *      ends, because expression i < clt->paths_num is false.
+> > > > +      */
+> > > > +     clt->paths_num--;
+> > > > +
+> > > > +     /*
+> > > > +      * Get @next connection from current @sess which is going to be
+> > > > +      * removed.  If @sess is the last element, then @next is NULL.
+> > > > +      */
+> > > > +     next = list_next_or_null_rr_rcu(&clt->paths_list, &sess->s.entry,
+> > > > +                                     typeof(*next), s.entry);
+> > >
+> > > calling rcu list iteration without holding rcu_lock is wrong
+> > This function (add_path) along with the corresponding
+> > remove_path_from_arr() are the only functions modifying the
+> > paths_list. In both functions paths_mutex is taken so that they are
+> > serialized. Since the modification of the paths_list is protected by
+> > the mutex, the rcu_read_lock is superfluous here.
+>
+> Then don't use the _rcu functions.
+We need to traverse rcu list in the update-side of the code. According
+to the whatisRCU.rst "if list_for_each_entry_rcu() instance might be
+used by update-side code...then an additional lockdep expression can
+be added to its list of arguments..." The would be our case since we
+always hold a lock when doing this, but I don't see a corresponding
+API. We can just surround the statement with
+rcu_readlock/rcu_readunlock to avoid the warning.
 
 >
-> --
-> Jens Axboe
+> > >
+> > > > +     /*
+> > > > +      * @pcpu paths can still point to the path which is going to be
+> > > > +      * removed, so change the pointer manually.
+> > > > +      */
+> > > > +     for_each_possible_cpu(cpu) {
+> > > > +             struct rtrs_clt_sess __rcu **ppcpu_path;
+> > > > +
+> > > > +             ppcpu_path = per_cpu_ptr(clt->pcpu_path, cpu);
+> > > > +             if (rcu_dereference(*ppcpu_path) != sess)
+> > >
+> > > calling rcu_dereference without holding rcu_lock is wrong.
+> > We only need a READ_ONCE semantic here. ppcpu_path is pointing to the
+> > last path used for an IO and is used for the round robin multipath
+> > policy. I guess the call can be changed to rcu_dereference_raw to
+> > avoid rcu_lockdep warning. The round-robin algorithm has been reviewed
+> > by Paul E. McKenney, he wrote a litmus test for it:
+> > https://lkml.org/lkml/2018/5/28/2080.
 >
+> You can't call rcu expecting functions without holding the rcu lock -
+> use READ_ONCE/etc if that is what is really going on
+Look's people are using rcu_dereference_protected when dereferencing
+rcu pointer in update-side and have an explicit lock to protect it, as
+we do. Will dig into it next week.
+
+>
+> > >
+> > > > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
+> > > > +                                   struct rtrs_addr *addr)
+> > > > +{
+> > > > +     struct rtrs_clt *clt = sess->clt;
+> > > > +
+> > > > +     mutex_lock(&clt->paths_mutex);
+> > > > +     clt->paths_num++;
+> > > > +
+> > > > +     /*
+> > > > +      * Firstly increase paths_num, wait for GP and then
+> > > > +      * add path to the list.  Why?  Since we add path with
+> > > > +      * !CONNECTED state explanation is similar to what has
+> > > > +      * been written in rtrs_clt_remove_path_from_arr().
+> > > > +      */
+> > > > +     synchronize_rcu();
+> > >
+> > > This makes no sense to me. RCU readers cannot observe the element in
+> > > the list without also observing paths_num++
+> > Paths_num is only used to make sure a reader doesn't look for a
+> > CONNECTED path in the list for ever - instead he makes at most
+> > paths_num attempts. The reader can in fact observe paths_num++ without
+> > observing new element in the paths_list, but this is OK. When adding a
+> > new path we first increase the paths_num and them add the element to
+> > the list to make sure the reader will also iterate over it. When
+> > removing the path - the logic is opposite: we first remove element
+> > from the list and only then decrement the paths_num.
+>
+> I don't understand how this explains why synchronize_rcu would be need
+> here.
+It is needed here so that readers who read the old (smaller) value of
+paths_num and are iterating over the list of paths will have a chance
+to reach the new path we are about to insert. Basically it is here to
+be symmetrical with the removal procedure: remove path,
+syncronize_rcu, path_num--.
+
+>
+> > > > +static void rtrs_clt_close_work(struct work_struct *work)
+> > > > +{
+> > > > +     struct rtrs_clt_sess *sess;
+> > > > +
+> > > > +     sess = container_of(work, struct rtrs_clt_sess, close_work);
+> > > > +
+> > > > +     cancel_delayed_work_sync(&sess->reconnect_dwork);
+> > > > +     rtrs_clt_stop_and_destroy_conns(sess);
+> > > > +     /*
+> > > > +      * Sounds stupid, huh?  No, it is not.  Consider this sequence:
+> > >
+> > > It sounds stupid because it is stupid. cancel_work is a giant race if
+> > > some other action hasn't been taken to block parallel threads from
+> > > calling queue_work before calling cancel_work.
+> > Will double check. It might be possible to avoid the second call to
+> > the cancel_delayed_work_sync().
+>
+> I would have guessed first call.. Before doing cancel_work something
+> must have prevented new work from being created.
+Will look look into it, thanks.
+>
+> > > > +     err = rtrs_clt_create_sysfs_root_folders(clt);
+> > >
+> > > sysfs creation that is not done as part of device_regsiter races with
+> > > udev.
+> > We only use device_register() to create
+> > /sys/class/rtrs_client/<sessionname> sysfs directory. We then create
+> > some folders and files inside this directory (i.e. paths/,
+> > multipath_policy, etc.). Do you mean that the uevent is generated
+> > before we create those subdirectories? How can the creation of this
+> > subdirectories and files be integrated into the device_register()
+> > call?
+>
+> Yes the uevent..
+>
+> Limited types of sysfs files can be created with the group scheme.
+>
+> Others need to manipulate the uevent unfortunately, see how ib device
+> registration works
+Will check it out, thank you.
+
+>
+> > > > +struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+> > > > +                              const char *sessname,
+> > > > +                              const struct rtrs_addr *paths,
+> > > > +                              size_t paths_num,
+> > > > +                              u16 port,
+> > > > +                              size_t pdu_sz, u8 reconnect_delay_sec,
+> > > > +                              u16 max_segments,
+> > > > +                              s16 max_reconnect_attempts)
+> > > > +{
+> > > > +     struct rtrs_clt_sess *sess, *tmp;
+> > > > +     struct rtrs_clt *clt;
+> > > > +     int err, i;
+> > > > +
+> > > > +     clt = alloc_clt(sessname, paths_num, port, pdu_sz, ops->priv,
+> > > > +                     ops->link_ev,
+> > > > +                     max_segments, reconnect_delay_sec,
+> > > > +                     max_reconnect_attempts);
+> > > > +     if (IS_ERR(clt)) {
+> > > > +             err = PTR_ERR(clt);
+> > > > +             goto out;
+> > > > +     }
+> > > > +     for (i = 0; i < paths_num; i++) {
+> > > > +             struct rtrs_clt_sess *sess;
+> > > > +
+> > > > +             sess = alloc_sess(clt, &paths[i], nr_cpu_ids,
+> > > > +                               max_segments);
+> > > > +             if (IS_ERR(sess)) {
+> > > > +                     err = PTR_ERR(sess);
+> > > > +                     goto close_all_sess;
+> > > > +             }
+> > > > +             list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
+> > > > +
+> > > > +             err = init_sess(sess);
+> > > > +             if (err)
+> > > > +                     goto close_all_sess;
+> > > > +
+> > > > +             err = rtrs_clt_create_sess_files(sess);
+> > > > +             if (err)
+> > > > +                     goto close_all_sess;
+> > > > +     }
+> > > > +     err = alloc_permits(clt);
+> > > > +     if (err)
+> > > > +             goto close_all_sess;
+> > > > +     err = rtrs_clt_create_sysfs_root_files(clt);
+> > > > +     if (err)
+> > > > +             goto close_all_sess;
+> > > > +
+> > > > +     /*
+> > > > +      * There is a race if someone decides to completely remove just
+> > > > +      * newly created path using sysfs entry.  To avoid the race we
+> > > > +      * use simple 'opened' flag, see rtrs_clt_remove_path_from_sysfs().
+> > > > +      */
+> > > > +     clt->opened = true;
+> > >
+> > > A race solution without locks?
+> > We wanted to make sure that a path belonging to a session currently
+> > being established can't be removed from sysfs before the establishment
+> > is finished.
+>
+> There are still no locks, so this solution to races is probably racey.
+Will try to get rid of the flag.
+>
+> Jason
