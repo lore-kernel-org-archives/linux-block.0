@@ -2,190 +2,140 @@ Return-Path: <SRS0=XUQF=5A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.3 required=3.0 tests=DATE_IN_PAST_06_12,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD61C1975A
-	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 01:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C4D2C0044D
+	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 02:47:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AED4B2076A
-	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 01:33:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KW2cooRS"
+	by mail.kernel.org (Postfix) with ESMTP id 0792B20650
+	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 02:47:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbgCOBdv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 Mar 2020 21:33:51 -0400
-Received: from mail-pf1-f174.google.com ([209.85.210.174]:42292 "EHLO
-        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726652AbgCOBdv (ORCPT
+        id S1727076AbgCOCrC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 Mar 2020 22:47:02 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40457 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbgCOCrC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Mar 2020 21:33:51 -0400
-Received: by mail-pf1-f174.google.com with SMTP id x2so7315958pfn.9
-        for <linux-block@vger.kernel.org>; Sat, 14 Mar 2020 18:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JGXAXivUWhookJzvhdY3H9q1Gm3tmXD7ABYuLmVnXJo=;
-        b=KW2cooRShutHVBMS2/HGQQsXxCEaJFWbK9PZ/2wfoXK27NHTZfhz4FqfrynEpw3dM6
-         p/FoMruesgv7n3cNwtXWZmaWR3EW02jFZKk8OuDCt8jUwQfOCWc/wHqiQi42dfJfgy1H
-         9EAUi/YncFPw/8miEWK22uXZ/2EXWAAr6iKFKrcCTLWisP8K5MFpuHjAe+rswjzOJ+c6
-         Iq+T7LSBrRDO/jgwZkshDqa8Wqs//m2AGRPBk9JautiGPtTH4ZQBsMchZEF2oR07Lo8Z
-         fElRPrYXibWdLDVM1QYDHXsqJr3AP/o5V4Xg3yEtDqIqQIrFFAuqQ8M7OI68Nq3W8Hp5
-         uXmQ==
+        Sat, 14 Mar 2020 22:47:02 -0400
+Received: by mail-pg1-f196.google.com with SMTP id t24so7453882pgj.7
+        for <linux-block@vger.kernel.org>; Sat, 14 Mar 2020 19:47:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JGXAXivUWhookJzvhdY3H9q1Gm3tmXD7ABYuLmVnXJo=;
-        b=IyrFMLFpAqqBnxxBhnc6O7Zx4Ma4Wh+x/tT5tK1O7XYvCNlLZ95V9NJ4M8a/lYxK81
-         9oq8hVcF3ZMICO+DEBWUQ7ZvUiiVDakJGy/CK5B9dN2fTERmhX3+bNfIc7K+S8GA0dMZ
-         4bBx9vaO22axULbeW6+Z7YaDF3+CWQk7mSXkmRz7A2RHC58uckKNFajYYy0ZufHRwb4b
-         2mK58IDxQ16edEJQR6ApSjuYrEiB0K46CnsISjhBU21mjjNRhFoXsJ0tob1OLdtAnAQf
-         1MJrWz3H6ZGqpBWQ9mMmCHrUI+XFEn6+EvetA/q7f99pX2wUpouh1V6rV4KSmuBrS/KC
-         EwTQ==
-X-Gm-Message-State: ANhLgQ1qry4ugD+rxfIGS+gr8ZGZ8vDY0uhLp4tk6Jgqo4EchNqSdJ+z
-        odA4IzXKaFNow9ahsvHkQfkBJazIioCxO6nkvtGrso09iApfPg==
-X-Google-Smtp-Source: ADFU+vvLUlPlBF85pvUtOeYaXjoTCZnlylPF2nB1gPyHPgvcb3MHRzxtJf1h5b6gfQ4sOB2vIM0nCGZgwqHL4C0x5Dk=
-X-Received: by 2002:a65:64ca:: with SMTP id t10mr4120644pgv.190.1584207813366;
- Sat, 14 Mar 2020 10:43:33 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3zkHpbIsmkUwu9U78T8mJG88teTa+jkQo5jbm0uzU5E=;
+        b=ALRHe2g+csYjU62Q0oXGsO93Fwq/rSlsdELP8GMrxKHhIeISRNuCMn/Q2FqUtByAm2
+         gCChUQPElZOJsPGANRp9nBBIAxZcrOyAYr8b/7qYOTGHzrhtlrh+ffJZweyVBBNGbYJm
+         m+2GXMcDKennzXN29XySj1x5vKQkOFmST4KdvJ50bd3C/JHvFunRu7z7sfbmMQy5TaB8
+         +fHmBzmDL+DqjIv5KQTmv4GTgwmlxjfb4CV4F5/ggyrkp7ji3rkutaBeIR/cDuWVcLKV
+         NBy6byt910LpdWsZ0fc3nLT1jgFu6JF/meALRHe5ABHia4vOxjkRdCLana78f3qxYAPS
+         kkiQ==
+X-Gm-Message-State: ANhLgQ2molTURFUTMX1TVrcDEsZzGs/fMeU/Z8eTfAy9eopzRWbb/5Go
+        YlP648lAFercH5m2NncL3G8=
+X-Google-Smtp-Source: ADFU+vtz3IDCDcVWvKI9TYOLU70DEPWHsOqvPcyb1tHPQFmgj0wQ9hmEBJp0kN1KTkwRFZJOoNETfA==
+X-Received: by 2002:a63:4752:: with SMTP id w18mr19731702pgk.379.1584240420457;
+        Sat, 14 Mar 2020 19:47:00 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:8c07:28a7:ab98:67e])
+        by smtp.gmail.com with ESMTPSA id fz3sm16123972pjb.41.2020.03.14.19.46.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Mar 2020 19:46:59 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH blktests] Add a test that triggers the blk_mq_realloc_hw_ctxs() error path
+Date:   Sat, 14 Mar 2020 19:46:54 -0700
+Message-Id: <20200315024654.25174-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
- <20200312123415.GA7660@ming.t460p> <CAEK8JBAiBwghR5hXiDPETx=EGNi=OTQQz7DOaSXd=96QkUWTGg@mail.gmail.com>
- <20200313023156.GB27275@ming.t460p>
-In-Reply-To: <20200313023156.GB27275@ming.t460p>
-From:   Feng Li <lifeng1519@gmail.com>
-Date:   Sun, 15 Mar 2020 01:43:06 +0800
-Message-ID: <CAEK8JBCHKbBoXutE5rtxA+kUeoCZB2o=Lsjf9WbYZ+sLayNymA@mail.gmail.com>
-Subject: Re: [Question] IO is split by block layer when size is larger than 4k
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
-This is my cmd to run qemu:
-qemu-2.12.0/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -device
-virtio-balloon -cpu host -smp 4 -m 2G -drive
-file=3D/root/html/fedora-10g.img,format=3Draw,cache=3Dnone,aio=3Dnative,if=
-=3Dnone,id=3Ddrive-virtio-disk1
--device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dvirtio-di=
-sk1,bootindex=3D1
--drive file=3D/dev/sdb,format=3Draw,cache=3Dnone,aio=3Dnative,if=3Dnone,id=
-=3Ddrive-virtio-disk2
--device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk2,id=3Dvirtio-di=
-sk2,bootindex=3D2
--device virtio-net,netdev=3Dnw1,mac=3D00:11:22:EE:EE:10 -netdev
-tap,id=3Dnw1,script=3Dno,downscript=3Dno,ifname=3Dtap0 -serial mon:stdio
--nographic -object
-memory-backend-file,id=3Dmem0,size=3D2G,mem-path=3D/dev/hugepages,share=3Do=
-n
--numa node,memdev=3Dmem0 -vnc 0.0.0.0:100 -machine usb=3Don,nvdimm -device
-usb-tablet -monitor unix:///tmp/a.socket,server,nowait -qmp
-tcp:0.0.0.0:2234,server,nowait
+Add a test that triggers the code touched by commit d0930bb8f46b ("blk-mq:
+Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()"). This
+test only runs if a recently added fault injection feature is available,
+namely commit 596444e75705 ("null_blk: Add support for init_hctx() fault
+injection").
 
-OS image is Fedora 31. Kernel is 5.3.7-301.fc31.x86_64.
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ tests/block/030     | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/030.out |  1 +
+ 2 files changed, 56 insertions(+)
+ create mode 100755 tests/block/030
+ create mode 100644 tests/block/030.out
 
-The address from virio in qemu like this:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 64
-      0: size: 4096 addr: 0x7fffc83f1000
-      1: size: 4096 addr: 0x7fffc8037000
-      2: size: 4096 addr: 0x7fffd3710000
-      3: size: 4096 addr: 0x7fffd5624000
-      4: size: 4096 addr: 0x7fffc766c000
-      5: size: 4096 addr: 0x7fffc7c21000
-      6: size: 4096 addr: 0x7fffc8d54000
-      7: size: 4096 addr: 0x7fffc8fc6000
-      8: size: 4096 addr: 0x7fffd5659000
-      9: size: 4096 addr: 0x7fffc7f88000
-      10: size: 4096 addr: 0x7fffc767b000
-      11: size: 4096 addr: 0x7fffc8332000
-      12: size: 4096 addr: 0x7fffb4297000
-      13: size: 4096 addr: 0x7fffc8888000
-      14: size: 4096 addr: 0x7fffc93d7000
-      15: size: 4096 addr: 0x7fffc9f1f000
-
-They are not contiguous pages, so the pages in bvec are not continus
-physical pages.
-
-I don't know how to dump the bvec address in bio without recompiling the ke=
-rnel.
-
-IO Pattern in guest is :
-root@192.168.19.239 02:39:29 ~ $ cat 256k-randread.fio
-[global]
-ioengine=3Dlibaio
-invalidate=3D1
-ramp_time=3D5
-iodepth=3D1
-runtime=3D120000
-time_based
-direct=3D1
-
-[randread-vdb-256k-para]
-bs=3D256k
-stonewall
-filename=3D/dev/vdb
-rw=3Drandread
-
-Thanks.
-
-
-Ming Lei <ming.lei@redhat.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8813=E6=97=A5=
-=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=8810:32=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Thu, Mar 12, 2020 at 09:21:11PM +0800, Feng Li wrote:
-> > Hi Ming,
-> > Thanks.
-> > I have tested kernel '5.4.0-rc6+', which includes 07173c3ec276.
-> > But the virtio is still be filled with single page by page.
->
-> Hello,
->
-> Could you share your test script?
->
-> BTW, it depends if fs layer passes contiguous pages to block layer.
->
-> You can dump each bvec of the bio, and see if they are contiguous
-> physically.
->
-> Thanks,
-> Ming
->
-> >
-> > Ming Lei <ming.lei@redhat.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8812=E6=97=
-=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:34=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > On Thu, Mar 12, 2020 at 07:13:28PM +0800, Feng Li wrote:
-> > > > Hi experts,
-> > > >
-> > > > May I ask a question about block layer?
-> > > > When running fio in guest os, I find a 256k IO is split into the pa=
-ge
-> > > > by page in bio, saved in bvecs.
-> > > > And virtio-blk just put the bio_vec one by one in the available
-> > > > descriptor table.
-> > > >
-> > > > So if my backend device does not support iovector
-> > > > opertion(preadv/pwritev), then IO is issued to a low layer page by
-> > > > page.
-> > > > My question is: why doesn't the bio save multi-pages in one bio_vec=
-?
-> > >
-> > > We start multipage bvec since v5.1, especially since 07173c3ec276
-> > > ("block: enable multipage bvecs").
-> > >
-> > > Thanks,
-> > > Ming
-> > >
-> >
->
-> --
-> Ming
->
+diff --git a/tests/block/030 b/tests/block/030
+new file mode 100755
+index 000000000000..028b0a1a6e9a
+--- /dev/null
++++ b/tests/block/030
+@@ -0,0 +1,55 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright 2020 Google LLC
++#
++# Trigger the blk_mq_realloc_hw_ctxs() error path.
++
++. tests/block/rc
++. common/null_blk
++
++DESCRIPTION="trigger the blk_mq_realloc_hw_ctxs() error path"
++QUICK=1
++
++requires() {
++	_have_null_blk || return $?
++	_have_module_param null_blk init_hctx || return $?
++}
++
++# Configure one null_blk instance.
++configure_null_blk() {
++	local nullb0="/sys/kernel/config/nullb/nullb0"
++
++	mkdir "$nullb0" &&
++	echo 0 > "$nullb0/completion_nsec" &&
++	echo 512 > "$nullb0/blocksize" &&
++	echo 16 > "$nullb0/size" &&
++	nproc > "$nullb0/submit_queues" &&
++	echo 1 > "$nullb0/memory_backed" &&
++	echo 1 > "$nullb0/power" &&
++	ls -l /dev/nullb* &>>"$FULL"
++}
++
++test() {
++	local i sq=/sys/kernel/config/nullb/nullb0/submit_queues
++
++	: "${TIMEOUT:=30}"
++	if ! _init_null_blk nr_devices=0 queue_mode=2 "init_hctx=$(nproc),100,0,0"; then
++		echo "Loading null_blk failed"
++		return 1
++	fi
++	if ! configure_null_blk; then
++		echo "Configuring null_blk failed"
++		return 1
++	fi
++	if { echo "$(<"$sq")" >$sq; } 2>/dev/null; then
++		for ((i=0;i<100;i++)); do
++			echo 1 >$sq
++			nproc >$sq
++		done
++	else
++		echo "Skipping test because $sq cannot be modified" >>"$FULL"
++	fi
++	rmdir /sys/kernel/config/nullb/nullb0
++	_exit_null_blk
++	echo Passed
++}
+diff --git a/tests/block/030.out b/tests/block/030.out
+new file mode 100644
+index 000000000000..863339fb8ced
+--- /dev/null
++++ b/tests/block/030.out
+@@ -0,0 +1 @@
++Passed
