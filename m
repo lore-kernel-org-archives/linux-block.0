@@ -2,134 +2,86 @@ Return-Path: <SRS0=XUQF=5A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 988FFC10DCE
-	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 20:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347FDC10DCE
+	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 22:13:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6538F20637
-	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 20:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584303382;
-	bh=5VqbqRCMOuCKrwhIgRoKM6xoalmVSXXR/W2soqbZ1L0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ft6xNON1T6ZGL1ZsWa10zx1+RvghQsQoO/ISTXs1FEkVjxgmgCqG5G0pHuH3Vr3PP
-	 rW9LMV8Tx2Zrz96oh7aCmhULAwkrYVT3lPNV0lnMjO8HIVp7bA/xZQh3uZy1/VTsCe
-	 Wou0uX+noNKIbO0K+G9fv8hzpaCfNtbhSFOb38go=
+	by mail.kernel.org (Postfix) with ESMTP id 00C4F20674
+	for <linux-block@archiver.kernel.org>; Sun, 15 Mar 2020 22:13:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729108AbgCOUQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Mar 2020 16:16:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45004 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729047AbgCOUQV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Mar 2020 16:16:21 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4834A205C9;
-        Sun, 15 Mar 2020 20:16:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584303380;
-        bh=5VqbqRCMOuCKrwhIgRoKM6xoalmVSXXR/W2soqbZ1L0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EcUzhGIuXaHU9vfOPWYtMg5tNxsoTitGkBlfvXySVUWt6Iu1NQNDAB8LCd1+0Nvyt
-         4XcWpBlIK/3A1T+NUUSkZwIzsU4SL3OLRuehrOjZp/6w9mEHq4mVL63J3TZCxfZEB0
-         4hZ1adM0h2K2JuNo4FFTY29yf4DUchHuTWpNOS4I=
-Date:   Sun, 15 Mar 2020 13:16:18 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v8 03/11] block: Make blk-integrity preclude hardware
- inline encryption
-Message-ID: <20200315201618.GH1055@sol.localdomain>
-References: <20200312080253.3667-1-satyat@google.com>
- <20200312080253.3667-4-satyat@google.com>
+        id S1729249AbgCOWN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Mar 2020 18:13:28 -0400
+Received: from mail-pl1-f179.google.com ([209.85.214.179]:35815 "EHLO
+        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729213AbgCOWN2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Mar 2020 18:13:28 -0400
+Received: by mail-pl1-f179.google.com with SMTP id g6so7053422plt.2
+        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2020 15:13:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=P80wRltRqG6LplwZKmF5QUEUV9hDVHBpMbVjKF9/ubo=;
+        b=NUpBzMaZ4YmpQGs6vohzatGJ+3pya16LaqXNSRtwN2aXlBRSbNwPoEhsYkIDi3sY7I
+         ZWF99j8vl9J6PSRjV4J7amf0wnLY6AgP7WS7cdpIkDdg4XKQ1wTNdYmDNSxVlgBJBzPv
+         jefVrqOwbb2/dzrxuwstEHao2p6eW5F9+qt9nmFXo8iiyXNThQYSdnKCVX5Vpcqpi4cy
+         +yu30V/Wz2NBx9C92QCWCYASryCSDLbiaQJvImdan1DTdTghc5dCoGsquOT2WpWFSLYP
+         cCsdFc4WfuvXVC1ZF0NVLUDEbIXgAsxykMHHpqUXTSr+0F+FT4phnnH3N6rgKkP1Tnko
+         oJMQ==
+X-Gm-Message-State: ANhLgQ3uuLGhkmyUd0njz4DRgiFnd8hotdfMpRezlY1Fe0S1vkd49FOX
+        mWeFho5+TUdVNzb7uNlRaU4=
+X-Google-Smtp-Source: ADFU+vtNEdb5UVOqq8DDRrWlZXSQMcTPdkcOKxaKo4XxXaiSFkqSJ+/AI7QMlk3Mwqkii6lmqsu3lw==
+X-Received: by 2002:a17:90a:326f:: with SMTP id k102mr21866862pjb.48.1584310406554;
+        Sun, 15 Mar 2020 15:13:26 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:dc50:2da4:5bd2:69ab])
+        by smtp.gmail.com with ESMTPSA id d1sm39192976pfn.51.2020.03.15.15.13.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Mar 2020 15:13:25 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests v2 0/4] Add a test that triggers the blk_mq_realloc_hw_ctxs() error path
+Date:   Sun, 15 Mar 2020 15:13:16 -0700
+Message-Id: <20200315221320.613-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200312080253.3667-4-satyat@google.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 01:02:45AM -0700, Satya Tangirala wrote:
-> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-> index ff1070edbb40..793ba23e8688 100644
-> --- a/block/blk-integrity.c
-> +++ b/block/blk-integrity.c
-> @@ -409,6 +409,13 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
->  	bi->tag_size = template->tag_size;
->  
->  	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
-> +
-> +#ifdef BLK_INLINE_ENCRYPTION
-> +	if (disk->queue->ksm) {
-> +		pr_warn("blk-integrity: Integrity and hardware inline encryption are not supported together. Unregistering keyslot manager from request queue, to disable hardware inline encryption.");
-> +		blk_ksm_unregister(disk->queue);
-> +	}
-> +#endif
->  }
->  EXPORT_SYMBOL(blk_integrity_register);
+Hi Omar,
 
-This ifdef is wrong, it should be CONFIG_BLK_INLINE_ENCRYPTION.
+Please consider this patch series for the upstream blktests repository.
 
-Also the log message is missing a trailing newline.
+Compared to v1, three patches have been added that refactor null_blk
+loading, unloading and configuration.
 
->  
-> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-> index 38df0652df80..a7970e18a122 100644
-> --- a/block/keyslot-manager.c
-> +++ b/block/keyslot-manager.c
-> @@ -25,6 +25,9 @@
->   * Upper layers will call blk_ksm_get_slot_for_key() to program a
->   * key into some slot in the inline encryption hardware.
->   */
-> +
-> +#define pr_fmt(fmt) "blk_ksm: " fmt
+Thanks,
 
-People aren't going to know what "blk_ksm" means in the logs.
-I think just use "blk-crypto" instead.
+Bart.
 
-> +
->  #include <crypto/algapi.h>
->  #include <linux/keyslot-manager.h>
->  #include <linux/atomic.h>
-> @@ -375,3 +378,20 @@ void blk_ksm_destroy(struct keyslot_manager *ksm)
->  	memzero_explicit(ksm, sizeof(*ksm));
->  }
->  EXPORT_SYMBOL_GPL(blk_ksm_destroy);
-> +
-> +bool blk_ksm_register(struct keyslot_manager *ksm, struct request_queue *q)
-> +{
-> +	if (blk_integrity_queue_supports_integrity(q)) {
-> +		pr_warn("Integrity and hardware inline encryption are not supported together. Won't register keyslot manager with request queue.");
-> +		return false;
-> +	}
-> +	q->ksm = ksm;
-> +	return true;
-> +}
-> +EXPORT_SYMBOL_GPL(blk_ksm_register);
+Bart Van Assche (4):
+  Make _exit_null_blk remove all null_blk device instances
+  Use _{init,exit}_null_blk instead of open-coding these functions
+  Introduce the function _configure_null_blk()
+  Add a test that triggers the blk_mq_realloc_hw_ctxs() error path
 
+ common/multipath-over-rdma | 29 ++++++++------------------
+ common/null_blk            | 26 +++++++++++++++++++----
+ tests/block/022            |  3 ---
+ tests/block/029            | 17 ++-------------
+ tests/block/030            | 42 ++++++++++++++++++++++++++++++++++++++
+ tests/block/030.out        |  1 +
+ tests/nvmeof-mp/rc         |  2 +-
+ 7 files changed, 76 insertions(+), 44 deletions(-)
+ create mode 100755 tests/block/030
+ create mode 100644 tests/block/030.out
 
-People reading the logs won't know what a keyslot manager is and why they should
-care that one wasn't registered.  It would be better to say that hardware inline
-encryption is being disabled.
-
-Ideally the device name would be included in the message too.
-
-> +
-> +void blk_ksm_unregister(struct request_queue *q)
-> +{
-> +	q->ksm = NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(blk_ksm_unregister);
-
-blk_ksm_unregister() doesn't need to be exported.
