@@ -2,143 +2,116 @@ Return-Path: <SRS0=UGhi=5B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB0E9C0044D
-	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 12:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E28EC0044D
+	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 15:08:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 886D42051A
-	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 12:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 077EA20783
+	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 15:08:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="OK0QZP+i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730902AbgCPM0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Mar 2020 08:26:45 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44158 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730896AbgCPM0p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Mar 2020 08:26:45 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6D3732A51CF7D85A3715;
-        Mon, 16 Mar 2020 20:26:41 +0800 (CST)
-Received: from [10.173.220.74] (10.173.220.74) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 16 Mar 2020 20:26:35 +0800
-Subject: Re: [PATCH] nbd: make starting request more reasonable
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-References: <20200303130843.12065-1-yuyufen@huawei.com>
-Message-ID: <9cdba8b1-f0e5-a079-8d44-0078478dd4d8@huawei.com>
-Date:   Mon, 16 Mar 2020 20:26:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1731827AbgCPPIM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Mar 2020 11:08:12 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:47047 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731688AbgCPPIM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Mar 2020 11:08:12 -0400
+Received: by mail-pl1-f194.google.com with SMTP id r3so91497pls.13
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2020 08:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SueAxX5eGkVwaiqNpop9oq5H6n/zweDvWrtavlfgylY=;
+        b=OK0QZP+iaxu4V61Q+ur02KwyU6iEqC36paQ8AvV6u8bQ5aiakL8fpQeZym9hJ+TxEG
+         yF2h9LjKGAtvRG4XmZtFKVGsxprDgxXFcb/fq3SL1bfTPtfbhAvwSe066pLBWvJ97MkI
+         Orh2ySIDEQcvdIcbk5bx8E74isNPevMyu3RUMnyayyHH1rxnF8h4AUdGMjW4MpwNTD5y
+         0F6qieajinziIRvT+08kjw0mnH79Sk4YiWcvR+ZUd5Rs7KUj/Ezjhyn5KGe+z31wPGjM
+         SAL2OvCGdtMxn7ssOqCFsFelS7l2mNAKlAJ8m5dntO2LOfLWucMbVdJ9eFJdisfa1mTx
+         ClVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SueAxX5eGkVwaiqNpop9oq5H6n/zweDvWrtavlfgylY=;
+        b=jRvXXsfDYIcmn97sylw/1+RsYIE9EwGwxFmNeCsJgM7BCfx4v6Fzp910RLGTeGLJcl
+         X/LWsXgkMuIgxRA+gva6B3yfPWDnKx5dvVFYp1ny7qodtFhSS3WQCEkyIgmy0Fe83C+F
+         pzYFBGzR5oO7QAZsF5y/5uek1ySjRmw8TrJm/gayzNCJ/jeHlc8hvKd5zabE/x50vOif
+         8T8qyBq7a6zFBFxh54p1gPx3pjaGXmkLPbeErObZB9zTOe66TI0VqQEhLHclKa696hBV
+         cy+O5L+ZOBLzfabMoxUUjAOn0RYSvEkferztQ6bge7jm10uUb1HvnpKS3wjcdCEIyEfS
+         W+FA==
+X-Gm-Message-State: ANhLgQ1Wnmvtuqy4oqxaGNZ0tqlDTYGOPfi8hqGMw5uB9Ni5uYDkj/mm
+        d+97mY2Z0zCisBzW1hp/JnFb+w==
+X-Google-Smtp-Source: ADFU+vtG3XzehIqqMBGu/eDH7NBJ2L35kdPeTQgmGBiEeCXw8j9V44Fw4/LJnEx/j/HnLSnNs5lJSw==
+X-Received: by 2002:a17:902:421:: with SMTP id 30mr5034500ple.271.1584371289283;
+        Mon, 16 Mar 2020 08:08:09 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id a18sm238701pfr.109.2020.03.16.08.08.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Mar 2020 08:08:08 -0700 (PDT)
+Subject: Re: [GIT PULL] Floppy cleanups for next
+To:     efremov@linux.com
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>
+References: <57ce0ee0-839c-a889-0bc0-ec46985e76d3@linux.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6f4fd061-a47e-7de5-df6e-c3002beedee0@kernel.dk>
+Date:   Mon, 16 Mar 2020 09:08:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200303130843.12065-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <57ce0ee0-839c-a889-0bc0-ec46985e76d3@linux.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.74]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping and Cc to more expert in blk-mq.
+On 3/16/20 4:47 AM, Denis Efremov wrote:
+> Hi Jens,
+> 
+> The following changes since commit 5d50c8f405bf91d9d9a48628fde0f2f4ff069d7b:
+> 
+>   Merge branch 'for-5.7/io_uring' into for-next (2020-03-14 17:20:45 -0600)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/evdenis/linux-floppy tags/floppy-for-5.7
+> 
+> Please pull
+> 
+> ----------------------------------------------------------------
+> Floppy patches for 5.7
+> 
+> Cleanups from Willy Tarreau:
+>   - expansion of macros referencing global or local variables with
+>     equivalent code
+>   - removal of incomplete support for second FDC from ARM code
+>   - renaming the "fdc" global variable to "current_fdc" to differ
+>     between global and local context
+> 
+> Changes were compile tested on arm, x86 arches. Changes introduce
+> no binary difference on x86 arch (before and after the patches).
+> On arm, incomplete support for second FDC removed. This set of
+> patches with commit 2e90ca68 ("floppy: check FDC index for errors
+> before assigning it") was tested with syzkaller and simple
+> write/read/format tests for no new issues.
+> 
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 
-On 2020/3/3 21:08, Yufen Yu wrote:
-> Our test robot reported a warning for refcount_dec trying to decrease
-> value '0'. The reason is that blk_mq_dispatch_rq_list() try to complete
-> the failed request from nbd driver, while the request have finished in
-> nbd timeout handle function. The race as following:
-> 
-> CPU1                             CPU2
-> 
-> //req->ref = 1
-> blk_mq_dispatch_rq_list
-> nbd_queue_rq
->    nbd_handle_cmd
->      blk_mq_start_request
->                                   blk_mq_check_expired
->                                     //req->ref = 2
->                                     blk_mq_rq_timed_out
->                                       nbd_xmit_timeout
->                                         blk_mq_complete_request
->                                           //req->ref = 1
->                                           refcount_dec_and_test(&req->ref)
-> 
->                                     refcount_dec_and_test(&req->ref)
->                                     //req->ref = 0
->                                       __blk_mq_free_request(req)
->    ret = BLK_STS_IOERR
-> blk_mq_end_request
-> // req->ref = 0, req have been free
-> refcount_dec_and_test(&rq->ref)
-> 
-> In fact, the bug also have been reported by syzbot:
->    https://lkml.org/lkml/2018/12/5/1308
-> 
-> Since the request have been freed by timeout handle, it can be reused
-> by others. Then, blk_mq_end_request() may get the re-initialized request
-> and free it, which is unexpected.
-> 
-> To fix the problem, we move blk_mq_start_request() down until the driver
-> will handle the request actully. If .queue_rq return something error in
-> preparation phase, timeout handle may don't need. Thus, moving start
-> request down may be more reasonable. Then, nbd_queue_rq() will not return
-> BLK_STS_IOERR after starting request.
-> 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->   drivers/block/nbd.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 78181908f0df..5256e9d02a03 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -541,6 +541,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
->   		return -EIO;
->   	}
->   
-> +	blk_mq_start_request(req);
-> +
->   	if (req->cmd_flags & REQ_FUA)
->   		nbd_cmd_flags |= NBD_CMD_FLAG_FUA;
->   
-> @@ -879,7 +881,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
->   	if (!refcount_inc_not_zero(&nbd->config_refs)) {
->   		dev_err_ratelimited(disk_to_dev(nbd->disk),
->   				    "Socks array is empty\n");
-> -		blk_mq_start_request(req);
->   		return -EINVAL;
->   	}
->   	config = nbd->config;
-> @@ -888,7 +889,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
->   		dev_err_ratelimited(disk_to_dev(nbd->disk),
->   				    "Attempted send on invalid socket\n");
->   		nbd_config_put(nbd);
-> -		blk_mq_start_request(req);
->   		return -EINVAL;
->   	}
->   	cmd->status = BLK_STS_OK;
-> @@ -912,7 +912,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
->   			 */
->   			sock_shutdown(nbd);
->   			nbd_config_put(nbd);
-> -			blk_mq_start_request(req);
->   			return -EIO;
->   		}
->   		goto again;
-> @@ -923,7 +922,6 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
->   	 * here so that it gets put _after_ the request that is already on the
->   	 * dispatch list.
->   	 */
-> -	blk_mq_start_request(req);
->   	if (unlikely(nsock->pending && nsock->pending != req)) {
->   		nbd_requeue_cmd(cmd);
->   		ret = 0;
-> 
+Thanks - I hand applied the series, my for-next branch isn't really
+stable, only the parent branches are.
+
+-- 
+Jens Axboe
+
