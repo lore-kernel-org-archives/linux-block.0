@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 562F8C10F29
-	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 02:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912CBC10F29
+	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 02:38:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C2B3206EB
-	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 02:37:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6880A20737
+	for <linux-block@archiver.kernel.org>; Mon, 16 Mar 2020 02:38:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584326254;
-	bh=Qb3WFXji45qyPaTvm2PnxhbwUJAHncNwwNgYzamZ68Q=;
+	s=default; t=1584326305;
+	bh=OGv4NJMH6egSO3CM+oM4/EP7ikbuiFpvtEs66GSlFxA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=apO4S9NJosJTHtZx7U3rM/vXI4/1TaVm7cdgIrXQ5yYtfh3ldNkMMKtJkYPssFZ2P
-	 BTR/6BYGgEKB6M0CsBWCLP46I0FXpmoGrg5fxcmGx3gHn+oXpiJMxcmbUoymqzqiA+
-	 xP8iMbLW9wy1BVHL9Mn7T411+3Mq90ZiVhEx4PYc=
+	b=lN5sNpV383eMa+I0xfqMZGmzDfWi73NEbSMbaUKrvIpTeJGu1amzoBQqqgYZe3nKl
+	 sd6g6buxW0pd2i+tddxqufjsbny4eDPqY0taSF08/tpCich0jjZkT38kYmMtcJjD9H
+	 qFEWqTaVXSyEKa+bXKD1O8Ac94qRQ5mcpRUn4utU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730156AbgCPChd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Mar 2020 22:37:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39572 "EHLO mail.kernel.org"
+        id S1730230AbgCPCiU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 Mar 2020 22:38:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38738 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730120AbgCPCfR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Mar 2020 22:35:17 -0400
+        id S1729989AbgCPCew (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Mar 2020 22:34:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4EEDE2072A;
-        Mon, 16 Mar 2020 02:35:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8BEA62073E;
+        Mon, 16 Mar 2020 02:34:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584326117;
-        bh=Qb3WFXji45qyPaTvm2PnxhbwUJAHncNwwNgYzamZ68Q=;
+        s=default; t=1584326091;
+        bh=OGv4NJMH6egSO3CM+oM4/EP7ikbuiFpvtEs66GSlFxA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oNqpx6BBB7i1Le3J8uIKkaPuhDpE8hptxsfpykuG2lFAt7jooPJ4O8pHF6zCWr9k3
-         EcsT38KQEzXQFAMeXlK95k+pvohRduxB4mFU6jqRy6aAL7cVkCtb1SmN8JpMz56Rpq
-         ig2Qo3DAqzRcproDPMDFULmIvcbIKUcXcBfLU8A0=
+        b=Nal4SxkVifYfOzHjgZJOKQfGU7HRzJMLKeFkO1olo2uVviykxF0hkN/YOHASBbYu+
+         jLzA/8pcWUoqurVRMgqVHMXKJ4hgnfblRF6PXTqjLy2VEi+CpFjUq9P+5x1gXwxugW
+         JWgdaJy7rJh0NyThkAk+3GEl34YqoYZIQw+AOpsI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Carlo Nonato <carlo.nonato95@gmail.com>,
@@ -45,12 +45,12 @@ Cc:     Carlo Nonato <carlo.nonato95@gmail.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 19/20] block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()
-Date:   Sun, 15 Mar 2020 22:34:52 -0400
-Message-Id: <20200316023453.1800-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 34/35] block, bfq: fix overwrite of bfq_group pointer in bfq_find_set_group()
+Date:   Sun, 15 Mar 2020 22:34:10 -0400
+Message-Id: <20200316023411.1263-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316023453.1800-1-sashal@kernel.org>
-References: <20200316023453.1800-1-sashal@kernel.org>
+In-Reply-To: <20200316023411.1263-1-sashal@kernel.org>
+References: <20200316023411.1263-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 9fe5952d117d5..ecd3d0ec2f3b6 100644
+index d0e36d6522649..86cd718e0380b 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -525,12 +525,13 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+@@ -593,12 +593,13 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
  	 */
  	entity = &bfqg->entity;
  	for_each_entity(entity) {
