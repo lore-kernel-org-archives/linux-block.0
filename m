@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D08D7C18E5B
-	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 15:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 914BDC18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 16:51:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD20520757
-	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 15:11:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6761B20738
+	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 16:51:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726781AbgCQPLW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Mar 2020 11:11:22 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:33860 "EHLO
+        id S1726386AbgCQQvR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Mar 2020 12:51:17 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:34734 "EHLO
         bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726478AbgCQPLW (ORCPT
+        with ESMTP id S1726704AbgCQQvP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Mar 2020 11:11:22 -0400
+        Tue, 17 Mar 2020 12:51:15 -0400
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (Authenticated sender: andrzej.p)
-        with ESMTPSA id A0A06290AD2
+        with ESMTPSA id 0E392295BF1
 From:   Andrzej Pietrasiewicz <andrzej.p@collabora.com>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, kernel@collabora.com,
         andrzej.p@collabora.com, Evan Green <evgreen@chromium.org>
-Subject: [PATCH 2/2] loop: Better discard support for block devices
-Date:   Tue, 17 Mar 2020 16:11:11 +0100
-Message-Id: <20200317151111.25749-3-andrzej.p@collabora.com>
+Subject: [PATCH RESEND 1/2] loop: Report EOPNOTSUPP properly
+Date:   Tue, 17 Mar 2020 17:51:06 +0100
+Message-Id: <20200317165106.29282-1-andrzej.p@collabora.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200317151111.25749-1-andrzej.p@collabora.com>
-References: <20200317151111.25749-1-andrzej.p@collabora.com>
+In-Reply-To: <20200317151111.25749-2-andrzej.p@collabora.com>
+References: <20200317151111.25749-2-andrzej.p@collabora.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -40,118 +40,52 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Evan Green <evgreen@chromium.org>
 
-If the backing device for a loop device is a block device,
-then mirror the "write zeroes" capabilities of the underlying
-block device into the loop device. Copy this capability into both
-max_write_zeroes_sectors and max_discard_sectors of the loop device.
-
-The reason for this is that REQ_OP_DISCARD on a loop device translates
-into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-presents a consistent interface for loop devices (that discarded data
-is zeroed), regardless of the backing device type of the loop device.
-There should be no behavior change for loop devices backed by regular
-files.
-
-This change fixes blktest block/003, and removes an extraneous
-error print in block/013 when testing on a loop device backed
-by a block device that does not support discard.
+Properly plumb out EOPNOTSUPP from loop driver operations, which may
+get returned when for instance a discard operation is attempted but not
+supported by the underlying block device. Before this change, everything
+was reported in the log as an I/O error, which is scary and not
+helpful in debugging.
 
 Signed-off-by: Evan Green <evgreen@chromium.org>
-[rebase onto v5.6-rc6]
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-
 ---
+Add missing S-o-b from me as sender.
 
-Changes in v5:
-- Don't mirror discard if lo_encrypt_key_size is non-zero (Gwendal)
-
-Changes in v4:
-- Mirror blkdev's write_zeroes into loopdev's discard_sectors.
-
-Changes in v3:
-- Updated commit description
-
-Changes in v2: None
----
- drivers/block/loop.c | 42 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 11 deletions(-)
+ drivers/block/loop.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 87307454f768..8de3b2b098d3 100644
+index 739b372a5112..87307454f768 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * information.
- 	 */
- 	struct file *file = lo->lo_backing_file;
-+	struct request_queue *q = lo->lo_queue;
- 	int ret;
+@@ -460,7 +460,9 @@ static void lo_complete_rq(struct request *rq)
  
- 	mode |= FALLOC_FL_KEEP_SIZE;
- 
--	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-+	if (!blk_queue_discard(q)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
+ 	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
+ 	    req_op(rq) != REQ_OP_READ) {
+-		if (cmd->ret < 0)
++		if (cmd->ret == -EOPNOTSUPP)
++			ret = BLK_STS_NOTSUPP;
++		else if (cmd->ret < 0)
+ 			ret = BLK_STS_IOERR;
+ 		goto end_io;
  	}
-@@ -867,28 +868,47 @@ static void loop_config_discard(struct loop_device *lo)
- 	struct inode *inode = file->f_mapping->host;
- 	struct request_queue *q = lo->lo_queue;
- 
-+
-+	/*
-+	 * If the backing device is a block device, mirror its zeroing
-+	 * capability. REQ_OP_DISCARD translates to a zero-out even when backed
-+	 * by block devices to keep consistent behavior with file-backed loop
-+	 * devices.
-+	 */
-+	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-+		struct request_queue *backingq;
-+
-+		backingq = bdev_get_queue(inode->i_bdev);
-+		blk_queue_max_discard_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
-+		blk_queue_max_write_zeroes_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
- 	/*
- 	 * We use punch hole to reclaim the free space used by the
- 	 * image a.k.a. discard. However we do not support discard if
- 	 * encryption is enabled, because it may give an attacker
- 	 * useful information.
- 	 */
--	if ((!file->f_op->fallocate) ||
--	    lo->lo_encrypt_key_size) {
-+	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
- 		q->limits.discard_granularity = 0;
- 		q->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(q, 0);
- 		blk_queue_max_write_zeroes_sectors(q, 0);
--		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
--		return;
--	}
- 
--	q->limits.discard_granularity = inode->i_sb->s_blocksize;
--	q->limits.discard_alignment = 0;
-+	} else {
-+		q->limits.discard_granularity = inode->i_sb->s_blocksize;
-+		q->limits.discard_alignment = 0;
-+
-+		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-+		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-+	}
- 
--	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
--	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
--	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+	if (q->limits.max_write_zeroes_sectors)
-+		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
+@@ -1953,7 +1955,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+  failed:
+ 	/* complete non-aio request */
+ 	if (!cmd->use_aio || ret) {
+-		cmd->ret = ret ? -EIO : 0;
++		if (ret == -EOPNOTSUPP)
++			cmd->ret = ret;
++		else
++			cmd->ret = ret ? -EIO : 0;
+ 		blk_mq_complete_request(rq);
+ 	}
  }
- 
- static void loop_unprepare_queue(struct loop_device *lo)
 -- 
 2.17.1
 
