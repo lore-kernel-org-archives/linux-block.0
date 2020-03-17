@@ -2,226 +2,152 @@ Return-Path: <SRS0=EH6z=5C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60553C10F29
-	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 08:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 449D5C10F29
+	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 08:50:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 080E2205ED
-	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 08:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 020DA20674
+	for <linux-block@archiver.kernel.org>; Tue, 17 Mar 2020 08:50:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uJq1q+4f"
+	dkim=pass (1024-bit key) header.d=windriversystems.onmicrosoft.com header.i=@windriversystems.onmicrosoft.com header.b="CxYQuGfY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725794AbgCQIUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Mar 2020 04:20:13 -0400
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:46894 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbgCQIUN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Mar 2020 04:20:13 -0400
-Received: by mail-pl1-f170.google.com with SMTP id r3so1250156pls.13
-        for <linux-block@vger.kernel.org>; Tue, 17 Mar 2020 01:20:11 -0700 (PDT)
+        id S1725906AbgCQIuX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Mar 2020 04:50:23 -0400
+Received: from mail-dm6nam11on2066.outbound.protection.outlook.com ([40.107.223.66]:6142
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725870AbgCQIuX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Mar 2020 04:50:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NVLctBqTwMlYOw6JBzVzC6SaMWs9hv6/4u1iNwlFLf//ISwhQzpRkVaeLlbEoisufuBy9E+JBWMP+533akBP8xzI9F3lRuCHvImIzoX60LJGpSDIFPTkw3KL2tnBp84qoKeYpjbdKoSYv52pZjJrG6C2znYSt4tkqgoNubQkhvYVvnsnxD6NGXx8SZ30fzlemW6WqQ1gYlC1Zti8sfULEsyz4AiMUwRiBOYaOVz4G/ZB/t0p00aMNOW53DlqCNRlSSv+vRgMUdtcTrc2H706EPCDaQqU+B2rXUoe50g7BSWLfbgODMWo+HgJlcdLnll1SJ9rFut61ePUkeUOc9S20g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xsrjx/9yJ9OR7MAyKwrvLrdwVhlLPzQbxX+Yn9pbJ6c=;
+ b=K68Q6bsGS0QHvVl2zTO44R9NqJO8Lwyq4HbtpN0X1zcmYOEy4Q7c77p0Tx7R5w2gqQ26wxUrl8vH20GfFd7OqGZvJFd+E16eZaX4UNuJEQ55FwxVdqU0o10ivRWpS6hjyt2b1tteepU4o4WmZsfYFiDh3Yaq3xzBMqu3/lEG7jhbtevXWeBtOORAOK3bWsPzYvi+nv9iDBeRG9/5pzApSE5HGuerN9JIxtzw9eQHt6Jb95+y210lszQZQsDG3ZwKc5vTq8u8g3t+m6wr/UtbLClVVvVAkOaWFiw1Hu8L8vo9+Z/IH0CORTHlom0s+CuCay3TFRWqZg+WuFhLQ/HwmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=kAy3Q9Y39G+FuvpBioeYBonxIBzlHnVN0CWGNZ5LzA4=;
-        b=uJq1q+4fHN57aH1IEzvuzn5Z/KMTIRrcrSwkAJ0R1XPKutBvYvnKFvl9l2Y048KqfQ
-         u60/qOt3mAIXpO6tp/6xGCMBoF8CoS4XIkzdBQVpDdj4vHo0IjZsrWDU1B7eEMOfnjjV
-         C58//hVTyl4NrCsIAV5ndpzx9bbkX/eQTzHsHwtnASQQP8Cn7I3SrFesLmcJm3VLTacq
-         iAv3fyHbCxa8LdZ9LTW8nj5Xm/tj3I8XLu87vatxAHNw5BgLXwhOkZPdN6OB24Rx0i9U
-         nkMnvzo1bS/ajrRHAi7s+4ZCfDC6RWTG0y8JoGMBnq3ThZ9mi5SKN247/m4WL1mcxLy7
-         J3fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kAy3Q9Y39G+FuvpBioeYBonxIBzlHnVN0CWGNZ5LzA4=;
-        b=mbzSP1slnJPJrDL2MuUB2wP+tvnI5+mnnQ9O197onux7wQ/Hv44ZStHtElA4TfDYZZ
-         zffMjo/78py3yuesDYv9KUOHAhTKrb4TEtzrzpaU9K5ugyCMx1Xmu3szzJ3eA7PkbLSi
-         BB51po8wc4XrIzMizqIhLE4V9b77YdZbWU7ZTNtZbVm8+zX4WCwJaR/hUNlp6/n1hKqy
-         8fvns+p6tPTiUUV3SMdfUOTt6ztUKzjfqtnXfbhsY3ct9pKM9By3l8QuPBLLbuZt0AuE
-         si/syRZTvB83URIhE6j1dXTDQmUOc3r2R4gGO2HzFbYY+5x3UxH5u3MoJ9CpB2Tlvlig
-         8FBA==
-X-Gm-Message-State: ANhLgQ2PujLR5beTC3yvLoy/AjZXxt0tk4s4PX6TPLUtRQO3qLZHSUwI
-        eOi5jZI8Twmp6nPH01bMquVbUwxiz2m2H8GV8GE=
-X-Google-Smtp-Source: ADFU+vtgqfG4FF6mc0jKTN556TAzeaxdc9Yk0mjV6/i86BIoJ5VRFLVhhkWg4WxWaPTVBA4tJmivAUGZWBGlzJ4d4As=
-X-Received: by 2002:a17:902:9b90:: with SMTP id y16mr3281931plp.217.1584433210972;
- Tue, 17 Mar 2020 01:20:10 -0700 (PDT)
+ d=windriversystems.onmicrosoft.com;
+ s=selector2-windriversystems-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xsrjx/9yJ9OR7MAyKwrvLrdwVhlLPzQbxX+Yn9pbJ6c=;
+ b=CxYQuGfYjjUTKQnA9Mcz+cF2MCr+QNME6+QXC4QFiiqyIqlimJ5iK02RaFiaseqHYBvWgu8c1sjS7rnNDRP22PuRzN0ShoYkkvGb29kAvrfC27lw2y1t9aHLvJQ+4hiYe8M78xDecq1iIFdudjvw42rMi3dTP7EngEYra10HaJA=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Zhe.He@windriver.com; 
+Received: from SN6PR11MB3360.namprd11.prod.outlook.com (2603:10b6:805:c8::30)
+ by SN6PR11MB2880.namprd11.prod.outlook.com (2603:10b6:805:58::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14; Tue, 17 Mar
+ 2020 08:50:19 +0000
+Received: from SN6PR11MB3360.namprd11.prod.outlook.com
+ ([fe80::d852:181d:278b:ba9d]) by SN6PR11MB3360.namprd11.prod.outlook.com
+ ([fe80::d852:181d:278b:ba9d%5]) with mapi id 15.20.2814.021; Tue, 17 Mar 2020
+ 08:50:19 +0000
+Subject: Re: disk revalidation updates and OOM
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     jack@suse.cz, Jens Axboe <axboe@kernel.dk>,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org, keith.busch@intel.com,
+        tglx@linutronix.de, mwilck@suse.com, yuyufen@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <93b395e6-5c3f-0157-9572-af0f9094dbd7@windriver.com>
+ <20200310074018.GB26381@lst.de>
+ <75865e17-48f8-a63a-3a29-f995115ffcfc@windriver.com>
+ <20200310162647.GA6361@lst.de>
+ <f48683d9-7854-ba5f-da3a-7ef987a539b8@windriver.com>
+ <20200311155458.GA24376@lst.de>
+ <18bbb6cd-578e-5ead-f2cd-a8a01db17e29@windriver.com>
+ <20200316113746.GA15930@lst.de>
+From:   He Zhe <zhe.he@windriver.com>
+Message-ID: <4215351e-89ac-4969-1d52-e2ff5c064d7d@windriver.com>
+Date:   Tue, 17 Mar 2020 16:50:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200316113746.GA15930@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: BYAPR01CA0067.prod.exchangelabs.com (2603:10b6:a03:94::44)
+ To SN6PR11MB3360.namprd11.prod.outlook.com (2603:10b6:805:c8::30)
 MIME-Version: 1.0
-References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
- <20200312123415.GA7660@ming.t460p> <CAEK8JBAiBwghR5hXiDPETx=EGNi=OTQQz7DOaSXd=96QkUWTGg@mail.gmail.com>
- <20200313023156.GB27275@ming.t460p> <CAEK8JBCHKbBoXutE5rtxA+kUeoCZB2o=Lsjf9WbYZ+sLayNymA@mail.gmail.com>
- <CACVXFVPJcO41a-dinfEhLKnJ6P=6sMXyg7SZcXPtqHcyqRPUUA@mail.gmail.com>
-In-Reply-To: <CACVXFVPJcO41a-dinfEhLKnJ6P=6sMXyg7SZcXPtqHcyqRPUUA@mail.gmail.com>
-From:   Feng Li <lifeng1519@gmail.com>
-Date:   Tue, 17 Mar 2020 16:19:44 +0800
-Message-ID: <CAEK8JBCKH8-tiUj1W6CB_wAx2xF4osDLXG3GNzuAySrgsqp=yQ@mail.gmail.com>
-Subject: Re: [Question] IO is split by block layer when size is larger than 4k
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [128.224.162.175] (60.247.85.82) by BYAPR01CA0067.prod.exchangelabs.com (2603:10b6:a03:94::44) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.21 via Frontend Transport; Tue, 17 Mar 2020 08:50:16 +0000
+X-Originating-IP: [60.247.85.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2f85771a-c97a-433e-9466-08d7ca503887
+X-MS-TrafficTypeDiagnostic: SN6PR11MB2880:
+X-Microsoft-Antispam-PRVS: <SN6PR11MB28804B46F0EE700781B533E68FF60@SN6PR11MB2880.namprd11.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0345CFD558
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(396003)(346002)(376002)(39850400004)(136003)(366004)(199004)(956004)(2616005)(478600001)(6486002)(2906002)(5660300002)(31686004)(7416002)(52116002)(53546011)(8676002)(6706004)(81166006)(4326008)(8936002)(81156014)(31696002)(86362001)(26005)(66946007)(15650500001)(186003)(16526019)(66476007)(6666004)(66556008)(36756003)(16576012)(316002)(6916009)(78286006);DIR:OUT;SFP:1101;SCL:1;SRVR:SN6PR11MB2880;H:SN6PR11MB3360.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: windriver.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Tzwe3+FcR8i0GebttUlZ1s7a3kQ2fkdknDoxLOwDSRhGE3QUDEz4JbVNVc/xWlvN5W4Glrm9Hitm5PFawVmGl763DAkK3+tnYOgUs7rkNpN4nyHrf4k/mfsmVHjXfyKktG1CdHI91W5tnzYC3JJ6U22L5e6W7dFTsKh0gQrun4zb3KOUUb08ppkTLjlm1oYX5h3dCzwo/EUHSk96ccusleHBizS179bvaEz2zgzH707bI8Ku93y8zy2kIKiLBTs4rBx4Ui76o5wqmK/0P/XJP62yTSEzT/PKp2LxyV/TTQthn9GoqKuClvsCx9hmx0gWuadsdgPrkJ8/pTpAg42ABqFzExwWy/E1RtZRHcGfdWYwjb5b7/HwnYzKWCYOffMWq6azk7lU7kY2AUYr9hJ0+0WqPR85A3wxhJ08IQj7UmgXmUFatGakeyt0icOF1kjjwnCumjRj5/y34ncMESDmEuCKTUl5iWm9Ba/i+y9JkAV4G0Ym5vjupMXrxA8AGbgm6hJzM/hwlXBTx+3IclaeXr4d7+nuDRjx9BYL62+M1j0=
+X-MS-Exchange-AntiSpam-MessageData: 219+CEimlBmOL71wNoOQWbl3EKI9VjFJEmHxyyVYKgxPXdE0reCscsfTFEndjEJujTEzivmM1S50oaV0IHJ4r4SrpX/kT6ITcVPju1s2Otdw/ZFuyMjWZ7FUvtlAfamD3s9WZukPFyWdOQcSZrdQmQ==
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f85771a-c97a-433e-9466-08d7ca503887
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 08:50:19.5325
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uF8D3WCKkRFMTUylZEC4EuVnFTlcxpD7bH3MxpZqqZrs4PNEStuu2S1B8T8DTbSMNJA5xMCY3z8Luzfj9r12Gg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB2880
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks.
-Sometimes when I observe multipage bvec on 5.3.7-301.fc31.x86_64.
-This log is from Qemu virtio-blk.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 2
-      0: size: 229376 addr: 0x7fff6a7c8000
-      1: size: 32768 addr: 0x7fff64c00000
-=3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 2
-      0: size: 229376 addr: 0x7fff6a7c8000
-      1: size: 32768 addr: 0x7fff64c00000
 
-I also tested on 5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64.
-And observe 64 iovcnt.
-=3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 64
-      0: size: 4096 addr: 0x7fffb5ece000
-      1: size: 4096 addr: 0x7fffb5ecd000
-...
-      63: size: 4096 addr: 0x7fff8baec000
+On 3/16/20 7:37 PM, Christoph Hellwig wrote:
+> On Mon, Mar 16, 2020 at 07:01:09PM +0800, He Zhe wrote:
+>>> Do 142fe8f and 979c690d work with the build fix applied? (f0b870d
+>>> shouldn't be interesting for this case).
+>> Sorry for slow reply.
+>>
+>> With my build fix applied, the issue is triggered since 142fe8f.
+>> And I can see the endless loop of invalidate and revalidate...
+> Thanks.  Can you test the patch below that restores the previous
+> rather odd behavior of not clearing the capacity to 0 if partition
+> scanning is not enabled?
 
-So I think this is a common issue of the upstream kernel, from 5.3 to 5.6.
+This fixes the issue. I also validated it on v5.6-rc6.
 
-BTW, I have used your script on 5.3.7-301.fc31.x86_64, it works well.
-However, when updating to kernel 5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x8=
-6_64.
-It complains:
+Thank you very much.
 
-root@192.168.19.239 16:57:23 ~ $ ./bvec_avg_pages.py
-In file included from /virtual/main.c:2:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/u=
-api/linux/ptrace.h:142:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/ptrace.h:5:
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/segment.h:266:2:
-error: expected '(' after 'asm'
-        alternative_io ("lsl %[seg],%[p]",
-        ^
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/alternative.h:240:2:
-note: expanded from macro 'alternative_io'
-        asm_inline volatile (ALTERNATIVE(oldinstr, newinstr, feature)   \
-        ^
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/compiler_types.h:210:24:
-note: expanded from macro 'asm_inline'
-#define asm_inline asm __inline
-                       ^
-In file included from /virtual/main.c:3:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/blkdev.h:5:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/sched.h:14:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/pid.h:5:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/rculist.h:11:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/rcupdate.h:27:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/preempt.h:78:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/preempt.h:7:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include/l=
-inux/thread_info.h:38:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/thread_info.h:12:
-In file included from
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/page.h:12:
-/lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/x86/=
-include/asm/page_64.h:49:2:
-error: expected '(' after 'asm'
-        alternative_call_2(clear_page_orig,
+Zhe
 
-Ming Lei <tom.leiming@gmail.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8816=E6=97=
-=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=8811:22=E5=86=99=E9=81=93=EF=BC=9A
 >
-> On Sun, Mar 15, 2020 at 9:34 AM Feng Li <lifeng1519@gmail.com> wrote:
-> >
-> > Hi Ming,
-> > This is my cmd to run qemu:
-> > qemu-2.12.0/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -device
-> > virtio-balloon -cpu host -smp 4 -m 2G -drive
-> > file=3D/root/html/fedora-10g.img,format=3Draw,cache=3Dnone,aio=3Dnative=
-,if=3Dnone,id=3Ddrive-virtio-disk1
-> > -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk1,id=3Dvirti=
-o-disk1,bootindex=3D1
-> > -drive file=3D/dev/sdb,format=3Draw,cache=3Dnone,aio=3Dnative,if=3Dnone=
-,id=3Ddrive-virtio-disk2
-> > -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk2,id=3Dvirti=
-o-disk2,bootindex=3D2
-> > -device virtio-net,netdev=3Dnw1,mac=3D00:11:22:EE:EE:10 -netdev
-> > tap,id=3Dnw1,script=3Dno,downscript=3Dno,ifname=3Dtap0 -serial mon:stdi=
-o
-> > -nographic -object
-> > memory-backend-file,id=3Dmem0,size=3D2G,mem-path=3D/dev/hugepages,share=
-=3Don
-> > -numa node,memdev=3Dmem0 -vnc 0.0.0.0:100 -machine usb=3Don,nvdimm -dev=
-ice
-> > usb-tablet -monitor unix:///tmp/a.socket,server,nowait -qmp
-> > tcp:0.0.0.0:2234,server,nowait
-> >
-> > OS image is Fedora 31. Kernel is 5.3.7-301.fc31.x86_64.
-> >
-> > The address from virio in qemu like this:
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 64
-> >       0: size: 4096 addr: 0x7fffc83f1000
-> >       1: size: 4096 addr: 0x7fffc8037000
-> >       2: size: 4096 addr: 0x7fffd3710000
-> >       3: size: 4096 addr: 0x7fffd5624000
-> >       4: size: 4096 addr: 0x7fffc766c000
-> >       5: size: 4096 addr: 0x7fffc7c21000
-> >       6: size: 4096 addr: 0x7fffc8d54000
-> >       7: size: 4096 addr: 0x7fffc8fc6000
-> >       8: size: 4096 addr: 0x7fffd5659000
-> >       9: size: 4096 addr: 0x7fffc7f88000
-> >       10: size: 4096 addr: 0x7fffc767b000
-> >       11: size: 4096 addr: 0x7fffc8332000
-> >       12: size: 4096 addr: 0x7fffb4297000
-> >       13: size: 4096 addr: 0x7fffc8888000
-> >       14: size: 4096 addr: 0x7fffc93d7000
-> >       15: size: 4096 addr: 0x7fffc9f1f000
-> >
-> > They are not contiguous pages, so the pages in bvec are not continus
-> > physical pages.
-> >
-> > I don't know how to dump the bvec address in bio without recompiling th=
-e kernel.
 >
-> I just run similar test on 5.3.11-100.fc29.x86_64, and the observation
-> is similar with
-> yours.
->
-> However, not observe similar problem in 5.6-rc kernel in VM, maybe kernel=
- config
-> causes the difference.
->
-> BTW, I usually use the attached bcc script to observe bvec pages, and you=
- may
-> try that on upstream kernel.
->
-> Thanks,
-> Ming
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 69bf2fb6f7cd..daac27f4b821 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1520,10 +1520,13 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (invalidate)
+> -		set_capacity(disk, 0);
+> -	else if (disk->fops->revalidate_disk)
+> -		disk->fops->revalidate_disk(disk);
+> +	if (invalidate) {
+> +		if (disk_part_scan_enabled(disk))
+> +			set_capacity(disk, 0);
+> +	} else {
+> +		if (disk->fops->revalidate_disk)
+> +			disk->fops->revalidate_disk(disk);
+> +	}
+>  
+>  	check_disk_size_change(disk, bdev, !invalidate);
+>  
+
