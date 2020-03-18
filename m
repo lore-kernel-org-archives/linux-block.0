@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD77C4332D
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDC6C4332D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 837972137B
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:00:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E4AF20775
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:01:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584565200;
-	bh=oY0SUiEeXSxBkyGUXp0/nvA1R5EflvNU30qHwxT+EX0=;
+	s=default; t=1584565277;
+	bh=42J0861Sc9p/xPMPpZePXMkomnaCTvjQRTecYhjzpUA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=AdXewIHQbYCJVqjHh/XMb0BETxmnSJ7fRpnxqtIANJBC5KZ0JMDAPlHk4WoSkjinV
-	 lZSp5BFmPU/OsInrwKHI3Uf3+2veK7P/uO/ISeMtsVOHqDlkr4NrIw5IfDh8PhJb6l
-	 +oK5+Ju8K4++VBZMH0Ay5lfp99CUNywe36Zj84NE=
+	b=W6PorpqjO4cjXeSPbhp666ZzJgB1WlyB5LOCjw3rJGawmbPVDaeHlkBaO4Fnoyvds
+	 ds3lQSZy/Xw2rhjxZec+n7LFWnCK3ufEVEL7tSEX1YcCfEtAUcLAaZ6TkvVogdJdq4
+	 7dHRLdTvpeUMNj+UmqEQNdrielu88/zXXZRIX4Tc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728308AbgCRU7z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Mar 2020 16:59:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57894 "EHLO mail.kernel.org"
+        id S1728591AbgCRVBQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Mar 2020 17:01:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57158 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728656AbgCRU4m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Mar 2020 16:56:42 -0400
+        id S1727983AbgCRU4T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Mar 2020 16:56:19 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F1BD421707;
-        Wed, 18 Mar 2020 20:56:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 561D420B1F;
+        Wed, 18 Mar 2020 20:56:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584565001;
-        bh=oY0SUiEeXSxBkyGUXp0/nvA1R5EflvNU30qHwxT+EX0=;
+        s=default; t=1584564979;
+        bh=42J0861Sc9p/xPMPpZePXMkomnaCTvjQRTecYhjzpUA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bKaW29Cl6wLJK+RXjhAqvvpsYsQNWM4L6DraYK9u7vR7/RU3rAm9IOLXeX35zx9li
-         M3vqIy9mIpE2oFw+2xHvWhE6Lp9r74Ub8Ape0YI/pvQYnN5AAGuMtv4Yz0kKHxssyf
-         sdN/pF7OHoYXOWLkUAeLecLCdfbe8OE3Gqkg1ci4=
+        b=ycejR//NFAk/yqrhHfNbUyjL5gaXotJAFo45Hsss3odDq4bz3aO5KkpUa+Cx3DkLf
+         gMSsTCPgpFNE8wtBO7E0tb5N6mVbnoKxQ8ZkxtVB7cY3L68eiMhoF0zfapLYlrO+Y5
+         HzNcogGlNekaKFnZtaVaIEyUgdO0c8K3qgSypVOo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Halil Pasic <pasic@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
@@ -46,12 +46,12 @@ Cc:     Halil Pasic <pasic@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 10/15] virtio-blk: fix hw_queue stopped on arbitrary error
-Date:   Wed, 18 Mar 2020 16:56:24 -0400
-Message-Id: <20200318205629.17750-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 20/28] virtio-blk: fix hw_queue stopped on arbitrary error
+Date:   Wed, 18 Mar 2020 16:55:47 -0400
+Message-Id: <20200318205555.17447-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200318205629.17750-1-sashal@kernel.org>
-References: <20200318205629.17750-1-sashal@kernel.org>
+In-Reply-To: <20200318205555.17447-1-sashal@kernel.org>
+References: <20200318205555.17447-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -89,11 +89,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 44ef1d66caa68..f287eec36b282 100644
+index 8767401f75e04..19d226ff15ef8 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
-@@ -215,10 +215,12 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	err = __virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+@@ -271,10 +271,12 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
  	if (err) {
  		virtqueue_kick(vblk->vqs[qid].vq);
 -		blk_mq_stop_hw_queue(hctx);
@@ -106,8 +106,8 @@ index 44ef1d66caa68..f287eec36b282 100644
 -		/* Out of mem doesn't actually happen, since we fall back
 -		 * to direct descriptors */
  		if (err == -ENOMEM || err == -ENOSPC)
- 			return BLK_MQ_RQ_QUEUE_BUSY;
- 		return BLK_MQ_RQ_QUEUE_ERROR;
+ 			return BLK_STS_RESOURCE;
+ 		return BLK_STS_IOERR;
 -- 
 2.20.1
 
