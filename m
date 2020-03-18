@@ -2,123 +2,112 @@ Return-Path: <SRS0=4fFE=5D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFEFC5ACD8
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 15:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD77C4332D
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:00:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B422E20770
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 15:04:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="L9KQnkzJ"
+	by mail.kernel.org (Postfix) with ESMTP id 837972137B
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 21:00:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584565200;
+	bh=oY0SUiEeXSxBkyGUXp0/nvA1R5EflvNU30qHwxT+EX0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=AdXewIHQbYCJVqjHh/XMb0BETxmnSJ7fRpnxqtIANJBC5KZ0JMDAPlHk4WoSkjinV
+	 lZSp5BFmPU/OsInrwKHI3Uf3+2veK7P/uO/ISeMtsVOHqDlkr4NrIw5IfDh8PhJb6l
+	 +oK5+Ju8K4++VBZMH0Ay5lfp99CUNywe36Zj84NE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727268AbgCRPEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Mar 2020 11:04:41 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:34213 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727000AbgCRPEk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Mar 2020 11:04:40 -0400
-Received: by mail-io1-f66.google.com with SMTP id h131so25324802iof.1
-        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2020 08:04:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=K7V57D5LKLD/makwBwGs+Nh4X2eF04Q8o8m9A5gDi7k=;
-        b=L9KQnkzJOVeNGxUvACnsnuPM0B+emqMYZO5pvR9oadDVdJ8MQQY55uvRV+R1vprlFh
-         MN/AVfCalBm4ZnfHwRupa5UirCNWVsiZll9jnXtaaJW2YWSrNuM3BVBoHkFM7UhbIMYD
-         2eHV+t5kU+pyV6qUKPZT5UzYqa6AZSYgEDH2mtyJYnMxi0Gda+HyrlHQASsBLTk4vHJT
-         SuZkhvG8dWEIR9zPQ5MHATUnodYULyO7fms1+6nycF+HqB3zfol3kRE8eL99SkDr+iQn
-         a+kwRo32U01VbVaOki/LxXHI1+36KdxoyQznWJO3Q3zrkfniI8btJyAKyXR61xygIFMJ
-         gBwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=K7V57D5LKLD/makwBwGs+Nh4X2eF04Q8o8m9A5gDi7k=;
-        b=YWIO58CCxCJ9vkEUhYnWITNm46loRVxr2Qrk6yOxfkTxxg9qeOqdje8q7MNDmvM+ov
-         z5hCROTDqQcxA4daPPVAWDaLutOooP5qQwc/SzGOcyEj2anXqtvQtPDh/4lp5Vf7YZeO
-         EiGpCso5q9hjj4S+KPz9QUs6wJ8AvyuUFvbR96PEoikaJ1pHMYrJc4A/u1DZPXA8Gz4K
-         aWUNW1SHtPRRKpCKVWdg7gAHA5QkjswzQOQgREIKcK2hkC3ipA57zKI/aeoS2Z7QUNFp
-         4ko7fGa4qGBXp9sMZ1XfXeqboE9u/ZRUS8nr7dIry+6yczbvldOcJWNg48sYBIUZjDrL
-         0hxQ==
-X-Gm-Message-State: ANhLgQ3HnF7gWa790+j4g/KaWNsONYDiJZv2fCPjgYrM8ABIGrSQRKk3
-        XWbbSJ6ODztV3do41VqVJOcPRzplcI1ri312zy6EmA==
-X-Google-Smtp-Source: ADFU+vsPU4sqnjw/Ln8NOvYRQp67bPCJ3jviKgPkXCwhrtBybp5GM9Cjwg2lfQ33S3vo3ycfFZHOCFR6GXhZeJMLvf0=
-X-Received: by 2002:a02:a581:: with SMTP id b1mr5051956jam.10.1584543879155;
- Wed, 18 Mar 2020 08:04:39 -0700 (PDT)
+        id S1728308AbgCRU7z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Mar 2020 16:59:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57894 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728656AbgCRU4m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Mar 2020 16:56:42 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F1BD421707;
+        Wed, 18 Mar 2020 20:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584565001;
+        bh=oY0SUiEeXSxBkyGUXp0/nvA1R5EflvNU30qHwxT+EX0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bKaW29Cl6wLJK+RXjhAqvvpsYsQNWM4L6DraYK9u7vR7/RU3rAm9IOLXeX35zx9li
+         M3vqIy9mIpE2oFw+2xHvWhE6Lp9r74Ub8Ape0YI/pvQYnN5AAGuMtv4Yz0kKHxssyf
+         sdN/pF7OHoYXOWLkUAeLecLCdfbe8OE3Gqkg1ci4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Halil Pasic <pasic@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 10/15] virtio-blk: fix hw_queue stopped on arbitrary error
+Date:   Wed, 18 Mar 2020 16:56:24 -0400
+Message-Id: <20200318205629.17750-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200318205629.17750-1-sashal@kernel.org>
+References: <20200318205629.17750-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200311161240.30190-1-jinpu.wang@cloud.ionos.com>
- <20200311161240.30190-7-jinpu.wang@cloud.ionos.com> <20200311190156.GH31668@ziepe.ca>
- <CAHg0HuziyOuUZ48Rp5S_-A9osB==UFOTfWH0+35omiqVjogqww@mail.gmail.com>
- <20200312172517.GU31668@ziepe.ca> <CAHg0HuxmjWu2V6gN=OTsv3v6aYxDkQN=z4F4gMYAu5Wwvp1qGg@mail.gmail.com>
- <20200313122546.GC31668@ziepe.ca>
-In-Reply-To: <20200313122546.GC31668@ziepe.ca>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 18 Mar 2020 16:04:28 +0100
-Message-ID: <CAMGffEnyZBw+9RR0YDW7=wdEEFpfTx53iBJGBG8M-ZOM=RA-SA@mail.gmail.com>
-Subject: Re: [PATCH v10 06/26] RDMA/rtrs: client: main functionality
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-snip
-> > > > > > +static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
-> > > > > > +                                   struct rtrs_addr *addr)
-> > > > > > +{
-> > > > > > +     struct rtrs_clt *clt = sess->clt;
-> > > > > > +
-> > > > > > +     mutex_lock(&clt->paths_mutex);
-> > > > > > +     clt->paths_num++;
-> > > > > > +
-> > > > > > +     /*
-> > > > > > +      * Firstly increase paths_num, wait for GP and then
-> > > > > > +      * add path to the list.  Why?  Since we add path with
-> > > > > > +      * !CONNECTED state explanation is similar to what has
-> > > > > > +      * been written in rtrs_clt_remove_path_from_arr().
-> > > > > > +      */
-> > > > > > +     synchronize_rcu();
-> > > > >
-> > > > > This makes no sense to me. RCU readers cannot observe the element in
-> > > > > the list without also observing paths_num++
-> > > > Paths_num is only used to make sure a reader doesn't look for a
-> > > > CONNECTED path in the list for ever - instead he makes at most
-> > > > paths_num attempts. The reader can in fact observe paths_num++ without
-> > > > observing new element in the paths_list, but this is OK. When adding a
-> > > > new path we first increase the paths_num and them add the element to
-> > > > the list to make sure the reader will also iterate over it. When
-> > > > removing the path - the logic is opposite: we first remove element
-> > > > from the list and only then decrement the paths_num.
-> > >
-> > > I don't understand how this explains why synchronize_rcu would be need
-> > > here.
-> > It is needed here so that readers who read the old (smaller) value of
-> > paths_num and are iterating over the list of paths will have a chance
-> > to reach the new path we are about to insert. Basically it is here to
-> > be symmetrical with the removal procedure: remove path,
-> > syncronize_rcu, path_num--.
->
-> How do readers see the paths_num before it is inserted into the list?
->
-> Jason
-We checked again, the synchronize_rcu indeed bogus, list_add_tail_rcu
-has SMP barier,
-so change will be visible to all CPU. We will remove it.
+From: Halil Pasic <pasic@linux.ibm.com>
 
-Thanks!
+[ Upstream commit f5f6b95c72f7f8bb46eace8c5306c752d0133daa ]
+
+Since nobody else is going to restart our hw_queue for us, the
+blk_mq_start_stopped_hw_queues() is in virtblk_done() is not sufficient
+necessarily sufficient to ensure that the queue will get started again.
+In case of global resource outage (-ENOMEM because mapping failure,
+because of swiotlb full) our virtqueue may be empty and we can get
+stuck with a stopped hw_queue.
+
+Let us not stop the queue on arbitrary errors, but only on -EONSPC which
+indicates a full virtqueue, where the hw_queue is guaranteed to get
+started by virtblk_done() before when it makes sense to carry on
+submitting requests. Let us also remove a stale comment.
+
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Fixes: f7728002c1c7 ("virtio_ring: fix return code on DMA mapping fails")
+Link: https://lore.kernel.org/r/20200213123728.61216-2-pasic@linux.ibm.com
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/virtio_blk.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 44ef1d66caa68..f287eec36b282 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -215,10 +215,12 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	err = __virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+ 	if (err) {
+ 		virtqueue_kick(vblk->vqs[qid].vq);
+-		blk_mq_stop_hw_queue(hctx);
++		/* Don't stop the queue if -ENOMEM: we may have failed to
++		 * bounce the buffer due to global resource outage.
++		 */
++		if (err == -ENOSPC)
++			blk_mq_stop_hw_queue(hctx);
+ 		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+-		/* Out of mem doesn't actually happen, since we fall back
+-		 * to direct descriptors */
+ 		if (err == -ENOMEM || err == -ENOSPC)
+ 			return BLK_MQ_RQ_QUEUE_BUSY;
+ 		return BLK_MQ_RQ_QUEUE_ERROR;
+-- 
+2.20.1
+
