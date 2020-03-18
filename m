@@ -2,132 +2,146 @@ Return-Path: <SRS0=4fFE=5D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32170C1975A
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 03:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA7BC10DCE
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 06:29:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8F8A206F1
-	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 03:43:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EFB32076A
+	for <linux-block@archiver.kernel.org>; Wed, 18 Mar 2020 06:29:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmxfuwI/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kEiq/Dj0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbgCRDnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Mar 2020 23:43:53 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30898 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726478AbgCRDnx (ORCPT
+        id S1727043AbgCRG3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Mar 2020 02:29:45 -0400
+Received: from mail-pf1-f172.google.com ([209.85.210.172]:43812 "EHLO
+        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726802AbgCRG3p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Mar 2020 23:43:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584503032;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=bmQ827waZds22LTCNtV+9ynvhEbmWFFpwt6zLVq2YUE=;
-        b=WmxfuwI/RDiXB7Qiu06cuTiXYjnrPcHhnr9gREAOc5hk78D9A0b8lButtzCMKf+m0kas6J
-        TQ8Rk3M4zKgnxKTY27PtrBMJmT13XSW/ixpOjEMV6axxPaFcStuvPkLPdKrfcSF/IFOQQr
-        nLKd1iDt7lFEThNQp6R/wRhKDwxABsQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-Wdyd3PQ3OS2Kk1zMDsiEMg-1; Tue, 17 Mar 2020 23:43:48 -0400
-X-MC-Unique: Wdyd3PQ3OS2Kk1zMDsiEMg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74875801E53;
-        Wed, 18 Mar 2020 03:43:47 +0000 (UTC)
-Received: from localhost (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E49B19C58;
-        Wed, 18 Mar 2020 03:43:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Salman Qazi <sqazi@google.com>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH V2] block: Prevent hung_check firing during long sync IO
-Date:   Wed, 18 Mar 2020 11:43:36 +0800
-Message-Id: <20200318034336.6212-1-ming.lei@redhat.com>
+        Wed, 18 Mar 2020 02:29:45 -0400
+Received: by mail-pf1-f172.google.com with SMTP id f206so2335964pfa.10
+        for <linux-block@vger.kernel.org>; Tue, 17 Mar 2020 23:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=u047cB8yDBpPqDutJpXDnsma04HGIiDhsreyouMKx7E=;
+        b=kEiq/Dj0Gwe6jusCPtETgjtkFbJsJOEea31PlzHY31H6h29hK0gkBbf0519hMOzjBG
+         Qlj9dF5F2u2pBXuCeUT1rwQE66h5GPkg0KamsfuXYM2Rexkfm7uUK2ZxnR6wRdyXW0CJ
+         rTjrXtxQns7rHhqHW0LS/34mg4l9GMPkswYqlBranbM09a059drNVmgp5osPzwliUSEf
+         cK2nWTLrxseC6HrpiHCswbPG4Po3xA3R7bFw+TQ1gGao2+XRtUB4bT3I+uyDoqyT3veg
+         s+S/hM8ISdiqMXRjAtiGtppW323l13AnrENJFbfCWtORi3+dLz9HONeplVHcRvM/jGsx
+         HKmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=u047cB8yDBpPqDutJpXDnsma04HGIiDhsreyouMKx7E=;
+        b=e3s313eq28y4QTDlDhQ5/GnlEYYcXoPMP2zYVQpVclW2xF5aLTC3G9XWLoIqdSTP00
+         JiRvVQY3CP+p3JEZ5fL3XcbVDaZFSxrUBduf8yONLfQBuZWpLlw62eYiZysoAPvCh5On
+         9K3fUib53SPYoUZF9lI+YLFnJdV4r8XvQMXQO7/ugtdA+W2BikKk9Dh363sMOPT653KY
+         b+TKLEcdqMD+UxD0utWdI0DNEz4icbkgvpvanXMZEUBq7sqAR/frbbD7JVs+Q15vX3K4
+         S+EeDRlVkYKrgMZGYCqIAAN9EQWCbK85BoXDkYVu2O7c0cldvbjPKxAtvtn2irs1F1c7
+         T+ww==
+X-Gm-Message-State: ANhLgQ3u6VPRA/DT2uhWDFCdboDF7XvwgihgkhWnoL9plIbfGWs/uwsA
+        TuGQPxX7GsD2Ydcy8s+dZ3rVzc4yQv3RX5Qd4PA=
+X-Google-Smtp-Source: ADFU+vsBC4Ze0e5MicOWZI0IAO3EszHEUI5f2DOjCEasNa26TRxEb86E6bud2DuMXQsnIE4CmtP6VNNqEKYQVHQkj6k=
+X-Received: by 2002:a63:1517:: with SMTP id v23mr2946208pgl.89.1584512983745;
+ Tue, 17 Mar 2020 23:29:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <CAEK8JBBSqiXPY8FhrQ7XqdQ38L9zQepYrZkjoF+r4euTeqfGQQ@mail.gmail.com>
+ <20200312123415.GA7660@ming.t460p> <CAEK8JBAiBwghR5hXiDPETx=EGNi=OTQQz7DOaSXd=96QkUWTGg@mail.gmail.com>
+ <20200313023156.GB27275@ming.t460p> <CAEK8JBCHKbBoXutE5rtxA+kUeoCZB2o=Lsjf9WbYZ+sLayNymA@mail.gmail.com>
+ <CACVXFVPJcO41a-dinfEhLKnJ6P=6sMXyg7SZcXPtqHcyqRPUUA@mail.gmail.com>
+ <CAEK8JBCKH8-tiUj1W6CB_wAx2xF4osDLXG3GNzuAySrgsqp=yQ@mail.gmail.com> <20200317102643.GA8721@ming.t460p>
+In-Reply-To: <20200317102643.GA8721@ming.t460p>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Wed, 18 Mar 2020 14:29:17 +0800
+Message-ID: <CAEK8JBChFOkNTi99CVwXbQZ+9R4OB79SeOy=s0rbNnZnQT+DFA@mail.gmail.com>
+Subject: Re: [Question] IO is split by block layer when size is larger than 4k
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Ming Lei <tom.leiming@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-submit_bio_wait() can be called from ioctl(BLKSECDISCARD), which
-may take long time to complete, as Salman mentioned, 4K BLKSECDISCARD
-takes up to 100 second on some devices. Also any block I/O operation
-that occurs after the BLKSECDISCARD is submitted will also potentially
-be affected by the hung task timeouts.
+Hi Ming,
+What I need is that always get contiguous pages in one bvec.
+Maybe currently it's hard to satisfy this requirement.
+About huge pages, I know the userspace processes could use huge pages
+that kernel reserved.
+Could bio/block layer support use huge pages?
 
-Another report is that task hang can be observed when running mkfs
-over raid10 which takes a small max discard sectors limit because
-of chunk size.
+Thanks again for your help.
 
-So prevent hung_check from firing by taking same approach used
-in blk_execute_rq(), and the wake-up interval is set as half the
-hung_check timer period, which keeps overhead low enough.
+Ming Lei <ming.lei@redhat.com> =E4=BA=8E2020=E5=B9=B43=E6=9C=8817=E6=97=A5=
+=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=886:27=E5=86=99=E9=81=93=EF=BC=9A
 
-Cc: Salman Qazi <sqazi@google.com>
-Cc: Jesse Barnes <jsbarnes@google.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Link: https://lkml.org/lkml/2020/2/12/1193
-Reported-by: Salman Qazi <sqazi@google.com>
-Reviewed-by: Jesse Barnes <jsbarnes@google.com>
-Reviewed-by: Salman Qazi <sqazi@google.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- fix checkpatch warning
-	- add reviewed-by
-	- add comment log for covering one recent report on task hung on
-	  raid10
-
- block/bio.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 94d697217887..0985f3422556 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -17,6 +17,7 @@
- #include <linux/cgroup.h>
- #include <linux/blk-cgroup.h>
- #include <linux/highmem.h>
-+#include <linux/sched/sysctl.h>
-=20
- #include <trace/events/block.h>
- #include "blk.h"
-@@ -1019,12 +1020,21 @@ static void submit_bio_wait_endio(struct bio *bio=
-)
- int submit_bio_wait(struct bio *bio)
- {
- 	DECLARE_COMPLETION_ONSTACK_MAP(done, bio->bi_disk->lockdep_map);
-+	unsigned long hang_check;
-=20
- 	bio->bi_private =3D &done;
- 	bio->bi_end_io =3D submit_bio_wait_endio;
- 	bio->bi_opf |=3D REQ_SYNC;
- 	submit_bio(bio);
--	wait_for_completion_io(&done);
-+
-+	/* Prevent hang_check timer from firing at us during very long I/O */
-+	hang_check =3D sysctl_hung_task_timeout_secs;
-+	if (hang_check)
-+		while (!wait_for_completion_io_timeout(&done,
-+					hang_check * (HZ/2)))
-+			;
-+	else
-+		wait_for_completion_io(&done);
-=20
- 	return blk_status_to_errno(bio->bi_status);
- }
---=20
-2.20.1
-
+>
+> On Tue, Mar 17, 2020 at 04:19:44PM +0800, Feng Li wrote:
+> > Thanks.
+> > Sometimes when I observe multipage bvec on 5.3.7-301.fc31.x86_64.
+> > This log is from Qemu virtio-blk.
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 2
+> >       0: size: 229376 addr: 0x7fff6a7c8000
+> >       1: size: 32768 addr: 0x7fff64c00000
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 2
+> >       0: size: 229376 addr: 0x7fff6a7c8000
+> >       1: size: 32768 addr: 0x7fff64c00000
+>
+> Then it is working.
+>
+> >
+> > I also tested on 5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64.
+> > And observe 64 iovcnt.
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D size: 262144, iovcnt: 64
+> >       0: size: 4096 addr: 0x7fffb5ece000
+> >       1: size: 4096 addr: 0x7fffb5ecd000
+> > ...
+> >       63: size: 4096 addr: 0x7fff8baec000
+> >
+> > So I think this is a common issue of the upstream kernel, from 5.3 to 5=
+.6.
+>
+> As I mentioned before, it is because the pages aren't contiguous
+> physically.
+>
+> If you enable hugepage, you will see lot of pages in one single bvec.
+>
+> >
+> > BTW, I have used your script on 5.3.7-301.fc31.x86_64, it works well.
+> > However, when updating to kernel 5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc3=
+1.x86_64.
+> > It complains:
+> >
+> > root@192.168.19.239 16:57:23 ~ $ ./bvec_avg_pages.py
+> > In file included from /virtual/main.c:2:
+> > In file included from
+> > /lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/inclu=
+de/uapi/linux/ptrace.h:142:
+> > In file included from
+> > /lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/=
+x86/include/asm/ptrace.h:5:
+> > /lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/arch/=
+x86/include/asm/segment.h:266:2:
+> > error: expected '(' after 'asm'
+> >         alternative_io ("lsl %[seg],%[p]",
+>
+> It can be workaround by commenting the following line in
+> /lib/modules/5.6.0-0.rc6.git0.1.vanilla.knurd.1.fc31.x86_64/build/include=
+/generated/autoconf.h:
+>
+> #define CONFIG_CC_HAS_ASM_INLINE 1
+>
+>
+> Thanks,
+> Ming
+>
