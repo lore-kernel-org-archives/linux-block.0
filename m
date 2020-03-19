@@ -2,83 +2,143 @@ Return-Path: <SRS0=6FHI=5E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F8FC4332D
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25433C4332B
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E4962076F
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF44A20772
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hz6uZZpR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="rh8/epw5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726680AbgCSV1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Mar 2020 17:27:07 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:35659 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726619AbgCSV1G (ORCPT
+        id S1726619AbgCSVfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Mar 2020 17:35:06 -0400
+Received: from gateway31.websitewelcome.com ([192.185.144.95]:11168 "EHLO
+        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725895AbgCSVfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Mar 2020 17:27:06 -0400
-Received: by mail-pl1-f193.google.com with SMTP id g6so1614692plt.2
-        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2020 14:27:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=THkvoVhG3wRH5Rf7Wp+NLGPc1Ncq257BuilCW5dt4i4=;
-        b=hz6uZZpRfTVGX8DfGFDVdm31XWrm9xr3K8m5qSo5BlZxmetMgvaWuGSp9CgEX9GWvE
-         GRaQRyNmtGGoteYs0Ydo0fxGlNqlpu1EOQ/Zdj1FQ8xLSykfA1nVbezHr62VG9RF1Gj2
-         e3w7vVqidC8S/r9gvZiJMNy9lDyog9OPDXJmUElHhx6Dtifn0N2OXGvwuq2xPbdJ2vXU
-         4EMtGQhkodb2L0SiCD8K9Ij+7dlfa9gFqbBmmSdEjNkiTTqNkC64qqx1+VwzObhfrLp3
-         HBlTRGznVF8zrGDsCZeaZVWNv46FTT+kLKXmUSQsxXozlUs/RNwjP2s2HZmOfdnMPjbj
-         wRIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=THkvoVhG3wRH5Rf7Wp+NLGPc1Ncq257BuilCW5dt4i4=;
-        b=aYVBBeUGn3NHAuYGA9Yc/mCheeXqGAvlQLCzjqmzEvbTMyCpEUGyYoTeDdUZbBCItu
-         ZDi1tz8OuCyAI50BuC/kAlQ+A88ousQ22y3avKktyskPGGFtmDZbwz4z+sp7ziJS2mB3
-         yS9qlJqw2CfsIpKscGrsrNXyOHgWV7JubNf/DlaNRR9DBl+O5U/Osa3kDbS/pWWyxF7+
-         zUWe5lvPBWkQ7fxWQzyX5bnHh0B1nrZgGIYURQrK0hiqhx58gm1zhIvvpzZiEJ0jCXrH
-         3HDaWme0obLaaJJ+SfuCC+0+imv2kaKpr8Zd2JnexIrAqg4wOLXdaTIpjglnwa0Ns+pt
-         Y5Fw==
-X-Gm-Message-State: ANhLgQ2eOXVgQOUwdXZNeaCnI7H9bh8MArVFAJQtOrkyeN1EAuQEVfFC
-        OV7qjwMoI946tPUkAdsjJq7sxg==
-X-Google-Smtp-Source: ADFU+vuapxu3N3BXVbZTrztGZTquP5PU+VMr3dwFAObPJklDp8y3LH9oth1K+gS3kFd/DMsdkGef3Q==
-X-Received: by 2002:a17:902:444:: with SMTP id 62mr5264448ple.301.1584653223773;
-        Thu, 19 Mar 2020 14:27:03 -0700 (PDT)
-Received: from ?IPv6:2600:380:7458:e065:880c:d56e:ca2:e7c4? ([2600:380:7458:e065:880c:d56e:ca2:e7c4])
-        by smtp.gmail.com with ESMTPSA id j9sm2819739pjz.7.2020.03.19.14.27.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Mar 2020 14:27:02 -0700 (PDT)
-Subject: Re: [PATCH] rsxx: Replace zero-length array with flexible-array
- member
-To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>
+        Thu, 19 Mar 2020 17:35:06 -0400
+X-Greylist: delayed 1331 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Mar 2020 17:35:04 EDT
+Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
+        by gateway31.websitewelcome.com (Postfix) with ESMTP id F291A1EA2
+        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2020 16:12:52 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id F2TEjF9eISl8qF2TEjnoFN; Thu, 19 Mar 2020 16:12:52 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:Subject:From:References:Cc:To:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=Bd4qps44HKQu3Q1TNbLVTx+ti81/j8FzLvCuObjdojg=; b=rh8/epw5pnHDsh4eqSJA35VhNw
+        65kJOhf4p2Pt4yskTMdFZ/fxbo680w8CGUvwrdNHoNOehybusy/BzU3txR2lQpt2DrmWmYK58+BBV
+        wnuBiEoALC5F/K3cnlh1+tvO3kLB08ateIsbOvKsvexVQogg8eRYziWk9xTQlWQe0CxYkmjBJWtsZ
+        DYkYWdt6ewslG0RAXXVoF848/NCbw5U/djQ6xTLFDUFhXYKTxmLFFCC+CTXIPCrfYma+iERGrhcgp
+        ueB/HlRQJd25n9urvuIdVLqdoSKRFB+3WdLciWYKnKdn6nLMqvLxmBq6WhzffMsUHb8lq3Fyx1PUV
+        2uKBHesg==;
+Received: from cablelink-189-218-116-241.hosts.intercable.net ([189.218.116.241]:40838 helo=[192.168.0.22])
+        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1jF2TE-001Teq-Ir; Thu, 19 Mar 2020 16:12:52 -0500
+To:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200212194602.GA31712@embeddedor>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <555096e4-4ce7-3769-f998-6e429d20cadf@kernel.dk>
-Date:   Thu, 19 Mar 2020 15:27:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gustavo@embeddedor.com; keydata=
+ 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
+ VtSixD1uOgytAP7RWS474w==
+Subject: Re: [PATCH] rsxx: Replace zero-length array with flexible-array
+ member
+Message-ID: <969e6ac8-eb7f-1dba-48f3-c7c70a69a54c@embeddedor.com>
+Date:   Thu, 19 Mar 2020 16:12:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
 In-Reply-To: <20200212194602.GA31712@embeddedor>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.218.116.241
+X-Source-L: No
+X-Exim-ID: 1jF2TE-001Teq-Ir
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: cablelink-189-218-116-241.hosts.intercable.net ([192.168.0.22]) [189.218.116.241]:40838
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/12/20 12:46 PM, Gustavo A. R. Silva wrote:
+Hi all,
+
+Friendly ping: Who can take this?
+
+Thanks
+--
+Gustavo
+
+On 2/12/20 1:46 PM, Gustavo A. R. Silva wrote:
 > The current codebase makes use of the zero-length array language
 > extension to the C90 standard, but the preferred mechanism to declare
 > variable-length types such as these ones is a flexible array member[1][2],
@@ -106,9 +166,23 @@ On 2/12/20 12:46 PM, Gustavo A. R. Silva wrote:
 > [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 > [2] https://github.com/KSPP/linux/issues/21
 > [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
-
-Applied for 5.7, thanks.
-
--- 
-Jens Axboe
-
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> ---
+>  drivers/block/rsxx/dma.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/rsxx/dma.c b/drivers/block/rsxx/dma.c
+> index 111eb659e66d..1914f5488b22 100644
+> --- a/drivers/block/rsxx/dma.c
+> +++ b/drivers/block/rsxx/dma.c
+> @@ -80,7 +80,7 @@ struct dma_tracker {
+>  struct dma_tracker_list {
+>  	spinlock_t		lock;
+>  	int			head;
+> -	struct dma_tracker	list[0];
+> +	struct dma_tracker	list[];
+>  };
+>  
+>  
+> 
