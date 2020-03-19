@@ -2,80 +2,92 @@ Return-Path: <SRS0=6FHI=5E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC631C43333
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 085DBC4332D
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:43:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B2D020740
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:33:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fqbeo36M"
+	by mail.kernel.org (Postfix) with ESMTP id CF33A20740
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727014AbgCSKdn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Mar 2020 06:33:43 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:37282 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbgCSKdn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Mar 2020 06:33:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cHEIfPKeH9omjNt+0k991N/wm6h5xTiMPSj7a3ocvkk=; b=fqbeo36MCxVADWcrpk/D9GeNit
-        YSF85PIZ5pZRnh/gMtR2c79Jsb8L7YhvvN64lZ60kOxZfWWSJ6Ae7O7AhkL3Ayjae3KYft2zXedIR
-        fNP+IugcEnmbNPTGciEn4qpUnj9OXjNyaCy7HO5i7Tky2zl+Ayw3wB4suhJF04W2+8RWQ7KuGpZAg
-        UJRxkefSD6ewnGd+iAQwAMtrwc9GVUoW5gZ/n8IDzmU5MBqMX2hMy7c+8sJXOpCVTfBuF7DEYMNPF
-        DEC44x4DgN1K7/3nnWxzQZlc3UczWGFRgrmw9tLdY3dxsXFsfrVkzF/N7t0J1mofyKqstCyOChcH9
-        kcg8bDNQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jEsUg-0001WX-9j; Thu, 19 Mar 2020 10:33:42 +0000
-Date:   Thu, 19 Mar 2020 03:33:42 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        "bjorn.andersson@linaro.org" <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [RFC PATCH v3 4/4] scsi: ufs-qcom: add Inline Crypto Engine
- support
-Message-ID: <20200319103342.GB30601@infradead.org>
-References: <20200312171259.151442-1-ebiggers@kernel.org>
- <20200312171259.151442-5-ebiggers@kernel.org>
- <BY5PR02MB65778B0D07AA92F6AB5E39E8FFFD0@BY5PR02MB6577.namprd02.prod.outlook.com>
- <20200312190541.GB6470@sol.localdomain>
+        id S1726932AbgCSKnG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Mar 2020 06:43:06 -0400
+Received: from relay.sw.ru ([185.231.240.75]:43536 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726911AbgCSKnG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Mar 2020 06:43:06 -0400
+Received: from [192.168.15.99]
+        by relay.sw.ru with esmtp (Exim 4.92.3)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1jEscu-0005aV-EY; Thu, 19 Mar 2020 13:42:12 +0300
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
+To:     Christoph Hellwig <hch@infradead.org>, martin.petersen@oracle.com
+Cc:     axboe@kernel.dk, bob.liu@oracle.com, darrick.wong@oracle.com,
+        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
+        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+        Chaitanya.Kulkarni@wdc.com, ming.lei@redhat.com, osandov@fb.com,
+        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
+ <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+ <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+ <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
+ <20200319102819.GA26418@infradead.org>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <dda7926e-7f2c-61b7-9173-845377cf1229@virtuozzo.com>
+Date:   Thu, 19 Mar 2020 13:42:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200312190541.GB6470@sol.localdomain>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200319102819.GA26418@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 12:05:41PM -0700, Eric Biggers wrote:
-> Of course, if someone actually posts patches to support hardware that diverges
-> from the UFS standard in new and "exciting" ways (whether it's another vendor's
-> hardware or future Qualcomm hardware) then they'll need to post any variant
-> operation(s) they need.  They need to be targetted to only the specific quirk(s)
-> needed, so that drivers don't have to unnecessarily re-implement stuff.
+On 19.03.2020 13:28, Christoph Hellwig wrote:
+> On Fri, Mar 13, 2020 at 04:08:58PM +0300, Kirill Tkhai wrote:
+>> I just don't understand the reason nothing happens :(
+>> I see newly-sent patches comes fast into block tree.
+>> But there is only silence... I grepped over Documentation,
+>> and there is no special rules about block tree. So,
+>> it looks like standard rules should be applyable.
+>>
+>> Some comments? Some requests for reworking? Some personal reasons to ignore my patches?
+> 
+> I'm still completely opposed to the magic overloading using a flag.
+> That is just a bad design waiting for trouble to happen.
 
-I think the only sane answer is that we only support hardware upstream
-that conforms to the standard and we skip all that bullshit.  The whole
-point of the standard is that things just work, and we should not give
-vendors a wild card to come up with bullshit like the interfaces handled
-in this patchset.
+This flag is suggested by Martin Petersen, while the first version of the patchset was based
+on a separate operation.
+
+Since I see only Jens in MAINTAINERS:
+
+BLOCK LAYER
+M:      Jens Axboe <axboe@kernel.dk>
+L:      linux-block@vger.kernel.org
+T:      git git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+S:      Maintained
+F:      block/
+F:      drivers/block/
+F:      kernel/trace/blktrace.c
+F:      lib/sbitmap.c
+
+I expect his comments about final design of this, because both you and Martin are maintainers
+of another subsystems. I don't want rework this many times until Jens says he wants some third
+design.
+
+I think I'm pretty polite and patient in my waiting, while Jens completely ignores me by some
+reasons, which are completely unclear for me. I don't think this is completely polite in relation
+to me.
+
+Kirill
