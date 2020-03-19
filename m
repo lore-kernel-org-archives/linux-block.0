@@ -2,56 +2,58 @@ Return-Path: <SRS0=6FHI=5E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25433C4332B
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64736C4332E
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF44A20772
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3154C2076F
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 21:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="rh8/epw5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="LLE68p0d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726619AbgCSVfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Mar 2020 17:35:06 -0400
-Received: from gateway31.websitewelcome.com ([192.185.144.95]:11168 "EHLO
-        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725895AbgCSVfG (ORCPT
+        id S1727103AbgCSVfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Mar 2020 17:35:50 -0400
+Received: from gateway33.websitewelcome.com ([192.185.146.130]:38900 "EHLO
+        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725895AbgCSVfu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Mar 2020 17:35:06 -0400
-X-Greylist: delayed 1331 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Mar 2020 17:35:04 EDT
+        Thu, 19 Mar 2020 17:35:50 -0400
 Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway31.websitewelcome.com (Postfix) with ESMTP id F291A1EA2
-        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2020 16:12:52 -0500 (CDT)
+        by gateway33.websitewelcome.com (Postfix) with ESMTP id AD5F02E1F5
+        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2020 16:35:48 -0500 (CDT)
 Received: from gator4166.hostgator.com ([108.167.133.22])
         by cmsmtp with SMTP
-        id F2TEjF9eISl8qF2TEjnoFN; Thu, 19 Mar 2020 16:12:52 -0500
+        id F2pQjFeE4Sl8qF2pQjoIcN; Thu, 19 Mar 2020 16:35:48 -0500
 X-Authority-Reason: nr=8
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:Subject:From:References:Cc:To:Sender
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
         :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Bd4qps44HKQu3Q1TNbLVTx+ti81/j8FzLvCuObjdojg=; b=rh8/epw5pnHDsh4eqSJA35VhNw
-        65kJOhf4p2Pt4yskTMdFZ/fxbo680w8CGUvwrdNHoNOehybusy/BzU3txR2lQpt2DrmWmYK58+BBV
-        wnuBiEoALC5F/K3cnlh1+tvO3kLB08ateIsbOvKsvexVQogg8eRYziWk9xTQlWQe0CxYkmjBJWtsZ
-        DYkYWdt6ewslG0RAXXVoF848/NCbw5U/djQ6xTLFDUFhXYKTxmLFFCC+CTXIPCrfYma+iERGrhcgp
-        ueB/HlRQJd25n9urvuIdVLqdoSKRFB+3WdLciWYKnKdn6nLMqvLxmBq6WhzffMsUHb8lq3Fyx1PUV
-        2uKBHesg==;
-Received: from cablelink-189-218-116-241.hosts.intercable.net ([189.218.116.241]:40838 helo=[192.168.0.22])
+        bh=ydq1VF0bf/TIb29Ec7UOcHY18zoRNSkk+eZv0/9UsFU=; b=LLE68p0d0bDxd8QL1H1Osnsg78
+        a00q1RsNLa0tjsk/aCeJKAPXcPgmVMYs055Mq6zAhfLPU6bs5Wy8OkXVOTGe59h+wmum3VlTBk4/o
+        wx8kPh4EX+UP59kt/jNAIQjJv04DxfMkuu1GfkPP7T+PO9vV6imMqy07fDyaYiBbbr4+/MMcFDphq
+        PSP0hFhNM1+WvEKJVFQcrMXo/lzqgSesTYmCNQbiT2eYeeTXMivssAmB2tnx2NSBL9zcjxzyN7qxZ
+        PpGxdnzZklzwNzY9XLe5vCej/4K/MvS8jGiykxN+Ac7SC9L2PkXKXX+fJPV9AXLf0BERHavsdBW+c
+        irao3bPw==;
+Received: from cablelink-189-218-116-241.hosts.intercable.net ([189.218.116.241]:40970 helo=[192.168.0.22])
         by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.92)
         (envelope-from <gustavo@embeddedor.com>)
-        id 1jF2TE-001Teq-Ir; Thu, 19 Mar 2020 16:12:52 -0500
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
+        id 1jF2pQ-001fgL-Cd; Thu, 19 Mar 2020 16:35:48 -0500
+Subject: Re: [PATCH] rsxx: Replace zero-length array with flexible-array
+ member
+To:     Jens Axboe <axboe@kernel.dk>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200212194602.GA31712@embeddedor>
+ <555096e4-4ce7-3769-f998-6e429d20cadf@kernel.dk>
 From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=gustavo@embeddedor.com; keydata=
@@ -97,17 +99,15 @@ Autocrypt: addr=gustavo@embeddedor.com; keydata=
  YJWH93PN+ZUh6i6Rd2U/i8jH5WvzR57UeWxE4P8bQc0hNGrUsHQH6bpHV2lbuhDdqo+cM9eh
  GZEO3+gCDFmKrjspZjkJbB5Gadzvts5fcWGOXEvuT8uQSvl+vEL0g6vczsyPBtqoBLa9SNrS
  VtSixD1uOgytAP7RWS474w==
-Subject: Re: [PATCH] rsxx: Replace zero-length array with flexible-array
- member
-Message-ID: <969e6ac8-eb7f-1dba-48f3-c7c70a69a54c@embeddedor.com>
-Date:   Thu, 19 Mar 2020 16:12:51 -0500
+Message-ID: <c00aa47c-ec41-4145-152f-66c823246690@embeddedor.com>
+Date:   Thu, 19 Mar 2020 16:35:47 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200212194602.GA31712@embeddedor>
+In-Reply-To: <555096e4-4ce7-3769-f998-6e429d20cadf@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
 X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
 X-AntiAbuse: Original Domain - vger.kernel.org
@@ -116,13 +116,13 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 189.218.116.241
 X-Source-L: No
-X-Exim-ID: 1jF2TE-001Teq-Ir
+X-Exim-ID: 1jF2pQ-001fgL-Cd
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
-X-Source-Sender: cablelink-189-218-116-241.hosts.intercable.net ([192.168.0.22]) [189.218.116.241]:40838
+X-Source-Sender: cablelink-189-218-116-241.hosts.intercable.net ([192.168.0.22]) [189.218.116.241]:40970
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 4
+X-Email-Count: 35
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
 Sender: linux-block-owner@vger.kernel.org
@@ -130,59 +130,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
 
-Friendly ping: Who can take this?
 
-Thanks
+On 3/19/20 4:27 PM, Jens Axboe wrote:
+
+>>
+>> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+>> [2] https://github.com/KSPP/linux/issues/21
+>> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+> 
+> Applied for 5.7, thanks.
+> 
+
+Thanks, Jens.
 --
 Gustavo
-
-On 2/12/20 1:46 PM, Gustavo A. R. Silva wrote:
-> The current codebase makes use of the zero-length array language
-> extension to the C90 standard, but the preferred mechanism to declare
-> variable-length types such as these ones is a flexible array member[1][2],
-> introduced in C99:
-> 
-> struct foo {
->         int stuff;
->         struct boo array[];
-> };
-> 
-> By making use of the mechanism above, we will get a compiler warning
-> in case the flexible array does not occur last in the structure, which
-> will help us prevent some kind of undefined behavior bugs from being
-> inadvertenly introduced[3] to the codebase from now on.
-> 
-> Also, notice that, dynamic memory allocations won't be affected by
-> this change:
-> 
-> "Flexible array members have incomplete type, and so the sizeof operator
-> may not be applied. As a quirk of the original implementation of
-> zero-length arrays, sizeof evaluates to zero."[1]
-> 
-> This issue was found with the help of Coccinelle.
-> 
-> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-> [2] https://github.com/KSPP/linux/issues/21
-> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
->  drivers/block/rsxx/dma.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/rsxx/dma.c b/drivers/block/rsxx/dma.c
-> index 111eb659e66d..1914f5488b22 100644
-> --- a/drivers/block/rsxx/dma.c
-> +++ b/drivers/block/rsxx/dma.c
-> @@ -80,7 +80,7 @@ struct dma_tracker {
->  struct dma_tracker_list {
->  	spinlock_t		lock;
->  	int			head;
-> -	struct dma_tracker	list[0];
-> +	struct dma_tracker	list[];
->  };
->  
->  
-> 
