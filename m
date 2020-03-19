@@ -2,92 +2,229 @@ Return-Path: <SRS0=6FHI=5E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085DBC4332D
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED578C4332D
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 11:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF33A20740
-	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 10:43:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A558B20724
+	for <linux-block@archiver.kernel.org>; Thu, 19 Mar 2020 11:01:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uB9WB4pp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726932AbgCSKnG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Mar 2020 06:43:06 -0400
-Received: from relay.sw.ru ([185.231.240.75]:43536 "EHLO relay.sw.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726911AbgCSKnG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Mar 2020 06:43:06 -0400
-Received: from [192.168.15.99]
-        by relay.sw.ru with esmtp (Exim 4.92.3)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1jEscu-0005aV-EY; Thu, 19 Mar 2020 13:42:12 +0300
-Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
- REQ_OP_WRITE_ZEROES
-To:     Christoph Hellwig <hch@infradead.org>, martin.petersen@oracle.com
-Cc:     axboe@kernel.dk, bob.liu@oracle.com, darrick.wong@oracle.com,
-        agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
-        song@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-        Chaitanya.Kulkarni@wdc.com, ming.lei@redhat.com, osandov@fb.com,
-        jthumshirn@suse.de, minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
- <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
- <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
- <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
- <20200319102819.GA26418@infradead.org>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <dda7926e-7f2c-61b7-9173-845377cf1229@virtuozzo.com>
-Date:   Thu, 19 Mar 2020 13:42:11 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726802AbgCSLBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Mar 2020 07:01:40 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:44958 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726188AbgCSLBj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Mar 2020 07:01:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+vl1LPoxkxHOU07W4GJvGU25FEPxKQgvle0+E353mqE=; b=uB9WB4ppC1GoT/zWSO4kHWQgqn
+        YEUMLeqg4KslKZWQmzvuxToWpdzkInoQ6yirSVGLEzZWN+M49KYCqhQL1Kp0IO7qy8wXnrOv3x2aO
+        W5D2/C6QV2R2hwbcqQSbe4YYjO+POTtpgdUFtQJSuA2tp3egSU0flbEt9754bcOhT2aqNszvXB0od
+        0+QAE9ZkFUa8gPY94HJMWAQlEQGtIfutJ+QDTm+6CjBOF8Je23JCGh8n3eOneufR5e0CN4hxZ18r8
+        LBvvqDmI6PGwo4zu5Al12gwJ1sq+GzNaODmkYU5KRKsLc3UYVVWEN6IHokPY+Xlg3+X+ajSHl6+su
+        i3opea0g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jEsvi-00047Y-O6; Thu, 19 Mar 2020 11:01:38 +0000
+Date:   Thu, 19 Mar 2020 04:01:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v8 02/11] block: Inline encryption support for blk-mq
+Message-ID: <20200319110138.GA20097@infradead.org>
+References: <20200312080253.3667-1-satyat@google.com>
+ <20200312080253.3667-3-satyat@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200319102819.GA26418@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200312080253.3667-3-satyat@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19.03.2020 13:28, Christoph Hellwig wrote:
-> On Fri, Mar 13, 2020 at 04:08:58PM +0300, Kirill Tkhai wrote:
->> I just don't understand the reason nothing happens :(
->> I see newly-sent patches comes fast into block tree.
->> But there is only silence... I grepped over Documentation,
->> and there is no special rules about block tree. So,
->> it looks like standard rules should be applyable.
->>
->> Some comments? Some requests for reworking? Some personal reasons to ignore my patches?
-> 
-> I'm still completely opposed to the magic overloading using a flag.
-> That is just a bad design waiting for trouble to happen.
+On Thu, Mar 12, 2020 at 01:02:44AM -0700, Satya Tangirala wrote:
+> +	if (bio_has_crypt_ctx(bio))
+> +		bio_crypt_clone(b, bio, gfp_mask);
 
-This flag is suggested by Martin Petersen, while the first version of the patchset was based
-on a separate operation.
+FYI, what I had tried to suggest when moving the the bio_has_crypt_ctx
+checks out was not to open code them, but to have inline functions.
 
-Since I see only Jens in MAINTAINERS:
+E.g. your current bio_crypt_clone becomes __bio_crypt_clone,
 
-BLOCK LAYER
-M:      Jens Axboe <axboe@kernel.dk>
-L:      linux-block@vger.kernel.org
-T:      git git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-S:      Maintained
-F:      block/
-F:      drivers/block/
-F:      kernel/trace/blktrace.c
-F:      lib/sbitmap.c
+and then a wrapper is added ala:
 
-I expect his comments about final design of this, because both you and Martin are maintainers
-of another subsystems. I don't want rework this many times until Jens says he wants some third
-design.
+static inline void bio_crypt_clone(struct bio *dst, struct bio *src,
+		gfp_t gfp_mask)
+{
+	if (bio_has_crypt_ctx(bio))
+		__bio_crypt_clone(dst, src, gfp_mask);
+}
 
-I think I'm pretty polite and patient in my waiting, while Jens completely ignores me by some
-reasons, which are completely unclear for me. I don't think this is completely polite in relation
+Which also means in all the headers you can now declare everything
+unconditional as long as bio_has_crypt_ctx is stubbed out for the case
+where blk crypto is disabled.
+
+>  	if (bio_integrity(bio)) {
+>  		int ret;
+>  
+>  		ret = bio_integrity_clone(b, bio, gfp_mask);
+> -
+>  		if (ret < 0) {
+>  			bio_put(b);
+>  			return NULL;
+
+Spurious whitespace change.
+
+>  free_and_out:
+> @@ -1813,5 +1830,7 @@ int __init blk_dev_init(void)
+>  	blk_debugfs_root = debugfs_create_dir("block", NULL);
+>  #endif
+>  
+> +	bio_crypt_ctx_init();
+> +
+
+Is there any good reason to explicitly call bio_crypt_ctx_init vs just
+making it a local subsys_initcall?
+
+> +bool bio_crypt_dun_is_contiguous(const struct bio_crypt_ctx *bc,
+> +				 unsigned int bytes,
+> +				 u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE])
+> +{
+> +	int i = 0;
+> +	unsigned int inc = bytes >> bc->bc_key->data_unit_size_bits;
+> +
+> +	while (i < BLK_CRYPTO_DUN_ARRAY_SIZE) {
+> +		if (bc->bc_dun[i] + inc != next_dun[i])
+> +			return false;
+> +		inc = ((bc->bc_dun[i] + inc)  < inc);
+
+Besides the bracing and double whitespace issue this code looks weird
 to me.
 
-Kirill
+So inc starts out as the number of bytes shifted to the dun size.
+
+We then check if it matches the next dun for every entry in the
+array.
+
+But then inc is turned into a bollean for the next iteration.  At that
+point I'm a little lost, can you add comments or make the code more
+explicit?
+
+> +	blk_crypto_rq_set_defaults(rq);
+> +
+> +	err = blk_ksm_get_slot_for_key(rq->q->ksm,
+> +				       bio->bi_crypt_context->bc_key,
+> +				       &rq->crypt_keyslot);
+> +	if (err != BLK_STS_OK)
+> +		pr_warn_once("Failed to acquire keyslot for %s (err=%d).\n",
+> +			     bio->bi_disk->disk_name, err);
+> +	return err;
+
+Is this error really that important?  If someone prints an error here
+I'd expect the low-level driver to do that, as that is the only place
+knowing what kind of error we could have here.
+
+> +int blk_crypto_bio_prep(struct bio **bio_ptr)
+> +{
+> +	struct bio *bio = *bio_ptr;
+> +
+> +	/*
+> +	 * If bio has no data, just pretend it didn't have an encryption
+> +	 * context.
+> +	 */
+> +	if (!bio_has_data(bio)) {
+> +		bio_crypt_free_ctx(bio);
+> +		return 0;
+> +	}
+
+Shouldn't a submitted bio without data but with a crypt context be a
+hard error?
+
+> +	bio_crypt_check_alignment(bio);
+> +	if (bio->bi_status != BLK_STS_OK)
+> +		goto fail;
+
+Weird calling convention.  Why doesn't bio_crypt_check_alignment
+return a bool, and then this becomes the much more obvious:
+
+	if (!bio_crypt_check_alignment(bio)) {
+		bio->bi_status = BLK_STS_IOERR;
+		goto fail;
+	}
+
+> +	/*
+> +	 * Success if device supports the encryption context, and blk-integrity
+> +	 * isn't supported by device/is turned off.
+> +	 */
+> +	if (!blk_ksm_crypto_key_supported(bio->bi_disk->queue->ksm,
+> +					  bio->bi_crypt_context->bc_key)) {
+> +		bio->bi_status = BLK_STS_NOTSUPP;
+> +		goto fail;
+> +	}
+> +
+> +	return 0;
+> +fail:
+> +	bio_endio(*bio_ptr);
+> +	return -EIO;
+
+Weird calling convention again.  If the actual error is in the bio,
+this should just be a bool.
+
+> +void blk_crypto_rq_prep_clone(struct request *dst, struct request *src)
+> +{
+> +	dst->crypt_ctx = src->crypt_ctx;
+> +}
+
+This seems reasonable to inline in the header..
+
+> +	blk_status_t err;
+>  
+>  	blk_queue_bounce(q, &bio);
+>  	__blk_queue_split(q, &bio, &nr_segs);
+> @@ -2002,6 +2007,16 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  
+>  	cookie = request_to_qc_t(data.hctx, rq);
+>  
+> +	if (bio_has_crypt_ctx(bio)) {
+> +		err = blk_crypto_init_request(rq, bio);
+> +		if (err != BLK_STS_OK) {
+
+The err declaration can go into this scope.  I'd also rather call it
+ret as err is usually used for errno codes.
+
+Also blk_crypto_init_request doesn't really need the bio, but just the
+key.  So I'd rather pass the key to avoid confusion what this function
+might do with the bio.
+
+> +			bio->bi_status = err;
+> +			bio_endio(bio);
+> +			blk_mq_end_request(rq, err);
+> +			return BLK_QC_T_NONE;
+
+Shoudn't the blk_mq_end_request just be a blk_mq_free_request here?
+
+> +#ifdef CONFIG_BLOCK
+> +
+> +#include <linux/blk_types.h>
+> +#include <linux/blkdev.h>
+> +
+> +struct request;
+> +struct request_queue;
+> +
+> +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+
+Does the #ifdef CONFIG_BLOCK buy us anything?
