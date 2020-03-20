@@ -2,57 +2,58 @@ Return-Path: <SRS0=+z0d=5F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C62C4332E
-	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 12:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4AC6C4332D
+	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 12:17:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D1CE20754
-	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 12:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73F492051A
+	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 12:17:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FkTr6Qg5"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="AKCED9ak"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgCTMRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Mar 2020 08:17:05 -0400
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:55857 "EHLO
-        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727006AbgCTMRE (ORCPT
+        id S1727114AbgCTMRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Mar 2020 08:17:09 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34531 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbgCTMRI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Mar 2020 08:17:04 -0400
-Received: by mail-wm1-f49.google.com with SMTP id 6so6257652wmi.5
-        for <linux-block@vger.kernel.org>; Fri, 20 Mar 2020 05:17:01 -0700 (PDT)
+        Fri, 20 Mar 2020 08:17:08 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 26so2888632wmk.1
+        for <linux-block@vger.kernel.org>; Fri, 20 Mar 2020 05:17:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=hTiyZCtJ5yIwWcoiETL9tbss+sl/Qg8JKF1emRbYluI=;
-        b=FkTr6Qg5djLomlTqWPuzl2X55o8C6pfm6ro6cV7/PTFAkKPGYUtLh1fXqOWto0x/me
-         iZRyiaCpM3IWpsdzfnnxT6P9LHQXt2NpASco52rv0PgzoEeiQ/05XiLfOCgLnBJWVbTd
-         gWz84kcNjeI03MtFjBU2wrUZ08d+wZhWgrh7e8CC3yUL+m1YR5xjgIhS8U0yVfNEpOmu
-         PS9VeMyoRJbJRDKc8MHfrRMc4ZRKtlusbxWSpoWXQdhU9BbuVPPi3NDM6qywLaKSXd/R
-         ZnV1sVanAWnma532K07VLnUZiaapIxQjkRxt3FvYqv/0usOJXR7HJqWmS0rFp1vgzHOE
-         3xdw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=z27+zNM13KHJv3BZ74xk1dY1fez/zmdK3nAIpuWrj4Y=;
+        b=AKCED9akp//+VpuqdZzWwuk9E2NruMVnTREy+rWLlgBY5Q4lYqdNic1y8Ht5H+tYVC
+         PimUwOd4wFtutA7r+/kPDoBUe2kRoMN6GwPACF4gQ73vXtPOudq2A/hsvxvfkmiHZjTy
+         af2U8fdKJIhr7xygMHaJMVIGYcZFuQrRjERww6s2wqR2pq5FRI/lRotXQbo3VSTQrycD
+         BOS/yNGp2wmO6b6hXoBf7KcHW5zHrSkh7ps5vlCFTPeTLZsyEspUjOvS8yMOh+Us/6pR
+         sleDVh6c9kD4ezQFWcau9eCLXzAO+dk/T+QHyINQnyENlvHXnYfvzWMHuO11Ebh9b7N6
+         vNdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=hTiyZCtJ5yIwWcoiETL9tbss+sl/Qg8JKF1emRbYluI=;
-        b=kLQhqElfqV0sRCdi0nxcP+9351sYzEQCmDBlILC9aQznJYbvVucNPwSH9ygVOpSxsm
-         7AAGUxWy5iwgoDPXhbTB7WxIstW/31y28UJGzN2zRo0PCKWQUo3krNToGjOMVMZCzcAv
-         CEcuMu5U5DeSGy4J4lJ++NwON8K1ww7ltKvRIL9V43EoJIAIykc7hOOzIGpana5/eo2U
-         eRMvBlG9xlcKg7RzwXn8yoshFdFKgL0UlgwQCHUOcjf2K6oVPvStordxrGnLI1KcRzfQ
-         LC2r+GkBlXOa6lCiioaBAaoOo/OOMnQCEolK89MnwGb2yUeEJjCG78btFfurktB5u5EM
-         WBJg==
-X-Gm-Message-State: ANhLgQ1Seg47KQAQXRsmBDZ1/UzRSAmkrGEMIxKf/Yn3OApqCsC4fl+T
-        MYywCQA3XkAm9MpCW8KYIAJ2ZJW6QS8=
-X-Google-Smtp-Source: ADFU+vvK9QwNA6V3ApPrpl4MmF0f38BJYhmJHBtmTB/dvVcaa2wlhe7f6ZzR502y+dxi+EuST/idgQ==
-X-Received: by 2002:a1c:6745:: with SMTP id b66mr9890542wmc.30.1584706620649;
-        Fri, 20 Mar 2020 05:17:00 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=z27+zNM13KHJv3BZ74xk1dY1fez/zmdK3nAIpuWrj4Y=;
+        b=KtBgpQwDp+1VhpNzBex+3Ecxf+TMjbXlSkHmXTQf/+2QMNB2fbCYuazlfKuMf2kNfU
+         ZljBFGdTIudoMkLxBxSGYDgOVfMpXyNyEgyxf17GqpF3g25uIwIoe3neNn+kT3NZJFgr
+         evECxWjK/HFd7vMpZ72LnpxuMDhAHlX1QCRqO+K54F6G4wzLZcfP/eXQxQrI/VUSEHoN
+         peuSfMbTMcIn5qhnRiXlFZPUnsVdCfX1SibvnCduE3kT+mAJCIbDW7kQ+HYgQ/k4rSrE
+         YZq7apCppEgBSltj4mNAFAHRXVbECU/FXFMWx34JrU7UvzJ7WEM40ZrTBhtlUg23ktSb
+         aSYg==
+X-Gm-Message-State: ANhLgQ0eMJxh61KOdIvaoK6Y5P4KRS6FHJePBDbY1zisKiCbI5lZrIge
+        sUMzpsVd235bealPMFhHo6oi1RXk5YE=
+X-Google-Smtp-Source: ADFU+vtsXIdiNVeGC38QIgdaf3h+/aMIUw84AgPETBn7OqE92pWeUzzMqXcd/zKW+R63dAQYF22N6A==
+X-Received: by 2002:a1c:f213:: with SMTP id s19mr9795747wmc.116.1584706625204;
+        Fri, 20 Mar 2020 05:17:05 -0700 (PDT)
 Received: from jwang-Latitude-5491.fritz.box ([2001:16b8:4927:3900:64cf:432e:192d:75a2])
-        by smtp.gmail.com with ESMTPSA id j39sm8593662wre.11.2020.03.20.05.16.58
+        by smtp.gmail.com with ESMTPSA id j39sm8593662wre.11.2020.03.20.05.17.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 05:16:59 -0700 (PDT)
+        Fri, 20 Mar 2020 05:17:04 -0700 (PDT)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
@@ -60,291 +61,469 @@ Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, rpenyaev@suse.de,
         pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v11 00/26] RTRS (former IBTRS) RDMA Transport Library and RNBD (former IBNBD) RDMA Network Block Device
-Date:   Fri, 20 Mar 2020 13:16:31 +0100
-Message-Id: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
+Subject: [PATCH v11 03/26] RDMA/rtrs: private headers with rtrs protocol structs and helpers
+Date:   Fri, 20 Mar 2020 13:16:34 +0100
+Message-Id: <20200320121657.1165-4-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
+References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
-Here is v11 of  the RTRS (former IBTRS) RDMA Transport Library and the
-corresponding RNBD (former IBNBD) RDMA Network Block Device, which includes
-changes to address comments from the community.
+These are common private headers with rtrs protocol structures,
+logging, sysfs and other helper functions, which are used on
+both client and server sides.
 
-Introduction
--------------
-
-RTRS (RDMA Transport) is a reliable high speed transport library
-which allows for establishing connection between client and server
-machines via RDMA. It is based on RDMA-CM, so expect also to support RoCE
-and iWARP, but we mainly tested in IB environment. It is optimized to
-transfer (read/write) IO blocks in the sense that it follows the BIO
-semantics of providing the possibility to either write data from a
-scatter-gather list to the remote side or to request ("read") data
-transfer from the remote side into a given set of buffers.
-
-RTRS is multipath capable and provides I/O fail-over and load-balancing
-functionality, i.e. in RTRS terminology, an RTRS path is a set of RDMA
-connections and particular path is selected according to the load-balancing
-policy. It can be used for other components beside RNBD.
-
-Module parameter always_invalidate is introduced for the security problem
-discussed in LPC RDMA MC 2019. When always_invalidate=Y, on the server side we
-invalidate each rdma buffer before we hand it over to RNBD server and
-then pass it to the block layer. A new rkey is generated and registered for the
-buffer after it returns back from the block layer and RNBD server.
-The new rkey is sent back to the client along with the IO result.
-The procedure is the default behaviour of the driver. This invalidation and
-registration on each IO causes performance drop of up to 20%. A user of the
-driver may choose to load the modules with this mechanism switched off
-(always_invalidate=N), if he understands and can take the risk of a malicious
-client being able to corrupt memory of a server it is connected to. This might
-be a reasonable option in a scenario where all the clients and all the servers
-are located within a secure datacenter.
-
-RNBD (RDMA Network Block Device) is a pair of kernel modules
-(client and server) that allow for remote access of a block device on
-the server over RTRS protocol. After being mapped, the remote block
-devices can be accessed on the client side as local block devices.
-Internally RNBD uses RTRS as an RDMA transport library.
-
-Commits for kernel can be found here:
-   https://github.com/ionos-enterprise/ibnbd/commits/linux-5.6-rc6-ibnbd-v11
-
-Testing
--------
-
-All the changes have been tested with our regression testsuite in our staging environment
-in IONOS data center. it's around 200 testcases, for both always_invalidate=N and
-always_invalidate=Y configurations.
-
-Changelog
----------
-v11:
- o Rebased to linux-5.6-rc6
- o rtrs-clt: use rcu_dereference_protected to avoid warning suggested by Jason
- o rtrs-clt: get rid of the second cancel_delayed_work_sync(reconnect_work) call
- suggested by Jason
- o rtrs-clt: remove unneeded synchronize_rcu suggested by Jason
- o rtrs-clt: removing the opened flag suggested by Jason
- o rtrs-clt: postpone uevent until sysfs is created suggested by Jason
- o rtrs-srv: postpone uevent until sysfs is created.
- o rtrs: remove unnecessary module_get/put call suggested by Jason
- o rtrs-clt: fix up error path in alloc_clt() reported by Jason
- o rtrs: move kdocs to .c files suggested by Jason and Bart
- o rtrs/rnbd: remove print during load/unload module reported by Jason
- o rtrs/rnbd: add missing mutex_destroy
- o rtrs: cleanup dead code
- o rtrs-srv: fix error handling
- o other misc cleanup
-
-v10:
- o Rebased to linux-5.6-rc5
- o Collect Reviewed-by from Bart
- o Update description in Kconfig for RNBD
- o Address comments from Bart for naming/typo/comments/etc
- o removal of rnbd_bio_map_kern by reexporting bio_map_kern suggested by Bart
- o kill some inline wrappers suggested by Bart
- o rtrs: use mutex more consistently reported by Leon
- o rtrs/rnbd: remove prints for allocation failure suggested by Leon
- o rtrs/rnbd: avoid typedefs for function callbacks suggested by Leon
- o rtrs-srv: handle sq_full situation suggested by Jason
- o rtrs-clt: remove useless get_cpu()/put_cpu() in __rtrs_get_permit suggested
- by Jason and Bart.
- o rtrs-srv: inline rtrs_srv_update_rdma_stats
- o other minor cleanup
- * https://lore.kernel.org/linux-block/20200311161240.30190-1-jinpu.wang@cloud.ionos.com/
-v9:
- o Rebased to linux-5.6-rc2
- o Update Date/Kernel version in Documentation
- o Update description in Kconfig for RNBD
- o rtrs-clt: inline rtrs_clt_decrease_inflight
- o rtrs-clt: only track inflight for Min_inflight policy
- * https://lore.kernel.org/linux-block/20200221104721.350-1-jinpuwang@gmail.com/
-v8:
- o Rebased to linux-5.5-rc7
- o Reviewed likey/unlikely usage, only keep the one in IO path suggested by Leon Romanovsky
- o Reviewed inline usage, remove inline for functions longer than 5 lines of code suggested by Leon
- o Removed 2 WARN_ON suggested by Leon
- o Removed 2 empty lines between copyright suggested by Leon
- o Makefile: remove compat include for upstream suggested by Leon
- o rtrs-clt: remove module parameters suggested by Leon
- o drop rnbd_clt_dev_is_mapped
- o rnbd-clt: clean up rnbd_rerun_if_needed
- o rtrs-srv: remove reset_all sysfs
- o rtrs stats: remove wc_completion stats
- o rtrs-clt: enhance doc for rtrs_clt_change_state
- o rtrs-clt: remove unused rtrs_permit_from_pdu
- * https://lore.kernel.org/linux-block/20200124204753.13154-1-jinpuwang@gmail.com/
-v7:
- o Rebased to linux-5.5-rc6
- o Implement code-style/readability/API/Documentation etc suggestions by Bart van Assche
- o Make W=1 clean
- o New benchmark results for Mellanox ConnectX-5
- o second try adding MAINTAINERS entries in alphabetical order as Gal Pressman suggested
- * https://lore.kernel.org/linux-block/20200116125915.14815-1-jinpuwang@gmail.com/
-v6:
-  o Rebased to linux-5.5-rc4
-  o Fix typo in my email address in first patch
-  o Cleanup copyright as suggested by Leon Romanovsky
-  o Remove 2 redudant kobject_del in error path as suggested by Leon Romanovsky
-  o Add MAINTAINERS entries in alphabetical order as Gal Pressman suggested
-  * https://lore.kernel.org/linux-block/20191230102942.18395-1-jinpuwang@gmail.com/
-v5:
-  o Fix the security problem pointed out by Jason
-  o Implement code-style/readability/API/etc suggestions by Bart van Assche
-  o Rename IBTRS and IBNBD to RTRS and RNBD accordingly
-  o Fileio mode support in rnbd-srv has been removed.
-  * https://lore.kernel.org/linux-block/20191220155109.8959-1-jinpuwang@gmail.com/
-v4:
-  o Protocol extended to transport IO priorities
-  o Support for Mellanox ConnectX-4/X-5
-  o Minor sysfs extentions (display access mode on server side)
-  o Bug fixes: cleaning up sysfs folders, race on deallocation of resources
-  o Style fixes
-  * https://lore.kernel.org/linux-block/20190620150337.7847-1-jinpuwang@gmail.com/
-v3:
-  o Sparse fixes:
-     - le32 -> le16 conversion
-     - pcpu and RCU wrong declaration
-     - sysfs: dynamically alloc array of sockaddr structures to reduce
-           size of a stack frame
-  o Rename sysfs folder on client and server sides to show source and
-    destination addresses of the connection, i.e.:
-           .../<session-name>/paths/<src@dst>/
-  o Remove external inclusions from Makefiles.
-  * https://lore.kernel.org/linux-block/20180606152515.25807-1-roman.penyaev@profitbricks.com/
-v2:
-  o IBNBD:
-     - No legacy request IO mode, only MQ is left.
-  o IBTRS:
-     - No FMR registration, only FR is left.
-  * https://lore.kernel.org/linux-block/20180518130413.16997-1-roman.penyaev@profitbricks.com/
-v1:
-  o IBTRS: load-balancing and IO fail-over using multipath features were added.
-  o Major parts of the code were rewritten, simplified and overall code
-    size was reduced by a quarter.
-  * https://lore.kernel.org/linux-block/20180202140904.2017-1-roman.penyaev@profitbricks.com/
-v0:
-  o Initial submission
-  * https://lore.kernel.org/linux-block/1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com/
-
-As always, please review, share your comments, and consider to merge to
-upstream.
-
-Thanks.
-
-
-Jack Wang (26):
-  sysfs: export sysfs_remove_file_self()
-  RDMA/rtrs: public interface header to establish RDMA connections
-  RDMA/rtrs: private headers with rtrs protocol structs and helpers
-  RDMA/rtrs: core: lib functions shared between client and server
-    modules
-  RDMA/rtrs: client: private header with client structs and functions
-  RDMA/rtrs: client: main functionality
-  RDMA/rtrs: client: statistics functions
-  RDMA/rtrs: client: sysfs interface functions
-  RDMA/rtrs: server: private header with server structs and functions
-  RDMA/rtrs: server: main functionality
-  RDMA/rtrs: server: statistics functions
-  RDMA/rtrs: server: sysfs interface functions
-  RDMA/rtrs: include client and server modules into kernel compilation
-  RDMA/rtrs: a bit of documentation
-  block: reexport bio_map_kern
-  block/rnbd: private headers with rnbd protocol structs and helpers
-  block/rnbd: client: private header with client structs and functions
-  block/rnbd: client: main functionality
-  block/rnbd: client: sysfs interface functions
-  block/rnbd: server: private header with server structs and functions
-  block/rnbd: server: main functionality
-  block/rnbd: server: functionality for IO submission to file or block
-    dev
-  block/rnbd: server: sysfs interface functions
-  block/rnbd: include client and server modules into kernel compilation
-  block/rnbd: a bit of documentation
-  MAINTAINERS: Add maintainers for RNBD/RTRS modules
-
- Documentation/ABI/testing/sysfs-block-rnbd    |   46 +
- .../ABI/testing/sysfs-class-rnbd-client       |  111 +
- .../ABI/testing/sysfs-class-rnbd-server       |   50 +
- .../ABI/testing/sysfs-class-rtrs-client       |  131 +
- .../ABI/testing/sysfs-class-rtrs-server       |   53 +
- MAINTAINERS                                   |   14 +
- block/bio.c                                   |    1 +
- drivers/block/Kconfig                         |    2 +
- drivers/block/Makefile                        |    1 +
- drivers/block/rnbd/Kconfig                    |   28 +
- drivers/block/rnbd/Makefile                   |   15 +
- drivers/block/rnbd/README                     |   92 +
- drivers/block/rnbd/rnbd-clt-sysfs.c           |  619 ++++
- drivers/block/rnbd/rnbd-clt.c                 | 1729 ++++++++++
- drivers/block/rnbd/rnbd-clt.h                 |  148 +
- drivers/block/rnbd/rnbd-common.c              |   23 +
- drivers/block/rnbd/rnbd-log.h                 |   41 +
- drivers/block/rnbd/rnbd-proto.h               |  305 ++
- drivers/block/rnbd/rnbd-srv-dev.c             |   94 +
- drivers/block/rnbd/rnbd-srv-dev.h             |   88 +
- drivers/block/rnbd/rnbd-srv-sysfs.c           |  211 ++
- drivers/block/rnbd/rnbd-srv.c                 |  852 +++++
- drivers/block/rnbd/rnbd-srv.h                 |   77 +
- drivers/infiniband/Kconfig                    |    1 +
- drivers/infiniband/ulp/Makefile               |    1 +
- drivers/infiniband/ulp/rtrs/Kconfig           |   27 +
- drivers/infiniband/ulp/rtrs/Makefile          |   15 +
- drivers/infiniband/ulp/rtrs/README            |  213 ++
- drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c  |  205 ++
- drivers/infiniband/ulp/rtrs/rtrs-clt-sysfs.c  |  480 +++
- drivers/infiniband/ulp/rtrs/rtrs-clt.c        | 2963 +++++++++++++++++
- drivers/infiniband/ulp/rtrs/rtrs-clt.h        |  252 ++
- drivers/infiniband/ulp/rtrs/rtrs-log.h        |   28 +
- drivers/infiniband/ulp/rtrs/rtrs-pri.h        |  399 +++
- drivers/infiniband/ulp/rtrs/rtrs-srv-stats.c  |   40 +
- drivers/infiniband/ulp/rtrs/rtrs-srv-sysfs.c  |  298 ++
- drivers/infiniband/ulp/rtrs/rtrs-srv.c        | 2146 ++++++++++++
- drivers/infiniband/ulp/rtrs/rtrs-srv.h        |  147 +
- drivers/infiniband/ulp/rtrs/rtrs.c            |  610 ++++
- drivers/infiniband/ulp/rtrs/rtrs.h            |  193 ++
- fs/sysfs/file.c                               |    1 +
- 41 files changed, 12750 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-block-rnbd
- create mode 100644 Documentation/ABI/testing/sysfs-class-rnbd-client
- create mode 100644 Documentation/ABI/testing/sysfs-class-rnbd-server
- create mode 100644 Documentation/ABI/testing/sysfs-class-rtrs-client
- create mode 100644 Documentation/ABI/testing/sysfs-class-rtrs-server
- create mode 100644 drivers/block/rnbd/Kconfig
- create mode 100644 drivers/block/rnbd/Makefile
- create mode 100644 drivers/block/rnbd/README
- create mode 100644 drivers/block/rnbd/rnbd-clt-sysfs.c
- create mode 100644 drivers/block/rnbd/rnbd-clt.c
- create mode 100644 drivers/block/rnbd/rnbd-clt.h
- create mode 100644 drivers/block/rnbd/rnbd-common.c
- create mode 100644 drivers/block/rnbd/rnbd-log.h
- create mode 100644 drivers/block/rnbd/rnbd-proto.h
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
- create mode 100644 drivers/block/rnbd/rnbd-srv-sysfs.c
- create mode 100644 drivers/block/rnbd/rnbd-srv.c
- create mode 100644 drivers/block/rnbd/rnbd-srv.h
- create mode 100644 drivers/infiniband/ulp/rtrs/Kconfig
- create mode 100644 drivers/infiniband/ulp/rtrs/Makefile
- create mode 100644 drivers/infiniband/ulp/rtrs/README
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-sysfs.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.h
+Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+---
+ drivers/infiniband/ulp/rtrs/rtrs-log.h |  28 ++
+ drivers/infiniband/ulp/rtrs/rtrs-pri.h | 399 +++++++++++++++++++++++++
+ 2 files changed, 427 insertions(+)
  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-log.h
  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-pri.h
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv-stats.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv-sysfs.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.h
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.h
 
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-log.h b/drivers/infiniband/ulp/rtrs/rtrs-log.h
+new file mode 100644
+index 000000000000..53c785b992f2
+--- /dev/null
++++ b/drivers/infiniband/ulp/rtrs/rtrs-log.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RDMA Transport Layer
++ *
++ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
++ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
++ */
++#ifndef RTRS_LOG_H
++#define RTRS_LOG_H
++
++#define rtrs_log(fn, obj, fmt, ...)				\
++	fn("<%s>: " fmt, obj->sessname, ##__VA_ARGS__)
++
++#define rtrs_err(obj, fmt, ...)	\
++	rtrs_log(pr_err, obj, fmt, ##__VA_ARGS__)
++#define rtrs_err_rl(obj, fmt, ...)	\
++	rtrs_log(pr_err_ratelimited, obj, fmt, ##__VA_ARGS__)
++#define rtrs_wrn(obj, fmt, ...)	\
++	rtrs_log(pr_warn, obj, fmt, ##__VA_ARGS__)
++#define rtrs_wrn_rl(obj, fmt, ...) \
++	rtrs_log(pr_warn_ratelimited, obj, fmt, ##__VA_ARGS__)
++#define rtrs_info(obj, fmt, ...) \
++	rtrs_log(pr_info, obj, fmt, ##__VA_ARGS__)
++#define rtrs_info_rl(obj, fmt, ...) \
++	rtrs_log(pr_info_ratelimited, obj, fmt, ##__VA_ARGS__)
++
++#endif /* RTRS_LOG_H */
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-pri.h b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+new file mode 100644
+index 000000000000..6edce28de239
+--- /dev/null
++++ b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+@@ -0,0 +1,399 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RDMA Transport Layer
++ *
++ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
++ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
++ */
++
++#ifndef RTRS_PRI_H
++#define RTRS_PRI_H
++
++#include <linux/uuid.h>
++#include <rdma/rdma_cm.h>
++#include <rdma/ib_verbs.h>
++#include <rdma/ib.h>
++
++#include "rtrs.h"
++
++#define RTRS_PROTO_VER_MAJOR 2
++#define RTRS_PROTO_VER_MINOR 0
++
++#define RTRS_PROTO_VER_STRING __stringify(RTRS_PROTO_VER_MAJOR) "." \
++			       __stringify(RTRS_PROTO_VER_MINOR)
++
++enum rtrs_imm_const {
++	MAX_IMM_TYPE_BITS = 4,
++	MAX_IMM_TYPE_MASK = ((1 << MAX_IMM_TYPE_BITS) - 1),
++	MAX_IMM_PAYL_BITS = 28,
++	MAX_IMM_PAYL_MASK = ((1 << MAX_IMM_PAYL_BITS) - 1),
++};
++
++enum rtrs_imm_type {
++	RTRS_IO_REQ_IMM       = 0, /* client to server */
++	RTRS_IO_RSP_IMM       = 1, /* server to client */
++	RTRS_IO_RSP_W_INV_IMM = 2, /* server to client */
++
++	RTRS_HB_MSG_IMM = 8, /* HB: HeartBeat */
++	RTRS_HB_ACK_IMM = 9,
++
++	RTRS_LAST_IMM,
++};
++
++enum {
++	SERVICE_CON_QUEUE_DEPTH = 512,
++
++	MAX_PATHS_NUM = 128,
++
++	/*
++	 * With the size of struct rtrs_permit allocated on the client, 4K
++	 * is the maximum number of rtrs_permits we can allocate. This number is
++	 * also used on the client to allocate the IU for the user connection
++	 * to receive the RDMA addresses from the server.
++	 */
++	MAX_SESS_QUEUE_DEPTH = 4096,
++
++	RTRS_HB_INTERVAL_MS = 5000,
++	RTRS_HB_MISSED_MAX = 5,
++
++	RTRS_MAGIC = 0x1BBD,
++	RTRS_PROTO_VER = (RTRS_PROTO_VER_MAJOR << 8) | RTRS_PROTO_VER_MINOR,
++};
++
++struct rtrs_ib_dev;
++
++struct rtrs_rdma_dev_pd_ops {
++	struct rtrs_ib_dev *(*alloc)(void);
++	void (*free)(struct rtrs_ib_dev *dev);
++	int (*init)(struct rtrs_ib_dev *dev);
++	void (*deinit)(struct rtrs_ib_dev *dev);
++};
++
++struct rtrs_rdma_dev_pd {
++	struct mutex		mutex;
++	struct list_head	list;
++	enum ib_pd_flags	pd_flags;
++	const struct rtrs_rdma_dev_pd_ops *ops;
++};
++
++struct rtrs_ib_dev {
++	struct ib_device	 *ib_dev;
++	struct ib_pd		 *ib_pd;
++	struct kref		 ref;
++	struct list_head	 entry;
++	struct rtrs_rdma_dev_pd *pool;
++};
++
++struct rtrs_con {
++	struct rtrs_sess	*sess;
++	struct ib_qp		*qp;
++	struct ib_cq		*cq;
++	struct rdma_cm_id	*cm_id;
++	unsigned int		cid;
++};
++
++struct rtrs_sess {
++	struct list_head	entry;
++	struct sockaddr_storage dst_addr;
++	struct sockaddr_storage src_addr;
++	char			sessname[NAME_MAX];
++	uuid_t			uuid;
++	struct rtrs_con	**con;
++	unsigned int		con_num;
++	unsigned int		recon_cnt;
++	struct rtrs_ib_dev	*dev;
++	int			dev_ref;
++	struct ib_cqe		*hb_cqe;
++	void			(*hb_err_handler)(struct rtrs_con *con);
++	struct workqueue_struct *hb_wq;
++	struct delayed_work	hb_dwork;
++	unsigned int		hb_interval_ms;
++	unsigned int		hb_missed_cnt;
++	unsigned int		hb_missed_max;
++};
++
++/* rtrs information unit */
++struct rtrs_iu {
++	struct list_head        list;
++	struct ib_cqe           cqe;
++	dma_addr_t              dma_addr;
++	void                    *buf;
++	size_t                  size;
++	enum dma_data_direction direction;
++};
++
++/**
++ * enum rtrs_msg_types - RTRS message types, see also rtrs/README
++ * @RTRS_MSG_INFO_REQ:		Client additional info request to the server
++ * @RTRS_MSG_INFO_RSP:		Server additional info response to the client
++ * @RTRS_MSG_WRITE:		Client writes data per RDMA to server
++ * @RTRS_MSG_READ:		Client requests data transfer from server
++ * @RTRS_MSG_RKEY_RSP:		Server refreshed rkey for rbuf
++ */
++enum rtrs_msg_types {
++	RTRS_MSG_INFO_REQ,
++	RTRS_MSG_INFO_RSP,
++	RTRS_MSG_WRITE,
++	RTRS_MSG_READ,
++	RTRS_MSG_RKEY_RSP,
++};
++
++/**
++ * enum rtrs_msg_flags - RTRS message flags.
++ * @RTRS_NEED_INVAL:	Send invalidation in response.
++ * @RTRS_MSG_NEW_RKEY_F: Send refreshed rkey in response.
++ */
++enum rtrs_msg_flags {
++	RTRS_MSG_NEED_INVAL_F = 1 << 0,
++	RTRS_MSG_NEW_RKEY_F = 1 << 1,
++};
++
++/**
++ * struct rtrs_sg_desc - RDMA-Buffer entry description
++ * @addr:	Address of RDMA destination buffer
++ * @key:	Authorization rkey to write to the buffer
++ * @len:	Size of the buffer
++ */
++struct rtrs_sg_desc {
++	__le64			addr;
++	__le32			key;
++	__le32			len;
++};
++
++/**
++ * struct rtrs_msg_conn_req - Client connection request to the server
++ * @magic:	   RTRS magic
++ * @version:	   RTRS protocol version
++ * @cid:	   Current connection id
++ * @cid_num:	   Number of connections per session
++ * @recon_cnt:	   Reconnections counter
++ * @sess_uuid:	   UUID of a session (path)
++ * @paths_uuid:	   UUID of a group of sessions (paths)
++ *
++ * NOTE: max size 56 bytes, see man rdma_connect().
++ */
++struct rtrs_msg_conn_req {
++	/* Is set to 0 by cma.c in case of AF_IB, do not touch that.
++	 * see https://www.spinics.net/lists/linux-rdma/msg22397.html
++	 */
++	u8		__cma_version;
++	/* On sender side that should be set to 0, or cma_save_ip_info()
++	 * extract garbage and will fail.
++	 */
++	u8		__ip_version;
++	__le16		magic;
++	__le16		version;
++	__le16		cid;
++	__le16		cid_num;
++	__le16		recon_cnt;
++	uuid_t		sess_uuid;
++	uuid_t		paths_uuid;
++	u8		reserved[12];
++};
++
++/**
++ * struct rtrs_msg_conn_rsp - Server connection response to the client
++ * @magic:	   RTRS magic
++ * @version:	   RTRS protocol version
++ * @errno:	   If rdma_accept() then 0, if rdma_reject() indicates error
++ * @queue_depth:   max inflight messages (queue-depth) in this session
++ * @max_io_size:   max io size server supports
++ * @max_hdr_size:  max msg header size server supports
++ *
++ * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accept().
++ */
++struct rtrs_msg_conn_rsp {
++	__le16		magic;
++	__le16		version;
++	__le16		errno;
++	__le16		queue_depth;
++	__le32		max_io_size;
++	__le32		max_hdr_size;
++	__le32		flags;
++	u8		reserved[36];
++};
++
++/**
++ * struct rtrs_msg_info_req
++ * @type:		@RTRS_MSG_INFO_REQ
++ * @sessname:		Session name chosen by client
++ */
++struct rtrs_msg_info_req {
++	__le16		type;
++	u8		sessname[NAME_MAX];
++	u8		reserved[15];
++};
++
++/**
++ * struct rtrs_msg_info_rsp
++ * @type:		@RTRS_MSG_INFO_RSP
++ * @sg_cnt:		Number of @desc entries
++ * @desc:		RDMA buffers where the client can write to server
++ */
++struct rtrs_msg_info_rsp {
++	__le16		type;
++	__le16          sg_cnt;
++	u8              reserved[4];
++	struct rtrs_sg_desc desc[];
++};
++
++/**
++ * struct rtrs_msg_rkey_rsp
++ * @type:		@RTRS_MSG_RKEY_RSP
++ * @buf_id:		RDMA buf_id of the new rkey
++ * @rkey:		new remote key for RDMA buffers id from server
++ */
++struct rtrs_msg_rkey_rsp {
++	__le16		type;
++	__le16          buf_id;
++	__le32		rkey;
++};
++
++/**
++ * struct rtrs_msg_rdma_read - RDMA data transfer request from client
++ * @type:		always @RTRS_MSG_READ
++ * @usr_len:		length of user payload
++ * @sg_cnt:		number of @desc entries
++ * @desc:		RDMA buffers where the server can write the result to
++ */
++struct rtrs_msg_rdma_read {
++	__le16			type;
++	__le16			usr_len;
++	__le16			flags;
++	__le16			sg_cnt;
++	struct rtrs_sg_desc    desc[];
++};
++
++/**
++ * struct_msg_rdma_write - Message transferred to server with RDMA-Write
++ * @type:		always @RTRS_MSG_WRITE
++ * @usr_len:		length of user payload
++ */
++struct rtrs_msg_rdma_write {
++	__le16			type;
++	__le16			usr_len;
++};
++
++/**
++ * struct_msg_rdma_hdr - header for read or write request
++ * @type:		@RTRS_MSG_WRITE | @RTRS_MSG_READ
++ */
++struct rtrs_msg_rdma_hdr {
++	__le16			type;
++};
++
++/* rtrs.c */
++
++struct rtrs_iu *rtrs_iu_alloc(u32 queue_size, size_t size, gfp_t t,
++			      struct ib_device *dev, enum dma_data_direction,
++			      void (*done)(struct ib_cq *cq, struct ib_wc *wc));
++void rtrs_iu_free(struct rtrs_iu *iu, enum dma_data_direction dir,
++		  struct ib_device *dev, u32 queue_size);
++int rtrs_iu_post_recv(struct rtrs_con *con, struct rtrs_iu *iu);
++int rtrs_iu_post_send(struct rtrs_con *con, struct rtrs_iu *iu, size_t size,
++		      struct ib_send_wr *head);
++int rtrs_iu_post_rdma_write_imm(struct rtrs_con *con, struct rtrs_iu *iu,
++				struct ib_sge *sge, unsigned int num_sge,
++				u32 rkey, u64 rdma_addr, u32 imm_data,
++				enum ib_send_flags flags,
++				struct ib_send_wr *head);
++
++int rtrs_post_recv_empty(struct rtrs_con *con, struct ib_cqe *cqe);
++int rtrs_post_rdma_write_imm_empty(struct rtrs_con *con, struct ib_cqe *cqe,
++				   u32 imm_data, enum ib_send_flags flags,
++				   struct ib_send_wr *head);
++
++int rtrs_cq_qp_create(struct rtrs_sess *rtrs_sess, struct rtrs_con *con,
++		      u32 max_send_sge, int cq_vector, u16 cq_size,
++		      u16 wr_queue_size, enum ib_poll_context poll_ctx);
++void rtrs_cq_qp_destroy(struct rtrs_con *con);
++
++void rtrs_init_hb(struct rtrs_sess *sess, struct ib_cqe *cqe,
++		  unsigned int interval_ms, unsigned int missed_max,
++		  void (*err_handler)(struct rtrs_con *con),
++		  struct workqueue_struct *wq);
++void rtrs_start_hb(struct rtrs_sess *sess);
++void rtrs_stop_hb(struct rtrs_sess *sess);
++void rtrs_send_hb_ack(struct rtrs_sess *sess);
++
++void rtrs_rdma_dev_pd_init(enum ib_pd_flags pd_flags,
++			   struct rtrs_rdma_dev_pd *pool);
++void rtrs_rdma_dev_pd_deinit(struct rtrs_rdma_dev_pd *pool);
++
++struct rtrs_ib_dev *rtrs_ib_dev_find_or_add(struct ib_device *ib_dev,
++					    struct rtrs_rdma_dev_pd *pool);
++int rtrs_ib_dev_put(struct rtrs_ib_dev *dev);
++
++static inline u32 rtrs_to_imm(u32 type, u32 payload)
++{
++	BUILD_BUG_ON(MAX_IMM_PAYL_BITS + MAX_IMM_TYPE_BITS != 32);
++	BUILD_BUG_ON(RTRS_LAST_IMM > (1<<MAX_IMM_TYPE_BITS));
++	return ((type & MAX_IMM_TYPE_MASK) << MAX_IMM_PAYL_BITS) |
++		(payload & MAX_IMM_PAYL_MASK);
++}
++
++static inline void rtrs_from_imm(u32 imm, u32 *type, u32 *payload)
++{
++	*payload = imm & MAX_IMM_PAYL_MASK;
++	*type = imm >> MAX_IMM_PAYL_BITS;
++}
++
++static inline u32 rtrs_to_io_req_imm(u32 addr)
++{
++	return rtrs_to_imm(RTRS_IO_REQ_IMM, addr);
++}
++
++static inline u32 rtrs_to_io_rsp_imm(u32 msg_id, int errno, bool w_inval)
++{
++	enum rtrs_imm_type type;
++	u32 payload;
++
++	/* 9 bits for errno, 19 bits for msg_id */
++	payload = (abs(errno) & 0x1ff) << 19 | (msg_id & 0x7ffff);
++	type = w_inval ? RTRS_IO_RSP_W_INV_IMM : RTRS_IO_RSP_IMM;
++
++	return rtrs_to_imm(type, payload);
++}
++
++static inline void rtrs_from_io_rsp_imm(u32 payload, u32 *msg_id, int *errno)
++{
++	/* 9 bits for errno, 19 bits for msg_id */
++	*msg_id = payload & 0x7ffff;
++	*errno = -(int)((payload >> 19) & 0x1ff);
++}
++
++#define STAT_STORE_FUNC(type, set_value, reset)				\
++static ssize_t set_value##_store(struct kobject *kobj,			\
++			     struct kobj_attribute *attr,		\
++			     const char *buf, size_t count)		\
++{									\
++	int ret = -EINVAL;						\
++	type *sess = container_of(kobj, type, kobj_stats);		\
++									\
++	if (sysfs_streq(buf, "1"))					\
++		ret = reset(&sess->stats, true);			\
++	else if (sysfs_streq(buf, "0"))					\
++		ret = reset(&sess->stats, false);			\
++	if (ret)							\
++		return ret;						\
++									\
++	return count;							\
++}
++
++#define STAT_SHOW_FUNC(type, get_value, print)				\
++static ssize_t get_value##_show(struct kobject *kobj,			\
++			   struct kobj_attribute *attr,			\
++			   char *page)					\
++{									\
++	type *sess = container_of(kobj, type, kobj_stats);		\
++									\
++	return print(&sess->stats, page, PAGE_SIZE);			\
++}
++
++#define STAT_ATTR(type, stat, print, reset)				\
++STAT_STORE_FUNC(type, stat, reset)					\
++STAT_SHOW_FUNC(type, stat, print)					\
++static struct kobj_attribute stat##_attr = __ATTR_RW(stat)
++
++#endif /* RTRS_PRI_H */
 -- 
 2.17.1
 
