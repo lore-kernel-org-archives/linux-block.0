@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454A0C4332B
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7B0C4332D
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:40:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A42A20752
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:38:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEBD92076C
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:40:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbgCUBiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Mar 2020 21:38:14 -0400
-Received: from mx2.didichuxing.com ([36.110.17.22]:32012 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726840AbgCUBiO (ORCPT
+        id S1726840AbgCUBkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Mar 2020 21:40:04 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:2116 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1727046AbgCUBkE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Mar 2020 21:38:14 -0400
-X-ASG-Debug-ID: 1584753674-0e408861fc67ea10001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.211]) by bsf01.didichuxing.com with ESMTP id Bwbj4G0VwMmULf5Q; Sat, 21 Mar 2020 09:21:14 +0800 (CST)
+        Fri, 20 Mar 2020 21:40:04 -0400
+X-ASG-Debug-ID: 1584753666-0e4108235339cd50001-Cu09wu
+Received: from mail.didiglobal.com (bogon [172.20.36.235]) by bsf02.didichuxing.com with ESMTP id 0oVwvWonRB63dX8P; Sat, 21 Mar 2020 09:21:06 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 21 Mar
- 2020 09:21:14 +0800
-Date:   Sat, 21 Mar 2020 09:21:12 +0800
+ 2020 09:21:05 +0800
+Date:   Sat, 21 Mar 2020 09:21:04 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tj@kernel.org>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [RFC 2/3] bio: track timestamp of submitting bio the disk driver
-Message-ID: <178d7f1408a7d6465840c8d8730dd490cecf96b0.1584728740.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [RFC 2/3] bio: track timestamp of submitting bio the disk driver
+Subject: [RFC 1/3] update the real issue size when bio_split
+Message-ID: <c35d6607d06b9cdad280f0e0f612e57910bbd4e4.1584728740.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [RFC 1/3] update the real issue size when bio_split
 Mail-Followup-To: axboe@kernel.dk, tj@kernel.org,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org
 References: <cover.1584728740.git.zhangweiping@didiglobal.com>
@@ -43,13 +43,13 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS04.didichuxing.com (172.20.36.192) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.211]
-X-Barracuda-Start-Time: 1584753674
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Barracuda-Connect: bogon[172.20.36.235]
+X-Barracuda-Start-Time: 1584753666
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 3150
+X-Barracuda-Scan-Msg-Size: 1990
 X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0209
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
 X-Barracuda-Spam-Score: -2.02
 X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
 X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.80738
@@ -61,110 +61,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Change-Id: Ibb9caf20616f83e111113ab5c824c05930c0e523
+The split.bi_iter.bi_size was copied from @bio,
+bi_issue was initialized in this flow:
+bio_clone_fast->__bio_clone_fast->blkcg_bio_issue_init
+
+So the split->bi_issue has a wrong size, so update the size
+at here.
+
+Change-Id: I1f9c8c973ac1d41f4aea17a9a766b4c4d532f642
 Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- block/blk-mq.c             |  3 +++
- include/linux/blk-cgroup.h |  6 ++++++
- include/linux/blk_types.h  | 29 +++++++++++++++++++++++++++++
- 3 files changed, 38 insertions(+)
+ block/bio.c               | 13 +++++++++++++
+ include/linux/blk_types.h |  9 +++++++++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5b2e6550e0b6..53db008ac8d0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -652,6 +652,7 @@ EXPORT_SYMBOL(blk_mq_complete_request);
- void blk_mq_start_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-+	struct bio *bio;
+diff --git a/block/bio.c b/block/bio.c
+index 0985f3422556..8654c4d692e5 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1911,6 +1911,19 @@ struct bio *bio_split(struct bio *bio, int sectors,
  
- 	trace_block_rq_issue(q, rq);
+ 	split->bi_iter.bi_size = sectors << 9;
  
-@@ -660,6 +661,8 @@ void blk_mq_start_request(struct request *rq)
- 		rq->stats_sectors = blk_rq_sectors(rq);
- 		rq->rq_flags |= RQF_STATS;
- 		rq_qos_issue(q, rq);
-+		__rq_for_each_bio(bio, rq)
-+			blkcg_bio_start_init(bio);
- 	}
- 
- 	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index e4a6949fd171..9720f04a9523 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -579,6 +579,11 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
- 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
- }
- 
-+static inline void blkcg_bio_start_init(struct bio *bio)
-+{
-+	bio_start_init(&bio->bi_start);
-+}
++	/*
++	 * reinit bio->bi_issue, the split.bi_iter.bi_size was copied
++	 * from @bio, bi_issue was initialized in this flow:
++	 * bio_clone_fast->__bio_clone_fast->blkcg_bio_issue_init
++	 *
++	 * So the split->bi_issue has a wrong size, so update the size
++	 * at here.
++	 *
++	 * Actually, we can just use blkcg_bio_issue_init, there is just
++	 * a bit difference for the issue_time.
++	 */
++	bio_issue_update_size(&split->bi_issue, bio_sectors(split));
 +
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio)
- {
-@@ -738,6 +743,7 @@ static inline void blkg_get(struct blkcg_gq *blkg) { }
- static inline void blkg_put(struct blkcg_gq *blkg) { }
+ 	if (bio_integrity(split))
+ 		bio_integrity_trim(split);
  
- static inline bool blkcg_punt_bio_submit(struct bio *bio) { return false; }
-++static inline void blkcg_bio_start_init(struct bio *bio) { }
- static inline void blkcg_bio_issue_init(struct bio *bio) { }
- static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 					 struct bio *bio) { return true; }
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 56e41ef3e827..30dc3a73235f 100644
+index 70254ae11769..56e41ef3e827 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -109,10 +109,38 @@ static inline bool blk_path_error(blk_status_t error)
- /* Reserved bit for blk-throtl */
- #define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
+@@ -128,6 +128,15 @@ static inline sector_t bio_issue_size(struct bio_issue *issue)
+ 	return ((issue->value & BIO_ISSUE_SIZE_MASK) >> BIO_ISSUE_SIZE_SHIFT);
+ }
  
-+/* submit bio to block layer */
- struct bio_issue {
- 	u64 value;
- };
- 
-+/*
-+ * submit bio to the disk driver layer
-+ *
-+ * 63:51	reserved
-+ * 50:0		bits: start time of bio
-+ *
-+ * same bitmask as bi_issue
-+ */
-+struct bio_start {
-+	u64 value;
-+};
-+
-+static inline u64 __bio_start_time(u64 time)
++static inline void bio_issue_update_size(struct bio_issue *issue, sector_t size)
 +{
-+	return time & BIO_ISSUE_TIME_MASK;
++	size &= (1ULL << BIO_ISSUE_SIZE_BITS) - 1;
++	/* set all _issue_size bits to 1 */
++	issue->value |= (u64)BIO_ISSUE_SIZE_MASK;
++	/* set new size */
++	issue->value &= ((u64)size << BIO_ISSUE_SIZE_SHIFT);
 +}
 +
-+static inline u64 bio_start_time(struct bio_start *start)
-+{
-+	return __bio_start_time(start->value);
-+}
-+
-+static inline void bio_start_init(struct bio_start *start)
-+{
-+	start->value = ktime_get_ns() & BIO_ISSUE_TIME_MASK;
-+}
-+
- static inline u64 __bio_issue_time(u64 time)
+ static inline void bio_issue_init(struct bio_issue *issue,
+ 				       sector_t size)
  {
- 	return time & BIO_ISSUE_TIME_MASK;
-@@ -178,6 +206,7 @@ struct bio {
- 	 */
- 	struct blkcg_gq		*bi_blkg;
- 	struct bio_issue	bi_issue;
-+	struct bio_start	bi_start;
- #ifdef CONFIG_BLK_CGROUP_IOCOST
- 	u64			bi_iocost_cost;
- #endif
 -- 
 2.18.1
 
