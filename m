@@ -1,133 +1,146 @@
-Return-Path: <SRS0=+z0d=5F=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=o1BL=5G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C5DC4332D
-	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 22:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CDFC43333
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:20:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02A3C20722
-	for <linux-block@archiver.kernel.org>; Fri, 20 Mar 2020 22:24:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B91CE20732
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:20:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbgCTWYa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Mar 2020 18:24:30 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:50304 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbgCTWYa (ORCPT
+        id S1726851AbgCUBUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Mar 2020 21:20:43 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:22704 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726773AbgCUBUm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Mar 2020 18:24:30 -0400
-Received: by mail-pj1-f66.google.com with SMTP id v13so3120351pjb.0
-        for <linux-block@vger.kernel.org>; Fri, 20 Mar 2020 15:24:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=mHkMYa5vZVVlYvxrWrdgU60QiqaYfeJK4ma/tbzKKVM=;
-        b=goBnRIZh1GBwqIghmEa8NIZXQ6fvyKjXrsGe8ZWXo++H3jXs79JxJOFVv43Mr0xwEe
-         7XizHQy4VTErGtzDapM3jHPwmBJj8/OAXDhXSpmRJno4eth+y596oBShsHy7c2Iw6mKV
-         r8J2FC9p9EsmPRz8pJ7k/soQLQS/XsE6VR6ZKu8mlve94EMjS8b6alZ+ahLEfzMuF1eS
-         aJdUaqneBMZb8O+12xE2RtDK1LtoR7/RmUqNQkSeKWM84OBLDfwpvmE1PvX9Bnpwtt1D
-         cvmBNlNvSW2Nbt0lhX2MqCAmh3LSEg1/VSXHYY0r7jI5di7YgD0LSmc7PBros8lGLbv6
-         AmWg==
-X-Gm-Message-State: ANhLgQ0QLHH7IA5DgAxw5rBK5AMwceIBIk2rQhtZhAZlUpTUCzQLJpSG
-        4c0zMHg/LO5r49DAgIaNo8I=
-X-Google-Smtp-Source: ADFU+vvTx5eJz0CW8OwYpguhzejQsBu3e1/yVuCtfOokBLoUOjLMcHh2TJMKCWdEIVziSoDy6swJHQ==
-X-Received: by 2002:a17:902:7d91:: with SMTP id a17mr10672073plm.267.1584743067615;
-        Fri, 20 Mar 2020 15:24:27 -0700 (PDT)
-Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:c142:5d77:5a3f:9429])
-        by smtp.gmail.com with ESMTPSA id z20sm6050530pge.62.2020.03.20.15.24.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 15:24:26 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH blktests v3 4/4] Add a test that triggers the blk_mq_realloc_hw_ctxs() error path
-Date:   Fri, 20 Mar 2020 15:24:13 -0700
-Message-Id: <20200320222413.24386-5-bvanassche@acm.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200320222413.24386-1-bvanassche@acm.org>
-References: <20200320222413.24386-1-bvanassche@acm.org>
+        Fri, 20 Mar 2020 21:20:42 -0400
+X-ASG-Debug-ID: 1584753637-0e408861fc67e960001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.175]) by bsf01.didichuxing.com with ESMTP id wO9k7EimjL3IGaj3; Sat, 21 Mar 2020 09:20:37 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 21 Mar
+ 2020 09:20:37 +0800
+Date:   Sat, 21 Mar 2020 09:20:36 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>, <tj@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
+Subject: [RFC 0/3] blkcg: add blk-iotrack
+Message-ID: <cover.1584728740.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [RFC 0/3] blkcg: add blk-iotrack
+Mail-Followup-To: axboe@kernel.dk, tj@kernel.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS04.didichuxing.com (172.20.36.192) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.175]
+X-Barracuda-Start-Time: 1584753637
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 3665
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.80738
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a test that triggers the code touched by commit d0930bb8f46b ("blk-mq:
-Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()"). This
-test only runs if a recently added fault injection feature is available,
-namely commit 596444e75705 ("null_blk: Add support for init_hctx() fault
-injection").
+Hi all,
 
-Cc: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- tests/block/030     | 42 ++++++++++++++++++++++++++++++++++++++++++
- tests/block/030.out |  1 +
- 2 files changed, 43 insertions(+)
- create mode 100755 tests/block/030
- create mode 100644 tests/block/030.out
+This patchset try to add a monitor-only module blk-iotrack for block
+cgroup.
 
-diff --git a/tests/block/030 b/tests/block/030
-new file mode 100755
-index 000000000000..4a17550ab8eb
---- /dev/null
-+++ b/tests/block/030
-@@ -0,0 +1,42 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright 2020 Google LLC
-+#
-+# Trigger the blk_mq_realloc_hw_ctxs() error path.
-+
-+. tests/block/rc
-+. common/null_blk
-+
-+DESCRIPTION="trigger the blk_mq_realloc_hw_ctxs() error path"
-+QUICK=1
-+
-+requires() {
-+	_have_null_blk || return $?
-+	_have_module_param null_blk init_hctx || return $?
-+}
-+
-+test() {
-+	local i sq=/sys/kernel/config/nullb/nullb0/submit_queues
-+
-+	: "${TIMEOUT:=30}"
-+	if ! _init_null_blk nr_devices=0 queue_mode=2 "init_hctx=$(nproc),100,0,0"; then
-+		echo "Loading null_blk failed"
-+		return 1
-+	fi
-+	if ! _configure_null_blk nullb0 completion_nsec=0 blocksize=512 size=16\
-+	     submit_queues="$(nproc)" memory_backed=1 power=1; then
-+		echo "Configuring null_blk failed"
-+		return 1
-+	fi
-+	if { echo "$(<"$sq")" >$sq; } 2>/dev/null; then
-+		for ((i=0;i<100;i++)); do
-+			echo 1 >$sq
-+			nproc >$sq
-+		done
-+	else
-+		SKIP_REASON="Skipping test because $sq cannot be modified"
-+	fi
-+	rmdir /sys/kernel/config/nullb/nullb0
-+	_exit_null_blk
-+	echo Passed
-+}
-diff --git a/tests/block/030.out b/tests/block/030.out
-new file mode 100644
-index 000000000000..863339fb8ced
---- /dev/null
-+++ b/tests/block/030.out
-@@ -0,0 +1 @@
-+Passed
+It contains kernel space blk-iotrack and user space tools iotrack, and
+you can also write your own tool to do more data analysis.
+
+blk-iotrack was designed to track various io statistic of block cgroup,
+it is based on rq_qos framework. It only tracks io and does not do any
+throttlling.
+
+Compare to blk-iolatency, it provides 8 configurable latency buckets,
+/sys/fs/cgroup/io.iotrack.lat_thresh, blk-iotrack will account the
+number of IOs whose latency less than corresponding threshold. In this
+way we can get the cgroup's latency distribution. The default latency
+bucket is 50us, 100us, 200us, 400us, 1ms, 2ms, 4ms, 8ms.
+
+Compare to io.stat.{rbytes,wbytes,rios,wios,dbytes,dios}, it account
+IOs when IO completed, instead of submited. If IO was throttled by
+io scheduler or other throttle policy, then there is a gap, these
+IOs have not been completed yet.
+
+The previous patch has record the timestamp for each bio, when it
+was issued to the disk driver. Then we can get the disk latency in
+rq_qos_done_bio, this is also be called D2C time. In rq_qos_done_bio,
+blk-iotrack also record total latency(now - bio_issue_time), actually
+it can be treated as the Q2C time. In this way, we can get the percentile
+%d2c=D2C/Q2C for each cgroup. It's very useful to detect the main latency
+is from disk or software e.g. io scheduler or other block cgroup throttle
+policy.
+
+The user space tool, which called iotrack, used to collect these basic
+io statistics and then generate more valuable metrics at cgroup level.
+From iotrack, you can get a cgroup's percentile for io, bytes,
+total_time and disk_time of the whole disk. It can easily to evaluate
+the real weight of the weight based policy(bfq, blk-iocost).
+There are lots of metrics for read and write generate by iotrack,
+for more details, please visit: https://github.com/dublio/iotrack.
+
+Test result for two fio with randread 4K,
+test1 cgroup bfq weight = 800
+test2 cgroup bfq weight = 100
+
+Device      io/s   MB/s    %io    %MB    %tm   %dtm  %d2c %hit0 %hit1 %hit2 %hit3 %hit4 %hit5  %hit6  %hit7 cgroup
+nvme1n1 44588.00 174.17 100.00 100.00 100.00 100.00 38.46  0.25 45.27 95.90 98.33 99.47 99.85  99.92  99.95 /
+nvme1n1 30206.00 117.99  67.74  67.74  29.44  67.29 87.90  0.35 47.82 99.22 99.98 99.99 99.99 100.00 100.00 /test1
+nvme1n1 14370.00  56.13  32.23  32.23  70.55  32.69 17.82  0.03 39.89 88.92 94.88 98.37 99.53  99.77  99.85 /test2
+
+* The root block cgroup "/" shows the io statistics for whole ssd disk.
+
+* test1 use disk's %67 iops and bps.
+
+* %dtm stands for the on disk time, test1 cgroup get 67% of whole disk,
+	that means test1 gets more disk time than test2.
+
+* For test's %d2c, there is only 17% latency cost at hardware disk,
+	that means the main latency cames from software, it was
+	throttled by softwre.
+
+
+The patch1 and patch2 are preapre patch.
+The last patch implement blk-iotrack.
+
+Weiping Zhang (3):
+  update the real issue size when bio_split
+  bio: track timestamp of submitting bio the disk driver
+  blkcg: add blk-iotrack
+
+ block/Kconfig              |   6 +
+ block/Makefile             |   1 +
+ block/bio.c                |  13 ++
+ block/blk-cgroup.c         |   4 +
+ block/blk-iotrack.c        | 436 +++++++++++++++++++++++++++++++++++++
+ block/blk-mq.c             |   3 +
+ block/blk-rq-qos.h         |   3 +
+ block/blk.h                |   7 +
+ include/linux/blk-cgroup.h |   6 +
+ include/linux/blk_types.h  |  38 ++++
+ 10 files changed, 517 insertions(+)
+ create mode 100644 block/blk-iotrack.c
+
+-- 
+2.18.1
+
