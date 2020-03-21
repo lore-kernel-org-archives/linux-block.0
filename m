@@ -6,72 +6,69 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FFEC4332B
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 20:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A02C4332B
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 20:31:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EDF092072C
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 20:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28FF420775
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 20:31:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="onoovAOq"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="MQxHRuAN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727405AbgCUUaB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Mar 2020 16:30:01 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:43892 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726146AbgCUUaB (ORCPT
+        id S1727220AbgCUUbT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Mar 2020 16:31:19 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45740 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726539AbgCUUbT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Mar 2020 16:30:01 -0400
-Received: by mail-pl1-f195.google.com with SMTP id v23so1707ply.10
-        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2020 13:30:00 -0700 (PDT)
+        Sat, 21 Mar 2020 16:31:19 -0400
+Received: by mail-pf1-f195.google.com with SMTP id j10so5252645pfi.12
+        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2020 13:31:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yQE1AGuPuSquTWhE+3+C/nBZtIGBtGuN9+H3HNtBPO4=;
-        b=onoovAOqdnHVRsn+D2keLQnUIEXz3fTCxc3cksfVs1zkhu6Vdw8KpjxT6twmbTppwt
-         LiZsjy65KFeJalVJfVLzWar6TXUbhOtml6ZyhcTMwc2YhaArKrHhlcULFDAp1aBIPanB
-         i6BAT85NkErgBonyqGqRDlbdaBOw9/l8ASyRluZ8jAQoOG+wUwa5fIkbRwgsmwzsyjXB
-         60W+PR7D80ZcGQwPrGlgm2tc3oXWoRBqtRHR8l5tVnOfuiX13cOM33maG6HqmbZnHBg2
-         EL/j2etChh6dpRxHmVZVnfw2R4aOwpeueag239BNhc45g6EdvlY6juYW2mKEpFrFsSI8
-         fd7Q==
+        bh=KtHEUeqpEQFTh0Lhcg4n5H6JIosCRRgpxD4fsra1T24=;
+        b=MQxHRuAN9tzpFIqfnlglw/uACONg2ZcBhmEd99Vp5/2qkqO9rinxrfuqXDoAu28mpF
+         fW+JqkBkRh/RCoKx2c63yeyGbs//OXts5nwquD5iw+gixTOyY+EaaULzCsbyVwnFbLJJ
+         jfRk8BGF88aKh4il9KT8vssDj7kEApngp55+wseBfqRuRC666ZJ3cCKBTvV/3OZ+zr4C
+         HmJsrto+r2iVf6j3pi6SJIJIulIxOTlGXYYVH2MsQ9nLYv/lyU16SER+4DRvsBrhfe6c
+         7VU+vvkHLUxUZUh7QKBlftWhUYFFLMdTLycnauvnSILyuWoX1w1qY4+pKHE1+BaFWL8Q
+         EYqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=yQE1AGuPuSquTWhE+3+C/nBZtIGBtGuN9+H3HNtBPO4=;
-        b=rJlC0CescBx+8yMMR83ctxM+liiH2zrLT8tqqlcEpCOgHdb007oo2fetrYJusxwxS8
-         rwwRpUxtUzUzOxn4YJVZJI7M/iznJh1X+eblPEgQaGlpUdyRpdWW4EZki1dfw3PNNm61
-         PQppkOvwZMC2NsYFaMoHgDgItN/mtibMpykyjDD2lD9T3NXz1nspWA+TOnlNs2dal+NQ
-         w22+7doOa4vVDjQ4ID58Dkh0+FIa449BxNnZP4BhduTEqAW1ZYYnpJeGfAB9S9Xgcw87
-         oxsJ9foF158ePSB5fuGEj+oOpKcVHv7P/jSKbGGjhftsBVkbtKJV7wmmj84F870pLBjv
-         LkVQ==
-X-Gm-Message-State: ANhLgQ3XL2d5dwgs4EuLQV3eGhndyawtwyVBhKzllrbn9+cxtgwnOdrO
-        c0VDZZmBdYe5Ml4Z9pLibQTyGQ==
-X-Google-Smtp-Source: ADFU+vtUmqZZZVxes1ZaCw/2dVpYE55mRIa/+emJV6bikExnLRHzXdQZYPtBfcwkAkkR+6uwQRUENw==
-X-Received: by 2002:a17:90a:c396:: with SMTP id h22mr16833567pjt.128.1584822599958;
-        Sat, 21 Mar 2020 13:29:59 -0700 (PDT)
+        bh=KtHEUeqpEQFTh0Lhcg4n5H6JIosCRRgpxD4fsra1T24=;
+        b=L2oouOX3tYeQUpaPXfbX+y3sCFyKi7Qye3Q3JKr2dWrPWZ56R96/Zqb4tMZyOwJpCy
+         Hqtqdcd1UQaYCe7IGlxYiRdP6xfqRAzL75x5m3hxp5ctTBG7eBY07D05zWBbRyCtzpV8
+         uoDz15ad4b7LgoKaQFPn6HU9XWkcZACK+F5fyOnx5UgTUOXnlP9UJQUpk8kQw7b9ZRkf
+         3Xm55Uw/zMZ+RO3A49Np8aILpg3fmw5lON8ZqjgspkHuhZnM/UmoZ/ue63X0Tyi+eOli
+         NGzewFbO7zAgQ6uBt/ES5u01gOIDGRZc3iHRl1bZiZjskIpWXvUSIqbYNa3iuWcW1pJb
+         p9qg==
+X-Gm-Message-State: ANhLgQ0QEhTeN2iN2KcpNSsQ+OaFcaOk/suZnHgb0q//srow/7S/6r8n
+        wx4Un0Ty5y/DvQ5q7HeW2c8SAA==
+X-Google-Smtp-Source: ADFU+vtkMgIvvqtkf5AO3P+JUquBgDfkgt0cwYNph/foYs8bN4hSKJW1JCzh/ITalvv430YzMkUDkQ==
+X-Received: by 2002:a63:7e52:: with SMTP id o18mr15282915pgn.46.1584822677898;
+        Sat, 21 Mar 2020 13:31:17 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id y30sm9353091pff.67.2020.03.21.13.29.58
+        by smtp.gmail.com with ESMTPSA id 5sm9131565pfw.98.2020.03.21.13.31.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Mar 2020 13:29:59 -0700 (PDT)
-Subject: Re: [PATCH V3] block, bfq: fix use-after-free in
- bfq_idle_slice_timer_body
-To:     Zhiqiang Liu <liuzhiqiang26@huawei.com>, paolo.valente@linaro.org
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Mingfangsen <mingfangsen@huawei.com>, yanxiaodan@huawei.com,
-        "wubo (T)" <wubo40@huawei.com>, renxudong <renxudong1@huawei.com>,
-        Louhongxiang <louhongxiang@huawei.com>, linfeilong@huawei.com,
-        wangwang2@huawei.com
-References: <da33586a-6fc1-0708-e86d-b09e349200f8@huawei.com>
+        Sat, 21 Mar 2020 13:31:17 -0700 (PDT)
+Subject: Re: [PATCH BUGFIX 0/4] block, bfq: series of cgroups-related fix
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+        rasibley@redhat.com, vkabatov@redhat.com, xzhou@redhat.com,
+        jstancek@redhat.com
+References: <20200321094521.85986-1-paolo.valente@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1052be18-ef45-e254-e1bb-09a7cd6d891f@kernel.dk>
-Date:   Sat, 21 Mar 2020 14:29:57 -0600
+Message-ID: <1c1e5f7d-14f8-1092-a777-a7ac457e9d0a@kernel.dk>
+Date:   Sat, 21 Mar 2020 14:31:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <da33586a-6fc1-0708-e86d-b09e349200f8@huawei.com>
+In-Reply-To: <20200321094521.85986-1-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,22 +77,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/19/20 5:18 AM, Zhiqiang Liu wrote:
-> 
-> In bfq_idle_slice_timer func, bfqq = bfqd->in_service_queue is
-> not in bfqd-lock critical section. The bfqq, which is not
-> equal to NULL in bfq_idle_slice_timer, may be freed after passing
-> to bfq_idle_slice_timer_body. So we will access the freed memory.
-> 
-> In addition, considering the bfqq may be in race, we should
-> firstly check whether bfqq is in service before doing something
-> on it in bfq_idle_slice_timer_body func. If the bfqq in race is
-> not in service, it means the bfqq has been expired through
-> __bfq_bfqq_expire func, and wait_request flags has been cleared in
-> __bfq_bfqd_reset_in_service func. So we do not need to re-clear the
-> wait_request of bfqq which is not in service.
+On 3/21/20 3:45 AM, Paolo Valente wrote:
+> Hi,
+> this is a series of four fixes. The first patch fixes the issue
+> reported in [1], while the following patches fix a few extra issues
+> found while testing the first fix.
 
-Applied, thanks.
+Applied for 5.7, thanks.
 
 -- 
 Jens Axboe
