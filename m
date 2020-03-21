@@ -2,52 +2,54 @@ Return-Path: <SRS0=o1BL=5G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CDFC43333
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454A0C4332B
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:38:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B91CE20732
-	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A42A20752
+	for <linux-block@archiver.kernel.org>; Sat, 21 Mar 2020 01:38:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726851AbgCUBUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Mar 2020 21:20:43 -0400
-Received: from mx1.didichuxing.com ([111.202.154.82]:22704 "HELO
+        id S1727046AbgCUBiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Mar 2020 21:38:14 -0400
+Received: from mx2.didichuxing.com ([36.110.17.22]:32012 "HELO
         bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726773AbgCUBUm (ORCPT
+        with SMTP id S1726840AbgCUBiO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Mar 2020 21:20:42 -0400
-X-ASG-Debug-ID: 1584753637-0e408861fc67e960001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.175]) by bsf01.didichuxing.com with ESMTP id wO9k7EimjL3IGaj3; Sat, 21 Mar 2020 09:20:37 +0800 (CST)
+        Fri, 20 Mar 2020 21:38:14 -0400
+X-ASG-Debug-ID: 1584753674-0e408861fc67ea10001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.211]) by bsf01.didichuxing.com with ESMTP id Bwbj4G0VwMmULf5Q; Sat, 21 Mar 2020 09:21:14 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 21 Mar
- 2020 09:20:37 +0800
-Date:   Sat, 21 Mar 2020 09:20:36 +0800
+ 2020 09:21:14 +0800
+Date:   Sat, 21 Mar 2020 09:21:12 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tj@kernel.org>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [RFC 0/3] blkcg: add blk-iotrack
-Message-ID: <cover.1584728740.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [RFC 0/3] blkcg: add blk-iotrack
+Subject: [RFC 2/3] bio: track timestamp of submitting bio the disk driver
+Message-ID: <178d7f1408a7d6465840c8d8730dd490cecf96b0.1584728740.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [RFC 2/3] bio: track timestamp of submitting bio the disk driver
 Mail-Followup-To: axboe@kernel.dk, tj@kernel.org,
         linux-block@vger.kernel.org, cgroups@vger.kernel.org
+References: <cover.1584728740.git.zhangweiping@didiglobal.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
+In-Reply-To: <cover.1584728740.git.zhangweiping@didiglobal.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS04.didichuxing.com (172.20.36.192) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.175]
-X-Barracuda-Start-Time: 1584753637
+X-Barracuda-Connect: localhost[172.20.36.211]
+X-Barracuda-Start-Time: 1584753674
 X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 3665
+X-Barracuda-Scan-Msg-Size: 3150
 X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0209
 X-Barracuda-Spam-Score: -2.02
 X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
 X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.80738
@@ -59,88 +61,110 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+Change-Id: Ibb9caf20616f83e111113ab5c824c05930c0e523
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+---
+ block/blk-mq.c             |  3 +++
+ include/linux/blk-cgroup.h |  6 ++++++
+ include/linux/blk_types.h  | 29 +++++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-This patchset try to add a monitor-only module blk-iotrack for block
-cgroup.
-
-It contains kernel space blk-iotrack and user space tools iotrack, and
-you can also write your own tool to do more data analysis.
-
-blk-iotrack was designed to track various io statistic of block cgroup,
-it is based on rq_qos framework. It only tracks io and does not do any
-throttlling.
-
-Compare to blk-iolatency, it provides 8 configurable latency buckets,
-/sys/fs/cgroup/io.iotrack.lat_thresh, blk-iotrack will account the
-number of IOs whose latency less than corresponding threshold. In this
-way we can get the cgroup's latency distribution. The default latency
-bucket is 50us, 100us, 200us, 400us, 1ms, 2ms, 4ms, 8ms.
-
-Compare to io.stat.{rbytes,wbytes,rios,wios,dbytes,dios}, it account
-IOs when IO completed, instead of submited. If IO was throttled by
-io scheduler or other throttle policy, then there is a gap, these
-IOs have not been completed yet.
-
-The previous patch has record the timestamp for each bio, when it
-was issued to the disk driver. Then we can get the disk latency in
-rq_qos_done_bio, this is also be called D2C time. In rq_qos_done_bio,
-blk-iotrack also record total latency(now - bio_issue_time), actually
-it can be treated as the Q2C time. In this way, we can get the percentile
-%d2c=D2C/Q2C for each cgroup. It's very useful to detect the main latency
-is from disk or software e.g. io scheduler or other block cgroup throttle
-policy.
-
-The user space tool, which called iotrack, used to collect these basic
-io statistics and then generate more valuable metrics at cgroup level.
-From iotrack, you can get a cgroup's percentile for io, bytes,
-total_time and disk_time of the whole disk. It can easily to evaluate
-the real weight of the weight based policy(bfq, blk-iocost).
-There are lots of metrics for read and write generate by iotrack,
-for more details, please visit: https://github.com/dublio/iotrack.
-
-Test result for two fio with randread 4K,
-test1 cgroup bfq weight = 800
-test2 cgroup bfq weight = 100
-
-Device      io/s   MB/s    %io    %MB    %tm   %dtm  %d2c %hit0 %hit1 %hit2 %hit3 %hit4 %hit5  %hit6  %hit7 cgroup
-nvme1n1 44588.00 174.17 100.00 100.00 100.00 100.00 38.46  0.25 45.27 95.90 98.33 99.47 99.85  99.92  99.95 /
-nvme1n1 30206.00 117.99  67.74  67.74  29.44  67.29 87.90  0.35 47.82 99.22 99.98 99.99 99.99 100.00 100.00 /test1
-nvme1n1 14370.00  56.13  32.23  32.23  70.55  32.69 17.82  0.03 39.89 88.92 94.88 98.37 99.53  99.77  99.85 /test2
-
-* The root block cgroup "/" shows the io statistics for whole ssd disk.
-
-* test1 use disk's %67 iops and bps.
-
-* %dtm stands for the on disk time, test1 cgroup get 67% of whole disk,
-	that means test1 gets more disk time than test2.
-
-* For test's %d2c, there is only 17% latency cost at hardware disk,
-	that means the main latency cames from software, it was
-	throttled by softwre.
-
-
-The patch1 and patch2 are preapre patch.
-The last patch implement blk-iotrack.
-
-Weiping Zhang (3):
-  update the real issue size when bio_split
-  bio: track timestamp of submitting bio the disk driver
-  blkcg: add blk-iotrack
-
- block/Kconfig              |   6 +
- block/Makefile             |   1 +
- block/bio.c                |  13 ++
- block/blk-cgroup.c         |   4 +
- block/blk-iotrack.c        | 436 +++++++++++++++++++++++++++++++++++++
- block/blk-mq.c             |   3 +
- block/blk-rq-qos.h         |   3 +
- block/blk.h                |   7 +
- include/linux/blk-cgroup.h |   6 +
- include/linux/blk_types.h  |  38 ++++
- 10 files changed, 517 insertions(+)
- create mode 100644 block/blk-iotrack.c
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5b2e6550e0b6..53db008ac8d0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -652,6 +652,7 @@ EXPORT_SYMBOL(blk_mq_complete_request);
+ void blk_mq_start_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
++	struct bio *bio;
+ 
+ 	trace_block_rq_issue(q, rq);
+ 
+@@ -660,6 +661,8 @@ void blk_mq_start_request(struct request *rq)
+ 		rq->stats_sectors = blk_rq_sectors(rq);
+ 		rq->rq_flags |= RQF_STATS;
+ 		rq_qos_issue(q, rq);
++		__rq_for_each_bio(bio, rq)
++			blkcg_bio_start_init(bio);
+ 	}
+ 
+ 	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index e4a6949fd171..9720f04a9523 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -579,6 +579,11 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ }
+ 
++static inline void blkcg_bio_start_init(struct bio *bio)
++{
++	bio_start_init(&bio->bi_start);
++}
++
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
+@@ -738,6 +743,7 @@ static inline void blkg_get(struct blkcg_gq *blkg) { }
+ static inline void blkg_put(struct blkcg_gq *blkg) { }
+ 
+ static inline bool blkcg_punt_bio_submit(struct bio *bio) { return false; }
+++static inline void blkcg_bio_start_init(struct bio *bio) { }
+ static inline void blkcg_bio_issue_init(struct bio *bio) { }
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio) { return true; }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 56e41ef3e827..30dc3a73235f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -109,10 +109,38 @@ static inline bool blk_path_error(blk_status_t error)
+ /* Reserved bit for blk-throtl */
+ #define BIO_ISSUE_THROTL_SKIP_LATENCY (1ULL << 63)
+ 
++/* submit bio to block layer */
+ struct bio_issue {
+ 	u64 value;
+ };
+ 
++/*
++ * submit bio to the disk driver layer
++ *
++ * 63:51	reserved
++ * 50:0		bits: start time of bio
++ *
++ * same bitmask as bi_issue
++ */
++struct bio_start {
++	u64 value;
++};
++
++static inline u64 __bio_start_time(u64 time)
++{
++	return time & BIO_ISSUE_TIME_MASK;
++}
++
++static inline u64 bio_start_time(struct bio_start *start)
++{
++	return __bio_start_time(start->value);
++}
++
++static inline void bio_start_init(struct bio_start *start)
++{
++	start->value = ktime_get_ns() & BIO_ISSUE_TIME_MASK;
++}
++
+ static inline u64 __bio_issue_time(u64 time)
+ {
+ 	return time & BIO_ISSUE_TIME_MASK;
+@@ -178,6 +206,7 @@ struct bio {
+ 	 */
+ 	struct blkcg_gq		*bi_blkg;
+ 	struct bio_issue	bi_issue;
++	struct bio_start	bi_start;
+ #ifdef CONFIG_BLK_CGROUP_IOCOST
+ 	u64			bi_iocost_cost;
+ #endif
 -- 
 2.18.1
 
