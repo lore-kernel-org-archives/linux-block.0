@@ -2,102 +2,98 @@ Return-Path: <SRS0=AgPR=5H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F2CC54EEB
-	for <linux-block@archiver.kernel.org>; Sun, 22 Mar 2020 09:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEE9C4332E
+	for <linux-block@archiver.kernel.org>; Sun, 22 Mar 2020 16:07:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29FD420753
-	for <linux-block@archiver.kernel.org>; Sun, 22 Mar 2020 09:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B44142072E
+	for <linux-block@archiver.kernel.org>; Sun, 22 Mar 2020 16:07:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gjmiSoZp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XgrfzTMP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbgCVJaB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Mar 2020 05:30:01 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:48596 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726827AbgCVJaB (ORCPT
+        id S1725985AbgCVQHq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Mar 2020 12:07:46 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35363 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725881AbgCVQHp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Mar 2020 05:30:01 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02M9OcCX024473;
-        Sun, 22 Mar 2020 09:29:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=eKfa3IdaCFFbAJ15qxfyTOoyMh8TmQPDYyEctN+Wptk=;
- b=gjmiSoZpCgsDQkNWcHI74TiI43MMrT2ACzIKf9oYCnczP4G9rEoUNmZahOiTzmd7aZ7i
- O9sJC1xnXuJaFfMp7QWqGJ8r+Fg+L5xwm2t5YCG036HbcyUMET8yFD8gmI4A3PGWjutd
- qpmk+XiI06el3FGn5VWYekrknacz52grncquq4V4gxokVE+qokpzPPQ2IrCPAvZha5fP
- gNW1szCQgeXUKPJuIJLqim5gq/yfP/zh/JyBCOXt9pYQcQOayR33HPC2I75yQGqQcdUf
- ocmnIi3XpJz1YPVqB9RewpmSVB1voe0sGBegdcP2GoIczkbdDePJcAAbkZbrk0Zyx/dc Mg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2ywbjmtmpn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 22 Mar 2020 09:29:57 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02M9NHNc031658;
-        Sun, 22 Mar 2020 09:29:56 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2ywwug7k85-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 22 Mar 2020 09:29:56 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02M9TtdP027561;
-        Sun, 22 Mar 2020 09:29:55 GMT
-Received: from localhost.localdomain (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 22 Mar 2020 02:29:54 -0700
-From:   Bob Liu <bob.liu@oracle.com>
-To:     dm-devel@redhat.com
-Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
-        Dmitry.Fomichev@wdc.com, Bob Liu <bob.liu@oracle.com>
-Subject: [PATCH] dm zoned: remove duplicated nr_rnd_zones increasement
-Date:   Sun, 22 Mar 2020 17:29:12 +0800
-Message-Id: <20200322092912.23148-1-bob.liu@oracle.com>
-X-Mailer: git-send-email 2.9.5
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9567 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=1 spamscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003220055
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9567 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
- mlxlogscore=999 spamscore=0 malwarescore=0 suspectscore=1 impostorscore=0
- clxscore=1011 phishscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003220055
+        Sun, 22 Mar 2020 12:07:45 -0400
+Received: by mail-pf1-f195.google.com with SMTP id u68so6200588pfb.2
+        for <linux-block@vger.kernel.org>; Sun, 22 Mar 2020 09:07:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Cllw+Acf1/zDGvW1OVmILYynNne/WJT+QGIYuOy4cYQ=;
+        b=XgrfzTMPyGWpYonyMLlkivFygz+4cfbqZuI6hehzYiLTyOo48DT/O1Rt1nIXmC7jrJ
+         cjSsmXXzyJGtUrNJ2Yta7qkNVD6/Z8xVtumU+RUVKrOxzKIdSghRgKAy+gylFCW4UUA0
+         +ZxX3IhOGpbWKJTkobZfkZ+nPuMUfE8gKMtWGzVzg05vTRi4d+i2E0yDKpROGFhk2KxH
+         svU2C8YxjO3132uzM8VG/nazrHRcbZDpOUUXZ0Qiyz04nUhNbv5nw9V3Ts5klUW8/zAc
+         6zIi20HgHAtL6tv7egc6F4mC3g6cBSN4HLCy9+VrE6iCYaBuYw/VORaMlON9tgIr17IJ
+         11qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Cllw+Acf1/zDGvW1OVmILYynNne/WJT+QGIYuOy4cYQ=;
+        b=Mwwo7aCgy+CJ7lGbSwrOqWV7JpOjDefyaTjN6l3Ihng28iFVkD2h3YvCRzVNdPhVRZ
+         jm7uiDGXrbARzr25noXVzSSnFpki61KNtmIfuPhTffGqmzej9ShFg7VQOx6ohKcimU1N
+         XVVEZ0qVGZHwGF8wR7UKGmwv5qs7bdEbcJahllg+oSD7uEgwPkFHKA/P07lysCD6Gnvh
+         OhvoudKL9KDgI+AehjEIgp+Ycd/AoblAuAXPqa4hPFHEZVyD5SXBMPjWlb7YA8BfGfWr
+         x5nQpS/uEoY6SuoSglpSb+318F4TD9Hgy3+6fOBZeUHImxOW4NQ65S+Exim622XPfBqV
+         HWUw==
+X-Gm-Message-State: ANhLgQ1uYvbi5PqRdYCVgoIXUF6XKLU0Kh/dLD4m06SWUoCazpEimUpc
+        JW/6/EudZfAiRa6ObczHP/+KgI/783EPZg==
+X-Google-Smtp-Source: ADFU+vtM5c1iiEMd+6SFCOef+T/gmQuzEyQ+klThEpY51RCqUgDDJUtlavFz9g4MHcgdDXOCuPf5Zw==
+X-Received: by 2002:aa7:848b:: with SMTP id u11mr19717978pfn.76.1584893262820;
+        Sun, 22 Mar 2020 09:07:42 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id y15sm11099322pfc.206.2020.03.22.09.07.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Mar 2020 09:07:42 -0700 (PDT)
+Subject: Re: [PATCH 0/7] bcache patches for Linux v5.7-rc1
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200322060305.70637-1-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <61344bad-e454-1827-c0bc-038f7e73dc16@kernel.dk>
+Date:   Sun, 22 Mar 2020 10:07:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200322060305.70637-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-zmd->nr_rnd_zones was increased twice by mistake.
-The other place:
-1131                 zmd->nr_useable_zones++;
-1132                 if (dmz_is_rnd(zone)) {
-1133                         zmd->nr_rnd_zones++;
-					^^^
+On 3/22/20 12:02 AM, Coly Li wrote:
+> Hi Jens,
+> 
+> These are bcache patches for Linux v5.7-rc1.
+> 
+> The major change is to make bcache btree check and dirty secrtors
+> counting being multithreaded, then the registration time can be
+> much less. My first four patches are for this purpose.
+> 
+> Davidlohr Bueso contributes a patch to optimize barrier usage for
+> atomic operations. By his inspiration I also compose a patch for
+> the rested locations to change.
+> 
+> Takashi Iwai contributes a helpful patch to avoid potential
+> buffer overflow in bcache sysfs code path.
+> 
+> Please take them, and thank you in advance.
 
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
----
- drivers/md/dm-zoned-metadata.c | 1 -
- 1 file changed, 1 deletion(-)
+Applied, thanks.
 
-diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-index 516c7b6..369de15 100644
---- a/drivers/md/dm-zoned-metadata.c
-+++ b/drivers/md/dm-zoned-metadata.c
-@@ -1109,7 +1109,6 @@ static int dmz_init_zone(struct blk_zone *blkz, unsigned int idx, void *data)
- 	switch (blkz->type) {
- 	case BLK_ZONE_TYPE_CONVENTIONAL:
- 		set_bit(DMZ_RND, &zone->flags);
--		zmd->nr_rnd_zones++;
- 		break;
- 	case BLK_ZONE_TYPE_SEQWRITE_REQ:
- 	case BLK_ZONE_TYPE_SEQWRITE_PREF:
 -- 
-2.9.5
+Jens Axboe
 
