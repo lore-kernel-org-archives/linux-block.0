@@ -2,318 +2,94 @@ Return-Path: <SRS0=J0qc=5I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FFDC3F2CD
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 17:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F51C3F2CD
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 17:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18EA02076E
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 17:12:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V6na2s0T"
+	by mail.kernel.org (Postfix) with ESMTP id 934CF20714
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 17:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727257AbgCWRMZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 13:12:25 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:42640 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726987AbgCWRMZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 13:12:25 -0400
-Received: by mail-vs1-f65.google.com with SMTP id s10so833838vsi.9
-        for <linux-block@vger.kernel.org>; Mon, 23 Mar 2020 10:12:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dZW5kJGjaJLVfHgqTtdCBKkBvciSHUN1uP2ys+t7nnY=;
-        b=V6na2s0THD8R1HojVheC0CZ68DIl/SEWqstGzu4lyupxHyEGOF4ZmZIJxLlEH2EEBV
-         McAntr0FUpbKNDu8ttJXk/9F1N/KC7gsUYg8avKmD+ZN5ztOBFj1/0yO2dO+yJpn8cE7
-         wlhYbJSS8LO6ZM+fQgYI3k2topfqAsFOa54Xjgp2F3B7b7K/NjPzXaM+HZ0Cr7EFH/TH
-         0WGK5JCo1j70ttSD6Mp1ndOpb0Coo0RSygGyvl0XMkJrgiZGVTZffh8lQA3+Mi42/1tW
-         riEjK5CGB/sztiAY7vgacJnbNkKjC1ToYEhTNR626cbdvV33xhxe1Ug9TiHWaUpQaX/S
-         MuIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dZW5kJGjaJLVfHgqTtdCBKkBvciSHUN1uP2ys+t7nnY=;
-        b=BpCIB0txi46OZJjyBF6YZGRUGTX56mdbrX426XXecsZPwwNNlDu1EowKpAMdUbM5mt
-         /imnx0+TbbwIt+LAbT2rOqxYoX0DU+FTySNle0Fmim5VzNupGuyMTHRJOf4/xIrdfU6o
-         j7lwFL6ij23B2azZF5y4HOhbZQ87ZkuY/+vdSuwL/ZUPtfdVi+Nzr0zveW35/7T9W8sj
-         ct5Nq4ak/0yIXKOa+LE4+ZeBznNZt6cP9W/1sIWwkXg9yFUr6RbILWcH1UX1m0faIg5g
-         JAu+UQ9cqv9kx0EV6t1xCcQ/rBPIX20ux+5boTfM1vQhaR3OvSVgJuX/4MKyXLIgGMSl
-         CEYw==
-X-Gm-Message-State: ANhLgQ2Us2m8wWdT/8KAp591gQ7mPw8J3wq+lqzfeiG+D5t2Hm0FbqhG
-        xFJqfEZPy5EkhC+tuGShtUMtskShVzj+Ifme0LWznw==
-X-Google-Smtp-Source: ADFU+vvhrzocxaqHGG+7TdHryCbguEw8uzoJw2Cyo3MclMMGBxwRLi9i+NAFUN4fgqG2fn9CIz/kYXlagougFxS9t7Y=
-X-Received: by 2002:a05:6102:3d4:: with SMTP id n20mr1045369vsq.39.1584983541786;
- Mon, 23 Mar 2020 10:12:21 -0700 (PDT)
+        id S1726769AbgCWRuM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Mar 2020 13:50:12 -0400
+Received: from mga07.intel.com ([134.134.136.100]:55473 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725880AbgCWRuM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Mar 2020 13:50:12 -0400
+IronPort-SDR: qSNyd7d3Hoiyx050wDY7VYDNrzP5beFuv03u6y2kZN+rwvrAUsY5sSWhSninz5QUH2MCTyH43w
+ Q61wLu2vUjTQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 10:50:11 -0700
+IronPort-SDR: peCJUioh2h6rnERlHncPaXBRcTMnUGtR5/rV5Zplnp0zVTegVdYk2dpo0Pe5sYlb+3TVE68IuG
+ RD+gG8bNQchQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
+   d="scan'208";a="235292595"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga007.jf.intel.com with ESMTP; 23 Mar 2020 10:50:10 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id C8AE814B; Mon, 23 Mar 2020 19:50:08 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1] zcomp: Use ARRAY_SIZE() for backends list
+Date:   Mon, 23 Mar 2020 19:50:08 +0200
+Message-Id: <20200323175008.83393-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <0000000000000bec9805a1581f05@google.com> <CACT4Y+Z_ZuQmDqq=0kKZuKAe=Dme=UsOnES6h9Y8vRmw2v3WmA@mail.gmail.com>
-In-Reply-To: <CACT4Y+Z_ZuQmDqq=0kKZuKAe=Dme=UsOnES6h9Y8vRmw2v3WmA@mail.gmail.com>
-From:   Todd Kjos <tkjos@google.com>
-Date:   Mon, 23 Mar 2020 10:12:09 -0700
-Message-ID: <CAHRSSExC-Q4PYV629XWkbCjLN55G2A=EDB3kMLN=KK4ZoFSmCw@mail.gmail.com>
-Subject: Re: INFO: task hung in blk_trace_remove
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+c07afbbb410e9f712273@syzkaller.appspotmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>,
-        Todd Kjos <tkjos@android.com>,
-        Martijn Coenen <maco@android.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Christian Brauner <christian@brauner.io>,
-        "open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 21, 2020 at 12:15 AM Dmitry Vyukov <dvyukov@google.com> wrote:
->
-> On Sat, Mar 21, 2020 at 8:12 AM syzbot
-> <syzbot+c07afbbb410e9f712273@syzkaller.appspotmail.com> wrote:
-> >
-> > Hello,
-> >
-> > syzbot found the following crash on:
-> >
-> > HEAD commit:    fb33c651 Linux 5.6-rc6
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=140688d3e00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=9f894bd92023de02
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=c07afbbb410e9f712273
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> >
-> > Unfortunately, I don't have any reproducer for this crash yet.
-> >
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+c07afbbb410e9f712273@syzkaller.appspotmail.com
->
-> +ashmem maintainers
+Instead of keeping NULL terminated array switch to use ARRAY_SIZE()
+which helps to further clean up.
 
-We'll have a look.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/block/zram/zcomp.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
->
-> From the log, ashmem spews an infinite sequence of some errors which
-> probably stall the machine:
->
-> [ 1094.685541][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641097791
-> [ 1094.701750][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641383141
-> [ 1094.708003][ T9576] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641233534
-> [ 1094.723597][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641083174
-> [ 1094.730025][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641098111
-> [ 1094.745592][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641383221
-> [ 1094.753153][ T9576] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641233534
-> [ 1094.767903][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641084454
-> [ 1094.819845][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641526579
-> [ 1094.830116][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641098111
-> [ 1094.845813][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641527219
-> [ 1094.852188][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641098751
-> [ 1094.871456][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641527219
-> [ 1094.874256][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641098751
-> [ 1094.890195][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641528499
-> [ 1094.895999][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641087014
-> [ 1094.912931][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641528499
-> [ 1094.918797][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641100031
-> [ 1094.936636][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641531059
-> [ 1094.941391][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641081897
-> [ 1094.957463][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641531059
-> [ 1094.963568][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641100031
-> [ 1094.980233][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641536179
-> [ 1094.985311][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641081899
-> [ 1095.001393][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641536179
-> [ 1095.008146][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641102591
-> [ 1095.024425][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525942
-> [ 1095.029644][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641081904
-> [ 1095.046399][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525942
-> [ 1095.052377][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641102591
-> [ 1095.068000][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525944
-> [ 1095.073934][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641081914
-> [ 1095.091076][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525944
-> [ 1095.096925][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641107711
-> [ 1095.112305][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525949
-> [ 1095.118570][ T1876] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641081934
-> [ 1095.135413][ T7239] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641525949
-> [ 1095.141206][ T9460] vmscan: shrink_slab:
-> ashmem_shrink_scan+0x0/0x500 negative objects to delete
-> nr=-6917529027641107711
->
->
->
-> > INFO: task syz-executor.4:7237 blocked for more than 143 seconds.
-> >       Not tainted 5.6.0-rc6-syzkaller #0
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > syz-executor.4  D26576  7237   9609 0x00004004
-> > Call Trace:
-> >  schedule+0xd0/0x2a0 kernel/sched/core.c:4154
-> >  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:4213
-> >  __mutex_lock_common kernel/locking/mutex.c:1033 [inline]
-> >  __mutex_lock+0x7ab/0x13c0 kernel/locking/mutex.c:1103
-> >  blk_trace_remove+0x1e/0x40 kernel/trace/blktrace.c:361
-> >  sg_ioctl_common+0x221/0x2710 drivers/scsi/sg.c:1125
-> >  sg_ioctl+0x8f/0x120 drivers/scsi/sg.c:1159
-> >  vfs_ioctl fs/ioctl.c:47 [inline]
-> >  ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
-> >  __do_sys_ioctl fs/ioctl.c:772 [inline]
-> >  __se_sys_ioctl fs/ioctl.c:770 [inline]
-> >  __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
-> >  do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:294
-> >  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > RIP: 0033:0x45c849
-> > Code: Bad RIP value.
-> > RSP: 002b:00007f5ba5a3bc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > RAX: ffffffffffffffda RBX: 00007f5ba5a3c6d4 RCX: 000000000045c849
-> > RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000003
-> > RBP: 000000000076bf00 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-> > R13: 000000000000022b R14: 00000000004c4526 R15: 000000000076bf0c
-> > INFO: task syz-executor.4:7266 blocked for more than 146 seconds.
-> >       Not tainted 5.6.0-rc6-syzkaller #0
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > syz-executor.4  D27752  7266   9609 0x00004004
-> > Call Trace:
-> >  schedule+0xd0/0x2a0 kernel/sched/core.c:4154
-> >  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:4213
-> >  __mutex_lock_common kernel/locking/mutex.c:1033 [inline]
-> >  __mutex_lock+0x7ab/0x13c0 kernel/locking/mutex.c:1103
-> >  blk_trace_setup+0x2f/0x60 kernel/trace/blktrace.c:588
-> >  sg_ioctl_common+0x2f2/0x2710 drivers/scsi/sg.c:1116
-> >  sg_ioctl+0x8f/0x120 drivers/scsi/sg.c:1159
-> >  vfs_ioctl fs/ioctl.c:47 [inline]
-> >  ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
-> >  __do_sys_ioctl fs/ioctl.c:772 [inline]
-> >  __se_sys_ioctl fs/ioctl.c:770 [inline]
-> >  __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
-> >  do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:294
-> >  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > RIP: 0033:0x45c849
-> > Code: Bad RIP value.
-> > RSP: 002b:00007f5ba5a1ac78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > RAX: ffffffffffffffda RBX: 00007f5ba5a1b6d4 RCX: 000000000045c849
-> > RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000008
-> > RBP: 000000000076bfa0 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-> > R13: 0000000000000228 R14: 00000000004c44eb R15: 000000000076bfac
-> > INFO: task syz-executor.5:7265 blocked for more than 149 seconds.
-> >       Not tainted 5.6.0-rc6-syzkaller #0
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > syz-executor.5  D26736  7265   9613 0x00004004
-> > Call Trace:
-> >  schedule+0xd0/0x2a0 kernel/sched/core.c:4154
-> >  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:4213
-> >  __mutex_lock_common kernel/locking/mutex.c:1033 [inline]
-> >  __mutex_lock+0x7ab/0x13c0 kernel/locking/mutex.c:1103
-> >  blk_trace_setup+0x2f/0x60 kernel/trace/blktrace.c:588
-> >  sg_ioctl_common+0x2f2/0x2710 drivers/scsi/sg.c:1116
-> >  sg_ioctl+0x8f/0x120 drivers/scsi/sg.c:1159
-> >  vfs_ioctl fs/ioctl.c:47 [inline]
-> >  ksys_ioctl+0x11a/0x180 fs/ioctl.c:763
-> >  __do_sys_ioctl fs/ioctl.c:772 [inline]
-> >  __se_sys_ioctl fs/ioctl.c:770 [inline]
-> >  __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:770
-> >  do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:294
-> >  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > RIP: 0033:0x45c849
-> > Code: Bad RIP value.
-> > RSP: 002b:00007f576f48ac78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > RAX: ffffffffffffffda RBX: 00007f576f48b6d4 RCX: 000000000045c849
-> > RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000006
-> >
-> >
-> > ---
-> > This bug is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this bug report. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> >
-> > --
-> > You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> > To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> > To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/0000000000000bec9805a1581f05%40google.com.
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 1a8564a79d8d..e78e7a2ccfd5 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -29,7 +29,6 @@ static const char * const backends[] = {
+ #if IS_ENABLED(CONFIG_CRYPTO_ZSTD)
+ 	"zstd",
+ #endif
+-	NULL
+ };
+ 
+ static void zcomp_strm_free(struct zcomp_strm *zstrm)
+@@ -67,7 +66,7 @@ bool zcomp_available_algorithm(const char *comp)
+ {
+ 	int i;
+ 
+-	i = __sysfs_match_string(backends, -1, comp);
++	i = sysfs_match_string(backends, comp);
+ 	if (i >= 0)
+ 		return true;
+ 
+@@ -86,9 +85,9 @@ ssize_t zcomp_available_show(const char *comp, char *buf)
+ {
+ 	bool known_algorithm = false;
+ 	ssize_t sz = 0;
+-	int i = 0;
++	int i;
+ 
+-	for (; backends[i]; i++) {
++	for (i = 0; i < ARRAY_SIZE(backends); i++) {
+ 		if (!strcmp(comp, backends[i])) {
+ 			known_algorithm = true;
+ 			sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2,
+-- 
+2.25.1
+
