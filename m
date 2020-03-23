@@ -2,61 +2,63 @@ Return-Path: <SRS0=J0qc=5I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2799C3F2CD
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 19:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE9DC54FCE
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 19:59:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8DA820774
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 19:44:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 066602073E
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 19:59:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPrQqIuj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VbyqDhdm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725839AbgCWToT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 15:44:19 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:39215 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725866AbgCWToT (ORCPT
+        id S1725913AbgCWT75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Mar 2020 15:59:57 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:43166 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbgCWT75 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 15:44:19 -0400
-Received: by mail-lj1-f193.google.com with SMTP id i20so3963157ljn.6;
-        Mon, 23 Mar 2020 12:44:16 -0700 (PDT)
+        Mon, 23 Mar 2020 15:59:57 -0400
+Received: by mail-lj1-f194.google.com with SMTP id g27so7270501ljn.10;
+        Mon, 23 Mar 2020 12:59:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PxeFoR7puwfL5UMnOaJme3OEi0Xyw7aUebfMwwSK1j8=;
-        b=bPrQqIujsyit09I1b6HS0plHeSy/7GNoVldQQIa0S/dJSXAF7YI38liDRIGik2JBYI
-         UrBomCmNaw2IK6/aWfpoQ1N86pk1j5X0N3scONHbpag4RBj/8dmXdKH1ouEeLm8GxOKr
-         HfkJKnJt+1BWSVN6Hrx9Zfsu2ykkyY459B9L5AVsetHE8YHQ6Dkx4BuYmhoQZjsvsYj0
-         MN1RCDXd1G7pHvwRO2/2TFZsAJTOCGI4X05MUQuxww8dMFZ4L2PUHPROlkx+mfoJ14JT
-         DUC0WXy2aTpS9gfNMTtcRrULvToyhgdKSxoHw1pZOgjlzHAiKwK10BkIlzeqdXUlIHqq
-         +xRw==
+        bh=dbO9AMgv2C3q3wUDDoD6CSYAM2+vrjv9y3H8u+4ZnFk=;
+        b=VbyqDhdmtu1qDNYwk412YWO11Exes5+3Tbpn9dyrqH8rA4FST2Mmw57mVUUdXqETrq
+         3czM7De1zTFuS3Mr3yve7kzyd4RBh5vHUsmtejnJA/REpAtlcpULSkKfJcGmdm3XO88l
+         X+d5o78Uk/LDxT2wpAPPjhbDgJm+9p/znfdteIDwCTTm9Baoi1SMRcLJBHY94Y08914a
+         ui8LDs/96Tu7ScP9kdocgm9eZ1TLrvVlWCCT0lCi2gRCpitCWvliYWGIr1uqEDqueWiB
+         UI+TPjxRMuiP+nGvb26XIDQn4dBrIYe5s5t6+mU4EZf2Cz+4B5m+GVd7TU/eoseddF7w
+         5+lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=PxeFoR7puwfL5UMnOaJme3OEi0Xyw7aUebfMwwSK1j8=;
-        b=r7rXLJ6rt+QIVnb1R/BZUfaPzPyYfoXQVJ6PQpvz6iCD64ELcwgPudZZgJRbc/lvyo
-         3yp25FmqZP8mJ6rY5yF/agN70TS69qV8zG2ILx9kmw9tOja++onHP40nANsd+0aFf6LX
-         vx2nLlhWbjjgmeuo1Ts0AWAsx9op2GNGHdNNFJLmBuABfvWvuP/GQHO/IxKeqT/zvJaL
-         ayHbjQJiDIy6KqTC6Mlm00oAl7JsWotbq52BE+5Y92F9CY+ocwgun5FnTYDYMMW/cCUW
-         YAh356wMDkVfNQ1a7fcefqZQj8B2B/7k/AUjzBDDLU1WPzt3XdJZ/4E1grPOgnHJEsAn
-         J9DQ==
-X-Gm-Message-State: ANhLgQ2w0lYexPYm0BTKGAKM7/AQ3AAvJEgZzl5xqUUvP5yK9Iv/pdeP
-        kuJr7BXI4WZyMs6ygzyROS3tI7st
-X-Google-Smtp-Source: ADFU+vvJyZu6IUSbYZsv/K3Gya6Nma49+gt39zgYnXVmB2IOUGZMTKQf3gSICLzZxL5pEbC4UC4wdA==
-X-Received: by 2002:a2e:924a:: with SMTP id v10mr14123746ljg.21.1584992655648;
-        Mon, 23 Mar 2020 12:44:15 -0700 (PDT)
+        bh=dbO9AMgv2C3q3wUDDoD6CSYAM2+vrjv9y3H8u+4ZnFk=;
+        b=l9PsH2Vji8B97O1gdsjfzQBzYSTQzBu35eVWZc5Kjfve6HPtj2lZg2WYolopB6keB8
+         +d/CXD1kF92VDCiV95dKhjqQQm6idC0e8xHussgag7MaJWCBGPXrDL8Y+cd+L3l3lA8i
+         LWh49B4RTYgrumY6YR5nf4GrrlutKdj/TJkiCZLseia8kezs3ebDw4SUAkS759lY1pj5
+         EVyLmDhpL2mxATHQIZZk2mMZtzBdjRW7t5R0hmnCizeXhjUBxqfa/waN5yXN56+YAGFW
+         eaDdLRjmnrP0DAvbhKT9A8AmGltCmF5O7iVNPn2lsEwyrR8wUG3QHbKkwsLUZ4GlZ61w
+         tuWQ==
+X-Gm-Message-State: ANhLgQ3GrbaQ+HQH2X9FiqFdsAL1ywo5i+askTgN8MTtlYl8VyYfPFG6
+        YjjeHJegwLLLyk//zc+61sWrI0GL
+X-Google-Smtp-Source: ADFU+vvxc3Pnf8dsypolZV8SPKqREwTrzUhihQIubesluJG79gKWfF5VhPPWmJ8InGnZv1b/rXQ7hA==
+X-Received: by 2002:a2e:94c8:: with SMTP id r8mr15041191ljh.28.1584993593897;
+        Mon, 23 Mar 2020 12:59:53 -0700 (PDT)
 Received: from [192.168.2.145] (94-29-39-224.dynamic.spd-mgts.ru. [94.29.39.224])
-        by smtp.googlemail.com with ESMTPSA id s4sm10309834lfs.54.2020.03.23.12.44.14
+        by smtp.googlemail.com with ESMTPSA id 127sm8831243lfl.29.2020.03.23.12.59.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 12:44:15 -0700 (PDT)
-Subject: Re: [PATCH v3 00/10] Introduce NVIDIA Tegra Partition Table
+        Mon, 23 Mar 2020 12:59:53 -0700 (PDT)
+Subject: Re: [PATCH v3 03/10] partitions: Introduce NVIDIA Tegra Partition
+ Table
 To:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Thierry Reding <thierry.reding@gmail.com>,
@@ -73,14 +75,15 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200323163431.7678-1-digetx@gmail.com>
- <20200323180750.GA30585@qmqm.qmqm.pl>
+ <20200323163431.7678-4-digetx@gmail.com>
+ <20200323191748.GB30585@qmqm.qmqm.pl>
 From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <9f63f113-fc67-5e1c-a539-81e3b0cd4e31@gmail.com>
-Date:   Mon, 23 Mar 2020 22:44:13 +0300
+Message-ID: <67140755-c829-5c58-3fbf-efd496e225df@gmail.com>
+Date:   Mon, 23 Mar 2020 22:59:52 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200323180750.GA30585@qmqm.qmqm.pl>
+In-Reply-To: <20200323191748.GB30585@qmqm.qmqm.pl>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -89,32 +92,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-23.03.2020 21:07, Michał Mirosław пишет:
-> On Mon, Mar 23, 2020 at 07:34:21PM +0300, Dmitry Osipenko wrote:
->> Some NVIDIA Tegra devices have GPT entry at a wrong location and others may
->> even not have it at all. So either a custom workaround for GPT parsing or
->> TegraPT support is needed for those devices if we want to support them in
->> upstream kernel. The former solution was already rejected [1], let's try
->> the latter.
+23.03.2020 22:17, Michał Mirosław пишет:
+> On Mon, Mar 23, 2020 at 07:34:24PM +0300, Dmitry Osipenko wrote:
+>> All NVIDIA Tegra devices use a special partition table format for the
+>> internal storage partitioning. Most of Tegra devices have GPT partition
+>> in addition to TegraPT, but some older Android consumer-grade devices do
+>> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
+>> in order to support these devices properly in the upstream kernel. This
+>> patch adds support for NVIDIA Tegra Partition Table format that is used
+>> at least by all NVIDIA Tegra20 and Tegra30 devices.
+>>
+>> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+>> ---
+>>  arch/arm/mach-tegra/tegra.c   |  54 ++++
 > [...]
 > 
-> Hi Dmitry,
-> 
-> This amusing use of whole-device offsets in the TegraPT makes it take
-> a lot of hacks to support it. Have you considered to first join the MMC
-> hardware partitions using DM and its linear target and only then processing
-> the partition table dividing just the merged device?
+> Please split off this part and make the information available to
+> userspace (pt_addr + pt_size) if found. This would make it easier
+> to support use the partition table later in initrd instead.
 
-Hello Michał,
-
-Thank you very much for the suggestion! I had a thought about that and
-it's not apparent to me how to determine when the joining needs to be
-done and when not.
-
-The joining shouldn't be done for devices that aren't booting from eMMC
-because then the alt GPT entry will be found on a joined block device
-and this shouldn't happen.
-
-Actually, maybe we could create a new MMC device-tree property, telling
-that the joining needs to be performed. Perhaps this indeed could result
-in a less hackery, I'll give it a try and see how it goes.
+Please clarify what do you mean by "use the partition table later in
+initrd instead".
