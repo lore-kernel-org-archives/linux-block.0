@@ -2,71 +2,84 @@ Return-Path: <SRS0=J0qc=5I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D715C4332B
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 14:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39D2C4332B
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 14:09:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB622077D
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 14:04:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584972267;
-	bh=s2NbQJjle+0OzIirrPM+TLR0bDT4Bsx1I69q/jCQKMY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KkqRKD7kqL22xpcTlp62yvaoGFbnmksNga9eo5rhhJVIoQljKEn3WkQicXGw5Bi2a
-	 SbMxcNjE+yAInzoKuiu+22GeqwFqrqbwpFLqhxgWsxkHV8iRJLuq6jIATh5NWjYg2/
-	 i8JS+vEIDtxiDK3nik6n6Dn8sKuWLxBseG0MJVUo=
+	by mail.kernel.org (Postfix) with ESMTP id A880220780
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 14:09:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728501AbgCWOE0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 10:04:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36788 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728446AbgCWOE0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 10:04:26 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DD2512076A;
-        Mon, 23 Mar 2020 14:04:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584972264;
-        bh=s2NbQJjle+0OzIirrPM+TLR0bDT4Bsx1I69q/jCQKMY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Y0JLIB8OTtTcgH+XZTnGtGS+5XCEF0ztyGqJtW8wr61SkA5In0i+4cekXFDZXJzF0
-         GcwQQNRsU5DczS2q9HjtUwmz23116PdLu5KEsRDBfGqQh2a4f5qmHa3vG8OAHlT+QU
-         omIZbpEWtAgyWLKvvWPZRKzww5YGqxS6EpWcyBoI=
-Date:   Mon, 23 Mar 2020 15:04:21 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, tj@kernel.org,
-        jack@suse.cz, bvanassche@acm.org, tytso@mit.edu
-Subject: Re: [PATCH v3 4/4] bdi: protect bdi->dev with spinlock
-Message-ID: <20200323140421.GA7976@kroah.com>
-References: <20200323132254.47157-1-yuyufen@huawei.com>
- <20200323132254.47157-5-yuyufen@huawei.com>
+        id S1728357AbgCWOJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Mar 2020 10:09:12 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:49328 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728378AbgCWOJL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Mar 2020 10:09:11 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id F15DA89CAE8D36E7464F;
+        Mon, 23 Mar 2020 22:08:56 +0800 (CST)
+Received: from [10.173.220.74] (10.173.220.74) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 23 Mar 2020 22:08:51 +0800
+Subject: Re: [PATCH] nbd: make starting request more reasonable
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200303130843.12065-1-yuyufen@huawei.com>
+ <9cdba8b1-f0e5-a079-8d44-0078478dd4d8@huawei.com>
+ <20200316153033.GA11016@ming.t460p>
+From:   Yufen Yu <yuyufen@huawei.com>
+Message-ID: <b990c260-ddf6-efa9-0856-9110aa4dd8a4@huawei.com>
+Date:   Mon, 23 Mar 2020 22:08:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200323132254.47157-5-yuyufen@huawei.com>
+In-Reply-To: <20200316153033.GA11016@ming.t460p>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.220.74]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 09:22:54PM +0800, Yufen Yu wrote:
-> diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-> index 82d2401fec37..1c0e2d0d6236 100644
-> --- a/include/linux/backing-dev.h
-> +++ b/include/linux/backing-dev.h
-> @@ -525,12 +525,16 @@ static inline const char *bdi_dev_name(struct backing_dev_info *bdi)
->  static inline char *bdi_get_dev_name(struct backing_dev_info *bdi,
->  			char *dname, int len)
->  {
-> +	spin_lock_irq(&bdi->lock);
->  	if (!bdi || !bdi->dev) {
-> +		spin_unlock_irq(&bdi->lock);
+Hi, Ming
 
-You can't test for (!bdi) right after you accessed bdi->lock :(
+On 2020/3/16 23:30, Ming Lei wrote:
+> On Mon, Mar 16, 2020 at 08:26:35PM +0800, Yufen Yu wrote:
+>> Ping and Cc to more expert in blk-mq.
+>>
+>> On 2020/3/3 21:08, Yufen Yu wrote:
+>>> Our test robot reported a warning for refcount_dec trying to decrease
+>>> value '0'. The reason is that blk_mq_dispatch_rq_list() try to complete
+>>> the failed request from nbd driver, while the request have finished in
+>>> nbd timeout handle function. The race as following:
+>>>
+>>> CPU1                             CPU2
+>>>
+>>> //req->ref = 1
+>>> blk_mq_dispatch_rq_list
+>>> nbd_queue_rq
+>>>     nbd_handle_cmd
+>>>       blk_mq_start_request
+>>>                                    blk_mq_check_expired
+>>>                                      //req->ref = 2
+>>>                                      blk_mq_rq_timed_out
+>>>                                        nbd_xmit_timeout
+> 
+> This shouldn't happen in reality, given rq->deadline is just updated
+> in blk_mq_start_request(), suppose you use the default 30 sec timeout.
+> How can the race be triggered in so short time? >
+> Could you explain a bit your test case?
+>
+In fact, this is reported by syzkaller. We have not actually test case.
+But, I think nbd driver should not start request in case of failure. So fix it.
 
+Thanks,
+Yufen
