@@ -8,54 +8,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E936C3F2CD
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 16:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF080C54FCE
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 16:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73F8C20658
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 16:36:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C485F20658
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 16:36:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LXue7MQ/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tIuzq/gr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727630AbgCWQfl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 12:35:41 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:46681 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727564AbgCWQfk (ORCPT
+        id S1727581AbgCWQfj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Mar 2020 12:35:39 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:45931 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727507AbgCWQfi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:35:40 -0400
-Received: by mail-lj1-f193.google.com with SMTP id v16so8281762ljk.13;
-        Mon, 23 Mar 2020 09:35:38 -0700 (PDT)
+        Mon, 23 Mar 2020 12:35:38 -0400
+Received: by mail-lf1-f66.google.com with SMTP id v4so7067600lfo.12;
+        Mon, 23 Mar 2020 09:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0wrb1jawDZ/OoSKSRa4jhXauQnVpnBi/wzx5vJ7NjQo=;
-        b=LXue7MQ/ynT2Qwn4Q8TkmyOyQlQ4Cl2ZdMW1YqwqkG1D/M0wI9BzolDLdIaer31yzj
-         zOLwVklExyWur1HIb64j6GxGiZxeVjzi1a+yoLrxYoZ7xg6xoz2izPmpZPYWZCHCp+++
-         DMjQUZPfh+SkW0G0pPW/JHkwWA7sl8Ww9IM/Y5DGKxgIINsREoSx3aVyjswp6BAO51mp
-         25xipyCqLfeuv17YaDx2+uuQ2w+G1GT7u5dK0Wc9dEO0K2fc9dzxe3UZxs11U5SmFyHH
-         FHjet48tQUbsfS4oZYz/67kQ6em5slQ7Ya31tnTI6xza5GuCsXmToLM5AAGAZoghr2jY
-         MvWQ==
+        bh=kWAeNpBn6fpU/PQ3w5gvOGDJx2Ia8b1U9luMqpJSJvQ=;
+        b=tIuzq/gr6LMfw5IhTrkX52zxdsdrWBcVd++BnjQqbifbF/uTfnv3vU/uWT5GolNcGv
+         fzIP6Xj8xKWfGM/c7axoGJBIG2hJJUV3PdBR/SamU9FuWO25HSXAOxPI6xDcHtUIdjS1
+         F6uLuPUQuP7b+zPugUhBWFGus7uAhAp1Iac4T7BpEU1Fngb/fuyE+C6YTXyRVDcdJYQQ
+         Jv2pU5fKWmWJa4dFyDBdf3k5GR+b+KVG2V4n6iSyvYsGtZNXm1sJxmdTUSZu5cMgQPVv
+         N7EjQhHhyBKZYKEiQ8gvUfdQnle1abEBG6SW5xmv6PS/7VLg68ZHaHlqADSpB+rHxfOD
+         ufBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0wrb1jawDZ/OoSKSRa4jhXauQnVpnBi/wzx5vJ7NjQo=;
-        b=ZwrcqWsJD9cslX1JBE9B7brD3mHOygumUCe4VDoKMl9iLAZlYYbXULzXQ7EVbF9rr/
-         qdN7SQL+2Axsfcy6p+d/v1K1bxjjTy+Ku6osWiRjW/TRp9P+nJaRrKUQXSaJYNumCciu
-         X10vdp+4MCjOOKKcyHKLNekZPmfDAsmUUyBVWrA2FhzhaixpFzzETZvtSAWd74FXxO4z
-         Xen1W88V0kz8vvZ4fiQol4MYbce3wjg+UVR/V4ltzIvs1X4yUe5qbCqvmOOfSAIasKIO
-         5feM3zEnUtA91IoVHq1F5h04z30LqAL/0JTBrqIEtBDl0qr9ggZVHDfHVYuXUOD1nils
-         eerA==
-X-Gm-Message-State: ANhLgQ1pCSNB4D2geBdF0Ny42nFZL7WSEoMYPLEaUVhJ/s9SFouEynby
-        nhLigY44/74h5Jx7qILNKbY=
-X-Google-Smtp-Source: ADFU+vstcQ7obgecuz7XRtqThNdaDgYd6CA+FmepLrt9ZGbs/ZU6P+XLZBTC9u7wsH0SAcNbkpBItg==
-X-Received: by 2002:a2e:90da:: with SMTP id o26mr14720812ljg.254.1584981338066;
-        Mon, 23 Mar 2020 09:35:38 -0700 (PDT)
+        bh=kWAeNpBn6fpU/PQ3w5gvOGDJx2Ia8b1U9luMqpJSJvQ=;
+        b=H7Ey5JYaizluCPShEZyGSeWE5pX/vYDbmOYIkaFgZ1vVOwCR6dk1GqbXrWLhBrhW2Y
+         8z575xNx2ywJoHNtk9/O0oPNDgXR0/fEzBv7NdPo85OXE91ewwhLjlQrgZZ8UuFw65ib
+         FJH+A/PHhr+qSIrMXBwNmqmxlUYbxLddu+FZsvGXqEreZgn6kJzmbK7M+BItkUMf2opj
+         OoPb4ukR+EMo0VdpDzYE7dKqGlazabOrDnB2pAFoU0dpB3/FdTphx4ZSeKeWh0eYnpFc
+         6ICae/LYsEHLEQvAvjOF6XZNXsk7CJ5dELGxm0GqqdixQYMF15BimtynN5bz5gljkkFk
+         luzw==
+X-Gm-Message-State: ANhLgQ0M4RMYeifgfD+xhL0V+tWMO49Ro0XxFRLe0ErLKn89vcYTGNV5
+        cPKmdvOC8f4xYs3EA4XscLsTgnSu
+X-Google-Smtp-Source: ADFU+vuS8o+ndODomWoUKADlFVTMveigNiAwppJWlBrao3k3C+IGzWVzvm8Hl+ovIgarsZgVtWqVAA==
+X-Received: by 2002:ac2:4c33:: with SMTP id u19mr13431354lfq.195.1584981335547;
+        Mon, 23 Mar 2020 09:35:35 -0700 (PDT)
 Received: from localhost.localdomain (94-29-39-224.dynamic.spd-mgts.ru. [94.29.39.224])
-        by smtp.gmail.com with ESMTPSA id m14sm4820017lfo.25.2020.03.23.09.35.36
+        by smtp.gmail.com with ESMTPSA id m14sm4820017lfo.25.2020.03.23.09.35.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 09:35:37 -0700 (PDT)
+        Mon, 23 Mar 2020 09:35:35 -0700 (PDT)
 From:   Dmitry Osipenko <digetx@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>,
         Thierry Reding <thierry.reding@gmail.com>,
@@ -73,9 +73,9 @@ Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
         Gilles Grandou <gilles@grandou.net>,
         Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 04/10] block: Introduce GENHD_FL_PART_SCAN_ONCE
-Date:   Mon, 23 Mar 2020 19:34:25 +0300
-Message-Id: <20200323163431.7678-5-digetx@gmail.com>
+Subject: [PATCH v3 02/10] mmc: block: Add mmc_bdev_to_card() helper
+Date:   Mon, 23 Mar 2020 19:34:23 +0300
+Message-Id: <20200323163431.7678-3-digetx@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200323163431.7678-1-digetx@gmail.com>
 References: <20200323163431.7678-1-digetx@gmail.com>
@@ -86,100 +86,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some NVIDIA Tegra devices store partition table on a boot eMMC partition,
-and thus, partition-scanner should read out partition table from the boot
-block device without assigning found partitions to the block device. The
-new disk flag allows MMC core to enable boot partitions scanning, without
-changing the old behavior.
+NVIDIA Tegra Partition Table takes into account MMC card's BOOT_SIZE_MULT
+parameter, and thus, the partition parser needs to retrieve that EXT_CSD
+value from the block device. There are also some other parts of struct
+mmc_card that are needed for the partition parser in order to calculate
+the eMMC offset and verify different things. This patch introduces new
+helper which takes block device for the input argument and returns the
+corresponding MMC card.
 
 Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
 ---
- block/genhd.c             |  2 +-
- block/partition-generic.c | 13 ++++++++++++-
- include/linux/genhd.h     | 12 ++++++++++++
- 3 files changed, 25 insertions(+), 2 deletions(-)
+ drivers/mmc/core/block.c   | 15 +++++++++++++++
+ include/linux/mmc/blkdev.h | 13 +++++++++++++
+ 2 files changed, 28 insertions(+)
+ create mode 100644 include/linux/mmc/blkdev.h
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b210c12c4870..e66a8fcc963b 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -700,7 +700,7 @@ static void register_disk(struct device *parent, struct gendisk *disk,
- 	}
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 7634894df853..36d84a8e182c 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -40,6 +40,7 @@
+ #include <linux/debugfs.h>
  
- 	/* No minors to use for partitions */
--	if (!disk_part_scan_enabled(disk))
-+	if (!disk_part_scan_enabled(disk) && !disk_part_scan_once(disk))
- 		goto exit;
- 
- 	/* No such device (e.g., media were just removed) */
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 564fae77711d..bd31b71f49f7 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -537,7 +537,7 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	struct parsed_partitions *state;
- 	int ret = -EAGAIN, p, highest;
- 
--	if (!disk_part_scan_enabled(disk))
-+	if (!disk_part_scan_enabled(disk) && !disk_part_scan_once(disk))
- 		return 0;
- 
- 	state = check_partition(disk, bdev);
-@@ -580,6 +580,17 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 			goto out_free_state;
- 	}
- 
-+	/*
-+	 * Partitions were found, but they should stay inactive for a
-+	 * scan-only disk.
-+	 */
-+	if (disk_part_scan_once(disk)) {
-+		pr_warn("%s: ignoring partition table on scan-only block device\n",
-+			disk->disk_name);
-+		ret = 0;
-+		goto out_free_state;
-+	}
-+
- 	/* tell userspace that the media / partition table may have changed */
- 	kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index d5c75df64bba..79831481142f 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -179,6 +179,12 @@ struct hd_struct {
-  * Implies ``GENHD_FL_SUPPRESS_PARTITION_INFO`` and
-  * ``GENHD_FL_NO_PART_SCAN``.
-  * Used for multipath devices.
-+ *
-+ * ``GENHD_FL_PART_SCAN_ONCE`` (0x0800): the block device will be scanned for
-+ * partition table presence, but found partition won't be assigned to the
-+ * block device.
-+ * Used for embedded devices with a non-standard partition table, where
-+ * partition table is stored on a separate block device.
-  */
- #define GENHD_FL_REMOVABLE			0x0001
- /* 2 is unused (used to be GENHD_FL_DRIVERFS) */
-@@ -191,6 +197,7 @@ struct hd_struct {
- #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	0x0100
- #define GENHD_FL_NO_PART_SCAN			0x0200
- #define GENHD_FL_HIDDEN				0x0400
-+#define GENHD_FL_PART_SCAN_ONCE			0x0800
- 
- enum {
- 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
-@@ -292,6 +299,11 @@ static inline bool disk_part_scan_enabled(struct gendisk *disk)
- 		!(disk->flags & GENHD_FL_NO_PART_SCAN);
+ #include <linux/mmc/ioctl.h>
++#include <linux/mmc/blkdev.h>
+ #include <linux/mmc/card.h>
+ #include <linux/mmc/host.h>
+ #include <linux/mmc/mmc.h>
+@@ -306,6 +307,20 @@ static ssize_t force_ro_store(struct device *dev, struct device_attribute *attr,
+ 	return ret;
  }
  
-+static inline bool disk_part_scan_once(struct gendisk *disk)
++struct mmc_card *mmc_bdev_to_card(struct block_device *bdev)
 +{
-+	return !!(disk->flags & GENHD_FL_PART_SCAN_ONCE);
++	struct mmc_blk_data *md;
++
++	if (bdev->bd_disk->major != MMC_BLOCK_MAJOR)
++		return NULL;
++
++	md = mmc_blk_get(bdev->bd_disk);
++	if (!md)
++		return NULL;
++
++	return md->queue.card;
 +}
 +
- static inline dev_t disk_devt(struct gendisk *disk)
+ static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
  {
- 	return MKDEV(disk->major, disk->first_minor);
+ 	struct mmc_blk_data *md = mmc_blk_get(bdev->bd_disk);
+diff --git a/include/linux/mmc/blkdev.h b/include/linux/mmc/blkdev.h
+new file mode 100644
+index 000000000000..67608c58de70
+--- /dev/null
++++ b/include/linux/mmc/blkdev.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ *  linux/include/linux/mmc/blkdev.h
++ */
++#ifndef LINUX_MMC_BLOCK_DEVICE_H
++#define LINUX_MMC_BLOCK_DEVICE_H
++
++struct block_device;
++struct mmc_card;
++
++struct mmc_card *mmc_bdev_to_card(struct block_device *bdev);
++
++#endif /* LINUX_MMC_BLOCK_DEVICE_H */
 -- 
 2.25.1
 
