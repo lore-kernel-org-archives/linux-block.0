@@ -2,301 +2,306 @@ Return-Path: <SRS0=J0qc=5I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CF3C54FCF
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 05:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 796C4C10F26
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 07:00:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65F0F20732
-	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 05:36:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRi/JU3P"
+	by mail.kernel.org (Postfix) with ESMTP id 4B0AE20769
+	for <linux-block@archiver.kernel.org>; Mon, 23 Mar 2020 07:00:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726954AbgCWFgu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 01:36:50 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:33875 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbgCWFgu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 01:36:50 -0400
-Received: by mail-lf1-f65.google.com with SMTP id e7so218431lfq.1;
-        Sun, 22 Mar 2020 22:36:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vl973em2pxaMWFzjKATnkNgkqkksRzVSUr8wfiYILqs=;
-        b=KRi/JU3PvxuEyGs/VyXM/xHV9oMLIhdnwWwjdm5Lq+BNG0Kvy3jANusiiQ9CwLvbW7
-         k6ZPFZ+/Bs8g4tebxTc9+YfeMIlKLnG/3KEYoncsK2rYynuOwD9O2ZzAAVytpaGcPZwx
-         FKSn/2d5HvZHt2MPUGDWUiprnDtQzVimdUhQTFujERvGU+nIVci7kL+UkF82NAouv697
-         A0eXipRj082rUlWrT4QhYaR49BUJICWvV7J6wGgvTFVHITgkF0OXTAE3BbCW7Mp/RI5B
-         biTKuj9iH480qGL1+A7NjAMhH4dwk5L2739BsumNixkKs/mukrNBK10C7ACO+4l/jub3
-         710A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vl973em2pxaMWFzjKATnkNgkqkksRzVSUr8wfiYILqs=;
-        b=DrBZKwPkM6qFI/w/pceDfR7cL4Rpy2yJ+fGQupGOjGkAALyfkd2iHHcRmFtWPFPJI6
-         y1T6/eEjVlwW0+dKmkli7oFXsa6ihJ9ljUaMSRm32YQg7Ex6VZxLEOzsIgDhGYlbV3ET
-         Dz2yWvc6T5D2d7N8+wTSvBrcVdq6pXotgcMOsSuCYzWdiVTwtlmJZGDTBGlpRSA1ulHf
-         q1qcq/QGPKpV5KAUKQq8ZTYpfl618n97XYclTfrwRdO7D6pd21H+T5A8mH0OP2PqG7oI
-         d5qRZmFvqpxHrl6ePw0WoPcikKmuoK7SbF+FoSSJx2X1ZHFhmuuDZhE0mQoRyHfNwSs5
-         Dw0A==
-X-Gm-Message-State: ANhLgQ0GyhaB1TknFwL0PjaPxZqSpyL7kuSYCYig/cWtzpp2QmaQLQ6k
-        4bhcXtZPSf6D89HMWe1bsScAzx33i1yz2DgcjPo=
-X-Google-Smtp-Source: ADFU+vvNGyfiGakSuPbgk0eIgn3wevFK8pelB8hWc5GpuAGyQ9UzB7GY2bTFnq+VLC/HjFqKG0T/shyjTOQND9v/TlY=
-X-Received: by 2002:a05:6512:202d:: with SMTP id s13mr7649171lfs.19.1584941805823;
- Sun, 22 Mar 2020 22:36:45 -0700 (PDT)
+        id S1727395AbgCWHAK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Mar 2020 03:00:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50912 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727130AbgCWHAK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Mar 2020 03:00:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 2B2A8AC1D;
+        Mon, 23 Mar 2020 07:00:07 +0000 (UTC)
+Subject: Re: [PATCH 3/7] bcache: make bch_btree_check() to be multithreaded
+To:     Coly Li <colyli@suse.de>, axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <20200322060305.70637-1-colyli@suse.de>
+ <20200322060305.70637-4-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <aa1a60c0-c1f4-c40d-6666-21044235bf94@suse.de>
+Date:   Mon, 23 Mar 2020 08:00:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <cover.1584350380.git.baolin.wang7@gmail.com> <c2e62e5a9942fb833dfc0cdc8c967a12f3c34b03.1584350380.git.baolin.wang7@gmail.com>
- <20200318100123.GA27531@ming.t460p> <CADBw62qbdpoyPZd+_np6f0L+83Ah8B218EYKmi8xiUbBf5c6+A@mail.gmail.com>
- <CADBw62rWWk=Jeg7=3nEBqK2prQjLzCGcFyJ+WkZ0D6_grcETHA@mail.gmail.com> <20200323034432.GA27507@ming.t460p>
-In-Reply-To: <20200323034432.GA27507@ming.t460p>
-From:   Baolin Wang <baolin.wang7@gmail.com>
-Date:   Mon, 23 Mar 2020 13:36:34 +0800
-Message-ID: <CADBw62rxFdriCSEo78M7_xnS3UiaDPN9CwURtiDOTxGVCevbsg@mail.gmail.com>
-Subject: Re: [RESEND RFC PATCH 2/8] block: Allow sending a batch of requests
- from the scheduler to hardware
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, Paolo Valente <paolo.valente@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Chunyan Zhang <zhang.lyra@gmail.com>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200322060305.70637-4-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 11:44 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Fri, Mar 20, 2020 at 06:27:41PM +0800, Baolin Wang wrote:
-> > Hi Ming,
-> >
-> > On Wed, Mar 18, 2020 at 6:26 PM Baolin Wang <baolin.wang7@gmail.com> wrote:
-> > >
-> > > Hi Ming,
-> > >
-> > > On Wed, Mar 18, 2020 at 6:01 PM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > On Mon, Mar 16, 2020 at 06:01:19PM +0800, Baolin Wang wrote:
-> > > > > As we know, some SD/MMC host controllers can support packed request,
-> > > > > that means we can package several requests to host controller at one
-> > > > > time to improve performence. So the hardware driver expects the blk-mq
-> > > > > can dispatch a batch of requests at one time, and driver can use bd.last
-> > > > > to indicate if it is the last request in the batch to help to combine
-> > > > > requests as much as possible.
-> > > > >
-> > > > > Thus we should add batch requests setting from the block driver to tell
-> > > > > the scheduler how many requests can be dispatched in a batch, as well
-> > > > > as changing the scheduler to dispatch more than one request if setting
-> > > > > the maximum batch requests number.
-> > > > >
-> > > >
-> > > > I feel this batch dispatch style is more complicated, and some other
-> > > > drivers(virtio blk/scsi) still may get benefit if we can pass real 'last' flag in
-> > > > .queue_rq().
-> > > >
-> > > > So what about the following way by extending .commit_rqs() to this usage?
-> > > > And you can do whatever batch processing in .commit_rqs() which will be
-> > > > guaranteed to be called if BLK_MQ_F_FORCE_COMMIT_RQS is set by driver.
-> > >
-> > > I'm very appreciated for your good suggestion, which is much simpler than mine.
-> > > It seems to solve my problem, and I will try it on my platform to see
-> > > if it can work and give you the feadback. Thanks again.
-> >
-> > I tried your approach on my platform, but met some problems, see below.
-> >
-> > >
-> > > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > > > index 856356b1619e..cd2bbe56f83f 100644
-> > > > --- a/block/blk-mq-sched.c
-> > > > +++ b/block/blk-mq-sched.c
-> > > > @@ -85,11 +85,12 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
-> > > >   * its queue by itself in its completion handler, so we don't need to
-> > > >   * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-> > > >   */
-> > > > -static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > > +static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > >  {
-> > > >         struct request_queue *q = hctx->queue;
-> > > >         struct elevator_queue *e = q->elevator;
-> > > >         LIST_HEAD(rq_list);
-> > > > +       bool ret = false;
-> > > >
-> > > >         do {
-> > > >                 struct request *rq;
-> > > > @@ -112,7 +113,10 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > >                  * in blk_mq_dispatch_rq_list().
-> > > >                  */
-> > > >                 list_add(&rq->queuelist, &rq_list);
-> > > > -       } while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-> > > > +               ret = blk_mq_dispatch_rq_list(q, &rq_list, true);
-> > > > +       } while (ret);
-> > > > +
-> > > > +       return ret;
-> > > >  }
-> > > >
-> > > >  static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-> > > > @@ -131,11 +135,12 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-> > > >   * its queue by itself in its completion handler, so we don't need to
-> > > >   * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-> > > >   */
-> > > > -static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-> > > > +static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-> > > >  {
-> > > >         struct request_queue *q = hctx->queue;
-> > > >         LIST_HEAD(rq_list);
-> > > >         struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
-> > > > +       bool ret = false;
-> > > >
-> > > >         do {
-> > > >                 struct request *rq;
-> > > > @@ -161,10 +166,12 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-> > > >
-> > > >                 /* round robin for fair dispatch */
-> > > >                 ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
-> > > > -
-> > > > -       } while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-> > > > +               ret = blk_mq_dispatch_rq_list(q, &rq_list, true);
-> > > > +       } while (ret);
-> > > >
-> > > >         WRITE_ONCE(hctx->dispatch_from, ctx);
-> > > > +
-> > > > +       return ret;
-> > > >  }
-> > > >
-> > > >  void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> > > > @@ -173,6 +180,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> > > >         struct elevator_queue *e = q->elevator;
-> > > >         const bool has_sched_dispatch = e && e->type->ops.dispatch_request;
-> > > >         LIST_HEAD(rq_list);
-> > > > +       bool dispatch_ret;
-> > > >
-> > > >         /* RCU or SRCU read lock is needed before checking quiesced flag */
-> > > >         if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
-> > > > @@ -206,20 +214,26 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> > > >          */
-> > > >         if (!list_empty(&rq_list)) {
-> > > >                 blk_mq_sched_mark_restart_hctx(hctx);
-> > > > -               if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
-> > > > +               dispatch_ret = blk_mq_dispatch_rq_list(q, &rq_list, false);
-> > > > +               if (dispatch_ret) {
-> > > >                         if (has_sched_dispatch)
-> > > > -                               blk_mq_do_dispatch_sched(hctx);
-> > > > +                               dispatch_ret = blk_mq_do_dispatch_sched(hctx);
-> >
-> > If we dispatched a request successfully by blk_mq_dispatch_rq_list(),
-> > and got dispatch_ret = true now. Then we will try to dispatch more
-> > reuqests from scheduler by blk_mq_do_dispatch_sched(), but if now no
-> > more requests in scheduler, then we will got dispatch_ret = false. In
->
-> 'dispatch_ret' always holds result of the last blk_mq_do_dispatch_sched().
-> When any one request has been dispatched successfully, 'dispatch_ret'
-> is true. New request is always added to list before calling
-> blk_mq_do_dispatch_sched(), so once blk_mq_do_dispatch_sched() returns
-> false, it means that .commit_rqs() has been called.
+On 3/22/20 7:03 AM, Coly Li wrote:
+> When registering a cache device, bch_btree_check() is called to check
+> all btree node, to make sure the btree is consistency and no corruption.
+> 
+> bch_btree_check() is recursively executed in single thread, when there
+> are a lot of data cached and the btree is huge, it may take very long
+> time to check all the btree nodes. In my testing, I observed it took
+> around 50 minutes to finish bch_btree_check().
+> 
+> When checking the bcache btree nodes, the cache set is not running yet,
+> and indeed the whole tree is in read-only state, it is safe to create
+> multiple threads to check the btree in parallel.
+> 
+> This patch tries to create multiple threads, and each thread tries to
+> one-by-one check the sub-tree indexed by a key from the btree root node.
+> The parallel thread number depends on how many keys in the btree root
+> node. At most BCH_BTR_CHKTHREAD_MAX (64) threads can be created, but in
+> practice is should be min(cpu-number/2, root-node-keys-number).
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> ---
+>   drivers/md/bcache/btree.c | 169 +++++++++++++++++++++++++++++++++++++-
+>   drivers/md/bcache/btree.h |  22 +++++
+>   2 files changed, 188 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index faf152524a16..74d66b641169 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -1897,13 +1897,176 @@ static int bch_btree_check_recurse(struct btree *b, struct btree_op *op)
+>   	return ret;
+>   }
+>   
+> +
+> +static int bch_btree_check_thread(void *arg)
+> +{
+> +	int ret;
+> +	struct btree_check_info *info = arg;
+> +	struct btree_check_state *check_state = info->state;
+> +	struct cache_set *c = check_state->c;
+> +	struct btree_iter iter;
+> +	struct bkey *k, *p;
+> +	int cur_idx, prev_idx, skip_nr;
+> +	int i, n;
+> +
+> +	k = p = NULL;
+> +	i = n = 0;
+> +	cur_idx = prev_idx = 0;
+> +	ret = 0;
+> +
+> +	/* root node keys are checked before thread created */
+> +	bch_btree_iter_init(&c->root->keys, &iter, NULL);
+> +	k = bch_btree_iter_next_filter(&iter, &c->root->keys, bch_ptr_bad);
+> +	BUG_ON(!k);
+> +
+> +	p = k;
+> +	while (k) {
+> +		/*
+> +		 * Fetch a root node key index, skip the keys which
+> +		 * should be fetched by other threads, then check the
+> +		 * sub-tree indexed by the fetched key.
+> +		 */
+> +		spin_lock(&check_state->idx_lock);
+> +		cur_idx = check_state->key_idx;
+> +		check_state->key_idx++;
+> +		spin_unlock(&check_state->idx_lock);
+> +
+> +		skip_nr = cur_idx - prev_idx;
+> +
+> +		while (skip_nr) {
+> +			k = bch_btree_iter_next_filter(&iter,
+> +						       &c->root->keys,
+> +						       bch_ptr_bad);
+> +			if (k)
+> +				p = k;
+> +			else {
+> +				/*
+> +				 * No more keys to check in root node,
+> +				 * current checking threads are enough,
+> +				 * stop creating more.
+> +				 */
+> +				atomic_set(&check_state->enough, 1);
+> +				/* Update check_state->enough earlier */
+> +				smp_mb();
+> +				goto out;
+> +			}
+> +			skip_nr--;
+> +			cond_resched();
+> +		}
+> +
+> +		if (p) {
+> +			struct btree_op op;
+> +
+> +			btree_node_prefetch(c->root, p);
+> +			c->gc_stats.nodes++;
+> +			bch_btree_op_init(&op, 0);
+> +			ret = bcache_btree(check_recurse, p, c->root, &op);
+> +			if (ret)
+> +				goto out;
+> +		}
+> +		p = NULL;
+> +		prev_idx = cur_idx;
+> +		cond_resched();
+> +	}
+> +
+> +out:
+> +	info->result = ret;
+> +	/* update check_state->started among all CPUs */
+> +	smp_mb();
+> +	if (atomic_dec_and_test(&check_state->started))
+> +		wake_up(&check_state->wait);
+> +
+> +	return ret;
+> +}
+> +
+> +
+> +
+> +static int bch_btree_chkthread_nr(void)
+> +{
+> +	int n = num_online_cpus()/2;
+> +
+> +	if (n == 0)
+> +		n = 1;
+> +	else if (n > BCH_BTR_CHKTHREAD_MAX)
+> +		n = BCH_BTR_CHKTHREAD_MAX;
+> +
+> +	return n;
+> +}
+> +
+>   int bch_btree_check(struct cache_set *c)
+>   {
+> -	struct btree_op op;
+> +	int ret = 0;
+> +	int i;
+> +	struct bkey *k = NULL;
+> +	struct btree_iter iter;
+> +	struct btree_check_state *check_state;
+> +	char name[32];
+>   
+> -	bch_btree_op_init(&op, SHRT_MAX);
+> +	/* check and mark root node keys */
+> +	for_each_key_filter(&c->root->keys, k, &iter, bch_ptr_invalid)
+> +		bch_initial_mark_key(c, c->root->level, k);
+> +
+> +	bch_initial_mark_key(c, c->root->level + 1, &c->root->key);
+> +
+> +	if (c->root->level == 0)
+> +		return 0;
+> +
+> +	check_state = kzalloc(sizeof(struct btree_check_state), GFP_KERNEL);
+> +	if (!check_state)
+> +		return -ENOMEM;
+> +
+> +	check_state->c = c;
+> +	check_state->total_threads = bch_btree_chkthread_nr();
+> +	check_state->key_idx = 0;
+> +	spin_lock_init(&check_state->idx_lock);
+> +	atomic_set(&check_state->started, 0);
+> +	atomic_set(&check_state->enough, 0);
+> +	init_waitqueue_head(&check_state->wait);
+>   
+> -	return bcache_btree_root(check_recurse, c, &op);
+> +	/*
+> +	 * Run multiple threads to check btree nodes in parallel,
+> +	 * if check_state->enough is non-zero, it means current
+> +	 * running check threads are enough, unncessary to create
+> +	 * more.
+> +	 */
+> +	for (i = 0; i < check_state->total_threads; i++) {
+> +		/* fetch latest check_state->enough earlier */
+> +		smp_mb();
+> +		if (atomic_read(&check_state->enough))
+> +			break;
+> +
+> +		check_state->infos[i].result = 0;
+> +		check_state->infos[i].state = check_state;
+> +		snprintf(name, sizeof(name), "bch_btrchk[%u]", i);
+> +		atomic_inc(&check_state->started);
+> +
+> +		check_state->infos[i].thread =
+> +			kthread_run(bch_btree_check_thread,
+> +				    &check_state->infos[i],
+> +				    name);
+> +		if (IS_ERR(check_state->infos[i].thread)) {
+> +			pr_err("fails to run thread bch_btrchk[%d]", i);
+> +			for (--i; i >= 0; i--)
+> +				kthread_stop(check_state->infos[i].thread);
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	wait_event_interruptible(check_state->wait,
+> +				 atomic_read(&check_state->started) == 0 ||
+> +				  test_bit(CACHE_SET_IO_DISABLE, &c->flags));
+> +
+> +	for (i = 0; i < check_state->total_threads; i++) {
+> +		if (check_state->infos[i].result) {
+> +			ret = check_state->infos[i].result;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +out:
+> +	kfree(check_state);
+> +	return ret;
+>   }
+>   
+>   void bch_initial_gc_finish(struct cache_set *c)
+> diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
+> index 19e30266070a..7c884f278da8 100644
+> --- a/drivers/md/bcache/btree.h
+> +++ b/drivers/md/bcache/btree.h
+> @@ -145,6 +145,9 @@ struct btree {
+>   	struct bio		*bio;
+>   };
+>   
+> +
+> +
+> +
+>   #define BTREE_FLAG(flag)						\
+>   static inline bool btree_node_ ## flag(struct btree *b)			\
+>   {	return test_bit(BTREE_NODE_ ## flag, &b->flags); }		\
+> @@ -216,6 +219,25 @@ struct btree_op {
+>   	unsigned int		insert_collision:1;
+>   };
+>   
+> +struct btree_check_state;
+> +struct btree_check_info {
+> +	struct btree_check_state	*state;
+> +	struct task_struct		*thread;
+> +	int				result;
+> +};
+> +
+> +#define BCH_BTR_CHKTHREAD_MAX	64
+> +struct btree_check_state {
+> +	struct cache_set		*c;
+> +	int				total_threads;
+> +	int				key_idx;
+> +	spinlock_t			idx_lock;
+> +	atomic_t			started;
+> +	atomic_t			enough;
+> +	wait_queue_head_t		wait;
+> +	struct btree_check_info		infos[BCH_BTR_CHKTHREAD_MAX];
+> +};
+> +
+>   static inline void bch_btree_op_init(struct btree_op *op, int write_lock_level)
+>   {
+>   	memset(op, 0, sizeof(struct btree_op));
+> 
+Any particular reason why you are not using workqueues?
+Kthreads is a bit of an overkill here I think...
 
-Not really, if no requests int the IO cheduler, we will break the loop
-in blk_mq_do_dispatch_sched() and return false without calling
-.commit_rqs().
+Cheers,
 
-So in this case, blk_mq_do_dispatch_sched() will return 'false', which
-overlapped the return value of 'true' from blk_mq_dispatch_rq_list(),
-and did not call .commit_rqs(). Then the IO processing will be stuck.
-
-static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-{
-        struct request_queue *q = hctx->queue;
-        struct elevator_queue *e = q->elevator;
-        LIST_HEAD(rq_list);
-        bool ret = false;
-
-       do {
-              struct request *rq;
-
-              if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
-                     break;
-
-              .......
-       } while (ret);
-
-       return ret;
-}
-
->
-> > this case, we will not issue commit_rqs() to tell the hardware to
-> > handle previous request dispatched from &rq_list.
-> >
-> > So I think we should not overlap the 'dispatch_ret'? Or do you have
-> > any other thoughts to fix?
-> >
-> > > >                         else
-> > > > -                               blk_mq_do_dispatch_ctx(hctx);
-> > > > +                               dispatch_ret = blk_mq_do_dispatch_ctx(hctx);
-> > > >                 }
-> > > >         } else if (has_sched_dispatch) {
-> > > > -               blk_mq_do_dispatch_sched(hctx);
-> > > > +               dispatch_ret = blk_mq_do_dispatch_sched(hctx);
-> > > >         } else if (hctx->dispatch_busy) {
-> > > >                 /* dequeue request one by one from sw queue if queue is busy */
-> > > > -               blk_mq_do_dispatch_ctx(hctx);
-> > > > +               dispatch_ret = blk_mq_do_dispatch_ctx(hctx);
-> > > >         } else {
-> > > >                 blk_mq_flush_busy_ctxs(hctx, &rq_list);
-> > > > -               blk_mq_dispatch_rq_list(q, &rq_list, false);
-> > > > +               dispatch_ret = blk_mq_dispatch_rq_list(q, &rq_list, false);
-> > > > +       }
-> > > > +
-> > > > +       if (dispatch_ret) {
-> > > > +               if (hctx->flags & BLK_MQ_F_FORCE_COMMIT_RQS)
-> > > > +                       hctx->queue->mq_ops->commit_rqs(hctx);
-> > > >         }
-> > > >  }
-> > > >
-> > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > > index 87c6699f35ae..9b46f5d6c7fd 100644
-> > > > --- a/block/blk-mq.c
-> > > > +++ b/block/blk-mq.c
-> > > > @@ -1238,11 +1238,15 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-> > > >                  * Flag last if we have no more requests, or if we have more
-> > > >                  * but can't assign a driver tag to it.
-> > > >                  */
-> > > > -               if (list_empty(list))
-> > > > -                       bd.last = true;
-> > > > -               else {
-> > > > -                       nxt = list_first_entry(list, struct request, queuelist);
-> > > > -                       bd.last = !blk_mq_get_driver_tag(nxt);
-> > > > +               if (!(hctx->flags & BLK_MQ_F_FORCE_COMMIT_RQS)) {
-> > > > +                       if (list_empty(list))
-> > > > +                               bd.last = true;
-> > > > +                       else {
-> > > > +                               nxt = list_first_entry(list, struct request, queuelist);
-> > > > +                               bd.last = !blk_mq_get_driver_tag(nxt);
-> > > > +                       }
-> > > > +               } else {
-> > > > +                       bd.last = false;
-> >
-> > If we enabled BLK_MQ_F_FORCE_COMMIT_RQS flag, we will always get
-> > bd.last = false even for the real last request in the IO scheduler. I
-> > know you already use commit_irqs() to help to kick driver. But I
-> > worried if it is reasonable that drivers always get bd.last = false.
-> >
->
-> BLK_MQ_F_FORCE_COMMIT_RQS means the .last flag is ignored, and we can
-> document this usage.
-
-OK. Thanks for your comments.
-
+Hannes
 -- 
-Baolin Wang
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
