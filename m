@@ -2,213 +2,174 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C55C54FCE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 14:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2376C43331
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 15:25:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA6CC20775
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 14:07:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3AEC20788
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 15:25:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpYKtojC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="p5InG0II"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727921AbgCXOH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 10:07:27 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21486 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727553AbgCXOHZ (ORCPT
+        id S1728185AbgCXPZD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 11:25:03 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:39883 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728181AbgCXPZC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 10:07:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585058844;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=guf8LTdbi3wmRiN5ykm7zFmobl16wEpjKymIGyI7jz0=;
-        b=OpYKtojCj6xyCvs7/au5k2U5r4Q50eH1RF2KpIEvApKYY5UIZJXIgjHlXdM2VXAwfVNbgs
-        HXIdjmpDcjV66ggcspRGvgfvSBmsMeJ2wFMxvgqx/Yu/jbw5c82ghn47TlOU6mgJLLFfNC
-        x8T9BK95KXmPy0XzXFE1PjHpfG6QBdk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-Y-hw-xkwP0KoK8tU2EARNg-1; Tue, 24 Mar 2020 10:07:20 -0400
-X-MC-Unique: Y-hw-xkwP0KoK8tU2EARNg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2537813FD;
-        Tue, 24 Mar 2020 14:07:19 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87BF05C241;
-        Tue, 24 Mar 2020 14:07:04 +0000 (UTC)
-Date:   Tue, 24 Mar 2020 22:06:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH v3 1/3] block/diskstats: more accurate approximation of
- io_ticks for slow disks
-Message-ID: <20200324140656.GA23550@ming.t460p>
-References: <158503038812.1955.7827988255138056389.stgit@buzz>
- <158503198072.1955.16227279292140721351.stgit@buzz>
+        Tue, 24 Mar 2020 11:25:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585063502; x=1616599502;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xaCtiHyqyRbO1ofbhK0zFUtuBTCIQCZrtTlzQ5zfCwY=;
+  b=p5InG0II7MBkIq/4FEBDbjz+OkNrhvNYQ6tgWmMmQJerQINSVQhpNIkt
+   pg7+VFvO+kaCtWvuD/3j536T4UUoI1Afi2vineUe6y4DBNWb+HsPueDvA
+   ZINUzMYdTeL3U4UiX2Pd2Ivf129LIV34HOzWN20yXoaw7k00/eZowxyOt
+   vetbR6QfEGTnbjvk/MpSeQGqfTpm6N3ND6b7RggMAL6Ay5diRELh0LDAv
+   wZPYPOL4apg0rtUl340wHbntXaEpKQ8mAYzZIf6vMpdcRHSUOXTqKmDom
+   Bcd9ZKYhddfgg0nosqVqR+j4ZlcOWo3zc4jQU16dSpBS5E+NfGe7FqC5L
+   Q==;
+IronPort-SDR: 6KSIteRFVGljOMXGfHQuMoBTYp5hCQPFdsvhX5lzWtNh7mrzPKS1J+AtwPQtpOAqTeBDDGWp5j
+ /rE7jEy1Wp6mqF+O6tGOHNtk7mZg1LC09kvaPiA/D5orzHKi2uj53gU9qSRpGVmy+cLihBVLZ0
+ yjOAAM3t49RelBrk7iOlOsxoS3CnbzTGguZ80FJZnfucNvEEwd0F9lOwfSupa2haG1llsHzuC8
+ 2WvftM1hQnmY+KiMmMiw36/o/eJecadrLQrDcSTC0aUonzEv8vAeKhiM0TQutuqWof2iSDU0MV
+ yqc=
+X-IronPort-AV: E=Sophos;i="5.72,300,1580745600"; 
+   d="scan'208";a="133371550"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Mar 2020 23:25:02 +0800
+IronPort-SDR: PmIhIju7mhB93u0Tf71Lw/OKvE/rLqrbqZfALbHAbn2mxmz4yAOsiiYrHqF7EVMcpnBVQ7TvOq
+ Hoj9PlorGq8mvdVLrCLeO1+OkpRmC4jLx66WFBxA0cTlLpS4LdJO0KO8JMf8ruxv2s/h10tEAE
+ CwFU9LHQH/D9c64gWcFzG2BK3yjwRWMe3WR217U85udiTJ5BjSHukRpWGYj2YvwFrBO1C/QgyP
+ 4J1srDgPwN3eU7Y+BdPJ6z4TlNatnLPEL4z84hR8bhiUD5+etQwK4V9uZpRxI9p10zwhz4wGCp
+ 32dVA2W4ZE2+JeqvHCxDzPxc
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 08:16:41 -0700
+IronPort-SDR: Fj32O1Z20k2UD58hwSuKR+Tvq0z8tJyxidYIqhthiJJV1FWoh6N7I1bdtCND+82AmdnfJCp0iY
+ yEa50Qltof6QI43JPOmw9jljrLRfG+xcdyTOStegBzg86pSx/cYAhLOydKiHJc5lgXauoKfsUR
+ ch0MPv8zp6SFOcxsRuFum4YNAG2dgHmF6TFStWXWVQD0MN0tbRRhvABEg8xMuSHMTDCVjETaRx
+ RmaIHyfvxLeVjKcF0NwBrTqPl87QBxc5QMM35gHaP4OX5qsDEHjccUSJ7ohUVUwyy4LW6LMsQw
+ +8U=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 24 Mar 2020 08:25:00 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v2 00/11] Introduce Zone Append for writing to zoned block devices
+Date:   Wed, 25 Mar 2020 00:24:43 +0900
+Message-Id: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <158503198072.1955.16227279292140721351.stgit@buzz>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 09:39:40AM +0300, Konstantin Khlebnikov wrote:
-> Currently io_ticks is approximated by adding one at each start and end of
-> requests if jiffies counter has changed. This works perfectly for requests
-> shorter than a jiffy or if one of requests starts/ends at each jiffy.
-> 
-> If disk executes just one request at a time and they are longer than two
-> jiffies then only first and last jiffies will be accounted.
-> 
-> Fix is simple: at the end of request add up into io_ticks jiffies passed
-> since last update rather than just one jiffy.
-> 
-> Example: common HDD executes random read 4k requests around 12ms.
-> 
-> fio --name=test --filename=/dev/sdb --rw=randread --direct=1 --runtime=30 &
-> iostat -x 10 sdb
-> 
-> Note changes of iostat's "%util" 8,43% -> 99,99% before/after patch:
-> 
-> Before:
-> 
-> Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-> sdb               0,00     0,00   82,60    0,00   330,40     0,00     8,00     0,96   12,09   12,09    0,00   1,02   8,43
-> 
-> After:
-> 
-> Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-> sdb               0,00     0,00   82,50    0,00   330,00     0,00     8,00     1,00   12,10   12,10    0,00  12,12  99,99
-> 
-> For load estimation "%util" is not as useful as average queue length,
-> but it clearly shows how often disk queue is completely empty.
-> 
-> Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-> ---
->  Documentation/admin-guide/iostats.rst |    5 ++++-
->  block/bio.c                           |    8 ++++----
->  block/blk-core.c                      |    4 ++--
->  include/linux/genhd.h                 |    2 +-
->  4 files changed, 11 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
-> index df5b8345c41d..9b14b0c2c9c4 100644
-> --- a/Documentation/admin-guide/iostats.rst
-> +++ b/Documentation/admin-guide/iostats.rst
-> @@ -100,7 +100,7 @@ Field 10 -- # of milliseconds spent doing I/Os (unsigned int)
->  
->      Since 5.0 this field counts jiffies when at least one request was
->      started or completed. If request runs more than 2 jiffies then some
-> -    I/O time will not be accounted unless there are other requests.
-> +    I/O time might be not accounted in case of concurrent requests.
->  
->  Field 11 -- weighted # of milliseconds spent doing I/Os (unsigned int)
->      This field is incremented at each I/O start, I/O completion, I/O
-> @@ -143,6 +143,9 @@ are summed (possibly overflowing the unsigned long variable they are
->  summed to) and the result given to the user.  There is no convenient
->  user interface for accessing the per-CPU counters themselves.
->  
-> +Since 4.19 request times are measured with nanoseconds precision and
-> +truncated to milliseconds before showing in this interface.
-> +
->  Disks vs Partitions
->  -------------------
->  
-> diff --git a/block/bio.c b/block/bio.c
-> index 0985f3422556..b1053eb7af37 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1762,14 +1762,14 @@ void bio_check_pages_dirty(struct bio *bio)
->  	schedule_work(&bio_dirty_work);
->  }
->  
-> -void update_io_ticks(struct hd_struct *part, unsigned long now)
-> +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
->  {
->  	unsigned long stamp;
->  again:
->  	stamp = READ_ONCE(part->stamp);
->  	if (unlikely(stamp != now)) {
->  		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
-> -			__part_stat_add(part, io_ticks, 1);
-> +			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
->  		}
->  	}
->  	if (part->partno) {
-> @@ -1785,7 +1785,7 @@ void generic_start_io_acct(struct request_queue *q, int op,
->  
->  	part_stat_lock();
->  
-> -	update_io_ticks(part, jiffies);
-> +	update_io_ticks(part, jiffies, false);
->  	part_stat_inc(part, ios[sgrp]);
->  	part_stat_add(part, sectors[sgrp], sectors);
->  	part_inc_in_flight(q, part, op_is_write(op));
-> @@ -1803,7 +1803,7 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
->  
->  	part_stat_lock();
->  
-> -	update_io_ticks(part, now);
-> +	update_io_ticks(part, now, true);
->  	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
->  	part_stat_add(part, time_in_queue, duration);
->  	part_dec_in_flight(q, part, op_is_write(req_op));
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index abfdcf81a228..4401b30a1751 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1337,7 +1337,7 @@ void blk_account_io_done(struct request *req, u64 now)
->  		part_stat_lock();
->  		part = req->part;
->  
-> -		update_io_ticks(part, jiffies);
-> +		update_io_ticks(part, jiffies, true);
->  		part_stat_inc(part, ios[sgrp]);
->  		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
->  		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
-> @@ -1379,7 +1379,7 @@ void blk_account_io_start(struct request *rq, bool new_io)
->  		rq->part = part;
->  	}
->  
-> -	update_io_ticks(part, jiffies);
-> +	update_io_ticks(part, jiffies, false);
->  
->  	part_stat_unlock();
->  }
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index d5c75df64bba..f1066f10b062 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -467,7 +467,7 @@ static inline void free_part_info(struct hd_struct *part)
->  	kfree(part->info);
->  }
->  
-> -void update_io_ticks(struct hd_struct *part, unsigned long now);
-> +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end);
->  
->  /* block/genhd.c */
->  extern void device_add_disk(struct device *parent, struct gendisk *disk,
-> 
+The upcoming NVMe ZNS Specification will define a new type of write
+command for zoned block devices, zone append.
 
-Looks fine:
+When when writing to a zoned block device using zone append, the start
+sector of the write is pointing at the start LBA of the zone to write to.
+Upon completion the block device will respond with the position the data
+has been placed in the zone. This from a high level perspective can be
+seen like a file system's block allocator, where the user writes to a
+file and the file-system takes care of the data placement on the device.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+In order to fully exploit the new zone append command in file-systems and
+other interfaces above the block layer, we choose to emulate zone append
+in SCSI and null_blk. This way we can have a single write path for both
+file-systems and other interfaces above the block-layer, like io_uring on
+zoned block devices, without having to care too much about the underlying
+characteristics of the device itself.
 
-Thanks,
-Ming
+The emulation works by providing a cache of each zone's write pointer, so
+zone append issued to the disk can be translated to a write with a
+starting LBA of the write pointer. This LBA is used as input zone number
+for the write pointer lookup in the zone write pointer offset cache and
+the cached offset is then added to the LBA to get the actual position to
+write the data. In SCSI we then turn the REQ_OP_ZONE_APPEND request into a
+WRITE(16) command. Upon successful completion of the WRITE(16), the cache
+will be updated to the new write pointer location and the written sector
+will be noted in the request. On error the cache entry will be marked as
+invalid and on the next write an update of the write pointer will be
+scheduled, before issuing the actual write.
+
+In order to reduce memory consumption, the only cached item is the offset
+of the write pointer from the start of the zone, everything else can be
+calculated. On an example drive with 52156 zones, the additional memory
+consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
+pages. The performance impact is neglectable for a spinning drive.
+
+For null_blk the emulation is way simpler, as null_blk's zoned block
+device emulation support already caches the write pointer position, so we
+only need to report the position back to the upper layers. Additional
+caching is not needed here.
+
+Furthermore we have converted zonefs to run use ZONE_APPEND for synchronous
+direct I/Os, which also needed changes in iomap.
+
+The series is based on Jens' for-next branch.
+
+Changes since v1:
+- Too much to mention, treat as a completely new series.
+
+Damien Le Moal (3):
+  block: Introduce zone write pointer offset caching
+  null_blk: Cleanup zoned device initialization
+  null_blk: Support REQ_OP_ZONE_APPEND
+
+Johannes Thumshirn (7):
+  block: factor out requeue handling from dispatch code
+  block: provide fallbacks for blk_queue_zone_is_seq and
+    blk_queue_zone_no
+  block: introduce blk_req_zone_write_trylock
+  scsi: sd_zbc: factor out sanity checks for zoned commands
+  scsi: sd_zbc: emulate ZONE_APPEND commands
+  iomap: Add support for zone append writes
+  zonefs: use zone-append for sequential zones
+
+Keith Busch (1):
+  block: Introduce REQ_OP_ZONE_APPEND
+
+ block/bio.c                    |  72 ++++++-
+ block/blk-core.c               |  52 +++++
+ block/blk-map.c                |   2 +-
+ block/blk-mq.c                 |  54 ++++-
+ block/blk-settings.c           |  19 ++
+ block/blk-sysfs.c              |  15 +-
+ block/blk-zoned.c              |  83 +++++++-
+ block/blk.h                    |   4 +-
+ drivers/block/null_blk.h       |  14 +-
+ drivers/block/null_blk_main.c  |  35 ++--
+ drivers/block/null_blk_zoned.c |  51 ++++-
+ drivers/scsi/scsi_lib.c        |   1 +
+ drivers/scsi/sd.c              |  28 ++-
+ drivers/scsi/sd.h              |  36 +++-
+ drivers/scsi/sd_zbc.c          | 352 +++++++++++++++++++++++++++++++--
+ fs/iomap/direct-io.c           |  80 ++++++--
+ fs/zonefs/super.c              |  15 +-
+ include/linux/bio.h            |  22 +--
+ include/linux/blk_types.h      |  14 ++
+ include/linux/blkdev.h         |  42 +++-
+ include/linux/fs.h             |   1 +
+ include/linux/iomap.h          |  22 +--
+ 22 files changed, 881 insertions(+), 133 deletions(-)
+
+-- 
+2.24.1
 
