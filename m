@@ -2,172 +2,100 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B77C41621
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 15:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F2BC43331
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 16:06:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFF17208CA
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 15:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64F7420788
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 16:06:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ncaTsK1B"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fQEuKNFQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbgCXPlc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 11:41:32 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55998 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727510AbgCXPlc (ORCPT
+        id S1728251AbgCXQGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 12:06:30 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:36335 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727730AbgCXQGa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 11:41:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=yRyMm7QNGa1QxyqAit0ud9YfLLzAXR0cCnyVzb5F8I8=; b=ncaTsK1BPjoxPIAZ6eyo+jvHwE
-        7uAo4fj8KfRTyNga+ATC0T0xGPy736fZ8Yc8Ofzd6t9j4ZrkcA664IFJtQvy9Vtol7N8JFThDuA0R
-        gbuEFl2WddJh4s/W0CfrCFFoIxgehbcEZLo0Xu48NyXsGXV3XkF1ly3M4NAn/dGczyrq6nGWZigKw
-        g6n94oeHiFm8oj4rMJhKqfajfwfeX88RrzV7kagZRqdD6TWTrgYS6lKhxfmUOn7IMwa70M2k6luCT
-        o0/rBE3zPHMt+K5zakWYPCWobpQ4Yb3Fvu4Gxq9ercdFi0q+huSSwV3pRIKGVo0bSEA+XAzNREjnw
-        6z7ZVe2A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jGlgJ-0002uc-6w; Tue, 24 Mar 2020 15:41:31 +0000
-Date:   Tue, 24 Mar 2020 08:41:31 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>
-Subject: Re: [PATCH v2 10/11] iomap: Add support for zone append writes
-Message-ID: <20200324154131.GA32087@infradead.org>
-References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
- <20200324152454.4954-11-johannes.thumshirn@wdc.com>
+        Tue, 24 Mar 2020 12:06:30 -0400
+Received: by mail-io1-f67.google.com with SMTP id d15so18648288iog.3
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2020 09:06:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ojwoexmi/yNDp0QrqjuP+tb9z9BxusbHoCk6iHU7shU=;
+        b=fQEuKNFQnAsD07TtSc6hXHFzVHp8dLZVMVM5iWSjjjdGw4f2R/gciWR/viQuDDtOfX
+         7es7jXjtssrvriqGFL5nVHrdtsxIQvYC/VBWTu7PB5BmEH27FnpoqZIsDCbsw97eSlDY
+         Ypij/2VgnN453qPo4pw07Ld9eSes/EugM5d7Zk1sVvuNNZpJjGUisbNxO7GgHret37KC
+         1CfI/hbxhhzJAM+DO6H/4zytEk592jhdyJRt60sxjsWFwAAXXXdz90/LvucNkwXawTqM
+         mF98FzSQfTQqxNOi/Mh0yyw26lXdwssdBTUc9eu4RLefyEvSv7XrpcCxtBeW+okQsfPq
+         UC9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ojwoexmi/yNDp0QrqjuP+tb9z9BxusbHoCk6iHU7shU=;
+        b=PCxAPmMREhRY08Ep+zMsSzo0Pegg1o28xtzbWx8C2V6wAy5nVpsx0lRFf/IYArt2nr
+         qKVSkrtetKn+HSGOSGsc6iUJtzST0m4WvM/u4WVL35WyfJ4nHkNyuHlIbP0oLIYWF7wj
+         fy3Zx1LrswYYNIi7NPoUKitRWOqfk8MoR2Oc2X3N1TqtnoBJaNC5B173mwjL373on9GF
+         r1GFK+CH4CbNlkcpQ2KkFwk+UpLzVzO1xJ/OtRb5KmH0P1dfCxRJg9OLrj4H2k+5LYYS
+         psk4Bl7qANWfyfqPXdKPFMxvKEM7nU6eZyLk1up6kVqT+RA3p7ewaxigwjU5wntoxUBF
+         YC5A==
+X-Gm-Message-State: ANhLgQ2caPwj9TE2TQT9e2EyZ6rZteHxaqTING+/3j6Z176ra/IU3hx/
+        j7vTR43qsQBUwrdYJOxwFG3ujw==
+X-Google-Smtp-Source: ADFU+vtSEIy6OU2P3p0F5VYmIIPCNs10wRnCB6nYzCevCk/nSG4XkYeAO/0NiEIbndZmWaAyWKV5KQ==
+X-Received: by 2002:a6b:156:: with SMTP id 83mr24819257iob.187.1585065989365;
+        Tue, 24 Mar 2020 09:06:29 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id n18sm6464554ilq.38.2020.03.24.09.06.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2020 09:06:28 -0700 (PDT)
+Subject: Re: [PATCH v3 0/3] block/diskstats: more accurate io_ticks and
+ optimization
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <158503038812.1955.7827988255138056389.stgit@buzz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8aa3e8f7-cd53-b038-d5a7-dca7bf3fa929@kernel.dk>
+Date:   Tue, 24 Mar 2020 10:06:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324152454.4954-11-johannes.thumshirn@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <158503038812.1955.7827988255138056389.stgit@buzz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 12:24:53AM +0900, Johannes Thumshirn wrote:
-> @@ -39,6 +40,7 @@ struct iomap_dio {
->  			struct task_struct	*waiter;
->  			struct request_queue	*last_queue;
->  			blk_qc_t		cookie;
-> +			sector_t		sector;
->  		} submit;
->  
->  		/* used for aio completion: */
-> @@ -151,6 +153,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
->  	if (bio->bi_status)
->  		iomap_dio_set_error(dio, blk_status_to_errno(bio->bi_status));
->  
-> +	if (dio->flags & IOMAP_DIO_ZONE_APPEND)
-> +		dio->submit.sector = bio->bi_iter.bi_sector;
+On 3/24/20 12:39 AM, Konstantin Khlebnikov wrote:
+> Simplified estimation for io_ticks introduced in patch
+> https://lore.kernel.org/linux-block/20181206164122.2166-5-snitzer@redhat.com/
+> could be very inaccurate for request longer than jiffy (i.e. any HDD)
+> 
+> There is at least one another report about this:
+> https://lore.kernel.org/linux-block/20200324031942.GA3060@ming.t460p/
+> See detail in comment for first patch.
+> 
+> v1: https://lore.kernel.org/lkml/155413438394.3201.15211440151043943989.stgit@buzz/
+> v2: https://lore.kernel.org/lkml/158314549775.1788.6529015932237292177.stgit@buzz/
+> v3:
+>  * update documentation
+>  * rebase to current linux-next
+>  * fix compilation for CONFIG_SMP=n
 
-The submit member in struct iomap_dio is for submit-time information,
-while this is used in the completion path..
+Can you respin this against my for-5.7/block branch?
 
->  		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
->  		iomap_dio_submit_bio(dio, iomap, bio);
-> +
-> +		/*
-> +		 * Issuing multiple BIOs for a large zone append write can
-> +		 * result in reordering of the write fragments and to data
-> +		 * corruption. So always stop after the first BIO is issued.
-> +		 */
-> +		if (zone_append)
-> +			break;
+-- 
+Jens Axboe
 
-At least for a normal file system that is absolutely not true.  If
-zonefs is so special it might be better of just using a slightly tweaked
-copy of blkdev_direct_IO rather than using iomap.
-
-> @@ -446,6 +486,11 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
->  		flags |= IOMAP_WRITE;
->  		dio->flags |= IOMAP_DIO_WRITE;
->  
-> +		if (iocb->ki_flags & IOCB_ZONE_APPEND) {
-> +			flags |= IOMAP_ZONE_APPEND;
-> +			dio->flags |= IOMAP_DIO_ZONE_APPEND;
-> +		}
-> +
->  		/* for data sync or sync, we need sync completion processing */
->  		if (iocb->ki_flags & IOCB_DSYNC)
->  			dio->flags |= IOMAP_DIO_NEED_SYNC;
-> @@ -516,6 +561,15 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
->  			iov_iter_revert(iter, pos - dio->i_size);
->  			break;
->  		}
-> +
-> +		/*
-> +		 * Zone append writes cannot be split and be shorted. Break
-> +		 * here to let the user know instead of sending more IOs which
-> +		 * could get reordered and corrupt the written data.
-> +		 */
-> +		if (flags & IOMAP_ZONE_APPEND)
-> +			break;
-
-But that isn't what we do here.  You exit after a single apply iteration
-which is perfectly fine - at at least for a normal file system, zonefs
-is rather weird.
-
-> +
->  	} while ((count = iov_iter_count(iter)) > 0);
->  	blk_finish_plug(&plug);
->  
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 3cd4fe6b845e..aa4ad705e549 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -314,6 +314,7 @@ enum rw_hint {
->  #define IOCB_SYNC		(1 << 5)
->  #define IOCB_WRITE		(1 << 6)
->  #define IOCB_NOWAIT		(1 << 7)
-> +#define IOCB_ZONE_APPEND	(1 << 8)
-
-I don't think the iocb is the right interface for passing this
-kind of information.  We currently pass a bool wait to iomap_dio_rw
-which really should be flags.  I have a pending patch for that.
-
-> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-> index 8b09463dae0d..16c17a79e53d 100644
-> --- a/include/linux/iomap.h
-> +++ b/include/linux/iomap.h
-> @@ -68,7 +68,6 @@ struct vm_fault;
->   */
->  #define IOMAP_F_PRIVATE		0x1000
->  
-> -
-
-Spurious whitespace change.
-
->  /*
->   * Magic value for addr:
->   */
-> @@ -95,6 +94,17 @@ iomap_sector(struct iomap *iomap, loff_t pos)
->  	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
->  }
->  
-> +/*
-> + * Flags for iomap_begin / iomap_end.  No flag implies a read.
-> + */
-> +#define IOMAP_WRITE		(1 << 0) /* writing, must allocate blocks */
-> +#define IOMAP_ZERO		(1 << 1) /* zeroing operation, may skip holes */
-> +#define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
-> +#define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
-> +#define IOMAP_DIRECT		(1 << 4) /* direct I/O */
-> +#define IOMAP_NOWAIT		(1 << 5) /* do not block */
-> +#define IOMAP_ZONE_APPEND	(1 << 6) /* Use zone append for writes */
-
-Why is this moved around?
