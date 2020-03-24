@@ -2,158 +2,131 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B903BC10DCE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 06:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98812C4332B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 07:17:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 926E22076A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 06:39:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="QDLKKBD8"
+	by mail.kernel.org (Postfix) with ESMTP id 72EC02076A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 07:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727382AbgCXGjt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 02:39:49 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:45114 "EHLO
-        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725867AbgCXGjs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 02:39:48 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net [IPv6:2a02:6b8:0:1619::119])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id D440B2E132A;
-        Tue, 24 Mar 2020 09:39:46 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
-        by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 8vnLE5EXoi-dkj88Mop;
-        Tue, 24 Mar 2020 09:39:46 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1585031986; bh=jyRnU+Asd2uxc7+0qAY2dN85ocWc8XFT/wVXuXTWsBE=;
-        h=In-Reply-To:Message-ID:References:Date:To:From:Subject:Cc;
-        b=QDLKKBD8Ec4XEAfztaT7qJTJzEani+im95myqbfF5QUF3ZWR4kgoIx7vojWZqduHI
-         /VgRiaD5XWx+lo/D8l4TPDdFANxWU6VyxNsiAY6segjOM4+X/S0Do36/ufhHPEjOme
-         IKRsrQw7aF4BSsP2yieT5Aot3TFEkYA/VIFBPR4E=
-Authentication-Results: mxbackcorp2j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from unknown (unknown [2a02:6b8:b080:6410::1:2])
-        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id XsUON6R6Im-dkbaHA5k;
-        Tue, 24 Mar 2020 09:39:46 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-Subject: [PATCH v3 3/3] block/diskstats: replace time_in_queue with sum of
- request times
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org
-Cc:     Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Date:   Tue, 24 Mar 2020 09:39:46 +0300
-Message-ID: <158503198613.1955.12660218488410753545.stgit@buzz>
-In-Reply-To: <158503038812.1955.7827988255138056389.stgit@buzz>
-References: <158503038812.1955.7827988255138056389.stgit@buzz>
-User-Agent: StGit/0.17.1-dirty
+        id S1727261AbgCXHRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 03:17:05 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48592 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725905AbgCXHRE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Mar 2020 03:17:04 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 5258CACA1;
+        Tue, 24 Mar 2020 07:17:02 +0000 (UTC)
+Subject: Re: [PATCH] block, nvme: Increase max segments parameter setting
+ value
+To:     Tokunori Ikegami <ikegami.t@gmail.com>, linux-block@vger.kernel.org
+Cc:     linux-nvme@lists.infradead.org
+References: <20200323182324.3243-1-ikegami.t@gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <2293733b-77d7-6fbb-a81a-b68c10656757@suse.de>
+Date:   Tue, 24 Mar 2020 08:16:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200323182324.3243-1-ikegami.t@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Column "time_in_queue" in diskstats is supposed to show total waiting time
-of all requests. I.e. value should be equal to the sum of times from other
-columns. But this is not true, because column "time_in_queue" is counted
-separately in jiffies rather than in nanoseconds as other times.
+On 3/23/20 7:23 PM, Tokunori Ikegami wrote:
+> Currently data length can be specified as UINT_MAX but failed.
+> This is caused by the max segments parameter limit set as USHRT_MAX.
+> To resolve this issue change to increase the value limit range.
+> 
+> Signed-off-by: Tokunori Ikegami <ikegami.t@gmail.com>
+> Cc: linux-block@vger.kernel.org
+> Cc: linux-nvme@lists.infradead.org
+> ---
+>   block/blk-settings.c     | 2 +-
+>   drivers/nvme/host/core.c | 2 +-
+>   include/linux/blkdev.h   | 7 ++++---
+>   3 files changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index c8eda2e7b91e..ed40bda573c2 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -266,7 +266,7 @@ EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
+>    *    Enables a low level driver to set an upper limit on the number of
+>    *    hw data segments in a request.
+>    **/
+> -void blk_queue_max_segments(struct request_queue *q, unsigned short max_segments)
+> +void blk_queue_max_segments(struct request_queue *q, unsigned int max_segments)
+>   {
+>   	if (!max_segments) {
+>   		max_segments = 1;
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index a4d8c90ee7cc..2b48aab0969e 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2193,7 +2193,7 @@ static void nvme_set_queue_limits(struct nvme_ctrl *ctrl,
+>   
+>   		max_segments = min_not_zero(max_segments, ctrl->max_segments);
+>   		blk_queue_max_hw_sectors(q, ctrl->max_hw_sectors);
+> -		blk_queue_max_segments(q, min_t(u32, max_segments, USHRT_MAX));
+> +		blk_queue_max_segments(q, min_t(u32, max_segments, UINT_MAX));
+>   	}
+>   	if ((ctrl->quirks & NVME_QUIRK_STRIPE_SIZE) &&
+>   	    is_power_of_2(ctrl->max_hw_sectors))
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f629d40c645c..4f4224e20c28 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -338,8 +338,8 @@ struct queue_limits {
+>   	unsigned int		max_write_zeroes_sectors;
+>   	unsigned int		discard_granularity;
+>   	unsigned int		discard_alignment;
+> +	unsigned int		max_segments;
+>   
+> -	unsigned short		max_segments;
+>   	unsigned short		max_integrity_segments;
+>   	unsigned short		max_discard_segments;
+>   
+> @@ -1067,7 +1067,8 @@ extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
+>   extern void blk_queue_bounce_limit(struct request_queue *, u64);
+>   extern void blk_queue_max_hw_sectors(struct request_queue *, unsigned int);
+>   extern void blk_queue_chunk_sectors(struct request_queue *, unsigned int);
+> -extern void blk_queue_max_segments(struct request_queue *, unsigned short);
+> +extern void blk_queue_max_segments(struct request_queue *q,
+> +				   unsigned int max_segments);
+>   extern void blk_queue_max_discard_segments(struct request_queue *,
+>   		unsigned short);
+>   extern void blk_queue_max_segment_size(struct request_queue *, unsigned int);
+> @@ -1276,7 +1277,7 @@ static inline unsigned int queue_max_hw_sectors(const struct request_queue *q)
+>   	return q->limits.max_hw_sectors;
+>   }
+>   
+> -static inline unsigned short queue_max_segments(const struct request_queue *q)
+> +static inline unsigned int queue_max_segments(const struct request_queue *q)
+>   {
+>   	return q->limits.max_segments;
+>   }
+> 
+One would assume that the same reasoning goes for max_integrity_segment, no?
 
-This patch removes redundant counter for "time_in_queue" and shows total
-time of read, write, discard and flush requests.
+Otherwise looks good.
 
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
----
- block/bio.c               |    1 -
- block/blk-core.c          |    1 -
- block/genhd.c             |    7 +++++--
- block/partition-generic.c |    6 +++++-
- include/linux/genhd.h     |    1 -
- 5 files changed, 10 insertions(+), 6 deletions(-)
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-diff --git a/block/bio.c b/block/bio.c
-index b1053eb7af37..a353d5cdf589 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1805,7 +1805,6 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
- 
- 	update_io_ticks(part, now, true);
- 	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
--	part_stat_add(part, time_in_queue, duration);
- 	part_dec_in_flight(q, part, op_is_write(req_op));
- 
- 	part_stat_unlock();
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4401b30a1751..eaf6cb3887e6 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1340,7 +1340,6 @@ void blk_account_io_done(struct request *req, u64 now)
- 		update_io_ticks(part, jiffies, true);
- 		part_stat_inc(part, ios[sgrp]);
- 		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
--		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
- 		part_dec_in_flight(req->q, part, rq_data_dir(req));
- 
- 		hd_struct_put(part);
-diff --git a/block/genhd.c b/block/genhd.c
-index 606e8755f6ed..2b49d997ac72 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -87,7 +87,6 @@ void part_stat_read_all(struct hd_struct *part, struct disk_stats *stat)
- 		}
- 
- 		stat->io_ticks += ptr->io_ticks;
--		stat->time_in_queue += ptr->time_in_queue;
- 	}
- }
- #endif /* CONFIG_SMP */
-@@ -1487,7 +1486,11 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 							NSEC_PER_MSEC),
- 			   inflight,
- 			   jiffies_to_msecs(stat.io_ticks),
--			   jiffies_to_msecs(stat.time_in_queue),
-+			   (unsigned int)div_u64(stat.nsecs[STAT_READ] +
-+						 stat.nsecs[STAT_WRITE] +
-+						 stat.nsecs[STAT_DISCARD] +
-+						 stat.nsecs[STAT_FLUSH],
-+							NSEC_PER_MSEC),
- 			   stat.ios[STAT_DISCARD],
- 			   stat.merges[STAT_DISCARD],
- 			   stat.sectors[STAT_DISCARD],
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 6d3fcb5187cb..2a9bc78a116f 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -143,7 +143,11 @@ ssize_t part_stat_show(struct device *dev,
- 		(unsigned int)div_u64(stat.nsecs[STAT_WRITE], NSEC_PER_MSEC),
- 		inflight,
- 		jiffies_to_msecs(stat.io_ticks),
--		jiffies_to_msecs(stat.time_in_queue),
-+		(unsigned int)div_u64(stat.nsecs[STAT_READ] +
-+				      stat.nsecs[STAT_WRITE] +
-+				      stat.nsecs[STAT_DISCARD] +
-+				      stat.nsecs[STAT_FLUSH],
-+						NSEC_PER_MSEC),
- 		stat.ios[STAT_DISCARD],
- 		stat.merges[STAT_DISCARD],
- 		(unsigned long long)stat.sectors[STAT_DISCARD],
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index ead3ffb7f327..019ede22ebd2 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -89,7 +89,6 @@ struct disk_stats {
- 	unsigned long ios[NR_STAT_GROUPS];
- 	unsigned long merges[NR_STAT_GROUPS];
- 	unsigned long io_ticks;
--	unsigned long time_in_queue;
- 	local_t in_flight[2];
- };
- 
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
