@@ -2,181 +2,98 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31420C43331
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 17:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6B4C43331
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 18:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFF0C2051A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 17:17:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsbrGR1k"
+	by mail.kernel.org (Postfix) with ESMTP id C8B8D2076E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 18:27:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585074449;
+	bh=3VIueW4obZmi3aOsXeEDUwjbw+eQKz9VOa+2oPaz4Q4=;
+	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
+	b=p40JNB1H1Z7y/0GbI5s9dPzBwBxnQV+QsqVxHY5rxoreEOAPFWfw0WBN+p+hNqjfi
+	 GSOHTDnuJgVIlgzxwvyAcQZBGq+8qOSSTsMoXcArJViZ5sG0P4+Wll7mz16mrqN58W
+	 dgG8Ct6MOjtaKgnVg50a29VJvKFFWJ+eqlv2BInM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727223AbgCXRRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 13:17:30 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44201 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727834AbgCXRRa (ORCPT
+        id S1727821AbgCXS13 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 14:27:29 -0400
+Received: from mail-qt1-f174.google.com ([209.85.160.174]:41760 "EHLO
+        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727769AbgCXS13 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 13:17:30 -0400
-Received: by mail-pl1-f196.google.com with SMTP id h11so7647573plr.11
-        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2020 10:17:28 -0700 (PDT)
+        Tue, 24 Mar 2020 14:27:29 -0400
+Received: by mail-qt1-f174.google.com with SMTP id i3so11982879qtv.8;
+        Tue, 24 Mar 2020 11:27:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=ZGYRf7bljlV95062/kAIKLYYfvkZE5yLnQI9lCDJN/o=;
-        b=CsbrGR1kakDt6gdEAN2mnN4rODtq3EuL3ugdMU8VFJU3a52q/D9r9aEung8lJYoe52
-         vzM/Xc5d3U/CgEiqyLV8fsyyR46cz49XOLjdWRFwVy7svFnXzu9ScHHSrsoYiQ735jMl
-         ceMOKstmieXXE3e1LyQf6rHu7ArbQMcmLLPPh2Hd2ON2J864s9CzBzCwIcj6bcFD9v69
-         EnF7CQeF7vpnBmYbvhGVbFsKeQsVdPHqbZtUpTtEGP7t3mBfehpkLt12vPgg4BJHeRiD
-         EzuUyEAMi25X59mGhwNHaEvkB3qoOfd5g2NBUDh204R4H9b0tKGELCTlUb+wnrn0+dIw
-         IQZg==
+        h=sender:date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=x+AJ73g67Lv+1tYqp3JK2cKPMpi2aKN3Up6Cs52zqao=;
+        b=vPcBHMCUcEGWwF6ReF3V5Oj14G9fzThxHKTmhQWjdrqvvIU9w3190k+I52sQr16+Ij
+         oLI36ieeOKdcMESeKCP0s24tJvKWfCQUYwfrD41UAeIb0gw84GL36gxKS0INNJBA5pzu
+         y5iXEEJRgq7+T+bK1a76JZ/eLF7uVGK7Be8OZlrMhcSQ28zyswt2Lwj3o3NDu8M04eBq
+         jbpWIyfyWojPE0y1UPULVXZCGWsxOa4n1gQa07TQR0uAgB2ZDs+J/hPstNCRW6pycLVy
+         VbFTImV9nQ8yIf6tFuqUAFcBDKV2V3X9WYdzJ7gF4668/MFNL0sPsMeCdVxmyPlTzz/Q
+         qdMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ZGYRf7bljlV95062/kAIKLYYfvkZE5yLnQI9lCDJN/o=;
-        b=T3XiH4qpbBrcD97iWU6d+Cae+kUF7TbMliFJDj/ZD/g6sHOnfZSrMUUSVuVNKvau3Q
-         5i1OI310ekHjkuKN/qbR7fmVIOWYPkGsvhsmpAmxFvpi1Gto6LSUFQVTmUgPZd8rKvGj
-         NoqSUAjpWn9PHFI4xZx6LOHxMd5FycdcU+LOEc5AfI0NhMsjDkUv7jYI77L9/YF3yIRH
-         R19ni4xPpr8bHccxCTaEXW8OHeyZyMKkzKAuYURuCbt3ZOBkNlMsyAnjQcixwKwvWfYD
-         py9F8epddzbiprCGCJcH1lLtjvfruFyPjm7oriLbKL74m5lHYal+1TTuZn0XY494z1vi
-         YRig==
-X-Gm-Message-State: ANhLgQ1dY8VrSIiBBo0/JTWzUEFj1t7VgzqrEaBksXN/8/joXYv6ZLil
-        1TFuvQ/z+OkmVoH/H4sBjoM=
-X-Google-Smtp-Source: ADFU+vuZIr/pgGhT1UOwU8wrrDA3p2As5Cza9affk2zUmovV5tMCSTipVd4R3F2K03PHkZyZ2ECVeg==
-X-Received: by 2002:a17:90a:9f88:: with SMTP id o8mr6526752pjp.145.1585070248234;
-        Tue, 24 Mar 2020 10:17:28 -0700 (PDT)
-Received: from ?IPv6:240b:10:2720:5510:a182:288:3ffa:432a? ([240b:10:2720:5510:a182:288:3ffa:432a])
-        by smtp.gmail.com with ESMTPSA id 144sm6660646pgd.29.2020.03.24.10.17.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2020 10:17:27 -0700 (PDT)
-Subject: Re: [PATCH] block, nvme: Increase max segments parameter setting
- value
-To:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Cc:     linux-nvme@lists.infradead.org
-References: <20200323182324.3243-1-ikegami.t@gmail.com>
- <2293733b-77d7-6fbb-a81a-b68c10656757@suse.de>
-From:   Tokunori Ikegami <ikegami.t@gmail.com>
-Message-ID: <5e296f02-27a4-5c6e-35a4-5bd6a53bef3c@gmail.com>
-Date:   Wed, 25 Mar 2020 02:17:24 +0900
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:sender:date:from:to:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=x+AJ73g67Lv+1tYqp3JK2cKPMpi2aKN3Up6Cs52zqao=;
+        b=Y81SfIWoaqUMGHkvL5Jo9bngKltXm3EaZdHBhHotQPj1pqZyvpJAU9EbtIJzYoK2h/
+         vlEHncxsBXlibPNQkDqg41Yi7BVdenF7zfRNbWiFY0pGPz/m13t1n8T7fKk1Pbd97ydx
+         atCu8Dqf5uLTe2d02jhigDj8qbfjUXeZCCJVMfeeHngKOzjra2wkI5K/neQFb3JNCANP
+         bpf8CBr2YEpHo/o6LYWnli5Wmw7/B3+SFYDnlFiLj8Dm5ljHOn7Lgm5WBvhZsSDoVb0X
+         pF6aq+krep3W/r2jfXSj+LiBOogOpxVJI6AJlxcXB6/6vb8PP5gBaXGyUQg8yqRdzL6S
+         7jAg==
+X-Gm-Message-State: ANhLgQ27peiFbTNy8LhCgv9EVlowLgSri4CUO2QEwBi5hi28u9aalDY4
+        zpFoAqxOHwMZfXGT6q3cs6M=
+X-Google-Smtp-Source: ADFU+vtmcT7gz4S7OovLma2taKH6A60dohcmWOI2PX7RmOQhGId2yOdfxujTItaPvCUIUDDsyNnl8w==
+X-Received: by 2002:ac8:3148:: with SMTP id h8mr28064345qtb.341.1585074447461;
+        Tue, 24 Mar 2020 11:27:27 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::19c2])
+        by smtp.gmail.com with ESMTPSA id r3sm14029528qkd.3.2020.03.24.11.27.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 11:27:27 -0700 (PDT)
+Date:   Tue, 24 Mar 2020 14:27:25 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
+Message-ID: <20200324182725.GG162390@mtj.duckdns.org>
+References: <cover.1584728740.git.zhangweiping@didiglobal.com>
 MIME-Version: 1.0
-In-Reply-To: <2293733b-77d7-6fbb-a81a-b68c10656757@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1584728740.git.zhangweiping@didiglobal.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat, Mar 21, 2020 at 09:20:36AM +0800, Weiping Zhang wrote:
+> The user space tool, which called iotrack, used to collect these basic
+> io statistics and then generate more valuable metrics at cgroup level.
+> From iotrack, you can get a cgroup's percentile for io, bytes,
+> total_time and disk_time of the whole disk. It can easily to evaluate
+> the real weight of the weight based policy(bfq, blk-iocost).
+> There are lots of metrics for read and write generate by iotrack,
+> for more details, please visit: https://github.com/dublio/iotrack.
+> 
+> Test result for two fio with randread 4K,
+> test1 cgroup bfq weight = 800
+> test2 cgroup bfq weight = 100
+> 
+> Device      io/s   MB/s    %io    %MB    %tm   %dtm  %d2c %hit0 %hit1 %hit2 %hit3 %hit4 %hit5  %hit6  %hit7 cgroup
+> nvme1n1 44588.00 174.17 100.00 100.00 100.00 100.00 38.46  0.25 45.27 95.90 98.33 99.47 99.85  99.92  99.95 /
+> nvme1n1 30206.00 117.99  67.74  67.74  29.44  67.29 87.90  0.35 47.82 99.22 99.98 99.99 99.99 100.00 100.00 /test1
+> nvme1n1 14370.00  56.13  32.23  32.23  70.55  32.69 17.82  0.03 39.89 88.92 94.88 98.37 99.53  99.77  99.85 /test2
 
-On 2020/03/24 16:16, Hannes Reinecke wrote:
-> On 3/23/20 7:23 PM, Tokunori Ikegami wrote:
->> Currently data length can be specified as UINT_MAX but failed.
->> This is caused by the max segments parameter limit set as USHRT_MAX.
->> To resolve this issue change to increase the value limit range.
->>
->> Signed-off-by: Tokunori Ikegami <ikegami.t@gmail.com>
->> Cc: linux-block@vger.kernel.org
->> Cc: linux-nvme@lists.infradead.org
->> ---
->>   block/blk-settings.c     | 2 +-
->>   drivers/nvme/host/core.c | 2 +-
->>   include/linux/blkdev.h   | 7 ++++---
->>   3 files changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index c8eda2e7b91e..ed40bda573c2 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -266,7 +266,7 @@ EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
->>    *    Enables a low level driver to set an upper limit on the 
->> number of
->>    *    hw data segments in a request.
->>    **/
->> -void blk_queue_max_segments(struct request_queue *q, unsigned short 
->> max_segments)
->> +void blk_queue_max_segments(struct request_queue *q, unsigned int 
->> max_segments)
->>   {
->>       if (!max_segments) {
->>           max_segments = 1;
->> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->> index a4d8c90ee7cc..2b48aab0969e 100644
->> --- a/drivers/nvme/host/core.c
->> +++ b/drivers/nvme/host/core.c
->> @@ -2193,7 +2193,7 @@ static void nvme_set_queue_limits(struct 
->> nvme_ctrl *ctrl,
->>             max_segments = min_not_zero(max_segments, 
->> ctrl->max_segments);
->>           blk_queue_max_hw_sectors(q, ctrl->max_hw_sectors);
->> -        blk_queue_max_segments(q, min_t(u32, max_segments, USHRT_MAX));
->> +        blk_queue_max_segments(q, min_t(u32, max_segments, UINT_MAX));
->>       }
->>       if ((ctrl->quirks & NVME_QUIRK_STRIPE_SIZE) &&
->>           is_power_of_2(ctrl->max_hw_sectors))
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index f629d40c645c..4f4224e20c28 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -338,8 +338,8 @@ struct queue_limits {
->>       unsigned int        max_write_zeroes_sectors;
->>       unsigned int        discard_granularity;
->>       unsigned int        discard_alignment;
->> +    unsigned int        max_segments;
->>   -    unsigned short        max_segments;
->>       unsigned short        max_integrity_segments;
->>       unsigned short        max_discard_segments;
->>   @@ -1067,7 +1067,8 @@ extern void blk_queue_make_request(struct 
->> request_queue *, make_request_fn *);
->>   extern void blk_queue_bounce_limit(struct request_queue *, u64);
->>   extern void blk_queue_max_hw_sectors(struct request_queue *, 
->> unsigned int);
->>   extern void blk_queue_chunk_sectors(struct request_queue *, 
->> unsigned int);
->> -extern void blk_queue_max_segments(struct request_queue *, unsigned 
->> short);
->> +extern void blk_queue_max_segments(struct request_queue *q,
->> +                   unsigned int max_segments);
->>   extern void blk_queue_max_discard_segments(struct request_queue *,
->>           unsigned short);
->>   extern void blk_queue_max_segment_size(struct request_queue *, 
->> unsigned int);
->> @@ -1276,7 +1277,7 @@ static inline unsigned int 
->> queue_max_hw_sectors(const struct request_queue *q)
->>       return q->limits.max_hw_sectors;
->>   }
->>   -static inline unsigned short queue_max_segments(const struct 
->> request_queue *q)
->> +static inline unsigned int queue_max_segments(const struct 
->> request_queue *q)
->>   {
->>       return q->limits.max_segments;
->>   }
->>
-> One would assume that the same reasoning goes for 
-> max_integrity_segment, no?
+Maybe this'd be better done with bpf?
 
-The error case itself can be resolved by the change without the 
-max_integrity_segment changes.
-Also the value is set to 0 as default and set to 1 by the nvme driver so 
-it seems that not necessary to change for this case.
-
->
-> Otherwise looks good.
->
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-Thanks for your reviewing.
->
-> Cheers,
->
-> Hannes
+-- 
+tejun
