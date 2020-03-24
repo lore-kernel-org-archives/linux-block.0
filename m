@@ -2,194 +2,156 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C44C41621
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4499C2BAEE
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:33:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C41D2206F6
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:25:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92A4A2076E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:33:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cD8qN2if"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728417AbgCXNZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 09:25:13 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:53734 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728543AbgCXNZM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 09:25:12 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 1DA525CE02A283122618;
-        Tue, 24 Mar 2020 21:24:41 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 24 Mar 2020
- 21:24:32 +0800
-From:   yu kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>, <houtao1@huawei.com>
-Subject: [PATCH V3] block: rename 'q->debugfs_dir' and 'q->blk_trace->dir' in blk_unregister_queue()
-Date:   Tue, 24 Mar 2020 21:23:15 +0800
-Message-ID: <20200324132315.22133-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.17.2
+        id S1727708AbgCXNMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 09:12:46 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:58746 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727701AbgCXNMp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Mar 2020 09:12:45 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02OD98e3100769;
+        Tue, 24 Mar 2020 13:12:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=izQffAPMCkPyhswmqTh42EEmqNfBWD2nZcuUr/piHSY=;
+ b=cD8qN2ifS/8PyZ37Uz2e/bht+qXFNK4AZ7qfVtiO3AR/p5hPn1iSqGgvyYSCjHr82dI2
+ zQi31DmeMEiIVxgCXw+YLtsl4Q0RWajPH9VZT14o5UXEqkVMfQWRQPS1s5Z1WK3YQznB
+ B3EtqgJs0qy0swJNsTznYHYpFb2m0c0xjSL3qQeqgrKmZWPdEXRvsGqLnU3Lbgoz+8hC
+ BFRvvmk342Jfdhld/lzTLaEM+RiTdJL1M6WI+Je3PcMnZKzDp9kp7dTi+0Xs2bYqNQXu
+ 2NCUhgYG3R36QfpLLhpJ1gytflVREC7w53Ts8tQCOgUKcQr6TAW8D5+bWtjuADmydHXa BQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2ywavm45y7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 13:12:40 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ODCCl8031198;
+        Tue, 24 Mar 2020 13:12:39 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2yyd9w3yyd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Mar 2020 13:12:39 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ODCc3v015764;
+        Tue, 24 Mar 2020 13:12:38 GMT
+Received: from [192.168.1.14] (/114.88.246.185)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Mar 2020 06:12:38 -0700
+Subject: Re: [RFC PATCH v2 0/3] dm zoned: extend the way of exposing zoned
+ block device
+To:     Hannes Reinecke <hare@suse.de>, dm-devel@redhat.com
+Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
+        Dmitry.Fomichev@wdc.com
+References: <20200324110255.8385-1-bob.liu@oracle.com>
+ <e2bef18e-f363-47c4-dd38-971a60ec1eca@suse.de>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <f1cc2096-21f6-59e7-174f-e5e51c492b6b@oracle.com>
+Date:   Tue, 24 Mar 2020 21:12:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.28]
-X-CFilter-Loop: Reflected
+In-Reply-To: <e2bef18e-f363-47c4-dd38-971a60ec1eca@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003240071
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ phishscore=0 suspectscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003240070
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting use after free bug in debugfs_remove[1].
+On 3/24/20 7:52 PM, Hannes Reinecke wrote:
+> On 3/24/20 12:02 PM, Bob Liu wrote:
+>> Motivation:
+>> dm-zoned exposes a zoned block device(ZBC) as a regular block device by storing
+>> metadata and buffering random writes in its conventional zones.
+>> This way is not flexible, there must be enough conventional zones and the
+>> performance may be constrained.
+>>
+>> This patchset split the metadata from zoned device to an extra regular device,
+>> with aim to increase the flexibility and potential performance.
+>> For example, now we can store metadata in a faster device like persistent memory.
+>> Also random writes can go to the regular devices in this version.
+>>
+>> Usage(will send user space patches later):
+>>> dmzadm --format $zoned_dev --regular=$regu_dev --force
+>>> echo "0 $size zoned $regu_dev $zoned_dev" | dmsetup create $dm-zoned-name
+>>
+>> v2:
+>>   * emulate regular device zone info
+>>   * support write both metadata and random writes to regular dev
+>>
+>> Bob Liu (3):
+>>    dm zoned: rename dev name to zoned_dev
+>>    dm zoned: introduce regular device to dm-zoned-target
+>>    dm zoned: add regular device info to metadata
+>>
+>>   drivers/md/dm-zoned-metadata.c | 205 +++++++++++++++++++++++++++--------------
+>>   drivers/md/dm-zoned-target.c   | 205 +++++++++++++++++++++++------------------
+>>   drivers/md/dm-zoned.h          |  53 ++++++++++-
+>>   3 files changed, 299 insertions(+), 164 deletions(-)
+>>
+> Well, surprise, surprise, both our patchsets are largely identical ...
+> 
 
-This is because in request_queue, 'q->debugfs_dir' and
-'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
-blk_mq_debugfs_unregister() will remove everything inside the dir.
+You may missed my first rfc.
+https://www.redhat.com/archives/dm-devel/2020-January/msg00024.html
 
-With futher investigation of the reporduce repro, the problem can be
-reporduced by following procedure:
+> So how to proceed? I guess if you were using 'cdev' instead of 'regu_dm_dev' we should be having an overlap of about 90 percent.
+> 
+> The main difference between our implementation is that I didn't move the metadata to the cache/regulard device, seeing that dmzadm will only write metadata onto the zoned device.
 
-1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
-create the dir.
-2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
-3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
-will fail because the dir aready exist.
-4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
-5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
-delete the files created in step 4.
-6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
-And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
-try to release the two files created in step 4, wich are aready released
-in step 5.
+I also patched dmzadm(will sent out soon) a lot, now my implementation can compatible with original usage.
 
-thread1		         |kworker                   |thread2
- ----------------------- | ------------------------ | --------------------
-loop_control_ioctl       |                          |
- loop_add                |                          |
-  blk_mq_debugfs_register|                          |
-   debugfs_create_dir    |                          |
-loop_control_ioctl       |                          |
- loop_remove		 |                          |
-  blk_release_queue      |                          |
-   schedule_work         |                          |
-                         |                          |loop_control_ioctl
-                         |                          | loop_add
-                         |                          |  ...
-                         |                          |blk_trace_ioctl
-                         |                          | __blk_trace_setup
-                         |                          |   debugfs_create_file
-                         |__blk_release_queue       |
-                         | blk_mq_debugfs_unregister|
-                         |  debugfs_remove_recursive|
-                         |                          |loop_control_ioctl
-                         |                          | loop_remove
-                         |                          |  ...
-                         |__blk_release_queue       |
-                         | blk_trace_shutdown       |
-                         |  debugfs_remove          |
+It supports two different usage:
+- Original zoned device only:
+#: dmzadm --format $zoned_dev
+#: echo "0 $size zoned $zoned_dev" | dmsetup create $dm-zoned-name
+(All data in zoned device)
 
-commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
-final release of request_queue to a workqueue, so, when loop_add() is
-called again(step 3), __blk_release_queue() might not been called yet,
-which causes the problem.
+- With regular device：
+dmzadm --format $zoned_dev --regular=$regu_dev
+echo "0 $size zoned $regu_dev $zoned_dev" | dmsetup create $dm-zoned-name
+(Metadata in regular device, other data spread in both regular device and zoned device.)
 
-Fix the problem by renaming 'q->debugfs_dir' or 'q->blk_trace->dir'
-in blk_unregister_queue() if they exist.
+I haven't thought about store metadata in zoned dev while other data in both cache/regular device and zoned dev.
+Actually in my first rfc I just plan to split metadata to a fast device, so as to get performance improvement.
 
-[1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
-References: CVE-2019-19770
-Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
-Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
-Signed-off-by: yu kuai <yukuai3@huawei.com>
----
-Changes in V2:
- add device name to the new dir name
- fix compile err when 'CONFIG_BLK_DEBUG_FS' is not enabled
- add treatment of 'q->blk_trace->dir'
-Changes in V3:
- handle 'q->debugfs-dir' and 'q->blk_trace->dir' respectivly
- remove dev name to avoid memory leek when dev name is too long
- warn_on when debugfs_rename failed, don't keep trying in a loop
+> I would rather keep it that way (ie storing metadata on the zoned device, too, if possible) as we would be keeping backwards compability with that.
+> And we could always move metadata to the cache/regular device in a later patch; for doing it properly we'll need to update the metadata anyway as we need to introduce UUIDs to stitch those devices together.
 
- block/blk-sysfs.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+Sure.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fca9b158f4a0..8cd124117e29 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -11,6 +11,8 @@
- #include <linux/blktrace_api.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/debugfs.h>
-+#include <linux/atomic.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-@@ -1011,6 +1013,53 @@ int blk_register_queue(struct gendisk *disk)
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
- 
-+#ifdef CONFIG_DEBUG_FS
-+
-+void blk_rename_debugfs_dir(struct dentry **old)
-+{
-+	static atomic_t i = ATOMIC_INIT(0);
-+	struct dentry *new;
-+	char name[DNAME_INLINE_LEN];
-+	u32 index = atomic_fetch_inc(&i);
-+
-+	snprintf(name, sizeof(name), "ready_to_remove_%u", index);
-+	new = debugfs_lookup(name, blk_debugfs_root);
-+	if (WARN_ON(new)) {
-+		dput(new);
-+		return;
-+	}
-+	new = debugfs_rename(blk_debugfs_root, *old, blk_debugfs_root, name);
-+	if (WARN_ON(!new))
-+		return;
-+	*old = new;
-+}
-+/*
-+ * blk_prepare_release_queue - rename q->debugfs_dir and q->blk_trace->dir
-+ * @q: request_queue of which the dir to be renamed belong to.
-+ *
-+ * Because the final release of request_queue is in a workqueue, the
-+ * cleanup might not been finished yet while the same device start to
-+ * create. It's not correct if q->debugfs_dir still exist while trying
-+ * to create a new one.
-+ */
-+static void blk_prepare_release_queue(struct request_queue *q)
-+{
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	if (!IS_ERR_OR_NULL(q->debugfs_dir))
-+		blk_rename_debugfs_dir(&q->debugfs_dir);
-+
-+#endif
-+#ifdef CONFIG_BLK_DEV_IO_TRACE
-+	mutex_lock(&q->blk_trace_mutex);
-+	if (q->blk_trace && !IS_ERR_OR_NULL(q->blk_trace->dir))
-+		blk_rename_debugfs_dir(&q->blk_trace->dir);
-+	mutex_unlock(&q->blk_trace_mutex);
-+#endif
-+}
-+#else
-+#define blk_prepare_release_queue(q)		do { } while (0)
-+#endif
-+
- /**
-  * blk_unregister_queue - counterpart of blk_register_queue()
-  * @disk: Disk of which the request queue should be unregistered from sysfs.
-@@ -1039,6 +1088,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	mutex_lock(&q->sysfs_dir_lock);
-+	blk_prepare_release_queue(q);
- 	/*
- 	 * Remove the sysfs attributes before unregistering the queue data
- 	 * structures that can be modified through sysfs.
--- 
-2.17.2
+> Remember, one my have more than one zoned device and regular device...
+> 
+> Should I try to merge both patchsets and send them out as an RFC?
+> 
 
+Fine to me, just please keep my signed-off-by.
+
+Thanks,
+Bob
