@@ -2,110 +2,245 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E46C43331
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 20:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D00C18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 22:46:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE3CA2074D
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 20:52:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=rere.qmqm.pl header.i=@rere.qmqm.pl header.b="HlMK8G4k"
+	by mail.kernel.org (Postfix) with ESMTP id A9BF4208CA
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 22:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727937AbgCXUw2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 16:52:28 -0400
-Received: from rere.qmqm.pl ([91.227.64.183]:42151 "EHLO rere.qmqm.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728060AbgCXUw2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 16:52:28 -0400
-Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 48n3N83mvQz9v;
-        Tue, 24 Mar 2020 21:52:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1585083145; bh=OCoxojzJM6Pabr/wFUBTBOMM8dOe6TGTqrew7ilAA98=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HlMK8G4ka8B/sZc9aZaXPNLBXCApFZYP5phSWJWo4Gc+H8KVYd/tiLVvmZMKxer4x
-         ZHJYv7jXToB219Y5sve5yURsqGSOWobp+AH8ABz7NRQkeByhypQrkFK4bKC9WwM3q3
-         K1rh3ZyQM7fb1EtLertGje8Ecv1LhVfrAeoGQ6Lar8lW0as7yn2oDrgCxrafZIszVh
-         c06ZQeWIR5E1q668Z/Mz9quu2kNY+F2eZaUnPGS16A0Z+V4nAuEr5/i/AfQ0jbVjK+
-         XeHHE9kYQcP50hd2H8dQahMfgEprsOIvSUJfiQPhBQHbwKOwng//ADWeQ2kahsmhVy
-         GKJO98WSDpqFQ==
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.102.2 at mail
-Date:   Tue, 24 Mar 2020 21:52:21 +0100
-From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To:     Dmitry Osipenko <digetx@gmail.com>
+        id S1728478AbgCXWqB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 18:46:01 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:37229 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727554AbgCXWqA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Mar 2020 18:46:00 -0400
+Received: from dread.disaster.area (pa49-195-202-68.pa.nsw.optusnet.com.au [49.195.202.68])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 7EF203A3AC5;
+        Wed, 25 Mar 2020 09:45:54 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1jGsIy-00059z-Fk; Wed, 25 Mar 2020 09:45:52 +1100
+Date:   Wed, 25 Mar 2020 09:45:52 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>, linux-tegra@vger.kernel.org,
-        linux-block@vger.kernel.org, Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 03/10] partitions: Introduce NVIDIA Tegra Partition
- Table
-Message-ID: <20200324205221.GA22063@qmqm.qmqm.pl>
-References: <20200323163431.7678-1-digetx@gmail.com>
- <20200323163431.7678-4-digetx@gmail.com>
- <20200323191748.GB30585@qmqm.qmqm.pl>
- <67140755-c829-5c58-3fbf-efd496e225df@gmail.com>
- <20200323213520.GA16587@qmqm.qmqm.pl>
- <c31a0335-a174-0f45-af03-3267710a8205@gmail.com>
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [PATCH v2 10/11] iomap: Add support for zone append writes
+Message-ID: <20200324224552.GI10737@dread.disaster.area>
+References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
+ <20200324152454.4954-11-johannes.thumshirn@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c31a0335-a174-0f45-af03-3267710a8205@gmail.com>
+In-Reply-To: <20200324152454.4954-11-johannes.thumshirn@wdc.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
+        a=mqTaRPt+QsUAtUurwE173Q==:117 a=mqTaRPt+QsUAtUurwE173Q==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=SS2py6AdgQ4A:10
+        a=JF9118EUAAAA:8 a=7-415B0cAAAA:8 a=fhFG6ulkHv1obGMw_aYA:9
+        a=yGqnPYzZc3v0PLXM:21 a=XexlqDWkxv1Qk9gv:21 a=CjuIK1q_8ugA:10
+        a=SUkNg17ZEekA:10 a=xVlTc564ipvMDusKsbsT:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 02:22:34AM +0300, Dmitry Osipenko wrote:
-> 24.03.2020 00:35, Michał Mirosław пишет:
-> > On Mon, Mar 23, 2020 at 10:59:52PM +0300, Dmitry Osipenko wrote:
-> >> 23.03.2020 22:17, Michał Mirosław пишет:
-> >>> On Mon, Mar 23, 2020 at 07:34:24PM +0300, Dmitry Osipenko wrote:
-> >>>> All NVIDIA Tegra devices use a special partition table format for the
-> >>>> internal storage partitioning. Most of Tegra devices have GPT partition
-> >>>> in addition to TegraPT, but some older Android consumer-grade devices do
-> >>>> not or GPT is placed in a wrong sector, and thus, the TegraPT is needed
-> >>>> in order to support these devices properly in the upstream kernel. This
-> >>>> patch adds support for NVIDIA Tegra Partition Table format that is used
-> >>>> at least by all NVIDIA Tegra20 and Tegra30 devices.
-> >>>>
-> >>>> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
-> >>>> ---
-> >>>>  arch/arm/mach-tegra/tegra.c   |  54 ++++
-> >>> [...]
-> >>>
-> >>> Please split off this part and make the information available to
-> >>> userspace (pt_addr + pt_size) if found. This would make it easier
-> >>> to support use the partition table later in initrd instead.
-> >>
-> >> Please clarify what do you mean by "use the partition table later in
-> >> initrd instead".
-> > 
-> > Configure device-mapper to span eMMC boot+data partitions and then ask
-> > (modified) kpartx to partition the resulting device. All before rootfs
-> > is mounted and switched to in initrd.
+On Wed, Mar 25, 2020 at 12:24:53AM +0900, Johannes Thumshirn wrote:
+> Use REQ_OP_ZONE_APPEND for direct I/O write BIOs, instead of REQ_OP_WRITE
+> if the file-system requests it. The file system can make this request
+> by setting the new flag IOCB_ZONE_APPEND for a direct I/O kiocb before
+> calling iompa_dio_rw(). Using this information, this function propagates
+> the zone append flag using IOMAP_ZONE_APPEND to the file system
+> iomap_begin() method. The BIOs submitted for the zone append DIO will be
+> set to use the REQ_OP_ZONE_APPEND operation.
 > 
-> The whole point of this series is to make partition handling generic in
-> the kernel, avoiding the need to customize anything.
+> Since zone append operations cannot be split, the iomap_apply() and
+> iomap_dio_rw() internal loops are executed only once, which may result
+> in short writes.
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>  fs/iomap/direct-io.c  | 80 ++++++++++++++++++++++++++++++++++++-------
+>  include/linux/fs.h    |  1 +
+>  include/linux/iomap.h | 22 ++++++------
+>  3 files changed, 79 insertions(+), 24 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 23837926c0c5..b3e2aadce72f 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -17,6 +17,7 @@
+>   * Private flags for iomap_dio, must not overlap with the public ones in
+>   * iomap.h:
+>   */
+> +#define IOMAP_DIO_ZONE_APPEND	(1 << 27)
+>  #define IOMAP_DIO_WRITE_FUA	(1 << 28)
+>  #define IOMAP_DIO_NEED_SYNC	(1 << 29)
+>  #define IOMAP_DIO_WRITE		(1 << 30)
+> @@ -39,6 +40,7 @@ struct iomap_dio {
+>  			struct task_struct	*waiter;
+>  			struct request_queue	*last_queue;
+>  			blk_qc_t		cookie;
+> +			sector_t		sector;
+>  		} submit;
+>  
+>  		/* used for aio completion: */
+> @@ -151,6 +153,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+>  	if (bio->bi_status)
+>  		iomap_dio_set_error(dio, blk_status_to_errno(bio->bi_status));
+>  
+> +	if (dio->flags & IOMAP_DIO_ZONE_APPEND)
+> +		dio->submit.sector = bio->bi_iter.bi_sector;
+> +
+>  	if (atomic_dec_and_test(&dio->ref)) {
+>  		if (dio->wait_for_completion) {
+>  			struct task_struct *waiter = dio->submit.waiter;
+> @@ -194,6 +199,21 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+>  	iomap_dio_submit_bio(dio, iomap, bio);
+>  }
+>  
+> +static sector_t
+> +iomap_dio_bio_sector(struct iomap_dio *dio, struct iomap *iomap, loff_t pos)
+> +{
+> +	sector_t sector = iomap_sector(iomap, pos);
+> +
+> +	/*
+> +	 * For zone append writes, the BIO needs to point at the start of the
+> +	 * zone to append to.
+> +	 */
+> +	if (dio->flags & IOMAP_DIO_ZONE_APPEND)
+> +		sector = ALIGN_DOWN(sector, bdev_zone_sectors(iomap->bdev));
+> +
+> +	return sector;
+> +}
 
-Yes, but at least for diagnostic purposes, it would be nice to have the
-values from BCT exposed somewhere in /sys.
+This seems to me like it should be done by the ->iomap_begin
+implementation when mapping the IO. I don't see why this needs to be
+specially handled by the iomap dio code.
 
-Best Regards,
-Michał Mirosław
+> +
+>  static loff_t
+>  iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  		struct iomap_dio *dio, struct iomap *iomap)
+> @@ -204,6 +224,7 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  	struct bio *bio;
+>  	bool need_zeroout = false;
+>  	bool use_fua = false;
+> +	bool zone_append = false;
+>  	int nr_pages, ret = 0;
+>  	size_t copied = 0;
+>  	size_t orig_count;
+> @@ -235,6 +256,9 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  			use_fua = true;
+>  	}
+>  
+> +	if (dio->flags & IOMAP_DIO_ZONE_APPEND)
+> +		zone_append = true;
+> +
+>  	/*
+>  	 * Save the original count and trim the iter to just the extent we
+>  	 * are operating on right now.  The iter will be re-expanded once
+> @@ -266,12 +290,28 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  
+>  		bio = bio_alloc(GFP_KERNEL, nr_pages);
+>  		bio_set_dev(bio, iomap->bdev);
+> -		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
+> +		bio->bi_iter.bi_sector = iomap_dio_bio_sector(dio, iomap, pos);
+>  		bio->bi_write_hint = dio->iocb->ki_hint;
+>  		bio->bi_ioprio = dio->iocb->ki_ioprio;
+>  		bio->bi_private = dio;
+>  		bio->bi_end_io = iomap_dio_bio_end_io;
+>  
+> +		if (dio->flags & IOMAP_DIO_WRITE) {
+> +			bio->bi_opf = REQ_SYNC | REQ_IDLE;
+> +			if (zone_append)
+> +				bio->bi_opf |= REQ_OP_ZONE_APPEND;
+> +			else
+> +				bio->bi_opf |= REQ_OP_WRITE;
+> +			if (use_fua)
+> +				bio->bi_opf |= REQ_FUA;
+> +			else
+> +				dio->flags &= ~IOMAP_DIO_WRITE_FUA;
+> +		} else {
+> +			bio->bi_opf = REQ_OP_READ;
+> +			if (dio->flags & IOMAP_DIO_DIRTY)
+> +				bio_set_pages_dirty(bio);
+> +		}
+
+Why move all this code? If it's needed, please split it into a
+separate patchi to separate it from the new functionality...
+
+> +
+>  		ret = bio_iov_iter_get_pages(bio, dio->submit.iter);
+>  		if (unlikely(ret)) {
+>  			/*
+> @@ -284,19 +324,10 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  			goto zero_tail;
+>  		}
+>  
+> -		n = bio->bi_iter.bi_size;
+> -		if (dio->flags & IOMAP_DIO_WRITE) {
+> -			bio->bi_opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
+> -			if (use_fua)
+> -				bio->bi_opf |= REQ_FUA;
+> -			else
+> -				dio->flags &= ~IOMAP_DIO_WRITE_FUA;
+> +		if (dio->flags & IOMAP_DIO_WRITE)
+>  			task_io_account_write(n);
+> -		} else {
+> -			bio->bi_opf = REQ_OP_READ;
+> -			if (dio->flags & IOMAP_DIO_DIRTY)
+> -				bio_set_pages_dirty(bio);
+> -		}
+> +
+> +		n = bio->bi_iter.bi_size;
+>  
+>  		dio->size += n;
+>  		pos += n;
+> @@ -304,6 +335,15 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  
+>  		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
+>  		iomap_dio_submit_bio(dio, iomap, bio);
+> +
+> +		/*
+> +		 * Issuing multiple BIOs for a large zone append write can
+> +		 * result in reordering of the write fragments and to data
+> +		 * corruption. So always stop after the first BIO is issued.
+> +		 */
+> +		if (zone_append)
+> +			break;
+
+I don't think this sort of functionality should be tied to "zone
+append". If there is a need for "issue a single (short) bio only" it
+should be a flag to iomap_dio_rw() set by the filesystem, which can
+then handle the short read/write that is returned.
+
+> +		/*
+> +		 * Zone append writes cannot be split and be shorted. Break
+> +		 * here to let the user know instead of sending more IOs which
+> +		 * could get reordered and corrupt the written data.
+> +		 */
+> +		if (flags & IOMAP_ZONE_APPEND)
+> +			break;
+
+ditto.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
