@@ -2,106 +2,194 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFC9C41621
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C44C41621
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:25:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95DA9208DB
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:23:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jWhoLaCS"
+	by mail.kernel.org (Postfix) with ESMTP id C41D2206F6
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:25:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728899AbgCXNXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 09:23:38 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:40656 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729138AbgCXNXi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 09:23:38 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ODNZi6011310;
-        Tue, 24 Mar 2020 13:23:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=becv5FYJXzs3JnZ2rYy3TkDqfdaAi9xKRTFsZMsQFiY=;
- b=jWhoLaCSPQBNO5yNvn9VlMsIFN4OCFBwosat3YcVAyrzDlvhgHs5h3LTm0UCpB/zgexl
- 1j/LZkM7akjYVFW9qpAoG0fR79rCAZE9lgMZ/Rm121GJd8FFpJkaQA4iuf4JIBR9YBoi
- Jv9TAu7lmXQLQBc+hwJn/ZYdzxVYjiuhcw0535MwRNFgg0UQrdryDbq0WjDNsdTi2jtm
- FLkFFHxQsNttOlveftwmA9kEKy5GkCiQ18BHFZEIFCw8Zdviv0nBIQh4nsstv6WZsVjC
- lIpwEv8bNtSXlPw+Ckv6lRh+w3fbLJUXiErPEfI0S5jhYCLGQkUkyIB32/XxZZWMUthf PA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2ywavm47ua-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 13:23:34 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ODNYlH115932;
-        Tue, 24 Mar 2020 13:23:34 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2yxw6mpyds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 13:23:34 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02ODNQSF031276;
-        Tue, 24 Mar 2020 13:23:26 GMT
-Received: from localhost.localdomain (/114.88.246.185)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 24 Mar 2020 06:23:25 -0700
-From:   Bob Liu <bob.liu@oracle.com>
-To:     dm-devel@redhat.com
-Cc:     Damien.LeMoal@wdc.com, linux-block@vger.kernel.org,
-        Dmitry.Fomichev@wdc.com, snitzer@redhat.com,
-        Bob Liu <bob.liu@oracle.com>, stable@vger.kernel.org
-Subject: [PATCH resend] dm zoned: remove duplicated nr_rnd_zones increasement
-Date:   Tue, 24 Mar 2020 21:22:45 +0800
-Message-Id: <20200324132245.27843-1-bob.liu@oracle.com>
-X-Mailer: git-send-email 2.9.5
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 adultscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240072
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9569 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 bulkscore=0 clxscore=1011 impostorscore=0
- phishscore=0 suspectscore=1 mlxlogscore=999 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003240072
+        id S1728417AbgCXNZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 09:25:13 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:53734 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728543AbgCXNZM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Mar 2020 09:25:12 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 1DA525CE02A283122618;
+        Tue, 24 Mar 2020 21:24:41 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 24 Mar 2020
+ 21:24:32 +0800
+From:   yu kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>, <houtao1@huawei.com>
+Subject: [PATCH V3] block: rename 'q->debugfs_dir' and 'q->blk_trace->dir' in blk_unregister_queue()
+Date:   Tue, 24 Mar 2020 21:23:15 +0800
+Message-ID: <20200324132315.22133-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.17.2
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-zmd->nr_rnd_zones was increased twice by mistake.
-The other place:
-1131                 zmd->nr_useable_zones++;
-1132                 if (dmz_is_rnd(zone)) {
-1133                         zmd->nr_rnd_zones++;
-					^^^
+syzbot is reporting use after free bug in debugfs_remove[1].
 
-Cc: stable@vger.kernel.org
-Fixes: 3b1a94c88b79 ("dm zoned: drive-managed zoned block device target")
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+This is because in request_queue, 'q->debugfs_dir' and
+'q->blk_trace->dir' could be the same dir. And in __blk_release_queue(),
+blk_mq_debugfs_unregister() will remove everything inside the dir.
+
+With futher investigation of the reporduce repro, the problem can be
+reporduced by following procedure:
+
+1. LOOP_CTL_ADD, create a request_queue q1, blk_mq_debugfs_register() will
+create the dir.
+2. LOOP_CTL_REMOVE, blk_release_queue() will add q1 to release queue.
+3. LOOP_CTL_ADD, create another request_queue q2,blk_mq_debugfs_register()
+will fail because the dir aready exist.
+4. BLKTRACESETUP, create two files(msg and dropped) inside the dir.
+5. call __blk_release_queue() for q1, debugfs_remove_recursive() will
+delete the files created in step 4.
+6. LOOP_CTL_REMOVE, blk_release_queue() will add q2 to release queue.
+And when __blk_release_queue() is called for q2, blk_trace_shutdown() will
+try to release the two files created in step 4, wich are aready released
+in step 5.
+
+thread1		         |kworker                   |thread2
+ ----------------------- | ------------------------ | --------------------
+loop_control_ioctl       |                          |
+ loop_add                |                          |
+  blk_mq_debugfs_register|                          |
+   debugfs_create_dir    |                          |
+loop_control_ioctl       |                          |
+ loop_remove		 |                          |
+  blk_release_queue      |                          |
+   schedule_work         |                          |
+                         |                          |loop_control_ioctl
+                         |                          | loop_add
+                         |                          |  ...
+                         |                          |blk_trace_ioctl
+                         |                          | __blk_trace_setup
+                         |                          |   debugfs_create_file
+                         |__blk_release_queue       |
+                         | blk_mq_debugfs_unregister|
+                         |  debugfs_remove_recursive|
+                         |                          |loop_control_ioctl
+                         |                          | loop_remove
+                         |                          |  ...
+                         |__blk_release_queue       |
+                         | blk_trace_shutdown       |
+                         |  debugfs_remove          |
+
+commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") pushed the
+final release of request_queue to a workqueue, so, when loop_add() is
+called again(step 3), __blk_release_queue() might not been called yet,
+which causes the problem.
+
+Fix the problem by renaming 'q->debugfs_dir' or 'q->blk_trace->dir'
+in blk_unregister_queue() if they exist.
+
+[1] https://syzkaller.appspot.com/bug?extid=903b72a010ad6b7a40f2
+References: CVE-2019-19770
+Fixes: commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
+Reported-by: syzbot <syz...@syzkaller.appspotmail.com>
+Signed-off-by: yu kuai <yukuai3@huawei.com>
 ---
- drivers/md/dm-zoned-metadata.c | 1 -
- 1 file changed, 1 deletion(-)
+Changes in V2:
+ add device name to the new dir name
+ fix compile err when 'CONFIG_BLK_DEBUG_FS' is not enabled
+ add treatment of 'q->blk_trace->dir'
+Changes in V3:
+ handle 'q->debugfs-dir' and 'q->blk_trace->dir' respectivly
+ remove dev name to avoid memory leek when dev name is too long
+ warn_on when debugfs_rename failed, don't keep trying in a loop
 
-diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-index 516c7b6..369de15 100644
---- a/drivers/md/dm-zoned-metadata.c
-+++ b/drivers/md/dm-zoned-metadata.c
-@@ -1109,7 +1109,6 @@ static int dmz_init_zone(struct blk_zone *blkz, unsigned int idx, void *data)
- 	switch (blkz->type) {
- 	case BLK_ZONE_TYPE_CONVENTIONAL:
- 		set_bit(DMZ_RND, &zone->flags);
--		zmd->nr_rnd_zones++;
- 		break;
- 	case BLK_ZONE_TYPE_SEQWRITE_REQ:
- 	case BLK_ZONE_TYPE_SEQWRITE_PREF:
+ block/blk-sysfs.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index fca9b158f4a0..8cd124117e29 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -11,6 +11,8 @@
+ #include <linux/blktrace_api.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/debugfs.h>
++#include <linux/atomic.h>
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -1011,6 +1013,53 @@ int blk_register_queue(struct gendisk *disk)
+ }
+ EXPORT_SYMBOL_GPL(blk_register_queue);
+ 
++#ifdef CONFIG_DEBUG_FS
++
++void blk_rename_debugfs_dir(struct dentry **old)
++{
++	static atomic_t i = ATOMIC_INIT(0);
++	struct dentry *new;
++	char name[DNAME_INLINE_LEN];
++	u32 index = atomic_fetch_inc(&i);
++
++	snprintf(name, sizeof(name), "ready_to_remove_%u", index);
++	new = debugfs_lookup(name, blk_debugfs_root);
++	if (WARN_ON(new)) {
++		dput(new);
++		return;
++	}
++	new = debugfs_rename(blk_debugfs_root, *old, blk_debugfs_root, name);
++	if (WARN_ON(!new))
++		return;
++	*old = new;
++}
++/*
++ * blk_prepare_release_queue - rename q->debugfs_dir and q->blk_trace->dir
++ * @q: request_queue of which the dir to be renamed belong to.
++ *
++ * Because the final release of request_queue is in a workqueue, the
++ * cleanup might not been finished yet while the same device start to
++ * create. It's not correct if q->debugfs_dir still exist while trying
++ * to create a new one.
++ */
++static void blk_prepare_release_queue(struct request_queue *q)
++{
++#ifdef CONFIG_BLK_DEBUG_FS
++	if (!IS_ERR_OR_NULL(q->debugfs_dir))
++		blk_rename_debugfs_dir(&q->debugfs_dir);
++
++#endif
++#ifdef CONFIG_BLK_DEV_IO_TRACE
++	mutex_lock(&q->blk_trace_mutex);
++	if (q->blk_trace && !IS_ERR_OR_NULL(q->blk_trace->dir))
++		blk_rename_debugfs_dir(&q->blk_trace->dir);
++	mutex_unlock(&q->blk_trace_mutex);
++#endif
++}
++#else
++#define blk_prepare_release_queue(q)		do { } while (0)
++#endif
++
+ /**
+  * blk_unregister_queue - counterpart of blk_register_queue()
+  * @disk: Disk of which the request queue should be unregistered from sysfs.
+@@ -1039,6 +1088,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+ 	mutex_lock(&q->sysfs_dir_lock);
++	blk_prepare_release_queue(q);
+ 	/*
+ 	 * Remove the sysfs attributes before unregistering the queue data
+ 	 * structures that can be modified through sysfs.
 -- 
-2.9.5
+2.17.2
 
