@@ -2,106 +2,92 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA1BC10DCE
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 03:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0631C10DCE
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 06:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 60DBA20714
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 03:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55B3A20714
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 06:39:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLx97bsg"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="JSTt9akt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbgCXDxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Mar 2020 23:53:23 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41872 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727243AbgCXDxX (ORCPT
+        id S1725922AbgCXGjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 02:39:42 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:45004 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725867AbgCXGjm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Mar 2020 23:53:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585022002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Foa5EtPSVO2fQmVu7TAxz60TcHedluqsObJcm8gkuiE=;
-        b=OLx97bsgd5qTRspIih42uBYes96sYZxq9NbLDT6m727sJWlgfNwu+c7GfF6C4jNGuFsA8h
-        nxtqOeTeHbiOpPVo8az+LXs6BeHLHaVW+5GpYzeYTZqt0+QCU+dnjYlxN/2lMEmt+rq1ze
-        dhjoWpbW0P03kDwgaKKscvjnXv8Ffx4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-SJCKVWLsNgCFcyy8T7aAUw-1; Mon, 23 Mar 2020 23:53:19 -0400
-X-MC-Unique: SJCKVWLsNgCFcyy8T7aAUw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DF8A107ACC4;
-        Tue, 24 Mar 2020 03:53:18 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C97A19C6A;
-        Tue, 24 Mar 2020 03:53:15 +0000 (UTC)
-Date:   Mon, 23 Mar 2020 23:53:14 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        mpatocka@redhat.com,
-        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Subject: Re: very inaccurate %util of iostat
-Message-ID: <20200324035313.GE30700@redhat.com>
-References: <20200324031942.GA3060@ming.t460p>
+        Tue, 24 Mar 2020 02:39:42 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::162])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 89E032E132A;
+        Tue, 24 Mar 2020 09:39:39 +0300 (MSK)
+Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
+        by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id vElDNcnrnr-ddNSsLOn;
+        Tue, 24 Mar 2020 09:39:39 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1585031979; bh=DOHGkNP9wh1iO1J5OIkX8CL+OdPnCkXwDuHeEIAWHT0=;
+        h=Message-ID:Date:To:From:Subject:Cc;
+        b=JSTt9aktxoPRYRmgSYFdRM5tFN6PKg+ZRu3ARvNyAM97e7Ov0AgQuUcLOSMVBIiwq
+         hzQSIG+dVrhQDphHO6d+jH2NavydF21wKHdQYH/lNe13KhIbFj5EiZPmouxcQm18jE
+         rdJlOqStlp1n+DBUT7ZTwn65PGeEgOU4qhY72GjQ=
+Authentication-Results: mxbackcorp1j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from unknown (unknown [2a02:6b8:b080:6410::1:2])
+        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id LXCZcZNDPq-dcbO1YeB;
+        Tue, 24 Mar 2020 09:39:38 +0300
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client certificate not present)
+Subject: [PATCH v3 0/3] block/diskstats: more accurate io_ticks and
+ optimization
+From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Date:   Tue, 24 Mar 2020 09:39:38 +0300
+Message-ID: <158503038812.1955.7827988255138056389.stgit@buzz>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324031942.GA3060@ming.t460p>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 23 2020 at 11:19pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+Simplified estimation for io_ticks introduced in patch
+https://lore.kernel.org/linux-block/20181206164122.2166-5-snitzer@redhat.com/
+could be very inaccurate for request longer than jiffy (i.e. any HDD)
 
-> Hi Guys,
-> 
-> Commit 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-> changes calculation of 'io_ticks' a lot.
-> 
-> In theory, io_ticks counts the time when there is any IO in-flight or in-queue,
-> so it has to rely on in-flight counting of IO.
-> 
-> However, commit 5b18b5a73760 changes io_ticks's accounting into the
-> following way:
-> 
-> 	stamp = READ_ONCE(part->stamp);
-> 	if (unlikely(stamp != now)) {
-> 		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp))
-> 			__part_stat_add(part, io_ticks, 1);
-> 	}
-> 
-> So this way doesn't use any in-flight IO's info, simply adding 1 if stamp
-> changes compared with previous stamp, no matter if there is any in-flight
-> IO or not.
-> 
-> Now when there is very heavy IO on disks, %util is still much less than
-> 100%, especially on HDD, the reason could be that IO latency can be much more
-> than 1ms in case of 1000HZ, so the above calculation is very inaccurate.
-> 
-> Another extreme example is that if IOs take long time to complete, such
-> as IO stall, %util may show 0% utilization, instead of 100%.
+There is at least one another report about this:
+https://lore.kernel.org/linux-block/20200324031942.GA3060@ming.t460p/
+See detail in comment for first patch.
 
-Hi Ming,
+v1: https://lore.kernel.org/lkml/155413438394.3201.15211440151043943989.stgit@buzz/
+v2: https://lore.kernel.org/lkml/158314549775.1788.6529015932237292177.stgit@buzz/
+v3:
+ * update documentation
+ * rebase to current linux-next
+ * fix compilation for CONFIG_SMP=n
 
-Your email triggered a memory of someone else (Konstantin Khlebnikov)
-having reported and fixed this relatively recently, please see this
-patchset: https://lkml.org/lkml/2020/3/2/336
+---
 
-Obviously this needs fixing.  If you have time to review/polish the
-proposed patches that'd be great.
+Konstantin Khlebnikov (3):
+      block/diskstats: more accurate approximation of io_ticks for slow disks
+      block/diskstats: accumulate all per-cpu counters in one pass
+      block/diskstats: replace time_in_queue with sum of request times
 
-Mike
 
+ Documentation/admin-guide/iostats.rst |    5 ++-
+ block/bio.c                           |    9 ++---
+ block/blk-core.c                      |    5 +--
+ block/genhd.c                         |   64 +++++++++++++++++++++++++--------
+ block/partition-generic.c             |   39 ++++++++++++--------
+ include/linux/genhd.h                 |   14 +++++--
+ 6 files changed, 90 insertions(+), 46 deletions(-)
+
+--
+Signature
