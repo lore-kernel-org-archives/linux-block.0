@@ -2,89 +2,213 @@ Return-Path: <SRS0=A/1A=5J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A08AC41621
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C55C54FCE
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 14:07:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A64B20714
-	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 13:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA6CC20775
+	for <linux-block@archiver.kernel.org>; Tue, 24 Mar 2020 14:07:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GuHVyfLt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpYKtojC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727697AbgCXN6e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 09:58:34 -0400
-Received: from mail-pj1-f43.google.com ([209.85.216.43]:55976 "EHLO
-        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727763AbgCXN6e (ORCPT
+        id S1727921AbgCXOH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 10:07:27 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21486 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727553AbgCXOHZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 09:58:34 -0400
-Received: by mail-pj1-f43.google.com with SMTP id mj6so1516519pjb.5
-        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2020 06:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=x5fXAGIMuTapier1gsbREHE5uidSK9jkxwBjZYaSvro=;
-        b=GuHVyfLtEaQS6ua0IdE6tBWddbpDehK1t8pnI71T5sIFDkffsobUKQ4A4ckdACJlzi
-         PerQQX9Qo6BJLQXl5vXmyumu2j+Oo/6WJgUeRrWlcScm6FdOlDNkXyueSmJJW7WrQY7X
-         ZgkNC/Ym/lLm264Jbgd1w3jrXs/Sjbv+FeVrpPu8GQziZ+l2HH/bAuwdBIMts78UKzu2
-         PgLG8T99SXdT7U7Ea6n9HF/10Yfbcw3mSga8g2/gdmzOcr5YJs5Rw/kHSGUnPGIm0M3i
-         0Ft6bu+IiOn2ReSIc1tPlou6GSLa/FdCbHTrWDNLhJMPg2455K1qJihwbRXTKnklQn4e
-         Njqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x5fXAGIMuTapier1gsbREHE5uidSK9jkxwBjZYaSvro=;
-        b=NJUOslL9r0+Cq4V9TpuLDURqaeBSl2bPWmXVpphLpT6IP8MqnpgdYHl1P0Qo+jJbZ0
-         7b9v1/ENyzOtKWQ+nwS19EfA8/ZNhBxS3p3jFVHg3z34+cYdjRufFKSRR23xJqe3hQ+u
-         PY6PHRo5YX6wYwAqSPnNmy1Ic2tgzsnBirBkRS69lRuTKSuL2HrZhmZ/oEJVOcGB+kZ/
-         7gIj9VTBIXiUZYsIDBh5rPgaOEO+zerYV96mP4cIT1Uf3HTXYuv2giCBG1g4oNb4drE3
-         EYtF+uRF0jTUPkjbuSI3Tf1HGJMI8qqXl49Pljj/lqHvjmGBsJDXRlwzZajth81V03E7
-         nJXA==
-X-Gm-Message-State: ANhLgQ0cn4pJJ4FK/TB1cnl3wNOhUI777t9kADXQyq3kSyIr7AiWT/kF
-        ajolCNUeBPitYOnRgzSk1pV/VQ==
-X-Google-Smtp-Source: ADFU+vsaJGMoiCAPmnmgto+goF4pP8bLqDaR5wU/oSKkxBsKicj5W2+zA/ckcACIUVr+G6j5uxGbPQ==
-X-Received: by 2002:a17:90a:e7c8:: with SMTP id kb8mr5523042pjb.79.1585058311952;
-        Tue, 24 Mar 2020 06:58:31 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id 141sm761887pfu.174.2020.03.24.06.58.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2020 06:58:31 -0700 (PDT)
-Subject: Re: cleanup the partitioning code v2
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, reiserfs-devel@vger.kernel.org
-References: <20200324072530.544483-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bafcc626-16bc-baeb-a0fe-2c2fe4cda14b@kernel.dk>
-Date:   Tue, 24 Mar 2020 07:58:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Tue, 24 Mar 2020 10:07:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585058844;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=guf8LTdbi3wmRiN5ykm7zFmobl16wEpjKymIGyI7jz0=;
+        b=OpYKtojCj6xyCvs7/au5k2U5r4Q50eH1RF2KpIEvApKYY5UIZJXIgjHlXdM2VXAwfVNbgs
+        HXIdjmpDcjV66ggcspRGvgfvSBmsMeJ2wFMxvgqx/Yu/jbw5c82ghn47TlOU6mgJLLFfNC
+        x8T9BK95KXmPy0XzXFE1PjHpfG6QBdk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-Y-hw-xkwP0KoK8tU2EARNg-1; Tue, 24 Mar 2020 10:07:20 -0400
+X-MC-Unique: Y-hw-xkwP0KoK8tU2EARNg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2537813FD;
+        Tue, 24 Mar 2020 14:07:19 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87BF05C241;
+        Tue, 24 Mar 2020 14:07:04 +0000 (UTC)
+Date:   Tue, 24 Mar 2020 22:06:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH v3 1/3] block/diskstats: more accurate approximation of
+ io_ticks for slow disks
+Message-ID: <20200324140656.GA23550@ming.t460p>
+References: <158503038812.1955.7827988255138056389.stgit@buzz>
+ <158503198072.1955.16227279292140721351.stgit@buzz>
 MIME-Version: 1.0
-In-Reply-To: <20200324072530.544483-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <158503198072.1955.16227279292140721351.stgit@buzz>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/24/20 1:25 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On Tue, Mar 24, 2020 at 09:39:40AM +0300, Konstantin Khlebnikov wrote:
+> Currently io_ticks is approximated by adding one at each start and end of
+> requests if jiffies counter has changed. This works perfectly for requests
+> shorter than a jiffy or if one of requests starts/ends at each jiffy.
 > 
-> this series cleans up the partitioning code.
+> If disk executes just one request at a time and they are longer than two
+> jiffies then only first and last jiffies will be accounted.
 > 
-> Changes sinve v1:
->  - rebased to for-5.7/block
+> Fix is simple: at the end of request add up into io_ticks jiffies passed
+> since last update rather than just one jiffy.
+> 
+> Example: common HDD executes random read 4k requests around 12ms.
+> 
+> fio --name=test --filename=/dev/sdb --rw=randread --direct=1 --runtime=30 &
+> iostat -x 10 sdb
+> 
+> Note changes of iostat's "%util" 8,43% -> 99,99% before/after patch:
+> 
+> Before:
+> 
+> Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> sdb               0,00     0,00   82,60    0,00   330,40     0,00     8,00     0,96   12,09   12,09    0,00   1,02   8,43
+> 
+> After:
+> 
+> Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> sdb               0,00     0,00   82,50    0,00   330,00     0,00     8,00     1,00   12,10   12,10    0,00  12,12  99,99
+> 
+> For load estimation "%util" is not as useful as average queue length,
+> but it clearly shows how often disk queue is completely empty.
+> 
+> Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
+> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> ---
+>  Documentation/admin-guide/iostats.rst |    5 ++++-
+>  block/bio.c                           |    8 ++++----
+>  block/blk-core.c                      |    4 ++--
+>  include/linux/genhd.h                 |    2 +-
+>  4 files changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
+> index df5b8345c41d..9b14b0c2c9c4 100644
+> --- a/Documentation/admin-guide/iostats.rst
+> +++ b/Documentation/admin-guide/iostats.rst
+> @@ -100,7 +100,7 @@ Field 10 -- # of milliseconds spent doing I/Os (unsigned int)
+>  
+>      Since 5.0 this field counts jiffies when at least one request was
+>      started or completed. If request runs more than 2 jiffies then some
+> -    I/O time will not be accounted unless there are other requests.
+> +    I/O time might be not accounted in case of concurrent requests.
+>  
+>  Field 11 -- weighted # of milliseconds spent doing I/Os (unsigned int)
+>      This field is incremented at each I/O start, I/O completion, I/O
+> @@ -143,6 +143,9 @@ are summed (possibly overflowing the unsigned long variable they are
+>  summed to) and the result given to the user.  There is no convenient
+>  user interface for accessing the per-CPU counters themselves.
+>  
+> +Since 4.19 request times are measured with nanoseconds precision and
+> +truncated to milliseconds before showing in this interface.
+> +
+>  Disks vs Partitions
+>  -------------------
+>  
+> diff --git a/block/bio.c b/block/bio.c
+> index 0985f3422556..b1053eb7af37 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1762,14 +1762,14 @@ void bio_check_pages_dirty(struct bio *bio)
+>  	schedule_work(&bio_dirty_work);
+>  }
+>  
+> -void update_io_ticks(struct hd_struct *part, unsigned long now)
+> +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+>  {
+>  	unsigned long stamp;
+>  again:
+>  	stamp = READ_ONCE(part->stamp);
+>  	if (unlikely(stamp != now)) {
+>  		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
+> -			__part_stat_add(part, io_ticks, 1);
+> +			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+>  		}
+>  	}
+>  	if (part->partno) {
+> @@ -1785,7 +1785,7 @@ void generic_start_io_acct(struct request_queue *q, int op,
+>  
+>  	part_stat_lock();
+>  
+> -	update_io_ticks(part, jiffies);
+> +	update_io_ticks(part, jiffies, false);
+>  	part_stat_inc(part, ios[sgrp]);
+>  	part_stat_add(part, sectors[sgrp], sectors);
+>  	part_inc_in_flight(q, part, op_is_write(op));
+> @@ -1803,7 +1803,7 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
+>  
+>  	part_stat_lock();
+>  
+> -	update_io_ticks(part, now);
+> +	update_io_ticks(part, now, true);
+>  	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
+>  	part_stat_add(part, time_in_queue, duration);
+>  	part_dec_in_flight(q, part, op_is_write(req_op));
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index abfdcf81a228..4401b30a1751 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1337,7 +1337,7 @@ void blk_account_io_done(struct request *req, u64 now)
+>  		part_stat_lock();
+>  		part = req->part;
+>  
+> -		update_io_ticks(part, jiffies);
+> +		update_io_ticks(part, jiffies, true);
+>  		part_stat_inc(part, ios[sgrp]);
+>  		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
+>  		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
+> @@ -1379,7 +1379,7 @@ void blk_account_io_start(struct request *rq, bool new_io)
+>  		rq->part = part;
+>  	}
+>  
+> -	update_io_ticks(part, jiffies);
+> +	update_io_ticks(part, jiffies, false);
+>  
+>  	part_stat_unlock();
+>  }
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index d5c75df64bba..f1066f10b062 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -467,7 +467,7 @@ static inline void free_part_info(struct hd_struct *part)
+>  	kfree(part->info);
+>  }
+>  
+> -void update_io_ticks(struct hd_struct *part, unsigned long now);
+> +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end);
+>  
+>  /* block/genhd.c */
+>  extern void device_add_disk(struct device *parent, struct gendisk *disk,
+> 
 
-Applied, thanks.
+Looks fine:
 
--- 
-Jens Axboe
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
 
