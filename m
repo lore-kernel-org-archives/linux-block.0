@@ -2,114 +2,117 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B133C1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86379C54FCF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 17:24:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20D7720772
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:45:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E16A20772
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 17:24:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8qcCd9P"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SsLqtwNs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727355AbgCYQpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 12:45:43 -0400
-Received: from mail-qt1-f173.google.com ([209.85.160.173]:43018 "EHLO
-        mail-qt1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727174AbgCYQpn (ORCPT
+        id S1727376AbgCYRYg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 13:24:36 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:55392 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727320AbgCYRYg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 12:45:43 -0400
-Received: by mail-qt1-f173.google.com with SMTP id a5so2713324qtw.10;
-        Wed, 25 Mar 2020 09:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=eNUeOGNC+DqnOKpMcPE0ACLXrDfm22ZmBEJ3IFoM+oc=;
-        b=g8qcCd9PRxGBiwF85aE5iYlhbw2CijtCWSs3nyjSo0GOoqTepNjYsfDZXPDMhOQeB7
-         Pp4RfdK6bGPix5F1v5baMp5fI+xO6jSu6PcffkQYuWJtNbElXGTPVve05YJdKYxvI47z
-         DOKvQOIOhRlThaHzEHEktHPIraHIixq44zeZ/9vChOxRdxrjOpdBU+1UiLFzx6lAX67q
-         nuIuRnMLn56yMmRzlZppxpeTnQKa6XxSpR4CpEVgH57q8cM552yWskXzhCC/3Xcw8zvI
-         TYzKOxDodDXtiqmAI+GkajfuuZ60gFeMwQynRWiZAl7gOkg/mtbLYErMMr9Gq1PImP/S
-         Pm2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=eNUeOGNC+DqnOKpMcPE0ACLXrDfm22ZmBEJ3IFoM+oc=;
-        b=Yci/MvmfTWvSOhre8E3RG9XFCnzSrrYyPS5afaGk/6uNHtuSTmcVzD3L2vgBGh0d/m
-         681xlcu2weQy1wjoPZTI0kURmTiVy/LZljWp6qsmY+so55APs2t1Dv9Elvdj4BjxhN//
-         t4DZO501+spSOLORhUekb69zJS22fyuXbLA9vKmBaFsc+uV2P8ACw+2eGkgl9ewtnRfh
-         wvPYYO16WHUmSmhRD6p8zZ06+MvmfWhCgahlN7aThVmqwYclKzkOVchJ6VeQDwaCRH0d
-         8L5oWhY+0dheVIUYiXIIhLNUlNfUj2g6KwMnI1oE3WTf98/P66ZyP9g9lZ7s/UgeapBL
-         OiYw==
-X-Gm-Message-State: ANhLgQ2ciT6nrse8LCnJuoPsmxKHTf7eNcfRd0Aps7Tmjr6tPbxVmhiA
-        IAXsOADcxdtykkFrgf55muhk6flOCvWRBq6YHq67JoNbWI4=
-X-Google-Smtp-Source: ADFU+vvGrcGHLMgT08+auD/+5xwHPXAIqQWP/i8/08HZbHJFJtcPV9tQiVYENkLlYNuErjkO3WToMquoJEIUFcOKG+A=
-X-Received: by 2002:ac8:7769:: with SMTP id h9mr3906340qtu.234.1585154741686;
- Wed, 25 Mar 2020 09:45:41 -0700 (PDT)
+        Wed, 25 Mar 2020 13:24:36 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02PHIUu9063725;
+        Wed, 25 Mar 2020 17:23:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=BVLD2DnNfc3hv/pKnHW3xvm86ovl8foR84Cu3jjRluI=;
+ b=SsLqtwNsiMxQfXKTjwpsTimV5kVfZurxza6rlE6nubcGWAuwfTQLsLzfoqG0Stq9ih08
+ JPc3GVkauUN9Cml8EKZvjx69mZwbc+VFBo0XITYoEyIu99jyzN2TJm/F2sx57xWqNmOh
+ zf792px6wXY0CY6mrHRCF2ct3trMMgap/0VufstShpXG/ZafG3BTY0QKhfGEra51fy1s
+ bVcRlQFVCNRwWWIGQ8CXRaRPqg/kGM6NAgfMca09okEe2kHd280CipW0AqoOSFCv+deO
+ 6GesVjacIeNC6T/w8+zLlG+Fz5PlAFNc1I53QbM4qMrLiNxiF65nF5uiIX0kBdvOmngY gQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 3005kva3e8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Mar 2020 17:23:45 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02PHMVh7021581;
+        Wed, 25 Mar 2020 17:23:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2yxw4rvfvw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Mar 2020 17:23:44 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02PHNepp026829;
+        Wed, 25 Mar 2020 17:23:40 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 25 Mar 2020 10:23:40 -0700
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Kirill Tkhai <ktkhai@virtuozzo.com>, axboe@kernel.dk,
+        bob.liu@oracle.com, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
+        <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+        <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+        <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
+        <20200319102819.GA26418@infradead.org> <yq1tv2k8pjn.fsf@oracle.com>
+        <20200325162656.GJ29351@magnolia>
+        <20200325163223.GA27156@infradead.org>
+Date:   Wed, 25 Mar 2020 13:23:33 -0400
+In-Reply-To: <20200325163223.GA27156@infradead.org> (Christoph Hellwig's
+        message of "Wed, 25 Mar 2020 09:32:23 -0700")
+Message-ID: <yq1d090jqlm.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
 MIME-Version: 1.0
-References: <cover.1584728740.git.zhangweiping@didiglobal.com>
- <20200324182725.GG162390@mtj.duckdns.org> <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
- <20200325141236.GJ162390@mtj.duckdns.org>
-In-Reply-To: <20200325141236.GJ162390@mtj.duckdns.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Thu, 26 Mar 2020 00:45:30 +0800
-Message-ID: <CAA70yB5yH9H6-gaKfRSTmgd6vvzP4T9N7v-NAD0MsRL+YTexHw@mail.gmail.com>
-Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ spamscore=0 mlxlogscore=786 adultscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003250140
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 phishscore=0
+ suspectscore=0 impostorscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ mlxlogscore=841 lowpriorityscore=0 mlxscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003250139
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Tejun Heo <tj@kernel.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=8825=E6=97=A5=E5=91=
-=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:12=E5=86=99=E9=81=93=EF=BC=9A
+
+Christoph,
+
+> I am very much against that for the following reason:
 >
-> On Wed, Mar 25, 2020 at 08:49:24PM +0800, Weiping Zhang wrote:
-> > For this patchset, iotrack can work well, I'm using it to monitor
-> > block cgroup for
-> > selecting a proper io isolation policy.
+>  - the current REQ_OP_DISCARD is purely a hint, and implementations can
+>    (and do) choose to ignore it
 >
-> Yeah, I get that but monitoring needs tend to diverge quite a bit
-> depending on the use cases making detailed monitoring often need fair
-> bit of flexibility, so I'm a bit skeptical about adding a fixed
-> controller for that. I think a better approach may be implementing
-> features which can make dynamic monitoring whether that's through bpf,
-> drgn or plain tracepoints easier and more efficient.
->
-I agree with you, there are lots of io metrics needed in the real
-production system.
-The more flexible way is export all bio structure members of bio=E2=80=99s =
-whole life to
-the userspace without re-compiling kernel, like what bpf did.
+>  - REQ_OP_WRITE_ZEROES is an actual data integrity operation with
+>    everything that entails
 
-Now the main block cgroup isolation policy:
- blk-iocost and bfq are weght based, blk-iolatency is latency based.
-The blk-iotrack can track the real percentage for IOs,kB,on disk time(d2c),
-and total time, it=E2=80=99s a good indicator to the real weight. For blk-i=
-olatency, the
-blk-iotrack has 8 lantency thresholds to show latency distribution, so if w=
-e
-change these thresholds around to blk-iolateny.target.latency, we can tune
-the target latency to a more proper value.
+If you want to keep emphasis on the "integrity operation" instead of the
+provisioning aspect, would you expect REQ_ALLOCATE (which may or may not
+zero blocks) to be considered a deterministic operation or a
+non-deterministic one? Should this depend on whether the device
+guarantees zeroing when provisioning blocks or not?
 
-blk-iotrack extends the basic io.stat. It just export the important
-basic io statistics
-for cgroup,like what /prof/diskstats for block device. And it=E2=80=99s eas=
-y
-programming,
-iotrack just working like iostat, but focus on cgroup.
-
-blk-iotrack is friendly with these block cgroup isolation policies, a
-indicator for
-cgroup weight and lantency.
-
-Thanks
+-- 
+Martin K. Petersen	Oracle Linux Engineering
