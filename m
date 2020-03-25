@@ -2,145 +2,148 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00D1C1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D627C1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:27:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7148F206F8
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:24:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49E73206F8
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:27:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QbiuNsU9";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="JvVvXJlm"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MLMa49Ky"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727600AbgCYQYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 12:24:10 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:23348 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727386AbgCYQYJ (ORCPT
+        id S1727956AbgCYQ1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 12:27:34 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38632 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727386AbgCYQ1e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 12:24:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585153449; x=1616689449;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=nEzd5oJhug7Jwx0NvWzMWqoR1WZl8Z18RwOJ+q1i8y0=;
-  b=QbiuNsU9hZL8MVt7LDczmd41gAdC4GdKG6fT0YbACInB3tyyGVCdawZ3
-   em3PU7gRmG7b7bOk8uAIp3Ma31I346gyYyRAjkcctfhDPFcUdZTzrw0J2
-   zbBngWHOCe1fERm4boE8pZmHJBM1QiiBzq81EiGjZerDOM5Obv8VuTnXf
-   sMmIXn2xkdx9QRYMxdu1TiZDuMiYiAbbSwzszRq7UqadyLVr3Cgi/EbZD
-   ur3KzDXs+3cF//mVbIWNjKZp7hVER2/W2fTIgupBnp0ypojPT6+YfWJ+S
-   06JW33eqhBNSkbjZMslAGrmFkS4U4IGLLIrhrhHhEtiXyMahUqVbr3VYc
-   Q==;
-IronPort-SDR: di97H+1McoR3IrkT0qGBQt8Ut6u7z+bqrqaPDD3YlVRk9Z9Z2lwgQJPNrLV2IoaxbgJIwIZUGQ
- WqqVgKdPhHz6wJ0WSC/RnLhR5JDTIHX+i/b2q2NWDtVXayCuQ1fRV4bDhSwlCeIqtJcVldiBTA
- z+QoRAXzE8Gn5m9WRV+OPDlyHeUJFWmxZPSOOO99ytP8IgTHzczKijJihpYN0KvZicJDRiwAus
- HEi290Z3NIJh85pW6QyIbWxtFDXWYhYWxgr3VOvCT2NoIJ8JWrBjkzxgiYufXWX6oEaAEMmCN2
- 5Sk=
-X-IronPort-AV: E=Sophos;i="5.72,304,1580745600"; 
-   d="scan'208";a="137865847"
-Received: from mail-sn1nam04lp2057.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.57])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Mar 2020 00:24:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OyMo61kp52C4OH+MzmAX/EPzNuNMFfuHvnoxDgPeifosSoX4JY2kwbKlplkxBl1gxE7jec972C1tXjw/npZkazkEmsmf1fkgZL2qrRxdsKEMSuWJGeKgOKHx45y20v4O3pGQ9q8tutRm0/IJ8nDA60zb/9NikSBUM9bxo9jAi0afwHyO+p4at1EDXmSfOqv2ZoeLfMIqJeDYI71d0Gta5XLobnc2t2GB1qvStiwkhgu9KKN0ImCwHYaJNx123CbFRtO583zf9vuznJtQ14g61AESfU/M5hTzuowhvsZwMKdasOSvFLNlXcLvD/pCacJjgHrjbsvFeXOhYrrD1LQwqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3vkxQaYPjMcWuUuTM4hP2zzHCGrwhBDyr5aSbrY9H38=;
- b=ZYHnXo0x9pRlvF3aDnBkHIIo0qOM1kBfD4TsMuyjUi69rbUZWWorOsglEEagnovdGNQFQh68wDK+4koEY4oIL/KkNpxwSmmijdgbuetseBrvHgavEXjg+F19nXdHZ4gp49XxeY8tY4oIob7AAy699KbczS6eDYdxkw3plyAVZJlky0u5APq5hcVDsvqlP1PQau6uwk7eBAG2WBfdna2IHAsMnAy4WoIGQCfLO17ULMkJcwdDm7Z74llhXBjbBQmRVdJFVP/FbaHLZcjQ1M0LnLT7AlxOdSzdknKiqp0beumQ6wVqktJXeyYwENOvhZA7OHAmfUCbsR4+eFBufnsHmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3vkxQaYPjMcWuUuTM4hP2zzHCGrwhBDyr5aSbrY9H38=;
- b=JvVvXJlmWRGUNsZKYHrffFzNVCtRCNtFtugsmgqVbcIysTKoSrkcFqH26LyDQCSDQQdgIs23GJUNMOKhsRHEZBZzbpAgbxNFzcgdoGRD4ZLQ68LisHoeKNqAJ/L+qvsd3JxYZiDCDESVFpOctefBkv+KNRnVAABKc8LVMtcgpfU=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3710.namprd04.prod.outlook.com
- (2603:10b6:803:43::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.22; Wed, 25 Mar
- 2020 16:24:07 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2835.023; Wed, 25 Mar 2020
- 16:24:07 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     "hch@infradead.org" <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>
-Subject: Re: [PATCH v2 03/11] block: Introduce REQ_OP_ZONE_APPEND
-Thread-Topic: [PATCH v2 03/11] block: Introduce REQ_OP_ZONE_APPEND
-Thread-Index: AQHWAfBskP1byqASXU26hlsR5DkSLQ==
-Date:   Wed, 25 Mar 2020 16:24:07 +0000
-Message-ID: <SN4PR0401MB35981508ACB7533C8516E9989BCE0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
- <20200324152454.4954-4-johannes.thumshirn@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 15dcdb5c-aaa0-4538-2ec3-08d7d0d8f150
-x-ms-traffictypediagnostic: SN4PR0401MB3710:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR0401MB3710B8EB95518B43DF033B569BCE0@SN4PR0401MB3710.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4125;
-x-forefront-prvs: 0353563E2B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(346002)(39860400002)(376002)(366004)(396003)(9686003)(2906002)(86362001)(6506007)(316002)(54906003)(33656002)(4326008)(53546011)(55016002)(26005)(6916009)(7696005)(186003)(66476007)(52536014)(66946007)(71200400001)(66556008)(8676002)(8936002)(66446008)(5660300002)(91956017)(81156014)(81166006)(478600001)(4744005)(76116006)(64756008);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR0401MB3710;H:SN4PR0401MB3598.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tNhGvDnYqxzvbIqiLb2gls/A+OMy+mwje1J2JnCK2FSnK90aGKfBk5m+4xiH93kOC/oZgDv/yfooaVt4oEO0Ba1LFhjcBvOf+4ui5qtkNc7Vph8gsRtJUC133GyBmDx1EOJZ5M8MlODm6e6DLs+3zLKBXfJ9hGqYeZLiuGKuKl97Hg3++BLj/fbU6W6Hi4GCBMM8LnXYUWXD3gPlxd+eEH9Ib3jyhr9ch8nd3Y/L9Kq0XsNeBvEy0I8qHIpDq6vdg4XZ6Ug3toU5/lAnw8holb/0Cvsbhu+l7mbRZyf+Yy9InDrqgwbcCZbCk4DyvA5XzPkM4CV0bincXe2j748Pb2hAc8orKx0hUHESPlBCUp9GeNfYGQ2F7mlHBWNTPzkGnkhWepURU0yHKE6Dy3JhB7MCNrVi9pEONMXX1DJZ8UmIT/Hd/L/QWN3MA3C2rNl3
-x-ms-exchange-antispam-messagedata: O4HIxgO7mq0DIE4nqHTFb4StemvRhCwt0/c5vAGNgNJfFF4mqUIrDTP71n5BT8FjJ2lKRGnigUZMTJFUDz9sj7MKal0GB/H/soG93WKe3VwXHbOj+3ZhOAkU7qBeK1TEIVe+0e9G67sWm7D/5+yBCw==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 25 Mar 2020 12:27:34 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02PGIHAl040559;
+        Wed, 25 Mar 2020 16:27:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=T54XmWMJ9nW/BeP4QaO9ECLZh+YI7p5D93ZEFmVIpVU=;
+ b=MLMa49KygIn1Ro2v03egKUdzqa8ZtH6pPcni2s4sW4r1FRwNBXlqzdvlF0p+qB0WKc1z
+ xuPM9F4vJra/hLQMrvQE5NQCNwdHxTvckSjWhlEyEysN3l93CDMQsSEn5dUi8NR2LJL3
+ qf+lP5fDY1LWXSQjFTV9heXdrOk/80Ij01Dy5kd+yOU7hN2VXjc5W3y0f2tANjOdIQ3+
+ uTLEApAuHLLHlsc1EVxczrx8/F4m9Mrh/grixnIz/hgvoyLLgFcuFL4cLAYQ9yVIXYhL
+ kbjx0sppTBSs6fDIsJY5YboPJWTix6aK+kYeyEdMGR/np+53eSuZX66t7DxIT+03+m7b KA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 3005kv9sw3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Mar 2020 16:27:05 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02PGLqh9185365;
+        Wed, 25 Mar 2020 16:27:04 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 3006r6v7a3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Mar 2020 16:27:04 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02PGQxmx024402;
+        Wed, 25 Mar 2020 16:27:00 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 25 Mar 2020 09:26:59 -0700
+Date:   Wed, 25 Mar 2020 09:26:56 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Kirill Tkhai <ktkhai@virtuozzo.com>, axboe@kernel.dk,
+        bob.liu@oracle.com, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
+        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
+Message-ID: <20200325162656.GJ29351@magnolia>
+References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
+ <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+ <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+ <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
+ <20200319102819.GA26418@infradead.org>
+ <yq1tv2k8pjn.fsf@oracle.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15dcdb5c-aaa0-4538-2ec3-08d7d0d8f150
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 16:24:07.5422
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8r5JY2HAqKHZ2Pyg3YDzmWDOGSbLIWIbQdy6ReMXSg++twviaTyPPpFBTIgyQhCBWt8Ou5gEQhP6MqobHOaZf2Q65FkwGcZ4rNUPS9o/iDI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3710
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1tv2k8pjn.fsf@oracle.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 suspectscore=0
+ phishscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003250131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 phishscore=0
+ suspectscore=0 impostorscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ mlxlogscore=999 lowpriorityscore=0 mlxscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003250130
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24/03/2020 16:25, Johannes Thumshirn wrote:=0A=
-> +static inline bool bio_can_zone_append(struct bio *bio, unsigned len)=0A=
-> +{=0A=
-> +	struct request_queue *q =3D bio->bi_disk->queue;=0A=
-> +	unsigned int max_append_sectors =3D queue_max_zone_append_sectors(q);=
-=0A=
-> +=0A=
-> +	if (WARN_ON_ONCE(!max_append_sectors))=0A=
-> +		return false;=0A=
-> +=0A=
-> +	if (((bio->bi_iter.bi_size + len) >> 9) > max_append_sectors)=0A=
-> +		return false;=0A=
-> +=0A=
-> +	if (bio->bi_vcnt >=3D q->limits.max_segments)=0A=
-> +		return false;=0A=
-> +=0A=
-> +	return true;=0A=
-> +}=0A=
-=0A=
-That return values need to be reversed as well...=0A=
+On Thu, Mar 19, 2020 at 09:03:40AM -0400, Martin K. Petersen wrote:
+> 
+> Christoph,
+> 
+> >> Some comments? Some requests for reworking? Some personal reasons to
+> >> ignore my patches?
+> >
+> > I'm still completely opposed to the magic overloading using a flag.
+> > That is just a bad design waiting for trouble to happen.
+> 
+> The observation was that Kirill's original patch set was a line-for-line
+> carbon copy of the write zeroes handling throughout the stack. The only
+> difference between the two was at the bottom. Instead of duplicating all
+> that code it seemed cleaner to use shared plumbing since these
+> operations need to be split and merged exactly the same way in the block
+> layer.
+> 
+> Also, we already have REQ_NOUNMAP, not sure why an additional handling
+> flag would lead to trouble? Note that I suggested renaming
+> REQ_OP_WRITE_ZEROES to something else to separate the semantics from the
+> plumbing.
+> 
+> We need to be able to express:
+> 
+>  - zero & allocate block range (REQ_OP_WRITE_ZEROES, REQ_NOUNMAP)
+>  - zero & deallocate block range (REQ_OP_WRITE_ZEROES, !REQ_NOUNMAP)
+>  - allocate block range (?, don't care about zeroing)
+>  - deallocate block range (REQ_OP_DISCARD, don't care about zeroing)
+> 
+> It just seems like a full-fledged REQ_OP_ALLOCATE is an overkill to fill
+> that gap.
+> 
+> That said, I do think that we have traditionally put emphasis on the
+> wrong part of these operations. All we ever talk about wrt. discard and
+> friends is the zeroing aspect. But I actually think that, semantically,
+> the act of allocating and deallocating blocks is more important. And
+> that zeroing is an optional second order effect of those operations. So
+> if we could go back in time and nuke multi-range DSM TRIM/UNMAP, I would
+> like to have REQ_OP_ALLOCATE/REQ_OP_DEALLOCATE with an optional REQ_ZERO
+> flag. I think that would be cleaner. I have a much easier time wrapping
+> my head around "allocate this block and zero it if you can" than "zero
+> this block and do not deallocate it". But maybe that's just me.
+
+I'd love to transition to that.  My brain is not good at following all
+the inverse logic that NOUNMAP spread everywhere.  I have a difficult
+time following what the blockdev fallocate code does, which is sad since
+hch and I are the primary stuckees^Wmeddlers^Wauthors of that function. :/
+
+--D
+
+> -- 
+> Martin K. Petersen	Oracle Linux Engineering
