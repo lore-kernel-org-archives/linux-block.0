@@ -2,94 +2,114 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03FEEC1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B133C1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBBAF20774
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:33:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20D7720772
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 16:45:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KblLZx5l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8qcCd9P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728143AbgCYQdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 12:33:02 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:40948 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728044AbgCYQdC (ORCPT
+        id S1727355AbgCYQpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 12:45:43 -0400
+Received: from mail-qt1-f173.google.com ([209.85.160.173]:43018 "EHLO
+        mail-qt1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727174AbgCYQpn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 12:33:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=iI2kZCOZdffPIYsZZTBoXRe/J58wOuQpQYgnCS5E0u8=; b=KblLZx5lvHAL3L7FaEMMD5jueW
-        t8BfbCjQuM4FQnOR1tqbhS5fyKSO7LX5vH11QPMn++OAzmBpp3LraQC0wQ3oKUNwXB7etyxwfn51X
-        IX+LSx8iqmiceyhSTch+mTJS/W2pBPWMnHTQIj9j1x8yp8l9pYY0IsRLT8/VaPU4k9J5rSrV5bpln
-        0kGEcnTK7hoiKuqWsJXSNbO9Gb4dsE3fkFbDSeWrJSR5Ckf3n+F7XGj7JssOqhMLGaDYsHAHwbtYT
-        n3qqJlClG1h5570HO7oLBPibCQFK7szYi+RITzIql+GgKgA+uMkT+UuvjU7GfHezQ8hN06eafqn55
-        JNt0rvsA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jH8x5-0000SZ-H8; Wed, 25 Mar 2020 16:32:23 +0000
-Date:   Wed, 25 Mar 2020 09:32:23 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>, axboe@kernel.dk,
-        bob.liu@oracle.com, agk@redhat.com, snitzer@redhat.com,
-        dm-devel@redhat.com, song@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, Chaitanya.Kulkarni@wdc.com,
-        ming.lei@redhat.com, osandov@fb.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
-        bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
- REQ_OP_WRITE_ZEROES
-Message-ID: <20200325163223.GA27156@infradead.org>
-References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
- <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
- <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
- <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
- <20200319102819.GA26418@infradead.org>
- <yq1tv2k8pjn.fsf@oracle.com>
- <20200325162656.GJ29351@magnolia>
+        Wed, 25 Mar 2020 12:45:43 -0400
+Received: by mail-qt1-f173.google.com with SMTP id a5so2713324qtw.10;
+        Wed, 25 Mar 2020 09:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=eNUeOGNC+DqnOKpMcPE0ACLXrDfm22ZmBEJ3IFoM+oc=;
+        b=g8qcCd9PRxGBiwF85aE5iYlhbw2CijtCWSs3nyjSo0GOoqTepNjYsfDZXPDMhOQeB7
+         Pp4RfdK6bGPix5F1v5baMp5fI+xO6jSu6PcffkQYuWJtNbElXGTPVve05YJdKYxvI47z
+         DOKvQOIOhRlThaHzEHEktHPIraHIixq44zeZ/9vChOxRdxrjOpdBU+1UiLFzx6lAX67q
+         nuIuRnMLn56yMmRzlZppxpeTnQKa6XxSpR4CpEVgH57q8cM552yWskXzhCC/3Xcw8zvI
+         TYzKOxDodDXtiqmAI+GkajfuuZ60gFeMwQynRWiZAl7gOkg/mtbLYErMMr9Gq1PImP/S
+         Pm2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=eNUeOGNC+DqnOKpMcPE0ACLXrDfm22ZmBEJ3IFoM+oc=;
+        b=Yci/MvmfTWvSOhre8E3RG9XFCnzSrrYyPS5afaGk/6uNHtuSTmcVzD3L2vgBGh0d/m
+         681xlcu2weQy1wjoPZTI0kURmTiVy/LZljWp6qsmY+so55APs2t1Dv9Elvdj4BjxhN//
+         t4DZO501+spSOLORhUekb69zJS22fyuXbLA9vKmBaFsc+uV2P8ACw+2eGkgl9ewtnRfh
+         wvPYYO16WHUmSmhRD6p8zZ06+MvmfWhCgahlN7aThVmqwYclKzkOVchJ6VeQDwaCRH0d
+         8L5oWhY+0dheVIUYiXIIhLNUlNfUj2g6KwMnI1oE3WTf98/P66ZyP9g9lZ7s/UgeapBL
+         OiYw==
+X-Gm-Message-State: ANhLgQ2ciT6nrse8LCnJuoPsmxKHTf7eNcfRd0Aps7Tmjr6tPbxVmhiA
+        IAXsOADcxdtykkFrgf55muhk6flOCvWRBq6YHq67JoNbWI4=
+X-Google-Smtp-Source: ADFU+vvGrcGHLMgT08+auD/+5xwHPXAIqQWP/i8/08HZbHJFJtcPV9tQiVYENkLlYNuErjkO3WToMquoJEIUFcOKG+A=
+X-Received: by 2002:ac8:7769:: with SMTP id h9mr3906340qtu.234.1585154741686;
+ Wed, 25 Mar 2020 09:45:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200325162656.GJ29351@magnolia>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <cover.1584728740.git.zhangweiping@didiglobal.com>
+ <20200324182725.GG162390@mtj.duckdns.org> <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
+ <20200325141236.GJ162390@mtj.duckdns.org>
+In-Reply-To: <20200325141236.GJ162390@mtj.duckdns.org>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Thu, 26 Mar 2020 00:45:30 +0800
+Message-ID: <CAA70yB5yH9H6-gaKfRSTmgd6vvzP4T9N7v-NAD0MsRL+YTexHw@mail.gmail.com>
+Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 09:26:56AM -0700, Darrick J. Wong wrote:
-> > That said, I do think that we have traditionally put emphasis on the
-> > wrong part of these operations. All we ever talk about wrt. discard and
-> > friends is the zeroing aspect. But I actually think that, semantically,
-> > the act of allocating and deallocating blocks is more important. And
-> > that zeroing is an optional second order effect of those operations. So
-> > if we could go back in time and nuke multi-range DSM TRIM/UNMAP, I would
-> > like to have REQ_OP_ALLOCATE/REQ_OP_DEALLOCATE with an optional REQ_ZERO
-> > flag. I think that would be cleaner. I have a much easier time wrapping
-> > my head around "allocate this block and zero it if you can" than "zero
-> > this block and do not deallocate it". But maybe that's just me.
-> 
-> I'd love to transition to that.  My brain is not good at following all
-> the inverse logic that NOUNMAP spread everywhere.  I have a difficult
-> time following what the blockdev fallocate code does, which is sad since
-> hch and I are the primary stuckees^Wmeddlers^Wauthors of that function. :/
+Tejun Heo <tj@kernel.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=8825=E6=97=A5=E5=91=
+=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:12=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Wed, Mar 25, 2020 at 08:49:24PM +0800, Weiping Zhang wrote:
+> > For this patchset, iotrack can work well, I'm using it to monitor
+> > block cgroup for
+> > selecting a proper io isolation policy.
+>
+> Yeah, I get that but monitoring needs tend to diverge quite a bit
+> depending on the use cases making detailed monitoring often need fair
+> bit of flexibility, so I'm a bit skeptical about adding a fixed
+> controller for that. I think a better approach may be implementing
+> features which can make dynamic monitoring whether that's through bpf,
+> drgn or plain tracepoints easier and more efficient.
+>
+I agree with you, there are lots of io metrics needed in the real
+production system.
+The more flexible way is export all bio structure members of bio=E2=80=99s =
+whole life to
+the userspace without re-compiling kernel, like what bpf did.
 
-I am very much against that for the following reason:
+Now the main block cgroup isolation policy:
+ blk-iocost and bfq are weght based, blk-iolatency is latency based.
+The blk-iotrack can track the real percentage for IOs,kB,on disk time(d2c),
+and total time, it=E2=80=99s a good indicator to the real weight. For blk-i=
+olatency, the
+blk-iotrack has 8 lantency thresholds to show latency distribution, so if w=
+e
+change these thresholds around to blk-iolateny.target.latency, we can tune
+the target latency to a more proper value.
 
- - the current REQ_OP_DISCARD is purely a hint, and implementations can
-   (and do) choose to ignore it
- - REQ_OP_WRITE_ZEROES is an actual data integrity operation with
-   everything that entails
+blk-iotrack extends the basic io.stat. It just export the important
+basic io statistics
+for cgroup,like what /prof/diskstats for block device. And it=E2=80=99s eas=
+y
+programming,
+iotrack just working like iostat, but focus on cgroup.
 
-Going back to mixing these two will lead to a disaster sooner or later.
+blk-iotrack is friendly with these block cgroup isolation policies, a
+indicator for
+cgroup weight and lantency.
+
+Thanks
