@@ -6,70 +6,66 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 248EAC1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B26C54FCF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 15:12:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E83CF2074D
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:49:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BCFB2078A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 15:12:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Vq2x/FtK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Bgi2pL0Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727316AbgCYOtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 10:49:42 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:55967 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727123AbgCYOtm (ORCPT
+        id S1727647AbgCYPMA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 11:12:00 -0400
+Received: from mail-pj1-f44.google.com ([209.85.216.44]:35185 "EHLO
+        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726969AbgCYPL7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 10:49:42 -0400
-Received: by mail-pj1-f68.google.com with SMTP id mj6so1115139pjb.5
-        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2020 07:49:41 -0700 (PDT)
+        Wed, 25 Mar 2020 11:11:59 -0400
+Received: by mail-pj1-f44.google.com with SMTP id g9so1128457pjp.0
+        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2020 08:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XaoMEMejIpMESAc9WqR2GhKqL0OQjsDRcjnTUf3tMEU=;
-        b=Vq2x/FtK+b9c3oq56Ike2Db5P6DEsGVOcUUKgyP+GHz434GzReIN2kgefyNw323oln
-         gEOwym2ejfMVV0z9WW53ltBChF9b42YciEy+RTto6pk4bJSkBfdTZntslttgOV79WAn4
-         phzJGBtAkyesDelSw/CmbodkA/VJ9nLJoREr88utYFaEtFQwhyqJXch7vXa9fJiJcMzh
-         3t9QT7wHOSvQt5jeb2uq/RH/w2hTvHEbFvYs+3hbYntd5s/VsVJl95HMXf7p7CwN8z7I
-         ZlD6Be0pN4pgT3z30DBD7Iz7pw9aIth6Fz2uV27vzPXZnCvPxph/3PT8svIj3M9NNln/
-         A50w==
+        bh=odeneEdONR8grSoihowwuREl6SAzgo70YaaaeKd/NpQ=;
+        b=Bgi2pL0YttlAbAQ73ifCSqGufCdzu80yX+RwuK0Cr4qZkga5F/vOeEcZ3SmF5/rxlT
+         eLQT8KQX4jl1EEkFig+TehDSjlMl4sS9cqCKv6ZP0Bq6To7mMhF/FjLbkCB4BNKO3g7g
+         /o3RvWq6XcC1Ep+tKnoFNt54hcNGxvswvwVfAQk7gAUTlqDAE85QMv1/EcVqnzHA9lat
+         pjirYEIMxdirjaURSXSPYCNhv3pl4jqqQhrgdo73Iree7pvMGj7xXuASmScFTz94Yoj+
+         4YryxJs2ZMIE2U2f/cDC1vgwLNDxaQKjHHkAERDacaBmjmk9K4hWJadKv5WQHmzxfqDH
+         mQOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XaoMEMejIpMESAc9WqR2GhKqL0OQjsDRcjnTUf3tMEU=;
-        b=dV1DGzFn2amQsjZXKij8DBQT0rtPcXkrrpT5duXSlz2vsxKjPiSk7JX60kBwQRB+AY
-         OYutTdoTS9FmDPg8wkGT7fvTV/Ng3uJ/ckYYcyqarDYOMKbuf1W6tmCtZ7UnO/BV7/qw
-         slIr6AFgtWEW5MqqXtgxANPOSj/gpm7yIhnFln3r8TABJATDBqoOcFF3vV1mK/TlGM7L
-         YuPnz8tGVPrt49LQGN18+5icDss/adZlAAGMpFvkCmpJ2C9e0cMmlHVVXiiR3tXEMEhB
-         8Za2Jn5G0APBXX3LqfeoP8bzbUjDPVujaPpxwLfb23ylL56d6641Xne20bgQnOrnEqxo
-         jREA==
-X-Gm-Message-State: ANhLgQ0sKv6AHSGH2wwTE09XDH26eChkatRNGV1ll4kHMzmMOklUT/AX
-        +z3md9Cy5ZSh2yPt3KAwa/LI0Q==
-X-Google-Smtp-Source: ADFU+vtAJhJaAlT8lvsDcE+zhPZE/r4CdTmaK8ibgJdiL7XXlGU4pvlo03OdxzU01Pwam6evPWdUHw==
-X-Received: by 2002:a17:90b:4d07:: with SMTP id mw7mr4246463pjb.103.1585147780821;
-        Wed, 25 Mar 2020 07:49:40 -0700 (PDT)
+        bh=odeneEdONR8grSoihowwuREl6SAzgo70YaaaeKd/NpQ=;
+        b=N/a+KoSTEDiPnPHdNpwgUSau/FB55aA4APxQ9VKQj7Gy6/r5MbKL2WiDUsYwrw/A/S
+         XCYVMlx/8RdURnxp3lHoBuCvzYDcb+tl8ePBgQKf8vWu2k1nCgss7G2cJn6x0ArO7Yiz
+         CwKLnNHHypGSEvT2qoDo6hsx1q/DlEBA+TvZbDY6UvQAlGBp3PycaHx79zZ78Bo8cuAb
+         UICC6hemWXu7nvstk6sIXr1UBaIQKPSbkDtqoobSxkEWDcsAofXFS7lbcUrDOt4wpr/J
+         83T1AVgkaGazahPnqwpBFr1F5zuRz+ejprr83y9Y2e1VqIzBy/KsOGT7nyDCrei4T6sx
+         GHHQ==
+X-Gm-Message-State: ANhLgQ0Fvjp6uc8MaZGBpJZu93Q2dmUYu0nGnn5lsU3CJE8GKAzU9qyc
+        Z0/5xNnobA7cmhiIOP2qiBKQqw==
+X-Google-Smtp-Source: ADFU+vua1+fKJkCuFU81kPz90wA3YXpegsrlLTveHbex3keCG+MmUUofz6eaQImAkWD9Mh/cRF0H3Q==
+X-Received: by 2002:a17:902:76ca:: with SMTP id j10mr3586522plt.184.1585149116391;
+        Wed, 25 Mar 2020 08:11:56 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id i11sm4668038pje.30.2020.03.25.07.49.39
+        by smtp.gmail.com with ESMTPSA id 144sm17138984pgc.25.2020.03.25.08.11.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2020 07:49:40 -0700 (PDT)
-Subject: Re: [PATCH v4 0/3] block/diskstats: more accurate io_ticks and
- optimization
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <158514148436.7009.1234367408038809210.stgit@buzz>
+        Wed, 25 Mar 2020 08:11:55 -0700 (PDT)
+Subject: Re: decruft genhd.h
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200325110338.1029232-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0d8e3459-6d67-72ae-c1df-5335d2a49bf7@kernel.dk>
-Date:   Wed, 25 Mar 2020 08:49:38 -0600
+Message-ID: <b6bac2cc-4657-0004-b69d-68f51ef429e0@kernel.dk>
+Date:   Wed, 25 Mar 2020 09:11:54 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <158514148436.7009.1234367408038809210.stgit@buzz>
+In-Reply-To: <20200325110338.1029232-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,26 +74,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/25/20 7:07 AM, Konstantin Khlebnikov wrote:
-> Simplified estimation for io_ticks introduced in patch
-> https://lore.kernel.org/linux-block/20181206164122.2166-5-snitzer@redhat.com/
-> could be very inaccurate for request longer than jiffy (i.e. any HDD)
+On 3/25/20 5:03 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> There is at least one another report about this:
-> https://lore.kernel.org/linux-block/20200324031942.GA3060@ming.t460p/
-> See detail in comment for first patch.
-> 
-> v1: https://lore.kernel.org/lkml/155413438394.3201.15211440151043943989.stgit@buzz/
-> v2: https://lore.kernel.org/lkml/158314549775.1788.6529015932237292177.stgit@buzz/
-> v3: https://lore.kernel.org/lkml/158503038812.1955.7827988255138056389.stgit@buzz/
->  * update documentation
->  * rebase to current linux-next
->  * fix compilation for CONFIG_SMP=n
-> v4:
->  * rebase to for-5.7/block
->  * make part_stat_read_all static in block/genhd.c
+> this series tries to move as much out of genhd.h that doesn't really
+> belong there.
 
-Applied for 5.7, thanks.
+Can you resend against the current 5.7/block? The second to last
+patch throws a trivial reject, and I could fix this up, but the
+last one moves code that has now changed slightly and it'd be better
+if you could rebase and re-test.
+
+This is due to the stat fixups that I queued up this morning.
 
 -- 
 Jens Axboe
