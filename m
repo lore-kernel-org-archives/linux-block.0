@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E81C3C43331
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 11:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5FFC43331
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 11:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C18EC207FF
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 11:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3098207FF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 11:06:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U26RUwOi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eWYY/sTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727552AbgCYLGB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 07:06:01 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:57828 "EHLO
+        id S1727598AbgCYLGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 07:06:07 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:57846 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727380AbgCYLGA (ORCPT
+        with ESMTP id S1727380AbgCYLGG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 07:06:00 -0400
+        Wed, 25 Mar 2020 07:06:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=AK5e+mU1Ma2q6vCv2R327p1MJXsygIrqf2AYyif01k4=; b=U26RUwOipgBrUqQ6+2xbGUDZOq
-        +TAgBFv/rd2/g8MmeEIO9jeilZmAQNMDFYqZGZJLGDPm5ICRxpFGXUDa3PuYGodek3ti7aPSPX5q5
-        Q/zZU/vfip5UeG+Y18CQsSUyvuDakzlnb53VUvd8zVgBLsklQUeEK5VC69u4xxcoOZjLCfl4nQLF8
-        INyLCfQUrjoZoXFIY0MWnufSietNGKQt9ygjOCaGf5bczwsfLl0OHGRCjon3m3gJgLI7g8THYrwOx
-        MhVhwRAtABxDkV5UQS1nP5JNlGaZAjxi0L2N1ENVPKVeGLJjSUgTHPCHkfhZtcUsfie5tCu3LzKSG
-        yjmDijlQ==;
+        bh=mKRskZXjWa8XbmaAt5uCmOin8W8FxUnY6fEu88X3jYA=; b=eWYY/sTUoHkw9fFgRGxdkRcgAK
+        HtyCAB5CbhEYE3ldA6sXz/bRSfhRZf8NZNCKrk2WpVUDo4WjemISdT4ggV8aiI4S+P+SO9pIDGI7z
+        LQBCvM2EDfsnLW1QK3KPIwC/1Vhx9Izd8J6FEvgXBjjp82U3aX+KV0i/dX6hgat2krhCGUOufibtS
+        i06knJB2f1wkG/mzfHSySDGsUskheBfWNGijPOaWH76a7USr1BJKBGXw9PI33j8L9++8xHJiXPmE3
+        XSThBvokAarDYK/B2mELeMGZcXZ7OotC769Po51nInR5B8mDztAT5Oq848rR5hE8pWoO+/bSU1hK/
+        QPbmeWvA==;
 Received: from [2001:4bb8:18c:2a9e:999c:283e:b14a:9189] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jH3rE-0001uO-4R; Wed, 25 Mar 2020 11:06:00 +0000
+        id 1jH3rJ-000280-VB; Wed, 25 Mar 2020 11:06:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/8] block: unexport disk_get_part
-Date:   Wed, 25 Mar 2020 12:03:33 +0100
-Message-Id: <20200325110338.1029232-4-hch@lst.de>
+Subject: [PATCH 5/8] block: unexport get_gendisk
+Date:   Wed, 25 Mar 2020 12:03:35 +0100
+Message-Id: <20200325110338.1029232-6-hch@lst.de>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200325110338.1029232-1-hch@lst.de>
 References: <20200325110338.1029232-1-hch@lst.de>
@@ -52,7 +52,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-disk_get_part is not used by any modular code.
+get_gendisk is not used by any modular code.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
@@ -60,17 +60,17 @@ Signed-off-by: Christoph Hellwig <hch@lst.de>
  1 file changed, 1 deletion(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index e8978df06f35..48ed042d7f26 100644
+index 144cb50e8eb3..214204c028df 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -190,7 +190,6 @@ struct hd_struct *disk_get_part(struct gendisk *disk, int partno)
- 
- 	return part;
+@@ -953,7 +953,6 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
+ 	}
+ 	return disk;
  }
--EXPORT_SYMBOL_GPL(disk_get_part);
+-EXPORT_SYMBOL(get_gendisk);
  
  /**
-  * disk_part_iter_init - initialize partition iterator
+  * bdget_disk - do bdget() by gendisk and partition number
 -- 
 2.25.1
 
