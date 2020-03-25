@@ -6,81 +6,86 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2B6C1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 05:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A2DC1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 05:27:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A183820719
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 05:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7159C2076E
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 05:27:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="l5+2bxLr";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="uoki+fmp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Z7qLWBO6";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ZDLsqVP0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726043AbgCYFUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 01:20:05 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:3379 "EHLO
+        id S1726072AbgCYF1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 01:27:41 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:65251 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726017AbgCYFUE (ORCPT
+        with ESMTP id S1725263AbgCYF1l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 01:20:04 -0400
+        Wed, 25 Mar 2020 01:27:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585113605; x=1616649605;
+  t=1585114061; x=1616650061;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=UskEXDXhEVYnLS37w9npCgMfd9P8QOjkKQTWbE52mhc=;
-  b=l5+2bxLreZaFe2xraojM6C4snQljCkye+RWrtPkIRZy/c3k5fJ027LNm
-   azxj9+TV6/BdKf2ksSCeDEjoOePJJIZcEmmCTbS5/hCG4Ue1ziz5pwz/F
-   pGVB9vixjKakuBOd/4tcjKyZslZiGzZ7kxfMTdlkF69IIm6HuO+3af1As
-   x/pKCbhu0Eo+b9s60fRrKudhi0h8yU/ObS8mfNFscojM1yK8uhUJxCz0D
-   fN4YNFl4oIqJA/fhxGwBie2YFaVkoqP4g0dB+iIdbzqf8IGlGb97Foi2X
-   kdMbZqhHbvQRyCG17+mSCbxgQ0aTmYOM2TmVZdXa3Bugy8ZeKADAkBv53
+  bh=ye2NAkKQBlZlQ1ZbR3MTWRJcqUz0Q0qDeXlWpKqk9VE=;
+  b=Z7qLWBO66innBsDsS0W9jzvEs5dcDsCwA4+0KT1BHYDnvp/M+QxNc5LF
+   z7unOuqsxEurdQoNX9cHWu6Utx+RgzkM1u4l0mJQLqfxof0g4FlhSugF6
+   ZUEt2Ok10E5AykBofKn8HAGv/7Tq5umkcBeFIbzVvyta1Ut6Yj1qeqRcD
+   ne5Dd2GoPMnAlNcchn78+oszwVIjsKyAARQNXQNuc9BIBSw05S4yM9V/K
+   dK5K4VR0HeAd35R6us/GawME+Lvm+nwDgx5PI8MdgUokqfsSteLkyuvqb
+   kV6djPFQNGpAkeklo5PQauNY0eMmzGVgMnaTGM8GfwPhn1SAiklo1iWDT
    Q==;
-IronPort-SDR: h5PhBFRGi8i39qV539/UwNoG68CdnEAaDzTQ9B6I1WbCLNFjMdds64ng4XZdBvPERNZKQ7lr+i
- yYrUTgLWFYvahRt/DU5ikL8Gc2yNS8rWDeQWIvpJn6beNC9P8crz/I6tVMiGbOFv8Gb9emwJGL
- EzOVjQEswqKGL+rExjB+Qh5Rm8r/30J8QcN/3Sz5EVqS7dZJvxJ0DRvDMPL0LDGPodShy5WYln
- hrmi2y83GRVZPSamM/kCWv5XLwjJlkTzdmU5ew1Sbbuta0+lILbzbAkdcXAKHm8M/seJE0oliO
- vAQ=
+IronPort-SDR: qvZs9VlS57sCB993X/Hs+5KpYk9Hz6ubaeay1u+6D88YRXS0YCotfYBzPokhsDHiiUrWDuwFAY
+ kumHfZ8BZa89vSPMuswko+Ac/ePkxk3HItyS7NmxgGHXZU7XRbHlmH80W1fT8sZDt+KIZU5n7l
+ /2Zmq7EGfrQDBT7hKB5/PxP4RVYe1BzuEPaPpxfXjEkpHEVVUcs0BRyZaBaPCh1JheVTSirmXq
+ 2M3HaEpzNMrol1c28XLR80EAiZ12NuJmJDbT1MBlG2hnPiHea4szkewaSo+PJxDpAUZALELjwi
+ bzo=
 X-IronPort-AV: E=Sophos;i="5.72,303,1580745600"; 
-   d="scan'208";a="134888582"
-Received: from mail-mw2nam10lp2108.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.108])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 13:20:04 +0800
+   d="scan'208";a="134889020"
+Received: from mail-dm6nam12lp2168.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.168])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 13:27:40 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eA/cPhZbFsBXyNJI2Ii2qX8AIj67l88VMu8x0f4jNfT2kb9I1e4amdbWZ3CyyS7XPUKXCOEBe3v55/9g6VWJ7sTOu1tX+iKwJ0lRuzFzzL7KzNwZNly/Y5wSy2IcQ0yqkawv4CgVe+5ZU22GrEPjbJ/3ULFyu8ifapffjCmdZKnX7paW3gxKY0d31i5/u9hCNdtHwsqUq8gAgQQbIeGBSztBc+H0B7Dh6sieIMasqXy44OkxemYtyA5LMJzKrL0Ah/2PKqHLYkUq53rUu87QTh4yIJLU1Eoo/9cMvu1sKacXViYDp1y6sQ8HHXaaQH19hRAhsLXIE/WyCD7qsNzX2g==
+ b=Is91NPmHEuaJEUEoJvb6ygT9eH/Ewrf2rcM8sph67clU0GOp9ZwAhmNG4SxjfkczseLIc61MyX2VTZeqGBRvoO775bbBe4QNwtGs/5+hQ/o87OXJPWXUPN99jwDiZmbjHzsX/GXduA8UDrFhb31AKUNET+6TWp8vPhiJEVHjmm2+5eQhzdYC6j0T38IZ7mHWNzYkvQDwgOhVkmCvTtcTjZHzf/Wk5QCNeYd9v0gK62z2mNMJeuSrX3y4I/fu4vB7yXKrg5qr9fStD/pqUnRCrnF2M6++j0pwrQ2vl9VU3KgB3REg4ct9S13DWwo/LgdPToYIyDg6W86aAC1sAtWSLA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvscLeCOLtKJOfo35Be6hZRRg028rr8AT3BW+qO+0L4=;
- b=Wvq+pbW/hWv7i6ulwmf0aDJPwlZPgRgy39i8S0NddPx0mB3WzsC72SB5Q/MhrwmcNfSVTI6Ym8tTkwBNVqsdnWLikxFdguZi9uxsQrJ2bR2GOMXi17wNz4yEUeR3QxvASp7Y1vNRloKsZWFPaLjLb20UMxv8TogiQYkX0w9431R9tDCFYml+kRMTTrFULqBqvGnGB3Ix0o8u5rMIyLBrrRXq5R7/qgU0yHCrCs+tWOplvNf7C01hTQLthM7y6yo79lPRhjZuIc2t93qBX82p0ssZ9GJGxHqw012QezMYP2Ux48LQqKvdH8edaRqVvbGIfICLl3cB55Hf6LEJF14kmg==
+ bh=Vx1AkGD6fAqnAa12WEEz9X5AYufrBmTVtyDDcCM44Ps=;
+ b=CKQso2Z/5zNrBxcND+v29IhjAgT+PyIal0rOxs0u7NRGePiamilhdFJSlFUGbOSuqgzVPzdlbjSnT9ja7fTOQwnWxQfHtqnXYaWgb3Z3z71h/9du+YQ+w6dbNOaylr68Xp1cbr5+swQvCqaEox2/8bY/LKPIfcEeY4Bw8Q7B/cMUHWQPInosGOEWmhz4iahdKBpduOpWSvo57s2KGyQKDJ61E0CyGgbM5wrdyhC15GlIEc2DPmOMk6AZiji2t8EgiqjRhYw4vsUFsUAWjx0k1Nwt+mU4TG4ZK4bOjuDRdBp4FrQzxwxt225Bl0CFfbyiZb1h9+c7Veha/vVs0H0JxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvscLeCOLtKJOfo35Be6hZRRg028rr8AT3BW+qO+0L4=;
- b=uoki+fmpBtqj9kyC0Ywv/NLL0/H55Mcdp48Gg1Ua+fBrnniLinTl27kRpGA8rOI8udoqAdIaur5lgFoBr/ixIUjp4ffOVZu4in8USKLorlu9uEB+JCD27Bs+uZ5zgz78ubBq5RuHGv64JOB6clqZ0bFo0ci1JzY7qmPROSrZ1Ac=
+ bh=Vx1AkGD6fAqnAa12WEEz9X5AYufrBmTVtyDDcCM44Ps=;
+ b=ZDLsqVP0rM1W6m5WFoJ70vqo4sA//ENm4eL/9OH3jBVAKapsCUpzT5pLyNr03zWdNzwiveboVmSH4hr3qM9oBqqOOMT5qJrROHlVpMWMuRo+8GoLnOKoK9JjIPiaH1zg/J7H3myw16KFTQM/uAoxgZ+VfwLdLdK/mRxHUTZikfs=
 Received: from CO2PR04MB2343.namprd04.prod.outlook.com (2603:10b6:102:12::9)
- by CO2PR04MB2309.namprd04.prod.outlook.com (2603:10b6:102:12::18) with
+ by CO2PR04MB2280.namprd04.prod.outlook.com (2603:10b6:102:e::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.18; Wed, 25 Mar
- 2020 05:20:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.22; Wed, 25 Mar
+ 2020 05:27:38 +0000
 Received: from CO2PR04MB2343.namprd04.prod.outlook.com
  ([fe80::c1a:6c0f:8207:580b]) by CO2PR04MB2343.namprd04.prod.outlook.com
  ([fe80::c1a:6c0f:8207:580b%7]) with mapi id 15.20.2835.023; Wed, 25 Mar 2020
- 05:20:03 +0000
+ 05:27:38 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH V3 1/3] block: add a zone condition debug helper
-Thread-Topic: [PATCH V3 1/3] block: add a zone condition debug helper
-Thread-Index: AQHWAlSDtDC4ZWOwBEmfbD5R0f0WZQ==
-Date:   Wed, 25 Mar 2020 05:20:02 +0000
-Message-ID: <CO2PR04MB234368CCA125D6DD0A1C376CE7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
-References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
- <20200325021629.15103-2-chaitanya.kulkarni@wdc.com>
- <CO2PR04MB2343C3B9DF774E6A6F052EC0E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
- <BYAPR04MB49659AFBB6519B9E9ABC51E186CE0@BYAPR04MB4965.namprd04.prod.outlook.com>
+To:     "hch@infradead.org" <hch@infradead.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [PATCH v2 10/11] iomap: Add support for zone append writes
+Thread-Topic: [PATCH v2 10/11] iomap: Add support for zone append writes
+Thread-Index: AQHWAfBwIA62KDxQPU+QCf/8uspjMw==
+Date:   Wed, 25 Mar 2020 05:27:38 +0000
+Message-ID: <CO2PR04MB2343309246F0D413F5C1691CE7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
+References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
+ <20200324152454.4954-11-johannes.thumshirn@wdc.com>
+ <20200324154131.GA32087@infradead.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -90,71 +95,184 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [129.253.182.57]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 81199103-a0cf-4051-19dd-08d7d07c2c3c
-x-ms-traffictypediagnostic: CO2PR04MB2309:
+x-ms-office365-filtering-correlation-id: f48d6863-17d4-41e1-6e16-08d7d07d3b6e
+x-ms-traffictypediagnostic: CO2PR04MB2280:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CO2PR04MB2309A38DE9ED0465932ABD22E7CE0@CO2PR04MB2309.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CO2PR04MB2280ED61A514D8A956D1574FE7CE0@CO2PR04MB2280.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 0353563E2B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(366004)(39860400002)(346002)(376002)(91956017)(64756008)(76116006)(66946007)(66556008)(66446008)(66476007)(33656002)(52536014)(9686003)(2906002)(55016002)(8936002)(5660300002)(478600001)(26005)(53546011)(8676002)(81166006)(186003)(81156014)(110136005)(6506007)(7696005)(4326008)(316002)(71200400001)(86362001)(21314003);DIR:OUT;SFP:1102;SCL:1;SRVR:CO2PR04MB2309;H:CO2PR04MB2343.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(346002)(396003)(366004)(136003)(39860400002)(26005)(6506007)(9686003)(7696005)(5660300002)(91956017)(66946007)(64756008)(110136005)(316002)(81156014)(76116006)(8676002)(52536014)(2906002)(66556008)(66476007)(81166006)(66446008)(33656002)(478600001)(71200400001)(186003)(55016002)(54906003)(6636002)(8936002)(86362001)(53546011)(4326008);DIR:OUT;SFP:1102;SCL:1;SRVR:CO2PR04MB2280;H:CO2PR04MB2343.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: sdZ+0c0Bl6jm63UGOY9oynYipS1za8SHAXX2+Nw+Mek0BFC++RVWQ+sNgk3nAAC6N/ESQA6F4OEeR4WNvG4N+ZKKyr45/gokxFnFwscGJevHkTKsrqj9muSXp1vzVsLjBuG9s9ufuXEAVmmqY6NJhcrGvRBMOcivGPs2tGBMdR5UVd5dDo9ZTfpMydKlkCKkMH+QpXp4YbVYVG5h6piDHo+nj8WK6sTUuGbrv1K919nkB/GDWuNvqcsg/+wi0IqrhaRwkG0F/cIBT0+aESloan1TUgX873JJOuZzRqR8uX1xZ9vHEGnPje29/vu93ciw7WtK0aZ37ZrxMVF7SjIXmhBRFjJOnSxlpWGEMh31Emz6yIThOpBt0ILoNDDolX5hBD+bIPPe70Ny3kgNkCm5NBmdOIJZMAk7+1zPhDJWLr9miAJpymsvwCOPy2CMSB8aq64bO2Bf0oiiRFkY2tmdD9FHsem18VSvzpLSGcwnxjSApIkYIhznANuNIqQeIMwa
-x-ms-exchange-antispam-messagedata: QutNH4a9vRrv7DjRG1KUqyUeh/LsKDKbQ6Rr3lPtim7Z4If1ETmDrwRFjF2FqtFe+0rA7ZvIA65z3nREg9d+zxiVTqE3S4GYIDot/RQzX0qjSjRbVpRLVJgvReNiYvOI6kYjsmOffEWdMdcXcP/ZYw==
+x-microsoft-antispam-message-info: gt2/SLvWaYibEgUN8JilrZyL8g868n4TGlGXtJ2ir4xYX+KNazUqhhLy1s8OehdTQh5NMG5/exZeJGIy7sKZ6z7yQzoktw69DLneB8Fmu/nkE2v3GPoecQ94h/lhsaIEuyjUbxbTo1zjD8cKREw2ltThNiW8FShnRXr9PupFg7eflucZTbzSINKpLw6b+j6hTzzUpu0XnPWTBbwKQLYOEOZd7LcrpWjjTKqmdRiyTMFAxkdpW+aqdYhFgAx2Dj1LApMQSW5Dmn3oYeaKh8DrvcmrLu83YKfcVd6LVtE+q+9gcT7Pj1Y4dYwoClvzEvOX4xOiVxzpjDbXf2NpjQNtv9yRDQEZaCRBjfXWbAQR7Ot+TvKCZM9aTtu3YtSZPBwXvUfjiVL90klyYv9xB/IGyTrAo7WSPfsx1Wwnsj8x428rfW/qRiWsLDNBnA4pBj2P
+x-ms-exchange-antispam-messagedata: S7wo6gLiGfaMxF1n0ktUNd9TjFdJ8rNca7FxShAwI2CtrnQL/LgpksdjoPAjJD2E6Cgh+8oUMHeCMMEOAhdXrHHa4GT7xUhxv0wjBCSKnA9rvu7x7T1r45+HU05BUt5eUi8unnsFoGSNg5GT/filHA==
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81199103-a0cf-4051-19dd-08d7d07c2c3c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 05:20:02.8054
+X-MS-Exchange-CrossTenant-Network-Message-Id: f48d6863-17d4-41e1-6e16-08d7d07d3b6e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 05:27:38.1037
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2fdxz740DXTpEu4ppjJ+V9r9EIEzvCppdNAQb1hhZSPzTKfFDD50YxpTe7we3P3P6YZoNj2/SJOEyh7ByE/bAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2309
+X-MS-Exchange-CrossTenant-userprincipalname: iVQxBYuWoYpstEy+B04mbUjdpdS/aJXsFgG52Cb6iqRl3WnqpxgNBk35xgCruk5iCtwsrxrolSseiUXuRkHHDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2280
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/03/25 13:31, Chaitanya Kulkarni wrote:=0A=
-> On 03/24/2020 08:27 PM, Damien Le Moal wrote:=0A=
->>>   {=0A=
->>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
->>>> index 53a1325efbc3..0070f26b9579 100644=0A=
->>>> --- a/include/linux/blkdev.h=0A=
->>>> +++ b/include/linux/blkdev.h=0A=
->>>> @@ -887,6 +887,9 @@ extern void blk_execute_rq_nowait(struct request_q=
-ueue *, struct gendisk *,=0A=
->>>>  /* Helper to convert REQ_OP_XXX to its string format XXX */=0A=
->>>>  extern const char *blk_op_str(unsigned int op);=0A=
->>>>=0A=
->>>> +/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */=0A=
->>>> +extern const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);=
-=0A=
->>>> +=0A=
->> I do not think that the extern is needed here. And I think that this dec=
-laration=0A=
->> should go under #ifdef CONFIG_BLK_DEV_ZONED since its code is compiled o=
-nly if=0A=
->> that config option is enabled.=0A=
->>=0A=
+On 2020/03/25 0:41, Christoph Hellwig wrote:=0A=
+> On Wed, Mar 25, 2020 at 12:24:53AM +0900, Johannes Thumshirn wrote:=0A=
+>> @@ -39,6 +40,7 @@ struct iomap_dio {=0A=
+>>  			struct task_struct	*waiter;=0A=
+>>  			struct request_queue	*last_queue;=0A=
+>>  			blk_qc_t		cookie;=0A=
+>> +			sector_t		sector;=0A=
+>>  		} submit;=0A=
+>>  =0A=
+>>  		/* used for aio completion: */=0A=
+>> @@ -151,6 +153,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)=0A=
+>>  	if (bio->bi_status)=0A=
+>>  		iomap_dio_set_error(dio, blk_status_to_errno(bio->bi_status));=0A=
+>>  =0A=
+>> +	if (dio->flags & IOMAP_DIO_ZONE_APPEND)=0A=
+>> +		dio->submit.sector =3D bio->bi_iter.bi_sector;=0A=
 > =0A=
-> Are you suggesting like following ?=0A=
+> The submit member in struct iomap_dio is for submit-time information,=0A=
+> while this is used in the completion path..=0A=
 > =0A=
-> +#ifdef CONFIG_BLK_DEV_ZONED=0A=
-> +/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */=0A=
-> +const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);=0A=
-> +#endif /* CONFIG_BLK_DEV_ZONED */=0A=
+>>  		nr_pages =3D iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);=0A=
+>>  		iomap_dio_submit_bio(dio, iomap, bio);=0A=
+>> +=0A=
+>> +		/*=0A=
+>> +		 * Issuing multiple BIOs for a large zone append write can=0A=
+>> +		 * result in reordering of the write fragments and to data=0A=
+>> +		 * corruption. So always stop after the first BIO is issued.=0A=
+>> +		 */=0A=
+>> +		if (zone_append)=0A=
+>> +			break;=0A=
+> =0A=
+> At least for a normal file system that is absolutely not true.  If=0A=
+> zonefs is so special it might be better of just using a slightly tweaked=
 =0A=
-Yes, That is what I meant. But may be do not add another #ifdef and simply =
-move=0A=
-the declaration within one of the existing #ifdef CONFIG_BLK_DEV_ZONED in=
+> copy of blkdev_direct_IO rather than using iomap.=0A=
 =0A=
-blkdev.h ? Less #ifdef is always better :)=0A=
+It would be very nice to not have to add this direct BIO use case in zonefs=
 =0A=
+since that would be only for writes to sequential zones while all other=0A=
+operations use iomap. So instead of this, what about using a flag as Dave=
+=0A=
+suggested (see below comment too) ?=0A=
+=0A=
+> =0A=
+>> @@ -446,6 +486,11 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *i=
+ter,=0A=
+>>  		flags |=3D IOMAP_WRITE;=0A=
+>>  		dio->flags |=3D IOMAP_DIO_WRITE;=0A=
+>>  =0A=
+>> +		if (iocb->ki_flags & IOCB_ZONE_APPEND) {=0A=
+>> +			flags |=3D IOMAP_ZONE_APPEND;=0A=
+>> +			dio->flags |=3D IOMAP_DIO_ZONE_APPEND;=0A=
+>> +		}=0A=
+>> +=0A=
+>>  		/* for data sync or sync, we need sync completion processing */=0A=
+>>  		if (iocb->ki_flags & IOCB_DSYNC)=0A=
+>>  			dio->flags |=3D IOMAP_DIO_NEED_SYNC;=0A=
+>> @@ -516,6 +561,15 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *i=
+ter,=0A=
+>>  			iov_iter_revert(iter, pos - dio->i_size);=0A=
+>>  			break;=0A=
+>>  		}=0A=
+>> +=0A=
+>> +		/*=0A=
+>> +		 * Zone append writes cannot be split and be shorted. Break=0A=
+>> +		 * here to let the user know instead of sending more IOs which=0A=
+>> +		 * could get reordered and corrupt the written data.=0A=
+>> +		 */=0A=
+>> +		if (flags & IOMAP_ZONE_APPEND)=0A=
+>> +			break;=0A=
+> =0A=
+> But that isn't what we do here.  You exit after a single apply iteration=
+=0A=
+> which is perfectly fine - at at least for a normal file system, zonefs=0A=
+> is rather weird.=0A=
+=0A=
+The comment is indeed not clear. For the short write, as Dave suggested, we=
+=0A=
+should have a special flag for it. So would you be OK if we replace this wi=
+th=0A=
+something like=0A=
+=0A=
+		if (flags & IOMAP_SHORT_WRITE)=0A=
+			break;=0A=
+=0A=
+Normal file systems with real block mapping metadata would not need this as=
+ they=0A=
+can perfectly handle non sequential zone append fragments of a large DIO. B=
+ut=0A=
+zonefs will need the short writes since it lacks file block mapping metadat=
+a.=0A=
+=0A=
+> =0A=
+>> +=0A=
+>>  	} while ((count =3D iov_iter_count(iter)) > 0);=0A=
+>>  	blk_finish_plug(&plug);=0A=
+>>  =0A=
+>> diff --git a/include/linux/fs.h b/include/linux/fs.h=0A=
+>> index 3cd4fe6b845e..aa4ad705e549 100644=0A=
+>> --- a/include/linux/fs.h=0A=
+>> +++ b/include/linux/fs.h=0A=
+>> @@ -314,6 +314,7 @@ enum rw_hint {=0A=
+>>  #define IOCB_SYNC		(1 << 5)=0A=
+>>  #define IOCB_WRITE		(1 << 6)=0A=
+>>  #define IOCB_NOWAIT		(1 << 7)=0A=
+>> +#define IOCB_ZONE_APPEND	(1 << 8)=0A=
+> =0A=
+> I don't think the iocb is the right interface for passing this=0A=
+> kind of information.  We currently pass a bool wait to iomap_dio_rw=0A=
+> which really should be flags.  I have a pending patch for that.=0A=
+=0A=
+Is that patch queued in iomap or xfs tree ? Could you point us to it please=
+ ?=0A=
+=0A=
+> =0A=
+>> diff --git a/include/linux/iomap.h b/include/linux/iomap.h=0A=
+>> index 8b09463dae0d..16c17a79e53d 100644=0A=
+>> --- a/include/linux/iomap.h=0A=
+>> +++ b/include/linux/iomap.h=0A=
+>> @@ -68,7 +68,6 @@ struct vm_fault;=0A=
+>>   */=0A=
+>>  #define IOMAP_F_PRIVATE		0x1000=0A=
+>>  =0A=
+>> -=0A=
+> =0A=
+> Spurious whitespace change.=0A=
+> =0A=
+>>  /*=0A=
+>>   * Magic value for addr:=0A=
+>>   */=0A=
+>> @@ -95,6 +94,17 @@ iomap_sector(struct iomap *iomap, loff_t pos)=0A=
+>>  	return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;=0A=
+>>  }=0A=
+>>  =0A=
+>> +/*=0A=
+>> + * Flags for iomap_begin / iomap_end.  No flag implies a read.=0A=
+>> + */=0A=
+>> +#define IOMAP_WRITE		(1 << 0) /* writing, must allocate blocks */=0A=
+>> +#define IOMAP_ZERO		(1 << 1) /* zeroing operation, may skip holes */=0A=
+>> +#define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */=
+=0A=
+>> +#define IOMAP_FAULT		(1 << 3) /* mapping for page fault */=0A=
+>> +#define IOMAP_DIRECT		(1 << 4) /* direct I/O */=0A=
+>> +#define IOMAP_NOWAIT		(1 << 5) /* do not block */=0A=
+>> +#define IOMAP_ZONE_APPEND	(1 << 6) /* Use zone append for writes */=0A=
+> =0A=
+> Why is this moved around?=0A=
+> =0A=
 =0A=
 =0A=
 -- =0A=
