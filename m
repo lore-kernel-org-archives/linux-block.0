@@ -2,289 +2,250 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B1BC54FD2
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DA7C54FCF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:40:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C24E72074D
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9367520724
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:40:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ky+En8mp";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="eMbh+s3r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLB5WWSn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbgCYD24 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 23:28:56 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:50651 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbgCYD24 (ORCPT
+        id S1727313AbgCYDkr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 23:40:47 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35582 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727253AbgCYDkq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 23:28:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585106935; x=1616642935;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=dGzt4XeinHWTGWwN8E37M60szImI5Pgdxezo1OhCMh8=;
-  b=ky+En8mpkpkKEI0yZeSEfpfTigRChd+1c/MrAhbDR9pQ9AKurhTIvE0v
-   gtHWMu/6S+N8uZi4ovDXQ9bsSnFgBSt0cuvJMnMyRdGCzK1S4EVMcEqwe
-   YOuY+VniLQrajkrllY0sGoOqRhacLCIgzM1AaERhaA6pfqtQeitXn/K0I
-   M5IUdYnDMPDqWmSo+P7Wlesjg5s/HfPq2u1Cl+kHYYXixLbUDHxzH2jGc
-   nKfOrpBlUD8J5vwfkMIpsYunEnSEGGZjQzYg05aItjvKO+n6cnKmtN9w4
-   bltVKXtfrMi2ciW4S6vXlJ4CG2BX9QgLwVHBSWCqptknYvIfE4IsSolDF
-   Q==;
-IronPort-SDR: WITTGbN31tv6B1cy8vXkle4GyQk3yO9AGy7UXQYG/OIA8T6s5OoWYanUAY6CILG/mVIC7gMi2E
- 4iz/zZZwGGSiH8LAE5ZzcvyP+5iiRGkvQ3i5+0eQx8qZHOGgttUyomcMVzaz3x3BAcY0wBDvng
- p2qT8+SdfRJoNS7ofkgxnDA7AM8wcMGcIqYbo5Ul5VBpAIC58U831S4U0dQxFqBTGq80Hv1Q9B
- 1abEzlivvk4QrpqoCyx08SYFMgfKfSNJ1QDj+vAwgvhF5lUOXW3kFhY+BcVMby+3Y2yGDEqifk
- sa4=
-X-IronPort-AV: E=Sophos;i="5.72,302,1580745600"; 
-   d="scan'208";a="133424332"
-Received: from mail-dm6nam10lp2109.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.109])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 11:28:54 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Uu7PyS9ho8LCI9IzOklsAklzdk6epo9Q9Vsi3bBvGdTBSTopa6wfI29cUqIl+MtjLHJ2pKv/qKT6lzzHEvClFQRXicXqiD/CwMpeW97BzKbuYqjfD57qz5OxC68BLd+TLnYKaxJfyvL87iPaCUY0T7H2QfMlKatBacv3hH+DjlriGx1q2EDc0/pXFO6ySgmDmneoxl2W2E8YyCP57fI53+AWQ3BnyVZpuvDqao0e4tKblm0EfUTXgXBvUTx6fNJXxcretgkW5P4kdzWWCoUCJnuEsQsniR5Hn000HzAVfnZx4VSNYGbUVqSeHgHznnqeAYAatjwbzCmkZ7x1p6uHhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m7mqU5t/b24q8JRr5g1vjZBk5gvgRpjbQw+4bOAs6ic=;
- b=ZfOdkBy1LwT/lF/8HCpZYUKyhZGtR6aRGSjJfKRst/y+IOoYYrg4ZHtZvfRv+p4nTREwOAOm5D775DbT7CzDZrLOa+DcDbj/MBPNBx9SqMRseeTYuMPbYxW2lth5+qr9QGtujhhWRdqb2P/Iiz4RDg2uhSO3adyAOHTKm+4bod916ofJ9CHfagQlwz3zHLBGRmrsoLE5J+JQ0zIXxRHOhOR48QsgEHyaIoCrfRBv9478z5+QBEIScj9RFkWHrsucykYsr7TC2t1z0ePvi8ekIjIxXbtTxdG7fpI75x17VoD+B7UhOj7ZovMZgHFv09uWNb/QY/MCteFPffXykahh0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m7mqU5t/b24q8JRr5g1vjZBk5gvgRpjbQw+4bOAs6ic=;
- b=eMbh+s3r22lCarot47ly5hMEXv6tJG4aAW26QCwaCHI04oR4DyIY08pQXa742nFb+PkOe31R3gt7782e6rtsXbuAK+E6Rjl/E7V1t4Lndo9BQ0oK/0dl4Ijau7qvXRIA9dB0DVxhR73Y9Y3OewYOfIHxEXPFTKwIwO8saeHL+IM=
-Received: from CO2PR04MB2343.namprd04.prod.outlook.com (2603:10b6:102:12::9)
- by CO2PR04MB2136.namprd04.prod.outlook.com (2603:10b6:102:11::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.18; Wed, 25 Mar
- 2020 03:28:53 +0000
-Received: from CO2PR04MB2343.namprd04.prod.outlook.com
- ([fe80::c1a:6c0f:8207:580b]) by CO2PR04MB2343.namprd04.prod.outlook.com
- ([fe80::c1a:6c0f:8207:580b%7]) with mapi id 15.20.2835.023; Wed, 25 Mar 2020
- 03:28:53 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH V3 2/3] null_blk: add tracepoint helpers for zoned mode
-Thread-Topic: [PATCH V3 2/3] null_blk: add tracepoint helpers for zoned mode
-Thread-Index: AQHWAlSH8p39FZsxq0qdBvBUiVsizg==
-Date:   Wed, 25 Mar 2020 03:28:53 +0000
-Message-ID: <CO2PR04MB2343BF7AABB1273251C8C474E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
-References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
- <20200325021629.15103-3-chaitanya.kulkarni@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Damien.LeMoal@wdc.com; 
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 79a6ae98-ba7f-4c81-78ed-08d7d06ca4b7
-x-ms-traffictypediagnostic: CO2PR04MB2136:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CO2PR04MB21360C20F5F609DF91EA73B4E7CE0@CO2PR04MB2136.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:374;
-x-forefront-prvs: 0353563E2B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(376002)(396003)(366004)(346002)(39860400002)(71200400001)(33656002)(8936002)(9686003)(91956017)(66476007)(4326008)(66556008)(66946007)(66446008)(55016002)(186003)(76116006)(86362001)(64756008)(52536014)(110136005)(2906002)(26005)(7696005)(316002)(5660300002)(81156014)(478600001)(53546011)(81166006)(8676002)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:CO2PR04MB2136;H:CO2PR04MB2343.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MEHmIaywD3+DrwyeB6rqU4+dUiG0UoFQybRvKKmkUXdZaM17fTBL57f9bo78TVmyg8ak0UDVI1AofbHUSqXfMV7XzNjuoD42VLds4ysEDQwj/A3jYKkwuMaKT8/Rkb+07+8tm9VFnRqAQJXC46VH7ljQNvExaJmFz83NBRiEPFWb0KoK/cXUGVhgi1+kDB5Ob7zEbUTEawAplo2729akz+4C/CBsdh314ehpqFcYIDdbGNu6ZSxV33rFQfbFZrtWZN5bdeRS8gk+GB9RNQU5mvaVrpplaqaCLPyvijdatmDHG4ntudAS/mGjF/THKCzLTA020g235y4k4mLzIcR58WOThgO3LSV4x14UZP8imqMQX5TDQoSgoxb0jPBuPoR/tOmkx7h2wxT93lk4m2Lo613wQ1Jy2TJMZamh2ozyIHo25JqfgNp3mnerdlTnkVlf
-x-ms-exchange-antispam-messagedata: NPceU21trMwu1JO+rFu+byTdtRffCeVh35oLVz5jZmuFLeeLL5e5nyMuX3WO5CS8VDHYjVkVrxQofO87dhFR7M40kORY8XTfywoa9GM2S3wG5/tGPBXu63MZH4r8SAqrWkudwzcbj7Dq4QmLFD5TCQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 24 Mar 2020 23:40:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585107644;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NzZ/iEZeQLHh1Y/Ua0zpzMRctI+bdZqgFy9kntWeYZ4=;
+        b=OLB5WWSnK6KCRvR+cYmAZu0BDMef0lby7MvZ9vXOOm1yGR1xRMLluSjpE47fq37PJEsyly
+        O/4wCy34LF2GaT2eOS82X+Fy+adJEJisBYoMAZ7JRPaKxyolIWDkcjxH2KpZWcuIwgrO16
+        hF+CtiDiWGAM+0LBeZMwmfx1+Oz4pyw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-L4ILdnHvOPmI4BD13INyDA-1; Tue, 24 Mar 2020 23:40:40 -0400
+X-MC-Unique: L4ILdnHvOPmI4BD13INyDA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97D048017CC;
+        Wed, 25 Mar 2020 03:40:39 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 409825D9C5;
+        Wed, 25 Mar 2020 03:40:29 +0000 (UTC)
+Date:   Wed, 25 Mar 2020 11:40:24 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH v3 1/3] block/diskstats: more accurate approximation of
+ io_ticks for slow disks
+Message-ID: <20200325034024.GC6086@ming.t460p>
+References: <158503038812.1955.7827988255138056389.stgit@buzz>
+ <158503198072.1955.16227279292140721351.stgit@buzz>
+ <20200324140656.GA23550@ming.t460p>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79a6ae98-ba7f-4c81-78ed-08d7d06ca4b7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 03:28:53.2728
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9Vj4KIHSntfEjN3Px2MHY0q0kFcYrhWRNC/rXUlPbl1cfzYIcjbU4Y8I/GT1T4CN/OSZ2SN5oGOgK1J1BQtmaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2136
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200324140656.GA23550@ming.t460p>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/03/25 12:21, Chaitanya Kulkarni wrote:=0A=
-> This patch adds two new tracpoints for null_blk_zoned.c that allows us=0A=
-> to trace report-zones, zone-mgmt-op and zone-write operations which has=
-=0A=
-> direct effect on the zone condition state machine.=0A=
-> =0A=
-> Also, we update drivers/block/Makefile so that new null_blk related=0A=
-> tracefiles can be compiled.=0A=
-> =0A=
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-Looks good to me.=0A=
-=0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-=0A=
-=0A=
-> ---=0A=
->  drivers/block/Makefile         |  6 +++=0A=
->  drivers/block/null_blk_trace.c | 21 +++++++++=0A=
->  drivers/block/null_blk_trace.h | 79 ++++++++++++++++++++++++++++++++++=
-=0A=
->  3 files changed, 106 insertions(+)=0A=
->  create mode 100644 drivers/block/null_blk_trace.c=0A=
->  create mode 100644 drivers/block/null_blk_trace.h=0A=
-> =0A=
-> diff --git a/drivers/block/Makefile b/drivers/block/Makefile=0A=
-> index a53cc1e3a2d3..795facd8cf19 100644=0A=
-> --- a/drivers/block/Makefile=0A=
-> +++ b/drivers/block/Makefile=0A=
-> @@ -6,6 +6,9 @@=0A=
->  # Rewritten to use lists instead of if-statements.=0A=
->  # =0A=
->  =0A=
-> +# needed for trace events=0A=
-> +ccflags-y				+=3D -I$(src)=0A=
-> +=0A=
->  obj-$(CONFIG_MAC_FLOPPY)	+=3D swim3.o=0A=
->  obj-$(CONFIG_BLK_DEV_SWIM)	+=3D swim_mod.o=0A=
->  obj-$(CONFIG_BLK_DEV_FD)	+=3D floppy.o=0A=
-> @@ -39,6 +42,9 @@ obj-$(CONFIG_ZRAM) +=3D zram/=0A=
->  =0A=
->  obj-$(CONFIG_BLK_DEV_NULL_BLK)	+=3D null_blk.o=0A=
->  null_blk-objs	:=3D null_blk_main.o=0A=
-> +ifeq ($(CONFIG_BLK_DEV_ZONED), y)=0A=
-> +null_blk-$(CONFIG_TRACING) +=3D null_blk_trace.o=0A=
-> +endif=0A=
->  null_blk-$(CONFIG_BLK_DEV_ZONED) +=3D null_blk_zoned.o=0A=
->  =0A=
->  skd-y		:=3D skd_main.o=0A=
-> diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk_trac=
-e.c=0A=
-> new file mode 100644=0A=
-> index 000000000000..f246e7bff698=0A=
-> --- /dev/null=0A=
-> +++ b/drivers/block/null_blk_trace.c=0A=
-> @@ -0,0 +1,21 @@=0A=
-> +// SPDX-License-Identifier: GPL-2.0=0A=
-> +/*=0A=
-> + * null_blk trace related helpers.=0A=
-> + *=0A=
-> + * Copyright (C) 2020 Western Digital Corporation or its affiliates.=0A=
-> + */=0A=
-> +#include "null_blk_trace.h"=0A=
-> +=0A=
-> +/*=0A=
-> + * Helper to use for all null_blk traces to extract disk name.=0A=
-> + */=0A=
-> +const char *nullb_trace_disk_name(struct trace_seq *p, char *name)=0A=
-> +{=0A=
-> +	const char *ret =3D trace_seq_buffer_ptr(p);=0A=
-> +=0A=
-> +	if (name && *name)=0A=
-> +		trace_seq_printf(p, "disk=3D%s, ", name);=0A=
-> +	trace_seq_putc(p, 0);=0A=
-> +=0A=
-> +	return ret;=0A=
-> +}=0A=
-> diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk_trac=
-e.h=0A=
-> new file mode 100644=0A=
-> index 000000000000..4f83032eb544=0A=
-> --- /dev/null=0A=
-> +++ b/drivers/block/null_blk_trace.h=0A=
-> @@ -0,0 +1,79 @@=0A=
-> +/* SPDX-License-Identifier: GPL-2.0 */=0A=
-> +/*=0A=
-> + * null_blk device driver tracepoints.=0A=
-> + *=0A=
-> + * Copyright (C) 2020 Western Digital Corporation or its affiliates.=0A=
-> + */=0A=
-> +=0A=
-> +#undef TRACE_SYSTEM=0A=
-> +#define TRACE_SYSTEM nullb=0A=
-> +=0A=
-> +#if !defined(_TRACE_NULLB_H) || defined(TRACE_HEADER_MULTI_READ)=0A=
-> +#define _TRACE_NULLB_H=0A=
-> +=0A=
-> +#include <linux/tracepoint.h>=0A=
-> +#include <linux/trace_seq.h>=0A=
-> +=0A=
-> +#include "null_blk.h"=0A=
-> +=0A=
-> +const char *nullb_trace_disk_name(struct trace_seq *p, char *name);=0A=
-> +=0A=
-> +#define __print_disk_name(name) nullb_trace_disk_name(p, name)=0A=
-> +=0A=
-> +#ifndef TRACE_HEADER_MULTI_READ=0A=
-> +static inline void __assign_disk_name(char *name, struct gendisk *disk)=
-=0A=
-> +{=0A=
-> +	if (disk)=0A=
-> +		memcpy(name, disk->disk_name, DISK_NAME_LEN);=0A=
-> +	else=0A=
-> +		memset(name, 0, DISK_NAME_LEN);=0A=
-> +}=0A=
-> +#endif=0A=
-> +=0A=
-> +TRACE_EVENT(nullb_zone_op,=0A=
-> +	    TP_PROTO(struct nullb_cmd *cmd, unsigned int zone_no,=0A=
-> +		     unsigned int zone_cond),=0A=
-> +	    TP_ARGS(cmd, zone_no, zone_cond),=0A=
-> +	    TP_STRUCT__entry(=0A=
-> +		__array(char, disk, DISK_NAME_LEN)=0A=
-> +		__field(enum req_opf, op)=0A=
-> +		__field(unsigned int, zone_no)=0A=
-> +		__field(unsigned int, zone_cond)=0A=
-> +	    ),=0A=
-> +	    TP_fast_assign(=0A=
-> +		__entry->op =3D req_op(cmd->rq);=0A=
-> +		__entry->zone_no =3D zone_no;=0A=
-> +		__entry->zone_cond =3D zone_cond;=0A=
-> +		__assign_disk_name(__entry->disk, cmd->rq->rq_disk);=0A=
-> +	    ),=0A=
-> +	    TP_printk("%s req=3D%-15s zone_no=3D%u zone_cond=3D%-10s",=0A=
-> +		      __print_disk_name(__entry->disk),=0A=
-> +		      blk_op_str(__entry->op),=0A=
-> +		      __entry->zone_no,=0A=
-> +		      blk_zone_cond_str(__entry->zone_cond))=0A=
-> +);=0A=
-> +=0A=
-> +TRACE_EVENT(nullb_report_zones,=0A=
-> +	    TP_PROTO(struct nullb *nullb, unsigned int nr_zones),=0A=
-> +	    TP_ARGS(nullb, nr_zones),=0A=
-> +	    TP_STRUCT__entry(=0A=
-> +		__array(char, disk, DISK_NAME_LEN)=0A=
-> +		__field(unsigned int, nr_zones)=0A=
-> +	    ),=0A=
-> +	    TP_fast_assign(=0A=
-> +		__entry->nr_zones =3D nr_zones;=0A=
-> +		__assign_disk_name(__entry->disk, nullb->disk);=0A=
-> +	    ),=0A=
-> +	    TP_printk("%s nr_zones=3D%u",=0A=
-> +		      __print_disk_name(__entry->disk), __entry->nr_zones)=0A=
-> +);=0A=
-> +=0A=
-> +#endif /* _TRACE_NULLB_H */=0A=
-> +=0A=
-> +#undef TRACE_INCLUDE_PATH=0A=
-> +#define TRACE_INCLUDE_PATH .=0A=
-> +#undef TRACE_INCLUDE_FILE=0A=
-> +#define TRACE_INCLUDE_FILE null_blk_trace=0A=
-> +=0A=
-> +/* This part must be outside protection */=0A=
-> +#include <trace/define_trace.h>=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Tue, Mar 24, 2020 at 10:06:56PM +0800, Ming Lei wrote:
+> On Tue, Mar 24, 2020 at 09:39:40AM +0300, Konstantin Khlebnikov wrote:
+> > Currently io_ticks is approximated by adding one at each start and end of
+> > requests if jiffies counter has changed. This works perfectly for requests
+> > shorter than a jiffy or if one of requests starts/ends at each jiffy.
+> > 
+> > If disk executes just one request at a time and they are longer than two
+> > jiffies then only first and last jiffies will be accounted.
+> > 
+> > Fix is simple: at the end of request add up into io_ticks jiffies passed
+> > since last update rather than just one jiffy.
+> > 
+> > Example: common HDD executes random read 4k requests around 12ms.
+> > 
+> > fio --name=test --filename=/dev/sdb --rw=randread --direct=1 --runtime=30 &
+> > iostat -x 10 sdb
+> > 
+> > Note changes of iostat's "%util" 8,43% -> 99,99% before/after patch:
+> > 
+> > Before:
+> > 
+> > Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> > sdb               0,00     0,00   82,60    0,00   330,40     0,00     8,00     0,96   12,09   12,09    0,00   1,02   8,43
+> > 
+> > After:
+> > 
+> > Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> > sdb               0,00     0,00   82,50    0,00   330,00     0,00     8,00     1,00   12,10   12,10    0,00  12,12  99,99
+> > 
+> > For load estimation "%util" is not as useful as average queue length,
+> > but it clearly shows how often disk queue is completely empty.
+> > 
+> > Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
+> > Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> > ---
+> >  Documentation/admin-guide/iostats.rst |    5 ++++-
+> >  block/bio.c                           |    8 ++++----
+> >  block/blk-core.c                      |    4 ++--
+> >  include/linux/genhd.h                 |    2 +-
+> >  4 files changed, 11 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
+> > index df5b8345c41d..9b14b0c2c9c4 100644
+> > --- a/Documentation/admin-guide/iostats.rst
+> > +++ b/Documentation/admin-guide/iostats.rst
+> > @@ -100,7 +100,7 @@ Field 10 -- # of milliseconds spent doing I/Os (unsigned int)
+> >  
+> >      Since 5.0 this field counts jiffies when at least one request was
+> >      started or completed. If request runs more than 2 jiffies then some
+> > -    I/O time will not be accounted unless there are other requests.
+> > +    I/O time might be not accounted in case of concurrent requests.
+> >  
+> >  Field 11 -- weighted # of milliseconds spent doing I/Os (unsigned int)
+> >      This field is incremented at each I/O start, I/O completion, I/O
+> > @@ -143,6 +143,9 @@ are summed (possibly overflowing the unsigned long variable they are
+> >  summed to) and the result given to the user.  There is no convenient
+> >  user interface for accessing the per-CPU counters themselves.
+> >  
+> > +Since 4.19 request times are measured with nanoseconds precision and
+> > +truncated to milliseconds before showing in this interface.
+> > +
+> >  Disks vs Partitions
+> >  -------------------
+> >  
+> > diff --git a/block/bio.c b/block/bio.c
+> > index 0985f3422556..b1053eb7af37 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -1762,14 +1762,14 @@ void bio_check_pages_dirty(struct bio *bio)
+> >  	schedule_work(&bio_dirty_work);
+> >  }
+> >  
+> > -void update_io_ticks(struct hd_struct *part, unsigned long now)
+> > +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
+> >  {
+> >  	unsigned long stamp;
+> >  again:
+> >  	stamp = READ_ONCE(part->stamp);
+> >  	if (unlikely(stamp != now)) {
+> >  		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
+> > -			__part_stat_add(part, io_ticks, 1);
+> > +			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+> >  		}
+> >  	}
+> >  	if (part->partno) {
+> > @@ -1785,7 +1785,7 @@ void generic_start_io_acct(struct request_queue *q, int op,
+> >  
+> >  	part_stat_lock();
+> >  
+> > -	update_io_ticks(part, jiffies);
+> > +	update_io_ticks(part, jiffies, false);
+> >  	part_stat_inc(part, ios[sgrp]);
+> >  	part_stat_add(part, sectors[sgrp], sectors);
+> >  	part_inc_in_flight(q, part, op_is_write(op));
+> > @@ -1803,7 +1803,7 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
+> >  
+> >  	part_stat_lock();
+> >  
+> > -	update_io_ticks(part, now);
+> > +	update_io_ticks(part, now, true);
+> >  	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
+> >  	part_stat_add(part, time_in_queue, duration);
+> >  	part_dec_in_flight(q, part, op_is_write(req_op));
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index abfdcf81a228..4401b30a1751 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -1337,7 +1337,7 @@ void blk_account_io_done(struct request *req, u64 now)
+> >  		part_stat_lock();
+> >  		part = req->part;
+> >  
+> > -		update_io_ticks(part, jiffies);
+> > +		update_io_ticks(part, jiffies, true);
+> >  		part_stat_inc(part, ios[sgrp]);
+> >  		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
+> >  		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
+> > @@ -1379,7 +1379,7 @@ void blk_account_io_start(struct request *rq, bool new_io)
+> >  		rq->part = part;
+> >  	}
+> >  
+> > -	update_io_ticks(part, jiffies);
+> > +	update_io_ticks(part, jiffies, false);
+> >  
+> >  	part_stat_unlock();
+> >  }
+> > diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> > index d5c75df64bba..f1066f10b062 100644
+> > --- a/include/linux/genhd.h
+> > +++ b/include/linux/genhd.h
+> > @@ -467,7 +467,7 @@ static inline void free_part_info(struct hd_struct *part)
+> >  	kfree(part->info);
+> >  }
+> >  
+> > -void update_io_ticks(struct hd_struct *part, unsigned long now);
+> > +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end);
+> >  
+> >  /* block/genhd.c */
+> >  extern void device_add_disk(struct device *parent, struct gendisk *disk,
+> > 
+> 
+> Looks fine:
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+BTW, there is still some gap(%65 vs. 99%) between this fix and the original
+accounting(before applying Mike/Mikulas's 7 patches), and it might be
+one thing to improve in future.
+
+1) test, sda is single queue virtio-scsi, which is emulated by one HDD
+image
+
+2) fio test script:
+fio --direct=1 --size=128G --bsrange=4k-4k \
+		--runtime=20 --numjobs=1 \
+		--ioengine=libaio --iodepth=16 \
+		--iodepth_batch_submit=16 \
+		--iodepth_batch_complete_min=16 \
+		--group_reporting=1 --filename=/dev/sda \
+		--name=seq-test --rw=read
+
+3) result:
+- v5.6-rc with this patch
+Run status group 0 (all jobs):
+   READ: bw=79.4MiB/s (83.3MB/s), 79.4MiB/s-79.4MiB/s (83.3MB/s-83.3MB/s), io=155
+88MiB (1665MB), run=20001-20001msec
+
+Disk stats (read/write):
+  sda: ios=25039/0, merge=375596/0, ticks=18823/0, in_queue=4330, util=99.43%
+
+
+- commit 112f158f66cb (which is previous commit of 5b18b5a73760)
+Run status group 0 (all jobs):
+   READ: bw=81.4MiB/s (85.3MB/s), 81.4MiB/s-81.4MiB/s (85.3MB/s-85.3MB/s), io=166
+28MiB (1707MB), run=20001-20001msec
+
+Disk stats (read/write):
+  sda: ios=25749/0, merge=386236/0, ticks=17963/0, in_queue=12976, util=65.20%
+
+
+Thanks,
+Ming
+
