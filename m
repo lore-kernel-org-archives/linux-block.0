@@ -2,95 +2,103 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6F8C43331
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 248EAC1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:49:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDA2020722
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:12:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585145560;
-	bh=sKqIZkqsdPcIsiaarERjYdbTn9cwigKL9KvUAbZIfCY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OX3R9NypJarVko30eLytHLK/pRIMNKb7xyLXNtrAJPcyHUcmWpy8i/Pmn7X/zvQEk
-	 lEnQ+32RUa3WsVpELiXWGlBUNmVkW2jUGj+zf2yYTw8HastbHFExkaBdxdxMks6trV
-	 09ZsepmuSEbc4SHEOYNpW8APvZVh2KF6F8axH+ew=
+	by mail.kernel.org (Postfix) with ESMTP id E83CF2074D
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 14:49:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Vq2x/FtK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727601AbgCYOMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 10:12:40 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:35865 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727521AbgCYOMk (ORCPT
+        id S1727316AbgCYOtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 10:49:42 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:55967 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbgCYOtm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 10:12:40 -0400
-Received: by mail-qt1-f193.google.com with SMTP id m33so2231269qtb.3;
-        Wed, 25 Mar 2020 07:12:39 -0700 (PDT)
+        Wed, 25 Mar 2020 10:49:42 -0400
+Received: by mail-pj1-f68.google.com with SMTP id mj6so1115139pjb.5
+        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2020 07:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=N7nQ4ebz3lUmPEZItWMKhCh2iPFhfdeLlfUD+yoZmZE=;
-        b=FXRWZ4idTS/9SmW/h6ukMHo4O1sk+A7oUGDB5LsZQ8TKlldyn0o8yk88kVp2+kcSJC
-         lvfqLWPwknKK0boCQXOXvGH17M9KbmCpw+qMPU/AXfi4lJQSylRdzjjv1OKBrKM03K3L
-         8LGV2prz6EVm47zu9u+8bJ7y/P8CJulaulx5BkB7mfTRcwa0cGi4R1/7u49roDrt2BU/
-         VdLxEKJhSbSnALe6Vr1yEJRTQLxGWRICUVQOOfkQLA5ahpQka7smhjhAmLiB+I70lyZV
-         Fob0h/ZhNg+DZx+y0rC801gEIeQArWhhCPUrPRd5QTlXXyfMhQYoi+AByvtSvPuVBd0B
-         7eOA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XaoMEMejIpMESAc9WqR2GhKqL0OQjsDRcjnTUf3tMEU=;
+        b=Vq2x/FtK+b9c3oq56Ike2Db5P6DEsGVOcUUKgyP+GHz434GzReIN2kgefyNw323oln
+         gEOwym2ejfMVV0z9WW53ltBChF9b42YciEy+RTto6pk4bJSkBfdTZntslttgOV79WAn4
+         phzJGBtAkyesDelSw/CmbodkA/VJ9nLJoREr88utYFaEtFQwhyqJXch7vXa9fJiJcMzh
+         3t9QT7wHOSvQt5jeb2uq/RH/w2hTvHEbFvYs+3hbYntd5s/VsVJl95HMXf7p7CwN8z7I
+         ZlD6Be0pN4pgT3z30DBD7Iz7pw9aIth6Fz2uV27vzPXZnCvPxph/3PT8svIj3M9NNln/
+         A50w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=N7nQ4ebz3lUmPEZItWMKhCh2iPFhfdeLlfUD+yoZmZE=;
-        b=Khpea25LXugMQf7iWs582/WM4q5DtDxRakM4rlNY4DNC9pLtzRCmeNyWwY9Rwbbvax
-         c2ylOra5M5Yws7qVu6ZUm3cyMXQubmZfZUBgdr+LyiIVBas5i87lOcBBSabyLMChAcIO
-         zkw/J/31dCs5NgnhstGgLKPu2IgZuYCPu6f3oMPpOwylfjGeSzd2yXtiDDV0bQobQzxJ
-         sPLUUSCGC1+BJxWGxKxjb4dzXt4+3NCGOjLdUpWVo7AX1E533UpXV9UszEFNhKNMWboa
-         SUHgT6T+67Ci1lG8xHkQ02ktROXkoHw+DGd7BvIvrCI7x/r8RvgjhjdH48hQ3SlDDSKH
-         4fTw==
-X-Gm-Message-State: ANhLgQ1X8A9iHGbCGPkQ6rWCJv09aDT2swyi0KkUa7RFlnuesiMy9aT3
-        pxx1tX7qT3SVpB0p4rclfz29BLKOFd0=
-X-Google-Smtp-Source: ADFU+vviwj5kbNzPI4MpcV6D+abNsFlE2SyiEgoJJw/slckG95vaO1pSwoQcUzPy2GwpsjzhItDUEw==
-X-Received: by 2002:ac8:2911:: with SMTP id y17mr3065339qty.73.1585145558617;
-        Wed, 25 Mar 2020 07:12:38 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::d8d4])
-        by smtp.gmail.com with ESMTPSA id e130sm15532213qkb.72.2020.03.25.07.12.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2020 07:12:37 -0700 (PDT)
-Date:   Wed, 25 Mar 2020 10:12:36 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Weiping Zhang <zwp10758@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
-Message-ID: <20200325141236.GJ162390@mtj.duckdns.org>
-References: <cover.1584728740.git.zhangweiping@didiglobal.com>
- <20200324182725.GG162390@mtj.duckdns.org>
- <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XaoMEMejIpMESAc9WqR2GhKqL0OQjsDRcjnTUf3tMEU=;
+        b=dV1DGzFn2amQsjZXKij8DBQT0rtPcXkrrpT5duXSlz2vsxKjPiSk7JX60kBwQRB+AY
+         OYutTdoTS9FmDPg8wkGT7fvTV/Ng3uJ/ckYYcyqarDYOMKbuf1W6tmCtZ7UnO/BV7/qw
+         slIr6AFgtWEW5MqqXtgxANPOSj/gpm7yIhnFln3r8TABJATDBqoOcFF3vV1mK/TlGM7L
+         YuPnz8tGVPrt49LQGN18+5icDss/adZlAAGMpFvkCmpJ2C9e0cMmlHVVXiiR3tXEMEhB
+         8Za2Jn5G0APBXX3LqfeoP8bzbUjDPVujaPpxwLfb23ylL56d6641Xne20bgQnOrnEqxo
+         jREA==
+X-Gm-Message-State: ANhLgQ0sKv6AHSGH2wwTE09XDH26eChkatRNGV1ll4kHMzmMOklUT/AX
+        +z3md9Cy5ZSh2yPt3KAwa/LI0Q==
+X-Google-Smtp-Source: ADFU+vtAJhJaAlT8lvsDcE+zhPZE/r4CdTmaK8ibgJdiL7XXlGU4pvlo03OdxzU01Pwam6evPWdUHw==
+X-Received: by 2002:a17:90b:4d07:: with SMTP id mw7mr4246463pjb.103.1585147780821;
+        Wed, 25 Mar 2020 07:49:40 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id i11sm4668038pje.30.2020.03.25.07.49.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Mar 2020 07:49:40 -0700 (PDT)
+Subject: Re: [PATCH v4 0/3] block/diskstats: more accurate io_ticks and
+ optimization
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <158514148436.7009.1234367408038809210.stgit@buzz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0d8e3459-6d67-72ae-c1df-5335d2a49bf7@kernel.dk>
+Date:   Wed, 25 Mar 2020 08:49:38 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
+In-Reply-To: <158514148436.7009.1234367408038809210.stgit@buzz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 08:49:24PM +0800, Weiping Zhang wrote:
-> For this patchset, iotrack can work well, I'm using it to monitor
-> block cgroup for
-> selecting a proper io isolation policy.
+On 3/25/20 7:07 AM, Konstantin Khlebnikov wrote:
+> Simplified estimation for io_ticks introduced in patch
+> https://lore.kernel.org/linux-block/20181206164122.2166-5-snitzer@redhat.com/
+> could be very inaccurate for request longer than jiffy (i.e. any HDD)
+> 
+> There is at least one another report about this:
+> https://lore.kernel.org/linux-block/20200324031942.GA3060@ming.t460p/
+> See detail in comment for first patch.
+> 
+> v1: https://lore.kernel.org/lkml/155413438394.3201.15211440151043943989.stgit@buzz/
+> v2: https://lore.kernel.org/lkml/158314549775.1788.6529015932237292177.stgit@buzz/
+> v3: https://lore.kernel.org/lkml/158503038812.1955.7827988255138056389.stgit@buzz/
+>  * update documentation
+>  * rebase to current linux-next
+>  * fix compilation for CONFIG_SMP=n
+> v4:
+>  * rebase to for-5.7/block
+>  * make part_stat_read_all static in block/genhd.c
 
-Yeah, I get that but monitoring needs tend to diverge quite a bit
-depending on the use cases making detailed monitoring often need fair
-bit of flexibility, so I'm a bit skeptical about adding a fixed
-controller for that. I think a better approach may be implementing
-features which can make dynamic monitoring whether that's through bpf,
-drgn or plain tracepoints easier and more efficient.
-
-Thanks.
+Applied for 5.7, thanks.
 
 -- 
-tejun
+Jens Axboe
+
