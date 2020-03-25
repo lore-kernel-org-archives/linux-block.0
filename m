@@ -2,168 +2,243 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB1A2C54FCF
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 02:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2688DC54FCF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 02:23:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E5A22072E
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 02:10:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E86FA2072E
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 02:23:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KW9a4Oq0";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="iGh9yFv4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727230AbgCYCKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 22:10:47 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38128 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727212AbgCYCKr (ORCPT
+        id S1727348AbgCYCX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 22:23:29 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:45352 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727253AbgCYCX2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 22:10:47 -0400
-Received: by mail-pg1-f196.google.com with SMTP id x7so395628pgh.5
-        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2020 19:10:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=2G7HyyAUCMvTRRqYv5M0bsEQtQlNMh/QkxpcRsDEGEc=;
-        b=VoL1bFgSBCsnKC6O+oOK2OAh0OqQa3pkauC+i92U5pWuqr9dSMHtyvlpIPONvOR8rC
-         FmnQ1+a6MpBjf24DxYDBcbjEKxmhk0+Gyvz8og6pLkr7/77SKKsvTcgYmhiukbRG4WJl
-         4SLKok01e5EUhuIuUgemM44eXPAtmt12x94XJzr9ittsx1OGhcNDfhE5eKZ6DXnGVCQ3
-         S9ovjqeV3IjJP91NVnkjU4MJ0Jtf7fft1lXPih08f7lt4kh2VeVMkYM+byGXmURhAVvH
-         pmCe3Fszc0tOZnFYzR5YrDafOy6evJbj1EMFb1i8w1r5kx/gx1Ax9viLP8Ymch2xgwK/
-         CMIg==
-X-Gm-Message-State: ANhLgQ3bic4UioRuCohZWfHyT788MdXkUlcW5jn8haddXj0TeTlaJWzl
-        vJRKXolc9nycIWd+aBkd9Sg=
-X-Google-Smtp-Source: ADFU+vuNvzV1+DNDtwqojqMZU12aMUSAoL/OAQcZO0+hRnsla4GGYw0HfAXFuOu/WpSNYZ1ultQ4VA==
-X-Received: by 2002:a62:d407:: with SMTP id a7mr840673pfh.57.1585102245501;
-        Tue, 24 Mar 2020 19:10:45 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:5d47:ccb1:eaa5:8a3c? ([2601:647:4000:d7:5d47:ccb1:eaa5:8a3c])
-        by smtp.gmail.com with ESMTPSA id f69sm17376622pfa.124.2020.03.24.19.10.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2020 19:10:44 -0700 (PDT)
-Subject: Re: [PATCH blktests v3 4/4] Add a test that triggers the
- blk_mq_realloc_hw_ctxs() error path
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20200320222413.24386-1-bvanassche@acm.org>
- <20200320222413.24386-5-bvanassche@acm.org>
- <20200323112909.wrbnlvdioe37mni7@beryllium.lan>
- <e4248d0c-445d-55b2-36c7-05b453f6d343@acm.org>
- <20200324104132.kihzqmgrcel3ufco@beryllium.lan>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <9c9aaf03-a8c7-03a1-16cd-128b05a0c6b2@acm.org>
-Date:   Tue, 24 Mar 2020 19:10:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200324104132.kihzqmgrcel3ufco@beryllium.lan>
-Content-Type: text/plain; charset=utf-8
+        Tue, 24 Mar 2020 22:23:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585103007; x=1616639007;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=ogt87FFyUKj4vlLNQfa/tXCoRLXaYp6vbYtMAQ5o1AE=;
+  b=KW9a4Oq099LXGQ3ujX+vIOb+wITQFZ9D5DxHpk+dl+cfuzDCVBu6VgBr
+   01EWMfL6l6muyr0lkCgVOK86voHbMuZbARNUv5hwPxhmNPygbOgkIB1+S
+   SdNp6Vdyyaj2dEpsITaP83e52XQIx/OAQAkbnnALRxVXY0ckXL8dlCmH0
+   bmONsBL0KwulYH9WXikyIeKCUoJLmquY+ZLaYVcdxheLw68/jZ6/dUtRo
+   KjYVZbZw/ZIsyPICvYLs7PU0iOfZ0SxB/3+umDN8S+FMjyubcA13aP4IS
+   ry44B1yF+LxvNdHF70/orIExOW4dr/CLQf51dcJQzIBGjvNAyb9ciQt9e
+   Q==;
+IronPort-SDR: uqYqLkekC/pUNejQoIKVrWYwqsHzaTZ4J7Xy7Djf6gjKjfeiQHbuKyIPombWnmFAynRK9snmbW
+ Hj4P+BO8EoI6vyxyVuVJ2eP3UDL0lEctWhb98V63i3gTUI8niwASrYOgWLtqkEIXycypGmRFce
+ j3zAjL7zOKybaUnAn1j5Gohc2c6Vx/Uqb+Y+Y/szTHCOl6bjkEKIs/7opDmhTf1tJl3A1l8ss6
+ yQEWIMsetK1AP30t8BGgEZoy6B2JtUfWKZT+gCObEnhkazlxqWgHDukuxz0NXqKJ3BZWGCzsy4
+ XAU=
+X-IronPort-AV: E=Sophos;i="5.72,302,1580745600"; 
+   d="scan'208";a="133419834"
+Received: from mail-dm6nam10lp2108.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.108])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 10:23:26 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O7kqt4Cbv2DoiEd33Fhq8e5lyn4EtIdMIgD0gQZpwfbgaLtA8p6G64n+1QybK4n+r6apvwUlnZ9zaZBsl1mowfSwOh/LuatIu3ntfuZbLhTN2DwyGaGbTfmXQFJoOAGgLc2h2Rd5lEUiyLl7uzXvbpuZwPOY9dbVESe/aR5OUOETfqsWmPAJXg/fOh/hrd2dFUJmQZixUPbwrFZ3AUSYhrsRm5fsvIWfSYEgDz+ZdMosWjPv2r9WX7S/5Z5yxH9+UmFpOSQLD3uIE19hUZotM2iKYrecQEAKzfSoQYUqp7HLASIlhXApPju/+CDA/hHvFeU6z6T2Kvg6+XgSLwoNBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l3/yocq2CNftyzwGRicNPPcGiKD7Q3Tj7+tENvYupsE=;
+ b=X9nwlg9ukhRNbepKEznOatwHTwCkAhi7u9/79//u+AH6F6OLPN8pS61Bwx5PDKmX8Nv7fy66qReFapqzP3KwQb/0liW27Dj8TNBrli3ngU0cL8K8aljiVsqBUKjJFKn46YicHo4T8UrmEZeEuDhJwsvPJyKikj6mCy6WvKcUg2CGHqJmg2VskysMk9GeHIjI5awafBiPe/Q3srUhlOJIh2ae8X1am8FBeEtvTUzRKvihvb6OA2/BmrLRFAIVWapMKK54oqReJsx/DQbGMbySBx+Y7PfTkgNTcVuWZJIfolLQOwl7KDrhFtYEGNLckejqV+hBttrEND7WH8he0Zw4bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l3/yocq2CNftyzwGRicNPPcGiKD7Q3Tj7+tENvYupsE=;
+ b=iGh9yFv4IpzkWRDkphbwKFrDR3j6XJRWPJn+d7AcmklCzSCb9Gmtgo8bvVwi3wo/HfhTmVIVMIOCSQBym9Wg3xg82QleL2ruYyEmPfIflITOuDeCNPKVa0aGUHELx2labLe3cWiq2oevszQ0oGhateUoRLoggoVR6v+lx30zQUY=
+Received: from CO2PR04MB2343.namprd04.prod.outlook.com (2603:10b6:102:12::9)
+ by CO2PR04MB2359.namprd04.prod.outlook.com (2603:10b6:102:a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.22; Wed, 25 Mar
+ 2020 02:23:24 +0000
+Received: from CO2PR04MB2343.namprd04.prod.outlook.com
+ ([fe80::c1a:6c0f:8207:580b]) by CO2PR04MB2343.namprd04.prod.outlook.com
+ ([fe80::c1a:6c0f:8207:580b%7]) with mapi id 15.20.2835.023; Wed, 25 Mar 2020
+ 02:23:24 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     Sasha Levin <sashal@kernel.org>, Bob Liu <bob.liu@oracle.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH resend] dm zoned: remove duplicated nr_rnd_zones
+ increasement
+Thread-Topic: [PATCH resend] dm zoned: remove duplicated nr_rnd_zones
+ increasement
+Thread-Index: AQHWAd9y7bntyyl1FkW2/iZtyzwrUw==
+Date:   Wed, 25 Mar 2020 02:23:24 +0000
+Message-ID: <CO2PR04MB2343A87740F1201B0DA3EAE2E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
+References: <20200324132245.27843-1-bob.liu@oracle.com>
+ <20200325010157.62A0220719@mail.kernel.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [129.253.182.57]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 5a250248-a74d-4408-092e-08d7d0637f0b
+x-ms-traffictypediagnostic: CO2PR04MB2359:
+x-microsoft-antispam-prvs: <CO2PR04MB23595F1BF676E0CA2DB6C589E7CE0@CO2PR04MB2359.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:3044;
+x-forefront-prvs: 0353563E2B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(136003)(366004)(39860400002)(376002)(346002)(66446008)(64756008)(53546011)(4326008)(66946007)(91956017)(9686003)(66556008)(55016002)(7696005)(66476007)(76116006)(6506007)(316002)(5660300002)(478600001)(52536014)(2906002)(71200400001)(8936002)(33656002)(186003)(81156014)(81166006)(110136005)(8676002)(26005)(54906003)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:CO2PR04MB2359;H:CO2PR04MB2343.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: G2kP1dbEmGURN3XgAFDCDPD1jLwb+M7kPew31GI34s03WzKux0rpeu1dW1/hb5WSUhU85ZRzkgfJzREShG6RFkf6mERC41NMKdDJpTIc1zL7my6G3iw3sBuTgwzslFl2mjbJ9MrDf2YI7/r8JEZdlhbunCElboCgsk0J5iqoc+W+ktrEt5zUpsjhkZIahV9Yq23/QlwKZYadABiPf+RUQAJbZFRJbVOCtfgQRy9negdHq6afDM/Bt5KD00Xl2vxoJidcN5n5vuwKWU+3ytUQBjxzWdodkihbaOzI3Z3id4L3NVCrKcN6YREkRs2YuD6BhAfGWWi4YmGFNNmHk1E7EEr72NLApagAgXkfe5FOW6yjuZGQ/qInF3zMQHQe3KrRIxsnPIaxA67x/DGqqBUW2L0RW5mn5XulmPlMdO7SVLBGo2Mz9Fks/MCUkJa5oXiS
+x-ms-exchange-antispam-messagedata: +cbFIS8LnhZ7WdD6tZoA4NExgQ4jZZt/yZwQoH2DRGZ9B+YSkba6SRdF1U+tudsQiB+SRwUsVIe0GYCBwsQZZTaLNIYwVQAJn8v8++M/tPY+Q8OcPrKD6lq3TbtImYo1Remt5IR2ecGAmM9bmVMSWQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a250248-a74d-4408-092e-08d7d0637f0b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 02:23:24.6714
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0T3VnvaeYRorgXaXGUoyrseV9G/A/3eAXFc0/fMHzSg54WQfUoVBkNdX5zJT0A/jdoejbdar5bfjyaXR4BMGsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2359
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-03-24 03:41, Daniel Wagner wrote:
-> Hi Bart,
-> 
-> On Mon, Mar 23, 2020 at 08:09:27PM -0700, Bart Van Assche wrote:
->> On 2020-03-23 04:29, Daniel Wagner wrote:
->>> On Fri, Mar 20, 2020 at 03:24:13PM -0700, Bart Van Assche wrote:
->>>> +test() {
->>>> +	local i sq=/sys/kernel/config/nullb/nullb0/submit_queues
->>>> +
->>>> +	: "${TIMEOUT:=30}"
->>>> +	if ! _init_null_blk nr_devices=0 queue_mode=2 "init_hctx=$(nproc),100,0,0"; then
-> 
->>From the kernel code:
-> 
-> 	/* "<interval>,<probability>,<space>,<times>" */
-> 
-> Don't you need to set the times attribute to -1 in order to inject the
-> everytime the interval is reached? If I understood it correctly,
-> with times=0 no failure is injected.
-> 
-> BTW, I've had to change it to init_hctx=$(($(nproc)+1)) to pass
-> the initial __configure_null_blk call before the first fail hits.
-
-Hi Daniel,
-
-I will make both changes in the init_hctx string. Not sure how this
-escaped from my attention.
-
->>> Doesn't make the $(nproc) the test subtil depending on the execution
->>> environment?
->> The value $(nproc) has been chosen on purpose. The following code from
->> the test script:
->>
->> +			echo 1 >$sq
->> +			nproc >$sq
->>
->> triggers (nproc + 1) calls to null_init_hctx().So injecting a failure
->> after (nproc) null_init_hctx() calls triggers the following pattern:
->> * The first blk_mq_realloc_hw_ctxs() call fails after (nproc - 1)
->> null_init_hctx() calls.
->> * The second blk_mq_realloc_hw_ctxs() call fails after (nproc - 2)
->> null_init_hctx() calls.
->> ...
->> * The (nproc) th blk_mq_realloc_hw_ctxs() call fails after one
->> null_init_hctx() call.
->> * The (nproc + 1) th blk_mq_realloc_hw_ctxs() call succeeds.
->>
->> I'm not sure to trigger this behavior without using the $(nproc) value?
-> 
-> Okay, I get the idea how you want to test.
-> 
-> Is the dependency on nproc because null_blk expects submit_queue <= online
-> cpus?
-
-That's correct. I want to test with the maximum number of submit queues
-allowed, hence the use of $(nproc).
-
-> Though why the 100?
-> 
-> 		for ((i=0;i<100;i++)); do
-> 			echo 1 >$sq
-> 			nproc >$sq
-> 		done
-
-No particular reason other than "a significant number of iterations".
-
-> And shouldn't be there a test for error?
-
-All I want to test is the absence of kernel crashes. The blktests
-framework already inspects dmesg for the absence of kernel crashes. So I
-don't think that I have to check whether or not the quoted sysfs writes
-succeed.
-
-Thanks,
-
-Bart.
+On 2020/03/25 10:02, Sasha Levin wrote:=0A=
+> Hi=0A=
+> =0A=
+> [This is an automated email]=0A=
+> =0A=
+> This commit has been processed because it contains a "Fixes:" tag=0A=
+> fixing commit: 3b1a94c88b79 ("dm zoned: drive-managed zoned block device =
+target").=0A=
+> =0A=
+> The bot has tested the following trees: v5.5.11, v5.4.27, v4.19.112, v4.1=
+4.174.=0A=
+> =0A=
+> v5.5.11: Build OK!=0A=
+> v5.4.27: Failed to apply! Possible dependencies:=0A=
+>     5eac3eb30c9a ("block: Remove partition support for zoned block device=
+s")=0A=
+>     6c1b1da58f8c ("block: add zone open, close and finish operations")=0A=
+>     7fc8fb51a143 ("null_blk: clean up report zones")=0A=
+>     ad512f2023b3 ("scsi: sd_zbc: add zone open, close, and finish support=
+")=0A=
+>     c7a1d926dc40 ("block: Simplify REQ_OP_ZONE_RESET_ALL handling")=0A=
+>     c98c3d09fca4 ("block: cleanup the !zoned case in blk_revalidate_disk_=
+zones")=0A=
+>     ceeb373aa6b9 ("block: Simplify report zones execution")=0A=
+>     d41003513e61 ("block: rework zone reporting")=0A=
+>     d9dd73087a8b ("block: Enhance blk_revalidate_disk_zones()")=0A=
+>     dd85b4922de1 ("null_blk: return fixed zoned reads > write pointer")=
+=0A=
+>     e3f89564c557 ("null_blk: clean up the block device operations")=0A=
+> =0A=
+> v4.19.112: Failed to apply! Possible dependencies:=0A=
+>     515ce6061312 ("scsi: sd_zbc: Fix sd_zbc_report_zones() buffer allocat=
+ion")=0A=
+>     5f832a395859 ("scsi: sd_zbc: Fix sd_zbc_check_zones() error checks")=
+=0A=
+>     a2d6b3a2d390 ("block: Improve zone reset execution")=0A=
+>     a91e138022bc ("block: Introduce blkdev_nr_zones() helper")=0A=
+>     bd976e527259 ("block: Kill gfp_t argument of blkdev_report_zones()")=
+=0A=
+>     bf5054569653 ("block: Introduce blk_revalidate_disk_zones()")=0A=
+>     d2e428e49eec ("scsi: sd_zbc: Reduce boot device scan and revalidate t=
+ime")=0A=
+>     d41003513e61 ("block: rework zone reporting")=0A=
+>     e76239a3748c ("block: add a report_zones method")=0A=
+> =0A=
+> v4.14.174: Failed to apply! Possible dependencies:=0A=
+>     08e18eab0c57 ("block: add bi_blkg to the bio for cgroups")=0A=
+>     30e5e929c7bf ("nvme: don't pass struct nvme_ns to nvme_config_discard=
+")=0A=
+>     5238dcf4136f ("block: replace bio->bi_issue_stat with bio-specific ty=
+pe")=0A=
+>     53cfdc10a95d ("blk-throttle: fix null pointer dereference while throt=
+tling writeback IOs")=0A=
+>     5d47c89f29ea ("dm: clear all discard attributes in queue_limits when =
+discards are disabled")=0A=
+>     8b904b5b6b58 ("block: Use blk_queue_flag_*() in drivers instead of qu=
+eue_flag_*()")=0A=
+>     a2d6b3a2d390 ("block: Improve zone reset execution")=0A=
+>     b889bf66d001 ("blk-throttle: track read and write request individuall=
+y")=0A=
+>     bd976e527259 ("block: Kill gfp_t argument of blkdev_report_zones()")=
+=0A=
+>     bf5054569653 ("block: Introduce blk_revalidate_disk_zones()")=0A=
+>     c8b5fd031a30 ("mmc: block: Factor out mmc_setup_queue()")=0A=
+>     d41003513e61 ("block: rework zone reporting")=0A=
+>     d70675121546 ("block: introduce blk-iolatency io controller")=0A=
+>     e447a0151f7c ("zram: set BDI_CAP_STABLE_WRITES once")=0A=
+>     ed754e5deeb1 ("nvme: track shared namespaces")=0A=
+> =0A=
+> =0A=
+> NOTE: The patch will not be queued to stable trees until it is upstream.=
+=0A=
+> =0A=
+> How should we proceed with this patch?=0A=
+> =0A=
+=0A=
+Fixing the conflict is simple. Bob or I can do it when Greg processes=0A=
+the patch once it is upstream ? Usually Greg sends a notice for such=0A=
+patches that do not apply cleanly.=0A=
+=0A=
+For reference, the fixed up patch for 4.19 is below.=0A=
+=0A=
+commit 48414897d7fde2c2a561a9f6d4b58b62ccb63e68 (HEAD -> linux-4.19.y)=0A=
+Author: Bob Liu <bob.liu@oracle.com>=0A=
+Date:   Tue Mar 24 21:22:45 2020 +0800=0A=
+=0A=
+    dm zoned: remove duplicated nr_rnd_zones increasement=0A=
+=0A=
+    zmd->nr_rnd_zones was increased twice by mistake.=0A=
+    The other place:=0A=
+    1131                 zmd->nr_useable_zones++;=0A=
+    1132                 if (dmz_is_rnd(zone)) {=0A=
+    1133                         zmd->nr_rnd_zones++;=0A=
+                                            ^^^=0A=
+=0A=
+    Cc: stable@vger.kernel.org=0A=
+    Fixes: 3b1a94c88b79 ("dm zoned: drive-managed zoned block device target=
+")=0A=
+    Signed-off-by: Bob Liu <bob.liu@oracle.com>=0A=
+    Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+=0A=
+diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.=
+c=0A=
+index 086a870087cf..53eb21343b11 100644=0A=
+--- a/drivers/md/dm-zoned-metadata.c=0A=
++++ b/drivers/md/dm-zoned-metadata.c=0A=
+@@ -1105,7 +1105,6 @@ static int dmz_init_zone(struct dmz_metadata *zmd, st=
+ruct dm_zone *zone,=0A=
+=0A=
+        if (blkz->type =3D=3D BLK_ZONE_TYPE_CONVENTIONAL) {=0A=
+                set_bit(DMZ_RND, &zone->flags);=0A=
+-               zmd->nr_rnd_zones++;=0A=
+        } else if (blkz->type =3D=3D BLK_ZONE_TYPE_SEQWRITE_REQ ||=0A=
+                   blkz->type =3D=3D BLK_ZONE_TYPE_SEQWRITE_PREF) {=0A=
+                set_bit(DMZ_SEQ, &zone->flags);=0A=
+=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
