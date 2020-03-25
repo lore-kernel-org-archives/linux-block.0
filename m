@@ -2,187 +2,139 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7500FC43331
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C22C1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 10:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D8652078E
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 10:07:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585130862;
-	bh=LlBkz1Uz0Po1b07BApsFzd2kMROaDUHTi2EMx+A2LFc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Yjul7BrhgPiCowHMi3+mCXTVCK5mNVqcflfs+V7FXmyKIsIa5FjUNFxj9f/20FaLm
-	 OLrOM2xYRb+FTdVEQf0tgIchNZxU8upPCDUOEvDJzY7rfKZWv9OsTUM0WPxris/z6t
-	 kzjrhFpxtouwiVFbrXMxZ5Gc1rVnH6apko2qgpuU=
+	by mail.kernel.org (Postfix) with ESMTP id 2DE7320775
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 10:15:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="I6LLN6sC";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="byMlhMvM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727332AbgCYKHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 06:07:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37686 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbgCYKHl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 06:07:41 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 622082077D;
-        Wed, 25 Mar 2020 10:07:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585130860;
-        bh=LlBkz1Uz0Po1b07BApsFzd2kMROaDUHTi2EMx+A2LFc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hEFQD3NlvWZHEqcpf6kr2/JRP+mYs2HhfBrSsJ/FcDmtl6c5WVfg+gPZDGkisSNNG
-         Jd27AFBmay/KyAG2PCSf4OgPc5knaF9/WBh+aJz8G3GSyvjVc5lbeM6VfzxGWsQltE
-         uUGMYw2bXc7eZ9+dV9eFwY4toPdtHnwQwRXJLkaY=
-Date:   Wed, 25 Mar 2020 11:07:36 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Rantala, Tommi T. (Nokia - FI/Espoo)" <tommi.t.rantala@nokia.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: 4.19 LTS high /proc/diskstats io_ticks
-Message-ID: <20200325100736.GA3083079@kroah.com>
-References: <564f7f3718cdc85f841d27a358a43aee4ca239d6.camel@nokia.com>
+        id S1726103AbgCYKPN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 06:15:13 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:63118 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726073AbgCYKPN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Mar 2020 06:15:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585131313; x=1616667313;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=AZVqA6RmlTg8Fq053QJQD9wiWZN6+XZK9agyYCYrqjE=;
+  b=I6LLN6sC29tLCjZkQpKoPT61xrb7qzoA1pKSJ64sEULMjL22w0IWpaSz
+   btE2v/anLBD2Aw6fgHZrO8mzFsWansTobA80QWNohKpvdq9CCyA/bzySN
+   mQSDWDsiWO2yY0TgzQZYw7efbQMv5eLvTWHhDaRHkhwD+TQ2TB/ncTgfd
+   T5G2k83oRPdyOsLr8wmQt/DhEMw5IcYbGo9Egec38mWk1iB03ny+yle+h
+   HdGAQokJ04Cgu9EgtQ2rNPKEnaNrVw3nXTGaOTB/p7AJYR+UcUGrMZEzg
+   G131RwQ6YJpW6482HlalMSDNsJtJ2duCbsbZJwFqVIO4rF+tk/JUJc6LE
+   g==;
+IronPort-SDR: 3dqIsgURmklZxdm1wu69zRK7yLX6gMT77Z5BQcERpKdHuVtpL0wQn+roS0ZMEC6v/yipGMMvmm
+ ftxzOra9lREhfTQ0LAmNPVqkoDgWsOnbqgtTd/b6UvfyccZDaWt+dGsB/flmXWHvEpHphYa0Vy
+ ZTOdlsVpK3Cy7AoJYoCs/iaOsgZVRuk0FUEk68pRDKk0IEC7x6e56+BqGzDoF3rNFWnZKvlG98
+ l6nbs7yUOBt/z8jwr+BaJcNxuSwOadv5bjJtqfquAu7tyApGaW0LkUS9vPABIwWPYzln6VLVQw
+ eJI=
+X-IronPort-AV: E=Sophos;i="5.72,304,1580745600"; 
+   d="scan'208";a="133896589"
+Received: from mail-co1nam11lp2175.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.175])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 18:15:12 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OBiOfCDcO+GlXnesfGI9F426jZ3Me3sAx7COwLtewYmk2S4VOcsF68Hs38z5zIHUv42zpLLJ/Co8JRn+9QqW6N890dIpKpoGN4l0m3lWx5t5XuVUdUCTlVq8KlBkq5ADMaX8ui6zsIwJSmh8CAbUyqhwZHvxlZ3RuulqBYz4kZbQEzr67Ey1kylqOYjV6lQQakM+BC3Q09TITub4kyTwDLeWb7qBF5B3knv/AdDMlVDDuwX5hxuyYtyk93M70X/Vfa71af867LQqYCGgGNc5AkeKb5efO0xSEjIhA0IHITqNKN8FKMwROSstiJYjccrukb0IP2oNBWS9+RuDKFuXFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1mDcCA00tr31iefPVRzt+aXfb3TdrXs1MIdi7VDKWwM=;
+ b=SuG/UdlaTeEzYcQ8Z5wQOxurmZ8S6/F2KnEDI7EyaHbA0+WEJgIe02PsBPBKcbj81PMDBGWJ+9QB0Gu31smDY1RnVQvJZiMYxKFh1ioVeU7zTDRJ6onrN6Jwx3ZLmiMejnFv4sJQTK/InmBR1HYiDK8+lnLC3dtIyoW/B/G4mnYOt2aZqpZtmIiJGgzkav3N7sGaOHqdVwO64xNxjmWbnrPtWNDQbANy0bDgrLUyKekGyco/OrKasbg15VsG0aUBGHLJckw10hdugC1EovVFAJTv1fvgk5FHFWdo08XWbCtte1fiu/2XUvZySMz1pO102iGaG3HNuJ/s1DrsPnNywA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1mDcCA00tr31iefPVRzt+aXfb3TdrXs1MIdi7VDKWwM=;
+ b=byMlhMvMukLdqhWhLJqRqwvMpDejTyra9D9f+63gtTgd6Fb6NVaMGzSDAZnk3F+wyViJVMmk21KFFcAP55A9um+2hPSNNyvw/Z/hBVLJMnTNBiDUlL5aAnw7IWacVFhmempTp/RMQY4XZHR+h3HRUb2fELwUF2IUCAybzvs5DqY=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3712.namprd04.prod.outlook.com
+ (2603:10b6:803:49::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.22; Wed, 25 Mar
+ 2020 10:15:10 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2835.017; Wed, 25 Mar 2020
+ 10:15:10 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     "hch@infradead.org" <hch@infradead.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Subject: Re: [PATCH v2 10/11] iomap: Add support for zone append writes
+Thread-Topic: [PATCH v2 10/11] iomap: Add support for zone append writes
+Thread-Index: AQHWAfBwrmUQROWSvUa2jUG+SCcnLQ==
+Date:   Wed, 25 Mar 2020 10:15:10 +0000
+Message-ID: <SN4PR0401MB3598C48C5748081BF26AF98F9BCE0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
+ <20200324152454.4954-11-johannes.thumshirn@wdc.com>
+ <20200324154131.GA32087@infradead.org>
+ <SN4PR0401MB35980056EFCD6D0003463F939BCE0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20200325094828.GA20415@infradead.org>
+ <CO2PR04MB2343F14FFF07D76BF7CE9D10E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
+ <20200325100145.GB20415@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 99e04e9b-8a6f-4486-ada4-08d7d0a566c2
+x-ms-traffictypediagnostic: SN4PR0401MB3712:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN4PR0401MB3712725010ED58BA0D845C1C9BCE0@SN4PR0401MB3712.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0353563E2B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(39860400002)(346002)(376002)(136003)(396003)(4744005)(5660300002)(110136005)(54906003)(6636002)(76116006)(52536014)(316002)(9686003)(91956017)(8676002)(55016002)(8936002)(33656002)(81156014)(66556008)(81166006)(64756008)(66476007)(66946007)(4326008)(66446008)(53546011)(186003)(478600001)(71200400001)(7696005)(86362001)(26005)(2906002)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR0401MB3712;H:SN4PR0401MB3598.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5qd7C9EZkgDxJ8A0ZCyf0eOKbxJyonnDlBUheNe+mGd+FLt7/mmFWq2DwSbEWaWa8MjM6yvLGs6TUUeyiE9B9MSVfXe+FcIe+/MMcy3pKGjblIHjQ1TYEQHuABGQ8pnrsWI9KcWVDGEyAbv4c0AjRIDqVx1N5GL2mM497X7ns4xtpoCrtE9nKAjh5ghtK5rFrW5nQ0lq/CyfHOzq7jS6BA4U4dZIETpyw/ywzcPpXoRhwOFlD+m3Ay6Ujl6xhhErt4GjMQoJLGwsdFBw3y4o9YRuoW3UZaEbBtYaXm9S5Mgk9lp8Jd3TvdAbY6ov2Irx8BYmb0IEF0UmF9A9jR3KNupn2dJnjTKhJ/3oSMzsEiFCwoWv9rfNfxGgIDujWFCa0pvdtoGZHIlV0zqfWmnL6Bff7QfoY01pwRwfCoNgARvdvtjO1+5jZuCRAKfvdXk/
+x-ms-exchange-antispam-messagedata: e2U+e3HW3kmT6crS68pIItkIlkpfoim4am5i2csqjdMlEz4VMM3j7lwLsoaEjcq+tZB6k4P+pcyz5ALziWW5HNwmEGGEq8eM58tWAbmMt+RWlFcPuzbU46GhnqDzPFo+1j5kHpBo/CvMy3q0W1805g==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <564f7f3718cdc85f841d27a358a43aee4ca239d6.camel@nokia.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99e04e9b-8a6f-4486-ada4-08d7d0a566c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 10:15:10.5541
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3rqkf5/aXW1clqRIfY+fMcY9XQdMRasVL1giJf1rSqykawSk5IHQnADNWrCDUwiOUQIYyJS+XqJFviDzSeEeV5AgJtqdEWsa9rsN8G22URg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3712
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 10:02:41AM +0000, Rantala, Tommi T. (Nokia - FI/Espoo) wrote:
-> Hi,
-> 
-> Tools like sar and iostat are reporting abnormally high %util with 4.19.y
-> running in VM (the disk is almost idle):
-> 
->   $ sar -dp
->   Linux 4.19.107-1.x86_64   03/25/20    _x86_64_   (6 CPU)
-> 
->   00:00:00        DEV       tps      ...     %util
->   00:10:00        vda      0.55      ...     98.07
->   ...
->   10:00:00        vda      0.44      ...     99.74
->   Average:        vda      0.48      ...     98.98
-> 
-> The numbers look reasonable for the partition:
-> 
->   # iostat -x -p ALL 1 1
->   Linux 4.19.107-1.x86_64   03/25/20    _x86_64_  (6 CPU)
-> 
->   avg-cpu:  %user   %nice %system %iowait  %steal   %idle
->             10.51    0.00    8.58    0.05    0.11   80.75
-> 
->   Device            r/s     ...  %util
->   vda              0.02     ...  98.25
->   vda1             0.01     ...   0.09
-> 
-> 
-> Lots of io_ticks in /proc/diskstats:
-> 
-> # cat /proc/uptime
-> 45787.03 229321.29
-> 
-> # grep vda /proc/diskstats
->  253      0 vda 760 0 38498 731 28165 43212 1462928 157514 0 44690263
-> 44812032 0 0 0 0
->  253      1 vda1 350 0 19074 293 26169 43212 1462912 154931 0 41560 150998
-> 0 0 0 0
-> 
-> 
-> Other people are apparently seeing this too with 4.19:
-> https://kudzia.eu/b/2019/09/iostat-x-1-reporting-100-utilization-of-nearly-idle-nvme-drives/
-> 
-> 
-> I also see this only in 4.19.y and bisected to this (based on the Fixes
-> tag, this should have been taken to 4.14 too...):
-> 
-> commit 6131837b1de66116459ef4413e26fdbc70d066dc
-> Author: Omar Sandoval <osandov@fb.com>
-> Date:   Thu Apr 26 00:21:58 2018 -0700
-> 
->   blk-mq: count allocated but not started requests in iostats inflight
-> 
->   In the legacy block case, we increment the counter right after we
->   allocate the request, not when the driver handles it. In both the legacy
->   and blk-mq cases, part_inc_in_flight() is called from
->   blk_account_io_start() right after we've allocated the request. blk-mq
->   only considers requests started requests as inflight, but this is
->   inconsistent with the legacy definition and the intention in the code.
->   This removes the started condition and instead counts all allocated
->   requests.
-> 
->   Fixes: f299b7c7a9de ("blk-mq: provide internal in-flight variant")
->   Signed-off-by: Omar Sandoval <osandov@fb.com>
->   Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index c3621453ad87..5450cbc61f8d 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -95,18 +95,15 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx
-> *hctx,
->  {
->         struct mq_inflight *mi = priv;
->  
-> -       if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
-> -               /*
-> -                * index[0] counts the specific partition that was asked
-> -                * for. index[1] counts the ones that are active on the
-> -                * whole device, so increment that if mi->part is indeed
-> -                * a partition, and not a whole device.
-> -                */
-> -               if (rq->part == mi->part)
-> -                       mi->inflight[0]++;
-> -               if (mi->part->partno)
-> -                       mi->inflight[1]++;
-> -       }
-> +       /*
-> +        * index[0] counts the specific partition that was asked for.
-> index[1]
-> +        * counts the ones that are active on the whole device, so
-> increment
-> +        * that if mi->part is indeed a partition, and not a whole device.
-> +        */
-> +       if (rq->part == mi->part)
-> +               mi->inflight[0]++;
-> +       if (mi->part->partno)
-> +               mi->inflight[1]++;
->  }
->  
->  void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
-> 
-> 
-> 
-> If I get it right, when the disk is idle, and some request is allocated,
-> part_round_stats() with this commit will now add all ticks between
-> previous I/O and current time (now - part->stamp) to io_ticks.
-> 
-> Before the commit, part_round_stats() would only update part->stamp when
-> called after request allocation.
-
-So this is a "false" reporting?  there's really no load?
-
-> Any thoughts how to best fix this in 4.19?
-> I see the io_ticks accounting has been reworked in 5.0, do we need to
-> backport those to 4.19, or any ill effects if this commit is reverted in
-> 4.19?
-
-Do you see this issue in 5.4?  What's keeping you from moving to 5.4.y?
-
-And if this isn't a real issue, is that a problem too?
-
-As you can test this, if you have a set of patches backported that could
-resolve it, can you send them to us?
-
-thanks,
-
-greg k-h
+On 25/03/2020 11:01, hch@infradead.org wrote:=0A=
+> I thought of recording the location in ->iomap_end (and in fact=0A=
+> had a prototype for that), but that is not going to work for AIO of=0A=
+> course.  So yes, we'll need some way to have per-extent completion=0A=
+> callbacks.=0A=
+=0A=
+OK let's postpone iomap then and handle zone-append directly in zonefs =0A=
+for now.=0A=
+=0A=
