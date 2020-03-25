@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CACC54FD2
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91A1C54FCF
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:21:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB36920724
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:21:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E8B220724
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:21:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HhBqJv/+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J/vNDQdD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727301AbgCYDVm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 23:21:42 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59502 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbgCYDVm (ORCPT
+        id S1727302AbgCYDVs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Mar 2020 23:21:48 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:28768 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727253AbgCYDVr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 23:21:42 -0400
+        Tue, 24 Mar 2020 23:21:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585106501; x=1616642501;
+  t=1585106508; x=1616642508;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YLRQeJ3ry+HoV2a584kdDIojGSXSDoBKvGB8JssfWbw=;
-  b=HhBqJv/+D8AHwEjnQEGWzx1qC+HSi0XH6pR2CiQImgjy3cmKJFO0sxI1
-   1yb4/is287zIdsBNiuV4oTlyO+2QRbmbRMcx/VaG27tt0wEe9PByIAkrG
-   52dcxY7P/2Olj7Zl7upZRCCjBX+HGCRuuhdNdhu3ky/cDmdX2w9OsEVMG
-   VuY8GVfOWoAAXFgo6+eJXtypUq0y9HIqIv2jo3sJmbCa5S78JDdu+y78/
-   Ex4eDM6ajSj+Mr8gckJdBefO7wWNTwiDaIG5oYtpAhdPAKlUro8XiEpts
-   w6/GgSGzDM8AuSNjg3gAlIlt+8ecRzINtl4th9zXLQIPHiOp8btWFR2d9
-   g==;
-IronPort-SDR: 29hpSKcXWREL95WzHw4CTgBGT1RTD0PEbXT9eyfLKuF08diq2PMBAzU65bYv6j/kJa6kKH/lAo
- q9mgv4Qnu0yh200a3eaCN74Ufmg6ZD/N5gZnjYpX6a7EYUFQkWuW6B8U1v8IliZtsJpHLcNi0q
- R7MvR5/Lo6uK6a094gUj21IiM7WRMHuUTH+ee6daeIGx+cfJhn2RV7XdmFLhy5lSZEr3H9X6Vu
- Og1mNy9fLsJBlL7TAAX8oqUCwsTIIIo5qD+o+jkIPOsgs5+fc94NNb123Hyxse+M6Z8jUVX+DJ
- DBQ=
+  bh=8ayaeOSCp0h6IyoJ4r1GNbP9LA7FwtNIS474PFWS2FQ=;
+  b=J/vNDQdDxolBmxUYxJPCnio5EeY7SXNssxrCahWkX72Q2jGJb2b0j5/y
+   M1K+ZqE58LorT5o8ICK+j1US6JR6c34obD36T3FbPpgVfWRUfQGATCZA+
+   XrAS5CUy1UtjDFsaJlyzHAJYXWFCcwRr1hxAL6+rbwIeIh78XvggAr5LT
+   HDurg+d9EQqJISxnUNgD9e4IZTsdvrtXzgrlQoEQGfZijuxNg6Oc9D4cD
+   bxoZ7vRgHdVHp8Sw2CYBblxgND5NNFADNBmZse72AU+IiKtxqphfahIGP
+   oahrmJZZuJUphxAoMD/1tUF4HMwh35s7nKQOPi7Vy5sgpGSTObl+Ivn60
+   w==;
+IronPort-SDR: tv1yJQiHnm2j5rf0hJzWGrISZDShq1kVpQz4UFPl6TDhoTiFss6hHcGybJ8K759c7MlBlmVKMG
+ gmd4as3VRUJSYz6HJniJ5X00IiLKP3uZCJC2b9j0DdxL22VdO63ttCK7q0rRoDopbJ749RdEjX
+ 84U9DLsuA+whuEKHFxL3I9L+Em5RoGJ1d9nXoKOowSKrHYE2w3+1sakyBnFJjFiRNUQDJpdFk1
+ 4hQT+g1pcD71zFiKT9vB29YzFWVr9nDv149j1xfP/C8PqiU0x/IKl5In6fUh2H2up8eT7iytJS
+ IZE=
 X-IronPort-AV: E=Sophos;i="5.72,302,1580745600"; 
-   d="scan'208";a="241910424"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 11:21:41 +0800
-IronPort-SDR: lL1P9fOXbpWwEQ0dsthmCbETRxrJ00Za/JhVq4YyDrszC2jhfRKyp4oD1HnruqCesKOFW4lDLK
- o+3MAALaCwHXl6/fA11jLz0+TRkQHKbyngb78u2A/t4rNlbU767xLuVE1tjMSBA13jtlIgdh9Z
- ilGy2q8uJxUMOY3fI5F6sFAr+QwY8Os74MW3XasWeAwchZEnjptSkZXKl3uQFoYlmb0JBHKpdS
- 2xKNymsLGwqeGpdKpUOPNeGyojjS14OF4+v/6pxtpkCnvgLgXKpfd028EbhjZIq/lekJu/LYm2
- 5Gq4wZESVP74iC6fwaCDIwRj
+   d="scan'208";a="133862165"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 11:21:47 +0800
+IronPort-SDR: +cipwvK6sVDbLq/rYlOV3vwRQzwgQWrYqOjIUELIX8ovUefJp+FbXOBLxq4AMyIOgchDHrLtej
+ B2S1mKC3Mqv9WT+xDtZgPLRt7W7qxTt3QbjVbLweypfEd9f6g9AHzJpbIr3/nwOG3xwQc5+xJQ
+ yEP61DFvWbUG1XLR6MNGFIxq3Tm/yE5juBrH6+iC1jwN7/mvvl1M55IZRp7546xeJJBS/cpxpP
+ 8qbCUSpHEY+hqQAfI+9BGCrdScAoPm+wB/zDscjhsuQBfUplyX1avfMYNamEOQkHnGMEENtJAJ
+ Yj9gsMmnVKu49/JfviEkYXHV
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 20:13:20 -0700
-IronPort-SDR: KI5tCn+Ql81jjgqafB84Rg2S4zWljNmKV5JmtqdHHHq9dJwxfKkGXY6gSFXQxrTOS36w9rw+Jo
- 48u8hc9eoaGCw7dnZLdt6RjSlWFgneerl383RmSQ0/vTf5ijtA/LTGflaJjJKDte3UI2SYuztn
- oUzqKHqcL70ccQ856EcueFGofqC1R3ggOrdG58e5nmq3c647/8QUfD7bVhROtf6z8/hXiuYP3C
- xCMzskEMLuOK8BVMzuF/RvQYzi2ihNQ9qlP1tUX1T6G5V8LtCAzwYCK0crolz4343OpL+rRcpD
- GYY=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 20:13:25 -0700
+IronPort-SDR: MvAwtnx8sYHEDAMT8HlPVk/IhsYyJcHHp7wUPIQA6eXl3cknBv8gQ3rbLB0FJBpN1bdw5m0ldu
+ Fm1fHKDCCNsqjrxggxA7wVmo45/uxMZWTqi90oi69UdCTDPdDYA6fhORHpA2Cka20yxmSdbQ9J
+ 3/KYTm3GAnifdodUxVCSWBr4jVzhM4upXQDK1aMt8rlfTHrw/Q7RmOTVeps+CKiMcAQNirMQfY
+ A5xguywRdAVb/5MdK2ogw8ZEPnW1GMaQSVBAC7tk2Mpn4i71/0oljDEVMMjdYBnZVJlivPiyz1
+ 0NA=
 WDCIronportException: Internal
 Received: from ioprio.labspan.wdc.com (HELO ioprio.sc.wdc.com) ([10.6.139.89])
-  by uls-op-cesaip02.wdc.com with ESMTP; 24 Mar 2020 20:21:41 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 24 Mar 2020 20:21:46 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, damien.lemoal@wdc.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V3 1/3] block: add a zone condition debug helper
-Date:   Tue, 24 Mar 2020 19:16:27 -0700
-Message-Id: <20200325021629.15103-2-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V3 2/3] null_blk: add tracepoint helpers for zoned mode
+Date:   Tue, 24 Mar 2020 19:16:28 -0700
+Message-Id: <20200325021629.15103-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
 References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
@@ -76,72 +76,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a helper to stringify the zone conditions. We use this helper in the
-next patch to track zone conditions in tracepoints.
+This patch adds two new tracpoints for null_blk_zoned.c that allows us
+to trace report-zones, zone-mgmt-op and zone-write operations which has
+direct effect on the zone condition state machine.
+
+Also, we update drivers/block/Makefile so that new null_blk related
+tracefiles can be compiled.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/blk-zoned.c      | 32 ++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 35 insertions(+)
+ drivers/block/Makefile         |  6 +++
+ drivers/block/null_blk_trace.c | 21 +++++++++
+ drivers/block/null_blk_trace.h | 79 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 106 insertions(+)
+ create mode 100644 drivers/block/null_blk_trace.c
+ create mode 100644 drivers/block/null_blk_trace.h
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 6b442ae96499..f87956e0dcaf 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -20,6 +20,38 @@
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index a53cc1e3a2d3..795facd8cf19 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -6,6 +6,9 @@
+ # Rewritten to use lists instead of if-statements.
+ # 
  
- #include "blk.h"
- 
-+#define ZONE_COND_NAME(name) [BLK_ZONE_COND_##name] = #name
-+static const char *const zone_cond_name[] = {
-+	ZONE_COND_NAME(NOT_WP),
-+	ZONE_COND_NAME(EMPTY),
-+	ZONE_COND_NAME(IMP_OPEN),
-+	ZONE_COND_NAME(EXP_OPEN),
-+	ZONE_COND_NAME(CLOSED),
-+	ZONE_COND_NAME(READONLY),
-+	ZONE_COND_NAME(FULL),
-+	ZONE_COND_NAME(OFFLINE),
-+};
-+#undef ZONE_COND_NAME
++# needed for trace events
++ccflags-y				+= -I$(src)
 +
-+/**
-+ * blk_zone_cond_str - Return string XXX in BLK_ZONE_COND_XXX.
-+ * @zone_cond: BLK_ZONE_COND_XXX.
+ obj-$(CONFIG_MAC_FLOPPY)	+= swim3.o
+ obj-$(CONFIG_BLK_DEV_SWIM)	+= swim_mod.o
+ obj-$(CONFIG_BLK_DEV_FD)	+= floppy.o
+@@ -39,6 +42,9 @@ obj-$(CONFIG_ZRAM) += zram/
+ 
+ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+ null_blk-objs	:= null_blk_main.o
++ifeq ($(CONFIG_BLK_DEV_ZONED), y)
++null_blk-$(CONFIG_TRACING) += null_blk_trace.o
++endif
+ null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
+ 
+ skd-y		:= skd_main.o
+diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk_trace.c
+new file mode 100644
+index 000000000000..f246e7bff698
+--- /dev/null
++++ b/drivers/block/null_blk_trace.c
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * null_blk trace related helpers.
 + *
-+ * Description: Centralize block layer function to convert BLK_ZONE_COND_XXX
-+ * into string format. Useful in the debugging and tracing zone conditions. For
-+ * invalid BLK_ZONE_COND_XXX it returns string "UNKNOWN".
++ * Copyright (C) 2020 Western Digital Corporation or its affiliates.
 + */
-+const char *blk_zone_cond_str(enum blk_zone_cond zone_cond)
++#include "null_blk_trace.h"
++
++/*
++ * Helper to use for all null_blk traces to extract disk name.
++ */
++const char *nullb_trace_disk_name(struct trace_seq *p, char *name)
 +{
-+	static const char *zone_cond_str = "UNKNOWN";
++	const char *ret = trace_seq_buffer_ptr(p);
 +
-+	if (zone_cond < ARRAY_SIZE(zone_cond_name) && zone_cond_name[zone_cond])
-+		zone_cond_str = zone_cond_name[zone_cond];
++	if (name && *name)
++		trace_seq_printf(p, "disk=%s, ", name);
++	trace_seq_putc(p, 0);
 +
-+	return zone_cond_str;
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(blk_zone_cond_str);
+diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk_trace.h
+new file mode 100644
+index 000000000000..4f83032eb544
+--- /dev/null
++++ b/drivers/block/null_blk_trace.h
+@@ -0,0 +1,79 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * null_blk device driver tracepoints.
++ *
++ * Copyright (C) 2020 Western Digital Corporation or its affiliates.
++ */
 +
- static inline sector_t blk_zone_start(struct request_queue *q,
- 				      sector_t sector)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 53a1325efbc3..0070f26b9579 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -887,6 +887,9 @@ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
- /* Helper to convert REQ_OP_XXX to its string format XXX */
- extern const char *blk_op_str(unsigned int op);
- 
-+/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
-+extern const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM nullb
 +
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
- 
++#if !defined(_TRACE_NULLB_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_NULLB_H
++
++#include <linux/tracepoint.h>
++#include <linux/trace_seq.h>
++
++#include "null_blk.h"
++
++const char *nullb_trace_disk_name(struct trace_seq *p, char *name);
++
++#define __print_disk_name(name) nullb_trace_disk_name(p, name)
++
++#ifndef TRACE_HEADER_MULTI_READ
++static inline void __assign_disk_name(char *name, struct gendisk *disk)
++{
++	if (disk)
++		memcpy(name, disk->disk_name, DISK_NAME_LEN);
++	else
++		memset(name, 0, DISK_NAME_LEN);
++}
++#endif
++
++TRACE_EVENT(nullb_zone_op,
++	    TP_PROTO(struct nullb_cmd *cmd, unsigned int zone_no,
++		     unsigned int zone_cond),
++	    TP_ARGS(cmd, zone_no, zone_cond),
++	    TP_STRUCT__entry(
++		__array(char, disk, DISK_NAME_LEN)
++		__field(enum req_opf, op)
++		__field(unsigned int, zone_no)
++		__field(unsigned int, zone_cond)
++	    ),
++	    TP_fast_assign(
++		__entry->op = req_op(cmd->rq);
++		__entry->zone_no = zone_no;
++		__entry->zone_cond = zone_cond;
++		__assign_disk_name(__entry->disk, cmd->rq->rq_disk);
++	    ),
++	    TP_printk("%s req=%-15s zone_no=%u zone_cond=%-10s",
++		      __print_disk_name(__entry->disk),
++		      blk_op_str(__entry->op),
++		      __entry->zone_no,
++		      blk_zone_cond_str(__entry->zone_cond))
++);
++
++TRACE_EVENT(nullb_report_zones,
++	    TP_PROTO(struct nullb *nullb, unsigned int nr_zones),
++	    TP_ARGS(nullb, nr_zones),
++	    TP_STRUCT__entry(
++		__array(char, disk, DISK_NAME_LEN)
++		__field(unsigned int, nr_zones)
++	    ),
++	    TP_fast_assign(
++		__entry->nr_zones = nr_zones;
++		__assign_disk_name(__entry->disk, nullb->disk);
++	    ),
++	    TP_printk("%s nr_zones=%u",
++		      __print_disk_name(__entry->disk), __entry->nr_zones)
++);
++
++#endif /* _TRACE_NULLB_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH .
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE null_blk_trace
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
 -- 
 2.22.0
 
