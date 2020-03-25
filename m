@@ -2,70 +2,124 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3745C18E5B
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 08:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34179C18E5B
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 08:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEAFA20714
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 08:40:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LmE+Tm3M"
+	by mail.kernel.org (Postfix) with ESMTP id 0F9BB206F8
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 08:45:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727316AbgCYIkb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 04:40:31 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:50280 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726906AbgCYIkb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 04:40:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=h5hpNPfmMzO0qwGMReM4jVIBMBMcWpn40WL8el6WfJ4=; b=LmE+Tm3MJYRXXkp5z3JzAHVGuZ
-        ffkeBa5uRK4MHD3ABne/71XmUAFBw0V6X6Hv0mXzXkKMnd7YLgOaTU7zJMx+X+tDr3z9rZBpHlR1z
-        aKPebzJ25am4a5foJ+qm285MD4eXsZYsRX/UY8gKgLrncXGxWLrMfujvvz2lcZDW3xoiqeDioLuy1
-        quXCUxq+ty/lG8giFZsvEERVF97LuFEVQ38+JLVFYOoidj3QKjnOvixkUceiljg5TqpephqA7sEPr
-        TOzW9WWXN2UoAILIfw7LJ1/lSR3Wg+NTKpuhllCSbsovVVxFkL+xbOZyb5DtoybnqsJSHDdJu9NDg
-        Z6k+BCcQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jH1aQ-0007C6-4n; Wed, 25 Mar 2020 08:40:30 +0000
-Date:   Wed, 25 Mar 2020 01:40:30 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block <linux-block@vger.kernel.org>,
+        id S1727358AbgCYIpI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 04:45:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:32844 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726658AbgCYIpI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Mar 2020 04:45:08 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id CA51BAFD4;
+        Wed, 25 Mar 2020 08:45:05 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 3/3] dm zoned: add regular device info to metadata
+To:     Bob Liu <bob.liu@oracle.com>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 01/11] block: factor out requeue handling from
- dispatch code
-Message-ID: <20200325084030.GB11943@infradead.org>
-References: <20200324152454.4954-1-johannes.thumshirn@wdc.com>
- <20200324152454.4954-2-johannes.thumshirn@wdc.com>
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
+References: <20200324110255.8385-1-bob.liu@oracle.com>
+ <20200324110255.8385-4-bob.liu@oracle.com>
+ <CO2PR04MB23438E0AB35CC46732F96085E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
+ <812da9e9-cfd2-ea24-60cb-4af48f476079@suse.de>
+ <0e7c5043-4345-b052-7cec-a53cfea340f7@oracle.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <6db63d3a-99e7-98f6-4b74-4a649d90d363@suse.de>
+Date:   Wed, 25 Mar 2020 09:45:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324152454.4954-2-johannes.thumshirn@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <0e7c5043-4345-b052-7cec-a53cfea340f7@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 12:24:44AM +0900, Johannes Thumshirn wrote:
-> Factor out the requeue handling from the dispatch code, this will make
-> subsequent addition of different requeueing schemes easier.
+On 3/25/20 8:29 AM, Bob Liu wrote:
+> On 3/25/20 2:47 PM, Hannes Reinecke wrote:
+>> On 3/25/20 7:29 AM, Damien Le Moal wrote:
+>>> On 2020/03/24 20:04, Bob Liu wrote:
+>>>> This patch implemented metadata support for regular device by:
+>>>>    - Emulated zone information for regular device.
+>>>>    - Store metadata at the beginning of regular device.
+>>>>
+>>>>        | --- zoned device --- | -- regular device ||
+>>>>        ^                      ^
+>>>>        |                      |Metadata
+>>>> zone 0
+>>>>
+>>>> Signed-off-by: Bob Liu <bob.liu@oracle.com>
+>>>> ---
+>>>>    drivers/md/dm-zoned-metadata.c | 135 +++++++++++++++++++++++++++++++----------
+>>>>    drivers/md/dm-zoned-target.c   |   6 +-
+>>>>    drivers/md/dm-zoned.h          |   3 +-
+>>>>    3 files changed, 108 insertions(+), 36 deletions(-)
+>>>>
+>> Having thought about it some more, I think we cannot continue with this 'simple' approach.
+>> The immediate problem is that we lie about the disk size; clearly the
+>> metadata cannot be used for regular data, yet we expose a target device with the full size of the underlying device.
 > 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> The exposed size is "regular dev size + zoned dev size - metadata size - reserved seq zone size".
+> I didn't see why there is a lie?
+> 
+The lie is in generating the device-mapper line for setting up the 
+target device.
+Format is
 
-Jens, can you pick this up?  I think it already is a nice improvement
-even without the rest of the series.
+0 <size> zoned <zoned-dev> <cache-dev>
+
+and <size> is the capacity of the resulting device-mapper device.
+So we should have adapted this to exclude the metadata size and the 
+reserved seq zone size (even with the original implementation); 
+'blksize' is certainly wrong here.
+
+>> Making me wonder if anybody ever tested a disk-full scenario...
+>> The other problem is that with two devices we need to be able to stitch them together
+>> in an automated fashion, eg via a systemd service or udev rule.
+>> But for this we need to be able to identify the devices, which means both need to carry
+>> metadata, and both need to have unique identifier within the metadata. Which the current
+>> metadata doesn't allow to.
+>>
+>> Hence my plan is to implement a v2 metadata, carrying UUIDs for the dmz set _and_ the
+>> component device. With that we can update blkid to create links etc so that the devices
+>> can be identified in the system.
+>> Additionally I would be updating dmzadm to write the new metadata.
+>>
+>> And I will add a new command 'start' to dmzadm which will then create the device-mapper
+>> device _with the correct size_. It also has the benefit that we can create the device-mapper
+>> target with the UUID specified in the metadata, so the persistent device links will be
+>> created automatically.
+>>
+>> Bob, can you send me your improvements to dmzadm so that I can include them in my changes?
+>>
+> 
+> Attached, but it's a big patch I haven't split them to smaller one.
+> The dmz_check/repair can't work neither in current stage.
+> 
+Yeah, of course. Plan is to start with V2 metadata handling first anyway 
+(it adding UUIDs), then add the 'start' functionality, and only then 
+implement cache device handling.
+
+Thanks for the patch.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
