@@ -2,233 +2,112 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F398C1975A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 12:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 385FDC43331
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 12:49:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8C7B2076A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 12:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 073682076A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 12:49:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKBMcEjg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbgCYMk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Mar 2020 08:40:28 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12130 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727279AbgCYMk2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Mar 2020 08:40:28 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 68DFC276D04602731DAD;
-        Wed, 25 Mar 2020 20:40:09 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Wed, 25 Mar 2020
- 20:40:07 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     <tj@kernel.org>, <jack@suse.cz>, <bvanassche@acm.org>,
-        <tytso@mit.edu>, <gregkh@linuxfoundation.org>, <hch@infradead.org>
-Subject: [PATCH v4 4/6] memcg: fix crash in wb_workfn when bdi unregister
-Date:   Wed, 25 Mar 2020 20:38:41 +0800
-Message-ID: <20200325123843.47452-5-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200325123843.47452-1-yuyufen@huawei.com>
-References: <20200325123843.47452-1-yuyufen@huawei.com>
+        id S1727452AbgCYMth (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 08:49:37 -0400
+Received: from mail-qv1-f50.google.com ([209.85.219.50]:44080 "EHLO
+        mail-qv1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726998AbgCYMth (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Mar 2020 08:49:37 -0400
+Received: by mail-qv1-f50.google.com with SMTP id f7so910762qvr.11;
+        Wed, 25 Mar 2020 05:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=iz+O4JY70/I6593EiYb3vc9QehOFE8IiCgzzBxiW4a8=;
+        b=eKBMcEjgLZnyeEd11yYfakt9CIsppElK+QY7MTSFwKvXZW/YKZ7ZmTS5bsV3G/bC3d
+         6/JF2+vOQUDQl5o2zVCDog0GopXRG3lV5vxmUKLSTjuqKceWTb1biDHq9++h+QCjOszV
+         OyOdMIHPmW4OAWDXt3LmJ3qe1I8DI3PbkD1L4LucYNKQyJlRVF/K1xiLq8ormRElmWnk
+         DaVEtB5gGmmHTDQEdWWDwY4sVf1gSQ2+9X2bSbmaOLVEcFCTazyz+PQlezXPGNPqxsri
+         00nFyYipB7MDDMxrstPkCW0VMiE/aLDqivvyhOAFvLuZZxPncSSEzxJC22sWBemBPf8q
+         Bumw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=iz+O4JY70/I6593EiYb3vc9QehOFE8IiCgzzBxiW4a8=;
+        b=lGXeUakr1e/8FxSEkxWxev1SdKJv3I2c9OY/HLTrxCRcm+XmSiFCuynBZSJvu82NaA
+         3aC6ptk2IfX3YX1iNoUZWXXniBZstci0uftEnAhR6D8GsusSXOpirRGwta/3M+GGLUfd
+         zHv5n/lUcNhl+YsKfqTenaul0CwqKTiX4L+AYxG9wwYw8H/4gWCsNklOrciqIOLhW1tP
+         lC7U3Mj0Ch8z8JE72Gs1u4PzUWuRPtbP/VDf/oLIirwucaEbo2D7RQU2B4sgln0paJzt
+         Zx3qjlvPrnePHpN9n4hdRFFhsu45w+LQdRtCXytXqZFHvEJ80Zd0SFlR22wdIWjemN6L
+         WTDg==
+X-Gm-Message-State: ANhLgQ32CiwUJqcTKFpAcaMS/4+WbC1woOE+YDRa/FcrKJx2KrkyOb3n
+        5fYgpqs/6sxtVCFQiN8PqJpHnsd43bDH6dtFLmD8hzXHYwY=
+X-Google-Smtp-Source: ADFU+vsty0PfeBjsXXPyBQ1ZiWxEC3jTwTYvNjh4h8Px8HLr/oAJn5U9IcjMz5ooQ10q6+FwSEY8DYseUI8RlJ6Umek=
+X-Received: by 2002:a05:6214:11ec:: with SMTP id e12mr2946998qvu.89.1585140575879;
+ Wed, 25 Mar 2020 05:49:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.28]
-X-CFilter-Loop: Reflected
+References: <cover.1584728740.git.zhangweiping@didiglobal.com> <20200324182725.GG162390@mtj.duckdns.org>
+In-Reply-To: <20200324182725.GG162390@mtj.duckdns.org>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Wed, 25 Mar 2020 20:49:24 +0800
+Message-ID: <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
+Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 68f23b89067f ("memcg: fix a crash in wb_workfn when a device
-disappears") try to handle bdi->dev beening NULL by adding bdi_dev_name().
-But, bdi->dev can be freed and set as 'NULL' after bdi_dev_name()
-think the value is valid. Then it can cause use-after-free for dev
-or kobj->name.
+Tejun Heo <tj@kernel.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=8825=E6=97=A5=E5=91=
+=A8=E4=B8=89 =E4=B8=8A=E5=8D=882:27=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Sat, Mar 21, 2020 at 09:20:36AM +0800, Weiping Zhang wrote:
+> > The user space tool, which called iotrack, used to collect these basic
+> > io statistics and then generate more valuable metrics at cgroup level.
+> > From iotrack, you can get a cgroup's percentile for io, bytes,
+> > total_time and disk_time of the whole disk. It can easily to evaluate
+> > the real weight of the weight based policy(bfq, blk-iocost).
+> > There are lots of metrics for read and write generate by iotrack,
+> > for more details, please visit: https://github.com/dublio/iotrack.
+> >
+> > Test result for two fio with randread 4K,
+> > test1 cgroup bfq weight =3D 800
+> > test2 cgroup bfq weight =3D 100
+> >
+> > Device      io/s   MB/s    %io    %MB    %tm   %dtm  %d2c %hit0 %hit1 %=
+hit2 %hit3 %hit4 %hit5  %hit6  %hit7 cgroup
+> > nvme1n1 44588.00 174.17 100.00 100.00 100.00 100.00 38.46  0.25 45.27 9=
+5.90 98.33 99.47 99.85  99.92  99.95 /
+> > nvme1n1 30206.00 117.99  67.74  67.74  29.44  67.29 87.90  0.35 47.82 9=
+9.22 99.98 99.99 99.99 100.00 100.00 /test1
+> > nvme1n1 14370.00  56.13  32.23  32.23  70.55  32.69 17.82  0.03 39.89 8=
+8.92 94.88 98.37 99.53  99.77  99.85 /test2
+>
+> Maybe this'd be better done with bpf?
+>
+Hi Tejun,
 
-After protecting the bdi->dev with lock, the race can be fixed thoroughly.
-Here, we just need to replace bdi_dev_name() with bdi_get_dev_name().
+How about support both iotrack and bpf?
+If it's ok I want to add bpf support in another patchset, I saw that
+iocost_monitor.py was base on drgn, maybe write a new script
+"biotrack" base on drgn.
 
-Fixes: 68f23b89067f ("memcg: fix a crash in wb_workfn when a device disappears")
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- fs/fs-writeback.c                |  4 +++-
- include/trace/events/writeback.h | 38 ++++++++++++++------------------
- 2 files changed, 20 insertions(+), 22 deletions(-)
+For this patchset, iotrack can work well, I'm using it to monitor
+block cgroup for
+selecting a proper io isolation policy.
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 76ac9c7d32ec..8d36c256560c 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -2062,8 +2062,10 @@ void wb_workfn(struct work_struct *work)
- 	struct bdi_writeback *wb = container_of(to_delayed_work(work),
- 						struct bdi_writeback, dwork);
- 	long pages_written;
-+	char dname[BDI_DEV_NAME_LEN];
- 
--	set_worker_desc("flush-%s", bdi_dev_name(wb->bdi));
-+	set_worker_desc("flush-%s",
-+			bdi_get_dev_name(wb->bdi, dname, BDI_DEV_NAME_LEN));
- 	current->flags |= PF_SWAPWRITE;
- 
- 	if (likely(!current_is_workqueue_rescuer() ||
-diff --git a/include/trace/events/writeback.h b/include/trace/events/writeback.h
-index d94def25e4dc..4767a5ab5e36 100644
---- a/include/trace/events/writeback.h
-+++ b/include/trace/events/writeback.h
-@@ -66,9 +66,8 @@ DECLARE_EVENT_CLASS(writeback_page_template,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->name,
--			    bdi_dev_name(mapping ? inode_to_bdi(mapping->host) :
--					 NULL), 32);
-+		bdi_get_dev_name(mapping ? inode_to_bdi(mapping->host) : NULL,
-+				__entry->name, 32);
- 		__entry->ino = mapping ? mapping->host->i_ino : 0;
- 		__entry->index = page->index;
- 	),
-@@ -111,7 +110,7 @@ DECLARE_EVENT_CLASS(writeback_dirty_inode_template,
- 		struct backing_dev_info *bdi = inode_to_bdi(inode);
- 
- 		/* may be called for files on pseudo FSes w/ unregistered bdi */
--		strscpy_pad(__entry->name, bdi_dev_name(bdi), 32);
-+		bdi_get_dev_name(bdi, __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->state		= inode->i_state;
- 		__entry->flags		= flags;
-@@ -192,7 +191,7 @@ TRACE_EVENT(inode_foreign_history,
- 	),
- 
- 	TP_fast_assign(
--		strncpy(__entry->name, bdi_dev_name(inode_to_bdi(inode)), 32);
-+		bdi_get_dev_name(inode_to_bdi(inode), __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->cgroup_ino	= __trace_wbc_assign_cgroup(wbc);
- 		__entry->history	= history;
-@@ -221,7 +220,7 @@ TRACE_EVENT(inode_switch_wbs,
- 	),
- 
- 	TP_fast_assign(
--		strncpy(__entry->name,	bdi_dev_name(old_wb->bdi), 32);
-+		bdi_get_dev_name(old_wb->bdi, __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->old_cgroup_ino	= __trace_wb_assign_cgroup(old_wb);
- 		__entry->new_cgroup_ino	= __trace_wb_assign_cgroup(new_wb);
-@@ -254,7 +253,7 @@ TRACE_EVENT(track_foreign_dirty,
- 		struct address_space *mapping = page_mapping(page);
- 		struct inode *inode = mapping ? mapping->host : NULL;
- 
--		strncpy(__entry->name,	bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->name, 32);
- 		__entry->bdi_id		= wb->bdi->id;
- 		__entry->ino		= inode ? inode->i_ino : 0;
- 		__entry->memcg_id	= wb->memcg_css->id;
-@@ -287,7 +286,7 @@ TRACE_EVENT(flush_foreign,
- 	),
- 
- 	TP_fast_assign(
--		strncpy(__entry->name,	bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->name, 32);
- 		__entry->cgroup_ino	= __trace_wb_assign_cgroup(wb);
- 		__entry->frn_bdi_id	= frn_bdi_id;
- 		__entry->frn_memcg_id	= frn_memcg_id;
-@@ -316,8 +315,7 @@ DECLARE_EVENT_CLASS(writeback_write_inode_template,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->name,
--			    bdi_dev_name(inode_to_bdi(inode)), 32);
-+		bdi_get_dev_name(inode_to_bdi(inode), __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->sync_mode	= wbc->sync_mode;
- 		__entry->cgroup_ino	= __trace_wbc_assign_cgroup(wbc);
-@@ -360,7 +358,7 @@ DECLARE_EVENT_CLASS(writeback_work_class,
- 		__field(ino_t, cgroup_ino)
- 	),
- 	TP_fast_assign(
--		strscpy_pad(__entry->name, bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->name, 32);
- 		__entry->nr_pages = work->nr_pages;
- 		__entry->sb_dev = work->sb ? work->sb->s_dev : 0;
- 		__entry->sync_mode = work->sync_mode;
-@@ -413,7 +411,7 @@ DECLARE_EVENT_CLASS(writeback_class,
- 		__field(ino_t, cgroup_ino)
- 	),
- 	TP_fast_assign(
--		strscpy_pad(__entry->name, bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->name, 32);
- 		__entry->cgroup_ino = __trace_wb_assign_cgroup(wb);
- 	),
- 	TP_printk("bdi %s: cgroup_ino=%lu",
-@@ -435,7 +433,7 @@ TRACE_EVENT(writeback_bdi_register,
- 		__array(char, name, 32)
- 	),
- 	TP_fast_assign(
--		strscpy_pad(__entry->name, bdi_dev_name(bdi), 32);
-+		bdi_get_dev_name(bdi, __entry->name, 32);
- 	),
- 	TP_printk("bdi %s",
- 		__entry->name
-@@ -460,7 +458,7 @@ DECLARE_EVENT_CLASS(wbc_class,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->name, bdi_dev_name(bdi), 32);
-+		bdi_get_dev_name(bdi, __entry->name, 32);
- 		__entry->nr_to_write	= wbc->nr_to_write;
- 		__entry->pages_skipped	= wbc->pages_skipped;
- 		__entry->sync_mode	= wbc->sync_mode;
-@@ -511,7 +509,7 @@ TRACE_EVENT(writeback_queue_io,
- 	),
- 	TP_fast_assign(
- 		unsigned long *older_than_this = work->older_than_this;
--		strscpy_pad(__entry->name, bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->name, 32);
- 		__entry->older	= older_than_this ?  *older_than_this : 0;
- 		__entry->age	= older_than_this ?
- 				  (jiffies - *older_than_this) * 1000 / HZ : -1;
-@@ -597,7 +595,7 @@ TRACE_EVENT(bdi_dirty_ratelimit,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->bdi, bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->bdi, 32);
- 		__entry->write_bw	= KBps(wb->write_bandwidth);
- 		__entry->avg_write_bw	= KBps(wb->avg_write_bandwidth);
- 		__entry->dirty_rate	= KBps(dirty_rate);
-@@ -662,7 +660,7 @@ TRACE_EVENT(balance_dirty_pages,
- 
- 	TP_fast_assign(
- 		unsigned long freerun = (thresh + bg_thresh) / 2;
--		strscpy_pad(__entry->bdi, bdi_dev_name(wb->bdi), 32);
-+		bdi_get_dev_name(wb->bdi, __entry->bdi, 32);
- 
- 		__entry->limit		= global_wb_domain.dirty_limit;
- 		__entry->setpoint	= (global_wb_domain.dirty_limit +
-@@ -722,8 +720,7 @@ TRACE_EVENT(writeback_sb_inodes_requeue,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->name,
--			    bdi_dev_name(inode_to_bdi(inode)), 32);
-+		bdi_get_dev_name(inode_to_bdi(inode), __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->state		= inode->i_state;
- 		__entry->dirtied_when	= inode->dirtied_when;
-@@ -796,8 +793,7 @@ DECLARE_EVENT_CLASS(writeback_single_inode_template,
- 	),
- 
- 	TP_fast_assign(
--		strscpy_pad(__entry->name,
--			    bdi_dev_name(inode_to_bdi(inode)), 32);
-+		bdi_get_dev_name(inode_to_bdi(inode), __entry->name, 32);
- 		__entry->ino		= inode->i_ino;
- 		__entry->state		= inode->i_state;
- 		__entry->dirtied_when	= inode->dirtied_when;
--- 
-2.17.2
-
+Thanks a ton
+Weiping
+> --
+> tejun
