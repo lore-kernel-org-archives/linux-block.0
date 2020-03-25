@@ -2,250 +2,148 @@ Return-Path: <SRS0=yjA8=5K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DA7C54FCF
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8E0C1975A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 04:31:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9367520724
-	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 03:40:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44D532070A
+	for <linux-block@archiver.kernel.org>; Wed, 25 Mar 2020 04:31:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLB5WWSn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Vc34o7qb";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zi6m8RzV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727313AbgCYDkr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Mar 2020 23:40:47 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35582 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727253AbgCYDkq (ORCPT
+        id S1725878AbgCYEba (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Mar 2020 00:31:30 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:64337 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbgCYEba (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Mar 2020 23:40:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585107644;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NzZ/iEZeQLHh1Y/Ua0zpzMRctI+bdZqgFy9kntWeYZ4=;
-        b=OLB5WWSnK6KCRvR+cYmAZu0BDMef0lby7MvZ9vXOOm1yGR1xRMLluSjpE47fq37PJEsyly
-        O/4wCy34LF2GaT2eOS82X+Fy+adJEJisBYoMAZ7JRPaKxyolIWDkcjxH2KpZWcuIwgrO16
-        hF+CtiDiWGAM+0LBeZMwmfx1+Oz4pyw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-L4ILdnHvOPmI4BD13INyDA-1; Tue, 24 Mar 2020 23:40:40 -0400
-X-MC-Unique: L4ILdnHvOPmI4BD13INyDA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97D048017CC;
-        Wed, 25 Mar 2020 03:40:39 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 409825D9C5;
-        Wed, 25 Mar 2020 03:40:29 +0000 (UTC)
-Date:   Wed, 25 Mar 2020 11:40:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH v3 1/3] block/diskstats: more accurate approximation of
- io_ticks for slow disks
-Message-ID: <20200325034024.GC6086@ming.t460p>
-References: <158503038812.1955.7827988255138056389.stgit@buzz>
- <158503198072.1955.16227279292140721351.stgit@buzz>
- <20200324140656.GA23550@ming.t460p>
+        Wed, 25 Mar 2020 00:31:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585110691; x=1616646691;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=JU077TxlsEZ6p2AuTMF8uQYwC+QY6Xp9POwbcBTU0hY=;
+  b=Vc34o7qbRqldqHyHmF1n+2+ZXzL9Dg8RqKUlz2gJ5DOKvs8Wo03XapVb
+   O28WeVmmliize5PiopVLNI92oL/KF1a5wv6OPKRHQK5EUjegffk6HKQBR
+   agNlTZfvMGFnNYJgSvz3gHXycisxbjDspJnJUpx/soCQcRoIHAZv1nFGg
+   ydUo0w3Tr9yMhRYfk8dwFAWa9s70XtmBqTP0YpkqrHuCc+LxJIzIeDYB4
+   ESzD5P7XN5ZoY16miMgOku3ijowB0Q1ManMwYXorXC0+tlnlepPBPP/7c
+   dUi80lD+zw0OmdWmV7aKOudOjUC0lt3ztSM76wUevUh/+V56R9lyCd1zT
+   Q==;
+IronPort-SDR: Vi6RGr9AM+FhzQtAel/bkpzaoD2QNZyNLO5mR34An6wHtAF9TQq/7UOulKv1YG5cBSI4V/LJCQ
+ Pb7VXrmRY1c03KGLDwiPoQio0PooE9TdWjhN+1u/doEhJ80rUe25BLCoaDw9/OxgHb1mPKbRkL
+ BRi9N1VsGjvbF6dnJG6/KI9z5jCEYnmvRgHcX6S0dzbnRAUH0AJZb5keYE5dn5py2p7KgsuuB+
+ lunRmeDChkaVCAqNLd0ko7/R0rdoJF2bqGwj25I6oYDv7JaxjWrGWhls/WWlVwK5UMqVQl6kNk
+ jTg=
+X-IronPort-AV: E=Sophos;i="5.72,303,1580745600"; 
+   d="scan'208";a="134878396"
+Received: from mail-bn8nam12lp2175.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.175])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2020 12:31:30 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SHNrw5aCLr7J1dBO2Gc7EayeDczQuflUieAyoLlgothqzg3jHqQimhvkRVM2EvfeQmapBFRaG98/0t+BAsisCaFzrHW9D78rmjItzerh3cL7WckjcHvtS/3dnlPLobszEWGCoY6CTXj0e1UNnDiKIlTM147KWa37pMbtO6B/YKUlGoDMGEYYJ5Z2GUMnwwqoSV2DvFwundGy0XT5nE7jrh/P5Ukplw1PSxAEFJ27EPLzV934XjbkZvhagNhg4x4jkn0g12JqioMea1+H9tV1LkZ+0KRoEvu83N9ZUy81OT2zpzl+HGD6BDJpHeCu2rGkogPWNccXmRq0QrWBSHK/Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xOwtzufthv+ms+lJaTM1v95GtJPEgX1PIGlHM0gQ4gA=;
+ b=avTohotGFAe9evW1TIZ0LTeCQ9S0HTc1o1Set/WZfMouqXQU31N800U+CAWx4Sh5zIYKYUFKmlJixdMu2eeuAyYTsYGarr+UWfbUK2rYM0KrzWcw5ioCdQd9EF7w9PaeZ82T9IozsLOPf5N6ET4PkJl41VtQ1Na0mTNEinPbcygCH6aQBBs5qBjjSQFmQVcFPALfVZKvZ//RWhw/LRUJ5gc1ZS3RnuDXGCguVXSSv3A3wpERUIcguOi3IRlcgMqdIFWrUCFQ/WKQTJ0szQxHQTtSoNHDghzaFNaitG4F54ojuLsO9sOQbC9EFdjX7VnKT4nM+hwFio/VDD0C85qGsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xOwtzufthv+ms+lJaTM1v95GtJPEgX1PIGlHM0gQ4gA=;
+ b=zi6m8RzVENKayw4IGoNwQUfDTCId6ZqyLrktFIuIzDlHr/wYU3ihr3BxyUh6O5uh0CUhMEfRyPDdY6y1FTETdYfTPltCD9TgxyDgYqSzYEa5q/fjlPuvKyKupvrm3RuAKYx8RMVUzcq1M5O0ve8avVOPsqxDf0ABo5GOw7isr5Y=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB4837.namprd04.prod.outlook.com (2603:10b6:a03:11::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.20; Wed, 25 Mar
+ 2020 04:31:28 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::d826:82b2:764f:9733]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::d826:82b2:764f:9733%7]) with mapi id 15.20.2835.023; Wed, 25 Mar 2020
+ 04:31:28 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH V3 1/3] block: add a zone condition debug helper
+Thread-Topic: [PATCH V3 1/3] block: add a zone condition debug helper
+Thread-Index: AQHWAlSDX61q9Qt9oUaGMFIm/s6SXQ==
+Date:   Wed, 25 Mar 2020 04:31:28 +0000
+Message-ID: <BYAPR04MB49659AFBB6519B9E9ABC51E186CE0@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
+ <20200325021629.15103-2-chaitanya.kulkarni@wdc.com>
+ <CO2PR04MB2343C3B9DF774E6A6F052EC0E7CE0@CO2PR04MB2343.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: d056e98b-5ade-4312-75ab-08d7d07562b1
+x-ms-traffictypediagnostic: BYAPR04MB4837:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB483776BBFF1186FF57EE77A686CE0@BYAPR04MB4837.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:3826;
+x-forefront-prvs: 0353563E2B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(366004)(346002)(39860400002)(136003)(376002)(7696005)(9686003)(110136005)(52536014)(4326008)(33656002)(53546011)(6506007)(2906002)(5660300002)(55016002)(66446008)(81156014)(8936002)(64756008)(66946007)(81166006)(186003)(66476007)(8676002)(71200400001)(66556008)(86362001)(26005)(478600001)(76116006)(316002)(21314003);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4837;H:BYAPR04MB4965.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /2kt4M6wX30OZ3jfLHuZMqk/fDFpFoX+YgOLa4VYX9qJdaX3Y8z9RZaS1wYdSXG4lgZ4NC9U4xAgtYNHFlJb+SBiMH2HdRfdXV8FzVah3auUYWyCT34Kq2LDihN7XF7Hu2ibqvmtz3mZq5Hxnfdw6u6jBpubaZk30uTcOSIGTOzoT0KpR9CtZqJGFHe+YFDVVNKZumlmdbIoeBMiUhnP7dtmcCCWdgBv0QWigBHaXwKWeruRvK7w0MK19CgeTYzrayFNugiicNQgcOa76E3RVRjAkiY13dcHsGhnH6IHXWHSCk3CteUcobZnj87xaEUjQwYHhZ1EtTKpxb5/E433mmIaeNKdxxZ5LForfw/bDFraVdTSmn69k96uOwMPykenfhiHPxxbRBDXI+ZGivNk375Xg+UNbXhrtVQPw7PxY8lG/hvHpagzQF42AdmKLsCScaPBwg0UadVeP1sB2RYfjFkTyQDEqW9Eg/oJFaYMRWN9LQ6IASxa+tehIyxjJuFl
+x-ms-exchange-antispam-messagedata: 74uka00tNR4wV+h+TmETpfuoxYzNstsuWU7NGkTzInXiDwWI6+Ogb0jfzbBdHPeQN6NzdaNZ+eyds9Z8XMu3QtwOGJD+eDC4fMe5LMzVazmdbnympgn6lRj6HZ+Aqm2WQbFgfG0GB+mwCOSG1zEvYw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324140656.GA23550@ming.t460p>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d056e98b-5ade-4312-75ab-08d7d07562b1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 04:31:28.0383
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LCTzRSxAllouJaXdxEwyVSTBoErlnewXWHjyIKfmxACpyuDCbXpjCuFIf+2hEw3vLFxwuIS/dJiP6+GtXqpywhXCBWLH9xWR0FsPpKl6SMU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4837
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 10:06:56PM +0800, Ming Lei wrote:
-> On Tue, Mar 24, 2020 at 09:39:40AM +0300, Konstantin Khlebnikov wrote:
-> > Currently io_ticks is approximated by adding one at each start and end of
-> > requests if jiffies counter has changed. This works perfectly for requests
-> > shorter than a jiffy or if one of requests starts/ends at each jiffy.
-> > 
-> > If disk executes just one request at a time and they are longer than two
-> > jiffies then only first and last jiffies will be accounted.
-> > 
-> > Fix is simple: at the end of request add up into io_ticks jiffies passed
-> > since last update rather than just one jiffy.
-> > 
-> > Example: common HDD executes random read 4k requests around 12ms.
-> > 
-> > fio --name=test --filename=/dev/sdb --rw=randread --direct=1 --runtime=30 &
-> > iostat -x 10 sdb
-> > 
-> > Note changes of iostat's "%util" 8,43% -> 99,99% before/after patch:
-> > 
-> > Before:
-> > 
-> > Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-> > sdb               0,00     0,00   82,60    0,00   330,40     0,00     8,00     0,96   12,09   12,09    0,00   1,02   8,43
-> > 
-> > After:
-> > 
-> > Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-> > sdb               0,00     0,00   82,50    0,00   330,00     0,00     8,00     1,00   12,10   12,10    0,00  12,12  99,99
-> > 
-> > For load estimation "%util" is not as useful as average queue length,
-> > but it clearly shows how often disk queue is completely empty.
-> > 
-> > Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-> > Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-> > ---
-> >  Documentation/admin-guide/iostats.rst |    5 ++++-
-> >  block/bio.c                           |    8 ++++----
-> >  block/blk-core.c                      |    4 ++--
-> >  include/linux/genhd.h                 |    2 +-
-> >  4 files changed, 11 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
-> > index df5b8345c41d..9b14b0c2c9c4 100644
-> > --- a/Documentation/admin-guide/iostats.rst
-> > +++ b/Documentation/admin-guide/iostats.rst
-> > @@ -100,7 +100,7 @@ Field 10 -- # of milliseconds spent doing I/Os (unsigned int)
-> >  
-> >      Since 5.0 this field counts jiffies when at least one request was
-> >      started or completed. If request runs more than 2 jiffies then some
-> > -    I/O time will not be accounted unless there are other requests.
-> > +    I/O time might be not accounted in case of concurrent requests.
-> >  
-> >  Field 11 -- weighted # of milliseconds spent doing I/Os (unsigned int)
-> >      This field is incremented at each I/O start, I/O completion, I/O
-> > @@ -143,6 +143,9 @@ are summed (possibly overflowing the unsigned long variable they are
-> >  summed to) and the result given to the user.  There is no convenient
-> >  user interface for accessing the per-CPU counters themselves.
-> >  
-> > +Since 4.19 request times are measured with nanoseconds precision and
-> > +truncated to milliseconds before showing in this interface.
-> > +
-> >  Disks vs Partitions
-> >  -------------------
-> >  
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 0985f3422556..b1053eb7af37 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -1762,14 +1762,14 @@ void bio_check_pages_dirty(struct bio *bio)
-> >  	schedule_work(&bio_dirty_work);
-> >  }
-> >  
-> > -void update_io_ticks(struct hd_struct *part, unsigned long now)
-> > +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)
-> >  {
-> >  	unsigned long stamp;
-> >  again:
-> >  	stamp = READ_ONCE(part->stamp);
-> >  	if (unlikely(stamp != now)) {
-> >  		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
-> > -			__part_stat_add(part, io_ticks, 1);
-> > +			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
-> >  		}
-> >  	}
-> >  	if (part->partno) {
-> > @@ -1785,7 +1785,7 @@ void generic_start_io_acct(struct request_queue *q, int op,
-> >  
-> >  	part_stat_lock();
-> >  
-> > -	update_io_ticks(part, jiffies);
-> > +	update_io_ticks(part, jiffies, false);
-> >  	part_stat_inc(part, ios[sgrp]);
-> >  	part_stat_add(part, sectors[sgrp], sectors);
-> >  	part_inc_in_flight(q, part, op_is_write(op));
-> > @@ -1803,7 +1803,7 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
-> >  
-> >  	part_stat_lock();
-> >  
-> > -	update_io_ticks(part, now);
-> > +	update_io_ticks(part, now, true);
-> >  	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
-> >  	part_stat_add(part, time_in_queue, duration);
-> >  	part_dec_in_flight(q, part, op_is_write(req_op));
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index abfdcf81a228..4401b30a1751 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -1337,7 +1337,7 @@ void blk_account_io_done(struct request *req, u64 now)
-> >  		part_stat_lock();
-> >  		part = req->part;
-> >  
-> > -		update_io_ticks(part, jiffies);
-> > +		update_io_ticks(part, jiffies, true);
-> >  		part_stat_inc(part, ios[sgrp]);
-> >  		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
-> >  		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
-> > @@ -1379,7 +1379,7 @@ void blk_account_io_start(struct request *rq, bool new_io)
-> >  		rq->part = part;
-> >  	}
-> >  
-> > -	update_io_ticks(part, jiffies);
-> > +	update_io_ticks(part, jiffies, false);
-> >  
-> >  	part_stat_unlock();
-> >  }
-> > diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> > index d5c75df64bba..f1066f10b062 100644
-> > --- a/include/linux/genhd.h
-> > +++ b/include/linux/genhd.h
-> > @@ -467,7 +467,7 @@ static inline void free_part_info(struct hd_struct *part)
-> >  	kfree(part->info);
-> >  }
-> >  
-> > -void update_io_ticks(struct hd_struct *part, unsigned long now);
-> > +void update_io_ticks(struct hd_struct *part, unsigned long now, bool end);
-> >  
-> >  /* block/genhd.c */
-> >  extern void device_add_disk(struct device *parent, struct gendisk *disk,
-> > 
-> 
-> Looks fine:
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-BTW, there is still some gap(%65 vs. 99%) between this fix and the original
-accounting(before applying Mike/Mikulas's 7 patches), and it might be
-one thing to improve in future.
-
-1) test, sda is single queue virtio-scsi, which is emulated by one HDD
-image
-
-2) fio test script:
-fio --direct=1 --size=128G --bsrange=4k-4k \
-		--runtime=20 --numjobs=1 \
-		--ioengine=libaio --iodepth=16 \
-		--iodepth_batch_submit=16 \
-		--iodepth_batch_complete_min=16 \
-		--group_reporting=1 --filename=/dev/sda \
-		--name=seq-test --rw=read
-
-3) result:
-- v5.6-rc with this patch
-Run status group 0 (all jobs):
-   READ: bw=79.4MiB/s (83.3MB/s), 79.4MiB/s-79.4MiB/s (83.3MB/s-83.3MB/s), io=155
-88MiB (1665MB), run=20001-20001msec
-
-Disk stats (read/write):
-  sda: ios=25039/0, merge=375596/0, ticks=18823/0, in_queue=4330, util=99.43%
-
-
-- commit 112f158f66cb (which is previous commit of 5b18b5a73760)
-Run status group 0 (all jobs):
-   READ: bw=81.4MiB/s (85.3MB/s), 81.4MiB/s-81.4MiB/s (85.3MB/s-85.3MB/s), io=166
-28MiB (1707MB), run=20001-20001msec
-
-Disk stats (read/write):
-  sda: ios=25749/0, merge=386236/0, ticks=17963/0, in_queue=12976, util=65.20%
-
-
-Thanks,
-Ming
-
+On 03/24/2020 08:27 PM, Damien Le Moal wrote:=0A=
+>>   {=0A=
+>> >diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+>> >index 53a1325efbc3..0070f26b9579 100644=0A=
+>> >--- a/include/linux/blkdev.h=0A=
+>> >+++ b/include/linux/blkdev.h=0A=
+>> >@@ -887,6 +887,9 @@ extern void blk_execute_rq_nowait(struct request_qu=
+eue *, struct gendisk *,=0A=
+>> >  /* Helper to convert REQ_OP_XXX to its string format XXX */=0A=
+>> >  extern const char *blk_op_str(unsigned int op);=0A=
+>> >=0A=
+>> >+/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */=0A=
+>> >+extern const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);=0A=
+>> >+=0A=
+> I do not think that the extern is needed here. And I think that this decl=
+aration=0A=
+> should go under #ifdef CONFIG_BLK_DEV_ZONED since its code is compiled on=
+ly if=0A=
+> that config option is enabled.=0A=
+>=0A=
+=0A=
+Are you suggesting like following ?=0A=
+=0A=
++#ifdef CONFIG_BLK_DEV_ZONED=0A=
++/* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */=0A=
++const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);=0A=
++#endif /* CONFIG_BLK_DEV_ZONED */=0A=
++=0A=
+=0A=
