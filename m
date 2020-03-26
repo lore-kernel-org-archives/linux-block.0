@@ -2,57 +2,41 @@ Return-Path: <SRS0=7tOu=5L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E70C43331
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 14:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB27C43331
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 14:46:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 680E52073E
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 14:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8077220775
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 14:46:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oOVvjG/3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UepjjWiX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726347AbgCZOhh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Mar 2020 10:37:37 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:56242 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726270AbgCZOhh (ORCPT
+        id S1727868AbgCZOqZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Mar 2020 10:46:25 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:33646 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727849AbgCZOqZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Mar 2020 10:37:37 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02QEX7M4009867;
-        Thu, 26 Mar 2020 14:36:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=7ms8FwymQmddGHgatxkaCEwofDmjeI0drCKbrY3vE+A=;
- b=oOVvjG/31vXbRMOzNpZ/LF+hTmcD6PEEc8JMgwIKf+ywhGB14RZdvG/5EhRCLmmJNYox
- P58kYdfDT7YLAotxz+eQ3JMyXl2oBrX1tb5i50OeGWQtYK6IFO58ALlNV13aXsApdcC9
- ta6kx8O4O0k9Fug82JJd2EvdzrkmLbzKRFD5z/6M+Uoq0u/ze2M2uDkEuCa0YnWmFY/L
- NiAIwUiFxqdOA76OtqxPjoqBvbwO5MqbmL+LUAHzklChNqmzYd6XBX6qY8/1Kc0hGd3y
- xfWMSna09dPrI/8NeeHvvKncNNvRrh01++6zorBh6r+cu8LfIe4neKQ+yqSX3oNIBQeF FQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2ywavmg5am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Mar 2020 14:36:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02QEWpDq129855;
-        Thu, 26 Mar 2020 14:34:55 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2yxw4trtk3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Mar 2020 14:34:55 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02QEYmJI025407;
-        Thu, 26 Mar 2020 14:34:48 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 26 Mar 2020 07:34:47 -0700
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thu, 26 Mar 2020 10:46:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8TwPFh8funJBhnnT2SeFgIP/csO3dTH9SO/ivFg6Uxs=; b=UepjjWiXc9vzYPwcUqhdIfi8zC
+        m4KZWLMEHyvsO2cRfgXAJ32RTfI/M972gzAGipDF6F4QO4kiraCPQhrDbDzLQsc7PVPiwSMxgtfBs
+        OlbPLimvj7YrM0GlAwRg7T08V16m3jsjEconFunvyhpyJFOysq0VYm+CsNGb/+uGjiiz1mgELA7xn
+        HjJcUFsPCIu2q4NpYr/IoUFWpdViqKjIszlNGhrfB2wnP6VU2tKWQwffGcB0c2lsdO5H0BrnpcAkl
+        HS9EvEFFnQBFRtXGySmWRD600rWIG0agEy44vBqJI7m79C9ZYXevI/WGLn+9eimjGI/ogG18GqJ5I
+        kmBLDlqw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHTlc-0002Pb-5G; Thu, 26 Mar 2020 14:45:56 +0000
+Date:   Thu, 26 Mar 2020 07:45:56 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         "Darrick J. Wong" <darrick.wong@oracle.com>,
         Kirill Tkhai <ktkhai@virtuozzo.com>, axboe@kernel.dk,
         bob.liu@oracle.com, agk@redhat.com, snitzer@redhat.com,
@@ -64,53 +48,35 @@ Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
         ajay.joshi@wdc.com, sagi@grimberg.me, dsterba@suse.com,
         bvanassche@acm.org, dhowells@redhat.com, asml.silence@gmail.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for REQ_OP_WRITE_ZEROES
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <158157930219.111879.12072477040351921368.stgit@localhost.localdomain>
-        <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
-        <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
-        <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
-        <20200319102819.GA26418@infradead.org> <yq1tv2k8pjn.fsf@oracle.com>
-        <20200325162656.GJ29351@magnolia>
-        <20200325163223.GA27156@infradead.org> <yq1d090jqlm.fsf@oracle.com>
-        <20200326092935.GA6478@infradead.org>
-Date:   Thu, 26 Mar 2020 10:34:42 -0400
-In-Reply-To: <20200326092935.GA6478@infradead.org> (Christoph Hellwig's
-        message of "Thu, 26 Mar 2020 02:29:35 -0700")
-Message-ID: <yq1lfnngp6l.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+Subject: Re: [PATCH v7 0/6] block: Introduce REQ_ALLOCATE flag for
+ REQ_OP_WRITE_ZEROES
+Message-ID: <20200326144556.GA4317@infradead.org>
+References: <e2b7cbab-d91f-fd7b-de6f-a671caa6f5eb@virtuozzo.com>
+ <69c0b8a4-656f-98c4-eb55-2fd1184f5fc9@virtuozzo.com>
+ <67d63190-c16f-cd26-6b67-641c8943dc3d@virtuozzo.com>
+ <20200319102819.GA26418@infradead.org>
+ <yq1tv2k8pjn.fsf@oracle.com>
+ <20200325162656.GJ29351@magnolia>
+ <20200325163223.GA27156@infradead.org>
+ <yq1d090jqlm.fsf@oracle.com>
+ <20200326092935.GA6478@infradead.org>
+ <yq1lfnngp6l.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxlogscore=923 adultscore=0 phishscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003260113
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9571 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- phishscore=0 suspectscore=0 mlxlogscore=965 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003260113
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1lfnngp6l.fsf@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Mar 26, 2020 at 10:34:42AM -0400, Martin K. Petersen wrote:
+> I just worry about the proliferation of identical merging and splitting
+> code throughout the block stack as we add additional single-range, no
+> payload operations (Verify, etc.). I prefer to enforce the semantics in
+> the LLD and not in the plumbing. But I won't object to a separate
+> REQ_OP_ALLOCATE if you find the resulting code duplication acceptable.
 
-Christoph,
-
-> That's why I don't like the whole flags game very much.  I'd rather
-> have REQ_OP_WRITE_ZEROES as the integrity operation that gurantees
-> zeroing, and a REQ_ALLOCATE that doesn't guarantee zeroing, just some
-> deterministic state of the blocks.
-
-I just worry about the proliferation of identical merging and splitting
-code throughout the block stack as we add additional single-range, no
-payload operations (Verify, etc.). I prefer to enforce the semantics in
-the LLD and not in the plumbing. But I won't object to a separate
-REQ_OP_ALLOCATE if you find the resulting code duplication acceptable.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+I find it acceptable for now.  And I think we should find some way
+(e.g. by being table driven) to share code between differnet opcodes.
