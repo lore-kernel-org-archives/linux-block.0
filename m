@@ -2,92 +2,75 @@ Return-Path: <SRS0=7tOu=5L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A25DC43331
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 15:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0E1C43331
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 15:55:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C9E220737
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 15:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF10220775
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 15:55:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fIO41+p1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qPCV1Rns"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727593AbgCZPwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Mar 2020 11:52:02 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:46647 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727056AbgCZPwC (ORCPT
+        id S1727699AbgCZPz6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Mar 2020 11:55:58 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:55358 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727646AbgCZPz6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Mar 2020 11:52:02 -0400
-Received: by mail-lf1-f68.google.com with SMTP id q5so5251235lfb.13
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2020 08:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Tp9mM3jlwtId/vdqhTHtN2qnBeVBExLHzO6AXaG0BKU=;
-        b=fIO41+p1lsoj4sTyeTV3Z5vIfVmAWEEXvMSsrj4r/H/bTELLTO7Hqr2hYtQpIJmMU2
-         ADaUGqnKSD26u15LhwVmQt9N/NRMkM8Ek8sxuCarwy8yW5eRjDOeqbe0zTrdtVkOSOBE
-         hqO5Pyy0ddR6yvTUbY5NbroZgzWDXZNPWfNz8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Tp9mM3jlwtId/vdqhTHtN2qnBeVBExLHzO6AXaG0BKU=;
-        b=RVx3Ayp6N8KzOS5YrfrtGXy1e3dX0VW6h0JwwAzmyrWld0yiy5MSMDiHvWgEG5VW23
-         73j83cFE4jCINQxGbKIZjcHfog/5YgNRL/EOUa1RxVl0L/NRX8DezY5p72PPPzUhGF4w
-         ZzlkhDOUBpnHMFYFH3KPnpsOhk6pQ74d2LdBnJQutuSbeI6GNl4er1Du7NahxBEsdP7B
-         GzYQHZF+19RWwxb/iyOtJVgof1c6ggDM2i0v3ATLXPxSufnn80uAGG1umUKV8my9OSsg
-         w0Ic9jHTqXKhWDVX2x7CdhInGgx4o9KHupWQt6nmOmKPJqW/hO4LwhsKLCJ6KmXDiYkg
-         2idw==
-X-Gm-Message-State: ANhLgQ2ATzUXNScyxvOQxg1q6ryxqq70oJn/rkUuXT368KXsIZirn7+U
-        R6X0fyA4E1YX7iuI77+FodarmrkwVRw=
-X-Google-Smtp-Source: ADFU+vu+IMp8JgCG6gRvrR6Wso+fQUmUo1/gp3G8vllZH5VBUBb9cU7MO3zU+QmxEsJN+zNT+bTfhg==
-X-Received: by 2002:a19:c388:: with SMTP id t130mr6395620lff.175.1585237919617;
-        Thu, 26 Mar 2020 08:51:59 -0700 (PDT)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com. [209.85.208.171])
-        by smtp.gmail.com with ESMTPSA id r9sm1699443ljd.10.2020.03.26.08.51.58
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2020 08:51:58 -0700 (PDT)
-Received: by mail-lj1-f171.google.com with SMTP id p10so6700597ljn.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2020 08:51:58 -0700 (PDT)
-X-Received: by 2002:a2e:9497:: with SMTP id c23mr5569835ljh.286.1585237917916;
- Thu, 26 Mar 2020 08:51:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200317151111.25749-2-andrzej.p@collabora.com>
- <20200317165106.29282-1-andrzej.p@collabora.com> <20200326145253.GA18623@infradead.org>
-In-Reply-To: <20200326145253.GA18623@infradead.org>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Thu, 26 Mar 2020 08:51:21 -0700
-X-Gmail-Original-Message-ID: <CAE=gft5w_8XwSGRNS6DZ0kppOihoUtYxrMfaTrM5eRifjBYYNQ@mail.gmail.com>
-Message-ID: <CAE=gft5w_8XwSGRNS6DZ0kppOihoUtYxrMfaTrM5eRifjBYYNQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND 1/2] loop: Report EOPNOTSUPP properly
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
+        Thu, 26 Mar 2020 11:55:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6p7M0oF06E9R88/xU23XER6eK4MkYLCH3j3MxDEX7fw=; b=qPCV1RnsoX1EfevxTvJ7K14S0D
+        bPw4mn5ohQol+5sF6Sk9KKiStYtLusdBF9m/78N5T6dAZQgZO15UF338ljaTBiDb2PTbvT05ZhFq+
+        smn5z89yq4vQDdpFivGrQZQAuIbPI7zYLGc2qKIL1s0Oxapu+E3SQUaGUY7ni5/8ZTxzkP7DLtxrK
+        IHw3XwZV5eL2ufFAjHq/gdfaZGECZy1dlwWhxPh8RJmrixEsSiNG3GH1N+Ii5CJzDb8NlQuFZK5HG
+        Vumu4jlqDOUA+a+4AhQXQNqUontS51b5mDOwfohl+0BmNqas8VOwdZDtV2b+IrCPVmXnqSqfCPnJN
+        ThfhlSQA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHUrN-0001x6-KM; Thu, 26 Mar 2020 15:55:57 +0000
+Date:   Thu, 26 Mar 2020 08:55:57 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Evan Green <evgreen@chromium.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
         linux-block <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>, kernel@collabora.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH RESEND 1/2] loop: Report EOPNOTSUPP properly
+Message-ID: <20200326155557.GA6043@infradead.org>
+References: <20200317151111.25749-2-andrzej.p@collabora.com>
+ <20200317165106.29282-1-andrzej.p@collabora.com>
+ <20200326145253.GA18623@infradead.org>
+ <CAE=gft5w_8XwSGRNS6DZ0kppOihoUtYxrMfaTrM5eRifjBYYNQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAE=gft5w_8XwSGRNS6DZ0kppOihoUtYxrMfaTrM5eRifjBYYNQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 7:53 AM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Tue, Mar 17, 2020 at 05:51:06PM +0100, Andrzej Pietrasiewicz wrote:
-> > From: Evan Green <evgreen@chromium.org>
+On Thu, Mar 26, 2020 at 08:51:21AM -0700, Evan Green wrote:
+> On Thu, Mar 26, 2020 at 7:53 AM Christoph Hellwig <hch@infradead.org> wrote:
 > >
-> > Properly plumb out EOPNOTSUPP from loop driver operations, which may
-> > get returned when for instance a discard operation is attempted but not
-> > supported by the underlying block device. Before this change, everything
-> > was reported in the log as an I/O error, which is scary and not
-> > helpful in debugging.
->
-> This really should be using errno_to_blk_status.
+> > On Tue, Mar 17, 2020 at 05:51:06PM +0100, Andrzej Pietrasiewicz wrote:
+> > > From: Evan Green <evgreen@chromium.org>
+> > >
+> > > Properly plumb out EOPNOTSUPP from loop driver operations, which may
+> > > get returned when for instance a discard operation is attempted but not
+> > > supported by the underlying block device. Before this change, everything
+> > > was reported in the log as an I/O error, which is scary and not
+> > > helpful in debugging.
+> >
+> > This really should be using errno_to_blk_status.
+> 
+> I had that here in v7:
+> https://lore.kernel.org/lkml/20191114235008.185111-1-evgreen@chromium.org/
 
-I had that here in v7:
-https://lore.kernel.org/lkml/20191114235008.185111-1-evgreen@chromium.org/
+Well, it wasn't in the version you sent the ping for..
