@@ -2,101 +2,74 @@ Return-Path: <SRS0=7tOu=5L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2B6C43331
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 16:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE28C43331
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 16:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A01B320848
-	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 16:27:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uXKE2b7w"
+	by mail.kernel.org (Postfix) with ESMTP id 1144F2083E
+	for <linux-block@archiver.kernel.org>; Thu, 26 Mar 2020 16:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbgCZQ1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Mar 2020 12:27:25 -0400
-Received: from mail-lf1-f44.google.com ([209.85.167.44]:45179 "EHLO
-        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726175AbgCZQ1Z (ORCPT
+        id S1726296AbgCZQg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Mar 2020 12:36:57 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:50768 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbgCZQg5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Mar 2020 12:27:25 -0400
-Received: by mail-lf1-f44.google.com with SMTP id v4so5346973lfo.12;
-        Thu, 26 Mar 2020 09:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YvH8nAkRIhWjmEV+9kX4eoO50WVDe3LtRQC8pQNa05A=;
-        b=uXKE2b7wkmnzI5GmZPrvAYbzQk2P/+sAOvmPrBZOw01lpLMbSeUUvFG8iT08TejXTm
-         gVXNXk8ONo3VzqGk/RUq2FhPVbRS/WwuC3oH8al9lQEZPxR90XFMVcK+qjwpj41NXL3t
-         A81Nej2jZkdxVL4fTPmJ9dXzTUjzPx2NXsAIlJ5FviAVgZ3ErTGm94NgWQxfTmuwVYaW
-         N63LyOTACRCginyM8Uqlv4OS9bTm/aFqgPMb9NoKEhoWPszciYQxgIJpvUMS82bL9qAP
-         ifCyacieEbveW/htPDeOtpva+IQKQN0Fpyqj+XqsMSeMR4btAaAoMo9yAMDXLwCFQKFr
-         mi/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YvH8nAkRIhWjmEV+9kX4eoO50WVDe3LtRQC8pQNa05A=;
-        b=Wb6pIGdsMCcKhAOtYkliiMi6eSOQyx3oRpwx2bS/c2cHSklggjry2MX/Wj2vgg7sNk
-         OEPt2Q2Ri16d+wG/9+vYYOf+XTzS9cDOX1yp3cqzn2MFkB7OJNCsKH7u5ycyE4rfphNT
-         LNnITG/pXl2qOH21+8r6j/NMcThaw8HOW0MLMGsnwzxwaMYaFZkSZdFa6VT44WlCQqRN
-         nNu68Z9MCYyH00hAJK0na13oRvghM3HvsaLS+7dVP0SjlUn/FhZbQgSY6u6OkdVWNZpt
-         ZVJzi8yy1sLMSzLTNF8PfnswxjfmXQRsIcOkRa40oWI5B72NThqJ8g6QCv33p5VaHz4T
-         NoyA==
-X-Gm-Message-State: ANhLgQ1ROobK+T2z6Hwv9jz9uQFYpFjA7RN2Cr9drvnWDeVGuVi1pHrh
-        1Xp2uWPrcuG5n4ITQJXYGFbflomXnpXgb4OZdfgMd4Pi
-X-Google-Smtp-Source: ADFU+vu94rttJ1jdk65LzSuZJ59m1noymI2fxV6Tq7r9N1fgkW8O2Cbyxoebzj1IrkbB14CXm5WIIWHtiEzQpQXRtTk=
-X-Received: by 2002:a19:be11:: with SMTP id o17mr6198870lff.168.1585240042693;
- Thu, 26 Mar 2020 09:27:22 -0700 (PDT)
+        Thu, 26 Mar 2020 12:36:57 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: andrzej.p)
+        with ESMTPSA id 630B328DA84
+Subject: Re: [PATCH RESEND 1/2] loop: Report EOPNOTSUPP properly
+To:     Christoph Hellwig <hch@infradead.org>,
+        Evan Green <evgreen@chromium.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, kernel@collabora.com
+References: <20200317151111.25749-2-andrzej.p@collabora.com>
+ <20200317165106.29282-1-andrzej.p@collabora.com>
+ <20200326145253.GA18623@infradead.org>
+ <CAE=gft5w_8XwSGRNS6DZ0kppOihoUtYxrMfaTrM5eRifjBYYNQ@mail.gmail.com>
+ <20200326155557.GA6043@infradead.org>
+From:   Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+Message-ID: <d3c36178-c6d6-154d-436c-e59fa7a47396@collabora.com>
+Date:   Thu, 26 Mar 2020 17:36:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <cover.1584728740.git.zhangweiping@didiglobal.com>
- <20200324182725.GG162390@mtj.duckdns.org> <CAA70yB7a7VjgPLObe-rzfV0dLAumeUVy0Dps+dY5r-Guq2Susg@mail.gmail.com>
- <20200325141236.GJ162390@mtj.duckdns.org> <CAA70yB5yH9H6-gaKfRSTmgd6vvzP4T9N7v-NAD0MsRL+YTexHw@mail.gmail.com>
- <CAA70yB4e65nbV=ZA8OT-SUkq+ZQOGGB9e-3QKJ_PqXjVaXGvFA@mail.gmail.com> <20200326161328.GN162390@mtj.duckdns.org>
-In-Reply-To: <20200326161328.GN162390@mtj.duckdns.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Fri, 27 Mar 2020 00:27:11 +0800
-Message-ID: <CAA70yB66fBdAOnv+8rXauwbuPu+UY+gr9ZKeSsQNgq+ZHhJn3Q@mail.gmail.com>
-Subject: Re: [RFC 0/3] blkcg: add blk-iotrack
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200326155557.GA6043@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Tejun Heo <tj@kernel.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=8827=E6=97=A5=E5=91=
-=A8=E4=BA=94 =E4=B8=8A=E5=8D=8812:15=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Thu, Mar 26, 2020 at 11:08:45PM +0800, Weiping Zhang wrote:
-> > But iocost_test1 cannot get 8/(8+1) iops,  and the total disk iops
-> > is 737559 < 79388, even I change rrandiops=3D637000.
->
-> iocost needs QoS targets set especially for deep queue devcies. W/o QoS t=
-argets,
-> it only throttles when QD is saturated, which might not happen at all dep=
-ending
-> on fio job params.
->
-> Can you try with sth like the following in io.cost.qos?
->
->   259:0 enable=3D1 ctrl=3Duser rpct=3D95.00 rlat=3D5000 wpct=3D50.00 wlat=
-=3D10000
->
-> In case you see significant bw loss, step up the r/wlat params.
->
-OK, I'll try it.
+Hi,
 
-I really appreciate that if you help review blk-iotrack.c, or just
-drop io.iotrakc.stat
-and append these  statistics to the io.stat? I think these metrics is usefu=
-ll,
-and it just extend io.stat output.
+W dniu 26.03.2020 o 16:55, Christoph Hellwig pisze:
+> On Thu, Mar 26, 2020 at 08:51:21AM -0700, Evan Green wrote:
+>> On Thu, Mar 26, 2020 at 7:53 AM Christoph Hellwig <hch@infradead.org> wrote:
+>>>
+>>> On Tue, Mar 17, 2020 at 05:51:06PM +0100, Andrzej Pietrasiewicz wrote:
+>>>> From: Evan Green <evgreen@chromium.org>
+>>>>
+>>>> Properly plumb out EOPNOTSUPP from loop driver operations, which may
+>>>> get returned when for instance a discard operation is attempted but not
+>>>> supported by the underlying block device. Before this change, everything
+>>>> was reported in the log as an I/O error, which is scary and not
+>>>> helpful in debugging.
+>>>
+>>> This really should be using errno_to_blk_status.
+>>
+>> I had that here in v7:
+>> https://lore.kernel.org/lkml/20191114235008.185111-1-evgreen@chromium.org/
+> 
+> Well, it wasn't in the version you sent the ping for..
+> 
 
-Thanks a ton
+It was me who pinged. I didn't notice the v7, sorry. Is it merged yet?
+
+Andrzej
