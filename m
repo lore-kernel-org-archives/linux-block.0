@@ -2,202 +2,78 @@ Return-Path: <SRS0=yDPB=5M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 632C1C2D0EE
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1E5C43331
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 17:00:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39A8D20A8B
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:50:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F35D220848
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 17:00:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Fvvg6Wq3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="etdXQcPb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgC0Quf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Mar 2020 12:50:35 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:2590 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727143AbgC0Quc (ORCPT
+        id S1726900AbgC0RAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Mar 2020 13:00:49 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38298 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbgC0RAt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Mar 2020 12:50:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585327831; x=1616863831;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hO0jQxdyY1ykEreRRj8II7pjB7WCTRWEQg4KbI4Pvtc=;
-  b=Fvvg6Wq3LFdh1FVdar/um968xP5LWue7cGT4WU2Kpo0d1HT7D4J/prIu
-   2X69zAeXiNWJup/tE8INcg+rLJfBYV0Sc8cc6WCZU0xqQjxi783YeTXyb
-   ubHFrmNewDADxWqgEOOyTwky1zq27lIIzvVIjvCehFI/zN+IAb1KRDsuT
-   7Qn4LE2bL0fXq2oxiUFenTmOamCLP4fkj3lomSyJeyQncCByuMmiNG9cP
-   W1WrtRjpEqn41Wazu7aJspHbBSvB4/fI0d9p82d/2hCDEIk3+mKSCLWBB
-   2Crburp1iqQ1yGwBgBYrYDeJaYgZa//sKs4+feQ4s1sTxgJ/IAn18fvD0
-   Q==;
-IronPort-SDR: 6ojcjvAcJP2ROpkA6X/49GYhpjXTvWlUF9BpcTqI1/q2Yy43LnV+7il6zDRBW1ckKK5h643/M7
- gzvNmfWK8l5HOxvdd8NJffiA9YmnEXwbQSU/QIi9IQxeSpHPmCR+7ZWTg7daWsfHezhRkidnsr
- VzcXf9hRpKJczRO6cQYXrDMyk/3ZnErxXP1XYHHvtRJ3nYPavHL1EKPC2PgimrIJz5ogU3gTCb
- EhKDnHDna4hg9jIIDS08/1nHnOm5BVFaRyvo72c3f5JsM8eoF8UXMCJ6NT2zdpbPNMIluUaqqt
- K6k=
-X-IronPort-AV: E=Sophos;i="5.72,313,1580745600"; 
-   d="scan'208";a="242210464"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2020 00:50:31 +0800
-IronPort-SDR: nImQ9MOv7Yf2kqrr8jY/Lkj4DMhgyz1/i02jveD5DFpfq9l1n4Bdt9s0CJD81EJTLJ7hkCJ3M4
- tG54qh2HVCdQKXKWIwT7TnjLQFZrlZ+2M4UAvnaiiPT/O2xegGb/h3CR7LcNg1/p76CjhAeJji
- IZmBpaPVGYVa2OY1ybyPmNjzHggAW1psCk4RKXIf06bdr0YaqovozrYvEC5BbTw2y6hoWITLS0
- fHN5wTgEycoeu2whLOQ6Bv3b/2hp7YJfBHPHnEV15eZaXMCIFarKgzciX6jGP0CanljY7+wurJ
- +jTixZ9w0ZhHcqWOHYodxecC
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 09:42:06 -0700
-IronPort-SDR: +9zzBPz4Bn4fJLPecXnXfgyKkwnWCJxaZlTi8TTgKmcTfEmrSgfRhKFxFwnn4Q7QWDyIgjQjSW
- YVQeNVeLA6P8CW6nNGEJoqVfHI6K5nkd4A2nJlvl+SWDKEQJE1icsKBK/v87qaNvIANdDAxltU
- +fzR9IWVZajbJhVLmqANQDnaD8M0efFX415jZKgb9BOYPnrMJcmte6MpI5ve4kEqQflkabm6ZA
- agsyo0xDG1gIykx/ElD3o2B3UeereFVaGOFhbsmvQz+KeHGUgv7PH1wcd/7EamMuSGTUo9neWX
- gbs=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip02.wdc.com with ESMTP; 27 Mar 2020 09:50:30 -0700
-From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v3 08/10] null_blk: Support REQ_OP_ZONE_APPEND
-Date:   Sat, 28 Mar 2020 01:50:10 +0900
-Message-Id: <20200327165012.34443-9-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200327165012.34443-1-johannes.thumshirn@wdc.com>
-References: <20200327165012.34443-1-johannes.thumshirn@wdc.com>
+        Fri, 27 Mar 2020 13:00:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=y4jqMXMuSCLjtxZfZUroyV7Ldlb0usNsMs0ZoH+IuWE=; b=etdXQcPbKq+hMTQy1uJbrj3Dwy
+        S43mHrDmjodUSCeE2wcyLdiTBbZJji4+WjPE4HUq2bPN515bISs4fQbf8iy6g0GnC/kLmQW2umQoC
+        MMfuXv8wpvN7PtMkMYIwpWJvRGQiwaX1yPIpaph27QJWiwOSxDnwSbMAQjDDsV452yNDgMra3H2br
+        HJZU6dXL+GOF5RIelMf0M3qQXd0XOSSLEIN61bYpPNgi7M0qZjp8iQxaFKDqzCCUi5yYZQRjdIg7S
+        R+6EFzJShR0M2/KGokbmRcDYGxefBu/VbHisjiZ965IiOWNK1hBiGOpezrfse89/d53XlYXi4+ZO5
+        cdtm2WfQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHsLf-00084s-Sa; Fri, 27 Mar 2020 17:00:47 +0000
+Date:   Fri, 27 Mar 2020 10:00:47 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v9 01/11] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200327170047.GA24682@infradead.org>
+References: <20200326030702.223233-1-satyat@google.com>
+ <20200326030702.223233-2-satyat@google.com>
+ <20200326062213.GF858@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200326062213.GF858@sol.localdomain>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+On Wed, Mar 25, 2020 at 11:22:13PM -0700, Eric Biggers wrote:
+> > +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+> > +	/* Inline crypto capabilities */
+> > +	struct blk_keyslot_manager *ksm;
+> > +#endif
+> 
+> I do still wonder whether the concept of inline crypto support should be more
+> separated from keyslot management, to be better prepared for device-mapper
+> passthrough support and for hardware that accepts keys directly.  (Such hardware
+> exists, though I'm not sure support for it will be upstreamed.)  For example,
+> the crypto capabilities could be stored in a 'struct blk_crypto_capabilities'
+> rather than in 'struct blk_keyslot_manager', and the latter could be optional.
+> 
+> What you have now is fine for the functionality in the current patchset though,
+> so I'm not really complaining.  Just something to think about.
 
-Support REQ_OP_ZONE_APPEND requests for zone mode null_blk devices.
-Use the internally tracked zone write pointer position as the actual
-write position, which is returned using the command request __sector
-field in the case of an mq device and using the command BIO sector in
-the case of a BIO device. Since the write position is used for data copy
-in the case of a memory backed device, reverse the order in which
-null_handle_zoned() and null_handle_memory_backed() are called to ensure
-that null_handle_memory_backed() sees the correct write position for
-REQ_OP_ZONE_APPEND operations.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- drivers/block/null_blk_main.c  |  9 +++++---
- drivers/block/null_blk_zoned.c | 38 +++++++++++++++++++++++++++-------
- 2 files changed, 37 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 3e45e3640c12..5492f1e49eee 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1300,12 +1300,15 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
- 			goto out;
- 	}
- 
-+	if (dev->zoned) {
-+		cmd->error = null_handle_zoned(cmd, op, sector, nr_sectors);
-+		if (cmd->error != BLK_STS_OK)
-+			goto out;
-+	}
-+
- 	if (dev->memory_backed)
- 		cmd->error = null_handle_memory_backed(cmd, op);
- 
--	if (!cmd->error && dev->zoned)
--		cmd->error = null_handle_zoned(cmd, op, sector, nr_sectors);
--
- out:
- 	nullb_complete_cmd(cmd);
- 	return BLK_STS_OK;
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 8259f3212a28..f20be7b91b9f 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -67,13 +67,22 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 
- int null_register_zoned_dev(struct nullb *nullb)
- {
-+	struct nullb_device *dev = nullb->dev;
- 	struct request_queue *q = nullb->q;
- 
--	if (queue_is_mq(q))
--		return blk_revalidate_disk_zones(nullb->disk);
-+	if (queue_is_mq(q)) {
-+		int ret = blk_revalidate_disk_zones(nullb->disk);
-+
-+		if (ret)
-+			return ret;
-+	} else {
-+		blk_queue_chunk_sectors(q, dev->zone_size_sects);
-+		q->nr_zones = blkdev_nr_zones(nullb->disk);
-+	}
- 
--	blk_queue_chunk_sectors(q, nullb->dev->zone_size_sects);
--	q->nr_zones = blkdev_nr_zones(nullb->disk);
-+	blk_queue_max_zone_append_sectors(q,
-+			min_t(sector_t, q->limits.max_hw_sectors,
-+			      dev->zone_size_sects));
- 
- 	return 0;
- }
-@@ -133,7 +142,7 @@ size_t null_zone_valid_read_len(struct nullb *nullb,
- }
- 
- static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
--		     unsigned int nr_sectors)
-+				    unsigned int nr_sectors, bool append)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
- 	unsigned int zno = null_zone_no(dev, sector);
-@@ -148,7 +157,20 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	case BLK_ZONE_COND_IMP_OPEN:
- 	case BLK_ZONE_COND_EXP_OPEN:
- 	case BLK_ZONE_COND_CLOSED:
--		/* Writes must be at the write pointer position */
-+		/*
-+		 * Regular writes must be at the write pointer position.
-+		 * Zone append writes are automatically issued at the write
-+		 * pointer and the position returned using the request or BIO
-+		 * sector.
-+		 */
-+		if (append) {
-+			sector = zone->wp;
-+			if (cmd->bio)
-+				cmd->bio->bi_iter.bi_sector = sector;
-+			else
-+				cmd->rq->__sector = sector;
-+		}
-+
- 		if (sector != zone->wp)
- 			return BLK_STS_IOERR;
- 
-@@ -228,7 +250,9 @@ blk_status_t null_handle_zoned(struct nullb_cmd *cmd, enum req_opf op,
- {
- 	switch (op) {
- 	case REQ_OP_WRITE:
--		return null_zone_write(cmd, sector, nr_sectors);
-+		return null_zone_write(cmd, sector, nr_sectors, false);
-+	case REQ_OP_ZONE_APPEND:
-+		return null_zone_write(cmd, sector, nr_sectors, true);
- 	case REQ_OP_ZONE_RESET:
- 	case REQ_OP_ZONE_RESET_ALL:
- 	case REQ_OP_ZONE_OPEN:
--- 
-2.24.1
-
+I'd rather keep things simple (aka as-is) for now.  If needed we can
+change it. I doubt we'll even have a handful drivers with inline
+crypto in the next years..
