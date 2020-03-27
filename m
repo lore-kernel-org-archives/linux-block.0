@@ -2,53 +2,55 @@ Return-Path: <SRS0=yDPB=5M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 250A9C43331
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 02:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4744AC43331
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 03:00:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0140F2074D
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 02:52:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 210A720787
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 03:00:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbgC0CwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Mar 2020 22:52:10 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46220 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727456AbgC0CwK (ORCPT
+        id S1727607AbgC0DAS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Mar 2020 23:00:18 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36702 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726496AbgC0DAS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Mar 2020 22:52:10 -0400
-Received: by mail-pl1-f194.google.com with SMTP id s23so2905530plq.13;
-        Thu, 26 Mar 2020 19:52:09 -0700 (PDT)
+        Thu, 26 Mar 2020 23:00:18 -0400
+Received: by mail-pg1-f193.google.com with SMTP id j29so3912118pgl.3;
+        Thu, 26 Mar 2020 20:00:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=o/x+mawiAvGAzXR6KVukxERD/FlFfrvg3WXOiyWEPps=;
-        b=SVUH3fje9XgH8zo99lBj38qgCDWKkqdkblr13dD7/YduwMaiLjUfsGYc+NW536+zW0
-         0cBMOIj4HddQoAGUFEytg6f3/F8p/O5JQ1G4I+Bn2WAhn+NZzRaCQeOYQTtFhjzlECGb
-         8ZZJE8oSxfG5zZO7ekZmSNQIJaQfVWBoUtyF98EnsBn3nspVLKP6uD6E1pwMxd5TxbLJ
-         1FOYifjlCQBzUfwGS72eXFqLwp2q0EXbEckzHUn9IFFY5ZkFaoeLb0N1jRLEM6Z+WlNj
-         auhOSPwvoseSHMN4Xkqd4cGaUv6RbLmXxDo8/RJZ/OCeX3Uh1MtlYstx4R/ViVU/+LYY
-         HPlw==
-X-Gm-Message-State: ANhLgQ0XZHd6GTMOIPEjQJZfydixWZg2XvM/DHhspe5fmyN/aaWGcGB2
-        BmA8ifVRFCyN3YYU66kowrE=
-X-Google-Smtp-Source: ADFU+vvY9d6FD9lutlmPr8wGpYNcXAXgpzUlPywZ8hK6JdGSAwBhtj7WcaYjdzjgsE+pbDMrIU5xyA==
-X-Received: by 2002:a17:902:8d94:: with SMTP id v20mr11584657plo.259.1585277528656;
-        Thu, 26 Mar 2020 19:52:08 -0700 (PDT)
+        bh=A8L7pOMKHT1Fvn5n/xgz4DQpKiNCVTukpmYePSYE6CA=;
+        b=jdziiDbOCRXE/h3X1N2+SYeOkyOd1+KTWjqMa2AAHQTHsjs+KoftS9aj3xlXb6pS6V
+         bWPW/wxneFZ72Y6kohjVpzXIFTvGqIsa89E9Eqd0nmhKUhBIx/FCFOGFZ+3AGdNcXbP5
+         zLy0BBZBJ2HVIIuVWjQc3cteOn0OXEHcCcrtcfHKvcMPK3EPrBHgpFAkvocEGkhfEL6c
+         0onFQCYH0bY3DxyYIoikAymiLVNxoJoMKkq+GqHACZ9/tDZ6azla5gVCXH2LtBfPUi74
+         lSeMGHXHZ5b6nXL4rdImITz/57+4OUucv5+rkgsv6wXVC/Mfpo8tOo95LaixJtSTbQBx
+         Ld8Q==
+X-Gm-Message-State: ANhLgQ1iO1J7MZyn10JjPyPNN14fuBdJiZWNgq5MfO0ymM5ntV9mXF38
+        wkZhxOdCg2viEC0Wq4GXubc=
+X-Google-Smtp-Source: ADFU+vsvK0eP4Uqeyd1/ByCifUDiaGERpiXtrwFTIu/opIyVLOq497xPOF0F6FhTPWo15KgCVy2gKQ==
+X-Received: by 2002:a63:f454:: with SMTP id p20mr11997394pgk.149.1585278017059;
+        Thu, 26 Mar 2020 20:00:17 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:f4c2:6961:f3fb:2dca? ([2601:647:4000:d7:f4c2:6961:f3fb:2dca])
-        by smtp.gmail.com with ESMTPSA id q91sm2626217pjb.11.2020.03.26.19.52.07
+        by smtp.gmail.com with ESMTPSA id f22sm2727805pgl.20.2020.03.26.20.00.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2020 19:52:07 -0700 (PDT)
+        Thu, 26 Mar 2020 20:00:16 -0700 (PDT)
 Subject: Re: KASAN: null-ptr-deref Write in blk_mq_map_swqueue
-To:     Dongli Zhang <dongli.zhang@oracle.com>,
-        syzbot <syzbot+313d95e8a7a49263f88d@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <00000000000047770d05a1c70ecb@google.com>
- <ffabca27-309e-4a6e-eac2-d03a56a7493a@oracle.com>
+To:     syzbot <syzbot+313d95e8a7a49263f88d@syzkaller.appspotmail.com>,
+        a@unstable.cc, axboe@kernel.dk, b.a.t.m.a.n@lists.open-mesh.org,
+        davem@davemloft.net, dongli.zhang@oracle.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch,
+        netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+References: <0000000000004760b805a1cc03fc@google.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +75,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <523c2b61-476e-0fb6-12d9-37038d150fb7@acm.org>
-Date:   Thu, 26 Mar 2020 19:52:06 -0700
+Message-ID: <60bb3266-03fb-acfc-d285-b0249bb5e57d@acm.org>
+Date:   Thu, 26 Mar 2020 20:00:15 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <ffabca27-309e-4a6e-eac2-d03a56a7493a@oracle.com>
+In-Reply-To: <0000000000004760b805a1cc03fc@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,37 +89,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-03-26 17:19, Dongli Zhang wrote:
-> I think the issue is because of line 2827, that is, the q->nr_hw_queues is
-> updated too earlier. It is still possible the init would fail later.
+On 2020-03-26 18:28, syzbot wrote:
+> syzbot has bisected this bug to:
 > 
-> 2809 static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
-> 2810                                                 struct request_queue *q)
-> 2811 {
-> 2812         int i, j, end;
-> 2813         struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
-> 2814
-> 2815         if (q->nr_hw_queues < set->nr_hw_queues) {
-> 2816                 struct blk_mq_hw_ctx **new_hctxs;
-> 2817
-> 2818                 new_hctxs = kcalloc_node(set->nr_hw_queues,
-> 2819                                        sizeof(*new_hctxs), GFP_KERNEL,
-> 2820                                        set->numa_node);
-> 2821                 if (!new_hctxs)
-> 2822                         return;
-> 2823                 if (hctxs)
-> 2824                         memcpy(new_hctxs, hctxs, q->nr_hw_queues *
-> 2825                                sizeof(*hctxs));
-> 2826                 q->queue_hw_ctx = new_hctxs;
-> 2827                 q->nr_hw_queues = set->nr_hw_queues;
-> 2828                 kfree(hctxs);
-> 2829                 hctxs = new_hctxs;
-> 2830         }
+> commit 768134d4f48109b90f4248feecbeeb7d684e410c
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Mon Nov 11 03:30:53 2019 +0000
+> 
+>     io_uring: don't do flush cancel under inflight_lock
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14233ef5e00000
+> start commit:   1b649e0b Merge git://git.kernel.org/pub/scm/linux/kernel/g..
+> git tree:       upstream
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=16233ef5e00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12233ef5e00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=27392dd2975fd692
+> dashboard link: https://syzkaller.appspot.com/bug?extid=313d95e8a7a49263f88d
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13850447e00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=119a26f5e00000
+> 
+> Reported-by: syzbot+313d95e8a7a49263f88d@syzkaller.appspotmail.com
+> Fixes: 768134d4f481 ("io_uring: don't do flush cancel under inflight_lock")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Which kernel tree does this syzbot report refer to? Commit
-d0930bb8f46b ("blk-mq: Fix a recently introduced regression in
-blk_mq_realloc_hw_ctxs()") in Jens' tree removed line 2827 shown above.
 
-Thanks,
-
-Bart.
+#syz fix: blk-mq: Fix a recently introduced regression in
+blk_mq_realloc_hw_ctxs()
