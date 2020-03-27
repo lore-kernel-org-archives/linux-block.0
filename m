@@ -2,149 +2,176 @@ Return-Path: <SRS0=yDPB=5M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7302C2D0ED
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39422C2D0ED
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:50:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E620206E6
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:35:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1002220B80
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:50:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BT0wbHzN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ErzSBswD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727495AbgC0QfU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Mar 2020 12:35:20 -0400
-Received: from mail-pj1-f43.google.com ([209.85.216.43]:39151 "EHLO
-        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727611AbgC0QfT (ORCPT
+        id S1727796AbgC0QuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Mar 2020 12:50:18 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:2564 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727666AbgC0QuS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Mar 2020 12:35:19 -0400
-Received: by mail-pj1-f43.google.com with SMTP id z3so3478945pjr.4
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2020 09:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=M46dTk9Mg6uNvDz6YoDBibNyJVywCM7jUyk+VGGER8o=;
-        b=BT0wbHzN1WNFdsC1LC7Q+2uPsn/1mT27qfNf9tIzhPazaRwAX0nvuU9nElzr2A3YiU
-         s5hljfZfd2Plu+OPr+aCLzV4NQIjD49St+kqUe13H4VtaGSLxkINDqaIp5+F/RxcaapA
-         K2+W3yTJP6pG7mlBzOJ+13FwAm9/kwfX+OU+t4MVsMaJPHuu4/pCkHo63A9ExHNf++iI
-         KW/Glfz3PIN0kZSd2wTqxvzReODJH3sXInJGIE/KSyjbU9d2QikDHdXItkdDLTUew5ND
-         xjjQwB8ow1t2xezaHYHV0ymPEAY/SMOZVCurPo4uMPdZSx5SFGynaFmfMYfwEqkS2F9N
-         2vBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=M46dTk9Mg6uNvDz6YoDBibNyJVywCM7jUyk+VGGER8o=;
-        b=CO3BlheXHp/p8sGWMEeo3J+FgVMOwTMyWtvBtfAfbcgnPNGVRoJZdCSzzSIMn2dfdr
-         4qY5fzo5+tpJ4e8JDhssv9Ix/SoO4kfVwQAw5Xh2qOFrLrpUd4Y1U07QoYYOZ9jckREg
-         gcTRenWE7++o+3FL4OFi4kMZwCtJ1p+Fz+lr6eArPsHJ4lWcnzfB47PsY8tTo82q4tH8
-         3NqeoYEwbVU+9o+bYoD9L4SdgahFXJVebNDBs5yr/SrL+4M3g8Ha+tVKklwEOds8iFs1
-         5Wj2QwDC2BlOoIVDmotKvjd3CBzYxiixzOvhqBJGxXVGsBQ78/Gkcb7S/FqYDkOwjTJo
-         cGGQ==
-X-Gm-Message-State: ANhLgQ1E18U+XOQ8+ChUJ7Bj9v4eU0Y2V+Ead00hGm+RECMh1QjZB+U4
-        slZpHv4W+kdoXyuFt92lb1kyQEitKK1Qlg==
-X-Google-Smtp-Source: ADFU+vuuwSgDGRSN3uiiP4R9sduHGxu9uBRYL33K0XACdp//N0Eji+mN0Ko/WyhyHG3UrUowKn9Yrw==
-X-Received: by 2002:a17:90a:cb87:: with SMTP id a7mr301218pju.80.1585326917792;
-        Fri, 27 Mar 2020 09:35:17 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id n7sm4215857pgm.28.2020.03.27.09.35.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2020 09:35:16 -0700 (PDT)
-Subject: Re: Polled I/O cannot find completions
-To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Cc:     io-uring@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <471572cf-700c-ec60-5740-0282930c849e@oracle.com>
- <4098ab93-980e-7a17-31f7-9eaeb24a2a65@kernel.dk>
- <34a7c633-c390-1220-3c78-1215bd64819f@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d2f92d20-2eb0-e683-5011-e1c922dfcf71@kernel.dk>
-Date:   Fri, 27 Mar 2020 10:35:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Fri, 27 Mar 2020 12:50:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585327818; x=1616863818;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=oVftKbwfnWY4xe1eo0bpwRwBmp1J09p+gkHG1l+XKYA=;
+  b=ErzSBswDNKkrxoO4iecb1mRMP6fKV/FyElh63sCNWcc2AJG7P09as45x
+   TV8TsAs9+yOmpng3w/yCRY44lHyNQdV8HZmnB/gKxPOYuZMpXFEDZZIXQ
+   n4AWY4xxKnSNPvQMW1PgXqKpKMXQs+hIJOtIyvUo4Zk9mhK+TC+IqQ/BZ
+   ZxxflytPIIlIxFhd+wfM68CFbTxTc6TxhUKjojGNJM4aevXoOo4dgnWz2
+   I8ujQq16UfKUgvhVAE332IguOD9OudChcUsS613IfDxWYfEt6FQ1mC670
+   Uw6A9KKAmMJ1+oiJ8M9+2Kv/iC5kDBoE05BTwJS8oukdQuId0GIrxI8TA
+   A==;
+IronPort-SDR: iLrtkVQphOYLb/b4mySNdoqgKC1d8dRLRKoXcPK0LAqt1m9U26VBKv7cXVdJARaeBsRfURjoxu
+ AvLLD0naEeRAle6eNj1Xtl5UZ4BcqlWGeSfCAesr8khSP/OwEmDm3aLFL0ofRRwoy8aS+L2TiH
+ clq4CfoIz0CpxbsblSCb7yeXegdJJFvkDBqsPihqhnryDMOWUKUmAmHU8NDGpthq0qPO35uvK8
+ wYQBToai8hefpXm1Fwp7VF4O1AU0jam8x1Uuy1y8btTv3+ptdj8Prcob35DSYUypDrTmhC1Vi9
+ KA4=
+X-IronPort-AV: E=Sophos;i="5.72,313,1580745600"; 
+   d="scan'208";a="242210429"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2020 00:50:17 +0800
+IronPort-SDR: pHMRElGYoE+EyGfEl1NKDyzsPWRwPB9M4NP/VR9m2ZAQFwYRBGa55PT+xSGgP8kwMlLItPzeLX
+ dOSbjTKYRJuqk89F7TjZAOGIdEI1P7koYHlVJ+NqWrv9vDEaHz+d/3A676DksI778lqQP9/r/j
+ OupQMbYjD6B2fFMQoEj7mRXRokgiXIpPdrGTRx7azchfJVxxq8HQiSPh1C1t7DDFGm459ktFim
+ A0UNxvDhUGiUkFen5HzA3rEQ46WOyrVVbUA+Z9fCKUo+/ek4R14OuAMAXGfVZLmuHh0DBvt/XO
+ 4gHmZp+R0pBfLSC58CdwkP/q
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 09:41:51 -0700
+IronPort-SDR: UNR1/lS7I37Z4IVey3UuPUL58K4ZEXjy+aXG+HsnSoPLpVzB2HinMLDFDHofH9xyxeTjRDK1i4
+ Aw+G7rol0KyTVgW5VjrYiUwdFgi+8QctcXlWPb9JkjhIsa9xysavsRxNZO8Zh5HMsRS0TqWQPT
+ 6YNwkbaFRM57z+fuZP/yyHD6KlGf2BlZRVoaIhCI8jkqCllH1DOgXjR4BE1of7aEw2tVaGHCK1
+ yT3SyI513XnHjPHFOA8TSep1WMyeF0sK1SkWB6naroYkrmRjvMeTI9gBnibJ5X+S6YlbKFSejL
+ 8Mo=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 27 Mar 2020 09:50:16 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v3 00/10] Introduce Zone Append for writing to zoned block devices
+Date:   Sat, 28 Mar 2020 01:50:02 +0900
+Message-Id: <20200327165012.34443-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <34a7c633-c390-1220-3c78-1215bd64819f@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/27/20 10:31 AM, Bijan Mottahedeh wrote:
-> Does io_uring though have to deal with BLK_QC_T_NONE at all?  Or are you 
-> saying that it should never receive that result?
-> That's one of the things I'm not clear about.
+The upcoming NVMe ZNS Specification will define a new type of write
+command for zoned block devices, zone append.
 
-BLK_QC_T_* are block cookies, they are only valid in the block layer.
-Only the poll handler called should have to deal with them, inside
-their f_op->iopoll() handler. It's simply passed from the queue to
-the poll side.
+When when writing to a zoned block device using zone append, the start
+sector of the write is pointing at the start LBA of the zone to write to.
+Upon completion the block device will respond with the position the data
+has been placed in the zone. This from a high level perspective can be
+seen like a file system's block allocator, where the user writes to a
+file and the file-system takes care of the data placement on the device.
 
-So no, io_uring shouldn't have to deal with them at all.
+In order to fully exploit the new zone append command in file-systems and
+other interfaces above the block layer, we choose to emulate zone append
+in SCSI and null_blk. This way we can have a single write path for both
+file-systems and other interfaces above the block-layer, like io_uring on
+zoned block devices, without having to care too much about the underlying
+characteristics of the device itself.
 
-The problem, as I see it, is if the block layer returns BLK_QC_T_NONE
-and the IO was actually queued and requires polling to be found. We'd
-end up with IO timeouts for handling those requests, and that's not a
-good thing...
+The emulation works by providing a cache of each zone's write pointer, so
+zone append issued to the disk can be translated to a write with a
+starting LBA of the write pointer. This LBA is used as input zone number
+for the write pointer lookup in the zone write pointer offset cache and
+the cached offset is then added to the LBA to get the actual position to
+write the data. In SCSI we then turn the REQ_OP_ZONE_APPEND request into a
+WRITE(16) command. Upon successful completion of the WRITE(16), the cache
+will be updated to the new write pointer location and the written sector
+will be noted in the request. On error the cache entry will be marked as
+invalid and on the next write an update of the write pointer will be
+scheduled, before issuing the actual write.
 
->> On 3/26/20 8:57 PM, Bijan Mottahedeh wrote:
->>> I'm seeing poll threads hang as I increase the number of threads in
->>> polled fio tests.  I think this is because of polling on BLK_QC_T_NONE
->>> cookie, which will never succeed.
->>>
->>> A related problem however, is that the meaning of BLK_QC_T_NONE seems to
->>> be ambiguous.
->>>
->>> Specifically, the following cases return BLK_QC_T_NONE which I think
->>> would be problematic for polled io:
->>>
->>>
->>> generic_make_request()
->>> ...
->>>           if (current->bio_list) {
->>>                   bio_list_add(&current->bio_list[0], bio);
->>>                   goto out;
->>>           }
->>>
->>> In this case the request is delayed but should get a cookie eventually.
->>> How does the caller know what the right action is in this case for a
->>> polled request?  Polling would never succeed.
->>>
->>>
->>> __blk_mq_issue_directly()
->>> ...
->>>           case BLK_STS_RESOURCE:
->>>           case BLK_STS_DEV_RESOURCE:
->>>                   blk_mq_update_dispatch_busy(hctx, true);
->>>                   __blk_mq_requeue_request(rq);
->>>                   break;
->>>
->>> In this case, cookie is not updated and would keep its default
->>> BLK_QC_T_NONE value from blk_mq_make_request().  However, this request
->>> will eventually be reissued, so again, how would the caller poll for the
->>> completion of this request?
->>>
->>> blk_mq_try_issue_directly()
->>> ...
->>>           ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
->>>           if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
->>>                   blk_mq_request_bypass_insert(rq, false, true);
->>>
->>> Am I missing something here?
->>>
->>> Incidentally, I don't see BLK_QC_T_EAGAIN used anywhere, should it be?
+In order to reduce memory consumption, the only cached item is the offset
+of the write pointer from the start of the zone, everything else can be
+calculated. On an example drive with 52156 zones, the additional memory
+consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
+pages. The performance impact is neglectable for a spinning drive.
 
-Pretty sure that's a leftover from when the attempts was made to pass
-back -EAGAIN inline instead of through the bio end_io handler.
+For null_blk the emulation is way simpler, as null_blk's zoned block
+device emulation support already caches the write pointer position, so we
+only need to report the position back to the upper layers. Additional
+caching is not needed here.
 
+Furthermore we have converted zonefs to run use ZONE_APPEND for synchronous
+direct I/Os.
+
+The series is based on Jens' for-next branch, with HEAD == 1385d15e8a0d
+("libata: remove references to ATA_DEBUG")
+
+Changes since v2:
+- Remove iomap implementation and directly issue zone-appends from within
+  zonefs (Christoph)
+- Drop already merged patch
+- Rebase onto new for-next branch
+
+Changes since v1:
+- Too much to mention, treat as a completely new series.
+
+Damien Le Moal (3):
+  block: Introduce zone write pointer offset caching
+  null_blk: Cleanup zoned device initialization
+  null_blk: Support REQ_OP_ZONE_APPEND
+
+Johannes Thumshirn (6):
+  block: provide fallbacks for blk_queue_zone_is_seq and
+    blk_queue_zone_no
+  block: introduce blk_req_zone_write_trylock
+  scsi: sd_zbc: factor out sanity checks for zoned commands
+  scsi: sd_zbc: emulate ZONE_APPEND commands
+  block: export bio_release_pages and bio_iov_iter_get_pages
+  zonefs: use REQ_OP_ZONE_APPEND for sync DIO
+
+Keith Busch (1):
+  block: Introduce REQ_OP_ZONE_APPEND
+
+ block/bio.c                    |  74 ++++++-
+ block/blk-core.c               |  52 +++++
+ block/blk-map.c                |   2 +-
+ block/blk-mq.c                 |  27 +++
+ block/blk-settings.c           |  19 ++
+ block/blk-sysfs.c              |  15 +-
+ block/blk-zoned.c              |  93 ++++++++-
+ block/blk.h                    |   4 +-
+ drivers/block/null_blk.h       |  14 +-
+ drivers/block/null_blk_main.c  |  35 ++--
+ drivers/block/null_blk_zoned.c |  51 ++++-
+ drivers/scsi/scsi_lib.c        |   1 +
+ drivers/scsi/sd.c              |  28 ++-
+ drivers/scsi/sd.h              |  36 +++-
+ drivers/scsi/sd_zbc.c          | 352 +++++++++++++++++++++++++++++++--
+ fs/zonefs/super.c              |  92 ++++++++-
+ include/linux/bio.h            |  22 +--
+ include/linux/blk_types.h      |  14 ++
+ include/linux/blkdev.h         |  42 +++-
+ 19 files changed, 877 insertions(+), 96 deletions(-)
 
 -- 
-Jens Axboe
+2.24.1
 
