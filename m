@@ -2,163 +2,144 @@ Return-Path: <SRS0=yDPB=5M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66ABC2D0E7
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 06:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E625C43331
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 08:09:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B74BA2076B
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 06:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53F5220714
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 08:09:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="I7nf3Sxz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725857AbgC0Gja (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Mar 2020 02:39:30 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:4062 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1725936AbgC0Gj3 (ORCPT
+        id S1726027AbgC0IJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Mar 2020 04:09:30 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:53358 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbgC0IJa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Mar 2020 02:39:29 -0400
-X-Greylist: delayed 716 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Mar 2020 02:39:19 EDT
-X-ASG-Debug-ID: 1585290434-0e408857441664a0001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.235]) by bsf01.didichuxing.com with ESMTP id ZHlvyL8mFxf1oeky; Fri, 27 Mar 2020 14:27:14 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 27 Mar
- 2020 14:27:14 +0800
-Date:   Fri, 27 Mar 2020 14:27:13 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>, <tj@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [RFC PATCH v2 0/3] blkcg: add blk-iotrack
-Message-ID: <cover.1584728740.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [RFC PATCH v2 0/3] blkcg: add blk-iotrack
-Mail-Followup-To: axboe@kernel.dk, tj@kernel.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org
+        Fri, 27 Mar 2020 04:09:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=7MkLh/AtsQmeJb55SUB0j8W/OcCYSrvtyMoSbjPhfsI=; b=I7nf3SxzztuN9ahCeBG1PEEDjJ
+        xKen67JCfXq3e7EyY8dwPCMyQZAI3Qxu5MmTThGOhl8FXMk7SulJXIPGwbgpqvXJ0EzQLFxG0SVzE
+        OUloYGfio6rvtc3gBcmjmkfdG9BkLWdN13qfyXRDh4vGddQd/JXuQEVyX2wukmA7tJW7C77YFVcej
+        xD5oqXR8Vn0E5GWmwF+jMdVFBlgXIIxsJCV2pEs/wOEq5X+rNfbyN53EfLlDfsHAy7ohfwSTCyt25
+        wIG4IAylCgfyQDV/qcc0dAOJ5Q2VVIXPhfU4qgLRe+nkWnI1ruEzevILysPpyfW4ctmtG8YZbjdrM
+        45LUckCA==;
+Received: from 213-225-10-87.nat.highway.a1.net ([213.225.10.87] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jHk3V-0006hL-VC; Fri, 27 Mar 2020 08:09:30 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: move the ->devnode callback to struct block_device_operations
+Date:   Fri, 27 Mar 2020 09:07:17 +0100
+Message-Id: <20200327080717.1574048-1-hch@lst.de>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS06.didichuxing.com (172.20.36.207) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.235]
-X-Barracuda-Start-Time: 1585290434
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 4440
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.80822
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
-Message-ID: <20200327062713.ZaBe1RvE9YKUyw-hHcWl_X3U9tzykmk1LvdSPzis6hU@z>
 
-Hi all,
+There really isn't any good reason to stash a method directly into
+struct gendisk.  Move it together with the other block device
+operations.
 
-This patchset try to add a monitor-only module blk-iotrack for block
-cgroup.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c           |  4 ++--
+ drivers/block/pktcdvd.c | 12 ++++++------
+ include/linux/blkdev.h  |  1 +
+ include/linux/genhd.h   |  1 -
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-It contains kernel space blk-iotrack and user space tools iotrack, and
-you can also write your own tool to do more data analysis.
-
-blk-iotrack was designed to track various io statistic of block cgroup,
-it is based on rq_qos framework. It only tracks io and does not do any
-throttlling.
-
-Compare to blk-iolatency, it provides 8 configurable latency buckets,
-/sys/fs/cgroup/io.iotrack.lat_thresh, blk-iotrack will account the
-number of IOs whose latency less than corresponding threshold. In this
-way we can get the cgroup's latency distribution. The default latency
-bucket is 50us, 100us, 200us, 400us, 1ms, 2ms, 4ms, 8ms.
-
-Compare to io.stat.{rbytes,wbytes,rios,wios,dbytes,dios}, it account
-IOs when IO completed, instead of submited. If IO was throttled by
-io scheduler or other throttle policy, then there is a gap, these
-IOs have not been completed yet.
-
-The previous patch has record the timestamp for each bio, when it
-was issued to the disk driver. Then we can get the disk latency in
-rq_qos_done_bio, this is also be called D2C time. In rq_qos_done_bio,
-blk-iotrack also record total latency(now - bio_issue_time), actually
-it can be treated as the Q2C time. In this way, we can get the percentile
-%d2c=D2C/Q2C for each cgroup. It's very useful to detect the main latency
-is from disk or software e.g. io scheduler or other block cgroup throttle
-policy.
-
-The user space tool, which called iotrack, used to collect these basic
-io statistics and then generate more valuable metrics at cgroup level.
-From iotrack, you can get a cgroup's percentage for io(%io), bytes(%byte),
-total_time and disk_time of the whole disk. It can easily to evaluate
-the real weight of the weight based policy(bfq, blk-iocost).
-Except the basic io/s, MB/s, iotrack also show:
-%io
-There are lots of metrics for read and write generate by iotrack,
-for more details, please visit: https://github.com/dublio/iotrack.
-
-Test result for two fio with randread 4K,
-test1 cgroup bfq weight = 800
-test2 cgroup bfq weight = 100
-numjobs=8, iodepth=32
-
-Device   rrqm/s wrqm/s r/s    w/s    rMB/s  wMB/s  avgrqkb  avgqu-sz await    r_await  w_await  svctm    %util    conc
-nvme1n1  0      0      217341 0      848.98 0.00   4.00     475.03   2.28     2.28     0.00     0.00     100.20   474.08
-
-Device   io/s   MB/s   %io    %byte  %tm    %dtm   %d2c ad2c aq2c   %hit0 %hit1 %hit2 %hit3 %hit4 %hit5 %hit6 %hit7 cgroup
-nvme1n1  217345 849.00 100.00 100.00 100.00 100.00 4.09 0.09 2.28   23.97 62.43 89.88 98.44 99.88 99.88 99.88 99.88 /
-nvme1n1  193183 754.62 88.88  88.88  45.91  84.54  7.52 0.09 1.18   26.85 64.87 90.71 98.40 99.88 99.88 99.88 99.88 /test1
-nvme1n1  24235  94.67  11.15  11.15  54.09  15.48  1.17 0.13 11.06  0.98  43.00 83.31 98.77 99.87 99.87 99.87 99.87 /test2
-
-* The root block cgroup "/" shows the io statistics for whole ssd disk.
-
-* test1 use disk's 88% iops and bps.
-
-* %dtm stands for the on disk time, test1 cgroup get 85% of whole disk,
-	that means test1 gets more disk time than test2.
-
-* For test's %d2c, there is only 1.17% latency cost at hardware disk,
-	that means the main latency cames from software, it was
-	throttled by softwre.
-
-* aq2c: average q2c, test2's aq2c(11ms) > test1's aq2c(1ms).
-
-* For latency distribution, hit1(<=100us), 64% io of test1 <=100us, and
-        43% io of test2 <=100us, test1's latency is better than test2.
-
-For more detail test report, please visit:
-https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test
-
-The patch1 and patch2 are preapre patch.
-The last patch implement blk-iotrack.
-
-Changes since v1:
-* fix bio issue_size when split bio, v1 patch will clear issue_time.
-
-Weiping Zhang (3):
-  update the real issue size when bio_split
-  bio: track timestamp of submitting bio the disk driver
-  blkcg: add blk-iotrack
-
- block/Kconfig              |   6 +
- block/Makefile             |   1 +
- block/bio.c                |  13 ++
- block/blk-cgroup.c         |   4 +
- block/blk-iotrack.c        | 436 +++++++++++++++++++++++++++++++++++++
- block/blk-mq.c             |   3 +
- block/blk-rq-qos.h         |   3 +
- block/blk.h                |   7 +
- include/linux/blk-cgroup.h |   6 +
- include/linux/blk_types.h  |  38 ++++
- 10 files changed, 517 insertions(+)
- create mode 100644 block/blk-iotrack.c
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 6323cc789efa..14cf395a1479 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1497,8 +1497,8 @@ static char *block_devnode(struct device *dev, umode_t *mode,
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
+-	if (disk->devnode)
+-		return disk->devnode(disk, mode);
++	if (disk->fops->devnode)
++		return disk->fops->devnode(disk, mode);
+ 	return NULL;
+ }
+ 
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 5f970a7d32c0..0d286a87e647 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2679,6 +2679,11 @@ static unsigned int pkt_check_events(struct gendisk *disk,
+ 	return attached_disk->fops->check_events(attached_disk, clearing);
+ }
+ 
++static char *pkt_devnode(struct gendisk *disk, umode_t *mode)
++{
++	return kasprintf(GFP_KERNEL, "pktcdvd/%s", disk->disk_name);
++}
++
+ static const struct block_device_operations pktcdvd_ops = {
+ 	.owner =		THIS_MODULE,
+ 	.open =			pkt_open,
+@@ -2686,13 +2691,9 @@ static const struct block_device_operations pktcdvd_ops = {
+ 	.ioctl =		pkt_ioctl,
+ 	.compat_ioctl =		blkdev_compat_ptr_ioctl,
+ 	.check_events =		pkt_check_events,
++	.devnode =		pkt_devnode,
+ };
+ 
+-static char *pktcdvd_devnode(struct gendisk *gd, umode_t *mode)
+-{
+-	return kasprintf(GFP_KERNEL, "pktcdvd/%s", gd->disk_name);
+-}
+-
+ /*
+  * Set up mapping from pktcdvd device to CD-ROM device.
+  */
+@@ -2748,7 +2749,6 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ 	disk->fops = &pktcdvd_ops;
+ 	disk->flags = GENHD_FL_REMOVABLE;
+ 	strcpy(disk->disk_name, pd->name);
+-	disk->devnode = pktcdvd_devnode;
+ 	disk->private_data = pd;
+ 	disk->queue = blk_alloc_queue(GFP_KERNEL);
+ 	if (!disk->queue)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 53a1325efbc3..e8defd718d62 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1697,6 +1697,7 @@ struct block_device_operations {
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
+ 	int (*report_zones)(struct gendisk *, sector_t sector,
+ 			unsigned int nr_zones, report_zones_cb cb, void *data);
++	char *(*devnode)(struct gendisk *disk, umode_t *mode);
+ 	struct module *owner;
+ 	const struct pr_ops *pr_ops;
+ };
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 927eed0be179..85b9e253cd39 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -191,7 +191,6 @@ struct gendisk {
+                                          * disks that can't be partitioned. */
+ 
+ 	char disk_name[DISK_NAME_LEN];	/* name of major driver */
+-	char *(*devnode)(struct gendisk *gd, umode_t *mode);
+ 
+ 	unsigned short events;		/* supported events */
+ 	unsigned short event_flags;	/* flags related to event processing */
 -- 
-2.18.1
+2.25.1
 
