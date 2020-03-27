@@ -6,70 +6,72 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA560C43331
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA163C43331
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:26:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E65620658
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7928720658
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 16:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oqs4yyDF"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="i+G9H0XE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727815AbgC0QZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Mar 2020 12:25:39 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:40758 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727705AbgC0QZj (ORCPT
+        id S1727495AbgC0Q05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Mar 2020 12:26:57 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44870 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726333AbgC0Q04 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Mar 2020 12:25:39 -0400
-Received: by mail-pj1-f66.google.com with SMTP id kx8so3975047pjb.5
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2020 09:25:38 -0700 (PDT)
+        Fri, 27 Mar 2020 12:26:56 -0400
+Received: by mail-pf1-f196.google.com with SMTP id b72so4724833pfb.11
+        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2020 09:26:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=iZ/2eIIHKKjs0cMEAc8LpHNkwem5h/jEq452IH82PJg=;
-        b=oqs4yyDFclgrDRhoMmzTkx4IvWDpTVV3/VGeI1oUvIoLhc1Z4BBQmCjcf1nt0LpWQP
-         HHSf9NxT/eQMDBfQw0uP5zmTNDYgP4EuYyNMF1ycyVMTQT/vqceXzZPjc2fOxtTwm83r
-         NWjBZXGyiP3hrPbRPM4DlI5kCn77VunT9j7eKQ8dGEg9PS1LdJYltm8bthGtn8qoS0D6
-         xozURWzhMKQqFq9KEHNH42PT4j7lwdOliZ5+J3kZ5bnMKkNj6ODn/Efv0gvvozS5aHIw
-         kYf8szYWpmrLnsjk6ByMeg42x/kmOCgaFlbhkKj6G0H2OHV2rDFrK8eCCJMcRxDVTT6P
-         x/Og==
+        bh=9wGl6Wa9QcDb2Dodea5tAybsKTGFt4bIi5UGB0n01cs=;
+        b=i+G9H0XEanhreLDRyPOrdm3E/anAyqwLOZ+qC4cS/PiYXG6pwl9/qQaaZVRqng5wHG
+         a9gYchMK/gcMdHzLIoWL5minq2VRExAsl//MbiQualDRYxuIvBx/3U4rsjaoxTOdZNmj
+         YYpuZ5q5Kz5EzYD/xLcxPZ3ndoRseL79xd24pw+4pkVgErTDP2zoQU/3cUzHYiMjkYgP
+         g79aqImQisfeL7d6Q73wKV35YKc4hwUYbvtPfxPVvKZ6K3KldSciBSThVvQg0mJ1Vu+r
+         apcVbgGzQASsVyxSOrpdLnvmY52yT3a7HgA7IPrTvFWComN5qtDZNH3cIyxqrqWI8iGa
+         bL7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iZ/2eIIHKKjs0cMEAc8LpHNkwem5h/jEq452IH82PJg=;
-        b=eFyx5QljShZhH+dDEWWHtZP1E8fD5DfFItqKuB0Z8bcuiqCikV6RQ/Hn9am2pMLyv7
-         bcbWN9H1yh0TVZVDTEd1GbbIse91J/Ax+661RykWi0nZsBQo1lAAHMDaE8xxiXlExyBO
-         0/EBaM1ph1bLo8w/Y9V9T1M0C3nF8zrMCbDulNsYRIPivcwNtqQtuEglxal833aYx7p6
-         PaQsyXdshqjXquHFi1SV/Gc2sEzaVIGyv95IxIIXE1m2KaqLrOByLJqFS/V1LIlQeXNS
-         qyVjPzoFmiEsNWCgiNvbo7ELm/nIK3cyg0OyCNmElRf4nJzLWmJHCIITA0/D4NrB6OUo
-         a9gQ==
-X-Gm-Message-State: ANhLgQ2kVnLL0W9ItPsNUlI77D8S0ucg8SJgaiBaNni7rV5PjZcrKwfH
-        /8xbE79KeW9c+dWiPXCmHNXsq6qYCNdTJA==
-X-Google-Smtp-Source: ADFU+vsJjoS9XZFzz1BLRv18rznzUzFqsZnppTzODT0Wo3yh0SIYw8SlCZlR/NUVc+xGlYUrvmGtmA==
-X-Received: by 2002:a17:902:bf0c:: with SMTP id bi12mr6976930plb.312.1585326337241;
-        Fri, 27 Mar 2020 09:25:37 -0700 (PDT)
+        bh=9wGl6Wa9QcDb2Dodea5tAybsKTGFt4bIi5UGB0n01cs=;
+        b=boYTw3MraPT8joNFf30S0KnnKqpsTwFJ2R+83fIdDRkoX8YZzhYoiTloBR6a5j0fvB
+         Y3OMeF+9msgs1mcJ3Borf8KOaN7aqZYYj7FksO5WA1d00HbpDs1IhJc9pN+ga2dTAs6F
+         4vOGwTixXVUCiVEhYhmkDnqBsGV1dazX5cJV0XFG9UumrbwGu+SDASIpuF8TnKLjcKw4
+         POLpVyuu40ycDhBtKWzIGzQF87u7P01Ca82BAO3fxH3z1Dz0dRADKiMj/i0e4OQHoTmv
+         7U4tTwg7JQq7oYrwos/xZTwL2WEN+LvFVm3BeP6xCXrosQXzNRtEZZd3D7CO4oE+8lVb
+         Y4Xg==
+X-Gm-Message-State: ANhLgQ3a8j8RyAhBR+EEaupJ8Ve9Oor1YY6wiGT0ysftnxLkTkGodJ65
+        0GNeMqm5T7gm0PlkvRWu9MIzDkXCXqTedw==
+X-Google-Smtp-Source: ADFU+vubMB0lGbM3zpgUhH51Md8EsyBIdpegFQwx5b0+Q76FNba1fLDt6/bPPFZndRMdakGtS6Twyg==
+X-Received: by 2002:a65:508b:: with SMTP id r11mr95108pgp.143.1585326415251;
+        Fri, 27 Mar 2020 09:26:55 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id g4sm4487037pfb.169.2020.03.27.09.25.36
+        by smtp.gmail.com with ESMTPSA id iq14sm1538619pjb.43.2020.03.27.09.26.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2020 09:25:36 -0700 (PDT)
-Subject: Re: [PATCH V3 0/3] null_blk: add tracepoints for zoned mode
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
- <BYAPR04MB496594887E19F1C972CEC9B786CC0@BYAPR04MB4965.namprd04.prod.outlook.com>
- <093c4ab1-924f-b109-31a8-ce5813f52e14@kernel.dk>
- <CO2PR04MB2343F7076EE9192F1015C34FE7CC0@CO2PR04MB2343.namprd04.prod.outlook.com>
+        Fri, 27 Mar 2020 09:26:54 -0700 (PDT)
+Subject: Re: [PATCH 4/5] block: simplify queue allocation
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20200327083012.1618778-1-hch@lst.de>
+ <20200327083012.1618778-5-hch@lst.de>
+ <SN4PR0401MB3598BF20E4DCF8F1B129625E9BCC0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20200327112131.GA1096@lst.de>
+ <SN4PR0401MB3598AD1669D1F5BFCA4F20379BCC0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e7916d89-6e94-a93d-5d74-536e87c7786d@kernel.dk>
-Date:   Fri, 27 Mar 2020 10:25:35 -0600
+Message-ID: <a2110f00-6d27-1567-2725-3afb2e83ea5f@kernel.dk>
+Date:   Fri, 27 Mar 2020 10:26:53 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CO2PR04MB2343F7076EE9192F1015C34FE7CC0@CO2PR04MB2343.namprd04.prod.outlook.com>
+In-Reply-To: <SN4PR0401MB3598AD1669D1F5BFCA4F20379BCC0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,22 +80,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/27/20 10:05 AM, Damien Le Moal wrote:
-> On 2020/03/28 0:35, Jens Axboe wrote:
->> On 3/26/20 9:12 PM, Chaitanya Kulkarni wrote:
->>> Hi Jens,
->>>
->>> Can we get this in ?
->>
->> There still seems to be the unresolved issue of the function
->> declaration. I agree that we should not have a declaration for
->> a function if CONFIG_BLK_DEV_ZONED isn't set, so move it under
->> the existing ifdef.
+On 3/27/20 10:24 AM, Johannes Thumshirn wrote:
+> On 27/03/2020 12:21, Christoph Hellwig wrote:
+>> Because the two variants are rather pointless.  And this might get
+>> more people to actually pass a useful node ID instead of copy and
+>> pasting some old example code. 
 > 
-> The latest v4 series that Chaitanya posted addressed this issue.
-> The subject of this email is indeed v3 though...
+> So then everybody will copy the NUMA_NO_NODE ones and in X years someone 
+> will come up with a wrapper passing in NUMA_NO_NODE to 
+> blk_alloc_queue_node(), because he/she didn't read the commit history.
 
-What's the msgid of that posting, I don't see it here?
+If you care about numa-node, then you are generally using it for other
+allocations as well, so it should come naturally. If you don't, then
+the copy/paste is fine. Better to expose it as the main API, so people
+don't miss it.
 
 -- 
 Jens Axboe
