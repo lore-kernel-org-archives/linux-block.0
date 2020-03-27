@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A955C43331
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 15:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1674BC2D0E5
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 15:37:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FC9D21655
-	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 15:35:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E14C420936
+	for <linux-block@archiver.kernel.org>; Fri, 27 Mar 2020 15:37:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DTBPwCtl"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yQEMwBRR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727173AbgC0Pfs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Mar 2020 11:35:48 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34762 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726540AbgC0Pfs (ORCPT
+        id S1726454AbgC0PhF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Mar 2020 11:37:05 -0400
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:38096 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726275AbgC0PhE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Mar 2020 11:35:48 -0400
-Received: by mail-pf1-f193.google.com with SMTP id 23so4689260pfj.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2020 08:35:47 -0700 (PDT)
+        Fri, 27 Mar 2020 11:37:04 -0400
+Received: by mail-pj1-f48.google.com with SMTP id m15so3922244pje.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2020 08:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HJ0d5xYgpclWdukH1jBaMHibnM4HFjumRZhUN1j7yw8=;
-        b=DTBPwCtlux/hfF4agATg2qvTk+b+c1bkx2spbcCWUUfhBD61qX2X0Ir0cu6yw2CcE+
-         5sHF9pl6W54fmNaxjaBVcaVzuULy5f67trQpq9P8c/vAAqAnCuG2r3On6S7WfELnxMIb
-         hAq4XTTMUdbV8j+sOI16se8sTBNuIml5GInBSdaxWd9QaoC4oj5kMAyprQAPzbIG9vYG
-         m8VgPm50scOxrv7LX9TI00U53xqMuBJ1DBnDytaDpyLWEilz/KWUYtvzLSApCzVssFLS
-         lu4MtXtE+0mhYuzzaVYveadJSjr1z7rIbfr18f7DXxtMHxPTc4/lyGUGyrY9H9kVRuqs
-         ZzoQ==
+        bh=7UBf1DuahhRtMwyxbslXC00LTHM9u0RyPfT7goTUM1o=;
+        b=yQEMwBRR8a6ENWL/Nxn5lX35uzP2sdY9HQpCa3PSt4LQdCi9wDUPOUzt8dPxs8BZya
+         lND/nQkNgNDPSkerouTSP9jf6IcCM3ODfeBcQsy90G/V01BMcvQePFeM3R4nrgIrtyog
+         aDJ0AWR812A2fiLsrVjoyGcmWL1tzoLf6nkm3yAc3BdWeLQurGc+U/pGGsxg+QtQSFzo
+         2Hf+g6gsOXjeeMf0nWOWHfj8G/qXr6h0gYF6Wk5wWsyKPtgBtEuoHHmz1SuO8RrjXiq4
+         y8LdjmCj/Tj/WcOmwiJ5xIwU+OgcPXIoQdIal0RYhW2bRvhLv8nxHe08GgfMMjTu98rH
+         DuKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HJ0d5xYgpclWdukH1jBaMHibnM4HFjumRZhUN1j7yw8=;
-        b=BwUoziB6LJckBw+RVDFFhea57Qs/Z3OKpgP9Hzj5D+DTTmcGaMPYZxL+URy0e2ggMp
-         u/JBr4IYV6Wg+ncrdVsZLiZf7d5tBFqDXV/XMSXxu27RcMG0lg57srqIOP1JzzxIoA0g
-         HjqXZImuIYyRrY4nolFZWR4E6eGQ2t047HseCD2T34yCs8BeKt/TDYDlo+4RgFNfa5rt
-         8tfEqzQuI9tDJmd3F6GTMTp8wf4P8t3wjc02RQxwifk130wEyACsR8+B1LFxKEmlYXUs
-         WGN5CZvf63uwm9BBT+hhispYY0DZwhaMhcJVek4pOtvYXYLPU15DASNJlIyLzO0NWGxM
-         hhuw==
-X-Gm-Message-State: ANhLgQ2nzaZzK1tMvQjQbH3qT275KnVkNkr5bIO/AtTj4iS6Pn7Ser/c
-        BwrenP3SW9PRv0XLtFYlCB5yyg8G8Hu9eA==
-X-Google-Smtp-Source: ADFU+vtk89VsSlqoAF6Yvan0HPV5HceGZiJSw5/NdFckfp6cNfU8iC1AaFYNNwf7msEkMnYBvEfJuQ==
-X-Received: by 2002:aa7:97a7:: with SMTP id d7mr15209248pfq.194.1585323347322;
-        Fri, 27 Mar 2020 08:35:47 -0700 (PDT)
+        bh=7UBf1DuahhRtMwyxbslXC00LTHM9u0RyPfT7goTUM1o=;
+        b=tFOePYwJiVy4bMtq++bXWH3nn7Pma5LyyJkNDjYoqyeXdZGF98EdYSThyATYTdUrrV
+         KSszOwumcx4VU/J40A8G0kBV449N7LR1OpPeCdlhIu/qE+NyEBXYWxlSv8EKLEheXI1d
+         n47LRd1U/Iavjux5xquacFmvrqk/Cyc5filTJX+J5ZJKsmiME/GHl8qe1C3XOPKo4C20
+         TdfWy+kcb7PT1a0ZtqMJS/63hKPaauuzqJKI5aiCzLdTbTwbeSSsknFpTpWJAyz0vNJA
+         0zC1EtwOCHMimXCzlRN+Ah4gDqNyiNjfNKfF2OazrC3H39cbhmBTNImg1PDNHM1KGbo2
+         gruw==
+X-Gm-Message-State: ANhLgQ0A/RuqUS7Eqn2iwJ8sLr5guNaGEmOEdRtHyd8G/TlGa3NQtFTP
+        0QVumNmSG4YXTdKKwWrjbec2TYpNqYDV0g==
+X-Google-Smtp-Source: ADFU+vtTlT1tMguri7k0iWYzzoX+P2h37FmOYgMJUol9iUBYo8GCIgY+txKpM9u09LwQmPE6ZD91bA==
+X-Received: by 2002:a17:902:7b97:: with SMTP id w23mr13635510pll.292.1585323422436;
+        Fri, 27 Mar 2020 08:37:02 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id f6sm4544602pfk.99.2020.03.27.08.35.46
+        by smtp.gmail.com with ESMTPSA id bx1sm4055963pjb.5.2020.03.27.08.37.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2020 08:35:46 -0700 (PDT)
-Subject: Re: [PATCH V3 0/3] null_blk: add tracepoints for zoned mode
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <20200325021629.15103-1-chaitanya.kulkarni@wdc.com>
- <BYAPR04MB496594887E19F1C972CEC9B786CC0@BYAPR04MB4965.namprd04.prod.outlook.com>
+        Fri, 27 Mar 2020 08:37:01 -0700 (PDT)
+Subject: Re: Polled I/O cannot find completions
+To:     Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Cc:     io-uring@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <471572cf-700c-ec60-5740-0282930c849e@oracle.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <093c4ab1-924f-b109-31a8-ce5813f52e14@kernel.dk>
-Date:   Fri, 27 Mar 2020 09:35:45 -0600
+Message-ID: <4098ab93-980e-7a17-31f7-9eaeb24a2a65@kernel.dk>
+Date:   Fri, 27 Mar 2020 09:36:59 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB496594887E19F1C972CEC9B786CC0@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <471572cf-700c-ec60-5740-0282930c849e@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,15 +75,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/26/20 9:12 PM, Chaitanya Kulkarni wrote:
-> Hi Jens,
-> 
-> Can we get this in ?
+CC'ing linux-block, this isn't an io_uring issue.
 
-There still seems to be the unresolved issue of the function
-declaration. I agree that we should not have a declaration for
-a function if CONFIG_BLK_DEV_ZONED isn't set, so move it under
-the existing ifdef.
+
+On 3/26/20 8:57 PM, Bijan Mottahedeh wrote:
+> I'm seeing poll threads hang as I increase the number of threads in 
+> polled fio tests.  I think this is because of polling on BLK_QC_T_NONE 
+> cookie, which will never succeed.
+> 
+> A related problem however, is that the meaning of BLK_QC_T_NONE seems to 
+> be ambiguous.
+> 
+> Specifically, the following cases return BLK_QC_T_NONE which I think 
+> would be problematic for polled io:
+> 
+> 
+> generic_make_request()
+> ...
+>          if (current->bio_list) {
+>                  bio_list_add(&current->bio_list[0], bio);
+>                  goto out;
+>          }
+> 
+> In this case the request is delayed but should get a cookie eventually.  
+> How does the caller know what the right action is in this case for a 
+> polled request?  Polling would never succeed.
+> 
+> 
+> __blk_mq_issue_directly()
+> ...
+>          case BLK_STS_RESOURCE:
+>          case BLK_STS_DEV_RESOURCE:
+>                  blk_mq_update_dispatch_busy(hctx, true);
+>                  __blk_mq_requeue_request(rq);
+>                  break;
+> 
+> In this case, cookie is not updated and would keep its default 
+> BLK_QC_T_NONE value from blk_mq_make_request().  However, this request 
+> will eventually be reissued, so again, how would the caller poll for the 
+> completion of this request?
+> 
+> blk_mq_try_issue_directly()
+> ...
+>          ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+>          if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+>                  blk_mq_request_bypass_insert(rq, false, true);
+> 
+> Am I missing something here?
+> 
+> Incidentally, I don't see BLK_QC_T_EAGAIN used anywhere, should it be?
+> 
+> Thanks.
+> 
+> --bijan
+> 
+> 
+> 
+> 
+
 
 -- 
 Jens Axboe
