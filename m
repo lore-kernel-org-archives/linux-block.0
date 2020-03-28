@@ -2,151 +2,139 @@ Return-Path: <SRS0=MX1A=5N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772D2C43331
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 12:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DF0C43331
+	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 14:17:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33AB0206E6
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 12:57:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7ED920723
+	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 14:17:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tv9lXVkC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JaugMWq0";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="fyKib4/U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726258AbgC1M5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Mar 2020 08:57:44 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35983 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726045AbgC1M5o (ORCPT
+        id S1727137AbgC1ORZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Mar 2020 10:17:25 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:50119 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726937AbgC1ORZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Mar 2020 08:57:44 -0400
-Received: by mail-pl1-f195.google.com with SMTP id g2so4590228plo.3
-        for <linux-block@vger.kernel.org>; Sat, 28 Mar 2020 05:57:43 -0700 (PDT)
+        Sat, 28 Mar 2020 10:17:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585405045; x=1616941045;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=moUPt29vKzoJQj/rg2s2bT3a8sVhdjHv+d/Lrs9QYP8=;
+  b=JaugMWq0ac/rh+Pxuh7XYqL5yAGKBKKWPeG8yl0LSrMqxnMaqOdlaKjw
+   6xTFqTQ4vdQhosXUtOeWzfGB6aE5mpyNyb2geteYLyhIashQkIDvZAMX/
+   oFxmxBf+pAb4/slgzMl+ceS7gJjNUNSbWhbBPXoEp9xuBMJsnHUwfQsaG
+   dN9FK2WVcoBnejlAASYyEndVPUU/ezwZALPSg8jHvaiI9govRTGJZBI92
+   SZg8oO7sa8kwr8O31z9Dqww98lpi88aWeFb9pV8ESY4GuwM0rctbViQml
+   anBsluThcnHbP1R/iusF/Dzg6Uwxupswtt+ZpAfYmqKR0Yw49EPhNC3No
+   A==;
+IronPort-SDR: BfZiQ93okK6fFDPc+1Y6MZAmD8Z6njC0u0uc649lOssYgxiqcFBxPcTTUv+t27SsMkVZSHuPvT
+ 6NP7c196w/fspM0MTsyZTAmB+1+6P+rgVO7o0UrQtKBBGUf4E7KOH2gWHESgs30zAJcexWsEa6
+ nShRkRfajC+rUMczdPWKMu/QbAJECEul2pc4RjPjE1EYhP9nXdcqN2jn+Fnw3NoZEMedp5fL3C
+ 5j9Vczv+B3h5nIQYDVpJ/Ax5Q/AK0S9br0e2kdokpCbcRb2kcn1VxeQIeKjrX0MOtAEeuLAbpm
+ 2Aw=
+X-IronPort-AV: E=Sophos;i="5.72,316,1580745600"; 
+   d="scan'208";a="134189774"
+Received: from mail-bn8nam11lp2171.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.171])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2020 22:17:23 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QYhW/VrD4CLfSR5mB3RuqZvUQckUVS7OeZfRO++Euw6DGoudLg7vgwUXsAJxTsn2urSBJoWoP4v4eFJUGkhbtbHtP8BqqpciJqtK3vQTgaOgIUmkRffmWObA7NykkQPINFdp+Bt0ejQ4YXxxhSO6klALf0toVTb1pV3midbxyQ1uxKwb2iXhQSO7/AQLf1Pv+uE/xeV+TTWe/RgcGDe6ZkUPiKUQJ5KI6thJSGvnCW9Q6Du2eKtrRbFVpX1fi446gdUuqNIrpKXMXJRmvvG8mXt76PdeuCp75yi4jbEsPb4QakjPWhce8/P9QitWjyKPaO1YgnFQSDf5v2ju0YyLbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=moUPt29vKzoJQj/rg2s2bT3a8sVhdjHv+d/Lrs9QYP8=;
+ b=oYbFVAjiXcdmmZUR2rFNQYoIuu1frmDExvVlR7dIvD/jOkHE5xa5nKPP99nCTtE+S9dtVv+X0TpBBrr+hIxAEngW8WC9HSzAKjYdJscaEsBr/c3+9j4C+FxkCbZ+mUHhK0DVgBSBPz+n4p9YrLnde4MaK62z4Tq768LuHiCJqx7/EIKzB3A2n1lAbThR//UKInY9rMg0h/s4wLnqHxAwpAhrjagiwagk7PPdRTtpIY1B4Oaa+iawfQSuw1+PoV6YI4ZzwI2jQw5DjVRgc5LXneZAwZcZ7XF5bVN0pEF9FjD77eduVPWAf5nyCWdpI7mc0sFpZ1GU7bntKfrPAWz4mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=GPReoKNVZW+mzx3T797PiFAFYu6BaP2nNmpUKla68Y8=;
-        b=tv9lXVkC+ylWkYm10Vy0+AAjz2f3GeF2nfhd4nwOzmX/P3HQ9pLSHdrVSxUZxufR2S
-         e9YsRQyY6JZGyxoIEAkp6/7qJ3u8xciT+InNhKZ59leSmh2PsrGUKT5hJEnOn7XakQYG
-         B8LqetvjnE/7AZvN5fhLHiR7u4U3LZPVl8k4fDo71AMaMmrLXjrxOCMZao6+MBszxt4u
-         uSwTsSm2YgevyNzR9rtpBEws3ghr/RaMoYO6p84Gbmqlo70vtxfk6chHyA2rtLLn7Rg6
-         CAOnr3VYwuHdl0pYw+Cm/Q6WU93XE354NOLDCiZ6s+GibPo5m2cGCe7/8uqFW51/Tjfz
-         QzbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=GPReoKNVZW+mzx3T797PiFAFYu6BaP2nNmpUKla68Y8=;
-        b=pCSLZFXMrboAHAjegdB5JrjQf+blS3vc4lvU7EzhUkROEqH+L4srWI3W6SRM/BL1S4
-         B6V1jVf0V8UHPDWRoZlF02zpE5JgrNbGHuwG3a4cH9mKZ/oyMNpmsLv/cIw1cL63P+Aq
-         cu+P7l9N/hAWYM+2WjdKpSNd9ktwWKSreqkFVQAyRtq7aajI8sonjtVyXMyVLdTXAAgO
-         Y95vfH2nU0e+SDo8fjZw0DKXO1uL+x2LxDn1aGn8Lsi/MYD64f7NswBZm5wm4zM1TI0N
-         eebIrVyAPIGfQRlIm381RKA9fXWvIcN04XvOP5J1cyIc7cKgc68AlUu/Zl9oGh/Dspt5
-         rTfg==
-X-Gm-Message-State: ANhLgQ0PdwuPf8/jXx7Yi0gOv9P0/ZvUwCwlUg+fkr4kPurBWEBYNWvI
-        8twUWMDtszInq+ciC7NYhuo=
-X-Google-Smtp-Source: ADFU+vt1H+sT3LBgl23FZaghxrgRXDwrSVtsmvR1AFwXIyfiezqXNIKuAUM77ziyz1eIu10fW6Bbhw==
-X-Received: by 2002:a17:90a:1acd:: with SMTP id p71mr5107202pjp.112.1585400262570;
-        Sat, 28 Mar 2020 05:57:42 -0700 (PDT)
-Received: from ?IPv6:240b:10:2720:5510:5c8f:768a:547c:1376? ([240b:10:2720:5510:5c8f:768a:547c:1376])
-        by smtp.gmail.com with ESMTPSA id y22sm6180923pfr.68.2020.03.28.05.57.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Mar 2020 05:57:42 -0700 (PDT)
-Subject: Re: [PATCH] block, nvme: Increase max segments parameter setting
- value
-To:     Ming Lei <tom.leiming@gmail.com>, Keith Busch <kbusch@kernel.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-References: <20200323182324.3243-1-ikegami.t@gmail.com>
- <BYAPR04MB4965BAF4C0300E1206B049A586F00@BYAPR04MB4965.namprd04.prod.outlook.com>
- <cff52955-e55c-068a-44a6-8ed4edc0696f@gmail.com>
- <20200324000237.GB15091@redsun51.ssa.fujisawa.hgst.com>
- <6b73db44-ca3f-4285-0c91-dc1b1a5ca9f1@gmail.com>
- <dc3a3e88-f062-b7df-dd18-18fb76e68e0c@gmail.com>
- <20200327181825.GA8356@redsun51.ssa.fujisawa.hgst.com>
- <CACVXFVM=rT=86JrmAkySTg=gknfFL8Q1NU0uXWzoDMKMyL_mow@mail.gmail.com>
-From:   Tokunori Ikegami <ikegami.t@gmail.com>
-Message-ID: <a0e7a985-a726-8e16-d29c-eb38a919e18e@gmail.com>
-Date:   Sat, 28 Mar 2020 21:57:39 +0900
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <CACVXFVM=rT=86JrmAkySTg=gknfFL8Q1NU0uXWzoDMKMyL_mow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=moUPt29vKzoJQj/rg2s2bT3a8sVhdjHv+d/Lrs9QYP8=;
+ b=fyKib4/UjF3cZVFQT4vMKCYbt4eRELpNPezdS1FZIElgA72H+dibz0f4AINg+3qKhOIxmoTpoHzxSgkodqdWiU/7t1L4yMfvykAu4nOMtMP7r7UenyrJYuJd/Z9Zal0D0XOvn9Y8ZrWwZrqyfDLE8i/rEZ+js+Zjz5TLjANvAQw=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3662.namprd04.prod.outlook.com
+ (2603:10b6:803:47::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20; Sat, 28 Mar
+ 2020 14:17:21 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2856.019; Sat, 28 Mar 2020
+ 14:17:21 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v3 08/10] null_blk: Support REQ_OP_ZONE_APPEND
+Thread-Topic: [PATCH v3 08/10] null_blk: Support REQ_OP_ZONE_APPEND
+Thread-Index: AQHWBFfX7h71lczrakCHx9Pfk27Rsw==
+Date:   Sat, 28 Mar 2020 14:17:21 +0000
+Message-ID: <SN4PR0401MB359808CCDB0B685D4A0A5E979BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200327165012.34443-1-johannes.thumshirn@wdc.com>
+ <20200327165012.34443-9-johannes.thumshirn@wdc.com>
+ <20200327172656.GB21347@infradead.org>
+ <CO2PR04MB2343547B8748378050855B2CE7CD0@CO2PR04MB2343.namprd04.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
+x-originating-ip: [46.244.221.17]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 30b113bd-bdb5-4fb2-35d4-08d7d322bb04
+x-ms-traffictypediagnostic: SN4PR0401MB3662:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN4PR0401MB36624E4B8659690305CCB2BE9BCD0@SN4PR0401MB3662.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 03569407CC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(39860400002)(396003)(366004)(376002)(136003)(346002)(91956017)(4744005)(5660300002)(54906003)(186003)(26005)(71200400001)(4326008)(6506007)(76116006)(86362001)(2906002)(8676002)(66476007)(66556008)(7696005)(53546011)(64756008)(478600001)(66946007)(110136005)(66446008)(9686003)(81156014)(52536014)(81166006)(8936002)(316002)(33656002)(55016002);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: C9EoDjeez11zOFob4meHOLwCnK6kKVfiys2dQaMnaJaKpKYbmLiF48bP2AZK8cVxSX3rad+IdfAbowC9PkgiC4Fz0aPNwgNfMcz2KnfN2kU0NS118kD1clKuxEubjh0YXCuar/OEFiR7H/31eFyFcbILtZsCXTfGb9IfCGKlWJ/kr38M2Ow3MzxQdPXVLjBKLaEBb/48pkHGlL6ujpTZaIz9IKFTIEzS31dJm1MpE3PVwpiYEtL42+2VGXzw16IfmWwq9fkjpPJ9U1V1d5fd1dsxMWltKpyRo9LSO270FCMNbSYtyGaXhWOEYHfseIIlg9YJt0E6NuKlV8BnTQkM3bYJrJJhfLewrSa04pE9o/rgLXFOQpv2lO0rtb1KnMttdL5OazbuNN5N0KdCBbZB/WfTbF2CZZOl+uovAnvHsYzOy8rKc5e3SLEC31b1+YLW
+x-ms-exchange-antispam-messagedata: nNAX/sR96H12exey/SUG87QOp4NqdSnKKrXt0Xu6KhFlm2GOLVT2tUc2qvM/B7/s0IdEM0At6OEmTsVaQ62Ttm1tU7EUIKT5f350Nkx/RHioFZTsaNc0DCNrcwEluif9cXCNHaplqFT3Mq50+e/CNQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30b113bd-bdb5-4fb2-35d4-08d7d322bb04
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2020 14:17:21.4679
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oxa8MHqTqtzoKILD4ayvbx1XRq7p2uH1hN4WLv9wrd5q3Bt8EZLwmWgFPDKfaUigmAJ4WMqOrjbezjTnEFuj6nhPVNysoFVSKUbJ7Mp0rEw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3662
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 2020/03/28 11:11, Ming Lei wrote:
-> On Sat, Mar 28, 2020 at 2:18 AM Keith Busch <kbusch@kernel.org> wrote:
->> On Sat, Mar 28, 2020 at 02:50:43AM +0900, Tokunori Ikegami wrote:
->>> On 2020/03/25 1:51, Tokunori Ikegami wrote:
->>>> On 2020/03/24 9:02, Keith Busch wrote:
->>>>> We didn't have 32-bit max segments before, though. Why was 16-bits
->>>>> enough in older kernels? Which kernel did this stop working?
->>>> Now I am asking the detail information to the reporter so let me
->>>> update later.  That was able to use the same command script with the
->>>> large data length in the past.
->>> I have just confirmed the detail so let me update below.
->>>
->>> The data length 20,531,712 (0x1394A00) is used on kernel 3.10.0 (CentOS
->>> 64bit).
->>> Also it is failed on kernel 10 4.10.0 (Ubuntu 32bit).
->>> But just confirmed it as succeeded on both 4.15.0 (Ubuntu 32bit) and 4.15.1
->>> (Ubuntu 64bit).
->>> So the original 20,531,712 length failure issue seems already resolved.
->>>
->>> I tested the data length 0x10000000 (268,435,456) and it is failed
->>> But now confirmed it as failed on all the above kernel versions.
->>> Also the patch fixes only this 0x10000000 length failure issue.
->> This is actually even more confusing. We do not support 256MB transfers
->> within a single command in the pci nvme driver anymore. The max is 4MB,
->> so I don't see how increasing the max segments will help: you should be
->> hitting the 'max_sectors' limit if you don't hit the segment limit first.
-> That looks a bug for passthrough req, because 'max_sectors' limit is only
-> checked in bio_add_pc_page(), not done in blk_rq_append_bio(), something
-> like the following seems required:
->
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index b0790268ed9d..e120d80b75a5 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -22,6 +22,10 @@ int blk_rq_append_bio(struct request *rq, struct bio **bio)
->          struct bio_vec bv;
->          unsigned int nr_segs = 0;
->
-> +       if (((rq->__data_len + (*bio)->bi_iter.bi_size) >> 9) >
-> +                       queue_max_hw_sectors(rq->q))
-> +               return -EINVAL;
-> +
-
-I have just confirmed about the max_hw_sectors checking below.
-It is checked by the function blk_rq_map_kern() also as below.
-
-     if (len > (queue_max_hw_sectors(q) << 9))
-         return -EINVAL;
-
-The function calls blk_rq_append_bio().
-So the max_hw_sectors will be used to check the length with the change 
-above.
-But it seems that there is a difference also for the checking limit 
-condition.
-
-It seems that it is better to check the limit by blk_rq_map_user() 
-instead of blk_rq_append_bio().
-Or it can be changed to check the limit by blk_rq_append_bio() only 
-without blk_rq_map_kern().
-
-Regards,
-Ikegami
-
+On 28/03/2020 09:51, Damien Le Moal wrote:=0A=
+[...]=0A=
+> Johannes,=0A=
+> =0A=
+> If you agree, I will send a patch separately for the move of null_handle_=
+zoned()=0A=
+> before the memcopy. While at it, I think I could also take patch 7 from t=
+his=0A=
+> series and send it together with the reset all cleanup using req flag. Th=
+at will=0A=
+> make a mini series for cleaning & fixing null blk.=0A=
+=0A=
+Sure no problem.=0A=
