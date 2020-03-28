@@ -2,99 +2,157 @@ Return-Path: <SRS0=MX1A=5N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE89CC43331
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 05:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA13C43331
+	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 08:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6527520716
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 05:00:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9587620716
+	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 08:13:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CdNuwXeI";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="s87vGOIB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725845AbgC1FAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Mar 2020 01:00:01 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:52717 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725810AbgC1FAB (ORCPT
+        id S1726449AbgC1INb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Mar 2020 04:13:31 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:49311 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726156AbgC1INb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Mar 2020 01:00:01 -0400
-Received: by mail-pj1-f68.google.com with SMTP id ng8so4798163pjb.2;
-        Fri, 27 Mar 2020 22:00:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=L4669NroGBW9XLBryKAcQdYv2RuzVeTTkHzEuRlB8Ns=;
-        b=LisnqsBsj45lbggqau70lCzUX47gwY8ej1cd2JqovjMf9EYIRXtn5G8gHVyyqSKPIQ
-         pFut/OigGyiGdQ6ZMgj9jZ1MVrPBOxbFjR3jB6a/2nwGYNpF72vMweKA3gBmk0qRSPbZ
-         kURdhK30ayHptyRh7x10kkZ7W/JI6k10Dg0vZkJN4HwZFgk53E7nmvAdSUHas79jQPxc
-         0MeagEnJnX5icFGGSKWWpZ2UJJxlhZdILla1NdzYOigIN6bhAxLYUSWutaM4NPEYLBEv
-         rHywkMLvXVHfWTD3lFdk0tsVbDlOTZws80X+sGQN68BbSG+iz663jtXUciGh7MC31Xl3
-         Tj8g==
-X-Gm-Message-State: ANhLgQ2Vr3H4Z/QJq4dW5FlMEFzZlxwEsAnB+sy0X/3gYxuqu/1b1t/s
-        xbfgYEG5v+H33KOdYZDoAXY=
-X-Google-Smtp-Source: ADFU+vu0tnsLz6dFMA049Icba0dRqFurginc9TaPwISgkviWXSO9pYJcB42R1jw2Ce+J6N3QZ5ASDQ==
-X-Received: by 2002:a17:90a:af81:: with SMTP id w1mr3126326pjq.14.1585371600528;
-        Fri, 27 Mar 2020 22:00:00 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:3563:edda:f4cf:995c? ([2601:647:4000:d7:3563:edda:f4cf:995c])
-        by smtp.gmail.com with ESMTPSA id o29sm5377486pfp.208.2020.03.27.21.59.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2020 21:59:59 -0700 (PDT)
-Subject: Re: [PATCH v11 19/26] block/rnbd: client: sysfs interface functions
-To:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        leon@kernel.org, dledford@redhat.com, jgg@ziepe.ca,
-        danil.kipnis@cloud.ionos.com, rpenyaev@suse.de,
-        pankaj.gupta@cloud.ionos.com
-References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-20-jinpu.wang@cloud.ionos.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <5c710388-c40e-4336-d1d8-b50d4ed3ca85@acm.org>
-Date:   Fri, 27 Mar 2020 21:59:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200320121657.1165-20-jinpu.wang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8
+        Sat, 28 Mar 2020 04:13:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585383219; x=1616919219;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=xdfle1pMCuIxWM3wLa1MInTUVf7MjWXyhYnFEiECkr0=;
+  b=CdNuwXeI+G7EfJl/9Fu4judClpVRB1o2rf62TzU/lYtcfdDKTB1OWQVl
+   23Wa2uZ2nfAUAKqKUaskUuEd9pnEwfWAa8kDCiwevJIr80ixrlKe9+Pe0
+   wgPeQKzwbsSdqff3RU0E7XTjH9C+QLgq7FlAOGHvaoHz+kbMKNLRsS7FN
+   JR+33g1ZST7o8opLjaeDI4A8SSpwAairwQXNZg/yqhtxsvS9sbBEmi/rm
+   mS04wmEuIy0j2H4nePB2ngDLOauGggnICavgjOJJWqME9P3zEf6MtGnzR
+   UmzaKQUr8CAl9UNTgGplCWkP27Xg98wVbWrvZKQlgu4JmFGjIIMxa3nbW
+   w==;
+IronPort-SDR: y9cf8X8k2FzCCwKpwzOogkRV6mC19xXx+aBB4a3MIrHU5GKoZoHAG4jp2vaBUSXEBCpXZnkbhO
+ TmbZ1W0XtMVhjziy+IPj/IrV6hhJhiS1BYGmRFN2Be5cfrO6UXKBukVauKE9IurIODWePj2Blq
+ us7FDQRw0b60JVPrAO8ASAmBNOYmFbpmKSzzVJx/3tIsIvSf20TBrGOW5ARVim3izspMNZ5c4g
+ RWzy37YkpnGx/xx7e6BNnSK/+lvXtW8UuVJn1YKdAoMFsuaZBZtA1RnY7JeEtZKNCo4kSkRPqw
+ h2o=
+X-IronPort-AV: E=Sophos;i="5.72,315,1580745600"; 
+   d="scan'208";a="235999060"
+Received: from mail-dm6nam10lp2104.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.104])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Mar 2020 16:13:38 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f5Lo+Q2LG9aU/cyzj6m9ujzjsDOJ+h0IjF3KzxrT8jLvEelXhqUxFBTQwXuZvMVtgkMOP/SwhMeQcj42P3hYICx7vZ9scaz3LcHKWJ4B7jlfoJwro5+nVz83n1OrVp0fLLhcpOgIjeV5pqoGojN/Ch3Mihk2dzNlP8r/fyN2xJVbpu9tuwi6jjYPSGtHztiTqbN73VZuxEWUNssuRA0wAPCY9eFtyunbIJlAQsmqwRO78KYm4cC8gygZUhHCGS5oRlQ1KSwm7hYngI9mg29fqtjoevH7KbzN2LECK3Od/Af5ysH8XR0hbPDQHRG3gCkn2SOZKj0ua8byFvdp6+Rb8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=278/iMV7W7Toiq1Ol04AymXjHcVg5CaemGHxshffdH8=;
+ b=Z8vxdGwMnzXQ7tHInTfzUL8YVrnjU/18NOr+AjuplQpuCv9MCQjBxG2w1pwgHxrmshwtWVOHm+FUBN/331GWpYyr1u3ca53OSksp8K1Y6kS/G0Eo5SrDKcF811L7HPxcxQNoPZBuGpRI+OF59nHlCI4yOg9E7V/6RVPYPmh7aK+rzIwTUmj9EPxI/5IscWmS/1najbhlhV7RjH3Ow0rZgMrf4FMz6OKi6jQKjV4JkGEYGh3e1+rnrpQqeczND3ioC4b5WZWGYa2RSYsLjmQ1FwkQd/5DCOOw6+xgSROu19VzOSqrWAuVQ8Es1MnF3HsvQix512Z/wtXUrt53qzf5pA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=278/iMV7W7Toiq1Ol04AymXjHcVg5CaemGHxshffdH8=;
+ b=s87vGOIBX9mvFpQ9b8VLlw96jjfLDKIPrnmsOuhqGS/qo9Iex6VyjMMpv4HnY7K3cS4qbF6lAQU7eRtJDpQlLl7pIhwgqrV+dEu6MeYsIPA/xnYjcjqTqJhIzscnfuuT1RUcYxbxFXT4vtm7eJ7ZBoCLI3fxad/Mrs8dp0SwSaU=
+Received: from CO2PR04MB2343.namprd04.prod.outlook.com (2603:10b6:102:12::9)
+ by CO2PR04MB2263.namprd04.prod.outlook.com (2603:10b6:102:d::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.21; Sat, 28 Mar
+ 2020 08:13:26 +0000
+Received: from CO2PR04MB2343.namprd04.prod.outlook.com
+ ([fe80::c1a:6c0f:8207:580b]) by CO2PR04MB2343.namprd04.prod.outlook.com
+ ([fe80::c1a:6c0f:8207:580b%7]) with mapi id 15.20.2835.023; Sat, 28 Mar 2020
+ 08:13:26 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "hch@infradead.org" <hch@infradead.org>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] block: all zones zone management operations
+Thread-Topic: [PATCH] block: all zones zone management operations
+Thread-Index: AQHWAydCbik6RfBk9kK4q1a4/Owqqw==
+Date:   Sat, 28 Mar 2020 08:13:26 +0000
+Message-ID: <CO2PR04MB234368B6701C041B292DC872E7CD0@CO2PR04MB2343.namprd04.prod.outlook.com>
+References: <20200326043012.600187-1-damien.lemoal@wdc.com>
+ <20200326072800.GA21082@infradead.org>
+ <CO2PR04MB23433C37660B9A8B53D95790E7CF0@CO2PR04MB2343.namprd04.prod.outlook.com>
+ <20200326093049.GB6478@infradead.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [129.253.182.57]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 8723bac0-c52e-4c4f-403f-08d7d2efe44d
+x-ms-traffictypediagnostic: CO2PR04MB2263:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-microsoft-antispam-prvs: <CO2PR04MB22639990126E51EC0B91C19EE7CD0@CO2PR04MB2263.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 03569407CC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO2PR04MB2343.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(396003)(136003)(366004)(346002)(376002)(39860400002)(66946007)(6916009)(478600001)(9686003)(2906002)(54906003)(55016002)(4326008)(64756008)(81156014)(8936002)(186003)(33656002)(66476007)(66556008)(71200400001)(52536014)(66446008)(76116006)(316002)(26005)(91956017)(53546011)(86362001)(5660300002)(7696005)(8676002)(6506007)(81166006);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +LTMiztV/OI03MQMGfIiAVtsVKe+W1tgQen5RY1AQanMpNIO90I01ySnALUQ5KcqAHFYXlKYSj9tB8iW3lzMgp74mmuj1BKTjcwdncvUxfB43XRJEja6TyjuVqR+puxwE8MKX0JVCjZu8SE2m9SldF2tIweVDUv4RvOP0kZb9AFp0Mp9lKhRCWCg5M8seIEVWl0KE9lDlbFxyhfSakvortgVaieuvxSnSj8T6j3Rd/RmL1Hk2cJ6cXPh/lYihhqfZz+6ZPLzOO1S2FwgooF6D4mozZm8/BIxlUVEoUyuAMq/Sd+ea0156cyYTEM7bEv7Z7eWcdMhAyToRssvN0u7x9NRRZynPK65D1i2a2V64Jhy1yF6ifVNyAux7nGXfkJa8V55IgOFWPzWjIBf0jKFphEqCW9SopN64n+0S5xDeh+4t5uZXiN4yG1p5dn2rbm6
+x-ms-exchange-antispam-messagedata: zfcxi1Biem1+y0Tlf2apYTw4/s75SCJNbfdwNTI/LJG4PUv85bNJlYFTts5K0UTic0O1yyTZN8M6hPt/s06YyDaEGLP85iX47XGPhB2eb2359wLj1nIcf9adtIHWsoBEcEMN0yIi3IzZwQI2YYHPVw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8723bac0-c52e-4c4f-403f-08d7d2efe44d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2020 08:13:26.3899
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: x7Pkx/46zOnrvpJdwN1VOg5BeRR3QiQGFIPQpyB0GfaA1MFqOwNCcJVpjildM0oQjBwn3vsPeX92Tfvy1Mae7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO2PR04MB2263
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-03-20 05:16, Jack Wang wrote:
-> +			ret = rtrs_addr_to_sockaddr(p, strlen(p), RTRS_PORT,
-> +						     &opt->paths[p_cnt]);
-
-Same question here: has the server port number been hardcoded here?
-
-Thanks,
-
-Bart.
+On 2020/03/26 18:30, hch@infradead.org wrote:=0A=
+> On Thu, Mar 26, 2020 at 08:23:34AM +0000, Damien Le Moal wrote:=0A=
+>> Open & Close all zones are indeed not super useful, at least on SMR driv=
+es. But=0A=
+>> finishing all zones does have some benefit, namely the ability to quickl=
+y change=0A=
+>> all incompletely written zones into "read-only" full zones. For drives w=
+ith low=0A=
+>> zone resources (open or active zones), this can be useful to recover zon=
+e=0A=
+>> resources. Again, not so much on SMR drives, but this could come in hand=
+y for=0A=
+>> ZNS drives with low zone resources (max open zones etc).=0A=
+> =0A=
+> What quantifies the "some benefit"?  If you have an application that=0A=
+> micro-manages the zone state it better knows what zones are open.  But=0A=
+> even if we want to add a finish all I'd rather wait for ZNS support=0A=
+> to land and real use cases, as it sounds all rather dubious.=0A=
+=0A=
+OK. Sure, we can delay this until ZNS. The use case are indeed not super cl=
+ear yet.=0A=
+=0A=
+In any case, I think that the patch has value as a nice cleanup of the rese=
+t vs=0A=
+reset all request operations (the latter going away). The side effect of it=
+=0A=
+being that open/close/finish all come for free with it. I would like to get=
+ it=0A=
+in just for this nice cleanup.=0A=
+=0A=
+=0A=
+-- =0A=
+Damien Le Moal=0A=
+Western Digital Research=0A=
