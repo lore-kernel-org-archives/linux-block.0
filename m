@@ -2,86 +2,97 @@ Return-Path: <SRS0=N2dH=5O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8676BC43331
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 16:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5725C2D0ED
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:08:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 406072073B
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 16:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C08620774
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KN6IRIin";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="rN7IIu9X"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZqUmDnYG";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="uxVSBZKw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727933AbgC2QsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Mar 2020 12:48:19 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:28133 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728313AbgC2QsT (ORCPT
+        id S1727506AbgC2SIi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Mar 2020 14:08:38 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:8670 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727485AbgC2SIi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Mar 2020 12:48:19 -0400
+        Sun, 29 Mar 2020 14:08:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585500498; x=1617036498;
+  t=1585505318; x=1617041318;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=RbMGyFEOny2llMrAwdlKRX6saY5vUGprXzIyG16MjkA=;
-  b=KN6IRIintQtmoBsJ9w72DhDWrcJIeXbCDnDpMhwn+xmF46OgYKtE115C
-   c/vHjStMv+c4CLphxbCu5cSN4kXd+F2NmePAQ8VDd/PUtuflYbPTrgea7
-   a17pUsn/sc82pB/VdRnO1xDT8MBesngfxV2/zph5IRQBo8SKGDHJeBR2w
-   gyL+QqUypTujq9zXcBqXHcUHh3kyldQZYaEROsJJLAW800r/DkkkVT3wg
-   h3x3PZwLdxrCMPZHgxWNm5Sn+lnlL+AVc6WFFJ95PFWxkU0MgOABdeaNH
-   4DVuhZXvcsrjuO/ZXWdEIL33CUWuL65Sjb0umiRxc0M+rFU8UCeN7CxfS
-   w==;
-IronPort-SDR: IC6U+cUGT9MdXqp7zVdpMc1rE6TaH+15eaXLGtgwKB8wJuCairpA/zT7uZ8WrMFreNgEL2Qbc0
- 1nXxyY9j737RrMNXDMLXTllzpkjOmdJbyVmSovMdrHQN0lwM0Z7I075TSUVKszmXSjGRPQSyb3
- MgA3GdbksAJ+Pdc+6m8QVIV8QGeru4rNx3BoT+M8Sxzorh967/2n4bSNfSHmpVRx6dc1NnmcCp
- G0xgRu8PZqV7JDcJIFO+4j/HhsU3B35RR3jYS+BBkfSqMtW14jIo5eDqcZC1O6Ua+0B3UcL367
- ueA=
+  bh=QPa+3ObTgNoGMTHCzVj5bIFyc8aMZPqTX+FXqSkbo8Q=;
+  b=ZqUmDnYGNb3ABwYAPOZW20yrR7ODVGgSNmmuDBEqDSlTfuVGvO8R0h4A
+   BtjagZLXrrRF7tSKf9xQf1XuB7chKqWYURyVrpetQ5JuuQFbY5MXL6l7x
+   woHZelVczfRNDwUgxMTV4zM3EDL6oRNDSQhSzAflQcvScJRWSXdrekTzQ
+   TYo1DayvPiK3YeQrwUj1eZvC9U/0nCPW/u8he3qR1mMNIB7XkYXG/ksVA
+   qWeVNFoHSFY/TfLZ6qrtQNkjzYPUuq/DOzQZFicBJdZnYDrRZVncP8rPB
+   zv3hNYqekqOb4sPhsV427ZXlz7m8ekHeQxTPw0DyUr3XxueuYIiWGlVJR
+   g==;
+IronPort-SDR: B8wZk2AWxTUi2u8kamfGnWQcPYYTV88nACi9WW2K5wANeHfxJoJDX+VBHSopPmJhKEexEjUu6k
+ 9EV/WRo6vfnOIG/LclWPLsbDEFeWgbBNnR3FwGemygECINIR25QiwST1TfzIuOQGeWrr4Rm6lD
+ c8XU8Eo5Sk+N6rS49jJROhWS2Fxm/nAq0UT/FJUjjIfK2GWpHAofya/boVWSdCW6fXlf4N6wPr
+ QOqJphtvj3Y5eXSCdORbRWFRk6yYD0l1MsGa6/y94BeS96639nmGEb6JvPgL+WCwv0lv6ycrSu
+ 9k0=
 X-IronPort-AV: E=Sophos;i="5.72,321,1580745600"; 
-   d="scan'208";a="135247846"
-Received: from mail-bn8nam11lp2170.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.170])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2020 00:48:16 +0800
+   d="scan'208";a="134245295"
+Received: from mail-bn8nam11lp2173.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.173])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2020 02:08:35 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dypDuFIoxRcbzWD6oM0cN+7UaAsf4ftkj4SZvY9g4lBSBvQHk6mSMdbyJE69zzBikmq9bMl7KSkZ61kuwwU9F/y1jxwEoZxS+OeNcs8xxHB7U9khXvzXnq2XIH2E0bvFgleCAgfIkiM+ZJpm/N/a5y4ypvjM1/GQwH5wsPtb+E9euaRwujmIO+o4sXInUOEQ2ruBchUlTKoGTj1Bs/C0/XzQ4JnaGca2fhfuaQahuh5eitORsX0xecXEUAczNWT5CXjYUTMJ7sYsfVufSKv5rXUo9Z2csVjRya+dHBmR05dDnD9yDB6zxaQgWqmJvq2xWlzFj9E4vlpWlFJjs7Bb0Q==
+ b=Ei9EBMrzX1N1eRAcrJyTODL6KTxJKlyQY1/sA5esclCjeY4TU9y3Vj9yzkwFuWy3SnWxUklcvjZd6e4qN7fd+Ftfjiw5jlpRIWSqxDEBEM9EEmU8yK2kYUQMSUzQOMopctO9UEO5CjiSBIGfV1MvUdW0abueiNFjKVIKxxbpSNIUgEPn/AGuFQrd/8lY1iP9ysgM4vESU82/w9YK7dCcAy5whQdLYW4pvwtB2qznPj/ZRYRj5HY5VAPOyQuLAm3Svhtntf7gLGk3P3YdTNjLcbF0AwiKaMCoZDdp7RYkqWDqpPjMVIRD0Bxy6nPaSKOtnKlS9AUmkqAB7CEcamv6rw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H+Ef8528ladLJNaTkCj02n5hX85Yr0CUhEVdBtAEl2A=;
- b=Wp/Gtf0Ap7st0mhHfy13OSBwpsfxm3V9vYbfiPR+qhc4vxxRyVzu0O9DujVXDAL8xSuY2w6DZmVl1FeiT/xB5FtOhVUq3G/AHXN6p0/vtCCefngNFF6Y48bF2RBtJQWl+wgZ6vpHP5z3b/u3yd0HYow0wHWq/GVWrNWDQ1Zuah3ChCbODwmR+0vuqxA8Cm9oeeeAb2kLm/PXzU6s6TiuGYInUmCo8dDfHS02Qfq6Zx7AxL11rOVegh/hBmJQ6g/jAEV0f0Q9QHhpeKvLOCrG4hO0ovy1DOziTM72FSMKx723B26Swvq9DK9spHYuQ3fjkcS7aq8BE2ldEkQftMWAkQ==
+ bh=wWWF9gHjXAOcHkGDZKDrxwMP2ex+8SlDgNdvHql4RKU=;
+ b=Lo4/so7k9T3W+F5xcVCg7iFYvRJdJYDFIQPeiU7u1yKI4vmCzqTtaBVmuz2dYfQBwXW7WeFjxYYQ2RbKYRYEO2a/xBfsShgQUWezLCp3hwzU8d7PcbPbJfJxX71pJmv8XkDKs2kYPmEGX2hKt3Ot9kX3sV+NjfaQDZUhqKu8Z0hCfmbvWflFG5dj2ks8QoZKp8CZyc+RPKRt19vaPnnMPiUvvusJfpWf1+fxJtw5brEtXqAKrd5SDO24Y4VvPCm39vdluTCD2VJCXhvNfsYo1w9PrhRY+u/FbwQCZ+/jm/ltvCItpOJKyyLb6HDAHIEaoElSM7bBbr87cvQWXd0JCg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H+Ef8528ladLJNaTkCj02n5hX85Yr0CUhEVdBtAEl2A=;
- b=rN7IIu9X8hiNQ9jY7sJ8vDBmMV7Y9l/umniQ3U6qrQ9NfchzPT076im62+YGSxu3WxVSB2Sm+wA4w8+vAHg9fdyt2WgESZhxfZ8cmcseZPOyb50v4hIjMb05mJgVFkesXC8DLRlhXuhWqy7RmnApus6lkuxfiNKjfuSHgB/PzE4=
+ bh=wWWF9gHjXAOcHkGDZKDrxwMP2ex+8SlDgNdvHql4RKU=;
+ b=uxVSBZKwivng+8Tt3F1jjtQKkwRm67oddD54UKKWounfMNrld0NX4etj3Xvkv6kNWf8MDHkMi8u/a6R266yS5kjYed/NAfn5BzGuahu2fQpR+N1Gvl+7aGrcEksQpHCVmaC5Fu3dTx/cJCqczT0cJKbLVm1cGN/0ES4/W9Etpls=
 Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB5672.namprd04.prod.outlook.com (2603:10b6:a03:106::22) with
+ by BYAPR04MB6232.namprd04.prod.outlook.com (2603:10b6:a03:e5::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20; Sun, 29 Mar
- 2020 16:48:12 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.18; Sun, 29 Mar
+ 2020 18:08:32 +0000
 Received: from BYAPR04MB4965.namprd04.prod.outlook.com
  ([fe80::d826:82b2:764f:9733]) by BYAPR04MB4965.namprd04.prod.outlook.com
  ([fe80::d826:82b2:764f:9733%7]) with mapi id 15.20.2856.019; Sun, 29 Mar 2020
- 16:48:12 +0000
+ 18:08:31 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Martijn Coenen <maco@android.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>
-CC:     "bvanassche@acm.org" <bvanassche@acm.org>,
+To:     "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <bvanassche@acm.org>
+CC:     Jack Wang <jinpu.wang@cloud.ionos.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-team@android.com" <kernel-team@android.com>
-Subject: Re: [PATCH] loop: Add LOOP_SET_FD_WITH_OFFSET ioctl.
-Thread-Topic: [PATCH] loop: Add LOOP_SET_FD_WITH_OFFSET ioctl.
-Thread-Index: AQHWBdMQQUAktCkpRU6btFmcg2in5Q==
-Date:   Sun, 29 Mar 2020 16:48:12 +0000
-Message-ID: <BYAPR04MB4965F147D89443CAD75FDE0E86CA0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200329140459.18155-1-maco@android.com>
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "dledford@redhat.com" <dledford@redhat.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "rpenyaev@suse.de" <rpenyaev@suse.de>,
+        "pankaj.gupta@cloud.ionos.com" <pankaj.gupta@cloud.ionos.com>
+Subject: Re: [PATCH v11 15/26] block: reexport bio_map_kern
+Thread-Topic: [PATCH v11 15/26] block: reexport bio_map_kern
+Thread-Index: AQHV/rGKCEGMgRuVP0mTYK+YBVb5SA==
+Date:   Sun, 29 Mar 2020 18:08:31 +0000
+Message-ID: <BYAPR04MB4965BA89446761D2C3D414D386CA0@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
+ <20200320121657.1165-16-jinpu.wang@cloud.ionos.com>
+ <15f25902-1f5a-a542-a311-c1e86330834b@acm.org>
+ <20200328082953.GB16355@infradead.org>
+ <bbba2682-0221-4173-9d00-b42d4f91f3b8@acm.org>
+ <20200329150524.GA13909@infradead.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -91,77 +102,59 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [199.255.45.62]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 709f9920-e3b0-4d46-df1e-08d7d400f816
-x-ms-traffictypediagnostic: BYAPR04MB5672:
-x-microsoft-antispam-prvs: <BYAPR04MB56728CFA151C3A4E8799744F86CA0@BYAPR04MB5672.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: a7d413d6-a7b8-4c0e-9fbe-08d7d40c30c1
+x-ms-traffictypediagnostic: BYAPR04MB6232:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-microsoft-antispam-prvs: <BYAPR04MB62325627DAB0B38259B7CBEF86CA0@BYAPR04MB6232.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
 x-ms-oob-tlc-oobclassifiers: OLM:7219;
 x-forefront-prvs: 035748864E
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(366004)(346002)(376002)(39850400004)(396003)(71200400001)(52536014)(316002)(8676002)(66476007)(54906003)(33656002)(81166006)(81156014)(110136005)(9686003)(4326008)(26005)(55016002)(2906002)(186003)(5660300002)(8936002)(53546011)(478600001)(76116006)(966005)(66556008)(64756008)(86362001)(66946007)(66446008)(6506007)(7696005);DIR:OUT;SFP:1102;
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(376002)(396003)(366004)(346002)(39860400002)(26005)(110136005)(316002)(478600001)(54906003)(4326008)(186003)(81166006)(7696005)(81156014)(66446008)(7416002)(53546011)(8676002)(86362001)(66476007)(2906002)(66946007)(66556008)(71200400001)(9686003)(6506007)(5660300002)(55016002)(76116006)(52536014)(8936002)(33656002)(64756008);DIR:OUT;SFP:1102;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: W78KCzbnGUJAyiYCaxGnqqY1si9iEzq7VQ90bK1AETbB0jxhPvwfQMik4jhpEcvSyjdmVUICmJaOp+WcmR/LlkVD7scHZ+SBAAwKpWqJ6MWSkPqhb0nu/lsMSlNggzEedRUlPyxJmnUdE3JhsvIRTShK5EWsf+CbTa00viB0k3X+euD7yU++N7Jlyn/BcNrS+asVTkQgNynCvcplYHzTTETpCneNX66LgeTu+u8Wwp9s1gcE+LNwvt1egKDzLq9c/BOKnQqsApTP8uR7XKhkISKw0OEJdTRWLhs4zEcDIcow/wiJpbEo7X1s9TbwUKdsU6fp/llO+7FtsX+/tH/B5dixqC8tu8co0Nq1uT7OrZfj/b9m8ARLnCeg+6u0P6a4N3a21SSGbYylpauSA+JeCwwRgrgrv/OTZLKOxvSsOgaiSjEsURracGRvXPNaWg2sBJvQWXEh3FIB0U1F2TTChV+gPMg9E775SCeE+8949d+JL0lUQo1+mpzmVHm2qCaZm7R+Kne6AX+NgJKGR/K8fA==
-x-ms-exchange-antispam-messagedata: p1xQ0Vtaac5XkOahnmM+3I3jGXCCbKG57xQzsBDqt9rk8wmXfSqw8+TYEs5BaZcwfIwWgU9PDDJCuB77jZQcixAYFWWnOYl0IrjQId9qPOGVKivms2ZEZ/anzuuNB8bI8+clIjjaFUcEQh/Lbimu/A==
+x-microsoft-antispam-message-info: WTmES70+9XH/y5k4KDy+K1Rkx89+aNL4GSEYl8AZJcR0q3qoKn8MFq/rrKrA2evphWhurl2OpZpVb2C7Qn4Q4AlsX14MM1YhRoyKCMHcW5RvgCW7aBe1pNy9rWRu7bLmP8gNFVA/XBseSCA6yXiFWlUoFLDNd6Tmqbl39KI+We56mUYix8Y65fa+q1Nq/laNb+Ug1XthRZyC7KMirHkFXb9uqQLdpGiezexvkj7neVfgh8UJ8cvgLNbO57Aiz6L67CbHhfYHOlkrPYRIPVPusg0dMjm9utGIvtJ1Tf7I91rsAZT18zPzQenuOEvkIzortedvcZPlzYeNG80IwWxPU1aWksaqLXcbbcXnf1ReMvU3WOUe7eUJ1s+8mupCIMUlXV3ZiUUR/VZ740fTUxtAH0JAL3TExmkmny6eDSYb3g06UCDUn9Pz1NFKHbVcaCf4
+x-ms-exchange-antispam-messagedata: EgkwIOBc1AuvZXSVt3pLrPOzGcJT3yCLHhp/Qx9F1SheZTki/gkH3iNNlDvnQY28Jd4Ga7+2Lh6z9VqZp8oMWUFEiNt8JlMIylJMtRiSXAeUmtRFcgZSgp7LWgSrus5GaZMjDUHO9Ff1bf6K7/DoTg==
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 709f9920-e3b0-4d46-df1e-08d7d400f816
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2020 16:48:12.0903
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7d413d6-a7b8-4c0e-9fbe-08d7d40c30c1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2020 18:08:31.7607
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1cRVeVKsuggNyTZ64CKX/8KqMfMeCNZMuJbZku0TXOEJOpTMFKdsGj1Tzay5nXLjqanBGWUD/8OjJdCnTjk+A71DwbJyi2bpTqY55jdTi/E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5672
+X-MS-Exchange-CrossTenant-userprincipalname: YLqjA4CPZMjyFazXe6IYA8yiOrTJ7U+0EyD7RXir/8Z3PdK8lLKcVKAV0bvZCURul723oXLOZmBizLf3dU+vaXki3y2e/JZih+GfyqlUfVk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6232
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/29/2020 07:05 AM, Martijn Coenen wrote:=0A=
-> Configuring a loop device for a filesystem that is located at an offset=
+On 03/29/2020 08:05 AM, Christoph Hellwig wrote:=0A=
+> On Sat, Mar 28, 2020 at 09:16:55AM -0700, Bart Van Assche wrote:=0A=
+>> >There are more users in the Linux kernel of bio_add_pc_page() than only=
 =0A=
-> currently requires calling LOOP_SET_FD and LOOP_SET_STATUS(64)=0A=
-> consecutively. This has some downsides.=0A=
->=0A=
-> The most important downside is that it can be slow. Here's setting=0A=
-> up ~70 regular loop devices on an x86 Android device:=0A=
->=0A=
-> vsoc_x86:/system/apex # time for i in `seq 30 100`;=0A=
-> do losetup -r /dev/block/loop$i com.android.adbd.apex; done=0A=
->      0m01.85s real     0m00.01s user     0m00.01s system=0A=
->=0A=
-> Here's configuring ~70 devices in the same way, but with an offset:=0A=
->=0A=
-> vsoc_x86:/system/apex # time for i in `seq 30 100`;=0A=
-> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done=0A=
->      0m03.40s real     0m00.02s user     0m00.03s system=0A=
->=0A=
-> This is almost twice as slow; the main reason for this slowness is that=
+>> >bio_map_kern(), e.g. the SCSI target pass-through code=0A=
+>> >(drivers/target/target_core_pscsi.c). The code that uses bio_map_kern()=
 =0A=
-> LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to freeze the associated=
+>> >is in patch 22/26: "block/rnbd: server: functionality for IO submission=
 =0A=
-> queue; this requires waiting for RCU synchronization, which I've=0A=
-> measured can take about 15-20ms on this device on average.=0A=
+>> >to file or block dev". Isn't that use case similar to the SCSI=0A=
+>> >pass-through code? I think the RNBD server code also implements storage=
+=0A=
+>> >target functionality.=0A=
+> No, it is not at all.  The RNBD case submits normal read/write bios, for=
+=0A=
+> which bio_map_kerl is the wrong interfac given that it=0A=
+> uses bio_add_pc_page.  Read, write and other non-passthrough requests=0A=
+> must use bio_add_page instead.=0A=
 >=0A=
-> A more minor downside of having to do two ioctls is that on devices with=
 =0A=
-> max_part > 0, the kernel will initiate a partition scan, which is=0A=
-> needless work if the image is at an offset.=0A=
->=0A=
-> This change introduces a new ioctl to combine setting the backing file=0A=
-> together with the offset, which avoids the above problems. Adding more=0A=
-> parameters could be a consideration, but offset appears to be the only=0A=
-> commonly used parameter that is required for accessing the device=0A=
-> safely.=0A=
->=0A=
-> Signed-off-by: Martijn Coenen<maco@android.com>=0A=
+Since rw are most common operations, it'd be nice to have a helper=0A=
+function for REQ_OP_[READ|WRITE] to map and submit bio from data buffer=0A=
+with chaining to avoid code duplication in each driver which based on =0A=
+the bio_add_page().=0A=
 =0A=
-This patch seems to solve problem, can you please make sure to add a=0A=
-blktest [1] for the same since it is a new IOCTL ?=0A=
-=0A=
-[1] https://github.com/osandov/blktests.=0A=
-=0A=
-=0A=
+I'd be happy to send a patch for that if that is acceptable.=0A=
