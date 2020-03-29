@@ -2,73 +2,87 @@ Return-Path: <SRS0=N2dH=5O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B06C43331
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 15:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FE6C43331
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 16:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCB10206F6
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 15:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 448372073B
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 16:09:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PEz8hf0l"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vUX2rCih"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728279AbgC2PF2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Mar 2020 11:05:28 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:41084 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727167AbgC2PF2 (ORCPT
+        id S1728317AbgC2QJA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Mar 2020 12:09:00 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43818 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728209AbgC2QJA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Mar 2020 11:05:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bJFSAZG1n+xzVtSP1SVc825QUuF9GdC/2ZtU7S6cLkA=; b=PEz8hf0lPNmRCSWD16vqwenN8R
-        dMerh5AqGy54wYPNu34Q1sZWVb3NRoRgHC8EW5iQIzT5I+nhaX/Xenj2IVTd3m6UAp7B9GNk6+LJn
-        YgmkE3twkrMKLyoIC1HG4RdwMXgtPh86nO3s3ja3IqIAp8R5vV3pplvCR1IOsjz/VdVUklxmDMZWY
-        uymiEw1eHSe1w86hSvrCMd3Zh3me3FRujRr1bXG2vB560+3mej+NTFwBpbOxCE0DyD0fY7BBIjaHm
-        NczVwADlVMCO7iE+gjNEvvwPPdw1LVme8VCNGh3yU/80KHZK8u8XprJagnmyi6Q0tzmhBKgVL39/p
-        BISc2ODQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jIZV6-0004wG-IX; Sun, 29 Mar 2020 15:05:24 +0000
-Date:   Sun, 29 Mar 2020 08:05:24 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, sagi@grimberg.me, leon@kernel.org,
-        dledford@redhat.com, jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
-        rpenyaev@suse.de, pankaj.gupta@cloud.ionos.com
-Subject: Re: [PATCH v11 15/26] block: reexport bio_map_kern
-Message-ID: <20200329150524.GA13909@infradead.org>
-References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-16-jinpu.wang@cloud.ionos.com>
- <15f25902-1f5a-a542-a311-c1e86330834b@acm.org>
- <20200328082953.GB16355@infradead.org>
- <bbba2682-0221-4173-9d00-b42d4f91f3b8@acm.org>
+        Sun, 29 Mar 2020 12:09:00 -0400
+Received: by mail-pg1-f195.google.com with SMTP id u12so7446747pgb.10
+        for <linux-block@vger.kernel.org>; Sun, 29 Mar 2020 09:08:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=xUjMfxIIS1iKsG6HzgG+NxuJGhknMOExVgFkzh/o9+M=;
+        b=vUX2rCihEDSjZvozJWYx9lAuzBHv6HukM/rN7Tlw4rFigiU920eu5sH5yKViDtv3Mr
+         4lvxBQ0tkNi7tEws1cTBSJYyBqqbwEiVrrSFSyDZQ0cU77p5Gmq0lkaYZkZ5cmBiw2x8
+         8k5WAnfpZU/DfaeLEI3tQWPIJ69rHN1eEKi9XWCEyfGvEW4YEAbbZvUGDk9w3VP3vQ0b
+         KtTGfY/4emJxqGDsPH+v731MwMbEcVYq9plLEok/lAgs0VM3ln06W3LbxMxZaj58Oc1t
+         8XATtz/vRK5hjBC6Az3C0CFY2FTF13XCrREDktlG4hFXB3SIRMI8IE6OMNjgnsQ0jZTM
+         QDWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xUjMfxIIS1iKsG6HzgG+NxuJGhknMOExVgFkzh/o9+M=;
+        b=mZ8tP267MzNfrE9yuQivbRbrPxWY7zXohxmh9SkoSAvB1wEi0X++IyY4FgXIDYs3PE
+         eHxrs89OlhdOuhfrKxPXOSh1mjxS53NxN0/UbysWXSBmryrdIvit523Q8HTVo5I9eKax
+         2VCvSTwYZreW76y19SUa+AgrjaJ0ADAi1oihQG/XaA5k+/vSiUU9HgIAJfx+1me3QO2u
+         cr9+iz3xJOyIEa/lhUIkVYlIBd97G3sSNkb1psZUTJlMM+FuSRatieSg6InKbqJ/npWN
+         /8TlZ8G2W9JeX5OswOo873v5712Hu2N6mkOqgeaQM2gWhj6xEAlQsLrRjqOXVu6bh/+8
+         y06g==
+X-Gm-Message-State: ANhLgQ3yvxuvtRB1Offv9AMhYJpsooAvIBiSdhBW9wJWaiDu/EPB1T1c
+        ER4HC/CHo5cpdajJ4DP5Yr28eWOBi13ZQQ==
+X-Google-Smtp-Source: ADFU+vuvEI/ydFfe4K0nqJdIBq6KZvUASEdwWqAegJqJ8yj2+hZKh4B6X9IU2uxUkKawCrVeiWj4kQ==
+X-Received: by 2002:a62:76d1:: with SMTP id r200mr9160394pfc.298.1585498138961;
+        Sun, 29 Mar 2020 09:08:58 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id e26sm8322607pfj.61.2020.03.29.09.08.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Mar 2020 09:08:58 -0700 (PDT)
+Subject: Re: [PATCH] block: return NULL in blk_alloc_queue() on error
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org, hch@lst.de
+References: <20200328182734.5585-1-chaitanya.kulkarni@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <86a32268-be6f-9f4c-fe3e-1357ff0e0c50@kernel.dk>
+Date:   Sun, 29 Mar 2020 10:08:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bbba2682-0221-4173-9d00-b42d4f91f3b8@acm.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200328182734.5585-1-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 28, 2020 at 09:16:55AM -0700, Bart Van Assche wrote:
-> There are more users in the Linux kernel of bio_add_pc_page() than only
-> bio_map_kern(), e.g. the SCSI target pass-through code
-> (drivers/target/target_core_pscsi.c). The code that uses bio_map_kern()
-> is in patch 22/26: "block/rnbd: server: functionality for IO submission
-> to file or block dev". Isn't that use case similar to the SCSI
-> pass-through code? I think the RNBD server code also implements storage
-> target functionality.
+On 3/28/20 12:27 PM, Chaitanya Kulkarni wrote:
+> This patch fixes follwoing warning:
+> 
+> block/blk-core.c: In function ‘blk_alloc_queue’:
+> block/blk-core.c:558:10: warning: returning ‘int’ from a function with return type ‘struct request_queue *’ makes pointer from integer without a cast [-Wint-conversion]
+>    return -EINVAL;
 
-No, it is not at all.  The RNBD case submits normal read/write bios, for
-which bio_map_kerl is the wrong interfac given that it
-uses bio_add_pc_page.  Read, write and other non-passthrough requests
-must use bio_add_page instead.
+Applied, thanks.
+
+-- 
+Jens Axboe
+
