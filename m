@@ -1,145 +1,132 @@
-Return-Path: <SRS0=MX1A=5N=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=N2dH=5O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B16FC43331
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 23:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E3AC43331
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 03:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E23D720748
-	for <linux-block@archiver.kernel.org>; Sat, 28 Mar 2020 23:42:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 449A4206DB
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 03:01:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RbAd9B9i";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="bavHFu1J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQaDg0k6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727452AbgC1Xmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Mar 2020 19:42:33 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22625 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726604AbgC1Xmd (ORCPT
+        id S1726445AbgC2DBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Mar 2020 23:01:33 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36206 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726316AbgC2DBd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Mar 2020 19:42:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585438990; x=1616974990;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=iPdwREVY6PO7I2w/AwRdzqyi/d2qkQl1ljlr351pMkw=;
-  b=RbAd9B9iwJ1uC1RZMUOItUqB4F3rmsKv+OvmUP9oxNZkQ30dBVhnqDft
-   F6Wa2lK20IyI4boWBVs4detndEp8v37+ilaO03NVPGmaecmkId+S4mg2q
-   4vw0sWR8maBofSDHVrQhVisnulGqOLTT1Xkd0uGAC7mCZmV+m1EBzOsUi
-   Jwf0rGMTeOz3PvNv5n7/hkv44oiG31ePlA4S1+xRwtj6KVFByECO4t3WA
-   kWJwm5M8CpnX1GkzJ6ps0oTHpf8bsQSSS9eFG7gWJwNc2HsOgistOZua+
-   98SQXIAdZby02x8U5VKFJqcuFa28hnR+dkPfVnXI+b6X+ucmb9HtLgwk8
-   g==;
-IronPort-SDR: axPwDsDarOoG2L896ic70Bv18mDQEhEx+e9c6OrxXKfb81MABcgIveV6nsqiKI2aXAuXN36pg/
- /3xV+mErDJWAo/s754mUc+r9cAfkJ3dRbh9SUXauwH1P4OJn03KLQXDmv9fKd/HflKh6O2LdYY
- JK4VcqerM6IRe/cGdjH6F4UP7NC9h1qbNUeM5DoDXdn0gf2g1gOTeRq4bsShd0tgjLBx0tRbo7
- lP6mQnY3gRamvomtP12X/VtUyivmLKOEaILPKVp7dpp3to5gX/8aSCm23eVhuRmoZkWqCdnAEn
- yh0=
-X-IronPort-AV: E=Sophos;i="5.72,318,1580745600"; 
-   d="scan'208";a="236041300"
-Received: from mail-bl2nam02lp2050.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.50])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Mar 2020 07:42:53 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iOmBA2d2lhoesgxY2GG+YT8zzF4w0RSQe2YHJYOiABML1eJ03VAMbDQ/+RYLwBvpLjloznGKDXwic+GxGdERGehEo7OhzyGqsvAOgsAULQc6ewQHL0u+JT0q2weF2a8TDvAc1adjWNXbjHi1/kwNOIGxHY4nnEHBIzizN1q4bXEsiW9UHd/0g27AqCNt0FgzXI+8hYwHwdcNZIZy9CJFOEowIe7x9RO9uZIfpplYDIXfpsPGMc2bg//G1nEaPyHUht/DM6hulq6Fr93lKnBt8iPGNgK7NtRJXD5xmIDsCUO+fCuqqW22aToWp5jHbnC8Juu/zuzO7zZtjhml3UvUNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z53x2w1Dt7aH7YNddk50rLAP4sTt1oebI+nIy2oZmT4=;
- b=LNomjyC9vpj24pMTRnM2e+xCsdRieZQoMoJ6faPGdL1iJIO3UpaqjAZ+IH8OGwrhsafb8KBS8PvEkeoEoi5w6ARcUALjf0ALXjJNz4diHdWaNWKD441uxKSaruGbKqO+L2R8B8PIaJXcgYClouHCZjTyc+HD5r99wVaayS4wrLrySaup7By8bxCUddp0HPkpJF4CWYxGJVtHPQyJI4SB+9ftxQrRr4dniiXWMlLZnDe2DQ6XlBHBdeKwMTPH1ubkrPtA2U/wzBNto6MuelUcpo6rSwIdeS2qgj2/TSQISEfovkHnqa/9zHb4IPQBkbIoztmsAgtqTejWJyjaExUPqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Sat, 28 Mar 2020 23:01:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id 31so16782796wrs.3
+        for <linux-block@vger.kernel.org>; Sat, 28 Mar 2020 20:01:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z53x2w1Dt7aH7YNddk50rLAP4sTt1oebI+nIy2oZmT4=;
- b=bavHFu1JgnkEkv+1bxseiCKhJyiacbhKUINfVf45jI1fkIjblyf0MamUhsjvQ9S320L5DVJFkHNLMV8OlG1u3ikk8a6cDRk4JjS4tuQkmz5Ihl60zUyX2WiaPtbmuf++T7Z/S/rz9ENfcbDCkj4sEN+xiWHjSa/lMzl9RiOGAYE=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB3974.namprd04.prod.outlook.com (2603:10b6:a02:ae::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.19; Sat, 28 Mar
- 2020 23:42:17 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::d826:82b2:764f:9733]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::d826:82b2:764f:9733%7]) with mapi id 15.20.2835.023; Sat, 28 Mar 2020
- 23:42:17 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH] block: return NULL in blk_alloc_queue() on error
-Thread-Topic: [PATCH] block: return NULL in blk_alloc_queue() on error
-Thread-Index: AQHWBS6R2yQGiNlOQ0SjSVx3uWgB7w==
-Date:   Sat, 28 Mar 2020 23:42:17 +0000
-Message-ID: <BYAPR04MB496593AEBF503ACC8DD6EFAE86CD0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200328182734.5585-1-chaitanya.kulkarni@wdc.com>
- <22e5e0bf-49db-03a8-d81f-00733f117765@cloud.ionos.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 646a0491-74b5-4f65-8ff8-08d7d371a693
-x-ms-traffictypediagnostic: BYAPR04MB3974:
-x-microsoft-antispam-prvs: <BYAPR04MB3974133C0EE6D02B16FD464886CD0@BYAPR04MB3974.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:3631;
-x-forefront-prvs: 03569407CC
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(346002)(366004)(396003)(39860400002)(376002)(6506007)(53546011)(316002)(33656002)(9686003)(64756008)(7696005)(66446008)(86362001)(478600001)(110136005)(66476007)(66556008)(66946007)(52536014)(76116006)(54906003)(5660300002)(4744005)(2906002)(4326008)(55016002)(71200400001)(81166006)(186003)(81156014)(26005)(8936002)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YZMir6I0SUrO8Mi/G6A1R06MZ4APjq7sKqL8ylA8qlfwSeoUjWvwnTGTxVbj1q0XdNt7YM6tcyddmvlJXNc5mMCt8f7QKkrxo1QXacOfghaHDnMNQGdUfRcPbK46vBpnDBUOJCbNH7qbVBKzGYwdh8c8Bnisji/gfSw0R6hz6PqCPK5RFuNAWXakp+xee2dVt9W2Bd30w2qeMN0Auux+Y+TCn/gSdKKAISyWjCalZJx1JjPAONCzq+d9fcGZag6sWWkKhgFmazrL4wjb96DJWa2SMfR2OGXu7u6QDs/TLd10D84DQNs8QT+VIsNjARzMPDgV/Vq9vrYtLOmx1uCnb7Emjuv7D4auZKQY2RZsx/HsJNJr2yYznWkrD7IBKp62fCZnM/2CHbF2ZV7ANDcqhwZCqrkWr/OBo+k+6uLYolKby8iagQwmY39w4gpAtHor
-x-ms-exchange-antispam-messagedata: 32KFgS8OlTjY/3cVpQbaQ3yLXsXSPeEXfLRX+bKYlpbdNvg9o8oGE0N+QQqghJE3VucG9jbodxIqXXbfxRLpm1gotHhJk2NHh2IbplPefqscQCv6rHcmzdJoZY0z0hp04yzlnxQiE6L2sf8p0mgLBQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1lnvHlmuRhQDgbhidJay1W7MqRCYIekQtHxcuUYunGc=;
+        b=fQaDg0k6NNEydB/Vwc6ZgcOr9ajs3qeROL8o4CVMWHnZ8xb9aNMq+R8DmFxIi+lHYR
+         z9UI+48eAAXCeELACJs0zfc3/2XbMcoYBq/MRMabsI76SYF8lGsrpHI0RF2BzmmTDtQ0
+         g88vUde84PiGG0/JGV2A6SKI0qDUMdLJda9fee7py044DgQJrIwYqAZ3iKVSexJFCP7Z
+         HQfptT23QpaPweLz6VULdPyD3RYWKET0BrCuJ+oKynRoouh+9b+1bVGnmDAukNOzjW0+
+         8vyJzOiFNP59YEBKe6HcqL952a+Esa/BBPGH2AzJZu2fTv1jN6lblMsyLD8EtulwA3xP
+         6KCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1lnvHlmuRhQDgbhidJay1W7MqRCYIekQtHxcuUYunGc=;
+        b=bR/4QElP8c2Y0Dq4AiCBbIaZDVYS7Tc814CISAmIH9w0rH2IaXN5dDAKkwhR05h6+G
+         uJUN5gK43D3/Se6Nn28PDTM6GCmf0HtvtzUn3CC/dy70LoMOjxWSXsT79tZD4utjyCO3
+         md9Vxs5xh/WZHwF81kxrtA6EM/dJVIlItbJDhprZtaiKCmQUwK8A4hztFPB3OJbaDk0Z
+         jZ/MTpLgtVRTfY793fcjBvXH+/C6b0PKzrnc4HwLJjb/hhWvgbxg78QNJ+Winm9deMZF
+         Xl8zS/3t7hQEqJ9RGd9k2HSZfW4zC37s+H4XElyGknoCrR5XnKZtWAh9M6QRthW/DDL4
+         H5bA==
+X-Gm-Message-State: ANhLgQ0o1bYE6Nmw7owivCwKqQ66Mh4Si0RRracSz1KpnoX4UjH6UMpf
+        7luOHM1WW/Cbjp6h+xYm8/D1MsAp+/7jEx2kF8w=
+X-Google-Smtp-Source: ADFU+vu5Dqu6Zgyd4KVxIX4B2sh8GgdQB0nnr4vbkA1gIb1fJ6uacc8qBLVRgembols/s/FlJqniWUhihsy9sih0V2w=
+X-Received: by 2002:a5d:6742:: with SMTP id l2mr8031333wrw.124.1585450891310;
+ Sat, 28 Mar 2020 20:01:31 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 646a0491-74b5-4f65-8ff8-08d7d371a693
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Mar 2020 23:42:17.4259
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: s8zpXPNULWhT5Uuyl1uPvY1eQmMwY7HIHKY3HTDQhA+MW0RFLgi+Q86o2dg9mg0PFpdlCNMY8q6LiXggvBu4HJKMwQKj+W94jxJh4kjjbP4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3974
+References: <20200323182324.3243-1-ikegami.t@gmail.com> <BYAPR04MB4965BAF4C0300E1206B049A586F00@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <cff52955-e55c-068a-44a6-8ed4edc0696f@gmail.com> <20200324000237.GB15091@redsun51.ssa.fujisawa.hgst.com>
+ <6b73db44-ca3f-4285-0c91-dc1b1a5ca9f1@gmail.com> <dc3a3e88-f062-b7df-dd18-18fb76e68e0c@gmail.com>
+ <20200327181825.GA8356@redsun51.ssa.fujisawa.hgst.com> <CACVXFVM=rT=86JrmAkySTg=gknfFL8Q1NU0uXWzoDMKMyL_mow@mail.gmail.com>
+ <a0e7a985-a726-8e16-d29c-eb38a919e18e@gmail.com>
+In-Reply-To: <a0e7a985-a726-8e16-d29c-eb38a919e18e@gmail.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Sun, 29 Mar 2020 11:01:19 +0800
+Message-ID: <CACVXFVMsPstD2ZLnozC8-RsaJ7EMZK9+d47Q+1Z0coFOw3vMhg@mail.gmail.com>
+Subject: Re: [PATCH] block, nvme: Increase max segments parameter setting value
+To:     Tokunori Ikegami <ikegami.t@gmail.com>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/28/2020 02:32 PM, Guoqing Jiang wrote:=0A=
->> >diff --git a/block/blk-core.c b/block/blk-core.c=0A=
->> >index 18b8c09d093e..7e4a1da0715e 100644=0A=
->> >--- a/block/blk-core.c=0A=
->> >+++ b/block/blk-core.c=0A=
->> >@@ -555,7 +555,7 @@ struct request_queue *blk_alloc_queue(make_request_=
-fn make_request, int node_id)=0A=
->> >   	struct request_queue *q;=0A=
->> >=0A=
->> >   	if (WARN_ON_ONCE(!make_request))=0A=
->> >-		return -EINVAL;=0A=
->> >+		return NULL;=0A=
-> Maybe return ERR_PTR(-EINVAL) is better.=0A=
->=0A=
-=0A=
-Initially I used that, what if existing callers are reallying on=0A=
-NULL vs !NULL return value ? Use of NULL just makes the code=0A=
-consistent with existing return value.=0A=
-=0A=
-If Jens is okay with ERR_PTR(), I'll send V2.=0A=
-=0A=
-> Thanks,=0A=
-> Guoqing=0A=
->=0A=
-=0A=
+On Sat, Mar 28, 2020 at 8:57 PM Tokunori Ikegami <ikegami.t@gmail.com> wrote:
+>
+> Hi,
+>
+> On 2020/03/28 11:11, Ming Lei wrote:
+> > On Sat, Mar 28, 2020 at 2:18 AM Keith Busch <kbusch@kernel.org> wrote:
+> >> On Sat, Mar 28, 2020 at 02:50:43AM +0900, Tokunori Ikegami wrote:
+> >>> On 2020/03/25 1:51, Tokunori Ikegami wrote:
+> >>>> On 2020/03/24 9:02, Keith Busch wrote:
+> >>>>> We didn't have 32-bit max segments before, though. Why was 16-bits
+> >>>>> enough in older kernels? Which kernel did this stop working?
+> >>>> Now I am asking the detail information to the reporter so let me
+> >>>> update later.  That was able to use the same command script with the
+> >>>> large data length in the past.
+> >>> I have just confirmed the detail so let me update below.
+> >>>
+> >>> The data length 20,531,712 (0x1394A00) is used on kernel 3.10.0 (CentOS
+> >>> 64bit).
+> >>> Also it is failed on kernel 10 4.10.0 (Ubuntu 32bit).
+> >>> But just confirmed it as succeeded on both 4.15.0 (Ubuntu 32bit) and 4.15.1
+> >>> (Ubuntu 64bit).
+> >>> So the original 20,531,712 length failure issue seems already resolved.
+> >>>
+> >>> I tested the data length 0x10000000 (268,435,456) and it is failed
+> >>> But now confirmed it as failed on all the above kernel versions.
+> >>> Also the patch fixes only this 0x10000000 length failure issue.
+> >> This is actually even more confusing. We do not support 256MB transfers
+> >> within a single command in the pci nvme driver anymore. The max is 4MB,
+> >> so I don't see how increasing the max segments will help: you should be
+> >> hitting the 'max_sectors' limit if you don't hit the segment limit first.
+> > That looks a bug for passthrough req, because 'max_sectors' limit is only
+> > checked in bio_add_pc_page(), not done in blk_rq_append_bio(), something
+> > like the following seems required:
+> >
+> > diff --git a/block/blk-map.c b/block/blk-map.c
+> > index b0790268ed9d..e120d80b75a5 100644
+> > --- a/block/blk-map.c
+> > +++ b/block/blk-map.c
+> > @@ -22,6 +22,10 @@ int blk_rq_append_bio(struct request *rq, struct bio **bio)
+> >          struct bio_vec bv;
+> >          unsigned int nr_segs = 0;
+> >
+> > +       if (((rq->__data_len + (*bio)->bi_iter.bi_size) >> 9) >
+> > +                       queue_max_hw_sectors(rq->q))
+> > +               return -EINVAL;
+> > +
+>
+> I have just confirmed about the max_hw_sectors checking below.
+> It is checked by the function blk_rq_map_kern() also as below.
+>
+>      if (len > (queue_max_hw_sectors(q) << 9))
+>          return -EINVAL;
+
+The above check doesn't take rq->__data_len into account.
+
+Thanks,
+Ming Lei
