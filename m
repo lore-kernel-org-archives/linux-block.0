@@ -2,159 +2,593 @@ Return-Path: <SRS0=N2dH=5O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5725C2D0ED
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:08:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E81C0C43331
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:52:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C08620774
-	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FBF92073E
+	for <linux-block@archiver.kernel.org>; Sun, 29 Mar 2020 18:52:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZqUmDnYG";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="uxVSBZKw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J0grQouF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727506AbgC2SIi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Mar 2020 14:08:38 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:8670 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727485AbgC2SIi (ORCPT
+        id S1727606AbgC2Swc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Mar 2020 14:52:32 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22780 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727101AbgC2Swc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Mar 2020 14:08:38 -0400
+        Sun, 29 Mar 2020 14:52:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585505318; x=1617041318;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=QPa+3ObTgNoGMTHCzVj5bIFyc8aMZPqTX+FXqSkbo8Q=;
-  b=ZqUmDnYGNb3ABwYAPOZW20yrR7ODVGgSNmmuDBEqDSlTfuVGvO8R0h4A
-   BtjagZLXrrRF7tSKf9xQf1XuB7chKqWYURyVrpetQ5JuuQFbY5MXL6l7x
-   woHZelVczfRNDwUgxMTV4zM3EDL6oRNDSQhSzAflQcvScJRWSXdrekTzQ
-   TYo1DayvPiK3YeQrwUj1eZvC9U/0nCPW/u8he3qR1mMNIB7XkYXG/ksVA
-   qWeVNFoHSFY/TfLZ6qrtQNkjzYPUuq/DOzQZFicBJdZnYDrRZVncP8rPB
-   zv3hNYqekqOb4sPhsV427ZXlz7m8ekHeQxTPw0DyUr3XxueuYIiWGlVJR
+  t=1585508012; x=1617044012;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3gSSougXGH5kzaUoO2vcl88x+8+Bdqn3YcEbTbXcFco=;
+  b=J0grQouFSQAtQXt3NZgL98qJuCeIXPVpIm0tRFvcGD+U90bhIe8hibjB
+   pEqk4oxUbPD1XuzNBWT220LkfDT5JImLL7gC0gbyymj/ght1v5nl9qwtt
+   KlKKmGpsvO+VEWFN0R7+kZkefMIdzzcpvCdcI3prRkIKQ3E9lrv570sVb
+   iqZ7uFMDpcsPQICEyy8ayOxupXVs51Z86hX3xcsuW06UbQKOLc4rqPsfx
+   97WEQJdgh0dyxCeMxthFtpFQOw9eCgA6D6z0JmmQHs2qTZlbD2jkhTPRx
+   IDcHMSXngoUFinN/CPzoQSYT5DWDvARk21JUn3OjyPYYEHaM2UEpsW5BB
    g==;
-IronPort-SDR: B8wZk2AWxTUi2u8kamfGnWQcPYYTV88nACi9WW2K5wANeHfxJoJDX+VBHSopPmJhKEexEjUu6k
- 9EV/WRo6vfnOIG/LclWPLsbDEFeWgbBNnR3FwGemygECINIR25QiwST1TfzIuOQGeWrr4Rm6lD
- c8XU8Eo5Sk+N6rS49jJROhWS2Fxm/nAq0UT/FJUjjIfK2GWpHAofya/boVWSdCW6fXlf4N6wPr
- QOqJphtvj3Y5eXSCdORbRWFRk6yYD0l1MsGa6/y94BeS96639nmGEb6JvPgL+WCwv0lv6ycrSu
- 9k0=
+IronPort-SDR: f6x+IcZNGSRbBJSXzeLA7xSFFSdZ7ftW+SkD+9syyzGv04tfQxZ6c2ybRqgTpjYVq3kr4gZYKJ
+ awmvZGJu/KWptVbIp4xJAtk+SxpRKUC2aDEeVdafiRwSwRasWVps2mTCBVbdi9pzYuvJAm0E+h
+ TMRqTxLpqyZXwjN7dYz/aHBMb+ZAclV/Zj3pOPhHkhPTufln6x68rQVBsge4N6DUMNUjHLl0dZ
+ AhZHdCwGzQ050apFCvosoNEItdgjtJZbTmDU+LOlYy0eAal7hB98j7gQbBiV1BSofk1N9U8Fd7
+ IcM=
+X-URL-LookUp-ScanningError: 1
 X-IronPort-AV: E=Sophos;i="5.72,321,1580745600"; 
-   d="scan'208";a="134245295"
-Received: from mail-bn8nam11lp2173.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.173])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2020 02:08:35 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ei9EBMrzX1N1eRAcrJyTODL6KTxJKlyQY1/sA5esclCjeY4TU9y3Vj9yzkwFuWy3SnWxUklcvjZd6e4qN7fd+Ftfjiw5jlpRIWSqxDEBEM9EEmU8yK2kYUQMSUzQOMopctO9UEO5CjiSBIGfV1MvUdW0abueiNFjKVIKxxbpSNIUgEPn/AGuFQrd/8lY1iP9ysgM4vESU82/w9YK7dCcAy5whQdLYW4pvwtB2qznPj/ZRYRj5HY5VAPOyQuLAm3Svhtntf7gLGk3P3YdTNjLcbF0AwiKaMCoZDdp7RYkqWDqpPjMVIRD0Bxy6nPaSKOtnKlS9AUmkqAB7CEcamv6rw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wWWF9gHjXAOcHkGDZKDrxwMP2ex+8SlDgNdvHql4RKU=;
- b=Lo4/so7k9T3W+F5xcVCg7iFYvRJdJYDFIQPeiU7u1yKI4vmCzqTtaBVmuz2dYfQBwXW7WeFjxYYQ2RbKYRYEO2a/xBfsShgQUWezLCp3hwzU8d7PcbPbJfJxX71pJmv8XkDKs2kYPmEGX2hKt3Ot9kX3sV+NjfaQDZUhqKu8Z0hCfmbvWflFG5dj2ks8QoZKp8CZyc+RPKRt19vaPnnMPiUvvusJfpWf1+fxJtw5brEtXqAKrd5SDO24Y4VvPCm39vdluTCD2VJCXhvNfsYo1w9PrhRY+u/FbwQCZ+/jm/ltvCItpOJKyyLb6HDAHIEaoElSM7bBbr87cvQWXd0JCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wWWF9gHjXAOcHkGDZKDrxwMP2ex+8SlDgNdvHql4RKU=;
- b=uxVSBZKwivng+8Tt3F1jjtQKkwRm67oddD54UKKWounfMNrld0NX4etj3Xvkv6kNWf8MDHkMi8u/a6R266yS5kjYed/NAfn5BzGuahu2fQpR+N1Gvl+7aGrcEksQpHCVmaC5Fu3dTx/cJCqczT0cJKbLVm1cGN/0ES4/W9Etpls=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB6232.namprd04.prod.outlook.com (2603:10b6:a03:e5::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.18; Sun, 29 Mar
- 2020 18:08:32 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::d826:82b2:764f:9733]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::d826:82b2:764f:9733%7]) with mapi id 15.20.2856.019; Sun, 29 Mar 2020
- 18:08:31 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>,
-        Bart Van Assche <bvanassche@acm.org>
-CC:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "dledford@redhat.com" <dledford@redhat.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
-        "rpenyaev@suse.de" <rpenyaev@suse.de>,
-        "pankaj.gupta@cloud.ionos.com" <pankaj.gupta@cloud.ionos.com>
-Subject: Re: [PATCH v11 15/26] block: reexport bio_map_kern
-Thread-Topic: [PATCH v11 15/26] block: reexport bio_map_kern
-Thread-Index: AQHV/rGKCEGMgRuVP0mTYK+YBVb5SA==
-Date:   Sun, 29 Mar 2020 18:08:31 +0000
-Message-ID: <BYAPR04MB4965BA89446761D2C3D414D386CA0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-16-jinpu.wang@cloud.ionos.com>
- <15f25902-1f5a-a542-a311-c1e86330834b@acm.org>
- <20200328082953.GB16355@infradead.org>
- <bbba2682-0221-4173-9d00-b42d4f91f3b8@acm.org>
- <20200329150524.GA13909@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a7d413d6-a7b8-4c0e-9fbe-08d7d40c30c1
-x-ms-traffictypediagnostic: BYAPR04MB6232:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <BYAPR04MB62325627DAB0B38259B7CBEF86CA0@BYAPR04MB6232.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 035748864E
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(376002)(396003)(366004)(346002)(39860400002)(26005)(110136005)(316002)(478600001)(54906003)(4326008)(186003)(81166006)(7696005)(81156014)(66446008)(7416002)(53546011)(8676002)(86362001)(66476007)(2906002)(66946007)(66556008)(71200400001)(9686003)(6506007)(5660300002)(55016002)(76116006)(52536014)(8936002)(33656002)(64756008);DIR:OUT;SFP:1102;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WTmES70+9XH/y5k4KDy+K1Rkx89+aNL4GSEYl8AZJcR0q3qoKn8MFq/rrKrA2evphWhurl2OpZpVb2C7Qn4Q4AlsX14MM1YhRoyKCMHcW5RvgCW7aBe1pNy9rWRu7bLmP8gNFVA/XBseSCA6yXiFWlUoFLDNd6Tmqbl39KI+We56mUYix8Y65fa+q1Nq/laNb+Ug1XthRZyC7KMirHkFXb9uqQLdpGiezexvkj7neVfgh8UJ8cvgLNbO57Aiz6L67CbHhfYHOlkrPYRIPVPusg0dMjm9utGIvtJ1Tf7I91rsAZT18zPzQenuOEvkIzortedvcZPlzYeNG80IwWxPU1aWksaqLXcbbcXnf1ReMvU3WOUe7eUJ1s+8mupCIMUlXV3ZiUUR/VZ740fTUxtAH0JAL3TExmkmny6eDSYb3g06UCDUn9Pz1NFKHbVcaCf4
-x-ms-exchange-antispam-messagedata: EgkwIOBc1AuvZXSVt3pLrPOzGcJT3yCLHhp/Qx9F1SheZTki/gkH3iNNlDvnQY28Jd4Ga7+2Lh6z9VqZp8oMWUFEiNt8JlMIylJMtRiSXAeUmtRFcgZSgp7LWgSrus5GaZMjDUHO9Ff1bf6K7/DoTg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="236085050"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2020 02:53:26 +0800
+IronPort-SDR: d4abIkB4zDkNnaVYZqtFromW1bLgR1en9uH2NL4qNi4JCLzaCCkST8NrLQITElLewOyOOBuEEZ
+ bmh7gKwO7Rho7TVqBNRqrf2yUWQdg3DL2EYhKv2gMsN3cHzv047sCgweW/RVzZhqohsRVHzaFK
+ k6XgEC97RaWS/QgTdIYUi4N+wP6LNpHF0FMu2c6gqXaNiH1CJyhw5OSuqMXRMvFwacFzcYl5oZ
+ RocdaLUDnK4mR5ZDi/KJpB9skG5akK6nlGZuUzApOhUGmd5mds+fOzaZKKlykKYOvN6GlbxGLy
+ XkD4n48WZ1bVnPpLnfRQOzBV
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2020 11:43:58 -0700
+IronPort-SDR: zhhYJae49cXt10BJLdRTL0pLs+9IMASreQn6kPE+M6r3ns/jfGtlslJ3qL/2dStmksSdEZs7nO
+ 479ttkBMIGEhby2y6irfiVRycac7c3OIFowYfjIgns/rYMLCBxpjQ274/pYFcd+lz4qXcBNXzG
+ GYJEC8/wPVQJa04EaR9hS23GHbl6+99+z2F5y0OszRRu2zFgvhQvfCea3geNatYSuzn6oK+k3X
+ UqLlR0FKfTEv3rjHPNNLW7CZCs3X9uIT06QIYdVpD1glbrr2PElae2oVVkgXfutEoDswup5ZHw
+ Xk0=
+WDCIronportException: Internal
+Received: from ioprio.labspan.wdc.com (HELO ioprio.sc.wdc.com) ([10.6.139.89])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Mar 2020 11:52:27 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     hch@lst.de, martin.petersen@oracle.com
+Cc:     darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, chaitanya.kulkarni@wdc.com,
+        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
+        hare@suse.com, tj@kernel.org, hannes@cmpxchg.org,
+        khlebnikov@yandex-team.ru, ajay.joshi@wdc.com, bvanassche@acm.org,
+        arnd@arndb.de, houtao1@huawei.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
+Date:   Sun, 29 Mar 2020 10:47:10 -0700
+Message-Id: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7d413d6-a7b8-4c0e-9fbe-08d7d40c30c1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2020 18:08:31.7607
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YLqjA4CPZMjyFazXe6IYA8yiOrTJ7U+0EyD7RXir/8Z3PdK8lLKcVKAV0bvZCURul723oXLOZmBizLf3dU+vaXki3y2e/JZih+GfyqlUfVk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6232
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/29/2020 08:05 AM, Christoph Hellwig wrote:=0A=
-> On Sat, Mar 28, 2020 at 09:16:55AM -0700, Bart Van Assche wrote:=0A=
->> >There are more users in the Linux kernel of bio_add_pc_page() than only=
-=0A=
->> >bio_map_kern(), e.g. the SCSI target pass-through code=0A=
->> >(drivers/target/target_core_pscsi.c). The code that uses bio_map_kern()=
-=0A=
->> >is in patch 22/26: "block/rnbd: server: functionality for IO submission=
-=0A=
->> >to file or block dev". Isn't that use case similar to the SCSI=0A=
->> >pass-through code? I think the RNBD server code also implements storage=
-=0A=
->> >target functionality.=0A=
-> No, it is not at all.  The RNBD case submits normal read/write bios, for=
-=0A=
-> which bio_map_kerl is the wrong interfac given that it=0A=
-> uses bio_add_pc_page.  Read, write and other non-passthrough requests=0A=
-> must use bio_add_page instead.=0A=
->=0A=
-=0A=
-Since rw are most common operations, it'd be nice to have a helper=0A=
-function for REQ_OP_[READ|WRITE] to map and submit bio from data buffer=0A=
-with chaining to avoid code duplication in each driver which based on =0A=
-the bio_add_page().=0A=
-=0A=
-I'd be happy to send a patch for that if that is acceptable.=0A=
+Hi,
+
+This patch-series is based on the original RFC patch series:-
+https://www.spinics.net/lists/linux-block/msg47933.html.
+
+I've designed a rough testcase based on the information present
+in the mailing list archive for original RFC, it may need
+some corrections from the author.
+
+If anyone is interested, test results are at the end of this patch.
+
+Following is the original cover-letter :-
+
+Information about continuous extent placement may be useful
+for some block devices. Say, distributed network filesystems,
+which provide block device interface, may use this information
+for better blocks placement over the nodes in their cluster,
+and for better performance. Block devices, which map a file
+on another filesystem (loop), may request the same length extent
+on underlining filesystem for less fragmentation and for batching
+allocation requests. Also, hypervisors like QEMU may use this
+information for optimization of cluster allocations.
+
+This patchset introduces REQ_OP_ASSIGN_RANGE, which is going
+to be used for forwarding user's fallocate(0) requests into
+block device internals. It rather similar to existing
+REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES, etc. The corresponding
+exported primitive is called blkdev_issue_assign_range().
+See [1/3] for the details.
+
+Patch [2/3] teaches loop driver to handle REQ_OP_ASSIGN_RANGE
+requests by calling fallocate(0).
+
+Patch [3/3] makes ext4 to notify a block device about fallocate(0).
+
+Here is a simple test I did:
+https://gist.github.com/tkhai/5b788651cdb74c1dbff3500745878856
+
+I attached a file on ext4 to loop. Then, created ext4 partition
+on loop device and started the test in the partition. Direct-io
+is enabled on loop.
+
+The test fallocates 4G file and writes from some offset with
+given step, then it chooses another offset and repeats. After
+the test all the blocks in the file become written.
+
+The results shows that batching extents-assigning requests improves
+the performance:
+
+Before patchset: real ~ 1min 27sec
+After patchset:  real ~ 1min 16sec (18% better)
+
+Ordinary fallocate() before writes improves the performance
+by batching the requests. These results just show, the same
+is in case of forwarding extents information to underlining
+filesystem.
+
+Regards,
+Chaitanya
+
+Changes from RFC:-
+
+1. Add missing plumbing for REQ_OP_ASSIGN_RANGE similar to write-zeores.
+2. Add a prep patch to create a helper to submit payloadless bios.
+3. Design a testcases around the description present in the
+   cover-letter.
+
+Chaitanya Kulkarni (1):
+  block: create payloadless issue bio helper
+
+Kirill Tkhai (3):
+  block: Add support for REQ_OP_ASSIGN_RANGE
+  loop: Forward REQ_OP_ASSIGN_RANGE into fallocate(0)
+  ext4: Notify block device about alloc-assigned blk
+
+ block/blk-core.c          |   5 ++
+ block/blk-lib.c           | 115 +++++++++++++++++++++++++++++++-------
+ block/blk-merge.c         |  21 +++++++
+ block/blk-settings.c      |  19 +++++++
+ block/blk-zoned.c         |   1 +
+ block/bounce.c            |   1 +
+ drivers/block/loop.c      |   5 ++
+ fs/ext4/ext4.h            |   2 +
+ fs/ext4/extents.c         |  12 +++-
+ include/linux/bio.h       |   9 ++-
+ include/linux/blk_types.h |   2 +
+ include/linux/blkdev.h    |  34 +++++++++++
+ 12 files changed, 201 insertions(+), 25 deletions(-)
+
+1. Setup :-
+-----------
+# git log --oneline -5 
+c64a4c781915 (HEAD -> req-op-assign-range) ext4: Notify block device about alloc-assigned blk
+000cbc6720a4 loop: Forward REQ_OP_ASSIGN_RANGE into fallocate(0)
+89ceed8cac80 block: Add support for REQ_OP_ASSIGN_RANGE
+a798743e87e7 block: create payloadless issue bio helper
+b53df2e7442c (tag: block-5.6-2020-03-13) block: Fix partition support for host aware zoned block devices
+
+# cat /proc/kallsyms | grep -i blkdev_issue_assign_range
+ffffffffa3264a80 T blkdev_issue_assign_range
+ffffffffa4027184 r __ksymtab_blkdev_issue_assign_range
+ffffffffa40524be r __kstrtabns_blkdev_issue_assign_range
+ffffffffa405a8eb r __kstrtab_blkdev_issue_assign_range
+
+2. Test program, will be moved to blktest once code is upstream :-
+-----------------
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define BLOCK_SIZE 4096
+#define STEP (BLOCK_SIZE * 16)
+#define SIZE (1024 * 1024 * 1024ULL)
+
+int main(int argc, char *argv[])
+{
+	int fd, step, ret = 0;
+	unsigned long i;
+	void *buf;
+
+	if (posix_memalign(&buf, BLOCK_SIZE, SIZE)) {
+		perror("alloc");
+		exit(1);
+	}
+
+	fd = open("/mnt/loop0/file.img", O_RDWR | O_CREAT | O_DIRECT);
+	if (fd < 0) {
+		perror("open");
+		exit(1);
+	}
+
+	if (ftruncate(fd, SIZE)) {
+		perror("ftruncate");
+		exit(1);
+	}
+
+	ret = fallocate(fd, 0, 0, SIZE);
+	if (ret) {
+		perror("fallocate");
+		exit(1);
+	}
+	
+	for (step = STEP - BLOCK_SIZE; step >= 0; step -= BLOCK_SIZE) {
+		printf("step=%u\n", step);
+		for (i = step; i < SIZE; i += STEP) {
+			errno = 0;
+			if (pwrite(fd, buf, BLOCK_SIZE, i) != BLOCK_SIZE) {
+				perror("pwrite");
+				exit(1);
+			}
+		}
+
+		if (fsync(fd)) {
+			perror("fsync");
+			exit(1);
+		}
+	}
+	return 0;
+}
+
+3. Test script, will be moved to blktests once code is upstream :-
+------------------------------------------------------------------
+# cat req_op_assign_test.sh 
+#!/bin/bash -x
+
+NULLB_FILE="/mnt/backend/data"
+NULLB_MNT="/mnt/backend"
+LOOP_MNT="/mnt/loop0"
+
+delete_loop()
+{
+	umount ${LOOP_MNT}
+	losetup -D
+	sleep 3
+}
+
+delete_nullb()
+{
+	umount ${NULLB_MNT}
+	echo 1 > config/nullb/nullb0/power
+	rmdir config/nullb/nullb0
+	sleep 3
+}
+
+unload_modules()
+{
+	rmmod drivers/block/loop.ko
+	rmmod fs/ext4/ext4.ko
+	rmmod drivers/block/null_blk.ko
+	lsmod | grep -e ext4 -e loop -e null_blk
+}
+
+unload()
+{
+	delete_loop
+	delete_nullb
+	unload_modules
+}
+
+load_ext4()
+{
+	make -j $(nproc) M=fs/ext4 modules
+	local src=fs/ext4/
+	local dest=/lib/modules/`uname -r`/kernel/fs/ext4
+	\cp ${src}/ext4.ko ${dest}/
+
+	modprobe mbcache
+	modprobe jbd2
+	sleep 1
+	insmod fs/ext4/ext4.ko
+	sleep 1
+}
+
+load_nullb()
+{
+	local src=drivers/block/
+	local dest=/lib/modules/`uname -r`/kernel/drivers/block
+	\cp ${src}/null_blk.ko ${dest}/
+
+	modprobe null_blk nr_devices=0
+	sleep 1
+
+	mkdir config/nullb/nullb0
+	tree config/nullb/nullb0
+
+	echo 1 > config/nullb/nullb0/memory_backed
+	echo 512 > config/nullb/nullb0/blocksize 
+
+	# 20 GB
+	echo 20480 > config/nullb/nullb0/size 
+	echo 1 > config/nullb/nullb0/power
+	sleep 2
+	IDX=`cat config/nullb/nullb0/index`
+	lsblk | grep null${IDX}
+	sleep 1
+
+	mkfs.ext4 /dev/nullb0 
+	mount /dev/nullb0 ${NULLB_MNT}
+	sleep 1
+	mount | grep nullb
+
+	# 10 GB
+	dd if=/dev/zero of=${NULLB_FILE} count=2621440 bs=4096
+}
+
+load_loop()
+{
+	local src=drivers/block/
+	local dest=/lib/modules/`uname -r`/kernel/drivers/block
+	\cp ${src}/loop.ko ${dest}/
+
+	insmod drivers/block/loop.ko max_loop=1
+	sleep 3
+	/root/util-linux/losetup --direct-io=off /dev/loop0 ${NULLB_FILE}
+	sleep 3
+	/root/util-linux/losetup
+	ls -l /dev/loop*
+	dmesg -c 
+	mkfs.ext4 /dev/loop0
+	mount /dev/loop0 ${LOOP_MNT}
+	mount | grep loop0
+}
+
+load()
+{
+	make -j $(nproc) M=drivers/block modules
+
+	load_ext4
+	load_nullb
+	load_loop
+	sleep 1
+	sync
+	sync
+	sync
+}
+
+unload
+load
+time ./test
+
+4. Test Results :-
+------------------
+
+# ./req_op_assign_test.sh 
++ NULLB_FILE=/mnt/backend/data
++ NULLB_MNT=/mnt/backend
++ LOOP_MNT=/mnt/loop0
++ unload
++ delete_loop
++ umount /mnt/loop0
++ losetup -D
++ sleep 3
++ delete_nullb
++ umount /mnt/backend
++ echo 1
++ rmdir config/nullb/nullb0
++ sleep 3
++ unload_modules
++ rmmod drivers/block/loop.ko
++ rmmod fs/ext4/ext4.ko
++ rmmod drivers/block/null_blk.ko
++ lsmod
++ grep -e ext4 -e loop -e null_blk
++ load
+++ nproc
++ make -j 32 M=drivers/block modules
+  CC [M]  drivers/block/loop.o
+  MODPOST 11 modules
+  CC [M]  drivers/block/loop.mod.o
+  LD [M]  drivers/block/loop.ko
++ load_ext4
+++ nproc
++ make -j 32 M=fs/ext4 modules
+  CC [M]  fs/ext4/balloc.o
+  CC [M]  fs/ext4/bitmap.o
+  CC [M]  fs/ext4/block_validity.o
+  CC [M]  fs/ext4/dir.o
+  CC [M]  fs/ext4/ext4_jbd2.o
+  CC [M]  fs/ext4/extents.o
+  CC [M]  fs/ext4/extents_status.o
+  CC [M]  fs/ext4/file.o
+  CC [M]  fs/ext4/fsmap.o
+  CC [M]  fs/ext4/fsync.o
+  CC [M]  fs/ext4/hash.o
+  CC [M]  fs/ext4/ialloc.o
+  CC [M]  fs/ext4/indirect.o
+  CC [M]  fs/ext4/inline.o
+  CC [M]  fs/ext4/inode.o
+  CC [M]  fs/ext4/ioctl.o
+  CC [M]  fs/ext4/mballoc.o
+  CC [M]  fs/ext4/migrate.o
+  CC [M]  fs/ext4/mmp.o
+  CC [M]  fs/ext4/move_extent.o
+  CC [M]  fs/ext4/namei.o
+  CC [M]  fs/ext4/page-io.o
+  CC [M]  fs/ext4/readpage.o
+  CC [M]  fs/ext4/resize.o
+  CC [M]  fs/ext4/super.o
+  CC [M]  fs/ext4/symlink.o
+  CC [M]  fs/ext4/sysfs.o
+  CC [M]  fs/ext4/xattr.o
+  CC [M]  fs/ext4/xattr_trusted.o
+  CC [M]  fs/ext4/xattr_user.o
+  CC [M]  fs/ext4/acl.o
+  CC [M]  fs/ext4/xattr_security.o
+  LD [M]  fs/ext4/ext4.o
+  MODPOST 1 modules
+  LD [M]  fs/ext4/ext4.ko
++ local src=fs/ext4/
+++ uname -r
++ local dest=/lib/modules/5.6.0-rc3lbk+/kernel/fs/ext4
++ cp fs/ext4//ext4.ko /lib/modules/5.6.0-rc3lbk+/kernel/fs/ext4/
++ modprobe mbcache
++ modprobe jbd2
++ sleep 1
++ insmod fs/ext4/ext4.ko
++ sleep 1
++ load_nullb
++ local src=drivers/block/
+++ uname -r
++ local dest=/lib/modules/5.6.0-rc3lbk+/kernel/drivers/block
++ cp drivers/block//null_blk.ko /lib/modules/5.6.0-rc3lbk+/kernel/drivers/block/
++ modprobe null_blk nr_devices=0
++ sleep 1
++ mkdir config/nullb/nullb0
++ tree config/nullb/nullb0
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── mbps
+├── memory_backed
+├── power
+├── queue_mode
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── zoned
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 20 files
++ echo 1
++ echo 512
++ echo 20480
++ echo 1
++ sleep 2
+++ cat config/nullb/nullb0/index
++ IDX=0
++ lsblk
++ grep null0
++ sleep 1
++ mkfs.ext4 /dev/nullb0
+mke2fs 1.42.9 (28-Dec-2013)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=0 blocks, Stripe width=0 blocks
+1310720 inodes, 5242880 blocks
+262144 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=2153775104
+160 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done   
+
++ mount /dev/nullb0 /mnt/backend
++ sleep 1
++ mount
++ grep nullb
+/dev/nullb0 on /mnt/backend type ext4 (rw,relatime,seclabel)
++ dd if=/dev/zero of=/mnt/backend/data count=2621440 bs=4096
+2621440+0 records in
+2621440+0 records out
+10737418240 bytes (11 GB) copied, 27.4579 s, 391 MB/s
++ load_loop
++ local src=drivers/block/
+++ uname -r
++ local dest=/lib/modules/5.6.0-rc3lbk+/kernel/drivers/block
++ cp drivers/block//loop.ko /lib/modules/5.6.0-rc3lbk+/kernel/drivers/block/
++ insmod drivers/block/loop.ko max_loop=1
++ sleep 3
++ /root/util-linux/losetup --direct-io=off /dev/loop0 /mnt/backend/data
++ sleep 3
++ /root/util-linux/losetup
+NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE         DIO LOG-SEC
+/dev/loop0         0      0         0  0 /mnt/backend/data   0     512
++ ls -l /dev/loop0 /dev/loop-control
+brw-rw----. 1 root disk  7,   0 Mar 29 10:28 /dev/loop0
+crw-rw----. 1 root disk 10, 237 Mar 29 10:28 /dev/loop-control
++ dmesg -c
+[42963.967060] null_blk: module loaded
+[42968.419481] EXT4-fs (nullb0): mounted filesystem with ordered data mode. Opts: (null)
+[42996.928141] loop: module loaded
++ mkfs.ext4 /dev/loop0
+mke2fs 1.42.9 (28-Dec-2013)
+Discarding device blocks: done                            
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=0 blocks, Stripe width=0 blocks
+655360 inodes, 2621440 blocks
+131072 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=2151677952
+80 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done 
+
++ mount /dev/loop0 /mnt/loop0
++ mount
++ grep loop0
+/dev/loop0 on /mnt/loop0 type ext4 (rw,relatime,seclabel)
++ sleep 1
++ sync
++ sync
++ sync
++ ./test
+step=61440
+step=57344
+step=53248
+step=49152
+step=45056
+step=40960
+step=36864
+step=32768
+step=28672
+step=24576
+step=20480
+step=16384
+step=12288
+step=8192
+step=4096
+step=0
+
+real	9m34.472s
+user	0m0.062s
+sys	0m5.783s
+
+-- 
+2.22.0
+
