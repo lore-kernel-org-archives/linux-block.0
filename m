@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0411C43331
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0271C2D0EB
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:17:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A75F920732
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:12:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 968A7206DB
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:17:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="VQHbi9zX"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="OB4YBY85"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728746AbgC3KMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Mar 2020 06:12:13 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:40089 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728609AbgC3KMM (ORCPT
+        id S1727696AbgC3KR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Mar 2020 06:17:58 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:46420 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728257AbgC3KR5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Mar 2020 06:12:12 -0400
-Received: by mail-io1-f67.google.com with SMTP id k9so17131964iov.7
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 03:12:12 -0700 (PDT)
+        Mon, 30 Mar 2020 06:17:57 -0400
+Received: by mail-il1-f195.google.com with SMTP id i75so7905725ild.13
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 03:17:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=7UCRav7GgrcqxbKA+bkkvE0NHFZyJUCyRM124ao2KOc=;
-        b=VQHbi9zX6v2tgR3F4FbwxOPzjsF0FFhEELvhGotVCxdIrK/VsF0VqvyB8bAAonLx71
-         0/7hOeVqkX2wO/G8v4+7SVRxz+BlP8S10+EFsMdiHX0Rw9eVIvD5t0aTx7z21JWzIdzw
-         Wstca7pWtndZ0EXxDhan6vWbu5FC6ScdolzK9ZYMcVsrSH7q4Twst5HVGcsd0j2aLAQW
-         mnTrdJzV89HgUmJwatM7aLY0AZkh/o+2yTNKxaU9IZm+M/EfX513qaxcb0qSY+E993qN
-         5gcJGk2AabpIKt7SISUlliLUAYKHnRM/x7CF/7Hj7Zz5CJrFlHehjB4uNZrNEBOg0P3g
-         3hfg==
+        bh=upalIYLMXEqgwroFLz8o7p1PD72FjazAP3WakghPkvM=;
+        b=OB4YBY85n9imsGg6EVlp5X/dL5sesnMAd72Zo5+hI1ARiBUrhnAzxB/iJsUa8pYWZt
+         uywkv307dGztvTZSdxthv7uCWf5rfs2oJ+vTEBgwL+gyV+AudjJkW59Zke2qHHtcuGUW
+         xE71y94apvMy8hrexN1N2yhqBRsULLRvozIfYHz+1sIOQk68iZjzngdqzAmPvuQwmTHG
+         ygMNdF+jcxrmm+zClKcjrdoT4GmCFSl+TJMk9Xg5EEEn0nplMGUlVVMGtibcdEhNIQzy
+         fU8a56p2Q5VYcmgcwrWcDDH2Ny7XCSSOM8WVTR4volSYtDUVHg8/gDDt8jdmAGcADyHc
+         2GZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=7UCRav7GgrcqxbKA+bkkvE0NHFZyJUCyRM124ao2KOc=;
-        b=L2F91QcmK/P6JiYsOGfkRMryj7uVN1fAntIMe0J9W51eWhgSW7auV0zERZp3GDNTaC
-         qCh8ZQ2oHWkL6W0xgUxNOGzjbJI/gSd3h6ItEBhThyS3YmksIc8oXdnGfZMLkbBeS4RA
-         qHpobKc9shQx4Nsg+BiOJBfIGrbGmSymFMNIGKjsoEmqCazUgVsR66WwCbxctJnSwDWX
-         DPNVEJgRXpGHiatPFwsUkUagsbEoqBdpJAGT2HulhZFOklAApFwFQyFiDnuIUze9Cm6x
-         qNOr8UUi9w49glkAv0MbN2IzxIkShdNmKDjjwaLJbeZV0NnVff+IJoVAkC/tlVR6mu4j
-         9jZA==
-X-Gm-Message-State: ANhLgQ38av+XZmlGoTSsrNZPbWLWH2t3A+pt4FK8XOg/Xqs5fr1N/CUe
-        5+6RYmNsA787RP3zn4WJIJovDL9u5TBGpCtY5YRA
-X-Google-Smtp-Source: ADFU+vtT/GzRj1IXMIIpOT0PCASeot7yQEOEIH9W1EjB22I3LJCML5DIXJ3AjRS1iId3GK6kSKro03O/3YFC1zRgFxQ=
-X-Received: by 2002:a02:3842:: with SMTP id v2mr10268615jae.9.1585563131996;
- Mon, 30 Mar 2020 03:12:11 -0700 (PDT)
+        bh=upalIYLMXEqgwroFLz8o7p1PD72FjazAP3WakghPkvM=;
+        b=f8VoTIs6C4hy1k/oHvo7AzrXGjPOhUNKcpPWITUy7YkQEhRLVJm1dB8N0mUDL1PAqO
+         JP5LnTwHifF3/dckUsula9HjFE+/QXhmKNW3SxuNhrWIo91gOGnkmDVC525//29Iy/Ct
+         iw9zitoRl0DO8oiyiMTLk7HXK/AJWxD0Y3/Ko9JZEJBsWlyb6g0BsKybxEzHQ2NTEPLI
+         jOC0gC59O+CSj7e3L7eJOz0mTLGevEZRrNvFUwy8wXMeSZJslee+aXws3OGVjuB2F0Q/
+         ffvLG/WbO7jULsecGumtlMy3cV7r3KpIyzWByTicl12y3Qy9HlCcgQ9azd9SIzZp2waO
+         5s7Q==
+X-Gm-Message-State: ANhLgQ0by/2lRH1xhE582xPwPADW846jf/S25/5rK1Xqpfzs52Hxl/Qs
+        x1Q7awfebURaRmCITm3JqxPApFarpawgVQWwC4Q4
+X-Google-Smtp-Source: ADFU+vtM5O5MKf06RLTuQxKEjmU+bK0fCa5rUBlA50W1+2VdL5TlEICp27mWm8Phqc2kq+4f78AN0ULdS3rHbG9Lask=
+X-Received: by 2002:a92:9f13:: with SMTP id u19mr10500655ili.111.1585563476283;
+ Mon, 30 Mar 2020 03:17:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-27-jinpu.wang@cloud.ionos.com> <7e9a4b85-1062-da29-db8e-9298dc71719d@acm.org>
-In-Reply-To: <7e9a4b85-1062-da29-db8e-9298dc71719d@acm.org>
+ <20200320121657.1165-26-jinpu.wang@cloud.ionos.com> <619d2dda-3c4e-a909-ab78-1201057b542c@acm.org>
+In-Reply-To: <619d2dda-3c4e-a909-ab78-1201057b542c@acm.org>
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Mon, 30 Mar 2020 12:12:01 +0200
-Message-ID: <CAHg0HuyU_WiwJD6+9=ZG_5pKNsjBXBtv7SnRxYdW4RjtKPwXHw@mail.gmail.com>
-Subject: Re: [PATCH v11 26/26] MAINTAINERS: Add maintainers for RNBD/RTRS modules
+Date:   Mon, 30 Mar 2020 12:17:45 +0200
+Message-ID: <CAHg0HuyBtKRca=8k_O9ZvPREMry4L7pcmKsm=GUCq_w8Gtjd-g@mail.gmail.com>
+Subject: Re: [PATCH v11 25/26] block/rnbd: a bit of documentation
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
         linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
@@ -67,7 +67,9 @@ Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
         Leon Romanovsky <leon@kernel.org>,
         Doug Ledford <dledford@redhat.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -77,8 +79,26 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Sat, Mar 28, 2020 at 8:40 PM Bart Van Assche <bvanassche@acm.org> wrote:
 >
 > On 2020-03-20 05:16, Jack Wang wrote:
-> > Danil and I will maintain RNBD/RTRS modules.
+> > +RNBD (RDMA Network Block Device) is a pair of kernel modules
+> > +(client and server) that allow for remote access of a block device on
+> > +the server over RTRS protocol using the RDMA (InfiniBand, RoCE, iWarp)
+>                                                                    ^^^^^
+> Isn't this protocol usually spelled as iWARP? See also
+> https://en.wikipedia.org/wiki/IWARP.
+
+Right.
+
+> > +dev_search_path option can also contain %SESSNAME% in order to provide
+> > +different deviec namespaces for different sessions.  See "device_path"
+>              ^^^^^^
+>              device?
+Will fix the typo.
+
+> > +option for details.
+
+
+> Otherwise this patch looks fine to me. Hence:
 >
 > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-Thanks.
+Thank you.
