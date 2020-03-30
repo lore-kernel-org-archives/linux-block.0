@@ -2,104 +2,157 @@ Return-Path: <SRS0=FzxQ=5P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E619C2D0E9
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F59C43331
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 11:15:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74E5320578
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 10:44:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="c16+qdET"
+	by mail.kernel.org (Postfix) with ESMTP id C1AB72072E
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 11:15:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729242AbgC3Kol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Mar 2020 06:44:41 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:38274 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728859AbgC3Kol (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Mar 2020 06:44:41 -0400
-Received: by mail-io1-f65.google.com with SMTP id m15so17223842iob.5
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 03:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0IbOGrt0Fj4NYF3EWqyfkLqlBUBr/YJhc4WhdXCsREU=;
-        b=c16+qdETJIOPqlNcm3XubxoDAMMm3mNE4voViPIVa1hokryeKVGll1fIc941+NF8GW
-         91j5rOlB38BJn6JI6Z8NRWJpA8Ax7q2trj/nKX0KVibkxqrKHF6eVTuc4cUybhOzeMKZ
-         SCJAg5bat2oGIBj2b2SS/p2Lf8YXlObUqiNv1qwPT9S1D/+ypaI8WMrkVU5Vcy8l/hZU
-         z7WnxkbOpFvk/GB2YZjHISOyq0qHbuEjs1IAxGaGIJhtVlwljXXqF1FkRTbWSzi1ig59
-         oyANOQHxCNiavUVgNC7oflKTwbNgvl9nBKsKqwp+mN9TeJPj6W9GV4qjsllrhvJ/fsdP
-         Vo9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0IbOGrt0Fj4NYF3EWqyfkLqlBUBr/YJhc4WhdXCsREU=;
-        b=aomE0BQB88fcTWjgu2g1DiAzIY+uqDaODpuV09L7z8uP3zT4sYsrOkjDB4p70gufk0
-         WYehQaiKCHv8o6hIhickSQO5mCsL1OFE4ObbmwTs9+wwkmhOeh6MDfNElPzDDqHePs0R
-         8q/l/9+SciqbeH9zeoTtrfntPovhjbOfDllDXVkqXpS+cuBLEwqNxqlhpoOtYutGLHjq
-         IFd3v4o7wIIE3GhGJyTh4GzQgiGCOfudt6AydEemBolCAYfTyn1+Vgi+01PsddXOjvmX
-         jdg7O1y6CZlpm/OIKaMgL5PP4fIJI5+c9EKQen5O2bjt6mdMC7oOT67VslF7pJFfvyyI
-         kgVw==
-X-Gm-Message-State: ANhLgQ3rS1jmz4Ve0Xv//300Vfi4ToLhO7eZSacj9SZaAUX+lylnbxTv
-        q8yw+z8Y2Ju7n1HycWNJIytj9CJ1HkpsTvySuLsrHA==
-X-Google-Smtp-Source: ADFU+vsCHoOKRh0SdFhPaKogBAD9pBeQ4tUJ7zncCd/3GrhvRYbEGI8zfyXXSOROPGqaGwbwAkq2zJ0hO7/RNxOyQIY=
-X-Received: by 2002:a6b:b70a:: with SMTP id h10mr10138917iof.54.1585565079727;
- Mon, 30 Mar 2020 03:44:39 -0700 (PDT)
+        id S1729489AbgC3LPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Mar 2020 07:15:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53442 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729263AbgC3LPv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Mar 2020 07:15:51 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id F4052AD08;
+        Mon, 30 Mar 2020 11:15:49 +0000 (UTC)
+Subject: Re: [PATCH 3/5] bcache: pass the make_request methods to
+ blk_queue_make_request
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200327083012.1618778-1-hch@lst.de>
+ <20200327083012.1618778-4-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+Organization: SUSE Labs
+Message-ID: <f0214b2f-5472-4c55-1b06-fa2b2afd3948@suse.de>
+Date:   Mon, 30 Mar 2020 19:15:46 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-16-jinpu.wang@cloud.ionos.com> <15f25902-1f5a-a542-a311-c1e86330834b@acm.org>
- <20200328082953.GB16355@infradead.org> <bbba2682-0221-4173-9d00-b42d4f91f3b8@acm.org>
- <20200329150524.GA13909@infradead.org>
-In-Reply-To: <20200329150524.GA13909@infradead.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 30 Mar 2020 12:44:28 +0200
-Message-ID: <CAMGffE=Oz+x8PCG3NK4Oo+Y1oDV70XbhSF9oVy8q=Z5+ZwnCGQ@mail.gmail.com>
-Subject: Re: [PATCH v11 15/26] block: reexport bio_map_kern
-To:     Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya.Kulkarni@wdc.com
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200327083012.1618778-4-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 5:05 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Sat, Mar 28, 2020 at 09:16:55AM -0700, Bart Van Assche wrote:
-> > There are more users in the Linux kernel of bio_add_pc_page() than only
-> > bio_map_kern(), e.g. the SCSI target pass-through code
-> > (drivers/target/target_core_pscsi.c). The code that uses bio_map_kern()
-> > is in patch 22/26: "block/rnbd: server: functionality for IO submission
-> > to file or block dev". Isn't that use case similar to the SCSI
-> > pass-through code? I think the RNBD server code also implements storage
-> > target functionality.
->
-> No, it is not at all.  The RNBD case submits normal read/write bios, for
-> which bio_map_kerl is the wrong interfac given that it
-> uses bio_add_pc_page.  Read, write and other non-passthrough requests
-> must use bio_add_page instead.
-Thanks for comments, Christoph.
-If I understood you correctly, so the right way is to construct bio
-similar to bio_map_kern, but we have to use bio_add_page instead of
-bio_add_pc_page?
+On 2020/3/27 4:30 下午, Christoph Hellwig wrote:
+> bcache is the only driver not actually passing its make_request
+> methods to blk_queue_make_request, but instead just sets them up
+> manually a little later.  Make bcache follow the common way of
+> setting up make_request based queues.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-As mentioned by Bart also Chaitanya, looks it's reasonable to add a
-helper for normal READ|WRITE operation to map and submit bio from the
-data buffer,
-but sure can be done later.
+For the bcache part, it is fine for me.
 
-Thanks!
+Reviewed-by: Coly Li <colyli@suse.de>
+
+Thanks.
+
+Coly Li
+
+> ---
+>  drivers/md/bcache/request.c |  7 ++-----
+>  drivers/md/bcache/request.h |  3 +++
+>  drivers/md/bcache/super.c   | 10 ++++++----
+>  3 files changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 820d8402a1dc..71a90fbec314 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -1161,8 +1161,7 @@ static void quit_max_writeback_rate(struct cache_set *c,
+>  
+>  /* Cached devices - read & write stuff */
+>  
+> -static blk_qc_t cached_dev_make_request(struct request_queue *q,
+> -					struct bio *bio)
+> +blk_qc_t cached_dev_make_request(struct request_queue *q, struct bio *bio)
+>  {
+>  	struct search *s;
+>  	struct bcache_device *d = bio->bi_disk->private_data;
+> @@ -1266,7 +1265,6 @@ void bch_cached_dev_request_init(struct cached_dev *dc)
+>  {
+>  	struct gendisk *g = dc->disk.disk;
+>  
+> -	g->queue->make_request_fn		= cached_dev_make_request;
+>  	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
+>  	dc->disk.cache_miss			= cached_dev_cache_miss;
+>  	dc->disk.ioctl				= cached_dev_ioctl;
+> @@ -1301,8 +1299,7 @@ static void flash_dev_nodata(struct closure *cl)
+>  	continue_at(cl, search_free, NULL);
+>  }
+>  
+> -static blk_qc_t flash_dev_make_request(struct request_queue *q,
+> -					     struct bio *bio)
+> +blk_qc_t flash_dev_make_request(struct request_queue *q, struct bio *bio)
+>  {
+>  	struct search *s;
+>  	struct closure *cl;
+> diff --git a/drivers/md/bcache/request.h b/drivers/md/bcache/request.h
+> index c64dbd7a91aa..bb005c93dd72 100644
+> --- a/drivers/md/bcache/request.h
+> +++ b/drivers/md/bcache/request.h
+> @@ -37,7 +37,10 @@ unsigned int bch_get_congested(const struct cache_set *c);
+>  void bch_data_insert(struct closure *cl);
+>  
+>  void bch_cached_dev_request_init(struct cached_dev *dc);
+> +blk_qc_t cached_dev_make_request(struct request_queue *q, struct bio *bio);
+> +
+>  void bch_flash_dev_request_init(struct bcache_device *d);
+> +blk_qc_t flash_dev_make_request(struct request_queue *q, struct bio *bio);
+>  
+>  extern struct kmem_cache *bch_search_cache;
+>  
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 0c3c5419c52b..5e38a167c85e 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -816,7 +816,7 @@ static void bcache_device_free(struct bcache_device *d)
+>  }
+>  
+>  static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+> -			      sector_t sectors)
+> +			      sector_t sectors, make_request_fn make_request_fn)
+>  {
+>  	struct request_queue *q;
+>  	const size_t max_stripes = min_t(size_t, INT_MAX,
+> @@ -870,7 +870,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
+>  	if (!q)
+>  		return -ENOMEM;
+>  
+> -	blk_queue_make_request(q, NULL);
+> +	blk_queue_make_request(q, make_request_fn);
+>  	d->disk->queue			= q;
+>  	q->queuedata			= d;
+>  	q->backing_dev_info->congested_data = d;
+> @@ -1339,7 +1339,8 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+>  			q->limits.raid_partial_stripes_expensive;
+>  
+>  	ret = bcache_device_init(&dc->disk, block_size,
+> -			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
+> +			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset,
+> +			 cached_dev_make_request);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -1451,7 +1452,8 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+>  
+>  	kobject_init(&d->kobj, &bch_flash_dev_ktype);
+>  
+> -	if (bcache_device_init(d, block_bytes(c), u->sectors))
+> +	if (bcache_device_init(d, block_bytes(c), u->sectors,
+> +			flash_dev_make_request))
+>  		goto err;
+>  
+>  	bcache_device_attach(d, c, u - c->uuids);
+> 
