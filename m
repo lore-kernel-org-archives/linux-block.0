@@ -2,106 +2,102 @@ Return-Path: <SRS0=FzxQ=5P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54FDEC2D0E7
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 01:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A0FC43331
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 04:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A09F20748
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 01:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23ACC20732
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 04:01:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3jWR2bT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Nqxu7TMi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727899AbgC3BAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Mar 2020 21:00:45 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22928 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727815AbgC3BAo (ORCPT
+        id S1725978AbgC3EBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Mar 2020 00:01:19 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:56281 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbgC3EBT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Mar 2020 21:00:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585530043;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/C+48h0ffEUHH3oF9o5G29hLSACeot3EfusEOYHKZmU=;
-        b=S3jWR2bTxpYQOwksIfqoEjBvG3ZvjYdiyILBYtrjkjCheC9+6sxVeXqwHa2uE6ATE2mQBG
-        p5Bg//4sGwWbuA6jlHnuXfxCTYfIMeNeYT5PDTRZZ1rnDUgkBc5/Rep4/mo8zixpWPOTt0
-        DYRSR5OyAA6ljbD+mHgdd0RgJO8GVxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-UK2ptt_yPRejILgn1C9Y9A-1; Sun, 29 Mar 2020 21:00:39 -0400
-X-MC-Unique: UK2ptt_yPRejILgn1C9Y9A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2E3C800D5B;
-        Mon, 30 Mar 2020 01:00:37 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3D8F97AF7;
-        Mon, 30 Mar 2020 01:00:29 +0000 (UTC)
-Date:   Mon, 30 Mar 2020 09:00:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Martijn Coenen <maco@android.com>
-Cc:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org,
-        Chaitanya.Kulkarni@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH] loop: Add LOOP_SET_FD_WITH_OFFSET ioctl.
-Message-ID: <20200330010024.GA23640@ming.t460p>
-References: <20200329140459.18155-1-maco@android.com>
+        Mon, 30 Mar 2020 00:01:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585540878; x=1617076878;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LNGf5/jzltHNucFGSZWp6m9dE7M/QIxEMXG+YJbhWx4=;
+  b=Nqxu7TMi43hUdxzIw83SvmP8po74bwmdoRO5lfA5+LS56/zeQ6j/uhU6
+   0LP8NZ1Wq8dtzaREROFGO3rx5soo7oV6vyIYxMhkLLM0732nE7DQgqBuw
+   UWMRXVgZWeWW/TpBTXvzoejHou/+RSqnJS8ngOq28sj/3x4LPsLsRcVY0
+   FRBFk65o4+qEJ4Uy6HO9QibIQCH81Oom6ZF3h0YYtp5a8FBT5+P5bz6xk
+   fqPfviRCxK/xHRCewtDs9m0B7X4JfTUdbbzlDGpMaOGEsDfdxbfvGunKy
+   5cZehSIu1bFwQR2vL5gofojqeVp8nbQHa0C/i7wDKqjYcgURvJSa45XhU
+   w==;
+IronPort-SDR: +diTemGwF/h5SnVQ9qKR5n6tZVlvrJRyC10Xgq41puGoiQN6opWt7ciaPflyWTE6uKmw8gtPb1
+ Orz06Z0EBqKMhOnddPO+UKQ0g2zhUpCZnvXDsZhzo7aLQQKe1D4hNQaIABQTo1tJ184izS1+QV
+ 8v+Tp37mG8HhKYexrbAPNYUHN3UDYmi7xqipexySlevBuovSK51tUi2SGvnR4AXSVioEEYjTAx
+ 0RSypPNXAexwEGwtcEphCWANr9xZMTQNotIrVvKApRL+0j+t9IUn9aKLhHvJB6mQSlnSHeCaEK
+ 384=
+X-IronPort-AV: E=Sophos;i="5.72,322,1580745600"; 
+   d="scan'208";a="242386352"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2020 12:01:18 +0800
+IronPort-SDR: MhzUI1P4dVgS8rjgn4M1i2jp9Tt6dBptk92u0l13liTuCTFYTcDAD61iNFwkL4vv7SMz2H5FBu
+ TEaFUScFEtAtug1ijDZe5rDl2EXwws8xB+/8qp+u8S366gC6TfDcFaD2/B27LZrpGzihqCjoHA
+ FElazykAPFsKnweaiskbc98Zci6nKXrqARAsLLn0WEZAGQfbHKyvalEP8LO8aWJfNRimu2mmOE
+ yJBLVhmc0BumuyeR1+UgMrY3dd2OKWLuHUfN8DR7Z68+J0711sijI8blbVv8Qt//Yn/uVFNLKu
+ z++P2Gwe/jj4kMQDNGA6+2fJ
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2020 20:52:14 -0700
+IronPort-SDR: iDUV8NkVbCNuAzNiOEHF1xh1Q5yILUm3Hq8s2BCyW14V3ahfSYcrNIYfEf3bojIe7Uu11qJFCg
+ UwujA122BljzoslPH4eClTNILM2JDYxTI1Dc2EBFLpx6yqKzMUAvLvkFGtjcgit97XxVvNAlsy
+ WvxAM5b4du5Ekut3Mc1Fxg7RpzQQtvQTu7dE4XHrhvLAUCWhKZo8jUTjSQqN/jrbx3M+/1fV9d
+ zMFIVQcO738lzCwNnpgSWIXYrJdswRmIa0EydAqIQimBwFOp7x6vAT7mta5zgeAB5xsafYPQ42
+ Ydg=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Mar 2020 21:01:17 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 0/2] null_blk cleanup and fix
+Date:   Mon, 30 Mar 2020 13:01:14 +0900
+Message-Id: <20200330040116.178731-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200329140459.18155-1-maco@android.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 04:04:59PM +0200, Martijn Coenen wrote:
-> Configuring a loop device for a filesystem that is located at an offset
-> currently requires calling LOOP_SET_FD and LOOP_SET_STATUS(64)
-> consecutively. This has some downsides.
-> 
-> The most important downside is that it can be slow. Here's setting
-> up ~70 regular loop devices on an x86 Android device:
-> 
-> vsoc_x86:/system/apex # time for i in `seq 30 100`;
-> do losetup -r /dev/block/loop$i com.android.adbd.apex; done
->     0m01.85s real     0m00.01s user     0m00.01s system
-> 
-> Here's configuring ~70 devices in the same way, but with an offset:
-> 
-> vsoc_x86:/system/apex # time for i in `seq 30 100`;
-> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
->     0m03.40s real     0m00.02s user     0m00.03s system
-> 
-> This is almost twice as slow; the main reason for this slowness is that
-> LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to freeze the associated
-> queue; this requires waiting for RCU synchronization, which I've
-> measured can take about 15-20ms on this device on average.
-> 
-> A more minor downside of having to do two ioctls is that on devices with
-> max_part > 0, the kernel will initiate a partition scan, which is
-> needless work if the image is at an offset.
-> 
-> This change introduces a new ioctl to combine setting the backing file
-> together with the offset, which avoids the above problems. Adding more
-> parameters could be a consideration, but offset appears to be the only
-> commonly used parameter that is required for accessing the device
-> safely.
+Jens,
 
-The new ioctl LOOP_SET_FD_WITH_OFFSET looks not generic enough, could
-you consider to add one ioctl LOOP_SET_FD_AND_STATUS to cover both
-SET_FD and SET_STATUS so that using two ioctl() to setup loop can become
-deprecated finally?
+The first patch of this series, extracted as is from Johannes series
+for REQ_OP_ZONE_APPEND support cleans up null_blk zoned device
+initialization. The reviewed tag from Christoph sent for the patch
+within Johannes post is included here.
 
+The second patch extracts and extends a fix included in the zonne
+append series to correctly handle writes to null_blk zoned devices.
+The fix forces zone type and zone condition checks to be executed
+before the generic null_blk bad block and memory backing options
+handling. The fix also makes sure that a zone write pointer position
+is updated only if these two generic operations are executed
+successfully.
 
-Thanks,
-Ming
+Please consider these patches for inclusion in 5.7.
+
+Damien Le Moal (2):
+  null_blk: Cleanup zoned device initialization
+  block: null_blk: Fix zoned command handling
+
+ drivers/block/null_blk.h       | 37 +++++++++++++++++++++---
+ drivers/block/null_blk_main.c  | 51 ++++++++++++----------------------
+ drivers/block/null_blk_zoned.c | 37 ++++++++++++++++++------
+ 3 files changed, 79 insertions(+), 46 deletions(-)
+
+-- 
+2.25.1
 
