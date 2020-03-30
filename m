@@ -2,157 +2,229 @@ Return-Path: <SRS0=FzxQ=5P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F59C43331
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 11:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E036EC43331
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 13:14:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1AB72072E
-	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 11:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6C9F2073B
+	for <linux-block@archiver.kernel.org>; Mon, 30 Mar 2020 13:14:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Gsq/0OEA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729489AbgC3LPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Mar 2020 07:15:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53442 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729263AbgC3LPv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Mar 2020 07:15:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id F4052AD08;
-        Mon, 30 Mar 2020 11:15:49 +0000 (UTC)
-Subject: Re: [PATCH 3/5] bcache: pass the make_request methods to
- blk_queue_make_request
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200327083012.1618778-1-hch@lst.de>
- <20200327083012.1618778-4-hch@lst.de>
-From:   Coly Li <colyli@suse.de>
-Organization: SUSE Labs
-Message-ID: <f0214b2f-5472-4c55-1b06-fa2b2afd3948@suse.de>
-Date:   Mon, 30 Mar 2020 19:15:46 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.6.0
+        id S1730194AbgC3NO7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Mar 2020 09:14:59 -0400
+Received: from mail-il1-f193.google.com ([209.85.166.193]:41237 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730102AbgC3NO6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Mar 2020 09:14:58 -0400
+Received: by mail-il1-f193.google.com with SMTP id t6so12084819ilj.8
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 06:14:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ukZxHuXcY+RSkOEQnOs8SE01WIPAoehebs9txPS9INA=;
+        b=Gsq/0OEAqZNUJ3xOQCl+XSkomNQk3hERzAOOBg7Bpyzlbj4fITzjK2urG50G69a/Sw
+         ajvzYFU3g1+A7x/KlsT5qcnAWl95q05JTvPpAVcWJ8+X+fxcYpT05ibGInd2wgWyGGys
+         AjUkcOSt3L0Imiu9MkGJXYj9n2aPS0ObxPbHApbbp3+1wZD5o9X7iY5gyMKSvf5XHJ6g
+         JpYBDNbKCRs4IAProMxwPfKpJvhyNFDp9U8dKcg0mAIZMy5HIiOUWZyLj7gHjHf+GVOF
+         IwfbMPThgB/Fv5rgBHzxxITRT19FSVC6uD7b+T8O5rV/9+eVV7V+tncox2SJ8sANeGb8
+         /25Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ukZxHuXcY+RSkOEQnOs8SE01WIPAoehebs9txPS9INA=;
+        b=ihZ54Q1DsWtb5NqrJk2uf5qcyTjGT/Sj8SAvafS/uhjHC4TiHGr5FGAmODhvIkG36C
+         c5ewEOzKGU1bV7HIFZcf9bLp2TmdAzYiUXUL64WrHaWsKcWrl5v/B0ttBXyrs0w/Ymbd
+         lEjN6dfciMOpBh36noLtVMhXWmTL6EyKn8wK5u1n8aM9hBlxv3ictfZ8Cu4dIQ38ulNf
+         aO68ngnkfyYdToo1LsyCxeFdXaoJFFmyR5fEvWWRqBofNst37yAHv9UzJ0i3KMXnK0d0
+         VGK/yALbbemkEB6icJFoD21e9ytwcFry+6p7qBJdvvHneF24WdgSxZLSgrCATts9cOAa
+         qRHA==
+X-Gm-Message-State: ANhLgQ0XY2T/rqNsKq5DAMBacstXHELqTLOokYH1EKiMaEtf6gpYMlJl
+        ohIBhHf/+KwxZXv/Z7FISNZbldhajycO1O/wrXwh
+X-Google-Smtp-Source: ADFU+vu/CcdW5NMLyBTPm9iVigb01s8LTpPXTv/W1C7Ycj7ZoHPDirRzhi4qoZg71CLTtEbJbCulCa7XUhQ05XPSkNQ=
+X-Received: by 2002:a92:da81:: with SMTP id u1mr10840997iln.116.1585574097606;
+ Mon, 30 Mar 2020 06:14:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200327083012.1618778-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
+ <20200320121657.1165-24-jinpu.wang@cloud.ionos.com> <8ecc1c47-bad0-dadb-7861-8776b89f0174@acm.org>
+In-Reply-To: <8ecc1c47-bad0-dadb-7861-8776b89f0174@acm.org>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Mon, 30 Mar 2020 15:14:46 +0200
+Message-ID: <CAHg0HuxsSJzth9iBotNSKJOG4327xRgSRgvaTMH6G58ADSXCTQ@mail.gmail.com>
+Subject: Re: [PATCH v11 23/26] block/rnbd: server: sysfs interface functions
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/3/27 4:30 下午, Christoph Hellwig wrote:
-> bcache is the only driver not actually passing its make_request
-> methods to blk_queue_make_request, but instead just sets them up
-> manually a little later.  Make bcache follow the common way of
-> setting up make_request based queues.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Sat, Mar 28, 2020 at 8:31 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-03-20 05:16, Jack Wang wrote:
+> > This is the sysfs interface to rnbd mapped devices on server side:
+> >
+> >   /sys/devices/virtual/rnbd-server/ctl/devices/<device_name>/
+> >     |- block_dev
+> >     |  *** link pointing to the corresponding block device sysfs entry
+> >     |
+> >     |- sessions/<session-name>/
+> >     |  *** sessions directory
+> >        |
+> >        |- read_only
+> >        |  *** is devices mapped as read only
+> >        |
+> >        |- mapping_path
+> >           *** relative device path provided by the client during mapping
+> >
+>
+> > +static struct kobj_type ktype = {
+> > +     .sysfs_ops      = &kobj_sysfs_ops,
+> > +};
+>
+> From Documentation/kobject.txt: "One important point cannot be
+> overstated: every kobject must have a release() method." I think this is
+> something that Greg KH feels very strongly about. Please fix this.
 
-For the bcache part, it is fine for me.
+OK.
 
-Reviewed-by: Coly Li <colyli@suse.de>
 
-Thanks.
+>
+> > +int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
+> > +                            struct block_device *bdev,
+> > +                            const char *dir_name)
+> > +{
+> > +     struct kobject *bdev_kobj;
+> > +     int ret;
+> > +
+> > +     ret = kobject_init_and_add(&dev->dev_kobj, &ktype,
+> > +                                rnbd_devs_kobj, dir_name);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     ret = kobject_init_and_add(&dev->dev_sessions_kobj,
+> > +                                &ktype,
+> > +                                &dev->dev_kobj, "sessions");
+> > +     if (ret)
+> > +             goto err;
+> > +
+> > +     bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
+> > +     ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
+> > +     if (ret)
+> > +             goto err2;
+> > +
+> > +     return 0;
+> > +
+> > +err2:
+> > +     kobject_put(&dev->dev_sessions_kobj);
+> > +err:
+> > +     kobject_put(&dev->dev_kobj);
+> > +     return ret;
+> > +}
+>
+> Please choose more descriptive names for the goto labels, e.g.
+> put_sess_kobj and put_dev_kobj.
 
-Coly Li
+OK
 
-> ---
->  drivers/md/bcache/request.c |  7 ++-----
->  drivers/md/bcache/request.h |  3 +++
->  drivers/md/bcache/super.c   | 10 ++++++----
->  3 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 820d8402a1dc..71a90fbec314 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -1161,8 +1161,7 @@ static void quit_max_writeback_rate(struct cache_set *c,
->  
->  /* Cached devices - read & write stuff */
->  
-> -static blk_qc_t cached_dev_make_request(struct request_queue *q,
-> -					struct bio *bio)
-> +blk_qc_t cached_dev_make_request(struct request_queue *q, struct bio *bio)
->  {
->  	struct search *s;
->  	struct bcache_device *d = bio->bi_disk->private_data;
-> @@ -1266,7 +1265,6 @@ void bch_cached_dev_request_init(struct cached_dev *dc)
->  {
->  	struct gendisk *g = dc->disk.disk;
->  
-> -	g->queue->make_request_fn		= cached_dev_make_request;
->  	g->queue->backing_dev_info->congested_fn = cached_dev_congested;
->  	dc->disk.cache_miss			= cached_dev_cache_miss;
->  	dc->disk.ioctl				= cached_dev_ioctl;
-> @@ -1301,8 +1299,7 @@ static void flash_dev_nodata(struct closure *cl)
->  	continue_at(cl, search_free, NULL);
->  }
->  
-> -static blk_qc_t flash_dev_make_request(struct request_queue *q,
-> -					     struct bio *bio)
-> +blk_qc_t flash_dev_make_request(struct request_queue *q, struct bio *bio)
->  {
->  	struct search *s;
->  	struct closure *cl;
-> diff --git a/drivers/md/bcache/request.h b/drivers/md/bcache/request.h
-> index c64dbd7a91aa..bb005c93dd72 100644
-> --- a/drivers/md/bcache/request.h
-> +++ b/drivers/md/bcache/request.h
-> @@ -37,7 +37,10 @@ unsigned int bch_get_congested(const struct cache_set *c);
->  void bch_data_insert(struct closure *cl);
->  
->  void bch_cached_dev_request_init(struct cached_dev *dc);
-> +blk_qc_t cached_dev_make_request(struct request_queue *q, struct bio *bio);
-> +
->  void bch_flash_dev_request_init(struct bcache_device *d);
-> +blk_qc_t flash_dev_make_request(struct request_queue *q, struct bio *bio);
->  
->  extern struct kmem_cache *bch_search_cache;
->  
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 0c3c5419c52b..5e38a167c85e 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -816,7 +816,7 @@ static void bcache_device_free(struct bcache_device *d)
->  }
->  
->  static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
-> -			      sector_t sectors)
-> +			      sector_t sectors, make_request_fn make_request_fn)
->  {
->  	struct request_queue *q;
->  	const size_t max_stripes = min_t(size_t, INT_MAX,
-> @@ -870,7 +870,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
->  	if (!q)
->  		return -ENOMEM;
->  
-> -	blk_queue_make_request(q, NULL);
-> +	blk_queue_make_request(q, make_request_fn);
->  	d->disk->queue			= q;
->  	q->queuedata			= d;
->  	q->backing_dev_info->congested_data = d;
-> @@ -1339,7 +1339,8 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
->  			q->limits.raid_partial_stripes_expensive;
->  
->  	ret = bcache_device_init(&dc->disk, block_size,
-> -			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
-> +			 dc->bdev->bd_part->nr_sects - dc->sb.data_offset,
-> +			 cached_dev_make_request);
->  	if (ret)
->  		return ret;
->  
-> @@ -1451,7 +1452,8 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
->  
->  	kobject_init(&d->kobj, &bch_flash_dev_ktype);
->  
-> -	if (bcache_device_init(d, block_bytes(c), u->sectors))
-> +	if (bcache_device_init(d, block_bytes(c), u->sectors,
-> +			flash_dev_make_request))
->  		goto err;
->  
->  	bcache_device_attach(d, c, u - c->uuids);
-> 
+
+>
+> > +static ssize_t read_only_show(struct kobject *kobj, struct kobj_attribute *attr,
+> > +                           char *page)
+> > +{
+> > +     struct rnbd_srv_sess_dev *sess_dev;
+> > +
+> > +     sess_dev = container_of(kobj, struct rnbd_srv_sess_dev, kobj);
+> > +
+> > +     return scnprintf(page, PAGE_SIZE, "%s\n",
+> > +                      (sess_dev->open_flags & FMODE_WRITE) ? "0" : "1");
+> > +}
+>
+> The scnprintf() statement looks overcomplicated. How about the following?
+>
+> return scnprintf(page, PAGE_SIZE, "%d\n",
+>                  (sess_dev->open_flags & FMODE_WRITE) != 0);
+
+Looks better, thanks.
+
+
+> > +void rnbd_srv_destroy_dev_session_sysfs(struct rnbd_srv_sess_dev *sess_dev)
+> > +{
+> > +     DECLARE_COMPLETION_ONSTACK(sysfs_compl);
+> > +
+> > +     sysfs_remove_group(&sess_dev->kobj,
+> > +                        &rnbd_srv_default_dev_session_attr_group);
+> > +
+> > +     sess_dev->sysfs_release_compl = &sysfs_compl;
+> > +     kobject_del(&sess_dev->kobj);
+> > +     kobject_put(&sess_dev->kobj);
+> > +     wait_for_completion(&sysfs_compl);
+> > +}
+>
+> Why is there a wait_for_completion() call in the above function? I think
+> Greg KH strongly disagrees with such calls in functions that remove
+> sysfs attributes.
+
+This just makes the function wait until the sysfs release function is
+called, so that sess_dev can be freed afterwards. Will try to get rid
+of the completion and call the rnbd_destroy_sess_dev() which frees the
+struct directly from the release function.
+
+
+>
+> > +int rnbd_srv_create_sysfs_files(void)
+> > +{
+> > +     int err;
+> > +
+> > +     rnbd_dev_class = class_create(THIS_MODULE, "rnbd-server");
+> > +     if (IS_ERR(rnbd_dev_class))
+> > +             return PTR_ERR(rnbd_dev_class);
+> > +
+> > +     rnbd_dev = device_create(rnbd_dev_class, NULL,
+> > +                               MKDEV(0, 0), NULL, "ctl");
+> > +     if (IS_ERR(rnbd_dev)) {
+> > +             err = PTR_ERR(rnbd_dev);
+> > +             goto cls_destroy;
+> > +     }
+> > +     rnbd_devs_kobj = kobject_create_and_add("devices", &rnbd_dev->kobj);
+> > +     if (!rnbd_devs_kobj) {
+> > +             err = -ENOMEM;
+> > +             goto dev_destroy;
+> > +     }
+> > +
+> > +     return 0;
+> > +
+> > +dev_destroy:
+> > +     device_destroy(rnbd_dev_class, MKDEV(0, 0));
+> > +cls_destroy:
+> > +     class_destroy(rnbd_dev_class);
+> > +
+> > +     return err;
+> > +}
+>
+> Please mention the device class in the description of this patch.
+
+OK,
+
+Thanks,
+
+Danil
+>
+> Thanks,
+>
+> Bart.
