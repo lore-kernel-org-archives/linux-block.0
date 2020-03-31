@@ -2,134 +2,143 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4384CC43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD6FC43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 173752071A
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585665400;
-	bh=KKeMLUeYMGBffgCKT12KZq/He3u45ibrbpsCZP4/Xsk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Fhl/szTqZq+WWL0shHnMzMnffxAyfKCM/W1C7x3soZ813yjWXzdKQXcBqElJYRqi2
-	 QLxPOj8Wjl91mM71j64BZuwmius4wCNEPgd09fpO6So7duozHOYpbBXS1zT3ucX9LR
-	 L150iJUSZxpqc8QOCkjvkMJVgsZFiWBVz1eoO9BU=
+	by mail.kernel.org (Postfix) with ESMTP id 7C34B20848
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 15:11:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="wAFNN/UM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730845AbgCaOgj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 10:36:39 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38800 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730887AbgCaOgj (ORCPT
+        id S1730607AbgCaPLH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 11:11:07 -0400
+Received: from mail-qv1-f66.google.com ([209.85.219.66]:45185 "EHLO
+        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726526AbgCaPLG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 10:36:39 -0400
-Received: by mail-qt1-f196.google.com with SMTP id z12so18476367qtq.5;
-        Tue, 31 Mar 2020 07:36:38 -0700 (PDT)
+        Tue, 31 Mar 2020 11:11:06 -0400
+Received: by mail-qv1-f66.google.com with SMTP id g4so10980796qvo.12
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 08:11:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=g8eJTubDOpnYx+MtqM441enT6egVrVa4bYoBdzCqVy0=;
-        b=VWvb+6VE6Bc3z/zRovKdw8FPguqnvnIL0uwajhY5uXtucaCe7G5c85lThPb8hTYhn9
-         PHL8UjRnU/deAljnmmbMJgW8hSM1swVCyNW2OW6VVgfDQlYLeOzIN1ms85bXnrPLVjfp
-         gURscr2MPffBwbRimGGc39gyNwgkkPSUHcXIpF981uDN/xVlURsl2L+jZJHEP9Q6N2/U
-         0RmjKDv3e33dDDCV6KBvznLJ9FFRCF2gp7g8UX6Ot84jVjOCu1VjPLF4rq4xCRpxW6/m
-         xc+sGYdo5GiXmo7cVGmvFQ5PPwcti5+DYPEvSt181iW17IaYwwGdANqpdxCjzS8sEHn/
-         kPWQ==
+        bh=cL08A4+kp0Y65AGLtqIoipG3SABzeYJkBubqqjwQrYg=;
+        b=wAFNN/UMuvu+vH9ES4W5SFNAVQYgWw45te05ekS4MQu7vEn7mxRosfgjeRbU3HiEAq
+         hUnlFE/DdeULkB891pVk8cdhRoYRQZSTgsAVDJP6Pg/ZtPIN2xPS+7aCiX/i9kpstFZC
+         nI3k03KbtEY+bcIQriZyQl90tTpaRsfj9nIEafKhQ1sxNc1fu3xTpgYwPDmQNRO9MpC+
+         BTqrNwSsj9qOUOdsTvZcPfw35IbXlLcCKCARpsi4Y/nSexlhABrVoP5pWvOPRHZFpltY
+         76ctavOq5D/flZ8NBqsajomS/yb4+k8cLYxHZLXCIIRGpFZm38okEgNvLePyq2IPU0WQ
+         5Xvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=g8eJTubDOpnYx+MtqM441enT6egVrVa4bYoBdzCqVy0=;
-        b=p2z33e1X1QCWg5UJcJ40p32az7HmOhhQ+krihBHODRsU2eqFNsCGBMVaDsV/mkgEJ5
-         69U2R+Syu+LcNT+plViFjguW+TcrXVhBdjK+ZBI2kAT6yNkKbg2P+czlhUPAwSRncy89
-         b7dk0T/mGQ3KSLHuQdHfPQfWHaZ9ERJqvNHnK0aJwA1EuM9wNguhK1SEyakUzbOnPhCm
-         d8SsGCldVUiBBG1dhpuW2XpgdOYQ4+Fj48XIYjHBOmGDG+Q+5tntbZh7m8qeyQoJRBRP
-         VnBoLE1q+m7w/vHLE2egKUTzKk7g8bBHbp7iViQ0zev5xabRa1a8sDozSmyr0yahgCqY
-         B/Ag==
-X-Gm-Message-State: ANhLgQ2DW9W0fRrSD84kpIuzawy4gLTBBy2BW4mgcaB82bWgqX6Ox+mT
-        cY5H4Kzze666ma2zUqvXVQg=
-X-Google-Smtp-Source: ADFU+vuHaX3R0Rod/OfU4HzywP3xMCDKTEorvnNns5X0xjYEKqcjXzXOibbmborAYzSd8CwlUgvZ7g==
-X-Received: by 2002:aed:3c10:: with SMTP id t16mr5340804qte.45.1585665397860;
-        Tue, 31 Mar 2020 07:36:37 -0700 (PDT)
-Received: from localhost ([199.96.181.106])
-        by smtp.gmail.com with ESMTPSA id 199sm12602372qkm.7.2020.03.31.07.36.36
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cL08A4+kp0Y65AGLtqIoipG3SABzeYJkBubqqjwQrYg=;
+        b=O7BQMo48hQaZM9i72m2PpzbAagrcUlVlsFkyA2yg7+i39EsDifCPrqYX4e0LqNC3xV
+         Y5crQf3yZajP2sIEeccXDJncvrYS8depx3dJGHGtFKA6xMorMFCTlE4NcBWfVXsxt89r
+         hsXO+pkzokzuq+Wg/P8e5fCd7OSNpPU2Fn18CiXRchXVY1MI+wx/UqlwyL0HFDXdVkLk
+         pXHYBXmS2nUWPHqdKyfibNDg+S+lcgrRP0iO5OHgIqafTArUeGJwm1CONyiSUDAapuwU
+         pq49UWXkCku4u4KYHzLPAPmB9vsRDvbH+PnITaDHRt8JOle9JBSzdRUNcETNBr+n6Y67
+         QeXA==
+X-Gm-Message-State: ANhLgQ2SeapQmbAk7AgQKOHunngBj2qJ/sgB4Jhff6rhXfojn3hptxAH
+        jLm3ylgQEmpr2LgPjP5L7PeVNw==
+X-Google-Smtp-Source: ADFU+vt3LCjS0xkXV3rjTOBSJRA2OF5NbQ3lYcpN2wK4TAg1p0cskQb+ade5qXppPN1vNqf2ot/j1A==
+X-Received: by 2002:ad4:4364:: with SMTP id u4mr16331097qvt.58.1585667465461;
+        Tue, 31 Mar 2020 08:11:05 -0700 (PDT)
+Received: from localhost (70.44.39.90.res-cmts.bus.ptd.net. [70.44.39.90])
+        by smtp.gmail.com with ESMTPSA id t43sm13933859qtc.14.2020.03.31.08.11.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 07:36:37 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 10:36:35 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Weiping Zhang <zwp10758@gmail.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and
- nvme
-Message-ID: <20200331143635.GS162390@mtj.duckdns.org>
-References: <cover.1580786525.git.zhangweiping@didiglobal.com>
- <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
- <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
- <CAA70yB62_6JD_8dJTGPjnjJfyJSa1xqiCVwwNYtsTCUXQR5uCA@mail.gmail.com>
+        Tue, 31 Mar 2020 08:11:04 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 11:11:03 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yafang Shao <laoar.shao@gmail.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        mgorman@suse.de, Steven Rostedt <rostedt@goodmis.org>,
+        mingo@redhat.com, Linux MM <linux-mm@kvack.org>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 0/2] psi: enhance psi with the help of ebpf
+Message-ID: <20200331151103.GB2089@cmpxchg.org>
+References: <1585221127-11458-1-git-send-email-laoar.shao@gmail.com>
+ <20200326143102.GB342070@cmpxchg.org>
+ <CALOAHbCe9msQ+7uON=7iXnud-hzDcrnz_2er4PMQRXtNLM2BSQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA70yB62_6JD_8dJTGPjnjJfyJSa1xqiCVwwNYtsTCUXQR5uCA@mail.gmail.com>
+In-Reply-To: <CALOAHbCe9msQ+7uON=7iXnud-hzDcrnz_2er4PMQRXtNLM2BSQ@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Weiping.
+On Fri, Mar 27, 2020 at 09:17:59AM +0800, Yafang Shao wrote:
+> On Thu, Mar 26, 2020 at 10:31 PM Johannes Weiner <hannes@cmpxchg.org> wrote:
+> >
+> > On Thu, Mar 26, 2020 at 07:12:05AM -0400, Yafang Shao wrote:
+> > > PSI gives us a powerful way to anaylze memory pressure issue, but we can
+> > > make it more powerful with the help of tracepoint, kprobe, ebpf and etc.
+> > > Especially with ebpf we can flexiblely get more details of the memory
+> > > pressure.
+> > >
+> > > In orderc to achieve this goal, a new parameter is added into
+> > > psi_memstall_{enter, leave}, which indicates the specific type of a
+> > > memstall. There're totally ten memstalls by now,
+> > >         MEMSTALL_KSWAPD
+> > >         MEMSTALL_RECLAIM_DIRECT
+> > >         MEMSTALL_RECLAIM_MEMCG
+> > >         MEMSTALL_RECLAIM_HIGH
+> > >         MEMSTALL_KCOMPACTD
+> > >         MEMSTALL_COMPACT
+> > >         MEMSTALL_WORKINGSET_REFAULT
+> > >         MEMSTALL_WORKINGSET_THRASHING
+> > >         MEMSTALL_MEMDELAY
+> > >         MEMSTALL_SWAPIO
+> >
+> > What does this provide over the events tracked in /proc/vmstats?
+> >
+> 
+> /proc/vmstat only tells us which events occured, but it can't tell us
+> how long these events take.
+> Sometimes we really want to know how long the event takes and PSI can
+> provide us the data
+> For example, in the past days when I did performance tuning for a
+> database service, I monitored that the latency spike is related with
+> the workingset_refault counter in /proc/vmstat, and at that time I
+> really want to know the spread of latencies caused by
+> workingset_refault, but there's no easy way to get it. Now with newly
+> added MEMSTALL_WORKINGSET_REFAULT, I can get the latencies caused by
+> workingset refault.
 
-On Tue, Mar 31, 2020 at 02:17:06PM +0800, Weiping Zhang wrote:
-> Recently I do some cgroup io weight testing,
-> https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test
-> I think a proper io weight policy
-> should consider high weight cgroup's iops, latency and also take whole
-> disk's throughput
-> into account, that is to say, the policy should do more carfully trade
-> off between cgroup's
-> IO performance and whole disk's throughput. I know one policy cannot
-> do all things perfectly,
-> but from the test result nvme-wrr can work well.
+Okay, but how do you use that information in practice?
 
-That's w/o iocost QoS targets configured, right? iocost should be able to
-achieve similar results as wrr with QoS configured.
+> > Can you elaborate a bit how you are using this information? It's not
+> > quite clear to me from the example in patch #2.
+> >
+> 
+> From the traced data in patch #2, we can find that the high latencies
+> of user tasks are always type 7 of memstall , which is
+> MEMSTALL_WORKINGSET_THRASHING,  and then we should look into the
+> details of wokingset of the user tasks and think about how to improve
+> it - for example, by reducing the workingset.
 
-> From the following test result, nvme-wrr work well for both cgroup's
-> latency, iops, and whole
-> disk's throughput.
+That's an analyses we run frequently as well: we see high pressure,
+and then correlate it with the events.
 
-As I wrote before, the issues I see with wrr are the followings.
+High rate of refaults? The workingset is too big.
 
-* Hardware dependent. Some will work ok or even fantastic. Many others will do
-  horribly.
+High rate of compaction work? Somebody is asking for higher order
+pages under load; check THP events next.
 
-* Lack of configuration granularity. We can't configure it granular enough to
-  serve hierarchical configuration.
+etc.
 
-* Likely not a huge problem with the deep QD of nvmes but lack of queue depth
-  control can lead to loss of latency control and thus loss of protection for
-  low concurrency workloads when pitched against workloads which can saturate
-  QD.
+This works fairly reliably. I'm curious what the extra per-event
+latency breakdown would add and where it would be helpful.
 
-All that said, given the feature is available, I don't see any reason to not
-allow to use it, but I don't think it fits the cgroup interface model given the
-hardware dependency and coarse granularity. For these cases, I think the right
-thing to do is using cgroups to provide tagging information - ie. build a
-dedicated interface which takes cgroup fd or ino as the tag and associate
-configurations that way. There already are other use cases which use cgroup this
-way (e.g. perf).
-
-Thanks.
-
--- 
-tejun
+I'm not really opposed to your patches it if it is, I just don't see
+the usecase right now.
