@@ -2,109 +2,134 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62818C43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4384CC43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 345652071A
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:20:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="IOsqcPnG"
+	by mail.kernel.org (Postfix) with ESMTP id 173752071A
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 14:36:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585665400;
+	bh=KKeMLUeYMGBffgCKT12KZq/He3u45ibrbpsCZP4/Xsk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Fhl/szTqZq+WWL0shHnMzMnffxAyfKCM/W1C7x3soZ813yjWXzdKQXcBqElJYRqi2
+	 QLxPOj8Wjl91mM71j64BZuwmius4wCNEPgd09fpO6So7duozHOYpbBXS1zT3ucX9LR
+	 L150iJUSZxpqc8QOCkjvkMJVgsZFiWBVz1eoO9BU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730556AbgCaOUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 10:20:44 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:45192 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729891AbgCaOUo (ORCPT
+        id S1730845AbgCaOgj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 10:36:39 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:38800 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730887AbgCaOgj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 10:20:44 -0400
-Received: by mail-io1-f65.google.com with SMTP id y14so4754578iol.12
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 07:20:43 -0700 (PDT)
+        Tue, 31 Mar 2020 10:36:39 -0400
+Received: by mail-qt1-f196.google.com with SMTP id z12so18476367qtq.5;
+        Tue, 31 Mar 2020 07:36:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GnPaVP2gBEwIPF8mfzd93scGAf3j/qK6lXY3ypX3mqA=;
-        b=IOsqcPnGJWgJtyx5ZJEg50LRaTrvcqPJSh8Oc2lGtJrVisHrPyv6fnOUThIjlm/FhJ
-         qSEEAEevksq9P/kXVty+lyn0fAeOBpV3zEIce5Q4gxAep4lSYigsedPKZe91E067pnXj
-         uiJFL/QboomYq3hjkOx1FTEcIQ6kQ7salGCqKhwzjCt/mbOuvZS7Z/zQ16KUtIa/k/Fl
-         4F/U7yyjI9LBczfSR00otULe1kQshZ06YE5blDAask2QIocxQzlb3SRvU9A3IDSST32S
-         1k70f3/fozO6EB6/YoUmD0mPYTnAe30BEQHB8c0Q1+Vv6K5tlzYmFEBmzmiidMnLalsE
-         FNZw==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g8eJTubDOpnYx+MtqM441enT6egVrVa4bYoBdzCqVy0=;
+        b=VWvb+6VE6Bc3z/zRovKdw8FPguqnvnIL0uwajhY5uXtucaCe7G5c85lThPb8hTYhn9
+         PHL8UjRnU/deAljnmmbMJgW8hSM1swVCyNW2OW6VVgfDQlYLeOzIN1ms85bXnrPLVjfp
+         gURscr2MPffBwbRimGGc39gyNwgkkPSUHcXIpF981uDN/xVlURsl2L+jZJHEP9Q6N2/U
+         0RmjKDv3e33dDDCV6KBvznLJ9FFRCF2gp7g8UX6Ot84jVjOCu1VjPLF4rq4xCRpxW6/m
+         xc+sGYdo5GiXmo7cVGmvFQ5PPwcti5+DYPEvSt181iW17IaYwwGdANqpdxCjzS8sEHn/
+         kPWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GnPaVP2gBEwIPF8mfzd93scGAf3j/qK6lXY3ypX3mqA=;
-        b=QQkKEOTJC0T4kHF1MsEottV8KQ8Pur5UoYTbt/Zq97Yalrv9zDxYw2xFQJR9FtE+pL
-         62GRpxmM1Zl8AOmf5Mf2CzQg2Rwkx24bJ6rMgfynv5F7Z2o8GZFSxORtNo6s18vH687m
-         6pSq4bxQIYll37NuEnxkQzbU0aB+FMHZBxYZ0MKgcQudY3z+UHA2ndB0VLFfI9T4o0v1
-         R0HjVC+kIVJ6gOPq0T+OkUJYOqOIRDgaEB60yQp3ySv67ImNgAhrYUFvyBvQGKCmT5ol
-         FQBKAlggeEoFPUmrx7t/fjpQZ46Ijy9pbM2di7WeMw9OCe6SUS0BiDiVHTbxfQ2aMaaN
-         3dUw==
-X-Gm-Message-State: ANhLgQ0sHyD3+eAe9w5v4icFl7kDgsVeBKmpS4E8PA1sgZey4i5s6Uy6
-        pxMudhqoGbQRB7o1+p0Vx5g3v1wAD2MG93SNHk58RQ==
-X-Google-Smtp-Source: ADFU+vtVgS5vr/ydr7uBVhvdFJEto7dqmOE9+vHSWzFR4/gsD6YOozE+HaVT0inaiIKDNDfNkaiVxO02iNO9/4BjTRI=
-X-Received: by 2002:a05:6638:a99:: with SMTP id 25mr16588167jas.37.1585664443040;
- Tue, 31 Mar 2020 07:20:43 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=g8eJTubDOpnYx+MtqM441enT6egVrVa4bYoBdzCqVy0=;
+        b=p2z33e1X1QCWg5UJcJ40p32az7HmOhhQ+krihBHODRsU2eqFNsCGBMVaDsV/mkgEJ5
+         69U2R+Syu+LcNT+plViFjguW+TcrXVhBdjK+ZBI2kAT6yNkKbg2P+czlhUPAwSRncy89
+         b7dk0T/mGQ3KSLHuQdHfPQfWHaZ9ERJqvNHnK0aJwA1EuM9wNguhK1SEyakUzbOnPhCm
+         d8SsGCldVUiBBG1dhpuW2XpgdOYQ4+Fj48XIYjHBOmGDG+Q+5tntbZh7m8qeyQoJRBRP
+         VnBoLE1q+m7w/vHLE2egKUTzKk7g8bBHbp7iViQ0zev5xabRa1a8sDozSmyr0yahgCqY
+         B/Ag==
+X-Gm-Message-State: ANhLgQ2DW9W0fRrSD84kpIuzawy4gLTBBy2BW4mgcaB82bWgqX6Ox+mT
+        cY5H4Kzze666ma2zUqvXVQg=
+X-Google-Smtp-Source: ADFU+vuHaX3R0Rod/OfU4HzywP3xMCDKTEorvnNns5X0xjYEKqcjXzXOibbmborAYzSd8CwlUgvZ7g==
+X-Received: by 2002:aed:3c10:: with SMTP id t16mr5340804qte.45.1585665397860;
+        Tue, 31 Mar 2020 07:36:37 -0700 (PDT)
+Received: from localhost ([199.96.181.106])
+        by smtp.gmail.com with ESMTPSA id 199sm12602372qkm.7.2020.03.31.07.36.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2020 07:36:37 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 10:36:35 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Weiping Zhang <zwp10758@gmail.com>
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and
+ nvme
+Message-ID: <20200331143635.GS162390@mtj.duckdns.org>
+References: <cover.1580786525.git.zhangweiping@didiglobal.com>
+ <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com>
+ <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
+ <CAA70yB62_6JD_8dJTGPjnjJfyJSa1xqiCVwwNYtsTCUXQR5uCA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-19-jinpu.wang@cloud.ionos.com> <27b4e9a5-826f-d323-3d19-3f64c79e03eb@acm.org>
- <CAMGffEmWPyBAHWJpkVvWuptgoX0tw4rs4jJH1TuJ0jRrkMBdYQ@mail.gmail.com> <a02887c4-2e54-3b55-612a-29721b44eb7b@acm.org>
-In-Reply-To: <a02887c4-2e54-3b55-612a-29721b44eb7b@acm.org>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 31 Mar 2020 16:20:32 +0200
-Message-ID: <CAMGffEkeVHm57DgTD_tXQNjuNx152PmGLum-cNS1X6x=5eysGg@mail.gmail.com>
-Subject: Re: [PATCH v11 18/26] block/rnbd: client: main functionality
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Roman Penyaev <rpenyaev@suse.de>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA70yB62_6JD_8dJTGPjnjJfyJSa1xqiCVwwNYtsTCUXQR5uCA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 4:13 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 3/31/20 2:25 AM, Jinpu Wang wrote:
-> > On Sat, Mar 28, 2020 at 5:59 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> >>
-> >> On 2020-03-20 05:16, Jack Wang wrote:
-> >>> +     /*
-> >>> +      * Nothing was found, establish rtrs connection and proceed further.
-> >>> +      */
-> >>> +     sess->rtrs = rtrs_clt_open(&rtrs_ops, sessname,
-> >>> +                                  paths, path_cnt, RTRS_PORT,
-> >>> +                                  sizeof(struct rnbd_iu),
-> >>> +                                  RECONNECT_DELAY, BMAX_SEGMENTS,
-> >>> +                                  MAX_RECONNECTS);
-> >>
-> >> Is the server port number perhaps hardcoded in the above code?
-> >
-> > Yes, we should have introduced a module parameter for rnbd-clt too, so
-> > if admin changes port_nr, it's possible to change it also on rnbd-clt.
->
-> What if someone decides to use different port numbers for different rnbd
-> servers? Shouldn't the port number be configurable per connection
-> instead of making it a kernel module parameter? How about extracting the
-> destination port number from the address string like srp_parse_in() does?
+Hello, Weiping.
 
-Probably we should do both, the per connection destination setting can
-over right the module parameter if both exist.
->
-> Thanks,
->
-> Bart.
-Thanks Bart!
+On Tue, Mar 31, 2020 at 02:17:06PM +0800, Weiping Zhang wrote:
+> Recently I do some cgroup io weight testing,
+> https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test
+> I think a proper io weight policy
+> should consider high weight cgroup's iops, latency and also take whole
+> disk's throughput
+> into account, that is to say, the policy should do more carfully trade
+> off between cgroup's
+> IO performance and whole disk's throughput. I know one policy cannot
+> do all things perfectly,
+> but from the test result nvme-wrr can work well.
+
+That's w/o iocost QoS targets configured, right? iocost should be able to
+achieve similar results as wrr with QoS configured.
+
+> From the following test result, nvme-wrr work well for both cgroup's
+> latency, iops, and whole
+> disk's throughput.
+
+As I wrote before, the issues I see with wrr are the followings.
+
+* Hardware dependent. Some will work ok or even fantastic. Many others will do
+  horribly.
+
+* Lack of configuration granularity. We can't configure it granular enough to
+  serve hierarchical configuration.
+
+* Likely not a huge problem with the deep QD of nvmes but lack of queue depth
+  control can lead to loss of latency control and thus loss of protection for
+  low concurrency workloads when pitched against workloads which can saturate
+  QD.
+
+All that said, given the feature is available, I don't see any reason to not
+allow to use it, but I don't think it fits the cgroup interface model given the
+hardware dependency and coarse granularity. For these cases, I think the right
+thing to do is using cgroups to provide tagging information - ie. build a
+dedicated interface which takes cgroup fd or ino as the tag and associate
+configurations that way. There already are other use cases which use cgroup this
+way (e.g. perf).
+
+Thanks.
+
+-- 
+tejun
