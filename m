@@ -2,284 +2,208 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BB7C43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 04:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7752BC43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 06:17:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C58220748
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 04:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FFC420757
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 06:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ceYFV2uo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gtnzYGc0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbgCaEFf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 00:05:35 -0400
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:33517 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725535AbgCaEFf (ORCPT
+        id S1726339AbgCaGRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 02:17:19 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:35371 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726060AbgCaGRT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 00:05:35 -0400
-Received: by mail-vk1-f195.google.com with SMTP id f63so5351306vkh.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 21:05:34 -0700 (PDT)
+        Tue, 31 Mar 2020 02:17:19 -0400
+Received: by mail-qk1-f194.google.com with SMTP id k13so21886895qki.2;
+        Mon, 30 Mar 2020 23:17:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Zke5yRW+ArGpRV56Byz8cgdPZDWiQ7bt+lqoUYmEskc=;
-        b=ceYFV2uoQr0mS2GX/LNa0KtgNEbRuaubbuTOCl8Wvye7sSyixJMXwo4LrJbxQ6j5HA
-         nJHMc6TUDu6dDEvnxKlOYZtoYGKF+0k0/H+rm6A4YhCYnsVMn2LvYoJ/xrmy6gqZ3tLm
-         vJgfKGExX9svErzZItdo/o5AEMLyrbPy2L/Ls=
+        bh=WIxxK39yFs5OEp2hoQ/hVPAMvH8Vwu0fOy3U41jNDI4=;
+        b=gtnzYGc01I61h4c7FPRTBKTYrGmeLJqPOxWQilD4KbLcH5GwVg/Uuv7hhK9eqxoldh
+         gjL/pGOzzxVQMvQ/LcYJhqqsc8wDXhhftxFsch/8i5eoD8Q2dw3TiI5w9VXjtVwEX5uR
+         ChUk3p8MIb5NoNxjV0sPR1r0huoWCYmshLRjSHiXCSUV8j9ma4mpP/0xj48nz3tusZ/c
+         jz1NULPB1/cd+In7xBAVsHPDhZALLJwJDFNetP9lBc6qt32VxOWsLU+DWt89fx/OElCA
+         +ISoWCYB7YSrFXcLmSbmztf9s9ctzTbv2gX4R+UhivVqvU1hgVwu0gV0lmTMYCks40gT
+         AFxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Zke5yRW+ArGpRV56Byz8cgdPZDWiQ7bt+lqoUYmEskc=;
-        b=YuY362YWW0sHtd3d/IvimSF1oIbXxtbnYGrjhw61bGmYZg0Z3HhYrZgb5XcVcw/kSp
-         7b4Y32mk8DvjgtuwE5axmvHPVlQJnaXpnsSYwsXUTQeFaPpiOWEbx+AAMaOzF3rM7zGQ
-         t6NrgYScvA53zPE+Mdccc/dOquULEV0jxNcezM4I9rCTDjNHzwl+PJtory+1236hnssT
-         AunqUIwIyJQRgt8eF9JdPVnqRLaNJBObUWT84UzHJ15s7BJy7lFM2YPTi/wiqRxn/mA2
-         a1R/4+APoDePZxoWDbHMNfqzApLEn5ToyGqUMyCOWr+w5Oyzosby7bOrZOYO5L+0w/OZ
-         DZmQ==
-X-Gm-Message-State: AGi0PuZK2snCPN+6M30f7Jb2GdfuQ+NchZKwZlAeeOxMDopILwQuKnAd
-        BBdVcSHU4PuYV9T6VPoQSzEc9haj2/M=
-X-Google-Smtp-Source: APiQypLpflO0JecluszZC6GgjgKHGWl+3kAgoh53lHsQSsd9BkqNFrRAadJRAv3Qc4hTargxhw5YCA==
-X-Received: by 2002:a1f:60d5:: with SMTP id u204mr9951136vkb.55.1585627533464;
-        Mon, 30 Mar 2020 21:05:33 -0700 (PDT)
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com. [209.85.221.171])
-        by smtp.gmail.com with ESMTPSA id f6sm1018264ual.9.2020.03.30.21.05.32
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Mar 2020 21:05:32 -0700 (PDT)
-Received: by mail-vk1-f171.google.com with SMTP id b187so5332784vkh.12
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2020 21:05:32 -0700 (PDT)
-X-Received: by 2002:a1f:a244:: with SMTP id l65mr10199156vke.34.1585627532149;
- Mon, 30 Mar 2020 21:05:32 -0700 (PDT)
+        bh=WIxxK39yFs5OEp2hoQ/hVPAMvH8Vwu0fOy3U41jNDI4=;
+        b=uXrzPwxtv31FmWBOU13dBRPE+ZMYozYUqnGo3rDjxaISZfYWZcI4jI9EXWIJ6bYIso
+         J2vVXYjiIUfQAJxpoRr71NyHhHBnL+uVrlGzCz9v9PpmGqCmHPBRiZIp1wGO/KNmcOh8
+         +mgXhdc91HIjFI3YFX/2mOw/dyiG+JkSp//HY3mwNQjgUUJFWn516l3QvAoqYckie9Rq
+         BS32m5ECqFjxGZHk2veoK+MeLke3emQbyo1QfHubuQQxXhKLsTYfxZgcuieu5b2z+5FG
+         GjsqmjWrH2Na+NnvqOo90oR+4Krmkixylp/s9KgEDbfpDUg+zsVkuzEs+d8wpRfDyhMn
+         Qn5A==
+X-Gm-Message-State: ANhLgQ1MwUrsj1o0002DsbC4wR7BOTr36OxIig2Dn+FFB26ZxqGRvwfl
+        rGxbADVNWgGbN0omr3uqyQitvdedWDUpk5OL0uRNZH08UAmd2w==
+X-Google-Smtp-Source: ADFU+vvimfZGmVLQxjvf61mux56f6SGLVtWGf9mUsRFBg9JeB4PpjjH593/kiVxo4oDb2kCxZul1ifV79Wa5PbBquUc=
+X-Received: by 2002:ae9:ee01:: with SMTP id i1mr3517974qkg.498.1585635437494;
+ Mon, 30 Mar 2020 23:17:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200330144907.13011-1-dianders@chromium.org> <20200330074856.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200331014109.GA20230@ming.t460p> <CAD=FV=V-6kFD2Nso+8YGpx5atDpkegBH+7JH9YZ70gPAs84FOw@mail.gmail.com>
- <20200331025828.GB20230@ming.t460p>
-In-Reply-To: <20200331025828.GB20230@ming.t460p>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Mon, 30 Mar 2020 21:05:20 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=Urdjs23t_J=GruoM_42rV94oXMiqTn0w3u4DR50zpb4Q@mail.gmail.com>
-Message-ID: <CAD=FV=Urdjs23t_J=GruoM_42rV94oXMiqTn0w3u4DR50zpb4Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] scsi: core: Fix stall if two threads request budget
- at the same time
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        linux-scsi@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <cover.1580786525.git.zhangweiping@didiglobal.com>
+ <20200204154200.GA5831@redsun51.ssa.fujisawa.hgst.com> <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
+In-Reply-To: <CAA70yB5qAj8YnNiPVD5zmPrrTr0A0F3v2cC6t2S1Fb0kiECLfw@mail.gmail.com>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Tue, 31 Mar 2020 14:17:06 +0800
+Message-ID: <CAA70yB62_6JD_8dJTGPjnjJfyJSa1xqiCVwwNYtsTCUXQR5uCA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/4] Add support Weighted Round Robin for blkcg and nvme
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Nadolski, Edmund" <edmund.nadolski@intel.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On Mon, Mar 30, 2020 at 7:58 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Mon, Mar 30, 2020 at 07:15:54PM -0700, Doug Anderson wrote:
-> > Hi,
+> > On the driver implementation, the number of module parameters being
+> > added here is problematic. We already have 2 special classes of queues,
+> > and defining this at the module level is considered too coarse when
+> > the system has different devices on opposite ends of the capability
+> > spectrum. For example, users want polled queues for the fast devices,
+> > and none for the slower tier. We just don't have a good mechanism to
+> > define per-controller resources, and more queue classes will make this
+> > problem worse.
 > >
-> > On Mon, Mar 30, 2020 at 6:41 PM Ming Lei <ming.lei@redhat.com> wrote:
-> > >
-> > > On Mon, Mar 30, 2020 at 07:49:06AM -0700, Douglas Anderson wrote:
-> > > > It is possible for two threads to be running
-> > > > blk_mq_do_dispatch_sched() at the same time with the same "hctx".
-> > > > This is because there can be more than one caller to
-> > > > __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
-> > > > prevent more than one thread from entering.
-> > > >
-> > > > If more than one thread is running blk_mq_do_dispatch_sched() at the
-> > > > same time with the same "hctx", they may have contention acquiring
-> > > > budget.  The blk_mq_get_dispatch_budget() can eventually translate
-> > > > into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
-> > > > uncommon) then only one of the two threads will be the one to
-> > > > increment "device_busy" to 1 and get the budget.
-> > > >
-> > > > The losing thread will break out of blk_mq_do_dispatch_sched() and
-> > > > will stop dispatching requests.  The assumption is that when more
-> > > > budget is available later (when existing transactions finish) the
-> > > > queue will be kicked again, perhaps in scsi_end_request().
-> > > >
-> > > > The winning thread now has budget and can go on to call
-> > > > dispatch_request().  If dispatch_request() returns NULL here then we
-> > > > have a potential problem.  Specifically we'll now call
-> > >
-> > > I guess this problem should be BFQ specific. Now there is definitely
-> > > requests in BFQ queue wrt. this hctx. However, looks this request is
-> > > only available from another loser thread, and it won't be retrieved in
-> > > the winning thread via e->type->ops.dispatch_request().
-> > >
-> > > Just wondering why BFQ is implemented in this way?
-> >
-> > Paolo can maybe comment why.
-> >
-> > ...but even if BFQ wanted to try to change this, I think it's
-> > impossible to fully close the race.  There is no locking between the
-> > call to has_work() and dispatch_request() and there can be two (or
-> > more) threads running the code at the same time.  Without some type of
-> > locking I think it will always be possible for dispatch_request() to
-> > return NULL.  Are we OK with code that works most of the time but
-> > still has a race?  ...or did I misunderstand how this all works?
+> We can add a new "string" module parameter, which contains a model number,
+> in most cases, the save product with a common prefix model number, so
+> in this way
+> nvme can distinguish the different performance devices(hign or low end).
+> Before create io queue, nvme driver can get the device's Model number(40 Bytes),
+> then nvme driver can compare device's model number with module parameter, to
+> decide how many io queues for each disk;
 >
-> Wrt. dispatching requests from hctx->dispatch, there is really one
-> race given scsi's run queue from scsi_end_request() may not see
-> that request. Looks that is what the patch 1 is addressing.
-
-OK, at least I got something right.  ;-)
-
-
-> However, for this issue, there isn't race, given when we get budget,
-> the request isn't dequeued from BFQ yet. If budget is assigned
-> successfully, either the request is dispatched to LLD successfully,
-> or STS_RESOURCE is triggered, or running out of driver tag, run queue
-> is guaranteed to be started for handling another dispatch path
-> which running out of budget.
+> /* if model_number is MODEL_ANY, these parameters will be applied to
+> all nvme devices. */
+> char dev_io_queues[1024] = "model_number=MODEL_ANY,
+> poll=0,read=0,wrr_low=0,wrr_medium=0,wrr_high=0,wrr_urgent=0";
+> /* these paramters only affect nvme disk whose model number is "XXX" */
+> char dev_io_queues[1024] = "model_number=XXX,
+> poll=1,read=2,wrr_low=3,wrr_medium=4,wrr_high=5,wrr_urgent=0;";
 >
-> That is why I raise the question why BFQ dispatches request in this way.
-
-Ah, I _think_ I see what you mean.  So there should be no race because
-the "has_work" is just a hint?  It's assumed that whichever task gets
-the budget will be able to dispatch all the work that's there.  Is
-that right?
-
-
-> > > > blk_mq_put_dispatch_budget() which translates into
-> > > > scsi_mq_put_budget().  That will mark the device as no longer busy but
-> > > > doesn't do anything to kick the queue.  This violates the assumption
-> > > > that the queue would be kicked when more budget was available.
-> > > >
-> > > > Pictorially:
-> > > >
-> > > > Thread A                          Thread B
-> > > > ================================= ==================================
-> > > > blk_mq_get_dispatch_budget() => 1
-> > > > dispatch_request() => NULL
-> > > >                                   blk_mq_get_dispatch_budget() => 0
-> > > >                                   // because Thread A marked
-> > > >                                   // "device_busy" in scsi_device
-> > > > blk_mq_put_dispatch_budget()
-> > > >
-> > > > The above case was observed in reboot tests and caused a task to hang
-> > > > forever waiting for IO to complete.  Traces showed that in fact two
-> > > > tasks were running blk_mq_do_dispatch_sched() at the same time with
-> > > > the same "hctx".  The task that got the budget did in fact see
-> > > > dispatch_request() return NULL.  Both tasks returned and the system
-> > > > went on for several minutes (until the hung task delay kicked in)
-> > > > without the given "hctx" showing up again in traces.
-> > > >
-> > > > Let's attempt to fix this problem by detecting budget contention.  If
-> > > > we're in the SCSI code's put_budget() function and we saw that someone
-> > > > else might have wanted the budget we got then we'll kick the queue.
-> > > >
-> > > > The mechanism of kicking due to budget contention has the potential to
-> > > > overcompensate and kick the queue more than strictly necessary, but it
-> > > > shouldn't hurt.
-> > > >
-> > > > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> > > > ---
-> > > >
-> > > >  drivers/scsi/scsi_lib.c    | 27 ++++++++++++++++++++++++---
-> > > >  drivers/scsi/scsi_scan.c   |  1 +
-> > > >  include/scsi/scsi_device.h |  2 ++
-> > > >  3 files changed, 27 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > > > index 610ee41fa54c..0530da909995 100644
-> > > > --- a/drivers/scsi/scsi_lib.c
-> > > > +++ b/drivers/scsi/scsi_lib.c
-> > > > @@ -344,6 +344,21 @@ static void scsi_dec_host_busy(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
-> > > >       rcu_read_unlock();
-> > > >  }
-> > > >
-> > > > +static void scsi_device_dec_busy(struct scsi_device *sdev)
-> > > > +{
-> > > > +     bool was_contention;
-> > > > +     unsigned long flags;
-> > > > +
-> > > > +     spin_lock_irqsave(&sdev->budget_lock, flags);
-> > > > +     atomic_dec(&sdev->device_busy);
-> > > > +     was_contention = sdev->budget_contention;
-> > > > +     sdev->budget_contention = false;
-> > > > +     spin_unlock_irqrestore(&sdev->budget_lock, flags);
-> > > > +
-> > > > +     if (was_contention)
-> > > > +             blk_mq_run_hw_queues(sdev->request_queue, true);
-> > > > +}
-> > > > +
-> > > >  void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
-> > > >  {
-> > > >       struct Scsi_Host *shost = sdev->host;
-> > > > @@ -354,7 +369,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
-> > > >       if (starget->can_queue > 0)
-> > > >               atomic_dec(&starget->target_busy);
-> > > >
-> > > > -     atomic_dec(&sdev->device_busy);
-> > > > +     scsi_device_dec_busy(sdev);
-> > > >  }
-> > > >
-> > > >  static void scsi_kick_queue(struct request_queue *q)
-> > > > @@ -1624,16 +1639,22 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
-> > > >       struct request_queue *q = hctx->queue;
-> > > >       struct scsi_device *sdev = q->queuedata;
-> > > >
-> > > > -     atomic_dec(&sdev->device_busy);
-> > > > +     scsi_device_dec_busy(sdev);
-> > > >  }
-> > > >
-> > > >  static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
-> > > >  {
-> > > >       struct request_queue *q = hctx->queue;
-> > > >       struct scsi_device *sdev = q->queuedata;
-> > > > +     unsigned long flags;
-> > > >
-> > > > -     if (scsi_dev_queue_ready(q, sdev))
-> > > > +     spin_lock_irqsave(&sdev->budget_lock, flags);
-> > > > +     if (scsi_dev_queue_ready(q, sdev)) {
-> > > > +             spin_unlock_irqrestore(&sdev->budget_lock, flags);
-> > > >               return true;
-> > > > +     }
-> > > > +     sdev->budget_contention = true;
-> > > > +     spin_unlock_irqrestore(&sdev->budget_lock, flags);
-> > >
-> > > No, it really hurts performance by adding one per-sdev spinlock in fast path,
-> > > and we actually tried to kill the atomic variable of 'sdev->device_busy'
-> > > for high performance HBA.
-> >
-> > It might be slow, but correctness trumps speed, right?  I tried to do
+> struct dev_io_queues {
+>         char model_number[40];
+>         unsigned int poll;
+>         unsgined int read;
+>         unsigned int wrr_low;
+>         unsigned int wrr_medium;
+>         unsigned int wrr_high;
+>         unsigned int wrr_urgent;
+> };
 >
-> Correctness doesn't have to cause performance regression, does it?
-
-I guess what I'm saying is that if there is a choice between the two
-we have to choose correctness.  If there is a bug and we don't know of
-any way to fix it other than with a fix that regresses performance
-then we have to regress performance.  I wasn't able to find a way to
-fix the bug (as I understood it) without regressing performance, but
-I'd be happy if someone else could come up with a way.
-
-
-> > this with a 2nd atomic and without the spinlock but I kept having a
-> > hole one way or the other.  I ended up just trying to keep the
-> > spinlock section as small as possible.
-> >
-> > If you know of a way to get rid of the spinlock that still makes the
-> > code correct, I'd be super interested!  :-)  I certainly won't claim
-> > that it's impossible to do, only that I didn't manage to come up with
-> > a way.
+> We can use these two variable to store io queue configurations:
 >
-> As I mentioned, if BFQ doesn't dispatch request in this special way,
-> there isn't such race.
+> /* default values for the all disk, except whose model number is not
+> in io_queues_cfg */
+> struct dev_io_queues io_queues_def = {};
+>
+> /* user defined values for a specific model number */
+> struct dev_io_queues io_queues_cfg = {};
+>
+> If we need multiple configurations( > 2), we can also extend
+> dev_io_queues to support it.
+>
 
-OK, so I guess this puts it in Paolo's court then.  I'm about done for
-the evening, but maybe he can comment on it or come up with a fix?
+Hi Maintainers,
 
--Doug
+If we add patch to support these queue count at controller level,
+instead moudle level,
+shall we add WRR ?
+
+Recently I do some cgroup io weight testing,
+https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test
+I think a proper io weight policy
+should consider high weight cgroup's iops, latency and also take whole
+disk's throughput
+into account, that is to say, the policy should do more carfully trade
+off between cgroup's
+IO performance and whole disk's throughput. I know one policy cannot
+do all things perfectly,
+but from the test result nvme-wrr can work well.
+
+From the following test result, nvme-wrr work well for both cgroup's
+latency, iops, and whole
+disk's throughput.
+
+Notes:
+blk-iocost: only set qos.model, not set percentage latency.
+nvme-wrr: set weight by:
+    h=64;m=32;l=8;ab=0; nvme set-feature /dev/nvme1n1 -f 1 -v $(printf
+"0x%x\n" $(($ab<<0|$l<<8|$m<<16|$h<<24)))
+    echo "$major:$minor high" > /sys/fs/cgroup/test1/io.wrr
+    echo "$major:$minor low" > /sys/fs/cgroup/test2/io.wrr
+
+
+Randread vs Randread:
+cgroup.test1.weight : cgroup.test2.weight = 8 : 1
+high weight cgroup test1: randread, fio: numjobs=8, iodepth=32, bs=4K
+low  weight cgroup test2: randread, fio: numjobs=8, iodepth=32, bs=4K
+
+test case         bw         iops       rd_avg_lat   wr_avg_lat
+rd_p99_lat   wr_p99_lat
+=======================================================================================
+bfq_test1         767226     191806     1333.30      0.00
+536.00       0.00
+bfq_test2         94607      23651      10816.06     0.00
+610.00       0.00
+iocost_test1      1457718    364429     701.76       0.00
+1630.00      0.00
+iocost_test2      1466337    366584     697.62       0.00
+1613.00      0.00
+none_test1        1456585    364146     702.22       0.00
+1646.00      0.00
+none_test2        1463090    365772     699.12       0.00
+1613.00      0.00
+wrr_test1         2635391    658847     387.94       0.00
+1236.00      0.00
+wrr_test2         365428     91357      2801.00      0.00
+5537.00      0.00
+
+https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test#215-summary-fio-output
+
+
+Randread vs Seq Write:
+cgroup.test1.weight : cgroup.test2.weight = 8 : 1
+high weight cgroup test1: randread, fio: numjobs=8, iodepth=32, bs=4K
+low  weight cgroup test2: seq write, fio: numjobs=1, iodepth=32, bs=256K
+
+test case      bw         iops       rd_avg_lat   wr_avg_lat
+rd_p99_lat   wr_p99_lat
+=======================================================================================
+bfq_test1      814327     203581     1256.19      0.00         593.00       0.00
+bfq_test2      104758     409        0.00         78196.32     0.00
+     1052770.00
+iocost_test1   270467     67616      3784.02      0.00         9371.00      0.00
+iocost_test2   1541575    6021       0.00         5313.02      0.00
+     6848.00
+none_test1     271708     67927      3767.01      0.00         9502.00      0.00
+none_test2     1541951    6023       0.00         5311.50      0.00
+     6848.00
+wrr_test1      775005     193751     1320.17      0.00         4112.00      0.00
+wrr_test2      1198319    4680       0.00         6835.30      0.00
+     8847.00
+
+
+https://github.com/dublio/iotrack/wiki/cgroup-io-weight-test#225-summary-fio-output
+
+Thanks
+Weiping
