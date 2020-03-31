@@ -2,113 +2,81 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DC6C2D0EE
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 10:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C13ABC43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 11:04:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED6BB20B1F
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 10:57:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfkWb4TT"
+	by mail.kernel.org (Postfix) with ESMTP id 9FA31208E0
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 11:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730557AbgCaK5C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 06:57:02 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:45573 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730549AbgCaK5C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 06:57:02 -0400
-Received: by mail-qk1-f196.google.com with SMTP id c145so22413777qke.12;
-        Tue, 31 Mar 2020 03:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=D4IVQ7JDKhY91r0DBf8xKIDAIEvpogwte6mgLoTb3Oc=;
-        b=JfkWb4TT+RcwZGVAEmdXuwffw1dfSxUEjBTdhxma75/CCqNb0D+er5mivvJaJjGP/f
-         nzZmBa0fReQdx/vRYCYbYL8WNExei7LxxJ3+VUiJqprPDJE+QUJeLaKcmPyF1Ph+2GLV
-         GKOAdUZFS7j8nQwKD9Am+IBe0SGt5rJK2um1HUW01epaPSrjSVSU1tRREn/Rbyi2CYza
-         mS0cKkM9E5HARhZxH7ix4FvpdQRAR/X06gn/xxUhcYFy8hEiu8CU2IotM9TqUyc02ujX
-         F+HjHjz25LhISTm3rPs0U6d4JmKL8Vhf7PmA4vLYnImRPA8EjrCyQitAFbHhvw9QZzUA
-         b4eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=D4IVQ7JDKhY91r0DBf8xKIDAIEvpogwte6mgLoTb3Oc=;
-        b=qiZ/UV0GdagjHS1CfTRKEd+zekMw3mIXdyEfg93SDrTzXghVTSmX4ajxdRRwpt8Ny8
-         vhvOObG1eA7Tckz3Yg4yrrRUe8bWbC+yOEIRm3gCJAflx9XxngMlEMY0A6xki6csBOYX
-         gWSKnTe8JogcgutfPykwBYoFJu8hPBtJ+ARssuyDkuglDt5sVV3QF4jNJbtF2qpqKVA7
-         nReZA1F9UFD0A4nrq4SbGV5V8YPfuT/1wkUjQuwABW0LFXwTLs0iUyfKOoHPObmH77nz
-         HQmCM1ThqE9nEIn7GlfKO9VeghBhTsq1GcduhrVh7LxhT+XHC10XH3l0mN1+BFIPhnxh
-         ZiKw==
-X-Gm-Message-State: ANhLgQ39R6/jdJhgxlJ+L3PYD7uBibPoKqQWwHty7lli74gh0Vq/5xGb
-        lcfbQHgNvNE7m0+cBUyey2D6BCRaeJ535EDPGb1mR6qWyRA2ZA==
-X-Google-Smtp-Source: ADFU+vsJUzQh/HN+3E3pxtBhLIWFfPDM8kvthWg8c+r6LvGrzF4MTuZ7C95fvA5oG5eZv7VVxgH72uevMTfHH2LjPA8=
-X-Received: by 2002:a37:8b04:: with SMTP id n4mr4265340qkd.222.1585652220814;
- Tue, 31 Mar 2020 03:57:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200327062859.GA12588@192.168.3.9> <20200331082505.GA14655@infradead.org>
- <CAA70yB5cWESKW600Lwoi8toPaiDtOVH53P8GSou6uukmX5mvgQ@mail.gmail.com> <20200331091644.GB12040@infradead.org>
-In-Reply-To: <20200331091644.GB12040@infradead.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Tue, 31 Mar 2020 18:56:49 +0800
-Message-ID: <CAA70yB5JeK0F_N_qcCaBeAUUUU=8TErV9EXONRGDmqkJ8bKRvA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/3] bio: track timestamp of submitting bio the
- disk driver
+        id S1730380AbgCaLEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 07:04:42 -0400
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:34203 "EHLO 1wt.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730377AbgCaLEm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Mar 2020 07:04:42 -0400
+Received: (from willy@localhost)
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 02VB1a4e024578;
+        Tue, 31 Mar 2020 13:01:36 +0200
+Date:   Tue, 31 Mar 2020 13:01:36 +0200
+From:   Willy Tarreau <w@1wt.eu>
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Helge Deller <deller@gmx.de>, Ian Molton <spyro@f2s.com>,
+        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+        Matt Turner <mattst88@gmail.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>, x86@kernel.org
+Subject: Re: [PATCH 00/23] Floppy driver cleanups
+Message-ID: <20200331110136.GB24562@1wt.eu>
+References: <20200331094054.24441-1-w@1wt.eu>
+ <20200331101019.GA6299@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200331101019.GA6299@infradead.org>
+User-Agent: Mutt/1.6.1 (2016-04-27)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=8831=E6=
-=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=885:16=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, Mar 31, 2020 at 04:45:33PM +0800, Weiping Zhang wrote:
-> > Christoph Hellwig <hch@infradead.org> =E4=BA=8E2020=E5=B9=B43=E6=9C=883=
-1=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=884:25=E5=86=99=E9=81=93=EF=BC=
-=9A
-> > >
-> > > On Fri, Mar 27, 2020 at 02:28:59PM +0800, Weiping Zhang wrote:
-> > > > Change-Id: Ibb9caf20616f83e111113ab5c824c05930c0e523
-> > > > Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> > >
-> > > This needs a commit description and loose the weird change id.
-> > >
-> > OK, I rewirte commit description, it record the timestamp of issue bio
-> > to the disk driver,
-> > then we can get the delta time in rq_qos_done_bio. It's same as the D2C=
- time
-> > of blktrace.
-> > > I also think oyu need to fins a way to not bloat the bio even more,
-> > > cgroup is a really bad offender for bio size.
-> > struct request {
-> >     u64 io_start_time_ns;
-> > also record this timestamp, I'll check if we can use it.
->
-> But except for a few exceptions bios are never issued directly to the
-> driver, requests are.  And the few exception (rsxx, umem) probably should
-> be rewritten to use requests.  And with generic_{start,end}_io_acct we
-> already have helpers to track bio based stats, which we should not
-> duplicate just for cgroups.
-generic_{start,end}_io_acct and blk_account_io_done,
-these two method use the a timeline (part->stamp), but cgroup doesn't have,
-so cgroup cann't use these general helper to counting the total io ticks
-for read,write and others. Block cgroup use delta =3D now -
-bio->bi_issue[issue_time]
-to counting total io ticks.
+Hi Christoph,
 
-How about move it into the blk-iotrack code, rq_qos_issue will call the
-rq_qos_ops.issue,  then if user doesn't enable blk-iotrack, these code
-will not be executed.
+On Tue, Mar 31, 2020 at 03:10:19AM -0700, Christoph Hellwig wrote:
+> Hi Willy,
+> 
+> given that you are actively maintaining the floppy driver now,
 
-Thanks
+No no no I'm not! Denis is :-) Really, I mean I just proposed some help
+to clean up this mess after being tricked into not believing a bug report
+just because the code was too confusing.
+
+> any
+> chance I could trick you into proper highmem handling?  I've been trying
+> to phase out block layer bounce buffering, and any help from a competent
+> maintainer to move their drivers to properly support highmem by kmapping
+> for PIO/MMIO I/O would be very helpful.
+
+I'm not sure what this implies regarding this code, to be honest. It's
+very tricky and implements sort of a state machine using function pointers
+within its interrupt handler so you never know exactly what accesses what,
+and quite a part of it remains obscure to me :-/  I can accept to help, I
+can even run tests since I still have running hardware, but I'd at least
+need some guidance. And probably Denis would know better than me there.
+Also I doubt we'd get sufficient testing on less common archs. While I
+do have sparc64/parisc/alpha available, I haven't booted a recent kernel
+on any of them for a while (2.4 used to be the last ones), and I'm not
+sure it's reasonable to go into such changes without proper testing.
+
+What do you think ?
+
+Willy
