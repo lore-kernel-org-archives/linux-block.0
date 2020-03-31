@@ -2,60 +2,54 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9F1C2D0EE
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B69C43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E72620848
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09A2C20787
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n5ImjXWj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KTuH+GZi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729425AbgCaIZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 04:25:06 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:46624 "EHLO
+        id S1726397AbgCaIZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 04:25:39 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46650 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726397AbgCaIZG (ORCPT
+        with ESMTP id S1726299AbgCaIZj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:25:06 -0400
+        Tue, 31 Mar 2020 04:25:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uHShfLyk+r2NtFiic0iTbAAoXgVtjC6D8jlMuvt3O8Y=; b=n5ImjXWjPQw04c5uquw6cwixCv
-        e578jSqqpyF1jjdfvtctP4mO/a2CkqhQt617UeqcG7Ay5zz1VUbguxYUT4llyz+IPv+tjjh96qvHc
-        0MH0wHtTkTJzBE8gaXP/KWsnZQVIKJJeCBxhgBAiZZqKYqelGWUnVX8hEZ92zxLhxjUBaynD1v2tD
-        pmqARRpdJOUaIWWZp3UygBsNnMB8s5/qz9kchbFuncuN6HUolUeX/tXdGO9Q8aqlgJNNHDDLd7Svp
-        IgnxLJzB3IDZR998Iik9Bvhg8SJ0QMNEkVSXlnqbcLX78f76825WKxw8lW0i7k0w4ByB79f7Z5U+x
-        cYLji1bQ==;
+        bh=6REFC0VXeCEFVv/usDeXTLYD9YHZ9HT76/8Yzro4Jew=; b=KTuH+GZiYWMVNbv7qVnGJ/OutS
+        mcSQouDTwIbOCsKYXDMruDrtpmG1SYQdKTrF9d85gXyjA/8PkNa4TTHm8AVhSRTGKi6Ovt1UFdAFV
+        TJQ9CNsIG7LQtVYMaq6OgCeuckV0azHi1n5T6OKvmLlf4nWSrgWOPMW2o90YYmvmqoy1n1dmVmY+0
+        NghIkQrIBFaS2VMo+l5eziJ4dnmoXTFa4+DVEHr3ce9tZ7DmTKlztXgEaYMmd8PMtp/bySdw0WtG7
+        LueV7M1TzQm1ks0FfFrUykah8coLeTeoc/y65P3GASO3zXRfyiBYDHyy4Zm9qwRNorZtuaZF35pJa
+        VY/u2n7Q==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jJCCn-0004wb-I0; Tue, 31 Mar 2020 08:25:05 +0000
-Date:   Tue, 31 Mar 2020 01:25:05 -0700
+        id 1jJCDL-0005QG-2g; Tue, 31 Mar 2020 08:25:39 +0000
+Date:   Tue, 31 Mar 2020 01:25:39 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/3] bio: track timestamp of submitting bio the
- disk driver
-Message-ID: <20200331082505.GA14655@infradead.org>
-References: <20200327062859.GA12588@192.168.3.9>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH 1/2] null_blk: Cleanup zoned device initialization
+Message-ID: <20200331082539.GB14655@infradead.org>
+References: <20200330040116.178731-1-damien.lemoal@wdc.com>
+ <20200330040116.178731-2-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200327062859.GA12588@192.168.3.9>
+In-Reply-To: <20200330040116.178731-2-damien.lemoal@wdc.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 27, 2020 at 02:28:59PM +0800, Weiping Zhang wrote:
-> Change-Id: Ibb9caf20616f83e111113ab5c824c05930c0e523
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-
-This needs a commit description and loose the weird change id.
-
-I also think oyu need to fins a way to not bloat the bio even more,
-cgroup is a really bad offender for bio size.
+Doesn't this belong after the actual bug fix?
