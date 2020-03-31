@@ -2,62 +2,60 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A44C43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9F1C2D0EE
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BE79206F5
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:48:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E72620848
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 08:25:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n5ImjXWj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729984AbgCaHsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 03:48:32 -0400
-Received: from verein.lst.de ([213.95.11.211]:37197 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726636AbgCaHsc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 03:48:32 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id ABC3168C4E; Tue, 31 Mar 2020 09:48:28 +0200 (CEST)
-Date:   Tue, 31 Mar 2020 09:48:28 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Martijn Coenen <maco@android.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kernel-team@android.com
-Subject: Re: [PATCH] loop: Add LOOP_SET_FD_WITH_OFFSET ioctl.
-Message-ID: <20200331074828.GA24372@lst.de>
-References: <20200329140459.18155-1-maco@android.com> <20200330010024.GA23640@ming.t460p> <CAB0TPYG4N-2Gg95VwQuQBQ8rvjC=4NQJP4syJWS3Q6CO28HzTQ@mail.gmail.com>
+        id S1729425AbgCaIZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 04:25:06 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46624 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726397AbgCaIZG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Mar 2020 04:25:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=uHShfLyk+r2NtFiic0iTbAAoXgVtjC6D8jlMuvt3O8Y=; b=n5ImjXWjPQw04c5uquw6cwixCv
+        e578jSqqpyF1jjdfvtctP4mO/a2CkqhQt617UeqcG7Ay5zz1VUbguxYUT4llyz+IPv+tjjh96qvHc
+        0MH0wHtTkTJzBE8gaXP/KWsnZQVIKJJeCBxhgBAiZZqKYqelGWUnVX8hEZ92zxLhxjUBaynD1v2tD
+        pmqARRpdJOUaIWWZp3UygBsNnMB8s5/qz9kchbFuncuN6HUolUeX/tXdGO9Q8aqlgJNNHDDLd7Svp
+        IgnxLJzB3IDZR998Iik9Bvhg8SJ0QMNEkVSXlnqbcLX78f76825WKxw8lW0i7k0w4ByB79f7Z5U+x
+        cYLji1bQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jJCCn-0004wb-I0; Tue, 31 Mar 2020 08:25:05 +0000
+Date:   Tue, 31 Mar 2020 01:25:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Subject: Re: [RFC PATCH v2 2/3] bio: track timestamp of submitting bio the
+ disk driver
+Message-ID: <20200331082505.GA14655@infradead.org>
+References: <20200327062859.GA12588@192.168.3.9>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAB0TPYG4N-2Gg95VwQuQBQ8rvjC=4NQJP4syJWS3Q6CO28HzTQ@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200327062859.GA12588@192.168.3.9>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 30, 2020 at 10:06:41AM +0200, Martijn Coenen wrote:
-> Hi Ming,
-> 
-> On Mon, Mar 30, 2020 at 3:00 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > The new ioctl LOOP_SET_FD_WITH_OFFSET looks not generic enough, could
-> > you consider to add one ioctl LOOP_SET_FD_AND_STATUS to cover both
-> > SET_FD and SET_STATUS so that using two ioctl() to setup loop can become
-> > deprecated finally?
-> 
-> I originally started out doing that. However, it is a significantly
-> larger refactoring of the loop driver, and it makes things like error
-> handling more complex. I thought configuring loop with an offset is
-> the most common case. But if there's a preference to do an ioctl that
-> takes the full status, I can work on that.
+On Fri, Mar 27, 2020 at 02:28:59PM +0800, Weiping Zhang wrote:
+> Change-Id: Ibb9caf20616f83e111113ab5c824c05930c0e523
+> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 
-I think the full blown set fd an status would seem a lot more useful,
-or even better a LOOP_CTL_ADD variant that sets up everything important
-on the character device so that we avoid the half set up block devices
-entirely.
+This needs a commit description and loose the weird change id.
+
+I also think oyu need to fins a way to not bloat the bio even more,
+cgroup is a really bad offender for bio size.
