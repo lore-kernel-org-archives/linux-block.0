@@ -2,264 +2,257 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_DIGITS,
-	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0A0C43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 17:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9179DC43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:06:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99F0C20848
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 17:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CFE7212CC
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:06:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PGbHZFmN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730677AbgCaRLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 13:11:17 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:40143 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730589AbgCaRLR (ORCPT
+        id S1726150AbgCaSGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 14:06:15 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37088 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725947AbgCaSGP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 13:11:17 -0400
-Received: by mail-io1-f72.google.com with SMTP id z207so19841259iof.7
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 10:11:16 -0700 (PDT)
+        Tue, 31 Mar 2020 14:06:15 -0400
+Received: by mail-wm1-f68.google.com with SMTP id j19so3930106wmi.2
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 11:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=rdHIFzp6WyS0NijgnSKxc0qBm0w7b6RkFiTqIi5G0RI=;
+        b=PGbHZFmNgek1IF9cb9XkbLzdCxHpn4Gh5pLqY2lNXlPYj2wgdW2tpOyQfxRW+lADlM
+         BMGcDDbQ2/yv6YArqmRRlo7X7B7yryVBNiJbkHmb2bDeEO64PVl/wdpd5zGAvGkTqhtq
+         uYAw9gYLQAyVV8jj+4SPAqa6Ydz5DH9zM2nwcHPyYJq6Qk8Td29I8douEblKObLiexak
+         x1MpLaxLZjIScdnqlbeK0d8rCrxP/0iKBBR2PkGXXWziupX0gRV3DYVXQH+S2RMUoBpJ
+         PSLt9c3LjYT3vExYUvVEmcbD97MSoJhpftyBhiRnQgNH2lIEG+9mHNLTrHR4WN4G/HS7
+         ObIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=GeqKjfeAdJEJGZUK1GjRw+TiUXvLDp+2kKiRMtW1LCk=;
-        b=tMW69W5VCNDOzt/WX1WXQyPnHCYUXULfoBaD6uX2uQF+MB9hdYP9qUMENKkyYFRbA+
-         JyPv0+Gxe0wcXKvTR9vIcgYQosDCB0wtBRdeD5f0NDoD3MuTyJrvS9WJtmBc3+J15msh
-         74hhTT3mpKtg48jFjTeFZFxzg2r2TboGaOC8yvAlOSMRpQxFar5nJivKBQl7AEi+cEVU
-         w1jduwjyDjNLhfpk9LCzfzuPRVJbyVMuTkNPEoCcrE52s5COfTCFPqtSncbMp4Rsmxbw
-         Yv4XYTTJKpjgDYYXqSqBY3rTDxpAQh84fRm/dqMZwZqMed6H9yF2LYIcPhY4PTir7mao
-         TynA==
-X-Gm-Message-State: ANhLgQ2bgzyWDS64h4iz+5/fRDURTyJ/NFBoZ037AlS33RJ2PRwaQZjK
-        Kk/RmG4Oi2GbgiKuue6sEOmXlOMwS4nW9z27OOcOL1wHYmDM
-X-Google-Smtp-Source: ADFU+vt+Tkk/vonhfkivzolcbjP+ktb+edSvNeC5MpAAEcl8QjOIsuGNwdwt5tE0tU8UThY0NBr6tIuoUZHzvQQy8JX8ZuxIgRsR
-MIME-Version: 1.0
-X-Received: by 2002:a02:c551:: with SMTP id g17mr7773176jaj.52.1585674675789;
- Tue, 31 Mar 2020 10:11:15 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 10:11:15 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c7a80905a229a785@google.com>
-Subject: memory leak in nbd_add_socket
-From:   syzbot <syzbot+934037347002901b8d2a@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=rdHIFzp6WyS0NijgnSKxc0qBm0w7b6RkFiTqIi5G0RI=;
+        b=iL3ZDU4nDkI+iNoqDgVelvcy4CO7S8yWtMu5U1wPkmdzH9cG3NPGGorTi/wlrMIH4L
+         wgDqJ7+Fqy5BRiOPFCW8rbHSxP1ucEruMC2eifSVwauoIAwmhFC5JWjlL2xV8F1RopiK
+         PeO8KRKww5UDVUNwkaEOlvycJY+yARSuCXrN+phJP4e8YG682KahdsC5C0twveYo4xh+
+         lHFYHHMqQ65AvFjnxe2F4KscSzz/P1y7jrSPu7fJb4m/75Trbt4/yTm9rmDfnhP7a4ez
+         p1XHEsf/ewioMt/QKkr2+wgBFOL04mzpx/UG82Ehjy5UHcwEpcUpVw5L9FnWUNtoh+bL
+         a5uA==
+X-Gm-Message-State: AGi0PuYMFHwU0pJCZpf3uIHG3KhiRji31HhPCIZIXnNPKyl5+do6M3yv
+        48SxxiZHCFbZkDNUg+tHx0qeuQ==
+X-Google-Smtp-Source: APiQypID0x6nOClfq+P0TTy8TSQdW9f1BCd93MzMM1F4FQaFe2EeZjymclbKAMKVAxxzX94LrjBXSQ==
+X-Received: by 2002:a05:600c:21d4:: with SMTP id x20mr23109wmj.77.1585677972371;
+        Tue, 31 Mar 2020 11:06:12 -0700 (PDT)
+Received: from [192.168.0.102] ([84.33.138.35])
+        by smtp.gmail.com with ESMTPSA id y11sm4580878wmi.13.2020.03.31.11.06.10
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 31 Mar 2020 11:06:11 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 2/2] scsi: core: Fix stall if two threads request budget
+ at the same time
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20200331014109.GA20230@ming.t460p>
+Date:   Tue, 31 Mar 2020 20:07:35 +0200
+Cc:     Douglas Anderson <dianders@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, jejb@linux.ibm.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Guenter Roeck <groeck@chromium.org>,
+        linux-scsi@vger.kernel.org, sqazi@google.com,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D38AB98D-7F6A-4C61-8A8F-C22C53671AC8@linaro.org>
+References: <20200330144907.13011-1-dianders@chromium.org>
+ <20200330074856.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
+ <20200331014109.GA20230@ming.t460p>
+To:     Ming Lei <ming.lei@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following crash on:
-
-HEAD commit:    673b41e0 staging/octeon: fix up merge error
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15badadbe00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d97026d04c648459
-dashboard link: https://syzkaller.appspot.com/bug?extid=934037347002901b8d2a
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12dbb747e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14421b9de00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+934037347002901b8d2a@syzkaller.appspotmail.com
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.060s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.170s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.270s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.380s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.480s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.590s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.690s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810fd584a0 (size 32):
-  comm "syz-executor586", pid 8424, jiffies 4294961663 (age 40.800s)
-  hex dump (first 32 bytes):
-    2f 64 65 76 2f 6e 62 64 30 00 00 00 00 00 00 00  /dev/nbd0.......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000090cb73c8>] __do_krealloc mm/slab_common.c:1671 [inline]
-    [<0000000090cb73c8>] krealloc+0x7c/0xa0 mm/slab_common.c:1700
-    [<00000000cf9e6ba7>] nbd_add_socket+0x7d/0x1e0 drivers/block/nbd.c:1040
-    [<0000000040a0a881>] __nbd_ioctl drivers/block/nbd.c:1373 [inline]
-    [<0000000040a0a881>] nbd_ioctl+0x175/0x430 drivers/block/nbd.c:1437
-    [<000000004972a55a>] __blkdev_driver_ioctl block/ioctl.c:322 [inline]
-    [<000000004972a55a>] blkdev_ioctl+0x147/0x300 block/ioctl.c:718
-    [<000000008903d911>] block_ioctl+0x50/0x70 fs/block_dev.c:1995
-    [<00000000c37950d9>] vfs_ioctl fs/ioctl.c:47 [inline]
-    [<00000000c37950d9>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:763
-    [<00000000ffe4bbdc>] __do_sys_ioctl fs/ioctl.c:772 [inline]
-    [<00000000ffe4bbdc>] __se_sys_ioctl fs/ioctl.c:770 [inline]
-    [<00000000ffe4bbdc>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:770
-    [<00000000ede38b98>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:294
-    [<00000000553f73d5>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
 
+> Il giorno 31 mar 2020, alle ore 03:41, Ming Lei <ming.lei@redhat.com> =
+ha scritto:
+>=20
+> On Mon, Mar 30, 2020 at 07:49:06AM -0700, Douglas Anderson wrote:
+>> It is possible for two threads to be running
+>> blk_mq_do_dispatch_sched() at the same time with the same "hctx".
+>> This is because there can be more than one caller to
+>> __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
+>> prevent more than one thread from entering.
+>>=20
+>> If more than one thread is running blk_mq_do_dispatch_sched() at the
+>> same time with the same "hctx", they may have contention acquiring
+>> budget.  The blk_mq_get_dispatch_budget() can eventually translate
+>> into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
+>> uncommon) then only one of the two threads will be the one to
+>> increment "device_busy" to 1 and get the budget.
+>>=20
+>> The losing thread will break out of blk_mq_do_dispatch_sched() and
+>> will stop dispatching requests.  The assumption is that when more
+>> budget is available later (when existing transactions finish) the
+>> queue will be kicked again, perhaps in scsi_end_request().
+>>=20
+>> The winning thread now has budget and can go on to call
+>> dispatch_request().  If dispatch_request() returns NULL here then we
+>> have a potential problem.  Specifically we'll now call
+>=20
+> I guess this problem should be BFQ specific. Now there is definitely
+> requests in BFQ queue wrt. this hctx. However, looks this request is
+> only available from another loser thread, and it won't be retrieved in
+> the winning thread via e->type->ops.dispatch_request().
+>=20
+> Just wondering why BFQ is implemented in this way?
+>=20
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+BFQ inherited this powerful non-working scheme from CFQ, some age ago.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+In more detail: if BFQ has at least one non-empty internal queue, then
+is says of course that there is work to do.  But if the currently
+in-service queue is empty, and is expected to receive new I/O, then
+BFQ plugs I/O dispatch to enforce service guarantees for the
+in-service queue, i.e., BFQ responds NULL to a dispatch request.
+
+It would be very easy to change bfq_has_work so that it returns false
+in case the in-service queue is empty, even if there is I/O
+backlogged.  My only concern is: since everything has worked with the
+current scheme for probably 15 years, are we sure that everything is
+still ok after we change this scheme?
+
+I'm confident it would be ok, because a timer fires if the in-service
+queue does not receive any I/O for too long, and the handler of the
+timer invokes blk_mq_run_hw_queues().
+
+Looking forward to your feedback before proposing a change,
+Paolo
+
+>> blk_mq_put_dispatch_budget() which translates into
+>> scsi_mq_put_budget().  That will mark the device as no longer busy =
+but
+>> doesn't do anything to kick the queue.  This violates the assumption
+>> that the queue would be kicked when more budget was available.
+>>=20
+>> Pictorially:
+>>=20
+>> Thread A                          Thread B
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> blk_mq_get_dispatch_budget() =3D> 1
+>> dispatch_request() =3D> NULL
+>>                                  blk_mq_get_dispatch_budget() =3D> 0
+>>                                  // because Thread A marked
+>>                                  // "device_busy" in scsi_device
+>> blk_mq_put_dispatch_budget()
+>>=20
+>> The above case was observed in reboot tests and caused a task to hang
+>> forever waiting for IO to complete.  Traces showed that in fact two
+>> tasks were running blk_mq_do_dispatch_sched() at the same time with
+>> the same "hctx".  The task that got the budget did in fact see
+>> dispatch_request() return NULL.  Both tasks returned and the system
+>> went on for several minutes (until the hung task delay kicked in)
+>> without the given "hctx" showing up again in traces.
+>>=20
+>> Let's attempt to fix this problem by detecting budget contention.  If
+>> we're in the SCSI code's put_budget() function and we saw that =
+someone
+>> else might have wanted the budget we got then we'll kick the queue.
+>>=20
+>> The mechanism of kicking due to budget contention has the potential =
+to
+>> overcompensate and kick the queue more than strictly necessary, but =
+it
+>> shouldn't hurt.
+>>=20
+>> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+>> ---
+>>=20
+>> drivers/scsi/scsi_lib.c    | 27 ++++++++++++++++++++++++---
+>> drivers/scsi/scsi_scan.c   |  1 +
+>> include/scsi/scsi_device.h |  2 ++
+>> 3 files changed, 27 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+>> index 610ee41fa54c..0530da909995 100644
+>> --- a/drivers/scsi/scsi_lib.c
+>> +++ b/drivers/scsi/scsi_lib.c
+>> @@ -344,6 +344,21 @@ static void scsi_dec_host_busy(struct Scsi_Host =
+*shost, struct scsi_cmnd *cmd)
+>> 	rcu_read_unlock();
+>> }
+>>=20
+>> +static void scsi_device_dec_busy(struct scsi_device *sdev)
+>> +{
+>> +	bool was_contention;
+>> +	unsigned long flags;
+>> +
+>> +	spin_lock_irqsave(&sdev->budget_lock, flags);
+>> +	atomic_dec(&sdev->device_busy);
+>> +	was_contention =3D sdev->budget_contention;
+>> +	sdev->budget_contention =3D false;
+>> +	spin_unlock_irqrestore(&sdev->budget_lock, flags);
+>> +
+>> +	if (was_contention)
+>> +		blk_mq_run_hw_queues(sdev->request_queue, true);
+>> +}
+>> +
+>> void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd =
+*cmd)
+>> {
+>> 	struct Scsi_Host *shost =3D sdev->host;
+>> @@ -354,7 +369,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, =
+struct scsi_cmnd *cmd)
+>> 	if (starget->can_queue > 0)
+>> 		atomic_dec(&starget->target_busy);
+>>=20
+>> -	atomic_dec(&sdev->device_busy);
+>> +	scsi_device_dec_busy(sdev);
+>> }
+>>=20
+>> static void scsi_kick_queue(struct request_queue *q)
+>> @@ -1624,16 +1639,22 @@ static void scsi_mq_put_budget(struct =
+blk_mq_hw_ctx *hctx)
+>> 	struct request_queue *q =3D hctx->queue;
+>> 	struct scsi_device *sdev =3D q->queuedata;
+>>=20
+>> -	atomic_dec(&sdev->device_busy);
+>> +	scsi_device_dec_busy(sdev);
+>> }
+>>=20
+>> static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+>> {
+>> 	struct request_queue *q =3D hctx->queue;
+>> 	struct scsi_device *sdev =3D q->queuedata;
+>> +	unsigned long flags;
+>>=20
+>> -	if (scsi_dev_queue_ready(q, sdev))
+>> +	spin_lock_irqsave(&sdev->budget_lock, flags);
+>> +	if (scsi_dev_queue_ready(q, sdev)) {
+>> +		spin_unlock_irqrestore(&sdev->budget_lock, flags);
+>> 		return true;
+>> +	}
+>> +	sdev->budget_contention =3D true;
+>> +	spin_unlock_irqrestore(&sdev->budget_lock, flags);
+>=20
+> No, it really hurts performance by adding one per-sdev spinlock in =
+fast path,
+> and we actually tried to kill the atomic variable of =
+'sdev->device_busy'
+> for high performance HBA.
+>=20
+> Thanks,
+> Ming
+
