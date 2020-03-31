@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1360CC2D0E8
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F538C2D0E8
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:23:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF3B820781
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:21:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DA4E20781
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 07:23:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GTEMTjOK"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="NhH9Aqnw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726174AbgCaHVB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 03:21:01 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:44989 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgCaHVB (ORCPT
+        id S1726299AbgCaHXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 03:23:35 -0400
+Received: from mail-il1-f196.google.com ([209.85.166.196]:39625 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726216AbgCaHXf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 03:21:01 -0400
-Received: by mail-io1-f66.google.com with SMTP id r25so8806454ioc.11
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 00:21:00 -0700 (PDT)
+        Tue, 31 Mar 2020 03:23:35 -0400
+Received: by mail-il1-f196.google.com with SMTP id r5so18443575ilq.6
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 00:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=52yap1u5QwMRqsrXFtOjtT2B5QyIT4tucmUPphiOHrI=;
-        b=GTEMTjOKXFybxlRKumEuM4V/PfF6eBoKtww0OsO9YQzyVAdmrNJggQ9yvKE3ewczqJ
-         F+jPdYQ3iOHbUnaKd5ChLHGybOJzcn5KN9BElQ8ELug4liXs5Deb1SnBHz0eh7KmudSC
-         qAB58ESePxjulAy6d3OajZ3wwhsnemHu/wSAtrk6kIu0VVzJN4CN93CPwecH1RwZfRak
-         Ak7V7rGQCPkXfNVvBD2cJyMedHJS93EzOT4liUhD0/bHf0cPG+CIru100SXDPHjlvnLm
-         9zi/m/0Td1R6AWxbb5CEkSR+rHvnYLP414D8r8PpT8jXhFEKU9D7vxR//2MBRfgl7EEK
-         ITjw==
+        bh=pYmhvetgwgJB3/SNAs9Ay4+GNdd0buNQ8ScCdL5qIAo=;
+        b=NhH9Aqnwn/jz9n5nmhhg5FmBCES9+80n1eqtkI4oil9+I157ZCyWonmXousXTYXiec
+         omrLkGkVIJDzsGte9wa+X1iCcmPQb+ekIWwnl3o8pR9jqYfH/7W0DGAmfG/1fLnEt+WT
+         GBxOr3oPH2faNZh7vAeR4aZf5Tun1GU9IRErfuzw3NhyjxT7rPMxao3YQE+9ILjz3mRN
+         UBu/L2VkTdzZC5AGHbcQlp6E+ahLF1lkNTokNwxrIs2/6sKsHdxnAel/kSgs80jOODMW
+         pYrxOKsv56J8TQtn/Gxq7Cg0J4dC+UtSLAUsM1WtHf7JnQFcM2rEfhNsGrWpJ9aa1c3c
+         0NIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=52yap1u5QwMRqsrXFtOjtT2B5QyIT4tucmUPphiOHrI=;
-        b=uQMBZVADPdFKWdYI+eLybceFyP1BDyx0eM1dHh2L1PwhcK3QOu/mg0k7tGwbmftRIo
-         G6C8KGmJnrRGUVeE/uVlX25mNnrKzyYbR0ZrpgVAd90RfR7Y4r+Zt07/ueors5LvojjG
-         AKk2ihemhZ0mol9yJdd22hlXuclsPQbeRh4v4ZLuXmjeLl68XgrOlZJrPJ9aa/VXSuZR
-         cznPy3eTxrlMuZ+7kUHg3JWWe6gqsMcb8Z2hbsq866JzJPZSrCB8KJEnPLIzblEKbMGm
-         3280BS137t6lmekXfmVypS9FYdFm82IWHAdPr20uTocUQwQkueU6l4zIPL3EcznBPHP9
-         Y/kw==
-X-Gm-Message-State: ANhLgQ1qAZUY1GxGYfaw4AnDhFvjIweXnaVsshMk4VcMQjWfTLAvqfES
-        7GHFArpn+OoqGD7p5uJHlzc/7X5U6fsm4njS/iabiQ==
-X-Google-Smtp-Source: ADFU+vsGLU/X7G6MrKpVK698XftSrAYv6eZQKIXo1zyQm2wQUl+il0qTmzzzZLjZ6UV6oJNrdPigOZINLrNoZWrkQJg=
-X-Received: by 2002:a6b:2d7:: with SMTP id 206mr14110250ioc.42.1585639260339;
- Tue, 31 Mar 2020 00:21:00 -0700 (PDT)
+        bh=pYmhvetgwgJB3/SNAs9Ay4+GNdd0buNQ8ScCdL5qIAo=;
+        b=suHj5mXBXS9vaT4Dc/ZGN7a9K3knAuGO2IOIngKwAVuh/6htp4URm8eJTpt0ObiuDn
+         +r+AiIwcNMHMm32NY73EsWUET4LDz6jUswh+72gVbwku119LOeQ+l4P1cOfd+7XsLn4F
+         H12iipejl7x4WCzxJlrLlWgLIZ0Py9CEMLGTpinHXxUK7SAX2gnlnYuUxCrdYqItAt0V
+         XMqHhELIuve5ede2TtuuW0auyzHU5XV1MLAQT2Tv+o8RatyHTTeMwmF0yq8rVKQs4piA
+         gtUI1MVY5JXU07WkykR5XGMzzqjBJVrQxSzxXvxrcmYbywBHf1R7BAD1Bpyvy+4saZC4
+         2yAQ==
+X-Gm-Message-State: ANhLgQ3gBVmoC+5JDjmO1qSrMXLaXKoYLz7oj6UnJJfaPJCDDsUMtm3U
+        EdzWvjinLH9u/SwjFxta0MR2mExADT8ohZ29iqFMfg==
+X-Google-Smtp-Source: ADFU+vviX+IfrrdYTDhxf766mcWvYHTwA5u5Bqq+BCi0GBesPQ5JpHC7+tlOjcPdC2VP5OHwNQf7J5yyBB0Xp2sXbU0=
+X-Received: by 2002:a92:ba01:: with SMTP id o1mr14705790ili.217.1585639412583;
+ Tue, 31 Mar 2020 00:23:32 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
- <20200320121657.1165-9-jinpu.wang@cloud.ionos.com> <788b815a-913b-5e4e-4023-585407411b5b@acm.org>
-In-Reply-To: <788b815a-913b-5e4e-4023-585407411b5b@acm.org>
+ <20200320121657.1165-25-jinpu.wang@cloud.ionos.com> <181aba74-b942-2faf-060b-89782c8f804e@acm.org>
+In-Reply-To: <181aba74-b942-2faf-060b-89782c8f804e@acm.org>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 31 Mar 2020 09:20:49 +0200
-Message-ID: <CAMGffEnHp51g8dTObhjYZTwrRLRCcZD9nbNQi1X1a08-Tu+ZLQ@mail.gmail.com>
-Subject: Re: [PATCH v11 08/26] RDMA/rtrs: client: sysfs interface functions
+Date:   Tue, 31 Mar 2020 09:23:21 +0200
+Message-ID: <CAMGffEnRZE-GBd8CwOsfY1YRq=fYzaX-2f+zHpy3CapZCAgfKw@mail.gmail.com>
+Subject: Re: [PATCH v11 24/26] block/rnbd: include client and server modules
+ into kernel compilation
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>,
@@ -75,17 +76,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 12:28 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Sat, Mar 28, 2020 at 8:34 PM Bart Van Assche <bvanassche@acm.org> wrote:
 >
 > On 2020-03-20 05:16, Jack Wang wrote:
-> > +static struct kobj_type ktype = {
-> > +     .sysfs_ops = &kobj_sysfs_ops,
-> > +};
+> > Add rnbd Makefile, Kconfig and also corresponding lines into upper
+> > block layer files.
 >
-> A release method is missing - please fix this.
->
-> Thanks,
->
-> Bart.
-Sure, will fix it.
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Thanks Bart!
