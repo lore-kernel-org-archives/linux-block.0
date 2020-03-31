@@ -2,155 +2,112 @@ Return-Path: <SRS0=+91Y=5Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F14C43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03490C43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 589022073B
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCD9820784
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 18:43:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rJlBKfpc"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KnpqFIXd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726282AbgCaS0F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 14:26:05 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:38300 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726208AbgCaS0F (ORCPT
+        id S1727787AbgCaSnz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 14:43:55 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:42810 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726194AbgCaSnz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 14:26:05 -0400
-Received: by mail-io1-f67.google.com with SMTP id m15so22855745iob.5
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 11:26:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zTlwgmGnB1cU3zTn4DEJZ8fbxVPFlHmycQ95U9sMbsg=;
-        b=rJlBKfpc9trObZI3GDcY/hj9Prgsnr2UUSPu7MoZgwW+UYvgO6ojYmpUMa8D9gkR2d
-         jHzqLzqXw+bcrVIjTAwan9UAYz75jpQMkVOfo3FQ9z95iWUi14eG4kf2j9ER1WyNVYMO
-         zzgQrlQUAR5uIaIILYDYe72AhhhG6ofXaZs0DcYUTAO7ixsCO99fTsQ6tZ+txEnNyATH
-         hf433+P2Y7tOINgKoyuQtPeiBm+Oc/B46Y9yxwRpxxct0yjtZ+Kphd26RFxwcqy4svIt
-         zlw43C0FHxtDS1nDrcD2z8bbHKfixzk5hC0ze5g2GiXbqCTnC0Vagtf0X7WKqQvdUMg7
-         HRew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zTlwgmGnB1cU3zTn4DEJZ8fbxVPFlHmycQ95U9sMbsg=;
-        b=lMh8HyY/VhencX81NBFSNYF8oIPmTso2zT403U3Us7LFShOjHhDi+LNsIrY9iVSlVB
-         snB58L5fBbV2YGgSW2OTYvfsCevyGBKXpY46FO0xeocxhXcYFIFBzBAwqtX5KWHoBz6G
-         NzNB9N0hyw4T7KXZ7pcybjoXuoVPNN6kY2vLzY52oUOgAa3KkREsZRPct2fpLCmATJ2L
-         kNU45CLncOlR1B9dKTIeSQe8uqQNmtY3EFbWp6vpURJadsjqH3xX8/nmkT3jzwdbndzS
-         fgLayCYRIMLMFaQiJ2mR56yl6WtcL1hM4B1kAjuw5cTpX6vIXoNny3dy4YpceMcROlfT
-         rMDA==
-X-Gm-Message-State: ANhLgQ09bb7M99WEgKL4mgHBGoLrdiPvV9hAI6gTmy2DuMPLDqBxbp5U
-        yECxt4fU3f+BYYllw/NlEfImFg==
-X-Google-Smtp-Source: ADFU+vtsgO04ADJ14bnAugG3u148qvxQ/2Jo5IgjZHLrY/snL+kMRclGcQ/tPKsaJebS6vvXnAvhqg==
-X-Received: by 2002:a5d:8d90:: with SMTP id b16mr16929726ioj.9.1585679163757;
-        Tue, 31 Mar 2020 11:26:03 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l12sm3656192ils.55.2020.03.31.11.26.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2020 11:26:02 -0700 (PDT)
-Subject: Re: [PATCH 2/2] scsi: core: Fix stall if two threads request budget
- at the same time
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Douglas Anderson <dianders@chromium.org>, jejb@linux.ibm.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        linux-scsi@vger.kernel.org, sqazi@google.com,
-        linux-kernel@vger.kernel.org
-References: <20200330144907.13011-1-dianders@chromium.org>
- <20200330074856.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200331014109.GA20230@ming.t460p>
- <D38AB98D-7F6A-4C61-8A8F-C22C53671AC8@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d6af2344-11f7-5862-daed-e21cbd496d92@kernel.dk>
-Date:   Tue, 31 Mar 2020 12:26:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Tue, 31 Mar 2020 14:43:55 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02VIhPep003003;
+        Tue, 31 Mar 2020 18:43:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ADi5iHr+DiyFeoElDNeP30DVd+kVi1D13wCm7TLp2M0=;
+ b=KnpqFIXds0AUFbe1rkdV1n59kycF8PtCIdI1mfyYqfGPq1wMSsejKYUao2cPbbcDgFog
+ EiDoqcmovPjVMDTUYGSrLryRcHq1ZAxvRVfEYOv/3kSKCWztT2akoGthF+W0DULDiD6A
+ xLWB6fV7o67HTxyemwHSYa6Br2bTP8vVU7lLqMwrkHomoOVjskcgXOeNi0wTH4ULc6Lu
+ hd2eGp62X3da/VLZt4+guyVZSI+H9rDyU6ECc6Zwz+McE/h0HOf6DR2MJmocXVtrxgO0
+ 3fnpJQlyDK249ruHhAsFlgC05Awv7trr34fhCJ+JiaBc1Ue6HWBxL9pKvkH6eZZ2dt36 Iw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 303yun3wyf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Mar 2020 18:43:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02VIh2hX182122;
+        Tue, 31 Mar 2020 18:43:51 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 302gcdcm2f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Mar 2020 18:43:51 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02VIhnMI006243;
+        Tue, 31 Mar 2020 18:43:49 GMT
+Received: from [10.154.118.208] (/10.154.118.208)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 31 Mar 2020 11:43:49 -0700
+Subject: Re: Polled I/O cannot find completions
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <471572cf-700c-ec60-5740-0282930c849e@oracle.com>
+ <4098ab93-980e-7a17-31f7-9eaeb24a2a65@kernel.dk>
+ <34a7c633-c390-1220-3c78-1215bd64819f@oracle.com>
+ <d2f92d20-2eb0-e683-5011-e1c922dfcf71@kernel.dk>
+From:   Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Message-ID: <400a73dc-78de-0de7-79b4-4a4e8bed34ce@oracle.com>
+Date:   Tue, 31 Mar 2020 11:43:46 -0700
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <D38AB98D-7F6A-4C61-8A8F-C22C53671AC8@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <d2f92d20-2eb0-e683-5011-e1c922dfcf71@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Antivirus: Avast (VPS 200330-0, 03/30/2020), Outbound message
+X-Antivirus-Status: Clean
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9577 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=502 adultscore=0 suspectscore=0 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003310156
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9577 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 mlxlogscore=567 bulkscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003310156
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/20 12:07 PM, Paolo Valente wrote:
->> Il giorno 31 mar 2020, alle ore 03:41, Ming Lei <ming.lei@redhat.com> ha scritto:
->>
->> On Mon, Mar 30, 2020 at 07:49:06AM -0700, Douglas Anderson wrote:
->>> It is possible for two threads to be running
->>> blk_mq_do_dispatch_sched() at the same time with the same "hctx".
->>> This is because there can be more than one caller to
->>> __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
->>> prevent more than one thread from entering.
->>>
->>> If more than one thread is running blk_mq_do_dispatch_sched() at the
->>> same time with the same "hctx", they may have contention acquiring
->>> budget.  The blk_mq_get_dispatch_budget() can eventually translate
->>> into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
->>> uncommon) then only one of the two threads will be the one to
->>> increment "device_busy" to 1 and get the budget.
->>>
->>> The losing thread will break out of blk_mq_do_dispatch_sched() and
->>> will stop dispatching requests.  The assumption is that when more
->>> budget is available later (when existing transactions finish) the
->>> queue will be kicked again, perhaps in scsi_end_request().
->>>
->>> The winning thread now has budget and can go on to call
->>> dispatch_request().  If dispatch_request() returns NULL here then we
->>> have a potential problem.  Specifically we'll now call
->>
->> I guess this problem should be BFQ specific. Now there is definitely
->> requests in BFQ queue wrt. this hctx. However, looks this request is
->> only available from another loser thread, and it won't be retrieved in
->> the winning thread via e->type->ops.dispatch_request().
->>
->> Just wondering why BFQ is implemented in this way?
->>
-> 
-> BFQ inherited this powerful non-working scheme from CFQ, some age ago.
-> 
-> In more detail: if BFQ has at least one non-empty internal queue, then
-> is says of course that there is work to do.  But if the currently
-> in-service queue is empty, and is expected to receive new I/O, then
-> BFQ plugs I/O dispatch to enforce service guarantees for the
-> in-service queue, i.e., BFQ responds NULL to a dispatch request.
 
-What BFQ is doing is fine, IFF it always ensures that the queue is run
-at some later time, if it returns "yep I have work" yet returns NULL
-when attempting to retrieve that work. Generally this should happen from
-subsequent IO completion, or whatever else condition will resolve the
-issue that is currently preventing dispatch of that request. Last resort
-would be a timer, but that can happen if you're slicing your scheduling
-somehow.
+>> Does io_uring though have to deal with BLK_QC_T_NONE at all?  Or are you
+>> saying that it should never receive that result?
+>> That's one of the things I'm not clear about.
+> BLK_QC_T_* are block cookies, they are only valid in the block layer.
+> Only the poll handler called should have to deal with them, inside
+> their f_op->iopoll() handler. It's simply passed from the queue to
+> the poll side.
+>
+> So no, io_uring shouldn't have to deal with them at all.
+>
+> The problem, as I see it, is if the block layer returns BLK_QC_T_NONE
+> and the IO was actually queued and requires polling to be found. We'd
+> end up with IO timeouts for handling those requests, and that's not a
+> good thing...
 
-> It would be very easy to change bfq_has_work so that it returns false
-> in case the in-service queue is empty, even if there is I/O
-> backlogged.  My only concern is: since everything has worked with the
-> current scheme for probably 15 years, are we sure that everything is
-> still ok after we change this scheme?
+I see requests in io_do_iopoll() on poll_list with req->res == -EAGAIN, 
+I think because the completion happened after an issued request was 
+added to poll_list in io_iopoll_req_issued().
 
-You're comparing apples to oranges, CFQ never worked within the blk-mq
-scheduling framework.
+How should we deal with such a request, reissue unconditionally or 
+something else?
 
-That said, I don't think such a change is needed. If we currently have a
-hang due to this discrepancy between has_work and gets_work, then it
-sounds like we're not always re-running the queue as we should. From the
-original patch, the budget putting is not something the scheduler is
-involved with. Do we just need to ensure that if we put budget without
-having dispatched a request, we need to kick off dispatching again?
-
-
--- 
-Jens Axboe
-
+--bijan
