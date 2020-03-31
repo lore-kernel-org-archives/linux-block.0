@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7979FC43331
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 09:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21179C43331
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 09:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B7482072E
-	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 09:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00B3220B1F
+	for <linux-block@archiver.kernel.org>; Tue, 31 Mar 2020 09:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730556AbgCaJl7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 05:41:59 -0400
-Received: from wtarreau.pck.nerim.net ([62.212.114.60]:34116 "EHLO 1wt.eu"
+        id S1730573AbgCaJmB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 05:42:01 -0400
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:34117 "EHLO 1wt.eu"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730375AbgCaJl7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 05:41:59 -0400
+        id S1730527AbgCaJmA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Mar 2020 05:42:00 -0400
 Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 02V9f4dp024511;
-        Tue, 31 Mar 2020 11:41:04 +0200
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 02V9f6U4024523;
+        Tue, 31 Mar 2020 11:41:06 +0200
 From:   Willy Tarreau <w@1wt.eu>
 To:     Denis Efremov <efremov@linux.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>,
-        Helge Deller <deller@gmx.de>
-Subject: [PATCH 04/23] floppy: use symbolic register names in the parisc port
-Date:   Tue, 31 Mar 2020 11:40:35 +0200
-Message-Id: <20200331094054.24441-5-w@1wt.eu>
+        linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+Subject: [PATCH 16/23] floppy: cleanup: make perpendicular_mode() not rely on current_fdc anymore
+Date:   Tue, 31 Mar 2020 11:40:47 +0200
+Message-Id: <20200331094054.24441-17-w@1wt.eu>
 X-Mailer: git-send-email 2.9.0
 In-Reply-To: <20200331094054.24441-1-w@1wt.eu>
 References: <20200331094054.24441-1-w@1wt.eu>
@@ -37,55 +37,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now we can use FD_STATUS and FD_DATA instead of 4 or 5, let's do
-this, and also use STATUS_DMA and STATUS_READY for the status bits.
+Now the fdc is passed in argument so that the function does not
+use current_fdc anymore.
 
-Cc: Helge Deller <deller@gmx.de>
+It's worth noting that there's still a single raw_cmd pointer
+specific to the current fdc. It may make sense to have one per
+fdc in the future. In addition, cont->done() still relies on the
+current drive and current raw_cmd.
+
 Signed-off-by: Willy Tarreau <w@1wt.eu>
 ---
- arch/parisc/include/asm/floppy.h | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ drivers/block/floppy.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/parisc/include/asm/floppy.h b/arch/parisc/include/asm/floppy.h
-index 1aebc23b7744..762cfe7778c0 100644
---- a/arch/parisc/include/asm/floppy.h
-+++ b/arch/parisc/include/asm/floppy.h
-@@ -75,27 +75,28 @@ static void floppy_hardint(int irq, void *dev_id, struct pt_regs * regs)
- 		register char *lptr = virtual_dma_addr;
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index aa2d840bf06b..fcccbb4c143e 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -1200,7 +1200,7 @@ static int need_more_output(int fdc)
+ /* Set perpendicular mode as required, based on data rate, if supported.
+  * 82077 Now tested. 1Mbps data rate only possible with 82077-1.
+  */
+-static void perpendicular_mode(void)
++static void perpendicular_mode(int fdc)
+ {
+ 	unsigned char perp_mode;
  
- 		for (lcount = virtual_dma_count; lcount; lcount--) {
--			st = fd_inb(virtual_dma_port, 4) & 0xa0;
--			if (st != 0xa0) 
-+			st = fd_inb(virtual_dma_port, FD_STATUS);
-+			st &= STATUS_DMA | STATUS_READY;
-+			if (st != (STATUS_DMA | STATUS_READY))
- 				break;
- 			if (virtual_dma_mode) {
--				fd_outb(*lptr, virtual_dma_port, 5);
-+				fd_outb(*lptr, virtual_dma_port, FD_DATA);
- 			} else {
--				*lptr = fd_inb(virtual_dma_port, 5);
-+				*lptr = fd_inb(virtual_dma_port, FD_DATA);
- 			}
- 			lptr++;
- 		}
- 		virtual_dma_count = lcount;
- 		virtual_dma_addr = lptr;
--		st = fd_inb(virtual_dma_port, 4);
-+		st = fd_inb(virtual_dma_port, FD_STATUS);
- 	}
+@@ -1215,7 +1215,7 @@ static void perpendicular_mode(void)
+ 		default:
+ 			DPRINT("Invalid data rate for perpendicular mode!\n");
+ 			cont->done(0);
+-			fdc_state[current_fdc].reset = 1;
++			fdc_state[fdc].reset = 1;
+ 					/*
+ 					 * convenient way to return to
+ 					 * redo without too much hassle
+@@ -1226,12 +1226,12 @@ static void perpendicular_mode(void)
+ 	} else
+ 		perp_mode = 0;
  
- #ifdef TRACE_FLPY_INT
- 	calls++;
- #endif
--	if (st == 0x20)
-+	if (st == STATUS_DMA)
+-	if (fdc_state[current_fdc].perp_mode == perp_mode)
++	if (fdc_state[fdc].perp_mode == perp_mode)
  		return;
--	if (!(st & 0x20)) {
-+	if (!(st & STATUS_DMA)) {
- 		virtual_dma_residue += virtual_dma_count;
- 		virtual_dma_count = 0;
- #ifdef TRACE_FLPY_INT
+-	if (fdc_state[current_fdc].version >= FDC_82077_ORIG) {
+-		output_byte(current_fdc, FD_PERPENDICULAR);
+-		output_byte(current_fdc, perp_mode);
+-		fdc_state[current_fdc].perp_mode = perp_mode;
++	if (fdc_state[fdc].version >= FDC_82077_ORIG) {
++		output_byte(fdc, FD_PERPENDICULAR);
++		output_byte(fdc, perp_mode);
++		fdc_state[fdc].perp_mode = perp_mode;
+ 	} else if (perp_mode) {
+ 		DPRINT("perpendicular mode not supported by this FDC.\n");
+ 	}
+@@ -1946,7 +1946,7 @@ static void floppy_ready(void)
+ #endif
+ 
+ 	if (raw_cmd->flags & (FD_RAW_NEED_SEEK | FD_RAW_NEED_DISK)) {
+-		perpendicular_mode();
++		perpendicular_mode(current_fdc);
+ 		fdc_specify();	/* must be done here because of hut, hlt ... */
+ 		seek_floppy();
+ 	} else {
 -- 
 2.20.1
 
