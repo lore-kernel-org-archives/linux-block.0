@@ -2,210 +2,188 @@ Return-Path: <SRS0=ADX+=5R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32055C2D0F1
-	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 01:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9FAC43331
+	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 01:23:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0A80206CC
-	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 01:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8453020BED
+	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 01:23:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sTbjAvAj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hy3d+uVW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731470AbgDABVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 Mar 2020 21:21:37 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46185 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731509AbgDABVh (ORCPT
+        id S1731683AbgDABXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 Mar 2020 21:23:02 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:36720 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731509AbgDABXC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Mar 2020 21:21:37 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q3so11222532pff.13
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2020 18:21:34 -0700 (PDT)
+        Tue, 31 Mar 2020 21:23:02 -0400
+Received: by mail-io1-f66.google.com with SMTP id n10so9847470iom.3;
+        Tue, 31 Mar 2020 18:23:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HScuquiREHE4S8rWy0Ix4F53byaCqgwH2GZ46SK14GQ=;
-        b=sTbjAvAjgf6dW3sc+cIevkOeVoaL96dT0IgLNTFWsFSIZ6HpyOjas1THhMmtyLFtaO
-         OXAfIyKEnys0ftuPAwd6enwHru6PnnOO0+FV7HKmQhXd8YhH73OisxNFvueIWCe2f8AG
-         Yg+oCZjxxdIMEo09kMY1Sbwa0BSY2oSDYUDIsk6KpzcAKJCgvo6VCjpoUh75BGXpUhkv
-         kclRl4ccx86g8/5hGYSQlFVvT/ByGyNWTMEQtmSy5AL/ixO4J3eaBXqk58aQ4U+/OKD6
-         U2BkxgXhab0ZFLFJ+z6wivDIxElF6jam7of49pOuGQmhuvpPvzxiPtOuvAa1LEyHGyZu
-         pa4w==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Z2QHlAG4R2a3GsBY1Sh9yeXpBxrWZUKwyn4p8dfZUCs=;
+        b=hy3d+uVWn9fBJjcef03m/QD3vQIZruQ5Af9+40C1Mcybj3hYYW6OtnmNQ6K0Hv1aAf
+         F3+do+pXWHYNusCQv7vpnxT3natkYX6QxYaCc7zJu1EC1skVIIx90eEQlw/t2z/kMYjR
+         HYRxlMlJNZwltiYoW/WwlzDoxi9elcsxQFbXCM+II/ON9tahA72/PLhZ0w3w03oWYLKx
+         +Zzj/SzRSANY0Kh1WciHZiZxfrHZNUhubzoE6IqAugYnttlQXeT0p6Q9SQ04z9EUDMEf
+         DB6CmvhhLRnG1gK2nUHGV/iZdOVvVgDJY4BVON6sTQ5dQbxVnix+1S1cJmZj8qJApNiv
+         gexA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HScuquiREHE4S8rWy0Ix4F53byaCqgwH2GZ46SK14GQ=;
-        b=NxQEnbBUpaPHSWEF1sYgrdLSqEmjkY0J+EJukjLXJqapAHL7+5FZlo3XO9B5epd8Nu
-         4YZ4AoWCssXuCO8/8zj1A7WT4pwIWzjjn8wW30pTaHZn/BfTZxr0bZLmASMMJ8RZxjTd
-         v9orNj7azZDhhMbUTJmJfrTzYJWRYe2JsjntU2hJY5duyHpXVhqu4bJbs9SaoR7eTLt5
-         gARaNvJCm8xiyOQ+oNeNpA6lWIDE4W93drw7lkfUV0KM3cvYmmgOj7gx7Dd9olw1QESS
-         JqusWV4F/MuDgePImOL4/ebEdZPda3HygkzpRUkMQmU7n0O2DhqYsq9QHaszr0OPf/yg
-         2TFQ==
-X-Gm-Message-State: ANhLgQ1o+QcuGuZYCrk2ixVEd+1LLbQb4JFrYPRZqw5D7mIQwUamcQjp
-        Fc9JQ7xAZG1J8wHpyFLqM/8L/w==
-X-Google-Smtp-Source: ADFU+vtkac8oluJOp2a7ANV9LlS6fPh7HbBbMT7hmDVkafTbFdRJQaku/ziQ7Qg1x2DVsC2KFEiCUQ==
-X-Received: by 2002:a63:f258:: with SMTP id d24mr20949669pgk.307.1585704093805;
-        Tue, 31 Mar 2020 18:21:33 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id m68sm283813pjb.0.2020.03.31.18.21.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2020 18:21:32 -0700 (PDT)
-Subject: Re: [PATCH 2/2] scsi: core: Fix stall if two threads request budget
- at the same time
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        linux-scsi@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200330144907.13011-1-dianders@chromium.org>
- <20200330074856.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200331014109.GA20230@ming.t460p>
- <D38AB98D-7F6A-4C61-8A8F-C22C53671AC8@linaro.org>
- <d6af2344-11f7-5862-daed-e21cbd496d92@kernel.dk>
- <CAD=FV=WHYFDoUKLnwMCm-o=gEQDCzZFeMAvia3wpJzm9XX7Bow@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <02968c1d-bd3a-af9c-77e7-23a9d9aa9af4@kernel.dk>
-Date:   Tue, 31 Mar 2020 19:21:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Z2QHlAG4R2a3GsBY1Sh9yeXpBxrWZUKwyn4p8dfZUCs=;
+        b=bKgF7EJg5wGcKxxDGrDK6vs/mR9w1oSAQ0Dqg/tORd8XExbAAnIqpVJ0bAYyEDc7lM
+         TywgKeGOMPJrrlhH4MJSeSCHWPbqUq0GNfgJ1cM36kEapimqaGVAGli2RBHDlLGLvZO+
+         8V3x8jZ25Iq62bi/PRVZK29ZOYsIMxOeE2ka7xiUcBAe7wJkzoXfRJmp1SWch/NMTidl
+         TpB32WMXIM3Lt02aF37CKSG3gKHZctkmSXu5GWeCDLObVH4fTUAe25MDNvimJCd0mj8z
+         HnzcFOWFZC9rfBkGH4MfgEu2N+nNmPveQZebt38DTh7c582NbOnZBEX++jzHJDZBiiHG
+         KckA==
+X-Gm-Message-State: ANhLgQ32DGwQrYAw1rnLgB6Ugx0+bDGPUIBb8sAasBL/64TAJyNIrIdm
+        nwfvLxa9d2Xts+1Kmw46MJNcmfVtSlRYVmat20w=
+X-Google-Smtp-Source: ADFU+vua/Mghg3wP2uz1d4+N70EOBTxAQsg9C+j/cD+lu2bR+th4xx/nLCk8XZ+P+5+zM8C5J7zXhb5i/jj3kAVC0OI=
+X-Received: by 2002:a6b:7903:: with SMTP id i3mr9107365iop.66.1585704181384;
+ Tue, 31 Mar 2020 18:23:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAD=FV=WHYFDoUKLnwMCm-o=gEQDCzZFeMAvia3wpJzm9XX7Bow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1585221127-11458-1-git-send-email-laoar.shao@gmail.com>
+ <20200326143102.GB342070@cmpxchg.org> <CALOAHbCe9msQ+7uON=7iXnud-hzDcrnz_2er4PMQRXtNLM2BSQ@mail.gmail.com>
+ <20200331151103.GB2089@cmpxchg.org>
+In-Reply-To: <20200331151103.GB2089@cmpxchg.org>
+From:   Yafang Shao <laoar.shao@gmail.com>
+Date:   Wed, 1 Apr 2020 09:22:24 +0800
+Message-ID: <CALOAHbAG=ehtwveu8DkQLkdeQEu7U3XA+LK4p_A7URQ0bW68=Q@mail.gmail.com>
+Subject: Re: [PATCH 0/2] psi: enhance psi with the help of ebpf
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        mgorman@suse.de, Steven Rostedt <rostedt@goodmis.org>,
+        mingo@redhat.com, Linux MM <linux-mm@kvack.org>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/20 5:51 PM, Doug Anderson wrote:
-> Hi,
-> 
-> On Tue, Mar 31, 2020 at 11:26 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 3/31/20 12:07 PM, Paolo Valente wrote:
->>>> Il giorno 31 mar 2020, alle ore 03:41, Ming Lei <ming.lei@redhat.com> ha scritto:
->>>>
->>>> On Mon, Mar 30, 2020 at 07:49:06AM -0700, Douglas Anderson wrote:
->>>>> It is possible for two threads to be running
->>>>> blk_mq_do_dispatch_sched() at the same time with the same "hctx".
->>>>> This is because there can be more than one caller to
->>>>> __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
->>>>> prevent more than one thread from entering.
->>>>>
->>>>> If more than one thread is running blk_mq_do_dispatch_sched() at the
->>>>> same time with the same "hctx", they may have contention acquiring
->>>>> budget.  The blk_mq_get_dispatch_budget() can eventually translate
->>>>> into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
->>>>> uncommon) then only one of the two threads will be the one to
->>>>> increment "device_busy" to 1 and get the budget.
->>>>>
->>>>> The losing thread will break out of blk_mq_do_dispatch_sched() and
->>>>> will stop dispatching requests.  The assumption is that when more
->>>>> budget is available later (when existing transactions finish) the
->>>>> queue will be kicked again, perhaps in scsi_end_request().
->>>>>
->>>>> The winning thread now has budget and can go on to call
->>>>> dispatch_request().  If dispatch_request() returns NULL here then we
->>>>> have a potential problem.  Specifically we'll now call
->>>>
->>>> I guess this problem should be BFQ specific. Now there is definitely
->>>> requests in BFQ queue wrt. this hctx. However, looks this request is
->>>> only available from another loser thread, and it won't be retrieved in
->>>> the winning thread via e->type->ops.dispatch_request().
->>>>
->>>> Just wondering why BFQ is implemented in this way?
->>>>
->>>
->>> BFQ inherited this powerful non-working scheme from CFQ, some age ago.
->>>
->>> In more detail: if BFQ has at least one non-empty internal queue, then
->>> is says of course that there is work to do.  But if the currently
->>> in-service queue is empty, and is expected to receive new I/O, then
->>> BFQ plugs I/O dispatch to enforce service guarantees for the
->>> in-service queue, i.e., BFQ responds NULL to a dispatch request.
->>
->> What BFQ is doing is fine, IFF it always ensures that the queue is run
->> at some later time, if it returns "yep I have work" yet returns NULL
->> when attempting to retrieve that work. Generally this should happen from
->> subsequent IO completion, or whatever else condition will resolve the
->> issue that is currently preventing dispatch of that request. Last resort
->> would be a timer, but that can happen if you're slicing your scheduling
->> somehow.
-> 
-> I've been poking more at this today trying to understand why the idle
-> timer that Paolo says is in BFQ isn't doing what it should be doing.
-> I've been continuing to put most of my stream-of-consciousness at
-> <https://crbug.com/1061950> to avoid so much spamming of this thread.
-> In the trace I looked at most recently it looks like BFQ does try to
-> ensure that the queue is run at a later time, but at least in this
-> trace the later time is not late enough.  Specifically the quick
-> summary of my recent trace:
-> 
-> 28977309us - PID 2167 got the budget.
-> 28977518us - BFQ told PID 2167 that there was nothing to dispatch.
-> 28977702us - BFQ idle timer fires.
-> 28977725us - We start to try to dispatch as a result of BFQ's idle timer.
-> 28977732us - Dispatching that was a result of BFQ's idle timer can't get
->              budget and thus does nothing.
-> 28977780us - PID 2167 put the budget and exits since there was nothing
->              to dispatch.
-> 
-> This is only one particular trace, but in this case BFQ did attempt to
-> rerun the queue after it returned NULL, but that ran almost
-> immediately after it returned NULL and thus ran into the race.  :(
+On Tue, Mar 31, 2020 at 11:11 PM Johannes Weiner <hannes@cmpxchg.org> wrote:
+>
+> On Fri, Mar 27, 2020 at 09:17:59AM +0800, Yafang Shao wrote:
+> > On Thu, Mar 26, 2020 at 10:31 PM Johannes Weiner <hannes@cmpxchg.org> wrote:
+> > >
+> > > On Thu, Mar 26, 2020 at 07:12:05AM -0400, Yafang Shao wrote:
+> > > > PSI gives us a powerful way to anaylze memory pressure issue, but we can
+> > > > make it more powerful with the help of tracepoint, kprobe, ebpf and etc.
+> > > > Especially with ebpf we can flexiblely get more details of the memory
+> > > > pressure.
+> > > >
+> > > > In orderc to achieve this goal, a new parameter is added into
+> > > > psi_memstall_{enter, leave}, which indicates the specific type of a
+> > > > memstall. There're totally ten memstalls by now,
+> > > >         MEMSTALL_KSWAPD
+> > > >         MEMSTALL_RECLAIM_DIRECT
+> > > >         MEMSTALL_RECLAIM_MEMCG
+> > > >         MEMSTALL_RECLAIM_HIGH
+> > > >         MEMSTALL_KCOMPACTD
+> > > >         MEMSTALL_COMPACT
+> > > >         MEMSTALL_WORKINGSET_REFAULT
+> > > >         MEMSTALL_WORKINGSET_THRASHING
+> > > >         MEMSTALL_MEMDELAY
+> > > >         MEMSTALL_SWAPIO
+> > >
+> > > What does this provide over the events tracked in /proc/vmstats?
+> > >
+> >
+> > /proc/vmstat only tells us which events occured, but it can't tell us
+> > how long these events take.
+> > Sometimes we really want to know how long the event takes and PSI can
+> > provide us the data
+> > For example, in the past days when I did performance tuning for a
+> > database service, I monitored that the latency spike is related with
+> > the workingset_refault counter in /proc/vmstat, and at that time I
+> > really want to know the spread of latencies caused by
+> > workingset_refault, but there's no easy way to get it. Now with newly
+> > added MEMSTALL_WORKINGSET_REFAULT, I can get the latencies caused by
+> > workingset refault.
+>
+> Okay, but how do you use that information in practice?
+>
 
-OK, and then it doesn't trigger again? It's key that it keeps doing this
-timeout and re-dispatch if it fails, not just once.
+With the newly added facility,  we can know when these events occur
+and how long each event takes.
+Then we can use these datas to generate a Latency Heat Map[1] and to
+compare whether these latencies match with the application latencies
+recoreded in its log - for example the slow query log in mysql. If the
+refault latencies match with the slow query log, then these slow
+queries are caused by these workingset refault.  If the refault
+latencies don't match with slow query log, IOW much smaller than the
+slow query log, then  the slow query log isn't caused by the
+workingset refault.
 
-But BFQ really should be smarter here. It's the same caller etc that
-asks whether it has work and whether it can dispatch, yet the answer is
-different. That's just kind of silly, and it'd make more sense if BFQ
-actually implemented the ->has_work() as a "would I actually dispatch
-for this guy, now".
+High rate of refaults may not cause high pressure, if the backing
+device is fast enough. While the latencies of refaults give us a
+direct relationship with memory pressure.
 
->>> It would be very easy to change bfq_has_work so that it returns false
->>> in case the in-service queue is empty, even if there is I/O
->>> backlogged.  My only concern is: since everything has worked with the
->>> current scheme for probably 15 years, are we sure that everything is
->>> still ok after we change this scheme?
->>
->> You're comparing apples to oranges, CFQ never worked within the blk-mq
->> scheduling framework.
->>
->> That said, I don't think such a change is needed. If we currently have a
->> hang due to this discrepancy between has_work and gets_work, then it
->> sounds like we're not always re-running the queue as we should. From the
->> original patch, the budget putting is not something the scheduler is
->> involved with. Do we just need to ensure that if we put budget without
->> having dispatched a request, we need to kick off dispatching again?
-> 
-> By this you mean a change like this in blk_mq_do_dispatch_sched()?
-> 
->   if (!rq) {
->     blk_mq_put_dispatch_budget(hctx);
-> +    ret = true;
->     break;
->   }
-> 
-> I'm pretty sure that would fix the problems and I'd be happy to test,
-> but it feels like a heavy hammer.  IIUC we're essentially going to go
-> into a polling loop and keep calling has_work() and dispatch_request()
-> over and over again until has_work() returns false or we manage to
-> dispatch something...
+[1]. http://www.brendangregg.com/HeatMaps/latency.html
 
-We obviously have to be careful not to introduce a busy-loop, where we
-just keep scheduling dispatch, only to fail.
+> > > Can you elaborate a bit how you are using this information? It's not
+> > > quite clear to me from the example in patch #2.
+> > >
+> >
+> > From the traced data in patch #2, we can find that the high latencies
+> > of user tasks are always type 7 of memstall , which is
+> > MEMSTALL_WORKINGSET_THRASHING,  and then we should look into the
+> > details of wokingset of the user tasks and think about how to improve
+> > it - for example, by reducing the workingset.
+>
+> That's an analyses we run frequently as well: we see high pressure,
+> and then correlate it with the events.
+>
+> High rate of refaults? The workingset is too big.
+>
+> High rate of compaction work? Somebody is asking for higher order
+> pages under load; check THP events next.
+>
+> etc.
+>
+> This works fairly reliably. I'm curious what the extra per-event
+> latency breakdown would add and where it would be helpful.
+>
+> I'm not really opposed to your patches it if it is, I just don't see
+> the usecase right now.
+>
 
--- 
-Jens Axboe
+As I explained above, the rate of these events can't give us a full
+view of the memory pressure. High memory pressure may not caused by
+high rate of vmstat events, while it can be caused by low rate of
+events but with high latencies.  Latencies are the application really
+concerns, that's why PSI is very useful for us.
 
+Furthermore, there're some events are not recored in vmstat. e.g.
+
+typf of memstall                                           vmstat event
+
+MEMSTALL_KSWAPD                                pageoutrun, {pgscan,
+pgsteal}_kswapd
+MEMSTALL_RECLAIM_DIRECT                {pgscan,steal}_direct
+MEMSTALL_RECLAIM_MEMCG                /* no event */
+MEMSTALL_RECLAIM_HIGH                     /* no event */
+MEMSTALL_KCOMPACTD                         compact_daemon_wake
+MEMSTALL_COMPACT                              compact_{stall, fail, success}
+MEMSTALL_WORKINGSET_REFAULT     workingset_refault
+MEMSTALL_WORKINGSET_THRASH      /* no event */
+MEMSTALL_MEMDELAY                           /* no event */
+MEMSTALL_SWAPIO                                 pswpin
+
+After we add these types of memstall, we don't need to add these
+missed events one by one.
+
+Thanks
+Yafang
