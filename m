@@ -2,146 +2,89 @@ Return-Path: <SRS0=ADX+=5R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F436C43331
-	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 16:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EA6C43331
+	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 19:11:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D84A32063A
-	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 16:58:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBwUszcg"
+	by mail.kernel.org (Postfix) with ESMTP id A61F320719
+	for <linux-block@archiver.kernel.org>; Wed,  1 Apr 2020 19:11:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732619AbgDAQ6L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Apr 2020 12:58:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46879 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732304AbgDAQ6L (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Apr 2020 12:58:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1585760290;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=DV6eq2ea7jGh9ZXDOxj9KRuvur5PVyRGKVBx/V1xwX8=;
-        b=VBwUszcggPtuzgHLtJ0/+btmgJuotX5BLOqf+ORH0jUZvfZWEVaFVaRs3X2WGRsVhflOIw
-        5ChEYsW8sv7XFXOmNEIKQnhCE63TEQQPkhx16FiX5D4x6/HMViZKUXKwQbv4Oi1ZeP3AuF
-        +nKpZDQIe7gsvi9VNenkCKygxTG8AlU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-wXdA5X9sMYaLNpn1XKVilw-1; Wed, 01 Apr 2020 12:58:06 -0400
-X-MC-Unique: wXdA5X9sMYaLNpn1XKVilw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C2CF61259;
-        Wed,  1 Apr 2020 16:57:58 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 96A035D9CA;
-        Wed,  1 Apr 2020 16:57:55 +0000 (UTC)
-Date:   Wed, 1 Apr 2020 12:57:54 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bob Liu <bob.liu@oracle.com>, Erich Eckner <git@eckner.net>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>,
-        Harshini X Shetty <Harshini.X.Shetty@sony.com>,
-        Yang Yingliang <yangyingliang@huawei.com>
-Subject: [git pull] device mapper changes for 5.7
-Message-ID: <20200401165628.GA22107@redhat.com>
+        id S1732148AbgDATLN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Apr 2020 15:11:13 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:38629 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727287AbgDATLN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Apr 2020 15:11:13 -0400
+Received: by mail-pj1-f67.google.com with SMTP id m15so462225pje.3
+        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2020 12:11:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9ekGkD2IlLQBhkQzaSBHBTkrc7NdLrPJO/D7tB34FXs=;
+        b=qQFVTGEKIjOIC8VWVMPsDTnaMUFJGOpSrJ954KPKSRtdWEZrrC3JSOKslgMvN+0ap/
+         3WYlHudOEI0/dymYSv4AJixQhvjZT9j8HG6cS9ImnG/xbn7vN8ROQy61SwlzDwE4nWb9
+         gKVzhyaOMtzOhuiCNx4oeyv2sE1ZVspDGSLLOljy9XwAABhZR38mYeEfj9xrhEcVpkVU
+         UrUZIvuKvxVVryLRtqgJ5rhuN8Wa/c1jmYDHImIlnUs7VhiMt1H76pRLXXhCJ9eLFXDC
+         W5ZbIwTwbc3PGRdL5f3yDDdJ0DkV/ozzNfGt8CHbbHpSSZ+75T4vQQ4LBqMSduiOfmpi
+         rHCA==
+X-Gm-Message-State: AGi0PuYVfT0iPUB8drB8W2ZhUdbu8+kHf/sVUBDE4QVGMIl9fVLTTS9Q
+        1sFyqfkkb+QTxwlGjuzaJma/6CGE
+X-Google-Smtp-Source: APiQypJFHGU29tvohQudGh4GCyv/2BvNJT90yAH5ccNA203n7VNqQTA251XzdLQ1XASA3Ycl6T3m8A==
+X-Received: by 2002:a17:90b:8c:: with SMTP id bb12mr6408096pjb.59.1585768272007;
+        Wed, 01 Apr 2020 12:11:12 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:a836:db4c:a7ac:3d7c? ([2601:647:4802:9070:a836:db4c:a7ac:3d7c])
+        by smtp.gmail.com with ESMTPSA id r186sm2119474pfc.181.2020.04.01.12.11.10
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 01 Apr 2020 12:11:10 -0700 (PDT)
+Subject: Re: [PATCH v2] nvme: inherit stable pages constraint in the mpath
+ stack device
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20200401060625.10293-1-sagi@grimberg.me>
+ <20200401090542.GB31980@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <469eb075-2a6f-3386-f843-90525590fcba@grimberg.me>
+Date:   Wed, 1 Apr 2020 12:11:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Firefox/60.0 Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200401090542.GB31980@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
 
-The following changes since commit fb33c6510d5595144d585aa194d377cf74d31911:
+>> @@ -1907,6 +1907,13 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+>>   	if (ns->head->disk) {
+>>   		nvme_update_disk_info(ns->head->disk, ns, id);
+>>   		blk_queue_stack_limits(ns->head->disk->queue, ns->queue);
+>> +		if (bdi_cap_stable_pages_required(ns->queue->backing_dev_info)) {
+>> +			struct backing_dev_info *info =
+>> +				ns->head->disk->queue->backing_dev_info;
+>> +
+>> +                        info->capabilities |= BDI_CAP_STABLE_WRITES;
+>> +		}
+> 
+> I think this needs to go into blk_queue_stack_limits instead, otherwise
+> we have the same problem with other stacking drivers.
 
-  Linux 5.6-rc6 (2020-03-15 15:01:23 -0700)
+I thought about this, but the stack_limits has different variants 
+(blk_stack_limits, bdev_stack_limits) but only the first takes a
+request_queue...
 
-are available in the Git repository at:
+I see that dm-table does roughly the same thing, drbd ignores it.
+In general, dm is doing a whole bunch of stacking limits/capabilities
+related stuff that are not involved in blk_stack_limits...
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.7/dm-changes
-
-for you to fetch changes up to 81d5553d1288c2ec0390f02f84d71ca0f0f9f137:
-
-  dm clone metadata: Fix return type of dm_clone_nr_of_hydrated_regions() (2020-03-27 14:42:51 -0400)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Add DM writecache "cleaner" policy feature that allows cache to be
-  flushed while userspace monitors for completion to then discommision
-  use of caching.
-
-- Optimize DM writecache superblock writing and also yield CPU while
-  initializing writecache on large PMEM devices to avoid CPU stalls.
-
-- Various fixes to DM integrity target while preparing for the
-  ability to resize a DM integrity device.  In addition to resize
-  support, add optional discard support with the "allow_discards"
-  feature.
-
-- Fix DM clone target's discard handling and overflow bugs which could
-  cause data corruption.
-
-- Fix memory leak in destructor for DM verity FEC support.
-
-- Fix DM zoned target's redundant increment of nr_rnd_zones.
-
-- Small cleanup in DM crypt to use crypt_integrity_aead() helper.
-
-----------------------------------------------------------------
-Bob Liu (1):
-      dm zoned: remove duplicate nr_rnd_zones increase in dmz_init_zone()
-
-Erich Eckner (1):
-      dm integrity: print device name in integrity_metadata() error message
-
-Mikulas Patocka (12):
-      dm writecache: do direct write if the cache is full
-      dm writecache: implement the "cleaner" policy
-      dm writecache: implement gradual cleanup
-      dm writecache: optimize superblock write
-      dm integrity: fix a crash with unusually large tag size
-      dm integrity: remove sector type casts
-      dm integrity: don't replay journal data past the end of the device
-      dm integrity: factor out get_provided_data_sectors()
-      dm integrity: allow resize of the integrity device
-      dm integrity: add optional discard support
-      dm integrity: improve discard in journal mode
-      dm writecache: add cond_resched to avoid CPU hangs
-
-Nikos Tsironis (4):
-      dm clone: Fix handling of partial region discards
-      dm clone: Add overflow check for number of regions
-      dm clone: Add missing casts to prevent overflows and data corruption
-      dm clone metadata: Fix return type of dm_clone_nr_of_hydrated_regions()
-
-Shetty, Harshini X (EXT-Sony Mobile) (1):
-      dm verity fec: fix memory leak in verity_fec_dtr
-
-Yang Yingliang (1):
-      dm crypt: use crypt_integrity_aead() helper
-
- drivers/md/dm-clone-metadata.c |  15 +-
- drivers/md/dm-clone-metadata.h |   2 +-
- drivers/md/dm-clone-target.c   |  66 ++++++---
- drivers/md/dm-crypt.c          |   6 +-
- drivers/md/dm-integrity.c      | 304 +++++++++++++++++++++++++++++++----------
- drivers/md/dm-verity-fec.c     |   1 +
- drivers/md/dm-writecache.c     | 138 +++++++++++++++++--
- drivers/md/dm-zoned-metadata.c |   1 -
- 8 files changed, 431 insertions(+), 102 deletions(-)
-
+I could theoretically add a flag to queue_limits to mirror this, is
+that what you are suggesting?
