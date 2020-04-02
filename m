@@ -2,65 +2,71 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5886CC2BA12
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38196C2BA14
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 274A02077D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0256C207FF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585785620;
-	bh=iFxKvfRoJl6Mk94Jrpc9orJrLvXwbeiPGYeaSg0hP5Q=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=HnDP4/iurVVuH0wCPmPQob5NMoxMVAaS2knzEW07mBLDSivxXHbqTnLcFpAguBmhF
-	 Pi3HujtukSJ29WCxO+F9y+ZSaziW50RJ3Ecr6UM0ivv2P5h+IdasbGyGWpLrmLI1kN
-	 aCIkXxLjpod80z7DwCqoNzk19Lc3bHgfUYNg3kGg=
+	s=default; t=1585785621;
+	bh=8fR77l9xfbt6qWg1vV/ZZYimPLZEkMBq+8PO1jeeOiI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=sazI36782D85WVct5N7bFUhJotp/0K6HiUHlUvCY6d+Zr2inKFX85v83Z2S4k7yNo
+	 oaLmmyfu88TyYaGhptyfHLX0rtamVeoX0EZ3HtsqAtTcetq0vztRnGq4DmRg9RPh8E
+	 DR8u4D8YwOBKq6hnzlQxc/J6+3hIFIoGE+uC7Qfs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733291AbgDBAAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Apr 2020 20:00:15 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:39374 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733287AbgDBAAP (ORCPT
+        id S2387447AbgDBAAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Apr 2020 20:00:20 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:43419 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732560AbgDBAAP (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Apr 2020 20:00:15 -0400
-Received: by mail-pj1-f68.google.com with SMTP id z3so767812pjr.4;
-        Wed, 01 Apr 2020 17:00:14 -0700 (PDT)
+Received: by mail-pl1-f194.google.com with SMTP id v23so624225ply.10;
+        Wed, 01 Apr 2020 17:00:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=w+waUt4y2u1TasC9CABKLSfdzELViZORJkYCPcxWv6M=;
-        b=ej3LnOrYDOrRWYN6TKpdtX+/Dq+4mU5e6hZi0eunaCl/vB763WNsB4Bu+/cyCelTax
-         edgTOXJDn5Ke4GIER6o5U1xZVFtz3NwI9VQ//xdxiudPzGcenYocd3bON8qJsnAYK7s7
-         OJXt8m7wQuoc7qSafNkThe/LhVRuXTV0gl33kkcqHddWcGOzEZv8MQ6vtd2O0mMo7El7
-         3FkpvgB0pgGShAjDNK2gFpPkwYC0aNrNYmkB7vPekrmlFOpzoNwy4xld74fjj7hoHgcS
-         Kw8YtNfF9/cPo4LPgyL7QKAXz7QuUnwGKY0x3jn2t4sF0QJWO/kr1/J7Nh7LULfPLgKj
-         8pgg==
-X-Gm-Message-State: AGi0PuY59gEpYwM/cGmzz31kmiAAFSmiMclJhEETgmTjV8ilSoZThqKH
-        17WaDMWz/t1tWeDzeiAbv3GSxTte4SA=
-X-Google-Smtp-Source: APiQypIwnylEuaIJuJLNziJlvP3IeVk11ni6vNFos9tjKBVX1i0Hvbdh/7hbCeL6EDwv9wdD48HMZw==
-X-Received: by 2002:a17:902:b692:: with SMTP id c18mr384318pls.7.1585785613452;
-        Wed, 01 Apr 2020 17:00:13 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Vm+IPYywOxBkwyr7TKQH9BbZsRaS9vSqfzACF8qBlbo=;
+        b=e1rLc8B8aJKzxPYn8uOzZ6D0p0nnn5Ii+IEh8aonCLNkHZcvLtidcer+LxxMjduCQw
+         RXNLolG3HXSOcPtRMtGo/QzvI5GhtBSm7uHVWCXBmygZ4YNYL2ImK++lApPu6VPP+QgQ
+         9t9FZOVhvQJPGhp3IdiY2nq5EqWG9l0gSSsfxo2Z00fsqCfkyBz5vZK99rnJt8ZIga8t
+         J2Xzl96bMejZnnr3HCbzhjBEf1W3HLQS3Jb2ufoS5saU89cOLRTjRb2Q/JgoY/Uv6Hs2
+         3If6d63MfxEqNdUpZ6U2QT3kvmnVGR/Fucw8U+FzK5KabzA1KBQE1+pw7KV8OsgC4Xy/
+         uZbQ==
+X-Gm-Message-State: AGi0PuYl08aelrDL+y1pFZ7KOjHywDznQo0/efCrQXy4k5FLEXfyzA+Y
+        HdABba5Q11Mp3q/YSFeuinM=
+X-Google-Smtp-Source: APiQypKV6AYf89cCEMicViLa7eFHdETMC/+pi997inC3D16Iti5incZo5Y11kbr1GFTvBYkvHkXSDg==
+X-Received: by 2002:a17:902:788e:: with SMTP id q14mr409569pll.72.1585785614675;
+        Wed, 01 Apr 2020 17:00:14 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id k24sm2282227pfi.196.2020.04.01.17.00.11
+        by smtp.gmail.com with ESMTPSA id np4sm2615858pjb.48.2020.04.01.17.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 01 Apr 2020 17:00:11 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 8808D40254; Thu,  2 Apr 2020 00:00:10 +0000 (UTC)
+        id B29F041DCA; Thu,  2 Apr 2020 00:00:10 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
         jack@suse.cz, ming.lei@redhat.com, nstange@suse.de
 Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [RFC 0/3] block: address blktrace use-after-free
-Date:   Wed,  1 Apr 2020 23:59:59 +0000
-Message-Id: <20200402000002.7442-1-mcgrof@kernel.org>
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: [RFC 3/3] block: avoid deferral of blk_release_queue() work
+Date:   Thu,  2 Apr 2020 00:00:02 +0000
+Message-Id: <20200402000002.7442-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
+In-Reply-To: <20200402000002.7442-1-mcgrof@kernel.org>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -68,46 +74,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Upstream kernel.org korg#205713 contends that there is a UAF in
-the core debugfs debugfs_remove() function, and has gone through
-pushing for a CVE for this, CVE-2019-19770.
+Commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") moved
+the blk_release_queue() into a workqueue after a splat floated around
+with some work here which could sleep in blk_exit_rl().
 
-If correct then parent dentries are not positive, and this would
-have implications far beyond this bug report. Thankfully, upon review
-with Nicolai, he wasn't buying it. His suspicions that this was just
-a blktrace issue were spot on, and this patch series demonstrates
-that, provides a reproducer, and provides a solution to the issue.
+On recent commit db6d9952356 ("block: remove request_list code") though
+Jens Axboe removed this code, now merged since v5.0. We no longer have
+to defer this work.
 
-We there would like to contend CVE-2019-19770 as invalid. The
-implications suggested are not correct, and this issue is only
-triggerable with root, by shooting yourself on the foot by misuing
-blktrace.
+By doing this we also avoid failing to detach / attach a block
+device with a BLKTRACESETUP. This issue can be reproduced with
+break-blktrace [0] using:
 
-If you want this on a git tree, you can get it from linux-next
-20200401-blktrace-fix-uaf branch [2].
+  break-blktrace -c 10 -d -s
 
-Wider review, testing, and rants are appreciated.
+The kernel does not crash without this commit, it just fails to
+create the block device because the prior block device removal
+deferred work is pending. After this commit we can use the above
+flaky use of blktrace without an issue.
 
-[0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
-[1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200401-blktrace-fix-uaf
+[0] https://github.com/mcgrof/break-blktrace
 
-Luis Chamberlain (3):
-  block: move main block debugfs initialization to its own file
-  blktrace: fix debugfs use after free
-  block: avoid deferral of blk_release_queue() work
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Michal Hocko <mhocko@kernel.org>
+Suggested-by: Nicolai Stange <nstange@suse.de>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ block/blk-sysfs.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
- block/Makefile               |  1 +
- block/blk-core.c             |  9 +--------
- block/blk-debugfs.c          | 27 +++++++++++++++++++++++++++
- block/blk-mq-debugfs.c       |  5 -----
- block/blk-sysfs.c            | 21 ++++++++-------------
- block/blk.h                  | 17 +++++++++++++++++
- include/linux/blktrace_api.h |  1 -
- kernel/trace/blktrace.c      | 19 ++++++++-----------
- 8 files changed, 62 insertions(+), 38 deletions(-)
- create mode 100644 block/blk-debugfs.c
-
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 20f20b0fa0b9..f159b40899ee 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -862,8 +862,8 @@ static void blk_exit_queue(struct request_queue *q)
+ 
+ 
+ /**
+- * __blk_release_queue - release a request queue
+- * @work: pointer to the release_work member of the request queue to be released
++ * blk_release_queue - release a request queue
++ * @kojb: pointer to the kobj representing the request queue
+  *
+  * Description:
+  *     This function is called when a block device is being unregistered. The
+@@ -873,9 +873,10 @@ static void blk_exit_queue(struct request_queue *q)
+  *     of the request queue reaches zero, blk_release_queue is called to release
+  *     all allocated resources of the request queue.
+  */
+-static void __blk_release_queue(struct work_struct *work)
++static void blk_release_queue(struct kobject *kobj)
+ {
+-	struct request_queue *q = container_of(work, typeof(*q), release_work);
++	struct request_queue *q =
++		container_of(kobj, struct request_queue, kobj);
+ 
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+@@ -905,15 +906,6 @@ static void __blk_release_queue(struct work_struct *work)
+ 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+ }
+ 
+-static void blk_release_queue(struct kobject *kobj)
+-{
+-	struct request_queue *q =
+-		container_of(kobj, struct request_queue, kobj);
+-
+-	INIT_WORK(&q->release_work, __blk_release_queue);
+-	schedule_work(&q->release_work);
+-}
+-
+ static const struct sysfs_ops queue_sysfs_ops = {
+ 	.show	= queue_attr_show,
+ 	.store	= queue_attr_store,
 -- 
 2.25.1
 
