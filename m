@@ -2,363 +2,130 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17959C18E5B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26501C43331
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 01:57:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7B6D2082F
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 00:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585785626;
-	bh=8SG2lxNlUhFihJncs4atxSh1fxcwhyatjGzSsMkpvHY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zcLCwIWy+0Mww7C/AwmvbnY5yk/me2QqXaN/fKk0qJaE7V/HrGi+/5G6mmuNiMogz
-	 ASacP+PHCK2OaJpWxf91AqnHG9u8DIe4pOKhTrOBTpz0GXU2nlZMNQNIoFaUhDwzU8
-	 wm0V3t2yVlyb7mwmiLnCZRMXELyrjVij9iORg/d4=
+	by mail.kernel.org (Postfix) with ESMTP id F3AC7206F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 01:57:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387454AbgDBAAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Apr 2020 20:00:20 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44681 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733287AbgDBAAR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Apr 2020 20:00:17 -0400
-Received: by mail-pl1-f193.google.com with SMTP id h11so621545plr.11;
-        Wed, 01 Apr 2020 17:00:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=QnLJUtXOSia7PQE5OyDEi1WF/+/PGHAetD+0mMY8uXs=;
-        b=LmktueFt+ykwGooK4RXZpbEEXpKBy0T2C5udtWS5Grj6anmIXZVY2JZinRH9SyuS1w
-         Y6agJmJ85vubcUJm7TF3X1i760C/ZgaFtcBimuYsgnGiRLzIgiLBPmbffKML0mYp/Dnv
-         xzaCWxUywluZBvyLqMxq8tabmO1tSCyKu+lZwmseM6ddRQ/ef6rHNKl6X+VysSsF0VFU
-         qArFLmOhpJ/UZjOy0y7gWDVIs/Y3IvquIOWYllaIzURnu487xlGFXSvogrvQn8oBnhFa
-         o6/mfx/6kC2CjWch2Z+jnnFypDgGoZtw/RoIlj+fQyUrVP36KBpq+5jLVaHZzfrv/Bmt
-         CXbg==
-X-Gm-Message-State: AGi0PuY74lyZlVVQ+ZBFfrxM7LVMvYKz2pDYFMvsmmWdAvkEqGLKwRNL
-        5XgfgpHsambwB5q64FY40X0=
-X-Google-Smtp-Source: APiQypIZbqiOw+Z25iDmBXUboufCfW1IaEAppS0y8nlBkDk1CH1yqy/pe9p4O36P93+CKhcfM9hY4A==
-X-Received: by 2002:a17:90a:77cc:: with SMTP id e12mr660680pjs.134.1585785615909;
-        Wed, 01 Apr 2020 17:00:15 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id ci18sm2504005pjb.23.2020.04.01.17.00.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2020 17:00:11 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id A2C49418C0; Thu,  2 Apr 2020 00:00:10 +0000 (UTC)
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de
+        id S1733213AbgDBB5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Apr 2020 21:57:46 -0400
+Received: from sandeen.net ([63.231.237.45]:50490 "EHLO sandeen.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733073AbgDBB5p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Apr 2020 21:57:45 -0400
+Received: from Liberator.local (liberator [10.0.0.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by sandeen.net (Postfix) with ESMTPSA id B842E116F4;
+        Wed,  1 Apr 2020 20:57:35 -0500 (CDT)
+Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de
 Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>,
         syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: [RFC 2/3] blktrace: fix debugfs use after free
-Date:   Thu,  2 Apr 2020 00:00:01 +0000
-Message-Id: <20200402000002.7442-3-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.23.0.rc1
-In-Reply-To: <20200402000002.7442-1-mcgrof@kernel.org>
 References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200402000002.7442-3-mcgrof@kernel.org>
+From:   Eric Sandeen <sandeen@sandeen.net>
+Autocrypt: addr=sandeen@sandeen.net; prefer-encrypt=mutual; keydata=
+ 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 pA==
+Message-ID: <9a6576cf-b89d-d1af-2d74-652878cb78c8@sandeen.net>
+Date:   Wed, 1 Apr 2020 20:57:42 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200402000002.7442-3-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
-Omar fixed the original blktrace code for multiqueue use. This however
-left in place a possible crash, if you happen to abuse blktrace in a way
-it was not intended.
+On 4/1/20 7:00 PM, Luis Chamberlain wrote:
+> On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
+> Omar fixed the original blktrace code for multiqueue use. This however
+> left in place a possible crash, if you happen to abuse blktrace in a way
+> it was not intended.
+> 
+> Namely, if you loop adding a device, setup the blktrace with BLKTRACESETUP,
+> forget to BLKTRACETEARDOWN, and then just remove the device you end up
+> with a panic:
 
-Namely, if you loop adding a device, setup the blktrace with BLKTRACESETUP,
-forget to BLKTRACETEARDOWN, and then just remove the device you end up
-with a panic:
+Weird, I swear I tested that and didn't hit it, but ...
+ 
 
-[  107.193134] debugfs: Directory 'loop0' with parent 'block' already present!
-[  107.254615] BUG: kernel NULL pointer dereference, address: 00000000000000a0
-[  107.258785] #PF: supervisor write access in kernel mode
-[  107.262035] #PF: error_code(0x0002) - not-present page
-[  107.264106] PGD 0 P4D 0
-[  107.264404] Oops: 0002 [#1] SMP NOPTI
-[  107.264803] CPU: 8 PID: 674 Comm: kworker/8:2 Tainted: G            E 5.6.0-rc7-next-20200327 #1
-[  107.265712] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1 04/01/2014
-[  107.266553] Workqueue: events __blk_release_queue
-[  107.267051] RIP: 0010:down_write+0x15/0x40
-[  107.267488] Code: eb ca e8 ee a5 8d ff cc cc cc cc cc cc cc cc cc cc cc cc cc cc 0f 1f 44 00 00 55 48 89 fd e8 52 db ff ff 31 c0 ba 01 00 00 00 <f0> 48 0f b1 55 00 75 0f  65 48 8b 04 25 c0 8b 01 00 48 89 45 08 5d
-[  107.269300] RSP: 0018:ffff9927c06efda8 EFLAGS: 00010246
-[  107.269841] RAX: 0000000000000000 RBX: ffff8be7e73b0600 RCX: ffffff8100000000
-[  107.270559] RDX: 0000000000000001 RSI: ffffff8100000000 RDI: 00000000000000a0
-[  107.271281] RBP: 00000000000000a0 R08: ffff8be7ebc80fa8 R09: ffff8be7ebc80fa8
-[  107.272001] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[  107.272722] R13: ffff8be7efc30400 R14: ffff8be7e0571200 R15: 00000000000000a0
-[  107.273475] FS:  0000000000000000(0000) GS:ffff8be7efc00000(0000) knlGS:0000000000000000
-[  107.274346] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  107.274968] CR2: 00000000000000a0 CR3: 000000042abee003 CR4: 0000000000360ee0
-[  107.275710] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  107.276465] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  107.277214] Call Trace:
-[  107.277532]  simple_recursive_removal+0x4e/0x2e0
-[  107.278049]  ? debugfs_remove+0x60/0x60
-[  107.278493]  debugfs_remove+0x40/0x60
-[  107.278922]  blk_trace_free+0xd/0x50
-[  107.279339]  __blk_trace_remove+0x27/0x40
-[  107.279797]  blk_trace_shutdown+0x30/0x40
-[  107.280256]  __blk_release_queue+0xab/0x110
-[  107.280734]  process_one_work+0x1b4/0x380
-[  107.281194]  worker_thread+0x50/0x3c0
-[  107.281622]  kthread+0xf9/0x130
-[  107.281994]  ? process_one_work+0x380/0x380
-[  107.282467]  ? kthread_park+0x90/0x90
-[  107.282895]  ret_from_fork+0x1f/0x40
-[  107.283316] Modules linked in: loop(E) <etc>
-[  107.288562] CR2: 00000000000000a0
-[  107.288957] ---[ end trace b885d243d441bbce ]---
+> This issue can be reproduced with break-blktrace [2] using:
+> 
+>   break-blktrace -c 10 -d
 
-This splat happens to be very similar to the one reported via
-kernel.org korg#205713, only that korg#205713 was for v4.19.83
-and the above now includes the simple_recursive_removal() introduced
-via commit a3d1e7eb5abe ("simple_recursive_removal(): kernel-side rm
--rf for ramfs-style filesystems") merged on v5.6.
++ -s, right?
+ 
+> This patch fixes this issue. Note that there is also another
+> respective UAF but from the ioctl path [3], this should also fix
+> that issue.
+> 
+> This patch then also contends the severity of CVE-2019-19770 as
+> this issue is only possible using root to shoot yourself in the
+> foot by also misuing blktrace.
+> 
+> [0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
+> [1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
+> [2] https://github.com/mcgrof/break-blktrace
 
-korg#205713 then was used to create CVE-2019-19770 and claims that
-the bug is in a use-after-free in the debugfs core code. The
-implications of this being a generic UAF on debugfs would be
-much more severe, as it would imply parent dentries can sometimes
-not be possitive, which is something claim is not possible.
+I verified that this does reproduce the exact same KASAN splat on
+kernel 4.19.83 as reported in the original bug, thanks!
 
-It turns out that the issue actually is a mis-use of debugfs for
-the multiqueue case, and the fragile nature of how we free the
-directory used to keep track of blktrace debugfs files. Omar's
-commit assumed the parent directory would be kept with
-debugfs_lookup() but this is not the case, only the dentry is
-kept around. We also special-case a solution for multiqueue
-given that for multiqueue code we always instantiate the debugfs
-directory for the request queue. We were leaving it only to chance,
-if someone happens to use blktrace, on single queue block devices
-for the respective debugfs directory be created.
-
-We can fix the UAF by simply using a debugfs directory which is
-always created for singlequeue and multiqueue block devices. This
-simplifies the code considerably, with the only penalty now being
-that we're always creating the request queue directory debugfs
-directory for the block device on singlequeue block devices.
-
-The UAF then is not a core debugfs issue, but instead a mis-use of
-debugfs, and this issue can only be triggered if you are root, and
-mis-use blktrace.
-
-This issue can be reproduced with break-blktrace [2] using:
-
-  break-blktrace -c 10 -d
-
-This patch fixes this issue. Note that there is also another
-respective UAF but from the ioctl path [3], this should also fix
-that issue.
-
-This patch then also contends the severity of CVE-2019-19770 as
-this issue is only possible using root to shoot yourself in the
-foot by also misuing blktrace.
-
-[0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
-[1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
-[2] https://github.com/mcgrof/break-blktrace
-[3] https://lore.kernel.org/lkml/000000000000ec635b059f752700@google.com/
-
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Nicolai Stange <nstange@suse.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Michal Hocko <mhocko@kernel.org>
-Reported-by: syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/blk-debugfs.c          | 12 ++++++++++++
- block/blk-mq-debugfs.c       |  5 -----
- block/blk-sysfs.c            |  3 +++
- block/blk.h                  | 10 ++++++++++
- include/linux/blktrace_api.h |  1 -
- kernel/trace/blktrace.c      | 19 ++++++++-----------
- 6 files changed, 33 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
-index 634dea4b1507..a8b343e758e4 100644
---- a/block/blk-debugfs.c
-+++ b/block/blk-debugfs.c
-@@ -13,3 +13,15 @@ void blk_debugfs_register(void)
- {
- 	blk_debugfs_root = debugfs_create_dir("block", NULL);
- }
-+
-+void blk_q_debugfs_register(struct request_queue *q)
-+{
-+	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-+					    blk_debugfs_root);
-+}
-+
-+void blk_q_debugfs_unregister(struct request_queue *q)
-+{
-+	debugfs_remove_recursive(q->debugfs_dir);
-+	q->debugfs_dir = NULL;
-+}
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b3f2ba483992..bda9378eab90 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -823,9 +823,6 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
--					    blk_debugfs_root);
--
- 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
- 
- 	/*
-@@ -856,9 +853,7 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 
- void blk_mq_debugfs_unregister(struct request_queue *q)
- {
--	debugfs_remove_recursive(q->debugfs_dir);
- 	q->sched_debugfs_dir = NULL;
--	q->debugfs_dir = NULL;
- }
- 
- static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fca9b158f4a0..20f20b0fa0b9 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -895,6 +895,7 @@ static void __blk_release_queue(struct work_struct *work)
- 
- 	blk_trace_shutdown(q);
- 
-+	blk_q_debugfs_unregister(q);
- 	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
- 
-@@ -975,6 +976,8 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
- 	}
- 
-+	blk_q_debugfs_register(q);
-+
- 	if (queue_is_mq(q)) {
- 		__blk_mq_register_dev(dev, q);
- 		blk_mq_debugfs_register(q);
-diff --git a/block/blk.h b/block/blk.h
-index 86a66b614f08..b86123a2d74f 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -489,10 +489,20 @@ int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		bool *same_page);
- #ifdef CONFIG_DEBUG_FS
- void blk_debugfs_register(void);
-+void blk_q_debugfs_register(struct request_queue *q);
-+void blk_q_debugfs_unregister(struct request_queue *q);
- #else
- static inline void blk_debugfs_register(void)
- {
- }
-+
-+static inline void blk_q_debugfs_register(struct request_queue *q)
-+{
-+}
-+
-+static inline void blk_q_debugfs_unregister(struct request_queue *q)
-+{
-+}
- #endif /* CONFIG_DEBUG_FS */
- 
- #endif /* BLK_INTERNAL_H */
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index 3b6ff5902edc..eb6db276e293 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -22,7 +22,6 @@ struct blk_trace {
- 	u64 end_lba;
- 	u32 pid;
- 	u32 dev;
--	struct dentry *dir;
- 	struct dentry *dropped_file;
- 	struct dentry *msg_file;
- 	struct list_head running_list;
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ca39dc3230cb..15086227592f 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -311,7 +311,6 @@ static void blk_trace_free(struct blk_trace *bt)
- 	debugfs_remove(bt->msg_file);
- 	debugfs_remove(bt->dropped_file);
- 	relay_close(bt->rchan);
--	debugfs_remove(bt->dir);
- 	free_percpu(bt->sequence);
- 	free_percpu(bt->msg_data);
- 	kfree(bt);
-@@ -476,7 +475,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 			      struct blk_user_trace_setup *buts)
- {
- 	struct blk_trace *bt = NULL;
--	struct dentry *dir = NULL;
- 	int ret;
- 
- 	if (!buts->buf_size || !buts->buf_nr)
-@@ -485,6 +483,9 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (!blk_debugfs_root)
- 		return -ENOENT;
- 
-+	if (!q->debugfs_dir)
-+		return -ENOENT;
-+
- 	strncpy(buts->name, name, BLKTRACE_BDEV_SIZE);
- 	buts->name[BLKTRACE_BDEV_SIZE - 1] = '\0';
- 
-@@ -509,21 +510,19 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 
- 	ret = -ENOENT;
- 
--	dir = debugfs_lookup(buts->name, blk_debugfs_root);
--	if (!dir)
--		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
--
- 	bt->dev = dev;
- 	atomic_set(&bt->dropped, 0);
- 	INIT_LIST_HEAD(&bt->running_list);
- 
- 	ret = -EIO;
--	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
-+	bt->dropped_file = debugfs_create_file("dropped", 0444,
-+					       q->debugfs_dir, bt,
- 					       &blk_dropped_fops);
- 
--	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
-+	bt->msg_file = debugfs_create_file("msg", 0222, q->debugfs_dir,
-+					   bt, &blk_msg_fops);
- 
--	bt->rchan = relay_open("trace", dir, buts->buf_size,
-+	bt->rchan = relay_open("trace", q->debugfs_dir, buts->buf_size,
- 				buts->buf_nr, &blk_relay_callbacks, bt);
- 	if (!bt->rchan)
- 		goto err;
-@@ -551,8 +550,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 
- 	ret = 0;
- err:
--	if (dir && !bt->dir)
--		dput(dir);
- 	if (ret)
- 		blk_trace_free(bt);
- 	return ret;
--- 
-2.25.1
-
+-Eric
