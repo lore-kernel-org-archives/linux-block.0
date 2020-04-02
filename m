@@ -2,89 +2,57 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69553C18E5B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 09:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C36C4C43331
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 11:32:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 36E712073B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 09:49:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="GdhMe6K1"
+	by mail.kernel.org (Postfix) with ESMTP id A00D820787
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 11:32:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387749AbgDBJtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 05:49:22 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:52850 "EHLO
-        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725965AbgDBJtW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Apr 2020 05:49:22 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id D3BA62E1265;
-        Thu,  2 Apr 2020 12:49:18 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
-        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id vrs95Mzv0O-nGN0qAIi;
-        Thu, 02 Apr 2020 12:49:18 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1585820958; bh=8qGtLajpajgQeO52XlnOyzpq0mVSyJ0nBQMIBhnX7Mo=;
-        h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
-        b=GdhMe6K1GB1Cm0lqto4XDJStvjnzsCYuv7+T9I2K1YsGwEED1x6Q9eGvt3eN45RPc
-         NowBnR5yl7MNyNWREHJPWUUSv5g9h/k+oBptD6da97vi6eH63QHqKdm3hcJz+LRc8F
-         Nn31PYKJc97nL601CRWds7TSsIIYcN5fZD3OH1M0=
-Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from unknown (unknown [2a02:6b8:b080:6404::1:b])
-        by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id FSN3Lw54Th-nFW8XYMv;
-        Thu, 02 Apr 2020 12:49:16 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, hch@lst.de,
-        darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        hannes@cmpxchg.org, ajay.joshi@wdc.com, bvanassche@acm.org,
-        arnd@arndb.de, houtao1@huawei.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
- <bb7d7604-8ee5-97d8-1563-9140cd499f15@yandex-team.ru>
- <yq1v9mi4o31.fsf@oracle.com>
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Message-ID: <9b88f077-616a-64f4-287a-77f5c3b8b07a@yandex-team.ru>
-Date:   Thu, 2 Apr 2020 12:49:15 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S2388049AbgDBLcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 07:32:14 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:56568 "EHLO
+        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388029AbgDBLcO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 07:32:14 -0400
+X-Greylist: delayed 416 seconds by postgrey-1.27 at vger.kernel.org; Thu, 02 Apr 2020 07:32:14 EDT
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
+        by charlie.dont.surf (Postfix) with ESMTPSA id 23AE7BF422;
+        Thu,  2 Apr 2020 11:25:17 +0000 (UTC)
+Date:   Thu, 2 Apr 2020 13:25:09 +0200
+From:   Klaus Birkelund Jensen <its@irrelevant.dk>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Klaus Jensen <k.jensen@samsung.com>, linux-block@vger.kernel.org,
+        osandov@fb.com
+Subject: Re: [PATCH blktests] common/fio: do not use norandommap with verify
+Message-ID: <20200402112458.bpcadafgkqf6eq6j@apples.localdomain>
+References: <CGME20200130084950eucas1p2dac69024658d531d5f69ea0bdbd2be81@eucas1p2.samsung.com>
+ <20200130084941.60943-1-k.jensen@samsung.com>
+ <20200203214320.GB1025074@vader>
 MIME-Version: 1.0
-In-Reply-To: <yq1v9mi4o31.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200203214320.GB1025074@vader>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 02/04/2020 05.29, Martin K. Petersen wrote:
+On Feb  3 13:43, Omar Sandoval wrote:
+> On Thu, Jan 30, 2020 at 09:49:41AM +0100, Klaus Jensen wrote:
+> > As per the fio documentation, using norandommap with an async I/O engine
+> > and I/O depth > 1, can cause verification errors.
+> > 
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Konstantin,
-> 
->>> The corresponding exported primitive is called
->>> blkdev_issue_assign_range().
->>
->> What exact semantics of that?
-> 
-> REQ_OP_ALLOCATE will be used to compel a device to allocate a block
-> range. What a given block contains after successful allocation is
-> undefined (depends on the device implementation).
+> Good catch, applied. Thanks!
 
-Ok. Then REQ_OP_ALLOCATE should be accounted as discard rather than write.
-That's decided by helper op_is_discard() which is used only by statistics.
-It seems REQ_OP_SECURE_ERASE also should be accounted in this way.
+Hi Omar,
 
-> 
-> For block allocation with deterministic zeroing, one must keep using
-> REQ_OP_WRITE_ZEROES with the NOUNMAP flag set.
-> 
+Looks like this got lost somewhere?
+
+
+Klaus
