@@ -2,195 +2,196 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75950C43331
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 14:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D21DC2D0F3
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 15:52:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5470120787
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 14:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A6E220737
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 15:52:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hnUfbYNS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388499AbgDBOtm convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 10:49:42 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34210 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388516AbgDBOtm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Apr 2020 10:49:42 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 408ACAED9;
-        Thu,  2 Apr 2020 14:49:39 +0000 (UTC)
-From:   Nicolai Stange <nstange@suse.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, mhocko@suse.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [RFC 3/3] block: avoid deferral of blk_release_queue() work
-References: <20200402000002.7442-1-mcgrof@kernel.org>
-        <20200402000002.7442-4-mcgrof@kernel.org>
-        <774a33e8-43ba-143f-f6fd-9cb0ae0862ac@acm.org>
-Date:   Thu, 02 Apr 2020 16:49:37 +0200
-In-Reply-To: <774a33e8-43ba-143f-f6fd-9cb0ae0862ac@acm.org> (Bart Van Assche's
-        message of "Wed, 1 Apr 2020 20:39:48 -0700")
-Message-ID: <87o8saj62m.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+        id S2389521AbgDBPwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 11:52:06 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:36440 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389444AbgDBPwF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 11:52:05 -0400
+Received: by mail-pj1-f67.google.com with SMTP id nu11so1671108pjb.1
+        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2020 08:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=53EevbSsJHKTeq9s0IC3tQ9L0J1W+vMWAqSDuwkHqVk=;
+        b=hnUfbYNShzJoidHGNUR989NwioR4qzZOhooPJ+fqHC852NAHPbteoeLIrFP+9Abvrk
+         kd9cMxkNIU0dKxnPV58SMtnHXcdQZVtnYDxUQkMJcQfnxwQ6PqdbnrlIg+4+MBZWAG75
+         7cG/w/cTwSUkBBeHfCHcBSR0ayXe+nF5HX/oI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=53EevbSsJHKTeq9s0IC3tQ9L0J1W+vMWAqSDuwkHqVk=;
+        b=L3or0qJ6XF79A9SfGFzDx+oNuMFUaIqGgfQKiOsvTwiE0FU1fRg5me7mpyrcyMOChC
+         CsK0wndI6pl93tduIKA6t5gUYKEK41SyIEbptVMRWKa6BdEonGxrFqzoPpVugMqwNQc6
+         IpzpEsY6ax2LLQzgmlIf8TRO2X1CJu7yS2edc+6IW2YJ5PO3jRwsH98KRl5jQXsCt/8N
+         lviRsYzjIwJv0pnG7qiYZIlc+4IZhubmylJ9DOY73hmp8idwttp0oshLOPpUYoyKJcBk
+         OWqNruTwaqHkQluMQJjSfbcCJ8TUJ0zSFcmJchO+x1v35GkEzpoTafANMFobASUYERXg
+         0bgA==
+X-Gm-Message-State: AGi0Puav9kewFQB7ZsV6IO6SiOtb6GWQcyAX6YyIuy5MELhBrNWO9Qei
+        ufguKCWZlPsyaIFxfxr5mEQYVQ==
+X-Google-Smtp-Source: APiQypIEEhOEPCQbbgYFfbiYTmmYZHjny8hB9JCWz1W4N8EfmbXxbelQJ90O7FdrjCwpWqdOWigUaQ==
+X-Received: by 2002:a17:902:449:: with SMTP id 67mr3383633ple.339.1585842723755;
+        Thu, 02 Apr 2020 08:52:03 -0700 (PDT)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:24fa:e766:52c9:e3b2])
+        by smtp.gmail.com with ESMTPSA id x68sm2578815pfb.5.2020.04.02.08.52.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2020 08:52:02 -0700 (PDT)
+From:   Douglas Anderson <dianders@chromium.org>
+To:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com
+Cc:     paolo.valente@linaro.org, sqazi@google.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, groeck@chromium.org,
+        Douglas Anderson <dianders@chromium.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] blk-mq: Fix two causes of IO stalls found in reboot testing
+Date:   Thu,  2 Apr 2020 08:51:28 -0700
+Message-Id: <20200402155130.8264-1-dianders@chromium.org>
+X-Mailer: git-send-email 2.26.0.rc2.310.g2932bb562d-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Bart Van Assche <bvanassche@acm.org> writes:
+While doing reboot testing, I found that occasionally my device would
+trigger the hung task detector.  Many tasks were stuck waiting for the
+a blkdev mutex, but at least one task in the system was always sitting
+waiting for IO to complete (and holding the blkdev mutex).  One
+example of a task that was just waiting for its IO to complete on one
+reboot:
 
-> On 2020-04-01 17:00, Luis Chamberlain wrote:
->> Commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") moved
->> the blk_release_queue() into a workqueue after a splat floated around
->> with some work here which could sleep in blk_exit_rl().
->> 
->> On recent commit db6d9952356 ("block: remove request_list code") though
->> Jens Axboe removed this code, now merged since v5.0. We no longer have
->> to defer this work.
->> 
->> By doing this we also avoid failing to detach / attach a block
->> device with a BLKTRACESETUP. This issue can be reproduced with
->> break-blktrace [0] using:
->> 
->>   break-blktrace -c 10 -d -s
->> 
->> The kernel does not crash without this commit, it just fails to
->> create the block device because the prior block device removal
->> deferred work is pending. After this commit we can use the above
->> flaky use of blktrace without an issue.
->> 
->> [0] https://github.com/mcgrof/break-blktrace
->> 
->> Cc: Bart Van Assche <bvanassche@acm.org>
->> Cc: Omar Sandoval <osandov@fb.com>
->> Cc: Hannes Reinecke <hare@suse.com>
->> Cc: Nicolai Stange <nstange@suse.de>
->> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> Cc: Michal Hocko <mhocko@kernel.org>
->> Suggested-by: Nicolai Stange <nstange@suse.de>
->> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
->> ---
->>  block/blk-sysfs.c | 18 +++++-------------
->>  1 file changed, 5 insertions(+), 13 deletions(-)
->> 
->> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->> index 20f20b0fa0b9..f159b40899ee 100644
->> --- a/block/blk-sysfs.c
->> +++ b/block/blk-sysfs.c
->> @@ -862,8 +862,8 @@ static void blk_exit_queue(struct request_queue *q)
->>  
->>  
->>  /**
->> - * __blk_release_queue - release a request queue
->> - * @work: pointer to the release_work member of the request queue to be released
->> + * blk_release_queue - release a request queue
->> + * @kojb: pointer to the kobj representing the request queue
->>   *
->>   * Description:
->>   *     This function is called when a block device is being unregistered. The
->> @@ -873,9 +873,10 @@ static void blk_exit_queue(struct request_queue *q)
->>   *     of the request queue reaches zero, blk_release_queue is called to release
->>   *     all allocated resources of the request queue.
->>   */
->> -static void __blk_release_queue(struct work_struct *work)
->> +static void blk_release_queue(struct kobject *kobj)
->>  {
->> -	struct request_queue *q = container_of(work, typeof(*q), release_work);
->> +	struct request_queue *q =
->> +		container_of(kobj, struct request_queue, kobj);
->>  
->>  	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
->>  		blk_stat_remove_callback(q, q->poll_cb);
->> @@ -905,15 +906,6 @@ static void __blk_release_queue(struct work_struct *work)
->>  	call_rcu(&q->rcu_head, blk_free_queue_rcu);
->>  }
->>  
->> -static void blk_release_queue(struct kobject *kobj)
->> -{
->> -	struct request_queue *q =
->> -		container_of(kobj, struct request_queue, kobj);
->> -
->> -	INIT_WORK(&q->release_work, __blk_release_queue);
->> -	schedule_work(&q->release_work);
->> -}
->> -
->>  static const struct sysfs_ops queue_sysfs_ops = {
->>  	.show	= queue_attr_show,
->>  	.store	= queue_attr_store,
->
-> The description of this patch mentions a single blk_release_queue() call
-> that happened in the past from a context from which sleeping is not
-> allowed and from which sleeping is allowed today. Have all other
-> blk_release_queue() / blk_put_queue() calls been verified to see whether
-> none of these happens from a context from which sleeping is not allowed?
+ udevd           D    0  2177    306 0x00400209
+ Call trace:
+  __switch_to+0x15c/0x17c
+  __schedule+0x6e0/0x928
+  schedule+0x8c/0xbc
+  schedule_timeout+0x9c/0xfc
+  io_schedule_timeout+0x24/0x48
+  do_wait_for_common+0xd0/0x160
+  wait_for_completion_io_timeout+0x54/0x74
+  blk_execute_rq+0x9c/0xd8
+  __scsi_execute+0x104/0x198
+  scsi_test_unit_ready+0xa0/0x154
+  sd_check_events+0xb4/0x164
+  disk_check_events+0x58/0x154
+  disk_clear_events+0x74/0x110
+  check_disk_change+0x28/0x6c
+  sd_open+0x5c/0x130
+  __blkdev_get+0x20c/0x3d4
+  blkdev_get+0x74/0x170
+  blkdev_open+0x94/0xa8
+  do_dentry_open+0x268/0x3a0
+  vfs_open+0x34/0x40
+  path_openat+0x39c/0xdf4
+  do_filp_open+0x90/0x10c
+  do_sys_open+0x150/0x3c8
+  ...
 
-I've just done this today and found the following potentially
-problematic call paths to blk_put_queue().
+I've reproduced this on two systems: one boots from an internal UFS
+disk and one from eMMC.  Each has a card reader attached via USB with
+an SD card plugged in.  On the USB-attached SD card is a disk with 12
+partitions (a Chrome OS test image), if it matters.  The system
+doesn't do much with the USB disk other than probe it (it's plugged in
+my system to help me recover).
 
-1.) mem_cgroup_throttle_swaprate() takes a spinlock and
-    calls blkcg_schedule_throttle()->blk_put_queue().
+From digging, I believe that there are two separate but related
+issues.  Both issues relate to the SCSI code saying that there is no
+budget.
 
-    Also note that AFAICS mem_cgroup_try_charge_delay() can be called
-    with GFP_ATOMIC.
+I have done testing with only one or the other of the two patches in
+this series and found that I could still encounter hung tasks if only
+one of the two patches was applied.  This deserves a bit of
+explanation.  To me, it's fairly obvious that the first fix wouldn't
+fix the problems talked about in the second patch.  However, it's less
+obvious why the second patch doesn't fix the problems in
+blk_mq_dispatch_rq_list().  It turns out that it _almost_ does
+(problems become much more rare), but I did manage to get a single
+trace where the "kick" scheduled by the second patch happened really
+quickly.  The scheduled kick then ran and found nothing to do.  This
+happened in parallel to a task running in blk_mq_dispatch_rq_list()
+which hadn't gotten around to splicing the list back into
+hctx->dispatch.  This is why we need both fixes or a heavier hammer
+where we always kick whenever two threads request budget at the same
+time.
 
-2.) scsi_unblock_requests() gets called from a lot of drivers and
-    invoke blk_put_queue() through
-    scsi_unblock_requests() -> scsi_run_host_queues() ->
-    scsi_starved_list_run() -> blk_put_queue().
+Most of my testing has been atop Chrome OS 5.4's kernel tree which
+currently has v5.4.28 merged in.  The Chrome OS 5.4 tree also has a
+patch by Salman Qazi, namely ("block: Limit number of items taken from
+the I/O scheduler in one go").  Reverting that patch didn't make the
+hung tasks go away, so I kept it in for most of my testing.
 
-    Most call sites are fine, the ones which are not are:
-    a.) pmcraid_complete_ioa_reset(). This gets assigned
-        to struct pmcraid_cmd's ->cmd_done and later invoked
-        under a spinlock.
+I have also done some testing on mainline Linux (git describe says I'm
+on v5.6-rc7-227-gf3e69428b5e2) even without Salman's patch.  I found
+that I could reproduce the problems there and that traces looked about
+the same as I saw on the downstream branch.  These patches were also
+confirmed to fix the problems on mainline.
 
-    b.) qla82xx_fw_dump() and qla8044_fw_dump().
-        These can potentially block w/o this patch already,
-        because both invoke qla2x00_wait_for_chip_reset().
+Chrome OS is currently setup to use the BFQ scheduler and I found that
+I couldn't reproduce the problems without BFQ.  As discussed in the
+second patch this is believed to be because BFQ sometimes returns
+"true" from has_work() but then NULL from dispatch_request().
 
-	However, they can get called from IRQ context. For example,
-        qla82xx_intr_handler(), qla82xx_msix_default() and
-        qla82xx_poll() call qla2x00_async_event(), which calls
-        ->fw_dump().
+I'll insert my usual caveat that I'm sending patches to code that I
+know very little about.  If I'm making a total bozo patch here, please
+help me figure out how I should fix the problems I found in a better
+way.
 
-	The aforementioned functions can also reach ->fw_dump() through
-        qla24xx_process_response_queue()->qlt_handle_abts_recv()->qlt_response_pkt_all_vps()
-        ->qlt_response_pkt()->qlt_handle_abts_completion()->qlt_chk_unresolv_exchg()
-        -> ->fw_dump().
+If you want to see a total ridiculous amount of chatter where I
+stumbled around a whole bunch trying to figure out what was wrong and
+how to fix it, feel free to read <https://crbug.com/1061950>.  I
+promise it will make your eyes glaze over right away if this cover
+letter didn't already do that.  Specifically comment 79 in that bug
+includes a link to my ugly prototype of making BFQ's has_work() more
+exact (I only managed it by actually defining _both_ an exact and
+inexact function to avoid circular locking problems when it was called
+directly from blk_mq_hctx_has_pending()).  Comment 79 also has more
+thoughts about alternatives considered.
 
-	But I'd consider this a problem with the driver -- either
-	->fw_dump() can sleep and must not be called from IRQ context
-        or they must not invoke qla2x00_wait_for_hba_ready().
+I don't know if these fixes represent a regression of some sort or are
+new.  As per above I could only reproduce with BFQ enabled which makes
+it nearly impossible to go too far back with this.  I haven't listed
+any "Fixes" tags here, but if someone felt it was appropriate to
+backport this to some stable trees that seems like it'd be nice.
+Presumably at least 5.4 stable would make sense.
 
+Thanks to Salman Qazi, Paolo Valente, and Guenter Roeck who spent a
+bunch of time helping me trawl through some of this code and reviewing
+early versions of this patch.
 
-(I can share the full analysis, but it's lengthy and contains nothing
- interesting except for what is listed above).
+Changes in v2:
+- Replace ("scsi: core: Fix stall...") w/ ("blk-mq: Rerun dispatch...")
 
+Douglas Anderson (2):
+  blk-mq: In blk_mq_dispatch_rq_list() "no budget" is a reason to kick
+  blk-mq: Rerun dispatching in the case of budget contention
 
-One final note though: If I'm not mistaken, then the final
-blk_put_queue() can in principle block even today, simply by virtue of
-the kernfs operations invoked through
-kobject_put()->kobject_release()->kobject_cleanup()->kobject_del()
-->sysfs_remove_dir()->kernfs_remove()->mutex_lock()?
-
-
-Thanks,
-
-Nicolai
+ block/blk-mq-sched.c   | 26 ++++++++++++++++++++++++--
+ block/blk-mq.c         | 14 +++++++++++---
+ include/linux/blkdev.h |  2 ++
+ 3 files changed, 37 insertions(+), 5 deletions(-)
 
 -- 
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
+2.26.0.rc2.310.g2932bb562d-goog
+
