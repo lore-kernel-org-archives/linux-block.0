@@ -2,66 +2,58 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F02C43331
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 07:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CDCC43331
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 07:52:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79E22208FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 07:44:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585813462;
-	bh=d/t/ujtXfu28zEOz6+VRG1AW8IlGcvBVan5BajLdORM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=miiSFolUivkBz30pg+A9o9dBfYXaoavr5LYNe5ZAOJzseabRjfkHwaqVoITdv7uRJ
-	 aAMiaNCv/44dOk+5BuH2uIOCVN/1WBv+PGjrD1l2BEca4C27rZrFSKbDlSe1ac0Fll
-	 BTMyFQl8lmlAGXn/Dbwl93dlAyeImKDuEmywV9Fo=
+	by mail.kernel.org (Postfix) with ESMTP id 322A52078E
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 07:52:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387537AbgDBHoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 03:44:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56020 "EHLO mail.kernel.org"
+        id S1729289AbgDBHwE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 03:52:04 -0400
+Received: from verein.lst.de ([213.95.11.211]:47202 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725965AbgDBHoV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Apr 2020 03:44:21 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9E81A2063A;
-        Thu,  2 Apr 2020 07:44:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585813461;
-        bh=d/t/ujtXfu28zEOz6+VRG1AW8IlGcvBVan5BajLdORM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XLku4gs1IZiQwF4QFe0O7SC6J3tvkwEMlX1UjDNr2ebi6Y+7CV5wi8pVr9/pMPWSH
-         /XJFl/7mgZyPwYrBlaQmCMakSc2GiZlXr9OiiLdY6FCFMVVi9XCTh6eUhhj1Kd61CM
-         wppysZScXU4zQ0fO6YtA6P3vhBtf6Ku/Qhtfk2yo=
-Date:   Thu, 2 Apr 2020 09:44:19 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
-        mingo@redhat.com, jack@suse.cz, ming.lei@redhat.com,
-        nstange@suse.de, mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 0/3] block: address blktrace use-after-free
-Message-ID: <20200402074419.GD2755501@kroah.com>
-References: <20200402000002.7442-1-mcgrof@kernel.org>
+        id S1726841AbgDBHwE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Apr 2020 03:52:04 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 343CA68C4E; Thu,  2 Apr 2020 09:52:01 +0200 (CEST)
+Date:   Thu, 2 Apr 2020 09:52:00 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2] nvme: inherit stable pages constraint in the mpath
+ stack device
+Message-ID: <20200402075200.GA15551@lst.de>
+References: <20200401060625.10293-1-sagi@grimberg.me> <20200401090542.GB31980@lst.de> <469eb075-2a6f-3386-f843-90525590fcba@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200402000002.7442-1-mcgrof@kernel.org>
+In-Reply-To: <469eb075-2a6f-3386-f843-90525590fcba@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 11:59:59PM +0000, Luis Chamberlain wrote:
-> Upstream kernel.org korg#205713 contends that there is a UAF in
-> the core debugfs debugfs_remove() function, and has gone through
-> pushing for a CVE for this, CVE-2019-19770.
+On Wed, Apr 01, 2020 at 12:11:09PM -0700, Sagi Grimberg wrote:
+>> I think this needs to go into blk_queue_stack_limits instead, otherwise
+>> we have the same problem with other stacking drivers.
+>
+> I thought about this, but the stack_limits has different variants 
+> (blk_stack_limits, bdev_stack_limits) but only the first takes a
+> request_queue...
+>
+> I see that dm-table does roughly the same thing, drbd ignores it.
+> In general, dm is doing a whole bunch of stacking limits/capabilities
+> related stuff that are not involved in blk_stack_limits...
+>
+> I could theoretically add a flag to queue_limits to mirror this, is
+> that what you are suggesting?
 
-As you point out, that CVE is crazy and pointless, thanks for seeing
-this through.
-
-greg k-h
+I guess we'll just go with your v4 patch for now and I'll see if I
+can refactor this mess later..
