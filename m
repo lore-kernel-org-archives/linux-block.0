@@ -2,123 +2,87 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE072C2D0F3
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FC4C43331
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:28:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2DC82080C
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:14:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585844051;
-	bh=YWCwFuRxlfQZCnQduX7beJeIGMvcM5FqEGUtc2q6GPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=LxRHpT797FGR42wDMR0+ptyOUwEB62pRxwCppd8jNhUvYFiZQUb+3P2i5o750s25k
-	 itkwemN8mrBfcCJ1TK6Deomgkr1/ISnN5LrCnGoO1G2GGjVijpqdqZtco1bybydaIh
-	 0OXfZYjj9q4zaHiVGeG/tW4LLze3efuKNZkH4Ns0=
+	by mail.kernel.org (Postfix) with ESMTP id A414F206F6
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:28:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="cyAtrTVx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389747AbgDBQOI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 12:14:08 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:44245 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389718AbgDBQOI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 12:14:08 -0400
-Received: by mail-pf1-f194.google.com with SMTP id b72so1951435pfb.11;
-        Thu, 02 Apr 2020 09:14:07 -0700 (PDT)
+        id S2389041AbgDBQ2C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 12:28:02 -0400
+Received: from mail-il1-f175.google.com ([209.85.166.175]:46516 "EHLO
+        mail-il1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731892AbgDBQ2B (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 12:28:01 -0400
+Received: by mail-il1-f175.google.com with SMTP id i75so4160484ild.13
+        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2020 09:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+LWQRzvGUf0Noo8gQmhIsnF90MWgcXs+EjcH83IaZZI=;
+        b=cyAtrTVxn8FFy1qj++2UDFQvNzskVPe9VtPrHb+clKTiQLHHTU7tnza2uSu0zk2FMB
+         QQxzhOvv99qOh2WZfAaUZM5I8TR7QgTxWA3Vy7e6s1UZ/lyxX70FbQ+Te56n0awso5na
+         Nnqii4V9Rvu2TeK/7ZT1EgLkDsa0TDBdp9LEe20Pv8j3yuOxKxwwNZEP7JU2kjAl7/EN
+         qgTizy2VhBStl+hR3noLJhwKet8yeXuqRSqntRO4Gqx90IDDnWiVm8QCnIn5WNczDXmK
+         wsp+sFaam7gmn0IyAFw5t8qzz+ogRRPlJodVPDvDSGNzNbR1avKF8PwshzpV7OXS5oAA
+         0iqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=P7i2URrTnDx5tzzyJk7AR5qnVc+j04ViOkgAKhpw3Sk=;
-        b=OtG07gGLTkOjTZK/AqxMXL1OE+3P7C6TAqu44Gb16LJYXWkegE5apmBbCEvHQmWFkD
-         DGP8Nnvrjfy3edVn88azm2ApreAoRbyhRU3+gkpqsGoNeO6lfSkvZi1JgtDkuok4nFil
-         tArhKXe83a4UGgxGVmt6/2ULbiUSuzBdZX5F+Sh94kRefJqGL6Mbm9a8dzDkIjEUycjQ
-         j88TavbxwWaeB9kWu/NxWJMhkS4IpuGYllP6NkWO+GE2BMeVhy3+v6+3gsdu60CX+ZyM
-         fw6azSq8UJUAP9Hgrfu568L7IPlauT1spzFkGQfx4i6Jz9Dybk1w5/JzSP4YrENFatbb
-         KxhQ==
-X-Gm-Message-State: AGi0Pua14+9eeQAX8tNMaAYm+Ooa0Kxm1O1mAVyOJAREQiC2sDlwWToi
-        7sa36cx7744suN9gTtLclJM=
-X-Google-Smtp-Source: APiQypJ7nVgA8DvXN3x5K29X+h7zJol60u/kBlCNRDKrdex9FBSNttqYuXzqAeEmfrTTFVIQ8cZrNA==
-X-Received: by 2002:aa7:990e:: with SMTP id z14mr4016427pff.274.1585844046496;
-        Thu, 02 Apr 2020 09:14:06 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id t188sm4068670pfb.102.2020.04.02.09.14.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2020 09:14:04 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 1BDD040254; Thu,  2 Apr 2020 16:14:04 +0000 (UTC)
-Date:   Thu, 2 Apr 2020 16:14:04 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Eric Sandeen <sandeen@sandeen.net>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
-Message-ID: <20200402161404.GD11244@42.do-not-panic.com>
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200402000002.7442-3-mcgrof@kernel.org>
- <9a6576cf-b89d-d1af-2d74-652878cb78c8@sandeen.net>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+LWQRzvGUf0Noo8gQmhIsnF90MWgcXs+EjcH83IaZZI=;
+        b=KW3QvE9EVTGxE84bMr9ePueklfaemTsdn8el58Pbmtc5ZrVrC3j9SYc6+HxBm40gUd
+         kgEMHtsBOzqsNbzhSt3hxd05B+Ue54HOKmRzSi6hYAXA49sG12MZEssRZxvJT35EdrAE
+         kgqguXNhGkOtAS78F1S8ytFL5k8VfKnzQvR8UUJtmfL00sOpJ2YwKGK3chodyYKxmvqr
+         SwDHLFsrQ46Z65XN8savta+3cvfNubdEDa5DAFS5KAn3v7h4w64MX+ge4R2r/EVHNA2L
+         y3ioB2GWnD6AgMmCEI8xHepUDkBvV7JvM7iLRKyqtOWyVtbZyBoreCGciY3ylEXWN8Yl
+         wDBQ==
+X-Gm-Message-State: AGi0PuZlt6D+ogyBulKRHiVdVG/ezFgtOI7GmbuilENxwWVNI+yhqWs5
+        L+UjD+kBZ9qH8LEQa//FP4mkOCN7qXsof39Z7VFweg==
+X-Google-Smtp-Source: APiQypIsUTohrvKHniCIy83q9ah4PZqWdPsXTTnRHexEKhHjSG91k73rGGZj9Uezdib+zAGJMz9OH6yGZwu43ziQb2A=
+X-Received: by 2002:a92:8159:: with SMTP id e86mr3907587ild.60.1585844880822;
+ Thu, 02 Apr 2020 09:28:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9a6576cf-b89d-d1af-2d74-652878cb78c8@sandeen.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20200320121657.1165-1-jinpu.wang@cloud.ionos.com>
+ <20200320121657.1165-19-jinpu.wang@cloud.ionos.com> <198cd2da-cbf8-17b0-3ee5-5dec366a43e2@acm.org>
+ <CAMGffEk1WA114u4KR8_UAUoUvpafshZkhxEYuxg6UcQpZid0qQ@mail.gmail.com>
+In-Reply-To: <CAMGffEk1WA114u4KR8_UAUoUvpafshZkhxEYuxg6UcQpZid0qQ@mail.gmail.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Thu, 2 Apr 2020 18:27:50 +0200
+Message-ID: <CAMGffEk3R_egv5ry4mQ3LDEPMHXkSzV9_SaVJ_83q5Xu-++-DA@mail.gmail.com>
+Subject: Re: [PATCH v11 18/26] block/rnbd: client: main functionality
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Roman Penyaev <rpenyaev@suse.de>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 08:57:42PM -0500, Eric Sandeen wrote:
-> On 4/1/20 7:00 PM, Luis Chamberlain wrote:
-> > On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
-> > Omar fixed the original blktrace code for multiqueue use. This however
-> > left in place a possible crash, if you happen to abuse blktrace in a way
-> > it was not intended.
-> > 
-> > Namely, if you loop adding a device, setup the blktrace with BLKTRACESETUP,
-> > forget to BLKTRACETEARDOWN, and then just remove the device you end up
-> > with a panic:
-> 
-> Weird, I swear I tested that and didn't hit it, but ...
+> > Would it be possible to use the .get_budget / .put_budget callbacks for
+> > obtaining / releasing a "permit" object? I'm asking this because it was
+> > really tricky to get the .get_budget / .put_budget calls right in the
+> > block layer core. See also commit 0bca799b9280 ("blk-mq: order getting
+> > budget and driver tag") # v4.17.
+>
+> Will check if we can use .get_budget/put_budget call back.
+I checked get_budget/put_budget only has single parameter blk_mq_hw_ctx,
+so it's not possible save the permit for later to release/put back the permit.
 
-The real issue was also the dangling block device, a loop device proves
-easy to test that. I'll note that another way to test this as well would
-be to have a virtual machine with a block devices that goes in and out
-via whatever virsh shenanigans to make a block device appear / disappear.
-
-> > This issue can be reproduced with break-blktrace [2] using:
-> > 
-> >   break-blktrace -c 10 -d
-> 
-> + -s, right?
-
-Yeap, sorry about that.
-
-> > This patch fixes this issue. Note that there is also another
-> > respective UAF but from the ioctl path [3], this should also fix
-> > that issue.
-> > 
-> > This patch then also contends the severity of CVE-2019-19770 as
-> > this issue is only possible using root to shoot yourself in the
-> > foot by also misuing blktrace.
-> > 
-> > [0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
-> > [1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
-> > [2] https://github.com/mcgrof/break-blktrace
-> 
-> I verified that this does reproduce the exact same KASAN splat on
-> kernel 4.19.83 as reported in the original bug, thanks!
-
-I just codified what Nicolai suspected, we should thank him :)
-
-  Luis
+Thanks!
