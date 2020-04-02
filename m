@@ -6,94 +6,123 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA77BC43331
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFB1C43331
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:41:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80356206F8
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90A9B2077D
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388218AbgDBWRA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 18:17:00 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54487 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726963AbgDBWRA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 18:17:00 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c81so5124113wmd.4;
-        Thu, 02 Apr 2020 15:16:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GMAAF1z1HDrpyRd0Ju0XEsYC0WrWOpuIWNSFdw2NHFQ=;
-        b=HyESLoDBBU3/sj7clsewJVzrebqgnSsjWcp+e354WYk8EPPfv82HgylYnGlu3igxH/
-         dwubjS8hjabkvAO5+45mSWbUKjRzEV7dxDsTyLv5QIm4A/qkXPIsGYa9bZexyYxisFhb
-         j+sta8Bi4Vgx1w1tlGO3EXgMDGAELhSGrCQ8NY/SX0oRryoDa4ni3WHZXqmJUR3FvXOX
-         jiYedamA0tol1G0xnX+uT9RKLfQ5X0ULmk8OqlO/BWnEkRcYwTyqSyhNlgayTERcb157
-         17nl0K/gn4ud881Sh1YVZpNDd1v72HOin1YT1z62gljT345fzbJqFEOLnhLVKmWUbMnQ
-         lDWg==
-X-Gm-Message-State: AGi0PuZ29cmsmJN/DfEmX4fMiJu3OFayMH/Vytg6Rw3FUG0ubt5Domgp
-        jFmXrMYNcFQ9iJQtPt2v+iM=
-X-Google-Smtp-Source: APiQypJxYdZHUHEdAKxNnoT93/Q4YYR7kkFS2HmhMw+028JCYZRHf6fQt1XBj/oalhRDin/42PQmLg==
-X-Received: by 2002:a1c:9652:: with SMTP id y79mr5441978wmd.89.1585865818193;
-        Thu, 02 Apr 2020 15:16:58 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:9069:e334:a021:3782? ([2601:647:4802:9070:9069:e334:a021:3782])
-        by smtp.gmail.com with ESMTPSA id z12sm9478177wrt.27.2020.04.02.15.16.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Apr 2020 15:16:57 -0700 (PDT)
-Subject: Re: Data corruption in kernel 5.1+ with iSER attached ramdisk
-To:     Stephen Rust <srust@blockbridge.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Rob Townley <rob.townley@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        target-devel@vger.kernel.org, Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Max Gurtovoy <maxg@mellanox.com>
-References: <CAAFE1beMkvyRctGqpffd3o_QtDH0CrmQSb=fV4GzqMUXWzPyOw@mail.gmail.com>
- <20191203005849.GB25002@ming.t460p>
- <CAAFE1bcG8c1Q3iwh-LUjruBMAuFTJ4qWxNGsnhfKvGWHNLAeEQ@mail.gmail.com>
- <20191203031444.GB6245@ming.t460p>
- <CAAFE1besnb=HV4C_buORYpWbkXecmtybwX8d_Ka2NsKmiym53w@mail.gmail.com>
- <CAAFE1bfpUWCZrtR8v3S++0-+gi8DJ79X3e0XqDe93i8nuGTnNg@mail.gmail.com>
- <20191203124558.GA22805@ming.t460p>
- <CAAFE1bfB2Km+e=T0ahwq0r9BQrBMnSguQQ+y=yzYi3tursS+TQ@mail.gmail.com>
- <20191204010529.GA3910@ming.t460p>
- <CAAFE1bcJmRP5OSu=5asNTpvkF=kjEZu=GafaS9h52776tVgpPA@mail.gmail.com>
- <20191204230225.GA26189@ming.t460p>
- <d9d39d10-d3f3-f2d8-b32e-96896ba0cdb2@grimberg.me>
- <CAAFE1beqFBQS_zVYEXFTD2qu8PAF9hBSW4j1k9ZD6MhU_gWg5Q@mail.gmail.com>
- <d2f633f1-57ef-4618-c3a6-c5ff0afead5b@grimberg.me>
- <CAAFE1bdAbKfqbf05pKBcMUj+58fijDMT-8WBSuwiKk2Bmm4v2w@mail.gmail.com>
- <95750c05-eb49-d1db-311f-4edf9b4fd6ec@grimberg.me>
- <CAAFE1bcmFxb6MYbicUVdVsK6QNjweaow3v+vHe6szwfFN6K-=A@mail.gmail.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <1f6bc60e-7f2b-d959-f1ce-5055752e2323@grimberg.me>
-Date:   Thu, 2 Apr 2020 15:16:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Firefox/60.0 Thunderbird/60.9.0
+        id S2388621AbgDBWli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 18:41:38 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:48371 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729549AbgDBWlh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Apr 2020 18:41:37 -0400
+Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 9CF567EA663;
+        Fri,  3 Apr 2020 09:41:25 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1jK8Wa-0005P5-UW; Fri, 03 Apr 2020 09:41:24 +1100
+Date:   Fri, 3 Apr 2020 09:41:24 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     hch@lst.de, martin.petersen@oracle.com, darrick.wong@oracle.com,
+        axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
+        ming.lei@redhat.com, jthumshirn@suse.de, minwoo.im.dev@gmail.com,
+        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
+        hare@suse.com, tj@kernel.org, hannes@cmpxchg.org,
+        khlebnikov@yandex-team.ru, ajay.joshi@wdc.com, bvanassche@acm.org,
+        arnd@arndb.de, houtao1@huawei.com, asml.silence@gmail.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
+Message-ID: <20200402224124.GK10737@dread.disaster.area>
+References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAFE1bcmFxb6MYbicUVdVsK6QNjweaow3v+vHe6szwfFN6K-=A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
+        a=OLL_FvSJAAAA:8 a=7-415B0cAAAA:8 a=djW_VkzYRv8b6pmHjpMA:9
+        a=83XbmwxN0B6MQfg-:21 a=82aPxsCgDOgqXjAm:21 a=CjuIK1q_8ugA:10
+        a=Q6O7Wtph5A0A:10 a=bGb42cQ31NwA:10 a=oIrB72frpwYPwTMnlWqB:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-> Hi Sagi,
+On Sun, Mar 29, 2020 at 10:47:10AM -0700, Chaitanya Kulkarni wrote:
+> Hi,
 > 
->> Does the attached patch work for you?
+> This patch-series is based on the original RFC patch series:-
+> https://www.spinics.net/lists/linux-block/msg47933.html.
 > 
-> This patch _does_ work for our tests. I see all the writes aligned to
-> 512 bytes as, I think, would be expected. Thanks!
+> I've designed a rough testcase based on the information present
+> in the mailing list archive for original RFC, it may need
+> some corrections from the author.
+> 
+> If anyone is interested, test results are at the end of this patch.
+> 
+> Following is the original cover-letter :-
+> 
+> Information about continuous extent placement may be useful
+> for some block devices. Say, distributed network filesystems,
+> which provide block device interface, may use this information
+> for better blocks placement over the nodes in their cluster,
+> and for better performance. Block devices, which map a file
+> on another filesystem (loop), may request the same length extent
+> on underlining filesystem for less fragmentation and for batching
+> allocation requests. Also, hypervisors like QEMU may use this
+> information for optimization of cluster allocations.
+> 
+> This patchset introduces REQ_OP_ASSIGN_RANGE, which is going
+> to be used for forwarding user's fallocate(0) requests into
+> block device internals. It rather similar to existing
+> REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES, etc. The corresponding
+> exported primitive is called blkdev_issue_assign_range().
+> See [1/3] for the details.
+> 
+> Patch [2/3] teaches loop driver to handle REQ_OP_ASSIGN_RANGE
+> requests by calling fallocate(0).
+> 
+> Patch [3/3] makes ext4 to notify a block device about fallocate(0).
 
-Good to hear, I'll wait for your further testing before submitting
-it as a patch as I don't have resources to test this thoroughly
-at the moment.
+Ok, so ext4 has a very limited max allocation size for an extent, so
+I expect this won't cause huge latency problems. However, what
+happens when we use XFS, have a 64kB block size, and fallocate() is
+allocating disk space in continguous 100GB extents and passing those
+down to the block device?
 
-Thanks,
-Sagi
+How does this get split by dm devices? Are raid stripes going to
+dice this into separate stripe unit sized bios, so instead of single
+large requests we end up with hundreds or thousands or tiny
+allocation requests being issued?
+
+I know that for the loop device, it is going to serialise all IO to
+the backing file while fallocate is run on it. Hence if you have
+concurrent IO running, any REQ_OP_ASSIGN_RANGE is going to cause an
+significant, measurable latency hit to all those IOs in flight.
+
+How are we expecting hardware to behave here? Is this a queued
+command in the scsi/nvme/sata protocols? Or is this, for the moment,
+just a special snowflake that we can't actually use in production
+because the hardware just can't handle what we throw at it?
+
+IOWs, what sort of latency issues is this operation going to cause
+on real hardware? Is this going to be like discard? i.e. where we
+end up not using it at all because so few devices actually handle
+the massive stream of operations the filesystem will end up sending
+the device(s) in the course of normal operations?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
