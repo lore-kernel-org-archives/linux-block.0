@@ -2,145 +2,123 @@ Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8511C43331
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 15:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE072C2D0F3
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:14:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99D1920757
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 15:53:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SlMrIQk0"
+	by mail.kernel.org (Postfix) with ESMTP id B2DC82080C
+	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 16:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585844051;
+	bh=YWCwFuRxlfQZCnQduX7beJeIGMvcM5FqEGUtc2q6GPY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=LxRHpT797FGR42wDMR0+ptyOUwEB62pRxwCppd8jNhUvYFiZQUb+3P2i5o750s25k
+	 itkwemN8mrBfcCJ1TK6Deomgkr1/ISnN5LrCnGoO1G2GGjVijpqdqZtco1bybydaIh
+	 0OXfZYjj9q4zaHiVGeG/tW4LLze3efuKNZkH4Ns0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389402AbgDBPxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 11:53:14 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:35757 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388677AbgDBPxN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 11:53:13 -0400
-Received: by mail-vs1-f65.google.com with SMTP id u11so2648642vsg.2
-        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2020 08:53:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7eeld/knQPBWgODPyyjL7AYipdgQCeX/lwMGVDPIUXk=;
-        b=SlMrIQk0FbHoFXUBmYGR7SVnFVueYsbknDCKTTsm/4DdvhFw51M47Aud6C5bAz+mNm
-         8X2lmjNIltMcbGrJmZHzKbETTaqLKN5+QVDKB5vOKRufB7KdcrpYeFkXsydwyB5QUMHY
-         ZHw0WVrZwx4lC3Baz+zy9xLHyMUJOVHXBJtHU=
+        id S2389747AbgDBQOI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 12:14:08 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:44245 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389718AbgDBQOI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 12:14:08 -0400
+Received: by mail-pf1-f194.google.com with SMTP id b72so1951435pfb.11;
+        Thu, 02 Apr 2020 09:14:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7eeld/knQPBWgODPyyjL7AYipdgQCeX/lwMGVDPIUXk=;
-        b=XUNUYvEwGM1JbCF3VheQyGx1BfaopamkRtYdtdMped0vZ6BHNRxPsDGkmebLzWKLkp
-         jxxTtuIX8awXgnfMlsf2QUguQmPjORsJ7h9Xt/0GzmfwKPx83sTMIEf+JCftOvCY8pgR
-         /HgOO4DMePEUN8OONJvz7PntA8fDijwiWJtdTb5hiEdJKpOasihFnBtZrxxP9Cw/L+n/
-         S5CEWopAgxxVwtl/j+qFVrTS6P5T8/RUXiY+T6+bVPkga+tnOMJuQVHRb+h8GLV1U8dg
-         lL7snTD4tYz7hKWn3AH5yKp1He3E62EeaJBVr6kuBcat+gDKeZnB7Dy0qaonAceZP3ET
-         fiew==
-X-Gm-Message-State: AGi0PuZaiAEws1oRllmYeWoNYOWNQN5lW51IQeds5gSf3dSe5VZt88qD
-        ryk6aIyA/3w48ptvCO9FiLnAngxPJdU=
-X-Google-Smtp-Source: APiQypK/Ep8VKzcZ5sD04DkOTCmC74ycPTulPtwDOBWtGWVO62nhHUAJAL8AZPSCTT3xwnWAOtst7Q==
-X-Received: by 2002:a67:a20f:: with SMTP id l15mr2943355vse.40.1585842792644;
-        Thu, 02 Apr 2020 08:53:12 -0700 (PDT)
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com. [209.85.222.43])
-        by smtp.gmail.com with ESMTPSA id v197sm1361833vsv.25.2020.04.02.08.53.11
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Apr 2020 08:53:11 -0700 (PDT)
-Received: by mail-ua1-f43.google.com with SMTP id a10so1365490uad.7
-        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2020 08:53:11 -0700 (PDT)
-X-Received: by 2002:a9f:2478:: with SMTP id 111mr3073972uaq.0.1585842791113;
- Thu, 02 Apr 2020 08:53:11 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=P7i2URrTnDx5tzzyJk7AR5qnVc+j04ViOkgAKhpw3Sk=;
+        b=OtG07gGLTkOjTZK/AqxMXL1OE+3P7C6TAqu44Gb16LJYXWkegE5apmBbCEvHQmWFkD
+         DGP8Nnvrjfy3edVn88azm2ApreAoRbyhRU3+gkpqsGoNeO6lfSkvZi1JgtDkuok4nFil
+         tArhKXe83a4UGgxGVmt6/2ULbiUSuzBdZX5F+Sh94kRefJqGL6Mbm9a8dzDkIjEUycjQ
+         j88TavbxwWaeB9kWu/NxWJMhkS4IpuGYllP6NkWO+GE2BMeVhy3+v6+3gsdu60CX+ZyM
+         fw6azSq8UJUAP9Hgrfu568L7IPlauT1spzFkGQfx4i6Jz9Dybk1w5/JzSP4YrENFatbb
+         KxhQ==
+X-Gm-Message-State: AGi0Pua14+9eeQAX8tNMaAYm+Ooa0Kxm1O1mAVyOJAREQiC2sDlwWToi
+        7sa36cx7744suN9gTtLclJM=
+X-Google-Smtp-Source: APiQypJ7nVgA8DvXN3x5K29X+h7zJol60u/kBlCNRDKrdex9FBSNttqYuXzqAeEmfrTTFVIQ8cZrNA==
+X-Received: by 2002:aa7:990e:: with SMTP id z14mr4016427pff.274.1585844046496;
+        Thu, 02 Apr 2020 09:14:06 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id t188sm4068670pfb.102.2020.04.02.09.14.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2020 09:14:04 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 1BDD040254; Thu,  2 Apr 2020 16:14:04 +0000 (UTC)
+Date:   Thu, 2 Apr 2020 16:14:04 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Eric Sandeen <sandeen@sandeen.net>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        mhocko@suse.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
+Message-ID: <20200402161404.GD11244@42.do-not-panic.com>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200402000002.7442-3-mcgrof@kernel.org>
+ <9a6576cf-b89d-d1af-2d74-652878cb78c8@sandeen.net>
 MIME-Version: 1.0
-References: <20200330144907.13011-1-dianders@chromium.org> <20200330074856.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200331014109.GA20230@ming.t460p> <D38AB98D-7F6A-4C61-8A8F-C22C53671AC8@linaro.org>
- <d6af2344-11f7-5862-daed-e21cbd496d92@kernel.dk> <CAD=FV=WHYFDoUKLnwMCm-o=gEQDCzZFeMAvia3wpJzm9XX7Bow@mail.gmail.com>
- <02968c1d-bd3a-af9c-77e7-23a9d9aa9af4@kernel.dk> <1D4B63FC-FA4B-4C73-B70F-6639CC41D3A6@linaro.org>
-In-Reply-To: <1D4B63FC-FA4B-4C73-B70F-6639CC41D3A6@linaro.org>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Thu, 2 Apr 2020 08:52:59 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=XX+S==bz1OQFYyQxNmsPdMQoJ7AJSs++D9dP_r0Rc93A@mail.gmail.com>
-Message-ID: <CAD=FV=XX+S==bz1OQFYyQxNmsPdMQoJ7AJSs++D9dP_r0Rc93A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] scsi: core: Fix stall if two threads request budget
- at the same time
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        linux-scsi@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a6576cf-b89d-d1af-2d74-652878cb78c8@sandeen.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Apr 01, 2020 at 08:57:42PM -0500, Eric Sandeen wrote:
+> On 4/1/20 7:00 PM, Luis Chamberlain wrote:
+> > On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
+> > Omar fixed the original blktrace code for multiqueue use. This however
+> > left in place a possible crash, if you happen to abuse blktrace in a way
+> > it was not intended.
+> > 
+> > Namely, if you loop adding a device, setup the blktrace with BLKTRACESETUP,
+> > forget to BLKTRACETEARDOWN, and then just remove the device you end up
+> > with a panic:
+> 
+> Weird, I swear I tested that and didn't hit it, but ...
 
-On Wed, Apr 1, 2020 at 12:48 AM Paolo Valente <paolo.valente@linaro.org> wrote:
->
-> >> 28977309us - PID 2167 got the budget.
-> >> 28977518us - BFQ told PID 2167 that there was nothing to dispatch.
-> >> 28977702us - BFQ idle timer fires.
-> >> 28977725us - We start to try to dispatch as a result of BFQ's idle timer.
-> >> 28977732us - Dispatching that was a result of BFQ's idle timer can't get
-> >>             budget and thus does nothing.
-> >> 28977780us - PID 2167 put the budget and exits since there was nothing
-> >>             to dispatch.
-> >>
-> >> This is only one particular trace, but in this case BFQ did attempt to
-> >> rerun the queue after it returned NULL, but that ran almost
-> >> immediately after it returned NULL and thus ran into the race.  :(
-> >
-> > OK, and then it doesn't trigger again? It's key that it keeps doing this
-> > timeout and re-dispatch if it fails, not just once.
-> >
->
-> The goal of BFQ's timer is to make BFQ switch from non-work-conserving
-> to work-conserving mode, just because not doing so would cause a
-> stall.  In contrast, it sounds a little weird that an I/O scheduler
-> systematically kicks I/O periodically (how can BFQ know when no more
-> kicking is needed?).  IOW, it doesn't seem very robust that blk-mq may
-> need a series of periodic kicks to finally restart, like a flooded
-> engine.
->
-> Compared with this solution, I'd still prefer one where BFQ doesn't
-> trigger this blk-mq stall at all.
+The real issue was also the dangling block device, a loop device proves
+easy to test that. I'll note that another way to test this as well would
+be to have a virtual machine with a block devices that goes in and out
+via whatever virsh shenanigans to make a block device appear / disappear.
 
-I spent more time thinking about this / testing things.  Probably the
-best summary of my thoughts can be found at
-<https://crbug.com/1061950#c79>.  The quick summary is that I believe
-the problem is that BFQ has faith that when it calls
-blk_mq_run_hw_queues() that it will eventually cause BFQ to be called
-back at least once to dispatch.  That doesn't always happen due to the
-race we're trying to solve here.  If we fix the race / make
-blk_mq_run_hw_queues() reliable then I don't think there's a need for
-BFQ to implement some type of timeout/retry mechanism.
+> > This issue can be reproduced with break-blktrace [2] using:
+> > 
+> >   break-blktrace -c 10 -d
+> 
+> + -s, right?
 
+Yeap, sorry about that.
 
-> > But BFQ really should be smarter here. It's the same caller etc that
-> > asks whether it has work and whether it can dispatch, yet the answer is
-> > different. That's just kind of silly, and it'd make more sense if BFQ
-> > actually implemented the ->has_work() as a "would I actually dispatch
-> > for this guy, now".
+> > This patch fixes this issue. Note that there is also another
+> > respective UAF but from the ioctl path [3], this should also fix
+> > that issue.
+> > 
+> > This patch then also contends the severity of CVE-2019-19770 as
+> > this issue is only possible using root to shoot yourself in the
+> > foot by also misuing blktrace.
+> > 
+> > [0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
+> > [1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
+> > [2] https://github.com/mcgrof/break-blktrace
+> 
+> I verified that this does reproduce the exact same KASAN splat on
+> kernel 4.19.83 as reported in the original bug, thanks!
 
-I prototyped this and I think it would solve the problem (though I
-haven't had time to do extensive testing yet).  It certainly makes
-BFQ's has_work() more expensive in some cases, but it might be worth
-it.  Someone setup to do benchmarking would need to say for sure.
+I just codified what Nicolai suspected, we should thank him :)
 
-However, I think I've figured out an inexpensive / lightweight
-solution that means we can let has_work() be inexact.  It's mostly the
-same as this patch but implemented at the blk-mq layer (not the SCSI
-layer) and doesn't add a spinlock.  I'll post a v2 and you can see if
-you hate it or if it looks OK.  You can find it at:
-
-https://lore.kernel.org/r/20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid
-
--Doug
+  Luis
