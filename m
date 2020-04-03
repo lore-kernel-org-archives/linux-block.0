@@ -2,120 +2,106 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C1BC43331
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE5DC2BA17
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:53:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2ACFF20719
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:44:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51CC620CC7
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:53:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j0Lbeu3C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727909AbgDCVok (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 17:44:40 -0400
-Received: from mail-pg1-f174.google.com ([209.85.215.174]:33415 "EHLO
-        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726460AbgDCVok (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 17:44:40 -0400
-Received: by mail-pg1-f174.google.com with SMTP id d17so4200653pgo.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2020 14:44:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FB8J39P/DF1EwR7coWH5rTatPixAEoxGOlHyFnSIFR0=;
-        b=Ei1wAq73iQLwd+omD/u9Sv3KWR/vYprTY7eFXrjXy+lxhknR8hFL3aiRa3eL49MoYF
-         Zdyl8ar1gQNdSpUVTkq1XcmapRPfGRgH/KqHEDwVfNCEOkWzVT+ZhDjTQ5kVTtgwGyyL
-         h4ysO9V2yAUSAzkrSOHhQ5JIs4E2YEY1q93IT25R1yx4JXtXcDHStnGui5Y2Zz95POWl
-         TA1V8KvVGV+ISlLpkhStiher8dWLGPnsc9ZcNWBMejO9QCmWA3lCo4ABTEraaZsFb5fA
-         47tnXi1paL+8T4mFtL1ds2YYhp6iaMpie4Koj+a+deiHSzQPbx8YB9ITPh90hYQn0t4r
-         GCog==
-X-Gm-Message-State: AGi0PuYbx2VKkgq3AAscbwUz4wX0ZbpQ0epy7lIQw6GKrXgOd+uidMDr
-        jTN4A9HvQ8wXoRasQoDqW4g=
-X-Google-Smtp-Source: APiQypI+I1m/YXSNElSlwLHiWHO+HZIvY8gGlIaUuDcnZiP2FH64XNA36FdGnDTJq5XzNC/4Skft+g==
-X-Received: by 2002:a63:1210:: with SMTP id h16mr10110095pgl.408.1585950278877;
-        Fri, 03 Apr 2020 14:44:38 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:f12d:c567:4bc9:a988? ([2601:647:4802:9070:f12d:c567:4bc9:a988])
-        by smtp.gmail.com with ESMTPSA id 189sm6382970pfg.170.2020.04.03.14.44.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Apr 2020 14:44:38 -0700 (PDT)
-Subject: Re: Sighting: io_uring requests on unexpected core
-To:     "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>
-References: <MW3PR11MB46843ADF1AEED8FCEA66BB8FE5C70@MW3PR11MB4684.namprd11.prod.outlook.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <1b9aa822-2516-4eb8-1472-7e7b66c32d45@grimberg.me>
-Date:   Fri, 3 Apr 2020 14:44:36 -0700
+        id S1727950AbgDCVxh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 17:53:37 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52104 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726460AbgDCVxh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 17:53:37 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033LrQuB096116;
+        Fri, 3 Apr 2020 21:53:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ZmykI1jF/AuRxj1O+Z6blTUcn3zOPYoue5aVA5PrXXE=;
+ b=j0Lbeu3CDslkmu4HCqlTJOy1hgXQsrQiAYqWZkENnEDPSZF1rvOW/jJGbxyw6xoEG1wG
+ VqolF1XVb/NXWDrW3CctpSZUzeUA8H4WGYXRHbysFxXvrEbzxP7P1af3HOn9MTlcAUwN
+ pE/HWWhTavvkI/c6ftbi+vPH6SiSQ7hD4/It5x2BWEF4T0GUvgbUKWz13WqI+Ov3523A
+ xwAGFqig7rr3XM0IYC9vFaH+xM8kzJeit4lE0LCmpBHkbOoPF65ebxzLQoO31cut47Qn
+ eXhi7246mItUtTIqzptZ/IHlbxgdPftC5nA/6Gdy2/kI227DHTY72KWHjKGljY0ZoqeD cQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 303aqj3u9d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Apr 2020 21:53:28 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033LqSjn017230;
+        Fri, 3 Apr 2020 21:53:27 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 302g4y8mtb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 03 Apr 2020 21:53:27 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 033LrPUC020496;
+        Fri, 3 Apr 2020 21:53:25 GMT
+Received: from [10.39.222.119] (/10.39.222.119)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 03 Apr 2020 14:53:25 -0700
+Subject: Re: [PATCH] xen/blkfront: fix memory allocation flags in
+ blkfront_setup_indirect()
+To:     Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        stable@vger.kernel.org,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+References: <20200403090034.8753-1-jgross@suse.com>
+From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Message-ID: <1d67be51-776d-dd53-c5db-8b3539505f40@oracle.com>
+Date:   Fri, 3 Apr 2020 17:53:14 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Firefox/68.0 Thunderbird/68.4.1
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <MW3PR11MB46843ADF1AEED8FCEA66BB8FE5C70@MW3PR11MB4684.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200403090034.8753-1-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9580 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
+ mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004030169
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9580 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 clxscore=1011
+ malwarescore=0 impostorscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004030169
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Hey all, Mark here again with another sighting.
 
-Hey Mark,
+On 4/3/20 5:00 AM, Juergen Gross wrote:
+> Commit 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for
+> large array allocation") didn't fix the issue it was meant to, as the
+> flags for allocating the memory are GFP_NOIO, which will lead the
+> memory allocation falling back to kmalloc().
+>
+> So instead of GFP_NOIO use GFP_KERNEL and do all the memory allocation
+> in blkfront_setup_indirect() in a memalloc_noio_{save,restore} section.=
 
-> If you're all WFH like myself during this virus period maybe this will provide you with a new puzzle to solve and pass the time, while helping to educate.  Our family big into puzzles during this period.
+>
+> Fixes: 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for lar=
+ge array allocation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 
-:-)
+Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-> Here is the issue:
-> While performing an FIO test, for a single job thread pinned to a specific CPU, I can trap requests to the nvmf layer from a core and queue not aligned to the FIO specified CPU.
-> I can replicate this on the baseline of nvme-5.5-rc or nvme-5.7-rc1 branches of the infradead repository, with no other patches applied.
-> For a typical 30 second 4k 100% read test there will be over 2 million packets processed, with under 100 sent by this other CPU to a different queue.  When this occurs it causes a drop in performance of 1-3%.
-> My nvmf queue configuration is 1 nr_io_queue and 104 nr_poll_queues that equal the number of active cores in the system.
 
-Given that you pin your fio thread the high poll queue count shouldn't
-really matter I assume.
-
-> As indicated this is while running an FIO test using io_uring for 100% random read.  And have seen this with a queue depth of 1 batch 1, as well as queue depth 32 batch 8.
-> 
->   The basic command line being:
-> /fio --filename=/dev/nvme0n1 --time_based --runtime=30 --ramp_time=10 --thread --rw=randrw --rwmixread=100 --refill_buffers --direct=1 --ioengine=io_uring --hipri --fixedbufs --bs=4k --iodepth=32 --iodepth_batch_complete_min=1 --iodepth_batch_complete_max=32 --iodepth_batch=8 --numjobs=1 --group_reporting --gtod_reduce=0 --disable_lat=0 --name=cpu3 --cpus_allowed=3
-> 
-> Adding monitoring within the code functions nvme_tcp_queue_request() and nvme_tcp_poll() I will see the following.  Polling from the expected CPU for different queues with different assigned CPU [queue->io_cpu].  And new queue request coming in on an unexpected CPU [not as directed on FIO invocation] indicating a queue context assigned with the same CPU value.  Note: even when requests come in on different CPU cores, all polling is from the same expected CPU core.
-
-nvme_tcp_poll: [Queue CPU 3], [CPU 3] means that the poll is is called
-on cpu core [3] on a queue that is mapped to cpu core [3] correct?
-
-nvme_tcp_poll: [Queue CPU 75], [CPU 3] means that the poll is is called
-on cpu core [3] on a queue that is mapped to cpu core [75] correct?
-
-> [  524.867622] nvme_tcp:        nvme_tcp_poll: [Queue CPU 3], [CPU 3]
-> [  524.867686] nvme_tcp:        nvme_tcp_poll: [Queue CPU 75], [CPU 3]
-
-I'm assuming that this is a poll invocation of a prior submission to
-queue that is mapped to CPU 75?
-
-> [  524.867693] nvme_tcp:        nvme_tcp_poll: [Queue CPU 3], [CPU 3]
-> [  524.867755] nvme_tcp: nvme_tcp_queue_request: IO-Q [Queue CPU 75], [CPU 75]
-
-This log print means that on cpu core [3] we see a request submitted on
-a queue that is mapped to cpu core [75] correct?
-
-> [  524.867758] nvme_tcp:        nvme_tcp_poll: [Queue CPU 75], [CPU 3]
-> [  524.867777] nvme_tcp: nvme_tcp_queue_request: IO-Q [Queue CPU 3], [CPU 3]
-> [  524.867781] nvme_tcp:        nvme_tcp_poll: [Queue CPU 3], [CPU 3]
-> [  524.867853] nvme_tcp:        nvme_tcp_poll: [Queue CPU 75], [CPU 3]
-> [  524.867864] nvme_tcp:        nvme_tcp_poll: [Queue CPU 3], [CPU 3]
-> 
-> So, if someone can help solve this puzzle and help me understand what is causing this behavior that would be great.  Hard for me to think this is an expected, or beneficial behavior, to have a need to use some other core/queue for less than 100 requests out of over 2 million.
-
-I'm assuming that this phenomenon happens also without polling?
-
-Anyways, it is unexpected to me, given that you have a queue that is
-mapped to the cpu you are pinning on, I'd expect that all request
-that are generated on this cpu would be submitted on that same
-queue..
-
-Anyone has any insights on this?
