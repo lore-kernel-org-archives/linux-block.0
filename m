@@ -2,261 +2,90 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1020C2BA12
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B4DC2BA15
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B135D2077D
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:11:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C25A20721
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:42:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IkCqFgbE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8wdsBNm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404132AbgDCPLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 11:11:02 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:35359 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404011AbgDCPLC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 11:11:02 -0400
-Received: by mail-vs1-f66.google.com with SMTP id u11so5146314vsg.2
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2020 08:11:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=s3B7TP3PryQrSMDQHVPJCTFtzd/ywd5l72std87udlQ=;
-        b=IkCqFgbE8sOnVH23Bfho3RoIfyYvdmlWc/wIjurrNtsT+gexEJaUgZwBOJ0C/jJdD1
-         PgAWRVuRJSjJV0P1Qc0uJR+gA1+MciQJ438syn4YTV4DdihnuugJxVQIWYWTTZXQXDTZ
-         vD6xDLcZVIpxcuhFAZ5BbzrIYJfcFfcGZ1KwY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=s3B7TP3PryQrSMDQHVPJCTFtzd/ywd5l72std87udlQ=;
-        b=oFqO6v21LjsMgP3fodUTyfuSMIyXEWjXLIGj895VwO+IChMlKa0qTULCdNiCZRQUBL
-         vmkR99CnjHbiOqqZL81HglIsNMZK09hkHXwa+FdlKwtrimvE3Dnc49elaA+330i7m6Jy
-         39VEOB330KKl0fBGWZy55bv+Db7jsxFQ/0jSBfuZL4o7viyGqxDYiEsMOKTZwOqGKZcd
-         wfYu3Va2q+EGL1w+z+RPrL9gEa2f64Jgt10FPOigDc+7hUZtdd/aJ5FfDQvyNcoxkPQf
-         qtLP/WWlrrPWLS99bghZ5WKz/dObOGq65hRE461Co/Gzfsc9oO3Zfz6eXBoLxhwPxaCM
-         mtUA==
-X-Gm-Message-State: AGi0PuZmdreKOiKCSxQ9LlDL+trmotth1Zyy/So0vIndhUPpTCd46bzH
-        ITjOhuRQV2fsxNOXnk5KbdTNjPtbTNU=
-X-Google-Smtp-Source: APiQypKLbUDpsMzr3gZWA8pIbOsLgKhgZMr+FJuL1h7z+lkFNkyqP2KJDcBa7X6xfbPlDHx9b3dFlw==
-X-Received: by 2002:a67:ae0f:: with SMTP id x15mr6890014vse.110.1585926660091;
-        Fri, 03 Apr 2020 08:11:00 -0700 (PDT)
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
-        by smtp.gmail.com with ESMTPSA id j78sm2097651vsd.4.2020.04.03.08.10.58
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Apr 2020 08:10:59 -0700 (PDT)
-Received: by mail-ua1-f47.google.com with SMTP id 9so2825544uav.12
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2020 08:10:58 -0700 (PDT)
-X-Received: by 2002:ab0:7406:: with SMTP id r6mr6622996uap.22.1585926657542;
- Fri, 03 Apr 2020 08:10:57 -0700 (PDT)
+        id S2403949AbgDCPmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 11:42:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45828 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728186AbgDCPmX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 11:42:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585928542;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=uGxOJunlxw46pzIKm4qpBYP9Z+z1L3NVwZv5aN7kdWs=;
+        b=E8wdsBNmn8qFQZnJjmAxHys39p2YB24RahHPovUoRkWQeHNzpM7NllGeJqMJ18FhgtABff
+        mED3zPjZlOnZku4UnFBtBnRG0O8iXhCDBsRJQRcuZQx6gQIR61B2AdW/0VqZhq8Pisz9sS
+        rQTKF5pKhSG97WtyCDe0rspDRx/1+Mk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-C8yEcXU2MwybbqxXa76bvg-1; Fri, 03 Apr 2020 11:42:20 -0400
+X-MC-Unique: C8yEcXU2MwybbqxXa76bvg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9500BDBA5;
+        Fri,  3 Apr 2020 15:42:19 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 986EA5DE79;
+        Fri,  3 Apr 2020 15:42:14 +0000 (UTC)
+Date:   Fri, 3 Apr 2020 11:42:13 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>
+Subject: [git pull] device mapper fixes for 5.7
+Message-ID: <20200403154213.GA18386@redhat.com>
 MIME-Version: 1.0
-References: <20200402155130.8264-1-dianders@chromium.org> <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200403013356.GA6987@ming.t460p>
-In-Reply-To: <20200403013356.GA6987@ming.t460p>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Fri, 3 Apr 2020 08:10:45 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
-Message-ID: <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget contention
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Salman Qazi <sqazi@google.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
-        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Tejun Heo <tj@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Linus,
 
-On Thu, Apr 2, 2020 at 6:34 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Thu, Apr 02, 2020 at 08:51:30AM -0700, Douglas Anderson wrote:
-> > It is possible for two threads to be running
-> > blk_mq_do_dispatch_sched() at the same time with the same "hctx".
-> > This is because there can be more than one caller to
-> > __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
-> > prevent more than one thread from entering.
-> >
-> > If more than one thread is running blk_mq_do_dispatch_sched() at the
-> > same time with the same "hctx", they may have contention acquiring
-> > budget.  The blk_mq_get_dispatch_budget() can eventually translate
-> > into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
-> > uncommon) then only one of the two threads will be the one to
-> > increment "device_busy" to 1 and get the budget.
-> >
-> > The losing thread will break out of blk_mq_do_dispatch_sched() and
-> > will stop dispatching requests.  The assumption is that when more
-> > budget is available later (when existing transactions finish) the
-> > queue will be kicked again, perhaps in scsi_end_request().
-> >
-> > The winning thread now has budget and can go on to call
-> > dispatch_request().  If dispatch_request() returns NULL here then we
-> > have a potential problem.  Specifically we'll now call
->
-> As I mentioned before, it is a BFQ specific issue, it tells blk-mq
-> that it has work to do, and now the budget is assigned to the only
-> winning thread, however, dispatch_request() still returns NULL.
+The following changes since commit 81d5553d1288c2ec0390f02f84d71ca0f0f9f137:
 
-Correct that it only happens with BFQ, but whether it's a BFQ bug or
-not just depends on how you define the has_work() API.  If has_work()
-is allowed to be in-exact then it's either a blk-mq bug or a SCSI bug
-depending on how you cut it.  If has_work() must be exact then it is
-certainly a BFQ bug.  If has_work() doesn't need to be exact then it's
-not a BFQ bug.  I believe that a sane API could be defined either way.
-Either has_work() can be defined as a lightweight hint to trigger
-heavier code or it can be defined as something exact.  It's really up
-to blk-mq to say how they define it.
+  dm clone metadata: Fix return type of dm_clone_nr_of_hydrated_regions() (2020-03-27 14:42:51 -0400)
 
-From his response on the SCSI patch [1], it sounded like Jens was OK
-with has_work() being a lightweight hint as long as BFQ ensures that
-the queues run later.  ...but, as my investigation found, I believe
-that BFQ _does_ try to ensure that the queue is run at a later time by
-calling blk_mq_run_hw_queues().  The irony is that due to the race
-we're talking about here, blk_mq_run_hw_queues() isn't guaranteed to
-be reliable if has_work() is inexact.  :(  One way to address this is
-to make blk_mq_run_hw_queues() reliable even if has_work() is inexact.
+are available in the Git repository at:
 
-...so Jens: care to clarify how you'd like has_work() to be defined?
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.7/dm-fixes
 
+for you to fetch changes up to 120c9257f5f19e5d1e87efcbb5531b7cd81b7d74:
 
-> > - Because this problem only trips with inexact has_work() it's
-> >   believed that blk_mq_do_dispatch_ctx() does not need a similar
-> >   change.
->
-> Right, I prefer to fix it in BFQ, given it isn't a generic issue,
-> not worth of generic solution.
+  Revert "dm: always call blk_queue_split() in dm_process_bio()" (2020-04-03 11:32:19 -0400)
 
-Just to confirm: it sounds like you are saying that BFQ is not a first
-class citizen here because not everyone uses BFQ.  Is that really the
-best policy?  Couldn't I say that SCSI shouldn't be a first class
-citizen because not everyone uses SCSI?  In such a case I could argue
-that we should speed up the blk-mq layer by removing all the budget
-code since SCSI is the only user.  I'm not actually suggesting it,
-only pointing out that sometimes we need to make allowances in the
-code.
+Please pull, thanks!
+Mike
 
+----------------------------------------------------------------
+- Fix excessive bio splitting that caused performance regressions.
 
-> > @@ -97,12 +97,34 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> >               if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
-> >                       break;
-> >
-> > -             if (!blk_mq_get_dispatch_budget(hctx))
-> > -                     break;
-> > +
-> > +             if (!blk_mq_get_dispatch_budget(hctx)) {
-> > +                     /*
-> > +                      * We didn't get budget so set contention.  If
-> > +                      * someone else had the budget but didn't dispatch
-> > +                      * they'll kick everything.  NOTE: we check one
-> > +                      * extra time _after_ setting contention to fully
-> > +                      * close the race.  If we don't actually dispatch
-> > +                      * we'll detext faux contention (with ourselves)
-> > +                      * but that should be rare.
-> > +                      */
-> > +                     atomic_set(&q->budget_contention, 1);
-> > +
-> > +                     if (!blk_mq_get_dispatch_budget(hctx))
->
-> scsi_mq_get_budget() implies a smp_mb(), so the barrier can order
-> between blk_mq_get_dispatch_budget() and atomic_set(&q->budget_contention, 0|1).
+- Fix DM integrity warning on ppc64le due to missing cast.
 
-I always struggle when working with memory barriers.  I think you are
-saying that this section of code is OK, though, presumably because the
-SCSI code does "atomic_inc_return" which implies this barrier.
+----------------------------------------------------------------
+Mike Snitzer (2):
+      dm integrity: fix ppc64le warning
+      Revert "dm: always call blk_queue_split() in dm_process_bio()"
 
-Do you happen to know if it's documented that anyone who implements
-get_budget() for "struct blk_mq_ops" will have a memory barrier here?
-I know SCSI is the only existing user, but we'd want to keep it
-generic.
+ drivers/md/dm-integrity.c | 2 +-
+ drivers/md/dm.c           | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-
-> > +                             break;
-> > +             }
-> >
-> >               rq = e->type->ops.dispatch_request(hctx);
-> >               if (!rq) {
-> >                       blk_mq_put_dispatch_budget(hctx);
-> > +
-> > +                     /*
-> > +                      * We've released the budget but us holding it might
-> > +                      * have prevented someone else from dispatching.
-> > +                      * Detect that case and run all queues again.
-> > +                      */
-> > +                     if (atomic_read(&q->budget_contention))
->
-> scsi_mq_put_budget() doesn't imply smp_mb(), so one smp_mb__after_atomic()
-> is needed between the above two op.
-
-OK, thanks.  I will add that we decide to move forward with this
-patch.  Again I'd wonder if this type of thing should be documented.
-
-
-> > +                             blk_mq_run_hw_queues(q, true);
-> >                       break;
-> >               }
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 2cd8d2b49ff4..6163c43ceca5 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1528,6 +1528,9 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
-> >       struct blk_mq_hw_ctx *hctx;
-> >       int i;
-> >
-> > +     /* We're running the queues, so clear the contention detector */
-> > +     atomic_set(&q->budget_contention, 0);
-> > +
->
-> You add extra cost in fast path.
-
-Yes, but it is a fairly minor cost added.  It's called once in a place
-where we're unlikely to be looping and where we're about to do a lot
-heavier operations (perhaps in a loop).  This doesn't feel like a
-dealbreaker.
-
-
-> >       queue_for_each_hw_ctx(q, hctx, i) {
-> >               if (blk_mq_hctx_stopped(hctx))
-> >                       continue;
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index f629d40c645c..07f21e45d993 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -583,6 +583,8 @@ struct request_queue {
-> >
-> >  #define BLK_MAX_WRITE_HINTS  5
-> >       u64                     write_hints[BLK_MAX_WRITE_HINTS];
-> > +
-> > +     atomic_t                budget_contention;
->
-> It needn't to be a atomic variable, and simple 'unsigned'
-> int should be fine, what matters is that the order between
-> R/W this flag and get/put budget.
-
-Apparently I'm the only one who feels atomic_t is more documenting
-here.  I will cede to the will of the majority here and change to
-'unsigned int' if we decide to move forward with this patch.
-
--Doug
-
-[1] https://lore.kernel.org/r/d6af2344-11f7-5862-daed-e21cbd496d92@kernel.dk
