@@ -2,221 +2,80 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B280C2BA1B
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6976C43331
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:27:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3AD520757
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GErCpaeN"
+	by mail.kernel.org (Postfix) with ESMTP id A05512073B
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:27:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390650AbgDCKNU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 06:13:20 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56752 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390633AbgDCKNP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 06:13:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585908795; x=1617444795;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DntH3FOL+F2qJ4JB8bNfeHvJeRnIrbJq4X8RpN63JaA=;
-  b=GErCpaeNP5ToG5PipM0I25323UAz4kYbZ2cFenjZp6viuNtQY/d2ZOHn
-   DjEW/Dly4/PyF5RMxxx8A5+u7ynzitYdDPW99Es2ujwAUqKxugwmWMgkY
-   Rw8JnUOPU2IMKDM9SrKl2iBi9nrVIV1RCQSvppdZFOYhU0c0zSGhjHvjQ
-   KXUEKSLz16T9iZntk7bl4S8S16Jqe3rGcUmeup6ARXSOlwavUa/lY5OFH
-   OLB0nF6WXSQIv+Klgc9IokLtySy7DA81J7kqeVPSRbMYSl+QXbH+fkXH6
-   M2cL3vkGJP2qP+UhbAkh62Bi82JfgFY/VNRQP/5CpSGLfXwFbSg1eqaXN
-   A==;
-IronPort-SDR: ge2drv3IAlwPOj6qIlYPp/t3OqdS3OoqKIndlWR5ZzBapR9sZ3F2Pi/lvKSWWHIyxJEsNtdHlT
- OCqw3Fh/Q44zPQLS6eThXe3YBLG7PhgTwkRMB4P90K2/+tup8i1AilBLx9njlcwaxPLJoh4NRP
- G1PzRzheuzWbHi05V5ffRiPzWlCuz8w1/4ksr6rA0MA5omJNrYTU1dBjDOvQW449mZMF5cef0S
- N5HQjkQKgWAa3w/WkQ8oowyrM07LUGRw/TCx4iDSdWIO/FtpMMCjxCPWieTqZvIReT6cVVs0ds
- 4Vc=
-X-IronPort-AV: E=Sophos;i="5.72,339,1580745600"; 
-   d="scan'208";a="135956057"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2020 18:13:15 +0800
-IronPort-SDR: 9GGFY5qNc8Q3jtHjZu838vi+eKJ9Eh004g/yPnqsrJXt5g3i+Gnj05IFlss5qAZ6zvyXxbBbCd
- 27yK1EiYHJ0rbKkVVA4v28RNwqxu+W5GE7RgWZHdaZtCxypuehzc6DcAKYAIDDAhnnbD97lkL9
- x4OvBRIX2mHnnpK1kn3YNV19iCepLrgIsN5LGaZjwoaHTCVTsXrzPhTXen7n14Ojo2Eai+h1UY
- 4evk54c2zKCG/N6QWvXOuL2YkEVxr9ZHZ9M9z96OlOwoqBsAibDwr2+tcKpb8iA3e0EsAMtQBY
- W0AsKD6WCNQMqXBSkqU5+bzB
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 03:04:04 -0700
-IronPort-SDR: nV9xeSC198WDQDPHiej2oAz+ea5egwfJmMSL3FUrsJsDBqhCg1ysRo+BxrcCkKj45k6YVzU4xb
- DZqUfXLnrMe+zdL/pKVdiXE6EkwvqkBC3NKyjod/E8IAH5v++gpadmiB5kg+tgtG02GQuQwQMK
- r5Lkiiixyvz83+VusZ+uca/vvGb520q6V68TaFeRlACAG3vimPaxuyK+HrI508xOSHbJdXEbP9
- AjbibnZyomsxUji2EIzyIIFLEOGEzZeHyNzsKjY4xw4KkWoU/nNnEefSPBGaIRJTYnlGfQb874
- eSk=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip02.wdc.com with ESMTP; 03 Apr 2020 03:13:12 -0700
-From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v4 10/10] zonefs: use REQ_OP_ZONE_APPEND for sync DIO
-Date:   Fri,  3 Apr 2020 19:12:50 +0900
-Message-Id: <20200403101250.33245-11-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
-References: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
+        id S1727895AbgDCK1d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 06:27:33 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:54354 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727774AbgDCK1c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 06:27:32 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: andrzej.p)
+        with ESMTPSA id 5F0DB29854C
+Subject: Re: [PATCH v8 2/2] loop: Better discard support for block devices
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     evgreen@chromium.org, asavery@chromium.org, axboe@kernel.dk,
+        bvanassche@acm.org, darrick.wong@oracle.com, dianders@chromium.org,
+        gwendal@chromium.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com, ming.lei@redhat.com,
+        kernel@collabora.com
+References: <20200402170603.19649-1-andrzej.p@collabora.com>
+ <20200402170603.19649-3-andrzej.p@collabora.com>
+ <20200403063955.GB28875@infradead.org>
+From:   Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+Message-ID: <49a20f42-f082-be3a-52f8-a4179ab886c0@collabora.com>
+Date:   Fri, 3 Apr 2020 12:27:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <20200403063955.GB28875@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Synchronous direct I/O to a sequential write only zone can be issued using
-the new REQ_OP_ZONE_APPEND request operation. As dispatching multiple
-BIOs can potentially result in reordering, we cannot support asynchronous
-IO via this interface.
+Hi Christoph,
 
-We also can only dispatch up to queue_max_zone_append_sectors() via the
-new zone-append method and have to return a short write back to user-space
-in case an IO larger than queue_max_zone_append_sectors() has been issued.
+W dniu 03.04.2020 o 08:39, Christoph Hellwig pisze:
+> On Thu, Apr 02, 2020 at 07:06:03PM +0200, Andrzej Pietrasiewicz wrote:
+>> From: Evan Green <evgreen@chromium.org>
+>>
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- fs/zonefs/super.c | 80 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 72 insertions(+), 8 deletions(-)
+<snip>
 
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index 3ce9829a6936..0bf7009f50a2 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -20,6 +20,7 @@
- #include <linux/mman.h>
- #include <linux/sched/mm.h>
- #include <linux/crc32.h>
-+#include <linux/task_io_accounting_ops.h>
- 
- #include "zonefs.h"
- 
-@@ -596,6 +597,61 @@ static const struct iomap_dio_ops zonefs_write_dio_ops = {
- 	.end_io			= zonefs_file_write_dio_end_io,
- };
- 
-+static ssize_t zonefs_file_dio_append(struct kiocb *iocb, struct iov_iter *from)
-+{
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct zonefs_inode_info *zi = ZONEFS_I(inode);
-+	struct block_device *bdev = inode->i_sb->s_bdev;
-+	unsigned int max;
-+	struct bio *bio;
-+	ssize_t size;
-+	int nr_pages;
-+	ssize_t ret;
-+
-+	nr_pages = iov_iter_npages(from, BIO_MAX_PAGES);
-+	if (!nr_pages)
-+		return 0;
-+
-+	max = queue_max_zone_append_sectors(bdev_get_queue(bdev));
-+	max = ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize);
-+	iov_iter_truncate(from, max);
-+
-+	bio = bio_alloc_bioset(GFP_NOFS, nr_pages, &fs_bio_set);
-+	if (!bio)
-+		return -ENOMEM;
-+
-+	bio_set_dev(bio, bdev);
-+	bio->bi_iter.bi_sector = zi->i_zsector;
-+	bio->bi_write_hint = iocb->ki_hint;
-+	bio->bi_ioprio = iocb->ki_ioprio;
-+	bio->bi_opf = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
-+	if (iocb->ki_flags & IOCB_DSYNC)
-+		bio->bi_opf |= REQ_FUA;
-+
-+	ret = bio_iov_iter_get_pages(bio, from);
-+	if (unlikely(ret)) {
-+		bio_io_error(bio);
-+		return ret;
-+	}
-+	size = bio->bi_iter.bi_size;
-+	task_io_account_write(ret);
-+
-+	if (iocb->ki_flags & IOCB_HIPRI)
-+		bio_set_polled(bio, iocb);
-+
-+	ret = submit_bio_wait(bio);
-+
-+	bio_put(bio);
-+
-+	zonefs_file_write_dio_end_io(iocb, size, ret, 0);
-+	if (ret >= 0) {
-+		iocb->ki_pos += size;
-+		return size;
-+	}
-+
-+	return ret;
-+}
-+
- /*
-  * Handle direct writes. For sequential zone files, this is the only possible
-  * write path. For these files, check that the user is issuing writes
-@@ -611,6 +667,8 @@ static ssize_t zonefs_file_dio_write(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	struct zonefs_inode_info *zi = ZONEFS_I(inode);
- 	struct super_block *sb = inode->i_sb;
-+	bool sync = is_sync_kiocb(iocb);
-+	bool append = false;
- 	size_t count;
- 	ssize_t ret;
- 
-@@ -619,7 +677,7 @@ static ssize_t zonefs_file_dio_write(struct kiocb *iocb, struct iov_iter *from)
- 	 * as this can cause write reordering (e.g. the first aio gets EAGAIN
- 	 * on the inode lock but the second goes through but is now unaligned).
- 	 */
--	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ && !is_sync_kiocb(iocb) &&
-+	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ && !sync &&
- 	    (iocb->ki_flags & IOCB_NOWAIT))
- 		return -EOPNOTSUPP;
- 
-@@ -643,16 +701,22 @@ static ssize_t zonefs_file_dio_write(struct kiocb *iocb, struct iov_iter *from)
- 	}
- 
- 	/* Enforce sequential writes (append only) in sequential zones */
--	mutex_lock(&zi->i_truncate_mutex);
--	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ && iocb->ki_pos != zi->i_wpoffset) {
-+	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ) {
-+		mutex_lock(&zi->i_truncate_mutex);
-+		if (iocb->ki_pos != zi->i_wpoffset) {
-+			mutex_unlock(&zi->i_truncate_mutex);
-+			ret = -EINVAL;
-+			goto inode_unlock;
-+		}
- 		mutex_unlock(&zi->i_truncate_mutex);
--		ret = -EINVAL;
--		goto inode_unlock;
-+		append = sync;
- 	}
--	mutex_unlock(&zi->i_truncate_mutex);
- 
--	ret = iomap_dio_rw(iocb, from, &zonefs_iomap_ops,
--			   &zonefs_write_dio_ops, is_sync_kiocb(iocb));
-+	if (append)
-+		ret = zonefs_file_dio_append(iocb, from);
-+	else
-+		ret = iomap_dio_rw(iocb, from, &zonefs_iomap_ops,
-+				   &zonefs_write_dio_ops, sync);
- 	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ &&
- 	    (ret > 0 || ret == -EIOCBQUEUED)) {
- 		if (ret > 0)
--- 
-2.24.1
+>> +	struct request_queue *backingq;
+>> +
+>> +	/*
+>> +	 * If the backing device is a block device, mirror its zeroing
+>> +	 * capability. Set the discard sectors to the block device's zeroing
+>> +	 * capabilities because loop discards result in blkdev_issue_zeroout(),
+>> +	 * not blkdev_issue_discard(). This maintains consistent behavior with
+>> +	 * file-backed loop devices: discarded regions read back as zero.
+>> +	 */
+>> +	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
+>> +		backingq = bdev_get_queue(inode->i_bdev);
+> 
+> The backingq could move into this local scope.
+> 
+>> +	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> 
+> No need for the inner braces.
+> 
+> But the actual functionality looks good to me.
+> 
 
+Would you A-b or R-b if I corrected the two small issues which you found?
+
+Andrzej
