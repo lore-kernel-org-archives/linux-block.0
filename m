@@ -2,73 +2,129 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A73E1C43331
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 11:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A065C43331
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 14:06:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79CB42073B
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 11:15:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BxKHzDGw"
+	by mail.kernel.org (Postfix) with ESMTP id CE75D206E9
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 14:06:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585922766;
+	bh=uoJpB8eSfiU/CWF7qbNmRzvrvapcuZJif4Ho8MXA2qc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=gwhG4DOqQv1RLMzOWJWZI8Qzrw57uqSfSG17p6wrsbW7/UATNma7DQVCIlQuVb99h
+	 5O9qexHJHIiPQ8V3kK/nXQUF8VCvyigWWrVGEPqgoP5OemlyeJWZ/STV3TNYH/O++V
+	 1DmMKHVP/vhrJ4bcDHDJEXCMylET7kkXVlDmzWcc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390667AbgDCLPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 07:15:55 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:38682 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728066AbgDCLPz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 07:15:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AeG0BBS5fyuZ5/KLlk5YFUpG+5gZPDE4CvetHvPlXLE=; b=BxKHzDGwyIXNN8s1f7rIBysFtk
-        wzP6Sf32TcKqJxc2ZcDbVwuX+QNk/JcOuCjvwj3Eh4s10GKhdEVlxmI/zHYRkrlapehuoIyWF665Q
-        lGAoqrgZVqe156p/Pt4Ds7LM01/XLj020qjI9FsphEMss2rGk/wm+X1bfZf1u2dhqpqbvTiCJAZVG
-        f4VFxgV/stMQakn8Bwu9PrCy6CC/NujHlANf6eQpL08oQtagpDLcMmJAWVGr/Kl6ZVvUPR259t2Rt
-        ZLi5yRfnSArDzjUyISdtSFyXkAaUmyGEX8GVrfHFUOfau/ZH3E0Gqj4rCS54Ex4miR8b+Su1q5EaI
-        zycRd+uQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jKKIa-0007m0-SF; Fri, 03 Apr 2020 11:15:44 +0000
-Date:   Fri, 3 Apr 2020 04:15:44 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, evgreen@chromium.org,
-        asavery@chromium.org, axboe@kernel.dk, bvanassche@acm.org,
-        darrick.wong@oracle.com, dianders@chromium.org,
-        gwendal@chromium.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com, ming.lei@redhat.com,
-        kernel@collabora.com
-Subject: Re: [PATCH v8 2/2] loop: Better discard support for block devices
-Message-ID: <20200403111544.GA27769@infradead.org>
-References: <20200402170603.19649-1-andrzej.p@collabora.com>
- <20200402170603.19649-3-andrzej.p@collabora.com>
- <20200403063955.GB28875@infradead.org>
- <49a20f42-f082-be3a-52f8-a4179ab886c0@collabora.com>
+        id S2390985AbgDCOGF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 10:06:05 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:38362 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390889AbgDCOGF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 10:06:05 -0400
+Received: by mail-pj1-f67.google.com with SMTP id m15so2982777pje.3;
+        Fri, 03 Apr 2020 07:06:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=a8g22/FwxwkjiRhQiEAJOv2w5JLkw7NJLiR2WpXy++A=;
+        b=H3wAHDEwOwW7durYx2PoslkSZulfjwlqrLe/8GCXTEJHGiCXd9JMoDZOcDqawQNSwH
+         c+4MF/bD8q7dHKmpKjPPmGTRtlXAvWXdR3jFgFj5KayhCJ4n/Ld9IkU9H0xy9bFIBe0J
+         euaTj5fYSQFsBR3xlcgFmC3NLnA9yzN7m42rYn21AsF56U3CyjzmMplTSTCoHMKb4Q4S
+         pcoONXrR4hMfpkZ7IfpnTJqunaup55iDICPlF2Hhd7Z6qeq7GhENtkOHedtrkfuinyT1
+         eJ3Is05/aCxBSGSyPw8GlP6pKOqG2EX3PX5Czh6dundhvvlMmImfTaTJvMSfInoyoFMN
+         ZlTg==
+X-Gm-Message-State: AGi0Puau6YiVG3YZVWQRCUkEmJtaSOuPX0kiK+fnZ7x6vnGCPpVzB1K2
+        dGEJiag4FbDdtf8VFv2v3Yg=
+X-Google-Smtp-Source: APiQypKpERbmgBhQxVd+/uOx5FaWLUkTGZQy3n5jE9fzkYMhWnKNWlUp9kUqvjNDKLGSXYvSgcHF2Q==
+X-Received: by 2002:a17:90a:c256:: with SMTP id d22mr10116186pjx.78.1585922764126;
+        Fri, 03 Apr 2020 07:06:04 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id z63sm5877782pfb.20.2020.04.03.07.06.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2020 07:06:02 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id DDC8640297; Fri,  3 Apr 2020 14:06:01 +0000 (UTC)
+Date:   Fri, 3 Apr 2020 14:06:01 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>, yu kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, nstange@suse.de, mhocko@suse.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com
+Subject: Re: [RFC 0/3] block: address blktrace use-after-free
+Message-ID: <20200403140601.GP11244@42.do-not-panic.com>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200403081929.GC6887@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49a20f42-f082-be3a-52f8-a4179ab886c0@collabora.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200403081929.GC6887@ming.t460p>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 12:27:26PM +0200, Andrzej Pietrasiewicz wrote:
-> > The backingq could move into this local scope.
+On Fri, Apr 03, 2020 at 04:19:29PM +0800, Ming Lei wrote:
+> On Wed, Apr 01, 2020 at 11:59:59PM +0000, Luis Chamberlain wrote:
+> > Upstream kernel.org korg#205713 contends that there is a UAF in
+> > the core debugfs debugfs_remove() function, and has gone through
+> > pushing for a CVE for this, CVE-2019-19770.
 > > 
-> > > +	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> > If correct then parent dentries are not positive, and this would
+> > have implications far beyond this bug report. Thankfully, upon review
+> > with Nicolai, he wasn't buying it. His suspicions that this was just
+> > a blktrace issue were spot on, and this patch series demonstrates
+> > that, provides a reproducer, and provides a solution to the issue.
 > > 
-> > No need for the inner braces.
+> > We there would like to contend CVE-2019-19770 as invalid. The
+> > implications suggested are not correct, and this issue is only
+> > triggerable with root, by shooting yourself on the foot by misuing
+> > blktrace.
 > > 
-> > But the actual functionality looks good to me.
+> > If you want this on a git tree, you can get it from linux-next
+> > 20200401-blktrace-fix-uaf branch [2].
 > > 
+> > Wider review, testing, and rants are appreciated.
+> > 
+> > [0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
+> > [1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
+> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200401-blktrace-fix-uaf
+> > 
+> > Luis Chamberlain (3):
+> >   block: move main block debugfs initialization to its own file
+> >   blktrace: fix debugfs use after free
+> >   block: avoid deferral of blk_release_queue() work
+> > 
+> >  block/Makefile               |  1 +
+> >  block/blk-core.c             |  9 +--------
+> >  block/blk-debugfs.c          | 27 +++++++++++++++++++++++++++
+> >  block/blk-mq-debugfs.c       |  5 -----
+> >  block/blk-sysfs.c            | 21 ++++++++-------------
+> >  block/blk.h                  | 17 +++++++++++++++++
+> >  include/linux/blktrace_api.h |  1 -
+> >  kernel/trace/blktrace.c      | 19 ++++++++-----------
+> >  8 files changed, 62 insertions(+), 38 deletions(-)
+> >  create mode 100644 block/blk-debugfs.c
 > 
-> Would you A-b or R-b if I corrected the two small issues which you found?
+> BTW, Yu Kuai posted one patch for this issue, looks that approach
+> is simpler:
+> 
+> https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@huawei.com/
 
-Sure:
+I cannot see how renaming the possible target directory to a temporary
+directory instead of unifying it for both SQ and MQ could be any
+simpler. IMHO this keeps the mess and fragile nature of the issue.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The approach taken here unifies the directory we should use for both SQ
+and MQ and makes the deferral issue a completely separate issue
+addressed in the last patch.
+
+  Luis
