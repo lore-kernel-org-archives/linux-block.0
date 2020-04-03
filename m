@@ -2,106 +2,69 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE5DC2BA17
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308B9C43331
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 22:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51CC620CC7
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 21:53:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j0Lbeu3C"
+	by mail.kernel.org (Postfix) with ESMTP id 06EA72078C
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 22:05:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585951521;
+	bh=PQJA7zgoUeJX1yGQtOzkFYkU54wSZxSEYhYWdTrfjGk=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=P7kGrEaqfvuSg5ugpC4NWHLJcH+16VQdlvMMUlkpwhllzQYDZ1mfMraENhjgGDRMt
+	 ykiR6lKX0jncihJB0zyVSf0JfvuoKok3h7wjOVy6fHdE1ns1Zsmm4eN5lbbRbGJE+S
+	 c8IZAGtRcKJgxtICM4TaXVTZnFhI6UAAYcMvpMYo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbgDCVxh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 17:53:37 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52104 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726460AbgDCVxh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 17:53:37 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033LrQuB096116;
-        Fri, 3 Apr 2020 21:53:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=ZmykI1jF/AuRxj1O+Z6blTUcn3zOPYoue5aVA5PrXXE=;
- b=j0Lbeu3CDslkmu4HCqlTJOy1hgXQsrQiAYqWZkENnEDPSZF1rvOW/jJGbxyw6xoEG1wG
- VqolF1XVb/NXWDrW3CctpSZUzeUA8H4WGYXRHbysFxXvrEbzxP7P1af3HOn9MTlcAUwN
- pE/HWWhTavvkI/c6ftbi+vPH6SiSQ7hD4/It5x2BWEF4T0GUvgbUKWz13WqI+Ov3523A
- xwAGFqig7rr3XM0IYC9vFaH+xM8kzJeit4lE0LCmpBHkbOoPF65ebxzLQoO31cut47Qn
- eXhi7246mItUtTIqzptZ/IHlbxgdPftC5nA/6Gdy2/kI227DHTY72KWHjKGljY0ZoqeD cQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 303aqj3u9d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 21:53:28 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 033LqSjn017230;
-        Fri, 3 Apr 2020 21:53:27 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 302g4y8mtb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 21:53:27 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 033LrPUC020496;
-        Fri, 3 Apr 2020 21:53:25 GMT
-Received: from [10.39.222.119] (/10.39.222.119)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 03 Apr 2020 14:53:25 -0700
-Subject: Re: [PATCH] xen/blkfront: fix memory allocation flags in
- blkfront_setup_indirect()
-To:     Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        stable@vger.kernel.org,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
-References: <20200403090034.8753-1-jgross@suse.com>
-From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Message-ID: <1d67be51-776d-dd53-c5db-8b3539505f40@oracle.com>
-Date:   Fri, 3 Apr 2020 17:53:14 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200403090034.8753-1-jgross@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9580 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
- mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004030169
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9580 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 clxscore=1011
- malwarescore=0 impostorscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004030169
+        id S1728535AbgDCWFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 18:05:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38582 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728532AbgDCWFT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Apr 2020 18:05:19 -0400
+Subject: Re: [git pull v2] device mapper fixes for 5.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1585951519;
+        bh=PQJA7zgoUeJX1yGQtOzkFYkU54wSZxSEYhYWdTrfjGk=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=nbVNIKUVPJN9daTRvhINA4t5n0hhoKxXig9IOWNvUUteny4wlHVlkvLkjyK09JEfH
+         BK6c7Hj1gJFRGoDO5bks+6Ep/bYs4Oc1rqwlO90C9FzwHqmtKYGjaguqrH1u8dXfvO
+         XFLPg52S/rBPl9xi6s+RTq/pyAnLUQYXtWgbEtH0=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200403171543.GA92499@lobo>
+References: <20200403154213.GA18386@redhat.com> <20200403171543.GA92499@lobo>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200403171543.GA92499@lobo>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.7/dm-fixes
+X-PR-Tracked-Commit-Id: 8267d8fb4819afa76b2a54dca48efdda6f0b1910
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: de3c913c6e9d8bbf8b2d3caaed55ff3e40a62e56
+Message-Id: <158595151917.22871.12219569331072002461.pr-tracker-bot@kernel.org>
+Date:   Fri, 03 Apr 2020 22:05:19 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Alasdair G Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The pull request you sent on Fri, 3 Apr 2020 13:15:43 -0400:
 
-On 4/3/20 5:00 AM, Juergen Gross wrote:
-> Commit 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for
-> large array allocation") didn't fix the issue it was meant to, as the
-> flags for allocating the memory are GFP_NOIO, which will lead the
-> memory allocation falling back to kmalloc().
->
-> So instead of GFP_NOIO use GFP_KERNEL and do all the memory allocation
-> in blkfront_setup_indirect() in a memalloc_noio_{save,restore} section.=
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.7/dm-fixes
 
->
-> Fixes: 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for lar=
-ge array allocation")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Juergen Gross <jgross@suse.com>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/de3c913c6e9d8bbf8b2d3caaed55ff3e40a62e56
 
-Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Thank you!
 
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
