@@ -1,128 +1,267 @@
-Return-Path: <SRS0=2u2q=5S=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFB1C43331
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF8BC2D0F4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 01:34:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90A9B2077D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Apr 2020 22:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C11A62077D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 01:34:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ElYFBWew"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388621AbgDBWli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 18:41:38 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:48371 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729549AbgDBWlh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Apr 2020 18:41:37 -0400
-Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 9CF567EA663;
-        Fri,  3 Apr 2020 09:41:25 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1jK8Wa-0005P5-UW; Fri, 03 Apr 2020 09:41:24 +1100
-Date:   Fri, 3 Apr 2020 09:41:24 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     hch@lst.de, martin.petersen@oracle.com, darrick.wong@oracle.com,
-        axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca,
-        ming.lei@redhat.com, jthumshirn@suse.de, minwoo.im.dev@gmail.com,
-        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
-        hare@suse.com, tj@kernel.org, hannes@cmpxchg.org,
-        khlebnikov@yandex-team.ru, ajay.joshi@wdc.com, bvanassche@acm.org,
-        arnd@arndb.de, houtao1@huawei.com, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
-Message-ID: <20200402224124.GK10737@dread.disaster.area>
-References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
+        id S2389108AbgDCBeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Apr 2020 21:34:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24193 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389171AbgDCBeT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 21:34:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585877658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4M8Y3hxWfPr3npNAdh6s+2Y4APbbKJSdSPJ367pAnSc=;
+        b=ElYFBWew3I91IxxAJrHzd0RZFRiw92bUDOwuuvtEceZ37EzQ7IlrjVDxdtnmlcka28Y0Sn
+        5bUe4G6t4oiR7gKY9tXF2slPO3lcoDRahdfGHFWHUz9x+vBn1k6FHXl8Gs/WBFp5Qfea/M
+        H2xMQ7/1MG5mspYXXbSe+AEZSmcdGeQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-XHlpQVaSNMOnetvbnK7G5Q-1; Thu, 02 Apr 2020 21:34:14 -0400
+X-MC-Unique: XHlpQVaSNMOnetvbnK7G5Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD0218018A2;
+        Fri,  3 Apr 2020 01:34:11 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DDBF796B99;
+        Fri,  3 Apr 2020 01:34:00 +0000 (UTC)
+Date:   Fri, 3 Apr 2020 09:33:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Douglas Anderson <dianders@chromium.org>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        paolo.valente@linaro.org, sqazi@google.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        groeck@chromium.org, Ajay Joshi <ajay.joshi@wdc.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget
+ contention
+Message-ID: <20200403013356.GA6987@ming.t460p>
+References: <20200402155130.8264-1-dianders@chromium.org>
+ <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
-        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
-        a=OLL_FvSJAAAA:8 a=7-415B0cAAAA:8 a=djW_VkzYRv8b6pmHjpMA:9
-        a=83XbmwxN0B6MQfg-:21 a=82aPxsCgDOgqXjAm:21 a=CjuIK1q_8ugA:10
-        a=Q6O7Wtph5A0A:10 a=bGb42cQ31NwA:10 a=oIrB72frpwYPwTMnlWqB:22
-        a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 29, 2020 at 10:47:10AM -0700, Chaitanya Kulkarni wrote:
-> Hi,
+On Thu, Apr 02, 2020 at 08:51:30AM -0700, Douglas Anderson wrote:
+> It is possible for two threads to be running
+> blk_mq_do_dispatch_sched() at the same time with the same "hctx".
+> This is because there can be more than one caller to
+> __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
+> prevent more than one thread from entering.
 > 
-> This patch-series is based on the original RFC patch series:-
-> https://www.spinics.net/lists/linux-block/msg47933.html.
+> If more than one thread is running blk_mq_do_dispatch_sched() at the
+> same time with the same "hctx", they may have contention acquiring
+> budget.  The blk_mq_get_dispatch_budget() can eventually translate
+> into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
+> uncommon) then only one of the two threads will be the one to
+> increment "device_busy" to 1 and get the budget.
 > 
-> I've designed a rough testcase based on the information present
-> in the mailing list archive for original RFC, it may need
-> some corrections from the author.
+> The losing thread will break out of blk_mq_do_dispatch_sched() and
+> will stop dispatching requests.  The assumption is that when more
+> budget is available later (when existing transactions finish) the
+> queue will be kicked again, perhaps in scsi_end_request().
 > 
-> If anyone is interested, test results are at the end of this patch.
-> 
-> Following is the original cover-letter :-
-> 
-> Information about continuous extent placement may be useful
-> for some block devices. Say, distributed network filesystems,
-> which provide block device interface, may use this information
-> for better blocks placement over the nodes in their cluster,
-> and for better performance. Block devices, which map a file
-> on another filesystem (loop), may request the same length extent
-> on underlining filesystem for less fragmentation and for batching
-> allocation requests. Also, hypervisors like QEMU may use this
-> information for optimization of cluster allocations.
-> 
-> This patchset introduces REQ_OP_ASSIGN_RANGE, which is going
-> to be used for forwarding user's fallocate(0) requests into
-> block device internals. It rather similar to existing
-> REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES, etc. The corresponding
-> exported primitive is called blkdev_issue_assign_range().
-> See [1/3] for the details.
-> 
-> Patch [2/3] teaches loop driver to handle REQ_OP_ASSIGN_RANGE
-> requests by calling fallocate(0).
-> 
-> Patch [3/3] makes ext4 to notify a block device about fallocate(0).
+> The winning thread now has budget and can go on to call
+> dispatch_request().  If dispatch_request() returns NULL here then we
+> have a potential problem.  Specifically we'll now call
 
-Ok, so ext4 has a very limited max allocation size for an extent, so
-I expect this won't cause huge latency problems. However, what
-happens when we use XFS, have a 64kB block size, and fallocate() is
-allocating disk space in continguous 100GB extents and passing those
-down to the block device?
+As I mentioned before, it is a BFQ specific issue, it tells blk-mq
+that it has work to do, and now the budget is assigned to the only
+winning thread, however, dispatch_request() still returns NULL.
 
-How does this get split by dm devices? Are raid stripes going to
-dice this into separate stripe unit sized bios, so instead of single
-large requests we end up with hundreds or thousands or tiny
-allocation requests being issued?
+> blk_mq_put_dispatch_budget() which translates into
+> scsi_mq_put_budget().  That will mark the device as no longer busy but
+> doesn't do anything to kick the queue.  This violates the assumption
+> that the queue would be kicked when more budget was available.
 
-I know that for the loop device, it is going to serialise all IO to
-the backing file while fallocate is run on it. Hence if you have
-concurrent IO running, any REQ_OP_ASSIGN_RANGE is going to cause an
-significant, measurable latency hit to all those IOs in flight.
+The queue is still kicked in by BFQ in its idle timer, however that
+timer doesn't make forward progress.
 
-How are we expecting hardware to behave here? Is this a queued
-command in the scsi/nvme/sata protocols? Or is this, for the moment,
-just a special snowflake that we can't actually use in production
-because the hardware just can't handle what we throw at it?
+Without this idle timer, it is simply a BFQ issue.
 
-IOWs, what sort of latency issues is this operation going to cause
-on real hardware? Is this going to be like discard? i.e. where we
-end up not using it at all because so few devices actually handle
-the massive stream of operations the filesystem will end up sending
-the device(s) in the course of normal operations?
+> 
+> Pictorially:
+> 
+> Thread A                          Thread B
+> ================================= ==================================
+> blk_mq_get_dispatch_budget() => 1
+> dispatch_request() => NULL
+>                                   blk_mq_get_dispatch_budget() => 0
+>                                   // because Thread A marked
+>                                   // "device_busy" in scsi_device
+> blk_mq_put_dispatch_budget()
 
-Cheers,
+What if there is only thread A? You need to mention that thread B
+is from BFQ.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> 
+> The above case was observed in reboot tests and caused a task to hang
+> forever waiting for IO to complete.  Traces showed that in fact two
+> tasks were running blk_mq_do_dispatch_sched() at the same time with
+> the same "hctx".  The task that got the budget did in fact see
+> dispatch_request() return NULL.  Both tasks returned and the system
+> went on for several minutes (until the hung task delay kicked in)
+> without the given "hctx" showing up again in traces.
+> 
+> Let's attempt to fix this problem by detecting if there was contention
+> for the budget in the case where we put the budget without dispatching
+> anything.  If we saw contention we kick all hctx's associated with the
+> queue where there was contention.  We do this without any locking by
+> adding a double-check for budget and accepting a small amount of faux
+> contention if the 2nd check gives us budget but then we don't dispatch
+> anything (we'll look like we contended with ourselves).
+> 
+> A few extra notes:
+> 
+> - This whole thing is only a problem due to the inexact nature of
+>   has_work().  Specifically if has_work() always guaranteed that a
+>   "true" return meant that dispatch_request() would return non-NULL
+>   then we wouldn't have this problem.  That's because we only grab the
+>   budget if has_work() returned true.  If we had the non-NULL
+>   guarantee then at least one of the threads would actually dispatch
+>   work and when the work was done then queues would be kicked
+>   normally.
+> 
+> - One specific I/O scheduler that trips this problem quite a bit is
+>   BFQ which definitely returns "true" for has_work() in cases where it
+>   wouldn't dispatch.  Making BFQ's has_work() more exact requires that
+>   has_work() becomes a much heavier function, including figuring out
+>   how to acquire spinlocks in has_work() without tripping circular
+>   lock dependencies.  This is prototyped but it's unclear if it's
+>   really the way to go when the problem can be solved with a
+>   relatively lightweight contention detection mechanism.
+> 
+> - Because this problem only trips with inexact has_work() it's
+>   believed that blk_mq_do_dispatch_ctx() does not need a similar
+>   change.
+
+Right, I prefer to fix it in BFQ, given it isn't a generic issue,
+not worth of generic solution.
+
+> 
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> ---
+> 
+> Changes in v2:
+> - Replace ("scsi: core: Fix stall...") w/ ("blk-mq: Rerun dispatch...")
+> 
+>  block/blk-mq-sched.c   | 26 ++++++++++++++++++++++++--
+>  block/blk-mq.c         |  3 +++
+>  include/linux/blkdev.h |  2 ++
+>  3 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 74cedea56034..0195d75f5f96 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -97,12 +97,34 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+>  			break;
+>  
+> -		if (!blk_mq_get_dispatch_budget(hctx))
+> -			break;
+> +
+> +		if (!blk_mq_get_dispatch_budget(hctx)) {
+> +			/*
+> +			 * We didn't get budget so set contention.  If
+> +			 * someone else had the budget but didn't dispatch
+> +			 * they'll kick everything.  NOTE: we check one
+> +			 * extra time _after_ setting contention to fully
+> +			 * close the race.  If we don't actually dispatch
+> +			 * we'll detext faux contention (with ourselves)
+> +			 * but that should be rare.
+> +			 */
+> +			atomic_set(&q->budget_contention, 1);
+> +
+> +			if (!blk_mq_get_dispatch_budget(hctx))
+
+scsi_mq_get_budget() implies a smp_mb(), so the barrier can order
+between blk_mq_get_dispatch_budget() and atomic_set(&q->budget_contention, 0|1).
+
+> +				break;
+> +		}
+>  
+>  		rq = e->type->ops.dispatch_request(hctx);
+>  		if (!rq) {
+>  			blk_mq_put_dispatch_budget(hctx);
+> +
+> +			/*
+> +			 * We've released the budget but us holding it might
+> +			 * have prevented someone else from dispatching.
+> +			 * Detect that case and run all queues again.
+> +			 */
+> +			if (atomic_read(&q->budget_contention))
+
+scsi_mq_put_budget() doesn't imply smp_mb(), so one smp_mb__after_atomic()
+is needed between the above two op.
+
+> +				blk_mq_run_hw_queues(q, true);
+>  			break;
+>  		}
+>  
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 2cd8d2b49ff4..6163c43ceca5 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1528,6 +1528,9 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+>  	struct blk_mq_hw_ctx *hctx;
+>  	int i;
+>  
+> +	/* We're running the queues, so clear the contention detector */
+> +	atomic_set(&q->budget_contention, 0);
+> +
+
+You add extra cost in fast path.
+
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+>  		if (blk_mq_hctx_stopped(hctx))
+>  			continue;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f629d40c645c..07f21e45d993 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -583,6 +583,8 @@ struct request_queue {
+>  
+>  #define BLK_MAX_WRITE_HINTS	5
+>  	u64			write_hints[BLK_MAX_WRITE_HINTS];
+> +
+> +	atomic_t		budget_contention;
+
+It needn't to be a atomic variable, and simple 'unsigned'
+int should be fine, what matters is that the order between
+R/W this flag and get/put budget.
+
+
+thanks,
+Ming
+
