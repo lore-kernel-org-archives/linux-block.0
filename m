@@ -2,132 +2,119 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22E5C43331
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 09:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 294DDC2BA18
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F9C920721
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 09:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 001AD2080C
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i39FQf0o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388221AbgDCJAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 05:00:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59384 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727803AbgDCJAj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Apr 2020 05:00:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 8972EAEB1;
-        Fri,  3 Apr 2020 09:00:37 +0000 (UTC)
-From:   Juergen Gross <jgross@suse.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, stable@vger.kernel.org
-Subject: [PATCH] xen/blkfront: fix memory allocation flags in blkfront_setup_indirect()
-Date:   Fri,  3 Apr 2020 11:00:34 +0200
-Message-Id: <20200403090034.8753-1-jgross@suse.com>
-X-Mailer: git-send-email 2.16.4
+        id S2389188AbgDCKNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 06:13:00 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56713 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727774AbgDCKNA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 06:13:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1585908780; x=1617444780;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=iOKpbr1Ka1cFGP35Fa6ZTxHG0mbfjgFm55pfw0HfVbo=;
+  b=i39FQf0o/Sne8oUB6uVXsvUffFc3Zs+m2B/qf6tpBo/h7wPk1J6cQZz6
+   6E3YWHyHJ+nkZ25Zhi5LvYyfoYKjBfNbZz9t9DeegLXoqp2QZ1OXNLCdB
+   vREL56LNKvlZC/sQoQVfy4Qq16w5knxhGNqZmHffY1GMOUBybrN2Uko7p
+   UOn4iq4Q4FpKRKEPbK5i0NGW9ppcjqF6UPi9a2Ocm9p300A6d7LB8gRjO
+   94YhQ9bfW08K59gV1zm81xsJqx7W4xFnWVkXuHM4zcNbxlI5oDhoM7524
+   63j5YKk3zZqOZn4mMV+o3XCzmsED/VHnO8rZ0xZWxubew1C7Px9jeQury
+   g==;
+IronPort-SDR: jCxQFdG0FIKkD2b8TM+0kw4bp+az5868RNQH/it6BUdGNO+1DPKf5yR1Gp9j7tfnCxAIBZ/Fr3
+ AtAQ5ztCaSd8UkCKc4dTaqSwyKlkg7lwgeNjTTIJry4joS8Bpb0UC8rdvYrKq8obGn7Ll7yvFP
+ 6fPes/DXCuAN0R0oQdLhjYV4nW/XxrGU0wflwhDdVCRlw14qdbQMywDAlcsekxname6GF+Xo8b
+ 1MBmQPY4MQif4syCLQ8kKE1rz6ae4DBlcy9w8hoWbBF8+r0J2v5GXLd4nTqZWQFmfQXhkc3irN
+ 23U=
+X-IronPort-AV: E=Sophos;i="5.72,339,1580745600"; 
+   d="scan'208";a="135955985"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2020 18:13:00 +0800
+IronPort-SDR: sBnqjut9ETJ8anmBBcqKpFxINTxAFMXl16c6SA0LBN+1O0UyZ9m+W+quxkDPfzn+iZv+ZlkF4q
+ xReqwUIpdgjVFZ814OwxOFEqeUG5YzKqiOIquQtkgb0o1vUVrzOLQLAM8ZLHPaXgMbe6dOcgBA
+ CDTC9BnNvx25rvu1JWACYe4NodNDO+PWAs7/Rr8GhR6bC191Yb5nTgDhJI/aiTGRqxlTtFQfvh
+ G9A2KgLclbWDv/YGuitV9r1FqyB8X7Bbs4ho0ulTps5qXHa7QbudIB+y4Pvcpq4hwhyLXssOM8
+ /57hE6etWf4P/5AmxP4hF6Au
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 03:03:49 -0700
+IronPort-SDR: C8QlHCSAhkkzsOxz/XBOnpQEUi67ssjLzwPUl+qtyHlzKJ1Yx5FyDwo/RVSmqTXf9dCLc7nFAR
+ fMnDcZoXA1JNU6MZpyzAT5fEQTAWCURq14TCSaSY9Hpi4586x3qUTUSTTNVD2r1xH9pyKvlY0a
+ kc4uh9ygDtwBDcFuX5MyMB1Wh8iO+o+qt5ALv7gY6RR2+6r3uUqTmRe3J75KXIgp3yfgI0MRhM
+ cTNSCrFMCjZ7kc+MHeLqqgXcNt8yvrj2vAXnRdm3lz/5uOb4HHAOun8WHUiBxDu/EzluUsZScF
+ DNE=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 03 Apr 2020 03:12:56 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 01/10] block: provide fallbacks for blk_queue_zone_is_seq and blk_queue_zone_no
+Date:   Fri,  3 Apr 2020 19:12:41 +0900
+Message-Id: <20200403101250.33245-2-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
+References: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for
-large array allocation") didn't fix the issue it was meant to, as the
-flags for allocating the memory are GFP_NOIO, which will lead the
-memory allocation falling back to kmalloc().
+blk_queue_zone_is_seq() and blk_queue_zone_no() have not been called with
+CONFIG_BLK_DEV_ZONED disabled until now.
 
-So instead of GFP_NOIO use GFP_KERNEL and do all the memory allocation
-in blkfront_setup_indirect() in a memalloc_noio_{save,restore} section.
+The introduction of REQ_OP_ZONE_APPEND will change this, so we need to
+provide noop fallbacks for the !CONFIG_BLK_DEV_ZONED case.
 
-Fixes: 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for large array allocation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/xen-blkfront.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ include/linux/blkdev.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 915cf5b6388c..3b889ea950c2 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -47,6 +47,7 @@
- #include <linux/bitmap.h>
- #include <linux/list.h>
- #include <linux/workqueue.h>
-+#include <linux/sched/mm.h>
- 
- #include <xen/xen.h>
- #include <xen/xenbus.h>
-@@ -2189,10 +2190,12 @@ static void blkfront_setup_discard(struct blkfront_info *info)
- 
- static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f629d40c645c..25b63f714619 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -729,6 +729,16 @@ static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
  {
--	unsigned int psegs, grants;
-+	unsigned int psegs, grants, memflags;
- 	int err, i;
- 	struct blkfront_info *info = rinfo->dev_info;
- 
-+	memflags = memalloc_noio_save();
-+
- 	if (info->max_indirect_segments == 0) {
- 		if (!HAS_EXTRA_REQ)
- 			grants = BLKIF_MAX_SEGMENTS_PER_REQUEST;
-@@ -2224,7 +2227,7 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
- 
- 		BUG_ON(!list_empty(&rinfo->indirect_pages));
- 		for (i = 0; i < num; i++) {
--			struct page *indirect_page = alloc_page(GFP_NOIO);
-+			struct page *indirect_page = alloc_page(GFP_KERNEL);
- 			if (!indirect_page)
- 				goto out_of_memory;
- 			list_add(&indirect_page->lru, &rinfo->indirect_pages);
-@@ -2235,15 +2238,15 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
- 		rinfo->shadow[i].grants_used =
- 			kvcalloc(grants,
- 				 sizeof(rinfo->shadow[i].grants_used[0]),
--				 GFP_NOIO);
-+				 GFP_KERNEL);
- 		rinfo->shadow[i].sg = kvcalloc(psegs,
- 					       sizeof(rinfo->shadow[i].sg[0]),
--					       GFP_NOIO);
-+					       GFP_KERNEL);
- 		if (info->max_indirect_segments)
- 			rinfo->shadow[i].indirect_grants =
- 				kvcalloc(INDIRECT_GREFS(grants),
- 					 sizeof(rinfo->shadow[i].indirect_grants[0]),
--					 GFP_NOIO);
-+					 GFP_KERNEL);
- 		if ((rinfo->shadow[i].grants_used == NULL) ||
- 			(rinfo->shadow[i].sg == NULL) ||
- 		     (info->max_indirect_segments &&
-@@ -2252,6 +2255,7 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
- 		sg_init_table(rinfo->shadow[i].sg, psegs);
- 	}
- 
-+	memalloc_noio_restore(memflags);
- 
  	return 0;
- 
-@@ -2271,6 +2275,9 @@ static int blkfront_setup_indirect(struct blkfront_ring_info *rinfo)
- 			__free_page(indirect_page);
- 		}
- 	}
-+
-+	memalloc_noio_restore(memflags);
-+
- 	return -ENOMEM;
  }
++static inline bool blk_queue_zone_is_seq(struct request_queue *q,
++					 sector_t sector)
++{
++	return false;
++}
++static inline unsigned int blk_queue_zone_no(struct request_queue *q,
++					     sector_t sector)
++{
++	return 0;
++}
+ #endif /* CONFIG_BLK_DEV_ZONED */
  
+ static inline bool rq_is_sync(struct request *rq)
 -- 
-2.16.4
+2.24.1
 
