@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E31C2BA80
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 004C9C2BABC
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2499020757
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBA8E208E4
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 10:13:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="E5AmxqKQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pWmNQycn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390255AbgDCKNE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 06:13:04 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56729 "EHLO
+        id S2390573AbgDCKNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 06:13:11 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:56741 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390105AbgDCKNE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 06:13:04 -0400
+        with ESMTP id S2390520AbgDCKNI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 06:13:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1585908784; x=1617444784;
+  t=1585908789; x=1617444789;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Kvkqhedaxckecfp14XwRLXhYwHCzNuCrujz+QWt/cdU=;
-  b=E5AmxqKQVhdI74T97u0p0/OgEd3Dj12nZTcIlFkvPxPvfN58TFh1cIhX
-   hhiourYGU84GRQlZOyZHvRDMwImEQkOBlrQa207N8uW4TPTZWZGq4TbnC
-   DhGddZfltMSAyoeTOijzcEicoMoNLvCKh34BkifLQfkr7HeeBTtfHU91Y
-   DzlBTor79IDomXB0g0VRjkeVekiqTNqPed3Kz9JNH2ZyaJnmoWM4lUeT+
-   E13Mzu6qzwQtsDfmfWo2YfWZU+ZeDIaVp/TK5A+MpQ+RSVs+nVr88sapz
-   Gq//6vFt5LYpMF6cF6y70+y8cyr7rsP7NuvE2o9AHfzjhS2EFA9eSUHaF
-   Q==;
-IronPort-SDR: awRpl5ZIkBvEQ0Ym7XDgT9NhCWKmB1MKFcTq4hBfz10dvgCDDUaJSQ0v3nMB5Vez+1SPswtP4R
- GrjW9v2U3RS7S7/wf8gbbLPScg6TwZTyccSnRs8FnSCasPpqI5M/BwjwZOOedcnO8m4HZkidd+
- sz9UDDQrXVbTea5Yh8O9siuNSCdZAcnnUnlc7eeZ8dArxT1g4bzSmETuJP4V9vU72YyiHTOEV7
- VmvzPMO+lralxlQnF9/6W99i7mgc/ax30U3OJwP3ah2Dkccdbe+VJlKxfjOT67A1cPaBDXCvh9
- eyA=
+  bh=RckJ1sRQ4Jj+9CntP2Tbns2sAuC38WlYy87tzhye2Ow=;
+  b=pWmNQycnyagogkNd09q9VBw9IYlV1wBCoW+PEUDH6SD2Eb7qwkzUS311
+   bs1yIe9LbcKrALitYNWip07EraAP5HPuaLdSqYK33MDg9bnISEMW7w4z3
+   mj5XvGrV1I00sUAueiLn6bASBo80NHz61IJExrPrMupzhs68DKzVWMOzO
+   lp3/Ex4qCyk4dzUscz5aXW5LNfMRkhEuxSQdH5pTLELfbqhyGb+PaagNX
+   010f8DgmbFxj7USg8KZnGETiztiloaYBHt+/rdm/IWoyDOZROD4cPkDw/
+   Vo9ULAk5gsU9483DIobp26pSfOi0ZrTe92fg0mZs/3X6h9pTBSo67xYDe
+   A==;
+IronPort-SDR: gYsU7QmrXmUw3hH+QiEkiLd+P0zY0s299+MN9udaAHka9+rAFhpiJLUzvdGaJEo48qqUKKiFth
+ YSpjHPNgbEswE22eICzjz4jYBp9BiMb6ol3oI4NlrQeKZBa3MONl34FfQz8WP/rBp3ONmBPEef
+ lNErwfUnKwTXcFIs0/2HsC0KZyMtEb3eOHNes8lpLwYfREYUEnenJJG/+5DPuPoOhlwxC/RV/W
+ V/XUmlHnAwVRGdENLEwKTFAj8O5zgZKVDrrkO0wHe/9sExP1qYFxBwg4heIXWHsH5NF0+ifNE/
+ Vys=
 X-IronPort-AV: E=Sophos;i="5.72,339,1580745600"; 
-   d="scan'208";a="135956006"
+   d="scan'208";a="135956026"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2020 18:13:03 +0800
-IronPort-SDR: 6BSG/poTewsrgJSV73RE7T5xP7+IrhdrylWCH2o16EGSSnUdMm7ztjT8GJhscaN6WkfFj/ue2z
- +cN6Ay85pdIrB/RM0CNSm0icSvXWGaYapAxNMmOgkgiDBEDWsxCQdi0ImNS1D6Q0Rlhaiz1kWC
- 00z72EJgn21mVme2k7UwB0OrM3G6ar2CdW48j0uRsFAjxvY+BHmExKRv2pxjHMGqb486cZMywi
- 5JZNc8MkmpGDj7nYwIUlqpxeUzbXQV410/ahA4eiwwGFLpqxwX5UeS/s8da5Sg8BnwwYi+4qpQ
- 2W4GM16DlcQKkfiNfEqI6slJ
+  by ob1.hgst.iphmx.com with ESMTP; 03 Apr 2020 18:13:08 +0800
+IronPort-SDR: 9myJisO6mosf6IfHTYB47hWWwsaUeGlvw0St+25JPqG39PFK8BXVqdb7TSShD+iIaI1uhKKlur
+ Rx9ymWLfxmAbB2cWD0X8HoSqOpVB/Nh+AppbLhVKYpmg55S2+D26dISTRQdjCON0ITVdPlrqSZ
+ KnKYjQHnBk+2Vo3/8Ag8nFG6tDM1RchHJwrd0icqgje2GaoSrKtG6y6eGu8CsnUzm/bhhGr7gB
+ o+dTaE/ACku5RmZY+gP7/Q53PesUFW9pUWWcxoF7ynHaLOI6wcka5IbtGNeq7hm/01qUo39VvT
+ DEiOJwE/QLAupAUjgmkXD/3T
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 03:03:52 -0700
-IronPort-SDR: BsUA2+SnRFFmQaC7Gk61IDnL+d3AbppkquPX57VZp7SlIcsvPzegt8rsas0E0rK5Nj/9GyavwB
- l4XzZgqU50FqBDo7AMod6hiXbgv/G7w0vz75v6O+FA37D3p/V86JHusbcuP2XWqxfxIOzOUY+E
- Vjc3sv2AeyePQootN0xDtyA6uDqHz9f7x/rHkbq33H3WqWRG1m5wm1XRtJubqf+XUxhTBTP5BV
- Oz7iE4w8VO2lrtW/9NUTiDTmZ2bUe18KaUo6puOIUqhVusqE4P3+OnwObjMY74SDsVWp+H6nHz
- 4h0=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2020 03:03:58 -0700
+IronPort-SDR: K6D54gYeH8kgtYZEz21xvEkqiwMeWyeW+I2LtzEB8WYp5xmcVQlsw+XUiZl9IiBls0e+bXM4Nf
+ iS7FhlfTcbXbOGXH0Pygh5vkr6AWtsFSC7rMIknn+1+CxYqoQtKjlwTMmxOZc3hzJSZR9Kvmbx
+ gb+TNpnGu+ikbHp1PVdEfiBnPf5ZfDYBUrQSz7ow/eRjmLE004s9uBrmqUYxbhB/O2CyT1SvFT
+ TkcuhR0r4ZLEhlOIYrV8lxk4iHM5KYom2RXOpeiNt/WOFuvDfYYqNPJCkpPpJZr6Vmn3SGuSYG
+ Wl8=
 WDCIronportException: Internal
 Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip02.wdc.com with ESMTP; 03 Apr 2020 03:13:00 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 03 Apr 2020 03:13:05 -0700
 From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -67,11 +67,10 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 03/10] block: introduce blk_req_zone_write_trylock
-Date:   Fri,  3 Apr 2020 19:12:43 +0900
-Message-Id: <20200403101250.33245-4-johannes.thumshirn@wdc.com>
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v4 06/10] scsi: export scsi_mq_uninit_cmnd
+Date:   Fri,  3 Apr 2020 19:12:46 +0900
+Message-Id: <20200403101250.33245-7-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
 References: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
@@ -82,53 +81,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce blk_req_zone_write_trylock(), which either grabs the write-lock
-for a sequential zone or returns false, if the zone is already locked.
+scsi_mq_uninit_cmnd is used to free the sg_tables, uninitialize the
+command and delete it from the command list.
+
+Export this function so it can be used from modular code to free the
+memory allocated by scsi_init_io() if the caller of scsi_init_io() needs
+to do error recovery.
 
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-zoned.c      | 14 ++++++++++++++
- include/linux/blkdev.h |  1 +
- 2 files changed, 15 insertions(+)
+ drivers/scsi/scsi_lib.c  | 9 ++++++---
+ include/scsi/scsi_cmnd.h | 1 +
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 05741c6f618b..00b025b8b7c0 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -50,6 +50,20 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
- }
- EXPORT_SYMBOL_GPL(blk_req_needs_zone_write_lock);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index ea327f320b7f..4646575a89d6 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -57,8 +57,6 @@ static struct kmem_cache *scsi_sense_cache;
+ static struct kmem_cache *scsi_sense_isadma_cache;
+ static DEFINE_MUTEX(scsi_sense_cache_mutex);
  
-+bool blk_req_zone_write_trylock(struct request *rq)
-+{
-+	unsigned int zno = blk_rq_zone_no(rq);
-+
-+	if (test_and_set_bit(zno, rq->q->seq_zones_wlock))
-+		return false;
-+
-+	WARN_ON_ONCE(rq->rq_flags & RQF_ZONE_WRITE_LOCKED);
-+	rq->rq_flags |= RQF_ZONE_WRITE_LOCKED;
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(blk_req_zone_write_trylock);
-+
- void __blk_req_zone_write_lock(struct request *rq)
+-static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd);
+-
+ static inline struct kmem_cache *
+ scsi_select_sense_cache(bool unchecked_isa_dma)
  {
- 	if (WARN_ON_ONCE(test_and_set_bit(blk_rq_zone_no(rq),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 36111b10d514..e591b22ace03 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1746,6 +1746,7 @@ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+@@ -558,12 +556,17 @@ static void scsi_mq_free_sgtables(struct scsi_cmnd *cmd)
+ 				SCSI_INLINE_PROT_SG_CNT);
+ }
  
- #ifdef CONFIG_BLK_DEV_ZONED
- bool blk_req_needs_zone_write_lock(struct request *rq);
-+bool blk_req_zone_write_trylock(struct request *rq);
- void __blk_req_zone_write_lock(struct request *rq);
- void __blk_req_zone_write_unlock(struct request *rq);
+-static void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
++/**
++ * scsi_mq_uninit_cmd - uninitialize a SCSI command
++ * @cmd: the command to free
++ */
++void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd)
+ {
+ 	scsi_mq_free_sgtables(cmd);
+ 	scsi_uninit_cmd(cmd);
+ 	scsi_del_cmd_from_list(cmd);
+ }
++EXPORT_SYMBOL_GPL(scsi_mq_uninit_cmd);
  
+ /* Returns false when no more bytes to process, true if there are more */
+ static bool scsi_end_request(struct request *req, blk_status_t error,
+diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+index a2849bb9cd19..65ff625db38b 100644
+--- a/include/scsi/scsi_cmnd.h
++++ b/include/scsi/scsi_cmnd.h
+@@ -167,6 +167,7 @@ extern void *scsi_kmap_atomic_sg(struct scatterlist *sg, int sg_count,
+ extern void scsi_kunmap_atomic_sg(void *virt);
+ 
+ extern blk_status_t scsi_init_io(struct scsi_cmnd *cmd);
++extern void scsi_mq_uninit_cmd(struct scsi_cmnd *cmd);
+ 
+ #ifdef CONFIG_SCSI_DMA
+ extern int scsi_dma_map(struct scsi_cmnd *cmd);
 -- 
 2.24.1
 
