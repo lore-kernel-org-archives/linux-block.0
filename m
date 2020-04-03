@@ -2,114 +2,72 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30986C43331
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 03:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8826BC43331
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 06:38:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB04C2077D
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 03:46:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 494EE2073B
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 06:38:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d9WWJvW5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J/S/FyyR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390204AbgDCDqo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Apr 2020 23:46:44 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51858 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389477AbgDCDqn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Apr 2020 23:46:43 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0333df0P052079;
-        Fri, 3 Apr 2020 03:46:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
- message-id : date : from : to : cc : subject : references : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=LP7MuDfUnm55cjU9l7zcHfb9C7qAOx6lnmRiUvL5W3w=;
- b=d9WWJvW5KLLw/zgxDi+0crxqY1bNiZGCtqvWWx2SGooEBfH4mF/qnsRPs6fVQMkyDlj9
- 4dLHigyfRG2F6fBaOqXEfBDnTlKwr2zKIjEuR2rpRbCTf4H+atilh+GxnMS3NRr6TCOp
- Y9d+1G4ulSU1mL03p3Mqq8TWG+n8KdhPUCQ6+Et/9faPs/JbeYavyOiZdUE0fopbY+Jj
- cvMg7HHBgBY/3YdoSsHEnXmOzry763FKCarlzS3O6v984NbW4CMbxouTbtWMQCQpkOsu
- 7CdiankJkhoKv+BwO64W3zW2FoCbPMiqA2ynVbIt9UjdewKJKGcOJTuMBXV2XZ04My/Q gw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 303ceveudu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 03:46:12 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0333cILs098315;
-        Fri, 3 Apr 2020 03:46:11 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 302ga3pctu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 Apr 2020 03:46:11 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0333k0PQ019888;
-        Fri, 3 Apr 2020 03:46:00 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123) by default (Oracle
- Beehive Gateway v4.0) with ESMTP ; Thu, 02 Apr 2020 20:45:34 -0700
-ORGANIZATION: Oracle Corporation
-USER-AGENT: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+        id S1732350AbgDCGiW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 02:38:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46932 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730550AbgDCGiW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 02:38:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2Z5ffwMMyQr5fqyL8STIVdTLMUXC8KbAaSDUy2T0pCM=; b=J/S/FyyRUH3nEENg3mXGxEAyVd
+        DIPDNoF6QcGSzqA7rIIVgHjjB83oqEsD8CsIFwOFJ1cf9U3angZb3/cUVbObAD9ETYitrVgBHqeHJ
+        d1yFp29Mrg4vhLxQz7fIbi1jycY30ea/b8sXNlKBAlwRpPB7dg8RXqT/r4ohGC7Jf+kwwZbw1erlh
+        w5uFnfr2OJLdrtx2Fk7sElWYms7mZYjGGJly+FHG2YthtuzS9MLKryXvzEyTj8sCvsk6UNK8JEH0+
+        CWR9w3jAfaXFytAZC0dHN/FJhgjK4/B50phtjtHz7ITal5pEg4OKUQVrZTqkv/FAX7+90YDHzFpJT
+        0xbs4RhA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jKFy8-0007X9-79; Fri, 03 Apr 2020 06:38:20 +0000
+Date:   Thu, 2 Apr 2020 23:38:20 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Andrzej Pietrasiewicz <andrzej.p@collabora.com>
+Cc:     evgreen@chromium.org, asavery@chromium.org, axboe@kernel.dk,
+        bvanassche@acm.org, darrick.wong@oracle.com, dianders@chromium.org,
+        gwendal@chromium.org, hch@infradead.org,
+        linux-block@vger.kernel.org, martin.petersen@oracle.com,
+        ming.lei@redhat.com, kernel@collabora.com
+Subject: Re: [PATCH v8 1/2] loop: Report EOPNOTSUPP properly
+Message-ID: <20200403063820.GA28875@infradead.org>
+References: <20200402170603.19649-1-andrzej.p@collabora.com>
+ <20200402170603.19649-2-andrzej.p@collabora.com>
 MIME-Version: 1.0
-Message-ID: <yq1a73t44h1.fsf@oracle.com>
-Date:   Thu, 2 Apr 2020 20:45:30 -0700 (PDT)
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, hch@lst.de,
-        darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        hannes@cmpxchg.org, khlebnikov@yandex-team.ru, ajay.joshi@wdc.com,
-        bvanassche@acm.org, arnd@arndb.de, houtao1@huawei.com,
-        asml.silence@gmail.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org
-Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
-References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
- <20200402224124.GK10737@dread.disaster.area> <yq1imih4aj0.fsf@oracle.com>
- <20200403025757.GL10737@dread.disaster.area>
-In-Reply-To: <20200403025757.GL10737@dread.disaster.area> <(Dave> <Chinner's>
- <message> <of> <"Fri> <> <3> <Apr> <2020> <13:57:57> <+1100")>
-Content-Type: text/plain; charset=ascii
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004030029
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9579 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
- clxscore=1015 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004030029
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200402170603.19649-2-andrzej.p@collabora.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Apr 02, 2020 at 07:06:02PM +0200, Andrzej Pietrasiewicz wrote:
+> From: Evan Green <evgreen@chromium.org>
+> 
+> Properly plumb out EOPNOTSUPP from loop driver operations, which may
+> get returned when for instance a discard operation is attempted but not
+> supported by the underlying block device. Before this change, everything
+> was reported in the log as an I/O error, which is scary and not
+> helpful in debugging.
+> 
+> Signed-off-by: Evan Green <evgreen@chromium.org>
+> Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
 
-Dave,
+Looks good,
 
-> .... because when backed by thinp storage, plumbing user level
-> fallocate() straight through from the filesystem introduces a
-> trivial, user level storage DOS vector....
->
-> i.e. a user can just fallocate a bunch of files and, because the
-> filesystem can do that instantly, can also run the back end array
-> out of space almost instantly. Storage admins are going to love
-> this!
-
-In the standards space, the allocation concept was mainly aimed at
-protecting filesystem internals against out-of-space conditions on
-devices that dedup identical blocks and where simply zeroing the blocks
-therefore is ineffective.
-
-So far we have mainly been talking about fallocate on block devices. How
-XFS decides to enforce space allocation policy and potentially leverage
-this plumbing is entirely up to you.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Christoph Hellwig <hch@lst.de>
