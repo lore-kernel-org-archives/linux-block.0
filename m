@@ -2,125 +2,115 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA554C43331
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 06:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6B0C2BA15
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 08:19:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DC7220757
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 06:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5170F20787
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 08:19:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pKdAXqAj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQOEoaJa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732862AbgDCGj5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 02:39:57 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:47036 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730759AbgDCGj5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 02:39:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bW9B1lP0XvAu62P5OjUE495sCbKgpxIMKSif/W1M0FM=; b=pKdAXqAjBugOD+svVrb5Yy+CDU
-        UT/IumPJThJnlAd26XkI+OIxigkPYn4xMaMGPio7ticQZ4hlD80NmBZODeRWU0GCz6SA5pHnnsXr3
-        06vJtLjDfi9n9XsI3njF2qLnJz/XC6kgeho3pzO+e5J1h+QKh5lUbstbD34XTjVPDKtYDrvZVzAJW
-        doYdhOOMv9y8/B0R8JdjRqFQ6C+P6rl7krCa7/6Efbx6gPYwTqS3UeEb9KADrpFYBicqmm+xd7k/H
-        eXsOpnmFNCl3FFOdAORSRaFwjdnt+HKiCHktO9VOogPfBliMcBDiw4UYqWPTAq5nhrr1w8n8PEoF6
-        wIxrRxDA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jKFzf-0007hQ-7z; Fri, 03 Apr 2020 06:39:55 +0000
-Date:   Thu, 2 Apr 2020 23:39:55 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-Cc:     evgreen@chromium.org, asavery@chromium.org, axboe@kernel.dk,
-        bvanassche@acm.org, darrick.wong@oracle.com, dianders@chromium.org,
-        gwendal@chromium.org, hch@infradead.org,
-        linux-block@vger.kernel.org, martin.petersen@oracle.com,
-        ming.lei@redhat.com, kernel@collabora.com
-Subject: Re: [PATCH v8 2/2] loop: Better discard support for block devices
-Message-ID: <20200403063955.GB28875@infradead.org>
-References: <20200402170603.19649-1-andrzej.p@collabora.com>
- <20200402170603.19649-3-andrzej.p@collabora.com>
+        id S2390508AbgDCIT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 04:19:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38223 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727835AbgDCIT5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 04:19:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585901996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BZ+Xgs03guAOyReZNCF6ZrrqdxLw5dFuzU2P8g5iCuY=;
+        b=dQOEoaJa4aZkIX0EcaVQf1Q5ph92upCJTiGqIct52PdiGGiiT4OH+Z4kOjHPwUWofS2sri
+        o+P8dO0WOB7BJpUeJM/ChgV8dctqqQ5Bh4kUYvLBoJN+C8YO/iCRQVSNHE8dZ6S3bgp6z8
+        /DKKAP5A5bytd6MNuMVgzfw6+tjavPA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-kbyr9x7vPNKH_44OGorzBA-1; Fri, 03 Apr 2020 04:19:46 -0400
+X-MC-Unique: kbyr9x7vPNKH_44OGorzBA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BC49DB62;
+        Fri,  3 Apr 2020 08:19:44 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-40.pek2.redhat.com [10.72.8.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E44715C3FA;
+        Fri,  3 Apr 2020 08:19:34 +0000 (UTC)
+Date:   Fri, 3 Apr 2020 16:19:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, nstange@suse.de, mhocko@suse.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com
+Subject: Re: [RFC 0/3] block: address blktrace use-after-free
+Message-ID: <20200403081929.GC6887@ming.t460p>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200402170603.19649-3-andrzej.p@collabora.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200402000002.7442-1-mcgrof@kernel.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 07:06:03PM +0200, Andrzej Pietrasiewicz wrote:
-> From: Evan Green <evgreen@chromium.org>
+On Wed, Apr 01, 2020 at 11:59:59PM +0000, Luis Chamberlain wrote:
+> Upstream kernel.org korg#205713 contends that there is a UAF in
+> the core debugfs debugfs_remove() function, and has gone through
+> pushing for a CVE for this, CVE-2019-19770.
 > 
-> If the backing device for a loop device is itself a block device,
-> then mirror the "write zeroes" capabilities of the underlying
-> block device into the loop device. Copy this capability into both
-> max_write_zeroes_sectors and max_discard_sectors of the loop device.
+> If correct then parent dentries are not positive, and this would
+> have implications far beyond this bug report. Thankfully, upon review
+> with Nicolai, he wasn't buying it. His suspicions that this was just
+> a blktrace issue were spot on, and this patch series demonstrates
+> that, provides a reproducer, and provides a solution to the issue.
 > 
-> The reason for this is that REQ_OP_DISCARD on a loop device translates
-> into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-> presents a consistent interface for loop devices (that discarded data
-> is zeroed), regardless of the backing device type of the loop device.
-> There should be no behavior change for loop devices backed by regular
-> files.
+> We there would like to contend CVE-2019-19770 as invalid. The
+> implications suggested are not correct, and this issue is only
+> triggerable with root, by shooting yourself on the foot by misuing
+> blktrace.
 > 
-> This change fixes blktest block/003, and removes an extraneous
-> error print in block/013 when testing on a loop device backed
-> by a block device that does not support discard.
+> If you want this on a git tree, you can get it from linux-next
+> 20200401-blktrace-fix-uaf branch [2].
 > 
-> Signed-off-by: Evan Green <evgreen@chromium.org>
-> Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
-> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> [used updated version of Evan's comment in loop_config_discard()]
-> Signed-off-by: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-> ---
->  drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
->  1 file changed, 30 insertions(+), 11 deletions(-)
+> Wider review, testing, and rants are appreciated.
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 6969be9a855a..d7f30338b8ec 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
->  	 * information.
->  	 */
->  	struct file *file = lo->lo_backing_file;
-> +	struct request_queue *q = lo->lo_queue;
->  	int ret;
->  
->  	mode |= FALLOC_FL_KEEP_SIZE;
->  
-> -	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> +	if (!blk_queue_discard(q)) {
->  		ret = -EOPNOTSUPP;
->  		goto out;
->  	}
-> @@ -864,6 +865,22 @@ static void loop_config_discard(struct loop_device *lo)
->  	struct file *file = lo->lo_backing_file;
->  	struct inode *inode = file->f_mapping->host;
->  	struct request_queue *q = lo->lo_queue;
-> +	struct request_queue *backingq;
-> +
-> +	/*
-> +	 * If the backing device is a block device, mirror its zeroing
-> +	 * capability. Set the discard sectors to the block device's zeroing
-> +	 * capabilities because loop discards result in blkdev_issue_zeroout(),
-> +	 * not blkdev_issue_discard(). This maintains consistent behavior with
-> +	 * file-backed loop devices: discarded regions read back as zero.
-> +	 */
-> +	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-> +		backingq = bdev_get_queue(inode->i_bdev);
+> [0] https://bugzilla.kernel.org/show_bug.cgi?id=205713
+> [1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770
+> [2] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200401-blktrace-fix-uaf
+> 
+> Luis Chamberlain (3):
+>   block: move main block debugfs initialization to its own file
+>   blktrace: fix debugfs use after free
+>   block: avoid deferral of blk_release_queue() work
+> 
+>  block/Makefile               |  1 +
+>  block/blk-core.c             |  9 +--------
+>  block/blk-debugfs.c          | 27 +++++++++++++++++++++++++++
+>  block/blk-mq-debugfs.c       |  5 -----
+>  block/blk-sysfs.c            | 21 ++++++++-------------
+>  block/blk.h                  | 17 +++++++++++++++++
+>  include/linux/blktrace_api.h |  1 -
+>  kernel/trace/blktrace.c      | 19 ++++++++-----------
+>  8 files changed, 62 insertions(+), 38 deletions(-)
+>  create mode 100644 block/blk-debugfs.c
 
-The backingq could move into this local scope.
+BTW, Yu Kuai posted one patch for this issue, looks that approach
+is simpler:
 
-> +	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@huawei.com/
 
-No need for the inner braces.
 
-But the actual functionality looks good to me.
+Thanks,
+Ming
+
