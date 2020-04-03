@@ -2,149 +2,261 @@ Return-Path: <SRS0=iNmo=5T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA09C2BA12
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 14:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1020C2BA12
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:11:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38D822073B
-	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 14:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B135D2077D
+	for <linux-block@archiver.kernel.org>; Fri,  3 Apr 2020 15:11:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IkCqFgbE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391061AbgDCOnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Apr 2020 10:43:14 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:57222 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391053AbgDCOnO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 10:43:14 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: andrzej.p)
-        with ESMTPSA id 56D52297518
-From:   Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-To:     evgreen@chromium.org
-Cc:     asavery@chromium.org, axboe@kernel.dk, bvanassche@acm.org,
-        darrick.wong@oracle.com, dianders@chromium.org,
-        gwendal@chromium.org, hch@infradead.org,
-        linux-block@vger.kernel.org, martin.petersen@oracle.com,
-        ming.lei@redhat.com, kernel@collabora.com
-Subject: [PATCH v9 2/2] loop: Better discard support for block devices
-Date:   Fri,  3 Apr 2020 16:43:04 +0200
-Message-Id: <20200403144304.11630-3-andrzej.p@collabora.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200403144304.11630-1-andrzej.p@collabora.com>
-References: <20200403144304.11630-1-andrzej.p@collabora.com>
+        id S2404132AbgDCPLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Apr 2020 11:11:02 -0400
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:35359 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404011AbgDCPLC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Apr 2020 11:11:02 -0400
+Received: by mail-vs1-f66.google.com with SMTP id u11so5146314vsg.2
+        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2020 08:11:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s3B7TP3PryQrSMDQHVPJCTFtzd/ywd5l72std87udlQ=;
+        b=IkCqFgbE8sOnVH23Bfho3RoIfyYvdmlWc/wIjurrNtsT+gexEJaUgZwBOJ0C/jJdD1
+         PgAWRVuRJSjJV0P1Qc0uJR+gA1+MciQJ438syn4YTV4DdihnuugJxVQIWYWTTZXQXDTZ
+         vD6xDLcZVIpxcuhFAZ5BbzrIYJfcFfcGZ1KwY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s3B7TP3PryQrSMDQHVPJCTFtzd/ywd5l72std87udlQ=;
+        b=oFqO6v21LjsMgP3fodUTyfuSMIyXEWjXLIGj895VwO+IChMlKa0qTULCdNiCZRQUBL
+         vmkR99CnjHbiOqqZL81HglIsNMZK09hkHXwa+FdlKwtrimvE3Dnc49elaA+330i7m6Jy
+         39VEOB330KKl0fBGWZy55bv+Db7jsxFQ/0jSBfuZL4o7viyGqxDYiEsMOKTZwOqGKZcd
+         wfYu3Va2q+EGL1w+z+RPrL9gEa2f64Jgt10FPOigDc+7hUZtdd/aJ5FfDQvyNcoxkPQf
+         qtLP/WWlrrPWLS99bghZ5WKz/dObOGq65hRE461Co/Gzfsc9oO3Zfz6eXBoLxhwPxaCM
+         mtUA==
+X-Gm-Message-State: AGi0PuZmdreKOiKCSxQ9LlDL+trmotth1Zyy/So0vIndhUPpTCd46bzH
+        ITjOhuRQV2fsxNOXnk5KbdTNjPtbTNU=
+X-Google-Smtp-Source: APiQypKLbUDpsMzr3gZWA8pIbOsLgKhgZMr+FJuL1h7z+lkFNkyqP2KJDcBa7X6xfbPlDHx9b3dFlw==
+X-Received: by 2002:a67:ae0f:: with SMTP id x15mr6890014vse.110.1585926660091;
+        Fri, 03 Apr 2020 08:11:00 -0700 (PDT)
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
+        by smtp.gmail.com with ESMTPSA id j78sm2097651vsd.4.2020.04.03.08.10.58
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Apr 2020 08:10:59 -0700 (PDT)
+Received: by mail-ua1-f47.google.com with SMTP id 9so2825544uav.12
+        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2020 08:10:58 -0700 (PDT)
+X-Received: by 2002:ab0:7406:: with SMTP id r6mr6622996uap.22.1585926657542;
+ Fri, 03 Apr 2020 08:10:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200402155130.8264-1-dianders@chromium.org> <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
+ <20200403013356.GA6987@ming.t460p>
+In-Reply-To: <20200403013356.GA6987@ming.t460p>
+From:   Doug Anderson <dianders@chromium.org>
+Date:   Fri, 3 Apr 2020 08:10:45 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
+Message-ID: <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget contention
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Salman Qazi <sqazi@google.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-scsi@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Evan Green <evgreen@chromium.org>
+Hi,
 
-If the backing device for a loop device is itself a block device,
-then mirror the "write zeroes" capabilities of the underlying
-block device into the loop device. Copy this capability into both
-max_write_zeroes_sectors and max_discard_sectors of the loop device.
+On Thu, Apr 2, 2020 at 6:34 PM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Thu, Apr 02, 2020 at 08:51:30AM -0700, Douglas Anderson wrote:
+> > It is possible for two threads to be running
+> > blk_mq_do_dispatch_sched() at the same time with the same "hctx".
+> > This is because there can be more than one caller to
+> > __blk_mq_run_hw_queue() with the same "hctx" and hctx_lock() doesn't
+> > prevent more than one thread from entering.
+> >
+> > If more than one thread is running blk_mq_do_dispatch_sched() at the
+> > same time with the same "hctx", they may have contention acquiring
+> > budget.  The blk_mq_get_dispatch_budget() can eventually translate
+> > into scsi_mq_get_budget().  If the device's "queue_depth" is 1 (not
+> > uncommon) then only one of the two threads will be the one to
+> > increment "device_busy" to 1 and get the budget.
+> >
+> > The losing thread will break out of blk_mq_do_dispatch_sched() and
+> > will stop dispatching requests.  The assumption is that when more
+> > budget is available later (when existing transactions finish) the
+> > queue will be kicked again, perhaps in scsi_end_request().
+> >
+> > The winning thread now has budget and can go on to call
+> > dispatch_request().  If dispatch_request() returns NULL here then we
+> > have a potential problem.  Specifically we'll now call
+>
+> As I mentioned before, it is a BFQ specific issue, it tells blk-mq
+> that it has work to do, and now the budget is assigned to the only
+> winning thread, however, dispatch_request() still returns NULL.
 
-The reason for this is that REQ_OP_DISCARD on a loop device translates
-into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-presents a consistent interface for loop devices (that discarded data
-is zeroed), regardless of the backing device type of the loop device.
-There should be no behavior change for loop devices backed by regular
-files.
+Correct that it only happens with BFQ, but whether it's a BFQ bug or
+not just depends on how you define the has_work() API.  If has_work()
+is allowed to be in-exact then it's either a blk-mq bug or a SCSI bug
+depending on how you cut it.  If has_work() must be exact then it is
+certainly a BFQ bug.  If has_work() doesn't need to be exact then it's
+not a BFQ bug.  I believe that a sane API could be defined either way.
+Either has_work() can be defined as a lightweight hint to trigger
+heavier code or it can be defined as something exact.  It's really up
+to blk-mq to say how they define it.
 
-This change fixes blktest block/003, and removes an extraneous
-error print in block/013 when testing on a loop device backed
-by a block device that does not support discard.
+From his response on the SCSI patch [1], it sounded like Jens was OK
+with has_work() being a lightweight hint as long as BFQ ensures that
+the queues run later.  ...but, as my investigation found, I believe
+that BFQ _does_ try to ensure that the queue is run at a later time by
+calling blk_mq_run_hw_queues().  The irony is that due to the race
+we're talking about here, blk_mq_run_hw_queues() isn't guaranteed to
+be reliable if has_work() is inexact.  :(  One way to address this is
+to make blk_mq_run_hw_queues() reliable even if has_work() is inexact.
 
-Signed-off-by: Evan Green <evgreen@chromium.org>
-Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-[used updated version of Evan's comment in loop_config_discard()]
-[moved backingq to local scope, removed redundant braces]
-Signed-off-by: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 42 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 11 deletions(-)
+...so Jens: care to clarify how you'd like has_work() to be defined?
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 6969be9a855a..d5dbe5836aa3 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -427,11 +427,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * information.
- 	 */
- 	struct file *file = lo->lo_backing_file;
-+	struct request_queue *q = lo->lo_queue;
- 	int ret;
- 
- 	mode |= FALLOC_FL_KEEP_SIZE;
- 
--	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-+	if (!blk_queue_discard(q)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
-@@ -865,28 +866,47 @@ static void loop_config_discard(struct loop_device *lo)
- 	struct inode *inode = file->f_mapping->host;
- 	struct request_queue *q = lo->lo_queue;
- 
-+	/*
-+	 * If the backing device is a block device, mirror its zeroing
-+	 * capability. Set the discard sectors to the block device's zeroing
-+	 * capabilities because loop discards result in blkdev_issue_zeroout(),
-+	 * not blkdev_issue_discard(). This maintains consistent behavior with
-+	 * file-backed loop devices: discarded regions read back as zero.
-+	 */
-+	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-+		struct request_queue *backingq;
-+
-+		backingq = bdev_get_queue(inode->i_bdev);
-+		blk_queue_max_discard_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
-+		blk_queue_max_write_zeroes_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
- 	/*
- 	 * We use punch hole to reclaim the free space used by the
- 	 * image a.k.a. discard. However we do not support discard if
- 	 * encryption is enabled, because it may give an attacker
- 	 * useful information.
- 	 */
--	if ((!file->f_op->fallocate) ||
--	    lo->lo_encrypt_key_size) {
-+	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
- 		q->limits.discard_granularity = 0;
- 		q->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(q, 0);
- 		blk_queue_max_write_zeroes_sectors(q, 0);
--		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
--		return;
--	}
- 
--	q->limits.discard_granularity = inode->i_sb->s_blocksize;
--	q->limits.discard_alignment = 0;
-+	} else {
-+		q->limits.discard_granularity = inode->i_sb->s_blocksize;
-+		q->limits.discard_alignment = 0;
- 
--	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
--	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
--	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-+		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-+	}
-+
-+	if (q->limits.max_write_zeroes_sectors)
-+		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
- }
- 
- static void loop_unprepare_queue(struct loop_device *lo)
--- 
-2.17.1
 
+> > - Because this problem only trips with inexact has_work() it's
+> >   believed that blk_mq_do_dispatch_ctx() does not need a similar
+> >   change.
+>
+> Right, I prefer to fix it in BFQ, given it isn't a generic issue,
+> not worth of generic solution.
+
+Just to confirm: it sounds like you are saying that BFQ is not a first
+class citizen here because not everyone uses BFQ.  Is that really the
+best policy?  Couldn't I say that SCSI shouldn't be a first class
+citizen because not everyone uses SCSI?  In such a case I could argue
+that we should speed up the blk-mq layer by removing all the budget
+code since SCSI is the only user.  I'm not actually suggesting it,
+only pointing out that sometimes we need to make allowances in the
+code.
+
+
+> > @@ -97,12 +97,34 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >               if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+> >                       break;
+> >
+> > -             if (!blk_mq_get_dispatch_budget(hctx))
+> > -                     break;
+> > +
+> > +             if (!blk_mq_get_dispatch_budget(hctx)) {
+> > +                     /*
+> > +                      * We didn't get budget so set contention.  If
+> > +                      * someone else had the budget but didn't dispatch
+> > +                      * they'll kick everything.  NOTE: we check one
+> > +                      * extra time _after_ setting contention to fully
+> > +                      * close the race.  If we don't actually dispatch
+> > +                      * we'll detext faux contention (with ourselves)
+> > +                      * but that should be rare.
+> > +                      */
+> > +                     atomic_set(&q->budget_contention, 1);
+> > +
+> > +                     if (!blk_mq_get_dispatch_budget(hctx))
+>
+> scsi_mq_get_budget() implies a smp_mb(), so the barrier can order
+> between blk_mq_get_dispatch_budget() and atomic_set(&q->budget_contention, 0|1).
+
+I always struggle when working with memory barriers.  I think you are
+saying that this section of code is OK, though, presumably because the
+SCSI code does "atomic_inc_return" which implies this barrier.
+
+Do you happen to know if it's documented that anyone who implements
+get_budget() for "struct blk_mq_ops" will have a memory barrier here?
+I know SCSI is the only existing user, but we'd want to keep it
+generic.
+
+
+> > +                             break;
+> > +             }
+> >
+> >               rq = e->type->ops.dispatch_request(hctx);
+> >               if (!rq) {
+> >                       blk_mq_put_dispatch_budget(hctx);
+> > +
+> > +                     /*
+> > +                      * We've released the budget but us holding it might
+> > +                      * have prevented someone else from dispatching.
+> > +                      * Detect that case and run all queues again.
+> > +                      */
+> > +                     if (atomic_read(&q->budget_contention))
+>
+> scsi_mq_put_budget() doesn't imply smp_mb(), so one smp_mb__after_atomic()
+> is needed between the above two op.
+
+OK, thanks.  I will add that we decide to move forward with this
+patch.  Again I'd wonder if this type of thing should be documented.
+
+
+> > +                             blk_mq_run_hw_queues(q, true);
+> >                       break;
+> >               }
+> >
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 2cd8d2b49ff4..6163c43ceca5 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1528,6 +1528,9 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+> >       struct blk_mq_hw_ctx *hctx;
+> >       int i;
+> >
+> > +     /* We're running the queues, so clear the contention detector */
+> > +     atomic_set(&q->budget_contention, 0);
+> > +
+>
+> You add extra cost in fast path.
+
+Yes, but it is a fairly minor cost added.  It's called once in a place
+where we're unlikely to be looping and where we're about to do a lot
+heavier operations (perhaps in a loop).  This doesn't feel like a
+dealbreaker.
+
+
+> >       queue_for_each_hw_ctx(q, hctx, i) {
+> >               if (blk_mq_hctx_stopped(hctx))
+> >                       continue;
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index f629d40c645c..07f21e45d993 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -583,6 +583,8 @@ struct request_queue {
+> >
+> >  #define BLK_MAX_WRITE_HINTS  5
+> >       u64                     write_hints[BLK_MAX_WRITE_HINTS];
+> > +
+> > +     atomic_t                budget_contention;
+>
+> It needn't to be a atomic variable, and simple 'unsigned'
+> int should be fine, what matters is that the order between
+> R/W this flag and get/put budget.
+
+Apparently I'm the only one who feels atomic_t is more documenting
+here.  I will cede to the will of the majority here and change to
+'unsigned int' if we decide to move forward with this patch.
+
+-Doug
+
+[1] https://lore.kernel.org/r/d6af2344-11f7-5862-daed-e21cbd496d92@kernel.dk
