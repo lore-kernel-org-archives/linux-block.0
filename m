@@ -2,76 +2,90 @@ Return-Path: <SRS0=MH8N=5U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E6C2BA16
-	for <linux-block@archiver.kernel.org>; Sat,  4 Apr 2020 06:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A11C7C2BA16
+	for <linux-block@archiver.kernel.org>; Sat,  4 Apr 2020 07:09:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A3E1206B8
-	for <linux-block@archiver.kernel.org>; Sat,  4 Apr 2020 06:51:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dKkSSb9g"
+	by mail.kernel.org (Postfix) with ESMTP id 7B40D206F5
+	for <linux-block@archiver.kernel.org>; Sat,  4 Apr 2020 07:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725862AbgDDGvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Apr 2020 02:51:24 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:44740 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725730AbgDDGvY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 02:51:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=qki1tQprFNKggA7pzaUzkSNxtkMWt/ABaK5EURoI05Y=; b=dKkSSb9gOjo2E7OmlfdylXMk+z
-        svrxeMeWIk7zmROuVWpDHooMfgVHJjG2/G9I2EVMx2JcB/RvLlPmJWG+hvPlOp0ogUOg1kzYMNoXP
-        +VO7rEqDV36zlixdPZSmsDkGSwyO856e1EmpLAvmyPXd7FKYNGeajT1sGVIt1FrvmfHxHR8hTCqmr
-        /o4hTeOUPlTqzvNHBIsVB/oiBw/uPLAaq4JiDhUuEs+sd/Xc51K+eObjdrayJktOKb+2d8D11RIvL
-        7MLlPSZIBMdMsgIfGJxeRpsULxKzUdrPrWd4qt89DlaMq1Rz+o5Uy9Y13KQ0wK0DFFz5AeXiDcugM
-        2JR81w+w==;
-Received: from [2001:4bb8:180:7914:2ca6:9476:bbfa:a4d0] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jKceI-0007FO-TR; Sat, 04 Apr 2020 06:51:23 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: [PATCH] block: fix busy device checking in blk_drop_partitions
-Date:   Sat,  4 Apr 2020 08:51:20 +0200
-Message-Id: <20200404065120.655735-1-hch@lst.de>
-X-Mailer: git-send-email 2.25.1
+        id S1725962AbgDDHJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Apr 2020 03:09:06 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:2935 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1725730AbgDDHJG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 03:09:06 -0400
+X-ASG-Debug-ID: 1585984133-0e410863a1264900001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.192]) by bsf02.didichuxing.com with ESMTP id 9oyvkZiPLpS9atQs; Sat, 04 Apr 2020 15:08:53 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 4 Apr
+ 2020 15:08:53 +0800
+Date:   Sat, 4 Apr 2020 15:08:48 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH] block: save previous hardware queue count before udpate
+Message-ID: <20200404070844.GA17505@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH] block: save previous hardware queue count before udpate
+Mail-Followup-To: axboe@kernel.dk, linux-block@vger.kernel.org
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS02.didichuxing.com (172.20.36.211) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.192]
+X-Barracuda-Start-Time: 1585984133
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 973
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0209
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.80990
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bd_super is only set by get_tree_bdev and mount_bdev, and thus not by
-other openers like btrfs or the XFS realtime and log devices, as well as
-block devices directly opened from user space.  Check bd_openers
-instead.
+blk_mq_realloc_tag_set_tags will update set->nr_hw_queues, so
+save old set->nr_hw_queues before call this function.
 
-Fixes: 77032ca66f86 ("Return EBUSY from BLKRRPART for mounted whole-dev fs")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Since set->nr_hw_queues has been updated in blk_mq_realloc_tag_set_tags,
+no need set it again.
+
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- block/partitions/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b79c4513629b..1a0a829d8416 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -496,7 +496,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f6291ceedee4..c86d1c81d3d6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3342,12 +3342,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		blk_mq_sysfs_unregister(q);
+ 	}
  
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
--	if (bdev->bd_part_count || bdev->bd_super)
-+	if (bdev->bd_part_count || bdev->bd_openers)
- 		return -EBUSY;
- 	res = invalidate_partition(disk, 0);
- 	if (res)
++	prev_nr_hw_queues = set->nr_hw_queues;
+ 	if (blk_mq_realloc_tag_set_tags(set, set->nr_hw_queues, nr_hw_queues) <
+ 	    0)
+ 		goto reregister;
+ 
+-	prev_nr_hw_queues = set->nr_hw_queues;
+-	set->nr_hw_queues = nr_hw_queues;
+ 	blk_mq_update_queue_map(set);
+ fallback:
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
 -- 
-2.25.1
+2.18.1
 
