@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82442C2BA15
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF76BC2BA15
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:29:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 564EE20659
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:20:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DE1B206F5
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:29:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgDECUR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Apr 2020 22:20:17 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:35942 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726300AbgDECUR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 22:20:17 -0400
-Received: by mail-pf1-f195.google.com with SMTP id n10so5735635pff.3
-        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2020 19:20:16 -0700 (PDT)
+        id S1726300AbgDEC36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Apr 2020 22:29:58 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:40082 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbgDEC36 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 22:29:58 -0400
+Received: by mail-pj1-f66.google.com with SMTP id kx8so4871901pjb.5
+        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2020 19:29:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BCo+TDaROooML0LkDU4vfg868YlADwQOlAQezTbRTB4=;
-        b=tLfcrWF89eCAxVuE7n68hoIp3Rr9L3TYStPSde2EZ5dhPaNLUno76bxbYvmTHW0usx
-         48ubHUubwRvaBr/UTGvq8RZuCqT1aVAA7Y4obO26C9NDQUJHmS9Aq4oSxn+Oxu5Xih81
-         gzC5pNirM12r4B1tBft4v2OnalCON7A8OOpl7zEM/Fp0XWN8FHazs5HzRJZfOrhc/ADh
-         q8kZh6Z2nHiRZNKLn9whfZbLGiKoWsdzHMmrtZPXsug6uYeH45057ZqRYzQsBmSs3Sg5
-         uNavkzK1D+JLXpHsPecNkgQsd2PFHMDG9BiJZhKmITrVh2vVmaPuS+bvr69amJJxZmHo
-         Lmlg==
-X-Gm-Message-State: AGi0Pua6Onia2es5qcC7aW0Vlqcet0GaCI7I8bwWgcesQzYX19xzSDQ5
-        JuZKvXNa0FS1duaaKMTTio5d4QMwBlA=
-X-Google-Smtp-Source: APiQypLndtK2Uv4JRg7CbQ3K2fDEDZFTR/NMS2oE56JTj65icw4L52NJXYd/8XzBEDmESbeZI3pGNw==
-X-Received: by 2002:a63:6d3:: with SMTP id 202mr15152696pgg.445.1586053215386;
-        Sat, 04 Apr 2020 19:20:15 -0700 (PDT)
+        bh=Gx4GHNUWtsGhoMe5BGDWzH5fhwt7Fgyke3F0pxuTNzc=;
+        b=Q+DumfvDxXVKBUFvCsaTC3OZU5arHUb/JzDtDZfv+c84boMftChR+hjGWajRcAnl7a
+         gpYNTjFIWE/WqOx2pbIBIns76P+cOk1p/UXbKs5nhNwX1E+bDV3LQtEkPODBRFpAiFKw
+         KlSooOhue1KxC18juE5CieQKFoInnHQUfEbi7XCKDJ6GA4dLaOzajJuPqOX0Gttz1TgV
+         MIwonaBuJiX+Q4xyWdsthJC0O1WXw35aMaDNQ+WICapOPsD27aC7a9bHHFrOKMsrg5h5
+         IvXjJb8ltkFYLf+5YSogcEpa2E6o4On7IQVX8MCe0uHKuW4onT1K1KtN9HDuTPN7j+bY
+         xsRQ==
+X-Gm-Message-State: AGi0PubM6XRIhhjKenOgJmH5SAKqsuRAnpbR3wIrtoP9uxu0EQaR7QON
+        b04dObM34k6xjhO1HdwtEeASdOmx/fg=
+X-Google-Smtp-Source: APiQypJdm2TpHQcmery5d6u/pjpfRWWNjc/8gTA441g6LtSX59wLjXCdRZ64M5FRadvCNNhauOOo8g==
+X-Received: by 2002:a17:90a:362a:: with SMTP id s39mr18899041pjb.28.1586053796477;
+        Sat, 04 Apr 2020 19:29:56 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:103a:6b0b:334d:7fb2? ([2601:647:4000:d7:103a:6b0b:334d:7fb2])
-        by smtp.gmail.com with ESMTPSA id m3sm8035758pgt.27.2020.04.04.19.20.14
+        by smtp.gmail.com with ESMTPSA id n5sm2267100pgb.5.2020.04.04.19.29.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Apr 2020 19:20:14 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] block: save previous hardware queue count before
- udpate
+        Sat, 04 Apr 2020 19:29:55 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] block: alloc map and request for new hardware
+ queue
 To:     axboe@kernel.dk, linux-block@vger.kernel.org
 References: <cover.1586006904.git.zhangweiping@didiglobal.com>
- <a0230ed5731a2c9183e1929611755579f20616ff.1586006904.git.zhangweiping@didiglobal.com>
+ <9818e6d277f88df0e40948c580b38316750c626f.1586006904.git.zhangweiping@didiglobal.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -70,12 +70,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <78d03e54-0787-f600-9381-e821eee6ad8d@acm.org>
-Date:   Sat, 4 Apr 2020 19:20:13 -0700
+Message-ID: <d08d0ecd-c12e-8b39-bb9c-45df0b8bad13@acm.org>
+Date:   Sat, 4 Apr 2020 19:29:54 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <a0230ed5731a2c9183e1929611755579f20616ff.1586006904.git.zhangweiping@didiglobal.com>
+In-Reply-To: <9818e6d277f88df0e40948c580b38316750c626f.1586006904.git.zhangweiping@didiglobal.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,11 +84,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-04 06:35, Weiping Zhang wrote:
-> blk_mq_realloc_tag_set_tags will update set->nr_hw_queues, so
-> save old set->nr_hw_queues before call this function.
+On 2020-04-04 06:36, Weiping Zhang wrote:
+> Alloc new map and request for new hardware queue when increse
+  ^^^^^                                                 ^^^^^^^
+  allocate?                                            increasing the?
+> hardware queue count. Before this patch, it will show a
+[ ... ]
+> Reproduce script:
 > 
-> Since set->nr_hw_queues has been updated in blk_mq_realloc_tag_set_tags,
-> no need set it again.
+> nr=$(expr `cat /sys/block/nvme0n1/device/queue_count` - 1)
+> echo $nr > /sys/module/nvme/parameters/write_queues
+> echo 1 > /sys/block/nvme0n1/device/reset_controller
+> dd if=/dev/nvme0n1 of=/dev/null bs=4K count=1
+
+Can this be converted in a blktests test?
+
+Otherwise this patch looks good to me, hence:
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
