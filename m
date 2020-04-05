@@ -2,93 +2,139 @@ Return-Path: <SRS0=lh2f=5V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1E0C2BA16
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19962C2BA18
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:13:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7821A206A3
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:09:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abEzYmoH"
+	by mail.kernel.org (Postfix) with ESMTP id ECE8C206A3
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726352AbgDEDJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Apr 2020 23:09:01 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:34289 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgDEDJB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 23:09:01 -0400
-Received: by mail-qk1-f196.google.com with SMTP id i186so3676451qke.1
-        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2020 20:09:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=5l5djp15fhqmaw1ZUF9zv9d+4qcfAeGGd97wUsov/go=;
-        b=abEzYmoHlGY3SHCbH3EHAzU2Oe6zPIk03fqtl1OIgxcM+4gb+oAw/ljzPoa/WEaCgZ
-         O16OXnY4GpBb4sQ7Q+9ETrrwjy1GcwA1fQvsg9ZfEr40wT60FQAYZ9p1lu0aB4XgQTKW
-         1m7l5mq19D+VzpOZI5uO6nRHjQ0qZsRbF13EN/uL1iZvlKSLi27t3HeEOYIPTorGm6+N
-         A3El/WkdbmYtst6c6CqhOcqiEtx0kiYWTf+0IZZaQ/5cX6eibk+2fnSw/2AUOw5s5nDm
-         hKrcbgHdNp37MaBoCT8kBUjpnxnpUAWNLrjSMvXaTRJsckoQpvW99zpspdOGW3rL2zix
-         Pfdw==
+        id S1726380AbgDEDM5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Apr 2020 23:12:57 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36660 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726057AbgDEDM5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 23:12:57 -0400
+Received: by mail-pf1-f193.google.com with SMTP id n10so5773291pff.3;
+        Sat, 04 Apr 2020 20:12:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=5l5djp15fhqmaw1ZUF9zv9d+4qcfAeGGd97wUsov/go=;
-        b=cgJEppFon21XrsgUNvmw6Vv24xWrkl6JZMdwVNI8sraUtds2WLWFubkL98S3SC59qp
-         8/bIM1PnU0dJ3R9ItfXspfFdRh8A8X7gMx1k6LZNyAzAxhUtnolnAVC34Z8NDwoNFYJt
-         bLFRPY/lbLA8KxR/SVE54xKNY1pLWIzrR/wUlGzGgMPXYCeZYkhB4C0yamfeG2CMkR8t
-         TpewfZeqyyrwX0Yi3bM288xFGkUAWiozTGGUGQ4tA5Zn2EJGIbDJF6aisZMcFyWu8Hjf
-         pV7gDfWd5eFNHL2CoWZMZGI+gPFpJEFJvfPex0QO355rs4QXlCmE6uRb9l65L/Vffw7V
-         MINg==
-X-Gm-Message-State: AGi0PuYTv5/y5B5qhQhD6XR51mQ7n/13j9R69tBBWtMgM68WQNTi0OdU
-        7DGAgn33It+IJoS42zxoritZkQjHF6UUCLpcMVho+57o
-X-Google-Smtp-Source: APiQypJ6L4IWhRIHcImrZhnKKeZQxh37gbLyFu78k9cfmuVTtqeX5+qKbpl864VLd/9KS3I+nPr0SpoQUdskg/OR0LE=
-X-Received: by 2002:a37:e115:: with SMTP id c21mr15411756qkm.249.1586056140420;
- Sat, 04 Apr 2020 20:09:00 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=CcrM78Ee5sJ7nNP72U0wM1cu31MrzFzOVzTC6xSrZ0U=;
+        b=oR6wJiaUrfU3miabYBQns0ThkVqBBnzEWm1UbO4LCCSWA3nbWosx4RjgSDfhjPY+k1
+         Bhpkyn2NRjp8axMKNB+ny7AnqtgMcEwDfWwQPOKwWUCoCRcbX5LoU4IemH4YilRuPCNu
+         adS/PU+/No4wviXivVGSZLaWzY3ghgAGUJtvnVtrtKfrBtCPGI2YZ6Eua/s4k1t9eV8/
+         4bQ2/50KUaHDfYjdoZgA8HeIlBIWaE2z9DthZBQJz1sGjXXRVYEhN+TphzExDc3TBaIU
+         XHx8lFOP0OcRpz2Jb+0dhRFj/d2QPGamDAjU98/Phg9yi5O89sydOYpIRI2o7lrHchZs
+         MR4g==
+X-Gm-Message-State: AGi0PuaKN0HMzV/8tuR2ErvsihMpce/6ZtmjbUzFjQmccQh3+C2aYFAj
+        McOZPl8SA7Ek5tu5HoEy1G0=
+X-Google-Smtp-Source: APiQypKEwX4L8/TOzddPUJ8IWcjtV6TmCEBEGEEZX5/TWkJI7xTfrX7PHuobqvMGyZlKuG3uYLQZuQ==
+X-Received: by 2002:a65:5a4f:: with SMTP id z15mr15611596pgs.103.1586056375548;
+        Sat, 04 Apr 2020 20:12:55 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:103a:6b0b:334d:7fb2? ([2601:647:4000:d7:103a:6b0b:334d:7fb2])
+        by smtp.gmail.com with ESMTPSA id s3sm6534495pjd.21.2020.04.04.20.12.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 04 Apr 2020 20:12:54 -0700 (PDT)
+Subject: Re: [RFC 1/3] block: move main block debugfs initialization to its
+ own file
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de
+Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200402000002.7442-2-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <cef15625-3814-aec2-d10c-1344a6f063a9@acm.org>
+Date:   Sat, 4 Apr 2020 20:12:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <cover.1586006904.git.zhangweiping@didiglobal.com>
- <9818e6d277f88df0e40948c580b38316750c626f.1586006904.git.zhangweiping@didiglobal.com>
- <d08d0ecd-c12e-8b39-bb9c-45df0b8bad13@acm.org>
-In-Reply-To: <d08d0ecd-c12e-8b39-bb9c-45df0b8bad13@acm.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Sun, 5 Apr 2020 11:08:49 +0800
-Message-ID: <CAA70yB4Q8AHmL3=wnbSVgNpdowJc36R6aM+k_1jxH1FvDpO+Vg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] block: alloc map and request for new hardware queue
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200402000002.7442-2-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Bart Van Assche <bvanassche@acm.org> =E4=BA=8E2020=E5=B9=B44=E6=9C=885=E6=
-=97=A5=E5=91=A8=E6=97=A5 =E4=B8=8A=E5=8D=8810:30=E5=86=99=E9=81=93=EF=BC=9A
->
-> On 2020-04-04 06:36, Weiping Zhang wrote:
-> > Alloc new map and request for new hardware queue when increse
->   ^^^^^                                                 ^^^^^^^
->   allocate?                                            increasing the?
-> > hardware queue count. Before this patch, it will show a
-> [ ... ]
-> > Reproduce script:
-> >
-> > nr=3D$(expr `cat /sys/block/nvme0n1/device/queue_count` - 1)
-> > echo $nr > /sys/module/nvme/parameters/write_queues
-> > echo 1 > /sys/block/nvme0n1/device/reset_controller
-> > dd if=3D/dev/nvme0n1 of=3D/dev/null bs=3D4K count=3D1
->
-> Can this be converted in a blktests test?
->
-It's ok, add it to blktest latter,
-> Otherwise this patch looks good to me, hence:
->
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On 2020-04-01 17:00, Luis Chamberlain wrote:
+> Single and multiqeueue block devices share some debugfs code. By
+             ^^^^^^^^^^^
+             multiqueue?
+> moving this into its own file it makes it easier to expand and audit
+> this shared code.
 
-Thanks
+[ ... ]
+
+> diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
+> new file mode 100644
+> index 000000000000..634dea4b1507
+> --- /dev/null
+> +++ b/block/blk-debugfs.c
+> @@ -0,0 +1,15 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +/*
+> + * Shared debugfs mq / non-mq functionality
+> + */
+
+The legacy block layer is gone, so not sure why the above comment refers
+to non-mq?
+
+> diff --git a/block/blk.h b/block/blk.h
+> index 0a94ec68af32..86a66b614f08 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -487,5 +487,12 @@ struct request_queue *__blk_alloc_queue(int node_id);
+>  int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
+>  		struct page *page, unsigned int len, unsigned int offset,
+>  		bool *same_page);
+> +#ifdef CONFIG_DEBUG_FS
+> +void blk_debugfs_register(void);
+> +#else
+> +static inline void blk_debugfs_register(void)
+> +{
+> +}
+> +#endif /* CONFIG_DEBUG_FS */
+
+Do we really need a new header file that only declares a single
+function? How about adding the above into block/blk-mq-debugfs.h?
+
+Thanks,
+
+Bart.
