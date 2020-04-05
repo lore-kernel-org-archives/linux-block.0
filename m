@@ -2,50 +2,50 @@ Return-Path: <SRS0=lh2f=5V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF76BC2BA15
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E06B3C2BA16
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:08:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DE1B206F5
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 02:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9AB52070E
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:08:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgDEC36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Apr 2020 22:29:58 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:40082 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgDEC36 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 22:29:58 -0400
-Received: by mail-pj1-f66.google.com with SMTP id kx8so4871901pjb.5
-        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2020 19:29:57 -0700 (PDT)
+        id S1726410AbgDEDIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Apr 2020 23:08:01 -0400
+Received: from mail-pj1-f44.google.com ([209.85.216.44]:54046 "EHLO
+        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbgDEDIA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 23:08:00 -0400
+Received: by mail-pj1-f44.google.com with SMTP id l36so4944480pjb.3
+        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2020 20:07:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Gx4GHNUWtsGhoMe5BGDWzH5fhwt7Fgyke3F0pxuTNzc=;
-        b=Q+DumfvDxXVKBUFvCsaTC3OZU5arHUb/JzDtDZfv+c84boMftChR+hjGWajRcAnl7a
-         gpYNTjFIWE/WqOx2pbIBIns76P+cOk1p/UXbKs5nhNwX1E+bDV3LQtEkPODBRFpAiFKw
-         KlSooOhue1KxC18juE5CieQKFoInnHQUfEbi7XCKDJ6GA4dLaOzajJuPqOX0Gttz1TgV
-         MIwonaBuJiX+Q4xyWdsthJC0O1WXw35aMaDNQ+WICapOPsD27aC7a9bHHFrOKMsrg5h5
-         IvXjJb8ltkFYLf+5YSogcEpa2E6o4On7IQVX8MCe0uHKuW4onT1K1KtN9HDuTPN7j+bY
-         xsRQ==
-X-Gm-Message-State: AGi0PubM6XRIhhjKenOgJmH5SAKqsuRAnpbR3wIrtoP9uxu0EQaR7QON
-        b04dObM34k6xjhO1HdwtEeASdOmx/fg=
-X-Google-Smtp-Source: APiQypJdm2TpHQcmery5d6u/pjpfRWWNjc/8gTA441g6LtSX59wLjXCdRZ64M5FRadvCNNhauOOo8g==
-X-Received: by 2002:a17:90a:362a:: with SMTP id s39mr18899041pjb.28.1586053796477;
-        Sat, 04 Apr 2020 19:29:56 -0700 (PDT)
+        bh=QvgFLTmqbpYN5RNoWHYPXVJx56cAmRWS52LALDeeaEI=;
+        b=hydApDHBWqbECmsfoeYfGjTsBAxRqXBknPM1u3JS3Csri3+f1+pd3vgC1qCnnYlZO9
+         vqSk5CnkYdt2sSLJz3uGcna3gM9GGlDhZRzp5ms1fULMdzFBSXpdjIfCgew167554Nlx
+         pPzyowM2IwkErnVFvZb/VsO/y3XChCuXer+cq+5ASF4B+xuRxNWlwQQYN+D1QqgbMkOw
+         bDEYea/Vfmq6KGxSBPALqZER6x6x3RBr0PvgdpKJWkQ3kcg7a3tTxpGVYpr5zcOLwzVM
+         uqF9QKhjKjuC0JNhxsXTXDqPl1z8JZBrHHa4Lv/Txl2DZ6svyZzdf67ezZotOdnz07Jc
+         Oxpw==
+X-Gm-Message-State: AGi0PuZsb4c2C62hu9FjYRbUywDKcbl6nsP3tSAASPBsdxY1We/F/nQu
+        tDMXZLV3EixwzhE0m+WGsco=
+X-Google-Smtp-Source: APiQypJT/0QI8BvPqptByEQSPFAvojwSI+GKP+JKljTMntNNg3m6gdEhZLE5vRTOHKi25Og/3Z4GAA==
+X-Received: by 2002:a17:902:be0e:: with SMTP id r14mr15055191pls.5.1586056079204;
+        Sat, 04 Apr 2020 20:07:59 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:103a:6b0b:334d:7fb2? ([2601:647:4000:d7:103a:6b0b:334d:7fb2])
-        by smtp.gmail.com with ESMTPSA id n5sm2267100pgb.5.2020.04.04.19.29.55
+        by smtp.gmail.com with ESMTPSA id hg20sm8762245pjb.3.2020.04.04.20.07.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Apr 2020 19:29:55 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] block: alloc map and request for new hardware
- queue
-To:     axboe@kernel.dk, linux-block@vger.kernel.org
-References: <cover.1586006904.git.zhangweiping@didiglobal.com>
- <9818e6d277f88df0e40948c580b38316750c626f.1586006904.git.zhangweiping@didiglobal.com>
+        Sat, 04 Apr 2020 20:07:58 -0700 (PDT)
+Subject: =?UTF-8?Q?Re=3a_=e2=9d=8c_FAIL=3a_Test_report_for_kernel_5=2e6=2e0-?=
+ =?UTF-8?Q?83eb78c=2ecki_=28block=29?=
+To:     CKI Project <cki-project@redhat.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+References: <cki.30CC7B67BD.D92JFO5H7A@redhat.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -70,12 +70,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <d08d0ecd-c12e-8b39-bb9c-45df0b8bad13@acm.org>
-Date:   Sat, 4 Apr 2020 19:29:54 -0700
+Message-ID: <0a957017-9d26-b3d5-4751-66c971b7c253@acm.org>
+Date:   Sat, 4 Apr 2020 20:07:57 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <9818e6d277f88df0e40948c580b38316750c626f.1586006904.git.zhangweiping@didiglobal.com>
+In-Reply-To: <cki.30CC7B67BD.D92JFO5H7A@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,21 +84,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-04 06:36, Weiping Zhang wrote:
-> Alloc new map and request for new hardware queue when increse
-  ^^^^^                                                 ^^^^^^^
-  allocate?                                            increasing the?
-> hardware queue count. Before this patch, it will show a
-[ ... ]
-> Reproduce script:
+On 2020-04-03 13:04, CKI Project wrote:
+> All kernel binaries, config files, and logs are available for download here:
 > 
-> nr=$(expr `cat /sys/block/nvme0n1/device/queue_count` - 1)
-> echo $nr > /sys/module/nvme/parameters/write_queues
-> echo 1 > /sys/block/nvme0n1/device/reset_controller
-> dd if=/dev/nvme0n1 of=/dev/null bs=4K count=1
+>   https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=datawarehouse/2020/04/03/518551
 
-Can this be converted in a blktests test?
+From the build log:
 
-Otherwise this patch looks good to me, hence:
+ERROR: modpost: "sysrq_mask" [drivers/tty/serial/serial_core.ko] undefined!
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+So why has this report been sent to the linux-block mailing list? Does
+the build bot perhaps need to become smarter?
+
+Thanks,
+
+Bart.
