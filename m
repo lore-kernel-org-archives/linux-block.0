@@ -2,171 +2,184 @@ Return-Path: <SRS0=lh2f=5V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 174E8C2BA1A
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E514C2BA19
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 09:15:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF6B520842
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 03:39:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09B992054F
+	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 09:15:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5N6Zz2x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbgDEDjw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Apr 2020 23:39:52 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:37079 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgDEDjw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Apr 2020 23:39:52 -0400
-Received: by mail-pj1-f66.google.com with SMTP id k3so4925299pjj.2;
-        Sat, 04 Apr 2020 20:39:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ereDF8FGoaOdArxxw03gJ2soJTiibGzd15XhK62QHfI=;
-        b=M4FJ3295tQD2F+A/wLM8yVX03ySF9G4O3E/65pZAnvk2aNUWKfsCqOEYSPT3uQCj8B
-         +EvbskF86UKuv4AMZ8P1+6D3KNj4bZrnKfkdd278dXN6POB3mAEWfxu/wyJ73O1HNDNp
-         PBvUI6k+PKGM+9/O1YZaUxbczg+ni2z5ZOFgtG973fa+3MqtwFTL5kwQ6ZP8ScDeIiWn
-         /4Rc/IWfyyGUok/nF9v2DKBQ3V8l6tqlutmjEwwxUABqWhMaGfeEbSm0IwIjno9+O1/w
-         q1LCdIXO69+R4tdmARy/yRAcnDy1zuvHeZ1CtE5x7eZ1JEwAeBAnGtoLLbn+CUJRMBo0
-         1Cfw==
-X-Gm-Message-State: AGi0PubScyQURT/uhnK3a8rseUqDkXDlE4ozxcy+lsAbQ/yceH0t9tvd
-        YE8MN5yxO3/LRtu2QZ50A6U=
-X-Google-Smtp-Source: APiQypIlhAC5+tCSUz3NsAmxOxfbEh/nWPl6r2rsCE6epnhDERfi9fJSuoS9ddgztKaYvRRI6TdoXg==
-X-Received: by 2002:a17:902:9003:: with SMTP id a3mr14409998plp.331.1586057990237;
-        Sat, 04 Apr 2020 20:39:50 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:103a:6b0b:334d:7fb2? ([2601:647:4000:d7:103a:6b0b:334d:7fb2])
-        by smtp.gmail.com with ESMTPSA id u3sm8847114pfb.36.2020.04.04.20.39.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Apr 2020 20:39:49 -0700 (PDT)
-Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de
-Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200402000002.7442-3-mcgrof@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
-Date:   Sat, 4 Apr 2020 20:39:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726508AbgDEJPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Apr 2020 05:15:12 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40818 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726397AbgDEJPM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Apr 2020 05:15:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586078110;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wec/vqv73hEsPDDrYN9Jlyzp12r1uEhEmr4QrwDkfL0=;
+        b=g5N6Zz2x9GmB08HAJSr0xo9jqF+gCLa/na3Smqex+3yy8DZR7CGHKu0uc3gWp88r6bGeJ4
+        UO8g0ttZUVfWg+OF76v7KkkCCodXFOgQfDG8ZJzU9BVxA/DKHFpuY4n22u+i8jOclB97RA
+        UEzcQtRJmyAQXxoAfUm2QpIx9fnwx6Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-Pz_XGH5uMB2z1gYApQFZPg-1; Sun, 05 Apr 2020 05:15:06 -0400
+X-MC-Unique: Pz_XGH5uMB2z1gYApQFZPg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C96E98017F3;
+        Sun,  5 Apr 2020 09:15:03 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 171345DA2C;
+        Sun,  5 Apr 2020 09:14:51 +0000 (UTC)
+Date:   Sun, 5 Apr 2020 17:14:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Salman Qazi <sqazi@google.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-scsi@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
+        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hou Tao <houtao1@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Tejun Heo <tj@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget
+ contention
+Message-ID: <20200405091446.GA3421@localhost.localdomain>
+References: <20200402155130.8264-1-dianders@chromium.org>
+ <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
+ <20200403013356.GA6987@ming.t460p>
+ <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
+ <CAD=FV=Vsk0SjkA+DbUwJxvO6NFcr0CO9=H1FD7okJ2PxMt5pYA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200402000002.7442-3-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=FV=Vsk0SjkA+DbUwJxvO6NFcr0CO9=H1FD7okJ2PxMt5pYA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-01 17:00, Luis Chamberlain wrote:
-> korg#205713 then was used to create CVE-2019-19770 and claims that
-> the bug is in a use-after-free in the debugfs core code. The
-> implications of this being a generic UAF on debugfs would be
-> much more severe, as it would imply parent dentries can sometimes
-> not be possitive, which is something claim is not possible.
-         ^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         positive?  is there perhaps a word missing here?
+On Fri, Apr 03, 2020 at 08:49:54AM -0700, Doug Anderson wrote:
+> Hi,
+> 
+> On Fri, Apr 3, 2020 at 8:10 AM Doug Anderson <dianders@chromium.org> wrote:
+> >
+> > Correct that it only happens with BFQ, but whether it's a BFQ bug or
+> > not just depends on how you define the has_work() API.  If has_work()
+> > is allowed to be in-exact then it's either a blk-mq bug or a SCSI bug
+> > depending on how you cut it.  If has_work() must be exact then it is
+> > certainly a BFQ bug.  If has_work() doesn't need to be exact then it's
+> > not a BFQ bug.  I believe that a sane API could be defined either way.
+> > Either has_work() can be defined as a lightweight hint to trigger
+> > heavier code or it can be defined as something exact.  It's really up
+> > to blk-mq to say how they define it.
+> >
+> > From his response on the SCSI patch [1], it sounded like Jens was OK
+> > with has_work() being a lightweight hint as long as BFQ ensures that
+> > the queues run later.  ...but, as my investigation found, I believe
+> > that BFQ _does_ try to ensure that the queue is run at a later time by
+> > calling blk_mq_run_hw_queues().  The irony is that due to the race
+> > we're talking about here, blk_mq_run_hw_queues() isn't guaranteed to
+> > be reliable if has_work() is inexact.  :(  One way to address this is
+> > to make blk_mq_run_hw_queues() reliable even if has_work() is inexact.
+> >
+> > ...so Jens: care to clarify how you'd like has_work() to be defined?
+> 
+> Sorry to reply so quickly after my prior reply, but I might have found
+> an extreme corner case where we can still run into the same race even
+> if has_work() is exact.  This is all theoretical from code analysis.
+> Maybe you can poke a hole in my scenario or tell me it's so
+> implausible that we don't care, but it seems like it's theoretically
+> possible.  For this example I'll assume a budget of 1 (AKA only one
+> thread can get budget for a given queue):
+> 
+> * Threads A and B both run has_work() at the same time with the same
+>   "hctx".  has_work() is exact but there's no lock, so it's OK if
+>   Thread A and B both get back true.
+> 
+> * Thread B gets interrupted for a long time right after it decides
+>   that there is work.  Maybe its CPU gets an interrupt and the
+>   interrupt handler is slow.
+> 
+> * Thread A runs, get budget, dispatches work.
+> 
+> * Thread A's work finishes and budget is released.
+> 
+> * Thread B finally runs again and gets budget.
+> 
+> * Since Thread A already took care of the work and no new work has
+>   come in, Thread B will get NULL from dispatch_request().  I believe
+>   this is specifically why dispatch_request() is allowed to return
+>   NULL in the first place if has_work() must be exact.
+> 
+> * Thread B will now be holding the budget and is about to call
+>   put_budget(), but hasn't called it yet.
+> 
+> * Thread B gets interrupted for a long time (again).  Dang interrupts.
+> 
+> * Now Thread C (with a different "hctx" but the same queue) comes
+>   along and runs blk_mq_do_dispatch_sched().
+> 
+> * Thread C won't do anything because it can't get budget.
+> 
+> * Finally Thread B will run again and put the budget without kicking
+>   any queues.
+> 
+> Now we have a potential I/O stall because nobody will ever kick the
+> queues.
+> 
+> 
+> I think the above example could happen even on non-BFQ systems and I
+> think it would also be fixed by an approach like the one in my patch.
 
-> It turns out that the issue actually is a mis-use of debugfs for
-> the multiqueue case, and the fragile nature of how we free the
-> directory used to keep track of blktrace debugfs files. Omar's
-> commit assumed the parent directory would be kept with
-> debugfs_lookup() but this is not the case, only the dentry is
-> kept around. We also special-case a solution for multiqueue
-> given that for multiqueue code we always instantiate the debugfs
-> directory for the request queue. We were leaving it only to chance,
-> if someone happens to use blktrace, on single queue block devices
-> for the respective debugfs directory be created.
+OK, looks it isn't specific on BFQ any more.
 
-Since the legacy block layer is gone, the above explanation may have to
-be rephrased.
+Follows another candidate approach for this issue, given it is so hard
+to trigger, we can make it more reliable by rerun queue when has_work()
+returns true after ops->dispath_request() returns NULL.
 
-> We can fix the UAF by simply using a debugfs directory which is
-> always created for singlequeue and multiqueue block devices. This
-> simplifies the code considerably, with the only penalty now being
-> that we're always creating the request queue directory debugfs
-> directory for the block device on singlequeue block devices.
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 74cedea56034..4408e5d4fcd8 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -80,6 +80,7 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+        blk_mq_run_hw_queue(hctx, true);
+ }
 
-Same comment here - the legacy block layer is gone. I think that today
-all block drivers are either request-based and multiqueue or so-called
-make_request drivers. See also the output of git grep -nHw
-blk_alloc_queue for examples of the latter category.
++#define BLK_MQ_BUDGET_DELAY    3               /* ms units */
+ /*
+  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
+  * its queue by itself in its completion handler, so we don't need to
+@@ -103,6 +104,9 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+                rq = e->type->ops.dispatch_request(hctx);
+                if (!rq) {
+                        blk_mq_put_dispatch_budget(hctx);
++
++                       if (e->type->ops.has_work && e->type->ops.has_work(hctx))
++                               blk_mq_delay_run_hw_queue(hctx, BLK_MQ_BUDGET_DELAY);
+                        break;
+                }
 
-> This patch then also contends the severity of CVE-2019-19770 as
-> this issue is only possible using root to shoot yourself in the
-> foot by also misuing blktrace.
-               ^^^^^^^
-               misusing?
 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index b3f2ba483992..bda9378eab90 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -823,9 +823,6 @@ void blk_mq_debugfs_register(struct request_queue *q)
->  	struct blk_mq_hw_ctx *hctx;
->  	int i;
->  
-> -	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> -					    blk_debugfs_root);
-> -
->  	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
->  
->  	/*
+Thanks, 
+Ming
 
-[ ... ]
-
->  static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index fca9b158f4a0..20f20b0fa0b9 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -895,6 +895,7 @@ static void __blk_release_queue(struct work_struct *work)
->  
->  	blk_trace_shutdown(q);
->  
-> +	blk_q_debugfs_unregister(q);
->  	if (queue_is_mq(q))
->  		blk_mq_debugfs_unregister(q);
-
-Does this patch change the behavior of the block layer from only
-registering a debugfs directory for request-based block devices to
-registering a debugfs directory for request-based and make_request based
-block devices? Is that behavior change an intended behavior change?
-
-Thanks,
-
-Bart.
