@@ -2,100 +2,90 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3EFC2BA80
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B43C2BA17
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:32:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02BED24895
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586186356;
-	bh=qAq6lW4cuP2wEhS5PvGUsTQiw6K0chbOTgyoH96CQ40=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=b6lDLyguFwmZWy8dCWZor+5oNMoc/aAq9RLdF3zNdo+wu80EtV9aEPwHvZFIchINg
-	 PDZdmojoWEhNmod1T6+WDh5SxYYrE+rV+bP2++pemptsal/wmQkKDakVWYHWPO6YPg
-	 E8pryrf6ZBOtpNW81qB+CNkmBrJu4f82zbcuV9/E=
+	by mail.kernel.org (Postfix) with ESMTP id C7C55248AB
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:32:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fSwjA78f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728954AbgDFPTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 11:19:11 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:33274 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728843AbgDFPTL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 11:19:11 -0400
-Received: by mail-pj1-f68.google.com with SMTP id cp9so99239pjb.0;
-        Mon, 06 Apr 2020 08:19:10 -0700 (PDT)
+        id S1728952AbgDFPch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 11:32:37 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:37956 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728942AbgDFPcg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 11:32:36 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c21so7682945pfo.5
+        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2020 08:32:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7VmKlpRwdchNnRw95jny/lwjYGByipa2aNaHLJyO/h8=;
+        b=fSwjA78fiVaYhEdu9cm73uYz/GAccmeCiK1ZZF4g8pB784H2TQnUZMAM8MtjfAJMyO
+         d9nJwtpKzHyK/XvD/i+d7ASW3J9bb4c7iQX9qg/LLhrQETL/w11itQZOIeszuwZg5Jjo
+         RJBvnVHRsjFxp7Z/Ert7W22fPXChXSFDFF6hZlbXucc0hlr1ICiSYYdgdhzsco7b8pG+
+         Awuzv4X/uWaOAWweNwJbEay4bCblOlH2L3I5sUGoYCUZGTY52UF03KCPX4ZoJPHLHZqn
+         vSNV4ygEdkOYPQj6l36AWDRCY1kFnk/Xug2noBWkjc/uqNtPB2QnFnegINZXsUjA6CpE
+         Gwew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=aBfDok83UFCkn0X8D+fWJrmNHdBWoIO84bdn980eTHw=;
-        b=AB40wVEXYr//GaCjwVMa2IClSM1o1poqpwK+v4mxFG7Ux4ujrsTd4ztwlz5uiRewpX
-         jOH0owTymoAqjGpJZeuiOUdFWtuRbAPcdkUX2Y7YzNJzMdl0TO1M0PUh9Xe8MFeIgrfU
-         JXu94cqw2SiWcGsH1as6gM06jyjUdNofD89SuqVjBZG73tGFZNO2CnqH23F+cc71bGCf
-         gA99oAF/gV62AtnQsq9Y+73GxuowAOvHwO0A5GTqvNNYhCyHFwdTlXeyGYU48/SYuyIv
-         r6MfPiViRLH04Fvz8cwpq4pVNXc7A/2NIq+hOduRpFQR9SRj2MKWGs9i1Kc2361fJg7m
-         baAg==
-X-Gm-Message-State: AGi0PuajSse0wwTcEJvkGfqTjtYYAliJWMcwlBiY8Jk+MgkZXJEYHxCK
-        PkeQVixmT+AaZjrI0AhH3hI=
-X-Google-Smtp-Source: APiQypLohMHAjT+WYyd+ePgRHomKWtNjTSamyDoO53eqDsQlYbPSAxuCfWqY8eGCTaUyBSoLzgc/CQ==
-X-Received: by 2002:a17:902:b187:: with SMTP id s7mr21513465plr.84.1586186349722;
-        Mon, 06 Apr 2020 08:19:09 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id h10sm11187936pgf.23.2020.04.06.08.19.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 08:19:08 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id B104940246; Mon,  6 Apr 2020 15:19:07 +0000 (UTC)
-Date:   Mon, 6 Apr 2020 15:19:07 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Nicolai Stange <nstange@suse.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Eric Sandeen <sandeen@sandeen.net>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
-Message-ID: <20200406151907.GD11244@42.do-not-panic.com>
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200402000002.7442-3-mcgrof@kernel.org>
- <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
- <b827d03c-e097-06c3-02ab-00df42b5fc0e@sandeen.net>
- <75aa4cff-1b90-ebd4-17a4-c1cb6d390b30@acm.org>
- <87d08lj7l6.fsf@suse.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7VmKlpRwdchNnRw95jny/lwjYGByipa2aNaHLJyO/h8=;
+        b=Q0rUOiogRAjSIB78vZ10sYh96NYL1adlzN9egTV5VdxF7thuctWLlev4oboAsMMvuX
+         0sLFr1OlPUYFy0grOY8l7m4rpzpWxiCWiFLTk2zVlbK5PR6c307yicIFJq6IlKk04X0x
+         hi2SYM04IEdJ9sfRrJtRf6yNNcuaoksLwWvyZiXlsyin2Mk95X/BVVyOOCtzWrQy4/UK
+         5Duxl2wpfbETbh6ezBhODa9PmcDAHo6J0trjSw7YgnXW/rdF3VTJ27r6Oem4tYtJEBze
+         jC0AI5Zvc1gxJngfjBOKh2tKc5dFF+s8ORSAsOojIF2kgw9sELo/F8bBZVPsXKcZkNE7
+         15wA==
+X-Gm-Message-State: AGi0PublUTs0r9zybVKR8WQqUdVS6kyluOKiGb12t23ZBw73oCgaIDZ/
+        1sYO39J6jvhyV/yGn5FAVPzxM15n+J61+Q==
+X-Google-Smtp-Source: APiQypJ8XlUqjCjeOBH/m7/pYNHylMk/OkqjgnSy2HPHGdoWE0S3xKIKTwqJVb4auTupdnpPuda+rA==
+X-Received: by 2002:aa7:99c8:: with SMTP id v8mr23502pfi.151.1586187154140;
+        Mon, 06 Apr 2020 08:32:34 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:b100:a89e:176d:c04d? ([2605:e000:100e:8c61:b100:a89e:176d:c04d])
+        by smtp.gmail.com with ESMTPSA id v42sm11233988pgn.6.2020.04.06.08.32.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Apr 2020 08:32:33 -0700 (PDT)
+Subject: Re: [PATCH 1/1] s390: Cleanup removed IOSCHED_DEADLINE
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+References: <20200406074118.86849-1-sth@linux.ibm.com>
+ <20200406074118.86849-2-sth@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0efad2a5-90f5-8ccf-169e-9715a64a4bb0@kernel.dk>
+Date:   Mon, 6 Apr 2020 08:32:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d08lj7l6.fsf@suse.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200406074118.86849-2-sth@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 06, 2020 at 11:18:13AM +0200, Nicolai Stange wrote:
-> Bart Van Assche <bvanassche@acm.org> writes:
-
-> So I'd suggest to drop patch [3/3] from this series and modify this
-> patch [2/3] here to move the blk_q_debugfs_unregister(q) invocation from
-> __blk_release_queue() to blk_unregister_queue() instead.
-
-I'll take a stab.
-
-> > Additionally, I think the following changes fix that problem by using
-> > q->debugfs_dir in the blktrace code instead of debugfs_lookup():
+On 4/6/20 1:41 AM, Stefan Haberland wrote:
+> From: Krzysztof Kozlowski <krzk@kernel.org>
 > 
-> That would fix the UAF, but !queue_is_mq() queues wouldn't get a debugfs
-> directory created for them by blktrace anymore?
+> CONFIG_IOSCHED_DEADLINE is gone since commit f382fb0bcef4 ("block:
+> remove legacy IO schedulers").
 
-It would, it would just be done early on init as well, and it would now be
-shared with the queue_is_mq() case.
+Isn't this a leftover thing from when dasd selected deadline
+internally? I don't think we need this anymore, just kill the
+select completely.
 
-  Luis
+-- 
+Jens Axboe
+
