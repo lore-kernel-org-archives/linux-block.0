@@ -2,90 +2,259 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B43C2BA17
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE871C2BA1B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 17:59:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7C55248AB
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 15:32:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE189206F5
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 17:59:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fSwjA78f"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="BM2q7hn6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728952AbgDFPch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 11:32:37 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:37956 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728942AbgDFPcg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 11:32:36 -0400
-Received: by mail-pf1-f196.google.com with SMTP id c21so7682945pfo.5
-        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2020 08:32:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7VmKlpRwdchNnRw95jny/lwjYGByipa2aNaHLJyO/h8=;
-        b=fSwjA78fiVaYhEdu9cm73uYz/GAccmeCiK1ZZF4g8pB784H2TQnUZMAM8MtjfAJMyO
-         d9nJwtpKzHyK/XvD/i+d7ASW3J9bb4c7iQX9qg/LLhrQETL/w11itQZOIeszuwZg5Jjo
-         RJBvnVHRsjFxp7Z/Ert7W22fPXChXSFDFF6hZlbXucc0hlr1ICiSYYdgdhzsco7b8pG+
-         Awuzv4X/uWaOAWweNwJbEay4bCblOlH2L3I5sUGoYCUZGTY52UF03KCPX4ZoJPHLHZqn
-         vSNV4ygEdkOYPQj6l36AWDRCY1kFnk/Xug2noBWkjc/uqNtPB2QnFnegINZXsUjA6CpE
-         Gwew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7VmKlpRwdchNnRw95jny/lwjYGByipa2aNaHLJyO/h8=;
-        b=Q0rUOiogRAjSIB78vZ10sYh96NYL1adlzN9egTV5VdxF7thuctWLlev4oboAsMMvuX
-         0sLFr1OlPUYFy0grOY8l7m4rpzpWxiCWiFLTk2zVlbK5PR6c307yicIFJq6IlKk04X0x
-         hi2SYM04IEdJ9sfRrJtRf6yNNcuaoksLwWvyZiXlsyin2Mk95X/BVVyOOCtzWrQy4/UK
-         5Duxl2wpfbETbh6ezBhODa9PmcDAHo6J0trjSw7YgnXW/rdF3VTJ27r6Oem4tYtJEBze
-         jC0AI5Zvc1gxJngfjBOKh2tKc5dFF+s8ORSAsOojIF2kgw9sELo/F8bBZVPsXKcZkNE7
-         15wA==
-X-Gm-Message-State: AGi0PublUTs0r9zybVKR8WQqUdVS6kyluOKiGb12t23ZBw73oCgaIDZ/
-        1sYO39J6jvhyV/yGn5FAVPzxM15n+J61+Q==
-X-Google-Smtp-Source: APiQypJ8XlUqjCjeOBH/m7/pYNHylMk/OkqjgnSy2HPHGdoWE0S3xKIKTwqJVb4auTupdnpPuda+rA==
-X-Received: by 2002:aa7:99c8:: with SMTP id v8mr23502pfi.151.1586187154140;
-        Mon, 06 Apr 2020 08:32:34 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:b100:a89e:176d:c04d? ([2605:e000:100e:8c61:b100:a89e:176d:c04d])
-        by smtp.gmail.com with ESMTPSA id v42sm11233988pgn.6.2020.04.06.08.32.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Apr 2020 08:32:33 -0700 (PDT)
-Subject: Re: [PATCH 1/1] s390: Cleanup removed IOSCHED_DEADLINE
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
-        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com
-References: <20200406074118.86849-1-sth@linux.ibm.com>
- <20200406074118.86849-2-sth@linux.ibm.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0efad2a5-90f5-8ccf-169e-9715a64a4bb0@kernel.dk>
-Date:   Mon, 6 Apr 2020 08:32:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727349AbgDFR7Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 13:59:24 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:51628 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726787AbgDFR7Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 13:59:24 -0400
+Received: from dede-linux.corp.microsoft.com (unknown [131.107.147.242])
+        by linux.microsoft.com (Postfix) with ESMTPSA id F1FE52072955;
+        Mon,  6 Apr 2020 10:59:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F1FE52072955
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1586195963;
+        bh=1PF/ShPN4ojALJPkpCvH1fBtV3IR9aL7+GRD4lEL+Es=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=BM2q7hn61sgw2I8AOb7TKeT8byFgDQ2Gby36bTcx0NGZYBZTR4ic6MZGkE9sKA6jL
+         O1exWydXPWFwwWnLD3XxAdPHQjtwVLE1c/4vlW+kKnXx/BP9tCkO9Aew/Ugg2Gg2PN
+         VBQRJ6kIzJ3URF2LHbinXHf9kJnkSwEKL5+o7fQs=
+From:   deven.desai@linux.microsoft.com
+To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
+        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.org,
+        linux-block@vger.kernel.org
+Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
+        mdsakib@microsoft.com, sashal@kernel.org,
+        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com
+Subject: [PATCH 01/11] scripts: add ipe tooling to generate boot policy
+Date:   Mon,  6 Apr 2020 10:59:08 -0700
+Message-Id: <20200406175919.1023205-2-deven.desai@linux.microsoft.com>
+X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200406175919.1023205-1-deven.desai@linux.microsoft.com>
+References: <20200406175919.1023205-1-deven.desai@linux.microsoft.com>
 MIME-Version: 1.0
-In-Reply-To: <20200406074118.86849-2-sth@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/20 1:41 AM, Stefan Haberland wrote:
-> From: Krzysztof Kozlowski <krzk@kernel.org>
-> 
-> CONFIG_IOSCHED_DEADLINE is gone since commit f382fb0bcef4 ("block:
-> remove legacy IO schedulers").
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Isn't this a leftover thing from when dasd selected deadline
-internally? I don't think we need this anymore, just kill the
-select completely.
+Add a tool for the generation of an IPE policy to be compiled into the
+kernel. This policy will be enforced until userland deploys and activates
+a new policy.
 
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+---
+ scripts/Makefile              |   1 +
+ scripts/ipe/Makefile          |   2 +
+ scripts/ipe/polgen/.gitignore |   1 +
+ scripts/ipe/polgen/Makefile   |   7 ++
+ scripts/ipe/polgen/polgen.c   | 136 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 147 insertions(+)
+ create mode 100644 scripts/ipe/Makefile
+ create mode 100644 scripts/ipe/polgen/.gitignore
+ create mode 100644 scripts/ipe/polgen/Makefile
+ create mode 100644 scripts/ipe/polgen/polgen.c
+
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 5e75802b1a44..9338017a3b6e 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -38,6 +38,7 @@ hostprogs += unifdef
+ subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
+ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
++subdir-$(CONFIG_SECURITY_IPE) += ipe
+ 
+ # Let clean descend into subdirs
+ subdir-	+= basic dtc gdb kconfig mod
+diff --git a/scripts/ipe/Makefile b/scripts/ipe/Makefile
+new file mode 100644
+index 000000000000..e87553fbb8d6
+--- /dev/null
++++ b/scripts/ipe/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++subdir-y := polgen
+diff --git a/scripts/ipe/polgen/.gitignore b/scripts/ipe/polgen/.gitignore
+new file mode 100644
+index 000000000000..80f32f25d200
+--- /dev/null
++++ b/scripts/ipe/polgen/.gitignore
+@@ -0,0 +1 @@
++polgen
+diff --git a/scripts/ipe/polgen/Makefile b/scripts/ipe/polgen/Makefile
+new file mode 100644
+index 000000000000..a519b594e13c
+--- /dev/null
++++ b/scripts/ipe/polgen/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++hostprogs-y	:= polgen
++HOST_EXTRACFLAGS += \
++	-I$(srctree)/include \
++	-I$(srctree)/include/uapi \
++
++always		:= $(hostprogs-y)
+diff --git a/scripts/ipe/polgen/polgen.c b/scripts/ipe/polgen/polgen.c
+new file mode 100644
+index 000000000000..a80fffe1b27c
+--- /dev/null
++++ b/scripts/ipe/polgen/polgen.c
+@@ -0,0 +1,136 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include <stdlib.h>
++#include <stddef.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
++
++static void usage(const char *const name)
++{
++	printf("Usage: %s OutputFile (PolicyFile)\n", name);
++	exit(EINVAL);
++}
++
++static int policy_to_buffer(const char *pathname, char **buffer, size_t *size)
++{
++	int rc = 0;
++	FILE *fd;
++	char *lbuf;
++	size_t fsize;
++	size_t read;
++
++	fd = fopen(pathname, "r");
++	if (!fd) {
++		rc = errno;
++		goto out;
++	}
++
++	fseek(fd, 0, SEEK_END);
++	fsize = ftell(fd);
++	rewind(fd);
++
++	lbuf = malloc(fsize);
++	if (!lbuf) {
++		rc = ENOMEM;
++		goto out_close;
++	}
++
++	read = fread((void *)lbuf, sizeof(*lbuf), fsize, fd);
++	if (read != fsize) {
++		rc = -1;
++		goto out_free;
++	}
++
++	*buffer = lbuf;
++	*size = fsize;
++	fclose(fd);
++
++	return rc;
++
++out_free:
++	free(lbuf);
++out_close:
++	fclose(fd);
++out:
++	return rc;
++}
++
++static int write_boot_policy(const char *pathname, const char *buf, size_t size)
++{
++	FILE *fd;
++	size_t i;
++
++	fd = fopen(pathname, "w");
++	if (!fd)
++		goto err;
++
++	fprintf(fd, "/* This file is automatically generated.");
++	fprintf(fd, " Do not edit. */\n");
++	fprintf(fd, "#include <stddef.h>\n");
++	fprintf(fd, "const char *const ipe_boot_policy =\n");
++
++	if (!buf || size == 0) {
++		fprintf(fd, "\tNULL;\n");
++		fclose(fd);
++		return 0;
++	}
++
++	for (i = 0; i < size; ++i) {
++		if (i == 0)
++			fprintf(fd, "\t\"");
++
++		switch (buf[i]) {
++		case '"':
++			fprintf(fd, "\\\"");
++			break;
++		case '\'':
++			fprintf(fd, "'");
++			break;
++		case '\n':
++			fprintf(fd, "\\n\"\n\t\"");
++			break;
++		case '\\':
++			fprintf(fd, "\\\\");
++			break;
++		default:
++			fprintf(fd, "%c", buf[i]);
++		}
++	}
++	fprintf(fd, "\";\n");
++	fclose(fd);
++
++	return 0;
++
++err:
++	if (fd)
++		fclose(fd);
++	return errno;
++}
++
++int main(int argc, const char *argv[])
++{
++	int rc = 0;
++	size_t len = 0;
++	char *policy = NULL;
++
++	if (argc < 2)
++		usage(argv[0]);
++
++	if (argc > 2) {
++		rc = policy_to_buffer(argv[2], &policy, &len);
++		if (rc != 0)
++			goto cleanup;
++	}
++
++	rc = write_boot_policy(argv[1], policy, len);
++cleanup:
++	if (policy)
++		free(policy);
++	if (rc != 0)
++		perror("An error occurred during policy conversion: ");
++	return rc;
++}
 -- 
-Jens Axboe
+2.26.0
 
