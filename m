@@ -2,36 +2,36 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AABE5C38A24
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51619C2BB55
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 815DF206B8
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 288C120753
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bxEYkegi"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Mab6gl0w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbgDFSLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 14:11:03 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:56244 "EHLO
+        id S1726635AbgDFSLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 14:11:01 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:56152 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726616AbgDFSLC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 14:11:02 -0400
+        with ESMTP id S1726520AbgDFSK7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 14:10:59 -0400
 Received: from dede-linux.corp.microsoft.com (unknown [131.107.147.242])
-        by linux.microsoft.com (Postfix) with ESMTPSA id CEA4B20A0864;
-        Mon,  6 Apr 2020 11:10:58 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CEA4B20A0864
+        by linux.microsoft.com (Postfix) with ESMTPSA id 975AB20A0861;
+        Mon,  6 Apr 2020 11:10:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 975AB20A0861
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1586196658;
-        bh=pUlxPOjKC4KTSLx80keIuhKm7Wh1PV8nyWmrGSnsMTQ=;
+        s=default; t=1586196657;
+        bh=9FYFmPniCXDJvrlfzO+eVVXSFFFiE8iLOu+qPY26nh0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bxEYkegi324TF2SHNf6eu9a+irZWk9324wNKZ0SNWa/r1SVrA2GaxlcR4LTyYxc+d
-         T7AW2mCdx5EcLB72SEMv9k0ECSrfyIcmrVoLrxFIbw3il2ShhFqy1JPA6Ma6/aIWxk
-         /opV9fTAtipLX+9VMnLIGz9tSh/IfV0oUenk6S+0=
+        b=Mab6gl0wSwv3NizJRs/GqYoeRFIzL93OY8pClGYaPqV9wbB2oE4eQ5mINugDMeRHt
+         gDl/rLMggqks9vYenp+XHxDGvnna9GV4qKQePwiW4VMZdII9Xg+uK7eBa+8JxsQv/x
+         tBreeCUNhKuB6ofAM+xK7vT6ehplxjOw35yz9enc=
 From:   deven.desai@linux.microsoft.com
 To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
         jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
@@ -41,9 +41,9 @@ To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
 Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
         sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
         nramas@linux.microsoft.com, mdsakib@linux.microsoft.com
-Subject: [RESEND PATCH 10/11] documentation: Add IPE Documentation
-Date:   Mon,  6 Apr 2020 11:10:44 -0700
-Message-Id: <20200406181045.1024164-11-deven.desai@linux.microsoft.com>
+Subject: [RESEND PATCH 04/11] fs: add security blob and hooks for block_device
+Date:   Mon,  6 Apr 2020 11:10:38 -0700
+Message-Id: <20200406181045.1024164-5-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
 References: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
@@ -56,562 +56,244 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Add IPE's documentation to the kernel tree.
+Add a security blob and associated allocation, deallocation and set hooks
+for a block_device structure.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 ---
- Documentation/admin-guide/LSM/index.rst       |   1 +
- Documentation/admin-guide/LSM/ipe.rst         | 487 ++++++++++++++++++
- .../admin-guide/kernel-parameters.txt         |  20 +
- MAINTAINERS                                   |   1 +
- 4 files changed, 509 insertions(+)
- create mode 100644 Documentation/admin-guide/LSM/ipe.rst
+ fs/block_dev.c                |  8 +++++
+ include/linux/fs.h            |  1 +
+ include/linux/lsm_hook_defs.h |  5 +++
+ include/linux/lsm_hooks.h     | 11 +++++++
+ include/linux/security.h      | 22 +++++++++++++
+ security/security.c           | 61 +++++++++++++++++++++++++++++++++++
+ 6 files changed, 108 insertions(+)
 
-diff --git a/Documentation/admin-guide/LSM/index.rst b/Documentation/admin-guide/LSM/index.rst
-index a6ba95fbaa9f..ce63be6d64ad 100644
---- a/Documentation/admin-guide/LSM/index.rst
-+++ b/Documentation/admin-guide/LSM/index.rst
-@@ -47,3 +47,4 @@ subdirectories.
-    tomoyo
-    Yama
-    SafeSetID
-+   ipe
-diff --git a/Documentation/admin-guide/LSM/ipe.rst b/Documentation/admin-guide/LSM/ipe.rst
-new file mode 100644
-index 000000000000..def353e34288
---- /dev/null
-+++ b/Documentation/admin-guide/LSM/ipe.rst
-@@ -0,0 +1,487 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Integrity Policy Enforcement (IPE)
-+==================================
-+
-+Overview
-+--------
-+
-+IPE is a Linux Security Module, which allows for a configurable policy
-+to enforce integrity requirements on the whole system. It attempts to
-+solve the issue of Code Integrity: that any code being executed (or
-+files being read), are identical to the version that was built by a
-+trusted source.
-+
-+There are multiple implementations within the Linux kernel that solve
-+some measure of integrity verification. For instance, device-mapper
-+verity, which ensures integrity for a block device, and fs-verity which
-+is a system that ensures integrity for a filesystem. What these
-+implementations lack is a measure of run-time verification that binaries
-+are sourced from these locations. IPE aims to address this gap.
-+
-+IPE is separated between two major components: A configurable policy,
-+provided by the LSM ("IPE Core"), and deterministic attributes provided
-+by the kernel to evaluate files against, ("IPE Properties").
-+
-+Use Cases
-+---------
-+
-+IPE is designed for use is an embedded device with a specific purpose
-+(e.g. network firewall device in a data center), where all software and
-+configuration is built and provisioned by the owner.
-+
-+Ideally, a system which leverages IPE is not intended for general
-+purpose computing and does not utilize any software or configuration
-+built by a third party. An ideal system to leverage IPE has both mutable
-+and immutable components, however, all binary executable code is
-+immutable.
-+
-+For the highest level of security, platform firmware should verify the
-+the kernel and optionally the root filesystem (e.g. via U-Boot verified
-+boot). This allows the entire system to be integrity verified.
-+
-+Known Gaps
-+----------
-+
-+IPE cannot verify the integrity of anonymous executable memory, such as
-+the trampolines created by gcc closures and libffi, or JIT'd code.
-+Unfortunately, as this is dynamically generated code, there is no way
-+for IPE to detect that this code has not been tampered with in
-+transition from where it was built, to where it is running. As a result,
-+IPE is incapable of tackling this problem for dynamically generated
-+code.
-+
-+IPE cannot verify the integrity of interpreted languages' programs when
-+these scripts invoked via ``<interpreter> <file>``. This is because the
-+way interpreters execute these files, the scripts themselves are not
-+evaluated as executable code through one of IPE's hooks. Interpreters
-+can be enlightened to the usage of IPE by trying to mmap a file into
-+executable memory (+X), after opening the file and responding to the
-+error code appropriately. This also applies to included files, or high
-+value files, such as configuration files of critical system components.
-+This specific gap is planned on being addressed within IPE.
-+
-+Threat Model
-+------------
-+
-+The threat type addressed by IPE is tampering of executable user-land
-+code beyond the initially booted kernel, and the initial verification of
-+kernel modules that are loaded in userland through ``modprobe`` or
-+``insmod``.
-+
-+Tampering violates the property of integrity. IPE's role in mitigating
-+this threat is to verify the integrity (and authenticity) of all
-+executable code and to deny their use if integrity verification fails.
-+IPE generates audit logs which may be utilized to detect integrity
-+verification failures.
-+
-+Tampering threat scenarios include modification or replacement of
-+executable code by a range of actors including:
-+
-+-  Insiders with physical access to the hardware
-+-  Insiders with local network access to the system
-+-  Insiders with access to the deployment system
-+-  Compromised internal systems under external control
-+-  Malicious end users of the system
-+-  Compromised end users of the system
-+-  Remote (external) compromise of the system
-+
-+IPE does not mitigate threats arising from malicious authorized
-+developers, or compromised developer tools used by authorized
-+developers. Additionally, IPE draws hard security boundary between user
-+mode and kernel mode. As a result, IPE does not provide any protections
-+against a kernel level exploit, and a kernel-level exploit can disable
-+or tamper with IPE's protections.
-+
-+The root of trust for all of IPE's verifications is the
-+``SYSTEM_TRUSTED_KEYRING``.
-+
-+IPE Core
-+--------
-+
-+IPE Policy
-+~~~~~~~~~~
-+
-+IPE policy is designed to be both forward compatible and backwards
-+compatible. There is one required line, at the top of the policy,
-+indicating the policy name, and the policy version, for instance:
-+
-+::
-+
-+   policy_name="Ex Policy" policy_version=0.0.0
-+
-+The policy name is a unique key identifying this policy in a human
-+readable name. This is used to create nodes under securityfs as well as
-+uniquely identify policies to deploy new policies vs update existing
-+policies.
-+
-+The policy version indicates the current version of the policy (NOT the
-+policy syntax version). This is used to prevent roll-back of policy to
-+potentially insecure previous versions of the policy.
-+
-+The next portion of IPE policy, are rules. Rules are formed by key=value
-+pairs, known as properties. IPE rules require two properties: "action",
-+which determines what IPE does when it encounters a match against the
-+rule, and "op", which determines when that rule should be evaluated.
-+Thus, a minimal rule is:
-+
-+::
-+
-+   op=EXECUTE action=ALLOW
-+
-+This example will allow any execution. Additional properties are used to
-+restrict attributes about the files being evaluated. These properties
-+are intended to be deterministic attributes that are resident in the
-+kernel.
-+
-+Order does not matter for the rule's properties - they can be listed in
-+any order, however it is encouraged to have the "op" property be first,
-+and the "action" property be last for readability. Rules are evaluated
-+top-to-bottom. As a result, any revocation rules, or denies should be
-+placed early in the file to ensure that these rules are evaluated before
-+as rule with "action=ALLOW" is hit.
-+
-+IPE policy is designed to be forward compatible and backwards
-+compatible, thus any failure to parse a rule will result in the line
-+being ignored, and a warning being emitted. If backwards compatibility
-+is not required, the kernel command line parameter and sysctl,
-+``ipe.strict_parse`` can be enabled, which will cause these warnings to
-+be fatal.
-+
-+IPE policy supports comments. The character '#' will function as a
-+comment, ignoring all characters to the right of '#' until the newline.
-+
-+The default behavior of IPE evaluations can also be expressed in policy,
-+through the ``DEFAULT`` statement. This can be done at a global level,
-+or a per-operation level:
-+
-+::
-+
-+   # Global
-+   DEFAULT action=ALLOW
-+
-+   # Operation Specific
-+   DEFAULT op=EXECUTE action=ALLOW
-+
-+If a global default is unset, and a specific operation default is not
-+set for an IPE operation, it will assume that the default action should
-+be ``ALLOW``. This is to preserve compatibility between policies and the
-+LSM.
-+
-+With configurable policy-based LSMs, there's several issues with
-+enforcing the configurable policies at startup, around reading and
-+parsing the policy:
-+
-+1. The kernel *should* not read files from userland, so directly reading
-+   the policy file is prohibited.
-+2. The kernel command line has a character limit, and one kernel module
-+   should not reserve the entire character limit for its own
-+   configuration.
-+3. There are various boot loaders in the kernel ecosystem, so handing
-+   off a memory block would be costly to maintain.
-+
-+As a result, IPE has addressed this problem through a concept of a "boot
-+policy". A boot policy is a minimal policy, compiled into the kernel.
-+This policy is intended to get the system to a state where userland is
-+setup and ready to receive commands, at which point a more complex
-+policy ("user policies") can be deployed via securityfs. The boot policy
-+can be specified via the Kconfig, ``SECURITY_IPE_BOOT_POLICY``, which
-+accepts a path to a plain-text version of the IPE policy to apply. This
-+policy will be compiled into the kernel. If not specified, IPE will be
-+disabled until a policy is deployed through securityfs, and activated
-+through sysfs.
-+
-+Deploying Policies
-+^^^^^^^^^^^^^^^^^^
-+
-+User policies as explained above, are policies that are deployed from
-+userland, through securityfs. These policies are signed to enforce some
-+level of authorization of the policies (prohibiting an attacker from
-+gaining root, and deploying an "allow all" policy), through the PKCS#7
-+enveloped data format. These policies must be signed by a certificate
-+that chains to the ``SYSTEM_TRUSTED_KEYRING``. Through openssl, the
-+signing can be done via:
-+
-+::
-+
-+   openssl smime -sign -in "$MY_POLICY" -signer "$MY_CERTIFICATE" \
-+     -inkey "$MY_PRIVATE_KEY" -binary -outform der -noattr -nodetach \
-+     -out "$MY_POLICY.p7s"
-+
-+Deploying the policies is done through securityfs, through the
-+``new_policy`` node. To deploy a policy, simply cat the file into the
-+securityfs node:
-+
-+::
-+
-+   cat "$MY_POLICY.p7s" > /sys/kernel/security/ipe/new_policy
-+
-+Upon success, this will create one subdirectory under
-+``/sys/kernel/security/ipe/policies/``. The subdirectory will be the
-+``policy_name`` field of the policy deployed, so for the example above,
-+the directory will be ``/sys/kernel/security/ipe/policies/Ex\ Policy``.
-+Within this directory, there will be two files: ``raw`` and ``content``.
-+
-+The ``raw`` file is rw, reading will provide the raw PKCS#7 data that
-+was provided to the kernel, representing the policy. Writing, will
-+deploy an in-place policy update - if this policy is the currently
-+running policy, the new updated policy will replace it immediately upon
-+success.
-+
-+The ``content`` file is read only. Reading will provide the PKCS#7 inner
-+content of the policy, which will be the plain text policy.
-+
-+Similarly, the ``cat`` command above will result in an error upon
-+syntactically invalid or untrusted policies. It will also error if a
-+policy already exists with the same ``policy_name``. The write to the
-+``raw`` node will error upon syntactically invalid, untrusted policies,
-+or if the payload fails the version check. The write will also fail if
-+the ``policy_name`` in the payload does not match the existing policy.
-+
-+Deploying these policies will *not* cause IPE to start enforcing this
-+policy. Once deployment is successful, a policy can be marked as active,
-+via the sysctl, ``ipe.active_policy``. IPE will enforce whatever policy
-+is marked as active. For our example, we can activate the ``Ex Policy``
-+via:
-+
-+::
-+
-+   sysctl ipe.active_policy="Ex Policy"
-+
-+At which point, ``Ex Policy`` will now be the enforced policy on the
-+system.
-+
-+IPE also provides a way to delete policies. This can be done via the
-+``del_policy`` securityfs node, ``/sys/kernel/security/ipe/del_policy``.
-+Writing the ``policy_name`` of the policy to be deleted will delete that
-+node:
-+
-+::
-+
-+   echo -n "$MY_POLICY_NAME" > /sys/kernel/security/ipe/del_policy
-+
-+There are two requirements to delete policies:
-+
-+1. The policy being deleted must not be the active policy.
-+2. The policy being deleted must not be the boot policy.
-+
-+NOTE: It's important to know above that the "echo" command will add a
-+newline to the end of the input, and this will be considered as part of
-+the filename. You can remove the newline via the -n parameter.
-+
-+Modes
-+~~~~~
-+
-+IPE supports two modes of operation: permissive (similar to SELinux's
-+permissive mode) and enforce. Permissive mode performs the same checks
-+as enforce mode, and logs policy violations, but will not enforce the
-+policy. This allows users to test policies before enforcing them.
-+
-+The default mode is enforce, and can be changed via the kernel command
-+line parameter ``ipe.enforce=(0|1)``, or the sysctl
-+``ipe.enforce=(0|1)``. The ability to switch modes can be compiled out
-+of the LSM via setting the Kconfig
-+``CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH`` to N.
-+
-+Audit Events
-+~~~~~~~~~~~~
-+
-+Success Auditing
-+^^^^^^^^^^^^^^^^
-+
-+IPE supports success auditing. When enabled, all events that pass IPE
-+policy and are not blocked will emit an audit event. This is disabled by
-+default, and can be enabled via the kernel command line
-+``ipe.success_audit=(0|1)`` or the sysctl ``ipe.success_audit=(0|1)``.
-+
-+This is very noisy, as IPE will check every user-mode binary on the
-+system, but is useful for debugging policies.
-+
-+IPE Properties
-+--------------
-+
-+As explained above, IPE properties are ``key=value`` pairs expressed in
-+IPE policy. Two properties are built-into the policy parser: 'op' and
-+'action'. The other properties are determinstic attributes to express
-+across files. Currently those properties are: 'boot_verified',
-+'dmverity_signature', 'dmverity_roothash'. A description of all
-+properties supported by IPE are listed below:
-+
-+op
-+~~
-+
-+Indicates the operation for a rule to apply to. Must be in every rule.
-+IPE supports the following operations:
-+
-+``EXECUTE``
-+
-+   Pertains to any file attempting to be executed, or loaded as an
-+   executable.
-+
-+``FIRMWARE``:
-+
-+   Pertains to firmware being loaded via the firmware_class interface.
-+   This covers both the preallocated buffer and the firmware file
-+   itself.
-+
-+``KMODULE``:
-+
-+   Pertains to loading kernel modules via ``modprobe`` or ``insmod``.
-+
-+``KEXEC_IMAGE``:
-+
-+   Pertains to kernel images loading via ``kexec``.
-+
-+``KEXEC_INITRAMFS``
-+
-+   Pertains to initrd images loading via ``kexec --initrd``.
-+
-+``POLICY``:
-+
-+   Controls loading IMA policies through the
-+   ``/sys/kernel/security/ima/policy`` securityfs entry.
-+
-+``X509_CERT``:
-+
-+   Controls loading IMA certificates through the Kconfigs,
-+   ``CONFIG_IMA_X509_PATH`` and ``CONFIG_EVM_X509_PATH``.
-+
-+action
-+~~~~~~
-+
-+Determines what IPE should do when a rule matches. Must be in every
-+rule. Can be one of:
-+
-+``ALLOW``:
-+
-+   If the rule matches, explicitly allow the call to proceed without
-+   executing any more rules.
-+
-+``DENY``:
-+
-+   If the rule matches, explicitly prohibit the call from proceeding
-+   without executing any more rules.
-+
-+boot_verified
-+~~~~~~~~~~~~~
-+
-+This property can be utilized for authorization of the first super-block
-+that is mounted on the system, where IPE attempts to evaluate a file.
-+Typically this is used for systems with an initramfs or other initial
-+disk, where this is unmounted before the system becomes available, and
-+is not covered by any other property. This property is controlled by the
-+Kconfig, ``CONFIG_IPE_BOOT_PROP``. The format of this property is:
-+
-+::
-+
-+       boot_verified=(TRUE|FALSE)
-+
-+
-+.. WARNING::
-+
-+  This property will trust any disk where the first IPE
-+  evaluation occurs. If you do not have a startup disk that is
-+  unpacked and unmounted (like initramfs), then it will automatically
-+  trust the root filesystem and potentially overauthorize the entire
-+  disk.
-+
-+dmverity_roothash
-+~~~~~~~~~~~~~~~~~
-+
-+This property can be utilized for authorization or revocation of
-+specific dm-verity volumes, identified via root hash. It has a
-+dependency on the DM_VERITY module. This property is controlled by the
-+property: ``CONFIG_IPE_DM_VERITY_ROOTHASH``. The format of this property
-+is:
-+
-+::
-+
-+   dmverity_roothash=HashHexDigest
-+
-+dmverity_signature
-+~~~~~~~~~~~~~~~~~~
-+
-+This property can be utilized for authorization of all dm-verity volumes
-+that have a signed roothash that chains to the system trusted keyring.
-+It has a dependency on the ``DM_VERITY_VERIFY_ROOTHASH_SIG`` Kconfig.
-+This property is controlled by the Kconfig:
-+``CONFIG_IPE_DM_VERITY_SIGNATURE``. The format of this property is:
-+
-+::
-+
-+   dmverity_signature=(TRUE|FALSE)
-+
-+Policy Examples
-+---------------
-+
-+Allow all
-+~~~~~~~~~
-+
-+::
-+
-+   policy_name="Allow All" policy_version=0.0.0
-+   DEFAULT action=ALLOW
-+
-+Allow only initial superblock
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+   policy_name="Allow All Initial SB" policy_version=0.0.0
-+   DEFAULT action=DENY
-+
-+   op=EXECUTE boot_verified=TRUE action=ALLOW
-+
-+Allow any signed dm-verity volume and the initial superblock
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+   policy_name="AllowSignedAndInitial" policy_version=0.0.0
-+   DEFAULT action=DENY
-+
-+   op=EXECUTE boot_verified=TRUE action=ALLOW
-+   op=EXECUTE dmverity_signature=TRUE action=ALLOW
-+
-+Prohibit execution from a specific dm-verity volume
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+   policy_name="AllowSignedAndInitial" policy_version=0.0.0
-+   DEFAULT action=DENY
-+
-+   op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
-+   op=EXECUTE boot_verified=TRUE action=ALLOW
-+   op=EXECUTE dmverity_signature=TRUE action=ALLOW
-+
-+Allow only a specific dm-verity volume
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+   policy_name="AllowSignedAndInitial" policy_version=0.0.0
-+   DEFAULT action=DENY
-+
-+   op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
-+
-+External Information
-+--------------------
-+
-+Please see the github repository at: https://github.com/microsoft/Integrity-Policy-Enforcement-LSM
-+
-+FAQ
-+---
-+
-+Q: What's the difference between other LSMs which provide integrity
-+verification (i.e. IMA)?
-+
-+A: IPE differs from other LSMs which provide integrity checking, as it
-+has no dependency on the filesystem metadata itself. The attributes that
-+IPE checks are deterministic properties that exist solely in the kernel.
-+Additionally, IPE provides no additional mechanisms of verifying these
-+files (e.g. IMA Signatures) - all of the attributes of verifying files
-+are existing features within the kernel.
-+
-+Additionally, IPE is completely restricted to integrity. It offers no
-+measurement or attestation features, which IMA addresses.
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 4d5a4fe22703..9eb8b19fe9db 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -1913,6 +1913,26 @@
- 	ip=		[IP_PNP]
- 			See Documentation/admin-guide/nfs/nfsroot.rst.
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 52b6f646cdbd..5dfa25f03208 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -35,6 +35,7 @@
+ #include <linux/falloc.h>
+ #include <linux/uaccess.h>
+ #include <linux/suspend.h>
++#include <linux/security.h>
+ #include "internal.h"
  
-+	ipe.enforce=	[IPE]
-+			Format: { "0" | "1" }
-+			0 - Start IPE in audit mode
-+			1 - Start IPE in enforce mode (default).
-+			See Documentation/security/ipe.rst
+ struct bdev_inode {
+@@ -773,11 +774,18 @@ static struct inode *bdev_alloc_inode(struct super_block *sb)
+ 	struct bdev_inode *ei = kmem_cache_alloc(bdev_cachep, GFP_KERNEL);
+ 	if (!ei)
+ 		return NULL;
 +
-+	ipe.success_audit=
-+			[IPE] Start IPE with success auditing
-+			Format: { "0" | "1" }
-+			0 - Disable success auditing (default)
-+			1 - Enable success auditing
-+			See Documentation/security/ipe.rst
++	if (unlikely(security_bdev_alloc(&ei->bdev))) {
++		kmem_cache_free(bdev_cachep, ei);
++		return NULL;
++	}
 +
-+	ipe.strict_parse=
-+			[IPE] Start IPE with strict policy parsing enabled
-+			Format: { "0" | "1" }
-+			0 - Disable strict parsing (default)
-+			1 - Enable strict parsing
-+			See Documentation/security/ipe.rst
-+
- 	ipcmni_extend	[KNL] Extend the maximum number of unique System V
- 			IPC identifiers from 32,768 to 16,777,216.
+ 	return &ei->vfs_inode;
+ }
  
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ab9adcd37a0c..897da80af3f8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8441,6 +8441,7 @@ INTEGRITY POLICY ENFORCEMENT (IPE)
- M:	Deven Bowers <deven.desai@linux.microsoft.com>
- L:	linux-integrity@vger.kernel.org
- S:	Supported
-+F:	Documentation/admin-guide/LSM/ipe.rst
- F:	scripts/ipe/
- F:	security/ipe/
+ static void bdev_free_inode(struct inode *inode)
+ {
++	security_bdev_free(&BDEV_I(inode)->bdev);
+ 	kmem_cache_free(bdev_cachep, BDEV_I(inode));
+ }
  
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f81c822f4d89..03d089f4a511 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -506,6 +506,7 @@ struct block_device {
+ 	int			bd_fsfreeze_count;
+ 	/* Mutex for freeze */
+ 	struct mutex		bd_fsfreeze_mutex;
++	void			*security;
+ } __randomize_layout;
+ 
+ /* XArray tags, for tagging dirty and writeback pages in the pagecache. */
+diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+index 9cd4455528e5..4782fef7eaf9 100644
+--- a/include/linux/lsm_hook_defs.h
++++ b/include/linux/lsm_hook_defs.h
+@@ -379,3 +379,8 @@ LSM_HOOK(void, LSM_RET_VOID, perf_event_free, struct perf_event *event)
+ LSM_HOOK(int, 0, perf_event_read, struct perf_event *event)
+ LSM_HOOK(int, 0, perf_event_write, struct perf_event *event)
+ #endif /* CONFIG_PERF_EVENTS */
++
++LSM_HOOK(int, 0, bdev_alloc_security, struct block_device *bdev)
++LSM_HOOK(void, LSM_RET_VOID, bdev_free_security, struct block_device *bdev)
++LSM_HOOK(int, 0, bdev_setsecurity, struct block_device *bdev, const char *name,
++	 const void *value, size_t size)
+diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+index 988ca0df7824..7bf0f82bc5d6 100644
+--- a/include/linux/lsm_hooks.h
++++ b/include/linux/lsm_hooks.h
+@@ -1476,6 +1476,16 @@
+  *
+  *     @what: kernel feature being accessed
+  *
++ * @bdev_alloc_security:
++ *	Initialize the security field inside a block_device structure.
++ *
++ * @bdev_free_security:
++ *	Cleanup the security information stored inside a block_device structure.
++ *
++ * @bdev_setsecurity:
++ *	Set the security property associated with @name for @bdev with
++ *	value @value. @size indicates the size of the @value in bytes.
++ *
+  * Security hooks for perf events
+  *
+  * @perf_event_open:
+@@ -1522,6 +1532,7 @@ struct lsm_blob_sizes {
+ 	int	lbs_ipc;
+ 	int	lbs_msg_msg;
+ 	int	lbs_task;
++	int	lbs_bdev;
+ };
+ 
+ /*
+diff --git a/include/linux/security.h b/include/linux/security.h
+index a8d9310472df..714eecc82e08 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -446,6 +446,11 @@ int security_inode_notifysecctx(struct inode *inode, void *ctx, u32 ctxlen);
+ int security_inode_setsecctx(struct dentry *dentry, void *ctx, u32 ctxlen);
+ int security_inode_getsecctx(struct inode *inode, void **ctx, u32 *ctxlen);
+ int security_locked_down(enum lockdown_reason what);
++int security_bdev_alloc(struct block_device *bdev);
++void security_bdev_free(struct block_device *bdev);
++int security_bdev_setsecurity(struct block_device *bdev,
++			      const char *name, const void *value,
++			      size_t size);
+ #else /* CONFIG_SECURITY */
+ 
+ static inline int call_blocking_lsm_notifier(enum lsm_event event, void *data)
+@@ -1273,6 +1278,23 @@ static inline int security_locked_down(enum lockdown_reason what)
+ {
+ 	return 0;
+ }
++
++static inline int security_bdev_alloc(struct block_device *bdev)
++{
++	return 0;
++}
++
++static inline void security_bdev_free(struct block_device *bdev)
++{
++}
++
++static inline int security_bdev_setsecurity(struct block_device *bdev,
++					    const char *name,
++					    const void *value, size_t size)
++{
++	return 0;
++}
++
+ #endif	/* CONFIG_SECURITY */
+ 
+ #ifdef CONFIG_SECURITY_NETWORK
+diff --git a/security/security.c b/security/security.c
+index 7fed24b9d57e..0d1af27711c1 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -28,6 +28,7 @@
+ #include <linux/string.h>
+ #include <linux/msg.h>
+ #include <net/flow.h>
++#include <linux/fs.h>
+ 
+ #define MAX_LSM_EVM_XATTR	2
+ 
+@@ -202,6 +203,7 @@ static void __init lsm_set_blob_sizes(struct lsm_blob_sizes *needed)
+ 	lsm_set_blob_size(&needed->lbs_ipc, &blob_sizes.lbs_ipc);
+ 	lsm_set_blob_size(&needed->lbs_msg_msg, &blob_sizes.lbs_msg_msg);
+ 	lsm_set_blob_size(&needed->lbs_task, &blob_sizes.lbs_task);
++	lsm_set_blob_size(&needed->lbs_bdev, &blob_sizes.lbs_bdev);
+ }
+ 
+ /* Prepare LSM for initialization. */
+@@ -337,6 +339,7 @@ static void __init ordered_lsm_init(void)
+ 	init_debug("ipc blob size      = %d\n", blob_sizes.lbs_ipc);
+ 	init_debug("msg_msg blob size  = %d\n", blob_sizes.lbs_msg_msg);
+ 	init_debug("task blob size     = %d\n", blob_sizes.lbs_task);
++	init_debug("bdev blob size     = %d\n", blob_sizes.lbs_bdev);
+ 
+ 	/*
+ 	 * Create any kmem_caches needed for blobs
+@@ -654,6 +657,28 @@ static int lsm_msg_msg_alloc(struct msg_msg *mp)
+ 	return 0;
+ }
+ 
++/**
++ * lsm_bdev_alloc - allocate a composite block_device blob
++ * @bdev: the block_device that needs a blob
++ *
++ * Allocate the block_device blob for all the modules
++ *
++ * Returns 0, or -ENOMEM if memory can't be allocated.
++ */
++static int lsm_bdev_alloc(struct block_device *bdev)
++{
++	if (blob_sizes.lbs_bdev == 0) {
++		bdev->security = NULL;
++		return 0;
++	}
++
++	bdev->security = kzalloc(blob_sizes.lbs_bdev, GFP_KERNEL);
++	if (!bdev->security)
++		return -ENOMEM;
++
++	return 0;
++}
++
+ /**
+  * lsm_early_task - during initialization allocate a composite task blob
+  * @task: the task that needs a blob
+@@ -2456,6 +2481,42 @@ int security_locked_down(enum lockdown_reason what)
+ }
+ EXPORT_SYMBOL(security_locked_down);
+ 
++int security_bdev_alloc(struct block_device *bdev)
++{
++	int rc = 0;
++
++	rc = lsm_bdev_alloc(bdev);
++	if (unlikely(rc))
++		return rc;
++
++	rc = call_int_hook(bdev_alloc_security, 0, bdev);
++	if (unlikely(rc))
++		security_bdev_free(bdev);
++
++	return 0;
++}
++EXPORT_SYMBOL(security_bdev_alloc);
++
++void security_bdev_free(struct block_device *bdev)
++{
++	if (!bdev->security)
++		return;
++
++	call_void_hook(bdev_free_security, bdev);
++
++	kfree(bdev->security);
++	bdev->security = NULL;
++}
++EXPORT_SYMBOL(security_bdev_free);
++
++int security_bdev_setsecurity(struct block_device *bdev,
++			      const char *name, const void *value,
++			      size_t size)
++{
++	return call_int_hook(bdev_setsecurity, 0, bdev, name, value, size);
++}
++EXPORT_SYMBOL(security_bdev_setsecurity);
++
+ #ifdef CONFIG_PERF_EVENTS
+ int security_perf_event_open(struct perf_event_attr *attr, int type)
+ {
 -- 
 2.26.0
 
