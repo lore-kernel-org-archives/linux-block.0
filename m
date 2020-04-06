@@ -1,98 +1,191 @@
-Return-Path: <SRS0=lh2f=5V=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44879C2BA19
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 22:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E965BC2BA2B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 01:27:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01F5420659
-	for <linux-block@archiver.kernel.org>; Sun,  5 Apr 2020 22:39:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tCJj69p0"
+	by mail.kernel.org (Postfix) with ESMTP id CC7BA2074B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 01:27:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727612AbgDEWjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Apr 2020 18:39:31 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39228 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727509AbgDEWjb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Apr 2020 18:39:31 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k18so5152482pll.6
-        for <linux-block@vger.kernel.org>; Sun, 05 Apr 2020 15:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=OdEDPg1uj6czYj2ENMVOETWmVb6mWwN1SQGCKZ+dHjw=;
-        b=tCJj69p0Y8rc548xIsTRZe8souY3WW1gDWL9CafReLDnGC+X0pNRuQDlY8G4KUeyb3
-         kNdmaTv+mczdzPQQvIQeFv/sQipISwukUI/SJWD6JeEEBmwSLCyRilviqJvy25wR8LKY
-         zyBWmfDbcQxKQ/yUvYYU7k025Zu469HDZcQMt2616HmJ/PXxDzPsFU0NHYO6OAkPRDff
-         PfZ8QfbZ0ma5oDQX4ckjW0xZ3v+/P1KuCneRVH8ujJPojCRxdeFlbaOkuFsUuwsVrvDy
-         II7/sMjj0R3RWLMB/rr7MViLD1QludTVXCUuDyQwm2L4rKXbxkErHtl5wk0bxf117E41
-         sOtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OdEDPg1uj6czYj2ENMVOETWmVb6mWwN1SQGCKZ+dHjw=;
-        b=VGOyAgfOXBrPtuauaBpwxcwHQe8/4+hRaS26WHfwS3+03SVf2hyVJWRrTj/m5+7Cbz
-         XkPHOWoCwytBPmW3e2hs43aacOVHa/GpsMk4GpQCQj27xZ0tBYTQ39H+CMwBu82TgFEl
-         7VPiZPGIu650vEWtinJsUC0pGhUdLIC9z65C76gLi1JYgBSywZNFTIkq6HJECJPLqIZQ
-         TxYLunCBoyixsVUOtUjMbqAm3SiFYqvfamQbCPxksP7j/XkceeXUWFrjn8C/hHqLBA2b
-         +hqHYNi8yJ5C43l+/6h+dZgZxDQ5uSuM1mMlUP9XtAFBl2Yk3GR8L6DuYpkypiEknWXN
-         ltMw==
-X-Gm-Message-State: AGi0PuZqhIRUdzE6re8SVei7JaI7WcpRxfA2s/HEN1npHkHhrDdjc5gm
-        ssfC/qQ7lOXQrsw7gsTuRrn5aWn4pf0A6Q==
-X-Google-Smtp-Source: APiQypL7ds5t0I80ORFe0Ng4w1OGRNRKW7aGKFzj+e2L7xY96gpJwTjLPT1lBQhkNin7qXPXGy3JOA==
-X-Received: by 2002:a17:902:8c94:: with SMTP id t20mr17307665plo.336.1586126369347;
-        Sun, 05 Apr 2020 15:39:29 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:5d19:ea24:5c10:884d? ([2605:e000:100e:8c61:5d19:ea24:5c10:884d])
-        by smtp.gmail.com with ESMTPSA id o29sm10292773pfp.208.2020.04.05.15.39.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Apr 2020 15:39:28 -0700 (PDT)
-Subject: =?UTF-8?Q?Re=3a_=e2=9d=8c_FAIL=3a_Test_report_for_kernel_5=2e6=2e0-?=
- =?UTF-8?Q?83eb78c=2ecki_=28block=29?=
+        id S1727899AbgDFB1j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Apr 2020 21:27:39 -0400
+Received: from sandeen.net ([63.231.237.45]:56456 "EHLO sandeen.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726408AbgDFB1i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 5 Apr 2020 21:27:38 -0400
+Received: from [10.0.0.4] (liberator [10.0.0.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by sandeen.net (Postfix) with ESMTPSA id 86E7F11664;
+        Sun,  5 Apr 2020 20:27:32 -0500 (CDT)
+Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
 To:     Bart Van Assche <bvanassche@acm.org>,
-        CKI Project <cki-project@redhat.com>,
-        linux-block@vger.kernel.org
-References: <cki.30CC7B67BD.D92JFO5H7A@redhat.com>
- <0a957017-9d26-b3d5-4751-66c971b7c253@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <722d886b-fbeb-b90e-54ff-05f7fbbedae1@kernel.dk>
-Date:   Sun, 5 Apr 2020 15:39:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de
+Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200402000002.7442-3-mcgrof@kernel.org>
+ <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
+From:   Eric Sandeen <sandeen@sandeen.net>
+Autocrypt: addr=sandeen@sandeen.net; prefer-encrypt=mutual; keydata=
+ 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 pA==
+Message-ID: <b827d03c-e097-06c3-02ab-00df42b5fc0e@sandeen.net>
+Date:   Sun, 5 Apr 2020 20:27:35 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <0a957017-9d26-b3d5-4751-66c971b7c253@acm.org>
+In-Reply-To: <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/4/20 9:07 PM, Bart Van Assche wrote:
-> On 2020-04-03 13:04, CKI Project wrote:
->> All kernel binaries, config files, and logs are available for download here:
->>
->>   https://cki-artifacts.s3.us-east-2.amazonaws.com/index.html?prefix=datawarehouse/2020/04/03/518551
+On 4/4/20 10:39 PM, Bart Van Assche wrote:
+> On 2020-04-01 17:00, Luis Chamberlain wrote:
+>> korg#205713 then was used to create CVE-2019-19770 and claims that
+>> the bug is in a use-after-free in the debugfs core code. The
+>> implications of this being a generic UAF on debugfs would be
+>> much more severe, as it would imply parent dentries can sometimes
+>> not be possitive, which is something claim is not possible.
+>          ^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>          positive?  is there perhaps a word missing here?
 > 
-> From the build log:
+>> It turns out that the issue actually is a mis-use of debugfs for
+>> the multiqueue case, and the fragile nature of how we free the
+>> directory used to keep track of blktrace debugfs files. Omar's
+>> commit assumed the parent directory would be kept with
+>> debugfs_lookup() but this is not the case, only the dentry is
+>> kept around. We also special-case a solution for multiqueue
+>> given that for multiqueue code we always instantiate the debugfs
+>> directory for the request queue. We were leaving it only to chance,
+>> if someone happens to use blktrace, on single queue block devices
+>> for the respective debugfs directory be created.
 > 
-> ERROR: modpost: "sysrq_mask" [drivers/tty/serial/serial_core.ko] undefined!
+> Since the legacy block layer is gone, the above explanation may have to
+> be rephrased.
 > 
-> So why has this report been sent to the linux-block mailing list? Does
-> the build bot perhaps need to become smarter?
+>> We can fix the UAF by simply using a debugfs directory which is
+>> always created for singlequeue and multiqueue block devices. This
+>> simplifies the code considerably, with the only penalty now being
+>> that we're always creating the request queue directory debugfs
+>> directory for the block device on singlequeue block devices.
+> 
+> Same comment here - the legacy block layer is gone. I think that today
+> all block drivers are either request-based and multiqueue or so-called
+> make_request drivers. See also the output of git grep -nHw
+> blk_alloc_queue for examples of the latter category.
+> 
+>> This patch then also contends the severity of CVE-2019-19770 as
+>> this issue is only possible using root to shoot yourself in the
+>> foot by also misuing blktrace.
+>                ^^^^^^^
+>                misusing?
 
-Still working out the kinks here, I did notify them about that on Friday
-that we're not interested in build errors that aren't specific to the
-block tree.
+Honestly I think the whole "misusing blktrace" narrative is not relevant
+here; the kernel has to deal with whatever ioctls it receives, right.
 
--- 
-Jens Axboe
+The thing I can't figure out from reading the change log is
+
+1) what the root cause of the problem is, and
+2) how this patch fixes it?
+
+>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>> index b3f2ba483992..bda9378eab90 100644
+>> --- a/block/blk-mq-debugfs.c
+>> +++ b/block/blk-mq-debugfs.c
+>> @@ -823,9 +823,6 @@ void blk_mq_debugfs_register(struct request_queue *q)
+>>  	struct blk_mq_hw_ctx *hctx;
+>>  	int i;
+>>  
+>> -	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+>> -					    blk_debugfs_root);
+>> -
+>>  	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+>>  
+>>  	/*
+> 
+> [ ... ]
+> 
+>>  static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
+>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>> index fca9b158f4a0..20f20b0fa0b9 100644
+>> --- a/block/blk-sysfs.c
+>> +++ b/block/blk-sysfs.c
+>> @@ -895,6 +895,7 @@ static void __blk_release_queue(struct work_struct *work)
+>>  
+>>  	blk_trace_shutdown(q);
+>>  
+>> +	blk_q_debugfs_unregister(q);
+>>  	if (queue_is_mq(q))
+>>  		blk_mq_debugfs_unregister(q);
+> 
+> Does this patch change the behavior of the block layer from only
+> registering a debugfs directory for request-based block devices to
+> registering a debugfs directory for request-based and make_request based
+> block devices? Is that behavior change an intended behavior change?
+
+Seems to be:
+
+"This simplifies the code considerably, with the only penalty now being
+that we're always creating the request queue directory debugfs
+directory for the block device on singlequeue block devices."
+
+?
+
+-Eric
 
