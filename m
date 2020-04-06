@@ -2,141 +2,104 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4485DC2BA18
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 04:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5A3C2BA18
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 07:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 195E02074F
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 04:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDDB12075E
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 07:41:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725887AbgDFEZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 00:25:46 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35844 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbgDFEZq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 00:25:46 -0400
-Received: by mail-pf1-f196.google.com with SMTP id n10so6949767pff.3;
-        Sun, 05 Apr 2020 21:25:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=c8wPbad/8W9/8b6vePf+GYvbUSqgcxrAZ3yGLbYkRIg=;
-        b=nNy1VitUHs4ZrHyV0qTotIiwPFPn26bHsJz/tDwyEl78xPQZv7H9P05l5s5+IIKo7/
-         9HKLR5ocx1coV44gUU9SZQ/S/LEp5p1DrKfc1T8bVsVntf0uC55kpOTSOYGd7uB0P/On
-         LAST/j2IzNsQsHj/ISazT4GOK7vlkjQqA1AIHN6KU2OvCoE61FUN9sqJc8fxc2bzHaLW
-         F0JKW2GEJ14ODUwRFfzKeQdx89JX2hL9PjnJ6YRvKykU2uhKW5xX7LxkzcAqoDzI+a1N
-         VSkZmQOxvuUh5jqvXUUF3J9Ym7pFRmuSIbBrOxC5oQ86Uwx+qL2qJvnyUxDQDWESWHNe
-         n1hA==
-X-Gm-Message-State: AGi0Pub8urHfmDuTS2LK9o/fiu2wz3LsZJA/OfjjeFPlLmSAQFa71XyD
-        5D3HxUuLOFiZ/Dix/SB9rEUpkXDJJ2o=
-X-Google-Smtp-Source: APiQypKEoPMxKPEw1lvcr+pVTnkijH/ndCn7BCmmULSLJlYTk+1hOrYPoUZBL8ZSN5GPm4bYSgO3WA==
-X-Received: by 2002:a63:8dc7:: with SMTP id z190mr19591971pgd.39.1586147144839;
-        Sun, 05 Apr 2020 21:25:44 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:7d7b:4f16:40c2:d1f9? ([2601:647:4000:d7:7d7b:4f16:40c2:d1f9])
-        by smtp.gmail.com with ESMTPSA id e184sm10462077pfh.219.2020.04.05.21.25.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Apr 2020 21:25:43 -0700 (PDT)
-Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
-To:     Eric Sandeen <sandeen@sandeen.net>,
-        Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de
-Cc:     mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200402000002.7442-3-mcgrof@kernel.org>
- <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
- <b827d03c-e097-06c3-02ab-00df42b5fc0e@sandeen.net>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <75aa4cff-1b90-ebd4-17a4-c1cb6d390b30@acm.org>
-Date:   Sun, 5 Apr 2020 21:25:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <b827d03c-e097-06c3-02ab-00df42b5fc0e@sandeen.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726793AbgDFHlZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 03:41:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52186 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726788AbgDFHlY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Apr 2020 03:41:24 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0367ZB1m034943
+        for <linux-block@vger.kernel.org>; Mon, 6 Apr 2020 03:41:23 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 306mjcbwkn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2020 03:41:23 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <sth@linux.ibm.com>;
+        Mon, 6 Apr 2020 08:41:04 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 6 Apr 2020 08:41:03 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0367fIYs55247018
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Apr 2020 07:41:18 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A4688A405F;
+        Mon,  6 Apr 2020 07:41:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 935DBA4054;
+        Mon,  6 Apr 2020 07:41:18 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon,  6 Apr 2020 07:41:18 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id 3E472E01C1; Mon,  6 Apr 2020 09:41:18 +0200 (CEST)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+Subject: [PATCH 1/1] s390: Cleanup removed IOSCHED_DEADLINE
+Date:   Mon,  6 Apr 2020 09:41:18 +0200
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200406074118.86849-1-sth@linux.ibm.com>
+References: <20200406074118.86849-1-sth@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 20040607-0008-0000-0000-0000036B57D4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20040607-0009-0000-0000-00004A8CED0E
+Message-Id: <20200406074118.86849-2-sth@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-06_03:2020-04-03,2020-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=1 malwarescore=0 phishscore=0 spamscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060059
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-05 18:27, Eric Sandeen wrote:
-> The thing I can't figure out from reading the change log is
-> 
-> 1) what the root cause of the problem is, and
-> 2) how this patch fixes it?
+From: Krzysztof Kozlowski <krzk@kernel.org>
 
-I think that the root cause is that do_blk_trace_setup() uses
-debugfs_lookup() and that debugfs_lookup() may return a pointer
-associated with a previous incarnation of the block device.
-Additionally, I think the following changes fix that problem by using
-q->debugfs_dir in the blktrace code instead of debugfs_lookup():
+CONFIG_IOSCHED_DEADLINE is gone since commit f382fb0bcef4 ("block:
+remove legacy IO schedulers").
 
-[ ... ]
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -311,7 +311,6 @@ static void blk_trace_free(struct blk_trace *bt)
- 	debugfs_remove(bt->msg_file);
- 	debugfs_remove(bt->dropped_file);
- 	relay_close(bt->rchan);
--	debugfs_remove(bt->dir);
- 	free_percpu(bt->sequence);
- 	free_percpu(bt->msg_data);
- 	kfree(bt);
-[ ... ]
-@@ -509,21 +510,19 @@ static int do_blk_trace_setup(struct request_queue
-*q, char *name, dev_t dev,
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- 	ret = -ENOENT;
+diff --git a/drivers/s390/block/Kconfig b/drivers/s390/block/Kconfig
+index a8682f69effc..1f06b19cb290 100644
+--- a/drivers/s390/block/Kconfig
++++ b/drivers/s390/block/Kconfig
+@@ -26,7 +26,7 @@ config DASD
+ 	def_tristate y
+ 	prompt "Support for DASD devices"
+ 	depends on CCW && BLOCK
+-	select IOSCHED_DEADLINE
++	select MQ_IOSCHED_DEADLINE
+ 	help
+ 	  Enable this option if you want to access DASDs directly utilizing
+ 	  S/390s channel subsystem commands. This is necessary for running
+-- 
+2.17.1
 
--	dir = debugfs_lookup(buts->name, blk_debugfs_root);
--	if (!dir)
--		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
--
- 	bt->dev = dev;
- 	atomic_set(&bt->dropped, 0);
- 	INIT_LIST_HEAD(&bt->running_list);
-
- 	ret = -EIO;
--	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
-+	bt->dropped_file = debugfs_create_file("dropped", 0444,
-+					       q->debugfs_dir, bt,
- 					       &blk_dropped_fops);
-[ ... ]
-
-Bart.
