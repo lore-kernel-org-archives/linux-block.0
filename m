@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3152C352B6
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA29C2BA1E
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C835F2076C
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 341D620731
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:11:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="N54VUr8Q"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DusNueFv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbgDFSLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726651AbgDFSLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 6 Apr 2020 14:11:02 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:56246 "EHLO
+Received: from linux.microsoft.com ([13.77.154.182]:56174 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726591AbgDFSLB (ORCPT
+        with ESMTP id S1726575AbgDFSLB (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 14:11:01 -0400
 Received: from dede-linux.corp.microsoft.com (unknown [131.107.147.242])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 11C5820A086B;
-        Mon,  6 Apr 2020 11:10:59 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 11C5820A086B
+        by linux.microsoft.com (Postfix) with ESMTPSA id 6BC2F20A0867;
+        Mon,  6 Apr 2020 11:10:58 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6BC2F20A0867
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1586196659;
-        bh=FoQEwrrWn/d3Fno/jqMS38zWmUVRke4mJOAaLbjRrY8=;
+        s=default; t=1586196658;
+        bh=vtS7tZDadPt65wOWMS99/Fu0/Y/o77wsMAmWG3vccKc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=N54VUr8QkarQLgnFqyjAszG7YIJ6pUaN/Zr3lkmOBOUyIo9VdjQstIz+BAhoGBCF7
-         bW+v9GE1SXS+1DVVjiBi/GlhP9y025G9+KVwyd4SK3KyasY/xI7W3lzn4DXxINnmy2
-         8plzBNslMLxjaM+b1+zzxbxzigxOcdQEC6m4q0Bo=
+        b=DusNueFven5BEm9rLbrKf4fmJj3fXl/fAVK6qkBBKfn4VRipdgK6FBblCer+jbogG
+         Nsaha+HSOzT61rVIKFzTr98nu3QWN63J9eUJtbeXg/TpI/66lYPcLl4PHgfGQO+2vO
+         rLj0v1OxDk0gGh9PYRitbtpPicLzcyf5JlgxNda4=
 From:   deven.desai@linux.microsoft.com
 To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
         jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
@@ -41,9 +41,9 @@ To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
 Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
         sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
         nramas@linux.microsoft.com, mdsakib@linux.microsoft.com
-Subject: [RESEND PATCH 11/11] cleanup: uapi/linux/audit.h
-Date:   Mon,  6 Apr 2020 11:10:45 -0700
-Message-Id: <20200406181045.1024164-12-deven.desai@linux.microsoft.com>
+Subject: [RESEND PATCH 08/11] dm-verity: add bdev_setsecurity hook for root-hash
+Date:   Mon,  6 Apr 2020 11:10:42 -0700
+Message-Id: <20200406181045.1024164-9-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
 References: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
@@ -56,71 +56,54 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Remove trailing whitespaces and align the integrity #defines in
-linux/uapi/audit.h
+Add a security hook call to set a security property of a block_device
+in dm-verity with the root-hash that was verified to match the merkel-tree.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 ---
- include/uapi/linux/audit.h | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ drivers/md/dm-verity-target.c | 8 ++++++++
+ include/linux/device-mapper.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/include/uapi/linux/audit.h b/include/uapi/linux/audit.h
-index 4e0122a0ed0c..d642ade068b5 100644
---- a/include/uapi/linux/audit.h
-+++ b/include/uapi/linux/audit.h
-@@ -48,7 +48,7 @@
-  * 2500 - 2999 future user space (maybe integrity labels and related events)
-  *
-  * Messages from 1000-1199 are bi-directional. 1200-1299 & 2100 - 2999 are
-- * exclusively user space. 1300-2099 is kernel --> user space 
-+ * exclusively user space. 1300-2099 is kernel --> user space
-  * communication.
-  */
- #define AUDIT_GET		1000	/* Get status */
-@@ -78,7 +78,7 @@
- #define AUDIT_LAST_USER_MSG	1199
- #define AUDIT_FIRST_USER_MSG2	2100	/* More user space messages */
- #define AUDIT_LAST_USER_MSG2	2999
-- 
-+
- #define AUDIT_DAEMON_START      1200    /* Daemon startup record */
- #define AUDIT_DAEMON_END        1201    /* Daemon normal stop record */
- #define AUDIT_DAEMON_ABORT      1202    /* Daemon error stop record */
-@@ -139,20 +139,20 @@
- #define AUDIT_MAC_CALIPSO_ADD	1418	/* NetLabel: add CALIPSO DOI entry */
- #define AUDIT_MAC_CALIPSO_DEL	1419	/* NetLabel: del CALIPSO DOI entry */
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index c507f3a4e237..225f67ab378d 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -16,8 +16,10 @@
+ #include "dm-verity.h"
+ #include "dm-verity-fec.h"
+ #include "dm-verity-verify-sig.h"
++#include "dm-core.h"
+ #include <linux/module.h>
+ #include <linux/reboot.h>
++#include <linux/security.h>
  
--#define AUDIT_FIRST_KERN_ANOM_MSG   1700
--#define AUDIT_LAST_KERN_ANOM_MSG    1799
--#define AUDIT_ANOM_PROMISCUOUS      1700 /* Device changed promiscuous mode */
--#define AUDIT_ANOM_ABEND            1701 /* Process ended abnormally */
--#define AUDIT_ANOM_LINK		    1702 /* Suspicious use of file links */
--#define AUDIT_ANOM_CREAT	    1703 /* Suspicious file creation */
--#define AUDIT_INTEGRITY_DATA	    1800 /* Data integrity verification */
--#define AUDIT_INTEGRITY_METADATA    1801 /* Metadata integrity verification */
--#define AUDIT_INTEGRITY_STATUS	    1802 /* Integrity enable status */
--#define AUDIT_INTEGRITY_HASH	    1803 /* Integrity HASH type */
--#define AUDIT_INTEGRITY_PCR	    1804 /* PCR invalidation msgs */
--#define AUDIT_INTEGRITY_RULE	    1805 /* policy rule */
--#define AUDIT_INTEGRITY_EVM_XATTR   1806 /* New EVM-covered xattr */
--#define AUDIT_INTEGRITY_POLICY_RULE 1807 /* IMA policy rules */
-+#define AUDIT_FIRST_KERN_ANOM_MSG	1700
-+#define AUDIT_LAST_KERN_ANOM_MSG	1799
-+#define AUDIT_ANOM_PROMISCUOUS		1700 /* Device changed promiscuous mode */
-+#define AUDIT_ANOM_ABEND		1701 /* Process ended abnormally */
-+#define AUDIT_ANOM_LINK			1702 /* Suspicious use of file links */
-+#define AUDIT_ANOM_CREAT		1703 /* Suspicious file creation */
-+#define AUDIT_INTEGRITY_DATA		1800 /* Data integrity verification */
-+#define AUDIT_INTEGRITY_METADATA	1801 /* Metadata integrity verification */
-+#define AUDIT_INTEGRITY_STATUS		1802 /* Integrity enable status */
-+#define AUDIT_INTEGRITY_HASH		1803 /* Integrity HASH type */
-+#define AUDIT_INTEGRITY_PCR		1804 /* PCR invalidation msgs */
-+#define AUDIT_INTEGRITY_RULE		1805 /* policy rule */
-+#define AUDIT_INTEGRITY_EVM_XATTR	1806 /* New EVM-covered xattr */
-+#define AUDIT_INTEGRITY_POLICY_RULE	1807 /* IMA policy rules */
- #define AUDIT_INTEGRITY_POLICY_LOAD	1808 /* IPE Policy Load */
- #define AUDIT_INTEGRITY_POLICY_ACTIVATE	1809 /* IPE Policy Activation */
- #define AUDIT_INTEGRITY_EVENT		1810 /* IPE Evaluation Event */
+ #define DM_MSG_PREFIX			"verity"
+ 
+@@ -530,6 +532,12 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 			return -EIO;
+ 	}
+ 
++	r = security_bdev_setsecurity(dm_table_get_md(v->ti->table)->bdev,
++				      DM_VERITY_ROOTHASH_SEC_NAME,
++				      v->root_digest, v->digest_size);
++	if (unlikely(r < 0))
++		return r;
++
+ 	/*
+ 	 * At this point, the merkel tree has finished validating.
+ 	 * if signature was specified, validate the signature here.
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 6bd49aa48186..467db44de194 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -625,5 +625,6 @@ static inline unsigned long to_bytes(sector_t n)
+ }
+ 
+ #define DM_VERITY_SIGNATURE_SEC_NAME DM_NAME	".verity-sig"
++#define DM_VERITY_ROOTHASH_SEC_NAME DM_NAME	".verity-rh"
+ 
+ #endif	/* _LINUX_DEVICE_MAPPER_H */
 -- 
 2.26.0
 
