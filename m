@@ -3,46 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C00C2BA80
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D758BC2BA19
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:18:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5EDC820781
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEAE920787
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:18:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726663AbgDFJLH convert rfc822-to-8bit (ORCPT
+        id S1726689AbgDFJSR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 05:11:07 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36872 "EHLO mx2.suse.de"
+        Mon, 6 Apr 2020 05:18:17 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40378 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726689AbgDFJLH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Apr 2020 05:11:07 -0400
+        id S1726723AbgDFJSR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Apr 2020 05:18:17 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id B8358AC40;
-        Mon,  6 Apr 2020 09:11:03 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 2B854AC19;
+        Mon,  6 Apr 2020 09:18:14 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
-To:     Nicolai Stange <nstange@suse.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Eric Sandeen <sandeen@sandeen.net>,
         Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
         viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
         rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
+        ming.lei@redhat.com, nstange@suse.de, mhocko@suse.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [RFC 3/3] block: avoid deferral of blk_release_queue() work
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [RFC 2/3] blktrace: fix debugfs use after free
 References: <20200402000002.7442-1-mcgrof@kernel.org>
-        <20200402000002.7442-4-mcgrof@kernel.org>
-        <774a33e8-43ba-143f-f6fd-9cb0ae0862ac@acm.org>
-        <87o8saj62m.fsf@suse.de>
-Date:   Mon, 06 Apr 2020 11:11:01 +0200
-In-Reply-To: <87o8saj62m.fsf@suse.de> (Nicolai Stange's message of "Thu, 02
-        Apr 2020 16:49:37 +0200")
-Message-ID: <87eet1j7x6.fsf@suse.de>
+        <20200402000002.7442-3-mcgrof@kernel.org>
+        <3640b16b-abda-5160-301a-6a0ee67365b4@acm.org>
+        <b827d03c-e097-06c3-02ab-00df42b5fc0e@sandeen.net>
+        <75aa4cff-1b90-ebd4-17a4-c1cb6d390b30@acm.org>
+Date:   Mon, 06 Apr 2020 11:18:13 +0200
+In-Reply-To: <75aa4cff-1b90-ebd4-17a4-c1cb6d390b30@acm.org> (Bart Van Assche's
+        message of "Sun, 5 Apr 2020 21:25:41 -0700")
+Message-ID: <87d08lj7l6.fsf@suse.de>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -52,71 +54,117 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Nicolai Stange <nstange@suse.de> writes:
+Bart Van Assche <bvanassche@acm.org> writes:
 
-> Bart Van Assche <bvanassche@acm.org> writes:
+> On 2020-04-05 18:27, Eric Sandeen wrote:
+>> The thing I can't figure out from reading the change log is
+>> 
+>> 1) what the root cause of the problem is, and
+>> 2) how this patch fixes it?
 >
->> The description of this patch mentions a single blk_release_queue() call
->> that happened in the past from a context from which sleeping is not
->> allowed and from which sleeping is allowed today. Have all other
->> blk_release_queue() / blk_put_queue() calls been verified to see whether
->> none of these happens from a context from which sleeping is not allowed?
->
-> I've just done this today and found the following potentially
-> problematic call paths to blk_put_queue().
->
-> 1.) mem_cgroup_throttle_swaprate() takes a spinlock and
->     calls blkcg_schedule_throttle()->blk_put_queue().
->
->     Also note that AFAICS mem_cgroup_try_charge_delay() can be called
->     with GFP_ATOMIC.
->
-> 2.) scsi_unblock_requests() gets called from a lot of drivers and
->     invoke blk_put_queue() through
->     scsi_unblock_requests() -> scsi_run_host_queues() ->
->     scsi_starved_list_run() -> blk_put_queue().
->
->     Most call sites are fine, the ones which are not are:
->     a.) pmcraid_complete_ioa_reset(). This gets assigned
->         to struct pmcraid_cmd's ->cmd_done and later invoked
->         under a spinlock.
->
->     b.) qla82xx_fw_dump() and qla8044_fw_dump().
->         These can potentially block w/o this patch already,
->         because both invoke qla2x00_wait_for_chip_reset().
->
-> 	However, they can get called from IRQ context. For example,
->         qla82xx_intr_handler(), qla82xx_msix_default() and
->         qla82xx_poll() call qla2x00_async_event(), which calls
->         ->fw_dump().
->
-> 	The aforementioned functions can also reach ->fw_dump() through
->         qla24xx_process_response_queue()->qlt_handle_abts_recv()->qlt_response_pkt_all_vps()
->         ->qlt_response_pkt()->qlt_handle_abts_completion()->qlt_chk_unresolv_exchg()
->         -> ->fw_dump().
->
-> 	But I'd consider this a problem with the driver -- either
-> 	->fw_dump() can sleep and must not be called from IRQ context
->         or they must not invoke qla2x00_wait_for_hba_ready().
->
->
-> (I can share the full analysis, but it's lengthy and contains nothing
->  interesting except for what is listed above).
->
->
-> One final note though: If I'm not mistaken, then the final
-> blk_put_queue() can in principle block even today, simply by virtue of
-> the kernfs operations invoked through
-> kobject_put()->kobject_release()->kobject_cleanup()->kobject_del()
-> ->sysfs_remove_dir()->kernfs_remove()->mutex_lock()?\
+> I think that the root cause is that do_blk_trace_setup() uses
+> debugfs_lookup() and that debugfs_lookup() may return a pointer
+> associated with a previous incarnation of the block device.
 
-That's wrong, I missed kobject_del() invocation issued from
-blk_unregister_queue(). Thus, blk_put_queue() in its current
-implementation won't ever block.
+That's correct, the debugfs_lookup() can find a previous incarnation's
+dir of the same name which is about to get removed from a not yet
+schedule work.
+
+I.e. something like the following is possible:
+
+  LOOP_CTL_DEL(loop0) /* schedule __blk_release_queue() work_struct */
+  LOOP_CTL_ADD(loop0) /* debugfs_create_dir() from
+		       * blk_mq_debugfs_register() fails with EEXIST
+                       */
+  BLKTRACE_SETUP(loop0) /* debugfs_lookup() finds the directory about to
+			 * get deleted and blktrace files will be created
+			 * thereunder.
+			 */
+
+  The work_struct gets scheduled and the debugfs dir debugfs_remove()ed
+  recursively, which includes the blktrace files just created. blktrace's
+  dentry pointers are now dangling and there will be a UAF when it
+  attempts to delete those again.
+
+Luis' patch [2/3] fixes the issue of the debugfs_lookup() from
+blk_mq_debugfs_register() potentially returning an existing directory
+associated with a previous block device incarnation of the same name and
+thus, fixes the UAF.
+
+
+However, the problem that the debugfs_create_dir() from
+blk_mq_debugfs_register() in a sequence of
+  LOOP_CTL_DEL(loop0)
+  LOOP_CTL_ADD(loop0)
+could silently fail still remains. The RFC patch [3/3] from Luis
+attempts to address this issue by folding the delayed
+__blk_release_queue() work back into blk_release_queue(), the release
+handler associated with the queue kobject and executed from the final
+blk_queue_put(). However, that's still no full solution, because the
+kobject release handler can run asynchronously, long after
+blk_unregister_queue() has returned (c.f. also
+CONFIG_DEBUG_KOBJECT_RELEASE).
+
+Note that I proposed this change here (internally) as a potential
+cleanup, because I missed the kobject_del() from blk_unregister_queue()
+and *wrongly* concluded that blk_queue_put() must be allowed to sleep
+nowadays. However, that kobject_del() is in place and moreover, the
+analysis requested by Bart (c.f. [1] in this thread) revealed that there
+are indeed a couple of sites calling blk_queue_put() from atomic
+context.
+
+So I'd suggest to drop patch [3/3] from this series and modify this
+patch [2/3] here to move the blk_q_debugfs_unregister(q) invocation from
+__blk_release_queue() to blk_unregister_queue() instead.
+
+
+> Additionally, I think the following changes fix that problem by using
+> q->debugfs_dir in the blktrace code instead of debugfs_lookup():
+
+That would fix the UAF, but !queue_is_mq() queues wouldn't get a debugfs
+directory created for them by blktrace anymore?
+
 
 Thanks,
 
 Nicolai
+
+[1] https://lkml.kernel.org/r/87o8saj62m.fsf@suse.de
+
+
+> [ ... ]
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -311,7 +311,6 @@ static void blk_trace_free(struct blk_trace *bt)
+>  	debugfs_remove(bt->msg_file);
+>  	debugfs_remove(bt->dropped_file);
+>  	relay_close(bt->rchan);
+> -	debugfs_remove(bt->dir);
+>  	free_percpu(bt->sequence);
+>  	free_percpu(bt->msg_data);
+>  	kfree(bt);
+> [ ... ]
+> @@ -509,21 +510,19 @@ static int do_blk_trace_setup(struct request_queue
+> *q, char *name, dev_t dev,
+>
+>  	ret = -ENOENT;
+>
+> -	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> -	if (!dir)
+> -		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> -
+>  	bt->dev = dev;
+>  	atomic_set(&bt->dropped, 0);
+>  	INIT_LIST_HEAD(&bt->running_list);
+>
+>  	ret = -EIO;
+> -	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
+> +	bt->dropped_file = debugfs_create_file("dropped", 0444,
+> +					       q->debugfs_dir, bt,
+>  					       &blk_dropped_fops);
+> [ ... ]
+>
+> Bart.
 
 -- 
 SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
