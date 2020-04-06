@@ -2,153 +2,183 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27FFC2BA80
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 23:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F89FC2BA1A
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 23:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79178207FF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 23:25:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F3C52076E
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 23:27:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BSv8rDCG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L4yf5hYt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbgDFXZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 19:25:06 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:45333 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726225AbgDFXZF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 19:25:05 -0400
+        id S1726303AbgDFX1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 19:27:08 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:11119 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726254AbgDFX1I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 19:27:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1586215504; x=1617751504;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yJMVJjs8Tg8tTHOw21er81hvgxe/6jLJlylymC8JZPw=;
-  b=BSv8rDCGUzkZocjARNbMV0abXtzncQoMLBWKKEtFNFTNpxNNJ3C1IUNq
-   aXsCNOxRrLT6cOExJfqCdg1lR6DS9bJjJhJlW9+Tf3HhzN92zPOkhxpQ2
-   rH9jgRUkcTCYtRUUiiu74uc5mgtTmoXhnIgCk0KqhTy9uFfy5vo/O1gj3
-   mlhDL9ic3lyK17H7NFdSvS4O0+afkI15jGFzYldE7lVUx58E/06QeCwG9
-   yfFShd7oQIwNMSBZmCZnmfhnA948p9Dtijejneybe/t6aPN50i92QjS01
-   4yzdGDG/N8DafWkjLYvXMp4J4GaDFtSZ7i2HyWBtZqh12yJT6SFut8aNX
-   g==;
-IronPort-SDR: tanPFpRBP6MWqDH0A4VjAQOzOkZ4DwJpsd2l5k3hBKIpEUNY5VW4XfHa+Y5czzHc6D7NELnG08
- 2lGsU6WMYurWHu82mwtOK9In0jGJr2xqm6MS3uXMpzn4ElRjvuDNNf9kIWs9a91ADcdkQLVYJn
- vQa+JvZueWMGhukUysldoDbcvtuxBM7sujd48BtXRKKz1+LaQ2yctnFg0fQjBfwhxxW6m6vjH0
- zhUleX97g3fFR2rfNaVldV3kYwLWnjMauYPWd3VPLArWz0hOFWvXvMBd4LUCUNzOZZ5sXPD+6j
- fj4=
+  t=1586215628; x=1617751628;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=X5Of+XNOiIABD5PHJhySeNSquylLNwYKPMHbC9s8oio=;
+  b=L4yf5hYttTNiAxxWzwsEXYfhr3xA5x3JF8a0Ir3k9ivQ7SA6IXF1DTq+
+   sXTLQxDXZaC0480kkXZt4nqz5NfkxD1iNu9A0tSqK++emVhtrqQN+eTdD
+   TAiQQgxufPvFB19hSmwVXRHWOsVkL7mv6upl7SoEf/mOhF5hVK6XXe/9V
+   JXI5GMMDkgI+nuRbQzzmRFpERggCF6eLkDhabXHUJFNWu7Csf84IMEYPx
+   RyrhxCCngipZKxyPYT200xCaY28UNKUklROG+LajLKmGCuvSBGxupYjx/
+   Tg6wIH5tRVOHUCHDDEUmvML72W9GJ4ThNS0syIbXgokf4lcllHo2CPEta
+   w==;
+IronPort-SDR: tj4qoymIBBq5d+oFKQmrh/xtEnw1SFHnMFHKeUYfiH/lp61vnT03EfTKiWkT84MvddaqMcLbD2
+ 0cv7TwEH8bG3zAA0oHD5O72cuoI4K50BC2St+SmZogEyccGK2ZjyZxUC6jDMFUuWHhsG6TkdAc
+ p7tDSss0bZgDaAZQ25Urk5xMdFZjd4Ip62b9xm2HDTLvKYQl+6Bxk/vCVcNt47vaZuGfKsBmZd
+ PJeXdjXth/HJUFSwj1AdAtbs4NXx4vN83G0+416kmDmEOyy73pBLGY8G9s8lQ5YR4pma5ac58C
+ lbU=
 X-IronPort-AV: E=Sophos;i="5.72,352,1580745600"; 
-   d="scan'208";a="243262378"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Apr 2020 07:25:04 +0800
-IronPort-SDR: mtuxDEISxvLjv3wD9YeAIW0s/NTwmyr6SkheNyEm1jw9EZiCi5IQQUIyg9EUjwU0E0puNstNLi
- dCQB0/lA7haqAw08IzA9OSsRnRyebj9TGvroz1PachcbP0belkhSQkEyHsC+GjazmflFTX5vsD
- 0KFu/g4jqYz53lSq5aS0h4e+F9Q0qtoa4u/iyldIvxha6FDmDsAPRGU/EpdVmaW/U0rhNp3fWB
- 7Uuwr6R3PkdTuZKDwP5ABqwRXLaVrhgjzuoslT8XFJ/hvBQgctswGOu8UjmV1xF1pgp6TnaIro
- MmlNfLmeexeD+SfOGxZ8TV1j
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2020 16:15:48 -0700
-IronPort-SDR: UT1OC9+Myzt65Sjpee3DgDcEGTJifMJOTfJJmZfVX2KP03f75hZQl9N+1kJ4af+P91Mcr7Ue2K
- K0MfePtROV8wE1amcpHFwzXijuGLn03nAXcqoywHjWAyzPeW8WRxPL+GcihVCrVL4BhFFany/4
- XZ0B9hDE6TD/lAaf3vmmO7oe2kxWLasZ79G/ycRdyjlUQ8VbIOZ/EICmJcGA8TzoDRER3M/F/M
- BoI2Q+V1BsjpQ4jad9PjGG/jzmxVYTNA++3DM3Bt3IVUT1MQzVGC+fKUq/VAIR8jUdfHoqLaG8
- /M0=
+   d="scan'208";a="136175313"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Apr 2020 07:27:08 +0800
+IronPort-SDR: TOdEYF0yJHJ7VDVlafhr2PV9YRRC6vsJVo7xnYQgNOdxRLcBNjf1mrQz0JXNez6eU5CXDqT68d
+ nEk1PEcA0gDQc0/0mT0yKsPbgCzX0ePO90YlADTmXBqFgVmpb9sneBtb5DR+f60xyZOSg9r7Mw
+ aHgK1yf6c/UGYtliZqyxBEuKWUtMSO3W1pt4NCxtypDjbEZsu6u4e5hGfZplHmHmJxE/cJ+YTA
+ OpE34y2tigY7Fr1HyOorDmKftqgOx8aFf5I8xiIshM+sDqy7MCFMcNnQgjtFWmsyYAs/qp+XIV
+ AWDSkUjZhZ657p7FQV3pL1tS
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2020 16:17:50 -0700
+IronPort-SDR: vrJU7kzzj1UEUyxdi9Iw6zGX1leY374TAplZqDUH+i50LaUR6LiNMl7C6Aj7/l7wvWx9xYtw6Y
+ omZd7E2//9ve2EU7lNX/R00vkIV0Vlh2iE/VHqEcmMd+zBYzHoPmk58scLmk+g82Bogth/rEgF
+ 9POgOL2O1P1aoeDGN7GV50LkCe1dHARnhtRJm6xBMPK17j3s433I+HglH8GBDRVsXdowQ/KIv8
+ h6gDv07udQiN26GqfFBbi1FPo9uRDgGdUsj7MsRTbnceIfj1QvrZ0ych4y6zIloJtUChF4NVh3
+ 2dg=
 WDCIronportException: Internal
-Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip02.wdc.com with ESMTP; 06 Apr 2020 16:25:04 -0700
+Received: from ioprio.labspan.wdc.com (HELO ioprio.sc.wdc.com) ([10.6.139.89])
+  by uls-op-cesaip01.wdc.com with ESMTP; 06 Apr 2020 16:27:07 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Cc:     hch@lst.de, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 2/2] xfs: use block layer helper for rw
-Date:   Mon,  6 Apr 2020 16:24:40 -0700
-Message-Id: <20200406232440.4027-3-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20200406232440.4027-1-chaitanya.kulkarni@wdc.com>
-References: <20200406232440.4027-1-chaitanya.kulkarni@wdc.com>
+To:     hch@lst.de, martin.petersen@oracle.com
+Cc:     darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, chaitanya.kulkarni@wdc.com,
+        damien.lemoal@wdc.com, andrea.parri@amarulasolutions.com,
+        hare@suse.com, tj@kernel.org, hannes@cmpxchg.org,
+        khlebnikov@yandex-team.ru, ajay.joshi@wdc.com, bvanassche@acm.org,
+        arnd@arndb.de, houtao1@huawei.com, asml.silence@gmail.com,
+        ktkhai@virtuozzo.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Subject: [PATCH V2 0/4] block: Add support for REQ_OP_ALLOCATE
+Date:   Mon,  6 Apr 2020 15:21:44 -0700
+Message-Id: <20200406222148.28365-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The existing routine xfs_rw_bdev has block layer bio-based code which
-maps the data buffer allocated with kmalloc or vmalloc to the READ/WRITE
-bios. Use a block layer helper from the previous patch to avoid code
-duplication.
+Hi,
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- fs/xfs/xfs_bio_io.c | 47 ++-------------------------------------------
- 1 file changed, 2 insertions(+), 45 deletions(-)
+This patch-series is based on the original RFC patch series:-
+https://www.spinics.net/lists/linux-block/msg47933.html.
 
-diff --git a/fs/xfs/xfs_bio_io.c b/fs/xfs/xfs_bio_io.c
-index e2148f2d5d6b..b04c398fb99c 100644
---- a/fs/xfs/xfs_bio_io.c
-+++ b/fs/xfs/xfs_bio_io.c
-@@ -4,11 +4,6 @@
-  */
- #include "xfs.h"
- 
--static inline unsigned int bio_max_vecs(unsigned int count)
--{
--	return min_t(unsigned, howmany(count, PAGE_SIZE), BIO_MAX_PAGES);
--}
--
- int
- xfs_rw_bdev(
- 	struct block_device	*bdev,
-@@ -18,44 +13,6 @@ xfs_rw_bdev(
- 	unsigned int		op)
- 
- {
--	unsigned int		is_vmalloc = is_vmalloc_addr(data);
--	unsigned int		left = count;
--	int			error;
--	struct bio		*bio;
--
--	if (is_vmalloc && op == REQ_OP_WRITE)
--		flush_kernel_vmap_range(data, count);
--
--	bio = bio_alloc(GFP_KERNEL, bio_max_vecs(left));
--	bio_set_dev(bio, bdev);
--	bio->bi_iter.bi_sector = sector;
--	bio->bi_opf = op | REQ_META | REQ_SYNC;
--
--	do {
--		struct page	*page = kmem_to_page(data);
--		unsigned int	off = offset_in_page(data);
--		unsigned int	len = min_t(unsigned, left, PAGE_SIZE - off);
--
--		while (bio_add_page(bio, page, len, off) != len) {
--			struct bio	*prev = bio;
--
--			bio = bio_alloc(GFP_KERNEL, bio_max_vecs(left));
--			bio_copy_dev(bio, prev);
--			bio->bi_iter.bi_sector = bio_end_sector(prev);
--			bio->bi_opf = prev->bi_opf;
--			bio_chain(prev, bio);
--
--			submit_bio(prev);
--		}
--
--		data += len;
--		left -= len;
--	} while (left > 0);
--
--	error = submit_bio_wait(bio);
--	bio_put(bio);
--
--	if (is_vmalloc && op == REQ_OP_READ)
--		invalidate_kernel_vmap_range(data, count);
--	return error;
-+	return blkdev_issue_rw(bdev, data, sector, count, op, REQ_META,
-+			       GFP_KERNEL);
- }
+I've designed a rough testcase based on the information present
+in the mailing list archive for original RFC, it may need
+some corrections from the author.
+
+If anyone is interested, test results are at the end of this patch.
+
+Following is the original cover-letter :-
+
+Information about continuous extent placement may be useful
+for some block devices. Say, distributed network filesystems,
+which provide block device interface, may use this information
+for better blocks placement over the nodes in their cluster,
+and for better performance. Block devices, which map a file
+on another filesystem (loop), may request the same length extent
+on underlining filesystem for less fragmentation and for batching
+allocation requests. Also, hypervisors like QEMU may use this
+information for optimization of cluster allocations.
+
+This patchset introduces REQ_OP_ALLOCATE, which is going
+to be used for forwarding user's fallocate(0) requests into
+block device internals. It rather similar to existing
+REQ_OP_DISCARD, REQ_OP_WRITE_ZEROES, etc. The corresponding
+exported primitive is called blkdev_issue_allocate().
+See [1/3] for the details.
+
+Patch [2/3] teaches loop driver to handle REQ_OP_ALLOCATE
+requests by calling fallocate(0).
+
+Patch [3/3] makes ext4 to notify a block device about fallocate(0).
+
+Here is a simple test I did:
+https://gist.github.com/tkhai/5b788651cdb74c1dbff3500745878856
+
+I attached a file on ext4 to loop. Then, created ext4 partition
+on loop device and started the test in the partition. Direct-io
+is enabled on loop.
+
+The test fallocates 4G file and writes from some offset with
+given step, then it chooses another offset and repeats. After
+the test all the blocks in the file become written.
+
+The results shows that batching extents-assigning requests improves
+the performance:
+
+Before patchset: real ~ 1min 27sec
+After patchset:  real ~ 1min 16sec (18% better)
+
+Ordinary fallocate() before writes improves the performance
+by batching the requests. These results just show, the same
+is in case of forwarding extents information to underlining
+filesystem.
+
+Regards,
+Chaitanya
+
+Changes from V1:-
+
+1. Adjust series from using assign range or ASSIGN_RANGE to allocate or
+   ALLOCATE. (Martin)
+2. Add SECT_FROM_SB_BLK() and NSECTS_FROM_SB_NBLK() macros since it
+   avoids weired line breaking and duplication of the code for
+   sb_issue_discard(), sb_issue_zeroout() and sb_issue_allocate().
+   Should there be a prep patch for this ?
+
+Changes from RFC:-
+
+1. Add missing plumbing for REQ_OP_ASSIGN_RANGE similar to write-zeores.
+2. Add a prep patch to create a helper to submit payloadless bios.
+3. Design a testcases around the description present in the
+   cover-letter.
+
+Chaitanya Kulkarni (1):
+  block: create payloadless issue bio helper
+
+Kirill Tkhai (3):
+  block: Add support for REQ_OP_ALLOCATE
+  loop: Forward REQ_OP_ALLOCATE into fallocate(0)
+  ext4: Notify block device about alloc-assigned blk
+
+ block/blk-core.c          |   5 ++
+ block/blk-lib.c           | 115 +++++++++++++++++++++++++++++++-------
+ block/blk-merge.c         |  21 +++++++
+ block/blk-settings.c      |  19 +++++++
+ block/blk-zoned.c         |   1 +
+ block/bounce.c            |   1 +
+ drivers/block/loop.c      |   5 ++
+ fs/ext4/ext4.h            |   2 +
+ fs/ext4/extents.c         |  12 +++-
+ include/linux/bio.h       |   9 ++-
+ include/linux/blk_types.h |   2 +
+ include/linux/blkdev.h    |  55 ++++++++++++++----
+ 12 files changed, 210 insertions(+), 37 deletions(-)
+
 -- 
-2.22.1
+2.22.0
 
