@@ -2,111 +2,122 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B483DC2BA2B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C00C2BA80
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:11:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8291820787
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:10:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Mls9pi13"
+	by mail.kernel.org (Postfix) with ESMTP id 5EDC820781
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 09:11:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbgDFJKG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 05:10:06 -0400
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:51998 "EHLO
-        esa1.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726663AbgDFJKG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 05:10:06 -0400
-X-Greylist: delayed 425 seconds by postgrey-1.27 at vger.kernel.org; Mon, 06 Apr 2020 05:10:05 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1586164206;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7NHbB9BsfudNyev+nKE/1EJEWNA2WPr4keczYxzGBKc=;
-  b=Mls9pi13hIp6oRyD0aZ9Et2Yjxajmbo8u2d/ghjsECQbqpC8TxpQmglM
-   lMAnPnNGUX1qZl3plS3Vve76L8JiyNzJunfmTmln8uRSLW5UvAX+e9khn
-   fCHsmdrykQM05j6G4XYI3+GZRptZIqhWKPN7DuZsBXyFRtABKWxySWZv/
-   I=;
-Authentication-Results: esa1.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=roger.pau@citrix.com; spf=Pass smtp.mailfrom=roger.pau@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible
-Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
-  roger.pau@citrix.com designates 162.221.158.21 as permitted
-  sender) identity=mailfrom; client-ip=162.221.158.21;
-  receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="roger.pau@citrix.com";
-  x-conformance=sidf_compatible; x-record-type="v=spf1";
-  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
-  ip4:168.245.78.127 ~all"
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@mail.citrix.com) identity=helo;
-  client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
-  envelope-from="roger.pau@citrix.com";
-  x-sender="postmaster@mail.citrix.com";
-  x-conformance=sidf_compatible
-IronPort-SDR: sfPgwiT0RDqtOpIx8BpsOCGBpAYrEzJ8byAffdFSgPLT9oxrM1pLGxV1YpTJCLmm+D5/KjNwTc
- 4UshXQsueyUHBq1QxYi9jubJ5prBv2AV1sK3XdnCfpQ5nvwcoAgTHamzh1kzvb9Msqal7Yq7ju
- qkhW17FkqJq6jUNmkeLMrG3DrtG4VCWd4pl8ZCS6WZTcR9wCZPK+yuKDj30clW5wGNYiAOrJNF
- kaoORMq+5pf6CxfxkMZjiwGVrinU52Ub1BjdqlJR6wPq5FyizUbdSQa9w4AHuCK67Qe5lhHDdp
- LIU=
-X-SBRS: 2.7
-X-MesageID: 15445372
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.72,350,1580792400"; 
-   d="scan'208";a="15445372"
-Date:   Mon, 6 Apr 2020 11:02:50 +0200
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Juergen Gross <jgross@suse.com>
-CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, <stable@vger.kernel.org>
-Subject: Re: [PATCH] xen/blkfront: fix memory allocation flags in
- blkfront_setup_indirect()
-Message-ID: <20200406090250.GX28601@Air-de-Roger>
-References: <20200403090034.8753-1-jgross@suse.com>
+        id S1726663AbgDFJLH convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 05:11:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36872 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726689AbgDFJLH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Apr 2020 05:11:07 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id B8358AC40;
+        Mon,  6 Apr 2020 09:11:03 +0000 (UTC)
+From:   Nicolai Stange <nstange@suse.de>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, mhocko@suse.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [RFC 3/3] block: avoid deferral of blk_release_queue() work
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+        <20200402000002.7442-4-mcgrof@kernel.org>
+        <774a33e8-43ba-143f-f6fd-9cb0ae0862ac@acm.org>
+        <87o8saj62m.fsf@suse.de>
+Date:   Mon, 06 Apr 2020 11:11:01 +0200
+In-Reply-To: <87o8saj62m.fsf@suse.de> (Nicolai Stange's message of "Thu, 02
+        Apr 2020 16:49:37 +0200")
+Message-ID: <87eet1j7x6.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200403090034.8753-1-jgross@suse.com>
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 11:00:34AM +0200, Juergen Gross wrote:
-> Commit 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for
-> large array allocation") didn't fix the issue it was meant to, as the
-> flags for allocating the memory are GFP_NOIO, which will lead the
-> memory allocation falling back to kmalloc().
-> 
-> So instead of GFP_NOIO use GFP_KERNEL and do all the memory allocation
-> in blkfront_setup_indirect() in a memalloc_noio_{save,restore} section.
-> 
-> Fixes: 1d5c76e664333 ("xen-blkfront: switch kcalloc to kvcalloc for large array allocation")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Juergen Gross <jgross@suse.com>
+Nicolai Stange <nstange@suse.de> writes:
 
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
+> Bart Van Assche <bvanassche@acm.org> writes:
+>
+>> The description of this patch mentions a single blk_release_queue() call
+>> that happened in the past from a context from which sleeping is not
+>> allowed and from which sleeping is allowed today. Have all other
+>> blk_release_queue() / blk_put_queue() calls been verified to see whether
+>> none of these happens from a context from which sleeping is not allowed?
+>
+> I've just done this today and found the following potentially
+> problematic call paths to blk_put_queue().
+>
+> 1.) mem_cgroup_throttle_swaprate() takes a spinlock and
+>     calls blkcg_schedule_throttle()->blk_put_queue().
+>
+>     Also note that AFAICS mem_cgroup_try_charge_delay() can be called
+>     with GFP_ATOMIC.
+>
+> 2.) scsi_unblock_requests() gets called from a lot of drivers and
+>     invoke blk_put_queue() through
+>     scsi_unblock_requests() -> scsi_run_host_queues() ->
+>     scsi_starved_list_run() -> blk_put_queue().
+>
+>     Most call sites are fine, the ones which are not are:
+>     a.) pmcraid_complete_ioa_reset(). This gets assigned
+>         to struct pmcraid_cmd's ->cmd_done and later invoked
+>         under a spinlock.
+>
+>     b.) qla82xx_fw_dump() and qla8044_fw_dump().
+>         These can potentially block w/o this patch already,
+>         because both invoke qla2x00_wait_for_chip_reset().
+>
+> 	However, they can get called from IRQ context. For example,
+>         qla82xx_intr_handler(), qla82xx_msix_default() and
+>         qla82xx_poll() call qla2x00_async_event(), which calls
+>         ->fw_dump().
+>
+> 	The aforementioned functions can also reach ->fw_dump() through
+>         qla24xx_process_response_queue()->qlt_handle_abts_recv()->qlt_response_pkt_all_vps()
+>         ->qlt_response_pkt()->qlt_handle_abts_completion()->qlt_chk_unresolv_exchg()
+>         -> ->fw_dump().
+>
+> 	But I'd consider this a problem with the driver -- either
+> 	->fw_dump() can sleep and must not be called from IRQ context
+>         or they must not invoke qla2x00_wait_for_hba_ready().
+>
+>
+> (I can share the full analysis, but it's lengthy and contains nothing
+>  interesting except for what is listed above).
+>
+>
+> One final note though: If I'm not mistaken, then the final
+> blk_put_queue() can in principle block even today, simply by virtue of
+> the kernfs operations invoked through
+> kobject_put()->kobject_release()->kobject_cleanup()->kobject_del()
+> ->sysfs_remove_dir()->kernfs_remove()->mutex_lock()?\
 
-Thanks!
+That's wrong, I missed kobject_del() invocation issued from
+blk_unregister_queue(). Thus, blk_put_queue() in its current
+implementation won't ever block.
+
+Thanks,
+
+Nicolai
+
+-- 
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
+(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
