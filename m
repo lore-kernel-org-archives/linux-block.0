@@ -2,51 +2,51 @@ Return-Path: <SRS0=Ayt2=5W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C858EC38A30
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 17:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15BDC2BA1B
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:10:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3D5920748
-	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 17:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0121206F8
+	for <linux-block@archiver.kernel.org>; Mon,  6 Apr 2020 18:10:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="m4RQ3sbP"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="tHxSAV3p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727464AbgDFR7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 13:59:30 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:51834 "EHLO
+        id S1726521AbgDFSK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 14:10:58 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:56096 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727226AbgDFR71 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 13:59:27 -0400
+        with ESMTP id S1726494AbgDFSK6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 14:10:58 -0400
 Received: from dede-linux.corp.microsoft.com (unknown [131.107.147.242])
-        by linux.microsoft.com (Postfix) with ESMTPSA id BFB87207295F;
-        Mon,  6 Apr 2020 10:59:25 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BFB87207295F
+        by linux.microsoft.com (Postfix) with ESMTPSA id BF78F2072955;
+        Mon,  6 Apr 2020 11:10:56 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BF78F2072955
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1586195965;
-        bh=FoQEwrrWn/d3Fno/jqMS38zWmUVRke4mJOAaLbjRrY8=;
+        s=default; t=1586196656;
+        bh=1PF/ShPN4ojALJPkpCvH1fBtV3IR9aL7+GRD4lEL+Es=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m4RQ3sbP70RlGztgdMxmZ1GdO/7pMzX5CS1tYBSXsCOJpoP7e1ve+lJcF3GYwxQD8
-         tkzj+maTzWyww5Ar6mLg+n8hu9HtzFKtardh95LU0IYloWf3zccicB1OxAqNKsdpFP
-         uSgRwSh8rq383RkGV8mLYbX13r2wuAa/QB2mDcTg=
+        b=tHxSAV3pEOehnWFW005aGYZlOjXJHKK5POcPTrVr57M7uFb/4ccm3/C2jNPlAW5EV
+         xAz6ry9+pEQV0BH02pEJtzgVwPXpAnfKv6sv3am+j3XvXs6G3pF/It2seODlHOVhph
+         o48zEmIM6iV2V93zlXk+3gDIt5nfUeOOanQCmogs=
 From:   deven.desai@linux.microsoft.com
 To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
         jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
         linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dm-devel@redhat.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
         linux-block@vger.kernel.org
 Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
-        mdsakib@microsoft.com, sashal@kernel.org,
-        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com
-Subject: [PATCH 11/11] cleanup: uapi/linux/audit.h
-Date:   Mon,  6 Apr 2020 10:59:19 -0700
-Message-Id: <20200406175919.1023205-13-deven.desai@linux.microsoft.com>
+        sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
+        nramas@linux.microsoft.com, mdsakib@linux.microsoft.com
+Subject: [RESEND PATCH 01/11] scripts: add ipe tooling to generate boot policy
+Date:   Mon,  6 Apr 2020 11:10:35 -0700
+Message-Id: <20200406181045.1024164-2-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200406175919.1023205-1-deven.desai@linux.microsoft.com>
-References: <20200406175919.1023205-1-deven.desai@linux.microsoft.com>
+In-Reply-To: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
+References: <20200406181045.1024164-1-deven.desai@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -56,71 +56,205 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Remove trailing whitespaces and align the integrity #defines in
-linux/uapi/audit.h
+Add a tool for the generation of an IPE policy to be compiled into the
+kernel. This policy will be enforced until userland deploys and activates
+a new policy.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 ---
- include/uapi/linux/audit.h | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ scripts/Makefile              |   1 +
+ scripts/ipe/Makefile          |   2 +
+ scripts/ipe/polgen/.gitignore |   1 +
+ scripts/ipe/polgen/Makefile   |   7 ++
+ scripts/ipe/polgen/polgen.c   | 136 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 147 insertions(+)
+ create mode 100644 scripts/ipe/Makefile
+ create mode 100644 scripts/ipe/polgen/.gitignore
+ create mode 100644 scripts/ipe/polgen/Makefile
+ create mode 100644 scripts/ipe/polgen/polgen.c
 
-diff --git a/include/uapi/linux/audit.h b/include/uapi/linux/audit.h
-index 4e0122a0ed0c..d642ade068b5 100644
---- a/include/uapi/linux/audit.h
-+++ b/include/uapi/linux/audit.h
-@@ -48,7 +48,7 @@
-  * 2500 - 2999 future user space (maybe integrity labels and related events)
-  *
-  * Messages from 1000-1199 are bi-directional. 1200-1299 & 2100 - 2999 are
-- * exclusively user space. 1300-2099 is kernel --> user space 
-+ * exclusively user space. 1300-2099 is kernel --> user space
-  * communication.
-  */
- #define AUDIT_GET		1000	/* Get status */
-@@ -78,7 +78,7 @@
- #define AUDIT_LAST_USER_MSG	1199
- #define AUDIT_FIRST_USER_MSG2	2100	/* More user space messages */
- #define AUDIT_LAST_USER_MSG2	2999
-- 
-+
- #define AUDIT_DAEMON_START      1200    /* Daemon startup record */
- #define AUDIT_DAEMON_END        1201    /* Daemon normal stop record */
- #define AUDIT_DAEMON_ABORT      1202    /* Daemon error stop record */
-@@ -139,20 +139,20 @@
- #define AUDIT_MAC_CALIPSO_ADD	1418	/* NetLabel: add CALIPSO DOI entry */
- #define AUDIT_MAC_CALIPSO_DEL	1419	/* NetLabel: del CALIPSO DOI entry */
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 5e75802b1a44..9338017a3b6e 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -38,6 +38,7 @@ hostprogs += unifdef
+ subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
+ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
++subdir-$(CONFIG_SECURITY_IPE) += ipe
  
--#define AUDIT_FIRST_KERN_ANOM_MSG   1700
--#define AUDIT_LAST_KERN_ANOM_MSG    1799
--#define AUDIT_ANOM_PROMISCUOUS      1700 /* Device changed promiscuous mode */
--#define AUDIT_ANOM_ABEND            1701 /* Process ended abnormally */
--#define AUDIT_ANOM_LINK		    1702 /* Suspicious use of file links */
--#define AUDIT_ANOM_CREAT	    1703 /* Suspicious file creation */
--#define AUDIT_INTEGRITY_DATA	    1800 /* Data integrity verification */
--#define AUDIT_INTEGRITY_METADATA    1801 /* Metadata integrity verification */
--#define AUDIT_INTEGRITY_STATUS	    1802 /* Integrity enable status */
--#define AUDIT_INTEGRITY_HASH	    1803 /* Integrity HASH type */
--#define AUDIT_INTEGRITY_PCR	    1804 /* PCR invalidation msgs */
--#define AUDIT_INTEGRITY_RULE	    1805 /* policy rule */
--#define AUDIT_INTEGRITY_EVM_XATTR   1806 /* New EVM-covered xattr */
--#define AUDIT_INTEGRITY_POLICY_RULE 1807 /* IMA policy rules */
-+#define AUDIT_FIRST_KERN_ANOM_MSG	1700
-+#define AUDIT_LAST_KERN_ANOM_MSG	1799
-+#define AUDIT_ANOM_PROMISCUOUS		1700 /* Device changed promiscuous mode */
-+#define AUDIT_ANOM_ABEND		1701 /* Process ended abnormally */
-+#define AUDIT_ANOM_LINK			1702 /* Suspicious use of file links */
-+#define AUDIT_ANOM_CREAT		1703 /* Suspicious file creation */
-+#define AUDIT_INTEGRITY_DATA		1800 /* Data integrity verification */
-+#define AUDIT_INTEGRITY_METADATA	1801 /* Metadata integrity verification */
-+#define AUDIT_INTEGRITY_STATUS		1802 /* Integrity enable status */
-+#define AUDIT_INTEGRITY_HASH		1803 /* Integrity HASH type */
-+#define AUDIT_INTEGRITY_PCR		1804 /* PCR invalidation msgs */
-+#define AUDIT_INTEGRITY_RULE		1805 /* policy rule */
-+#define AUDIT_INTEGRITY_EVM_XATTR	1806 /* New EVM-covered xattr */
-+#define AUDIT_INTEGRITY_POLICY_RULE	1807 /* IMA policy rules */
- #define AUDIT_INTEGRITY_POLICY_LOAD	1808 /* IPE Policy Load */
- #define AUDIT_INTEGRITY_POLICY_ACTIVATE	1809 /* IPE Policy Activation */
- #define AUDIT_INTEGRITY_EVENT		1810 /* IPE Evaluation Event */
+ # Let clean descend into subdirs
+ subdir-	+= basic dtc gdb kconfig mod
+diff --git a/scripts/ipe/Makefile b/scripts/ipe/Makefile
+new file mode 100644
+index 000000000000..e87553fbb8d6
+--- /dev/null
++++ b/scripts/ipe/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++subdir-y := polgen
+diff --git a/scripts/ipe/polgen/.gitignore b/scripts/ipe/polgen/.gitignore
+new file mode 100644
+index 000000000000..80f32f25d200
+--- /dev/null
++++ b/scripts/ipe/polgen/.gitignore
+@@ -0,0 +1 @@
++polgen
+diff --git a/scripts/ipe/polgen/Makefile b/scripts/ipe/polgen/Makefile
+new file mode 100644
+index 000000000000..a519b594e13c
+--- /dev/null
++++ b/scripts/ipe/polgen/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++hostprogs-y	:= polgen
++HOST_EXTRACFLAGS += \
++	-I$(srctree)/include \
++	-I$(srctree)/include/uapi \
++
++always		:= $(hostprogs-y)
+diff --git a/scripts/ipe/polgen/polgen.c b/scripts/ipe/polgen/polgen.c
+new file mode 100644
+index 000000000000..a80fffe1b27c
+--- /dev/null
++++ b/scripts/ipe/polgen/polgen.c
+@@ -0,0 +1,136 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include <stdlib.h>
++#include <stddef.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
++
++static void usage(const char *const name)
++{
++	printf("Usage: %s OutputFile (PolicyFile)\n", name);
++	exit(EINVAL);
++}
++
++static int policy_to_buffer(const char *pathname, char **buffer, size_t *size)
++{
++	int rc = 0;
++	FILE *fd;
++	char *lbuf;
++	size_t fsize;
++	size_t read;
++
++	fd = fopen(pathname, "r");
++	if (!fd) {
++		rc = errno;
++		goto out;
++	}
++
++	fseek(fd, 0, SEEK_END);
++	fsize = ftell(fd);
++	rewind(fd);
++
++	lbuf = malloc(fsize);
++	if (!lbuf) {
++		rc = ENOMEM;
++		goto out_close;
++	}
++
++	read = fread((void *)lbuf, sizeof(*lbuf), fsize, fd);
++	if (read != fsize) {
++		rc = -1;
++		goto out_free;
++	}
++
++	*buffer = lbuf;
++	*size = fsize;
++	fclose(fd);
++
++	return rc;
++
++out_free:
++	free(lbuf);
++out_close:
++	fclose(fd);
++out:
++	return rc;
++}
++
++static int write_boot_policy(const char *pathname, const char *buf, size_t size)
++{
++	FILE *fd;
++	size_t i;
++
++	fd = fopen(pathname, "w");
++	if (!fd)
++		goto err;
++
++	fprintf(fd, "/* This file is automatically generated.");
++	fprintf(fd, " Do not edit. */\n");
++	fprintf(fd, "#include <stddef.h>\n");
++	fprintf(fd, "const char *const ipe_boot_policy =\n");
++
++	if (!buf || size == 0) {
++		fprintf(fd, "\tNULL;\n");
++		fclose(fd);
++		return 0;
++	}
++
++	for (i = 0; i < size; ++i) {
++		if (i == 0)
++			fprintf(fd, "\t\"");
++
++		switch (buf[i]) {
++		case '"':
++			fprintf(fd, "\\\"");
++			break;
++		case '\'':
++			fprintf(fd, "'");
++			break;
++		case '\n':
++			fprintf(fd, "\\n\"\n\t\"");
++			break;
++		case '\\':
++			fprintf(fd, "\\\\");
++			break;
++		default:
++			fprintf(fd, "%c", buf[i]);
++		}
++	}
++	fprintf(fd, "\";\n");
++	fclose(fd);
++
++	return 0;
++
++err:
++	if (fd)
++		fclose(fd);
++	return errno;
++}
++
++int main(int argc, const char *argv[])
++{
++	int rc = 0;
++	size_t len = 0;
++	char *policy = NULL;
++
++	if (argc < 2)
++		usage(argv[0]);
++
++	if (argc > 2) {
++		rc = policy_to_buffer(argv[2], &policy, &len);
++		if (rc != 0)
++			goto cleanup;
++	}
++
++	rc = write_boot_policy(argv[1], policy, len);
++cleanup:
++	if (policy)
++		free(policy);
++	if (rc != 0)
++		perror("An error occurred during policy conversion: ");
++	return rc;
++}
 -- 
 2.26.0
 
