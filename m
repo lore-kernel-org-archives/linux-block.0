@@ -2,84 +2,122 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D75ACC2D0EC
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 20:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7793C2BB54
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 21:32:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E3322074B
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 20:43:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YIeRtzS9"
+	by mail.kernel.org (Postfix) with ESMTP id C475920748
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 21:32:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbgDGUnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 16:43:22 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:43505 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbgDGUnV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 16:43:21 -0400
-Received: by mail-pl1-f196.google.com with SMTP id z6so188045plk.10
-        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2020 13:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=lAoleMRuYnqDdpdbAtO8SSxhrald+xVhoPKw4jheceE=;
-        b=YIeRtzS9twKbUESIFLeTvVmePNQGmVB0TqEOvrqnh5PaJul/yc2RhdgYfyy+ecorbC
-         gZSXyE/OLhssrN29ZkXIV0vK89CSR5cri+4OP13XE7o4c4wcuhvZPi1LkhKV+8Ltdc8o
-         O2uAytqJnStS63Bjfb2soyRqOeDJWzGgcS+t4kcRwavRanWEBt1W23ORv7zslQFspozf
-         pvdJVaT4SFvwzsWGJSAskBD63qa1WEvsG0XeXrLSdizpIJkfaW2tIeWbleBTfXS/oKXw
-         nFST4M+r2m9u3HY+Q9IhrflIxYEwtsQYAjtl587QZTq0cZ9lsRKtIWvIsg5T3QtNrOJS
-         YXlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lAoleMRuYnqDdpdbAtO8SSxhrald+xVhoPKw4jheceE=;
-        b=FLpA5b6c3o11V6iFh39rRcr03a5oUuX1yWSsRFlRT/sT2x9NRHl8pIrBaOE/td3JaP
-         +wn+NaLCUc/LE8PpmKQ+lYHAgCF2rv7NcrYDmFCUuvUKyrhvtd3XGllDWRn7Vd4rGmz/
-         Z33IbamZQbrarH/x994pH4+rXkv2LB1fJ3oVMbGrPN2lNXvzwm1mnKRvzGgkWsptZIDp
-         x7lnhAg9P3qiPUrC13G40Vr5SjDzYNE5BiZVST31C3MsIaZqnlALC6BTAZYnYR0K9k7a
-         +MiKFFMX95ftn8nk6f+2i9bi6ymSyoTj/urXWRbnLPjMGZPacL4kgEHw/xo4fKd72OuO
-         nTPA==
-X-Gm-Message-State: AGi0PuZsJtvID8zFii6IDFLtKjcsznij3Lotd0tubN+nhCdeYqhO4CCJ
-        QD6SJV2dEzbSSmLHZVeudCadA9QddYBggw==
-X-Google-Smtp-Source: APiQypJwrolGH80Q3l24ZzEKdiiRwVo2QR1rXSBajy8RCChhb+dtQOEO8/NYb5BoFS8qEkPZdcSSxA==
-X-Received: by 2002:a17:90a:1f0b:: with SMTP id u11mr1299505pja.18.1586292197986;
-        Tue, 07 Apr 2020 13:43:17 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:ec7d:96d3:6e2d:dcab? ([2605:e000:100e:8c61:ec7d:96d3:6e2d:dcab])
-        by smtp.gmail.com with ESMTPSA id z12sm15233008pfj.144.2020.04.07.13.43.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 13:43:16 -0700 (PDT)
-Subject: Re: [PATCH] block: fix busy device checking in blk_drop_partitions
-To:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-References: <20200404065120.655735-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0efdeebf-2d5e-b025-34e2-6d29c6b4e992@kernel.dk>
-Date:   Tue, 7 Apr 2020 13:43:15 -0700
+        id S1726437AbgDGVcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 17:32:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38238 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726395AbgDGVcO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Apr 2020 17:32:14 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037L4hap104014;
+        Tue, 7 Apr 2020 17:31:59 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hh5qp2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 17:31:59 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037LRsL0015276;
+        Tue, 7 Apr 2020 17:31:59 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hh5qng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 17:31:59 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037LUbr1023206;
+        Tue, 7 Apr 2020 21:31:57 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma04dal.us.ibm.com with ESMTP id 306hv69vxa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 21:31:57 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037LVuCl12845986
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Apr 2020 21:31:56 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C7712B2066;
+        Tue,  7 Apr 2020 21:31:56 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 66031B2068;
+        Tue,  7 Apr 2020 21:31:55 +0000 (GMT)
+Received: from swastik.ibm.com (unknown [9.65.198.190])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Apr 2020 21:31:55 +0000 (GMT)
+Subject: Re: [RFC PATCH v2 00/12] Integrity Policy Enforcement LSM (IPE)
+To:     deven.desai@linux.microsoft.com
+Cc:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
+        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, tyhicks@linux.microsoft.com,
+        pasha.tatashin@soleen.com, sashal@kernel.org,
+        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com,
+        mdsakib@linux.microsoft.com, linux-kernel@vger.kernel.org
+References: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
+From:   Nayna <nayna@linux.vnet.ibm.com>
+Message-ID: <c1466cc8-8a08-708a-4629-234485bb833e@linux.vnet.ibm.com>
+Date:   Tue, 7 Apr 2020 17:31:54 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200404065120.655735-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-07_09:2020-04-07,2020-04-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 clxscore=1011 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=1 mlxscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004070166
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/3/20 11:51 PM, Christoph Hellwig wrote:
-> bd_super is only set by get_tree_bdev and mount_bdev, and thus not by
-> other openers like btrfs or the XFS realtime and log devices, as well as
-> block devices directly opened from user space.  Check bd_openers
-> instead.
 
-Applied, thanks.
+On 4/6/20 6:14 PM, deven.desai@linux.microsoft.com wrote:
+> From: Deven Bowers <deven.desai@linux.microsoft.com>
+>
+> Changelog:
+> ------------------------------------
+>
+> v1: Introduced
+>
+> v2:
+>    Split the second patch of the previous series into two.
+>    Minor corrections in the cover-letter and documentation
+>    comments regarding CAP_MAC_ADMIN checks in IPE.
+>
+> Overview:
+> ------------------------------------
+> IPE is a Linux Security Module, which allows for a configurable
+> policy to enforce integrity requirements on the whole system. It
+> attempts to solve the issue of Code Integrity: that any code being
+> executed (or files being read), are identical to the version that
+> was built by a trusted source.
 
--- 
-Jens Axboe
+Can you please clarify the "motivation" for this patch set more clearly? 
+It seems to define a policy layer on top of dm-verity, which may be 
+compiled into the kernel. In the motivation, can you please also make it 
+explicit why existing mechanisms cannot be extended to achieve your purpose?
+
+Also, AFIK, the changelog should be moved to the end of the patch 
+description.
+
+Thanks & Regards,
+
+     - Nayna
 
