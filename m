@@ -2,118 +2,104 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2609C2BA80
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 19:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A0C5C2D0EC
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 19:24:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EF9620768
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 19:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586286014;
-	bh=Lde45rsVR94vCtmaheBgWUpbSHu4NQK23JdF7kYO79Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Rd72OcnFvDsb8E7lw9NfpxzoGdx06AdzqZ290JL9dPabgKn0GuBLb3/whYtjysa7n
-	 heTYh1Ycv5pemclh63oVboJN51uEnVUTGSEdFeWXlgyX8YU6oaQecZ+W7vp7q628SN
-	 Ut56BqVJM9rJ9yrssQi3lKHTlDfC5ju0vA+/KZKE=
+	by mail.kernel.org (Postfix) with ESMTP id 4DD4D2075E
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 19:24:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="umqPoRxN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbgDGTAK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 15:00:10 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:44153 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgDGTAK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 15:00:10 -0400
-Received: by mail-pg1-f196.google.com with SMTP id n13so725394pgp.11;
-        Tue, 07 Apr 2020 12:00:08 -0700 (PDT)
+        id S1726628AbgDGTYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 15:24:33 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:42992 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbgDGTYd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 15:24:33 -0400
+Received: by mail-pl1-f194.google.com with SMTP id v2so228251plp.9
+        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2020 12:24:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6GN8OH2/jW9JwHGhBC4VMasJH95BH8giiJV5mLcCQBQ=;
+        b=umqPoRxNCHNRpmbH80vy5O201YJUULc6hqGly7WERsycQLmJAhO/fVVs0NUxbo0l+E
+         Ei4s58f5tNqvMgLIcwKgvVEnW0BeTKp+LR2xj28quO7X9xzHL1qheZq8K+9zq3fpFXT1
+         7Bz/U4ffV/4gQmnphXeuqNVVISlhLjUOwzYBbP8l2iA8/Vk4T8zzQ40zx8ygNihSUJ3K
+         iIA1RizX4q3JVeW6dTXuVhqd2CbOnVNHjczZklP/lu6OnSsNR+gGdqswsbT5kB8IcXz8
+         uAWz543RkO8Mz2nU8LVlHh6qdTEUVNFTbPhnDQzkXW6hAGebrFdQRcxEKFYqM9Mrasf3
+         aTLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=8g+YOhto+FId7IOGUsnB9ouZCy1lzdR5Jj8DGscjgPI=;
-        b=lZ1KjvpXvtj33QhvN+6L47Fl7nyV9BQgah/WiiuNfrJRnXXoKpzRIASMmJI1U6DJfY
-         Nspm7KlQkEt9JzC7SRfIaVSOe1OehX5PlhgO0i1EM7L2HwITRo0Nk6y5o2ZVyMPrrcb/
-         iavfpmP/lhUyvEXk4x17fzVzR+zJ4RSxho4zpA4x/wERThmineXfAH3Ra1HtldHJKYJ6
-         Csg3C6XedQAV6sqrYlv1bOw7g9HOntHqEP1TfRUnc869NpCp/TJKIu1VODW7ukO261FL
-         QeZi45Au/nwwBrgThMeuD5kqtCsRYeVm98qFKaZLciXpJHPtnPaRiPLZO/VHBGSrIf0c
-         rcTg==
-X-Gm-Message-State: AGi0PubnlF2qgaelbQlFdCLc6H5OXhjdRcsOyGR2mC0TQ1E4yIiwJrwD
-        WzGrP1UDE0eaDI1TRQMDJrI=
-X-Google-Smtp-Source: APiQypKZLouSqK9lQOJSsWNqRvqKEIfChEwiU3Z9h3IB3dcC5wNVv88wHOM+aJPwonteOJ90kXqfDQ==
-X-Received: by 2002:aa7:96c1:: with SMTP id h1mr3991833pfq.212.1586286007677;
-        Tue, 07 Apr 2020 12:00:07 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id i2sm14616408pfr.203.2020.04.07.12.00.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2020 12:00:05 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 60B4B40246; Tue,  7 Apr 2020 19:00:04 +0000 (UTC)
-Date:   Tue, 7 Apr 2020 19:00:04 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        nstange@suse.de, mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 0/3] block: address blktrace use-after-free
-Message-ID: <20200407190004.GG11244@42.do-not-panic.com>
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200403081929.GC6887@ming.t460p>
- <0e753195-72fb-ce83-16a1-176f2c3cea6a@huawei.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6GN8OH2/jW9JwHGhBC4VMasJH95BH8giiJV5mLcCQBQ=;
+        b=MekVzul1qanBnGA+3un4jyuACBbcFQhUXakj3bAGgoA6LzkwQLFAa2LRSW+O3wy88m
+         h60LwVX8e94axbUO5Du5klZ6APmgcPFxc64r+a3426PmXNvTDLy/B+RMHLf/V2NRdCpc
+         DRNd0L7aHDKK0aV1gLeEHD22iXM+T48225pvIvJLIhsCNLYMzh6R4gdXlNkz77EOcZz+
+         aF44EPm1sPhRzyC2mJUwdj2bTheKoiJGsEyqwzBf7V7WaI+AeULjf0oRrEDg8sZKCkhZ
+         6JimylRowrzDPYbJ/2UOIY+V6Em9A2FXNp0Ei4eg8fzg2lqZxHw98M6boz68Fyf6pzY1
+         fEhw==
+X-Gm-Message-State: AGi0PuZ5vietNv9aMIqD7OqKX6HFCjOIP/cDNbcglrlNk7GjRgEc10ED
+        Tu9DlqiNHbQEsR2z9cXwLrts9njyycotXg==
+X-Google-Smtp-Source: APiQypJkFPl162p4/chu82kIXc2V1RKn4YeyTYS10aBaifyojwyQWsTT5b8OWXXLdeIHmi9Pnd1a7w==
+X-Received: by 2002:a17:902:b210:: with SMTP id t16mr1553926plr.71.1586287472981;
+        Tue, 07 Apr 2020 12:24:32 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:ec7d:96d3:6e2d:dcab? ([2605:e000:100e:8c61:ec7d:96d3:6e2d:dcab])
+        by smtp.gmail.com with ESMTPSA id x186sm14543759pfb.151.2020.04.07.12.24.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Apr 2020 12:24:32 -0700 (PDT)
+Subject: Re: [PATCH 1/1] s390: Cleanup removed IOSCHED_DEADLINE
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com
+References: <20200406074118.86849-1-sth@linux.ibm.com>
+ <20200406074118.86849-2-sth@linux.ibm.com>
+ <0efad2a5-90f5-8ccf-169e-9715a64a4bb0@kernel.dk>
+ <c7ac9c3c-3a1f-3ce3-acbd-422bc4206288@linux.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4a51ce19-7827-5ee6-8b06-5b814bdf503a@kernel.dk>
+Date:   Tue, 7 Apr 2020 12:24:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <c7ac9c3c-3a1f-3ce3-acbd-422bc4206288@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0e753195-72fb-ce83-16a1-176f2c3cea6a@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 07, 2020 at 10:47:01AM +0800, yukuai (C) wrote:
-> On 2020/4/3 16:19, Ming Lei wrote:
+On 4/7/20 3:01 AM, Stefan Haberland wrote:
+> Am 06.04.20 um 17:32 schrieb Jens Axboe:
+>> On 4/6/20 1:41 AM, Stefan Haberland wrote:
+>>> From: Krzysztof Kozlowski <krzk@kernel.org>
+>>>
+>>> CONFIG_IOSCHED_DEADLINE is gone since commit f382fb0bcef4 ("block:
+>>> remove legacy IO schedulers").
+>> Isn't this a leftover thing from when dasd selected deadline
+>> internally? I don't think we need this anymore, just kill the
+>> select completely.
+>>
 > 
-> > BTW, Yu Kuai posted one patch for this issue, looks that approach
-> > is simpler:
-> > 
-> > https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@huawei.com/
-> > 
-> > 
-> 
-> I think the issue might not be fixed with the patch seires.
-> 
-> At first, I think there are two key points for the issure:
-> 1. The final release of queue is delayed in a workqueue
-> 2. The creation of 'q->debugfs_dir' might failed(only if 1 exist)
-> And if we can fix any of the above problem, the UAF issue will be fixed.
-> (BTW, I did not come up with a good idea for problem 1, and my approach
-> is for problem 2.)
-> 
-> The third patch "block: avoid deferral of blk_release_queue() work" is
-> not enough to fix problem 1:
-> a. if CONFIG_DEBUG_KOBJECT_RELEASE is enable:
-> static void kobject_release(struct kref *kref)
-> {
->         struct kobject *kobj = container_of(kref, struct kobject, kref);
-> #ifdef CONFIG_DEBUG_KOBJECT_RELEASE
->         unsigned long delay = HZ + HZ * (get_random_int() & 0x3);
->         pr_info("kobject: '%s' (%p): %s, parent %p (delayed %ld)\n",
->                 ┊kobject_name(kobj), kobj, __func__, kobj->parent, delay);
->         INIT_DELAYED_WORK(&kobj->release, kobject_delayed_cleanup);
-> 
->         schedule_delayed_work(&kobj->release, delay);
-> #else
->         kobject_cleanup(kobj);
-> #endif
-> }
-> b. when 'kobject_put' is called from blk_cleanup_queue, can we make sure
-> it is the last reference?
+> Basically yes.
+> We still have the recommendation to use deadline and there are some udev
+> rules in place which select it.
+> So I thought it might be a good idea to keep the line. But I am also
+> fine to drop it completely if you prefer this.
 
-You are right, I think I know the fix for this now. Will run some more
-tests.
+I don't feel super strongly about it, but at the same time I don't
+think there's a reason for it. Besides, I think everyone has deadline
+enabled. So I guess we should just kill it.
 
-  Luis
+-- 
+Jens Axboe
+
