@@ -2,106 +2,122 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0074EC2BA80
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EFBC2BA1A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:27:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCAC0206C0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:14:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxpcWNeb"
+	by mail.kernel.org (Postfix) with ESMTP id E068B2078A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726417AbgDGCO2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 22:14:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23595 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726287AbgDGCO1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Apr 2020 22:14:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586225667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=44SXGZt0xPbhcRSOYKE7iKipjDa+yIoa6ofEFx4YQKU=;
-        b=MxpcWNebs6J+nFEIttxP1UE3I9bDm8b//vxwceR136ttkG4WlwGeAtviKCqaBk9iHwhg+9
-        NiUQHqtkmo1TVJcy/DDjRUJ3zQ/XUQxTsVHe4/xWO9zsakOLlV5QbZj9hfb/0Ht40P8/gX
-        RBhyx60iFFhPSj93x4gYh9IqUfk62nE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-5WYMe6t2MHiYUIN2w1VJzA-1; Mon, 06 Apr 2020 22:14:23 -0400
-X-MC-Unique: 5WYMe6t2MHiYUIN2w1VJzA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 958A5107ACCC;
-        Tue,  7 Apr 2020 02:14:20 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-8-35.pek2.redhat.com [10.72.8.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 191301001B28;
-        Tue,  7 Apr 2020 02:14:08 +0000 (UTC)
-Date:   Tue, 7 Apr 2020 10:14:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Salman Qazi <sqazi@google.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
-        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Tejun Heo <tj@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget
- contention
-Message-ID: <20200407021403.GB5779@localhost.localdomain>
-References: <20200402155130.8264-1-dianders@chromium.org>
- <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200403013356.GA6987@ming.t460p>
- <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
- <CAD=FV=Vsk0SjkA+DbUwJxvO6NFcr0CO9=H1FD7okJ2PxMt5pYA@mail.gmail.com>
- <20200405091446.GA3421@localhost.localdomain>
- <CAD=FV=WQZA7PGEbv_fKikGOEijP+qEEZgYXWifgjDzV6BVOUMQ@mail.gmail.com>
+        id S1726331AbgDGC1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 22:27:22 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:50364 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726287AbgDGC1W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Apr 2020 22:27:22 -0400
+Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 423317EBFF2;
+        Tue,  7 Apr 2020 12:27:06 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1jLdxB-0006Xf-Eb; Tue, 07 Apr 2020 12:27:05 +1000
+Date:   Tue, 7 Apr 2020 12:27:05 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, hch@lst.de,
+        darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        hannes@cmpxchg.org, khlebnikov@yandex-team.ru, ajay.joshi@wdc.com,
+        bvanassche@acm.org, arnd@arndb.de, houtao1@huawei.com,
+        asml.silence@gmail.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
+Message-ID: <20200407022705.GA24067@dread.disaster.area>
+References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
+ <20200402224124.GK10737@dread.disaster.area>
+ <yq1imih4aj0.fsf@oracle.com>
+ <20200403025757.GL10737@dread.disaster.area>
+ <yq1a73t44h1.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAD=FV=WQZA7PGEbv_fKikGOEijP+qEEZgYXWifgjDzV6BVOUMQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <yq1a73t44h1.fsf@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
+        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
+        a=7-415B0cAAAA:8 a=HsR5391j3YDOVBnZw_AA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 05, 2020 at 09:26:39AM -0700, Doug Anderson wrote:
-> Hi,
+On Thu, Apr 02, 2020 at 08:45:30PM -0700, Martin K. Petersen wrote:
 > 
-> On Sun, Apr 5, 2020 at 2:15 AM Ming Lei <ming.lei@redhat.com> wrote:
+> Dave,
+> 
+> > .... because when backed by thinp storage, plumbing user level
+> > fallocate() straight through from the filesystem introduces a
+> > trivial, user level storage DOS vector....
 > >
-> > @@ -103,6 +104,9 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> >                 rq = e->type->ops.dispatch_request(hctx);
-> >                 if (!rq) {
-> >                         blk_mq_put_dispatch_budget(hctx);
-> > +
-> > +                       if (e->type->ops.has_work && e->type->ops.has_work(hctx))
-> > +                               blk_mq_delay_run_hw_queue(hctx, BLK_MQ_BUDGET_DELAY);
+> > i.e. a user can just fallocate a bunch of files and, because the
+> > filesystem can do that instantly, can also run the back end array
+> > out of space almost instantly. Storage admins are going to love
+> > this!
 > 
-> To really close the race, don't we need to run all the queues
-> associated with the hctx?  I haven't traced it through, but I've been
-> assuming that the multiple "hctx"s associated with the same queue will
-> have the same budget associated with them and thus they can block each
-> other out.
+> In the standards space, the allocation concept was mainly aimed at
+> protecting filesystem internals against out-of-space conditions on
+> devices that dedup identical blocks and where simply zeroing the blocks
+> therefore is ineffective.
 
-Yeah, we should run all hctxs which share the same budget space.
+Um, so we're supposed to use space allocation before overwriting
+existing metadata in the filesystem? So that the underlying storage
+can reserve space for it before we write it? Which would mean we
+have to issue a space allocation before we dirty the metadata, which
+means before we dirty any metadata in a transaction. Which means
+we'll basically have to redesign the filesystems from the ground up,
+yes?
 
-Also, in theory, we don't have to add the delay, however BFQ may plug the
-dispatch for 9 ms, so looks delay run queue is required.
+> So far we have mainly been talking about fallocate on block devices.
 
-thanks,
-Ming
+You might be talking about filesystem metadata and block devices,
+but this patchset ends up connecting ext4's user data fallocate() to
+the block device, thereby allowing users to reserve space directly
+in the underlying block device and directly exposing this issue to
+userspace.
 
+I can only go on what is presented to me in patches - this patchset
+nothing to do with filesystem metadata nor preventing ENOSPC issues
+with internal filesystem updates.
+
+XFS is no different to ext4 or btrfs here - the filesystem doesn't
+matter because all of them can fallocate() terabytes of space in
+a second or two these days....
+
+> How XFS decides to enforce space allocation policy and potentially
+> leverage this plumbing is entirely up to you.
+
+Do I understand this correctly? i.e. that it is the filesystem's
+responsibility to prevent users from preallocating more space than
+exists in an underlying storage pool that has been intentionally
+hidden from the filesystem so it can be underprovisioned?
+
+IOWs, I'm struggling to understand exactly how the "standards space"
+think filesystems are supposed to be using this feature whilst also
+preventing unprivileged exhaustion of a underprovisioned storage
+pool they know nothing about.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
