@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6FDC2BB1D
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 01:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8D3C2BA1B
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 01:17:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 326E12078A
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 01:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70EAB2076E
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 01:17:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BidS1jBI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YjSu3/0W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbgDGBHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 21:07:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33151 "EHLO
+        id S1726706AbgDGBQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 21:16:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50141 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726627AbgDGBHw (ORCPT
+        by vger.kernel.org with ESMTP id S1726678AbgDGBQw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Apr 2020 21:07:52 -0400
+        Mon, 6 Apr 2020 21:16:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586221670;
+        s=mimecast20190719; t=1586222211;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
         bh=s9Mom4OhtTxtDHxzUnnXxvRU3zaONixqwgs5hBxczCA=;
-        b=BidS1jBIpd+5Cg0iQZqflYOERPVIFORW1fQk1ajjsQG2CQgHUdPM/lXtkxzKDmYyaZIijS
-        /+cQ+aluZ29i8a5r5QuJ8ddcWvYcryKbenW5QZU9fdiM5Fhxr5TFwaIHtEsPeKle6hb3ww
-        sbHlsMpQB25Vl0pFvGfRC+6M6EnpZbo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-DHjcJjp_OUm97hjEJP5FRA-1; Mon, 06 Apr 2020 21:07:48 -0400
-X-MC-Unique: DHjcJjp_OUm97hjEJP5FRA-1
-Received: by mail-wr1-f72.google.com with SMTP id u16so849880wrp.14
-        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2020 18:07:48 -0700 (PDT)
+        b=YjSu3/0WrhQRa9300d9X1/dg1eyVQbA/pfeeqxpkM23cSjJ6XWE1qLFkzGXAinQNEd1UW1
+        LVkJ1hPZXAfcbtoA43Hol2D4iTmqp/PRbJZptvzE4PgDwilv+TniB55cTm9BJkFPznI2YV
+        73ERgL9Yul2CrzbMRBUy9iKCA0Xn+bU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-zWyqsgvOPCCSdt3lntq8Ww-1; Mon, 06 Apr 2020 21:16:49 -0400
+X-MC-Unique: zWyqsgvOPCCSdt3lntq8Ww-1
+Received: by mail-wr1-f70.google.com with SMTP id d4so862857wrq.10
+        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2020 18:16:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
         bh=s9Mom4OhtTxtDHxzUnnXxvRU3zaONixqwgs5hBxczCA=;
-        b=oycu3xs1AU/QelpNJs6bWYNyhWrQeZTtNxmLJwCW5wefsTpwFHRGbzoZGzSl4/bJZp
-         wMbOw4xGkt4WG5OY3cTb+FcfOSNpmxT/3eT+SXZGH9dAlsum+njFMBOaa+VWRA8ACpef
-         U9TKC22IeaK3gs8Of18anWuRq4AbQ9D0pP4PeahEzZE3MlkCFL1xVGUGl/96TFMuJmbD
-         PF38v4J6PSetKnBuh15JBfaDdYQKqTxn9MnCH9/F4aPz99/roGMjzmKnb+nNptUoXJNf
-         qbZ2B9mpNCSOxWjrAKNjbOQ1l/s3iQhatdwi7MOCcFcWCxbL+GcPGPqsvlEdo1A4aa+p
-         TSLA==
-X-Gm-Message-State: AGi0Publg+VnMnS38Jh56pQhvLUqWR77xhWU1k0ZOVaKnc6wZhP99emI
-        bB2fFTpTbNNhE3/D140lno365dHr8/d3PcCVuQAVzbipDGb3kBf6JPNidnPkgYLCcNKMG6x0iJX
-        EWZptGhyVf9ylfjEvDO77gEI=
-X-Received: by 2002:a1c:1fca:: with SMTP id f193mr2011209wmf.5.1586221667501;
-        Mon, 06 Apr 2020 18:07:47 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI2kbXjpwa81pslGC91wSJV93qqpn7rHzCxCLN6d5M/mFdqTlYs1aMMNlbk/4ocXf6OPo/tow==
-X-Received: by 2002:a1c:1fca:: with SMTP id f193mr2011192wmf.5.1586221667224;
-        Mon, 06 Apr 2020 18:07:47 -0700 (PDT)
+        b=npmQLDYMi9VdqJnqNbJ2FTlD0YXwVU+1sI0kMHn3F5ph/LyDDoKP3c+XQ/25rvnknr
+         gU0i1clr0Bl6Agf7CbVdDAFKpHikxwYIvUbyByUNeN6Lyq3ckkI76J9cEUZ6diAwlPqP
+         sZxhXK1L9/i578muH6kETfz2dza0wluJdlxiWwzG86mKkWLbydPgCb4HV87pI4Yfplzf
+         sPn56ZjkVsUla65dRunrhHTNlb/t3QsrI87/tEtQCwKR61sRHdMB025kE/xtpsIZBVJ/
+         MI9olBogCKts4MbG8P+26uQK9xSP4iI8I6xZVPTyJ77oZS19DoOBju6k16SD1KMpqW0J
+         fZAA==
+X-Gm-Message-State: AGi0PuZ+8nPbviRgagJeEii+2amjsxQyS1/E4ZMkvyfxBgvBQSVgYzxW
+        fiY2AtVN9elpMlCRZxXP10bCn+Rsbl64Ah5l6wDEenUKFcvHIEfAELohX2i3hOxJmULjMRY//K8
+        e9BNDRJ4yXL5iwXT8xYc0xmw=
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr2067362wrc.307.1586222208324;
+        Mon, 06 Apr 2020 18:16:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ/dge/8spWKIaBy0YAnruK2451GbwHSQlhuWFVle8QbZTZJxIx87OFuUPf+rzQcTJJvSQCfw==
+X-Received: by 2002:adf:82a6:: with SMTP id 35mr2067345wrc.307.1586222208128;
+        Mon, 06 Apr 2020 18:16:48 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-51-222.red.bezeqint.net. [79.176.51.222])
-        by smtp.gmail.com with ESMTPSA id l185sm66782wml.44.2020.04.06.18.07.45
+        by smtp.gmail.com with ESMTPSA id 127sm107605wmd.38.2020.04.06.18.16.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 18:07:46 -0700 (PDT)
-Date:   Mon, 6 Apr 2020 21:07:45 -0400
+        Mon, 06 Apr 2020 18:16:47 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 21:16:46 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Jason Wang <jasowang@redhat.com>,
@@ -69,13 +69,13 @@ Cc:     Jason Wang <jasowang@redhat.com>,
         Jens Axboe <axboe@kernel.dk>,
         virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
-Subject: [PATCH v7 09/19] virtio: stop using legacy struct vring in kernel
-Message-ID: <20200407010700.446571-10-mst@redhat.com>
-References: <20200407010700.446571-1-mst@redhat.com>
+Subject: [PATCH v8 09/19] virtio: stop using legacy struct vring in kernel
+Message-ID: <20200407011612.478226-10-mst@redhat.com>
+References: <20200407011612.478226-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200407010700.446571-1-mst@redhat.com>
+In-Reply-To: <20200407011612.478226-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 Sender: linux-block-owner@vger.kernel.org
