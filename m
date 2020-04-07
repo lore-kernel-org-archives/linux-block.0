@@ -2,122 +2,212 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7793C2BB54
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 21:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3FEC2BB54
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 22:00:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C475920748
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 21:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDA142082D
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 22:00:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DoMYYcsn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbgDGVcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 17:32:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38238 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726395AbgDGVcO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Apr 2020 17:32:14 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037L4hap104014;
-        Tue, 7 Apr 2020 17:31:59 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hh5qp2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 17:31:59 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037LRsL0015276;
-        Tue, 7 Apr 2020 17:31:59 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3082hh5qng-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 17:31:59 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037LUbr1023206;
-        Tue, 7 Apr 2020 21:31:57 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma04dal.us.ibm.com with ESMTP id 306hv69vxa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Apr 2020 21:31:57 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037LVuCl12845986
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Apr 2020 21:31:56 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7712B2066;
-        Tue,  7 Apr 2020 21:31:56 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66031B2068;
-        Tue,  7 Apr 2020 21:31:55 +0000 (GMT)
-Received: from swastik.ibm.com (unknown [9.65.198.190])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Apr 2020 21:31:55 +0000 (GMT)
-Subject: Re: [RFC PATCH v2 00/12] Integrity Policy Enforcement LSM (IPE)
-To:     deven.desai@linux.microsoft.com
-Cc:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
-        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, tyhicks@linux.microsoft.com,
-        pasha.tatashin@soleen.com, sashal@kernel.org,
-        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com,
-        mdsakib@linux.microsoft.com, linux-kernel@vger.kernel.org
-References: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
-From:   Nayna <nayna@linux.vnet.ibm.com>
-Message-ID: <c1466cc8-8a08-708a-4629-234485bb833e@linux.vnet.ibm.com>
-Date:   Tue, 7 Apr 2020 17:31:54 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726598AbgDGWAs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 18:00:48 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37227 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbgDGWAo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 18:00:44 -0400
+Received: by mail-pg1-f195.google.com with SMTP id r4so2371164pgg.4
+        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2020 15:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Me9YjeaVzWgazxTUthRuKJI46sDGdqwI3du7HWGuOE8=;
+        b=DoMYYcsntVvHTK2oXwnp3vDDbf3nT3otp0Pm+CFLtccf3kJadBX/hZRhcI+IUM7OHu
+         9GtnDCkyi0neXGAopex9ODL02nb2SkLNI9F9jFhOpGDWQH8JSCPaQyp2PFwBCyKzwP31
+         RESBufGdSgg25ZKaFUfV1vNerMXA6d58coYtU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Me9YjeaVzWgazxTUthRuKJI46sDGdqwI3du7HWGuOE8=;
+        b=gkXkrcqiGiChkQcsU1xtX4TRTHLe6KLlTsPTUD+C+29nbZSfkp2IYsh7yAzH3FAD0m
+         LJ6kJEnNRMGGgKZNO0lW5Zd3YMPBjkT5jqmswBFWXxKBgX5ovDY2aObowN/lTpO16GQl
+         mIcCeH7hioaNAWA+9PBdCKoyU4FFJemb+0xL7qX5dfSSFheqjunNGzCLTYttcsrenDMz
+         gJ7BrJCBaTLkEWbzRNVz/Xx+McaO+ayVydNYm9k6aGE8zOE2LhkdXYJHoJbbWKwpN2ty
+         yw033E52Fk7G5WbnEZCBlJEA4E+MDZNCt6/E+V6y1yA0woEAWvHtG6tEg/Q7sKuTEG2R
+         w+yw==
+X-Gm-Message-State: AGi0PuZ5LO56BUP/mRRPGiAt7HltKVkp8xMSITrpazyKXQdZW+h+gD1h
+        DuesJx+suvdegprEv1qmhJi3zA==
+X-Google-Smtp-Source: APiQypIc2emGqDVPItIPl9ujfmle5KLS4GyLNUOKdjuBUMmxWIOMYhRxDK6Fup63PD2P+ZhrpVonLQ==
+X-Received: by 2002:a63:c06:: with SMTP id b6mr4046203pgl.218.1586296841645;
+        Tue, 07 Apr 2020 15:00:41 -0700 (PDT)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:24fa:e766:52c9:e3b2])
+        by smtp.gmail.com with ESMTPSA id g3sm880112pgd.64.2020.04.07.15.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2020 15:00:41 -0700 (PDT)
+From:   Douglas Anderson <dianders@chromium.org>
+To:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
+        sqazi@google.com, Gwendal Grignou <gwendal@chromium.org>,
+        groeck@chromium.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, Douglas Anderson <dianders@chromium.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 3/4] blk-mq: Rerun dispatching in the case of budget contention
+Date:   Tue,  7 Apr 2020 15:00:04 -0700
+Message-Id: <20200407145906.v3.3.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
+X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+In-Reply-To: <20200407220005.119540-1-dianders@chromium.org>
+References: <20200407220005.119540-1-dianders@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-07_09:2020-04-07,2020-04-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxlogscore=999 spamscore=0 clxscore=1011 malwarescore=0 impostorscore=0
- lowpriorityscore=0 suspectscore=1 mlxscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004070166
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+If ever a thread running blk-mq code tries to get budget and fails it
+immediately stops doing work and assumes that whenever budget is freed
+up that queues will be kicked and whatever work the thread was trying
+to do will be tried again.
 
-On 4/6/20 6:14 PM, deven.desai@linux.microsoft.com wrote:
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
->
-> Changelog:
-> ------------------------------------
->
-> v1: Introduced
->
-> v2:
->    Split the second patch of the previous series into two.
->    Minor corrections in the cover-letter and documentation
->    comments regarding CAP_MAC_ADMIN checks in IPE.
->
-> Overview:
-> ------------------------------------
-> IPE is a Linux Security Module, which allows for a configurable
-> policy to enforce integrity requirements on the whole system. It
-> attempts to solve the issue of Code Integrity: that any code being
-> executed (or files being read), are identical to the version that
-> was built by a trusted source.
+One path where budget is freed and queues are kicked in the normal
+case can be seen in scsi_finish_command().  Specifically:
+- scsi_finish_command()
+  - scsi_device_unbusy()
+    - # Decrement "device_busy", AKA release budget
+  - scsi_io_completion()
+    - scsi_end_request()
+      - blk_mq_run_hw_queues()
 
-Can you please clarify the "motivation" for this patch set more clearly? 
-It seems to define a policy layer on top of dm-verity, which may be 
-compiled into the kernel. In the motivation, can you please also make it 
-explicit why existing mechanisms cannot be extended to achieve your purpose?
+The above is all well and good.  The problem comes up when a thread
+claims the budget but then releases it without actually dispatching
+any work.  Since we didn't schedule any work we'll never run the path
+of finishing work / kicking the queues.
 
-Also, AFIK, the changelog should be moved to the end of the patch 
-description.
+This isn't often actually a problem which is why this issue has
+existed for a while and nobody noticed.  Specifically we only get into
+this situation when we unexpectedly found that we weren't going to do
+any work.  Code that later receives new work kicks the queues.  All
+good, right?
 
-Thanks & Regards,
+The problem shows up, however, if timing is just wrong and we hit a
+race.  To see this race let's think about the case where we only have
+a budget of 1 (only one thread can hold budget).  Now imagine that a
+thread got budget and then decided not to dispatch work.  It's about
+to call put_budget() but then the thread gets context switched out for
+a long, long time.  While in this state, any and all kicks of the
+queue (like the when we received new work) will be no-ops because
+nobody can get budget.  Finally the thread holding budget gets to run
+again and returns.  All the normal kicks will have been no-ops and we
+have an I/O stall.
 
-     - Nayna
+As you can see from the above, you need just the right timing to see
+the race.  To start with, the only case it happens if we thought we
+had work, actually managed to get the budget, but then actually didn't
+have work.  That's pretty rare to start with.  Even then, there's
+usually a very small amount of time between realizing that there's no
+work and putting the budget.  During this small amount of time new
+work has to come in and the queue kick has to make it all the way to
+trying to get the budget and fail.  It's pretty unlikely.
+
+One case where this could have failed is illustrated by an example of
+threads running blk_mq_do_dispatch_sched():
+
+* Threads A and B both run has_work() at the same time with the same
+  "hctx".  Imagine has_work() is exact.  There's no lock, so it's OK
+  if Thread A and B both get back true.
+* Thread B gets interrupted for a long time right after it decides
+  that there is work.  Maybe its CPU gets an interrupt and the
+  interrupt handler is slow.
+* Thread A runs, get budget, dispatches work.
+* Thread A's work finishes and budget is released.
+* Thread B finally runs again and gets budget.
+* Since Thread A already took care of the work and no new work has
+  come in, Thread B will get NULL from dispatch_request().  I believe
+  this is specifically why dispatch_request() is allowed to return
+  NULL in the first place if has_work() must be exact.
+* Thread B will now be holding the budget and is about to call
+  put_budget(), but hasn't called it yet.
+* Thread B gets interrupted for a long time (again).  Dang interrupts.
+* Now Thread C (maybe with a different "hctx" but the same queue)
+  comes along and runs blk_mq_do_dispatch_sched().
+* Thread C won't do anything because it can't get budget.
+* Finally Thread B will run again and put the budget without kicking
+  any queues.
+
+Even though the example above is with blk_mq_do_dispatch_sched() I
+believe the race is possible any time someone is holding budget but
+doesn't do work.
+
+Unfortunately, the unlikely has become more likely if you happen to be
+using the BFQ I/O scheduler.  BFQ, by design, sometimes returns "true"
+for has_work() but then NULL for dispatch_request() and stays in this
+state for a while (currently up to 9 ms).  Suddenly you only need one
+race to hit, not two races in a row.  With my current setup this is
+easy to reproduce in reboot tests and traces have actually shown that
+we hit a race similar to the one describe above.
+
+In theory we could choose to just fix blk_mq_do_dispatch_sched() to
+kick the queues when it puts budget.  That would fix the BFQ case and
+one could argue that all the other cases are just theoretical.  While
+that is true, for all the other cases it should be very uncommon to
+run into the case where we need put_budget().  Having an extra queue
+kick for safety there shouldn't affect much and keeps the race at bay.
+
+One last note is that (at least in the SCSI case) budget is shared by
+all "hctx"s that have the same queue.  Thus we need to make sure to
+kick the whole queue, not just re-run dispatching on a single "hctx".
+
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
+
+Changes in v3:
+- Always kick when putting the budget.
+- Delay blk_mq_do_dispatch_sched() kick by 3 ms for inexact has_work().
+- Totally rewrote commit message.
+
+Changes in v2:
+- Replace ("scsi: core: Fix stall...") w/ ("blk-mq: Rerun dispatch...")
+
+ block/blk-mq.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 10bfdfb494fa..1270505367ab 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -180,12 +180,24 @@ unsigned int blk_mq_in_flight(struct request_queue *q, struct hd_struct *part);
+ void blk_mq_in_flight_rw(struct request_queue *q, struct hd_struct *part,
+ 			 unsigned int inflight[2]);
+ 
++#define BLK_MQ_BUDGET_DELAY	3		/* ms units */
++
+ static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 
+-	if (q->mq_ops->put_budget)
++	if (q->mq_ops->put_budget) {
+ 		q->mq_ops->put_budget(hctx);
++
++		/*
++		 * The only time we call blk_mq_put_dispatch_budget() is if
++		 * we released the budget without dispatching.  Holding the
++		 * budget could have blocked any "hctx"s with the same queue
++		 * and if we didn't dispatch then there's no guarantee anyone
++		 * will kick the queue.  Kick it ourselves.
++		 */
++		blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
++	}
+ }
+ 
+ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+-- 
+2.26.0.292.g33ef6b2f38-goog
 
