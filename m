@@ -2,129 +2,131 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A933C2BB1D
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 22:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E576C2BB54
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 23:27:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E913C206C0
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 22:04:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EDpSU9+3"
+	by mail.kernel.org (Postfix) with ESMTP id 344A7206BE
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 23:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726416AbgDGWEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 18:04:34 -0400
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:33615 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbgDGWEe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 18:04:34 -0400
-Received: by mail-ua1-f68.google.com with SMTP id v24so1978374uak.0
-        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2020 15:04:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FcYVbwRy7qPzYPxF2uVobHVwbwhKOGFJJ0f6jVVp4qc=;
-        b=EDpSU9+3vSDiHbPzXJwkVB41VD773ddvZ2XAEKXuJacwUm5dvTEpqcpoGt1jjkYg9Z
-         /4FL46J2z60kPy/RlHgBbfan5YGebhTpD4W1ejOHuri5M3XeaXe5P8dVtFqdLAjEL+ed
-         axbbvcHv0tSnEQKhza5grVDB+jYhJdXTCUDkY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FcYVbwRy7qPzYPxF2uVobHVwbwhKOGFJJ0f6jVVp4qc=;
-        b=R+KeW1atqx+JdySRuviTkWtrboD5wyCzZXiIqfSk3hEZvxcgXRPrs1/IeG+wnafCFc
-         YOCLmQK4wh9mUzhtbuKtrP7tBqzZ3xZlTU8TwB5NAFBRq1pWisQGfdaPUQjFvNHfQjpg
-         fZdUM1dftgGfOX62tjKq0HB4nCxeswN9GZnaTdyO6wCBnxOK5LDaP8tgs79LapL6jhO5
-         uGjMrMKX42ixFXaK2ihepRlgUtcJitx9TcoqeNYVWUUmo8rzX1FDsU6/tl2/w6B72FCl
-         U1kqomsgDlrm+qVDnpyvmtJgOUVcnLshBPWh/I8XdQkf4WdzfVdStQWLO1xkzHwQGz4A
-         PbyA==
-X-Gm-Message-State: AGi0PubmiVfIkJq2c0qX8bcC3K0sR7yfF2peBStd/4TzUU2P0XNexVn8
-        OdqFkt/xIlwTjn9TfUxZBjsYb+0zj7g=
-X-Google-Smtp-Source: APiQypK6dp0X6X3FdPzxY6eXToSSiY788aPjU5xmUFH6e1YyHPU327SGt4dB6okc2pxETFbHAh/WAA==
-X-Received: by 2002:ab0:6588:: with SMTP id v8mr2920720uam.35.1586297073005;
-        Tue, 07 Apr 2020 15:04:33 -0700 (PDT)
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com. [209.85.222.45])
-        by smtp.gmail.com with ESMTPSA id v26sm5737788vsf.9.2020.04.07.15.04.32
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2020 15:04:32 -0700 (PDT)
-Received: by mail-ua1-f45.google.com with SMTP id d23so1972683uak.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2020 15:04:32 -0700 (PDT)
-X-Received: by 2002:a9f:2478:: with SMTP id 111mr3368330uaq.0.1586297071641;
- Tue, 07 Apr 2020 15:04:31 -0700 (PDT)
+        id S1726464AbgDGX1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 19:27:55 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:49130 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726386AbgDGX1z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Apr 2020 19:27:55 -0400
+Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 784FF7EBDA0;
+        Wed,  8 Apr 2020 09:27:50 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1jLxdF-0005Tl-A3; Wed, 08 Apr 2020 09:27:49 +1000
+Date:   Wed, 8 Apr 2020 09:27:49 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [PATCH 2/2] xfs: use block layer helper for rw
+Message-ID: <20200407232749.GC24067@dread.disaster.area>
+References: <20200406232440.4027-1-chaitanya.kulkarni@wdc.com>
+ <20200406232440.4027-3-chaitanya.kulkarni@wdc.com>
+ <BY5PR04MB690075C16A97151A6216948CE7C30@BY5PR04MB6900.namprd04.prod.outlook.com>
+ <BYAPR04MB4965A3A58D804CCE9892266686C30@BYAPR04MB4965.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-References: <20200402155130.8264-1-dianders@chromium.org> <20200402085050.v2.2.I28278ef8ea27afc0ec7e597752a6d4e58c16176f@changeid>
- <20200403013356.GA6987@ming.t460p> <CAD=FV=Ub6zhVvTj79SWPUv19RDvD0gt5EjJV-FZSbYxUy_T1OA@mail.gmail.com>
- <CAD=FV=Vsk0SjkA+DbUwJxvO6NFcr0CO9=H1FD7okJ2PxMt5pYA@mail.gmail.com>
- <20200405091446.GA3421@localhost.localdomain> <CAD=FV=WQZA7PGEbv_fKikGOEijP+qEEZgYXWifgjDzV6BVOUMQ@mail.gmail.com>
- <20200407021403.GB5779@localhost.localdomain>
-In-Reply-To: <20200407021403.GB5779@localhost.localdomain>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Tue, 7 Apr 2020 15:04:20 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=UmdL5d13FqpwVC8MokY8yzMV=_wNe=42vtDx9OVNvpkQ@mail.gmail.com>
-Message-ID: <CAD=FV=UmdL5d13FqpwVC8MokY8yzMV=_wNe=42vtDx9OVNvpkQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] blk-mq: Rerun dispatching in the case of budget contention
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Salman Qazi <sqazi@google.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi@vger.kernel.org, Guenter Roeck <groeck@chromium.org>,
-        Ajay Joshi <ajay.joshi@wdc.com>, Arnd Bergmann <arnd@arndb.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Hou Tao <houtao1@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Tejun Heo <tj@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR04MB4965A3A58D804CCE9892266686C30@BYAPR04MB4965.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
+        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
+        a=7-415B0cAAAA:8 a=deSlaM45Gs4b21hfZ6IA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On Mon, Apr 6, 2020 at 7:14 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Sun, Apr 05, 2020 at 09:26:39AM -0700, Doug Anderson wrote:
-> > Hi,
+On Tue, Apr 07, 2020 at 08:06:35PM +0000, Chaitanya Kulkarni wrote:
+> On 04/06/2020 05:32 PM, Damien Le Moal wrote:
+> >> -
+> >> >-	do {
+> >> >-		struct page	*page = kmem_to_page(data);
+> >> >-		unsigned int	off = offset_in_page(data);
+> >> >-		unsigned int	len = min_t(unsigned, left, PAGE_SIZE - off);
+> >> >-
+> >> >-		while (bio_add_page(bio, page, len, off) != len) {
+> >> >-			struct bio	*prev = bio;
+> >> >-
+> >> >-			bio = bio_alloc(GFP_KERNEL, bio_max_vecs(left));
+> >> >-			bio_copy_dev(bio, prev);
+> >> >-			bio->bi_iter.bi_sector = bio_end_sector(prev);
+> >> >-			bio->bi_opf = prev->bi_opf;
+> >> >-			bio_chain(prev, bio);
+> >> >-
+> >> >-			submit_bio(prev);
+> >> >-		}
+> >> >-
+> >> >-		data += len;
+> >> >-		left -= len;
+> >> >-	} while (left > 0);
+> > Your helper could use a similar loop structure. This is very easy to read.
 > >
-> > On Sun, Apr 5, 2020 at 2:15 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > >
-> > > @@ -103,6 +104,9 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > >                 rq = e->type->ops.dispatch_request(hctx);
-> > >                 if (!rq) {
-> > >                         blk_mq_put_dispatch_budget(hctx);
-> > > +
-> > > +                       if (e->type->ops.has_work && e->type->ops.has_work(hctx))
-> > > +                               blk_mq_delay_run_hw_queue(hctx, BLK_MQ_BUDGET_DELAY);
-> >
-> > To really close the race, don't we need to run all the queues
-> > associated with the hctx?  I haven't traced it through, but I've been
-> > assuming that the multiple "hctx"s associated with the same queue will
-> > have the same budget associated with them and thus they can block each
-> > other out.
->
-> Yeah, we should run all hctxs which share the same budget space.
->
-> Also, in theory, we don't have to add the delay, however BFQ may plug the
-> dispatch for 9 ms, so looks delay run queue is required.
+> If I understand correctly this pattern is used since it is not a part of 
+> block layer.
 
-I have posted up v3.  A few notes:
+It's because it was simple and easy to understandi, not because of
+the fact it is outside the core block layer.
 
-* Since we should run all "hctxs" I took out the check for has_work()
-before kicking the queue.
+Us XFS folks are simple people who like simple things that are easy to
+understand because there is so much of XFS that is so horrifically
+complex that we want to implement simple stuff once and just not
+have to care about it again.
 
-* As far as I can tell the theoretical race happens for _anyone_ who
-puts budget, so I added it to blk_mq_put_dispatch_budget().  Feel free
-to shout at me in response to v3 if you believe I'm wrong about that.
+> The helpers in blk-lib.c are not accessible so this :-
 
-Thanks for all your reviews and suggestions so far!
+So export the helpers?
 
--Doug
+> All above breaks the existing pattern and code reuse in blk-lib.c, since 
+> blk-lib.c:-
+> 1. Already provides blk_next_bio() why repeat the bio allocation
+>     and bio chaining code ?
+
+So export the helper?
+
+> 2. Instead of adding a new helper bio_max_vecs() why not use existing
+>      __blkdev_sectors_to_bio_pages() ?
+
+That's not an improvement. The XFS code is _much_ easier to read
+and understand.
+
+> 3. Why use two bios when it can be done with one bio with the helpers
+>     in blk-lib.c ?
+
+That helper is blk_next_bio(), which hides the second bio inside it.
+So you aren't actually getting rid of the need for two bio pointers.
+
+> 4. Allows async version.
+
+Which is not used by XFS, so just adds complexity to this XFS path
+for no good reason.
+
+Seriously, this 20 lines of code in XFS turns into 50-60 lines
+of code in the block layer to do the same thing. How is that an
+improvement?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
