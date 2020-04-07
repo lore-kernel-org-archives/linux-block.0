@@ -2,155 +2,179 @@ Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63460C2BA80
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 14:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77F3C2BA2B
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 14:17:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E3F620747
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 14:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C14632078A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 14:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728812AbgDGOAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 10:00:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40192 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728596AbgDGOAR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Apr 2020 10:00:17 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id E3B4AADCD;
-        Tue,  7 Apr 2020 14:00:13 +0000 (UTC)
-Subject: Re: [PATCH RFC v2 02/24] scsi: allocate separate queue for reserved
- commands
-To:     John Garry <john.garry@huawei.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        ming.lei@redhat.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        Hannes Reinecke <hare@suse.com>
-References: <1583857550-12049-1-git-send-email-john.garry@huawei.com>
- <1583857550-12049-3-git-send-email-john.garry@huawei.com>
- <20200310183243.GA14549@infradead.org>
- <79cf4341-f2a2-dcc9-be0d-2efc6e83028a@huawei.com>
- <20200311062228.GA13522@infradead.org>
- <b5a63725-722b-8ccd-3867-6db192a248a4@suse.de>
- <9c6ced82-b3f1-9724-b85e-d58827f1a4a4@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <39bc2d82-2676-e329-5d32-8acb99b0a204@suse.de>
-Date:   Tue, 7 Apr 2020 16:00:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728768AbgDGORE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 10:17:04 -0400
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:6849 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1728737AbgDGORE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Apr 2020 10:17:04 -0400
+X-ASG-Debug-ID: 1586268998-0e408857446da600001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.236]) by bsf01.didichuxing.com with ESMTP id SocDcA0GUwJORJ7n; Tue, 07 Apr 2020 22:16:38 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 7 Apr
+ 2020 22:16:38 +0800
+Date:   Tue, 7 Apr 2020 22:16:33 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <osandov@osandov.com>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH blktest] nvme/033: add test case for nvme update hardware
+ queue count
+Message-ID: <20200407141621.GA29060@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH blktest] nvme/033: add test case for nvme update hardware
+ queue count
+Mail-Followup-To: osandov@osandov.com, linux-block@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <9c6ced82-b3f1-9724-b85e-d58827f1a4a4@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.236]
+X-Barracuda-Start-Time: 1586268998
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 3032
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0005 1.0000 -2.0178
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=MAILTO_TO_SPAM_ADDR
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81036
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
+        0.00 MAILTO_TO_SPAM_ADDR    Includes a link to a likely spammer email
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/7/20 1:54 PM, John Garry wrote:
-> On 06/04/2020 10:05, Hannes Reinecke wrote:
->> On 3/11/20 7:22 AM, Christoph Hellwig wrote:
->>> On Tue, Mar 10, 2020 at 09:08:56PM +0000, John Garry wrote:
->>>> On 10/03/2020 18:32, Christoph Hellwig wrote:
->>>>> On Wed, Mar 11, 2020 at 12:25:28AM +0800, John Garry wrote:
->>>>>> From: Hannes Reinecke <hare@suse.com>
->>>>>>
->>>>>> Allocate a separate 'reserved_cmd_q' for sending reserved commands.
->>>>>
->>>>> Why?  Reserved command specifically are not in any way tied to queues.
->>>>> .
->>>>>
->>>>
->>>> So the v1 series used a combination of the sdev queue and the per-host
->>>> reserved_cmd_q. Back then you questioned using the sdev queue for 
->>>> virtio
->>>> scsi, and the unconfirmed conclusion was to use a common per-host q. 
->>>> This is
->>>> the best link I can find now:
->>>>
->>>> https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg83177.html
->>>
->>> That was just a question on why virtio uses the per-device tags, which
->>> didn't look like it made any sense.  What I'm worried about here is
->>> mixing up the concept of reserved tags in the tagset, and queues to use
->>> them.  Note that we already have the scsi_get_host_dev to allocate
->>> a scsi_device and thus a request_queue for the host itself.  That seems
->>> like the better interface to use a tag for a host wide command vs
->>> introducing a parallel path.
->>>
->> Thinking about it some more, I don't think that scsi_get_host_dev() is
->> the best way of handling it.
->> Problem is that it'll create a new scsi_device with <hostno:this_id:0>,
->> which will then show up via eg 'lsscsi'.
-> 
-> are you sure? Doesn't this function just allocate the sdev, but do 
-> nothing with it, like probing it?
-> 
-> I bludgeoned it in here for PoC:
-> 
-> https://github.com/hisilicon/kernel-dev/commit/ef0ae8540811e32776f64a5b42bd76cbed17ba47 
-> 
-> 
-> And then still:
-> 
-> john@ubuntu:~$ lsscsi
-> [0:0:0:0] disk SEAGATE  ST2000NM0045  N004  /dev/sda
-> [0:0:1:0] disk SEAGATE  ST2000NM0045  N004  /dev/sdb
-> [0:0:2:0] disk ATASAMSUNG HM320JI  0_01  /dev/sdc
-> [0:0:3:0] disk SEAGATE  ST1000NM0023  0006  /dev/sdd
-> [0:0:4:0] enclosu HUAWEIExpander 12Gx16  128-
-> john@ubuntu:~$
-> 
-> Some proper plumbing would be needed, though.
-> 
->> This would be okay if 'this_id' would have been defined by the driver;
->> sadly, most drivers which are affected here do set 'this_id' to -1.
->> So we wouldn't have a nice target ID to allocate the device from, let
->> alone the problem that we would have to emulate a complete scsi device
->> with all required minimal command support etc.
->> And I'm not quite sure how well that would play with the exising SCSI
->> host template; the device we'll be allocating would have basically
->> nothing in common with the 'normal' SCSI devices.
->>
->> What we could do, though, is to try it the other way round:
->> Lift the request queue from scsi_get_host_dev() into the scsi host
->> itself, so that scsi_get_host_dev() can use that queue, but we also
->> would be able to use it without a SCSI device attached.
-> 
-> wouldn't that limit 1x scsi device per host, not that I know if any more 
-> would ever be required? But it does still seem better to use the request 
-> queue in the scsi device.
-> 
-My concern is this:
+Modify nvme module parameter write_queues to change hardware
+queue count, then reset nvme controller to reinitialize nvme
+with different queue count.
 
-struct scsi_device *scsi_get_host_dev(struct Scsi_Host *shost)
-{
-	[ .. ]
-	starget = scsi_alloc_target(&shost->shost_gendev, 0, shost->this_id);
-	[ .. ]
+Attention, this test case may trigger a kernel panic.
 
-and we have typically:
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+---
+ tests/nvme/033     | 87 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/033.out |  2 ++
+ 2 files changed, 89 insertions(+)
+ create mode 100755 tests/nvme/033
+ create mode 100644 tests/nvme/033.out
 
-drivers/scsi/hisi_sas/hisi_sas_v3_hw.c: .this_id                = -1,
-
-It's _very_ uncommon to have a negative number as the SCSI target 
-device; in fact, it _is_ an unsigned int already.
-
-But alright, I'll give it a go; let's see what I'll end up with.
-
-Cheers,
-
-Hannes
+diff --git a/tests/nvme/033 b/tests/nvme/033
+new file mode 100755
+index 0000000..e3b9211
+--- /dev/null
++++ b/tests/nvme/033
+@@ -0,0 +1,87 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2020 Weiping Zhang <zwp10758@gmail.com>
++#
++# Test nvme update hardware queue count larger than system cpu count
++#
++
++. tests/nvme/rc
++
++DESCRIPTION="test nvme update hardware queue count larger than system cpu count"
++QUICK=1
++
++requires() {
++	_have_program dd
++}
++
++device_requires() {
++	_test_dev_is_nvme
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	local old_write_queues
++	local cur_hw_io_queues
++	local file
++	local sys_dev=$TEST_DEV_SYSFS/device
++
++	# backup old module parameter: write_queues
++	file=/sys/module/nvme/parameters/write_queues
++	if [[ ! -e "$file" ]]; then
++		echo "$file does not exist"
++		return 1
++	fi
++	old_write_queues="$(cat $file)"
++
++	# get current hardware queue count
++	file="$sys_dev/queue_count"
++	if [[ ! -e "$file" ]]; then
++		echo "$file does not exist"
++		return 1
++	fi
++	cur_hw_io_queues="$(cat "$file")"
++	# minus admin queue
++	cur_hw_io_queues=$((cur_hw_io_queues - 1))
++
++	# set write queues count to increase more hardware queues
++	file=/sys/module/nvme/parameters/write_queues
++	echo "$cur_hw_io_queues" > "$file"
++
++	# reset controller, make it effective
++	file="$sys_dev/reset_controller"
++	if [[ ! -e "$file" ]]; then
++		echo "$file does not exist"
++		return 1
++	fi
++	echo 1 > "$file"
++
++	# wait nvme reinitialized
++	for ((m = 0; m < 10; m++)); do
++		if [[ -b "${TEST_DEV}" ]]; then
++			break
++		fi
++		sleep 0.5
++	done
++	if (( m > 9 )); then
++		echo "nvme still not reinitialized after 5 seconds!"
++		return 1
++	fi
++
++	# read data from device (may kernel panic)
++	dd if="${TEST_DEV}" of=/dev/null bs=4096 count=1 status=none
++
++	# If all work well restore hardware queue to default
++	file=/sys/module/nvme/parameters/write_queues
++	echo "$old_write_queues" > "$file"
++
++	# reset controller
++	file="$sys_dev/reset_controller"
++	echo 1 > "$file"
++
++	# read data from device (may kernel panic)
++	dd if="${TEST_DEV}" of=/dev/null bs=4096 count=1 iflag=direct status=none
++	dd if=/dev/zero of="${TEST_DEV}" bs=4096 count=1 oflag=direct status=none
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/033.out b/tests/nvme/033.out
+new file mode 100644
+index 0000000..9648c73
+--- /dev/null
++++ b/tests/nvme/033.out
+@@ -0,0 +1,2 @@
++Running nvme/033
++Test complete
 -- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.18.1
+
