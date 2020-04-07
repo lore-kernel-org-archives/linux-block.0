@@ -6,118 +6,92 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EFBC2BA1A
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A321C2BA1A
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E068B2078A
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C80BD20768
+	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 02:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726331AbgDGC1W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Apr 2020 22:27:22 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:50364 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726287AbgDGC1W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Apr 2020 22:27:22 -0400
-Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 423317EBFF2;
-        Tue,  7 Apr 2020 12:27:06 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1jLdxB-0006Xf-Eb; Tue, 07 Apr 2020 12:27:05 +1000
-Date:   Tue, 7 Apr 2020 12:27:05 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, hch@lst.de,
-        darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
-        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
-        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
-        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
-        hannes@cmpxchg.org, khlebnikov@yandex-team.ru, ajay.joshi@wdc.com,
-        bvanassche@acm.org, arnd@arndb.de, houtao1@huawei.com,
-        asml.silence@gmail.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org
-Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
-Message-ID: <20200407022705.GA24067@dread.disaster.area>
-References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
- <20200402224124.GK10737@dread.disaster.area>
- <yq1imih4aj0.fsf@oracle.com>
- <20200403025757.GL10737@dread.disaster.area>
- <yq1a73t44h1.fsf@oracle.com>
+        id S1726332AbgDGCrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Apr 2020 22:47:11 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12616 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726312AbgDGCrL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Apr 2020 22:47:11 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id D3634CBD79F8FD698109;
+        Tue,  7 Apr 2020 10:47:04 +0800 (CST)
+Received: from [127.0.0.1] (10.173.220.66) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 7 Apr 2020
+ 10:47:03 +0800
+Subject: Re: [RFC 0/3] block: address blktrace use-after-free
+To:     Ming Lei <ming.lei@redhat.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+CC:     <axboe@kernel.dk>, <viro@zeniv.linux.org.uk>,
+        <gregkh@linuxfoundation.org>, <rostedt@goodmis.org>,
+        <mingo@redhat.com>, <jack@suse.cz>, <nstange@suse.de>,
+        <mhocko@suse.com>, <linux-block@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20200402000002.7442-1-mcgrof@kernel.org>
+ <20200403081929.GC6887@ming.t460p>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <0e753195-72fb-ce83-16a1-176f2c3cea6a@huawei.com>
+Date:   Tue, 7 Apr 2020 10:47:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1a73t44h1.fsf@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
-        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
-        a=7-415B0cAAAA:8 a=HsR5391j3YDOVBnZw_AA:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20200403081929.GC6887@ming.t460p>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.220.66]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 08:45:30PM -0700, Martin K. Petersen wrote:
+On 2020/4/3 16:19, Ming Lei wrote:
+
+> BTW, Yu Kuai posted one patch for this issue, looks that approach
+> is simpler:
 > 
-> Dave,
+> https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@huawei.com/
 > 
-> > .... because when backed by thinp storage, plumbing user level
-> > fallocate() straight through from the filesystem introduces a
-> > trivial, user level storage DOS vector....
-> >
-> > i.e. a user can just fallocate a bunch of files and, because the
-> > filesystem can do that instantly, can also run the back end array
-> > out of space almost instantly. Storage admins are going to love
-> > this!
 > 
-> In the standards space, the allocation concept was mainly aimed at
-> protecting filesystem internals against out-of-space conditions on
-> devices that dedup identical blocks and where simply zeroing the blocks
-> therefore is ineffective.
 
-Um, so we're supposed to use space allocation before overwriting
-existing metadata in the filesystem? So that the underlying storage
-can reserve space for it before we write it? Which would mean we
-have to issue a space allocation before we dirty the metadata, which
-means before we dirty any metadata in a transaction. Which means
-we'll basically have to redesign the filesystems from the ground up,
-yes?
+I think the issue might not be fixed with the patch seires.
 
-> So far we have mainly been talking about fallocate on block devices.
+At first, I think there are two key points for the issure:
+1. The final release of queue is delayed in a workqueue
+2. The creation of 'q->debugfs_dir' might failed(only if 1 exist)
+And if we can fix any of the above problem, the UAF issue will be fixed.
+(BTW, I did not come up with a good idea for problem 1, and my approach
+is for problem 2.)
 
-You might be talking about filesystem metadata and block devices,
-but this patchset ends up connecting ext4's user data fallocate() to
-the block device, thereby allowing users to reserve space directly
-in the underlying block device and directly exposing this issue to
-userspace.
+The third patch "block: avoid deferral of blk_release_queue() work" is
+not enough to fix problem 1:
+a. if CONFIG_DEBUG_KOBJECT_RELEASE is enable:
+static void kobject_release(struct kref *kref)
+{
+         struct kobject *kobj = container_of(kref, struct kobject, kref);
+#ifdef CONFIG_DEBUG_KOBJECT_RELEASE
+         unsigned long delay = HZ + HZ * (get_random_int() & 0x3);
+         pr_info("kobject: '%s' (%p): %s, parent %p (delayed %ld)\n",
+                 ©®kobject_name(kobj), kobj, __func__, kobj->parent, delay);
+         INIT_DELAYED_WORK(&kobj->release, kobject_delayed_cleanup);
 
-I can only go on what is presented to me in patches - this patchset
-nothing to do with filesystem metadata nor preventing ENOSPC issues
-with internal filesystem updates.
+         schedule_delayed_work(&kobj->release, delay);
+#else
+         kobject_cleanup(kobj);
+#endif
+}
+b. when 'kobject_put' is called from blk_cleanup_queue, can we make sure
+it is the last reference?
 
-XFS is no different to ext4 or btrfs here - the filesystem doesn't
-matter because all of them can fallocate() terabytes of space in
-a second or two these days....
+Futhermore, I do understand the second patch fix the UAF problem by
+using 'q->debugfs_dir' instead of 'q->blk_trace->dir', but the problem 2
+still exist and need to be fixed.
 
-> How XFS decides to enforce space allocation policy and potentially
-> leverage this plumbing is entirely up to you.
+Thanks!
+Yu Kuai
 
-Do I understand this correctly? i.e. that it is the filesystem's
-responsibility to prevent users from preallocating more space than
-exists in an underlying storage pool that has been intentionally
-hidden from the filesystem so it can be underprovisioned?
-
-IOWs, I'm struggling to understand exactly how the "standards space"
-think filesystems are supposed to be using this feature whilst also
-preventing unprivileged exhaustion of a underprovisioned storage
-pool they know nothing about.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
