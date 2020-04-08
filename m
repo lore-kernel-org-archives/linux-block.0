@@ -2,137 +2,120 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F302C2D0F4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 19:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0F0C2BA1B
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 20:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11CA420768
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 19:45:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OXY2d9Y0"
+	by mail.kernel.org (Postfix) with ESMTP id 3DC2F206C0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 20:14:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586376898;
+	bh=3UyICkWbKd8GHWybd5Y5l+Uw0dVuaCPbwmUlwiHLDAY=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=XzM7Cb/fRt/oqqIhB1p72jSzEhnAVxAWiTg/7hJuZ/geGtSTZ2OFYFqW+ql+EKnRE
+	 1sPix8lBA8rpo7hG1IKngSNQSCfNVygY1c33wltZbIzFmTqMTpvhh2bGx5MFb8DjPc
+	 0PIrllEHohPAo39BQThFTu9y1TEj+w/ueGbzLPG0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730161AbgDHTpH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 15:45:07 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:40938 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730155AbgDHTpH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 15:45:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=FEfhWvLPZ+iih2DaP3qYwNHreINUocGi+rjtpjpeO7c=; b=OXY2d9Y08lLZf/nY5hBJ1v0Tj8
-        qzf5arRByNejSLT74+LWTZ7yrLfpFJCdQ/BVi67porZqbPrhuDX+JIJ4HMtopLbSPDKP1Ks0OwW2g
-        3IR/jWagzml6yDf4jBC9h0Ccu55/8HIgEIS/KmbhYVPfBiBOoWOepWZFNCy2uiGZW9d38kd6k2b35
-        tPiPiKdTIb+FnqxL60+2DcYK9R8nJIw4++KK4mc4kzoJRguf7tL17/TkygKptxxD8z+0khcExMxLs
-        Sp3yHgR81vTXjI5/i9kZld90FvhAK89jejAhc9L/6Raa4SIgg/TrROvwreYPuBDXTsQdXwFhnZW8Z
-        wSro+NFw==;
-Received: from [2001:4bb8:180:5765:65b6:f11e:f109:b151] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jMGdG-00055y-4Q; Wed, 08 Apr 2020 19:45:06 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH 10/10] block: fold bdev_unhash_inode into invalidate_partition
-Date:   Wed,  8 Apr 2020 21:44:39 +0200
-Message-Id: <20200408194439.1580699-11-hch@lst.de>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200408194439.1580699-1-hch@lst.de>
-References: <20200408194439.1580699-1-hch@lst.de>
+        id S1730222AbgDHUO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 16:14:57 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44280 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728853AbgDHUO5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 16:14:57 -0400
+Received: by mail-qk1-f193.google.com with SMTP id j4so1632243qkc.11;
+        Wed, 08 Apr 2020 13:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sbOTLSdpKRSWoJg86rhLkNXWwpT6Ra+lmlyLxQcG74M=;
+        b=EAQj6ooRELE1aSGdzl7xJCc1N1bQ2cVXEuUaSuPh+B65JXFnbaMPbHPnsYsojbTQTv
+         J82pjh9KiPam7s6QYx7bnkyDaxRbQFxhX1VnRY/G1HkxOfJrvF2n+2L85QAxDdSaSoUr
+         n6H9+zQQamAM0P5VBdHIMJ8vxacPTyhuUmZHyRXrm6NSAw00nu1Qn57W0euRSLugCmZi
+         pWBk/lQmL0FXqZVjLH5BO+6+dLC5aQfBwRNkC0WBOV5HvTIF6/E50Hz2YII0b89d978J
+         zf8uziZ991jIjlqmJERnMicGbdRW1Y1ZI6n2EK3YeC+aUPZAZ0O3HrbJm9/W+oR7Kr1N
+         /l0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=sbOTLSdpKRSWoJg86rhLkNXWwpT6Ra+lmlyLxQcG74M=;
+        b=Getm7iOBLiCrbZm0jNW/ZIV0Q0MGbb2sgJqSEMb5O42vcmIMFoUq6lFvHJq6RHJ9m6
+         EmaluLxNwrCKp12u1B4uhYg4u5E2uXI2ZTsV2GXXce/NYJoFyN4z3UyDFQY1VHbA+y4I
+         lKgLFvcL4fpstgxmpQKEJ96ZPXatLB0W7H7OMbwl9qJxYYV3CTC9nW8PwmMlQwNp1Ca+
+         Y1RtWCyFkpXGxXg0aA7esj3bAVwAYQEAm2yGOS7IhewNjN/NHtoOK8AECd/qfWcNedxi
+         5fPn5jpZJIZFh0PH0jTCdmnz2v9ABF3t+vwCMyzVBCYTPfgSgSJN876Ll9MMpA4rjiXa
+         v3cA==
+X-Gm-Message-State: AGi0PuZvKqXYmtfhxekBKhnKst4L3Ae1ur7YBz9ts/iaW3dIw5peQ0sk
+        XRofoFawFi8uWWhlcEYpAT+PDg40KXM=
+X-Google-Smtp-Source: APiQypIqYaz+eZ0Lnqw/OZK4i8K0k+TZAR8pMonm/QC8s87JkRsvyM0ekWeZTspZPo0IdhZPmV6zAQ==
+X-Received: by 2002:a37:74d:: with SMTP id 74mr9442111qkh.376.1586376895466;
+        Wed, 08 Apr 2020 13:14:55 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::36b2])
+        by smtp.gmail.com with ESMTPSA id r128sm2506570qke.95.2020.04.08.13.14.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2020 13:14:54 -0700 (PDT)
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@vger.kernel.org, cgroups@vger.kernel.org,
+        newella@fb.com, josef@toxicpanda.com
+Subject: [PATCHSET block/for-5.8] iocost: improve use_delay and latency target handling
+Date:   Wed,  8 Apr 2020 16:14:45 -0400
+Message-Id: <20200408201450.3959560-1-tj@kernel.org>
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-invalidate_partition and bdev_unhash_inode are always paired, and
-invalidate_partition already does an icache lookup for the block device
-inode.  Piggy back on that to remove the inode from the hash.
+Hello, Jens.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c      |  8 ++++++--
- fs/block_dev.c     | 15 ---------------
- include/linux/fs.h |  1 -
- 3 files changed, 6 insertions(+), 18 deletions(-)
+This patchset improves the following two iocost control behaviors.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 980a4609d4a5..c05d509877fa 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -888,6 +888,12 @@ static void invalidate_partition(struct gendisk *disk, int partno)
- 
- 	fsync_bdev(bdev);
- 	__invalidate_device(bdev, true);
-+
-+	/*
-+	 * Unhash the bdev inode for this device so that it gets evicted as soon
-+	 * as last inode reference is dropped.
-+	 */
-+	remove_inode_hash(bdev->bd_inode);
- 	bdput(bdev);
- }
- 
-@@ -909,13 +915,11 @@ void del_gendisk(struct gendisk *disk)
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
- 		invalidate_partition(disk, part->partno);
--		bdev_unhash_inode(part_devt(part));
- 		delete_partition(disk, part);
- 	}
- 	disk_part_iter_exit(&piter);
- 
- 	invalidate_partition(disk, 0);
--	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
- 	up_write(&disk->lookup_sem);
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9c8de54fa0c9..998820174d3e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -883,21 +883,6 @@ static int bdev_set(struct inode *inode, void *data)
- 
- static LIST_HEAD(all_bdevs);
- 
--/*
-- * If there is a bdev inode for this device, unhash it so that it gets evicted
-- * as soon as last inode reference is dropped.
-- */
--void bdev_unhash_inode(dev_t dev)
--{
--	struct inode *inode;
--
--	inode = ilookup5(blockdev_superblock, hash(dev), bdev_test, &dev);
--	if (inode) {
--		remove_inode_hash(inode);
--		iput(inode);
--	}
--}
--
- struct block_device *bdget(dev_t dev)
- {
- 	struct block_device *bdev;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2b4e9f86b151..1a95e5158811 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2581,7 +2581,6 @@ extern struct kmem_cache *names_cachep;
- #ifdef CONFIG_BLOCK
- extern int register_blkdev(unsigned int, const char *);
- extern void unregister_blkdev(unsigned int, const char *);
--extern void bdev_unhash_inode(dev_t dev);
- extern struct block_device *bdget(dev_t);
- extern struct block_device *bdgrab(struct block_device *bdev);
- extern void bd_set_size(struct block_device *, loff_t size);
--- 
-2.25.1
+* iocost was failing to punish heavy shared IO generators (file metadata, memory
+  reclaim) through use_delay mechanism - use_delay automatically decays which
+  works well for iolatency but doesn't match how iocost behaves. This led to
+  e.g. memory bombs which generate a lot of swap IOs to use over their allotted
+  amount. This is fixed by adding non-decaying use_delay mechanism.
+
+* The same latency targets were being applied regardless of the IO sizes. While
+  this works fine for loose targets, it gets in the way when trying to tigthen
+  them - a latency target adequate for a 4k IO is too short for a 1 meg IO.
+  iocost now discounts the size portion of cost when testing whether a given IO
+  met or missed its latency target.
+
+While at it, it also makes minor changse to iocost_monitor.py.
+
+This patchset contains the following five patches.
+
+ 0001-blk-iocost-switch-to-fixed-non-auto-decaying-use_del.patch
+ 0002-block-add-request-io_data_len.patch
+ 0003-blk-iocost-account-for-IO-size-when-testing-latencie.patch
+ 0004-iocost_monitor-exit-successfully-if-interval-is-zero.patch
+ 0005-iocost_monitor-drop-string-wrap-around-numbers-when-.patch
+
+and is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git iocost-delay-latency
+
+diffstat follows. Thanks.
+
+ block/Kconfig                  |    4 +++
+ block/blk-cgroup.c             |    6 ++++
+ block/blk-iocost.c             |   54 ++++++++++++++++++++++++++++-------------
+ block/blk-mq.c                 |    6 ++++
+ include/linux/blk-cgroup.h     |   43 +++++++++++++++++++++++++-------
+ include/linux/blkdev.h         |    8 ++++++
+ tools/cgroup/iocost_monitor.py |   48 +++++++++++++++++++-----------------
+ 7 files changed, 121 insertions(+), 48 deletions(-)
+
+--
+tejun
 
