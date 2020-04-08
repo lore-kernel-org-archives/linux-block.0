@@ -2,144 +2,119 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36636C2D0F4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D42C2D0F4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:57:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17E0B20787
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3904B20730
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:57:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730194AbgDHQl5 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 12:41:57 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:43194 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728209AbgDHQl5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 12:41:57 -0400
-Received: from mail-lj1-f177.google.com ([209.85.208.177])
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <stgraber@ubuntu.com>)
-        id 1jMDlx-0001Tt-Ly
-        for linux-block@vger.kernel.org; Wed, 08 Apr 2020 16:41:53 +0000
-Received: by mail-lj1-f177.google.com with SMTP id r7so8305687ljg.13
-        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2020 09:41:53 -0700 (PDT)
-X-Gm-Message-State: AGi0PuY+g1uh9moREamVOb33/MF6HR82zee3Vl0s90WCr4xDESybSTnK
-        Pbhmbn8n0Znfk25Hm7IBq2h6y8+KEQBouao7idRDkw==
-X-Google-Smtp-Source: APiQypLzUyLptlfj4UREBf2l5xN02F+xA0MQtCV/4zxKUkblPb/olSzPaY17gwOo3IIMcNmLwikMsI/ASDg0+VXPjE8=
-X-Received: by 2002:a2e:97c2:: with SMTP id m2mr5450395ljj.228.1586364113069;
- Wed, 08 Apr 2020 09:41:53 -0700 (PDT)
+        id S1730447AbgDHQ5P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 12:57:15 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2644 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729456AbgDHQ5P (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 8 Apr 2020 12:57:15 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 00F6D9F3B650D1797C8B;
+        Wed,  8 Apr 2020 17:57:13 +0100 (IST)
+Received: from [127.0.0.1] (10.210.166.224) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 8 Apr 2020
+ 17:57:12 +0100
+Subject: Re: [PATCH V6 0/8] blk-mq: improvement CPU hotplug
+To:     Daniel Wagner <dwagner@suse.de>
+CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200407092901.314228-1-ming.lei@redhat.com>
+ <20200408124017.g6wizq5bljzwb2gq@beryllium.lan>
+ <d441e96f-2450-6fc7-c5ab-b8bb9f98f3be@huawei.com>
+ <20200408131030.456mq6kjxscex7ql@beryllium.lan>
+ <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
+ <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <8dade35b-6fd6-4438-25b1-b4620d4982ba@huawei.com>
+Date:   Wed, 8 Apr 2020 17:56:48 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-References: <20200408152151.5780-1-christian.brauner@ubuntu.com> <CAG48ez0KWgLMOp1d3X1AcRNc4-eF1YiCw=PgWiGjtM6PqQqawg@mail.gmail.com>
-In-Reply-To: <CAG48ez0KWgLMOp1d3X1AcRNc4-eF1YiCw=PgWiGjtM6PqQqawg@mail.gmail.com>
-From:   =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@ubuntu.com>
-Date:   Wed, 8 Apr 2020 12:41:41 -0400
-X-Gmail-Original-Message-ID: <CA+enf=uhTi1yWtOe+iuv2FvdZzo69pwsP-NNU2775jN01aDcVQ@mail.gmail.com>
-Message-ID: <CA+enf=uhTi1yWtOe+iuv2FvdZzo69pwsP-NNU2775jN01aDcVQ@mail.gmail.com>
-Subject: Re: [PATCH 0/8] loopfs
-To:     Jann Horn <jannh@google.com>
-Cc:     Christian Brauner <christian.brauner@ubuntu.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Serge Hallyn <serge@hallyn.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Saravana Kannan <saravanak@google.com>,
-        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
-        Seth Forshee <seth.forshee@canonical.com>,
-        David Rheinsberg <david.rheinsberg@gmail.com>,
-        Tom Gundersen <teg@jklm.no>,
-        Christian Kellner <ckellner@redhat.com>,
-        Dmitry Vyukov <dvyukov@google.com>, linux-doc@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        Matthew Garrett <mjg59@google.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.166.224]
+X-ClientProxiedBy: lhreml738-chm.china.huawei.com (10.201.108.188) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 8, 2020 at 12:24 PM Jann Horn <jannh@google.com> wrote:
->
-> On Wed, Apr 8, 2020 at 5:23 PM Christian Brauner
-> <christian.brauner@ubuntu.com> wrote:
-> > One of the use-cases for loopfs is to allow to dynamically allocate loop
-> > devices in sandboxed workloads without exposing /dev or
-> > /dev/loop-control to the workload in question and without having to
-> > implement a complex and also racy protocol to send around file
-> > descriptors for loop devices. With loopfs each mount is a new instance,
-> > i.e. loop devices created in one loopfs instance are independent of any
-> > loop devices created in another loopfs instance. This allows
-> > sufficiently privileged tools to have their own private stash of loop
-> > device instances. Dmitry has expressed his desire to use this for
-> > syzkaller in a private discussion. And various parties that want to use
-> > it are Cced here too.
-> >
-> > In addition, the loopfs filesystem can be mounted by user namespace root
-> > and is thus suitable for use in containers. Combined with syscall
-> > interception this makes it possible to securely delegate mounting of
-> > images on loop devices, i.e. when a user calls mount -o loop <image>
-> > <mountpoint> it will be possible to completely setup the loop device.
-> > The final mount syscall to actually perform the mount will be handled
-> > through syscall interception and be performed by a sufficiently
-> > privileged process. Syscall interception is already supported through a
-> > new seccomp feature we implemented in [1] and extended in [2] and is
-> > actively used in production workloads. The additional loopfs work will
-> > be used there and in various other workloads too. You'll find a short
-> > illustration how this works with syscall interception below in [4].
->
-> Would that privileged process then allow you to mount your filesystem
-> images with things like ext4? As far as I know, the filesystem
-> maintainers don't generally consider "untrusted filesystem image" to
-> be a strongly enforced security boundary; and worse, if an attacker
-> has access to a loop device from which something like ext4 is mounted,
-> things like "struct ext4_dir_entry_2" will effectively be in shared
-> memory, and an attacker can trivially bypass e.g.
-> ext4_check_dir_entry(). At the moment, that's not a huge problem (for
-> anything other than kernel lockdown) because only root normally has
-> access to loop devices.
->
-> Ubuntu carries an out-of-tree patch that afaik blocks the shared
-> memory thing: <https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/eoan/commit?id=4bc428fdf5500b7366313f166b7c9c50ee43f2c4>
->
-> But even with that patch, I'm not super excited about exposing
-> filesystem image parsing attack surface to containers unless you run
-> the filesystem in a sandboxed environment (at which point you don't
-> need a loop device anymore either).
+On 08/04/2020 16:14, Daniel Wagner wrote:
+> On Wed, Apr 08, 2020 at 02:29:51PM +0100, John Garry wrote:
+>> On 08/04/2020 14:10, Daniel Wagner wrote:
+>> ok, but to really test this you need to ensure that all the cpus for a
+>> managed interrupt affinity mask are offlined together for some period of
+>> time greater than the IO timeout. Otherwise the hw queue's managed interrupt
+>> would not be shut down, and you're not verifying that the queues are fully
+>> drained.
+> 
 
-So in general we certainly agree that you should never expose someone
-that you wouldn't trust with root on the host to syscall interception
-mounting of real kernel filesystems.
+Hi Daniel,
 
-But that's not all that our syscall interception logic can do. We have
-support for rewriting a normal filesystem mount attempt to instead use
-an available FUSE implementation. As far as the user is concerned,
-they ran "mount /dev/sdaX /mnt" and got that ext4 filesystem mounted
-on /mnt as requested, except that the container manager intercepted
-the mount attempt and instead spawned fuse2fs for that mount. This
-requires absolutely no change to the software the user is running.
+> Not sure if I understand you correctly: Are you saying that the IRQ
+> related resources are not freed/moved from the offlining CPU?
 
-loopfs, with that interception mode, will let us also handle all cases
-where a loop would be used, similarly without needing any change to
-the software being run. If a piece of software calls the command
-"mount -o loop blah.img /mnt", the "mount" command will setup a loop
-device as it normally would (doing so through loopfs) and then will
-call the "mount" syscall, which will get intercepted and redirected to
-a FUSE implementation if so configured, resulting in the expected
-filesystem being mounted for the user.
+This series tries to drain the hw queue when all cpus in the queue (IRQ) 
+affinity mask are being offlined. This is because when all the cpus are 
+offlined, the managed IRQ for that hw queue is shutdown - so there are 
+no cpus remaining online to service the completion interrupt for 
+in-flight IOs. The cover letter may explain this better.
 
-LXD with syscall interception offers both straight up privileged
-mounting using the kernel fs or using a FUSE based implementation.
-This is configurable on a per-filesystem and per-container basis.
+> 
+>>>> Will the fio processes migrate back onto cpus which have been onlined again?
+>>>
+>>> Hmm, good question. I've tried to assign them to a specific CPU via
+>>> --cpus_allowed_policy=split and --cpus_allowed.
+>>>
+>>>     fio --rw=randwrite --name=test --size=50M --iodepth=32 --direct=1 \
+>>>         --bs=4k --numjobs=40 --time_based --runtime=1h --ioengine=libaio \
+>>>         --group_reporting --cpus_allowed_policy=split --cpus_allowed=0-40
+>>>
+>>> Though I haven't verified what happens when the CPU get's back online.
+>>
+>> Maybe this will work since you're offlining patterns of cpus and the fio
+>> processes have to migrate somewhere. But see above.
+> 
+> At least after the initial setup a fio thread will be migrated away
+> from the offlining CPU.
+> 
+> A quick test shows, that the affinity mask for a fio thread will be
+> cleared when the CPU goes offline. There seems to be a discussion
+> going on about the cpu hotplug and the affinity mask:
+> 
+> https://lore.kernel.org/lkml/1251528473.590671.1579196495905.JavaMail.zimbra@efficios.com
+> 
+> TL;DR: it can be scheduled back if affinity is tweaked via
+> e.g. taskset, it won't if it's via cpusets
 
-I hope that clarifies what we're doing here :)
+I just avoid any of this in my test by looping in a sequence of onlining 
+all cpus, start fio for short period, and then offline cpus.
 
-Stéphane
+BTW, you mentioned earlier that you would test megaraid_sas. As things 
+stand, I don't think that series will help there as that driver still 
+just exposes a single HW queue to blk-mq. I think qla2xxx driver does 
+expose >1 queues, i.e. it sets Scsi_Host.nr_hq_queues, so may be a 
+better option.
+
+Cheers,
+John
+
