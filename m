@@ -2,209 +2,86 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B792C2D0EA
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692F0C2D0EA
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:14:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 269AE2076D
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:12:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LkpfPCBM"
+	by mail.kernel.org (Postfix) with ESMTP id 3C20220692
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:14:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728647AbgDHPMK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 11:12:10 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:33583 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728309AbgDHPMK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 11:12:10 -0400
-Received: by mail-il1-f195.google.com with SMTP id k29so7038542ilg.0
-        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2020 08:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SssEa34uyWGuXvyMVdQpqUpofdA5aXmoGGscUTPybO4=;
-        b=LkpfPCBMz5VnGfzoWxExmYIpo0+FnFFGjJY1msnRJtTohUxZbu0BG52EXxkq6IBeuf
-         ZZf+IObj/jLDbnZGwYQ7xiOI2IQsIBVjrZVTvh/8oz1mUI1bTJudCZFtMzBs/e2VQke+
-         10kX6P7ZJlrLlWCp+Ri1Ros9d0kublJPJe4K4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SssEa34uyWGuXvyMVdQpqUpofdA5aXmoGGscUTPybO4=;
-        b=UNYCy/0dOS6MKFXzXLdWUGPL385ETd2djLV+b3AczfrVxTbXs17yM2gQ0SIMeN/z3R
-         8CwzcW4G1oKMuxeb2AOEPpnZt5l/n0DpDww1IaxKFuvyfXfGH9rxnodQRN6NkaQm68J4
-         igdG/fEOYJlre7LlrpDtyJzJM+AWpO/gbGG+ev/M3XWiT2FEV7W1G4odO9EIDY9MsG1f
-         4Dn2vzx3VK9lfAcHaDH3poKcOuCDBuOREbcAVVJKwhESFIDccJrLHQSfvL9cwcE8Wvho
-         5qnGgo0Kij80Ln1+O2gtBoy9B3VwnjexxD6Z28FdEcepdY0V2AJuFj07Ys9jO97Zp2BY
-         aymQ==
-X-Gm-Message-State: AGi0Pub1PAZDx8qlu9qnjnOw+w+VTS8DWAwgHRrQ8+CA9VF6fLjYLYGU
-        VHYX8ysu/r6Pebe8Y7btPYzYAyk5bdvvYg==
-X-Google-Smtp-Source: APiQypJ/jLI3GuzCIUnaE0J6LM/OrpH9vqwGhYBMjKYfjXiXGgMJd8Y15SYRX2g99IdcymrlbrcVqw==
-X-Received: by 2002:a63:d143:: with SMTP id c3mr7174945pgj.171.1586358270481;
-        Wed, 08 Apr 2020 08:04:30 -0700 (PDT)
-Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:24fa:e766:52c9:e3b2])
-        by smtp.gmail.com with ESMTPSA id d85sm1468083pfd.157.2020.04.08.08.04.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2020 08:04:30 -0700 (PDT)
-From:   Douglas Anderson <dianders@chromium.org>
-To:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com
-Cc:     paolo.valente@linaro.org, groeck@chromium.org,
-        Gwendal Grignou <gwendal@chromium.org>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, sqazi@google.com,
-        Douglas Anderson <dianders@chromium.org>,
-        =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 0/4] blk-mq: Fix two causes of IO stalls found in reboot testing
-Date:   Wed,  8 Apr 2020 08:03:58 -0700
-Message-Id: <20200408150402.21208-1-dianders@chromium.org>
-X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+        id S1727187AbgDHPOT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 11:14:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52082 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727126AbgDHPOT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 8 Apr 2020 11:14:19 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id C3FE4AD72;
+        Wed,  8 Apr 2020 15:14:16 +0000 (UTC)
+Date:   Wed, 8 Apr 2020 17:14:16 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH V6 0/8] blk-mq: improvement CPU hotplug
+Message-ID: <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
+References: <20200407092901.314228-1-ming.lei@redhat.com>
+ <20200408124017.g6wizq5bljzwb2gq@beryllium.lan>
+ <d441e96f-2450-6fc7-c5ab-b8bb9f98f3be@huawei.com>
+ <20200408131030.456mq6kjxscex7ql@beryllium.lan>
+ <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-While doing reboot testing, I found that occasionally my device would
-trigger the hung task detector.  Many tasks were stuck waiting for the
-a blkdev mutex, but at least one task in the system was always sitting
-waiting for IO to complete (and holding the blkdev mutex).  One
-example of a task that was just waiting for its IO to complete on one
-reboot:
+On Wed, Apr 08, 2020 at 02:29:51PM +0100, John Garry wrote:
+> On 08/04/2020 14:10, Daniel Wagner wrote:
+> ok, but to really test this you need to ensure that all the cpus for a
+> managed interrupt affinity mask are offlined together for some period of
+> time greater than the IO timeout. Otherwise the hw queue's managed interrupt
+> would not be shut down, and you're not verifying that the queues are fully
+> drained.
 
- udevd           D    0  2177    306 0x00400209
- Call trace:
-  __switch_to+0x15c/0x17c
-  __schedule+0x6e0/0x928
-  schedule+0x8c/0xbc
-  schedule_timeout+0x9c/0xfc
-  io_schedule_timeout+0x24/0x48
-  do_wait_for_common+0xd0/0x160
-  wait_for_completion_io_timeout+0x54/0x74
-  blk_execute_rq+0x9c/0xd8
-  __scsi_execute+0x104/0x198
-  scsi_test_unit_ready+0xa0/0x154
-  sd_check_events+0xb4/0x164
-  disk_check_events+0x58/0x154
-  disk_clear_events+0x74/0x110
-  check_disk_change+0x28/0x6c
-  sd_open+0x5c/0x130
-  __blkdev_get+0x20c/0x3d4
-  blkdev_get+0x74/0x170
-  blkdev_open+0x94/0xa8
-  do_dentry_open+0x268/0x3a0
-  vfs_open+0x34/0x40
-  path_openat+0x39c/0xdf4
-  do_filp_open+0x90/0x10c
-  do_sys_open+0x150/0x3c8
-  ...
+Not sure if I understand you correctly: Are you saying that the IRQ
+related resources are not freed/moved from the offlining CPU?
 
-I've reproduced this on two systems: one boots from an internal UFS
-disk and one from eMMC.  Each has a card reader attached via USB with
-an SD card plugged in.  On the USB-attached SD card is a disk with 12
-partitions (a Chrome OS test image), if it matters.  The system
-doesn't do much with the USB disk other than probe it (it's plugged in
-my system to help me recover).
+> > > Will the fio processes migrate back onto cpus which have been onlined again?
+> > 
+> > Hmm, good question. I've tried to assign them to a specific CPU via
+> > --cpus_allowed_policy=split and --cpus_allowed.
+> > 
+> >    fio --rw=randwrite --name=test --size=50M --iodepth=32 --direct=1 \
+> >        --bs=4k --numjobs=40 --time_based --runtime=1h --ioengine=libaio \
+> >        --group_reporting --cpus_allowed_policy=split --cpus_allowed=0-40
+> > 
+> > Though I haven't verified what happens when the CPU get's back online.
+> 
+> Maybe this will work since you're offlining patterns of cpus and the fio
+> processes have to migrate somewhere. But see above.
 
-From digging, I believe that there are two separate but related
-issues.  Both issues relate to the SCSI code saying that there is no
-budget.
+At least after the initial setup a fio thread will be migrated away
+from the offlining CPU.
 
-I have done testing with only one or the other of the two patches in
-this series and found that I could still encounter hung tasks if only
-one of the two patches was applied.  This deserves a bit of
-explanation.  To me, it's fairly obvious that the first fix wouldn't
-fix the problems talked about in the second patch.  However, it's less
-obvious why the second patch doesn't fix the problems in
-blk_mq_dispatch_rq_list().  It turns out that it _almost_ does
-(problems become much more rare), but I did manage to get a single
-trace where the "kick" scheduled by the second patch happened really
-quickly.  The scheduled kick then ran and found nothing to do.  This
-happened in parallel to a task running in blk_mq_dispatch_rq_list()
-which hadn't gotten around to splicing the list back into
-hctx->dispatch.  This is why we need both fixes.
+A quick test shows, that the affinity mask for a fio thread will be
+cleared when the CPU goes offline. There seems to be a discussion
+going on about the cpu hotplug and the affinity mask:
 
-Most of my testing has been atop Chrome OS 5.4's kernel tree which
-currently has v5.4.30 merged in.  The Chrome OS 5.4 tree also has a
-patch by Salman Qazi, namely ("block: Limit number of items taken from
-the I/O scheduler in one go").  Reverting that patch didn't make the
-hung tasks go away, so I kept it in for most of my testing.
+https://lore.kernel.org/lkml/1251528473.590671.1579196495905.JavaMail.zimbra@efficios.com
 
-I have also done some testing on mainline Linux (most on what git
-describe calls v5.6-rc7-227-gf3e69428b5e2) even without Salman's
-patch.  I found that I could reproduce the problems there and that
-traces looked about the same as I saw on the downstream branch.  These
-patches were also confirmed to fix the problems on mainline.
+TL;DR: it can be scheduled back if affinity is tweaked via
+e.g. taskset, it won't if it's via cpusets
 
-Chrome OS is currently setup to use the BFQ scheduler and I found that
-I couldn't reproduce the problems without BFQ.  As discussed in the
-second patch this is believed to be because BFQ sometimes returns
-"true" from has_work() but then NULL from dispatch_request().
-
-I'll insert my usual caveat that I'm sending patches to code that I
-know very little about.  If I'm making a total bozo patch here, please
-help me figure out how I should fix the problems I found in a better
-way.
-
-If you want to see a total ridiculous amount of chatter where I
-stumbled around a whole bunch trying to figure out what was wrong and
-how to fix it, feel free to read <https://crbug.com/1061950>.  I
-promise it will make your eyes glaze over right away if this cover
-letter didn't already do that.  Specifically comment 79 in that bug
-includes a link to my ugly prototype of making BFQ's has_work() more
-exact (I only managed it by actually defining _both_ an exact and
-inexact function to avoid circular locking problems when it was called
-directly from blk_mq_hctx_has_pending()).  Comment 79 also has more
-thoughts about alternatives considered.
-
-I don't know if these fixes represent a regression of some sort or are
-new.  As per above I could only reproduce with BFQ enabled which makes
-it nearly impossible to go too far back with this.  I haven't listed
-any "Fixes" tags here, but if someone felt it was appropriate to
-backport this to some stable trees that seems like it'd be nice.
-Presumably at least 5.4 stable would make sense.
-
-Thanks to Salman Qazi, Paolo Valente, and Guenter Roeck who spent a
-bunch of time helping me trawl through some of this code and reviewing
-early versions of this patch.
-
-Changes in v4:
-- Only kick in blk_mq_do_dispatch_ctx() / blk_mq_do_dispatch_sched().
-
-Changes in v3:
-- Note why blk_mq_dispatch_rq_list() change is needed.
-- ("blk-mq: Add blk_mq_delay_run_hw_queues() API call") new for v3
-- Always kick when putting the budget.
-- Delay blk_mq_do_dispatch_sched() kick by 3 ms for inexact has_work().
-- Totally rewrote commit message.
-- ("Revert "scsi: core: run queue...") new for v3.
-
-Changes in v2:
-- Replace ("scsi: core: Fix stall...") w/ ("blk-mq: Rerun dispatch...")
-
-Douglas Anderson (4):
-  blk-mq: In blk_mq_dispatch_rq_list() "no budget" is a reason to kick
-  blk-mq: Add blk_mq_delay_run_hw_queues() API call
-  blk-mq: Rerun dispatching in the case of budget contention
-  Revert "scsi: core: run queue if SCSI device queue isn't ready and
-    queue is idle"
-
- block/blk-mq-sched.c    | 18 ++++++++++++++++++
- block/blk-mq.c          | 30 +++++++++++++++++++++++++++---
- drivers/scsi/scsi_lib.c |  7 +------
- include/linux/blk-mq.h  |  1 +
- 4 files changed, 47 insertions(+), 9 deletions(-)
-
--- 
-2.26.0.292.g33ef6b2f38-goog
-
+Thanks,
+Daniel
