@@ -2,133 +2,175 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E78DC2D0EA
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 11:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCA1C2D0EA
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 12:19:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03B9220747
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 11:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E78952074F
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 12:19:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VLogq0/r";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="kQeHV2Vn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EB6JIMCS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728494AbgDHLcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 07:32:33 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:14046 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728455AbgDHLcd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 07:32:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1586345573; x=1617881573;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Tw41quE27+FcqToxPw7W6Bnl09ZSNYM+bmNFMNaBaro=;
-  b=VLogq0/r5f1LIfFehqqUia5GfXQWjiHug/pb8sitkvjk9BNCpyHJRWBq
-   2Xj6JFwxPWqUABkNPo3yaGzZqbscG3NXm/9RISVbT4+3YX8RUZwu5rEpw
-   jOk3hnMBD9nSpMx5YryvRAMTCiNNa57f1JeBD7Eh6QiYPQxN/SIBbv7z5
-   9/A7agIBm153IjJcqmy7bwBpWNQs2S/qM6BxHHGaRn+UzlYxz5Ku4y/Qb
-   88NVE/IdV3QxdOHo+At59bLkKoiDtadhnoZhQrSqEWqTKhdG9ituCL0qP
-   b4mVzgVOAMwuvliC4D4cw0iySnDtR+LioWmDGdT/TTfuByLCAlIbqmIlP
-   w==;
-IronPort-SDR: j1KJmCwvydr6ojhEsg62KyFuKOCJq+URbHRt/vloMUHz04l3wqxIeisxZ6aoVrlbmy6m2YldAj
- E+/3EE8wdoOni8uIfjBCMUGT6Xg602Pa8DdySVTBvWqRW8QLxZD6q3fEZfGGdSzp5HePv0U9J3
- fj0FbQNMJMUWDU6d970SVKEfcCIS0jjT9btcmJEJNbsj8ZGUa88O5GnWfXgjcX0gOxnrRiK73m
- n7DNcplb9llx/TDtiej1IKRfBfEm4bozCch39YxUmB9XqtnkSJstQNugxOEnu8QKQbUnNoUAqL
- QBs=
-X-IronPort-AV: E=Sophos;i="5.72,358,1580745600"; 
-   d="scan'208";a="237196737"
-Received: from mail-dm6nam12lp2168.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.168])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Apr 2020 19:32:52 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=knxuQOJ1yZ4tH/pKDc1CA/8ZNJngG9gOaq+Q4n03eeDEdyGXi4nRn5FeZjpzm5yadI92JTTeLorFpLAJ0fCSW+mZsFsG6U9cWnKYyuLYJPGAOs9OI7FWjWIT+oUG8Kr05NXmEoEyvCAPa0UjNr2XIDVSmlULm8YRXLfQpqeXQz5DMzCtDu/3k68iLqOAyhXAVk4QkY1L/aRLQIQSY7fWyZ5PH+JCRircMaE3U/9glqOYBX5E8B+Cm/i1R0rSoZ+Dt/8b+6aBkm9nulEepKOoShh6RQjri7vngqV3BQYJ8GbNpDirgA+wwYPmCD1O6p/NhRjladlNje0PmyMGl+LS8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=piCGdhmyKTmh+zXIAj4s17hamobS/f/ygCIA+ON1TOM=;
- b=Bjhnn9Fg111me7KTZGycyAdflD3kacYnXLyQzvq+g4NPFRj74FqaGW7Jr+YmiddaXvg+Z1bFj0BVtzawpK/AxkB/V7KiuM/crYho4E6nw8SaZ09mLEsdrU5g1rQX3kHE/74dvBPK2XAoLpHCuuQ1QkilmX5DJVQHca3w3sr+dVRJXikZZuEiDbf8QpWkD55jvm9Htn+cTw1vUqW+WIYTM3e8lhgtyj1yJTxTmf45nRB9j2lXlIFrPXBAzVsPC7yBK9DrpOLR1/Q5N1eJ3Oc3EBkIsIbPkVsztR//anp0ohrTmptyfdopNoUFwmhPevHLJW74xK+VzmBFCLlxnEY0Ig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S1726921AbgDHMTT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 08:19:19 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:46763 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726769AbgDHMTT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 08:19:19 -0400
+Received: by mail-qk1-f196.google.com with SMTP id g74so2824222qke.13
+        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2020 05:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=piCGdhmyKTmh+zXIAj4s17hamobS/f/ygCIA+ON1TOM=;
- b=kQeHV2Vnk3MysSZnefMAUDPvxqWlTRV4EnaNnFmHN4kSZEqvAtDUAo4Ce5MnplmMrCrNXtPxTdIMIakkvcOr57OXIyQsztpA1GnCyKsBmnByVJkN83yZLyNjkmEFc/g5KOR3uK/1yQmSPNIqRE39LipemUYMhASM/UlCTGncWyg=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3535.namprd04.prod.outlook.com
- (2603:10b6:803:4e::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.21; Wed, 8 Apr
- 2020 11:32:31 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2878.018; Wed, 8 Apr 2020
- 11:32:31 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v4 06/10] scsi: export scsi_mq_uninit_cmnd
-Thread-Topic: [PATCH v4 06/10] scsi: export scsi_mq_uninit_cmnd
-Thread-Index: AQHWCaB+r0BJcUV2vk2dBDMa83deYg==
-Date:   Wed, 8 Apr 2020 11:32:30 +0000
-Message-ID: <SN4PR0401MB3598D625922E9EFCC2F039F09BC00@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200403101250.33245-1-johannes.thumshirn@wdc.com>
- <20200403101250.33245-7-johannes.thumshirn@wdc.com>
- <20200407170048.GE13893@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 8a37fd4c-127f-4c70-ea5f-08d7dbb08654
-x-ms-traffictypediagnostic: SN4PR0401MB3535:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR0401MB3535897AC3660BB84D1392D69BC00@SN4PR0401MB3535.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0367A50BB1
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(2906002)(186003)(81156014)(86362001)(76116006)(66556008)(5660300002)(7696005)(8676002)(316002)(66476007)(91956017)(66446008)(81166007)(53546011)(64756008)(8936002)(33656002)(6506007)(55016002)(26005)(4326008)(66946007)(4744005)(54906003)(6916009)(9686003)(478600001)(52536014)(71200400001);DIR:OUT;SFP:1102;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nKTzdELW0Io/7KVZ2Bq1DlSLudGpbzhAWO+XOaUseTUxWdoApd1CX1wg/tvfR7BGKV3ttiHpzhi5+OVjs+ti/ckRFqJxEbD9cM9f3SrjycOPAannRO2PSiTjHqURR4GITfDthVc6U5g7UpJAktSC+/Eyr5POvL04pHyCfWKz1L09kw/uiK1eZYPT8k7hZ5DpRHYpvqUQV0HXN0rxk1AFNvkSM4kFNJ/L8lOTqnvu+N+XY3Jcv9EH+LQMs1/S9FABoqmAEiQ+r8Sieyx8FmKmLGd4bZGz4Mj4PwHzPKhTVqWkjsCW9BcC6RObGjDsYv1lNvS2VPVu0/OgF86KRKNjUZbbBtG1Wl0JCt2Uc5sfjMYySfWLBwEw7Vs3l/YZsYJq6wJNmOk6NOV6k+paFJ1vOqu9vC53/6pzSLtfE1MFpq8nStzfToYv1TS8ArlVL/2B
-x-ms-exchange-antispam-messagedata: Fnn/2ZE3tgYYbtjz25DZ37FlKLARQ4fsSdUrSVvTXnHa+mG7PX4GcbB1caZ8FOnqJHTYeXeGCSiTaHR6C2XHGQ/yYhHeLD5+ZZmwR6Cn98vVqguACtAp7ZuEPuvUCbXox/yy5k/3E+rfHAb5AX5RpQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=NVTELMYjXgVLoLs43MP5pps+p0/+MK0jceWllGzIGU0=;
+        b=EB6JIMCSbVRlWPY3CVqCTRe9fznlpmwccxHBlH+nFQHqMhK1JjAM9eiASFfdwl66JD
+         o12RhWfbdh+PJ6HZENbuixoYlwBys2Bkg1Nppo5Leba/ks/4OCe6q34h7g77+1KDlWud
+         m6bHiw4qND5rF9Su+xb14FZOns6tTZbX2SNuDupmm4MSjAItkAsA3H4DGLfnHHfQXTa1
+         wn3BRRi/gFl0LydmgS6+BWWOMiJCwL5Nm3t7FeNaLDg5IUjuVeDfRpOFtEoEcji0Y2k0
+         +5FbYHSd8VM1tK+svnx0+DX9rVX5altJNoGNRTPPMipnNIF5LuxwoheqZVUW0YWcM43A
+         3FBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=NVTELMYjXgVLoLs43MP5pps+p0/+MK0jceWllGzIGU0=;
+        b=EjtR+eRBVcDK2ogLtcCuIVBPYytxnMYJ0RlCqvrGmChdrLX/cVllYQavrT6AWo99Qq
+         fPPofMj0/hd4OSZNwdIGae4o+/5nQ2AinnilwfKLXbpTPJScOrAiQS0QePVIPpQ7pQhc
+         QEv50saJ7rgnZFMMVn1jBT7ZB4KJ+xqLJoJCeomMf05TFAym6RJySGdX7pqO43lsjvRu
+         cpcpV6xPWE2hYtF08AVSI0q0Z8rgLTvRoYiI3N/EbPylrWVZ8NAm3NMPULX5IqIMYDoU
+         KYipg2SLHF0zW/0Bq1QSd5whViEdv4ThftqAG8aGQZ3+whn8IUZhGa7nx/fAm8JjWFT9
+         DhIA==
+X-Gm-Message-State: AGi0PubkY6Njgj+MXYBB+QNmHV9YBjfNxZjc8Ydo21Lv2xiArv8b/LOF
+        Z1UpKnToiT+dmUBig0aCTmfPN/ZXIa1lYanYQ14=
+X-Google-Smtp-Source: APiQypI/JWuiuEEo2hKeVLp/oRrJOjcx2X+LRnF1IVVbyVcrMFcdmXrh9DO2iq0COwJJsxP1W6aGI55hxM6H41MKfXE=
+X-Received: by 2002:a37:8b04:: with SMTP id n4mr7283548qkd.222.1586348354811;
+ Wed, 08 Apr 2020 05:19:14 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a37fd4c-127f-4c70-ea5f-08d7dbb08654
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2020 11:32:30.9764
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iltsmVnWqwuEh75HjhrvfLPAfg+ygfeh7s6SlG4FzTtOMbSLaOIb8+K0r5wXY40tVpzL4toI85EfyxRoow2NV40KLehYnWZ2WPdvqUWxtj4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3535
+References: <20200407141621.GA29060@192.168.3.9> <BYAPR04MB49657AC1B762EA5450AA178986C30@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <BYAPR04MB49657AC1B762EA5450AA178986C30@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Wed, 8 Apr 2020 20:19:03 +0800
+Message-ID: <CAA70yB7Z8bkQAaPy+u8FPme4Y34O6CTw=YCXEJ+_W57M1CxzFg@mail.gmail.com>
+Subject: Re: [PATCH blktest] nvme/033: add test case for nvme update hardware
+ queue count
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
+        "osandov@osandov.com" <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/04/2020 19:00, Christoph Hellwig wrote:=0A=
->   - scsi_mq_free_sgtables - yes, this would need to be done by the driver=
-=0A=
->     and actually is what undoes scsi_init_io.  I think you want to export=
-=0A=
->     this instead (and remove the _mq in the name while you are at it)=0A=
-=0A=
-OK, I was afraid to expose too much internals if I export =0A=
-scsi_mq_free_sgtables() but, sure that's a trivial change.=0A=
+Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com> =E4=BA=8E2020=E5=B9=B44=E6=
+=9C=887=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:32=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+Hi Chaitanya,
+Thanks your review
+
+> > +     # backup old module parameter: write_queues
+> > +     file=3D/sys/module/nvme/parameters/write_queues
+> > +     if [[ ! -e "$file" ]]; then
+> > +             echo "$file does not exist"
+> > +             return 1
+> > +     fi
+> can we skip the test ? I think Omar added a feature to skip the test.
+
+What feature can be used here, I don't see any rc file "set -e".
+> > +     old_write_queues=3D"$(cat $file)"
+> > +
+> > +     # get current hardware queue count
+> > +     file=3D"$sys_dev/queue_count"
+> > +     if [[ ! -e "$file" ]]; then
+> > +             echo "$file does not exist"
+> > +             return 1
+> > +     fi
+> Same here.
+> > +     cur_hw_io_queues=3D"$(cat "$file")"
+> > +     # minus admin queue
+> > +     cur_hw_io_queues=3D$((cur_hw_io_queues - 1))
+> > +
+> > +     # set write queues count to increase more hardware queues
+> > +     file=3D/sys/module/nvme/parameters/write_queues
+> > +     echo "$cur_hw_io_queues" > "$file"
+> > +
+> Shouldn't we check if new queue count is set here by reading
+> write_queues ?
+Most of time, this parameter will not equal to io queue_count,
+if really so, it will makes this test case be more complicated.
+
+> > +     # reset controller, make it effective
+> > +     file=3D"$sys_dev/reset_controller"
+> > +     if [[ ! -e "$file" ]]; then
+> > +             echo "$file does not exist"
+> > +             return 1
+> > +     fi
+> I think we need to add a helper to verify all the files and skip the
+> test required file doesn't exists. Also, please use different variables
+> representing different files.
+The reason why use same variable name $file, is that copy and paste
+code(check file exist or not).
+
+If common/rc include "set -e", all these checks can be removed.
+
+> > +     echo 1 > "$file"
+> > +
+> > +     # wait nvme reinitialized
+> > +     for ((m =3D 0; m < 10; m++)); do
+> > +             if [[ -b "${TEST_DEV}" ]]; then
+> > +                     break
+> > +             fi
+> > +             sleep 0.5
+> > +     done
+> > +     if (( m > 9 )); then
+> > +             echo "nvme still not reinitialized after 5 seconds!"
+> > +             return 1
+> > +     fi
+> > +
+> > +     # read data from device (may kernel panic)
+> > +     dd if=3D"${TEST_DEV}" of=3D/dev/null bs=3D4096 count=3D1 status=
+=3Dnone
+> > +
+> This should not lead to the kernel panic. Do you have a patch to fix
+> the panic ? If not can you please provide information so that we can
+> fix the panic and make test a test which will not result in panic ?
+>
+The patch is under the review, for more detail please visit:
+https://patchwork.kernel.org/patch/11476409/
+> > +     # If all work well restore hardware queue to default
+> > +     file=3D/sys/module/nvme/parameters/write_queues
+> > +     echo "$old_write_queues" > "$file"
+> > +
+> > +     # reset controller
+> > +     file=3D"$sys_dev/reset_controller"
+> > +     echo 1 > "$file"
+> > +
+> > +     # read data from device (may kernel panic)
+> > +     dd if=3D"${TEST_DEV}" of=3D/dev/null bs=3D4096 count=3D1 iflag=3D=
+direct status=3Dnone
+> > +     dd if=3D/dev/zero of=3D"${TEST_DEV}" bs=3D4096 count=3D1 oflag=3D=
+direct status=3Dnone
+> Just a write a helper for dd command instead of hard-coding it.
+I think dd is simple enough.
+> > +
+> > +     echo "Test complete"
+> > +}
+> > diff --git a/tests/nvme/033.out b/tests/nvme/033.out
+> > new file mode 100644
+> > index 0000000..9648c73
+> > --- /dev/null
+> > +++ b/tests/nvme/033.out
+> > @@ -0,0 +1,2 @@
+> > +Running nvme/033
+> > +Test complete
+> >
+>
+Thanks
