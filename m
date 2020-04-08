@@ -1,132 +1,113 @@
-Return-Path: <SRS0=69Bb=5X=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E576C2BB54
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 23:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D49B9C2D0EC
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 01:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 344A7206BE
-	for <linux-block@archiver.kernel.org>; Tue,  7 Apr 2020 23:27:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 792B2206F7
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 01:38:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+eGd8KG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726464AbgDGX1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Apr 2020 19:27:55 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:49130 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726386AbgDGX1z (ORCPT
+        id S1726407AbgDHBiq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Apr 2020 21:38:46 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21397 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726421AbgDHBiq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Apr 2020 19:27:55 -0400
-Received: from dread.disaster.area (pa49-180-164-3.pa.nsw.optusnet.com.au [49.180.164.3])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 784FF7EBDA0;
-        Wed,  8 Apr 2020 09:27:50 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1jLxdF-0005Tl-A3; Wed, 08 Apr 2020 09:27:49 +1000
-Date:   Wed, 8 Apr 2020 09:27:49 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
-        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
-Subject: Re: [PATCH 2/2] xfs: use block layer helper for rw
-Message-ID: <20200407232749.GC24067@dread.disaster.area>
-References: <20200406232440.4027-1-chaitanya.kulkarni@wdc.com>
- <20200406232440.4027-3-chaitanya.kulkarni@wdc.com>
- <BY5PR04MB690075C16A97151A6216948CE7C30@BY5PR04MB6900.namprd04.prod.outlook.com>
- <BYAPR04MB4965A3A58D804CCE9892266686C30@BYAPR04MB4965.namprd04.prod.outlook.com>
+        Tue, 7 Apr 2020 21:38:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586309925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EX654m5SzYXHo3s0O8Fk9j2QSRRVqZr+GuSNTZWrpkY=;
+        b=D+eGd8KGdfFWu0TckNk2dPzVjAQtou2QFZ0bWa9L6pN/IN3UI5kSSHHtRiHFtRFmz3c5or
+        Uc1fwXKahInIh8p2dXQRchXQHaQBQueN0Lnr7l+0aAlvEUXEW3P0sJHGFzb5jK9+V37/k6
+        rLkolI2jQU2O78M0h5ODujI06e6L1cQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460-FOQSbdUTM8iqvcWR7CBJ7Q-1; Tue, 07 Apr 2020 21:38:41 -0400
+X-MC-Unique: FOQSbdUTM8iqvcWR7CBJ7Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 558B818A8C94;
+        Wed,  8 Apr 2020 01:38:40 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A06C27E303;
+        Wed,  8 Apr 2020 01:38:32 +0000 (UTC)
+Date:   Wed, 8 Apr 2020 09:38:27 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH V6 1/8] blk-mq: assign rq->tag in blk_mq_get_driver_tag
+Message-ID: <20200408013827.GA337494@localhost.localdomain>
+References: <20200407092901.314228-1-ming.lei@redhat.com>
+ <20200407092901.314228-2-ming.lei@redhat.com>
+ <20200407171405.GA5614@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR04MB4965A3A58D804CCE9892266686C30@BYAPR04MB4965.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=LYdCFQXi c=1 sm=1 tr=0
-        a=K0+o7W9luyMo1Ua2eXjR1w==:117 a=K0+o7W9luyMo1Ua2eXjR1w==:17
-        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10
-        a=7-415B0cAAAA:8 a=deSlaM45Gs4b21hfZ6IA:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <20200407171405.GA5614@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 07, 2020 at 08:06:35PM +0000, Chaitanya Kulkarni wrote:
-> On 04/06/2020 05:32 PM, Damien Le Moal wrote:
-> >> -
-> >> >-	do {
-> >> >-		struct page	*page = kmem_to_page(data);
-> >> >-		unsigned int	off = offset_in_page(data);
-> >> >-		unsigned int	len = min_t(unsigned, left, PAGE_SIZE - off);
-> >> >-
-> >> >-		while (bio_add_page(bio, page, len, off) != len) {
-> >> >-			struct bio	*prev = bio;
-> >> >-
-> >> >-			bio = bio_alloc(GFP_KERNEL, bio_max_vecs(left));
-> >> >-			bio_copy_dev(bio, prev);
-> >> >-			bio->bi_iter.bi_sector = bio_end_sector(prev);
-> >> >-			bio->bi_opf = prev->bi_opf;
-> >> >-			bio_chain(prev, bio);
-> >> >-
-> >> >-			submit_bio(prev);
-> >> >-		}
-> >> >-
-> >> >-		data += len;
-> >> >-		left -= len;
-> >> >-	} while (left > 0);
-> > Your helper could use a similar loop structure. This is very easy to read.
-> >
-> If I understand correctly this pattern is used since it is not a part of 
-> block layer.
+On Tue, Apr 07, 2020 at 07:14:05PM +0200, Christoph Hellwig wrote:
+> On Tue, Apr 07, 2020 at 05:28:54PM +0800, Ming Lei wrote:
+> > @@ -472,14 +462,18 @@ static void __blk_mq_free_request(struct request *rq)
+> >  	struct request_queue *q = rq->q;
+> >  	struct blk_mq_ctx *ctx = rq->mq_ctx;
+> >  	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+> > -	const int sched_tag = rq->internal_tag;
+> > +	const int tag = rq->internal_tag;
+> > +	bool has_sched = !!hctx->sched_tags;
+> >  
+> >  	blk_pm_mark_last_busy(rq);
+> >  	rq->mq_hctx = NULL;
+> > +	if (!has_sched)
+> > +		blk_mq_put_tag(hctx->tags, ctx, tag);
+> > +	else if (rq->tag >= 0)
+> >  		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+> > +
+> > +	if (has_sched)
+> > +		blk_mq_put_tag(hctx->sched_tags, ctx, tag);
+> 
+> This looks weird to me.  Why not simply:
+> 
+> 	if (hctx->sched_tags) {
+> 		if (rq->tag >= 0)
+> 			blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+> 		blk_mq_put_tag(hctx->sched_tags, ctx, rq->internal_tag);
+> 	} else {
+> 		blk_mq_put_tag(hctx->tags, ctx, rq->internal_tag);
+> 	}
 
-It's because it was simple and easy to understandi, not because of
-the fact it is outside the core block layer.
+Nice!
 
-Us XFS folks are simple people who like simple things that are easy to
-understand because there is so much of XFS that is so horrifically
-complex that we want to implement simple stuff once and just not
-have to care about it again.
+> 
+> 
+> > @@ -1037,14 +1031,21 @@ bool blk_mq_get_driver_tag(struct request *rq)
+> 
+> FYI, it seems like blk_mq_get_driver_tag can be marked static.
+> 
+> Otherwise this looks pretty sensible to me.
 
-> The helpers in blk-lib.c are not accessible so this :-
+Indeed, just forgot to do that.
 
-So export the helpers?
 
-> All above breaks the existing pattern and code reuse in blk-lib.c, since 
-> blk-lib.c:-
-> 1. Already provides blk_next_bio() why repeat the bio allocation
->     and bio chaining code ?
+Thanks,
+Ming
 
-So export the helper?
-
-> 2. Instead of adding a new helper bio_max_vecs() why not use existing
->      __blkdev_sectors_to_bio_pages() ?
-
-That's not an improvement. The XFS code is _much_ easier to read
-and understand.
-
-> 3. Why use two bios when it can be done with one bio with the helpers
->     in blk-lib.c ?
-
-That helper is blk_next_bio(), which hides the second bio inside it.
-So you aren't actually getting rid of the need for two bio pointers.
-
-> 4. Allows async version.
-
-Which is not used by XFS, so just adds complexity to this XFS path
-for no good reason.
-
-Seriously, this 20 lines of code in XFS turns into 50-60 lines
-of code in the block layer to do the same thing. How is that an
-improvement?
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
