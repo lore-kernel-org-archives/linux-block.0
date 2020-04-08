@@ -2,119 +2,395 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D42C2D0F4
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259C7C2D0F4
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 19:44:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3904B20730
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 16:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D887120768
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 19:44:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uA3NBa5j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730447AbgDHQ5P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 12:57:15 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2644 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729456AbgDHQ5P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Apr 2020 12:57:15 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 00F6D9F3B650D1797C8B;
-        Wed,  8 Apr 2020 17:57:13 +0100 (IST)
-Received: from [127.0.0.1] (10.210.166.224) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 8 Apr 2020
- 17:57:12 +0100
-Subject: Re: [PATCH V6 0/8] blk-mq: improvement CPU hotplug
-To:     Daniel Wagner <dwagner@suse.de>
-CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200407092901.314228-1-ming.lei@redhat.com>
- <20200408124017.g6wizq5bljzwb2gq@beryllium.lan>
- <d441e96f-2450-6fc7-c5ab-b8bb9f98f3be@huawei.com>
- <20200408131030.456mq6kjxscex7ql@beryllium.lan>
- <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
- <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <8dade35b-6fd6-4438-25b1-b4620d4982ba@huawei.com>
-Date:   Wed, 8 Apr 2020 17:56:48 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1729134AbgDHTop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 15:44:45 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40568 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726795AbgDHTop (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 15:44:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=zaiVVn26POc3v9EheIrbbUfgKHpxYPyAv21MH+M1N7Y=; b=uA3NBa5jwXGt8OOvlAv0cZL6Tt
+        MSRvGcvla4/LNjOGonN8XWF1hdIF9692+uAQZZZFCqzKCCxwot5tkoDuBYX4oU9go2i4q/qOT7ocv
+        fVwSdakhjCI4NLpCoVOcwj0pmOcYIQJUyCDeK+yO4S9piGtzmcxOZqljjBL0SRMsK1WR2KkHLs8uw
+        OIHTSuQASC+/euKmvUJ/ugJadN56wWEx13CrEnt243cJVubL5Eg3KX4gfOZwIOVtrPjVPQgRifncZ
+        70Nklwc+y3YBbpJc7CduxngpNPHll8Bgk+XxuQeZxnnUKGV15+0gDoArJvTI31qw1ASbwsqQG6uDG
+        ogyReXSQ==;
+Received: from [2001:4bb8:180:5765:65b6:f11e:f109:b151] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jMGct-0004GS-VM; Wed, 08 Apr 2020 19:44:44 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH 01/10] block: refactor blkpg_ioctl
+Date:   Wed,  8 Apr 2020 21:44:30 +0200
+Message-Id: <20200408194439.1580699-2-hch@lst.de>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200408194439.1580699-1-hch@lst.de>
+References: <20200408194439.1580699-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.166.224]
-X-ClientProxiedBy: lhreml738-chm.china.huawei.com (10.201.108.188) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08/04/2020 16:14, Daniel Wagner wrote:
-> On Wed, Apr 08, 2020 at 02:29:51PM +0100, John Garry wrote:
->> On 08/04/2020 14:10, Daniel Wagner wrote:
->> ok, but to really test this you need to ensure that all the cpus for a
->> managed interrupt affinity mask are offlined together for some period of
->> time greater than the IO timeout. Otherwise the hw queue's managed interrupt
->> would not be shut down, and you're not verifying that the queues are fully
->> drained.
-> 
+Split each sub-command out into a separate helper, and move those helpers
+to block/partitions/core.c instead of having a lot of partition
+manipulation logic open coded in block/ioctl.c.
 
-Hi Daniel,
+Signed-off-by: Christoph Hellwig <hch@lst.de
+---
+ block/blk.h             |   8 ++-
+ block/ioctl.c           | 150 +++++++---------------------------------
+ block/partitions/core.c | 115 +++++++++++++++++++++++++++++-
+ 3 files changed, 145 insertions(+), 128 deletions(-)
 
-> Not sure if I understand you correctly: Are you saying that the IRQ
-> related resources are not freed/moved from the offlining CPU?
-
-This series tries to drain the hw queue when all cpus in the queue (IRQ) 
-affinity mask are being offlined. This is because when all the cpus are 
-offlined, the managed IRQ for that hw queue is shutdown - so there are 
-no cpus remaining online to service the completion interrupt for 
-in-flight IOs. The cover letter may explain this better.
-
-> 
->>>> Will the fio processes migrate back onto cpus which have been onlined again?
->>>
->>> Hmm, good question. I've tried to assign them to a specific CPU via
->>> --cpus_allowed_policy=split and --cpus_allowed.
->>>
->>>     fio --rw=randwrite --name=test --size=50M --iodepth=32 --direct=1 \
->>>         --bs=4k --numjobs=40 --time_based --runtime=1h --ioengine=libaio \
->>>         --group_reporting --cpus_allowed_policy=split --cpus_allowed=0-40
->>>
->>> Though I haven't verified what happens when the CPU get's back online.
->>
->> Maybe this will work since you're offlining patterns of cpus and the fio
->> processes have to migrate somewhere. But see above.
-> 
-> At least after the initial setup a fio thread will be migrated away
-> from the offlining CPU.
-> 
-> A quick test shows, that the affinity mask for a fio thread will be
-> cleared when the CPU goes offline. There seems to be a discussion
-> going on about the cpu hotplug and the affinity mask:
-> 
-> https://lore.kernel.org/lkml/1251528473.590671.1579196495905.JavaMail.zimbra@efficios.com
-> 
-> TL;DR: it can be scheduled back if affinity is tweaked via
-> e.g. taskset, it won't if it's via cpusets
-
-I just avoid any of this in my test by looping in a sequence of onlining 
-all cpus, start fio for short period, and then offline cpus.
-
-BTW, you mentioned earlier that you would test megaraid_sas. As things 
-stand, I don't think that series will help there as that driver still 
-just exposes a single HW queue to blk-mq. I think qla2xxx driver does 
-expose >1 queues, i.e. it sets Scsi_Host.nr_hq_queues, so may be a 
-better option.
-
-Cheers,
-John
+diff --git a/block/blk.h b/block/blk.h
+index 0a94ec68af32..305e0ac22bf7 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -389,11 +389,13 @@ char *disk_name(struct gendisk *hd, int partno, char *buf);
+ #define ADDPART_FLAG_NONE	0
+ #define ADDPART_FLAG_RAID	1
+ #define ADDPART_FLAG_WHOLEDISK	2
+-struct hd_struct *__must_check add_partition(struct gendisk *disk, int partno,
+-		sector_t start, sector_t len, int flags,
+-		struct partition_meta_info *info);
+ void __delete_partition(struct percpu_ref *ref);
+ void delete_partition(struct gendisk *disk, int partno);
++int bdev_add_partition(struct block_device *bdev, int partno,
++		sector_t start, sector_t length);
++int bdev_del_partition(struct block_device *bdev, int partno);
++int bdev_resize_partition(struct block_device *bdev, int partno,
++		sector_t start, sector_t length);
+ int disk_expand_part_tbl(struct gendisk *disk, int target);
+ 
+ static inline int hd_ref_init(struct hd_struct *part)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 6e827de1a4c4..3de5b29c839e 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -16,142 +16,44 @@
+ static int blkpg_do_ioctl(struct block_device *bdev,
+ 			  struct blkpg_partition __user *upart, int op)
+ {
+-	struct block_device *bdevp;
+-	struct gendisk *disk;
+-	struct hd_struct *part, *lpart;
+ 	struct blkpg_partition p;
+-	struct disk_part_iter piter;
+ 	long long start, length;
+-	int partno;
+ 
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+ 	if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
+ 		return -EFAULT;
+-	disk = bdev->bd_disk;
+ 	if (bdev != bdev->bd_contains)
+ 		return -EINVAL;
+-	partno = p.pno;
+-	if (partno <= 0)
++
++	if (p.pno <= 0)
+ 		return -EINVAL;
++
++	if (op == BLKPG_DEL_PARTITION)
++		return bdev_del_partition(bdev, p.pno);
++
++	start = p.start >> SECTOR_SHIFT;
++	length = p.length >> SECTOR_SHIFT;
++
++	/* check for fit in a hd_struct */
++	if (sizeof(sector_t) < sizeof(long long)) {
++		long pstart = start, plength = length;
++
++		if (pstart != start || plength != length || pstart < 0 ||
++		    plength < 0 || p.pno > 65535)
++			return -EINVAL;
++	}
++
+ 	switch (op) {
+-		case BLKPG_ADD_PARTITION:
+-			start = p.start >> 9;
+-			length = p.length >> 9;
+-			/* check for fit in a hd_struct */
+-			if (sizeof(sector_t) == sizeof(long) &&
+-			    sizeof(long long) > sizeof(long)) {
+-				long pstart = start, plength = length;
+-				if (pstart != start || plength != length
+-				    || pstart < 0 || plength < 0 || partno > 65535)
+-					return -EINVAL;
+-			}
+-			/* check if partition is aligned to blocksize */
+-			if (p.start & (bdev_logical_block_size(bdev) - 1))
+-				return -EINVAL;
+-
+-			mutex_lock(&bdev->bd_mutex);
+-
+-			/* overlap? */
+-			disk_part_iter_init(&piter, disk,
+-					    DISK_PITER_INCL_EMPTY);
+-			while ((part = disk_part_iter_next(&piter))) {
+-				if (!(start + length <= part->start_sect ||
+-				      start >= part->start_sect + part->nr_sects)) {
+-					disk_part_iter_exit(&piter);
+-					mutex_unlock(&bdev->bd_mutex);
+-					return -EBUSY;
+-				}
+-			}
+-			disk_part_iter_exit(&piter);
+-
+-			/* all seems OK */
+-			part = add_partition(disk, partno, start, length,
+-					     ADDPART_FLAG_NONE, NULL);
+-			mutex_unlock(&bdev->bd_mutex);
+-			return PTR_ERR_OR_ZERO(part);
+-		case BLKPG_DEL_PARTITION:
+-			part = disk_get_part(disk, partno);
+-			if (!part)
+-				return -ENXIO;
+-
+-			bdevp = bdget(part_devt(part));
+-			disk_put_part(part);
+-			if (!bdevp)
+-				return -ENOMEM;
+-
+-			mutex_lock(&bdevp->bd_mutex);
+-			if (bdevp->bd_openers) {
+-				mutex_unlock(&bdevp->bd_mutex);
+-				bdput(bdevp);
+-				return -EBUSY;
+-			}
+-			/* all seems OK */
+-			fsync_bdev(bdevp);
+-			invalidate_bdev(bdevp);
+-
+-			mutex_lock_nested(&bdev->bd_mutex, 1);
+-			delete_partition(disk, partno);
+-			mutex_unlock(&bdev->bd_mutex);
+-			mutex_unlock(&bdevp->bd_mutex);
+-			bdput(bdevp);
+-
+-			return 0;
+-		case BLKPG_RESIZE_PARTITION:
+-			start = p.start >> 9;
+-			/* new length of partition in bytes */
+-			length = p.length >> 9;
+-			/* check for fit in a hd_struct */
+-			if (sizeof(sector_t) == sizeof(long) &&
+-			    sizeof(long long) > sizeof(long)) {
+-				long pstart = start, plength = length;
+-				if (pstart != start || plength != length
+-				    || pstart < 0 || plength < 0)
+-					return -EINVAL;
+-			}
+-			part = disk_get_part(disk, partno);
+-			if (!part)
+-				return -ENXIO;
+-			bdevp = bdget(part_devt(part));
+-			if (!bdevp) {
+-				disk_put_part(part);
+-				return -ENOMEM;
+-			}
+-			mutex_lock(&bdevp->bd_mutex);
+-			mutex_lock_nested(&bdev->bd_mutex, 1);
+-			if (start != part->start_sect) {
+-				mutex_unlock(&bdevp->bd_mutex);
+-				mutex_unlock(&bdev->bd_mutex);
+-				bdput(bdevp);
+-				disk_put_part(part);
+-				return -EINVAL;
+-			}
+-			/* overlap? */
+-			disk_part_iter_init(&piter, disk,
+-					    DISK_PITER_INCL_EMPTY);
+-			while ((lpart = disk_part_iter_next(&piter))) {
+-				if (lpart->partno != partno &&
+-				   !(start + length <= lpart->start_sect ||
+-				   start >= lpart->start_sect + lpart->nr_sects)
+-				   ) {
+-					disk_part_iter_exit(&piter);
+-					mutex_unlock(&bdevp->bd_mutex);
+-					mutex_unlock(&bdev->bd_mutex);
+-					bdput(bdevp);
+-					disk_put_part(part);
+-					return -EBUSY;
+-				}
+-			}
+-			disk_part_iter_exit(&piter);
+-			part_nr_sects_write(part, (sector_t)length);
+-			i_size_write(bdevp->bd_inode, p.length);
+-			mutex_unlock(&bdevp->bd_mutex);
+-			mutex_unlock(&bdev->bd_mutex);
+-			bdput(bdevp);
+-			disk_put_part(part);
+-			return 0;
+-		default:
++	case BLKPG_ADD_PARTITION:
++		/* check if partition is aligned to blocksize */
++		if (p.start & (bdev_logical_block_size(bdev) - 1))
+ 			return -EINVAL;
++		return bdev_add_partition(bdev, p.pno, start, length);
++	case BLKPG_DEL_PARTITION:
++		return bdev_resize_partition(bdev, p.pno, start, length);
++	default:
++		return -EINVAL;
+ 	}
+ }
+ 
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 1a0a829d8416..7577bdba3b2b 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -335,7 +335,7 @@ static DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
+  * Must be called either with bd_mutex held, before a disk can be opened or
+  * after all disk users are gone.
+  */
+-struct hd_struct *add_partition(struct gendisk *disk, int partno,
++static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 				sector_t start, sector_t len, int flags,
+ 				struct partition_meta_info *info)
+ {
+@@ -472,6 +472,119 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 	return ERR_PTR(err);
+ }
+ 
++static bool partition_overlaps(struct gendisk *disk, sector_t start,
++		sector_t length, int skip_partno)
++{
++	struct disk_part_iter piter;
++	struct hd_struct *part;
++	bool overlap = false;
++
++	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
++	while ((part = disk_part_iter_next(&piter))) {
++		if (part->partno == skip_partno ||
++		    start >= part->start_sect + part->nr_sects ||
++		    start + length <= part->start_sect)
++			continue;
++		overlap = true;
++		break;
++	}
++
++	disk_part_iter_exit(&piter);
++	return overlap;
++}
++
++int bdev_add_partition(struct block_device *bdev, int partno,
++		sector_t start, sector_t length)
++{
++	struct hd_struct *part;
++
++	mutex_lock(&bdev->bd_mutex);
++	if (partition_overlaps(bdev->bd_disk, start, length, -1)) {
++		mutex_unlock(&bdev->bd_mutex);
++		return -EBUSY;
++	}
++
++	part = add_partition(bdev->bd_disk, partno, start, length,
++			ADDPART_FLAG_NONE, NULL);
++	mutex_unlock(&bdev->bd_mutex);
++	return PTR_ERR_OR_ZERO(part);
++}
++
++int bdev_del_partition(struct block_device *bdev, int partno)
++{
++	struct block_device *bdevp;
++	struct hd_struct *part;
++	int ret = 0;
++
++	part = disk_get_part(bdev->bd_disk, partno);
++	if (!part)
++		return -ENXIO;
++
++	bdevp = bdget(part_devt(part));
++	disk_put_part(part);
++	if (!bdevp)
++		return -ENOMEM;
++
++	mutex_lock(&bdevp->bd_mutex);
++
++	ret = -EBUSY;
++	if (bdevp->bd_openers)
++		goto out_unlock;
++
++	fsync_bdev(bdevp);
++	invalidate_bdev(bdevp);
++
++	mutex_lock_nested(&bdev->bd_mutex, 1);
++	delete_partition(bdev->bd_disk, partno);
++	mutex_unlock(&bdev->bd_mutex);
++
++	ret = 0;
++out_unlock:
++	mutex_unlock(&bdevp->bd_mutex);
++	bdput(bdevp);
++	return ret;
++}
++
++int bdev_resize_partition(struct block_device *bdev, int partno,
++		sector_t start, sector_t length)
++{
++	struct block_device *bdevp;
++	struct hd_struct *part;
++	int ret = 0;
++
++	part = disk_get_part(bdev->bd_disk, partno);
++	if (!part)
++		return -ENXIO;
++
++	ret = -ENOMEM;
++	bdevp = bdget(part_devt(part));
++	if (!bdevp)
++		goto out_put_part;
++
++	mutex_lock(&bdevp->bd_mutex);
++	mutex_lock_nested(&bdev->bd_mutex, 1);
++
++	ret = -EINVAL;
++	if (start != part->start_sect)
++		goto out_unlock;
++
++	ret = -EBUSY;
++	if (partition_overlaps(bdev->bd_disk, start, length, partno))
++		goto out_unlock;
++
++	part_nr_sects_write(part, (sector_t)length);
++	i_size_write(bdevp->bd_inode, length << SECTOR_SHIFT);
++
++	ret = 0;
++out_unlock:
++	mutex_unlock(&bdevp->bd_mutex);
++	mutex_unlock(&bdev->bd_mutex);
++	bdput(bdevp);
++out_put_part:
++	disk_put_part(part);
++	return ret;
++}
++
+ static bool disk_unlock_native_capacity(struct gendisk *disk)
+ {
+ 	const struct block_device_operations *bdops = disk->fops;
+-- 
+2.25.1
 
