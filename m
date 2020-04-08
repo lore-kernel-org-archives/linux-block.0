@@ -2,90 +2,145 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A67C2D0EA
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 14:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A603CC2D0EA
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:04:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E4D420787
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 14:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B0A2206F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:04:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="K46bTvro"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WeIoaF6V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727376AbgDHOuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 10:50:02 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:40233 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726889AbgDHOuC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 10:50:02 -0400
-Received: by mail-pl1-f194.google.com with SMTP id h11so2571801plk.7
-        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2020 07:50:01 -0700 (PDT)
+        id S1728424AbgDHPEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 11:04:35 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:41873 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728157AbgDHPEe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 11:04:34 -0400
+Received: by mail-pg1-f195.google.com with SMTP id m13so3424943pgd.8
+        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2020 08:04:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=I8FzH7EebZtU80iu8VKOhofG02voMqpeLU7mMA/1duw=;
-        b=K46bTvroOv0b5L2EiCyrJPdIos+MKgPHL/VqLYrdtCQSNgcnLYRNJmrLU3UrZSBPb/
-         zQGA+h9UFp4oKK3OBipnhxnix9RrOyoaJD4iFvltAz67T8HEQoMrxDXo0GamnvwBdsyM
-         LQP2fZUxR3BV7EkxFbo1LQbP40qKCHspkcJLnC2uo7Yu+P4u3+J1OrO3qSNaSkuyqaEc
-         zXkGcJ2a8Uc9+P8n5Lqs291INdThk0a/PvMF/sktuMhmdZgjEqWovor5cQjVPsTui1nv
-         H8FrFi/+A3CRKM3oCDLaqPNKUuRxx7lVmowZSDhR6Pz7fi4ltPxnxpClknR1ThbRSgnw
-         AZDQ==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=ykBFVrZ5VqErlxdGxaznASIr1DPALx6cRNBKHC8zE+4=;
+        b=WeIoaF6VGX20BswqY9TqTj+Q4BN5xdWpQNb+lBxDFRLRQmKlLnHtyLEo9szLuaaWmL
+         uXpXqkrjLeFDrSpJb/pE3XsdBUYkCYg2TKiL8z75XbapAgBEJhKQqHfqot+Y6/AjHT6p
+         PqyW+Y65GrBglvA1WkUvjpo7Yk5AoZ2kfXZMs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I8FzH7EebZtU80iu8VKOhofG02voMqpeLU7mMA/1duw=;
-        b=j0XMK9iJgCDoltzQ2HZYolvULrfYyJaloMuVK9dNN2+K1o5hMARnWSKblWIPcvl8V9
-         W0WdfWi86M1lIz/lX39JKQZNjm8/C4meM0QKr8YZyiou/aogBzgrvamu/9ptnCw5bYN7
-         EeP9gtweE4FWsSaJUoux+CLGyRu8lC9AFcRJAWIlry86RAZUdGJtlUCOeCsRaDNm9MzU
-         QuiCQjmWPCQ4DM13U/Ht1aobnROdLEwf44K9mUCGOG3vV1Xe5LpyOlZ9vynGsj+/LYV0
-         4lmCTD5T6U0bErSxZPwpe7ofA4seteOmO5GW95efE/Lc1XuNyhd3q8j9cLS1haJ0H8po
-         Dykw==
-X-Gm-Message-State: AGi0PubEWPnQc68SjcfD7q+1MKmpembjr6PP8WwUpn8JpFKIXxfKMxYf
-        qUaR2wFOO23JwN88b99U++e+zBqs3JPdlw==
-X-Google-Smtp-Source: APiQypLx/xljiVY4tkyNO5Z6jOqqaJGZZ9DaV7MRYO/RbCEZlAbtLkD3YztpKMrblyNBSsvzCICYsg==
-X-Received: by 2002:a17:902:8c94:: with SMTP id t20mr48219plo.336.1586356917092;
-        Wed, 08 Apr 2020 07:41:57 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:4466:6b33:f85b:7770? ([2605:e000:100e:8c61:4466:6b33:f85b:7770])
-        by smtp.gmail.com with ESMTPSA id x188sm15772384pgb.76.2020.04.08.07.41.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2020 07:41:56 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for 5.7
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     kbusch@kernel.org, sagi@grimberg.me,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-References: <20200408062131.GA212017@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <795e9c03-4213-8d98-3d18-791c3a97efe3@kernel.dk>
-Date:   Wed, 8 Apr 2020 07:41:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ykBFVrZ5VqErlxdGxaznASIr1DPALx6cRNBKHC8zE+4=;
+        b=glV1ar0hStsZlqHwq+jvFlumJmnhXmjOTzS/eupF7zWg3FpM24jP4Nwss1d05ZqAvM
+         b4ODbqjT8XLOqOG9VaEeK5Fl9jmLitPwWz8Zt4+ooO08uTHIknEim4exo9VH5X2Q9A7M
+         LgcNSfBXfLKkscBwFbxRrrAMpi/Tv0GRfn/gbt9YcaWI/Z9gRect+eohvg2hAKgtGy+q
+         JbwhgYA0pPOfHXKykAUwWVs35SqbU2RWGD7IowhRJCKHro7QSTD+/KFxnxyNJRT8Z0/h
+         4USujTot8fUPVZljoSpy+rJh+kBfMhF+OvqlzCgc+gIU7V7gYPZX30DbkGU0uvjp1x3h
+         csnw==
+X-Gm-Message-State: AGi0PuYeXCVZy1aGsl0NcvN/3RIuhPFWQJzqZEcqpUU8I98S/bQVkNht
+        OLcuqWGTH2UX7U5HHs7B4rtOog==
+X-Google-Smtp-Source: APiQypKEWc3MCkral5p3jzK3p9lOhhJpdLJZpPnwPUwZmxycNIYMNVYj0LsS1r4g9XYOgoQikNcQMw==
+X-Received: by 2002:a63:7a07:: with SMTP id v7mr6385580pgc.302.1586358272199;
+        Wed, 08 Apr 2020 08:04:32 -0700 (PDT)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:202:1:24fa:e766:52c9:e3b2])
+        by smtp.gmail.com with ESMTPSA id d85sm1468083pfd.157.2020.04.08.08.04.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2020 08:04:31 -0700 (PDT)
+From:   Douglas Anderson <dianders@chromium.org>
+To:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com
+Cc:     paolo.valente@linaro.org, groeck@chromium.org,
+        Gwendal Grignou <gwendal@chromium.org>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, sqazi@google.com,
+        Douglas Anderson <dianders@chromium.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4 1/4] blk-mq: In blk_mq_dispatch_rq_list() "no budget" is a reason to kick
+Date:   Wed,  8 Apr 2020 08:03:59 -0700
+Message-Id: <20200408080255.v4.1.I1f95c459e51962b8d2c83e869913b6befda2255c@changeid>
+X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+In-Reply-To: <20200408150402.21208-1-dianders@chromium.org>
+References: <20200408150402.21208-1-dianders@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <20200408062131.GA212017@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/7/20 11:21 PM, Christoph Hellwig wrote:
-> The following changes since commit 458ef2a25e0cbdc216012aa2b9cf549d64133b08:
-> 
->   Merge tag 'x86-timers-2020-03-30' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2020-03-30 19:55:39 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git nvme-5.7
+In blk_mq_dispatch_rq_list(), if blk_mq_sched_needs_restart() returns
+true and the driver returns BLK_STS_RESOURCE then we'll kick the
+queue.  However, there's another case where we might need to kick it.
+If we were unable to get budget we can be in much the same state as
+when the driver returns BLK_STS_RESOURCE, so we should treat it the
+same.
 
-Pulled, thanks.
+It should be noted that even if we add a whole bunch of extra kicking
+to the queue in other patches this patch is still important.
+Specifically any kicking that happened before we re-spliced leftover
+requests into 'hctx->dispatch' wouldn't have found any work, so we
+really need to make sure we kick ourselves after we've done the
+splicing.
 
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+
+Changes in v4: None
+Changes in v3:
+- Note why blk_mq_dispatch_rq_list() change is needed.
+
+Changes in v2: None
+
+ block/blk-mq.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d92088dec6c3..2cd8d2b49ff4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1189,6 +1189,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 	bool no_tag = false;
+ 	int errors, queued;
+ 	blk_status_t ret = BLK_STS_OK;
++	bool no_budget_avail = false;
+ 
+ 	if (list_empty(list))
+ 		return false;
+@@ -1205,8 +1206,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 
+ 		hctx = rq->mq_hctx;
+-		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
++		if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
++			no_budget_avail = true;
+ 			break;
++		}
+ 
+ 		if (!blk_mq_get_driver_tag(rq)) {
+ 			/*
+@@ -1311,13 +1314,15 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 		 *
+ 		 * If driver returns BLK_STS_RESOURCE and SCHED_RESTART
+ 		 * bit is set, run queue after a delay to avoid IO stalls
+-		 * that could otherwise occur if the queue is idle.
++		 * that could otherwise occur if the queue is idle.  We'll do
++		 * similar if we couldn't get budget and SCHED_RESTART is set.
+ 		 */
+ 		needs_restart = blk_mq_sched_needs_restart(hctx);
+ 		if (!needs_restart ||
+ 		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
+ 			blk_mq_run_hw_queue(hctx, true);
+-		else if (needs_restart && (ret == BLK_STS_RESOURCE))
++		else if (needs_restart && (ret == BLK_STS_RESOURCE ||
++					   no_budget_avail))
+ 			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+ 
+ 		blk_mq_update_dispatch_busy(hctx, true);
 -- 
-Jens Axboe
+2.26.0.292.g33ef6b2f38-goog
 
