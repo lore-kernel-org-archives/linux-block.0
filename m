@@ -2,86 +2,172 @@ Return-Path: <SRS0=kJV6=5Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 692F0C2D0EA
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CDAC2BA1A
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C20220692
-	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94438206C0
+	for <linux-block@archiver.kernel.org>; Wed,  8 Apr 2020 15:22:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727187AbgDHPOT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Apr 2020 11:14:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52082 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727126AbgDHPOT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Apr 2020 11:14:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C3FE4AD72;
-        Wed,  8 Apr 2020 15:14:16 +0000 (UTC)
-Date:   Wed, 8 Apr 2020 17:14:16 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V6 0/8] blk-mq: improvement CPU hotplug
-Message-ID: <20200408151416.ecpcpsq4psdbkufk@beryllium.lan>
-References: <20200407092901.314228-1-ming.lei@redhat.com>
- <20200408124017.g6wizq5bljzwb2gq@beryllium.lan>
- <d441e96f-2450-6fc7-c5ab-b8bb9f98f3be@huawei.com>
- <20200408131030.456mq6kjxscex7ql@beryllium.lan>
- <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
+        id S1726663AbgDHPWj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Apr 2020 11:22:39 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:39079 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728772AbgDHPWi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Apr 2020 11:22:38 -0400
+Received: from ip5f5bd698.dynamic.kabel-deutschland.de ([95.91.214.152] helo=wittgenstein.fritz.box)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <christian.brauner@ubuntu.com>)
+        id 1jMCXC-0001BO-7U; Wed, 08 Apr 2020 15:22:34 +0000
+From:   Christian Brauner <christian.brauner@ubuntu.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>, Serge Hallyn <serge@hallyn.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        Seth Forshee <seth.forshee@canonical.com>,
+        David Rheinsberg <david.rheinsberg@gmail.com>,
+        Tom Gundersen <teg@jklm.no>,
+        Christian Kellner <ckellner@redhat.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        =?UTF-8?q?St=C3=A9phane=20Graber?= <stgraber@ubuntu.com>,
+        linux-doc@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 1/8] kobject_uevent: remove unneeded netlink_ns check
+Date:   Wed,  8 Apr 2020 17:21:44 +0200
+Message-Id: <20200408152151.5780-2-christian.brauner@ubuntu.com>
+X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200408152151.5780-1-christian.brauner@ubuntu.com>
+References: <20200408152151.5780-1-christian.brauner@ubuntu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fce90f4b-1d23-a352-c48c-d80253b7a4b2@huawei.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 08, 2020 at 02:29:51PM +0100, John Garry wrote:
-> On 08/04/2020 14:10, Daniel Wagner wrote:
-> ok, but to really test this you need to ensure that all the cpus for a
-> managed interrupt affinity mask are offlined together for some period of
-> time greater than the IO timeout. Otherwise the hw queue's managed interrupt
-> would not be shut down, and you're not verifying that the queues are fully
-> drained.
+Back when I rewrote large chunks of uevent sending I should have removed
+the .netlink_ns method completely after having removed it's last user in
+[1]. Let's remove it now and also remove the helper associated with it
+that is unused too.
 
-Not sure if I understand you correctly: Are you saying that the IRQ
-related resources are not freed/moved from the offlining CPU?
+Fixes: a3498436b3a0 ("netns: restrict uevents") /* No backport needed. */
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+---
+ Documentation/filesystems/sysfs-tagging.txt |  1 -
+ include/linux/kobject_ns.h                  |  3 ---
+ lib/kobject.c                               | 13 -------------
+ lib/kobject_uevent.c                        |  2 +-
+ net/core/net-sysfs.c                        |  6 ------
+ 5 files changed, 1 insertion(+), 24 deletions(-)
 
-> > > Will the fio processes migrate back onto cpus which have been onlined again?
-> > 
-> > Hmm, good question. I've tried to assign them to a specific CPU via
-> > --cpus_allowed_policy=split and --cpus_allowed.
-> > 
-> >    fio --rw=randwrite --name=test --size=50M --iodepth=32 --direct=1 \
-> >        --bs=4k --numjobs=40 --time_based --runtime=1h --ioengine=libaio \
-> >        --group_reporting --cpus_allowed_policy=split --cpus_allowed=0-40
-> > 
-> > Though I haven't verified what happens when the CPU get's back online.
-> 
-> Maybe this will work since you're offlining patterns of cpus and the fio
-> processes have to migrate somewhere. But see above.
+diff --git a/Documentation/filesystems/sysfs-tagging.txt b/Documentation/filesystems/sysfs-tagging.txt
+index c7c8e6438958..51d28dd8b84f 100644
+--- a/Documentation/filesystems/sysfs-tagging.txt
++++ b/Documentation/filesystems/sysfs-tagging.txt
+@@ -37,6 +37,5 @@ Users of this interface:
+ - define a type in the kobj_ns_type enumeration.
+ - call kobj_ns_type_register() with its kobj_ns_type_operations which has
+   - current_ns() which returns current's namespace
+-  - netlink_ns() which returns a socket's namespace
+   - initial_ns() which returns the initial namesapce
+ - call kobj_ns_exit() when an individual tag is no longer valid
+diff --git a/include/linux/kobject_ns.h b/include/linux/kobject_ns.h
+index 069aa2ebef90..991a9286bcea 100644
+--- a/include/linux/kobject_ns.h
++++ b/include/linux/kobject_ns.h
+@@ -32,7 +32,6 @@ enum kobj_ns_type {
+ /*
+  * Callbacks so sysfs can determine namespaces
+  *   @grab_current_ns: return a new reference to calling task's namespace
+- *   @netlink_ns: return namespace to which a sock belongs (right?)
+  *   @initial_ns: return the initial namespace (i.e. init_net_ns)
+  *   @drop_ns: drops a reference to namespace
+  */
+@@ -40,7 +39,6 @@ struct kobj_ns_type_operations {
+ 	enum kobj_ns_type type;
+ 	bool (*current_may_mount)(void);
+ 	void *(*grab_current_ns)(void);
+-	const void *(*netlink_ns)(struct sock *sk);
+ 	const void *(*initial_ns)(void);
+ 	void (*drop_ns)(void *);
+ };
+@@ -52,7 +50,6 @@ const struct kobj_ns_type_operations *kobj_ns_ops(struct kobject *kobj);
+ 
+ bool kobj_ns_current_may_mount(enum kobj_ns_type type);
+ void *kobj_ns_grab_current(enum kobj_ns_type type);
+-const void *kobj_ns_netlink(enum kobj_ns_type type, struct sock *sk);
+ const void *kobj_ns_initial(enum kobj_ns_type type);
+ void kobj_ns_drop(enum kobj_ns_type type, void *ns);
+ 
+diff --git a/lib/kobject.c b/lib/kobject.c
+index 83198cb37d8d..6f07083cc111 100644
+--- a/lib/kobject.c
++++ b/lib/kobject.c
+@@ -1092,19 +1092,6 @@ void *kobj_ns_grab_current(enum kobj_ns_type type)
+ }
+ EXPORT_SYMBOL_GPL(kobj_ns_grab_current);
+ 
+-const void *kobj_ns_netlink(enum kobj_ns_type type, struct sock *sk)
+-{
+-	const void *ns = NULL;
+-
+-	spin_lock(&kobj_ns_type_lock);
+-	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
+-	    kobj_ns_ops_tbl[type])
+-		ns = kobj_ns_ops_tbl[type]->netlink_ns(sk);
+-	spin_unlock(&kobj_ns_type_lock);
+-
+-	return ns;
+-}
+-
+ const void *kobj_ns_initial(enum kobj_ns_type type)
+ {
+ 	const void *ns = NULL;
+diff --git a/lib/kobject_uevent.c b/lib/kobject_uevent.c
+index 7998affa45d4..a45b3eeaa2b9 100644
+--- a/lib/kobject_uevent.c
++++ b/lib/kobject_uevent.c
+@@ -400,7 +400,7 @@ static int kobject_uevent_net_broadcast(struct kobject *kobj,
+ 	 * are the only tag relevant here since we want to decide which
+ 	 * network namespaces to broadcast the uevent into.
+ 	 */
+-	if (ops && ops->netlink_ns && kobj->ktype->namespace)
++	if (ops && kobj->ktype->namespace)
+ 		if (ops->type == KOBJ_NS_TYPE_NET)
+ 			net = kobj->ktype->namespace(kobj);
+ 
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 4c826b8bf9b1..5d05e13a96cc 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1592,16 +1592,10 @@ static const void *net_initial_ns(void)
+ 	return &init_net;
+ }
+ 
+-static const void *net_netlink_ns(struct sock *sk)
+-{
+-	return sock_net(sk);
+-}
+-
+ const struct kobj_ns_type_operations net_ns_type_operations = {
+ 	.type = KOBJ_NS_TYPE_NET,
+ 	.current_may_mount = net_current_may_mount,
+ 	.grab_current_ns = net_grab_current_ns,
+-	.netlink_ns = net_netlink_ns,
+ 	.initial_ns = net_initial_ns,
+ 	.drop_ns = net_drop_ns,
+ };
+-- 
+2.26.0
 
-At least after the initial setup a fio thread will be migrated away
-from the offlining CPU.
-
-A quick test shows, that the affinity mask for a fio thread will be
-cleared when the CPU goes offline. There seems to be a discussion
-going on about the cpu hotplug and the affinity mask:
-
-https://lore.kernel.org/lkml/1251528473.590671.1579196495905.JavaMail.zimbra@efficios.com
-
-TL;DR: it can be scheduled back if affinity is tweaked via
-e.g. taskset, it won't if it's via cpusets
-
-Thanks,
-Daniel
