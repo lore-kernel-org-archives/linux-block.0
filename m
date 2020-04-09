@@ -2,62 +2,68 @@ Return-Path: <SRS0=YBka=5Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF71FC2BA19
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 17:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB31BC2BB55
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 17:09:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1B7520678
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 17:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADD5A20768
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 17:09:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728158AbgDIRJ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 13:09:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44208 "EHLO mx2.suse.de"
+        id S1726884AbgDIRJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 13:09:31 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44226 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726723AbgDIRJ2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 13:09:28 -0400
+        id S1726723AbgDIRJa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 13:09:30 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 2CEF8ABEF;
-        Thu,  9 Apr 2020 17:09:27 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 14000AC53;
+        Thu,  9 Apr 2020 17:09:29 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E289D1E124D; Thu,  9 Apr 2020 19:09:26 +0200 (CEST)
+        id 92ED61E124D; Thu,  9 Apr 2020 19:09:28 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     <linux-block@vger.kernel.org>,
         Andreas Herrmann <aherrmann@suse.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/2 RFC] bfq: Waker logic tweaks for dbench performance
-Date:   Thu,  9 Apr 2020 19:09:13 +0200
-Message-Id: <20200409170915.30570-1-jack@suse.cz>
+Subject: [PATCH 1/2] bfq: Fix check detecting whether waker queue should be selected
+Date:   Thu,  9 Apr 2020 19:09:14 +0200
+Message-Id: <20200409170915.30570-2-jack@suse.cz>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20200409170915.30570-1-jack@suse.cz>
+References: <20200409170915.30570-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+The check in bfq_select_queue() checking whether a waker queue should be
+selected has a bug and is checking bfqq->next_rq instead of
+bfqq->waker_bfqq->next_rq to verify whether the waker queue has a
+request to dispatch. This often results in the condition being false
+(most notably when the current queue is idling waiting for next request)
+and thus the waker queue logic is ineffective. Fix the condition.
 
-I was investigating why dbench performance (even for single dbench client) with
-BFQ is significantly worse than it used to be CFQ. The culprit is the idling
-logic in BFQ. The dbench workload is very fsync(2) heavy. In practice the time
-to complete fsync(2) calls is what determines the overall performance. For
-filesystems with a journal such as xfs or ext4 it is common that fsync(2)
-involves writing data from the process runningg fsync(2) - dbench in this case
-- and then waiting for the journalling machinery to flush out metadata from a
-separate process (jbd2 process in ext4 case, worker thread in xfs case).
-CFQ's heuristic was able to determine that it isn't worth to idle waiting for
-either dbench or jbd2 IO. BFQ's heuristic is not able to determine this and
-thus jbd2 process is often blocked waiting for idle timer of dbench queue to
-trigger.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/bfq-iosched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The first patch in the series is an obvious bugfix but is not enough to improve
-performance. The second patch does improve dbench performance from ~80 MB/s
-to ~200 MB/s on my test machine but I'm aware that it is probably way too
-aggressive and probably a different solution is needed. So I just wrote that
-patch to see the results and spark some discussion :). Any idea how to
-improve the waker logic so that dbench performance doesn't drop so
-dramatically?
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 78ba57efd16b..18f85d474c9c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4498,7 +4498,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+ 			bfqq = bfqq->bic->bfqq[0];
+ 		else if (bfq_bfqq_has_waker(bfqq) &&
+ 			   bfq_bfqq_busy(bfqq->waker_bfqq) &&
+-			   bfqq->next_rq &&
++			   bfqq->waker_bfqq->next_rq &&
+ 			   bfq_serv_to_charge(bfqq->waker_bfqq->next_rq,
+ 					      bfqq->waker_bfqq) <=
+ 			   bfq_bfqq_budget_left(bfqq->waker_bfqq)
+-- 
+2.16.4
 
-								Honza
