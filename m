@@ -2,157 +2,270 @@ Return-Path: <SRS0=YBka=5Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85EBC2BB1D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 05:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A47B2C2BB54
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 05:39:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87DE120784
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 05:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6475120771
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 05:39:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxYr4H02"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkG56GMf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725765AbgDIFKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 01:10:03 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35252 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725271AbgDIFKC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Apr 2020 01:10:02 -0400
-Received: by mail-wr1-f65.google.com with SMTP id g3so10401223wrx.2;
-        Wed, 08 Apr 2020 22:10:00 -0700 (PDT)
+        id S1726137AbgDIFjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 01:39:31 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:43024 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726052AbgDIFja (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Apr 2020 01:39:30 -0400
+Received: by mail-io1-f66.google.com with SMTP id u2so2630760iop.10;
+        Wed, 08 Apr 2020 22:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=p/HH0I63YdWRi6zlDYRvwzJ5V+QRFikbr1SYHN1Nt0w=;
-        b=bxYr4H02EMVAhN2rr3PIeVwESTDIrZeTP52yl2v5asGqpo5KqQ277wQNnIA+SxyNtd
-         MQEejIbkAofiSfIxf5nJg8rMNodVMULxPXtSiUdIx9t1H1v4PH6NOF2BZdINeNfhifrs
-         rXXSfHkyBMu+OszMxJvBCNuLhRTB4NubYOd5lBIvQOgx8hHChIo4J+OCeLiVVDJ9qRwt
-         8aWOYITlmaP6rRJHHo2bCJ7llA2vLaMCMyfodK/Qi+xKzPCRQSmlYsTlT1mT6MyNrrx4
-         7HH3uqpmF9vOv1ibeM49KxFYH6aAoZZUJ5GuZ4yLlmWh1vwvi5wg15bVZXFoC0VF1qM3
-         nbgQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ljGAHp2OjKbTOFHe8vnoaVTTxVxXbioqrcoMST1/WOo=;
+        b=HkG56GMfGJ4oOadqcLZ8K9Ajjq83Iyh59fq801QTD4zro/RN9oEeQEvooFasxrfuGz
+         BzKmFHaUGhXK5R2MqHGJXcMU0QKgkBTY9bk+Dr4xm1NO0WnnQDZcuNwAPvu7wGpOCMmk
+         t2K7/u5Y6+3RA8y1RUgDhYz8BgvFB3eBZtM1sNjmiGhfoL7OGG6x33RmyDZqQkx4dXek
+         IIwzbjuPUQU9harCVey752sogp8rmD+CdeW8CIUUtNyxJh4PdV7nhEDY21FTP4E5vBpX
+         mkrasJc8tvc6IXNJGIeutXFt6PI1hokvM0Kb4dfs4HpUBUSwID2C+0VsV/m895xuZkyj
+         Ub4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=p/HH0I63YdWRi6zlDYRvwzJ5V+QRFikbr1SYHN1Nt0w=;
-        b=N0ebKqOz5tV8I9SIabtntAxpemqd7B7t6Of5aT4zB1Jhoi1fSwdfUKF8mrmAWKdgwe
-         EoB0ihTzRcrTsNP4Np0jhP40JmDPzC2CNLwOSmHjklnB+5aYSIZpKW8eL6WF3/aGLC44
-         Be4UKgsnaOK5EUL0TbK8vtAn/k5Js6BfzyVnEFm2osYn0FlXHPHOW8cn5DQKGX3xaubv
-         mjHE03odlJqKkIG6I94tWWTzpjs5sX0odIoLW6fPTl+gJyR7Cdr6uzYOPh+MU9iea6D5
-         W0puj2hrdicP97SutdZktjRYlM0WqhGQmAnwvjy5XlDiLLVVaPozwI9jpiFGG8pghFbB
-         uZdw==
-X-Gm-Message-State: AGi0PuZlAEb4g9xczWwgD7d33rn+DrjfiAHwlZmHwUG4xKu0dwnBLZMg
-        56nbdnvsPD5xTVroFdIJajo=
-X-Google-Smtp-Source: APiQypL9EboOn1TZCg8YnzHqNRRhFAOeZw7fvELoPHT8Y/iT/Q2Eot8q5KJp0qOhxd9m8XFSro1NIQ==
-X-Received: by 2002:a5d:51c7:: with SMTP id n7mr11790891wrv.11.1586409000111;
-        Wed, 08 Apr 2020 22:10:00 -0700 (PDT)
-Received: from [192.168.43.177] ([109.126.129.227])
-        by smtp.gmail.com with ESMTPSA id 132sm2149268wmc.47.2020.04.08.22.09.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2020 22:09:59 -0700 (PDT)
-To:     Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@vger.kernel.org,
-        cgroups@vger.kernel.org, newella@fb.com, josef@toxicpanda.com
-References: <20200408201450.3959560-1-tj@kernel.org>
- <20200408201450.3959560-3-tj@kernel.org>
- <20200409014406.GA370295@localhost.localdomain>
- <20200409021119.GJ162390@mtj.duckdns.org>
- <20200409023857.GB370295@localhost.localdomain>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
- bdwSHrhOWdW61pmfMbDYbTj6ZvGRvhoLWfGkzujB2wjNcbNTXIoOzJEGISHaPf6E2IQx1ik9
- 6uqVkK1OMb7qRvKH0i7HYP4WJzYbEWVyLiAxUj611mC9tgd73oqZ2pLYzGTqF2j6a/obaqha
- +hXuWTvpDQXqcOZJXIW43atprH03G1tQs7VwR21Q1eq6Yvy2ESLdc38EqCszBfQRMmKy+cfp
- W3U9Mb1w0L680pXrONcnlDBCN7/sghGeMHjGKfNANjPc+0hzz3rApPxpoE7HC1uRiwC4et83
- CKnncH1l7zgeBT9Oa3qEiBlaa1ZCBqrA4dY+z5fWJYjMpwI1SNp37RtF8fKXbKQg+JuUjAa9
- Y6oXeyEvDHMyJYMcinl6xCqCBAXPHnHmawkMMgjr3BBRzODmMr+CPVvnYe7BFYfoajzqzq+h
- EyXSl3aBf0IDPTqSUrhbmjj5OEOYgRW5p+mdYtY1cXeK8copmd+fd/eTkghok5li58AojCba
- jRjp7zVOLOjDlpxxiKhuFmpV4yWNh5JJaTbwCRSd04sCcDNlJj+TehTr+o1QiORzc2t+N5iJ
- NbILft19Izdn8U39T5oWiynqa1qCLgbuFtnYx1HlUq/HvAm+kwARAQABtDFQYXZlbCBCZWd1
- bmtvdiAoc2lsZW5jZSkgPGFzbWwuc2lsZW5jZUBnbWFpbC5jb20+iQJOBBMBCAA4FiEE+6Ju
- PTjTbx479o3OWt5b1Glr+6UFAlmKBOQCGwMFCwkIBwIGFQgJCgsCBBYCAwECHgECF4AACgkQ
- Wt5b1Glr+6WxZA//QueaKHzgdnOikJ7NA/Vq8FmhRlwgtP0+E+w93kL+ZGLzS/cUCIjn2f4Q
- Mcutj2Neg0CcYPX3b2nJiKr5Vn0rjJ/suiaOa1h1KzyNTOmxnsqE5fmxOf6C6x+NKE18I5Jy
- xzLQoktbdDVA7JfB1itt6iWSNoOTVcvFyvfe5ggy6FSCcP+m1RlR58XxVLH+qlAvxxOeEr/e
- aQfUzrs7gqdSd9zQGEZo0jtuBiB7k98t9y0oC9Jz0PJdvaj1NZUgtXG9pEtww3LdeXP/TkFl
- HBSxVflzeoFaj4UAuy8+uve7ya/ECNCc8kk0VYaEjoVrzJcYdKP583iRhOLlZA6HEmn/+Gh9
- 4orG67HNiJlbFiW3whxGizWsrtFNLsSP1YrEReYk9j1SoUHHzsu+ZtNfKuHIhK0sU07G1OPN
- 2rDLlzUWR9Jc22INAkhVHOogOcc5ajMGhgWcBJMLCoi219HlX69LIDu3Y34uIg9QPZIC2jwr
- 24W0kxmK6avJr7+n4o8m6sOJvhlumSp5TSNhRiKvAHB1I2JB8Q1yZCIPzx+w1ALxuoWiCdwV
- M/azguU42R17IuBzK0S3hPjXpEi2sK/k4pEPnHVUv9Cu09HCNnd6BRfFGjo8M9kZvw360gC1
- reeMdqGjwQ68o9x0R7NBRrtUOh48TDLXCANAg97wjPoy37dQE7e5Ag0EWYoE5AEQAMWS+aBV
- IJtCjwtfCOV98NamFpDEjBMrCAfLm7wZlmXy5I6o7nzzCxEw06P2rhzp1hIqkaab1kHySU7g
- dkpjmQ7Jjlrf6KdMP87mC/Hx4+zgVCkTQCKkIxNE76Ff3O9uTvkWCspSh9J0qPYyCaVta2D1
- Sq5HZ8WFcap71iVO1f2/FEHKJNz/YTSOS/W7dxJdXl2eoj3gYX2UZNfoaVv8OXKaWslZlgqN
- jSg9wsTv1K73AnQKt4fFhscN9YFxhtgD/SQuOldE5Ws4UlJoaFX/yCoJL3ky2kC0WFngzwRF
- Yo6u/KON/o28yyP+alYRMBrN0Dm60FuVSIFafSqXoJTIjSZ6olbEoT0u17Rag8BxnxryMrgR
- dkccq272MaSS0eOC9K2rtvxzddohRFPcy/8bkX+t2iukTDz75KSTKO+chce62Xxdg62dpkZX
- xK+HeDCZ7gRNZvAbDETr6XI63hPKi891GeZqvqQVYR8e+V2725w+H1iv3THiB1tx4L2bXZDI
- DtMKQ5D2RvCHNdPNcZeldEoJwKoA60yg6tuUquvsLvfCwtrmVI2rL2djYxRfGNmFMrUDN1Xq
- F3xozA91q3iZd9OYi9G+M/OA01husBdcIzj1hu0aL+MGg4Gqk6XwjoSxVd4YT41kTU7Kk+/I
- 5/Nf+i88ULt6HanBYcY/+Daeo/XFABEBAAGJAjYEGAEIACAWIQT7om49ONNvHjv2jc5a3lvU
- aWv7pQUCWYoE5AIbDAAKCRBa3lvUaWv7pfmcEACKTRQ28b1y5ztKuLdLr79+T+LwZKHjX++P
- 4wKjEOECCcB6KCv3hP+J2GCXDOPZvdg/ZYZafqP68Yy8AZqkfa4qPYHmIdpODtRzZSL48kM8
- LRzV8Rl7J3ItvzdBRxf4T/Zseu5U6ELiQdCUkPGsJcPIJkgPjO2ROG/ZtYa9DvnShNWPlp+R
- uPwPccEQPWO/NP4fJl2zwC6byjljZhW5kxYswGMLBwb5cDUZAisIukyAa8Xshdan6C2RZcNs
- rB3L7vsg/R8UCehxOH0C+NypG2GqjVejNZsc7bgV49EOVltS+GmGyY+moIzxsuLmT93rqyII
- 5rSbbcTLe6KBYcs24XEoo49Zm9oDA3jYvNpeYD8rDcnNbuZh9kTgBwFN41JHOPv0W2FEEWqe
- JsCwQdcOQ56rtezdCJUYmRAt3BsfjN3Jn3N6rpodi4Dkdli8HylM5iq4ooeb5VkQ7UZxbCWt
- UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
- m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
- OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Subject: Re: [PATCH 2/5] block: add request->io_data_len
-Message-ID: <c2b362f5-36f6-116d-ddb5-2445d13d2bac@gmail.com>
-Date:   Thu, 9 Apr 2020 08:08:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ljGAHp2OjKbTOFHe8vnoaVTTxVxXbioqrcoMST1/WOo=;
+        b=UjHuUOQPsMnVOw9k7TCYcsoQPfhJFSviIjZO9p0GYqkwYZKP3vXURcSvzbl6cYS0aC
+         hawMtXw5Uh/yqNMZaucNU+J/QcyKhHOhBO667EWjL/iMRuRUx/6p3yX+atVYoGn2MUeN
+         zVhie+NVB9NxIbGcR7OwuIYRia2LqYPdBAxnORoSW9V4PK9FE9ZkDaNgz6H7SHm6GUIY
+         SbuG9TUtK4AxBF5DuX3Gaueovq8hCNhqag/lrukKXz9a/c/hrsXvinUL1+GCZHkR4a8C
+         4/UgcMdnXUJwzmkqy7KM5RdN+c4+F/ADX/HyLS8mSBTixCX7jqDGGSyXCDC+3akvDKbO
+         51XA==
+X-Gm-Message-State: AGi0PuahwDRDpvxeukGixeVhGF4lNay2Ykvb+DZYWgizQ1xYQGAy+QUY
+        6gSqNjSJHtG4X4x4tJ/C9pxzhZKfsQeUnbiIz2o=
+X-Google-Smtp-Source: APiQypIL7SeYio2ZFuNp5g6MDFQufig71I9V1q4nfq+9nWJ+P9gSXGZQgEVwLHyPBwzlz+ajo1kFs5NqvWoLGRKwBuA=
+X-Received: by 2002:a05:6638:186:: with SMTP id a6mr1070872jaq.36.1586410769722;
+ Wed, 08 Apr 2020 22:39:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200409023857.GB370295@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200408152151.5780-1-christian.brauner@ubuntu.com> <20200408152151.5780-3-christian.brauner@ubuntu.com>
+In-Reply-To: <20200408152151.5780-3-christian.brauner@ubuntu.com>
+From:   David Rheinsberg <david.rheinsberg@gmail.com>
+Date:   Thu, 9 Apr 2020 07:39:18 +0200
+Message-ID: <CADyDSO54-GuSUJrciSD2jbSShCYDpXCp53cr+D7u0ZQT141uTA@mail.gmail.com>
+Subject: Re: [PATCH 2/8] loopfs: implement loopfs
+To:     Christian Brauner <christian.brauner@ubuntu.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        lkml <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Serge Hallyn <serge@hallyn.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Saravana Kannan <saravanak@google.com>,
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        Seth Forshee <seth.forshee@canonical.com>,
+        Tom Gundersen <teg@jklm.no>,
+        Christian Kellner <ckellner@redhat.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@ubuntu.com>,
+        linux-doc@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/04/2020 05:38, Ming Lei wrote:
-> On Wed, Apr 08, 2020 at 10:11:19PM -0400, Tejun Heo wrote:
->> On Thu, Apr 09, 2020 at 09:44:06AM +0800, Ming Lei wrote:
->>> Almost all __blk_mq_end_request() follow blk_update_request(), so the
->>> completed bytes can be passed to __blk_mq_end_request(), then we can
->>> avoid to introduce this field.
->>
->> But on some drivers blk_update_request() may be called multiple times before
->> __blk_mq_end_request() is called and what's needed here is the total number of
->> bytes in the whole request, not just in the final completion.
-> 
-> OK.
-> 
-> Another choice might be to record request bytes in rq's payload
-> when calling .queue_rq() only for these drivers.
-> 
->>
->>> Also there is just 20 callers of __blk_mq_end_request(), looks this kind
->>> of change shouldn't be too big.
->>
->> This would work iff we get rid of partial completions and if we get rid of
->> partial completions, we might as well stop exposing blk_update_request() and
->> __blk_mq_end_request().
-> 
-> Indeed, we can store the completed bytes in request payload, so looks killing
-> partial completion shouldn't be too hard.
+Hi
 
-struct request already has such field (see @stats_sectors) because of the same
-root-cause. I'd prefer killing it as well by following Ming's way, but otherwise
-it could be easily adopted.
+On Wed, Apr 8, 2020 at 5:27 PM Christian Brauner
+<christian.brauner@ubuntu.com> wrote:
+>
+> This implements loopfs, a loop device filesystem. It takes inspiration
+> from the binderfs filesystem I implemented about two years ago and with
+> which we had overally good experiences so far. Parts of it are also
+> based on [3] but it's mostly a new, imho cleaner approach.
+>
+> One of the use-cases for loopfs is to allow to dynamically allocate loop
+> devices in sandboxed workloads without exposing /dev or
+> /dev/loop-control to the workload in question and without having to
+> implement a complex and also racy protocol to send around file
+> descriptors for loop devices. With loopfs each mount is a new instance,
+> i.e. loop devices created in one loopfs instance are independent of any
+> loop devices created in another loopfs instance. This allows
+> sufficiently privileged tools to have their own private stash of loop
+> device instances.
+>
+> In addition, the loopfs filesystem can be mounted by user namespace root
+> and is thus suitable for use in containers. Combined with syscall
+> interception this makes it possible to securely delegate mounting of
+> images on loop devices, i.e. when a users calls mount -o loop <image>
+> <mountpoint> it will be possible to completely setup the loop device
+> (enabled in later patches) and the mount syscall to actually perform the
+> mount will be handled through syscall interception and be performed by a
+> sufficiently privileged process. Syscall interception is already
+> supported through a new seccomp feature we implemented in [1] and
+> extended in [2] and is actively used in production workloads. The
+> additional loopfs work will be used there and in various other workloads
+> too.
+>
+> The number of loop devices available to a loopfs instance can be limited
+> by setting the "max" mount option to a positive integer. This e.g.
+> allows sufficiently privileged processes to dynamically enforce a limit
+> on the number of devices. This limit is dynamic in contrast to the
+> max_loop module option in that a sufficiently privileged process can
+> update it with a simple remount operation.
+>
+> The loopfs filesystem is placed under a new config option and special
+> care has been taken to not introduce any new code when users do not
+> select this config option.
+>
+> Note that in __loop_clr_fd() we now need not just check whether bdev is
+> valid but also whether bdev->bd_disk is valid. This wasn't necessary
+> before because in order to call LOOP_CLR_FD the loop device would need
+> to be open and thus bdev->bd_disk was guaranteed to be allocated. For
+> loopfs loop devices we allow callers to simply unlink them just as we do
+> for binderfs binder devices and we do also need to account for the case
+> where a loopfs superblock is shutdown while backing files might still be
+> associated with some loop devices. In such cases no bd_disk device will
+> be attached to bdev. This is not in itself noteworthy it's more about
+> documenting the "why" of the added bdev->bd_disk check for posterity.
+>
+> [1]: 6a21cc50f0c7 ("seccomp: add a return code to trap to userspace")
+> [2]: fb3c5386b382 ("seccomp: add SECCOMP_USER_NOTIF_FLAG_CONTINUE")
+> [3]: https://lore.kernel.org/lkml/1401227936-15698-1-git-send-email-seth.forshee@canonical.com
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Seth Forshee <seth.forshee@canonical.com>
+> Cc: Tom Gundersen <teg@jklm.no>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Christian Kellner <ckellner@redhat.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: David Rheinsberg <david.rheinsberg@gmail.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+> ---
+>  MAINTAINERS                   |   5 +
+>  drivers/block/Kconfig         |   4 +
+>  drivers/block/Makefile        |   1 +
+>  drivers/block/loop.c          | 151 +++++++++---
+>  drivers/block/loop.h          |   8 +-
+>  drivers/block/loopfs/Makefile |   3 +
+>  drivers/block/loopfs/loopfs.c | 429 ++++++++++++++++++++++++++++++++++
+>  drivers/block/loopfs/loopfs.h |  35 +++
+>  include/uapi/linux/magic.h    |   1 +
+>  9 files changed, 600 insertions(+), 37 deletions(-)
+>  create mode 100644 drivers/block/loopfs/Makefile
+>  create mode 100644 drivers/block/loopfs/loopfs.c
+>  create mode 100644 drivers/block/loopfs/loopfs.h
+>
+[...]
+> diff --git a/drivers/block/loopfs/loopfs.c b/drivers/block/loopfs/loopfs.c
+> new file mode 100644
+> index 000000000000..ac46aa337008
+> --- /dev/null
+> +++ b/drivers/block/loopfs/loopfs.c
+> @@ -0,0 +1,429 @@
+[...]
+> +/**
+> + * loopfs_loop_device_create - allocate inode from super block of a loopfs mount
+> + * @lo:                loop device for which we are creating a new device entry
+> + * @ref_inode: inode from wich the super block will be taken
+> + * @device_nr:  device number of the associated disk device
+> + *
+> + * This function creates a new device node for @lo.
+> + * Minor numbers are limited and tracked globally. The
+> + * function will stash a struct loop_device for the specific loop
+> + * device in i_private of the inode.
+> + * It will go on to allocate a new inode from the super block of the
+> + * filesystem mount, stash a struct loop_device in its i_private field
+> + * and attach a dentry to that inode.
+> + *
+> + * Return: 0 on success, negative errno on failure
+> + */
+> +int loopfs_loop_device_create(struct loop_device *lo, struct inode *ref_inode,
+> +                             dev_t device_nr)
+> +{
+> +       char name[DISK_NAME_LEN];
+> +       struct super_block *sb;
+> +       struct loopfs_info *info;
+> +       struct dentry *root, *dentry;
+> +       struct inode *inode;
+> +
+> +       sb = loopfs_i_sb(ref_inode);
+> +       if (!sb)
+> +               return 0;
+> +
+> +       if (MAJOR(device_nr) != LOOP_MAJOR)
+> +               return -EINVAL;
+> +
+> +       info = LOOPFS_SB(sb);
+> +       if ((info->device_count + 1) > info->mount_opts.max)
+> +               return -ENOSPC;
 
--- 
-Pavel Begunkov
+Can you elaborate what the use-case for this limit is?
+
+With loopfs in place, any process can create its own user_ns, mount
+their private loopfs and create as many loop-devices as they want.
+Hence, this limit does not serve as an effective global
+resource-control. Secondly, anyone with access to `loop-control` can
+now create loop instances until this limit is hit, thus causing anyone
+else to be unable to create more. This effectively prevents you from
+sharing a loopfs between non-trusting parties. I am unsure where that
+limit would actually be used?
+
+Thanks
+David
+
+> +
+> +       if (snprintf(name, sizeof(name), "loop%d", lo->lo_number) >= sizeof(name))
+> +               return -EINVAL;
+> +
+> +       inode = new_inode(sb);
+> +       if (!inode)
+> +               return -ENOMEM;
+> +
+> +       /*
+> +        * The i_fop field will be set to the correct fops by the device layer
+> +        * when the loop device in this loopfs instance is opened.
+> +        */
+> +       inode->i_ino = MINOR(device_nr) + INODE_OFFSET;
+> +       inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
+> +       inode->i_uid = info->root_uid;
+> +       inode->i_gid = info->root_gid;
+> +       init_special_inode(inode, S_IFBLK | 0600, device_nr);
+> +
+> +       root = sb->s_root;
+> +       inode_lock(d_inode(root));
+> +       /* look it up */
+> +       dentry = lookup_one_len(name, root, strlen(name));
+> +       if (IS_ERR(dentry)) {
+> +               inode_unlock(d_inode(root));
+> +               iput(inode);
+> +               return PTR_ERR(dentry);
+> +       }
+> +
+> +       if (d_really_is_positive(dentry)) {
+> +               /* already exists */
+> +               dput(dentry);
+> +               inode_unlock(d_inode(root));
+> +               iput(inode);
+> +               return -EEXIST;
+> +       }
+> +
+> +       d_instantiate(dentry, inode);
+> +       fsnotify_create(d_inode(root), dentry);
+> +       inode_unlock(d_inode(root));
+> +
+> +       inode->i_private = lo;
+> +       lo->lo_loopfs_i = inode;
+> +       info->device_count++;
+> +
+> +       return 0;
+> +}
+[...]
