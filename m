@@ -2,124 +2,123 @@ Return-Path: <SRS0=YBka=5Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CDEC2BA19
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 20:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922CAC2BB85
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 21:45:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4A5B2082D
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 20:59:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 678C52087E
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 21:45:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586465989;
-	bh=/zoh9Bel3OVki0JgUa51ErfZPh3PKGwN0xm71H6gVlE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=qxQWp5e6zNciNIPdyvpPmIRFnW5EIWbUm+EGD4th8BdmNdJnBJaYziTTDRqFRtjT/
-	 VjulUs7IK0mMMRaLqJ8saNQGv+kKt8yDPKUUBiP4ywhxqDGVyRSwpMNE9yEojqSMpT
-	 qHNHH1Ey9NK2TsufZq/3tYR6cygRn742EFoTM61A=
+	s=default; t=1586468737;
+	bh=sPgKZcIbslMsYUL+H7kbEpKllf9J9gMN5tOWhmBtZnc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=ss46AGC6YrQ+Z48kjUr/jLyGQGshGvQCv8HdbYWwonmKhuXI1EJYPI4VybU6AaPMv
+	 +uEb1Q3FYCTvLCPamUSnUay4Yd3d279QdaCHaxdD97ebUG5gTNjBTFld1wcRHVjW2k
+	 tN7eUFFusnDA4mlefev08zZNFDHCnyrXdGd7EehU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgDIU7p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 16:59:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46044 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726650AbgDIU7p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 16:59:45 -0400
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4F4F32082D;
-        Thu,  9 Apr 2020 20:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586465984;
-        bh=/zoh9Bel3OVki0JgUa51ErfZPh3PKGwN0xm71H6gVlE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=bJAJpPoprDQK92N85fpzG0cgNvz0uW5e2GuCCkn3PP348hQvPcVPLpsxEGBwIDmOe
-         1QFW0xWU0pO2wsvNKS4EEfebkJ6KlsEo0+gmu78w3ZBZtXz+apwLu8pyuGYs1Ec2EH
-         nWr6NEKRZpWA7DcYfEQAtGmxuemkzAn03uShNjvQ=
-Received: by mail-ua1-f51.google.com with SMTP id c7so504528uap.12;
-        Thu, 09 Apr 2020 13:59:44 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYgbkSjEZ1xaIwkV5+Rx1MebEdjXUnUff0lar/+AkG6xiJjPKuD
-        DDqo9ts1XwqTwxEmXdS1D5o6Vvt8vQ34jgeghwQ=
-X-Google-Smtp-Source: APiQypLTqSBtxs7bQ0LuVti900RTFBk5ZczjHXpDHPi1M3iHr7okU6jbk0ejw87EuNLYNl/1repOvHUGiSiDx2g6XJ8=
-X-Received: by 2002:ab0:1e89:: with SMTP id o9mr829993uak.93.1586465983383;
- Thu, 09 Apr 2020 13:59:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200402000002.7442-1-mcgrof@kernel.org> <20200403081929.GC6887@ming.t460p>
- <0e753195-72fb-ce83-16a1-176f2c3cea6a@huawei.com> <20200407190004.GG11244@42.do-not-panic.com>
-In-Reply-To: <20200407190004.GG11244@42.do-not-panic.com>
+        id S1726725AbgDIVpg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 17:45:36 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:39805 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726666AbgDIVpf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Apr 2020 17:45:35 -0400
+Received: by mail-pj1-f65.google.com with SMTP id z3so26341pjr.4;
+        Thu, 09 Apr 2020 14:45:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=eoDxljTp5vbr3aoHKkBfKXVECAcC7qfX/D5k3HZf/M0=;
+        b=P1CySppNDyG4X/dJQjTjZVVcnrzipKQxDqaLUpx7gMZigXiTJSleZAEmUqaV14KU0+
+         xyrSTUO3SW7RjVxd/flCjnrt++5fRlxmEh1ra2oni4C+T/bTItHjrxDSP/4sCqsh0Et6
+         WyE1UwWp4kg+A1SDJfOpnWZ2PMzuwADHH4VaiqKI6cMB5y/XjfojEg4snVHXS371oRVO
+         mB7P54CGtUOvlffE7Iz9n94N3XCfeYzJawWXTtYc00nzydEfS7DDUIBzu182doNmRMME
+         6aPl5sPYEnQ7rAEGGwxWjilC/Ciob4N3HfnKhbc6SlZ6ZkZx36bxiKsARkmiQvPA+0Ze
+         sVFQ==
+X-Gm-Message-State: AGi0Pua+Abv9HUsXk43pU0iUUvSBj47sLsvut5vUCdyypEHUH7Bms78D
+        O1uejfjQd6/wrt2Y0EIfn+w=
+X-Google-Smtp-Source: APiQypJjM7OsXoNAVoK/beb/tphg54XlEChQn9RFbJNqZgnvlVR9rMP+bWm17T1MuhZd12Ok+Iemmg==
+X-Received: by 2002:a17:902:ba86:: with SMTP id k6mr1675518pls.47.1586468735123;
+        Thu, 09 Apr 2020 14:45:35 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id u186sm42297pfu.205.2020.04.09.14.45.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Apr 2020 14:45:32 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 4DC0C41D00; Thu,  9 Apr 2020 21:45:32 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-Date:   Thu, 9 Apr 2020 14:59:36 -0600
-X-Gmail-Original-Message-ID: <CAB=NE6VV1yCOHJC__qAXNmxfe45DB=JaUksLeXV=dp-VAa6jnA@mail.gmail.com>
-Message-ID: <CAB=NE6VV1yCOHJC__qAXNmxfe45DB=JaUksLeXV=dp-VAa6jnA@mail.gmail.com>
-Subject: Re: [RFC 0/3] block: address blktrace use-after-free
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>, Jan Kara <jack@suse.cz>,
-        Nicolai Stange <nstange@suse.de>,
-        Michal Hocko <mhocko@suse.com>, linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: [RFC v2 3/5] blktrace: ref count the request_queue during ioctl
+Date:   Thu,  9 Apr 2020 21:45:28 +0000
+Message-Id: <20200409214530.2413-4-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.23.0.rc1
+In-Reply-To: <20200409214530.2413-1-mcgrof@kernel.org>
+References: <20200409214530.2413-1-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 7, 2020 at 1:00 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> On Tue, Apr 07, 2020 at 10:47:01AM +0800, yukuai (C) wrote:
-> > On 2020/4/3 16:19, Ming Lei wrote:
-> >
-> > > BTW, Yu Kuai posted one patch for this issue, looks that approach
-> > > is simpler:
-> > >
-> > > https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@hu=
-awei.com/
-> > >
-> > >
-> >
-> > I think the issue might not be fixed with the patch seires.
-> >
-> > At first, I think there are two key points for the issure:
-> > 1. The final release of queue is delayed in a workqueue
-> > 2. The creation of 'q->debugfs_dir' might failed(only if 1 exist)
-> > And if we can fix any of the above problem, the UAF issue will be fixed=
-.
-> > (BTW, I did not come up with a good idea for problem 1, and my approach
-> > is for problem 2.)
-> >
-> > The third patch "block: avoid deferral of blk_release_queue() work" is
-> > not enough to fix problem 1:
-> > a. if CONFIG_DEBUG_KOBJECT_RELEASE is enable:
-> > static void kobject_release(struct kref *kref)
-> > {
-> >         struct kobject *kobj =3D container_of(kref, struct kobject, kre=
-f);
-> > #ifdef CONFIG_DEBUG_KOBJECT_RELEASE
-> >         unsigned long delay =3D HZ + HZ * (get_random_int() & 0x3);
-> >         pr_info("kobject: '%s' (%p): %s, parent %p (delayed %ld)\n",
-> >                 =E2=94=8Akobject_name(kobj), kobj, __func__, kobj->pare=
-nt, delay);
-> >         INIT_DELAYED_WORK(&kobj->release, kobject_delayed_cleanup);
-> >
-> >         schedule_delayed_work(&kobj->release, delay);
-> > #else
-> >         kobject_cleanup(kobj);
-> > #endif
-> > }
-> > b. when 'kobject_put' is called from blk_cleanup_queue, can we make sur=
-e
-> > it is the last reference?
->
-> You are right, I think I know the fix for this now. Will run some more
-> tests.
+Ensure that the reqest_queue ref counts the request_queue
+during its full ioctl cycle. This avoids possible races against
+removal, given blk_get_queue() also checks to ensure the queue
+is not dying.
 
-Yeap, we were just not refcounting during blktrace. I'll send a fix as
-part of the series.
+This small race is possible if you defer removal of the reqest_queue
+and userspace fires off an ioctl for the device in the meantime.
 
-  Luis
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: yu kuai <yukuai3@huawei.com>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ kernel/trace/blktrace.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 15086227592f..17e144d15779 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -701,6 +701,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+ 	if (!q)
+ 		return -ENXIO;
+ 
++	if (!blk_get_queue(q))
++		return -ENXIO;
++
+ 	mutex_lock(&q->blk_trace_mutex);
+ 
+ 	switch (cmd) {
+@@ -729,6 +732,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+ 	}
+ 
+ 	mutex_unlock(&q->blk_trace_mutex);
++
++	blk_put_queue(q);
++
+ 	return ret;
+ }
+ 
+-- 
+2.25.1
+
