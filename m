@@ -2,113 +2,124 @@ Return-Path: <SRS0=YBka=5Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0217CC2BA19
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 18:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CDEC2BA19
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 20:59:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBA1820757
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 18:11:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4A5B2082D
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 20:59:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586455875;
-	bh=lI66sUkYORb2/YlfU+5U3heNT5NZ831su6mzgZODTT8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Sh5HtJQTRiTi8k31T2t1YSJANaR0Qzxvl+44PsNn+GtrTLwl78hI/EwYy3gpNiFuH
-	 rbgv59m1oyUA8LRlxd04BBWa8OyjCgvpbvXOEzfWVDJ31pD5D+XAs7PbGzK+x219ud
-	 043D2/PaI2Yn5GaIVkVHGjFKNayQkLhRxH51QCto=
+	s=default; t=1586465989;
+	bh=/zoh9Bel3OVki0JgUa51ErfZPh3PKGwN0xm71H6gVlE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=qxQWp5e6zNciNIPdyvpPmIRFnW5EIWbUm+EGD4th8BdmNdJnBJaYziTTDRqFRtjT/
+	 VjulUs7IK0mMMRaLqJ8saNQGv+kKt8yDPKUUBiP4ywhxqDGVyRSwpMNE9yEojqSMpT
+	 qHNHH1Ey9NK2TsufZq/3tYR6cygRn742EFoTM61A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726646AbgDISLO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 14:11:14 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:40473 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbgDISLO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Apr 2020 14:11:14 -0400
-Received: by mail-pl1-f194.google.com with SMTP id h11so4099495plk.7;
-        Thu, 09 Apr 2020 11:11:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=+u9wu3D+1SAT+AyByv6VWCl1y8XJyfZjKsIoztZ2sLk=;
-        b=uBbHcBc4eqQ3MoO6nRN5kfqc1RT/wk6gAngm1is9dhITwi3l1GkR0PoM17F4Exs3jO
-         L1SQGxdjVuCZbpRyZRiaC1fwRTbtCEh56inWC/rq8q7AWygbVnwUQJGvoR6KJ9An541p
-         lb21VxlEB6YoJGZgFCpawLgVDXCJII47ixBTERoFFeGCbsGKULhtV/5PpVc1ALgrEHPA
-         myqVWOZUx811xHROrzxefSv9v4PPUrkxNIVO50Q5uFtpogkW6cVy0OCx3QCL6l8x68jK
-         KC/pNU4tJ8M7vKmaoJGwpogVvH0nEICz2sGzgb2u2NeqQBuL72NQTZRNf8v/fOIJRkDX
-         QC/A==
-X-Gm-Message-State: AGi0PubUeKDLSxT5+2DAS/09bU2IvO9pTiDKlc3HGcCqfBEKrq4d2oj9
-        vcF3diZpKkT6y9daUzs0nos=
-X-Google-Smtp-Source: APiQypIEjb7k0vg1mEoUtBe15H1kcK7BSjonLF/QsYErQW99NzcpWLX1DshA4rkPF6yQ2OehZFCT2Q==
-X-Received: by 2002:a17:90b:4d04:: with SMTP id mw4mr791725pjb.180.1586455873370;
-        Thu, 09 Apr 2020 11:11:13 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id r4sm6458344pgi.6.2020.04.09.11.11.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2020 11:11:12 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 8790440246; Thu,  9 Apr 2020 18:11:11 +0000 (UTC)
-Date:   Thu, 9 Apr 2020 18:11:11 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Nicolai Stange <nstange@suse.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, mhocko@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [RFC 3/3] block: avoid deferral of blk_release_queue() work
-Message-ID: <20200409181111.GJ11244@42.do-not-panic.com>
-References: <20200402000002.7442-1-mcgrof@kernel.org>
- <20200402000002.7442-4-mcgrof@kernel.org>
- <774a33e8-43ba-143f-f6fd-9cb0ae0862ac@acm.org>
- <87o8saj62m.fsf@suse.de>
+        id S1726956AbgDIU7p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 16:59:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46044 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726650AbgDIU7p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 16:59:45 -0400
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F4F32082D;
+        Thu,  9 Apr 2020 20:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586465984;
+        bh=/zoh9Bel3OVki0JgUa51ErfZPh3PKGwN0xm71H6gVlE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=bJAJpPoprDQK92N85fpzG0cgNvz0uW5e2GuCCkn3PP348hQvPcVPLpsxEGBwIDmOe
+         1QFW0xWU0pO2wsvNKS4EEfebkJ6KlsEo0+gmu78w3ZBZtXz+apwLu8pyuGYs1Ec2EH
+         nWr6NEKRZpWA7DcYfEQAtGmxuemkzAn03uShNjvQ=
+Received: by mail-ua1-f51.google.com with SMTP id c7so504528uap.12;
+        Thu, 09 Apr 2020 13:59:44 -0700 (PDT)
+X-Gm-Message-State: AGi0PuYgbkSjEZ1xaIwkV5+Rx1MebEdjXUnUff0lar/+AkG6xiJjPKuD
+        DDqo9ts1XwqTwxEmXdS1D5o6Vvt8vQ34jgeghwQ=
+X-Google-Smtp-Source: APiQypLTqSBtxs7bQ0LuVti900RTFBk5ZczjHXpDHPi1M3iHr7okU6jbk0ejw87EuNLYNl/1repOvHUGiSiDx2g6XJ8=
+X-Received: by 2002:ab0:1e89:: with SMTP id o9mr829993uak.93.1586465983383;
+ Thu, 09 Apr 2020 13:59:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8saj62m.fsf@suse.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20200402000002.7442-1-mcgrof@kernel.org> <20200403081929.GC6887@ming.t460p>
+ <0e753195-72fb-ce83-16a1-176f2c3cea6a@huawei.com> <20200407190004.GG11244@42.do-not-panic.com>
+In-Reply-To: <20200407190004.GG11244@42.do-not-panic.com>
+From:   Luis Chamberlain <mcgrof@kernel.org>
+Date:   Thu, 9 Apr 2020 14:59:36 -0600
+X-Gmail-Original-Message-ID: <CAB=NE6VV1yCOHJC__qAXNmxfe45DB=JaUksLeXV=dp-VAa6jnA@mail.gmail.com>
+Message-ID: <CAB=NE6VV1yCOHJC__qAXNmxfe45DB=JaUksLeXV=dp-VAa6jnA@mail.gmail.com>
+Subject: Re: [RFC 0/3] block: address blktrace use-after-free
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, Jan Kara <jack@suse.cz>,
+        Nicolai Stange <nstange@suse.de>,
+        Michal Hocko <mhocko@suse.com>, linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 02, 2020 at 04:49:37PM +0200, Nicolai Stange wrote:
-> Bart Van Assche <bvanassche@acm.org> writes:
-> 
-> > On 2020-04-01 17:00, Luis Chamberlain wrote:
-> > The description of this patch mentions a single blk_release_queue() call
-> > that happened in the past from a context from which sleeping is not
-> > allowed and from which sleeping is allowed today. Have all other
-> > blk_release_queue() / blk_put_queue() calls been verified to see whether
-> > none of these happens from a context from which sleeping is not allowed?
-> 
-> I've just done this today and found the following potentially
-> problematic call paths to blk_put_queue().
-> 
-> 1.) mem_cgroup_throttle_swaprate() takes a spinlock and
->     calls blkcg_schedule_throttle()->blk_put_queue().
-> 
->     Also note that AFAICS mem_cgroup_try_charge_delay() can be called
->     with GFP_ATOMIC.
+On Tue, Apr 7, 2020 at 1:00 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> On Tue, Apr 07, 2020 at 10:47:01AM +0800, yukuai (C) wrote:
+> > On 2020/4/3 16:19, Ming Lei wrote:
+> >
+> > > BTW, Yu Kuai posted one patch for this issue, looks that approach
+> > > is simpler:
+> > >
+> > > https://lore.kernel.org/linux-block/20200324132315.22133-1-yukuai3@hu=
+awei.com/
+> > >
+> > >
+> >
+> > I think the issue might not be fixed with the patch seires.
+> >
+> > At first, I think there are two key points for the issure:
+> > 1. The final release of queue is delayed in a workqueue
+> > 2. The creation of 'q->debugfs_dir' might failed(only if 1 exist)
+> > And if we can fix any of the above problem, the UAF issue will be fixed=
+.
+> > (BTW, I did not come up with a good idea for problem 1, and my approach
+> > is for problem 2.)
+> >
+> > The third patch "block: avoid deferral of blk_release_queue() work" is
+> > not enough to fix problem 1:
+> > a. if CONFIG_DEBUG_KOBJECT_RELEASE is enable:
+> > static void kobject_release(struct kref *kref)
+> > {
+> >         struct kobject *kobj =3D container_of(kref, struct kobject, kre=
+f);
+> > #ifdef CONFIG_DEBUG_KOBJECT_RELEASE
+> >         unsigned long delay =3D HZ + HZ * (get_random_int() & 0x3);
+> >         pr_info("kobject: '%s' (%p): %s, parent %p (delayed %ld)\n",
+> >                 =E2=94=8Akobject_name(kobj), kobj, __func__, kobj->pare=
+nt, delay);
+> >         INIT_DELAYED_WORK(&kobj->release, kobject_delayed_cleanup);
+> >
+> >         schedule_delayed_work(&kobj->release, delay);
+> > #else
+> >         kobject_cleanup(kobj);
+> > #endif
+> > }
+> > b. when 'kobject_put' is called from blk_cleanup_queue, can we make sur=
+e
+> > it is the last reference?
+>
+> You are right, I think I know the fix for this now. Will run some more
+> tests.
 
-I have a solution to this which would avoid having to deal with the
-concern completely. I'll post in my follow up.
-
-> 2.) scsi_unblock_requests() gets called from a lot of drivers and
->     invoke blk_put_queue() through
->     scsi_unblock_requests() -> scsi_run_host_queues() ->
->     scsi_starved_list_run() -> blk_put_queue().
-
-sd_probe() calls device_add_disk(), and the scsi lib also has its
-own refcounting for scsi, but unless you call sd_remove() you'll be
-protecting the underlying block disk and request_queue, as sd_remove()
-calls the del_gendisk() which would in call call blk_unregister_queue()
-which calls the last blk_put_queue(). If sd_remove() can be called from
-atomic context we can also fix this, and this should be evident how in
-my next follow up series of patches.
+Yeap, we were just not refcounting during blktrace. I'll send a fix as
+part of the series.
 
   Luis
