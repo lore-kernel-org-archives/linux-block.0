@@ -2,103 +2,110 @@ Return-Path: <SRS0=YBka=5Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF44BC2BA2B
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 13:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7F9C2BB55
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 16:26:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9C162072F
-	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 13:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38ADC20768
+	for <linux-block@archiver.kernel.org>; Thu,  9 Apr 2020 16:26:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="SVIUfVQP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726783AbgDIN2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 09:28:16 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12633 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726632AbgDIN2Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 09:28:16 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id C3598BF0368A815B026B;
-        Thu,  9 Apr 2020 21:28:12 +0800 (CST)
-Received: from [10.173.220.74] (10.173.220.74) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 9 Apr 2020 21:28:08 +0800
-Subject: Re: [PATCH v4 0/6] bdi: fix use-after-free for bdi device
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     <tj@kernel.org>, <jack@suse.cz>, <bvanassche@acm.org>,
-        <tytso@mit.edu>, <gregkh@linuxfoundation.org>, <hch@infradead.org>
-References: <20200325123843.47452-1-yuyufen@huawei.com>
-Message-ID: <1a735dce-c72b-5b2e-66c5-b5db30f1139b@huawei.com>
-Date:   Thu, 9 Apr 2020 21:28:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1726794AbgDIQZ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 12:25:58 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:54992 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726621AbgDIQZ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Apr 2020 12:25:58 -0400
+Received: from [10.137.106.115] (unknown [131.107.174.243])
+        by linux.microsoft.com (Postfix) with ESMTPSA id CC37A2007679;
+        Thu,  9 Apr 2020 09:25:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CC37A2007679
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1586449558;
+        bh=mxgHZSJk9nY2+sfPQybAXK1hYlxOn5wF6OLSUaiTeXQ=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=SVIUfVQPfYXivTtnf81II2+cuX+VuuFT/cdRyrSfPQa/NspfBGhnRo9yWKcDnzRbk
+         LJ3Ki75Ows6uAhw3zh0yXVdiT1bgycAFmEUG1RPPnFEYcitcKAqCmE0Cd8qQo22Fey
+         1mwwxBUG5vr/LHYHNEZymvqJ6fmpTEryjbQU2kPw=
+Subject: Re: [RFC PATCH v2 00/12] Integrity Policy Enforcement LSM (IPE)
+To:     Nayna <nayna@linux.vnet.ibm.com>
+Cc:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
+        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, tyhicks@linux.microsoft.com,
+        pasha.tatashin@soleen.com, sashal@kernel.org,
+        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com,
+        mdsakib@linux.microsoft.com, linux-kernel@vger.kernel.org
+References: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
+ <c1466cc8-8a08-708a-4629-234485bb833e@linux.vnet.ibm.com>
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+Message-ID: <35afdffe-179c-aedd-333a-9dfc20635fc3@linux.microsoft.com>
+Date:   Thu, 9 Apr 2020 09:25:57 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200325123843.47452-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <c1466cc8-8a08-708a-4629-234485bb833e@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.220.74]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ping
+On 4/7/2020 2:31 PM, Nayna wrote:
 
-On 2020/3/25 20:38, Yufen Yu wrote:
-> Hi, all
-> 
-> We have reported a use-after-free crash for bdi device in __blkg_prfill_rwstat().
-> The bug is caused by printing device kobj->name while the device and kobj->name
-> has been freed by bdi_unregister().
-> 
-> In fact, commit 68f23b8906 "memcg: fix a crash in wb_workfn when a device disappears"
-> has tried to address the issue, but the code is till somewhat racy after that commit.
-> 
-> In this patchset, we try to protect bdi->dev with spinlock and copy device name
-> into caller buffer, avoiding use-after-free.
-> 
-> V4:
->    * Fix coding error in bdi_get_dev_name()
->    * Write one patch for each broken caller
-> 
-> V3:
->    https://www.spinics.net/lists/linux-block/msg51111.html
->    Use spinlock to protect bdi->dev and copy device name into caller buffer
-> 
-> V2:
->    https://www.spinics.net/lists/linux-fsdevel/msg163206.html
->    Try to protect device lifetime with RCU.
-> 
-> V1:
->    https://www.spinics.net/lists/linux-block/msg49693.html
->    Add a new spinlock and copy kobj->name into caller buffer.
->    Or using synchronize_rcu() to wait until reader complete.
-> 
-> Yufen Yu (6):
->    bdi: use bdi_dev_name() to get device name
->    bdi: protect bdi->dev with spinlock
->    bfq: fix potential kernel crash when print error info
->    memcg: fix crash in wb_workfn when bdi unregister
->    blk-wbt: replace bdi_dev_name() with bdi_get_dev_name()
->    blkcg: fix use-after-free for bdi->dev
-> 
->   block/bfq-iosched.c              |  6 +++--
->   block/blk-cgroup-rwstat.c        |  6 +++--
->   block/blk-cgroup.c               | 19 +++++-----------
->   block/blk-iocost.c               | 14 +++++++-----
->   block/blk-iolatency.c            |  5 +++--
->   block/blk-throttle.c             |  6 +++--
->   fs/ceph/debugfs.c                |  2 +-
->   fs/fs-writeback.c                |  4 +++-
->   include/linux/backing-dev-defs.h |  1 +
->   include/linux/backing-dev.h      | 26 ++++++++++++++++++++++
->   include/linux/blk-cgroup.h       |  1 -
->   include/trace/events/wbt.h       |  8 +++----
->   include/trace/events/writeback.h | 38 ++++++++++++++------------------
->   mm/backing-dev.c                 |  9 ++++++--
->   14 files changed, 88 insertions(+), 57 deletions(-)
-> 
+>
+> On 4/6/20 6:14 PM, deven.desai@linux.microsoft.com wrote:
+>> From: Deven Bowers <deven.desai@linux.microsoft.com>
+>>
+>> Changelog:
+>> ------------------------------------
+>>
+>> v1: Introduced
+>>
+>> v2:
+>>    Split the second patch of the previous series into two.
+>>    Minor corrections in the cover-letter and documentation
+>>    comments regarding CAP_MAC_ADMIN checks in IPE.
+>>
+>> Overview:
+>> ------------------------------------
+>> IPE is a Linux Security Module, which allows for a configurable
+>> policy to enforce integrity requirements on the whole system. It
+>> attempts to solve the issue of Code Integrity: that any code being
+>> executed (or files being read), are identical to the version that
+>> was built by a trusted source.
+>
+> Can you please clarify the "motivation" for this patch set more 
+> clearly? It seems to define a policy layer on top of dm-verity, which 
+> may be compiled into the kernel. In the motivation, can you please 
+> also make it explicit why existing mechanisms cannot be extended to 
+> achieve your purpose?
+>
+This LSM was born out of a motivation to provide strong integrity 
+guarantees without a dependency on file-metadata, allow the integrity 
+claims to be configurable on a hot system, and allow for the mechanisms 
+for ensuring integrity to be extendable.
+
+This naturally had to be an LSM, as controlling execution at the block 
+or filesystem layer does not make sense. Existing LSM implementations 
+use filesystem metadata, and since one of IPE's goals is to secure file 
+metadata, it is circular to depend on the file metadata itself to make 
+decisions about whether the file has been modified.
+
+Additionally, IPE while IPE currently provides dm-verity support and the 
+trust root support, it can be easily extended to other implementations 
+such as fs-verity. At it's core, IPE is attempting to separate mechanism 
+(dm-verity, fs-verity, etc.) from policy (IPE).
+
+> Also, AFIK, the changelog should be moved to the end of the patch 
+> description.
+>
+Thanks! I'll move the changelog.
