@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B7BC2BB86
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC2CC2BB85
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D25DD2063A
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5A522063A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491372;
-	bh=KKBWfcgXI2QAhilK8gWcaz6FAjMhjAQb240IduL7qew=;
+	s=default; t=1586491377;
+	bh=YE7qF5ymZ6drq8K0sUSY9ANzzcy+WdJFJc1P19o1qX8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Q/kiOQcOzm9/f6htog6Lb7ifKpAfLR+IyPGz/MjH5eeBUPdUlf/XOnx2HvuA9i98M
-	 RO6T17k3fOWFyInOWV3eeDs8gwvQNMLsIJm5/hpb6SkSTWaYJvTrZXZrPL2rEXjPZz
-	 xSMua5G/mKg3YWl+2pKtVupaDVXbmQobxfWXvlys=
+	b=1uwUBgw6BAZU/BNiwwS7M3fhPE7XC3K1cjwyIXfl6or5t8+FamQOqm45tG0bGTVwT
+	 1OmsacmX41hdNGvDx63Q9KJInk4YvIXS9hnl/gtrDi1xXfjuGKTXrv/W0MNedPMTez
+	 W91ACVB/ly3uMQb6A28PuVXusO7UkPJy4Q6yvoZU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725893AbgDJECr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Apr 2020 00:02:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57202 "EHLO mail.kernel.org"
+        id S1726682AbgDJECw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 00:02:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57146 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726902AbgDJDq6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:46:58 -0400
+        id S1726892AbgDJDq4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:46:56 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E7B8720CC7;
-        Fri, 10 Apr 2020 03:46:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6520A20936;
+        Fri, 10 Apr 2020 03:46:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490418;
-        bh=KKBWfcgXI2QAhilK8gWcaz6FAjMhjAQb240IduL7qew=;
+        s=default; t=1586490416;
+        bh=YE7qF5ymZ6drq8K0sUSY9ANzzcy+WdJFJc1P19o1qX8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Cs0hAkad+6Sdjq2hsiwGR4GhylRVK5nHzcT02X5QoXLuied+Azeoel0jvGx3XdQ30
-         bkXfkD7RXdZZZ0oPel34mY/c1PstzReH1ISxaugXaqmILHe5d1XlrLZP99DI4hK1Tc
-         wIve+cWxDj9zdrlLjiwWFvs1NLcm+ZJR5ffXu080=
+        b=gKBJznsrNfBgkLDWRYkE3LMAgcXwhdNUxGhUPNf17uV/RT487+vIhI+K989Shmkxq
+         NIlHohk32VwL5nQxjo8cq6RqIMF+SM0ukGXCPi8eLmgVbV/GoTGH2vW32EaEU6hBLJ
+         bNuXLy1QfIEC4BYunFuRLqcgyfCoB75KRVAU4KGo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Johannes Thumshirn <jth@kernel.org>,
         Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 18/68] blk-mq: Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()
-Date:   Thu,  9 Apr 2020 23:45:43 -0400
-Message-Id: <20200410034634.7731-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 17/68] null_blk: Fix the null_add_dev() error path
+Date:   Thu,  9 Apr 2020 23:45:42 -0400
+Message-Id: <20200410034634.7731-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034634.7731-1-sashal@kernel.org>
 References: <20200410034634.7731-1-sashal@kernel.org>
@@ -65,28 +65,45 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Bart Van Assche <bvanassche@acm.org>
 
-[ Upstream commit d0930bb8f46b8fb4a7d429c0bf1c91b3ed00a7cf ]
+[ Upstream commit 2004bfdef945fe55196db6b9cdf321fbc75bb0de ]
 
-q->nr_hw_queues must only be updated once it is known that
-blk_mq_realloc_hw_ctxs() has succeeded. Otherwise it can happen that
-reallocation fails and that q->nr_hw_queues is larger than the number of
-allocated hardware queues. This patch fixes the following crash if
-increasing the number of hardware queues fails:
+If null_add_dev() fails, clear dev->nullb.
 
-BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x775/0x810
-Write of size 8 at addr 0000000000000118 by task check/977
+This patch fixes the following KASAN complaint:
 
-CPU: 3 PID: 977 Comm: check Not tainted 5.6.0-rc1-dbg+ #8
-Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+BUG: KASAN: use-after-free in nullb_device_submit_queues_store+0xcf/0x160 [null_blk]
+Read of size 8 at addr ffff88803280fc30 by task check/8409
+
 Call Trace:
  dump_stack+0xa5/0xe6
- __kasan_report.cold+0x65/0x99
+ print_address_description.constprop.0+0x26/0x260
+ __kasan_report.cold+0x7b/0x99
  kasan_report+0x16/0x20
- check_memory_region+0x140/0x1b0
- memset+0x28/0x40
- blk_mq_map_swqueue+0x775/0x810
- blk_mq_update_nr_hw_queues+0x468/0x710
- nullb_device_submit_queues_store+0xf7/0x1a0 [null_blk]
+ __asan_load8+0x58/0x90
+ nullb_device_submit_queues_store+0xcf/0x160 [null_blk]
+ configfs_write_file+0x1c4/0x250 [configfs]
+ __vfs_write+0x4c/0x90
+ vfs_write+0x145/0x2c0
+ ksys_write+0xd7/0x180
+ __x64_sys_write+0x47/0x50
+ do_syscall_64+0x6f/0x2f0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x7ff370926317
+Code: 64 89 02 48 c7 c0 ff ff ff ff eb bb 0f 1f 80 00 00 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+RSP: 002b:00007fff2dd2da48 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007ff370926317
+RDX: 0000000000000002 RSI: 0000559437ef23f0 RDI: 0000000000000001
+RBP: 0000559437ef23f0 R08: 000000000000000a R09: 0000000000000001
+R10: 0000559436703471 R11: 0000000000000246 R12: 0000000000000002
+R13: 00007ff370a006a0 R14: 00007ff370a014a0 R15: 00007ff370a008a0
+
+Allocated by task 8409:
+ save_stack+0x23/0x90
+ __kasan_kmalloc.constprop.0+0xcf/0xe0
+ kasan_kmalloc+0xd/0x10
+ kmem_cache_alloc_node_trace+0x129/0x4c0
+ null_add_dev+0x24a/0xe90 [null_blk]
+ nullb_device_power_store+0x1b6/0x270 [null_blk]
  configfs_write_file+0x1c4/0x250 [configfs]
  __vfs_write+0x4c/0x90
  vfs_write+0x145/0x2c0
@@ -95,31 +112,46 @@ Call Trace:
  do_syscall_64+0x6f/0x2f0
  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Fixes: ac0d6b926e74 ("block: Reduce the amount of memory required per request queue")
+Freed by task 8409:
+ save_stack+0x23/0x90
+ __kasan_slab_free+0x112/0x160
+ kasan_slab_free+0x12/0x20
+ kfree+0xdf/0x250
+ null_add_dev+0xaf3/0xe90 [null_blk]
+ nullb_device_power_store+0x1b6/0x270 [null_blk]
+ configfs_write_file+0x1c4/0x250 [configfs]
+ __vfs_write+0x4c/0x90
+ vfs_write+0x145/0x2c0
+ ksys_write+0xd7/0x180
+ __x64_sys_write+0x47/0x50
+ do_syscall_64+0x6f/0x2f0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Fixes: 2984c8684f96 ("nullb: factor disk parameters")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Cc: Johannes Thumshirn <jth@kernel.org>
 Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/null_blk_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d92088dec6c35..062bbf6c55958 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2824,7 +2824,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
- 			       sizeof(*hctxs));
- 		q->queue_hw_ctx = new_hctxs;
--		q->nr_hw_queues = set->nr_hw_queues;
- 		kfree(hctxs);
- 		hctxs = new_hctxs;
- 	}
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 133060431dbdb..8ada43b3eca13 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1788,6 +1788,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 	cleanup_queues(nullb);
+ out_free_nullb:
+ 	kfree(nullb);
++	dev->nullb = NULL;
+ out:
+ 	return rv;
+ }
 -- 
 2.20.1
 
