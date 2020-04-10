@@ -7,45 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F5AC2D0EC
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D42C2BB86
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33466216FD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:59:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E03D2063A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:59:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491186;
-	bh=zrlF1T55Zp8RBkwf0vAGxoyyMKYpXfj8FOGIZ2PSuqU=;
+	s=default; t=1586491188;
+	bh=zndEF5nbEyrafOSfKLd+VqjCVDUNvwtQObFN7ypRggA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uWJdYxS/M/vtccH8RcNA1wmjvC1J4oEEdRbeRpWCgmuqbrqFsxdYNSu+yRq4TsJWi
-	 nGrnJO2lDximSKVgzGOq6VUPVjQutnSD2RyChsGmhyqAaddCmq7EwOrw+0uxppCbvn
-	 Gs8xn2I31RXiQXU30j1FJM89nPT1UhjA5fW9MpMY=
+	b=JHfVS5aTVPEGEOJXCNaSDjz1zgAVidro1BhUnvJbczBO65iC36BGZ8u3r+VCq51mo
+	 LbNOaw3iIo9xepx62Jv4eOpmU+KLYcbI95QthrwuHtucYO14VMxizfyMsRjpkF/exZ
+	 4D7sfLbZSBTaF6jMVogClCFSUq65Rt/UEAKrU220=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728128AbgDJDsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 23:48:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59542 "EHLO mail.kernel.org"
+        id S1728064AbgDJDsP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 23:48:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59488 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728110AbgDJDsR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:48:17 -0400
+        id S1728086AbgDJDsO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:48:14 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4C29E2145D;
-        Fri, 10 Apr 2020 03:48:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D6AF20936;
+        Fri, 10 Apr 2020 03:48:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490497;
-        bh=zrlF1T55Zp8RBkwf0vAGxoyyMKYpXfj8FOGIZ2PSuqU=;
+        s=default; t=1586490494;
+        bh=zndEF5nbEyrafOSfKLd+VqjCVDUNvwtQObFN7ypRggA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xj0woNIBbPJtiKTG2LPFCVLIZeV1pbiBFRT5NhoNaRmveNtSRr39ps7C4qQzgveeD
-         sBM8j3OFZBjNnLJo9Mo1WexW38WSgeY5Q7JHGz4nv09X4vzeQNH6gIsCtyA9Xg5gFX
-         l0f0R1V4ceMOxvbcdhzgxYAuBxe2K4IQGyDAwEbw=
+        b=XedX5TzBrbXu5gcy6jnx0XaJVFYJj8cI5QD4hl0Q4Xof7JwltC4qECDiffU+jTYX6
+         XmVUPBtG+Je+G431nuGSKpibgEfck7+0YY0hOcaHT4tDvOJbIHGM+Ccb1DsAcQuQA7
+         4j97ER2rOyifbhH4z/wm8EGGpS3MgPV+0iZdBWOQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexey Dobriyan <adobriyan@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 13/56] null_blk: fix spurious IO errors after failed past-wp access
-Date:   Thu,  9 Apr 2020 23:47:17 -0400
-Message-Id: <20200410034800.8381-13-sashal@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 11/56] blk-mq: Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()
+Date:   Thu,  9 Apr 2020 23:47:15 -0400
+Message-Id: <20200410034800.8381-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034800.8381-1-sashal@kernel.org>
 References: <20200410034800.8381-1-sashal@kernel.org>
@@ -58,53 +63,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Alexey Dobriyan <adobriyan@gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
 
-[ Upstream commit ff77042296d0a54535ddf74412c5ae92cb4ec76a ]
+[ Upstream commit d0930bb8f46b8fb4a7d429c0bf1c91b3ed00a7cf ]
 
-Steps to reproduce:
+q->nr_hw_queues must only be updated once it is known that
+blk_mq_realloc_hw_ctxs() has succeeded. Otherwise it can happen that
+reallocation fails and that q->nr_hw_queues is larger than the number of
+allocated hardware queues. This patch fixes the following crash if
+increasing the number of hardware queues fails:
 
-	BLKRESETZONE zone 0
+BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x775/0x810
+Write of size 8 at addr 0000000000000118 by task check/977
 
-	// force EIO
-	pwrite(fd, buf, 4096, 4096);
+CPU: 3 PID: 977 Comm: check Not tainted 5.6.0-rc1-dbg+ #8
+Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+Call Trace:
+ dump_stack+0xa5/0xe6
+ __kasan_report.cold+0x65/0x99
+ kasan_report+0x16/0x20
+ check_memory_region+0x140/0x1b0
+ memset+0x28/0x40
+ blk_mq_map_swqueue+0x775/0x810
+ blk_mq_update_nr_hw_queues+0x468/0x710
+ nullb_device_submit_queues_store+0xf7/0x1a0 [null_blk]
+ configfs_write_file+0x1c4/0x250 [configfs]
+ __vfs_write+0x4c/0x90
+ vfs_write+0x145/0x2c0
+ ksys_write+0xd7/0x180
+ __x64_sys_write+0x47/0x50
+ do_syscall_64+0x6f/0x2f0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-	[issue more IO including zone ioctls]
-
-It will start failing randomly including IO to unrelated zones because of
-->error "reuse". Trigger can be partition detection as well if test is not
-run immediately which is even more entertaining.
-
-The fix is of course to clear ->error where necessary.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
+Fixes: ac0d6b926e74 ("block: Reduce the amount of memory required per request queue")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Johannes Thumshirn <jth@kernel.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/null_blk_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-mq.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 635904bfcf777..0cafad09c9b29 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -605,6 +605,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
- 	if (tag != -1U) {
- 		cmd = &nq->cmds[tag];
- 		cmd->tag = tag;
-+		cmd->error = BLK_STS_OK;
- 		cmd->nq = nq;
- 		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
- 			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
-@@ -1385,6 +1386,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		cmd->timer.function = null_cmd_timer_expired;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 329df7986bf60..51ff4852d34bc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2766,7 +2766,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+ 			       sizeof(*hctxs));
+ 		q->queue_hw_ctx = new_hctxs;
+-		q->nr_hw_queues = set->nr_hw_queues;
+ 		kfree(hctxs);
+ 		hctxs = new_hctxs;
  	}
- 	cmd->rq = bd->rq;
-+	cmd->error = BLK_STS_OK;
- 	cmd->nq = nq;
- 
- 	blk_mq_start_request(bd->rq);
 -- 
 2.20.1
 
