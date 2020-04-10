@@ -4,48 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9EAC2BBFD
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF2EC2BB1D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:01:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2D8E20936
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:01:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C789D2137B
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491265;
-	bh=Szm+1rgDnYEAet5MAJnily9gGMqOJMGUuLDtS4pC0Vc=;
+	s=default; t=1586491273;
+	bh=Q3BImW1BvueS/wzGylY0Q7rl6yLLYN+YDzOdA3qO/es=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Qqgtv1k2MZ5pvtOe+4r2wZlp6HQ4xZr+5KlSw/DEt3xmAvYKD9Khw+Cc5ytMPywTJ
-	 1unD/70l24+eDMT8GiOxlpV1doyANefogmGRft582l32Kzwc2GpZ3rTIm12EvnkNJQ
-	 iF3+duU+aUyDDETEFnob43WyC5yHbpmAOBNojyrM=
+	b=IyjQSfkLxXwwkrbdIVLnKbFcevKyXwgS8HriF3RZ2rBC1fPzEhFs5fxyRMCZrx1TQ
+	 zKYoc+jpxoNWn+DFFwTIb7nyyCVnP3zbEzTm0GJFpKEsBkWjvrCTk7RDN9Hr/M8Jd8
+	 2bR3CUYN49FdwEb/eSddf4fhB2cZFHaa1ODri6wc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726774AbgDJEBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727761AbgDJEBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 10 Apr 2020 00:01:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58562 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:58512 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727787AbgDJDrj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:47:39 -0400
+        id S1726701AbgDJDrg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:47:36 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2B58F212CC;
-        Fri, 10 Apr 2020 03:47:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 73D2020B1F;
+        Fri, 10 Apr 2020 03:47:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490458;
-        bh=Szm+1rgDnYEAet5MAJnily9gGMqOJMGUuLDtS4pC0Vc=;
+        s=default; t=1586490456;
+        bh=Q3BImW1BvueS/wzGylY0Q7rl6yLLYN+YDzOdA3qO/es=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MFSNqFHSm91F8xrWDPL2eygtz8JTFSZrVT6OmfI4wRiMQisQbDMFNKrhcoXwn9IKL
-         9mcqy5Ezn2EQBhIBKbvSA/RYUxhntT/ehQPzJKHXLy+dmeS19k1QfgvCUdeYwSU/Vy
-         ggeLes4YfVRgVReYP+NMX/IdEY5bSsLJX4mJOyQo=
+        b=xGQM0GDuIR1S1KiO8rlkL6GrIGi8q9H+HE3SgSVw/JnjQS8ehYf6W5y0yIaOKeJOg
+         hiC/GRn3cBkpnkvj0lOPFJHVMbpId/qo7NvEsMPtyRVKjjokBJtScmLJGN3TY0+jSl
+         R0NocBW5KUJKxLa1Mi2fwZg+frr04S5AXWizWKS4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexey Dobriyan <adobriyan@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 53/68] block, zoned: fix integer overflow with BLKRESETZONE et al
-Date:   Thu,  9 Apr 2020 23:46:18 -0400
-Message-Id: <20200410034634.7731-53-sashal@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 51/68] blk-mq: Keep set->nr_hw_queues and set->map[].nr_queues in sync
+Date:   Thu,  9 Apr 2020 23:46:16 -0400
+Message-Id: <20200410034634.7731-51-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034634.7731-1-sashal@kernel.org>
 References: <20200410034634.7731-1-sashal@kernel.org>
@@ -58,73 +64,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Alexey Dobriyan <adobriyan@gmail.com>
+From: Bart Van Assche <bvanassche@acm.org>
 
-[ Upstream commit 11bde986002c0af67eb92d73321d06baefae7128 ]
+[ Upstream commit 6e66b49392419f3fe134e1be583323ef75da1e4b ]
 
-Check for overflow in addition before checking for end-of-block-device.
+blk_mq_map_queues() and multiple .map_queues() implementations expect that
+set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the number of hardware
+queues. Hence set .nr_queues before calling these functions. This patch
+fixes the following kernel warning:
 
-Steps to reproduce:
-
-	#define _GNU_SOURCE 1
-	#include <sys/ioctl.h>
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <fcntl.h>
-
-	typedef unsigned long long __u64;
-
-	struct blk_zone_range {
-	        __u64 sector;
-	        __u64 nr_sectors;
-	};
-
-	#define BLKRESETZONE    _IOW(0x12, 131, struct blk_zone_range)
-
-	int main(void)
-	{
-	        int fd = open("/dev/nullb0", O_RDWR|O_DIRECT);
-	        struct blk_zone_range zr = {4096, 0xfffffffffffff000ULL};
-	        ioctl(fd, BLKRESETZONE, &zr);
-	        return 0;
-	}
-
-BUG: KASAN: null-ptr-deref in submit_bio_wait+0x74/0xe0
-Write of size 8 at addr 0000000000000040 by task a.out/1590
-
-CPU: 8 PID: 1590 Comm: a.out Not tainted 5.6.0-rc1-00019-g359c92c02bfa #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190711_202441-buildvm-armv7-10.arm.fedoraproject.org-2.fc31 04/01/2014
+WARNING: CPU: 0 PID: 2501 at include/linux/cpumask.h:137
 Call Trace:
- dump_stack+0x76/0xa0
- __kasan_report.cold+0x5/0x3e
- kasan_report+0xe/0x20
- submit_bio_wait+0x74/0xe0
- blkdev_zone_mgmt+0x26f/0x2a0
- blkdev_zone_mgmt_ioctl+0x14b/0x1b0
- blkdev_ioctl+0xb28/0xe60
- block_ioctl+0x69/0x80
- ksys_ioctl+0x3af/0xa50
+ blk_mq_run_hw_queue+0x19d/0x350 block/blk-mq.c:1508
+ blk_mq_run_hw_queues+0x112/0x1a0 block/blk-mq.c:1525
+ blk_mq_requeue_work+0x502/0x780 block/blk-mq.c:775
+ process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
+ worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+ kthread+0x361/0x430 kernel/kthread.c:255
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
+Fixes: ed76e329d74a ("blk-mq: abstract out queue map") # v5.0
+Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Johannes Thumshirn <jth@kernel.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-zoned.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 05741c6f618be..6b442ae96499a 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -173,7 +173,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 	if (!op_is_zone_mgmt(op))
- 		return -EOPNOTSUPP;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 062bbf6c55958..37ff8dfb8ab9f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3022,6 +3022,14 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
  
--	if (!nr_sectors || end_sector > capacity)
-+	if (end_sector <= sector || end_sector > capacity)
- 		/* Out of range */
- 		return -EINVAL;
+ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ {
++	/*
++	 * blk_mq_map_queues() and multiple .map_queues() implementations
++	 * expect that set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the
++	 * number of hardware queues.
++	 */
++	if (set->nr_maps == 1)
++		set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
++
+ 	if (set->ops->map_queues && !is_kdump_kernel()) {
+ 		int i;
  
 -- 
 2.20.1
