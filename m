@@ -2,133 +2,220 @@ Return-Path: <SRS0=rO4A=52=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 017D9C2BB55
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 08:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C37C2BA2B
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 08:35:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C416D20753
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 08:01:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ug2g0Npy";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="amU6DeUA"
+	by mail.kernel.org (Postfix) with ESMTP id 0AD262051A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 08:35:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbgDJIBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Apr 2020 04:01:33 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:57875 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbgDJIBc (ORCPT
+        id S1725913AbgDJIf4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 04:35:56 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:43994 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725893AbgDJIfz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Apr 2020 04:01:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1586505693; x=1618041693;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=4o3TisBG1Yclcv/K4CcJ6BW7Az2djfFo4ACWhV2a7sE=;
-  b=Ug2g0NpyTD24E3qZaqtC2aF83ViRNDd09QH/rufX06ljfpgF7sRSzsZa
-   MTz/CH4Uh7f21F4/Fx/Ug3c/ftk0ODysOBppb+bCoMsSeKEGl47RU1JC+
-   xSIdDCaIz1Bh/5uepUsvNVylTv0/NPDXan86IBIBpFB16Ou+nLNGbFXTh
-   IczmijHiBuQNPa0BJflR7QXtcrippxJtWQelPhAGyrWkz+34IqBQP31oF
-   atC3aUXD4aeSVgp4fJKQKt6pmRbli0w+BQ0+/DYKkxxvKlQ6mDj3+91wW
-   1pd18cGfbv+UIJ5aldbiVsSMFncIBMW2NTpCTAnpE09Xw6f0KOiF48d1C
-   w==;
-IronPort-SDR: kzfqaA+PzNxJJmB4B3OnDLN8m2MujzCu5M1PTxf0MQX2CwM6c3fBaZxzX4l2EqkfDBlbO5i8EH
- OfYYnb8eRgZpF/HYIp6shYzmG3EcsobldSIOGUK+kOLc/3QJ4LRpP6yi6rZ2sopaYGrL3j93UQ
- yLEWS7kT2zsYYrglblQED3tu2xkrpDJGXw9phDXiAh02GbRYbuURQA/DzzdvVP4VpLWLq2t1gq
- o6lbkSIZdIajxagVpi3AViDgW0OTU4Y7OaVJkMsV1LmLMxLTuRli6NiaqgIpOO4ubkweuhnLDv
- DRE=
-X-IronPort-AV: E=Sophos;i="5.72,366,1580745600"; 
-   d="scan'208";a="139359330"
-Received: from mail-mw2nam10lp2102.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.102])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Apr 2020 16:01:32 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z+jdwJmBTRUUHybO2EIXox9hjLolfqVlq7WM99pD7YPwtHA8rbKPQJ8cYDQu4Tb/ue29hSvFTGhAkpt58KmAow5k02axfcrI7JLyYQ8NV6Z0Ho4YjTBiucT6Jb1XpQUXSXfqV6G4+NV2jn03bT0qsLJa9GJQXxUQpG9rMtYvZ5yCxs0U8C1EmR4HiAgdSxdnqJf08nqyHmDxk6CJoFjFvyRy2t+EREndxl6qOfOnWS7VhLGQouwrrim/LaMEqmyvyQWFw4bFgWto4Xd3TtRGCRNCxeN5wIX2MNrDRtsu5Rosg02lYgAgyvMaQbCZT9lcP3ClO9SXEiO4ueaLin+o9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rNGDoxVqol+AGNgz1SwgR7+Xgb/QNRuYTHRnEeyCMZY=;
- b=L3LYkYCB+loW8XjcHkGMBr/8X00nB/zxQXg1zHpjDqJ6SenUqyPrFP24vMYc49zzje4NZTTkFXynGo7pA1st0s9hp7gLibVbjfYyWpIhbeqvCiqhanPH3YdpZ1t1OEp5baPif2VOfY2+DKrMEQarF8bmKsPVHTjPYWuNQu0IxKqV4kJh+tOUDpRQWGcZPLebkMhW0wshLDfbcjF4YRu7GUGFkzp1URfPOqr4soZOy5L5Jfd9s07LQK/LjoaJxdJ2jThIIB0bLcs8xU0VnEThPARbnpHQdY/RticnAwKO96sbqHIH/zBviJM53W0fI0EM8HYkQdLkixZmFKXBhtDmyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rNGDoxVqol+AGNgz1SwgR7+Xgb/QNRuYTHRnEeyCMZY=;
- b=amU6DeUA5gwGL9cLNF5ts9WcDK9ecl/HMEQtIaNHMqD5nmnUm902ctBG2M+2LRaDhVOMeuvmqjyZbpcUx9Y3itzXrMHMSwAL37CcuRGguC73d3lvYHvMU8S122jD7v5GRQ+EpNswy5BvNapHlFfiva+Mqq8aha32EFKh+S7n7W8=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3661.namprd04.prod.outlook.com
- (2603:10b6:803:45::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.20; Fri, 10 Apr
- 2020 08:01:30 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2878.018; Fri, 10 Apr 2020
- 08:01:30 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v5 07/10] scsi: sd_zbc: emulate ZONE_APPEND commands
-Thread-Topic: [PATCH v5 07/10] scsi: sd_zbc: emulate ZONE_APPEND commands
-Thread-Index: AQHWDo9/7/TsxA+1IEecB4cF8olDQw==
-Date:   Fri, 10 Apr 2020 08:01:29 +0000
-Message-ID: <SN4PR0401MB3598BD2ABC30EE4413BAD2DB9BDE0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200409165352.2126-1-johannes.thumshirn@wdc.com>
- <20200409165352.2126-8-johannes.thumshirn@wdc.com>
- <20200410061822.GB4791@infradead.org> <20200410063855.GC4791@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 2ab216b1-6d89-407b-2460-08d7dd2560a2
-x-ms-traffictypediagnostic: SN4PR0401MB3661:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR0401MB3661C3D276F14AC294FC50389BDE0@SN4PR0401MB3661.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0369E8196C
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(346002)(376002)(136003)(396003)(366004)(39860400002)(71200400001)(53546011)(6506007)(186003)(6916009)(26005)(5660300002)(7696005)(54906003)(8676002)(4744005)(81156014)(33656002)(52536014)(8936002)(478600001)(91956017)(66446008)(4326008)(66946007)(86362001)(76116006)(66556008)(66476007)(64756008)(316002)(9686003)(55016002)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +JkZQ7FVGQC/M+Taoh9aCsRuo5FDgiaTIWftG+ojps6I6bGZFBQK3ZfLcQoyAuACmKEXxLWaTzKyn9moZwnBzxRu3eaelHYxuXy7qRcRlEG91ysULouhCGz0pQXxXc8igjjGJ0KUXOj7ZoO5Jfk/wFOXWbWyOGkg84+OnySv2aXXvIXqi4O2sed6Gvabig7DMVyHeZTpB3sy2KYNQ9FW3OGu5km+te40GRqaPdf6Wb/Nsm6mQhiz2eUFQLZwAWpnnOiTzqLSfEB8HY/28+JXjlJGkQsOQE81RY8c3exfUEaNCFI9Zhw+6IOoxP3oZuztdwAS34DoIE9qI5hYyvqVFBNUDWdH7rM4wPu49rO1r5I8heZmUXWZyG9OnRU++TTlScNCMc5ZsSg1PcsOLeu17UMzRrxSCUxIttXnHNhf05VbB/XPmPtiyzXNqiN2NJo3
-x-ms-exchange-antispam-messagedata: FsmP9vVovD3dbExBTI/4kSU0Q4LcfBdl7pOz/Msk6g7FrwT93MKgwGgjo1B1LGt5uvZ/tFRse9GYeZLE2CADthHQghn1gHNwGrtY5RDCQKVlqYlq36Neiam8xyRTinbXhr+YlLjgC3paQMiSRY6ZpQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 10 Apr 2020 04:35:55 -0400
+Received: by mail-lf1-f65.google.com with SMTP id k28so833678lfe.10;
+        Fri, 10 Apr 2020 01:35:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=DcH37kFw3pA3TszaAlB4FxdsO6scQAKynKBKosGJvw8=;
+        b=NNfvw6+PavF+mc8vRL6F585DhlDMhbFQul6ultsRxTpdBQh0Q5icTrp6cGPm0iRAj0
+         6I9xcKKta4iK2ZNdBXaI3FLcGplWpfhFsmYAAKFu/8v1CW//xWxIEnxXQEUZxkmQycsS
+         CBddePTUiwTD1Naw7h3lWAhoWTLMWy9xaWAgYVSfnMKv01UMEq4hWXcsLeNIKGVTtqjP
+         qd+xL47UEwbo5gf0kQb4GCVNRNtdtVppSruWM0D20tRMSWmzUYWO52iwf0JMAK3R5MyZ
+         4kzlfwXGXHAYMqcuuXdGJBq2+F1M2zolsqXP4OYY6Ea9P2M9XUcdJkGAf9t1PQzAb8Rg
+         EAwA==
+X-Gm-Message-State: AGi0PuY2Hm3q0DzBzWY1NCiIkna7SpF1pZ2A0ysJfOjeR/1HpOPPdYrs
+        bu5OaUUi+sadIV7NbxLX+dBr0/KnNZ4=
+X-Google-Smtp-Source: APiQypJCdNAwb1kOP3vYH3Df/92yjIoG2YCAIQhGV7XlAyX7GLcVkjbB1jVG0LvJh2DJL9zCr0i1Qw==
+X-Received: by 2002:a05:6512:1046:: with SMTP id c6mr2050367lfb.115.1586507753158;
+        Fri, 10 Apr 2020 01:35:53 -0700 (PDT)
+Received: from [10.68.32.192] (broadband-188-32-231-41.ip.moscow.rt.ru. [188.32.231.41])
+        by smtp.gmail.com with ESMTPSA id i20sm895855lfe.15.2020.04.10.01.35.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Apr 2020 01:35:52 -0700 (PDT)
+To:     Willy Tarreau <w@1wt.eu>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200331094054.24441-1-w@1wt.eu>
+ <20200331094054.24441-23-w@1wt.eu>
+From:   Denis Efremov <efremov@linux.com>
+Autocrypt: addr=efremov@linux.com; keydata=
+ mQINBFsJUXwBEADDnzbOGE/X5ZdHqpK/kNmR7AY39b/rR+2Wm/VbQHV+jpGk8ZL07iOWnVe1
+ ZInSp3Ze+scB4ZK+y48z0YDvKUU3L85Nb31UASB2bgWIV+8tmW4kV8a2PosqIc4wp4/Qa2A/
+ Ip6q+bWurxOOjyJkfzt51p6Th4FTUsuoxINKRMjHrs/0y5oEc7Wt/1qk2ljmnSocg3fMxo8+
+ y6IxmXt5tYvt+FfBqx/1XwXuOSd0WOku+/jscYmBPwyrLdk/pMSnnld6a2Fp1zxWIKz+4VJm
+ QEIlCTe5SO3h5sozpXeWS916VwwCuf8oov6706yC4MlmAqsQpBdoihQEA7zgh+pk10sCvviX
+ FYM4gIcoMkKRex/NSqmeh3VmvQunEv6P+hNMKnIlZ2eJGQpz/ezwqNtV/przO95FSMOQxvQY
+ 11TbyNxudW4FBx6K3fzKjw5dY2PrAUGfHbpI3wtVUNxSjcE6iaJHWUA+8R6FLnTXyEObRzTS
+ fAjfiqcta+iLPdGGkYtmW1muy/v0juldH9uLfD9OfYODsWia2Ve79RB9cHSgRv4nZcGhQmP2
+ wFpLqskh+qlibhAAqT3RQLRsGabiTjzUkdzO1gaNlwufwqMXjZNkLYu1KpTNUegx3MNEi2p9
+ CmmDxWMBSMFofgrcy8PJ0jUnn9vWmtn3gz10FgTgqC7B3UvARQARAQABtCFEZW5pcyBFZnJl
+ bW92IDxlZnJlbW92QGxpbnV4LmNvbT6JAlcEEwEIAEECGwMFCQPCZwAFCwkIBwIGFQoJCAsC
+ BBYCAwECHgECF4AWIQR2VAM2ApQN8ZIP5AO1IpWwM1AwHwUCW3qdrQIZAQAKCRC1IpWwM1Aw
+ HwF5D/sHp+jswevGj304qvG4vNnbZDr1H8VYlsDUt+Eygwdg9eAVSVZ8yr9CAu9xONr4Ilr1
+ I1vZRCutdGl5sneXr3JBOJRoyH145ExDzQtHDjqJdoRHyI/QTY2l2YPqH/QY1hsLJr/GKuRi
+ oqUJQoHhdvz/NitR4DciKl5HTQPbDYOpVfl46i0CNvDUsWX7GjMwFwLD77E+wfSeOyXpFc2b
+ tlC9sVUKtkug1nAONEnP41BKZwJ/2D6z5bdVeLfykOAmHoqWitCiXgRPUg4Vzc/ysgK+uKQ8
+ /S1RuUA83KnXp7z2JNJ6FEcivsbTZd7Ix6XZb9CwnuwiKDzNjffv5dmiM+m5RaUmLVVNgVCW
+ wKQYeTVAspfdwJ5j2gICY+UshALCfRVBWlnGH7iZOfmiErnwcDL0hLEDlajvrnzWPM9953i6
+ fF3+nr7Lol/behhdY8QdLLErckZBzh+tr0RMl5XKNoB/kEQZPUHK25b140NTSeuYGVxAZg3g
+ 4hobxbOGkzOtnA9gZVjEWxteLNuQ6rmxrvrQDTcLTLEjlTQvQ0uVK4ZeDxWxpECaU7T67khA
+ ja2B8VusTTbvxlNYbLpGxYQmMFIUF5WBfc76ipedPYKJ+itCfZGeNWxjOzEld4/v2BTS0o02
+ 0iMx7FeQdG0fSzgoIVUFj6durkgch+N5P1G9oU+H37kCDQRbCVF8ARAA3ITFo8OvvzQJT2cY
+ nPR718Npm+UL6uckm0Jr0IAFdstRZ3ZLW/R9e24nfF3A8Qga3VxJdhdEOzZKBbl1nadZ9kKU
+ nq87te0eBJu+EbcuMv6+njT4CBdwCzJnBZ7ApFpvM8CxIUyFAvaz4EZZxkfEpxaPAivR1Sa2
+ 2x7OMWH/78laB6KsPgwxV7fir45VjQEyJZ5ac5ydG9xndFmb76upD7HhV7fnygwf/uIPOzNZ
+ YVElGVnqTBqisFRWg9w3Bqvqb/W6prJsoh7F0/THzCzp6PwbAnXDedN388RIuHtXJ+wTsPA0
+ oL0H4jQ+4XuAWvghD/+RXJI5wcsAHx7QkDcbTddrhhGdGcd06qbXe2hNVgdCtaoAgpCEetW8
+ /a8H+lEBBD4/iD2La39sfE+dt100cKgUP9MukDvOF2fT6GimdQ8TeEd1+RjYyG9SEJpVIxj6
+ H3CyGjFwtIwodfediU/ygmYfKXJIDmVpVQi598apSoWYT/ltv+NXTALjyNIVvh5cLRz8YxoF
+ sFI2VpZ5PMrr1qo+DB1AbH00b0l2W7HGetSH8gcgpc7q3kCObmDSa3aTGTkawNHzbceEJrL6
+ mRD6GbjU4GPD06/dTRIhQatKgE4ekv5wnxBK6v9CVKViqpn7vIxiTI9/VtTKndzdnKE6C72+
+ jTwSYVa1vMxJABtOSg8AEQEAAYkCPAQYAQgAJhYhBHZUAzYClA3xkg/kA7UilbAzUDAfBQJb
+ CVF8AhsMBQkDwmcAAAoJELUilbAzUDAfB8cQALnqSjpnPtFiWGfxPeq4nkfCN8QEAjb0Rg+a
+ 3fy1LiquAn003DyC92qphcGkCLN75YcaGlp33M/HrjrK1cttr7biJelb5FncRSUZqbbm0Ymj
+ U4AKyfNrYaPz7vHJuijRNUZR2mntwiKotgLV95yL0dPyZxvOPPnbjF0cCtHfdKhXIt7Syzjb
+ M8k2fmSF0FM+89/hP11aRrs6+qMHSd/s3N3j0hR2Uxsski8q6x+LxU1aHS0FFkSl0m8SiazA
+ Gd1zy4pXC2HhCHstF24Nu5iVLPRwlxFS/+o3nB1ZWTwu8I6s2ZF5TAgBfEONV5MIYH3fOb5+
+ r/HYPye7puSmQ2LCXy7X5IIsnAoxSrcFYq9nGfHNcXhm5x6WjYC0Kz8l4lfwWo8PIpZ8x57v
+ gTH1PI5R4WdRQijLxLCW/AaiuoEYuOLAoW481XtZb0GRRe+Tm9z/fCbkEveyPiDK7oZahBM7
+ QdWEEV8mqJoOZ3xxqMlJrxKM9SDF+auB4zWGz5jGzCDAx/0qMUrVn2+v8i4oEKW6IUdV7axW
+ Nk9a+EF5JSTbfv0JBYeSHK3WRklSYLdsMRhaCKhSbwo8Xgn/m6a92fKd3NnObvRe76iIEMSw
+ 60iagNE6AFFzuF/GvoIHb2oDUIX4z+/D0TBWH9ADNptmuE+LZnlPUAAEzRgUFtlN5LtJP8ph
+Subject: Re: [PATCH 22/23] floppy: cleanup: do not iterate on current_fdc in
+ DMA grab/release functions
+Message-ID: <f5fb363f-8c2c-3aca-6b71-4a45544d067a@linux.com>
+Date:   Fri, 10 Apr 2020 11:35:51 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ab216b1-6d89-407b-2460-08d7dd2560a2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2020 08:01:29.9542
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RhiDu2lJdFRYQxFyaqxj1Zl3tt9IwvuMGAgUptM2nrHirN22qg/DZ3WkQcEuKkZ0fHVU8dPi8htA6sxgItK6+f0GNCDDzvQWCnCtsnjXTDM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3661
+In-Reply-To: <20200331094054.24441-23-w@1wt.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/04/2020 08:39, Christoph Hellwig wrote:=0A=
-> Looking more the situation seems even worse.  If scsi_mq_prep_fn=0A=
-> isn't successfull we never seem to free the sgtables, even for fatal=0A=
-> errors.  So I think we need a real bug fix here in front of the series.=
-=0A=
-> =0A=
-=0A=
-I'll look at in on Tuesday, Easter holidays here.=0A=
+I see a couple of similar cycles in do_floppy_init:
+
+for (i = 0; i < N_FDC; i++) {
+        current_fdc = i;
+        memset(&fdc_state[current_fdc], 0, sizeof(*fdc_state));
+        fdc_state[current_fdc].dtr = -1;
+        fdc_state[current_fdc].dor = 0x4;
+...
+}
+
+for (i = 0; i < N_FDC; i++) {
+        current_fdc = i;
+        fdc_state[current_fdc].driver_version = FD_DRIVER_VERSION;
+...
+}
+
+On 3/31/20 12:40 PM, Willy Tarreau wrote:
+> Both floppy_grab_irq_and_dma() and floppy_release_irq_and_dma() used to
+> iterate on the global variable while setting up or freeing resources.
+> Now that they exclusively rely on functions which take the fdc as an
+> argument, so let's not touch the global one anymore.
+> 
+> Signed-off-by: Willy Tarreau <w@1wt.eu>
+> ---
+>  drivers/block/floppy.c | 39 ++++++++++++++++++++-------------------
+>  1 file changed, 20 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index 8850baa3372a..77bb9a5fcd33 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -4854,6 +4854,8 @@ static void floppy_release_regions(int fdc)
+>  
+>  static int floppy_grab_irq_and_dma(void)
+>  {
+> +	int fdc;
+> +
+>  	if (atomic_inc_return(&usage_count) > 1)
+>  		return 0;
+>  
+> @@ -4881,24 +4883,24 @@ static int floppy_grab_irq_and_dma(void)
+>  		}
+>  	}
+>  
+> -	for (current_fdc = 0; current_fdc < N_FDC; current_fdc++) {
+> -		if (fdc_state[current_fdc].address != -1) {
+> -			if (floppy_request_regions(current_fdc))
+> +	for (fdc = 0; fdc < N_FDC; fdc++) {
+> +		if (fdc_state[fdc].address != -1) {
+> +			if (floppy_request_regions(fdc))
+>  				goto cleanup;
+>  		}
+>  	}
+> -	for (current_fdc = 0; current_fdc < N_FDC; current_fdc++) {
+> -		if (fdc_state[current_fdc].address != -1) {
+> -			reset_fdc_info(current_fdc, 1);
+> -			fdc_outb(fdc_state[current_fdc].dor, current_fdc, FD_DOR);
+> +	for (fdc = 0; fdc < N_FDC; fdc++) {
+> +		if (fdc_state[fdc].address != -1) {
+> +			reset_fdc_info(fdc, 1);
+> +			fdc_outb(fdc_state[fdc].dor, fdc, FD_DOR);
+>  		}
+>  	}
+> -	current_fdc = 0;
+> +
+>  	set_dor(0, ~0, 8);	/* avoid immediate interrupt */
+>  
+> -	for (current_fdc = 0; current_fdc < N_FDC; current_fdc++)
+> -		if (fdc_state[current_fdc].address != -1)
+> -			fdc_outb(fdc_state[current_fdc].dor, current_fdc, FD_DOR);
+> +	for (fdc = 0; fdc < N_FDC; fdc++)
+> +		if (fdc_state[fdc].address != -1)
+> +			fdc_outb(fdc_state[fdc].dor, fdc, FD_DOR);
+>  	/*
+>  	 * The driver will try and free resources and relies on us
+>  	 * to know if they were allocated or not.
+> @@ -4909,15 +4911,16 @@ static int floppy_grab_irq_and_dma(void)
+>  cleanup:
+>  	fd_free_irq();
+>  	fd_free_dma();
+> -	while (--current_fdc >= 0)
+> -		floppy_release_regions(current_fdc);
+> +	while (--fdc >= 0)
+> +		floppy_release_regions(fdc);
+> +	current_fdc = 0;
+>  	atomic_dec(&usage_count);
+>  	return -1;
+>  }
+>  
+>  static void floppy_release_irq_and_dma(void)
+>  {
+> -	int old_fdc;
+> +	int fdc;
+>  #ifndef __sparc__
+>  	int drive;
+>  #endif
+> @@ -4958,11 +4961,9 @@ static void floppy_release_irq_and_dma(void)
+>  		pr_info("auxiliary floppy timer still active\n");
+>  	if (work_pending(&floppy_work))
+>  		pr_info("work still pending\n");
+> -	old_fdc = current_fdc;
+> -	for (current_fdc = 0; current_fdc < N_FDC; current_fdc++)
+> -		if (fdc_state[current_fdc].address != -1)
+> -			floppy_release_regions(current_fdc);
+> -	current_fdc = old_fdc;
+> +	for (fdc = 0; fdc < N_FDC; fdc++)
+> +		if (fdc_state[fdc].address != -1)
+> +			floppy_release_regions(fdc);
+>  }
+>  
+>  #ifdef MODULE
+> 
