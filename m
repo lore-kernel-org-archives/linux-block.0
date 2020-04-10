@@ -7,46 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A3EC2BB86
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D18B4C2BB85
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 537172063A
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB8182082D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491339;
-	bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
+	s=default; t=1586491365;
+	bh=xSuIVxf2IZEyMJBOPJqn1kxpuXNYcQGD/c4t9Fjt72E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=QRgrkBlWtiKQVKbBX52u/Pd+A89kT4z8gqmzv+MV2TVBK7vQfJtsb2mO8hW3tgcHx
-	 o5kleGdNcEqPpUUNXOT+sTsnGqyzEvuFuJrt6PwwYQ+0oz8jyQVz4X5hzB2GVUvt8g
-	 3yFht/xrtylvfcIB+qKjpLctMRGa5tTF7adoje20=
+	b=GdYruma/Oue3j7y8ZsflDOs7NUg8/niOPB4J72AB9cFivu+3RsGs27/B3jGMtC6NM
+	 7nc42D7vdHTgpGQARrscIFiZvr3d2bWc0YMOpKO41pqJmyOr0D+Rq8ccT4N/IB+rH7
+	 alVAJqTKg4KXbXhCiP5eku+21SaSkGStKmDSkHEw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbgDJDrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 23:47:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57692 "EHLO mail.kernel.org"
+        id S1727949AbgDJECi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 00:02:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57246 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727048AbgDJDrL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:47:11 -0400
+        id S1726916AbgDJDq7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:46:59 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A221920A8B;
-        Fri, 10 Apr 2020 03:47:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64336214D8;
+        Fri, 10 Apr 2020 03:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490431;
-        bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
+        s=default; t=1586490419;
+        bh=xSuIVxf2IZEyMJBOPJqn1kxpuXNYcQGD/c4t9Fjt72E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hnU9b8Kl6dn7Taxm7puHO+W5UDMzFuMwEuDW0AJKnsSDiK03xTXFyuIZLZewbBOQW
-         M3x/YEFs7qEDSmrHesQhYMaYvgH1edSQNX0T7TGRF+qFSQMN5D9UcE9/1GpSWYPe2H
-         NviBVvsuVy/QZrMYI/BMYQmQB+Gzn5bnu6vVnngs=
+        b=RQIz+nUTpPNAxW0W+HWDpR4HJ/KH0KK8kZJETOf8m3LN7ya+VvJ/Wq0/6ZGXyrVtt
+         jo8DWVUm6OJKVR6iu1ZwpzrzW8X3ULic8oPJfgjBR/4Ba21JkOBPKD8Y2IAUslVXjQ
+         ClclWxul46zMaCnx3VldEf62Ppz0EDjF9seWi+sA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Bob Liu <bob.liu@oracle.com>, Song Liu <songliubraving@fb.com>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 29/68] block: keep bdi->io_pages in sync with max_sectors_kb for stacked devices
-Date:   Thu,  9 Apr 2020 23:45:54 -0400
-Message-Id: <20200410034634.7731-29-sashal@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 19/68] null_blk: Handle null_add_dev() failures properly
+Date:   Thu,  9 Apr 2020 23:45:44 -0400
+Message-Id: <20200410034634.7731-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034634.7731-1-sashal@kernel.org>
 References: <20200410034634.7731-1-sashal@kernel.org>
@@ -59,45 +63,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+From: Bart Van Assche <bvanassche@acm.org>
 
-[ Upstream commit e74d93e96d721c4297f2a900ad0191890d2fc2b0 ]
+[ Upstream commit 9b03b713082a31a5b90e0a893c72aa620e255c26 ]
 
-Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
-size based on read-ahead setting") removes unneeded split of read requests.
+If null_add_dev() fails then null_del_dev() is called with a NULL argument.
+Make null_del_dev() handle this scenario correctly. This patch fixes the
+following KASAN complaint:
 
-Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they set
-limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
-Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
+null-ptr-deref in null_del_dev+0x28/0x280 [null_blk]
+Read of size 8 at addr 0000000000000000 by task find/1062
 
-This patch updates io_pages after merging limits in disk_stack_limits().
+Call Trace:
+ dump_stack+0xa5/0xe6
+ __kasan_report.cold+0x65/0x99
+ kasan_report+0x16/0x20
+ __asan_load8+0x58/0x90
+ null_del_dev+0x28/0x280 [null_blk]
+ nullb_group_drop_item+0x7e/0xa0 [null_blk]
+ client_drop_item+0x53/0x80 [configfs]
+ configfs_rmdir+0x395/0x4e0 [configfs]
+ vfs_rmdir+0xb6/0x220
+ do_rmdir+0x238/0x2c0
+ __x64_sys_unlinkat+0x75/0x90
+ do_syscall_64+0x6f/0x2f0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
-the same problem for device-mapper devices, this one fixes MD RAIDs.
-
-Fixes: 9491ae4aade6 ("mm: don't cap request size based on read-ahead setting")
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Signed-off-by: Song Liu <songliubraving@fb.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Johannes Thumshirn <jth@kernel.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-settings.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/block/null_blk_main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c8eda2e7b91e4..be1dca0103a45 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -664,6 +664,9 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
- 		       top, bottom);
- 	}
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 8ada43b3eca13..d5b4a92033d48 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1432,7 +1432,12 @@ static void cleanup_queues(struct nullb *nullb)
+ 
+ static void null_del_dev(struct nullb *nullb)
+ {
+-	struct nullb_device *dev = nullb->dev;
++	struct nullb_device *dev;
 +
-+	t->backing_dev_info->io_pages =
-+		t->limits.max_sectors >> (PAGE_SHIFT - 9);
- }
- EXPORT_SYMBOL(disk_stack_limits);
++	if (!nullb)
++		return;
++
++	dev = nullb->dev;
+ 
+ 	ida_simple_remove(&nullb_indexes, nullb->index);
  
 -- 
 2.20.1
