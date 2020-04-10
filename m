@@ -7,46 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0697DC2BB1D
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1B6C2BB1D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3E5720BED
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 263812063A
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491021;
-	bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
+	s=default; t=1586491032;
+	bh=FeXGNYdkirxuv81iCWK4RTDiAnC+H9pdUcHZk8JChQI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=OhYhJ0GxhXLCjY5Sjb4INuDb1QqUK6PA8GwpnVY05mdGjpO4m5FmJot5g5MfOqu/X
-	 p2G/vlTuy/B3No5JGDo6jzBHpJcKoae7ukozXVGgQc6t4AwsMP9MpuTTwUOi2r0ljI
-	 1YqFpwEAWZosjY8K8clfSjFjOYMTAS/QJraSZODc=
+	b=UEeH7xn2jEax4jXQRjkui1npaHTDERvxaV4uHc9OPN6DPW7C0tioIk8/Noe1PkYxJ
+	 7hYzTBEnb6ynnR3wlHIXLAs5eZn/fl+gd9lakQRtcsi1GTDT8nvaG7yKctGqaJfbFg
+	 VCwFfi6/XMhJe1ENkvnih4+18gYLZjKEXhGYjG7w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728606AbgDJD4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 23:56:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33434 "EHLO mail.kernel.org"
+        id S1727735AbgDJDtU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 23:49:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33202 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728552AbgDJDt1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:49:27 -0400
+        id S1728507AbgDJDtT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:49:19 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BDEAD21473;
-        Fri, 10 Apr 2020 03:49:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9BE4F20CC7;
+        Fri, 10 Apr 2020 03:49:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490567;
-        bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
+        s=default; t=1586490559;
+        bh=FeXGNYdkirxuv81iCWK4RTDiAnC+H9pdUcHZk8JChQI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gBl1ezq/R6KgTx+XmOQMjQj2X8kCrpzrZWX51oKOb2qxsFJihyCtHnqYFJIMEls9X
-         93hZGGkaVQ9gI+kWAH35Fm9rLOUIn8S4HpMVNu4ZCguZ/iLIkllLcoVa2g4hIrHg6a
-         6AOmXcoHOMDYMLgpCF2jTiv86O9I1dB89NSsGTeo=
+        b=PxEjvNcgULZDWXWQCWwPLBY1CnjbBAdYp/Mi81mGSb1Y+tFYM4TtZHDQlO72rQBAO
+         lz9AAR7odCRsffUucEawFpTsegPAr4m14v8fZG9jZjI1WqIG5KasVnFBEeKz33GQic
+         eJtEzvYWQewvxr5aE4Nv53lzVvVuQPHgrfTEsSxk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Bob Liu <bob.liu@oracle.com>, Song Liu <songliubraving@fb.com>,
+Cc:     Alexey Dobriyan <adobriyan@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 14/46] block: keep bdi->io_pages in sync with max_sectors_kb for stacked devices
-Date:   Thu,  9 Apr 2020 23:48:37 -0400
-Message-Id: <20200410034909.8922-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 07/46] null_blk: fix spurious IO errors after failed past-wp access
+Date:   Thu,  9 Apr 2020 23:48:30 -0400
+Message-Id: <20200410034909.8922-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034909.8922-1-sashal@kernel.org>
 References: <20200410034909.8922-1-sashal@kernel.org>
@@ -59,46 +58,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+From: Alexey Dobriyan <adobriyan@gmail.com>
 
-[ Upstream commit e74d93e96d721c4297f2a900ad0191890d2fc2b0 ]
+[ Upstream commit ff77042296d0a54535ddf74412c5ae92cb4ec76a ]
 
-Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
-size based on read-ahead setting") removes unneeded split of read requests.
+Steps to reproduce:
 
-Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they set
-limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
-Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
+	BLKRESETZONE zone 0
 
-This patch updates io_pages after merging limits in disk_stack_limits().
+	// force EIO
+	pwrite(fd, buf, 4096, 4096);
 
-Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
-the same problem for device-mapper devices, this one fixes MD RAIDs.
+	[issue more IO including zone ioctls]
 
-Fixes: 9491ae4aade6 ("mm: don't cap request size based on read-ahead setting")
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Signed-off-by: Song Liu <songliubraving@fb.com>
+It will start failing randomly including IO to unrelated zones because of
+->error "reuse". Trigger can be partition detection as well if test is not
+run immediately which is even more entertaining.
+
+The fix is of course to clear ->error where necessary.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Alexey Dobriyan (SK hynix) <adobriyan@gmail.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-settings.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/block/null_blk_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c8eda2e7b91e4..be1dca0103a45 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -664,6 +664,9 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
- 		       top, bottom);
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 6603598b7bae9..c4454cfc6d530 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -579,6 +579,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
+ 	if (tag != -1U) {
+ 		cmd = &nq->cmds[tag];
+ 		cmd->tag = tag;
++		cmd->error = BLK_STS_OK;
+ 		cmd->nq = nq;
+ 		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
+ 			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
+@@ -1335,6 +1336,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		cmd->timer.function = null_cmd_timer_expired;
  	}
-+
-+	t->backing_dev_info->io_pages =
-+		t->limits.max_sectors >> (PAGE_SHIFT - 9);
- }
- EXPORT_SYMBOL(disk_stack_limits);
+ 	cmd->rq = bd->rq;
++	cmd->error = BLK_STS_OK;
+ 	cmd->nq = nq;
  
+ 	blk_mq_start_request(bd->rq);
 -- 
 2.20.1
 
