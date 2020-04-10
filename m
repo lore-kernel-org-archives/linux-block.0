@@ -4,52 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60388C2BB1D
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E325C2BB85
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 299AD20BED
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E0CE20936
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:52:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586490622;
-	bh=0dCjT5nFRePwKB1f0perCjVU+KxOZ4mV+cUHzcKpO9Q=;
+	s=default; t=1586490770;
+	bh=QF9c6+MH0YbWaRTKCfrPPHbam1WjjKd6j69dKZVjBWQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=IX7UPcW0Bniw4sNP1p61gr1UxLQSmr+CIdvbeUL0EmavW5QvaAaBkhSEqsWJ8tozY
-	 B8Lu8kkQ5XQYdn1cMVvUalq1H9Eir9pO7WMQ988ebM1+SI2R6cINpNCNuQI+6DuHIF
-	 krbbDvIvnoyCFfi4Y1TEtkiy0tNAUEUN6vXu5mxg=
+	b=WfBVUXQLYtwuXVdcGpERNci2CB5ujiumBiiCCwJl7dkfhgOWkUoO4dzMVVKGGp+J0
+	 H1eKul5dlyt7xTME0b1en9fi0axMUGHdzwE+gHrADITllvvCMs10OzICC5tYk45WMd
+	 AG1348JWAu48Ix/+PZSZidiRL89oe1hUZtxaOYGI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728117AbgDJDuU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 23:50:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34738 "EHLO mail.kernel.org"
+        id S1727756AbgDJDwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 23:52:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36120 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728851AbgDJDuQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:50:16 -0400
+        id S1729083AbgDJDvH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:51:07 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3555920CC7;
-        Fri, 10 Apr 2020 03:50:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E4FBA215A4;
+        Fri, 10 Apr 2020 03:51:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490617;
-        bh=0dCjT5nFRePwKB1f0perCjVU+KxOZ4mV+cUHzcKpO9Q=;
+        s=default; t=1586490666;
+        bh=QF9c6+MH0YbWaRTKCfrPPHbam1WjjKd6j69dKZVjBWQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JTyXsYGDyeVxrAr2cMvuBOWp7p1QoJBLqXJ1kPxCabr7SojOd/OpimnRSlR2/0Exm
-         DmV9cxmtSlTiQs8PSUQS81TRRicQuUTHIU7yJ8tn3bqHqeUbShmfBqmQRCEMi9buAP
-         Tsjq1xgv8SbDXO5jmUADQGLMIDtbZFe3ZnjTe5Mg=
+        b=Zu3ew5UDVlMQRaf3CI87cUBhfc2lZNccwhbbhH4VevlQhZFTM+5blxRiHQoFXIJ+y
+         LTj51skeIgMWgiVdHrGfiZxinZFFw6dZfMzL1Ih8Zb9OrGbqE88EoSDTXVidANw+yd
+         hsy4qurvobhumPA2xVelnQ1+32irSIOMKL3IYWI8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Bob Liu <bob.liu@oracle.com>, Song Liu <songliubraving@fb.com>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 09/32] block: keep bdi->io_pages in sync with max_sectors_kb for stacked devices
-Date:   Thu,  9 Apr 2020 23:49:42 -0400
-Message-Id: <20200410035005.9371-9-sashal@kernel.org>
+Cc:     Zhiqiang Liu <liuzhiqiang26@huawei.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Wang Wang <wangwang2@huawei.com>,
+        Feilong Lin <linfeilong@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 19/22] block, bfq: fix use-after-free in bfq_idle_slice_timer_body
+Date:   Thu,  9 Apr 2020 23:50:41 -0400
+Message-Id: <20200410035044.9698-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200410035005.9371-1-sashal@kernel.org>
-References: <20200410035005.9371-1-sashal@kernel.org>
+In-Reply-To: <20200410035044.9698-1-sashal@kernel.org>
+References: <20200410035044.9698-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -59,46 +61,176 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+From: Zhiqiang Liu <liuzhiqiang26@huawei.com>
 
-[ Upstream commit e74d93e96d721c4297f2a900ad0191890d2fc2b0 ]
+[ Upstream commit 2f95fa5c955d0a9987ffdc3a095e2f4e62c5f2a9 ]
 
-Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
-size based on read-ahead setting") removes unneeded split of read requests.
+In bfq_idle_slice_timer func, bfqq = bfqd->in_service_queue is
+not in bfqd-lock critical section. The bfqq, which is not
+equal to NULL in bfq_idle_slice_timer, may be freed after passing
+to bfq_idle_slice_timer_body. So we will access the freed memory.
 
-Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they set
-limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
-Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
+In addition, considering the bfqq may be in race, we should
+firstly check whether bfqq is in service before doing something
+on it in bfq_idle_slice_timer_body func. If the bfqq in race is
+not in service, it means the bfqq has been expired through
+__bfq_bfqq_expire func, and wait_request flags has been cleared in
+__bfq_bfqd_reset_in_service func. So we do not need to re-clear the
+wait_request of bfqq which is not in service.
 
-This patch updates io_pages after merging limits in disk_stack_limits().
+KASAN log is given as follows:
+[13058.354613] ==================================================================
+[13058.354640] BUG: KASAN: use-after-free in bfq_idle_slice_timer+0xac/0x290
+[13058.354644] Read of size 8 at addr ffffa02cf3e63f78 by task fork13/19767
+[13058.354646]
+[13058.354655] CPU: 96 PID: 19767 Comm: fork13
+[13058.354661] Call trace:
+[13058.354667]  dump_backtrace+0x0/0x310
+[13058.354672]  show_stack+0x28/0x38
+[13058.354681]  dump_stack+0xd8/0x108
+[13058.354687]  print_address_description+0x68/0x2d0
+[13058.354690]  kasan_report+0x124/0x2e0
+[13058.354697]  __asan_load8+0x88/0xb0
+[13058.354702]  bfq_idle_slice_timer+0xac/0x290
+[13058.354707]  __hrtimer_run_queues+0x298/0x8b8
+[13058.354710]  hrtimer_interrupt+0x1b8/0x678
+[13058.354716]  arch_timer_handler_phys+0x4c/0x78
+[13058.354722]  handle_percpu_devid_irq+0xf0/0x558
+[13058.354731]  generic_handle_irq+0x50/0x70
+[13058.354735]  __handle_domain_irq+0x94/0x110
+[13058.354739]  gic_handle_irq+0x8c/0x1b0
+[13058.354742]  el1_irq+0xb8/0x140
+[13058.354748]  do_wp_page+0x260/0xe28
+[13058.354752]  __handle_mm_fault+0x8ec/0x9b0
+[13058.354756]  handle_mm_fault+0x280/0x460
+[13058.354762]  do_page_fault+0x3ec/0x890
+[13058.354765]  do_mem_abort+0xc0/0x1b0
+[13058.354768]  el0_da+0x24/0x28
+[13058.354770]
+[13058.354773] Allocated by task 19731:
+[13058.354780]  kasan_kmalloc+0xe0/0x190
+[13058.354784]  kasan_slab_alloc+0x14/0x20
+[13058.354788]  kmem_cache_alloc_node+0x130/0x440
+[13058.354793]  bfq_get_queue+0x138/0x858
+[13058.354797]  bfq_get_bfqq_handle_split+0xd4/0x328
+[13058.354801]  bfq_init_rq+0x1f4/0x1180
+[13058.354806]  bfq_insert_requests+0x264/0x1c98
+[13058.354811]  blk_mq_sched_insert_requests+0x1c4/0x488
+[13058.354818]  blk_mq_flush_plug_list+0x2d4/0x6e0
+[13058.354826]  blk_flush_plug_list+0x230/0x548
+[13058.354830]  blk_finish_plug+0x60/0x80
+[13058.354838]  read_pages+0xec/0x2c0
+[13058.354842]  __do_page_cache_readahead+0x374/0x438
+[13058.354846]  ondemand_readahead+0x24c/0x6b0
+[13058.354851]  page_cache_sync_readahead+0x17c/0x2f8
+[13058.354858]  generic_file_buffered_read+0x588/0xc58
+[13058.354862]  generic_file_read_iter+0x1b4/0x278
+[13058.354965]  ext4_file_read_iter+0xa8/0x1d8 [ext4]
+[13058.354972]  __vfs_read+0x238/0x320
+[13058.354976]  vfs_read+0xbc/0x1c0
+[13058.354980]  ksys_read+0xdc/0x1b8
+[13058.354984]  __arm64_sys_read+0x50/0x60
+[13058.354990]  el0_svc_common+0xb4/0x1d8
+[13058.354994]  el0_svc_handler+0x50/0xa8
+[13058.354998]  el0_svc+0x8/0xc
+[13058.354999]
+[13058.355001] Freed by task 19731:
+[13058.355007]  __kasan_slab_free+0x120/0x228
+[13058.355010]  kasan_slab_free+0x10/0x18
+[13058.355014]  kmem_cache_free+0x288/0x3f0
+[13058.355018]  bfq_put_queue+0x134/0x208
+[13058.355022]  bfq_exit_icq_bfqq+0x164/0x348
+[13058.355026]  bfq_exit_icq+0x28/0x40
+[13058.355030]  ioc_exit_icq+0xa0/0x150
+[13058.355035]  put_io_context_active+0x250/0x438
+[13058.355038]  exit_io_context+0xd0/0x138
+[13058.355045]  do_exit+0x734/0xc58
+[13058.355050]  do_group_exit+0x78/0x220
+[13058.355054]  __wake_up_parent+0x0/0x50
+[13058.355058]  el0_svc_common+0xb4/0x1d8
+[13058.355062]  el0_svc_handler+0x50/0xa8
+[13058.355066]  el0_svc+0x8/0xc
+[13058.355067]
+[13058.355071] The buggy address belongs to the object at ffffa02cf3e63e70#012 which belongs to the cache bfq_queue of size 464
+[13058.355075] The buggy address is located 264 bytes inside of#012 464-byte region [ffffa02cf3e63e70, ffffa02cf3e64040)
+[13058.355077] The buggy address belongs to the page:
+[13058.355083] page:ffff7e80b3cf9800 count:1 mapcount:0 mapping:ffff802db5c90780 index:0xffffa02cf3e606f0 compound_mapcount: 0
+[13058.366175] flags: 0x2ffffe0000008100(slab|head)
+[13058.370781] raw: 2ffffe0000008100 ffff7e80b53b1408 ffffa02d730c1c90 ffff802db5c90780
+[13058.370787] raw: ffffa02cf3e606f0 0000000000370023 00000001ffffffff 0000000000000000
+[13058.370789] page dumped because: kasan: bad access detected
+[13058.370791]
+[13058.370792] Memory state around the buggy address:
+[13058.370797]  ffffa02cf3e63e00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fb fb
+[13058.370801]  ffffa02cf3e63e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[13058.370805] >ffffa02cf3e63f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[13058.370808]                                                                 ^
+[13058.370811]  ffffa02cf3e63f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[13058.370815]  ffffa02cf3e64000: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+[13058.370817] ==================================================================
+[13058.370820] Disabling lock debugging due to kernel taint
 
-Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
-the same problem for device-mapper devices, this one fixes MD RAIDs.
+Here, we directly pass the bfqd to bfq_idle_slice_timer_body func.
+--
+V2->V3: rewrite the comment as suggested by Paolo Valente
+V1->V2: add one comment, and add Fixes and Reported-by tag.
 
-Fixes: 9491ae4aade6 ("mm: don't cap request size based on read-ahead setting")
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Bob Liu <bob.liu@oracle.com>
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Signed-off-by: Song Liu <songliubraving@fb.com>
+Fixes: aee69d78d ("block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler")
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+Reported-by: Wang Wang <wangwang2@huawei.com>
+Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+Signed-off-by: Feilong Lin <linfeilong@huawei.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-settings.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/bfq-iosched.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index be9b39caadbd2..01093b8f3e624 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -717,6 +717,9 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
- 		       top, bottom);
- 	}
-+
-+	t->backing_dev_info->io_pages =
-+		t->limits.max_sectors >> (PAGE_SHIFT - 9);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 93863c6173e66..959bee9fa9118 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4541,20 +4541,28 @@ static void bfq_prepare_request(struct request *rq, struct bio *bio)
+ 	spin_unlock_irq(&bfqd->lock);
  }
- EXPORT_SYMBOL(disk_stack_limits);
  
+-static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
++static void
++bfq_idle_slice_timer_body(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ {
+-	struct bfq_data *bfqd = bfqq->bfqd;
+ 	enum bfqq_expiration reason;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&bfqd->lock, flags);
+-	bfq_clear_bfqq_wait_request(bfqq);
+ 
++	/*
++	 * Considering that bfqq may be in race, we should firstly check
++	 * whether bfqq is in service before doing something on it. If
++	 * the bfqq in race is not in service, it has already been expired
++	 * through __bfq_bfqq_expire func and its wait_request flags has
++	 * been cleared in __bfq_bfqd_reset_in_service func.
++	 */
+ 	if (bfqq != bfqd->in_service_queue) {
+ 		spin_unlock_irqrestore(&bfqd->lock, flags);
+ 		return;
+ 	}
+ 
++	bfq_clear_bfqq_wait_request(bfqq);
++
+ 	if (bfq_bfqq_budget_timeout(bfqq))
+ 		/*
+ 		 * Also here the queue can be safely expired
+@@ -4599,7 +4607,7 @@ static enum hrtimer_restart bfq_idle_slice_timer(struct hrtimer *timer)
+ 	 * early.
+ 	 */
+ 	if (bfqq)
+-		bfq_idle_slice_timer_body(bfqq);
++		bfq_idle_slice_timer_body(bfqd, bfqq);
+ 
+ 	return HRTIMER_NORESTART;
+ }
 -- 
 2.20.1
 
