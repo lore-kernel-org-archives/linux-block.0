@@ -7,40 +7,49 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43698C2D0EC
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 19:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A475C2BB55
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 19:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 204E12083E
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 19:09:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED01820769
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 19:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="qNp1L1fO"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="FzwYaxzv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbgDJTJe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Apr 2020 15:09:34 -0400
-Received: from mout.web.de ([217.72.192.78]:58861 "EHLO mout.web.de"
+        id S1726780AbgDJTi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 15:38:28 -0400
+Received: from mout.web.de ([212.227.17.11]:56425 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726142AbgDJTJd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Apr 2020 15:09:33 -0400
+        id S1726773AbgDJTi2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Apr 2020 15:38:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1586545733;
-        bh=sNyyQCsXyfuYEo6jFFgq3kX3z34MamWp1a11cAuN5zU=;
+        s=dbaedf251592; t=1586547440;
+        bh=PGEeqxNlVBCsSOG4LIqFOF2BvoLw4Q31E+UCkpke5aA=;
         h=X-UI-Sender-Class:To:Cc:Subject:From:Date;
-        b=qNp1L1fOOWMQM3UexEtjL14eGqCbvX4P4PzqI9eP/BC6nDECv5MDFnivM4tuddLnT
-         PbyzcG5QwglSfww/WFR9Sp/nqYUt70q8ju3fFz0gp9z7YSG4zKgKh1M9KOt5uRvisu
-         DuW74elHE/91Gvzo0K9y4PGgHjCCbNl4RTTcfVBY=
+        b=FzwYaxzvptZn7OAXoibSOtHQglzrbu9Q404Q6WbomdRhGmd/q7Q+UXjil5U+Dw/2J
+         JOA+rKrp/nuQy3efkyVK1XVrgIr2uiCynGKQ9OyHvjGgH7hiBHwISQR985GlFJ36Ix
+         f5SwiIq/+I7AQjXAZBqvBnDPSgFhdpuRDdjurOHs=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from [192.168.1.3] ([78.48.110.107]) by smtp.web.de (mrweb103
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LpO4v-1ikdbF3Xbp-00fDaZ; Fri, 10
- Apr 2020 21:08:52 +0200
-To:     Tuomas Tynkkynen <tuomas.tynkkynen@iki.fi>,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        stable@kernel.org,
-        syzbot+934037347002901b8d2a@syzkaller.appspotmail.com,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] nbd: Fix memory leak from krealloc() if another
- allocation fails
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lhvpu-1iseZu1Q9a-00nBTJ; Fri, 10
+ Apr 2020 21:37:20 +0200
+To:     Luis Chamberlain <mcgrof@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Hannes Reinecke <hare@suse.com>, Jan Kara <jack@suse.cz>,
+        Michal Hocko <mhocko@kernel.org>,
+        Michal Hocko <mhocko@suse.com>, Ming Lei <ming.lei@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Nicolai Stange <nstange@suse.de>,
+        Omar Sandoval <osandov@fb.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Yu Kuai <yukuai3@huawei.com>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC v2 2/5] blktrace: fix debugfs use after free
 From:   Markus Elfring <Markus.Elfring@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
@@ -85,49 +94,44 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <c91c88ef-0600-4733-d301-de1e2e62cb94@web.de>
-Date:   Fri, 10 Apr 2020 21:08:50 +0200
+Message-ID: <ccc51229-ae0c-4c41-842b-f267eed96843@web.de>
+Date:   Fri, 10 Apr 2020 21:37:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XgK3M+Ie6c8esxWP36w86h1EJ+IdOJZFcBjHUfFqC3WwiR5fz42
- YAO13exwf2rwdSPsuWOuKZMh4xF1utnVeLxMT8bFy7/Bx+860bDS40eN9cf8wtC2uCszvg4
- DJAdQDcpcDT0Q62N5+htU6dTJkiJ3XblX8dRreoC8OknBDDTRmeIilBwzNNqf+Jp2nhksTb
- sVjB6r/ww8xbmPmbsVjEg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PRuJ7OaHffM=:G7/NYEgKIvP/9OnnQwQnnZ
- el1WAjUmpGDSrO5Nz2W+m++zMym9Jo6MQtug78U8/ozyNlU6V+UvoImXyHGONjZT89LChSJGQ
- Aq2uKj+UsZntNApxR4FYKe9BRWYOzWsthhldpJ118EtHXBGG0z0DAhXiH4i9CvwU75Fib22zw
- RdYQg4rWFRAS2tA18dKdSIDFZ9znxPk9cRzDaqLEfMKgKONbMi3o+by8XquFTBntth3SymKXe
- AtunTkI2uEkRO+VdC1faP1HeywuoqLcGTxj744nDwr/U0vwet/ljuAJ5xTiblx+DLQ4iTbloP
- FhpTGKO74bQ3pcUtISl3+LGWzNZePu56vFsgWTgMMYSVmVoigerTez5f73+UrXiqDkR3+AjDf
- IIBbvkueOX0wZjDmnteoyHli7hp/vZPY3Xf2w7nctCwmtPrWhK1xAN9bvjxNJvenE/Zadbxpt
- tJfGwXLvOV91Cx4ZdyklfCRB3tpS5KdkQiZ2OtYULNQ3irNB30nUZhtuaThdOCP9frzrTsh5O
- XnsqJMYxNE9dGV8H24E/nR83b0YycmHkrUOA9+jifGG4dVEoKavuHQv2cmdDuBRety0pI2+J0
- GxW328Tllgvno6p0gPujXRmhnql/PMKH4EaZ6mFINVDeV21rAdhFxhxA/n5bmkc0MIVfGsTGU
- x8Z7/QKExm1QdsSkDXg5b/EzNb8qHitb6geOYcGtnJmTXvUQbaQWVLklQVigL1sHvpp/DEssX
- qZwEsGusOGf5aE6xTwACBKSNn+l/uyIqgAeDoMA2LO2Px9iVr4Roh5DRsk7j9409cfhQN9dwb
- XmK7o+Qp0/M747IpsoEUhiTOqKXVpCxjJW0XxQhXlgvU1EcG55xHgHekNZqgGOpehSJwodzbB
- sBaNoB9Dca0t0Aod6vlGGXuqkxLcbOnzpN36dulRPfsGHoVsELvRTP6MvJdKGj7n0rzvEEoMl
- YPjBA4zsQfHb6pX/iAAI8V+dULEWOqKEFGE2CfaUOXwQfvOmwJZkm4sP1xib/RHd+TVWm54Yc
- YwfA52Ng/bsA7CT+UGwdfS29D/3F3FQReO+zWW5LnurPMj832rZYFJR/KuqrD0wvPiHJDuqs5
- eakuicCYPsk4CbumcHw7aK1UeOmeeMqxVp7H8y2TocJYkCKiLVJADa5suMsZ0xflRsiY1lbs6
- A+hMjug1xh1GSWufLcMh5PC0gkf6LbDtZNuCWtJqkKZn2dppHTgMQFN2HOpMmu87T4Oytqavy
- etlpNffL+RGcmAAKL
+X-Provags-ID: V03:K1:SqcB46BVWuHcsp34+t7mjQ4lYXatYFAbVT0yn5wReMaLmawsuKa
+ nmZa04tGZABhR4ZvIl6hLcs4eMfbCEkuTLn9rrGpujiMhGUEglOB5bcIa4OkLvEyw0O3AGO
+ cDkTMM1gVq4zbHZjHxoKRIgHyFY2kEfHAVlJHDu2E0WGLyqOj6eoYoh7B+RX56fmPBKOnb1
+ 8Lm3lvGxYqQaeyd5Ldoaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Hy4Do2hsiqw=:xA7n8QnkZxeSx8p4Cloh4C
+ q33RG+if7wj0s8c0xcKLmFRsg7uw+zT3Ya8CjMz3uJzkG5AyhpLMvWbyIhl0ORbAZ5fHHvaNH
+ etOK2G0QO5FpOQoPsZUA79zJvKBhpG8hxA49JVGZuJlGwYUysUD5AVj7LBdRtWhtEOXoOtft9
+ DJ3gM6vTSWz9I9Kf0ELav3wo6hZhGoOF8dblZaM0qO+JuIQZO/KF51JXR8x9/B6+pP7K2P1CV
+ DuM9geZgfvaAfrAPYvLTts7yfYJqhKa36J70MV2EwmrOxF4sb4wCIEjCa1pX2q/SLH8yB5D2f
+ D9KC9lo4YYfO3+l37rRQCsVB+SveaxRdh3VwGHEo7ZMf8Zbx8qi3KUiXweaKZeBc28v8lvCte
+ D5e97yBiD+zb084CqjvU/rwQdWfMR3UJltXSHGZAX2tHJ0AxwTS0xvJ8ApNeBpPPU3awN7d2l
+ oSjJtxZT7hNb4s0znAMxAYbUzJc0M8uYktYqyCmRRmUrpxPLtSdOclzp0I7AFkEtJRBEjiOpZ
+ ZKSfR3HjJ9W15DvJvhMFIpXiXuQxsZBXYAyenAyV+oAqffdWPfQXr7QS+SLi8Fy7RUw0wQcoM
+ fJkJbKtwPb1odnh4koB94Nc9pC20Br3ml0NKNwlesipehRdGVmerMvuOukb0vU3IdrLAAYihY
+ aTlkIl2J4+orlP9QzZQ5Kiw7sU4+BiW6URTXumYjqDohQWbVmxhqMxzkCfOWV2x09glTMnV4B
+ CZc1kaZIC8pFNgqNhspMzBNcEAir7YRIbVOHs4ua2b3lCYywyPYwfawRgR0rVUZvjNybUpfbD
+ JFWQWCQea9ZNeUCuZh8ZU5cEIXDGcq76DZ4jorszGuOSCePVTegDW/t/DnyNwR+C2W8gOJdTN
+ 9Ud+kwhNRd7l615bd0QLH8bu8FaDkg1TwSRS5gupVWfaawwY13RtIamB31gnXqmOuFlLIpTj1
+ WuyuIN7uAv8rK61tSbX+CsuWqW/pm0beUwFOSuRGW/VUt2EjIDzuL2Q+fLuNSn/lEG6kvOUh+
+ YaPkynKNoF6UtBNZoQDMvTe2VdEuZVu5rsl98hmcriqMSYGScRXE9PPfnIuW7kYi+TJvNewRN
+ dXnXU9Tyl3G/rxQhNu7mY+noq5Il0mErH6F9i2W+Rk5G1cw3nwwL2q6GlzXRNJGVysYR9IwI0
+ rH8gl7fRhTbgiGY56g733JT2JkzmZLzM63KRt2eH2Sw5cPHz3fruDOFPP203a/3aV6Nw31X8A
+ Jl0MeTrwRoewM83bu
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> syzkaller reports a memory leak when injecting allocation failures:
-=E2=80=A6
-> as then config->num_connections is not incremented and the cleanup code
-> freeing config->socks is skipped. Just make it run always.
+> Fiexes: 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
 
-How do you think about to add the tag =E2=80=9CFixes=E2=80=9D for the fina=
-l change description?
+Please avoid a typo for this tag.
 
 Regards,
 Markus
