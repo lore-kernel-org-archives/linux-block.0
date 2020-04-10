@@ -2,78 +2,104 @@ Return-Path: <SRS0=rO4A=52=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 032B4C2BB1D
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 12:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BD0C2BA2B
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 14:22:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9F56208E4
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 12:31:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fWX+kmbd"
+	by mail.kernel.org (Postfix) with ESMTP id 93910212CC
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 14:22:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726049AbgDJMbt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Apr 2020 08:31:49 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:46782 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbgDJMbt (ORCPT
+        id S1726142AbgDJOWc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 10:22:32 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45047 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726145AbgDJOWc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Apr 2020 08:31:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=yvcLsYHNvHteQ2swi8hf4h/I6Qn6p4yKs1CffDQbzEo=; b=fWX+kmbdfpV1cyl5q4g4ojwVid
-        OTii/SkG/jPhzO4rH6k7eSFfDyeLvRae0ZzgVgJYLQA8oLMhFB6hD4niNOXcii0tMG7SsHIPGw8R+
-        T6qiiQAOp2D1rZUTIavi2DTyQgzIlTCSO33/MzScrqUegzXJ+to63a5DakPauBhQhaf3xHFry874r
-        FMV77RJvDZ8B5ckLzWnXXlvM2BlNFTxcYYY+fG12hIlMNkkk5cZi6jz2SAVtq4v+v50Vujh3IUsIU
-        doazzu/kp/vrtFbCUtezm384ehMqdHznUEQlro6HfujgaX+cTUakEGtcIe7hDdlDgyNu2jdg6zHa/
-        x5tly1nQ==;
-Received: from [2001:4bb8:180:5765:8cdf:b820:7ed9:b80c] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jMsp3-0000MD-DK; Fri, 10 Apr 2020 12:31:49 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, cai@lca.pw
-Subject: [PATCH] block: fix busy device checking in blk_drop_partitions again
-Date:   Fri, 10 Apr 2020 14:31:47 +0200
-Message-Id: <20200410123147.1771206-1-hch@lst.de>
-X-Mailer: git-send-email 2.25.1
+        Fri, 10 Apr 2020 10:22:32 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n13so1029232pgp.11;
+        Fri, 10 Apr 2020 07:22:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=xlgGbQXteZwjaq0FPW56XQgo4r5anuUOKJTrYIkhdRE=;
+        b=oDHbJUraA1BTx45bC30boK/SHoNN4LZexj/35kAi0QhauRLOsDxjp5Pnx0pxm+hSXS
+         hJYBPLIpiuHBh64aZxb4S+g+wqvoi/oGLK5/hAMcXWm0f44ruJ60QVQp0YUOIKEaoojI
+         cRRY3VtsQwTzPElXrzQjdf7j5KDTH6b7PTORehDmzaAvvTJ2FoXxB8lAuHG3jdymV3nN
+         pAUMDbEkJueICNHlQFMl6cHgiWKZfaCGbtNgpDGGDEXTyQgCJ1D+ofckmTC6xswNPSEt
+         CbluZbOjo3uQUNqQoCdz8Qu3tbyx7m9dHRim4TmuYNZKADgM8+r+BMsE10IsQqnlU5/n
+         azGw==
+X-Gm-Message-State: AGi0PubN725z5wUFTpX7c/0SPe9xU8BTo5OVgXfdGxAM7mKBZVNHiE45
+        r5oZ/Wz3/3xHr+k3LGSD78XbzgVn
+X-Google-Smtp-Source: APiQypInzAbKW6EPxbsfNyjm2zdAsyobTg29jQQ1MpkwdVJ9GxtK43RPuySgXb5XA9bg7cPegMDy+Q==
+X-Received: by 2002:a63:213:: with SMTP id 19mr4642616pgc.202.1586528550741;
+        Fri, 10 Apr 2020 07:22:30 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:8c73:15e7:164:cf4f? ([2601:647:4000:d7:8c73:15e7:164:cf4f])
+        by smtp.gmail.com with ESMTPSA id h11sm1868818pfn.125.2020.04.10.07.22.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Apr 2020 07:22:29 -0700 (PDT)
+Subject: Re: [PATCH v5 06/10] scsi: export scsi_mq_free_sgtables
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
+References: <20200409165352.2126-1-johannes.thumshirn@wdc.com>
+ <20200409165352.2126-7-johannes.thumshirn@wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <e3d40619-9f61-1eb0-865a-cec1d4793358@acm.org>
+Date:   Fri, 10 Apr 2020 07:22:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200409165352.2126-7-johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The previous fix had an off by one in the bd_openers checking, counting
-the callers blkdev_get.
+On 2020-04-09 09:53, Johannes Thumshirn wrote:
+> scsi_mq_free_sgtables is used to free the sg_tables, uninitialize the
+> command and delete it from the command list.
+> 
+> Export this function so it can be used from modular code to free the
+> memory allocated by scsi_init_io() if the caller of scsi_init_io() needs
+> to do error recovery.
+> 
+> While we're at it, rename scsi_mq_free_sgtables() to scsi_free_sgtables().
 
-Fixes: d3ef5536274f ("block: fix busy device checking in blk_drop_partitions")
-Reported-by: Qian Cai <cai@lca.pw>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Qian Cai <cai@lca.pw>
----
- block/partitions/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 1a0a829d8416..bc1ded1331b1 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -496,7 +496,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
--	if (bdev->bd_part_count || bdev->bd_openers)
-+	if (bdev->bd_part_count || bdev->bd_openers > 1)
- 		return -EBUSY;
- 	res = invalidate_partition(disk, 0);
- 	if (res)
--- 
-2.25.1
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
