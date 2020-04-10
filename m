@@ -2,156 +2,78 @@ Return-Path: <SRS0=rO4A=52=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC2CC2BB85
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B52C2BB55
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 05:45:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5A522063A
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 04:02:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586491377;
-	bh=YE7qF5ymZ6drq8K0sUSY9ANzzcy+WdJFJc1P19o1qX8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1uwUBgw6BAZU/BNiwwS7M3fhPE7XC3K1cjwyIXfl6or5t8+FamQOqm45tG0bGTVwT
-	 1OmsacmX41hdNGvDx63Q9KJInk4YvIXS9hnl/gtrDi1xXfjuGKTXrv/W0MNedPMTez
-	 W91ACVB/ly3uMQb6A28PuVXusO7UkPJy4Q6yvoZU=
+	by mail.kernel.org (Postfix) with ESMTP id A78A620801
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 05:45:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbgDJECw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Apr 2020 00:02:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57146 "EHLO mail.kernel.org"
+        id S1725844AbgDJFps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Apr 2020 01:45:48 -0400
+Received: from verein.lst.de ([213.95.11.211]:49645 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726892AbgDJDq4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:46:56 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6520A20936;
-        Fri, 10 Apr 2020 03:46:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490416;
-        bh=YE7qF5ymZ6drq8K0sUSY9ANzzcy+WdJFJc1P19o1qX8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gKBJznsrNfBgkLDWRYkE3LMAgcXwhdNUxGhUPNf17uV/RT487+vIhI+K989Shmkxq
-         NIlHohk32VwL5nQxjo8cq6RqIMF+SM0ukGXCPi8eLmgVbV/GoTGH2vW32EaEU6hBLJ
-         bNuXLy1QfIEC4BYunFuRLqcgyfCoB75KRVAU4KGo=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 17/68] null_blk: Fix the null_add_dev() error path
-Date:   Thu,  9 Apr 2020 23:45:42 -0400
-Message-Id: <20200410034634.7731-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200410034634.7731-1-sashal@kernel.org>
-References: <20200410034634.7731-1-sashal@kernel.org>
+        id S1725818AbgDJFpr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Apr 2020 01:45:47 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D2EFD68C4E; Fri, 10 Apr 2020 07:45:44 +0200 (CEST)
+Date:   Fri, 10 Apr 2020 07:45:44 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Qian Cai <cai@lca.pw>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: s390 boot woe due to "block: fix busy device checking in
+ blk_drop_partitions"
+Message-ID: <20200410054544.GA17923@lst.de>
+References: <AD16A450-794F-4EEA-A7BF-42452F18294A@lca.pw>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AD16A450-794F-4EEA-A7BF-42452F18294A@lca.pw>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bvanassche@acm.org>
+Please try this patch:
 
-[ Upstream commit 2004bfdef945fe55196db6b9cdf321fbc75bb0de ]
-
-If null_add_dev() fails, clear dev->nullb.
-
-This patch fixes the following KASAN complaint:
-
-BUG: KASAN: use-after-free in nullb_device_submit_queues_store+0xcf/0x160 [null_blk]
-Read of size 8 at addr ffff88803280fc30 by task check/8409
-
-Call Trace:
- dump_stack+0xa5/0xe6
- print_address_description.constprop.0+0x26/0x260
- __kasan_report.cold+0x7b/0x99
- kasan_report+0x16/0x20
- __asan_load8+0x58/0x90
- nullb_device_submit_queues_store+0xcf/0x160 [null_blk]
- configfs_write_file+0x1c4/0x250 [configfs]
- __vfs_write+0x4c/0x90
- vfs_write+0x145/0x2c0
- ksys_write+0xd7/0x180
- __x64_sys_write+0x47/0x50
- do_syscall_64+0x6f/0x2f0
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x7ff370926317
-Code: 64 89 02 48 c7 c0 ff ff ff ff eb bb 0f 1f 80 00 00 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-RSP: 002b:00007fff2dd2da48 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007ff370926317
-RDX: 0000000000000002 RSI: 0000559437ef23f0 RDI: 0000000000000001
-RBP: 0000559437ef23f0 R08: 000000000000000a R09: 0000000000000001
-R10: 0000559436703471 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007ff370a006a0 R14: 00007ff370a014a0 R15: 00007ff370a008a0
-
-Allocated by task 8409:
- save_stack+0x23/0x90
- __kasan_kmalloc.constprop.0+0xcf/0xe0
- kasan_kmalloc+0xd/0x10
- kmem_cache_alloc_node_trace+0x129/0x4c0
- null_add_dev+0x24a/0xe90 [null_blk]
- nullb_device_power_store+0x1b6/0x270 [null_blk]
- configfs_write_file+0x1c4/0x250 [configfs]
- __vfs_write+0x4c/0x90
- vfs_write+0x145/0x2c0
- ksys_write+0xd7/0x180
- __x64_sys_write+0x47/0x50
- do_syscall_64+0x6f/0x2f0
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 8409:
- save_stack+0x23/0x90
- __kasan_slab_free+0x112/0x160
- kasan_slab_free+0x12/0x20
- kfree+0xdf/0x250
- null_add_dev+0xaf3/0xe90 [null_blk]
- nullb_device_power_store+0x1b6/0x270 [null_blk]
- configfs_write_file+0x1c4/0x250 [configfs]
- __vfs_write+0x4c/0x90
- vfs_write+0x145/0x2c0
- ksys_write+0xd7/0x180
- __x64_sys_write+0x47/0x50
- do_syscall_64+0x6f/0x2f0
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Fixes: 2984c8684f96 ("nullb: factor disk parameters")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Johannes Thumshirn <jth@kernel.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/null_blk_main.c | 1 +
- 1 file changed, 1 insertion(+)
+From f42fb98cc627f9b960fd5b9a3a229da5c5dcf54a Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 10 Apr 2020 07:14:13 +0200
+Subject: block: fix busy device checking in blk_drop_partitions again
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 133060431dbdb..8ada43b3eca13 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1788,6 +1788,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	cleanup_queues(nullb);
- out_free_nullb:
- 	kfree(nullb);
-+	dev->nullb = NULL;
- out:
- 	return rv;
- }
+The previous fix had an off by one in the bd_openers checking, counting
+the callers blkdev_get.
+
+Fixes: d3ef5536274f ("block: fix busy device checking in blk_drop_partitions")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/partitions/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 1a0a829d8416..bc1ded1331b1 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -496,7 +496,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
+ 
+ 	if (!disk_part_scan_enabled(disk))
+ 		return 0;
+-	if (bdev->bd_part_count || bdev->bd_openers)
++	if (bdev->bd_part_count || bdev->bd_openers > 1)
+ 		return -EBUSY;
+ 	res = invalidate_partition(disk, 0);
+ 	if (res)
 -- 
-2.20.1
+2.25.1
 
