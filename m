@@ -7,51 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC10CC2D0EC
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0697DC2BB1D
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C348220936
-	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:56:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3E5720BED
+	for <linux-block@archiver.kernel.org>; Fri, 10 Apr 2020 03:57:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586490968;
-	bh=MDjQnBTuj10hq8TT9O84r+Mc5y0Rp29mQWABAjHG7nc=;
+	s=default; t=1586491021;
+	bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=u2MstUpUZnPnHfUs4ZHT1SmN1FkkTduIOAO6V2/Pyt+4ttMqQg4pIImUnEEPeNgMH
-	 BXwvyWaop2RsDNu0lpMMLfZQy0o2JQAf7TJcGrBGbWKh69d2uQJC3fFonHdZrQUX3O
-	 VUUEanwUr0J6k+Ca5qKRKFbND1FBwhxr/GNjjRMM=
+	b=OhYhJ0GxhXLCjY5Sjb4INuDb1QqUK6PA8GwpnVY05mdGjpO4m5FmJot5g5MfOqu/X
+	 p2G/vlTuy/B3No5JGDo6jzBHpJcKoae7ukozXVGgQc6t4AwsMP9MpuTTwUOi2r0ljI
+	 1YqFpwEAWZosjY8K8clfSjFjOYMTAS/QJraSZODc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728550AbgDJD4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Apr 2020 23:56:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33906 "EHLO mail.kernel.org"
+        id S1728606AbgDJD4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Apr 2020 23:56:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728652AbgDJDtr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Apr 2020 23:49:47 -0400
+        id S1728552AbgDJDt1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Apr 2020 23:49:27 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 59D2A20B1F;
-        Fri, 10 Apr 2020 03:49:46 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BDEAD21473;
+        Fri, 10 Apr 2020 03:49:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586490587;
-        bh=MDjQnBTuj10hq8TT9O84r+Mc5y0Rp29mQWABAjHG7nc=;
+        s=default; t=1586490567;
+        bh=rcjh3l3DjFWYTa13HVk4wQSTUrOgmQ2s6RvdNQnB9Cg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kBvgMQSH2+W1ChuC+QIigd79K9f75zAv5ibcG5Fv46LlZjheymAjLFatb8xP67RWT
-         AJMjSrLzHhBzc6BJvENf1j28IZgg+2pqt7HE62FZe4yLKU8wYCDZvhER4XlkVmhA8p
-         cXzpwVU6H3F1Bo+QYFsD4pJ+YO4u9N5A2QDUchwM=
+        b=gBl1ezq/R6KgTx+XmOQMjQj2X8kCrpzrZWX51oKOb2qxsFJihyCtHnqYFJIMEls9X
+         93hZGGkaVQ9gI+kWAH35Fm9rLOUIn8S4HpMVNu4ZCguZ/iLIkllLcoVa2g4hIrHg6a
+         6AOmXcoHOMDYMLgpCF2jTiv86O9I1dB89NSsGTeo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com,
-        Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 32/46] blk-mq: Keep set->nr_hw_queues and set->map[].nr_queues in sync
-Date:   Thu,  9 Apr 2020 23:48:55 -0400
-Message-Id: <20200410034909.8922-32-sashal@kernel.org>
+Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Bob Liu <bob.liu@oracle.com>, Song Liu <songliubraving@fb.com>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 14/46] block: keep bdi->io_pages in sync with max_sectors_kb for stacked devices
+Date:   Thu,  9 Apr 2020 23:48:37 -0400
+Message-Id: <20200410034909.8922-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200410034909.8922-1-sashal@kernel.org>
 References: <20200410034909.8922-1-sashal@kernel.org>
@@ -64,57 +59,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bvanassche@acm.org>
+From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 
-[ Upstream commit 6e66b49392419f3fe134e1be583323ef75da1e4b ]
+[ Upstream commit e74d93e96d721c4297f2a900ad0191890d2fc2b0 ]
 
-blk_mq_map_queues() and multiple .map_queues() implementations expect that
-set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the number of hardware
-queues. Hence set .nr_queues before calling these functions. This patch
-fixes the following kernel warning:
+Field bdi->io_pages added in commit 9491ae4aade6 ("mm: don't cap request
+size based on read-ahead setting") removes unneeded split of read requests.
 
-WARNING: CPU: 0 PID: 2501 at include/linux/cpumask.h:137
-Call Trace:
- blk_mq_run_hw_queue+0x19d/0x350 block/blk-mq.c:1508
- blk_mq_run_hw_queues+0x112/0x1a0 block/blk-mq.c:1525
- blk_mq_requeue_work+0x502/0x780 block/blk-mq.c:775
- process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
- worker_thread+0x98/0xe40 kernel/workqueue.c:2415
- kthread+0x361/0x430 kernel/kthread.c:255
+Stacked drivers do not call blk_queue_max_hw_sectors(). Instead they set
+limits of their devices by blk_set_stacking_limits() + disk_stack_limits().
+Field bio->io_pages stays zero until user set max_sectors_kb via sysfs.
 
-Fixes: ed76e329d74a ("blk-mq: abstract out queue map") # v5.0
-Reported-by: syzbot+d44e1b26ce5c3e77458d@syzkaller.appspotmail.com
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Johannes Thumshirn <jth@kernel.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This patch updates io_pages after merging limits in disk_stack_limits().
+
+Commit c6d6e9b0f6b4 ("dm: do not allow readahead to limit IO size") fixed
+the same problem for device-mapper devices, this one fixes MD RAIDs.
+
+Fixes: 9491ae4aade6 ("mm: don't cap request size based on read-ahead setting")
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Signed-off-by: Song Liu <songliubraving@fb.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/blk-settings.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3c1abab1fdf52..a8c1a45cedde0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3007,6 +3007,14 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 
- static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- {
-+	/*
-+	 * blk_mq_map_queues() and multiple .map_queues() implementations
-+	 * expect that set->map[HCTX_TYPE_DEFAULT].nr_queues is set to the
-+	 * number of hardware queues.
-+	 */
-+	if (set->nr_maps == 1)
-+		set->map[HCTX_TYPE_DEFAULT].nr_queues = set->nr_hw_queues;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index c8eda2e7b91e4..be1dca0103a45 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -664,6 +664,9 @@ void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
+ 		printk(KERN_NOTICE "%s: Warning: Device %s is misaligned\n",
+ 		       top, bottom);
+ 	}
 +
- 	if (set->ops->map_queues && !is_kdump_kernel()) {
- 		int i;
++	t->backing_dev_info->io_pages =
++		t->limits.max_sectors >> (PAGE_SHIFT - 9);
+ }
+ EXPORT_SYMBOL(disk_stack_limits);
  
 -- 
 2.20.1
