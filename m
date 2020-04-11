@@ -2,144 +2,111 @@ Return-Path: <SRS0=UUXI=53=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C45C2BA19
-	for <linux-block@archiver.kernel.org>; Sat, 11 Apr 2020 04:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 506B3C2BA2B
+	for <linux-block@archiver.kernel.org>; Sat, 11 Apr 2020 14:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03C3420757
-	for <linux-block@archiver.kernel.org>; Sat, 11 Apr 2020 04:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A3D72145D
+	for <linux-block@archiver.kernel.org>; Sat, 11 Apr 2020 14:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O3EvBYAe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CjUCGvi2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725835AbgDKEEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Apr 2020 00:04:20 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46239 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbgDKEEU (ORCPT
+        id S1726054AbgDKObV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Apr 2020 10:31:21 -0400
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:45244 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726037AbgDKObV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Apr 2020 00:04:20 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q3so1880724pff.13
-        for <linux-block@vger.kernel.org>; Fri, 10 Apr 2020 21:04:20 -0700 (PDT)
+        Sat, 11 Apr 2020 10:31:21 -0400
+Received: by mail-vs1-f65.google.com with SMTP id j65so2904066vsd.12
+        for <linux-block@vger.kernel.org>; Sat, 11 Apr 2020 07:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nQvMpukNO/jhSN1Dfak56wDogQyph8/YlqBe2s+q9Yo=;
-        b=O3EvBYAecnfGImdmby4Qbt1ENjJpYMO1t7rXq9OZY79NJKUbUUBgAlo7wZQaB5UsuU
-         9EO+RQSuSYnaJq6jHkcsEOUXBy501G7w0yIDDV3S0+yQ4TXRJB+2eTQAV4EjUze12zrV
-         wUBIFFQUQpweYQVW9eFUa1mMMYm/NePxY68LaOfz/uabXINOnymYOWiMnNw1coesnI2P
-         02KGPRxFunnFGF47J6a/5Kc2L6vqBh8K0RT+wdXD9anX11YYVcNUhrRBfYmzcIryxxeQ
-         s8NGkL80WfxnxrPN0165CZ/gFujs5sZYNcaIn1w2dXNUozVuytKtd9D/ycpKUoutm2nL
-         oWBQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=9ZXgjDb+KwiiQSp/A/i2RANwYZsGpovkCsRU6ThyQ8Q=;
+        b=CjUCGvi2lmFaBvef8N0enUVUFPemvp6bJ8KbZCjEz2b7JCrwRdBwfxZqtE/z3dfozK
+         XgRGGbKOm5k53qHGnAT5VJXuReWAiBfAprrvrr1T7O3HIu1JZznETPsaAyeJvniLd0Mn
+         Jec9azyyBvSSOMt7hYlKdihsBNE1Umh+VOoVtN/QFapqmMH5jZqhTO71/zEoLjl9BKtc
+         mMP3iOtdSIAQzxN5b2NSnB8JczlzT9DpwDSRGwIy8CUXvB0ay8bQSqz2E3cVkFHCJclP
+         7VqHxyPNPb5xGNistcfn/BPRvtdsGsn+VNYcTMaP7DiRg4hhTNZaPOZh/CnohD/cleCP
+         yBwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
          :content-transfer-encoding;
-        bh=nQvMpukNO/jhSN1Dfak56wDogQyph8/YlqBe2s+q9Yo=;
-        b=Vk4+388HcebGqQx9mukmQBjsaxZcfAQdcESADE9e4E+5UlWYT6r5L7mvp67ZQR894W
-         OP6YNBO8AyqguauMtF/nS2Z77oAwW9Os+0fUtVTyds/dbpQALQOaf93eRcU4GyHtCL7H
-         +0fumX6QsdaN8+HN6WcDfpbKxfifvl/7G0x+RwABbuLMc92hgXrG1wQmIE9vGKjXbL1U
-         ZXIgIgezByreLhtdoEEP/KGknogMgQG8uty+yepJRTDI2iE8UMSNsOypmoZ3mSVUKsVq
-         Mn+r7nhWnovyVVdgmhW8oDZ3TJVGmWX01Yo7ngeAQE324KOt8TEXshDRtdTUDqeoYllP
-         pT8w==
-X-Gm-Message-State: AGi0Pua+sH/xJoMTtwEgMb7KIRuQicw73DCIlplmWG0rzDrVT4sCqDFR
-        W8WM9nyyEXY0/Bx+ypwwxAq997EcfcpIQg==
-X-Google-Smtp-Source: APiQypJfXSCbRhZy/l+M2iD7TFSquu/abK+hhf3qBU/xl1QNKGr9Ok0ZTvvwvi9q5rQEcPfTeQ9jrg==
-X-Received: by 2002:a62:2783:: with SMTP id n125mr8598113pfn.133.1586577859189;
-        Fri, 10 Apr 2020 21:04:19 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id i124sm3064826pfg.14.2020.04.10.21.04.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Apr 2020 21:04:18 -0700 (PDT)
-Subject: Re: [GIT PULL] Block fixes for 5.7-rc1
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <0d580c9a-be04-0b48-0594-17a0339df1b5@kernel.dk>
- <5b4a4f64-3a39-e1a6-6141-60436bb9249b@kernel.dk>
- <CAHk-=wgJVzsnWk+rODQjsq0vttQFA3yDE_f+YRMV5jtsC5qdsQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9686fd16-126a-4f52-e7c8-832991fb98bb@kernel.dk>
-Date:   Fri, 10 Apr 2020 22:04:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        bh=9ZXgjDb+KwiiQSp/A/i2RANwYZsGpovkCsRU6ThyQ8Q=;
+        b=YxXBpAJy0rKWGEQUjhCsyH151VIvetulVr7lH71rOhFISvPW3XMbhUKUBkHisvU71K
+         fvRrdT6xwapyqDjOD3lvD2UXVUQ5nWQJsOwSWlGi4D13/9n/wXvogII9ZS0H+X8CzdeC
+         a/YZRzWFkpFglkGH0ruVNZdldR1rj10ubxefd7FyyQYvpCIR9mm032eVi/ofQhif9tqA
+         mBtIBi8nNGj4t/DPgr6eCJec9KSUixxuKmmiKRgxAcR+a3ZdyOhSuVmJMZimsxulISCr
+         FMLiv/9pkm2c1gHMS/JuGDMFKGOD2OJUJOkI503ikEnFG2icm1VZIwMxaQeMMeCORCXO
+         pgBw==
+X-Gm-Message-State: AGi0PuYlM1CRo0Ledo8OfknCwuGz9/Ypmk9Y1h369kgmqKw7myo+86Fb
+        NCJgdhl1ZWupbAqTrp2uknJtv4BJj+zkPKI9VwaSYoss
+X-Google-Smtp-Source: APiQypIzpIvli3B9uzFh5dHe6yo4BbVIbd9vLN451E9tTCxWFX0iKDN8NXub/fd6BsABL3JMQK54ApZ+5H9U+e1icHY=
+X-Received: by 2002:a67:885:: with SMTP id 127mr5065899vsi.119.1586615480565;
+ Sat, 11 Apr 2020 07:31:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wgJVzsnWk+rODQjsq0vttQFA3yDE_f+YRMV5jtsC5qdsQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a67:ce95:0:0:0:0:0 with HTTP; Sat, 11 Apr 2020 07:31:20
+ -0700 (PDT)
+From:   Daegyu Han <hdg9400@gmail.com>
+Date:   Sat, 11 Apr 2020 23:31:20 +0900
+Message-ID: <CAARcW+piE++DqhZQGEPEpQHCvCFFWC6m7hoZN=4x9tNThf0QrQ@mail.gmail.com>
+Subject: Block request size is limited to readahead size when doing buffered
+ read to nvme over fabric target(remote nvme)
+To:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/10/20 10:25 AM, Linus Torvalds wrote:
-> On Fri, Apr 10, 2020 at 7:37 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> This one sits on top of the previous, figured that was easier than
->> redoing the other one fully.
-> 
-> It's actually easier for me if you remove the broken tag when you
-> notice things like this (or use the same name for the fix tag and just
-> force-update it).
-> 
-> And then send a "oops, me bad, I updated it" with the new pull data.
-> 
-> The reason: when I opened this thread, I didn't notice your follow-up
-> at first, so I pulled the old tag, and so got the known-broken code.
-> 
-> And yes, I double-checked and caught it, unpulled and then re-pulled
-> the fixed-up tag instead.
-> 
-> But if the wrong tag had been just overwritten or deleted, the extra
-> steps wouldn't have been necessary.
-> 
-> Not a huge deal, it's not like it took me a lot of effort (it's more
-> painful if I have to fix up conflicts twice, although even that isn't
-> usually much of a bother since the second time I don't have to really
-> analyze them again).
-> 
-> So just a heads up for "I wish you'd done X instead".
+Hi all, I wonder why the block layer generates requests that are
+limited to readahead size when doing buffered read to nvmeof target
+ssd.
 
-Noted! Since I sent out this pull yesterday and I knew I'd be away from
-a keyborad all day today, I had to rush this followup pull this morning.
-Normally I probably would have killed the branch and sent a new one.
-Thanks for doing the right thing, and just pulling the new tag instead.
+I don't know=C2=A0it is okay to ask questions this mailing list.
+I'm sorry if these personal questions were banned.
 
-> Btw, on the subject of "I wish you had done X": this is not at all
-> particular to you, and a lot of people do this, but pull requests tend
-> to have the same pattern that we are trying to discourage in patch
-> descriptions.
-> 
-> So in Documentation/process/submitting-patches.rst, we talk about this:
-> 
->  "Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
->   instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
->   to do frotz", as if you are giving orders to the codebase to change
->   its behaviour"
-> 
-> because once it's then accepted into git, the whole "this patch" kind
-> of language doesn't really make much sense. It's much better to just
-> describe what the change does, than say "this change does X".
-> 
-> The same is actually true when I merge your pull request, and I take
-> the description from your email. Because the same way "This patch does
-> X" does not make a regular commit message any more legible, the "This
-> pull request does X" does not make sense in the commit message of a
-> merge.
-> 
-> So I end up editing peoples messages a lot (and I occasionally forget
-> or miss it).
-> 
-> Again, this is _not_ a huge deal, and I obviously haven't made a stink
-> about it, but I thought I'd mention it since I was on the subject of
-> "this causes me extra work".
+To describe in detail the environment I experimented with, it is as follows=
+.
 
-I like it, I'll word my pull requests imperatively going forward.
+I used a Samsung nvme 970 ssd for storage and a Mellanox connectx-4
+Infiniband for the network.
+My server OS is kernel version 4.20.
+I did buffered IO by using C language read() API and trace using blktrace.
+NVMeoF ssd was formated as ext4.
 
--- 
-Jens Axboe
+C read API test
+- I saw that the initiator sends requests to the target only as large
+as the readahead(default: 128KB). After that, I changed the size of
+the readahead through sysfs and the size of the request changed.
+- In Direct IO, a request size set to a buffer (char array[]) size
+created at the my user level program.
 
+FIO test
+- In the case fo buffered io, the request size changed according to
+the block size. I think because I set the block size to 4K.
+-=C2=A0Similarly, in the case of Direct IO, the request was made according
+to the block size.
+
+To sum up, more requests were completed in Buffered IO using C read
+API than local IO to nvme ssd.
+From what I have measured, I think that nvmeof in buffered io is worse
+than local performance due to requests split by readahead size.
+I tried to analyze the blk-mq and nvme code, but these layers are too
+broad and difficult to understand.
+
+Why is the request size set to readhead size when buffered IO is
+performed from target nvmeof using C read API?
+I want to know the reason and which code makes the block request.
+
+I had my trace logs. If you want to see logs, I will attach my logs.
+
+Thank you.
