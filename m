@@ -2,52 +2,127 @@ Return-Path: <SRS0=SW/x=55=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB931C2BA19
-	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 13:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 241A2C2BA19
+	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 13:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F0022073E
-	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 13:41:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 045E82072C
+	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 13:52:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586785941;
+	bh=2QT0hVPsskyN8JQI/O18ExbNXWNjGVlkPziO10x9bI8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=oJlQv/yMctb6gOUvgSprJm571H3vfCHh0nhTYi6Ngu6M2NlKt3UlEh60lpOODmL5R
+	 Qsjplfj8kMyl933/Pxz+vUC4qJvtSuM0/yVaJqglAaBevXqpsU8jrMTe6d6/XCbfUo
+	 htUM7hrhtJ/udtzm4bPnYsLWXpE7i+X+ZIyyBs10=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730124AbgDMNlv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Apr 2020 09:41:51 -0400
-Received: from verein.lst.de ([213.95.11.211]:34828 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730085AbgDMNlu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Apr 2020 09:41:50 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9C1ED68BEB; Mon, 13 Apr 2020 15:41:47 +0200 (CEST)
-Date:   Mon, 13 Apr 2020 15:41:47 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
-Subject: Re: [PATCH 03/10] block: cleanup hd_struct freeing
-Message-ID: <20200413134147.GA16386@lst.de>
-References: <20200408194439.1580699-1-hch@lst.de> <20200408194439.1580699-4-hch@lst.de> <SN4PR0401MB3598FDA8DB67BE8337A4C16B9BC10@SN4PR0401MB3598.namprd04.prod.outlook.com>
+        id S1730085AbgDMNwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Apr 2020 09:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730000AbgDMNwQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Apr 2020 09:52:16 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CAEC0A3BDC;
+        Mon, 13 Apr 2020 06:52:15 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id c63so9449298qke.2;
+        Mon, 13 Apr 2020 06:52:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=pEQ2ZN/sQMUNp0cAGyj+0Oo/y3A6wiKh+7dkMJzMwVI=;
+        b=MRSZ1qTh0me/yxxie/3CYFIGX8lrDC3ISjXJe6J7lVXk3NNURSYMsAEkOVRdvkUZVL
+         K97VBE5C8GBEcLI1j6snQqwxNHlR4+HRv+4c/KG8wrRFOyycSy4N/YUZrTbaWF/itcdj
+         cB85PL1NzoFmMsWzbeHhQx6dVVQzIf3ZmbjjAeD+6Zxf9S4eQh8M7DkjB6DbllIxcu9+
+         EKj5ePFmNh8aNV2InN7y+YDDIRVaayW85AjvKvBf+4LPxQciv2SkXZe9Pwsh7Sb+gzyp
+         dfQBXRF70YH8Zx2h75h9z8upaN74WXugMBbMvCCiTmq4wrRoQAEL6eB/jTiTQivTf8P6
+         cxJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=pEQ2ZN/sQMUNp0cAGyj+0Oo/y3A6wiKh+7dkMJzMwVI=;
+        b=NnlNV5l2gecQ4fPeqiap813QxvpTfOFGEidjKBRM0IHYzu0JiRis6pOBX7YniBMrLS
+         PWdiu2ZG42FT5ILkPSWOwnQE4uXE9VumJ7sMVxBZB3t3sedwkiZ7wDATyqY6v/duduSn
+         ImERfNeWW0awC29tRVt6FsMZAUibiWWj4empa+oJSwEFjPZOMDO3IqnnHVbBBB4fCcFb
+         PTyfy+yvdJR7DE6l7T906u/gVUsUAPh4zynFR9E17idUP9lj53ZHHKCo5fSinYCvc4eo
+         eaNr+fcvwPs8R1GgE99/otzAtG2MAjAKxb1Nis8ZLtANn5VbCMrscRdypaMZfBqMxg9e
+         I1pQ==
+X-Gm-Message-State: AGi0PuZRS/nHVjVz3z4hrINI0U2WsotxHOO1RX/yaLkL7m7O3/OVIhat
+        NGTZDokwL8EP79fnLBFCHeM=
+X-Google-Smtp-Source: APiQypLe7MO13U/Rf9ZmvyBPQqLT6zGJOfgTyGiBiUG0HsVQKvD4PRhBAITPJDiJayaHpv91ab4IvA==
+X-Received: by 2002:a37:418d:: with SMTP id o135mr16605498qka.349.1586785934916;
+        Mon, 13 Apr 2020 06:52:14 -0700 (PDT)
+Received: from localhost ([199.96.181.106])
+        by smtp.gmail.com with ESMTPSA id c8sm8541264qke.90.2020.04.13.06.52.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2020 06:52:14 -0700 (PDT)
+Date:   Mon, 13 Apr 2020 09:52:12 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@vger.kernel.org,
+        cgroups@vger.kernel.org, newella@fb.com, josef@toxicpanda.com
+Subject: Re: [PATCH 2/5] block: add request->io_data_len
+Message-ID: <20200413135212.GA60335@mtj.duckdns.org>
+References: <20200408201450.3959560-1-tj@kernel.org>
+ <20200408201450.3959560-3-tj@kernel.org>
+ <b027a718-1c76-6e34-1edb-5435a5605d35@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN4PR0401MB3598FDA8DB67BE8337A4C16B9BC10@SN4PR0401MB3598.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <b027a718-1c76-6e34-1edb-5435a5605d35@acm.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 09, 2020 at 11:30:19AM +0000, Johannes Thumshirn wrote:
-> On 08/04/2020 21:45, Christoph Hellwig wrote:
-> > -	struct hd_struct *part = container_of(to_rcu_work(work), struct hd_struct,
-> > -					rcu_work);
-> > +	struct hd_struct *part =
-> > +		container_of(to_rcu_work(work), struct hd_struct, rcu_work);
-> 
-> That looks like an unneeded white space only change
+Hello,
 
-It was intentional as I was touching the code right next to it anyway..
+On Wed, Apr 08, 2020 at 08:44:17PM -0700, Bart Van Assche wrote:
+> On 2020-04-08 13:14, Tejun Heo wrote:
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 32868fbedc9e..bfd34c6a27ef 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -142,6 +142,14 @@ struct request {
+> >  
+> >  	/* the following two fields are internal, NEVER access directly */
+> >  	unsigned int __data_len;	/* total data len */
+> > +#ifdef CONFIG_BLK_RQ_IO_DATA_LEN
+> > +	/*
+> > +	 * Total data len at the time of issue. This doesn't get deducted by
+> > +	 * blk_update_request() and can be used by completion path to determine
+> > +	 * the request size.
+> > +	 */
+> > +	unsigned int io_data_len;
+> > +#endif
+> >  	sector_t __sector;		/* sector cursor */
+> >  
+> >  	struct bio *bio;
+> 
+> So we have one struct member with the description "total data len" and
+> another struct member with the description "total data len at the time
+> of issue"? How could one not get confused by these descriptions?
+
+The new one explicitly says it doesn't get deducted by update_request.
+
+> This change makes the comment above __data_len incorrect. Please update
+> that comment or move io_data_len in front of that comment.
+
+Sure.
+
+> How does this change interact with the code in drivers/scsi/sd.c that
+> manipulates __data_len directly?
+
+It doesn't.
+
+Thanks.
+
+-- 
+tejun
