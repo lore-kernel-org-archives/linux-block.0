@@ -2,74 +2,111 @@ Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28ABEC2BA19
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 11:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86482C2BA19
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 14:45:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0AE120768
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 11:30:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wd48rBg/"
+	by mail.kernel.org (Postfix) with ESMTP id 6B4BE20578
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 14:45:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439168AbgDNLab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 07:30:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2439160AbgDNLaJ (ORCPT
+        id S2404517AbgDNOpk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 10:45:40 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:53755 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2404511AbgDNOpj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 07:30:09 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910D4C061A0C;
-        Tue, 14 Apr 2020 04:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CIUrbcmj1xhW3MOaPe81Ur6/xKrEzd9msEFn9mkphaA=; b=Wd48rBg/0x0CXzD+KRzC20Aj12
-        3q2vCAAoyKJtZiWfj5RrnksBszf30fdP56w1lVxUfY9YPrnTeS/YjMCJugR973FvGBfuiVREliaIL
-        57LVWXx9aZe5HuOQXnM5IZDfSHk0hzE+FdIeGN8pdWuPS91xnQelXWvJBSg4FeIK9v7dEhcqcGedC
-        2zkwbFgR3ncFRlY1SKieVy8LZ6B/vl2XoN8uY3LuMC5pE4V6zm0YgBfzhP9DrMCnDjr8bv09aXaFY
-        4Q5SJh8O3X8Tf3TvMkKyDHDpiz5bYmBGjv3VyJ2nQrluSqUEae2vjDHDRz6GIV5Njcups4z/408PZ
-        t3uzYQng==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOJlY-0001Eu-J2; Tue, 14 Apr 2020 11:30:08 +0000
-Date:   Tue, 14 Apr 2020 04:30:08 -0700
-From:   "hch@infradead.org" <hch@infradead.org>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     "hch@infradead.org" <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v5 07/10] scsi: sd_zbc: emulate ZONE_APPEND commands
-Message-ID: <20200414113008.GB26599@infradead.org>
-References: <20200409165352.2126-1-johannes.thumshirn@wdc.com>
- <20200409165352.2126-8-johannes.thumshirn@wdc.com>
- <20200410061822.GB4791@infradead.org>
- <20200410063855.GC4791@infradead.org>
- <SN4PR0401MB3598DD3A892162A3FADB06CD9BDA0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+        Tue, 14 Apr 2020 10:45:39 -0400
+Received: from callcc.thunk.org (pool-72-93-95-157.bstnma.fios.verizon.net [72.93.95.157])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 03EEinef011881
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Apr 2020 10:44:49 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id E825A42013D; Tue, 14 Apr 2020 10:44:48 -0400 (EDT)
+Date:   Tue, 14 Apr 2020 10:44:48 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, tj@kernel.org,
+        jack@suse.cz, bvanassche@acm.org, gregkh@linuxfoundation.org,
+        hch@infradead.org
+Subject: Re: [PATCH v4 0/6] bdi: fix use-after-free for bdi device
+Message-ID: <20200414144448.GA317058@mit.edu>
+References: <20200325123843.47452-1-yuyufen@huawei.com>
+ <1a735dce-c72b-5b2e-66c5-b5db30f1139b@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN4PR0401MB3598DD3A892162A3FADB06CD9BDA0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1a735dce-c72b-5b2e-66c5-b5db30f1139b@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 11:09:41AM +0000, Johannes Thumshirn wrote:
-> On 10/04/2020 08:39, Christoph Hellwig wrote:
-> > Looking more the situation seems even worse.  If scsi_mq_prep_fn
-> > isn't successfull we never seem to free the sgtables, even for fatal
-> > errors.  So I think we need a real bug fix here in front of the series
-> 
-> If I'm not missing something all that needs to be done to fix it is:
+On Thu, Apr 09, 2020 at 09:28:07PM +0800, Yufen Yu wrote:
+> ping
 
-Looks sensible.
+ping**2
+
+Can this go in as a bugfix during this cycle?
+
+    	       	    	   	  - Ted
+
+> 
+> On 2020/3/25 20:38, Yufen Yu wrote:
+> > Hi, all
+> > 
+> > We have reported a use-after-free crash for bdi device in __blkg_prfill_rwstat().
+> > The bug is caused by printing device kobj->name while the device and kobj->name
+> > has been freed by bdi_unregister().
+> > 
+> > In fact, commit 68f23b8906 "memcg: fix a crash in wb_workfn when a device disappears"
+> > has tried to address the issue, but the code is till somewhat racy after that commit.
+> > 
+> > In this patchset, we try to protect bdi->dev with spinlock and copy device name
+> > into caller buffer, avoiding use-after-free.
+> > 
+> > V4:
+> >    * Fix coding error in bdi_get_dev_name()
+> >    * Write one patch for each broken caller
+> > 
+> > V3:
+> >    https://www.spinics.net/lists/linux-block/msg51111.html
+> >    Use spinlock to protect bdi->dev and copy device name into caller buffer
+> > 
+> > V2:
+> >    https://www.spinics.net/lists/linux-fsdevel/msg163206.html
+> >    Try to protect device lifetime with RCU.
+> > 
+> > V1:
+> >    https://www.spinics.net/lists/linux-block/msg49693.html
+> >    Add a new spinlock and copy kobj->name into caller buffer.
+> >    Or using synchronize_rcu() to wait until reader complete.
+> > 
+> > Yufen Yu (6):
+> >    bdi: use bdi_dev_name() to get device name
+> >    bdi: protect bdi->dev with spinlock
+> >    bfq: fix potential kernel crash when print error info
+> >    memcg: fix crash in wb_workfn when bdi unregister
+> >    blk-wbt: replace bdi_dev_name() with bdi_get_dev_name()
+> >    blkcg: fix use-after-free for bdi->dev
+> > 
+> >   block/bfq-iosched.c              |  6 +++--
+> >   block/blk-cgroup-rwstat.c        |  6 +++--
+> >   block/blk-cgroup.c               | 19 +++++-----------
+> >   block/blk-iocost.c               | 14 +++++++-----
+> >   block/blk-iolatency.c            |  5 +++--
+> >   block/blk-throttle.c             |  6 +++--
+> >   fs/ceph/debugfs.c                |  2 +-
+> >   fs/fs-writeback.c                |  4 +++-
+> >   include/linux/backing-dev-defs.h |  1 +
+> >   include/linux/backing-dev.h      | 26 ++++++++++++++++++++++
+> >   include/linux/blk-cgroup.h       |  1 -
+> >   include/trace/events/wbt.h       |  8 +++----
+> >   include/trace/events/writeback.h | 38 ++++++++++++++------------------
+> >   mm/backing-dev.c                 |  9 ++++++--
+> >   14 files changed, 88 insertions(+), 57 deletions(-)
+> > 
