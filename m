@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C469C352BE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73037C2BB85
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:29:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B43C206E9
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49BB42074D
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:29:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JR5Z7k7B"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VBVVt23e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406601AbgDNH3i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2406630AbgDNH3i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 14 Apr 2020 03:29:38 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:59838 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:59812 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390797AbgDNH3g (ORCPT
+        with ESMTP id S2390794AbgDNH3f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 03:29:36 -0400
+        Tue, 14 Apr 2020 03:29:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=h6L8qe8CLhfRfBQB93wPXOSvNk4Jso8JkIvEH7OeOJs=; b=JR5Z7k7BDo/0cXHAGhEDbGKqc/
-        IhQovb976xAy+Eqhz7DO4wKv41nZeZOAbeXWtyCdJhlGs1MS+d+1fn9S+db5BUNvch9DDjSzjSG7n
-        I3P1iLKQfcIN5LoU4SI2DqaEz2ip87oUjdi+JsCIx7wNaOGObaaaeapo6ej6rCXCiLcS8pxMKcxwj
-        fEtTKzKVKQVuNzLGcK7ud/+3zNiBwIzr/ZF3oAZ3Uc0gCN4h0A+l35OXUcq9KBIgiBdBRztxzTrS0
-        1dJVQW6I3NEKzFeuP8HS33g8mdZehvmf4yPvCSpU/2LId7TFg0N3iosG3OnvwcQk/e1QMsfBqX7Rr
-        R1rkIQ2g==;
+        bh=1XH5GbocTPgBE38P465Thqk6IEdigoyWMin6IJ+rU2o=; b=VBVVt23e1IRsYpSdhgD19IQdkc
+        /T3j0Gm6RVvDK8n+/zJKQNT7NxYiWILmIAbjRoqlJFWQS3RlckyJePlP3skTse2y6IzxtKOA6v3sc
+        k/vNKaoarV32kEq1PMc8xwcD0xS0k1Wfe/yEGMJLeZ+pbFd6P7Aqdi9swr3JI8cC03Ku8HN2CeUnU
+        ZMiE51ribrN1oBxqthVXkQNrNXaIF6g0sWRPlRE6YqY5kTV1fVFuVQOpVDOVYdj3RM5O26XBiWMFm
+        +rS9UtDmnxMSTFYPRHdMaZgbGWdXN5J7bUjVZXL9VpI6RemIAONiMSsPdNNvbCgW4Iz8K9vg9SzmS
+        phGvu8eA==;
 Received: from [2001:4bb8:180:384b:4c21:af7:dd95:e552] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOG0l-0005cK-4C; Tue, 14 Apr 2020 07:29:35 +0000
+        id 1jOG0f-0005b8-Iu; Tue, 14 Apr 2020 07:29:29 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Stefan Haberland <sth@linux.ibm.com>,
         Jan Hoeppner <hoeppner@linux.ibm.com>,
         linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 10/10] block: fold bdev_unhash_inode into invalidate_partition
-Date:   Tue, 14 Apr 2020 09:29:02 +0200
-Message-Id: <20200414072902.324936-11-hch@lst.de>
+Subject: [PATCH 08/10] block: simplify block device syncing in bdev_del_partition
+Date:   Tue, 14 Apr 2020 09:29:00 +0200
+Message-Id: <20200414072902.324936-9-hch@lst.de>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200414072902.324936-1-hch@lst.de>
 References: <20200414072902.324936-1-hch@lst.de>
@@ -55,87 +55,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-invalidate_partition and bdev_unhash_inode are always paired, and
-invalidate_partition already does an icache lookup for the block device
-inode.  Piggy back on that to remove the inode from the hash.
+We just checked a little above that the block device for the partition
+im busy.  That implies no file system is mounted, and thus the only
+thing in fsync_bdev that actually is used is sync_blockdev.  Just call
+sync_blockdev directly.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/genhd.c      |  8 ++++++--
- fs/block_dev.c     | 15 ---------------
- include/linux/fs.h |  1 -
- 3 files changed, 6 insertions(+), 18 deletions(-)
+ block/partitions/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 980a4609d4a5..c05d509877fa 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -888,6 +888,12 @@ static void invalidate_partition(struct gendisk *disk, int partno)
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index a94d296d7aed..c085bf85509b 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -531,7 +531,7 @@ int bdev_del_partition(struct block_device *bdev, int partno)
+ 	if (bdevp->bd_openers)
+ 		goto out_unlock;
  
- 	fsync_bdev(bdev);
- 	__invalidate_device(bdev, true);
-+
-+	/*
-+	 * Unhash the bdev inode for this device so that it gets evicted as soon
-+	 * as last inode reference is dropped.
-+	 */
-+	remove_inode_hash(bdev->bd_inode);
- 	bdput(bdev);
- }
+-	fsync_bdev(bdevp);
++	sync_blockdev(bdevp);
+ 	invalidate_bdev(bdevp);
  
-@@ -909,13 +915,11 @@ void del_gendisk(struct gendisk *disk)
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
- 		invalidate_partition(disk, part->partno);
--		bdev_unhash_inode(part_devt(part));
- 		delete_partition(disk, part);
- 	}
- 	disk_part_iter_exit(&piter);
- 
- 	invalidate_partition(disk, 0);
--	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
- 	up_write(&disk->lookup_sem);
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9c8de54fa0c9..998820174d3e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -883,21 +883,6 @@ static int bdev_set(struct inode *inode, void *data)
- 
- static LIST_HEAD(all_bdevs);
- 
--/*
-- * If there is a bdev inode for this device, unhash it so that it gets evicted
-- * as soon as last inode reference is dropped.
-- */
--void bdev_unhash_inode(dev_t dev)
--{
--	struct inode *inode;
--
--	inode = ilookup5(blockdev_superblock, hash(dev), bdev_test, &dev);
--	if (inode) {
--		remove_inode_hash(inode);
--		iput(inode);
--	}
--}
--
- struct block_device *bdget(dev_t dev)
- {
- 	struct block_device *bdev;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2b4e9f86b151..1a95e5158811 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2581,7 +2581,6 @@ extern struct kmem_cache *names_cachep;
- #ifdef CONFIG_BLOCK
- extern int register_blkdev(unsigned int, const char *);
- extern void unregister_blkdev(unsigned int, const char *);
--extern void bdev_unhash_inode(dev_t dev);
- extern struct block_device *bdget(dev_t);
- extern struct block_device *bdgrab(struct block_device *bdev);
- extern void bd_set_size(struct block_device *, loff_t size);
+ 	mutex_lock_nested(&bdev->bd_mutex, 1);
 -- 
 2.25.1
 
