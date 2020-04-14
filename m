@@ -2,188 +2,111 @@ Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B10C352BE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 20:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B4AC352BE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 21:18:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53DE92076A
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 20:59:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586897956;
-	bh=GYIm3oRtzkOhfzRvwaslo+C0b0DbLNOXs+e7b+LgPDQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=gDhJJ3EhivDbg3PMwAbQsXpjorZ1FpgW6npZQQHdiX0hgal9U6flGBeZ4Axlucpwp
-	 +HxnyEcsSdo9dxQxSrOdkX4qvTpH3+nWE0i/Z/+uOscRQTQ70CCOQoZNr64EL/a/2Z
-	 GI3PJGdnPmC3vY+S7Ficc0/p9OVe/KZqb+gD/zaM=
+	by mail.kernel.org (Postfix) with ESMTP id A3F1A20787
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 21:18:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GwNkoQjL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2633526AbgDNU66 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 16:58:58 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43486 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2633447AbgDNU64 (ORCPT
+        id S2633755AbgDNVSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 17:18:48 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:39766 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2633733AbgDNVSr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 16:58:56 -0400
-Received: by mail-pf1-f195.google.com with SMTP id l1so494778pff.10;
-        Tue, 14 Apr 2020 13:58:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2BFbh/NVyd/nEEqnIV7FAkYPsjDu10E1KJ7JMizEGUs=;
-        b=ZWg9atuX4nJmFaJPPy+n7lOuSBx7FEJ8gvZo1CcZo74d88FAoma5A71qE1KOBH/PvC
-         DV5Vkof9X6SLYKwo9ORSz80qzDn3LK6aDCrt5IIvD36s0A/1Z+6nq1FiUXwylFO/Xh+b
-         CjnbGHZdIjgxWp/2vTphtjenOw2vnr8c/Us3Gr2cqqjvppUOaj8xR5IIhejNomuZpHiw
-         1Z3ccIpUfz0eM79HJrNGR/yGx+4F+bHrtYKjaBCxqBIkWO1OOqh6NWRKO3IQqQoWcPDp
-         FV2Z0vcA0th/lS+ARwUj6to88XraeBz9oQn9/8pVvtf1oULyC5QeYb6gbdtEheRNEWrl
-         qsig==
-X-Gm-Message-State: AGi0PuZP3OMe13UFWnBtH2hOsMkorDZ5tzBBAGZNdF8AXpYQ9Xfsxvk/
-        2W475FGPTuz3PvZtSPcj420=
-X-Google-Smtp-Source: APiQypKmhyUPwU3E+eaaqWqZ9C3MBCiwt3U/HU4Vjk70huVm8L0B8YcyK+w2BA/5pI1GVFdjIpQH2g==
-X-Received: by 2002:a63:d454:: with SMTP id i20mr22395308pgj.209.1586897935063;
-        Tue, 14 Apr 2020 13:58:55 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id a1sm11817266pfl.188.2020.04.14.13.58.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2020 13:58:53 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id DA82440277; Tue, 14 Apr 2020 20:58:52 +0000 (UTC)
-Date:   Tue, 14 Apr 2020 20:58:52 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 5/5] block: revert back to synchronous request_queue
- removal
-Message-ID: <20200414205852.GP11244@42.do-not-panic.com>
-References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-6-mcgrof@kernel.org>
- <20200414154725.GD25765@infradead.org>
+        Tue, 14 Apr 2020 17:18:47 -0400
+Received: from [10.137.106.115] (unknown [131.107.174.243])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 3E91D20B4737;
+        Tue, 14 Apr 2020 14:18:46 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3E91D20B4737
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1586899126;
+        bh=8vd2NllO885QphfJq499exMBBONhyoMLoUuWkoB9kMM=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=GwNkoQjLBGfCuuREHe/03lAwC66jZGflscriy+ucC2VLYeU1H2gwGfnbtARtIw/Bv
+         4DplFt0PBFLVA7BsFj6OcZIZHvCpm7RJoNrRJgrPikIOOWGzRv+KAeHNeUITy1lxxp
+         3F7GXI1j8U26y2fFZxmIuTVq/Npy+xZPthhmAfPo=
+Subject: Re: [RFC PATCH v2 11/12] documentation: Add IPE Documentation
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
+        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, tyhicks@linux.microsoft.com,
+        pasha.tatashin@soleen.com, sashal@kernel.org,
+        jaskarankhurana@linux.microsoft.com, nramas@linux.microsoft.com,
+        mdsakib@linux.microsoft.com, linux-kernel@vger.kernel.org
+References: <20200406221439.1469862-1-deven.desai@linux.microsoft.com>
+ <20200406221439.1469862-12-deven.desai@linux.microsoft.com>
+ <20200414093809.2c6ef93b@lwn.net>
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+Message-ID: <9c55bbe9-2c6e-7a0d-cf90-5b2aee724f19@linux.microsoft.com>
+Date:   Tue, 14 Apr 2020 14:18:45 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200414154725.GD25765@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200414093809.2c6ef93b@lwn.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 08:47:25AM -0700, Christoph Hellwig wrote:
-> On Tue, Apr 14, 2020 at 04:19:02AM +0000, Luis Chamberlain wrote:
-> > Commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") merged on
-> > v4.12 moved the work behind blk_release_queue() into a workqueue after a
-> > splat floated around which indicated some work on blk_release_queue()
-> > could sleep in blk_exit_rl(). This splat would be possible when a driver
-> > called blk_put_queue() or blk_cleanup_queue() (which calls blk_put_queue()
-> > as its final call) from an atomic context.
-> > 
-> > blk_put_queue() decrements the refcount for the request_queue
-> > kobject, and upon reaching 0 blk_release_queue() is called. Although
-> > blk_exit_rl() is now removed through commit db6d9952356 ("block: remove
-> > request_list code"), we reserve the right to be able to sleep within
-> > blk_release_queue() context. If you see no other way and *have* be
-> > in atomic context when you driver calls the last blk_put_queue()
-> > you can always just increase your block device's reference count with
-> > bdgrab() as this can be done in atomic context and the request_queue
-> > removal would be left to upper layers later. We document this bit of
-> > tribal knowledge as well now, and adjust kdoc format a bit.
-> > 
-> > We revert back to synchronous request_queue removal because asynchronous
-> > removal creates a regression with expected userspace interaction with
-> > several drivers. An example is when removing the loopback driver and
-> > issues ioctl from userspace to do so, upon return and if successful one
-> > expects the device to be removed. Moving to asynchronous request_queue
-> > removal could have broken many scripts which relied on the removal to
-> > have been completed if there was no error.
-> > 
-> > Using asynchronous request_queue removal however has helped us find
-> > other bugs, in the future we can test what could break with this
-> > arrangement by enabling CONFIG_DEBUG_KOBJECT_RELEASE.
-> > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Omar Sandoval <osandov@fb.com>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: Nicolai Stange <nstange@suse.de>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: Michal Hocko <mhocko@kernel.org>
-> > Cc: yu kuai <yukuai3@huawei.com>
-> > Suggested-by: Nicolai Stange <nstange@suse.de>
-> > Fixes: dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> >  block/blk-core.c       | 19 ++++++++++++++++++-
-> >  block/blk-sysfs.c      | 38 +++++++++++++++++---------------------
-> >  include/linux/blkdev.h |  2 --
-> >  3 files changed, 35 insertions(+), 24 deletions(-)
-> > 
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index 5aaae7a1b338..8346c7c59ee6 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -301,6 +301,17 @@ void blk_clear_pm_only(struct request_queue *q)
-> >  }
-> >  EXPORT_SYMBOL_GPL(blk_clear_pm_only);
-> >  
-> > +/**
-> > + * blk_put_queue - decrement the request_queue refcount
-> > + *
-> > + * Decrements the refcount to the request_queue kobject, when this reaches
-> > + * 0 we'll have blk_release_queue() called. You should avoid calling
-> > + * this function in atomic context but if you really have to ensure you
-> > + * first refcount the block device with bdgrab() / bdput() so that the
-> > + * last decrement happens in blk_cleanup_queue().
-> > + *
-> > + * @q: the request_queue structure to decrement the refcount for
-> > + */
-> >  void blk_put_queue(struct request_queue *q)
-> >  {
-> >  	kobject_put(&q->kobj);
-> > @@ -328,10 +339,16 @@ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
-> >  
-> >  /**
-> >   * blk_cleanup_queue - shutdown a request queue
-> > - * @q: request queue to shutdown
-> >   *
-> >   * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
-> >   * put it.  All future requests will be failed immediately with -ENODEV.
-> > + *
-> > + * You should not call this function in atomic context. If you need to
-> > + * refcount a request_queue in atomic context, instead refcount the
-> > + * block device with bdgrab() / bdput().
-> 
-> I think this needs a WARN_ON thrown in to enforece the calling context.
 
-I considered adding a might_sleep() but upon review with Bart, he noted
-that this function already has a mutex_lock(), and if you look under the
-hood of mutex_lock(), it has a might_sleep() at the very top. The
-warning then is implicit.
+On 4/14/2020 8:38 AM, Jonathan Corbet wrote:
+> On Mon,  6 Apr 2020 15:14:38 -0700
+> deven.desai@linux.microsoft.com wrote:
+>
+>> From: Deven Bowers <deven.desai@linux.microsoft.com>
+>>
+>> Add IPE's documentation to the kernel tree.
+>>
+>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> Thanks for including this nice documentation from the outset!  I have a
+> couple of tiny nits to pick, but nothing really substantive to complain
+> about, so:
+>
+>    Acked-by: Jonathan Corbet <corbet@lwn.net>
 
-> > + *
-> > + * @q: request queue to shutdown
-> 
-> Moving the argument documentation seems against the usual kerneldoc
-> style.
+Thanks!
 
-Would you look at that, Documentation/doc-guide/kernel-doc.rst does
-say to keep the argument at the top as it was in place before, OK will
-revert that. Sorry, I used include/net/mac80211.h as my base for style.
+> [...]
+>
+>> +IPE is a Linux Security Module, which allows for a configurable policy
+> I'd drop the comma (I told you these were nits!)
 
-> Otherwise this look good, I hope it sticks :)
+Got it, thanks!
 
-I hope that the kdocs / might_sleep() sprinkled should make it stick now.
-But hey, this uncovered wonderful obscure bugs, it was fun. I'll add a
-selftest also later to ensure we don't regress on some of this later
-once again.
+>
+> [...]
+>
+>> +IPE Policy
+>> +~~~~~~~~~~
+>> +
+>> +IPE policy is designed to be both forward compatible and backwards
+>> +compatible. There is one required line, at the top of the policy,
+>> +indicating the policy name, and the policy version, for instance:
+>> +
+>> +::
+>> +
+>> +   policy_name="Ex Policy" policy_version=0.0.0
+> This pattern can be compressed a bit by just putting the "::" at the end of
+> the last line of text:
+>
+> 	indicating the policy name, and the policy version, for instance::
+>
+> 	   policy_name="Ex Policy" policy_version=0.0.0
+>
+> The result is a bit more readable in the plain-text format, IMO, and
+> renders exactly the same in Sphinx.
 
-  Luis
+Awesome. I'll address this feedback in v3.
