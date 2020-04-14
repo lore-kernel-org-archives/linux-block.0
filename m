@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EE6C3815B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6182DC3815B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:43:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94FC82072D
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39121208E0
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:43:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ape5s4sd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nD1jFWNX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406826AbgDNHmp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 03:42:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60026 "EHLO
+        id S2406816AbgDNHmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 03:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406822AbgDNHmn (ORCPT
+        with ESMTP id S2406809AbgDNHmj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 03:42:43 -0400
+        Tue, 14 Apr 2020 03:42:39 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31C5C008749;
-        Tue, 14 Apr 2020 00:42:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07BD2C008748;
+        Tue, 14 Apr 2020 00:42:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=SqPcLMimSJ0sqLaKstNKrRjJ4WttSTRibfiSByDqRdE=; b=ape5s4sdPYnpjSEOQ+EECj6zT+
-        u+/+u/gG34o+mPn4ue/zLwtAn3XA8wRnivCE1iNqtE3RmTx5NExUkrLNTbdc6JqKwvtdvkKTfINT6
-        moHG9L1sJyvxLh6LLBCfIxFVuKrA8aDuRb0sUiwSX7sIlVbmzihDLOVQ7xiojegSzMRZOO8SZWIK/
-        b5kQN6d31Yfi9OWyM0x0WygwDI+kcEv0kPRTpClTvRoITU4cRah2QVK+f8Dkre9iUdOt42TuCJuRQ
-        tywfc/71ba7CF8We5Eqd95ajzuxt2SXUWwGymXtz/ieEQj9oBOUL905j6aBBQce3K4sJmZKbBLIqo
-        WN7H/X1g==;
+        bh=Ual/dMzALNy8sA75wgtQ+6CUGk8C9/Ruhu//u9rXiYs=; b=nD1jFWNXBCPAHbKCVLUh/4zZP6
+        aMmoAa2p2OsI8xgMcnB2Cn2pKZLtc9sWDwBKzIOUkA23FTslj2T/Be9JdJ4HQVKaEyXHHQMuW+sfu
+        jn6zfc5VOaCWrYlqGOs25hrYbadm7LCeLtoppuaGtok7dBPU2ONjPtVyzQQ9wf4TGJHdhA/9vW2UH
+        3mLC9RoxUAmaa7Wl/cGJ3jRcIBTrEgaioW3BYA3yXv+djI+7ET76a/vdqROV+H0pVYi8BtA03QTja
+        t8b2rWol0S9WjASVxYfn4Xp9JPF6Qg6Lmv60JIRaPq3EqVTeORW/hap4olwjWqc3pzDjOmLNF2ghk
+        oy8BDYBA==;
 Received: from [2001:4bb8:180:384b:4c21:af7:dd95:e552] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOGDP-0007Ap-3S; Tue, 14 Apr 2020 07:42:39 +0000
+        id 1jOGDJ-00078L-FJ; Tue, 14 Apr 2020 07:42:33 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 4/5] block: move dma drain handling to scsi
-Date:   Tue, 14 Apr 2020 09:42:24 +0200
-Message-Id: <20200414074225.332324-5-hch@lst.de>
+Subject: [PATCH 2/5] block: provide a blk_rq_map_sg variant that returns the last element
+Date:   Tue, 14 Apr 2020 09:42:22 +0200
+Message-Id: <20200414074225.332324-3-hch@lst.de>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200414074225.332324-1-hch@lst.de>
 References: <20200414074225.332324-1-hch@lst.de>
@@ -56,364 +56,106 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't burden the common block code with with specifics of the libata DMA
-draining mechanism.  Instead move most of the code to the scsi midlayer.
-
-That also means the nr_phys_segments adjustments in the blk-mq fast path
-can go away entirely, given that SCSI never looks at nr_phys_segments
-after mapping the request to a scatterlist.
+To be able to move some of the special purpose hacks in blk_rq_map_sg
+into the callers we need a variant that returns the last mapped
+S/G list element to the caller.  Add that variant as __blk_rq_map_sg
+and make blk_rq_map_sg a trivial inline wrapper around it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-wip
 ---
- block/blk-merge.c          | 14 --------------
- block/blk-mq.c             | 11 -----------
- block/blk-settings.c       | 37 ------------------------------------
- drivers/ata/libata-scsi.c  | 28 ++++++++++-----------------
- drivers/scsi/scsi_lib.c    | 39 +++++++++++++++++++++++++++++++++-----
- include/linux/blkdev.h     |  7 -------
- include/linux/libata.h     |  2 ++
- include/scsi/scsi_device.h |  3 +++
- include/scsi/scsi_host.h   |  7 +++++++
- 9 files changed, 56 insertions(+), 92 deletions(-)
+ block/blk-merge.c      | 25 ++++++++++++-------------
+ include/linux/blkdev.h | 10 +++++++++-
+ 2 files changed, 21 insertions(+), 14 deletions(-)
 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index ee618cdb141e..25f5a5e00ee6 100644
+index 99c9759f3a8a..ee618cdb141e 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
-@@ -539,20 +539,6 @@ int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
+@@ -519,24 +519,23 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+  * map a request to scatterlist, return number of sg entries setup. Caller
+  * must make sure sg can hold rq->nr_phys_segments entries
+  */
+-int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+-		  struct scatterlist *sglist)
++int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
++		struct scatterlist *sglist, struct scatterlist **last_sg)
+ {
+-	struct scatterlist *sg = NULL;
+ 	int nsegs = 0;
+ 
+ 	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+-		nsegs = __blk_bvec_map_sg(rq->special_vec, sglist, &sg);
++		nsegs = __blk_bvec_map_sg(rq->special_vec, sglist, last_sg);
+ 	else if (rq->bio && bio_op(rq->bio) == REQ_OP_WRITE_SAME)
+-		nsegs = __blk_bvec_map_sg(bio_iovec(rq->bio), sglist, &sg);
++		nsegs = __blk_bvec_map_sg(bio_iovec(rq->bio), sglist, last_sg);
+ 	else if (rq->bio)
+-		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg);
++		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, last_sg);
+ 
+ 	if (blk_rq_bytes(rq) && (blk_rq_bytes(rq) & q->dma_pad_mask)) {
+ 		unsigned int pad_len =
+ 			(q->dma_pad_mask & ~blk_rq_bytes(rq)) + 1;
+ 
+-		sg->length += pad_len;
++		(*last_sg)->length += pad_len;
  		rq->extra_len += pad_len;
  	}
  
--	if (q->dma_drain_size && q->dma_drain_needed(rq)) {
--		if (op_is_write(req_op(rq)))
--			memset(q->dma_drain_buffer, 0, q->dma_drain_size);
--
--		sg_unmark_end(*last_sg);
--		*last_sg = sg_next(*last_sg);
--		sg_set_page(*last_sg, virt_to_page(q->dma_drain_buffer),
--			    q->dma_drain_size,
--			    ((unsigned long)q->dma_drain_buffer) &
--			    (PAGE_SIZE - 1));
--		nsegs++;
--		rq->extra_len += q->dma_drain_size;
--	}
--
- 	if (*last_sg)
- 		sg_mark_end(*last_sg);
+@@ -544,9 +543,9 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ 		if (op_is_write(req_op(rq)))
+ 			memset(q->dma_drain_buffer, 0, q->dma_drain_size);
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8e56884fd2e9..28ad7e1e850b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -667,15 +667,6 @@ void blk_mq_start_request(struct request *rq)
- 	blk_add_timer(rq);
- 	WRITE_ONCE(rq->state, MQ_RQ_IN_FLIGHT);
- 
--	if (q->dma_drain_size && blk_rq_bytes(rq)) {
--		/*
--		 * Make sure space for the drain appears.  We know we can do
--		 * this because max_hw_segments has been adjusted to be one
--		 * fewer than the device can handle.
--		 */
--		rq->nr_phys_segments++;
--	}
--
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- 	if (blk_integrity_rq(rq) && req_op(rq) == REQ_OP_WRITE)
- 		q->integrity.profile->prepare_fn(rq);
-@@ -695,8 +686,6 @@ static void __blk_mq_requeue_request(struct request *rq)
- 	if (blk_mq_request_started(rq)) {
- 		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
- 		rq->rq_flags &= ~RQF_TIMED_OUT;
--		if (q->dma_drain_size && blk_rq_bytes(rq))
--			rq->nr_phys_segments--;
+-		sg_unmark_end(sg);
+-		sg = sg_next(sg);
+-		sg_set_page(sg, virt_to_page(q->dma_drain_buffer),
++		sg_unmark_end(*last_sg);
++		*last_sg = sg_next(*last_sg);
++		sg_set_page(*last_sg, virt_to_page(q->dma_drain_buffer),
+ 			    q->dma_drain_size,
+ 			    ((unsigned long)q->dma_drain_buffer) &
+ 			    (PAGE_SIZE - 1));
+@@ -554,8 +553,8 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ 		rq->extra_len += q->dma_drain_size;
  	}
- }
  
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 14397b4c4b53..2ab1967b9716 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -651,43 +651,6 @@ void blk_queue_update_dma_pad(struct request_queue *q, unsigned int mask)
- }
- EXPORT_SYMBOL(blk_queue_update_dma_pad);
- 
--/**
-- * blk_queue_dma_drain - Set up a drain buffer for excess dma.
-- * @q:  the request queue for the device
-- * @dma_drain_needed: fn which returns non-zero if drain is necessary
-- * @buf:	physically contiguous buffer
-- * @size:	size of the buffer in bytes
-- *
-- * Some devices have excess DMA problems and can't simply discard (or
-- * zero fill) the unwanted piece of the transfer.  They have to have a
-- * real area of memory to transfer it into.  The use case for this is
-- * ATAPI devices in DMA mode.  If the packet command causes a transfer
-- * bigger than the transfer size some HBAs will lock up if there
-- * aren't DMA elements to contain the excess transfer.  What this API
-- * does is adjust the queue so that the buf is always appended
-- * silently to the scatterlist.
-- *
-- * Note: This routine adjusts max_hw_segments to make room for appending
-- * the drain buffer.  If you call blk_queue_max_segments() after calling
-- * this routine, you must set the limit to one fewer than your device
-- * can support otherwise there won't be room for the drain buffer.
-- */
--int blk_queue_dma_drain(struct request_queue *q,
--			       dma_drain_needed_fn *dma_drain_needed,
--			       void *buf, unsigned int size)
--{
--	if (queue_max_segments(q) < 2)
--		return -EINVAL;
--	/* make room for appending the drain */
--	blk_queue_max_segments(q, queue_max_segments(q) - 1);
--	q->dma_drain_needed = dma_drain_needed;
--	q->dma_drain_buffer = buf;
--	q->dma_drain_size = size;
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(blk_queue_dma_drain);
--
- /**
-  * blk_queue_segment_boundary - set boundary rules for segment merging
-  * @q:  the request queue for the device
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 36e588d88b95..feb13b8f93d7 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -1017,16 +1017,11 @@ void ata_scsi_sdev_config(struct scsi_device *sdev)
-  *	RETURNS:
-  *	1 if ; otherwise, 0.
-  */
--static int atapi_drain_needed(struct request *rq)
-+bool ata_scsi_dma_need_drain(struct request *rq)
- {
--	if (likely(!blk_rq_is_passthrough(rq)))
--		return 0;
--
--	if (!blk_rq_bytes(rq) || op_is_write(req_op(rq)))
--		return 0;
--
- 	return atapi_cmd_type(scsi_req(rq)->cmd[0]) == ATAPI_MISC;
- }
-+EXPORT_SYMBOL_GPL(ata_scsi_dma_need_drain);
- 
- int ata_scsi_dev_config(struct scsi_device *sdev, struct ata_device *dev)
- {
-@@ -1039,21 +1034,21 @@ int ata_scsi_dev_config(struct scsi_device *sdev, struct ata_device *dev)
- 	blk_queue_max_hw_sectors(q, dev->max_sectors);
- 
- 	if (dev->class == ATA_DEV_ATAPI) {
--		void *buf;
--
- 		sdev->sector_size = ATA_SECT_SIZE;
- 
- 		/* set DMA padding */
- 		blk_queue_update_dma_pad(q, ATA_DMA_PAD_SZ - 1);
- 
--		/* configure draining */
--		buf = kmalloc(ATAPI_MAX_DRAIN, q->bounce_gfp | GFP_KERNEL);
--		if (!buf) {
-+		/* make room for appending the drain */
-+		blk_queue_max_segments(q, queue_max_segments(q) - 1);
-+
-+		sdev->dma_drain_len = ATAPI_MAX_DRAIN;
-+		sdev->dma_drain_buf = kmalloc(sdev->dma_drain_len,
-+				q->bounce_gfp | GFP_KERNEL);
-+		if (!sdev->dma_drain_buf) {
- 			ata_dev_err(dev, "drain buffer allocation failed\n");
- 			return -ENOMEM;
- 		}
--
--		blk_queue_dma_drain(q, atapi_drain_needed, buf, ATAPI_MAX_DRAIN);
- 	} else {
- 		sdev->sector_size = ata_id_logical_sector_size(dev->id);
- 		sdev->manage_start_stop = 1;
-@@ -1135,7 +1130,6 @@ EXPORT_SYMBOL_GPL(ata_scsi_slave_config);
- void ata_scsi_slave_destroy(struct scsi_device *sdev)
- {
- 	struct ata_port *ap = ata_shost_to_port(sdev->host);
--	struct request_queue *q = sdev->request_queue;
- 	unsigned long flags;
- 	struct ata_device *dev;
- 
-@@ -1152,9 +1146,7 @@ void ata_scsi_slave_destroy(struct scsi_device *sdev)
- 	}
- 	spin_unlock_irqrestore(ap->lock, flags);
- 
--	kfree(q->dma_drain_buffer);
--	q->dma_drain_buffer = NULL;
--	q->dma_drain_size = 0;
-+	kfree(sdev->dma_drain_buf);
- }
- EXPORT_SYMBOL_GPL(ata_scsi_slave_destroy);
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 274dd3ffa66b..b561c6dbda6b 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -978,6 +978,14 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
- 		scsi_io_completion_action(cmd, result);
- }
- 
-+static inline bool scsi_cmd_needs_dma_drain(struct scsi_device *sdev,
-+		struct request *rq)
-+{
-+	return sdev->dma_drain_len && blk_rq_is_passthrough(rq) &&
-+	       !op_is_write(req_op(rq)) &&
-+	       sdev->host->hostt->dma_need_drain(rq);
-+}
-+
- /*
-  * Function:    scsi_init_io()
-  *
-@@ -991,26 +999,47 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
-  */
- blk_status_t scsi_init_io(struct scsi_cmnd *cmd)
- {
-+	struct scsi_device *sdev = cmd->device;
- 	struct request *rq = cmd->request;
-+	unsigned short nr_segs = blk_rq_nr_phys_segments(rq);
-+	struct scatterlist *last_sg = NULL;
- 	blk_status_t ret;
-+	bool need_drain = scsi_cmd_needs_dma_drain(sdev, rq);
- 	int count;
- 
--	if (WARN_ON_ONCE(!blk_rq_nr_phys_segments(rq)))
-+	if (WARN_ON_ONCE(!nr_segs))
- 		return BLK_STS_IOERR;
- 
-+	/*
-+	 * Make sure there is space for the drain.  The driver must adjust
-+	 * max_hw_segments to be prepared for this.
-+	 */
-+	if (need_drain)
-+		nr_segs++;
-+
- 	/*
- 	 * If sg table allocation fails, requeue request later.
- 	 */
--	if (unlikely(sg_alloc_table_chained(&cmd->sdb.table,
--			blk_rq_nr_phys_segments(rq), cmd->sdb.table.sgl,
--			SCSI_INLINE_SG_CNT)))
-+	if (unlikely(sg_alloc_table_chained(&cmd->sdb.table, nr_segs,
-+			cmd->sdb.table.sgl, SCSI_INLINE_SG_CNT)))
- 		return BLK_STS_RESOURCE;
+-	if (sg)
+-		sg_mark_end(sg);
++	if (*last_sg)
++		sg_mark_end(*last_sg);
  
  	/*
- 	 * Next, walk the list, and fill in the addresses and sizes of
- 	 * each segment.
- 	 */
--	count = blk_rq_map_sg(rq->q, rq, cmd->sdb.table.sgl);
-+	count = __blk_rq_map_sg(rq->q, rq, cmd->sdb.table.sgl, &last_sg);
-+
-+	if (need_drain) {
-+		sg_unmark_end(last_sg);
-+		last_sg = sg_next(last_sg);
-+		sg_set_buf(last_sg, sdev->dma_drain_buf, sdev->dma_drain_len);
-+		sg_mark_end(last_sg);
-+
-+		rq->extra_len += sdev->dma_drain_len;
-+		count++;
-+	}
-+
- 	BUG_ON(count > cmd->sdb.table.nents);
- 	cmd->sdb.table.nents = count;
- 	cmd->sdb.length = blk_rq_payload_bytes(rq);
+ 	 * Something must have been wrong if the figured number of
+@@ -565,7 +564,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ 
+ 	return nsegs;
+ }
+-EXPORT_SYMBOL(blk_rq_map_sg);
++EXPORT_SYMBOL(__blk_rq_map_sg);
+ 
+ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 		unsigned int nr_phys_segs)
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 496dc9491026..8e4726bce498 100644
+index 76da162b6ae9..496dc9491026 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -288,7 +288,6 @@ struct blk_queue_ctx;
- typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
+@@ -1136,7 +1136,15 @@ static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
+ 	return max_t(unsigned short, rq->nr_phys_segments, 1);
+ }
  
- struct bio_vec;
--typedef int (dma_drain_needed_fn)(struct request *);
- 
- enum blk_eh_timer_return {
- 	BLK_EH_DONE,		/* drivers has completed the command */
-@@ -397,7 +396,6 @@ struct request_queue {
- 	struct rq_qos		*rq_qos;
- 
- 	make_request_fn		*make_request_fn;
--	dma_drain_needed_fn	*dma_drain_needed;
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
-@@ -467,8 +465,6 @@ struct request_queue {
- 	 */
- 	unsigned long		nr_requests;	/* Max # of requests */
- 
--	unsigned int		dma_drain_size;
--	void			*dma_drain_buffer;
- 	unsigned int		dma_pad_mask;
- 	unsigned int		dma_alignment;
- 
-@@ -1097,9 +1093,6 @@ extern void disk_stack_limits(struct gendisk *disk, struct block_device *bdev,
- 			      sector_t offset);
- extern void blk_queue_stack_limits(struct request_queue *t, struct request_queue *b);
- extern void blk_queue_update_dma_pad(struct request_queue *, unsigned int);
--extern int blk_queue_dma_drain(struct request_queue *q,
--			       dma_drain_needed_fn *dma_drain_needed,
--			       void *buf, unsigned int size);
- extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
- extern void blk_queue_dma_alignment(struct request_queue *, int);
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index cffa4714bfa8..af832852e620 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -1092,6 +1092,7 @@ extern int ata_scsi_ioctl(struct scsi_device *dev, unsigned int cmd,
- #define ATA_SCSI_COMPAT_IOCTL /* empty */
- #endif
- extern int ata_scsi_queuecmd(struct Scsi_Host *h, struct scsi_cmnd *cmd);
-+bool ata_scsi_dma_need_drain(struct request *rq);
- extern int ata_sas_scsi_ioctl(struct ata_port *ap, struct scsi_device *dev,
- 			    unsigned int cmd, void __user *arg);
- extern bool ata_link_online(struct ata_link *link);
-@@ -1387,6 +1388,7 @@ extern struct device_attribute *ata_common_sdev_attrs[];
- 	.ioctl			= ata_scsi_ioctl,		\
- 	ATA_SCSI_COMPAT_IOCTL					\
- 	.queuecommand		= ata_scsi_queuecmd,		\
-+	.dma_need_drain		= ata_scsi_dma_need_drain,	\
- 	.can_queue		= ATA_DEF_QUEUE,		\
- 	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,		\
- 	.this_id		= ATA_SHT_THIS_ID,		\
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index c3cba2aaf934..bc5909033d13 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -229,6 +229,9 @@ struct scsi_device {
- 	struct scsi_device_handler *handler;
- 	void			*handler_data;
- 
-+	size_t			dma_drain_len;
-+	void			*dma_drain_buf;
+-extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
++int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
++		struct scatterlist *sglist, struct scatterlist **last_sg);
++static inline int blk_rq_map_sg(struct request_queue *q, struct request *rq,
++		struct scatterlist *sglist)
++{
++	struct scatterlist *last_sg = NULL;
 +
- 	unsigned char		access_state;
- 	struct mutex		state_mutex;
- 	enum scsi_device_state sdev_state;
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 822e8cda8d9b..46ef8cccc982 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -270,6 +270,13 @@ struct scsi_host_template {
- 	 */
- 	int (* map_queues)(struct Scsi_Host *shost);
++	return __blk_rq_map_sg(q, rq, sglist, &last_sg);
++}
+ extern void blk_dump_rq_flags(struct request *, char *);
+ extern long nr_blockdev_pages(void);
  
-+	/*
-+	 * Check if scatterlists need to be padded for DMA draining.
-+	 *
-+	 * Status: OPTIONAL
-+	 */
-+	bool (* dma_need_drain)(struct request *rq);
-+
- 	/*
- 	 * This function determines the BIOS parameters for a given
- 	 * harddisk.  These tend to be numbers that are made up by
 -- 
 2.25.1
 
