@@ -2,137 +2,157 @@ Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5D0C2BA19
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 09:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0C4C2BBC7
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 09:43:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E423206E9
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 09:21:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E28D20644
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 09:43:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="efDzL6FO";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="VuUvP7+f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437580AbgDNJVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 05:21:08 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37628 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437568AbgDNJVD (ORCPT
+        id S2437722AbgDNJnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 05:43:31 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7220 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728305AbgDNJna (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 05:21:03 -0400
-Received: by mail-lf1-f68.google.com with SMTP id t11so8802962lfe.4;
-        Tue, 14 Apr 2020 02:21:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=LywWFJk14UpQ6bDY3nfxNnszaV03Hsnpt1J5lFZIdc4=;
-        b=CHc2dSSsspRqkTPrdH1LqDfBZ0eFSFjv0cl4l58VoBC+33oSpbOkhlSSMjVppjLBr+
-         1ylMpoltQSxsc23OUIZ0zuoawgwRv67Pq28L0BnSudmaCigJE2hhIlcqmSAATqT4/4vB
-         ejqBowiuTUm0MYxxN5/ckx41w4rCVm01iCnS7j0b2LXupPXU2jI517UnCSKFhN2xqwEk
-         Ci+sj6eZ1lNIGZcEiqPfVFC81ekvGdIuST+rFRhO7HznlXMJQTbVcXfhzAaiTMHw8Plv
-         jeLy+/pK5RY0GR3ujIE/QxAo+XeMgW/aRHlfinTWA2WWlzxyH0yo4DWOJ2VEl+a+HYyb
-         T1zQ==
-X-Gm-Message-State: AGi0PuZ3vn3tWZ5lt4VU+ubelaJw/GSPWvJ1sQ82u5eW3Nz4R6pDSxdg
-        m1KzVd8iMbOW3rwwG4xcK5uDJO4jHz0=
-X-Google-Smtp-Source: APiQypI5GgR4aLihNN/8n444oF17+wSmXZMTHVQCCUThjYgd10aTZwcq9crkU2ou4vSCpeFGP7xSow==
-X-Received: by 2002:a05:6512:54e:: with SMTP id h14mr13068942lfl.56.1586856059445;
-        Tue, 14 Apr 2020 02:20:59 -0700 (PDT)
-Received: from [10.68.32.192] (broadband-188-32-231-41.ip.moscow.rt.ru. [188.32.231.41])
-        by smtp.gmail.com with ESMTPSA id a10sm4088622ljp.16.2020.04.14.02.20.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 02:20:58 -0700 (PDT)
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-References: <20200331094054.24441-1-w@1wt.eu>
- <20200331094054.24441-8-w@1wt.eu>
-From:   Denis Efremov <efremov@linux.com>
-Autocrypt: addr=efremov@linux.com; keydata=
- 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
-Subject: Re: [PATCH 07/23] floppy: use symbolic register names in the sparc64
- port
-Message-ID: <bcaddeb1-7017-9ac7-fd76-ebd1146b4293@linux.com>
-Date:   Tue, 14 Apr 2020 12:20:57 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200331094054.24441-8-w@1wt.eu>
-Content-Type: text/plain; charset=utf-8
+        Tue, 14 Apr 2020 05:43:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1586857409; x=1618393409;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=JjsN3/wDeOAyq1yPI6OtF5dwC+PNpCu8yaV+QrrPX/0=;
+  b=efDzL6FOBrYfikYxdWiUvpq1o2waWC9sCwTD3HG+VhG88t7OLFeb1hGk
+   9VSZmjCinlsDq033afYwlDhQDK8qzDq/fTXIEkheQaE/36N3b5e5yjjib
+   tg8XrYAp6L0ZYqaPj5PH82K28rq02T990pnStglqccfEhHNxzgtZghjrR
+   VvBrSrc4CSXGRZnYkxwpi70Uym/d8V9c37LcSLeojCfs2D/Sv427GM9cZ
+   KD20zGOz7WKPD1AURwjsgXtctx+TqLP20JE89BwPDvAi5lBOMD9VTKmYj
+   DYiH0OG7GdslKmENfXVavC+vx0b5HBjqP2A7/7jawXNDiwcKrCndR2ZYH
+   Q==;
+IronPort-SDR: rII4rSEb0I+aAp3NbKD1NOALIdPL81VhpsTpIscT0uGxg3uJECOfLxVlA+fIKwM0rPSex7Iq5T
+ TcS4Mp58Z7XjMoM6zxYFF3k6A2LtfFwd0JxbnNmJsWnLPo6xUIBQoI0HOMGi+jWQWUdHV+OZRY
+ WCG93bKkNlnVsCiG4wHEDA01uv7ZlKlJCnyVcZ8dM5wUrDXFoLZKgaJ87FL4iuPwKNfthAgsm2
+ d1KhK34RzDXKkmryrRGqamRzuNyw6KpvI9PqKzzRK3A+/pn7LUycAFX0/lGJV6QkRLmfsW/OKA
+ M/I=
+X-IronPort-AV: E=Sophos;i="5.72,382,1580745600"; 
+   d="scan'208";a="135291567"
+Received: from mail-bn7nam10lp2103.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.103])
+  by ob1.hgst.iphmx.com with ESMTP; 14 Apr 2020 17:43:27 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k1dFlYbODlH+crIheZmpZNOdFUQPpngTJtAhhfnjsdis19t11j8EwamJUepbfwvZGAjs1IvE5+e3IQx/1+qw3RxWK4eB8emVBZ4H8GBq6l7RaJJGUMTJIxWtiY2cVbsp07Cd9tXvvllh8dlLJqxUOK32aXzsBFnLLjdfyvFC+1wtYvdQoVvvPOi4vkfmufdiyxad5l4l99kq8VEYy/5xdIa0PI64gYgdQvoB3aXclylAKpaxHtyLz2bNfDB0lgl40z6xXLRPM36uhtJOFc4o9hdpVmes67MC8Qd0U7AX5FdsnF2zdzxkWu3JzSDS7QtnlXIErDYVGexxVK0XPurxMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UX2geM4plNo0WUYz3sfatTXLsFFeVjCMOZE/Z97rs2s=;
+ b=lw56IkCjwN9Y3c1Kzx7/a+NCOdjwuRpF1P7Ob6g0dn7XoiEipojUjtBEBdJji5VL4XfNEm+LS8UYX2UP+V6RhWomqIVZn3gQV30GIrCBpECYXImYPStNBAxrPNBABwCvN/C/my4V1RfqYyhIDmZSe9Ko5agErxn6FV+i/bNBniihWWbqn1jgPv6JAAEd5etapcbI1ISaZKnRKvtGlBFIAnfe0APAEMX6jLc/N5Uudk1NHMx00zDE2IA7gBs80te5XkpgKeqep/KElogdEz+o1WHTbe1Vb3WeghzhZ2/uava6weV7thXifJa1ckbqJpz79NTr4RCmnxQHpqyOLpFJ/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UX2geM4plNo0WUYz3sfatTXLsFFeVjCMOZE/Z97rs2s=;
+ b=VuUvP7+fy03vIpbYHmMmtaF0qU3ZJ8gs4boEKYXlojS77lSNxRtFAjTIMX2/liywCdanWTPAi/d0X/JdWRWMEC5cO/6hpIirdnFNiyucX1EqWPYPtLfwaJ8Y8+CYNrdu080JM9vsEpfwiBT5N3aXdTSZ6zGADcEtGap1pPBVZms=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3679.namprd04.prod.outlook.com
+ (2603:10b6:803:46::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.26; Tue, 14 Apr
+ 2020 09:43:25 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2900.028; Tue, 14 Apr 2020
+ 09:43:24 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     "hch@infradead.org" <hch@infradead.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v5 02/10] block: Introduce REQ_OP_ZONE_APPEND
+Thread-Topic: [PATCH v5 02/10] block: Introduce REQ_OP_ZONE_APPEND
+Thread-Index: AQHWDo95jboc2AavX0GtjTYeYQHkkg==
+Date:   Tue, 14 Apr 2020 09:43:24 +0000
+Message-ID: <SN4PR0401MB3598F69EFD255EAA28374D979BDA0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200409165352.2126-1-johannes.thumshirn@wdc.com>
+ <20200409165352.2126-3-johannes.thumshirn@wdc.com>
+ <20200410071045.GA13404@infradead.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: cf27e5f5-7462-4782-6110-08d7e058470c
+x-ms-traffictypediagnostic: SN4PR0401MB3679:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN4PR0401MB367989E492CFC20772E28A459BDA0@SN4PR0401MB3679.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0373D94D15
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(346002)(376002)(366004)(39860400002)(136003)(396003)(76116006)(91956017)(6916009)(86362001)(8676002)(316002)(478600001)(26005)(81156014)(4326008)(53546011)(66556008)(71200400001)(64756008)(66446008)(8936002)(7696005)(66946007)(33656002)(54906003)(66476007)(9686003)(5660300002)(52536014)(186003)(6506007)(55016002)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RQxn9A9+04HYlW9fvbAa5+DOPqyq5Kxep6G8OVTe7LDy7btwhQXLqaQ707NiJIhbKTY2B0Gky/L0Zrh1rHgy/ju4v5vYWLeSCFnowtAZgesvCnrMfGqZXFF60dZW5Ld8VpwfcWq3FDZAhdQLMIwuLYW0ZfrEjSuFVcWZjUr+D8nejVQo70C1kqlMzcuK3r8j98w5wyvBPNY7jmUAnZw1ytXCbOJmPsrFPMkz/ZPX6Xjm9gsLC8vLnkuHY7AyNFJxOSNpcH0q/L7+sDZd0XiSy4kOMyVccqkXXZLYmYCkDVQK7dYRJod35b3fjgpxn3pv7NHzs/KTNo7GcQpzHbhWtATf7ExciZAZEzV2JXIPYHamH4uHYqZEbfzU1yw6M7kC1hqX8NsZEsHjsMfaMo4m2Q91Xc9vyK+FJGr2FgRW80ABnuYQvgqFGXfzRJ2Lt8bs
+x-ms-exchange-antispam-messagedata: mpfYElbOit1kzuDzp2K2wf32NGwrTcaO/o6ikPMgrPnCzWjeCM8Vo1wUlltWbW6IvDlg57xbUY3litWURBSyFukBXhdVVPJtFuFvAUL4hPz30rRz4Q3MlMPGwcmQejCIYhw/HidvtbotXd0EK2tngw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf27e5f5-7462-4782-6110-08d7e058470c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2020 09:43:24.8862
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GgpQjTADOxybuxNyEmbmwxQfwmaZ6Rsf1A2x6yP1fUoj//Wf4Qq9sNt2hBafWHXUUB9x+S2Ls4k+J5IksUJqXj/qdfo2I4RamuHQLRaWHi4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3679
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 3/31/20 12:40 PM, Willy Tarreau wrote:
--		printk("floppy: Asked to read unknown port %lx\n", port);
-> +		printk("floppy: Asked to read unknown port %lx\n", reg);
-
-> -		printk("floppy: Asked to write to unknown port %lx\n", port);
-> +		printk("floppy: Asked to write to unknown port %lx\n", reg);
-
-sparc64 showed a couple of warnings in printks (I will send fixes)
-./arch/sparc/include/asm/floppy_64.h: In function ‘sun_82077_fd_inb’:
-./arch/sparc/include/asm/floppy_64.h:106:48: warning: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘unsigned int’ [-Wformat=]
-  106 |   printk("floppy: Asked to read unknown port %lx\n", reg);
-      |                                              ~~^     ~~~
-      |                                                |     |
-      |                                                |     unsigned int
-      |                                                long unsigned int
-      |                                              %x
-./arch/sparc/include/asm/floppy_64.h: In function ‘sun_82077_fd_outb’:
-./arch/sparc/include/asm/floppy_64.h:125:52: warning: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘unsigned int’ [-Wformat=]
-  125 |   printk("floppy: Asked to write to unknown port %lx\n", reg);
-      |                                                  ~~^     ~~~
-      |                                                    |     |
-      |                                                    |     unsigned int
-      |                                                    long unsigned int
-      |                                                  %x
-
-A couple of new warnings.
+On 10/04/2020 09:10, Christoph Hellwig wrote:=0A=
+> -/**=0A=
+> - *	__bio_add_pc_page	- attempt to add page to passthrough bio=0A=
+> - *	@q: the target queue=0A=
+> - *	@bio: destination bio=0A=
+> - *	@page: page to add=0A=
+> - *	@len: vec entry length=0A=
+> - *	@offset: vec entry offset=0A=
+> - *	@same_page: return if the merge happen inside the same page=0A=
+> - *=0A=
+> - *	Attempt to add a page to the bio_vec maplist. This can fail for a=0A=
+> - *	number of reasons, such as the bio being full or target block device=
+=0A=
+> - *	limitations. The target block device must allow bio's up to PAGE_SIZE=
+,=0A=
+> - *	so it is always possible to add a single page to an empty bio.=0A=
+> - *=0A=
+> - *	This should only be used by passthrough bios.=0A=
+> +/*=0A=
+> + * Add a page to a bio while respecting the hardware max_sectors, max_se=
+gment=0A=
+> + * and gap limitations.=0A=
+>    */=0A=
+> -static int __bio_add_pc_page(struct request_queue *q, struct bio *bio,=
+=0A=
+> +static int bio_add_hw_page(struct request_queue *q, struct bio *bio,=0A=
+>   		struct page *page, unsigned int len, unsigned int offset,=0A=
+> -		bool *same_page)=0A=
+> +		unsigned int max_sectors, bool *same_page)=0A=
+=0A=
+Should I split that rename into a prep patch and if yes add you as the =0A=
+author?=0A=
