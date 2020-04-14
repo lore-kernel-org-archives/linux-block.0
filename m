@@ -2,157 +2,149 @@ Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D41E8C2BA19
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 10:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A74DC2BA19
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 10:57:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B593720644
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 10:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25A602072D
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 10:57:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438330AbgDNK3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 06:29:48 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:43691 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729506AbgDNK3l (ORCPT
+        id S2438766AbgDNK5Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 06:57:25 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:43203 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438755AbgDNK5K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 06:29:41 -0400
-Received: by mail-lj1-f194.google.com with SMTP id h25so11854994lja.10;
-        Tue, 14 Apr 2020 03:29:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=mIqPfx4e4L3IGXAgqiGpZ+KDaVK6Sf0ZxBEGjobhNgg=;
-        b=YkJDJtbAgra7v3UYjYVtYPOnf0CNMnHXI8XUkhZ+YIL+AmUhnpN2ikIv8tP1jiSNOB
-         ilryebmTsJ5RBN8H40CZZ9bSFLmznuge0UieQwGllUvPIsZ6Ap9L8mSrEjoxs368v5+N
-         Xv823xwnnQo0/4uQvY4yJFWQ5eVkYK3oD2kO4FN+VHQOeULktKDKA4OWJc/IcpJahcua
-         ZqbINp7WeOuSc5yZya2QyBdAicTgBQBGw8gBE9+vpd9YkCt4WrfVci7TkyKBhIWU3nVI
-         uNe/lkO3/dRTQzCKsOtPrrv/ZZeOXxJys91F65yYc/qnBDa6OxjvungkfQIYtGrKfyPo
-         5vXg==
-X-Gm-Message-State: AGi0PuZybjaADxwiYwnXq+xhDKCCxzPpfpExl8GlA6qD4rnNcGWBLBo3
-        WMXp6dCt9Wp+Bw4baH356tw=
-X-Google-Smtp-Source: APiQypJXm0vqnFUdHEU+gU9EChhbVBRXDN1IQWGmNCNeRRGTnxki0Q4ff7wcuBIxWxY3kTOc2iR98w==
-X-Received: by 2002:a2e:9886:: with SMTP id b6mr13417739ljj.237.1586860143935;
-        Tue, 14 Apr 2020 03:29:03 -0700 (PDT)
-Received: from [10.68.32.192] (broadband-188-32-231-41.ip.moscow.rt.ru. [188.32.231.41])
-        by smtp.gmail.com with ESMTPSA id w3sm11127835ljm.0.2020.04.14.03.29.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 03:29:03 -0700 (PDT)
-To:     Willy Tarreau <w@1wt.eu>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tue, 14 Apr 2020 06:57:10 -0400
+Received: from ip5f5bd698.dynamic.kabel-deutschland.de ([95.91.214.152] helo=wittgenstein)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <christian.brauner@ubuntu.com>)
+        id 1jOIye-0002Aq-5I; Tue, 14 Apr 2020 10:39:36 +0000
+Date:   Tue, 14 Apr 2020 12:39:34 +0200
+From:   Christian Brauner <christian.brauner@ubuntu.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Serge Hallyn <serge@hallyn.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Helge Deller <deller@gmx.de>, Ian Molton <spyro@f2s.com>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>, x86@kernel.org
-References: <20200331094054.24441-1-w@1wt.eu>
- <ae23d88d-fc21-6f46-7c27-ea0adf6211e5@kernel.dk>
- <20200414053119.GB20927@1wt.eu>
-From:   Denis Efremov <efremov@linux.com>
-Autocrypt: addr=efremov@linux.com; keydata=
- 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
-Subject: Re: [PATCH 00/23] Floppy driver cleanups
-Message-ID: <da6afb7c-d543-b0a3-c165-89ad0b2a2783@linux.com>
-Date:   Tue, 14 Apr 2020 13:29:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Saravana Kannan <saravanak@google.com>,
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        Seth Forshee <seth.forshee@canonical.com>,
+        David Rheinsberg <david.rheinsberg@gmail.com>,
+        Tom Gundersen <teg@jklm.no>,
+        Christian Kellner <ckellner@redhat.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        =?utf-8?B?U3TDqXBoYW5l?= Graber <stgraber@ubuntu.com>,
+        linux-doc@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 5/8] kernfs: let objects opt-in to propagating from the
+ initial namespace
+Message-ID: <20200414103934.ks4x45cwt7ss7v4d@wittgenstein>
+References: <20200408152151.5780-1-christian.brauner@ubuntu.com>
+ <20200408152151.5780-6-christian.brauner@ubuntu.com>
+ <20200413190239.GG60335@mtj.duckdns.org>
+ <20200413193950.tokh5m7wsyrous3c@wittgenstein>
+ <20200413194550.GJ60335@mtj.duckdns.org>
+ <20200413195915.yo2l657nmtkwripb@wittgenstein>
+ <20200413203716.GK60335@mtj.duckdns.org>
 MIME-Version: 1.0
-In-Reply-To: <20200414053119.GB20927@1wt.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20200413203716.GK60335@mtj.duckdns.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 4/14/20 8:31 AM, Willy Tarreau wrote:
-> Hi Jens,
+On Mon, Apr 13, 2020 at 04:37:16PM -0400, Tejun Heo wrote:
+> Hello,
 > 
-> On Mon, Apr 13, 2020 at 04:46:41PM -0600, Jens Axboe wrote:
->> I'll be happy to queue these up for 5.8 when ready. Would be handy
->> if you could resend a v2 patchset with the extra patches, makes my
->> life so much easier...
+> On Mon, Apr 13, 2020 at 09:59:15PM +0200, Christian Brauner wrote:
+> > Right, pid namespaces deal with a single random identifier about which
+> > userspace makes no assumptions other than that it's a positive number so
+> > generating aliases is fine. In addition pid namespaces are nicely
 > 
-> Sure, will do once Denis confirms he's done with the review and is
-> OK with the series.
+> I don't see any fundamental differences between pids and device numbers. One
+> of the reasons pid namespace does aliasing instead of just showing subsets is
+> because applications can have expectations on what the specific numbers should
+> be - e.g. for checkpoint-restarting.
+
+One difference is that ownership is hierarchial in a pid namespace. This
+becomes clear when looking at the parent child relationship when
+creating new processes in nested pid namespaces. All processes created
+in the innermost pid namespace are owned by that pid namespaces's init
+process. If that pid namespace's init/subreaper process dies all
+processes get zapped and autoreaped. In essence, unless the ancestor pid
+namespace has setns()ed a process in there, ownership of that process is
+clearly defined. I don't think that model is transferable to a device.
+What seems most important to me here is that a pid namespace completely
+defines ownership of a process. But there's not necessarily
+a single namespace that guarantees ownership for all device types.
+Network devices, imho are a good example for that. Their full ownership
+is network namespace + user namespace actually. You could easily
+envision other device classes where a combination of namespaces would
+make sense.
+
 > 
-> Thanks!
-> Willy
->
-I can see no new issues, respecting that the initial version
-was sent privately and additional [24-27] fixups.
+> > hierarchical. I fear that we might introduce unneeded complexity if we
+> > go this way and start generating aliases for devices that userspace
+> 
+> It adds complexity for sure but the other side of the scale is losing
+> visiblity into what devices are on the system, which can become really nasty
+> in practice, so I do think it can probably justify some additional complexity
+> especially if it's something which can be used by different devices. Even just
+> for block, if we end up expanding ns support to regular block devices for some
+> reason, it's kinda dreadful to think a situation where all devices can't be
+> discovered at the system level.
 
-[+] eye checked the changes
-[+] compile tested the patches on x86, arm, powerpc, sparc64,
-    m68k (forced ARCH_MAY_HAVE_PC_FDC by removing BROKEN)
-    sparc64 showed a couple of warnings in printks
-I was expecting that some of the arch maintainers will at least
-ack the patches.
-[+] tested on real hardware for x86
-[+] local syzkaller fuzzing reveals no new issues
+Hm, it is already the case that we can't see all devices at the system
+level. That includes network devices and also binderfs devices (the
+latter don't have sysfs entries though which is what this is about).
+And for virtual devices just as loop, binder, and network devices this
+is fine imho. They are not physicall attached to your computer. Actual
+disk devices where this would matter wouldn't be namespaced anyway imho.
 
-Willy, could you please resend the patchset with printks fix for sparc64?
-Or if Jens don't mind and you don't want to send 30 patches again you can
-resend only sparc64 patch and I will reapply it and send everything to Jens
-with merge request. I applied your patches a couple of days ago here
-https://github.com/evdenis/linux-floppy/ to cleanups branch.
+We also need to consider that it is potentially dangerous for a
+namespace to trigger a device event tricking the host into performing an
+action on it. If e.g. the creation of a network device were to propagate
+into all namespaces and there'd be a rule matching it you could trick
+the host into performing privileged actions it. So it also isn't
+obviously safe propagating devices out of their namespace. (I fixed
+something similar to this just recently in a sysfs series.)
 
-I also faced minor ubsan warning in setup_rw_floppy that is not related
-to these patches. It's false alarm of cross-boundary access of cmd,
-reply_count, reply in floppy_raw_cmd. This access is intentional.
-I will send a patch on top of your patchset.
+I addition the file ownership permissions would propagate from the inner
+to all outer sysfs instances as well which would mean you'd suddenly
+have 100000:100000 entries in your host's sysfs in the initial
+namespace.
 
-Thanks,
-Denis 
+> 
+> > already knows about and has expectations of. We also still face some of
+> > the other problems I mentioned.
+> > I do think that what you say might make sense to explore in more detail
+> > for a new device class (or type under a given class) that userspace does
+> > not yet know about and were we don't regress anything.
+> 
+> I don't quite follow why adding namespace support would break existing users.
+> Wouldn't namespace usage be opt-in?
+
+For sysfs, this change is opt-in per device type and it only applies to
+loop devices here, i.e. if you don't e.g. use loopfs nothing changes
+for you at all. If you use it, all that you get is correct ownership for
+sysfs entries for those loop devices accounted to you in addition to all
+the other entries that have always been there. This way we can handle
+legacy workloads cleanly which we really want for our use-case.
+
+Your model would effectively require a new version of sysfs where you
+e.g. mount it with a new option that zaps all device entries that don't
+belong to non-initial user namespaces. Which would mean most major tools
+in containers will break completely. We can still totally try to bring
+up a change like this independent of this patchset. This patchset
+doesn't rule this out at all.
+
+Christian
