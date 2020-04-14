@@ -1,233 +1,116 @@
-Return-Path: <SRS0=SW/x=55=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 676EBC2BA2B
-	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 23:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01031C2BB1D
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 03:32:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43CD5206DA
-	for <linux-block@archiver.kernel.org>; Mon, 13 Apr 2020 23:13:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4AF520644
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 03:32:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586835177;
+	bh=zhwSF3NZS9bLrQun2YibJSAsZeZNELHfYull4/GBo6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=iz6+HsIhL9IqxKon8UZ5a5HKTkay6DIXvpU42J3ixhejv9zFPWDWqLj/tEkmrGY/d
+	 xySHj63yVSl9WZh9RL8pLSRYFs6alN+K6+urzM3SxZC/2Bfu/GIZWscX3o4mRqV0fH
+	 MUp2ZaO0lDkZOyc2QenWltGBMqZPdeCBHnEZwPPk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389966AbgDMXNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Apr 2020 19:13:53 -0400
-Received: from mga12.intel.com ([192.55.52.136]:37165 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389929AbgDMXNw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Apr 2020 19:13:52 -0400
-IronPort-SDR: Ge/f0QwmpveczHOmmENzg6YO8F4jEjD+KOdebaTTisN4R0Z+InI6l4EjT8g6L++GqjK29gii7I
- 0fPmmo1NYAaw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 16:13:51 -0700
-IronPort-SDR: lD4iG5Obl61CJo+2Yxn1SoKG3LQ4OjlUf8fdQ9MM5wYUgTBMwtTU38d/jyWPdr+n7BgO2DiZUn
- jEZNn+N/m1bQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,380,1580803200"; 
-   d="scan'208";a="253025102"
-Received: from unknown (HELO linux-machine.lm.intel.com) ([10.232.116.103])
-  by orsmga003.jf.intel.com with ESMTP; 13 Apr 2020 16:13:51 -0700
-From:   Revanth Rajashekar <revanth.rajashekar@intel.com>
-To:     <linux-block@vger.kernel.org>
-Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>,
-        =?UTF-8?q?Andrzej=20Jakowski=C2=BB?= <andrzej.jakowski@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>
-Subject: [PATCH] block: sed-opal: Implement RevertSP IOCTL
-Date:   Mon, 13 Apr 2020 17:11:21 -0600
-Message-Id: <20200413231121.8207-1-revanth.rajashekar@intel.com>
-X-Mailer: git-send-email 2.17.1
+        id S2404743AbgDNDct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Apr 2020 23:32:49 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:55263 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728845AbgDNDcs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Apr 2020 23:32:48 -0400
+Received: by mail-pj1-f68.google.com with SMTP id np9so4718811pjb.4;
+        Mon, 13 Apr 2020 20:32:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ArgnOF6jLXpb/Aiqzc0Aon2OsGQE4oCrOJZfbEaRH+I=;
+        b=bn5RUFOoLjNufGkZiwp+HvhbtDf+SXl58erARtI9EBH9cETeOXao+x/CLmeULiCjnp
+         lNgEHUz2GMvRrSOWEXaxOrkah+FqA0mCsLFLjkOsywlgHp0xiVhCPQPoUiJm5t7/jEH0
+         0UEyorNelLbBB8qXPceyL2lPJPLbxNRtF5tYBRbBihNqKXGX4umJSe+t9HcyB2MBc5tW
+         Cu8bcnXj2VQ9af9u4lMAc5qsDWcgBaYSTWLXfy3zro8bv1KONjTne/ys5TZQfKZPz+ZW
+         x6uTUmwfmgZC/y9wXIMtDDsiWLyquSvIryanXSoNx9G+W+S9ziZa6ak60Z0mKWy+u1tq
+         KF1g==
+X-Gm-Message-State: AGi0PuYduIQC+z6m77/RE8Lp4Bpp2bqrNclkpYzjYoW6gagfOtrWy+xc
+        2RetwDv+3mMaAtzx/dxVV3U=
+X-Google-Smtp-Source: APiQypID3YxvbyG2BHdjJhI/9Ccmf+GO9Qf3+pzzIuUIxcf0WguocjZaoZm68OvUVdP61Q4w8oVZnQ==
+X-Received: by 2002:a17:902:bc48:: with SMTP id t8mr2486948plz.311.1586835167370;
+        Mon, 13 Apr 2020 20:32:47 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id u8sm2686875pjy.16.2020.04.13.20.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2020 20:32:46 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 757DF40277; Tue, 14 Apr 2020 03:32:44 +0000 (UTC)
+Date:   Tue, 14 Apr 2020 03:32:44 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [RFC v2 2/5] blktrace: fix debugfs use after free
+Message-ID: <20200414033244.GN11244@42.do-not-panic.com>
+References: <20200409214530.2413-1-mcgrof@kernel.org>
+ <20200409214530.2413-3-mcgrof@kernel.org>
+ <88f94070-cd34-7435-9175-e0518a7d7db8@acm.org>
+ <20200410195805.GM11244@42.do-not-panic.com>
+ <0837b27e-e07b-b61c-5842-00cdf78873ca@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0837b27e-e07b-b61c-5842-00cdf78873ca@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch implements an ioctl for Reverting SP functionality.
-RevertSP fucntionality can be used under scenarios where user
-data shall not be erased after TPer reverting.
+On Sat, Apr 11, 2020 at 04:09:13PM -0700, Bart Van Assche wrote:
+> On 2020-04-10 12:58, Luis Chamberlain wrote:
+> > On Thu, Apr 09, 2020 at 07:52:59PM -0700, Bart Van Assche wrote:
+> >> On 2020-04-09 14:45, Luis Chamberlain wrote:
+> >>> +void blk_q_debugfs_register(struct request_queue *q)
+> >>> +{
+> >>> +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> >>> +					    blk_debugfs_root);
+> >>> +}
+> >>> +
+> >>> +void blk_q_debugfs_unregister(struct request_queue *q)
+> >>> +{
+> >>> +	debugfs_remove_recursive(q->debugfs_dir);
+> >>> +	q->debugfs_dir = NULL;
+> >>> +}
+> >>
+> >> There are no other functions in the block layer that start with the
+> >> prefix blk_q_. How about changing that prefix into blk_?
+> > 
+> > I the first patch already introduced blk_debugfs_register(), so I have
+> > now changed the above to:
+> > 
+> > blk_debugfs_common_register()
+> > blk_debugfs_common_unregister()
+> > 
+> > Let me know if something else is preferred.
+> 
+> I just realized that the "q" in "blk_q_" probably refers to the word
+> "queue"? How about renaming these funtions into
+> blk_queue_debugfs_register/unregister()?
 
-The pacth adds a new optional parameter 'keep_glbl_rn_key' to opal_key struct.
-If the optional parameter, keep_glbl_rn_key(KeepGlobalRangeKey),is provided
-with a value of TRUE, then the media encryption key associated with
-Locking_GlobalRange is preserved. Else, all user data is cryptographically
-erased.
+Sure.
 
-Test Scenarios:
-RevertSP(keep_glbl_rn_key = true)  + RevertTper => Data is retained
-RevertSP(keep_glbl_rn_key = false) + RevertTper => Data is erased
-RevertSP(no keep_glbl_rn_key)      + RevertTper => Data is erased
-
-Reference:
-1. Section 5.1.3 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_SSC_v2.01_rev1.00.pdf
-2. Section 3.2.12.2 of https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Opal_SSC_Application_Note_1-00_1-00-Final.pdf
-
-Signed-off-by: Revanth Rajashekar <revanth.rajashekar@intel.com>
----
- block/opal_proto.h            |  6 ++++
- block/sed-opal.c              | 52 +++++++++++++++++++++++++++++++----
- include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h |  4 ++-
- 4 files changed, 57 insertions(+), 6 deletions(-)
-
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index b486b3ec7dc4..8c6faa418ab4 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -140,6 +140,12 @@ enum opal_method {
- 	OPAL_ERASE,
- };
-
-+enum opal_revert_method {
-+	OPAL_REVERT_TPER,
-+	OPAL_REVERT_PSID,
-+	OPAL_REVERT_SP,
-+};
-+
- enum opal_token {
- 	/* Boolean */
- 	OPAL_TRUE = 0x01,
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index daafadbb88ca..1939df83c45e 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1552,6 +1552,28 @@ static int revert_tper(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
-
-+static int revert_sp(struct opal_dev *dev, void *data)
-+{
-+	int err;
-+	struct opal_key *key = data;
-+
-+	err = cmd_start(dev, opaluid[OPAL_THISSP_UID],
-+			opalmethod[OPAL_REVERTSP]);
-+
-+	add_token_u8(&err, dev, OPAL_STARTNAME);
-+	add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
-+
-+	/*
-+	 * If KeepGlobalRangeKey is true, then the media encryption key
-+	 * associated with Locking_GlobalRange is preserved.
-+	 * If not true, then all user data is cryptographically erased.
-+	 */
-+	add_token_u8(&err, dev, key->keep_glbl_rn_key ? OPAL_TRUE : OPAL_FALSE);
-+	add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+	return finalize_and_send(dev, parse_and_check_status);
-+}
-+
- static int internal_activate_user(struct opal_dev *dev, void *data)
- {
- 	struct opal_session_info *session = data;
-@@ -2327,7 +2349,8 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- 	return ret;
- }
-
--static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal, bool psid)
-+static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal,
-+			   enum opal_revert_method revert_type)
- {
- 	/* controller will terminate session */
- 	const struct opal_step revert_steps[] = {
-@@ -2338,17 +2361,33 @@ static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal, bool psi
- 		{ start_PSID_opal_session, opal },
- 		{ revert_tper, }
- 	};
-+	const struct opal_step revertsp_steps[] = {
-+		{ start_admin1LSP_opal_session, opal },
-+		{ revert_sp, opal }
-+	};
-
- 	int ret;
-
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev);
--	if (psid)
-+	switch (revert_type) {
-+	case OPAL_REVERT_PSID:
- 		ret = execute_steps(dev, psid_revert_steps,
- 				    ARRAY_SIZE(psid_revert_steps));
--	else
-+		break;
-+	case OPAL_REVERT_TPER:
- 		ret = execute_steps(dev, revert_steps,
- 				    ARRAY_SIZE(revert_steps));
-+		break;
-+	case OPAL_REVERT_SP:
-+		ret = execute_steps(dev, revertsp_steps,
-+				    ARRAY_SIZE(revertsp_steps));
-+		break;
-+	default:
-+		pr_debug("Invalid revert type\n");
-+		ret = -EINVAL;
-+		break;
-+	}
- 	mutex_unlock(&dev->dev_lock);
-
- 	/*
-@@ -2656,7 +2695,7 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 		ret = opal_activate_user(dev, p);
- 		break;
- 	case IOC_OPAL_REVERT_TPR:
--		ret = opal_reverttper(dev, p, false);
-+		ret = opal_reverttper(dev, p, OPAL_REVERT_TPER);
- 		break;
- 	case IOC_OPAL_LR_SETUP:
- 		ret = opal_setup_locking_range(dev, p);
-@@ -2680,11 +2719,14 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 		ret = opal_secure_erase_locking_range(dev, p);
- 		break;
- 	case IOC_OPAL_PSID_REVERT_TPR:
--		ret = opal_reverttper(dev, p, true);
-+		ret = opal_reverttper(dev, p, OPAL_REVERT_PSID);
- 		break;
- 	case IOC_OPAL_GENERIC_TABLE_RW:
- 		ret = opal_generic_read_write_table(dev, p);
- 		break;
-+	case IOC_OPAL_REVERT_SP:
-+		ret = opal_reverttper(dev, p, OPAL_REVERT_SP);
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 1ac0d712a9c3..85ad7bb7da41 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -43,6 +43,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_MBR_DONE:
- 	case IOC_OPAL_WRITE_SHADOW_MBR:
- 	case IOC_OPAL_GENERIC_TABLE_RW:
-+	case IOC_OPAL_REVERT_SP:
- 		return true;
- 	}
- 	return false;
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 6f5af1a84213..ac59fbc1d06b 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -47,7 +47,8 @@ enum opal_lock_state {
- struct opal_key {
- 	__u8 lr;
- 	__u8 key_len;
--	__u8 __align[6];
-+	__u8 keep_glbl_rn_key;
-+	__u8 __align[5];
- 	__u8 key[OPAL_KEY_MAX];
- };
-
-@@ -148,5 +149,6 @@ struct opal_read_write_table {
- #define IOC_OPAL_MBR_DONE           _IOW('p', 233, struct opal_mbr_done)
- #define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 234, struct opal_shadow_mbr)
- #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
-+#define IOC_OPAL_REVERT_SP          _IOW('p', 236, struct opal_key)
-
- #endif /* _UAPI_SED_OPAL_H */
---
-2.17.1
-
+  Luis
