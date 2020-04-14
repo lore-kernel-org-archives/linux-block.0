@@ -2,86 +2,60 @@ Return-Path: <SRS0=NWvS=56=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9079AC352B6
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63106C2BA19
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FEB420857
-	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586849900;
-	bh=c3VeZmnJ21uO4nl4ipI0bU3GZYnYIrzWwg7ElW9HfPI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=LbXjMLRqBPX7ZN7FufV9pCANmcSHsBm2HF3PZfb5smPW/9nlTvs2564+bEUN5GiAE
-	 3S0DZf2CLobOILeUmOu/3sokkJZ91yL2iWs7B7vaNSlOxQnVXnnltBfW/ndyUpuzVW
-	 BEqbNN+jBvtJwp+QZyUOTWpQtlA68gCm8MDEF+qw=
+	by mail.kernel.org (Postfix) with ESMTP id 41DBB206E9
+	for <linux-block@archiver.kernel.org>; Tue, 14 Apr 2020 07:42:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mZGEHRFv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406730AbgDNHiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 03:38:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49354 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729308AbgDNHiS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 03:38:18 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D22E420575;
-        Tue, 14 Apr 2020 07:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586849898;
-        bh=c3VeZmnJ21uO4nl4ipI0bU3GZYnYIrzWwg7ElW9HfPI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e94n9Y+GtlyXQJiMemhpG+YBmqCcUf11viZViWfVtiWxBg6xFDMrZBSTun5L7rD3o
-         eGdz5EqGWdIqYwfU6XQgFo7vt5kxDHs9afTdqsJFjtwQwVZHlTMiE76GMfFJqRqQRv
-         cTzrdlOP+2fzUpFhH3I95pdBlcXkVof8bn0PWzS0=
-Date:   Tue, 14 Apr 2020 09:38:16 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] blktrace: fix use after free
-Message-ID: <20200414073816.GC4111599@kroah.com>
-References: <20200414041902.16769-1-mcgrof@kernel.org>
+        id S2406788AbgDNHmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Apr 2020 03:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59990 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406798AbgDNHmd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Apr 2020 03:42:33 -0400
+X-Greylist: delayed 800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Apr 2020 00:42:28 PDT
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFE0C0A3BDC;
+        Tue, 14 Apr 2020 00:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=JJ5p+3/4IGSnlDpePvLUhJym9cud2qctPPEa9hKpgOM=; b=mZGEHRFvMVjixYpNm3y0zpmQjV
+        IC9wydu/Xq4lMZvgsrmgMxNkFERUCAjs3f8J0/5wVTNywoZV3uCEIT8qAAtKV0YO94ZgF2FK51m1H
+        vajT4cliScjbIguGiXn2RA8fC+zCjbCIYKn12IP9YpSPdMocRBFokH08fC7Sfko8e0stwbptBPv+e
+        oouFi+80pNZ7tRxPc2lL+SqmxxShS7ZjVQEGdJg/UPhgnHiYCFbAHvkxLFBh160Yh+srwNXcV1Szw
+        lX6vVL3wX1vFWmyhgEB2vCiFI6oXcr6R6Y1BByOGu5shaghfjpinuSyxHNWHysEQHvA50d/TYeVTV
+        l7cg2/xw==;
+Received: from [2001:4bb8:180:384b:4c21:af7:dd95:e552] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jOGDD-00073b-R8; Tue, 14 Apr 2020 07:42:28 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: clean up DMA draining
+Date:   Tue, 14 Apr 2020 09:42:20 +0200
+Message-Id: <20200414074225.332324-1-hch@lst.de>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200414041902.16769-1-mcgrof@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 04:18:57AM +0000, Luis Chamberlain wrote:
-> After two iterations of RFCs I think this is ready now. I've taken
-> the feedback from the last series, both on code and commit log.
-> I've also extended the commit log on the last patch to also explain
-> how the original shift to async request_queue removal turned out
-> to actually be a userspace regression and added a respective fixes
-> tag for it.
-> 
-> You can find these patches on my 20200414-dev-blkqueue-defer-removal-patch-v1
-> branch based on linux-next tag next-20200414 on kernel.org [0].
-> 
-> Further review and rants are appreciated.
-> 
-> [0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200414-dev-blkqueue-defer-removal
-> 
-> Luis Chamberlain (5):
->   block: move main block debugfs initialization to its own file
->   blktrace: fix debugfs use after free
->   blktrace: refcount the request_queue during ioctl
->   mm/swapfile: refcount block and queue before using
->     blkcg_schedule_throttle()
->   block: revert back to synchronous request_queue removal
+Hi all,
 
-Looks good from a debugfs point of view, thanks for doing this cleanup.
-
-greg k-h
+currently the dma draining and alignining specific to ATA CDROMs
+and the UFS driver has its ugly hooks in core block code.  Move
+this out into the scsi and ide drivers instead.
