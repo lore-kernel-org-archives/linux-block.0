@@ -2,183 +2,163 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E15C2BA19
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE64C2BB55
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:19:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17C142076D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:01:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IfOMSEpx"
+	by mail.kernel.org (Postfix) with ESMTP id CCCDF2074F
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586956782;
+	bh=LK5i17oKr75c/wlaNjsw+7HclaPdIRvTO6fWkrLjOec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vgomqV6D/xchoeO4dhIG/+piVi7h70w4Fj55+e4UZ7O+CToDiMNUaLQafE0lzDOA+
+	 6IeL6Krby7X/Pe6wSiDq1uT37h0Mh1nR9sZHhOysATR1MrJhFXqUYK1CMbOhNIPJG3
+	 h4zRZggNuSamVL4ZISfjbLtbfwG9ArYEuZQV7HtI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503506AbgDONBl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 09:01:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2503275AbgDONA3 (ORCPT
+        id S2506280AbgDONTk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 09:19:40 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:38448 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2505331AbgDONTT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 09:00:29 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB2BC061A0E
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 06:00:29 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id h14so10510778wrr.12
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 06:00:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=s3Dxz6p1foOuGnxsSwWBIgg5lmhpYMN/jCU503kDd5o=;
-        b=IfOMSEpx4pQsR3HEfyZOboHR9m64ZHfElfCnje4KRTt3afIq0tZW6YVXq1Lj/rAPCx
-         /yAkOGcVUVYzFtctxYp/ddj9EgFchjAribmeuWeYkqF43fOc0RoenxXfybf5Er4fg4YK
-         43aM6iQ6z8OQxQKLvfnl8X/ogD+sLNZRx7RekltR9FE6Rin5f0L14W6kN5yCbnYdLTCK
-         b0NRJaWP7OuAkvC/oWTYOS8h+Xt2mgG/Nsv1A6OgiHkdC0E90GrluqLUWxwbLCiTOfDi
-         Xj9Mne8DAX6Lwj6BgOVuBnmbwKg/Ty2bps4dywBBVGgt30HdKNMBOs/2TpLkFNYjcJeo
-         gBJw==
+        Wed, 15 Apr 2020 09:19:19 -0400
+Received: by mail-pl1-f195.google.com with SMTP id w3so1240441plz.5;
+        Wed, 15 Apr 2020 06:19:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=s3Dxz6p1foOuGnxsSwWBIgg5lmhpYMN/jCU503kDd5o=;
-        b=YLk0auayov5UDv/311DMXdBnm6RYYIooXVoaCC6ui4edEMC9EnvoYv8lqHtfYpHRZu
-         7A2EKOwCBn2Nri+0a4Q/sJJfvfNXMTrM3CEfMijKmEiNiKChMWDNfXQlHAsw0A59zqoh
-         gqqBDqD1iiJj4AjkT1eID/grPfveOUOTVk9w2LpbA1BWX/uKcMuAVFEI4n+srk+2DLl5
-         VsIYMiDdlJyHrFqNQge7VVXe2/wc0RfxghfAPXqs8wianW1nziX4d6mC+VyJb3gCdpK7
-         KaIGKyTmrrI6wLnGXNK107doLmWuI6Yw2qNgt50TWYsmqmLlwQgbmUSsD5nyFle2l/xC
-         R9FA==
-X-Gm-Message-State: AGi0PuYy3GWF+/G0Bfp8C5M6QFr1+tqwjyOpHvUhcZPaC0Y+iYHOSUwf
-        IUoN2U5GxOM5K6pcbXR8IfGOHrwb7XXEXg==
-X-Google-Smtp-Source: APiQypIp0009AH1kf1YuFTFoNXOREBYaJxauBtwP18dY6kJ/6AEXAzSa7n4cFwaAW91uUPTqLtnhcBJFy6SR7g==
-X-Received: by 2002:a5d:6a92:: with SMTP id s18mr27270946wru.50.1586955627848;
- Wed, 15 Apr 2020 06:00:27 -0700 (PDT)
-Date:   Wed, 15 Apr 2020 14:00:15 +0100
-In-Reply-To: <CAGvU0Hn2U88Dy2MEP-ZTNvfrWaKF4XL9EtR+4iF5BZ6_GW3Tvg@mail.gmail.com>
-Message-Id: <20200415130017.244979-3-gprocida@google.com>
-Mime-Version: 1.0
-References: <CAGvU0Hn2U88Dy2MEP-ZTNvfrWaKF4XL9EtR+4iF5BZ6_GW3Tvg@mail.gmail.com>
-X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
-Subject: [PATCH v2 2/4] blk-mq: Allow timeouts to run while queue is freezing
-From:   Giuliano Procida <gprocida@google.com>
-To:     greg@kroah.com
-Cc:     Giuliano Procida <gprocida@google.com>, stable@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=7IvG2bEA5VCaC2qgBtVR/FZ0IDKm4MJccJ5LrCzVHtM=;
+        b=bJfSjuAWcr0o2SqPwRDSD4f/zznNmACFO7AMUI288bLG8n9CXbJX08ZTNHFh23VG2O
+         20yQgmkDfy5gDldJ5n2S+q0nIgZAmKR4zgaASFNJLhTtlIjFqMg9Vy4MJIfOe04AAfEm
+         MH8TMR7ck4zX/EnQAkx3MIP8kn2Ttj8Uxmg4f14we34pVFB1cUzH3r91f/wHQtNKVjNU
+         tmIweebitxfeQLTlZ3ruZSBrNByGTrr5/vSP/q7Q2t4/z/10VKTF7/K/XS68x+u9iplE
+         Gr9rbTw6MB/GThAFPvNTazNyWpcZ+c4ndDs/y+MLrs9lrryAAY5ZsnPCrIoAbVnwgYv2
+         Ro1g==
+X-Gm-Message-State: AGi0Pub9OgKPwbfjASurdBU86f0xTagjdIbL1gdmMAPMt6YI/oOf10DR
+        /tvk8jp7Bb1ANkGD7Dt64Mk=
+X-Google-Smtp-Source: APiQypKt0dyTdKtn4rGriYEeFWzmB80X5z3lTmEXBrfOHZD1nC8rYnZFAuTFIJUuQI3bysuLAnuDnA==
+X-Received: by 2002:a17:902:8485:: with SMTP id c5mr5057637plo.242.1586956757999;
+        Wed, 15 Apr 2020 06:19:17 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id n9sm3466685pjt.29.2020.04.15.06.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2020 06:19:16 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id CFE5D40277; Wed, 15 Apr 2020 13:19:15 +0000 (UTC)
+Date:   Wed, 15 Apr 2020 13:19:15 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Alan Jenkins <alan.christopher.jenkins@gmail.com>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [PATCH 4/5] mm/swapfile: refcount block and queue before using
+ blkcg_schedule_throttle()
+Message-ID: <20200415131915.GV11244@42.do-not-panic.com>
+References: <20200414041902.16769-1-mcgrof@kernel.org>
+ <20200414041902.16769-5-mcgrof@kernel.org>
+ <20200414154447.GC25765@infradead.org>
+ <20200415054234.GQ11244@42.do-not-panic.com>
+ <20200415072712.GB21099@infradead.org>
+ <20200415073443.GA21036@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200415073443.GA21036@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit 71f79fb3179e69b0c1448a2101a866d871c66e7f upstream.
+On Wed, Apr 15, 2020 at 12:34:43AM -0700, Christoph Hellwig wrote:
+> On Wed, Apr 15, 2020 at 12:27:12AM -0700, Christoph Hellwig wrote:
+> > On Wed, Apr 15, 2020 at 05:42:34AM +0000, Luis Chamberlain wrote:
+> > > > I don't understand the atomic part of the comment.  How does
+> > > > bdgrab/bdput help us there?
+> > > 
+> > > The commit log above did a better job at explaining this in terms of our
+> > > goal to use the request_queue and how this use would prevent the risk of
+> > > releasing the request_queue, which could sleep.
+> > 
+> > So bdput eventually does and iput, but what leads to an out of context
+> > offload?
+> > 
+> > But anyway, isn't the original problem better solved by simply not
+> > releasing the queue from atomic context to start with?  There isn't
+> > really any good reason we keep holding the spinlock once we have a
+> > reference on the queue, so something like this (not even compile tested)
+> > should do the work:
+> 
+> Actually - mem_cgroup_throttle_swaprate already checks for a non-NULL
+> current->throttle_queue above, so we should never even call
+> blk_put_queue here.  Was this found by code inspection, or was there
+> a real report?
 
-In case a submitted request gets stuck for some reason, the block layer
-can prevent the request starvation by starting the scheduled timeout work.
-If this stuck request occurs at the same time another thread has started
-a queue freeze, the blk_mq_timeout_work will not be able to acquire the
-queue reference and will return silently, thus not issuing the timeout.
-But since the request is already holding a q_usage_counter reference and
-is unable to complete, it will never release its reference, preventing
-the queue from completing the freeze started by first thread.  This puts
-the request_queue in a hung state, forever waiting for the freeze
-completion.
+No but report, this code path came up as a possible use of
+blk_put_queue() which already exists in atomic context. So yes, it
+already uses blk_put_queue(), but how are we *sure* its not going to be
+the last one? Because if it is that mean the release will happen in
+atomic context, defeating the goal of the last patch in this series.
 
-This was observed while running IO to a NVMe device at the same time we
-toggled the CPU hotplug code. Eventually, once a request got stuck
-requiring a timeout during a queue freeze, we saw the CPU Hotplug
-notification code get stuck inside blk_mq_freeze_queue_wait, as shown in
-the trace below.
+Using bdgrab() however ensures that during the lifecycle of this path,
+blk_put_queue() won't be the last if used after, but instead we are
+sure it will be upon disk release.
 
-[c000000deaf13690] [c000000deaf13738] 0xc000000deaf13738 (unreliable)
-[c000000deaf13860] [c000000000015ce8] __switch_to+0x1f8/0x350
-[c000000deaf138b0] [c000000000ade0e4] __schedule+0x314/0x990
-[c000000deaf13940] [c000000000ade7a8] schedule+0x48/0xc0
-[c000000deaf13970] [c0000000005492a4] blk_mq_freeze_queue_wait+0x74/0x110
-[c000000deaf139e0] [c00000000054b6a8] blk_mq_queue_reinit_notify+0x1a8/0x2e0
-[c000000deaf13a40] [c0000000000e7878] notifier_call_chain+0x98/0x100
-[c000000deaf13a90] [c0000000000b8e08] cpu_notify_nofail+0x48/0xa0
-[c000000deaf13ac0] [c0000000000b92f0] _cpu_down+0x2a0/0x400
-[c000000deaf13b90] [c0000000000b94a8] cpu_down+0x58/0xa0
-[c000000deaf13bc0] [c0000000006d5dcc] cpu_subsys_offline+0x2c/0x50
-[c000000deaf13bf0] [c0000000006cd244] device_offline+0x104/0x140
-[c000000deaf13c30] [c0000000006cd40c] online_store+0x6c/0xc0
-[c000000deaf13c80] [c0000000006c8c78] dev_attr_store+0x68/0xa0
-[c000000deaf13cc0] [c0000000003974d0] sysfs_kf_write+0x80/0xb0
-[c000000deaf13d00] [c0000000003963e8] kernfs_fop_write+0x188/0x200
-[c000000deaf13d50] [c0000000002e0f6c] __vfs_write+0x6c/0xe0
-[c000000deaf13d90] [c0000000002e1ca0] vfs_write+0xc0/0x230
-[c000000deaf13de0] [c0000000002e2cdc] SyS_write+0x6c/0x110
-[c000000deaf13e30] [c000000000009204] system_call+0x38/0xb4
+In fact, with bdgrab() isn't the blk_get_queue() on
+blkcg_schedule_throttle() no longer needed?
 
-The fix is to allow the timeout work to execute in the window between
-dropping the initial refcount reference and the release of the last
-reference, which actually marks the freeze completion.  This can be
-achieved with percpu_refcount_tryget, which does not require the counter
-to be alive.  This way the timeout work can do it's job and terminate a
-stuck request even during a freeze, returning its reference and avoiding
-the deadlock.
+> In the latter case we need to figure out what protects >throttle_queue,
+> as the way blkcg_schedule_throttle first put the reference and only then
+> assign a value to it already looks like it introduces a tiny race
+> window.
+> 
+> Otherwise just open coding the applicable part of blkcg_schedule_throttle
+> in mem_cgroup_throttle_swaprate seems easiest:
+> 
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index 5871a2aa86a5..e16051ef074c 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -3761,15 +3761,20 @@ void mem_cgroup_throttle_swaprate(struct mem_cgroup *memcg, int node,
+>  	 */
+>  	if (current->throttle_queue)
+>  		return;
+> +	if (unlikely(current->flags & PF_KTHREAD))
+> +		return;
+>  
+>  	spin_lock(&swap_avail_lock);
+>  	plist_for_each_entry_safe(si, next, &swap_avail_heads[node],
+>  				  avail_lists[node]) {
+> -		if (si->bdev) {
+> -			blkcg_schedule_throttle(bdev_get_queue(si->bdev),
+> -						true);
+> -			break;
+> +		if (!si->bdev)
+> +			continue;
+> +		if (blk_get_queue(dev_get_queue(si->bdev))) {
+> +			current->throttle_queue = dev_get_queue(si->bdev);
+> +			current->use_memdelay = true;
+> +			set_notify_resume(current);
+>  		}
+> +		break;
+>  	}
+>  	spin_unlock(&swap_avail_lock);
+>  }
 
-Allowing the timeout to run is just a part of the fix, since for some
-devices, we might get stuck again inside the device driver's timeout
-handler, should it attempt to allocate a new request in that path -
-which is a quite common action for Abort commands, which need to be sent
-after a timeout.  In NVMe, for instance, we call blk_mq_alloc_request
-from inside the timeout handler, which will fail during a freeze, since
-it also tries to acquire a queue reference.
+Sorry, its not clear to me  who calls the respective blk_put_queue()
+here?
 
-I considered a similar change to blk_mq_alloc_request as a generic
-solution for further device driver hangs, but we can't do that, since it
-would allow new requests to disturb the freeze process.  I thought about
-creating a new function in the block layer to support unfreezable
-requests for these occasions, but after working on it for a while, I
-feel like this should be handled in a per-driver basis.  I'm now
-experimenting with changes to the NVMe timeout path, but I'm open to
-suggestions of ways to make this generic.
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@fb.com>
-Signed-off-by: Giuliano Procida <gprocida@google.com>
----
- block/blk-mq.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 11a23bf73fd9..d13e70d40df9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -628,7 +628,20 @@ static void blk_mq_rq_timer(unsigned long priv)
- 	};
- 	int i;
- 
--	if (blk_queue_enter(q, GFP_NOWAIT))
-+	/* A deadlock might occur if a request is stuck requiring a
-+	 * timeout at the same time a queue freeze is waiting
-+	 * completion, since the timeout code would not be able to
-+	 * acquire the queue reference here.
-+	 *
-+	 * That's why we don't use blk_queue_enter here; instead, we use
-+	 * percpu_ref_tryget directly, because we need to be able to
-+	 * obtain a reference even in the short window between the queue
-+	 * starting to freeze, by dropping the first reference in
-+	 * blk_mq_freeze_queue_start, and the moment the last request is
-+	 * consumed, marked by the instant q_usage_counter reaches
-+	 * zero.
-+	 */
-+	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
- 
- 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &data);
--- 
-2.26.0.110.g2183baf09c-goog
-
+  Luis
