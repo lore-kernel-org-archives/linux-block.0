@@ -5,70 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27176C2BB85
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94114C2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:22:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0177E20768
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DFA920771
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:22:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="AP01Fz+J"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="cOvX0Wkb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895334AbgDOJV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 05:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47462 "EHLO
+        id S2895366AbgDOJWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 05:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405298AbgDOJV5 (ORCPT
+        by vger.kernel.org with ESMTP id S2895364AbgDOJWQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 05:21:57 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E61C061A0F
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:21:55 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id k11so17609856wrp.5
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:21:55 -0700 (PDT)
+        Wed, 15 Apr 2020 05:22:16 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00654C061A0E
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:22:14 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id a81so18049959wmf.5
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Lsw/Iaiux+MLh4zGmzRDP0c55QH0mpEc78oqXzNiG98=;
-        b=AP01Fz+J3iar2E8zAzRwSbGq6J5btXocj1naiyK6aV6oO2naqSE3EQZ3ZRr6JeqT0C
-         YNfSOjiXOgYT030rl1G8vLdrb5iVUsISZkvKL2AvDIWK6hWPglbg3jDKoYveRo2xTlSU
-         sHXOrYhBuMqfXbIPABFtsM6AOu7xVsX1pBW15pI0mEXvvNLYD48d0yYZMWkhjL8NyTOJ
-         NAHwRZlhKQ36mSBqQ2QMV4DyfczF0Fb8asvbogbkytqebyvo+omP3WqWQX/XuosNxkIe
-         kIIzu1c8XrcOeltLaJ53JvMlTgtvlQfWdacIaPTkN1hlotbcOaUUwOCbiL2MELj+BK3k
-         2D8w==
+        bh=IeH18tv77fAQvFr1Jks8T1IR/i3hK0ZYok4Cp+keg68=;
+        b=cOvX0WkbQpaegqbexVIfXnyw28BZncZUKLB6krrI9MIH+8D8J0LBPPldlFr3+vUFWJ
+         uuOE0sdLAlaYvlIELYOWCQuCUZvxP2T6f9v0682ZWwyQKHqGRBuenNpJl7frQ9ur5N7h
+         7CZdRnooPCqg6+CE/4SlXJjOPsegZJXIEpdBGo7k2Vi1kjNNeUNxAGzMUZPgaoPyykxL
+         un87r4TzeRYA4lnEyKllJhud6+5OiRD5WTLPoL0vJ1RUMskQlPJMKTZGSWhBiI/MDagO
+         uPS1iNfeaAPDsDWdqtcbDlxf1av7BE9l5XUt97atoSEWqP7nsZUJqOMLsshhPSwPXGPd
+         7H6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Lsw/Iaiux+MLh4zGmzRDP0c55QH0mpEc78oqXzNiG98=;
-        b=lUIQwTPzNYSFym3rUam25Ttn2GSBV15lao/41bc4ggcVzBhTLlW7DrM3oYQ4e+mPZx
-         Th3iFR0/ydVFSRh52EM53zKh1SE6B8NpGLXVo/7CQcZwqEfWU9r9KCYw2y1U8aYSpL0r
-         /vJyFGGCDY54n8k73AYtyL1muAC9gCvoRdWCC70sfZRg1hRDp2C7bCeJk/5ikueBgzii
-         4Haoe6JY4bVnHTI10iYUPiUbHhxUjYBf96N50YcRIn4gYZVGfUhmkgmAVPMNFi+tkkhT
-         3vZyE7s8+cyKOmB83v7Dzk0EgM8fBWWYT0yYgbmoKvbvHS+uCxaNZhXNfBDLufwDSOP3
-         K6Lw==
-X-Gm-Message-State: AGi0PuY9EpBNlkIyIXl+BAg44w4KzYblJ+Y14tDH8dXoGcR38OMu6yPW
-        Ikbawb8bMH81CUizoAbXTBcXzTsF0BjJWKQ=
-X-Google-Smtp-Source: APiQypLsqG22QZWeFoVMXZG8q5JrTXXNY5wde4LPzpchrO/6FZiARk3OSMxWx53p8sQ3RQF2n6+qAw==
-X-Received: by 2002:adf:e3ca:: with SMTP id k10mr11353040wrm.53.1586942514244;
-        Wed, 15 Apr 2020 02:21:54 -0700 (PDT)
+        bh=IeH18tv77fAQvFr1Jks8T1IR/i3hK0ZYok4Cp+keg68=;
+        b=Zrf414asZtzNS9IiJcGYwWjrGhJ7oX4ZfPcO4RUYWcNCY+tVLwuyBwaX+4w76d7hqA
+         g2pIpFbx9cPyD8Yg2fTB+kOMN0KGnGIBgsEdlEWOOo3MbwSy/V5SWfAl4YA57LgSsIke
+         7Js8svS+SR26D5DOHoEaDYtfbfyLx8+H86puTMz1nBiEhNASleNvC8d5XR75AoWfPxD5
+         bK9a79rCw6ePd3x4OWeDBh/rl1YdHjVAPAMhnmHd0ROIvYM2kjFeaijf3gty/xXOApmZ
+         Fx7wrVdmnsa20aH1miOyLs9AzOr7DbgrYeJ1SWmCx8MaHBIDabUpN89i/xEHvdjD4P/p
+         0EGw==
+X-Gm-Message-State: AGi0PuZryFBqO0WJG60AeBfBd4A+t+l3lFsHHGQLhPc9vE03ze12dqEo
+        WwSttyTFVnrMeye0v0H5mFHxoXgw8jlOOFs=
+X-Google-Smtp-Source: APiQypIJO14oWlk3S2TTt3GuAMhjwhqanfU1Y0sVL8e6V49/3Efl9cX3zp8IeE1los9OwwyBgAqgmw==
+X-Received: by 2002:a05:600c:224a:: with SMTP id a10mr4388539wmm.174.1586942533244;
+        Wed, 15 Apr 2020 02:22:13 -0700 (PDT)
 Received: from dkxps.fkb.profitbricks.net (dslb-002-204-231-072.002.204.pools.vodafone-ip.de. [2.204.231.72])
-        by smtp.gmail.com with ESMTPSA id v7sm22534615wmg.3.2020.04.15.02.21.52
+        by smtp.gmail.com with ESMTPSA id v7sm22534615wmg.3.2020.04.15.02.22.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 02:21:53 -0700 (PDT)
+        Wed, 15 Apr 2020 02:22:12 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Tejun Heo <tj@kernel.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 01/25] sysfs: export sysfs_remove_file_self()
-Date:   Wed, 15 Apr 2020 11:20:21 +0200
-Message-Id: <20200415092045.4729-2-danil.kipnis@cloud.ionos.com>
+        jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
+Subject: [PATCH v12 02/25] RDMA/rtrs: public interface header to establish RDMA connections
+Date:   Wed, 15 Apr 2020 11:20:22 +0200
+Message-Id: <20200415092045.4729-3-danil.kipnis@cloud.ionos.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
 References: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
@@ -81,31 +79,236 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-Function is going to be used in transport over RDMA module
-in subsequent patches, so export it to GPL modules.
+Introduce public header which provides set of API functions to
+establish RDMA connections from client to server machine using
+RTRS protocol, which manages RDMA connections for each session,
+does multipathing and load balancing.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Cc: linux-kernel@vger.kernel.org
-[jwang: extend the commit message]
+Main functions for client (active) side:
+
+ rtrs_clt_open() - Creates set of RDMA connections incapsulated
+                    in IBTRS session and returns pointer on RTRS
+		    session object.
+ rtrs_clt_close() - Closes RDMA connections associated with RTRS
+                     session.
+ rtrs_clt_request() - Requests zero-copy RDMA transfer to/from
+                       server.
+
+Main functions for server (passive) side:
+
+ rtrs_srv_open() - Starts listening for RTRS clients on specified
+                    port and invokes RTRS callbacks for incoming
+		    RDMA requests or link events.
+ rtrs_srv_close() - Closes RTRS server context.
+
+Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- fs/sysfs/file.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/infiniband/ulp/rtrs/rtrs.h | 195 +++++++++++++++++++++++++++++
+ 1 file changed, 195 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.h
 
-diff --git a/fs/sysfs/file.c b/fs/sysfs/file.c
-index 26bbf960e2a2..d81f9f974a35 100644
---- a/fs/sysfs/file.c
-+++ b/fs/sysfs/file.c
-@@ -492,6 +492,7 @@ bool sysfs_remove_file_self(struct kobject *kobj, const struct attribute *attr)
- 	kernfs_put(kn);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(sysfs_remove_file_self);
- 
- void sysfs_remove_files(struct kobject *kobj, const struct attribute * const *ptr)
- {
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs.h b/drivers/infiniband/ulp/rtrs/rtrs.h
+new file mode 100644
+index 000000000000..9879d40467b6
+--- /dev/null
++++ b/drivers/infiniband/ulp/rtrs/rtrs.h
+@@ -0,0 +1,195 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RDMA Transport Layer
++ *
++ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
++ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
++ */
++#ifndef RTRS_H
++#define RTRS_H
++
++#include <linux/socket.h>
++#include <linux/scatterlist.h>
++
++struct rtrs_permit;
++struct rtrs_clt;
++struct rtrs_srv_ctx;
++struct rtrs_srv;
++struct rtrs_srv_op;
++
++/*
++ * RDMA transport (RTRS) client API
++ */
++
++/**
++ * enum rtrs_clt_link_ev - Events about connectivity state of a client
++ * @RTRS_CLT_LINK_EV_RECONNECTED	Client was reconnected.
++ * @RTRS_CLT_LINK_EV_DISCONNECTED	Client was disconnected.
++ */
++enum rtrs_clt_link_ev {
++	RTRS_CLT_LINK_EV_RECONNECTED,
++	RTRS_CLT_LINK_EV_DISCONNECTED,
++};
++
++/**
++ * Source and destination address of a path to be established
++ */
++struct rtrs_addr {
++	struct sockaddr_storage *src;
++	struct sockaddr_storage *dst;
++};
++
++/**
++ * rtrs_clt_ops - it holds the link event callback and private pointer.
++ * @priv: User supplied private data.
++ * @link_ev: Event notification callback function for connection state changes
++ *	@priv: User supplied data that was passed to rtrs_clt_open()
++ *	@ev: Occurred event
++ */
++struct rtrs_clt_ops {
++	void	*priv;
++	void	(*link_ev)(void *priv, enum rtrs_clt_link_ev ev);
++};
++
++struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
++				 const char *sessname,
++				 const struct rtrs_addr *paths,
++				 size_t path_cnt, u16 port,
++				 size_t pdu_sz, u8 reconnect_delay_sec,
++				 u16 max_segments,
++				 s16 max_reconnect_attempts);
++
++void rtrs_clt_close(struct rtrs_clt *sess);
++
++/**
++ * rtrs_permit_to_pdu() - converts rtrs_permit to opaque pdu pointer
++ * @permit: RTRS permit pointer, it associates the memory allocation for future
++ *          RDMA operation.
++ */
++void *rtrs_permit_to_pdu(struct rtrs_permit *permit);
++
++enum {
++	RTRS_PERMIT_NOWAIT = 0,
++	RTRS_PERMIT_WAIT   = 1,
++};
++
++/**
++ * enum rtrs_clt_con_type() type of ib connection to use with a given
++ * rtrs_permit
++ * @ADMIN_CON - use connection reserved for "service" messages
++ * @IO_CON - use a connection reserved for IO
++ */
++enum rtrs_clt_con_type {
++	RTRS_ADMIN_CON,
++	RTRS_IO_CON
++};
++
++struct rtrs_permit *rtrs_clt_get_permit(struct rtrs_clt *sess,
++				    enum rtrs_clt_con_type con_type,
++				    int wait);
++
++void rtrs_clt_put_permit(struct rtrs_clt *sess, struct rtrs_permit *permit);
++
++/**
++ * rtrs_clt_req_ops - it holds the request confirmation callback
++ * and a private pointer.
++ * @priv: User supplied private data.
++ * @conf_fn:	callback function to be called as confirmation
++ *	@priv:	User provided data, passed back with corresponding
++ *		@(conf) confirmation.
++ *	@errno: error number.
++ */
++struct rtrs_clt_req_ops {
++	void	*priv;
++	void	(*conf_fn)(void *priv, int errno);
++};
++
++int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
++		     struct rtrs_clt *sess, struct rtrs_permit *permit,
++		     const struct kvec *vec, size_t nr, size_t len,
++		     struct scatterlist *sg, unsigned int sg_cnt);
++
++/**
++ * rtrs_attrs - RTRS session attributes
++ */
++struct rtrs_attrs {
++	u32		queue_depth;
++	u32		max_io_size;
++	u8		sessname[NAME_MAX];
++	struct kobject	*sess_kobj;
++};
++
++int rtrs_clt_query(struct rtrs_clt *sess, struct rtrs_attrs *attr);
++
++/*
++ * Here goes RTRS server API
++ */
++
++/**
++ * enum rtrs_srv_link_ev - Server link events
++ * @RTRS_SRV_LINK_EV_CONNECTED:	Connection from client established
++ * @RTRS_SRV_LINK_EV_DISCONNECTED:	Connection was disconnected, all
++ *					connection RTRS resources were freed.
++ */
++enum rtrs_srv_link_ev {
++	RTRS_SRV_LINK_EV_CONNECTED,
++	RTRS_SRV_LINK_EV_DISCONNECTED,
++};
++
++struct rtrs_srv_ops {
++	/**
++	 * rdma_ev():		Event notification for RDMA operations
++	 *			If the callback returns a value != 0, an error
++	 *			message for the data transfer will be sent to
++	 *			the client.
++
++	 *	@sess:		Session
++	 *	@priv:		Private data set by rtrs_srv_set_sess_priv()
++	 *	@id:		internal RTRS operation id
++	 *	@dir:		READ/WRITE
++	 *	@data:		Pointer to (bidirectional) rdma memory area:
++	 *			- in case of %RTRS_SRV_RDMA_EV_RECV contains
++	 *			data sent by the client
++	 *			- in case of %RTRS_SRV_RDMA_EV_WRITE_REQ points
++	 *			to the memory area where the response is to be
++	 *			written to
++	 *	@datalen:	Size of the memory area in @data
++	 *	@usr:		The extra user message sent by the client (%vec)
++	 *	@usrlen:	Size of the user message
++	 */
++	int (*rdma_ev)(struct rtrs_srv *sess, void *priv,
++		       struct rtrs_srv_op *id, int dir,
++		       void *data, size_t datalen, const void *usr,
++		       size_t usrlen);
++	/**
++	 * link_ev():		Events about connectivity state changes
++	 *			If the callback returns != 0 and the event
++	 *			%RTRS_SRV_LINK_EV_CONNECTED the corresponding
++	 *			session will be destroyed.
++	 *	@sess:		Session
++	 *	@ev:		event
++	 *	@priv:		Private data from user if previously set with
++	 *			rtrs_srv_set_sess_priv()
++	 */
++	int (*link_ev)(struct rtrs_srv *sess, enum rtrs_srv_link_ev ev,
++		       void *priv);
++};
++
++struct rtrs_srv_ctx *rtrs_srv_open(struct rtrs_srv_ops *ops, u16 port);
++
++void rtrs_srv_close(struct rtrs_srv_ctx *ctx);
++
++bool rtrs_srv_resp_rdma(struct rtrs_srv_op *id, int errno);
++
++void rtrs_srv_set_sess_priv(struct rtrs_srv *sess, void *priv);
++
++int rtrs_srv_get_sess_name(struct rtrs_srv *sess, char *sessname, size_t len);
++
++int rtrs_srv_get_queue_depth(struct rtrs_srv *sess);
++
++int rtrs_addr_to_sockaddr(const char *str, size_t len, u16 port,
++			  struct rtrs_addr *addr);
++
++int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len);
++#endif
 -- 
 2.20.1
 
