@@ -2,129 +2,163 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B03C2BA19
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 07:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C27C2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:05:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53D75208FE
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 07:35:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5435206E9
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:05:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gAg7IFfD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KRMMq/dx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2635161AbgDOHfW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 03:35:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2635160AbgDOHfP (ORCPT
+        id S2393867AbgDOJFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 05:05:45 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:19515 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393862AbgDOJFf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 03:35:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A477DC061A0C;
-        Wed, 15 Apr 2020 00:35:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Spel49OH3kq+f0h1cQE64vdlWjbJubQE7iWfCRxff4E=; b=gAg7IFfDoCtoS3lw9q5kB7iF3u
-        8et/F09oG1/mSQ6pPTclzNQTE0cp8m3Op/n5PXekX9gKp8drR/EOoquZq8CxWmZf7V7Jf3DzEuR2i
-        n/Pjcy9rylY/B9Pzm6lE+HeVM9aA70RBJaPI+Xh2WHG9ltoFE5PE9tiI0ca7GPILuSYolnYEXemrM
-        HbJ2xOXJO++cxn7bICbx6AmSvGj3DcBvix1wjr9CZOTy6K4xGYnKxxEVDZjnVk9utgN+ON8fztiIR
-        dt2c/xCo4N9YwqeWs6P00Lb0FTUAwdUIr5EoB8A3LR1ocdCwEm2Gg3yAOmjFRmx11RaYsO0uBbVWk
-        LaUyIZgQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOcZH-0000l3-Ho; Wed, 15 Apr 2020 07:34:43 +0000
-Date:   Wed, 15 Apr 2020 00:34:43 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
+        Wed, 15 Apr 2020 05:05:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1586941535; x=1618477535;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=EZGgCaxhmOjWPMpG7WdR3trpTne96AwC+nAojHGYRdc=;
+  b=KRMMq/dxdZHNjoV+OvXfNPfsghap6rqDGiCtVQP/CNkUbaoRXg3s+p3+
+   c3+l2EGYQdGn2p/rESF1sA0AnkQcmeypXLHwmGD3nDd7ZUQWA0F5KyFlA
+   jLHPbCI4SUNRFlt7uIURV8J3zamB6NK7MFT9JLo4P/OL+dh4WNd4+xzPe
+   nWx9UPkuAxhdBvFScCb1l2jRUsdN5y4FLhdTLXE9qcw5+nyYGfXZ9+Lf8
+   ZNsn0pJfnMcgfmqcm+JINa2oqwLv1bBvxoaQ9QRqDtq3HzugwEQi8/Wut
+   xAA7eLHatEw9p7+1dObhVbb9BRan4E3rPeIeywTJyB9sWr9sevobgznGe
+   w==;
+IronPort-SDR: O/Yy1NarxNjJQ9Qj6AuvfCG//Mzof87BRHupzIRlNkzgj3UyWTlkEW1hiIuxvh2jx5N85hrDaH
+ RdVtT91aLKGPHKadwyAB08ekJDmNgp0EW1HduDZXA6sQSLVQOgJo7+KI48843u88JC5ZxrQ+BR
+ 6El62SaF3yglZHNvSU4Smj7EIAV8Dp9zMb2HdxR3PAC/7DAlAuOD/x9A7a13ax7z49ggB7A+bR
+ sq7rvqwRPhOBgK8rMqpwGnDw2fw55viSE27Lj3gLxkosOTa+oQxVEjVhe/elJHuEG9Jyp9jsvo
+ aoE=
+X-IronPort-AV: E=Sophos;i="5.72,386,1580745600"; 
+   d="scan'208";a="136802987"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Apr 2020 17:05:33 +0800
+IronPort-SDR: NHNLDTPTPM1js7NMbKRMP3yQ1bUdMJ8r82k2k8qGaUMZLycIl6ruqpbr+UYX8Fm4YFDMxtrK/L
+ gaYcA3Jn3J6ccBTRSwM0G9zisIHFMvuia9F2NylhyaGsCcdEtJoHZvPcTzti73jC+nu9s4x/fW
+ UrYBYosoRdhJBe6LDGbH+S2s7LLy02WvGASWNx7kCuj84pUVE4wAE/54rufESPCoR302+ouTpA
+ iqfo8xta3S29uzaH9aoEOMHQBd0QYl9p2yWUeRQkevOj5b/tJ7WhC2XqvXI3IEkUhSvoqP4Fut
+ 17yBtPJ4/V3SnP9IKW6VnA4w
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2020 01:56:35 -0700
+IronPort-SDR: J4P2vw+hHRLrI+fFzRnvFTTG6uvGiNmHYnMX3PE5RUE7sANHkmvBqqbL7LkEClKL5NWaDGateo
+ B3HmnnYSrQ98nJQgmxQXpdMMf2rSS+H0oddW9re7H1M9xxCXLbRBv3QWVurIM07/MU/lzzQ698
+ VZ7B422+Vq1bvOMXbP+KHmxDmrRt1h7Som1UIC8CZ8EjLNBK515OO3zTpRq7njq1bfqLwLYmXn
+ rDss1JxpAM1bSm1YTtaPD3f/16HUEz/5I588hEy6aHNIyoKd2tb4cpys7QMS33yZzablZlEfWY
+ a8g=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip01.wdc.com with ESMTP; 15 Apr 2020 02:05:32 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
-        Alan Jenkins <alan.christopher.jenkins@gmail.com>,
-        axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 4/5] mm/swapfile: refcount block and queue before using
- blkcg_schedule_throttle()
-Message-ID: <20200415073443.GA21036@infradead.org>
-References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-5-mcgrof@kernel.org>
- <20200414154447.GC25765@infradead.org>
- <20200415054234.GQ11244@42.do-not-panic.com>
- <20200415072712.GB21099@infradead.org>
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v6 06/11] block: Modify revalidate zones
+Date:   Wed, 15 Apr 2020 18:05:08 +0900
+Message-Id: <20200415090513.5133-7-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200415090513.5133-1-johannes.thumshirn@wdc.com>
+References: <20200415090513.5133-1-johannes.thumshirn@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200415072712.GB21099@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 12:27:12AM -0700, Christoph Hellwig wrote:
-> On Wed, Apr 15, 2020 at 05:42:34AM +0000, Luis Chamberlain wrote:
-> > > I don't understand the atomic part of the comment.  How does
-> > > bdgrab/bdput help us there?
-> > 
-> > The commit log above did a better job at explaining this in terms of our
-> > goal to use the request_queue and how this use would prevent the risk of
-> > releasing the request_queue, which could sleep.
-> 
-> So bdput eventually does and iput, but what leads to an out of context
-> offload?
-> 
-> But anyway, isn't the original problem better solved by simply not
-> releasing the queue from atomic context to start with?  There isn't
-> really any good reason we keep holding the spinlock once we have a
-> reference on the queue, so something like this (not even compile tested)
-> should do the work:
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Actually - mem_cgroup_throttle_swaprate already checks for a non-NULL
-current->throttle_queue above, so we should never even call
-blk_put_queue here.  Was this found by code inspection, or was there
-a real report?
+Modify the interface of blk_revalidate_disk_zones() to add an optional
+driver callback function that a driver can use to extend processing
+done during zone revalidation. The callback, if defined, is executed
+with the device request queue frozen, after all zones have been
+inspected.
 
-In the latter case we need to figure out what protects >throttle_queue,
-as the way blkcg_schedule_throttle first put the reference and only then
-assign a value to it already looks like it introduces a tiny race
-window.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ block/blk-zoned.c              | 8 +++++++-
+ drivers/block/null_blk_zoned.c | 2 +-
+ include/linux/blkdev.h         | 3 ++-
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-Otherwise just open coding the applicable part ofblkcg_schedule_throttle
-in mem_cgroup_throttle_swaprate seems easiest:
-
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 5871a2aa86a5..e16051ef074c 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -3761,15 +3761,20 @@ void mem_cgroup_throttle_swaprate(struct mem_cgroup *memcg, int node,
- 	 */
- 	if (current->throttle_queue)
- 		return;
-+	if (unlikely(current->flags & PF_KTHREAD))
-+		return;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index c822cfa7a102..2912e964d7b2 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -471,14 +471,18 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+ /**
+  * blk_revalidate_disk_zones - (re)allocate and initialize zone bitmaps
+  * @disk:	Target disk
++ * @driver_cb:	LLD callback
+  *
+  * Helper function for low-level device drivers to (re) allocate and initialize
+  * a disk request queue zone bitmaps. This functions should normally be called
+  * within the disk ->revalidate method for blk-mq based drivers.  For BIO based
+  * drivers only q->nr_zones needs to be updated so that the sysfs exposed value
+  * is correct.
++ * If the @driver_cb callback function is not NULL, the callback is executed
++ * with the device request queue frozen after all zones have been checked.
+  */
+-int blk_revalidate_disk_zones(struct gendisk *disk)
++int blk_revalidate_disk_zones(struct gendisk *disk,
++			      void (*driver_cb)(struct gendisk *disk))
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct blk_revalidate_zone_args args = {
+@@ -512,6 +516,8 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 		q->nr_zones = args.nr_zones;
+ 		swap(q->seq_zones_wlock, args.seq_zones_wlock);
+ 		swap(q->conv_zones_bitmap, args.conv_zones_bitmap);
++		if (driver_cb)
++			driver_cb(disk);
+ 		ret = 0;
+ 	} else {
+ 		pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
+index 9e4bcdad1a80..46641df2e58e 100644
+--- a/drivers/block/null_blk_zoned.c
++++ b/drivers/block/null_blk_zoned.c
+@@ -73,7 +73,7 @@ int null_register_zoned_dev(struct nullb *nullb)
+ 	struct request_queue *q = nullb->q;
  
- 	spin_lock(&swap_avail_lock);
- 	plist_for_each_entry_safe(si, next, &swap_avail_heads[node],
- 				  avail_lists[node]) {
--		if (si->bdev) {
--			blkcg_schedule_throttle(bdev_get_queue(si->bdev),
--						true);
--			break;
-+		if (!si->bdev)
-+			continue;
-+		if (blk_get_queue(dev_get_queue(si->bdev))) {
-+			current->throttle_queue = dev_get_queue(si->bdev);
-+			current->use_memdelay = true;
-+			set_notify_resume(current);
- 		}
-+		break;
- 	}
- 	spin_unlock(&swap_avail_lock);
- }
+ 	if (queue_is_mq(q))
+-		return blk_revalidate_disk_zones(nullb->disk);
++		return blk_revalidate_disk_zones(nullb->disk, NULL);
+ 
+ 	blk_queue_chunk_sectors(q, nullb->dev->zone_size_sects);
+ 	q->nr_zones = blkdev_nr_zones(nullb->disk);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0797d1e81802..62fe9f962478 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -362,7 +362,8 @@ unsigned int blkdev_nr_zones(struct gendisk *disk);
+ extern int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+ 			    sector_t sectors, sector_t nr_sectors,
+ 			    gfp_t gfp_mask);
+-extern int blk_revalidate_disk_zones(struct gendisk *disk);
++int blk_revalidate_disk_zones(struct gendisk *disk,
++			      void (*driver_cb)(struct gendisk *disk));
+ 
+ extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+ 				     unsigned int cmd, unsigned long arg);
+-- 
+2.24.1
+
