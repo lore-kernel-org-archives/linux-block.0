@@ -6,51 +6,51 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A10C2C2BA19
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 354D4C2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:25:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7404F2074F
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:20:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DFA520737
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 13:25:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586956830;
-	bh=icevHMlNaKU3+OGN8LI44T7CknePHU+2Xhl97UBCtAI=;
+	s=default; t=1586957136;
+	bh=2NWtP2cNZMrKlgOZdBrmPsy6fRqnD5tJXXFFLb6xOmA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=R1NW8YUsicSvs09K0GDYDH35yp1xK/opmGBqGF9xUP9sfG1Cz01umUfwwXEVgBOlA
-	 0Lo3eLc+X56T/236fdE+66eNXXaLF3a2TeV29ICPSfRPXZk6Jaj/51kIzbnfV8PUc6
-	 yE+tPtwueA2ANWurRbiL7eiFBBAAudc6OvpzhxSM=
+	b=EUiK+oHXnyxEfGVaRE2kPhJGNmeDlUvZup48N9BGRzdr7cH1h8JkvsJNtNwHOqsnd
+	 9iCsLYhVd7dRjFRQLDblp2rjsfsINuqDpRgCoc71bPDjtL+yJXcpHasau9dJsnTeuU
+	 sMjKXTWAAkMsRzSngXibVp5ATJgrR5+kuJYOEYJM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2506315AbgDONU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 09:20:27 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:56183 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2506307AbgDONUW (ORCPT
+        id S2636065AbgDONZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 09:25:33 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:38242 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2636090AbgDONZG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 09:20:22 -0400
-Received: by mail-pj1-f66.google.com with SMTP id a32so6757488pje.5;
-        Wed, 15 Apr 2020 06:20:22 -0700 (PDT)
+        Wed, 15 Apr 2020 09:25:06 -0400
+Received: by mail-pj1-f68.google.com with SMTP id t40so6672649pjb.3;
+        Wed, 15 Apr 2020 06:25:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RJpmPPEbW5DFD5EOE4e1MFnGEEY0tGlTM0SU0H+OaOw=;
-        b=kwd3IsEe9y/QMKAsTq1Wc0vZoVM0KpCPxPTibciD4XEiexhNx/nHVOggAAkHFCc4pI
-         Y9LrTG3WaHJWcbTV20e4t0WEKzbSOJQIzT8M+LV1309ZtiE1u0jIOzv8vTvRfKMooA0B
-         JpUia6/+S3tAmUyWMaobP+htZGCKgTnKUprm02v6Htnscgiu0vcTdzyGT0ecYLeKY0JE
-         oTgswhKaWqZJkeVoUqjn/TqjkXq4yqGrKh+4/AaldoW6GRV5pyFFFU8u6Y9XDeFr/bSn
-         u7R+183U0M5ojGK4QPlPlU9P27gpQc9tmob+q+sxvg8WSfDu1n1kI9P2Mt2aqYRUtGEf
-         phtQ==
-X-Gm-Message-State: AGi0PuYBihfwD0tnL1IbAGDYaE3bepcPVcJ1VVFYgE3kxs2XPSdYUiMH
-        nqC4tncEKXV4hDmfFJshcpA=
-X-Google-Smtp-Source: APiQypJUeYCz7pZivMHyL551WxNhmqBNbGwfbuuxjlm8hRiqy/s1ws3J2v8JSkBdw41jCGt/Xs+WVw==
-X-Received: by 2002:a17:902:6b07:: with SMTP id o7mr4705177plk.141.1586956821686;
-        Wed, 15 Apr 2020 06:20:21 -0700 (PDT)
+        bh=VxzOHBakm6zWRy000AuKfccE4q5d/hsyCc04Zt0DJtg=;
+        b=IRZ0H8DcQ2OaXUc/yZtJgNL6K8Kx4uKT+N1omloeQ5Up8gtBfHz0pMmHPOFIh+KY0o
+         BLvYaaZG0Y2X2gf9vclLe4Mzc9kAv1m27aqljqlzq9vVMY3IDG7egZC1nER4qWu8nhxc
+         Rq2s83bupsK0AEKNwJlvCbrCH6er9+Qk9kXZh2V87xjycZBldqU0qQn35bGY868GaOUF
+         sE7yOONXD7QbWLOAkDKIy1GAUmr09Ux+sldzykA9CrL+BnCtt58M6d7hsFAnEJQqB9mL
+         ZOEmNUBQw05vKN6I3gJugVn+640CJZ3DPO82S8kHbTnWUjkKpSpBXL82fREbQCwwDkcX
+         L1Dw==
+X-Gm-Message-State: AGi0PuYsxlMo9zy/2c/lHHWifFBbmK/8GOuIX4Ith2NBS9NcTIMWtFN4
+        K7rqaEK7DmIqk3di2nObq1A=
+X-Google-Smtp-Source: APiQypLzsjEy5ye1O+lv4UjZnyAkJCntXBLPPdDHpWm50UQu9/3cAd14/acJ8Zmqjk3bVWJOaNRWQw==
+X-Received: by 2002:a17:902:8608:: with SMTP id f8mr4959948plo.110.1586957105130;
+        Wed, 15 Apr 2020 06:25:05 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id x3sm13521951pfq.95.2020.04.15.06.20.20
+        by smtp.gmail.com with ESMTPSA id z63sm13828068pfb.20.2020.04.15.06.25.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 06:20:20 -0700 (PDT)
+        Wed, 15 Apr 2020 06:25:04 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id EF32940277; Wed, 15 Apr 2020 13:20:19 +0000 (UTC)
-Date:   Wed, 15 Apr 2020 13:20:19 +0000
+        id 757A040277; Wed, 15 Apr 2020 13:25:03 +0000 (UTC)
+Date:   Wed, 15 Apr 2020 13:25:03 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
@@ -62,39 +62,45 @@ Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 5/5] block: revert back to synchronous request_queue
- removal
-Message-ID: <20200415132019.GW11244@42.do-not-panic.com>
+Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
+Message-ID: <20200415132503.GX11244@42.do-not-panic.com>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-6-mcgrof@kernel.org>
- <20200414154725.GD25765@infradead.org>
- <20200414205852.GP11244@42.do-not-panic.com>
- <20200415064644.GA28112@infradead.org>
+ <20200414041902.16769-4-mcgrof@kernel.org>
+ <20200414154044.GB25765@infradead.org>
+ <20200415061649.GS11244@42.do-not-panic.com>
+ <20200415071425.GA21099@infradead.org>
+ <20200415123434.GU11244@42.do-not-panic.com>
+ <20200415123925.GA14925@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200415064644.GA28112@infradead.org>
+In-Reply-To: <20200415123925.GA14925@infradead.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 11:46:44PM -0700, Christoph Hellwig wrote:
-> On Tue, Apr 14, 2020 at 08:58:52PM +0000, Luis Chamberlain wrote:
-> > > I think this needs a WARN_ON thrown in to enforece the calling context.
+On Wed, Apr 15, 2020 at 05:39:25AM -0700, Christoph Hellwig wrote:
+> On Wed, Apr 15, 2020 at 12:34:34PM +0000, Luis Chamberlain wrote:
+> > I'll pile up a fix. I've also considered doing a full review of callers
+> > outside of the core block layer using it, and maybe just unexporting
+> > this. It was originally exported due to commit d86e0e83b ("block: export
+> > blk_{get,put}_queue()") to fix a scsi bug, but I can't find such
+> > respective fix. I suspec that using bdgrab()/bdput() seems more likely
+> > what drivers should be using. That would allow us to keep this
+> > functionality internal.
 > > 
-> > I considered adding a might_sleep() but upon review with Bart, he noted
-> > that this function already has a mutex_lock(), and if you look under the
-> > hood of mutex_lock(), it has a might_sleep() at the very top. The
-> > warning then is implicit.
+> > Think that's worthy review?
 > 
-> It might just be a personal preference, but I think the documentation
-> value of a WARN_ON_ONCE or might_sleep with a comment at the top of
-> the function is much higher than a blurb in a long kerneldoc text and
-> a later mutex_lock.
+> Probably.  I did in fact very quickly look into that but then gave
+> up due to the fair amount of modular users.
 
-Well I'm a fan of making this explicit, so sure will just sprinkle a
-might_sleep(), even though we have a mutex_lock().
+Alright, then might as well then verify if the existing practice of
+bdgrab()/bdput() is indeed valid logic, as otherwise we'd be puting
+the atomic context / sleep concern to bdput(). As noted earlier I
+am able to confirm easily that bdgrab() can be called in atomic contex,
+however I cannot easily yet vet for *why* this was a safe assumption for
+bdput().
 
   Luis
