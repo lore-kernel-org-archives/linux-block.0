@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D39C2BB85
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2BDC2BB85
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 07:15:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D433220784
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A848D20771
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 07:15:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K9+bRfkI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FmMuX+Ji"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2635039AbgDOGre (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 02:47:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51596 "EHLO
+        id S2441110AbgDOHPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 03:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2634963AbgDOGr1 (ORCPT
+        with ESMTP id S2390559AbgDOHO6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 02:47:27 -0400
+        Wed, 15 Apr 2020 03:14:58 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EECFC061A0C;
-        Tue, 14 Apr 2020 23:47:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E15C061A0C;
+        Wed, 15 Apr 2020 00:14:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2gmDYLi4/Kmt66vaVwEAhPniYnGKhZzhEZo2/uC5wIA=; b=K9+bRfkIbjPRAj6/hm1WXdcGYq
-        RKI3+ySEt4A6WXG3J1GKfCgXt06KUGaBEvkJIq+Ie1IZuw2l9X2O6i4sieH18zY4z3skuFesVclAN
-        BzDFLAlYhdBM4ie6U2u3ELSTPd/eCBvy+OjM7KO7k4qcRkz7xTxNN6JrW15dsWYFQSdozekpJTamE
-        y1JskYiFntJpdpNo7Vr8fxBfqhHY62ENK3TN1b/rFEAEXkNUniJITN6C4B88EMz0k45doOCEKueRC
-        XkVe8IHDFCyGId329J0iVUv8TlpM2rz884iyI4vRivowvIeJw6pDmZO55b9WOc1/ewo+lyxeh1CPb
-        DB4NnBhg==;
+        bh=JzUzg/mW68+ufFV5qcTuM5sEEYmvYc+6RGs1lG03lg0=; b=FmMuX+JibdIFYgAXEY1r2PHZfA
+        B6B5zj7G5Q0xig3P+EqdOp9okOT/6pUfs/hJ6jp3mokJUa2kVkgxvL0o268Dmm//QdY3sCehn9W/M
+        8LBFnKP6FW+f4rCqJG2SKKOW4szpZ30CA8uej5/nzN9v4V8w1eMM78y7m5L1w0jwgoVaMQaGE+PIA
+        mc5Xhco0YqAsDEootkgKFBn8fqXCExSnuOm+EFhD0RGpSTbBaXunYLtrlVqd6nSEPpnIsaxcgCNP1
+        nyLiRlxsxPNphoVRfgE/zZY6hPfr9yvrzGiWBcrqSxNt7F4sXyMllwf8EIYvlgdEtNmnFLJN4JVvC
+        RLvFKpzw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOboq-00041j-2i; Wed, 15 Apr 2020 06:46:44 +0000
-Date:   Tue, 14 Apr 2020 23:46:44 -0700
+        id 1jOcFd-0004Uk-AU; Wed, 15 Apr 2020 07:14:25 +0000
+Date:   Wed, 15 Apr 2020 00:14:25 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
@@ -49,32 +49,36 @@ Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
         Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 5/5] block: revert back to synchronous request_queue
- removal
-Message-ID: <20200415064644.GA28112@infradead.org>
+Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
+Message-ID: <20200415071425.GA21099@infradead.org>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-6-mcgrof@kernel.org>
- <20200414154725.GD25765@infradead.org>
- <20200414205852.GP11244@42.do-not-panic.com>
+ <20200414041902.16769-4-mcgrof@kernel.org>
+ <20200414154044.GB25765@infradead.org>
+ <20200415061649.GS11244@42.do-not-panic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200414205852.GP11244@42.do-not-panic.com>
+In-Reply-To: <20200415061649.GS11244@42.do-not-panic.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 08:58:52PM +0000, Luis Chamberlain wrote:
-> > I think this needs a WARN_ON thrown in to enforece the calling context.
+On Wed, Apr 15, 2020 at 06:16:49AM +0000, Luis Chamberlain wrote:
+> The BLKTRACESETUP above works on request_queue which later
+> LOOP_CTL_DEL races on and sweeps the debugfs dir underneath us.
+> If you use this commit alone though, this doesn't fix the race issue
+> however, and that's because of both still the debugfs_lookup() use
+> and that we're still using asynchronous removal at this point.
 > 
-> I considered adding a might_sleep() but upon review with Bart, he noted
-> that this function already has a mutex_lock(), and if you look under the
-> hood of mutex_lock(), it has a might_sleep() at the very top. The
-> warning then is implicit.
+> refcounting will just ensure we don't take the request_queue underneath
+> our noses.
+> 
+> Should I just add this to the commit log?
 
-It might just be a personal preference, but I think the documentation
-value of a WARN_ON_ONCE or might_sleep with a comment at the top of
-the function is much higher than a blurb in a long kerneldoc text and
-a later mutex_lock.
+That sounds much more useful than the trace.
+
+Btw, Isn't blk_get_queue racy as well?  Shouldn't we check
+blk_queue_dying after getting the reference and undo it if the queue is
+indeeed dying?
