@@ -2,101 +2,172 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BB6C2BB1D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 02:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12273C3815B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:24:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 861D32072D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 02:46:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9B8A2063A
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:24:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=jgottula-com.20150623.gappssmtp.com header.i=@jgottula-com.20150623.gappssmtp.com header.b="jDnPnIgi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732543AbgDOCq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Apr 2020 22:46:27 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40113 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730445AbgDOCqY (ORCPT
+        id S2389366AbgDOFYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 01:24:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389365AbgDOFYo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Apr 2020 22:46:24 -0400
-Received: by mail-pl1-f196.google.com with SMTP id t16so709568plo.7;
-        Tue, 14 Apr 2020 19:46:22 -0700 (PDT)
+        Wed, 15 Apr 2020 01:24:44 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD4CC061A0C
+        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2020 22:24:43 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id 1so1475855vsl.9
+        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2020 22:24:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jgottula-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=CjsNluhDo6fii/3wuLR0y0/drIzNQWBRrY6KxvovKTQ=;
+        b=jDnPnIgi7FFitiIZ8LbcTGZwv9agTPLMLv2ivenUIbh5qdeAbnOQwcSdYlcK41IrGL
+         /sUcePO+BF/BiiWpgdjxBHB0NHiqtFuTtRo2EPBN7eh7iBxtSffRUr1/igweyng3ffhn
+         +GqPqMKKV0S48gRa2B/h6fFWtGhb5cFrUpKlD+Re1OkUEwocS8u7VBovDftc/0vCfC9g
+         L7SYN2MMIKb0go4htOsrNbXHfS6H3QeEH8FEaFlie9s2YfHqkwJquuTf6SBL+Rq/zJFK
+         148j0XmJh6nypq7hsQNHk8H1wEb9XtuiokbeZaAE3WABugYFNvtMI9ajTSP4VRYQpRa1
+         ADbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=8mRfxoN3bcfcA1TxXqki/WiTHgjCQ2LePwB5Nf3Tcgg=;
-        b=ddSMr44V1NatRcjpEvz0b95ktygt7OTU2BZw0ha9+6C4DuYeICp6R3raOyf2gfLMGk
-         0/oZFpliKstDHroOimSMoju/21FD3YsjtP+8mOyP3zXikfy7f6WXVt4Nnvguag9XMHGf
-         05EybzPQ0Ff7/VbRZgGfFhpTEbX3evsK/Ggf4u8I8xCLCbdTn51fTL/aiykC5mp0BLBG
-         dlpI5xD9eOV5lvQPc6xyo+BBivX/LZaDsEsAaukJmTXz2bhKFjsym/+RG1wgq8G+AwY2
-         7Wn0YbuATXfRSeQ1FRVBPo6SfuSVV1vKdWodcSdW/vq/8nrL0/urD+bC31bhg+qMf9Ea
-         j4Gw==
-X-Gm-Message-State: AGi0Pua2egqZKhtOYjal5upsmQrQlB5jYWllxqv4xogKjee1CyGV17gC
-        8HSnK2tWEsSkrLxWU/Iftm0=
-X-Google-Smtp-Source: APiQypIWuUQhQ3vjC/8iRMxAkMbtjgb/6nKIWTCZxGVhNEk2zJlKzeWIiiIkPFYUAm26uppDkSO/wg==
-X-Received: by 2002:a17:90a:21ce:: with SMTP id q72mr3616695pjc.0.1586918781929;
-        Tue, 14 Apr 2020 19:46:21 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:3d9e:6f43:1883:92f0? ([2601:647:4000:d7:3d9e:6f43:1883:92f0])
-        by smtp.gmail.com with ESMTPSA id z12sm12827964pfj.144.2020.04.14.19.46.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 19:46:21 -0700 (PDT)
-Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
-Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-3-mcgrof@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <608dc241-2f87-27df-fd51-a1b91c7e4425@acm.org>
-Date:   Tue, 14 Apr 2020 19:46:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=CjsNluhDo6fii/3wuLR0y0/drIzNQWBRrY6KxvovKTQ=;
+        b=KjcAn5f8yLS5msCxRVauvAfV1fRqXTyWnq0AmAOQwApm/QgFHaAO2Njy3bWj06K8tU
+         rEYnK6ASKbJ3l+Y0yjxBqaLGZkb2+JCwsMrwzTbiNojctfqAfn5x6NYylHQAk08Rq2/E
+         O7Ne2lrLMM5z1PR/YWNIuKpVs4LW35Yz7R1xcQvaha4z4zxmqgUeO27qjmU02U0ogeFx
+         9DVvYCy1ISkXIScKezXQOPM6DCqDeW2ajZ8jCZdGj8P0JLNPn0KQ+FC+w2SuUOXaEnZ+
+         ycDOPCLPpP92peaelCiiJFU3HOLid/XFGeCyAhbyZqQ/o5VQVN1lg+JEIC1bw2+LzVAR
+         NoKw==
+X-Gm-Message-State: AGi0PuaW3NSFccDIcD4jbNNeRRW2dEtuQ5HJleN5eznBdSrw/xod7igA
+        vHsyi28EVEYD+Jwy3WbA8t9BUK/dA91/Y64EgVDTJg==
+X-Google-Smtp-Source: APiQypKiW+5K0iIExgtZmen2x20OqxZ63I0VRkzalxonLHEZYX6mBfSp24X+mssKwRT5Rz35YF2TSuEg/IGVr/32UbA=
+X-Received: by 2002:a05:6102:a01:: with SMTP id t1mr2866733vsa.108.1586928282467;
+ Tue, 14 Apr 2020 22:24:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200414041902.16769-3-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Justin Gottula <justin@jgottula.com>
+Date:   Tue, 14 Apr 2020 22:24:18 -0700
+Message-ID: <CAKuMfTUPzPjuNk+T_GQMCKoB9ssh2arr6xRiu6VODwwB0PMdZw@mail.gmail.com>
+Subject: [PATCH] zram: fix writeback_store returning zero in most situations
+To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-13 21:18, Luis Chamberlain wrote:
-> On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
-> merged on v4.12 Omar fixed the original blktrace code for request-based
-> drivers (multiqueue). This however left in place a possible crash, if you
-> happen to abuse blktrace in a way it was not intended.
+Commit 3b82a051c101 ("zram: fix error return codes not being returned in
+writeback_store") altered the return value logic in writeback_store such
+that ret = len is done at the beginning of the function, which alleviated
+an issue where the -EIO and -ENOSPC break-outs from the for-loop would
+unintentionally hit the ret = len previously located at the end of the
+function. That change in itself was largely fine; however, it exposed
+another return value logic problem.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Currently, when the writeback_store for-loop does _not_ encounter the -EIO
+or -ENOSPC situations, and _does_ attempt to write at least one block to
+the backing device, the function will simply return whatever the most
+recent submit_bio_wait return value was. This means that if at least one
+block write is attempted, the function will never actually return len; and,
+if the last written block's call to submit_bio_wait was successful, then
+the function will actually return _zero_. (Prior to the above-mentioned
+patch, this situation was masked by the fact that the ret = len assignment
+occurred _after_ all calls to submit_bio_wait.)
+
+So, if writeback of one or more blocks is attempted, and the last
+submit_bio_wait is successful (which will usually be the case), userspace
+programs performing write(3) syscalls to /sys/block/zramN/writeback will
+receive a return value of zero. Well-written programs use non-negative
+return values from write(3) to determine if a partial write occurred, and
+in that circumstance, they generally add the value to their buffer pointer
+and call write(3) again. Programs written this way will, as a result,
+effectively spin in a loop calling write(3) forever (or at least until an
+actual error value does finally crop up), repeatedly writing the entire
+string buffer ("huge" or "idle") to the writeback file and getting the
+false impression that no forward progress is being made, since zero bytes
+of the buffer are apparently being consumed with each syscall.
+
+I came across this problem while adding a new parameter to the zramctl
+program, in a personal fork of the util-linux suite, that would allow the
+user to easily request writeback on a zram device. In zramctl (and the
+util-linux programs in general), sysfs writes are typically done via
+ul_path_write_string, which invokes write_all. The write_all utility
+function is written in such a way that write(3) return values _not greater
+than zero_ are treated as error conditions; upon which, any errno value
+other than EINTR or EAGAIN will cause the function to bail out and indicate
+an error. A return value of zero is indeed greater than zero; and an errno
+value of zero is neither EINTR nor EAGAIN; so write_all bails and indicates
+an error. (And thanks to automatic strerror-based printout functions, this
+of course produces the message "error: Success", a personal favorite of
+mine.)
+
+The writeback_store return value problem is addressed by storing the
+submit_bio_wait result in a separate local variable, which is only assigned
+to ret if it is actually an errno value.
+
+The behavior should now be that, if an error arises from one or more of the
+calls to submit_bio_wait during writeback_store, and none of the other
+explicit error cases in the function are triggered, then the most recent
+submit_bio_wait error will be returned. Otherwise, the function will return
+len.
+
+Fixes: a939888ec38b ("zram: support idle/huge page writeback")
+Signed-off-by: Justin Gottula <justin@jgottula.com>
+---
+Side Note: My understanding of whether a return value of zero from
+write(3) is actually even valid--given a nonzero length parameter--became a
+whole lot murkier when I took a really close look at the Linux and POSIX
+man pages, as well as Internet discussions on the topic. Initially I was
+sure that a zero return value indicated that no error had occurred, but
+that no forward progress on the write had been made either; and that as
+such, the implementation of write_all in util-linux was faulty. But now
+I've come to understand that apparently some historical implementations of
+write(3) have actually returned zero as an indication that a non-blocking
+write on certain special files would block (though modern POSIX specifies
+returning -1 and setting errno to EAGAIN for this case); and that a return
+value of zero may apparently be used as an EOF indication. So perhaps
+treating a zero result as an error in write_all, implicit and accidental
+though it may have appeared, was actually intentional and well-founded all
+along; I don't entirely know. In any case, though, it's clear that the zram
+driver shouldn't be returning 0 in this circumstance.
+
+ drivers/block/zram/zram_drv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 1bf4a908a0bd..e55330a615c2 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -627,6 +627,7 @@ static ssize_t writeback_store(struct device *dev,
+    struct bio_vec bio_vec;
+    struct page *page;
+    ssize_t ret = len;
++   int bio_ret;
+    int mode;
+    unsigned long blk_idx = 0;
+
+@@ -719,8 +720,9 @@ static ssize_t writeback_store(struct device *dev,
+         * XXX: A single page IO would be inefficient for write
+         * but it would be not bad as starter.
+         */
+-       ret = submit_bio_wait(&bio);
+-       if (ret) {
++       bio_ret = submit_bio_wait(&bio);
++       if (bio_ret) {
++           ret = bio_ret;
+            zram_slot_lock(zram, index);
+            zram_clear_flag(zram, index, ZRAM_UNDER_WB);
+            zram_clear_flag(zram, index, ZRAM_IDLE);
+--
+2.25.1
