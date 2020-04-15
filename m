@@ -2,71 +2,71 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E982AC2BB85
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BA7C2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C27ED20775
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD6E920771
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="ARF1kKA5"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="IhRTjTDz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2895400AbgDOJX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 05:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
+        id S2895388AbgDOJXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 05:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2895413AbgDOJXR (ORCPT
+        by vger.kernel.org with ESMTP id S2895418AbgDOJXT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 05:23:17 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F890C03C1A6
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:23:16 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id y24so18071310wma.4
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:23:16 -0700 (PDT)
+        Wed, 15 Apr 2020 05:23:19 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E0DC03C1AE
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:23:18 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id d27so9034406wra.1
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 02:23:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Vsqbk9yd/R1BpMJdkLDH91Om0CETzwSXfeDvcfyeZUY=;
-        b=ARF1kKA5rarhNcGMUzemo8TmINevmQT9bAmzeTwOxtZYZi/ILkUtHFxM0Nij/nYGmK
-         TB7IaQAd/EMg4mo3Bs1ul+Jrzxf0oZvCf1147VNTxbVd60lA9PiLfo4A5dlAfe723XT4
-         5Cee7foLJrvOHnqEavb3zvKGJ7A13Idbrl/5HV7qorgkRUetONlmfVRkVFCd+cMMj95b
-         DLT/ZSYw96Okr722Nhe7a3S6b6z0Ys//pIDz5GhGPdZluwNYpvsN29oK1CxOosmeyTHC
-         0i1GuogCTPJaz+Yca+ow8GKB6SKtYsvWoYOLBRSuaQf7Mpxh04IJk7ANCZeqtFHUGNMe
-         EUfg==
+        bh=+lzbi8aK38U3+DnvnY6rCKYXK2X3LSq1Bs0xPjQHnEY=;
+        b=IhRTjTDz7EJWFq9QmsxzQIXFo/Rz3p94HTg5QUIce2pHs0vR3K/yQlWoDkJjT7He0Z
+         xRnivZ/Znkw7AR7UZS6EvUSTJY9YeFboUWxVV1VjtXTiprve5IVpyGRptJE+8C3tBH0/
+         tgkpnAjMv3N4JiZRQ5Mr+W+Fji7QVJn1rwXgHnJbYwWK6V/GoCpM/Ci6daZx62Moh+Lm
+         IRLgxB7s3VdZUjGuqH70CDCrUcxhyqHZXGuASdLZca4OrXD017gWVnF+KU585tMXB+YE
+         24sCXYIC4zPEfv/B6eH+75F7xLSJ/p6tY2Kod7H0tPDoR2GZNZ6yhp6Rh6eYbUAzQOhT
+         OwvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Vsqbk9yd/R1BpMJdkLDH91Om0CETzwSXfeDvcfyeZUY=;
-        b=hM9B9hsLeBslr/nJtLoGFKyHo/y2kT4EM222cJc8kF8PjWf/HiqixaJkoujc0KfBz6
-         MEwOY/wwjOLtHnGpwEkOvhINEKAcn1Yn3tczbCibWxQU79yW5hD8XvH5nAXWm3eU1Yhj
-         qfxhq6cewsyqSjVtWOI1P3mrto8kayOZGC7tI8m4XyLBV/+O+eco/ueoBycNfkd/Ee4z
-         EHO6SnuEVJcJdhbXrcADw2ioBkHqh1EqTLuZY8lu0+GltgoOkSXxh3UPjYR1PuKXsYUE
-         roE+qopdO1W7FAEhgYr3WAs34JRvSXmCrubSp/cmQ5ZTvGYN0dCOd9crE/8ThsC6wkfx
-         4Mrg==
-X-Gm-Message-State: AGi0PuYh803p85F0afZcDe/wQLltpMKU2hPi9VN44iP4a0D+AsayuHBM
-        /XFbzpc2PDOXnYJT6JWB58J5CjbiSBzbZh0=
-X-Google-Smtp-Source: APiQypKVEVqm8UCf/EmtF9FDT7krui0NoFILMq253tn05KEYtHVoGw0X1f76h1MqH/9b4QHbY/b6gQ==
-X-Received: by 2002:a1c:147:: with SMTP id 68mr4394428wmb.28.1586942590936;
-        Wed, 15 Apr 2020 02:23:10 -0700 (PDT)
+        bh=+lzbi8aK38U3+DnvnY6rCKYXK2X3LSq1Bs0xPjQHnEY=;
+        b=VMIvkZJDqYx9CblnLtKCZ1F2SvKVC2CxNO1Tk69M1cobZmVRKRrm95/NtnKOtCySTm
+         bEeMDqGGfYvU/sopISUjlNc7Gcpe8Kg35djPehgeREfkCU+n1jvgJc9m31e1HaGBonJM
+         YBnmzjrYRVLaAiHU7512+6kUK4+FPwfvCSTJIKHjvjpb8EdLfoKBwGYwPtaWKyq1FHmp
+         cL2r/7084CQfsk+TnPBrnnqWvqj4N9P2bAfEEIpPg+pd53yCNspXKwMmX30G/SRiQlHq
+         8CGMNZ+z6hkdjKm0DH6MJAQy4Jav+DeeVqBZYxrCLgLCOhHyBd8RAfifOrj6P0BMSALL
+         gZkA==
+X-Gm-Message-State: AGi0PuY2ZUDGAYuxytPlsuOYs8UgvwtgIOdyRKg6MTHOkm9vjjk7oxhh
+        1D2rNzDF8IxlM2ejDzWqMgLEe+qHa2zWDzM=
+X-Google-Smtp-Source: APiQypJ3GJM0/+2P/AexxwNZcsOmkayjLCRqYin26oqaGvC5I/yiPcNjbwDbLtPAlMe8SMno++ygnQ==
+X-Received: by 2002:a5d:50c9:: with SMTP id f9mr9515274wrt.191.1586942597275;
+        Wed, 15 Apr 2020 02:23:17 -0700 (PDT)
 Received: from dkxps.fkb.profitbricks.net (dslb-002-204-231-072.002.204.pools.vodafone-ip.de. [2.204.231.72])
-        by smtp.gmail.com with ESMTPSA id v7sm22534615wmg.3.2020.04.15.02.23.09
+        by smtp.gmail.com with ESMTPSA id v7sm22534615wmg.3.2020.04.15.02.23.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 02:23:10 -0700 (PDT)
+        Wed, 15 Apr 2020 02:23:16 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v12 21/25] block/rnbd: server: functionality for IO submission to block dev
-Date:   Wed, 15 Apr 2020 11:20:41 +0200
-Message-Id: <20200415092045.4729-22-danil.kipnis@cloud.ionos.com>
+Subject: [PATCH v12 25/25] MAINTAINERS: Add maintainers for RNBD/RTRS modules
+Date:   Wed, 15 Apr 2020 11:20:45 +0200
+Message-Id: <20200415092045.4729-26-danil.kipnis@cloud.ionos.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
 References: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
@@ -79,255 +79,47 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This provides helper functions for IO submission to block dev.
+Danil and I will maintain RNBD/RTRS modules.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/rnbd/rnbd-srv-dev.c | 134 ++++++++++++++++++++++++++++++
- drivers/block/rnbd/rnbd-srv-dev.h |  92 ++++++++++++++++++++
- 2 files changed, 226 insertions(+)
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
+ MAINTAINERS | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
-new file mode 100644
-index 000000000000..5eddfd29ab64
---- /dev/null
-+++ b/drivers/block/rnbd/rnbd-srv-dev.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RDMA Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-+ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-+ */
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e64e5db31497..8031a923e5a5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14448,6 +14448,13 @@ F:	arch/riscv/
+ N:	riscv
+ K:	riscv
+ 
++RNBD BLOCK DRIVERS
++M:	Danil Kipnis <danil.kipnis@cloud.ionos.com>
++M:	Jack Wang <jinpu.wang@cloud.ionos.com>
++L:	linux-block@vger.kernel.org
++S:	Maintained
++F:	drivers/block/rnbd/
 +
-+#include "rnbd-srv-dev.h"
-+#include "rnbd-log.h"
+ ROCCAT DRIVERS
+ M:	Stefan Achatz <erazor_de@users.sourceforge.net>
+ S:	Maintained
+@@ -14576,6 +14583,13 @@ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jes/linux.git rtl8xxxu-devel
+ F:	drivers/net/wireless/realtek/rtl8xxxu/
+ 
++RTRS TRANSPORT DRIVERS
++M:	Danil Kipnis <danil.kipnis@cloud.ionos.com>
++M:	Jack Wang <jinpu.wang@cloud.ionos.com>
++L:	linux-rdma@vger.kernel.org
++S:	Maintained
++F:	drivers/infiniband/ulp/rtrs/
 +
-+struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
-+			       struct bio_set *bs)
-+{
-+	struct rnbd_dev *dev;
-+	int ret;
-+
-+	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-+	if (!dev)
-+		return ERR_PTR(-ENOMEM);
-+
-+	dev->blk_open_flags = flags;
-+	dev->bdev = blkdev_get_by_path(path, flags, THIS_MODULE);
-+	ret = PTR_ERR_OR_ZERO(dev->bdev);
-+	if (ret)
-+		goto err;
-+
-+	dev->blk_open_flags = flags;
-+	bdevname(dev->bdev, dev->name);
-+	dev->ibd_bio_set = bs;
-+
-+	return dev;
-+
-+err:
-+	kfree(dev);
-+	return ERR_PTR(ret);
-+}
-+
-+void rnbd_dev_close(struct rnbd_dev *dev)
-+{
-+	blkdev_put(dev->bdev, dev->blk_open_flags);
-+	kfree(dev);
-+}
-+
-+static void rnbd_dev_bi_end_io(struct bio *bio)
-+{
-+	struct rnbd_dev_blk_io *io = bio->bi_private;
-+
-+	rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
-+	bio_put(bio);
-+}
-+
-+/**
-+ *	rnbd_bio_map_kern	-	map kernel address into bio
-+ *	@data: pointer to buffer to map
-+ *	@bs: bio_set to use.
-+ *	@len: length in bytes
-+ *	@gfp_mask: allocation flags for bio allocation
-+ *
-+ *	Map the kernel address into a bio suitable for io to a block
-+ *	device. Returns an error pointer in case of error.
-+ */
-+static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
-+				     unsigned int len, gfp_t gfp_mask)
-+{
-+	unsigned long kaddr = (unsigned long)data;
-+	unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	unsigned long start = kaddr >> PAGE_SHIFT;
-+	const int nr_pages = end - start;
-+	int offset, i;
-+	struct bio *bio;
-+
-+	bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
-+	if (!bio)
-+		return ERR_PTR(-ENOMEM);
-+
-+	offset = offset_in_page(kaddr);
-+	for (i = 0; i < nr_pages; i++) {
-+		unsigned int bytes = PAGE_SIZE - offset;
-+
-+		if (len <= 0)
-+			break;
-+
-+		if (bytes > len)
-+			bytes = len;
-+
-+		if (bio_add_page(bio, virt_to_page(data), bytes,
-+				    offset) < bytes) {
-+			/* we don't support partial mappings */
-+			bio_put(bio);
-+			return ERR_PTR(-EINVAL);
-+		}
-+
-+		data += bytes;
-+		len -= bytes;
-+		offset = 0;
-+	}
-+
-+	bio->bi_end_io = bio_put;
-+	return bio;
-+}
-+
-+int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
-+		       size_t len, u32 bi_size, enum rnbd_io_flags flags,
-+		       short prio, void *priv)
-+{
-+	struct rnbd_dev_blk_io *io;
-+	struct bio *bio;
-+
-+	/* Generate bio with pages pointing to the rdma buffer */
-+	bio = rnbd_bio_map_kern(data, dev->ibd_bio_set, len, GFP_KERNEL);
-+	if (IS_ERR(bio))
-+		return PTR_ERR(bio);
-+
-+	io = container_of(bio, struct rnbd_dev_blk_io, bio);
-+
-+	io->dev	= dev;
-+	io->priv = priv;
-+
-+	bio->bi_end_io = rnbd_dev_bi_end_io;
-+	bio->bi_private	= io;
-+	bio->bi_opf = rnbd_to_bio_flags(flags);
-+	bio->bi_iter.bi_sector = sector;
-+	bio->bi_iter.bi_size = bi_size;
-+	bio_set_prio(bio, prio);
-+	bio_set_dev(bio, dev->bdev);
-+
-+	submit_bio(bio);
-+
-+	return 0;
-+}
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
-new file mode 100644
-index 000000000000..0f65b09a270e
---- /dev/null
-+++ b/drivers/block/rnbd/rnbd-srv-dev.h
-@@ -0,0 +1,92 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * RDMA Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-+ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-+ */
-+#ifndef RNBD_SRV_DEV_H
-+#define RNBD_SRV_DEV_H
-+
-+#include <linux/fs.h>
-+#include "rnbd-proto.h"
-+
-+struct rnbd_dev {
-+	struct block_device	*bdev;
-+	struct bio_set		*ibd_bio_set;
-+	fmode_t			blk_open_flags;
-+	char			name[BDEVNAME_SIZE];
-+};
-+
-+struct rnbd_dev_blk_io {
-+	struct rnbd_dev *dev;
-+	void		 *priv;
-+	/* have to be last member for front_pad usage of bioset_init */
-+	struct bio	bio;
-+};
-+
-+/**
-+ * rnbd_dev_open() - Open a device
-+ * @flags:	open flags
-+ * @bs:		bio_set to use during block io,
-+ */
-+struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
-+			       struct bio_set *bs);
-+
-+/**
-+ * rnbd_dev_close() - Close a device
-+ */
-+void rnbd_dev_close(struct rnbd_dev *dev);
-+
-+void rnbd_endio(void *priv, int error);
-+
-+static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
-+{
-+	return queue_max_segments(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_max_hw_sects(const struct rnbd_dev *dev)
-+{
-+	return queue_max_hw_sectors(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_secure_discard(const struct rnbd_dev *dev)
-+{
-+	return blk_queue_secure_erase(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_max_discard_sects(const struct rnbd_dev *dev)
-+{
-+	if (!blk_queue_discard(bdev_get_queue(dev->bdev)))
-+		return 0;
-+
-+	return blk_queue_get_max_sectors(bdev_get_queue(dev->bdev),
-+					 REQ_OP_DISCARD);
-+}
-+
-+static inline int rnbd_dev_get_discard_granularity(const struct rnbd_dev *dev)
-+{
-+	return bdev_get_queue(dev->bdev)->limits.discard_granularity;
-+}
-+
-+static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
-+{
-+	return bdev_get_queue(dev->bdev)->limits.discard_alignment;
-+}
-+
-+/**
-+ * rnbd_dev_submit_io() - Submit an I/O to the disk
-+ * @dev:	device to that the I/O is submitted
-+ * @sector:	address to read/write data to
-+ * @data:	I/O data to write or buffer to read I/O date into
-+ * @len:	length of @data
-+ * @bi_size:	Amount of data that will be read/written
-+ * @prio:       IO priority
-+ * @priv:	private data passed to @io_fn
-+ */
-+int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
-+			size_t len, u32 bi_size, enum rnbd_io_flags flags,
-+			short prio, void *priv);
-+
-+#endif /* RNBD_SRV_DEV_H */
+ RXRPC SOCKETS (AF_RXRPC)
+ M:	David Howells <dhowells@redhat.com>
+ L:	linux-afs@lists.infradead.org
 -- 
 2.20.1
 
