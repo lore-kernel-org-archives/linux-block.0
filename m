@@ -2,58 +2,45 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F997C2BA2B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D39C2BB85
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:47:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF419206D9
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:16:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586931420;
-	bh=0n6/CWVjTfYgmYIxyNlxDiz0paPVlOuRK/A6BVXHcoU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=pRlgvtJ7ROPAo4rTwl6Gusx5zOyWdk8DSR5YpXcd4QcVkXnF9FQtERukDZz4TeJP0
-	 doktWJkZmgngY0s5Fvbj0B3fhIZG45WyqC4jj8lpjLlM5e8BpO3GTxzf4gq79wHwJD
-	 +e1SrmLG0tTtfx4rRuZTgqEs0FFqceiToY6xos74=
+	by mail.kernel.org (Postfix) with ESMTP id D433220784
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 06:47:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K9+bRfkI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393502AbgDOGQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 02:16:54 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:36962 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732426AbgDOGQx (ORCPT
+        id S2635039AbgDOGre (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 02:47:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2634963AbgDOGr1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 02:16:53 -0400
-Received: by mail-pj1-f67.google.com with SMTP id z9so6252767pjd.2;
-        Tue, 14 Apr 2020 23:16:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=kKwt+k2pDUu9qpX8GZzWlBWNHQkyl61044lYkr3xgoo=;
-        b=VK3NqCX5GJWZR0IOMzFqowungM2D3Z17M9Tml2MsGpuucVJHN5yvKWFkEuDJIvqgMg
-         5llyEJCK7ew5cRHTwkCO5X+plfbmI+sQUJmjH9vJa78UL9JIetbzZSGDnGsIhXqu34Zb
-         jsm0FLvYnEwwuATKf9otvBS4UmVh0Jl6JIyw7+sGk0o6Hdd2vA7qgc1HHrWye8EhwzS/
-         s3gN2vwI9kq3MJ6AFxDISXTvvDPKmW67KStV0BA9+Tmec5KO0tc+C0JUDr7ijfCXKm4h
-         4bSoCWLfFR5BO/bb5Hk8VDHtZehaXI3safCQElFyXMKsftiyK2C/Jys8sPpPGYIdRhdA
-         pGfQ==
-X-Gm-Message-State: AGi0Pua0RB9AQdtE12qPRkRPDBXXeS4vTIahdbmTXgGcFshudAs8Geeh
-        92U8g6vIguFkwLvjPALHbtI=
-X-Google-Smtp-Source: APiQypLUnBYTt2JPAvzaO1zJS12kV1LMzAoWxzi3yM07dJiAaH0luQJiHmQw3RCIjIBzSRfPCV0Vfw==
-X-Received: by 2002:a17:902:7616:: with SMTP id k22mr2578548pll.39.1586931411005;
-        Tue, 14 Apr 2020 23:16:51 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id z16sm3078792pfa.3.2020.04.14.23.16.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2020 23:16:49 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 2980940277; Wed, 15 Apr 2020 06:16:49 +0000 (UTC)
-Date:   Wed, 15 Apr 2020 06:16:49 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        Wed, 15 Apr 2020 02:47:27 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EECFC061A0C;
+        Tue, 14 Apr 2020 23:47:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2gmDYLi4/Kmt66vaVwEAhPniYnGKhZzhEZo2/uC5wIA=; b=K9+bRfkIbjPRAj6/hm1WXdcGYq
+        RKI3+ySEt4A6WXG3J1GKfCgXt06KUGaBEvkJIq+Ie1IZuw2l9X2O6i4sieH18zY4z3skuFesVclAN
+        BzDFLAlYhdBM4ie6U2u3ELSTPd/eCBvy+OjM7KO7k4qcRkz7xTxNN6JrW15dsWYFQSdozekpJTamE
+        y1JskYiFntJpdpNo7Vr8fxBfqhHY62ENK3TN1b/rFEAEXkNUniJITN6C4B88EMz0k45doOCEKueRC
+        XkVe8IHDFCyGId329J0iVUv8TlpM2rz884iyI4vRivowvIeJw6pDmZO55b9WOc1/ewo+lyxeh1CPb
+        DB4NnBhg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jOboq-00041j-2i; Wed, 15 Apr 2020 06:46:44 +0000
+Date:   Tue, 14 Apr 2020 23:46:44 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
         jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
         akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
@@ -62,67 +49,32 @@ Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
-Message-ID: <20200415061649.GS11244@42.do-not-panic.com>
+Subject: Re: [PATCH 5/5] block: revert back to synchronous request_queue
+ removal
+Message-ID: <20200415064644.GA28112@infradead.org>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-4-mcgrof@kernel.org>
- <20200414154044.GB25765@infradead.org>
+ <20200414041902.16769-6-mcgrof@kernel.org>
+ <20200414154725.GD25765@infradead.org>
+ <20200414205852.GP11244@42.do-not-panic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200414154044.GB25765@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200414205852.GP11244@42.do-not-panic.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 08:40:44AM -0700, Christoph Hellwig wrote:
-> On Tue, Apr 14, 2020 at 04:19:00AM +0000, Luis Chamberlain wrote:
-> > Ensure that the request_queue is refcounted during its full
-> > ioctl cycle. This avoids possible races against removal, given
-> > blk_get_queue() also checks to ensure the queue is not dying.
-> > 
-> > This small race is possible if you defer removal of the request_queue
-> > and userspace fires off an ioctl for the device in the meantime.
+On Tue, Apr 14, 2020 at 08:58:52PM +0000, Luis Chamberlain wrote:
+> > I think this needs a WARN_ON thrown in to enforece the calling context.
 > 
-> Hmm, where exactly does the race come in so that it can only happen
-> after where you take the reference, but not before it?  I'm probably
-> missing something, but that just means it needs to be explained a little
-> better :)
+> I considered adding a might_sleep() but upon review with Bart, he noted
+> that this function already has a mutex_lock(), and if you look under the
+> hood of mutex_lock(), it has a might_sleep() at the very top. The
+> warning then is implicit.
 
-From the trace on patch 2/5:
-
-    BLKTRACE_SETUP(loop0) #2
-    [   13.933961] == blk_trace_ioctl(2, BLKTRACESETUP) start
-    [   13.936758] === do_blk_trace_setup(2) start
-    [   13.938944] === do_blk_trace_setup(2) creating directory
-    [   13.941029] === do_blk_trace_setup(2) using what debugfs_lookup() gave
-    
-    ---> From LOOP_CTL_DEL(loop0) #2
-    [   13.971046] === blk_trace_cleanup(7) end
-    [   13.973175] == __blk_trace_remove(7) end
-    [   13.975352] == blk_trace_shutdown(7) end
-    [   13.977415] = __blk_release_queue(7) calling blk_mq_debugfs_unregister()
-    [   13.980645] ==== blk_mq_debugfs_unregister(7) begin
-    [   13.980696] ==== blk_mq_debugfs_unregister(7) debugfs_remove_recursive(q->debugfs_dir)
-    [   13.983118] ==== blk_mq_debugfs_unregister(7) end q->debugfs_dir is NULL
-    [   13.986945] = __blk_release_queue(7) blk_mq_debugfs_unregister() end
-    [   13.993155] = __blk_release_queue(7) end
-    
-    ---> From BLKTRACE_SETUP(loop0) #2
-    [   13.995928] === do_blk_trace_setup(2) end with ret: 0
-    [   13.997623] == blk_trace_ioctl(2, BLKTRACESETUP) end
-
-The BLKTRACESETUP above works on request_queue which later
-LOOP_CTL_DEL races on and sweeps the debugfs dir underneath us.
-If you use this commit alone though, this doesn't fix the race issue
-however, and that's because of both still the debugfs_lookup() use
-and that we're still using asynchronous removal at this point.
-
-refcounting will just ensure we don't take the request_queue underneath
-our noses.
-
-Should I just add this to the commit log?
-
-  Luis
+It might just be a personal preference, but I think the documentation
+value of a WARN_ON_ONCE or might_sleep with a comment at the top of
+the function is much higher than a blurb in a long kerneldoc text and
+a later mutex_lock.
