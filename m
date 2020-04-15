@@ -2,172 +2,241 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12273C3815B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C0DC3815B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:42:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9B8A2063A
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:24:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=jgottula-com.20150623.gappssmtp.com header.i=@jgottula-com.20150623.gappssmtp.com header.b="jDnPnIgi"
+	by mail.kernel.org (Postfix) with ESMTP id 4F8752074F
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 05:42:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586929363;
+	bh=3Taj3Ol8Hg2/sKpPZLERaiQ3+4EDsUg0KQl6ETQ0+vY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NYvDAIqPXHa2OdZ0vxX0oEaG/B2tcBURWO0l0iffY0R7FfkS2QQQEgUprZCXTjlyT
+	 z5oJYjJlKG6Kbv1Z2gnOZZbUGgy1NevU9Ix7K+QUpXLjAukdkBud+3jlFLHNMO/3lp
+	 roe2Kp1Eex61KsFu2kK0/jjiDXP/yc4JRH4S+gdg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389366AbgDOFYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 01:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38836 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389365AbgDOFYo (ORCPT
+        id S2393375AbgDOFml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 01:42:41 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35285 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393395AbgDOFmj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 01:24:44 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD4CC061A0C
-        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2020 22:24:43 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id 1so1475855vsl.9
-        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2020 22:24:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jgottula-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=CjsNluhDo6fii/3wuLR0y0/drIzNQWBRrY6KxvovKTQ=;
-        b=jDnPnIgi7FFitiIZ8LbcTGZwv9agTPLMLv2ivenUIbh5qdeAbnOQwcSdYlcK41IrGL
-         /sUcePO+BF/BiiWpgdjxBHB0NHiqtFuTtRo2EPBN7eh7iBxtSffRUr1/igweyng3ffhn
-         +GqPqMKKV0S48gRa2B/h6fFWtGhb5cFrUpKlD+Re1OkUEwocS8u7VBovDftc/0vCfC9g
-         L7SYN2MMIKb0go4htOsrNbXHfS6H3QeEH8FEaFlie9s2YfHqkwJquuTf6SBL+Rq/zJFK
-         148j0XmJh6nypq7hsQNHk8H1wEb9XtuiokbeZaAE3WABugYFNvtMI9ajTSP4VRYQpRa1
-         ADbQ==
+        Wed, 15 Apr 2020 01:42:39 -0400
+Received: by mail-pg1-f194.google.com with SMTP id t11so1012574pgg.2;
+        Tue, 14 Apr 2020 22:42:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=CjsNluhDo6fii/3wuLR0y0/drIzNQWBRrY6KxvovKTQ=;
-        b=KjcAn5f8yLS5msCxRVauvAfV1fRqXTyWnq0AmAOQwApm/QgFHaAO2Njy3bWj06K8tU
-         rEYnK6ASKbJ3l+Y0yjxBqaLGZkb2+JCwsMrwzTbiNojctfqAfn5x6NYylHQAk08Rq2/E
-         O7Ne2lrLMM5z1PR/YWNIuKpVs4LW35Yz7R1xcQvaha4z4zxmqgUeO27qjmU02U0ogeFx
-         9DVvYCy1ISkXIScKezXQOPM6DCqDeW2ajZ8jCZdGj8P0JLNPn0KQ+FC+w2SuUOXaEnZ+
-         ycDOPCLPpP92peaelCiiJFU3HOLid/XFGeCyAhbyZqQ/o5VQVN1lg+JEIC1bw2+LzVAR
-         NoKw==
-X-Gm-Message-State: AGi0PuaW3NSFccDIcD4jbNNeRRW2dEtuQ5HJleN5eznBdSrw/xod7igA
-        vHsyi28EVEYD+Jwy3WbA8t9BUK/dA91/Y64EgVDTJg==
-X-Google-Smtp-Source: APiQypKiW+5K0iIExgtZmen2x20OqxZ63I0VRkzalxonLHEZYX6mBfSp24X+mssKwRT5Rz35YF2TSuEg/IGVr/32UbA=
-X-Received: by 2002:a05:6102:a01:: with SMTP id t1mr2866733vsa.108.1586928282467;
- Tue, 14 Apr 2020 22:24:42 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=WVRGT38XUU6swRwzPEXLZ5k+G+eQg7kh7o2o1EiB+e0=;
+        b=BURb0KoXrGq3CeMemEwS/w7sasWpNmr4obb6UxIeGSij1vZZnTlbGq+ZriFI8wfwzj
+         R7k3hiH2aFVm0SAUK3/dAptHSG+x60ITAmgvTgnEXxzLXIKI97hckoZUhBhkDUrtTOVt
+         x2QNqTlLnLb7PpJSuuB3G9iIeY8mVtY/5m2m7LuI8wtgVaCINSi9Gc0JpzxYq6PVCuUj
+         OdLXBuSoTlQYf1T2Luy5aZAqHWaX/l8h/hsD3YLSm3Mwinz2OMlqftmFRwnpqhvLfDTV
+         s2QWHHKGcvyInT9KLQFCaW4jF+E6ao6tG5H1eV5QW6A5qoEE5lpAWkzCofuJ3hOJMrsw
+         f2Ug==
+X-Gm-Message-State: AGi0PuYC5+ADKGwXBniX2eHnYfqF54vF2Uu7pLcwy8+Xap4a0kG5oH9Q
+        aMuCqQcid7hvRA7oLTBxQhw=
+X-Google-Smtp-Source: APiQypLmh/Lgdr/B3ZY1buelbusFHBjMg4/XhSao7YfVHnutpJiQaiLvOKzKUkf7C36e2nFiqFgLgw==
+X-Received: by 2002:a63:602:: with SMTP id 2mr25278301pgg.383.1586929356466;
+        Tue, 14 Apr 2020 22:42:36 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id p1sm13349461pjr.40.2020.04.14.22.42.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2020 22:42:34 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 1E49F40277; Wed, 15 Apr 2020 05:42:34 +0000 (UTC)
+Date:   Wed, 15 Apr 2020 05:42:34 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>,
+        Alan Jenkins <alan.christopher.jenkins@gmail.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [PATCH 4/5] mm/swapfile: refcount block and queue before using
+ blkcg_schedule_throttle()
+Message-ID: <20200415054234.GQ11244@42.do-not-panic.com>
+References: <20200414041902.16769-1-mcgrof@kernel.org>
+ <20200414041902.16769-5-mcgrof@kernel.org>
+ <20200414154447.GC25765@infradead.org>
 MIME-Version: 1.0
-From:   Justin Gottula <justin@jgottula.com>
-Date:   Tue, 14 Apr 2020 22:24:18 -0700
-Message-ID: <CAKuMfTUPzPjuNk+T_GQMCKoB9ssh2arr6xRiu6VODwwB0PMdZw@mail.gmail.com>
-Subject: [PATCH] zram: fix writeback_store returning zero in most situations
-To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200414154447.GC25765@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 3b82a051c101 ("zram: fix error return codes not being returned in
-writeback_store") altered the return value logic in writeback_store such
-that ret = len is done at the beginning of the function, which alleviated
-an issue where the -EIO and -ENOSPC break-outs from the for-loop would
-unintentionally hit the ret = len previously located at the end of the
-function. That change in itself was largely fine; however, it exposed
-another return value logic problem.
+On Tue, Apr 14, 2020 at 08:44:47AM -0700, Christoph Hellwig wrote:
+> On Tue, Apr 14, 2020 at 04:19:01AM +0000, Luis Chamberlain wrote:
+> > block devices are refcounted so to ensure once its final user goes away it
+> > can be cleaned up by the lower layers properly. The block device's
+> > request_queue structure is also refcounted, however, if the last
+> > blk_put_queue() is called under atomic context the block layer has
+> > to defer removal.
+> > 
+> > By refcounting the block device during the use of blkcg_schedule_throttle(),
+> > we ensure ensure two things:
+> > 
+> > 1) the block device remains available during the call
+> > 2) we ensure avoid having to deal with the fact we're using the
+> >    request_queue structure in atomic context, since the last
+> >    blk_put_queue() will be called upon disk_release(), *after*
+> >    our own bdput().
+> > 
+> > This means this code path is *not* going to remove the request_queue
+> > structure, as we are ensuring some later upper layer disk_release()
+> > will be the one to release the request_queue structure for us.
+> > 
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > Cc: Nicolai Stange <nstange@suse.de>
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Michal Hocko <mhocko@kernel.org>
+> > Cc: yu kuai <yukuai3@huawei.com>
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  mm/swapfile.c | 14 ++++++++++++--
+> >  1 file changed, 12 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/mm/swapfile.c b/mm/swapfile.c
+> > index 6659ab563448..9285ff6030ca 100644
+> > --- a/mm/swapfile.c
+> > +++ b/mm/swapfile.c
+> > @@ -3753,6 +3753,7 @@ static void free_swap_count_continuations(struct swap_info_struct *si)
+> >  void mem_cgroup_throttle_swaprate(struct mem_cgroup *memcg, int node,
+> >  				  gfp_t gfp_mask)
+> >  {
+> > +	struct block_device *bdev;
+> >  	struct swap_info_struct *si, *next;
+> >  	if (!(gfp_mask & __GFP_IO) || !memcg)
+> >  		return;
+> > @@ -3771,8 +3772,17 @@ void mem_cgroup_throttle_swaprate(struct mem_cgroup *memcg, int node,
+> >  	plist_for_each_entry_safe(si, next, &swap_avail_heads[node],
+> >  				  avail_lists[node]) {
+> >  		if (si->bdev) {
+> > -			blkcg_schedule_throttle(bdev_get_queue(si->bdev),
+> > -						true);
+> > +			bdev = bdgrab(si->bdev);
+> > +			if (!bdev)
+> > +				continue;
+> > +			/*
+> > +			 * By adding our own bdgrab() we ensure the queue
+> > +			 * sticks around until disk_release(), and so we ensure
+> > +			 * our release of the request_queue does not happen in
+> > +			 * atomic context.
+> > +			 */
+> > +			blkcg_schedule_throttle(bdev_get_queue(bdev), true);
+> > +			bdput(bdev);
+> 
+> I don't understand the atomic part of the comment.  How does
+> bdgrab/bdput help us there?
 
-Currently, when the writeback_store for-loop does _not_ encounter the -EIO
-or -ENOSPC situations, and _does_ attempt to write at least one block to
-the backing device, the function will simply return whatever the most
-recent submit_bio_wait return value was. This means that if at least one
-block write is attempted, the function will never actually return len; and,
-if the last written block's call to submit_bio_wait was successful, then
-the function will actually return _zero_. (Prior to the above-mentioned
-patch, this situation was masked by the fact that the ret = len assignment
-occurred _after_ all calls to submit_bio_wait.)
+The commit log above did a better job at explaining this in terms of our
+goal to use the request_queue and how this use would prevent the risk of
+releasing the request_queue, which could sleep.
 
-So, if writeback of one or more blocks is attempted, and the last
-submit_bio_wait is successful (which will usually be the case), userspace
-programs performing write(3) syscalls to /sys/block/zramN/writeback will
-receive a return value of zero. Well-written programs use non-negative
-return values from write(3) to determine if a partial write occurred, and
-in that circumstance, they generally add the value to their buffer pointer
-and call write(3) again. Programs written this way will, as a result,
-effectively spin in a loop calling write(3) forever (or at least until an
-actual error value does finally crop up), repeatedly writing the entire
-string buffer ("huge" or "idle") to the writeback file and getting the
-false impression that no forward progress is being made, since zero bytes
-of the buffer are apparently being consumed with each syscall.
+If its not clear still, at least why we'd escape the sleep potential
+of the request_queue, we can just see its up to the disk_release()
+to call the last blk_put_queue():
 
-I came across this problem while adding a new parameter to the zramctl
-program, in a personal fork of the util-linux suite, that would allow the
-user to easily request writeback on a zram device. In zramctl (and the
-util-linux programs in general), sysfs writes are typically done via
-ul_path_write_string, which invokes write_all. The write_all utility
-function is written in such a way that write(3) return values _not greater
-than zero_ are treated as error conditions; upon which, any errno value
-other than EINTR or EAGAIN will cause the function to bail out and indicate
-an error. A return value of zero is indeed greater than zero; and an errno
-value of zero is neither EINTR nor EAGAIN; so write_all bails and indicates
-an error. (And thanks to automatic strerror-based printout functions, this
-of course produces the message "error: Success", a personal favorite of
-mine.)
+static void __device_add_disk(struct device *parent, struct gendisk disk,      
+			      const struct attribute_group **groups,            
+			      bool register_queue)                              
+{   
+	...
+        /*                                                                      
+	 * Take an extra ref on queue which will be put on disk_release()
+	 * so that it sticks around as long as @disk is there.                  
+	 */                                                                     
+	WARN_ON_ONCE(!blk_get_queue(disk->queue));
 
-The writeback_store return value problem is addressed by storing the
-submit_bio_wait result in a separate local variable, which is only assigned
-to ret if it is actually an errno value.
+	disk_add_events(disk);
+	blk_integrity_add(disk);
+}
 
-The behavior should now be that, if an error arises from one or more of the
-calls to submit_bio_wait during writeback_store, and none of the other
-explicit error cases in the function are triggered, then the most recent
-submit_bio_wait error will be returned. Otherwise, the function will return
-len.
+static void disk_release(struct device *dev)                                    
+{                                                                               
+	struct gendisk *disk = dev_to_disk(dev);
 
-Fixes: a939888ec38b ("zram: support idle/huge page writeback")
-Signed-off-by: Justin Gottula <justin@jgottula.com>
----
-Side Note: My understanding of whether a return value of zero from
-write(3) is actually even valid--given a nonzero length parameter--became a
-whole lot murkier when I took a really close look at the Linux and POSIX
-man pages, as well as Internet discussions on the topic. Initially I was
-sure that a zero return value indicated that no error had occurred, but
-that no forward progress on the write had been made either; and that as
-such, the implementation of write_all in util-linux was faulty. But now
-I've come to understand that apparently some historical implementations of
-write(3) have actually returned zero as an indication that a non-blocking
-write on certain special files would block (though modern POSIX specifies
-returning -1 and setting errno to EAGAIN for this case); and that a return
-value of zero may apparently be used as an EOF indication. So perhaps
-treating a zero result as an error in write_all, implicit and accidental
-though it may have appeared, was actually intentional and well-founded all
-along; I don't entirely know. In any case, though, it's clear that the zram
-driver shouldn't be returning 0 in this circumstance.
+	blk_free_devt(dev->devt);
+	disk_release_events(disk);
+	kfree(disk->random);
+	disk_replace_part_tbl(disk, NULL);
+	hd_free_part(&disk->part0);
+	if (disk->queue)
+		blk_put_queue(disk->queue);
+	kfree(disk);
+}     
 
- drivers/block/zram/zram_drv.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I admit that all this however it did a poor job at explaining why
+bdgrab()/bdput() was safe in atomic context other than the implicit
+reasoning that we already do that elsewhere in atomic context.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1bf4a908a0bd..e55330a615c2 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -627,6 +627,7 @@ static ssize_t writeback_store(struct device *dev,
-    struct bio_vec bio_vec;
-    struct page *page;
-    ssize_t ret = len;
-+   int bio_ret;
-    int mode;
-    unsigned long blk_idx = 0;
+bdgrab() specifically was added to be able to refcount a block device in
+atomic context via commit dddac6a7b445 ("("PM / Hibernate: Replace bdget
+call with simple atomic_inc of i_count"). In its latest incarnation we
+have:
 
-@@ -719,8 +720,9 @@ static ssize_t writeback_store(struct device *dev,
-         * XXX: A single page IO would be inefficient for write
-         * but it would be not bad as starter.
-         */
--       ret = submit_bio_wait(&bio);
--       if (ret) {
-+       bio_ret = submit_bio_wait(&bio);
-+       if (bio_ret) {
-+           ret = bio_ret;
-            zram_slot_lock(zram, index);
-            zram_clear_flag(zram, index, ZRAM_UNDER_WB);
-            zram_clear_flag(zram, index, ZRAM_IDLE);
---
-2.25.1
+/**
+ * bdgrab -- Grab a reference to an already referenced block device
+ * @bdev:       Block device to grab a reference to.                            
+ */
+struct block_device *bdgrab(struct block_device *bdev)
+{
+	ihold(bdev->bd_inode);                                                  
+	return bdev;                                                            
+}                                                                               
+EXPORT_SYMBOL(bdgrab); 
+
+And this in turn:
+
+/*                                                                              
+ * get additional reference to inode; caller must already hold one.
+ */
+void ihold(struct inode *inode)                                                 
+{                                                                               
+	WARN_ON(atomic_inc_return(&inode->i_count) < 2);                        
+}                                                                               
+EXPORT_SYMBOL(ihold);
+
+However... I'd eventure to say we don't have tribal knowledge documented
+about why bdput() is safe in atomic context when used with bdgrab(),
+including the commit log which added it. So the only thing backing its
+safety is that we already use this combo in atomic context, and if its
+incorrect, other areas would be incorrect as well.
+
+But looking underneath the hood, I see at the end of __blkdev_get():
+
+static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)  
+{
+	...
+	disk = bdev_get_gendisk(bdev, &partno);
+	...
+        /* only one opener holds refs to the module and disk */                 
+	if (!first_open)                                                        
+		put_disk_and_module(disk); 
+	...
+}
+
+So ihold() seems like a way to ensure the caller of bdgrab() won't be
+this first opener. If only one opener holds the ref to the disk and it
+was not us, we musn't be the one to decrease it, and if the disk is
+held, it should mean the block device should be refcounted by it as
+well. More review on this later part is appreciated though.
+
+  Luis
