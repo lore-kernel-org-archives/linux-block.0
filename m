@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E59C2BA19
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D533C2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:06:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FD71206E9
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09D1120768
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 09:06:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A0sAm42l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="a0XyQ9N/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393863AbgDOJFf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 05:05:35 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:19517 "EHLO
+        id S2405331AbgDOJGu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 05:06:50 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:19511 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393856AbgDOJF0 (ORCPT
+        with ESMTP id S2393860AbgDOJFc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 05:05:26 -0400
+        Wed, 15 Apr 2020 05:05:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1586941526; x=1618477526;
+  t=1586941532; x=1618477532;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rp/9OsypQVA9Jov9x+82RNHkk+PbM/KfEuomMQ2uw8w=;
-  b=A0sAm42lq0gRASBUZB+ykduHMQQBgD2IV9y6glZ2BrH9qvvQgmBoNqNr
-   3iNfHyx6MGv+3+cHPmjbl+E3km9Bi/T++FerSWrzXMXgWMO/HLzf1LlZl
-   mDfUwCbgM0xF9cLHgMLndpPv0t+m9fu23b0rCw8GD8U5j67F920IlK7H2
-   4PZuF4vwWPJ7BTxtzrM3joXGiouJMEFMORbSHfgRCEHSR7vGX+H0Krq41
-   EqTBtwjJUEVDmVmiyCg74WltJmUYwGGAu7pR9JXO+4ckHhyZsfS7eevHL
-   HsYgOU3ssFdeZfKwnbdlG9kgPw3uYa7KojGqpSw1Jk+8X+rGAzxW+uE1X
-   g==;
-IronPort-SDR: 6U4e3Vn63ymwZGEaIf/guLMST5YhsL0FcgjxG4njL7hP18gw5CIHIMZl3MNtYTazjphOt6oM3M
- 0qDGT4Opay+3JUDrJBjPb/BuOAqdSay4XfUZDzEh+f5Fz6fcO3y98YQXE47PchKHhLYNSJHBqS
- tyzVa6BQTQ3jwCUNMMLPa7QQ7hVfVIbjGs+uFdDdaKRGKBYhERr+fpJ00EqMhKvOiK/SSYRTJX
- BMvYTCXHcbcCTAyRiVmuTYrUTu9wtIo/PGNzdAW/fhFK/Y7mq447Y9J5Kp3HSKa2bAcBx5SiRV
- 8LQ=
+  bh=idI1WH8nxkPnh+O/RqijVff+VKCcvan/3RihAz7vyTw=;
+  b=a0XyQ9N/k/lG1Fd8q6KoPB4n12VcDANkHGa/zFP95PMRh4fSzOyJ7t/k
+   44E154T8CeaciFrih9jQsEyNo0tjekPHk/xMKgS/MOTKGjvv+9xM28ADz
+   hzzs9ZiaJx2Duvh5MYf0MTuh9RYPNVNYZ/jKzACqHbuIcF/izaVLpWKnZ
+   vKf8KzmPJon4ILUyhSMrFtv6Gbf0QSII9i5kPMtL9/F15rMA0+zvKoKZs
+   wNoQePClwFTbpwsoMT7DkvIUf8e+6Dtl7sVlMYP/RPFYJfUYDj2kYTPS7
+   m6tUB01893lXIISZ3/becRObLKfJIOGjSOlmaWMA3yo1qUDJDiPMK4AGe
+   w==;
+IronPort-SDR: 9wrwBFjRsUc9S1qHHiLblQNKC3SD6nqvuaq64fUmjYy4rFv8TiwNn/Qd3jnoGVnrgTrr3tvMrI
+ yBG8C2G71T/shB1Xn5HATxEVQt6HJbL3H3UeHFTP9ePpd4vQ4JBPXOMmf5fVKhIgBWiXbT6tTB
+ bV2mUpCTxybJvSbeywp2A8LVsmlXHMWrz3a9jXwfd5bevjbn31nLTR3btO7SpTF80wSTZcgoSf
+ NL33lM8t7kVgG3Eh6ttexYeU6htfUDUh4hDHEGezrrF5pjBlIM9aQX1yt7lgdBIikwRh1zdxAt
+ nGM=
 X-IronPort-AV: E=Sophos;i="5.72,386,1580745600"; 
-   d="scan'208";a="136802970"
+   d="scan'208";a="136802984"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Apr 2020 17:05:26 +0800
-IronPort-SDR: Hbe9sqm6137kgcXdKENp81+0422rfOoid94+3d7ovTIom+0s6iF59wuz2eRHko/pw6XLge4z26
- Gss4U1DKKdVGaB6kCljqvL+538t147uWulvA/hNoJj9kFrCbTxOuj9aNZtpf+TBaCjqQau7WLu
- i6TKKwYo2Eo2g1vDetea33ckx6e7WjkUcLOJ1eFv+R5w4UQLm4tHDEHOjtRKNtUJCQiiKOPiLc
- 6pYJRsKrziJcwTQOSG2IgqsjwZFWgYOYFUpVn6twBHfEEfgbyfzgYEu6tz5Jnni9LolJiXZjJb
- EsaMttPnSCOw3b4p9lJPIWm6
+  by ob1.hgst.iphmx.com with ESMTP; 15 Apr 2020 17:05:32 +0800
+IronPort-SDR: LZIR/hTgf9K5yjr4UpOlj2+U1N0nNbSC8KziFhzJ55xJ3zCqYyZ2Wr6uG+QECB++vep9DlAdrE
+ bx7O0SveGZ/RqkyZjY+RpCThUCyAyuh7EN5Rq6qStm1jBTHQMsms/uBm1Kw/2wTSxcrHoCSkKR
+ tbP4PlJoPT0l0j6R+VB18yLWTsmFTIswAaycES4QCPAzfkbf5UCOKNx1XkNkY1MIm82MJ7lBLu
+ ztdc+V90qaheLHpHBaAFvbQl7q7Tf3721tDRfnURixuiQjfQhDclxiY82Ltqy4uUGc2sfcfKUu
+ sga765D8yLEq3xyNmsaq+VzH
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2020 01:56:28 -0700
-IronPort-SDR: kuQf5tUEWAIbNPwKQS52xE2aOUQ3DY7v6ecMACcizaAMYMYBixSjwwFBibdCCPBsV8WEPUB5Rf
- C3xTCGPxQQVVIUQU+t5vPzUQwSodnubFSJYtiDezk/zXodz8Onr79FbnLzos0Hw17FIx5qNgxu
- hZ9Ob82r0+ZTOby6Iy6KNNz6t0qhfeVA26RQ4RQbUdhEOmK9YTRnxHdtOqQFkGZekXh6FtPlpF
- TT2F78UOoJmbhTwxjDyJJax+oSDPV6eQxNx6Y8KGoTMfsh2lVtGjx4ZIPKc0SOdIuNFMIQUg17
- nn0=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2020 01:56:33 -0700
+IronPort-SDR: HkG8rv9h3gsOoqwpUjPARDHl84hAQkYxswWrcoSyJpMtpqKtMizwBLoyue+NEdDqfaBOR2k1ik
+ kepzVsNApdvR0DWGZimcM/gvEL10iCiqj/Ys/8CUhSK3dLfgJdeOWagZERhNJ+C/PQvHgg2PuB
+ 8UQOfMMTfSZW9JW/gUMqm06tFv+5+AEdfUGv9Wqb1Gh8f5U+fS2AZw0iWm6DZLa+UA7YmvCcT5
+ idaS21mcOp17PoboDz7R7Qjw8EN1pxLzCB3hoG0yc+DR86UZG5mN1YeSepOpdU9ESAdi343Vjb
+ MNM=
 WDCIronportException: Internal
 Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip01.wdc.com with ESMTP; 15 Apr 2020 02:05:25 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 15 Apr 2020 02:05:30 -0700
 From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -70,9 +70,9 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 02/11] block: provide fallbacks for blk_queue_zone_is_seq and blk_queue_zone_no
-Date:   Wed, 15 Apr 2020 18:05:04 +0900
-Message-Id: <20200415090513.5133-3-johannes.thumshirn@wdc.com>
+Subject: [PATCH v6 05/11] block: introduce blk_req_zone_write_trylock
+Date:   Wed, 15 Apr 2020 18:05:07 +0900
+Message-Id: <20200415090513.5133-6-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200415090513.5133-1-johannes.thumshirn@wdc.com>
 References: <20200415090513.5133-1-johannes.thumshirn@wdc.com>
@@ -83,39 +83,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_queue_zone_is_seq() and blk_queue_zone_no() have not been called with
-CONFIG_BLK_DEV_ZONED disabled until now.
-
-The introduction of REQ_OP_ZONE_APPEND will change this, so we need to
-provide noop fallbacks for the !CONFIG_BLK_DEV_ZONED case.
+Introduce blk_req_zone_write_trylock(), which either grabs the write-lock
+for a sequential zone or returns false, if the zone is already locked.
 
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/blkdev.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/blk-zoned.c      | 14 ++++++++++++++
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 15 insertions(+)
 
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index f87956e0dcaf..c822cfa7a102 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -82,6 +82,20 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
+ }
+ EXPORT_SYMBOL_GPL(blk_req_needs_zone_write_lock);
+ 
++bool blk_req_zone_write_trylock(struct request *rq)
++{
++	unsigned int zno = blk_rq_zone_no(rq);
++
++	if (test_and_set_bit(zno, rq->q->seq_zones_wlock))
++		return false;
++
++	WARN_ON_ONCE(rq->rq_flags & RQF_ZONE_WRITE_LOCKED);
++	rq->rq_flags |= RQF_ZONE_WRITE_LOCKED;
++
++	return true;
++}
++EXPORT_SYMBOL_GPL(blk_req_zone_write_trylock);
++
+ void __blk_req_zone_write_lock(struct request *rq)
+ {
+ 	if (WARN_ON_ONCE(test_and_set_bit(blk_rq_zone_no(rq),
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 32868fbedc9e..e47888a7d80b 100644
+index 774947365341..0797d1e81802 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -729,6 +729,16 @@ static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
- {
- 	return 0;
- }
-+static inline bool blk_queue_zone_is_seq(struct request_queue *q,
-+					 sector_t sector)
-+{
-+	return false;
-+}
-+static inline unsigned int blk_queue_zone_no(struct request_queue *q,
-+					     sector_t sector)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
+@@ -1740,6 +1740,7 @@ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
  
- static inline bool rq_is_sync(struct request *rq)
+ #ifdef CONFIG_BLK_DEV_ZONED
+ bool blk_req_needs_zone_write_lock(struct request *rq);
++bool blk_req_zone_write_trylock(struct request *rq);
+ void __blk_req_zone_write_lock(struct request *rq);
+ void __blk_req_zone_write_unlock(struct request *rq);
+ 
 -- 
 2.24.1
 
