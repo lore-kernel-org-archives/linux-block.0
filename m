@@ -2,491 +2,151 @@ Return-Path: <SRS0=HXqG=57=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36845C2BB85
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 16:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0DFC2BA19
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 17:38:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C694208FE
-	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 16:28:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="YQeaa8nC"
+	by mail.kernel.org (Postfix) with ESMTP id 394F62076D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Apr 2020 17:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1415965AbgDOQ2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 12:28:13 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:49144 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1415790AbgDOQ0A (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 12:26:00 -0400
-Received: from dede-linux.corp.microsoft.com (unknown [131.107.147.242])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 4F0BC20BC5EB;
-        Wed, 15 Apr 2020 09:25:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4F0BC20BC5EB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1586967957;
-        bh=F03SrsU1ortusmnywFZQsfRqdTVis7HUV3FMhbERjiw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YQeaa8nCSOVmm8KIVRJDRgtL8hFamb7Ky6yq1HRm5+alXhAgzzz4OmBKcYYEgBecb
-         i9djDLtjDTN6dorEpgPqk4DEuBTpwn290mXEE5LkP9d9+uVKTt2SeYNSnMb4/1JFJe
-         jN64N5enXZipGDK6vWfHEkRRKu36vtcrfD9uQA/k=
-From:   deven.desai@linux.microsoft.com
-To:     agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
-        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, jannh@google.com
-Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
-        sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
-        nramas@linux.microsoft.com, mdsakib@linux.microsoft.com,
-        linux-kernel@vger.kernel.org, corbet@lwn.net
-Subject: [RFC PATCH v3 06/12] dm-verity: move signature check after tree validation
-Date:   Wed, 15 Apr 2020 09:25:44 -0700
-Message-Id: <20200415162550.2324-7-deven.desai@linux.microsoft.com>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200415162550.2324-1-deven.desai@linux.microsoft.com>
-References: <20200415162550.2324-1-deven.desai@linux.microsoft.com>
+        id S2411419AbgDORii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Apr 2020 13:38:38 -0400
+Received: from sandeen.net ([63.231.237.45]:51432 "EHLO sandeen.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2411346AbgDORif (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Apr 2020 13:38:35 -0400
+Received: from [10.0.0.4] (liberator [10.0.0.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by sandeen.net (Postfix) with ESMTPSA id 1DFF6F8C2B;
+        Wed, 15 Apr 2020 12:38:08 -0500 (CDT)
+Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+References: <20200414041902.16769-1-mcgrof@kernel.org>
+ <20200414041902.16769-3-mcgrof@kernel.org>
+From:   Eric Sandeen <sandeen@sandeen.net>
+Autocrypt: addr=sandeen@sandeen.net; prefer-encrypt=mutual; keydata=
+ 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 pA==
+Message-ID: <55401e02-f61c-25eb-271c-3ec7baf35e28@sandeen.net>
+Date:   Wed, 15 Apr 2020 12:38:26 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <20200414041902.16769-3-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Deven Bowers <deven.desai@linux.microsoft.com>
+On 4/13/20 11:18 PM, Luis Chamberlain wrote:
+> On commit 6ac93117ab00 ("blktrace: use existing disk debugfs directory")
+> merged on v4.12 Omar fixed the original blktrace code for request-based
+> drivers (multiqueue). This however left in place a possible crash, if you
+> happen to abuse blktrace in a way it was not intended.
+> 
+> Namely, if you loop adding a device, setup the blktrace with BLKTRACESETUP,
+> forget to BLKTRACETEARDOWN, and then just remove the device you end up
+> with a panic:
 
-The CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG introduced by Jaskaran was
-intended to be used to allow an LSM to enforce verifications for all
-dm-verity volumes.
+I think this patch makes this all cleaner anyway, but - without the apparent
+loop bug mentioned by Bart which allows removal of the loop device while blktrace
+is active (if I read that right), can this still happen?
 
-However, with it's current implementation, this signature verification
-occurs after the merkel-tree is validated, as a result the signature can
-pass initial verification by passing a matching root-hash and signature.
-This results in an unreadable block_device, but that has passed signature
-validation (and subsequently, would be marked as verified).
+-Eric
 
-This change moves the signature verification to after the merkel-tree has
-finished validation.
-
-Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
----
- drivers/md/dm-verity-target.c     |  42 ++++-----
- drivers/md/dm-verity-verify-sig.c | 140 ++++++++++++++++++++++--------
- drivers/md/dm-verity-verify-sig.h |  20 ++---
- drivers/md/dm-verity.h            |   2 +-
- 4 files changed, 132 insertions(+), 72 deletions(-)
-
-diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index eec9f252e935..c507f3a4e237 100644
---- a/drivers/md/dm-verity-target.c
-+++ b/drivers/md/dm-verity-target.c
-@@ -471,9 +471,9 @@ static int verity_verify_io(struct dm_verity_io *io)
- 	struct bvec_iter start;
- 	unsigned b;
- 	struct crypto_wait wait;
-+	int r;
- 
- 	for (b = 0; b < io->n_blocks; b++) {
--		int r;
- 		sector_t cur_block = io->block + b;
- 		struct ahash_request *req = verity_io_hash_req(v, io);
- 
-@@ -530,6 +530,16 @@ static int verity_verify_io(struct dm_verity_io *io)
- 			return -EIO;
- 	}
- 
-+	/*
-+	 * At this point, the merkel tree has finished validating.
-+	 * if signature was specified, validate the signature here.
-+	 */
-+	r = verity_verify_root_hash(v);
-+	if (r < 0) {
-+		DMERR_LIMIT("signature mismatch");
-+		return r;
-+	}
-+
- 	return 0;
- }
- 
-@@ -728,7 +738,7 @@ static void verity_status(struct dm_target *ti, status_type_t type,
- 			args++;
- 		if (v->validated_blocks)
- 			args++;
--		if (v->signature_key_desc)
-+		if (v->sig)
- 			args += DM_VERITY_ROOT_HASH_VERIFICATION_OPTS;
- 		if (!args)
- 			return;
-@@ -751,9 +761,9 @@ static void verity_status(struct dm_target *ti, status_type_t type,
- 		if (v->validated_blocks)
- 			DMEMIT(" " DM_VERITY_OPT_AT_MOST_ONCE);
- 		sz = verity_fec_status_table(v, sz, result, maxlen);
--		if (v->signature_key_desc)
-+		if (v->sig)
- 			DMEMIT(" " DM_VERITY_ROOT_HASH_VERIFICATION_OPT_SIG_KEY
--				" %s", v->signature_key_desc);
-+				" %s", v->sig->signature_key_desc);
- 		break;
- 	}
- }
-@@ -819,7 +829,7 @@ static void verity_dtr(struct dm_target *ti)
- 
- 	verity_fec_dtr(v);
- 
--	kfree(v->signature_key_desc);
-+	verity_verify_dtr(v);
- 
- 	kfree(v);
- }
-@@ -876,8 +886,7 @@ static int verity_alloc_zero_digest(struct dm_verity *v)
- 	return r;
- }
- 
--static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
--				 struct dm_verity_sig_opts *verify_args)
-+static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v)
- {
- 	int r;
- 	unsigned argc;
-@@ -927,9 +936,7 @@ static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
- 				return r;
- 			continue;
- 		} else if (verity_verify_is_sig_opt_arg(arg_name)) {
--			r = verity_verify_sig_parse_opt_args(as, v,
--							     verify_args,
--							     &argc, arg_name);
-+			r = verity_verify_sig_parse_opt_args(as, v, &argc);
- 			if (r)
- 				return r;
- 			continue;
-@@ -960,7 +967,6 @@ static int verity_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
- static int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
- {
- 	struct dm_verity *v;
--	struct dm_verity_sig_opts verify_args = {0};
- 	struct dm_arg_set as;
- 	unsigned int num;
- 	unsigned long long num_ll;
-@@ -1128,20 +1134,11 @@ static int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
- 		as.argc = argc;
- 		as.argv = argv;
- 
--		r = verity_parse_opt_args(&as, v, &verify_args);
-+		r = verity_parse_opt_args(&as, v);
- 		if (r < 0)
- 			goto bad;
- 	}
- 
--	/* Root hash signature is  a optional parameter*/
--	r = verity_verify_root_hash(root_hash_digest_to_validate,
--				    strlen(root_hash_digest_to_validate),
--				    verify_args.sig,
--				    verify_args.sig_size);
--	if (r < 0) {
--		ti->error = "Root hash verification failed";
--		goto bad;
--	}
- 	v->hash_per_block_bits =
- 		__fls((1 << v->hash_dev_block_bits) / v->digest_size);
- 
-@@ -1207,13 +1204,10 @@ static int verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
- 	ti->per_io_data_size = roundup(ti->per_io_data_size,
- 				       __alignof__(struct dm_verity_io));
- 
--	verity_verify_sig_opts_cleanup(&verify_args);
--
- 	return 0;
- 
- bad:
- 
--	verity_verify_sig_opts_cleanup(&verify_args);
- 	verity_dtr(ti);
- 
- 	return r;
-diff --git a/drivers/md/dm-verity-verify-sig.c b/drivers/md/dm-verity-verify-sig.c
-index 614e43db93aa..27dac8aa2e5a 100644
---- a/drivers/md/dm-verity-verify-sig.c
-+++ b/drivers/md/dm-verity-verify-sig.c
-@@ -22,6 +22,16 @@ MODULE_PARM_DESC(require_signatures,
- #define DM_VERITY_IS_SIG_FORCE_ENABLED() \
- 	(require_signatures != false)
- 
-+static void destroy_verity_sig(struct dm_verity_sig *sig_info)
-+{
-+	if (!sig_info)
-+		return;
-+
-+	kfree(sig_info->sig);
-+	kfree(sig_info->signature_key_desc);
-+	kfree(sig_info);
-+}
-+
- bool verity_verify_is_sig_opt_arg(const char *arg_name)
- {
- 	return (!strcasecmp(arg_name,
-@@ -29,7 +39,7 @@ bool verity_verify_is_sig_opt_arg(const char *arg_name)
- }
- 
- static int verity_verify_get_sig_from_key(const char *key_desc,
--					struct dm_verity_sig_opts *sig_opts)
-+					  struct dm_verity_sig  *sig_info)
- {
- 	struct key *key;
- 	const struct user_key_payload *ukp;
-@@ -48,14 +58,14 @@ static int verity_verify_get_sig_from_key(const char *key_desc,
- 		goto end;
- 	}
- 
--	sig_opts->sig = kmalloc(ukp->datalen, GFP_KERNEL);
--	if (!sig_opts->sig) {
-+	sig_info->sig = kmalloc(ukp->datalen, GFP_KERNEL);
-+	if (!sig_info->sig) {
- 		ret = -ENOMEM;
- 		goto end;
- 	}
--	sig_opts->sig_size = ukp->datalen;
-+	sig_info->sig_size = ukp->datalen;
- 
--	memcpy(sig_opts->sig, ukp->data, sig_opts->sig_size);
-+	memcpy(sig_info->sig, ukp->data, sig_info->sig_size);
- 
- end:
- 	up_read(&key->sem);
-@@ -64,70 +74,128 @@ static int verity_verify_get_sig_from_key(const char *key_desc,
- 	return ret;
- }
- 
-+/**
-+ * Parse any signature verification arguments.
-+ *	This function will populate v->sig, it is the caller's
-+ *	responsibility to free this structure via verity_verify_dtr
-+ *
-+ * @as: argument set passed in to parse
-+ * @v: verity context structure. Should have a NULL v->sig member.
-+ * @argc: current argument number
-+ */
- int verity_verify_sig_parse_opt_args(struct dm_arg_set *as,
- 				     struct dm_verity *v,
--				     struct dm_verity_sig_opts *sig_opts,
--				     unsigned int *argc,
--				     const char *arg_name)
-+				     unsigned int *argc)
- {
- 	struct dm_target *ti = v->ti;
-+	struct dm_verity_sig *sig_info = NULL;
- 	int ret = 0;
- 	const char *sig_key = NULL;
- 
- 	if (!*argc) {
- 		ti->error = DM_VERITY_VERIFY_ERR("Signature key not specified");
--		return -EINVAL;
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	sig_info = kzalloc(sizeof(*sig_info), GFP_KERNEL);
-+	if (!sig_info) {
-+		ret = -ENOMEM;
-+		goto cleanup;
- 	}
- 
- 	sig_key = dm_shift_arg(as);
- 	(*argc)--;
- 
--	ret = verity_verify_get_sig_from_key(sig_key, sig_opts);
--	if (ret < 0)
-+	ret = verity_verify_get_sig_from_key(sig_key, sig_info);
-+	if (ret < 0) {
- 		ti->error = DM_VERITY_VERIFY_ERR("Invalid key specified");
-+		goto cleanup;
-+	}
- 
--	v->signature_key_desc = kstrdup(sig_key, GFP_KERNEL);
--	if (!v->signature_key_desc)
--		return -ENOMEM;
-+	sig_info->signature_key_desc = kstrdup(sig_key, GFP_KERNEL);
-+	if (!sig_info->signature_key_desc) {
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
- 
-+	v->sig = sig_info;
-+	sig_info = NULL;
-+cleanup:
-+	if (sig_info)
-+		destroy_verity_sig(sig_info);
- 	return ret;
- }
- 
--/*
-+/**
-  * verify_verify_roothash - Verify the root hash of the verity hash device
-  *			     using builtin trusted keys.
-  *
-- * @root_hash: For verity, the roothash/data to be verified.
-- * @root_hash_len: Size of the roothash/data to be verified.
-- * @sig_data: The trusted signature that verifies the roothash/data.
-- * @sig_len: Size of the signature.
-+ * @v: dm_verity structure containing all context for the dm_verity
-+ *	operation.
-  *
-  */
--int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,
--			    const void *sig_data, size_t sig_len)
-+int verity_verify_root_hash(const struct dm_verity *v)
- {
--	int ret;
-+	int ret = 0;
-+	char *root_hash = NULL;
-+	size_t root_hash_size = 0;
-+	struct dm_verity_sig *sig_target = NULL;
-+
-+	if (!v || !v->ti || !v->root_digest || v->digest_size == 0) {
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	sig_target = v->sig;
-+
-+	if (!sig_target || !sig_target->sig || sig_target->sig_size == 0) {
-+		if (DM_VERITY_IS_SIG_FORCE_ENABLED()) {
-+			ret = -ENOKEY;
-+			goto cleanup;
-+		} else {
-+			goto cleanup;
-+		}
-+	}
- 
--	if (!root_hash || root_hash_len == 0)
--		return -EINVAL;
-+	/*
-+	 * If signature has passed validation once, assume
-+	 * that future signatures will pass.
-+	 */
-+	if (sig_target->passed)
-+		goto cleanup;
- 
--	if (!sig_data  || sig_len == 0) {
--		if (DM_VERITY_IS_SIG_FORCE_ENABLED())
--			return -ENOKEY;
--		else
--			return 0;
-+	root_hash_size = v->digest_size * 2;
-+	root_hash = kzalloc(root_hash_size, GFP_KERNEL);
-+	if (!root_hash) {
-+		ret = -ENOMEM;
-+		goto cleanup;
- 	}
- 
--	ret = verify_pkcs7_signature(root_hash, root_hash_len, sig_data,
--				sig_len, NULL, VERIFYING_UNSPECIFIED_SIGNATURE,
--				NULL, NULL);
-+	bin2hex(root_hash, v->root_digest, v->digest_size);
-+
-+	ret = verify_pkcs7_signature(root_hash, root_hash_size, v->sig->sig,
-+				     v->sig->sig_size, NULL,
-+				     VERIFYING_UNSPECIFIED_SIGNATURE, NULL,
-+				     NULL);
-+	if (ret != 0)
-+		goto cleanup;
- 
-+	sig_target->passed = true;
-+cleanup:
-+	kfree(root_hash);
- 	return ret;
- }
- 
--void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts)
-+/**
-+ * Performs destruction / cleanup of a valid dm_verity_sig struct
-+ *
-+ * @v: dm_verity structure containing the dm_verity_sig struct to
-+ *	be freed.
-+ */
-+
-+void verity_verify_dtr(struct dm_verity *v)
- {
--	kfree(sig_opts->sig);
--	sig_opts->sig = NULL;
--	sig_opts->sig_size = 0;
-+	destroy_verity_sig(v->sig);
-+	v->sig = NULL;
- }
-diff --git a/drivers/md/dm-verity-verify-sig.h b/drivers/md/dm-verity-verify-sig.h
-index 19b1547aa741..81158d7702a3 100644
---- a/drivers/md/dm-verity-verify-sig.h
-+++ b/drivers/md/dm-verity-verify-sig.h
-@@ -11,31 +11,30 @@
- #define DM_VERITY_ROOT_HASH_VERIFICATION "DM Verity Sig Verification"
- #define DM_VERITY_ROOT_HASH_VERIFICATION_OPT_SIG_KEY "root_hash_sig_key_desc"
- 
--struct dm_verity_sig_opts {
-+struct dm_verity_sig {
-+	char *signature_key_desc;
- 	unsigned int sig_size;
- 	u8 *sig;
-+	bool passed;
- };
- 
- #ifdef CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG
- 
- #define DM_VERITY_ROOT_HASH_VERIFICATION_OPTS 2
- 
--int verity_verify_root_hash(const void *data, size_t data_len,
--			    const void *sig_data, size_t sig_len);
-+int verity_verify_root_hash(const struct dm_verity *v);
- bool verity_verify_is_sig_opt_arg(const char *arg_name);
- 
- int verity_verify_sig_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
--				    struct dm_verity_sig_opts *sig_opts,
--				    unsigned int *argc, const char *arg_name);
-+				    unsigned int *argc);
- 
--void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts);
-+void verity_verify_dtr(struct dm_verity *v);
- 
- #else
- 
- #define DM_VERITY_ROOT_HASH_VERIFICATION_OPTS 0
- 
--int verity_verify_root_hash(const void *data, size_t data_len,
--			    const void *sig_data, size_t sig_len)
-+int verity_verify_root_hash(const struct dm_verity *v)
- {
- 	return 0;
- }
-@@ -46,13 +45,12 @@ bool verity_verify_is_sig_opt_arg(const char *arg_name)
- }
- 
- int verity_verify_sig_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
--				    struct dm_verity_sig_opts *sig_opts,
--				    unsigned int *argc, const char *arg_name)
-+				    unsigned int *argc)
- {
- 	return -EINVAL;
- }
- 
--void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts)
-+void verity_verify_dtr(struct dm_verity *v)
- {
- }
- 
-diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index 641b9e3a399b..995c495decad 100644
---- a/drivers/md/dm-verity.h
-+++ b/drivers/md/dm-verity.h
-@@ -64,7 +64,7 @@ struct dm_verity {
- 	struct dm_verity_fec *fec;	/* forward error correction */
- 	unsigned long *validated_blocks; /* bitset blocks validated */
- 
--	char *signature_key_desc; /* signature keyring reference */
-+	struct dm_verity_sig *sig; /* signature verification */
- };
- 
- struct dm_verity_io {
--- 
-2.26.0
+> [  107.193134] debugfs: Directory 'loop0' with parent 'block' already present!
+> [  107.254615] BUG: kernel NULL pointer dereference, address: 00000000000000a0
+> [  107.258785] #PF: supervisor write access in kernel mode
+> [  107.262035] #PF: error_code(0x0002) - not-present page
+> [  107.264106] PGD 0 P4D 0
+> [  107.264404] Oops: 0002 [#1] SMP NOPTI
+> [  107.264803] CPU: 8 PID: 674 Comm: kworker/8:2 Tainted: G            E 5.6.0-rc7-next-20200327 #1
+> [  107.265712] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1 04/01/2014
+> [  107.266553] Workqueue: events __blk_release_queue
+> [  107.267051] RIP: 0010:down_write+0x15/0x40
+> [  107.267488] Code: eb ca e8 ee a5 8d ff cc cc cc cc cc cc cc cc cc cc cc cc cc cc 0f 1f 44 00 00 55 48 89 fd e8 52 db ff ff 31 c0 ba 01 00 00 00 <f0> 48 0f b1 55 00 75 0f  65 48 8b 04 25 c0 8b 01 00 48 89 45 08 5d
+> [  107.269300] RSP: 0018:ffff9927c06efda8 EFLAGS: 00010246
+> [  107.269841] RAX: 0000000000000000 RBX: ffff8be7e73b0600 RCX: ffffff8100000000
+> [  107.270559] RDX: 0000000000000001 RSI: ffffff8100000000 RDI: 00000000000000a0
+> [  107.271281] RBP: 00000000000000a0 R08: ffff8be7ebc80fa8 R09: ffff8be7ebc80fa8
+> [  107.272001] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+> [  107.272722] R13: ffff8be7efc30400 R14: ffff8be7e0571200 R15: 00000000000000a0
+> [  107.273475] FS:  0000000000000000(0000) GS:ffff8be7efc00000(0000) knlGS:0000000000000000
+> [  107.274346] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  107.274968] CR2: 00000000000000a0 CR3: 000000042abee003 CR4: 0000000000360ee0
+> [  107.275710] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  107.276465] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  107.277214] Call Trace:
+> [  107.277532]  simple_recursive_removal+0x4e/0x2e0
+> [  107.278049]  ? debugfs_remove+0x60/0x60
+> [  107.278493]  debugfs_remove+0x40/0x60
+> [  107.278922]  blk_trace_free+0xd/0x50
+> [  107.279339]  __blk_trace_remove+0x27/0x40
+> [  107.279797]  blk_trace_shutdown+0x30/0x40
+> [  107.280256]  __blk_release_queue+0xab/0x110
+> [  107.280734]  process_one_work+0x1b4/0x380
+> [  107.281194]  worker_thread+0x50/0x3c0
+> [  107.281622]  kthread+0xf9/0x130
+> [  107.281994]  ? process_one_work+0x380/0x380
+> [  107.282467]  ? kthread_park+0x90/0x90
+> [  107.282895]  ret_from_fork+0x1f/0x40
+> [  107.283316] Modules linked in: loop(E) <etc>
+> [  107.288562] CR2: 00000000000000a0
+> [  107.288957] ---[ end trace b885d243d441bbce ]---
 
