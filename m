@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD30BC2BA2B
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1CDC2BA2B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 06:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD73021734
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E88D214D8
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 06:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYY6p4Pw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dY6dFxT4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407189AbgDPFsY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 01:48:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40335 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2407174AbgDPFsU (ORCPT
+        id S2407385AbgDPGKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 02:10:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42908 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407672AbgDPGJs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 01:48:20 -0400
+        Thu, 16 Apr 2020 02:09:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587016098;
+        s=mimecast20190719; t=1587017386;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Ae5ly7M/OETZeDnJohKJkBFZBczMSVWSQhC8QwiJPZs=;
-        b=UYY6p4PwbvHlbEmYxBq7G9uPRiRA0vsLXFOe+sQgilHFf0khVS8zN/INJLzRXGgu0edg0i
-        XZF8UXUIhV4E0TvUX4AE1eIR2chxhmUWYwlDlselmr5FnrEn9MxY3X5wDHeBRCnT3mU/vM
-        b1fpWeYMIrsfv3ZzFXPEfxPk4fRbQSw=
+        bh=WSD44ootEBXyzkzNcdpXGbzlmx+BBRKBSaXWnZtwryM=;
+        b=dY6dFxT4bgRH6o/sjVHFXRwgls1j1MT4G+kwW1upN2P9hN0bp5o7+kmQn8fFgBNp5vsi3P
+        UJ8+/uiXZoEzLeli6mcxs/aPkGTdpuL8rcOB/N27XdtlPYG/PXJnP+Z5oRFFakCTbM/15g
+        RwhAuZXwxqmJ2VM7S/VsksbqE52Ni8M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-y0juUd9SPm6Dr1B_bF4zJA-1; Thu, 16 Apr 2020 01:48:13 -0400
-X-MC-Unique: y0juUd9SPm6Dr1B_bF4zJA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-8-KtHJpBBfOye0jlhWDKwoow-1; Thu, 16 Apr 2020 02:09:41 -0400
+X-MC-Unique: KtHJpBBfOye0jlhWDKwoow-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09D7B801A09;
-        Thu, 16 Apr 2020 05:48:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECF3313F9;
+        Thu, 16 Apr 2020 06:09:38 +0000 (UTC)
 Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ED6405C1C5;
-        Thu, 16 Apr 2020 05:47:55 +0000 (UTC)
-Date:   Thu, 16 Apr 2020 13:47:50 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B7C2699E03;
+        Thu, 16 Apr 2020 06:09:26 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 14:09:21 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
@@ -55,59 +55,84 @@ Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         Michal Hocko <mhocko@kernel.org>,
         syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
 Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
-Message-ID: <20200416054750.GA2723777@T590>
+Message-ID: <20200416060921.GB2723777@T590>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
  <20200414041902.16769-3-mcgrof@kernel.org>
  <20200416021036.GA2717677@T590>
  <20200416052524.GH11244@42.do-not-panic.com>
+ <20200416054750.GA2723777@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200416052524.GH11244@42.do-not-panic.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200416054750.GA2723777@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 05:25:24AM +0000, Luis Chamberlain wrote:
-> On Thu, Apr 16, 2020 at 10:10:36AM +0800, Ming Lei wrote:
-> > In theory, multiple partitions can be traced concurrently, but looks
-> > it never works, so it won't cause trouble for multiple partition trace.
+On Thu, Apr 16, 2020 at 01:47:50PM +0800, Ming Lei wrote:
+> On Thu, Apr 16, 2020 at 05:25:24AM +0000, Luis Chamberlain wrote:
+> > On Thu, Apr 16, 2020 at 10:10:36AM +0800, Ming Lei wrote:
+> > > In theory, multiple partitions can be traced concurrently, but looks
+> > > it never works, so it won't cause trouble for multiple partition trace.
+> > > 
+> > > One userspace visible change is that blktrace debugfs dir name is switched 
+> > > to disk name from partition name in case of partition trace, will it
+> > > break some utilities?
 > > 
-> > One userspace visible change is that blktrace debugfs dir name is switched 
-> > to disk name from partition name in case of partition trace, will it
-> > break some utilities?
+> > How is this possible, its not clear to me, we go from:
+> > 
+> > -	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> > -					    blk_debugfs_root);
+> > 
+> > To this:
+> > 
+> > +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> > +					    blk_debugfs_root);
+> > 
+> > 
+> > Maybe I am overlooking something.
 > 
-> How is this possible, its not clear to me, we go from:
+> Your patch removes the blktrace debugfs dir:
 > 
-> -	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> -					    blk_debugfs_root);
+> do_blk_trace_setup()
 > 
-> To this:
+> -       dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> -       if (!dir)
+> -               bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> -
 > 
-> +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> +					    blk_debugfs_root);
+> Then create blktrace attributes under the dir of q->debugfs_dir.
 > 
+> However, buts->name could be one partition device name, but
+> q->debugfs_dir has to be disk name.
 > 
-> Maybe I am overlooking something.
+> This change is visible to blktrace utilities.
 
-Your patch removes the blktrace debugfs dir:
+Just test the 1st two patches via "blktrace /dev/sda2", follows the
+result, so this way can't be accepted.
 
-do_blk_trace_setup()
+[root@ktest-01 ~]# blktrace /dev/sda2
+Thread 0 failed open /sys/kernel/debug/block/sda2/trace0: 2/No such file or directory
+Thread 4 failed open /sys/kernel/debug/block/sda2/trace4: 2/No such file or directory
+Thread 1 failed open /sys/kernel/debug/block/sda2/trace1: 2/No such file or directory
+Thread 2 failed open /sys/kernel/debug/block/sda2/trace2: 2/No such file or directory
+Thread 5 failed open /sys/kernel/debug/block/sda2/trace5: 2/No such file or directory
+Thread 3 failed open /sys/kernel/debug/block/sda2/trace3: 2/No such file or directory
+Thread 6 failed open /sys/kernel/debug/block/sda2/trace6: 2/No such file or directory
+Thread 7 failed open /sys/kernel/debug/block/sda2/trace7: 2/No such file or directory
+FAILED to start thread on CPU 0: 1/Operation not permitted
+FAILED to start thread on CPU 1: 1/Operation not permitted
+FAILED to start thread on CPU 2: 1/Operation not permitted
+FAILED to start thread on CPU 3: 1/Operation not permitted
+FAILED to start thread on CPU 4: 1/Operation not permitted
+FAILED to start thread on CPU 5: 1/Operation not permitted
+FAILED to start thread on CPU 6: 1/Operation not permitted
+FAILED to start thread on CPU 7: 1/Operation not permitted
 
--       dir = debugfs_lookup(buts->name, blk_debugfs_root);
--       if (!dir)
--               bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
--
 
-Then create blktrace attributes under the dir of q->debugfs_dir.
 
-However, buts->name could be one partition device name, but
-q->debugfs_dir has to be disk name.
-
-This change is visible to blktrace utilities.
-
-Thanks,
+Thanks, 
 Ming
 
