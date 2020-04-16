@@ -2,127 +2,115 @@ Return-Path: <SRS0=Ef4g=6A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68658C2BB85
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 08:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC05C2BB85
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 09:03:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52CCA216FD
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 08:35:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59EFA20787
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 09:03:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NfjvQQON"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439552AbgDPIev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 04:34:51 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2381 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2502445AbgDPIe2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 04:34:28 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id D4369D718DC70E64E64B;
-        Thu, 16 Apr 2020 16:34:17 +0800 (CST)
-Received: from [10.166.215.172] (10.166.215.172) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 16 Apr 2020 16:34:14 +0800
-Subject: Re: [PATCH 3/8] bdi: add a ->dev_name field to struct
- backing_dev_info
-To:     Christoph Hellwig <hch@lst.de>, <axboe@kernel.dk>
-CC:     <tj@kernel.org>, <jack@suse.cz>, <bvanassche@acm.org>,
-        <tytso@mit.edu>, <gregkh@linuxfoundation.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20200416071519.807660-1-hch@lst.de>
- <20200416071519.807660-4-hch@lst.de>
-From:   Yufen Yu <yuyufen@huawei.com>
-Message-ID: <5bfcd35a-2463-3769-be93-911c4e3c38bb@huawei.com>
-Date:   Thu, 16 Apr 2020 16:34:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S2503329AbgDPJDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 05:03:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26530 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2503335AbgDPJDT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Apr 2020 05:03:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587027796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=FgRMAeZTRnCv/1+3solCzy3IyPcrmkQx0MVaWIgfZRg=;
+        b=NfjvQQON+p9lOK+Fg9MJ0jiu7cTq90mMjaMT9vljTTBQhTwAzwP1TT8eOdwJyd6BCUFOr0
+        gfdlQ5qhchV2B22g3N2PrSymFTklPs2WxDBpDEvblZjRhLPlfwdAZhhj00g8gbtySLbHhd
+        RPizbTlrcNi0qiTuNAG/XXdh4pNtk9s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-nEEonNe8NdaVXIcIwAM0lg-1; Thu, 16 Apr 2020 05:03:11 -0400
+X-MC-Unique: nEEonNe8NdaVXIcIwAM0lg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2F361408;
+        Thu, 16 Apr 2020 09:03:10 +0000 (UTC)
+Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB6ED7E7CD;
+        Thu, 16 Apr 2020 09:03:04 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 17:02:59 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [Regression] No IO interrupt is generated before CPU is offline
+Message-ID: <20200416090108.GG2723777@T590>
 MIME-Version: 1.0
-In-Reply-To: <20200416071519.807660-4-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.166.215.172]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Thomas,
 
-On 2020/4/16 15:15, Christoph Hellwig wrote:
-> Cache a copy of the name for the life time of the backing_dev_info
-> structure so that we can reference it even after unregistering.
-> 
-> Fixes: 68f23b89067f ("memcg: fix a crash in wb_workfn when a device disappears")
-> Reported-by: Yufen Yu <yuyufen@huawei.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   include/linux/backing-dev-defs.h |  1 +
->   mm/backing-dev.c                 | 13 ++++++++++---
->   2 files changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-> index 4fc87dee005a..249590bcccf7 100644
-> --- a/include/linux/backing-dev-defs.h
-> +++ b/include/linux/backing-dev-defs.h
-> @@ -220,6 +220,7 @@ struct backing_dev_info {
->   	wait_queue_head_t wb_waitq;
->   
->   	struct device *dev;
-> +	const char *dev_name;
->   	struct device *owner;
->   
->   	struct timer_list laptop_mode_wb_timer;
-> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-> index c2c44c89ee5d..4f6c05df72f9 100644
-> --- a/mm/backing-dev.c
-> +++ b/mm/backing-dev.c
-> @@ -938,9 +938,15 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
->   	if (bdi->dev)	/* The driver needs to use separate queues per device */
->   		return 0;
->   
-> -	dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0), bdi, fmt, args);
-> -	if (IS_ERR(dev))
-> +	bdi->dev_name = kvasprintf(GFP_KERNEL, fmt, args);
-> +	if (!bdi->dev_name)
-> +		return -ENOMEM;
-> +
-> +	dev = device_create(bdi_class, NULL, MKDEV(0, 0), bdi, bdi->dev_name);
-> +	if (IS_ERR(dev)) {
-> +		kfree(bdi->dev_name);
->   		return PTR_ERR(dev);
-> +	}
->   
->   	cgwb_bdi_register(bdi);
->   	bdi->dev = dev;
-> @@ -1034,6 +1040,7 @@ static void release_bdi(struct kref *ref)
->   	WARN_ON_ONCE(bdi->dev);
->   	wb_exit(&bdi->wb);
->   	cgwb_bdi_exit(bdi);
-> +	kfree(bdi->dev_name);
->   	kfree(bdi);
->   }
+When I run test script [1] in KVM guest[2], and disk is virtio-scsi,
+IO hang can be triggered easily. Most times, it can be reproduced
+by running './cpuhotplug_io 400 /dev/sda' once, and sometimes it
+needs one more run.
+
+After I checked blk-mq debugfs log, I found these requests have
+been queued to virtio-scsi hardware, but interrupts aren't be
+generated.
+
+The issue is firstly found when John and I test the patchset[3][4] for
+draining IO in cpu hotplug handler before CPU and managed IRQ becomes
+shudown. And IOs are found not completed even though the CPU responsible
+for dealing with this hw queue is still online, but going to shutdown.
+
+git-bisect shows that the issue is introduced by the following commit:
+
+	60dcaad5736f ("x86/hotplug: Silence APIC and NMI when CPU is dead")
 
 
-When driver try to to re-register bdi but without release_bdi(), the old dev_name
-will be cover directly by the newer in bdi_register_va(). So, I am not sure whether
-it can cause memory leak for bdi->dev_name.
+The issue can't be triggered any more after applying the following change:
+
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 69881b2d446c..c5e9f005fbb2 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1596,7 +1596,7 @@ int native_cpu_disable(void)
+         * it. It still responds normally to INIT, NMI, SMI, and SIPI
+         * messages.
+         */
+-       apic_soft_disable();
++       clear_local_APIC();
+        cpu_disable_common();
+ 
+        return 0;
+
+
+[1] test script
+http://people.redhat.com/minlei/tests/tools/cpuhotplug_io
+
+[2] virtio-scsi is MQ by passing 'num_queues=3' to qemu virtio-scsi
+command line, meantime set cpu number as 8, so one queue can be covered
+by more than one CPU
+
+[3] https://lore.kernel.org/linux-block/20200407092901.314228-5-ming.lei@redhat.com/
+
+[4] latest patches for stop & drain IO before shutdown irq/cpu
+https://github.com/ming1/linux/commits/v5.6-blk-mq-improve-cpu-hotplug
+
+
 
 Thanks,
-Yufen
-
->   
-> @@ -1047,7 +1054,7 @@ const char *bdi_dev_name(struct backing_dev_info *bdi)
->   {
->   	if (!bdi || !bdi->dev)
->   		return bdi_unknown_name;
-> -	return dev_name(bdi->dev);
-> +	return bdi->dev_name;
->   }
->   EXPORT_SYMBOL_GPL(bdi_dev_name);
-
-
-
+Ming
 
