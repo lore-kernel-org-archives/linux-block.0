@@ -2,132 +2,75 @@ Return-Path: <SRS0=Ef4g=6A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1077DC2BA2B
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C816BC2BA2B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E248820857
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587015392;
-	bh=xCowZXciRw/0YmkG7IsWoXqi+JUJpR6G+sfoRiT02YI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=XEgEHTisiLLtzffN2HiEqKzC+IClwe/3/DruYqgdfTeT/s2ks+GuaAsn8dBPDcrrH
-	 kyzcM2IvT+HWVSHFcfTQNHSaQVy1qFTrUi6ex+GOZkggA7IMDLTCMqGqqSVb1lLc2S
-	 GYVbPRmmjOzAURSH4ttjOf5OoAk5SRAF5r9gROMM=
+	by mail.kernel.org (Postfix) with ESMTP id 9B58F20784
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fJFbG/si"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406673AbgDPFg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 01:36:27 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39758 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406579AbgDPFgZ (ORCPT
+        id S2406894AbgDPFg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 01:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2406891AbgDPFgz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 01:36:25 -0400
-Received: by mail-pf1-f195.google.com with SMTP id k15so1166656pfh.6;
-        Wed, 15 Apr 2020 22:36:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0GGMjsf7bes7SO0tixSZYBmOOrlUUrx9KPMpJ3HujiA=;
-        b=PsugiwtkDvY+ipIWYG68EFplwPnqwl+ZNBLDliiWfrjmYfpNCrbWVQlLPCeZFJo1+4
-         cBVu3Y6yasjt919eOIywMIxdlOHVW0ot8RC6U2LwWjCiLshnWGZLE6kJd93fwJkATcfs
-         Npj7eg33OWhAsukQ7k1541FD4OwBuGjhZj83zvRo8eaN0AIKDUAeJNojysalrTjkNmnW
-         Mw2waBTEdmnX4BDqw7G51WAshAtxIQUQkR682g2BADZ09OJC1hKzE76B29Yc38rmf9lp
-         RIxIFu6AK4Y5OxuqE0gReZnlXmqPWhc06G4KFSozUSy+bQ45G5V2DKqHBEDxzh8A+S1a
-         OOEA==
-X-Gm-Message-State: AGi0PuYGZvY3/MkfWuYMaB5d1auMpae+T1dwxRq1aDCcKDHAgHjBh3kZ
-        6YadQLidjV2/CiSyxNYMRhIdCqP7pEQ=
-X-Google-Smtp-Source: APiQypKbKv0BkBHKUzEiqUuVeGbX7gfEsR18Wnsdwe3iyXHjlLh95ibBMf8/BWrc5gEIAQNARJvn0Q==
-X-Received: by 2002:a65:68c7:: with SMTP id k7mr30843871pgt.248.1587015384681;
-        Wed, 15 Apr 2020 22:36:24 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id w5sm15602046pfw.154.2020.04.15.22.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 22:36:23 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id C714B40277; Thu, 16 Apr 2020 05:36:22 +0000 (UTC)
-Date:   Thu, 16 Apr 2020 05:36:22 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
-Message-ID: <20200416053622.GJ11244@42.do-not-panic.com>
-References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-4-mcgrof@kernel.org>
- <20200416023122.GB2717677@T590>
+        Thu, 16 Apr 2020 01:36:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67B3C061A0C
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2020 22:36:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Qb+jdoDJIU9fBJH5uTIamXl3JzkVNnuhRUHKDnvTIcY=; b=fJFbG/siCzethB36RhbQ1JUiYd
+        6PU8f5DzrRBG3d97VxzrKCczVsHU8rFnCkpaOhd6ES+ju/14rg1GupxMkpVa2UM1EkK+TbAybcLCX
+        AwmH84JZJxpDHfRyZpULmG0Sjp7I9gEJvw69Y3D/sXTkcgeAulXdz3ZTHGd7RGp+Dikjt5EsXl13q
+        zuRoTtLt4s/Halzaa3+W2cQJTzeL+vXaqSn9UrTHlxrTn41Zxj2/9rF1GotQ9gltPeegG7QYAKH0C
+        +Fa7ugO41Hcx27X423DLA9TbasotIeyb5f/hQpecEGEie2rdUYXlXPAZJCnrcx+WkWCHCKBz9MBYz
+        q8elMx4w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jOxCl-0006hh-01; Thu, 16 Apr 2020 05:36:51 +0000
+Date:   Wed, 15 Apr 2020 22:36:50 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, tj@kernel.org, bvanassche@acm.org,
+        tytso@mit.edu, gregkh@linuxfoundation.org
+Subject: Re: [PATCH v4 0/6] bdi: fix use-after-free for bdi device
+Message-ID: <20200416053650.GA522@infradead.org>
+References: <20200325123843.47452-1-yuyufen@huawei.com>
+ <20200414155228.GA17487@infradead.org>
+ <20200415093459.GH501@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200416023122.GB2717677@T590>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200415093459.GH501@quack2.suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 10:31:22AM +0800, Ming Lei wrote:
-> On Tue, Apr 14, 2020 at 04:19:00AM +0000, Luis Chamberlain wrote:
-> > Ensure that the request_queue is refcounted during its full
-> > ioctl cycle. This avoids possible races against removal, given
-> > blk_get_queue() also checks to ensure the queue is not dying.
-> > 
-> > This small race is possible if you defer removal of the request_queue
-> > and userspace fires off an ioctl for the device in the meantime.
-> > 
-> > Cc: Bart Van Assche <bvanassche@acm.org>
-> > Cc: Omar Sandoval <osandov@fb.com>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: Nicolai Stange <nstange@suse.de>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: Michal Hocko <mhocko@kernel.org>
-> > Cc: yu kuai <yukuai3@huawei.com>
-> > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> >  kernel/trace/blktrace.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> > index 15086227592f..17e144d15779 100644
-> > --- a/kernel/trace/blktrace.c
-> > +++ b/kernel/trace/blktrace.c
-> > @@ -701,6 +701,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
-> >  	if (!q)
-> >  		return -ENXIO;
-> >  
-> > +	if (!blk_get_queue(q))
-> > +		return -ENXIO;
-> > +
-> >  	mutex_lock(&q->blk_trace_mutex);
-> >  
-> >  	switch (cmd) {
-> > @@ -729,6 +732,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
-> >  	}
-> >  
-> >  	mutex_unlock(&q->blk_trace_mutex);
-> > +
-> > +	blk_put_queue(q);
-> > +
-> >  	return ret;
-> >  }
-> 
-> Actually when bdev is opened, one extra refcount is held on gendisk, so
-> gendisk won't go away. And __device_add_disk() does grab one extra
-> refcount on request queue, so request queue shouldn't go away when ioctl
-> is running.
+On Wed, Apr 15, 2020 at 11:34:59AM +0200, Jan Kara wrote:
+> Yeah, that's what I was suggesting as well [1] - especially since we
+> already have bdi->name with a dubious value (but looking into it now, we
+> would need a separate dev_name field since bdi->name is visible in sysfs so
+> we cannot change that).
 
-Alright, then yes, this should not be needed.
+That is a little anoying, but not the end of the world.
 
-  Luis
+> But Yufen explained to me that this could result in
+> bogus name being reported when bdi gets re-registered. Not sure if that's
+> serious enough but it could happen...
+
+I don't think that is a problem at all.  If it is a problem we can just
+replace the ->dev_name pointer with one that says "(unregistered)" at
+unregister time, but to me that seems worse than just keeping the name
+around.
