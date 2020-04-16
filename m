@@ -2,120 +2,100 @@ Return-Path: <SRS0=Ef4g=6A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B503C352BE
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 03:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD96C2D0EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:25:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54B6F20737
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 03:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FC772076A
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:25:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587014736;
+	bh=mTV4yOfOt5MmZ8GQe00lVMWrQWROluQXaQPSmbvQm7g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=gphDzWJP5wQMX5qRTDz+XNbaO5HbcwJ4LOyu7AdCRv5Yyvl3FAca5Ij+2Irmpq3Xa
+	 gwFjI/fA1KKowVAEBMf4wHbgj/Q/5ZPsxzAT05MULofFuH7RTBd6ulMEUJ8rjuE26T
+	 7AB4QQdszaMVV19TbNKqAtv0KzZDgEiIrtAu+7/c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391236AbgDPDnj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Apr 2020 23:43:39 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44332 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729245AbgDPDni (ORCPT
+        id S2406141AbgDPFZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 01:25:31 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43448 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406053AbgDPFZ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Apr 2020 23:43:38 -0400
-Received: by mail-pf1-f193.google.com with SMTP id b72so1039791pfb.11;
-        Wed, 15 Apr 2020 20:43:36 -0700 (PDT)
+        Thu, 16 Apr 2020 01:25:27 -0400
+Received: by mail-pg1-f193.google.com with SMTP id x26so1098904pgc.10;
+        Wed, 15 Apr 2020 22:25:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=MF+GTcAP/Qi1eGTnMDQ31INQwaQqeTxesD5C90whNm4=;
-        b=OSNHTeLgm7mfq2H+4Mbf2xG+wk1C2t/IBwmavxqO0EBEuN2WGqif1n9DhZ/czrNHEI
-         B9SiNSXXQOViU1Gs04jpYjPKAO0y3yH2Jko8ctQpph++ShfDhl9f3SHrlMFkDD+sx8t/
-         laj9b/tbS7mRA7WsXbt2HRmj50GT7A0aGk5UiDftQQSyNMQVx7jS2MO1w8UFxb6DcCRo
-         FiCUJAE8tj0ppNkTzyPw8iy31TpJxeobxw7hhCMMyJzOXOXltUJF/h8Ld5K0Uyt/6Beu
-         SLZmzbF2XmMkYtHq1x98SolAcPEx43uGmg1E0iDYpO+oxLg61jKxnbgBHfoqThLhOK1n
-         2D1w==
-X-Gm-Message-State: AGi0PuaLrv2lnb4+V0aw9SObEk8bkOfe3c3RIsxaJsof4Ih6GPY7+jio
-        MULKmfLOCtx2vpzOez9qwVo=
-X-Google-Smtp-Source: APiQypJW/DVeigCfIx/tEMJ1u8JJIZm5hJJ9dvGJdqr8k9BoFgyywcE0DNRRh5Kfl5ObHf8rRTRZ/A==
-X-Received: by 2002:a63:1f0c:: with SMTP id f12mr28638998pgf.245.1587008615446;
-        Wed, 15 Apr 2020 20:43:35 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:91ba:7380:46ae:a781? ([2601:647:4000:d7:91ba:7380:46ae:a781])
-        by smtp.gmail.com with ESMTPSA id u24sm12045079pgo.65.2020.04.15.20.43.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2020 20:43:34 -0700 (PDT)
-Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Kg7nI0Dukhm7hME7k56vQQPnaqgMUKpXaW8k038CnpY=;
+        b=N6fkaAenH6mBP6CkcCtj9a4W+2OlFJTtDFNRthR3NlRm3SbO0B6hoC4WOAzlSveL4g
+         prde5eX4LJNP6jgCrsJinl45EAjlNsA7gEFDNJAPwhtk5qYWUwVryVE4NFXwG2uGIfar
+         J+Qg2h1PMtN5ulhw1auo/K1Aa9VdFq/2IibiW+7iYXXuYHpc4VVlW/Y26vk2Gx2+8VKA
+         yoSruUgKxo2AOECVAvELY2nBGmjkA2z1jFcvdB+51rWeTrjWQCkJEM4YUr/DD5b6jXx0
+         PaRT3wo8AVcVR7stvsBv5M0ZsZl03U3/JD2am1nlFOTHboThwKY6eV+6q8kJkOAj6cKu
+         WQMA==
+X-Gm-Message-State: AGi0PuamD27zH4Z1x6rDUhu29zrt9HmHh16hvpnmpejNIbs65dWtered
+        WvZr+qW7pcFsjefp4LN7gEg=
+X-Google-Smtp-Source: APiQypIg+I4iUy63S0mBZ7fWRB3nVMRCNRDUKQvXsu0TEmZwpSFoQiVN/BIM0RYKLVeyKWhDUMDDWg==
+X-Received: by 2002:a62:2a8c:: with SMTP id q134mr32437286pfq.35.1587014726673;
+        Wed, 15 Apr 2020 22:25:26 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id b13sm6005334pfo.67.2020.04.15.22.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2020 22:25:25 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id C8C0340277; Thu, 16 Apr 2020 05:25:24 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 05:25:24 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, nstange@suse.de, akpm@linux-foundation.org,
         mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
+Message-ID: <20200416052524.GH11244@42.do-not-panic.com>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
- <20200414041902.16769-4-mcgrof@kernel.org>
- <20200414154044.GB25765@infradead.org>
- <20200415061649.GS11244@42.do-not-panic.com>
- <20200415071425.GA21099@infradead.org>
- <20200415123434.GU11244@42.do-not-panic.com>
- <73332d32-b095-507f-fb2a-68460533eeb7@acm.org>
- <20200416011247.GB11244@42.do-not-panic.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <a71d9c9b-72c8-8905-aeba-08e5382f5a81@acm.org>
-Date:   Wed, 15 Apr 2020 20:43:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ <20200414041902.16769-3-mcgrof@kernel.org>
+ <20200416021036.GA2717677@T590>
 MIME-Version: 1.0
-In-Reply-To: <20200416011247.GB11244@42.do-not-panic.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200416021036.GA2717677@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-15 18:12, Luis Chamberlain wrote:
-> On Wed, Apr 15, 2020 at 07:18:22AM -0700, Bart Van Assche wrote:
->> blk_get_queue() prevents concurrent freeing of struct request_queue but
->> does not prevent concurrent blk_cleanup_queue() calls.
+On Thu, Apr 16, 2020 at 10:10:36AM +0800, Ming Lei wrote:
+> In theory, multiple partitions can be traced concurrently, but looks
+> it never works, so it won't cause trouble for multiple partition trace.
 > 
-> Wouldn't concurrent blk_cleanup_queue() calls be a bug? If so should
-> I make it clear that it would be or simply prevent it?
+> One userspace visible change is that blktrace debugfs dir name is switched 
+> to disk name from partition name in case of partition trace, will it
+> break some utilities?
 
-I think calling blk_cleanup_queue() while the queue refcount > 0 is well
-established behavior. At least the SCSI core triggers that behavior
-since a very long time. I prefer not to change that behavior.
+How is this possible, its not clear to me, we go from:
 
-Regarding patch 3/5: how about dropping that patch? If the queue
-refcount can drop to zero while blk_trace_ioctl() is in progress I think
-that should be fixed in the block_device_operations.open callback
-instead of in blk_trace_ioctl().
+-	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+-					    blk_debugfs_root);
 
-Thanks,
+To this:
 
-Bart.
++	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
++					    blk_debugfs_root);
+
+
+Maybe I am overlooking something.
+
+  Luis
