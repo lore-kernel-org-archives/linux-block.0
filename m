@@ -2,111 +2,132 @@ Return-Path: <SRS0=Ef4g=6A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E96AC2BA2B
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1077DC2BA2B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C52320936
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:29:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E248820857
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 05:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587014956;
-	bh=DWbXHiWpLxx+sN1p4qL0rxRWHvwF2lF1XmQAYW3HKSw=;
+	s=default; t=1587015392;
+	bh=xCowZXciRw/0YmkG7IsWoXqi+JUJpR6G+sfoRiT02YI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=sKqEYI3q1Nr5C/CuYI2sU1PDAUGknWAwMk7REbrvNixaBAmM1e06doBxqu8HJf1HE
-	 TcUKgHv4os0FB4L/UUSTsSjGFXdbQaHIQr7YR9JVkMeVm0GYU0ey70g/ZUrgeG6PFy
-	 A9WAEWGhQkKvjY8wY5eDU5aehI8THUX5EBuWnEBI=
+	b=XEgEHTisiLLtzffN2HiEqKzC+IClwe/3/DruYqgdfTeT/s2ks+GuaAsn8dBPDcrrH
+	 kyzcM2IvT+HWVSHFcfTQNHSaQVy1qFTrUi6ex+GOZkggA7IMDLTCMqGqqSVb1lLc2S
+	 GYVbPRmmjOzAURSH4ttjOf5OoAk5SRAF5r9gROMM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406402AbgDPF3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 01:29:15 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:45821 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406188AbgDPF3N (ORCPT
+        id S2406673AbgDPFg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 01:36:27 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:39758 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406579AbgDPFgZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 01:29:13 -0400
-Received: by mail-pl1-f194.google.com with SMTP id t4so936772plq.12;
-        Wed, 15 Apr 2020 22:29:11 -0700 (PDT)
+        Thu, 16 Apr 2020 01:36:25 -0400
+Received: by mail-pf1-f195.google.com with SMTP id k15so1166656pfh.6;
+        Wed, 15 Apr 2020 22:36:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ij4rGJFKYYZMX5F8riwLVS0GXQyfAT1zFiaKZy0C85M=;
-        b=AXqoMDO4c7CwVybHhi3bDUiC9dkPYsif7yaj0wo0CYlxeb9N5gWz87RzVzcXHKrJLS
-         zjoY+8hKbZx0P+eSEz2RADWhJTjyluTfIWccuK9hHW0vUy9OkrOjUoyR4x3lSGij/6He
-         Puv2VpYCfbs3ONMEsxSMc08FpyqqteoFgCgsOwHz0NW9HxonulPy5Tllb4geL/wYhMom
-         zCDRc26VCf4wjtH6amIcABBMySfZY87VaOKMwijXxmXETdk+z9ouza42t0hdLX50NAd5
-         L9xCyPWPXVutBpX77ZYCkqmd6gVtiu4UR5Lfqqg4r2dziJnaCsuC6ooF0ccAdimoj1GT
-         g2rw==
-X-Gm-Message-State: AGi0PuaAaikMEhpoPjnJ5HMZvfyoN/xB/7R3UmyI9CFC4SwRmi9K1fDO
-        LiCqiCSUUgT5AktNz7FtqG4=
-X-Google-Smtp-Source: APiQypJtVA7tYtC5+yKFDxY4H+Ux5Opdy5jE7rOi5sFzYU8r893dt7Op6/U6W4QfePu/vQgcNikFYg==
-X-Received: by 2002:a17:902:b10d:: with SMTP id q13mr8105119plr.265.1587014951372;
-        Wed, 15 Apr 2020 22:29:11 -0700 (PDT)
+        bh=0GGMjsf7bes7SO0tixSZYBmOOrlUUrx9KPMpJ3HujiA=;
+        b=PsugiwtkDvY+ipIWYG68EFplwPnqwl+ZNBLDliiWfrjmYfpNCrbWVQlLPCeZFJo1+4
+         cBVu3Y6yasjt919eOIywMIxdlOHVW0ot8RC6U2LwWjCiLshnWGZLE6kJd93fwJkATcfs
+         Npj7eg33OWhAsukQ7k1541FD4OwBuGjhZj83zvRo8eaN0AIKDUAeJNojysalrTjkNmnW
+         Mw2waBTEdmnX4BDqw7G51WAshAtxIQUQkR682g2BADZ09OJC1hKzE76B29Yc38rmf9lp
+         RIxIFu6AK4Y5OxuqE0gReZnlXmqPWhc06G4KFSozUSy+bQ45G5V2DKqHBEDxzh8A+S1a
+         OOEA==
+X-Gm-Message-State: AGi0PuYGZvY3/MkfWuYMaB5d1auMpae+T1dwxRq1aDCcKDHAgHjBh3kZ
+        6YadQLidjV2/CiSyxNYMRhIdCqP7pEQ=
+X-Google-Smtp-Source: APiQypKbKv0BkBHKUzEiqUuVeGbX7gfEsR18Wnsdwe3iyXHjlLh95ibBMf8/BWrc5gEIAQNARJvn0Q==
+X-Received: by 2002:a65:68c7:: with SMTP id k7mr30843871pgt.248.1587015384681;
+        Wed, 15 Apr 2020 22:36:24 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id f3sm1303896pjo.24.2020.04.15.22.29.10
+        by smtp.gmail.com with ESMTPSA id w5sm15602046pfw.154.2020.04.15.22.36.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2020 22:29:10 -0700 (PDT)
+        Wed, 15 Apr 2020 22:36:23 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 914EF40277; Thu, 16 Apr 2020 05:29:09 +0000 (UTC)
-Date:   Thu, 16 Apr 2020 05:29:09 +0000
+        id C714B40277; Thu, 16 Apr 2020 05:36:22 +0000 (UTC)
+Date:   Thu, 16 Apr 2020 05:36:22 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, nstange@suse.de, akpm@linux-foundation.org,
         mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>
 Subject: Re: [PATCH 3/5] blktrace: refcount the request_queue during ioctl
-Message-ID: <20200416052909.GI11244@42.do-not-panic.com>
+Message-ID: <20200416053622.GJ11244@42.do-not-panic.com>
 References: <20200414041902.16769-1-mcgrof@kernel.org>
  <20200414041902.16769-4-mcgrof@kernel.org>
- <20200414154044.GB25765@infradead.org>
- <20200415061649.GS11244@42.do-not-panic.com>
- <20200415071425.GA21099@infradead.org>
- <20200415123434.GU11244@42.do-not-panic.com>
- <73332d32-b095-507f-fb2a-68460533eeb7@acm.org>
- <20200416011247.GB11244@42.do-not-panic.com>
- <a71d9c9b-72c8-8905-aeba-08e5382f5a81@acm.org>
+ <20200416023122.GB2717677@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a71d9c9b-72c8-8905-aeba-08e5382f5a81@acm.org>
+In-Reply-To: <20200416023122.GB2717677@T590>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 08:43:32PM -0700, Bart Van Assche wrote:
-> On 2020-04-15 18:12, Luis Chamberlain wrote:
-> > On Wed, Apr 15, 2020 at 07:18:22AM -0700, Bart Van Assche wrote:
-> >> blk_get_queue() prevents concurrent freeing of struct request_queue but
-> >> does not prevent concurrent blk_cleanup_queue() calls.
+On Thu, Apr 16, 2020 at 10:31:22AM +0800, Ming Lei wrote:
+> On Tue, Apr 14, 2020 at 04:19:00AM +0000, Luis Chamberlain wrote:
+> > Ensure that the request_queue is refcounted during its full
+> > ioctl cycle. This avoids possible races against removal, given
+> > blk_get_queue() also checks to ensure the queue is not dying.
 > > 
-> > Wouldn't concurrent blk_cleanup_queue() calls be a bug? If so should
-> > I make it clear that it would be or simply prevent it?
+> > This small race is possible if you defer removal of the request_queue
+> > and userspace fires off an ioctl for the device in the meantime.
+> > 
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > Cc: Nicolai Stange <nstange@suse.de>
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Michal Hocko <mhocko@kernel.org>
+> > Cc: yu kuai <yukuai3@huawei.com>
+> > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  kernel/trace/blktrace.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > index 15086227592f..17e144d15779 100644
+> > --- a/kernel/trace/blktrace.c
+> > +++ b/kernel/trace/blktrace.c
+> > @@ -701,6 +701,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+> >  	if (!q)
+> >  		return -ENXIO;
+> >  
+> > +	if (!blk_get_queue(q))
+> > +		return -ENXIO;
+> > +
+> >  	mutex_lock(&q->blk_trace_mutex);
+> >  
+> >  	switch (cmd) {
+> > @@ -729,6 +732,9 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+> >  	}
+> >  
+> >  	mutex_unlock(&q->blk_trace_mutex);
+> > +
+> > +	blk_put_queue(q);
+> > +
+> >  	return ret;
+> >  }
 > 
-> I think calling blk_cleanup_queue() while the queue refcount > 0 is well
-> established behavior. At least the SCSI core triggers that behavior
-> since a very long time. I prefer not to change that behavior.
+> Actually when bdev is opened, one extra refcount is held on gendisk, so
+> gendisk won't go away. And __device_add_disk() does grab one extra
+> refcount on request queue, so request queue shouldn't go away when ioctl
+> is running.
 
-I see. An alternative is to simply check if we already are cleaning up
-and if so abort early on the blk_cleanup_queue(). That would allow
-re-entrant calls, and just be a no-op to the additional calls. Or is
-the re-entrant, two attemps to really do all the work
-blk_cleanup_queue() expected functionality already?
-
-> Regarding patch 3/5: how about dropping that patch? If the queue
-> refcount can drop to zero while blk_trace_ioctl() is in progress I think
-> that should be fixed in the block_device_operations.open callback
-> instead of in blk_trace_ioctl().
-
-I'll take a look, thanks!
+Alright, then yes, this should not be needed.
 
   Luis
