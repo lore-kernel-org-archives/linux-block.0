@@ -6,125 +6,147 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C46C352BE
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 12:05:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42400C2BB55
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 12:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2077820771
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 12:05:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24E5320771
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 12:07:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2634894AbgDPMF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 08:05:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39968 "EHLO mx2.suse.de"
+        id S2634771AbgDPMHH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 08:07:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40712 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2634179AbgDPMFY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 08:05:24 -0400
+        id S2634831AbgDPMHC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Apr 2020 08:07:02 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 82776AB7F;
-        Thu, 16 Apr 2020 12:05:20 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 475AEAC6D;
+        Thu, 16 Apr 2020 12:06:59 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 201CF1E1250; Thu, 16 Apr 2020 14:05:20 +0200 (CEST)
-Date:   Thu, 16 Apr 2020 14:05:20 +0200
+        id 6CFFC1E1250; Thu, 16 Apr 2020 14:06:59 +0200 (CEST)
+Date:   Thu, 16 Apr 2020 14:06:59 +0200
 From:   Jan Kara <jack@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     axboe@kernel.dk, yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
         bvanassche@acm.org, tytso@mit.edu, gregkh@linuxfoundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/8] bdi: remove bdi_register_owner
-Message-ID: <20200416120520.GK23739@quack2.suse.cz>
+Subject: Re: [PATCH 7/8] bdi: simplify bdi_alloc
+Message-ID: <20200416120659.GL23739@quack2.suse.cz>
 References: <20200416071519.807660-1-hch@lst.de>
- <20200416071519.807660-7-hch@lst.de>
+ <20200416071519.807660-8-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200416071519.807660-7-hch@lst.de>
+In-Reply-To: <20200416071519.807660-8-hch@lst.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 16-04-20 09:15:17, Christoph Hellwig wrote:
-> Split out a new bdi_set_owner helper to set the owner, and move the policy
-> for creating the bdi name back into genhd.c, where it belongs.
+On Thu 16-04-20 09:15:18, Christoph Hellwig wrote:
+> Merge the _node vs normal version and drop the superflous gfp_t argument.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Fine by me. You can add:
+Looks good to me. You can add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
 
 > ---
->  block/genhd.c               |  8 +++++---
->  include/linux/backing-dev.h |  2 +-
->  mm/backing-dev.c            | 12 ++----------
->  3 files changed, 8 insertions(+), 14 deletions(-)
+>  block/blk-core.c            | 2 +-
+>  drivers/mtd/mtdcore.c       | 2 +-
+>  fs/super.c                  | 2 +-
+>  include/linux/backing-dev.h | 6 +-----
+>  mm/backing-dev.c            | 7 +++----
+>  5 files changed, 7 insertions(+), 12 deletions(-)
 > 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 06b642b23a07..7d10cfc38c70 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -840,13 +840,15 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
->  		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
->  		disk->flags |= GENHD_FL_NO_PART_SCAN;
->  	} else {
-> +		struct backing_dev_info *bdi = disk->queue->backing_dev_info;
-> +		struct device *dev = disk_to_dev(disk);
->  		int ret;
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 7e4a1da0715e..ab87f2833ab2 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -484,7 +484,7 @@ struct request_queue *__blk_alloc_queue(int node_id)
+>  	if (ret)
+>  		goto fail_id;
 >  
->  		/* Register BDI before referencing it from bdev */
-> -		disk_to_dev(disk)->devt = devt;
-> -		ret = bdi_register_owner(disk->queue->backing_dev_info,
-> -						disk_to_dev(disk));
-> +		dev->devt = devt;
-> +		ret = bdi_register(bdi, "%u:%u", MAJOR(devt), MINOR(devt));
->  		WARN_ON(ret);
-> +		bdi_set_owner(bdi, dev);
->  		blk_register_region(disk_devt(disk), disk->minors, NULL,
->  				    exact_match, exact_lock, disk);
->  	}
+> -	q->backing_dev_info = bdi_alloc_node(GFP_KERNEL, node_id);
+> +	q->backing_dev_info = bdi_alloc(node_id);
+>  	if (!q->backing_dev_info)
+>  		goto fail_split;
+>  
+> diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
+> index 2916674208b3..39ec563d9a14 100644
+> --- a/drivers/mtd/mtdcore.c
+> +++ b/drivers/mtd/mtdcore.c
+> @@ -2036,7 +2036,7 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
+>  	struct backing_dev_info *bdi;
+>  	int ret;
+>  
+> -	bdi = bdi_alloc(GFP_KERNEL);
+> +	bdi = bdi_alloc(NUMA_NO_NODE);
+>  	if (!bdi)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> diff --git a/fs/super.c b/fs/super.c
+> index cd352530eca9..dd28fcd706ff 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1598,7 +1598,7 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
+>  	int err;
+>  	va_list args;
+>  
+> -	bdi = bdi_alloc(GFP_KERNEL);
+> +	bdi = bdi_alloc(NUMA_NO_NODE);
+>  	if (!bdi)
+>  		return -ENOMEM;
+>  
 > diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-> index c9ad5c3b7b4b..4098ed6ba6b4 100644
+> index 4098ed6ba6b4..6b3504bf7a42 100644
 > --- a/include/linux/backing-dev.h
 > +++ b/include/linux/backing-dev.h
-> @@ -33,7 +33,7 @@ int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...);
->  __printf(2, 0)
->  int bdi_register_va(struct backing_dev_info *bdi, const char *fmt,
->  		    va_list args);
-> -int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
-> +void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner);
+> @@ -36,11 +36,7 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt,
+>  void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner);
 >  void bdi_unregister(struct backing_dev_info *bdi);
 >  
->  struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
+> -struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
+> -static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
+> -{
+> -	return bdi_alloc_node(gfp_mask, NUMA_NO_NODE);
+> -}
+> +struct backing_dev_info *bdi_alloc(int node_id);
+>  
+>  void wb_start_background_writeback(struct bdi_writeback *wb);
+>  void wb_workfn(struct work_struct *work);
 > diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-> index a7eb91146c9c..1ba9a7b30933 100644
+> index 1ba9a7b30933..119a41650833 100644
 > --- a/mm/backing-dev.c
 > +++ b/mm/backing-dev.c
-> @@ -982,20 +982,12 @@ int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
+> @@ -865,12 +865,11 @@ static int bdi_init(struct backing_dev_info *bdi)
+>  	return ret;
 >  }
->  EXPORT_SYMBOL(bdi_register);
 >  
-> -int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
-> +void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner)
+> -struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
+> +struct backing_dev_info *bdi_alloc(int node_id)
 >  {
-> -	int rc;
-> -
-> -	rc = bdi_register(bdi, "%u:%u", MAJOR(owner->devt), MINOR(owner->devt));
-> -	if (rc)
-> -		return rc;
-> -	/* Leaking owner reference... */
-> -	WARN_ON(bdi->owner);
-> +	WARN_ON_ONCE(bdi->owner);
->  	bdi->owner = owner;
->  	get_device(owner);
-> -	return 0;
->  }
-> -EXPORT_SYMBOL(bdi_register_owner);
+>  	struct backing_dev_info *bdi;
 >  
->  /*
->   * Remove bdi from bdi_list, and ensure that it is no longer visible
+> -	bdi = kmalloc_node(sizeof(struct backing_dev_info),
+> -			   gfp_mask | __GFP_ZERO, node_id);
+> +	bdi = kzalloc_node(sizeof(*bdi), GFP_KERNEL, node_id);
+>  	if (!bdi)
+>  		return NULL;
+>  
+> @@ -880,7 +879,7 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
+>  	}
+>  	return bdi;
+>  }
+> -EXPORT_SYMBOL(bdi_alloc_node);
+> +EXPORT_SYMBOL(bdi_alloc);
+>  
+>  static struct rb_node **bdi_lookup_rb_node(u64 id, struct rb_node **parentp)
+>  {
 > -- 
 > 2.25.1
 > 
