@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304DAC352BE
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 07:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B8EC2BA2B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 07:16:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A7DA206D5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 07:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 340CF21556
+	for <linux-block@archiver.kernel.org>; Thu, 16 Apr 2020 07:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NQCWq5lB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="i1VQSmLQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438631AbgDPHPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 03:15:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53892 "EHLO
+        id S2438698AbgDPHPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Apr 2020 03:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2438556AbgDPHPs (ORCPT
+        by vger.kernel.org with ESMTP id S2438624AbgDPHPt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 03:15:48 -0400
+        Thu, 16 Apr 2020 03:15:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE13C061A10;
-        Thu, 16 Apr 2020 00:15:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDA9C061A0C;
+        Thu, 16 Apr 2020 00:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=kaUioJLzSNdHi6CtA9jKUeu4EXabW4JIPk0+j+Gr6Qk=; b=NQCWq5lBA9bkqrTWiomFiNi7DH
-        0F7R5lMt6xmILjoHZmzqQPVzaK3Tit4Ob8OV4Rk7H2nrbheqK50k5UwjrxnkVSiBYDttLUQ7X2b7o
-        Anvw2BL9q0+345aqnqDySJfYz+Fvxs9LvqtZctA4E6KCcs9EJzsNcqK1UsVYCoHjHRzjEz+Glwo+9
-        xLO5ry1EyUalEZwH+uq6RNkKsVW18yL6wAaCQUytCvmN1pFNZYMD4ktaebRdSHcxWYdjGM/GFPWKA
-        Ums37sjw+AQXK3bTxM5KNLFxydon2tzj+hooZ4/zPEqSCP+ykNE1pI6s97xA+wdWE50JxWlcMLyJI
-        wQYLITBA==;
+        bh=WCKfWboZ9v8szGZxRLkE1q594CoxOaKOM9awrL+nvmE=; b=i1VQSmLQIBpYKEZvDQdkXLsik0
+        R2X4ntez5bz0cEKQV6XE3NtPK9aWtEnHWcH4qddgdbYLzZZXZSEnpDHqL46l2iPSyLwIXw+Z5T8ER
+        IBV/isWwqDk1OUDrTpS4wBUEsyvY8kfBPnq+RbXklC8mfLeGqMtnV572iU1cGHoaFjqqXaer69l1I
+        n3blgE9nxbY95E1/lM8uLjNL9rMCF+Um44Zwme8EUFam+MiCtSF+vTE7U0FFasfMBApCuNzRVfXEN
+        qcoWq94OsAhYdxBx0PyH+9i/X0uWr31LyshxvAZZ/x8jRGN4GePgJAd86GZm33qiOMd2r0JCDfMUD
+        UpnH30tQ==;
 Received: from [2001:4bb8:184:4aa1:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jOykQ-0003SP-Bc; Thu, 16 Apr 2020 07:15:42 +0000
+        id 1jOykT-0003W6-40; Thu, 16 Apr 2020 07:15:45 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
         bvanassche@acm.org, tytso@mit.edu, gregkh@linuxfoundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 7/8] bdi: simplify bdi_alloc
-Date:   Thu, 16 Apr 2020 09:15:18 +0200
-Message-Id: <20200416071519.807660-8-hch@lst.de>
+Subject: [PATCH 8/8] bdi: remove the name field in struct backing_dev_info
+Date:   Thu, 16 Apr 2020 09:15:19 +0200
+Message-Id: <20200416071519.807660-9-hch@lst.de>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200416071519.807660-1-hch@lst.de>
 References: <20200416071519.807660-1-hch@lst.de>
@@ -57,101 +57,95 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Merge the _node vs normal version and drop the superflous gfp_t argument.
+The name is only printed for a not registered bdi in writeback.  Use the
+device name there as is more useful anyway for the unlike case that the
+warning triggers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c            | 2 +-
- drivers/mtd/mtdcore.c       | 2 +-
- fs/super.c                  | 2 +-
- include/linux/backing-dev.h | 6 +-----
- mm/backing-dev.c            | 7 +++----
- 5 files changed, 7 insertions(+), 12 deletions(-)
+ block/blk-core.c                 | 1 -
+ drivers/mtd/mtdcore.c            | 1 -
+ fs/fs-writeback.c                | 2 +-
+ fs/super.c                       | 2 --
+ include/linux/backing-dev-defs.h | 2 --
+ mm/backing-dev.c                 | 1 -
+ 6 files changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 7e4a1da0715e..ab87f2833ab2 100644
+index ab87f2833ab2..f37068c611bf 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -484,7 +484,7 @@ struct request_queue *__blk_alloc_queue(int node_id)
- 	if (ret)
- 		goto fail_id;
+@@ -494,7 +494,6 @@ struct request_queue *__blk_alloc_queue(int node_id)
  
--	q->backing_dev_info = bdi_alloc_node(GFP_KERNEL, node_id);
-+	q->backing_dev_info = bdi_alloc(node_id);
- 	if (!q->backing_dev_info)
- 		goto fail_split;
+ 	q->backing_dev_info->ra_pages = VM_READAHEAD_PAGES;
+ 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+-	q->backing_dev_info->name = "block";
+ 	q->node = node_id;
  
+ 	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
 diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
-index 2916674208b3..39ec563d9a14 100644
+index 39ec563d9a14..fcb018ce17c3 100644
 --- a/drivers/mtd/mtdcore.c
 +++ b/drivers/mtd/mtdcore.c
-@@ -2036,7 +2036,7 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
- 	struct backing_dev_info *bdi;
- 	int ret;
- 
--	bdi = bdi_alloc(GFP_KERNEL);
-+	bdi = bdi_alloc(NUMA_NO_NODE);
+@@ -2040,7 +2040,6 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
  	if (!bdi)
  		return ERR_PTR(-ENOMEM);
  
+-	bdi->name = name;
+ 	/*
+ 	 * We put '-0' suffix to the name to get the same name format as we
+ 	 * used to get. Since this is called only once, we get a unique name. 
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index 76ac9c7d32ec..d85323607b49 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -2320,7 +2320,7 @@ void __mark_inode_dirty(struct inode *inode, int flags)
+ 
+ 			WARN(bdi_cap_writeback_dirty(wb->bdi) &&
+ 			     !test_bit(WB_registered, &wb->state),
+-			     "bdi-%s not registered\n", wb->bdi->name);
++			     "bdi-%s not registered\n", bdi_dev_name(wb->bdi));
+ 
+ 			inode->dirtied_when = jiffies;
+ 			if (dirtytime)
 diff --git a/fs/super.c b/fs/super.c
-index cd352530eca9..dd28fcd706ff 100644
+index dd28fcd706ff..4991f441988e 100644
 --- a/fs/super.c
 +++ b/fs/super.c
-@@ -1598,7 +1598,7 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
- 	int err;
- 	va_list args;
- 
--	bdi = bdi_alloc(GFP_KERNEL);
-+	bdi = bdi_alloc(NUMA_NO_NODE);
+@@ -1602,8 +1602,6 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
  	if (!bdi)
  		return -ENOMEM;
  
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 4098ed6ba6b4..6b3504bf7a42 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -36,11 +36,7 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt,
- void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
+-	bdi->name = sb->s_type->name;
+-
+ 	va_start(args, fmt);
+ 	err = bdi_register_va(bdi, fmt, args);
+ 	va_end(args);
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 249590bcccf7..0a55170b2142 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -194,8 +194,6 @@ struct backing_dev_info {
+ 	congested_fn *congested_fn; /* Function pointer if device is md/dm */
+ 	void *congested_data;	/* Pointer to aux data for congested func */
  
--struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
--static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
--{
--	return bdi_alloc_node(gfp_mask, NUMA_NO_NODE);
--}
-+struct backing_dev_info *bdi_alloc(int node_id);
- 
- void wb_start_background_writeback(struct bdi_writeback *wb);
- void wb_workfn(struct work_struct *work);
+-	const char *name;
+-
+ 	struct kref refcnt;	/* Reference counter for the structure */
+ 	unsigned int capabilities; /* Device capabilities */
+ 	unsigned int min_ratio;
 diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 1ba9a7b30933..119a41650833 100644
+index 119a41650833..dc7215dfd56b 100644
 --- a/mm/backing-dev.c
 +++ b/mm/backing-dev.c
-@@ -865,12 +865,11 @@ static int bdi_init(struct backing_dev_info *bdi)
- 	return ret;
- }
+@@ -15,7 +15,6 @@
+ #include <trace/events/writeback.h>
  
--struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
-+struct backing_dev_info *bdi_alloc(int node_id)
- {
- 	struct backing_dev_info *bdi;
- 
--	bdi = kmalloc_node(sizeof(struct backing_dev_info),
--			   gfp_mask | __GFP_ZERO, node_id);
-+	bdi = kzalloc_node(sizeof(*bdi), GFP_KERNEL, node_id);
- 	if (!bdi)
- 		return NULL;
- 
-@@ -880,7 +879,7 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
- 	}
- 	return bdi;
- }
--EXPORT_SYMBOL(bdi_alloc_node);
-+EXPORT_SYMBOL(bdi_alloc);
- 
- static struct rb_node **bdi_lookup_rb_node(u64 id, struct rb_node **parentp)
- {
+ struct backing_dev_info noop_backing_dev_info = {
+-	.name		= "noop",
+ 	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
+ };
+ EXPORT_SYMBOL_GPL(noop_backing_dev_info);
 -- 
 2.25.1
 
