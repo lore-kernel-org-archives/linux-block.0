@@ -2,78 +2,101 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C2FC2BB55
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 08:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74450C352BE
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 09:18:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D429221E9
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 08:59:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 550942137B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 09:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729937AbgDQI7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 04:59:13 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42364 "EHLO mx2.suse.de"
+        id S1730182AbgDQJSL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 05:18:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52736 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729890AbgDQI7N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 04:59:13 -0400
+        id S1730181AbgDQJSL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 05:18:11 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id CE6EFAC22;
-        Fri, 17 Apr 2020 08:59:10 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 2A5B5AFAE;
+        Fri, 17 Apr 2020 09:18:09 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E272B1E0E58; Fri, 17 Apr 2020 10:59:09 +0200 (CEST)
-Date:   Fri, 17 Apr 2020 10:59:09 +0200
+        id E72AE1E0E58; Fri, 17 Apr 2020 11:18:08 +0200 (CEST)
+Date:   Fri, 17 Apr 2020 11:18:08 +0200
 From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
-        bvanassche@acm.org, tytso@mit.edu, gregkh@linuxfoundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/8] bdi: add a ->dev_name field to struct
- backing_dev_info
-Message-ID: <20200417085909.GA12234@quack2.suse.cz>
-References: <20200416165453.1080463-1-hch@lst.de>
- <20200416165453.1080463-4-hch@lst.de>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Andreas Herrmann <aherrmann@suse.com>
+Subject: Re: [PATCH 0/2 RFC] bfq: Waker logic tweaks for dbench performance
+Message-ID: <20200417091808.GB12234@quack2.suse.cz>
+References: <20200409170915.30570-1-jack@suse.cz>
+ <2C0E3547-FD20-45A4-B1B0-AAD7B0024999@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200416165453.1080463-4-hch@lst.de>
+In-Reply-To: <2C0E3547-FD20-45A4-B1B0-AAD7B0024999@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 16-04-20 18:54:48, Christoph Hellwig wrote:
-> Cache a copy of the name for the life time of the backing_dev_info
-> structure so that we can reference it even after unregistering.
+Hi Paolo!
+
+On Fri 17-04-20 09:47:07, Paolo Valente wrote:
+> I'm glad you're addressing these BFQ issues.  Sorry for the delay, but
+> I happen to be working on similar issues, for other sort of
+> corner-case workloads.  So I wanted to consolidate my changes before
+> replying.
 > 
-> Fixes: 68f23b89067f ("memcg: fix a crash in wb_workfn when a device disappears")
-> Reported-by: Yufen Yu <yuyufen@huawei.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Probably, the best first step for me, to check your proposal, is to
+> merge it with my current changes, and test the outcome.  In this
+> respect, my problem is that, after our last improvements for dbench,
+> we cannot reproduce regressions any longer.  So, we would need your
+> support to test both issues, i.e., to test throughput with dbench (on
+> your side/machines), and possible other regressions of your and my
+> changes (on our side/machines).
+> 
+> Would it be ok for you to participate in this little collaboration?
+> If it is, then I'll contact you privately to kick this off.
 
-...
-
-> @@ -938,7 +938,8 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
->  	if (bdi->dev)	/* The driver needs to use separate queues per device */
->  		return 0;
->  
-> -	dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0), bdi, fmt, args);
-> +	vsnprintf(bdi->dev_name, sizeof(bdi->dev_name), fmt, args);
-> +	dev = device_create(bdi_class, NULL, MKDEV(0, 0), bdi, bdi->dev_name);
->  	if (IS_ERR(dev))
->  		return PTR_ERR(dev);
->  
-
-This can have a sideeffect not only bdi->dev_name will be truncated to 64
-chars (which generally doesn't matter) but possibly also kobject name will
-be truncated in the same way.  Which may have user visible effects. E.g.
-for fs/vboxsf 64 chars need not be enough. So shouldn't we rather do it the
-other way around - i.e., let device_create_vargs() create the device name
-and then copy to bdi->dev_name whatever fits?
+Sure, I can test whatever patches you send me on our machines.
 
 								Honza
+
+> 
+> Thanks,
+> Paolo
+> 
+> > Il giorno 9 apr 2020, alle ore 19:09, Jan Kara <jack@suse.cz> ha scritto:
+> > 
+> > Hello,
+> > 
+> > I was investigating why dbench performance (even for single dbench client) with
+> > BFQ is significantly worse than it used to be CFQ. The culprit is the idling
+> > logic in BFQ. The dbench workload is very fsync(2) heavy. In practice the time
+> > to complete fsync(2) calls is what determines the overall performance. For
+> > filesystems with a journal such as xfs or ext4 it is common that fsync(2)
+> > involves writing data from the process runningg fsync(2) - dbench in this case
+> > - and then waiting for the journalling machinery to flush out metadata from a
+> > separate process (jbd2 process in ext4 case, worker thread in xfs case).
+> > CFQ's heuristic was able to determine that it isn't worth to idle waiting for
+> > either dbench or jbd2 IO. BFQ's heuristic is not able to determine this and
+> > thus jbd2 process is often blocked waiting for idle timer of dbench queue to
+> > trigger.
+> > 
+> > The first patch in the series is an obvious bugfix but is not enough to improve
+> > performance. The second patch does improve dbench performance from ~80 MB/s
+> > to ~200 MB/s on my test machine but I'm aware that it is probably way too
+> > aggressive and probably a different solution is needed. So I just wrote that
+> > patch to see the results and spark some discussion :). Any idea how to
+> > improve the waker logic so that dbench performance doesn't drop so
+> > dramatically?
+> > 
+> > 								Honza
+> 
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
