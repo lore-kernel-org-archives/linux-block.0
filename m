@@ -2,135 +2,64 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5808FC2BB1D
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 04:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7996C2BB85
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 07:35:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2289021D93
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 04:09:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587096577;
-	bh=/aAOMVOP3MZQGTBFo0xdiu+n9iKYVv70X4AkPfYDRUY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=AScZtUEqOjWJZJYDtfLKPQ2zn0XdJbwVbM++v0t4tQwnNa888ZflbQGtaykGusnJf
-	 u9YgpwdvA5+mu2DhFIvc04V5EzU5yP7BhX73foWHqUFQ8hsINaGQIeKUhshsj+CTVK
-	 O5aOrNnPKEFFQ4fJS/zJHoc7LbOmG0Ix4j75v79I=
+	by mail.kernel.org (Postfix) with ESMTP id 872292054F
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 07:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbgDQEJg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 00:09:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725900AbgDQEJf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 00:09:35 -0400
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CF70922250;
-        Fri, 17 Apr 2020 04:09:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587096575;
-        bh=/aAOMVOP3MZQGTBFo0xdiu+n9iKYVv70X4AkPfYDRUY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Gyt0aCIAKdLM3LASetND1QH5Wfx32kCgTTnBxG2zuGNZrZ5A+Uuyt+EWvqojWwS5D
-         zo4tgkaCD0hTcasyZJ7j/nTI6TtMjrTbvxEv3IIfeepWgrn5l7XiWcWDXVNXOJm1L+
-         +zIEAsvTYvKFPhvJ4etnosn3KdqzsUfe3B4cENx8=
-Received: by mail-ej1-f45.google.com with SMTP id s9so562727eju.1;
-        Thu, 16 Apr 2020 21:09:34 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZNPhNoQAkTKyBDr33jnGgVBB9DN5jxGH+ZDHjahcuPmUK5fbz/
-        JuKsLUQp6g23YwDG/75hsDcrkp5qhVRaUNb6Zp4=
-X-Google-Smtp-Source: APiQypIdKCMgMXNdIoKxA+hJgxlg7THMOt/IQ9RE95/qKc1hrmrQknmbKq/g59E4lMJ6Zg4qLEjnmgHh/BtY8F2Saqg=
-X-Received: by 2002:a17:906:7c2:: with SMTP id m2mr1049847ejc.339.1587096573102;
- Thu, 16 Apr 2020 21:09:33 -0700 (PDT)
+        id S1729017AbgDQHfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 03:35:15 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:41824 "EHLO
+        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728419AbgDQHfP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 03:35:15 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
+        by charlie.dont.surf (Postfix) with ESMTPSA id 13A07BF493;
+        Fri, 17 Apr 2020 07:35:13 +0000 (UTC)
+Date:   Fri, 17 Apr 2020 09:35:09 +0200
+From:   Klaus Birkelund Jensen <its@irrelevant.dk>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] Fix unintended skipping of tests
+Message-ID: <20200417073509.3j6evbnu54ojfwi2@apples.localdomain>
+References: <20200414221151.449946-1-its@irrelevant.dk>
+ <20200416214428.GD701157@vader>
 MIME-Version: 1.0
-References: <20200414041902.16769-1-mcgrof@kernel.org> <20200414041902.16769-3-mcgrof@kernel.org>
- <20200416021036.GA2717677@T590> <20200416052524.GH11244@42.do-not-panic.com>
- <20200416054750.GA2723777@T590> <20200416062054.GL11244@42.do-not-panic.com> <20200416062856.GD2723777@T590>
-In-Reply-To: <20200416062856.GD2723777@T590>
-From:   Luis Chamberlain <mcgrof@kernel.org>
-Date:   Thu, 16 Apr 2020 22:09:24 -0600
-X-Gmail-Original-Message-ID: <CAB=NE6VFj4w_o+NA57iBzGaXCGF0afeHy1N_2C9awGcFz5pnQw@mail.gmail.com>
-Message-ID: <CAB=NE6VFj4w_o+NA57iBzGaXCGF0afeHy1N_2C9awGcFz5pnQw@mail.gmail.com>
-Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>, Jan Kara <jack@suse.cz>,
-        Nicolai Stange <nstange@suse.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>, yu kuai <yukuai3@huawei.com>,
-        linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200416214428.GD701157@vader>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 12:29 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Thu, Apr 16, 2020 at 06:20:54AM +0000, Luis Chamberlain wrote:
-> > On Thu, Apr 16, 2020 at 01:47:50PM +0800, Ming Lei wrote:
-> > > On Thu, Apr 16, 2020 at 05:25:24AM +0000, Luis Chamberlain wrote:
-> > > > On Thu, Apr 16, 2020 at 10:10:36AM +0800, Ming Lei wrote:
-> > > > > In theory, multiple partitions can be traced concurrently, but looks
-> > > > > it never works, so it won't cause trouble for multiple partition trace.
-> > > > >
-> > > > > One userspace visible change is that blktrace debugfs dir name is switched
-> > > > > to disk name from partition name in case of partition trace, will it
-> > > > > break some utilities?
-> > > >
-> > > > How is this possible, its not clear to me, we go from:
-> > > >
-> > > > - q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> > > > -                                     blk_debugfs_root);
-> > > >
-> > > > To this:
-> > > >
-> > > > + q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> > > > +                                     blk_debugfs_root);
-> > > >
-> > > >
-> > > > Maybe I am overlooking something.
-> > >
-> > > Your patch removes the blktrace debugfs dir:
-> > >
-> > > do_blk_trace_setup()
-> > >
-> > > -       dir = debugfs_lookup(buts->name, blk_debugfs_root);
-> > > -       if (!dir)
-> > > -               bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
-> > > -
-> > >
-> > > Then create blktrace attributes under the dir of q->debugfs_dir.
-> > >
-> > > However, buts->name could be one partition device name, but
-> >
-> > I can see how buts->name is set to bdevname() which expands to
-> > disk_name(bdev->bd_disk, bdev->bd_part->partno, buf).
-> >
-> > > q->debugfs_dir has to be disk name.
-> >
-> > I can't see this, can you point me to where it is clear the
-> > request_queue kobject's parent is sure to be the disk name?
->
-> blk_register_queue():
->         ...
->         ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
->         ...
+On Apr 16 14:44, Omar Sandoval wrote:
+> On Wed, Apr 15, 2020 at 12:11:51AM +0200, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> > 
+> > cd11d001fe86 ("Support skipping tests from test{,_device}()") breaks a
+> > handful of tests in the block group.
+> > 
+> > For example, block/005 uses _test_dev_is_rotational to check if the
+> > device is rotational and uses the result to size up the fio run. As a
+> > side-effect, _test_dev_is_rotational also sets SKIP_REASON, which (since
+> > commit cd11d001fe86) causes the test to print out a "[not run]" even
+> > through the test actually ran successfully.
+> 
+> Oof, I thought I checked for this sort of thing, but clearly I missed
+> this one. It might be better to rename the existing helpers _require_foo
+> (e.g., _require_test_dev_is_rotational), and have the variant without
+> the _require whenever it's needed. Would you mind writing a patch for
+> that?
+> 
 
-Alright, I have a fix for this now, and I do have also a further
-explanation as to *why* the debugfs_lookup() doesn't help us here.
-I'll follow up with more patches.
+Sounds good to me. I'll whip that up :)
 
-  Luis
+
+K
