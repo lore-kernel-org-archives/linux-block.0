@@ -2,182 +2,68 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CDCC38A2B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 16:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA50C38A2B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:45:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D18220771
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 16:47:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 176F222240
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587145532;
+	bh=aNYaOxxB1m0g7coZTESdvIulaLbkpvpjC8dst6hi9sE=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=hSywsbLNq+YMVYQfY3jqgSdXmKYM39IcbKxQ9QcBGTHQ5CNd/Td9hQAmoYFCxoA5A
+	 7oF5xwv4eldC9xnhxB2SUoQmTewmgLxFutwW1xjz27ji7HKPKLQmNH1BwoXWqRy9i5
+	 rbkS3riCUAWwFLG987gQFWnEH0exTS3EwEUhAs4M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726507AbgDQQrC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 12:47:02 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2059 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726420AbgDQQrC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 12:47:02 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id A5AEC2902422DABEF175;
-        Fri, 17 Apr 2020 17:46:59 +0100 (IST)
-Received: from [127.0.0.1] (10.210.172.89) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 17 Apr
- 2020 17:46:57 +0100
-Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.de>,
-        <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>, <hch@infradead.org>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
- <1583409280-158604-9-git-send-email-john.garry@huawei.com>
- <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com>
- <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
- <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
-Date:   Fri, 17 Apr 2020 17:46:25 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.172.89]
-X-ClientProxiedBy: lhreml735-chm.china.huawei.com (10.201.108.86) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+        id S1730091AbgDQRpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 13:45:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46258 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729969AbgDQRpa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 13:45:30 -0400
+Subject: Re: [GIT PULL] Block fixes for 5.7-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587145529;
+        bh=aNYaOxxB1m0g7coZTESdvIulaLbkpvpjC8dst6hi9sE=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=AZsxINB5yqHeM3wBj4Z8Cnk5tknuSSGZXaqJ8Oyg6GXHeX0qDEbmg6RnxH8C/N6on
+         kbLlOrxSThP5IVtHxH5sqNIKPTvXffW08TFpgij251yC46nujBV22zVGMljYfvmlwE
+         YZ4XMQHHQGkoXC15B4Xc79iJDt+v+v5A6WIbjitg=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
+References: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.7-2020-04-17
+X-PR-Tracked-Commit-Id: 3f22037d382b45710248b6faa4d5bd30d169c4ba
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: bf9196d51f7d7222875916c685653981088668b1
+Message-Id: <158714552979.1625.13505670253634285544.pr-tracker-bot@kernel.org>
+Date:   Fri, 17 Apr 2020 17:45:29 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08/04/2020 10:59, Kashyap Desai wrote:
+The pull request you sent on Fri, 17 Apr 2020 09:13:28 -0600:
 
-Hi Kashyap,
+> git://git.kernel.dk/linux-block.git tags/block-5.7-2020-04-17
 
-> 
->>> We have done some level of testing to know performance impact on SAS
->>> SSDs and HDD setup. Here is my finding - My testing used - Two socket
->>> Intel Skylake/Lewisburg/Purley Output of numactl --hardware
->>>
->>> available: 2 nodes (0-1)
->>> node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 36 37 38 39
->>> 40 41
->>> 42 43 44 45 46 47 48 49 50 51 52 53
->>> node 0 size: 31820 MB
->>> node 0 free: 21958 MB
->>> node 1 cpus: 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 54
->>> 55
->>> 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 node 1 size: 32247 MB
->>> node 1 free: 21068 MB node distances:
->>> node   0   1
->>>     0:  10  21
->>>     1:  21  10
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/bf9196d51f7d7222875916c685653981088668b1
 
-Do you have other info, like IRQ-CPU affinity dump and controller PCI 
-vendor+device ID? Also /proc/interrupts info would be good after a run, 
-like supplied by Sumit here:
+Thank you!
 
-https://lore.kernel.org/linux-scsi/CAL2rwxotoWakFS4DPe85hZ4VAgd_zw8pL+B5ckHR9NwEf+-L=g@mail.gmail.com/
-
-Are you enabling some special driver perf mode?
-
->>>
->>>
->>> 64 HDD setup -
->>>
->>> With higher QD
->> what's OD?
->>
->>> and io schedulder = mq-deadline, shared host tag is not scaling well. >>> If I use ioscheduler = none, I can see consistent 2.0M IOPs.
->>> This issue is seen only with RFC. Without RFC mq-deadline scales up to
->>> 2.0M IOPS.
-
-In theory, from this driver perspective, we should not be making a 
-difference. That's after your change to use sdev-> device busy count, 
-rather than the hctx nr_active count. As I understand, that's the only 
-difference you made.
-
-But I will try an IO scheduler on hisi sas for ssd to see if any difference.
-
->> I didn't try any scheduler. I can have a look at that.
->>
->>> Perf Top result of RFC - (IOPS = 1.4M IOPS)
->>>
->>>      78.20%  [kernel]        [k] native_queued_spin_lock_slowpath
->>>        1.46%  [kernel]        [k] sbitmap_any_bit_set
->>>        1.14%  [kernel]        [k] blk_mq_run_hw_queue
->>>        0.90%  [kernel]        [k] _mix_pool_bytes
->>>        0.63%  [kernel]        [k] _raw_spin_lock
->>>        0.57%  [kernel]        [k] blk_mq_run_hw_queues
->>>        0.56%  [megaraid_sas]  [k] complete_cmd_fusion
->>>        0.54%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
->>>        0.50%  [kernel]        [k] dd_has_work
->>>        0.38%  [kernel]        [k] _raw_spin_lock_irqsave
->>>        0.36%  [kernel]        [k] gup_pgd_range
->>>        0.35%  [megaraid_sas]  [k] megasas_build_ldio_fusion
->>>        0.31%  [kernel]        [k] io_submit_one
->>>        0.29%  [kernel]        [k] hctx_lock
->>>        0.26%  [kernel]        [k] try_to_grab_pending
->>>        0.24%  [kernel]        [k] scsi_queue_rq
->>>        0.22%  fio             [.] __fio_gettime
->>>        0.22%  [kernel]        [k] insert_work
->>>        0.20%  [kernel]        [k] native_irq_return_iret
->>>
->>> Perf top without RFC driver - (IOPS = 2.0 M IOPS)
->>>
->>>       58.40%  [kernel]          [k] native_queued_spin_lock_slowpath
->>>        2.06%  [kernel]          [k] _mix_pool_bytes
->>>        1.38%  [kernel]          [k] _raw_spin_lock_irqsave
->>>        0.97%  [kernel]          [k] _raw_spin_lock
->>>        0.91%  [kernel]          [k] scsi_queue_rq
->>>        0.82%  [kernel]          [k] __sbq_wake_up
->>>        0.77%  [kernel]          [k] _raw_spin_unlock_irqrestore
->>>        0.74%  [kernel]          [k] scsi_mq_get_budget
->>>        0.61%  [kernel]          [k] gup_pgd_range
->>>        0.58%  [kernel]          [k] aio_complete_rw
->>>        0.52%  [kernel]          [k] elv_rb_add
->>>        0.50%  [kernel]          [k] llist_add_batch
->>>        0.50%  [kernel]          [k] native_irq_return_iret
->>>        0.48%  [kernel]          [k] blk_rq_map_sg
->>>        0.48%  fio               [.] __fio_gettime
->>>        0.47%  [kernel]          [k] blk_mq_get_tag
->>>        0.44%  [kernel]          [k] blk_mq_dispatch_rq_list
->>>        0.40%  fio               [.] io_u_queued_complete
->>>        0.39%  fio               [.] get_io_u
->>>
->>>
->>> If you want me to test any top up patch, please let me know.  BTW, we
->>> also wants to provide module parameter for user to switch back to
->>> older nr_hw_queue = 1 mode. I will work on that part.
->> ok, but I would just like to reiterate the point that you will not see the
->> full
->> benefit of blk-mq draining hw queues for cpu hotplug since you hide hw
->> queues from blk-mq.
-> Agree. We have done  minimal testing using this RFC. We want to ACK this RFC
-> as long as primary performance goal is achieved.
-> 
-> We have done full testing on nr_hw_queue =1 (and that is what customer is
-> using) so we at least want to give that interface available for customer for
-> some time (assuming they may find some performance gap between two interface
-> which we may not have encountered during smoke testing.).
-> Over a period of time, if nr_hw_queue = N works for (Broadcom will conduct
-> full performance once RFC is committed in upstream) all the IO profiles, we
-> will share the information with customer about benefit of using nr_hw_queues
-> =  N.
-
-Hopefully you can use nr_hw_queues = N always.
-
-> 
-
-Thanks,
-john
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
