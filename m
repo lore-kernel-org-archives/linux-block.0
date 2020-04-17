@@ -2,68 +2,151 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA50C38A2B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1C9C2D0EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:48:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 176F222240
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:45:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587145532;
-	bh=aNYaOxxB1m0g7coZTESdvIulaLbkpvpjC8dst6hi9sE=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=hSywsbLNq+YMVYQfY3jqgSdXmKYM39IcbKxQ9QcBGTHQ5CNd/Td9hQAmoYFCxoA5A
-	 7oF5xwv4eldC9xnhxB2SUoQmTewmgLxFutwW1xjz27ji7HKPKLQmNH1BwoXWqRy9i5
-	 rbkS3riCUAWwFLG987gQFWnEH0exTS3EwEUhAs4M=
+	by mail.kernel.org (Postfix) with ESMTP id A1B2F2076D
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 17:48:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MF8+ckPN";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ts1BlNwd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730091AbgDQRpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 13:45:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46258 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729969AbgDQRpa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 13:45:30 -0400
-Subject: Re: [GIT PULL] Block fixes for 5.7-rc
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587145529;
-        bh=aNYaOxxB1m0g7coZTESdvIulaLbkpvpjC8dst6hi9sE=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=AZsxINB5yqHeM3wBj4Z8Cnk5tknuSSGZXaqJ8Oyg6GXHeX0qDEbmg6RnxH8C/N6on
-         kbLlOrxSThP5IVtHxH5sqNIKPTvXffW08TFpgij251yC46nujBV22zVGMljYfvmlwE
-         YZ4XMQHHQGkoXC15B4Xc79iJDt+v+v5A6WIbjitg=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
-References: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <26613a68-19f0-e588-d9d8-da8f5a1f95f9@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
- tags/block-5.7-2020-04-17
-X-PR-Tracked-Commit-Id: 3f22037d382b45710248b6faa4d5bd30d169c4ba
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bf9196d51f7d7222875916c685653981088668b1
-Message-Id: <158714552979.1625.13505670253634285544.pr-tracker-bot@kernel.org>
-Date:   Fri, 17 Apr 2020 17:45:29 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1729965AbgDQRsX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 13:48:23 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:19423 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729736AbgDQRsX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 13:48:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1587145702; x=1618681702;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=adV8Gpr8MHweAYhq9tiHEXkdyPEny8cb3eGRce2pzfw=;
+  b=MF8+ckPNL23/FmazpAz2Xah4UptofCUgw6URCNUROoYyS2Wu1wy4ahy3
+   COh6yghUTRDp5kY5zlQn7ww3GJTAvwcvsSyauAQizpc4DuwvGO9/4kLEb
+   nK69532No46LDcR3pnFKqm6o/Ql3js3MtBguoqBfeUE/zI7KWerlwhEe/
+   lpOEapB2KiIdhmuT8ud4hpNMfFNBw9vzkG0OQGxhp2SdsBMsGHPXY6PIA
+   RSw0AYJcTFORW7GDFCvMl+Vg/YgPNLDyudNTLdXoFzPEpGPMQOeoH7/ZW
+   EzE4paYVqRLU2y9VpY/mTjxU1DJxSdgPP35Ni6gz8f/aXWEJSmBjGWF4u
+   A==;
+IronPort-SDR: f1adXbzvecV6U5jHIWZZS5T1yk1nU3gNVVH5XcQLocgZPeBG9HwJTPy4FOrCV8fE7/IcZo4D0A
+ 6b95FELRW25bgHWArws6ZzQO0tOAnoTFetVvEnn0iVgTCV9vB3d+NiqddEENQ9BvNI5bJcJq6L
+ 42Zdql4zMnsavO0ltYjOEQ3WAUXVcWSadNSGUxNJUa3n+vbRUHKREBLJfYm5iKK+ovYJ4239yh
+ Kn0nUTX+hOTUVW8eR7SAWfJJAb2iugMnSfHgGeegCWIa9Zo/RhVlPnb6s6x6ApStPE1mGAStxa
+ aiM=
+X-IronPort-AV: E=Sophos;i="5.72,395,1580745600"; 
+   d="scan'208";a="244253074"
+Received: from mail-dm6nam11lp2172.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.172])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Apr 2020 01:48:21 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fb3S0Fg/7DhJG7SzKhLl4RF/aqtsqYv7iiB+8S5myRS4YZFD/k2nWBklUxH3FUjXmWrQcdUF7LmDjoKDzTM2tbWr4KdM/6TcaUsijUb1+FdJXazhX+Znu8tMCQ5vdmuSRU6grcseBPWTQZ45L1fLiCKBA0G08wjIp2R31EsQPAaJ7XkHUsMFstw6qTZ7pGOLFcBLk+sz4Nw7qx3zUUNkeAPZGcDq1PLMDyu0pvelKgr4fyM4sgS3fvPtSa2gpjJay1AS3eBTJiBpF3GOIl+FsbR2KLuaTlyJFGP0ngb7QmuA30dNGICvvHK/0oVlTIQ25G1+NKuKHfdvNAkSmaFAKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NI+8VuiSZQPh23FSjynwla8g8vjLDcUKZXNngAV3RgY=;
+ b=I638cBDH27CBDXmOq0s02c0A2BcjGOyLpSf7eiAYsETfC3tUT+9rmf33a1pImnxdxzjq5WjJ/1q4b+bhwzLoIW7KyNjjbBI1Lc4/oFD+lhLru4cpxIddHXH6YunBOuS9IAeD4cscjtp924iG4L5IljGFrEPKpawLZqCTf3ND6DUzgNVl9u+BiUKedj09Sx1lmOKTYfVxjdWPsTMmA9w/Gzbqp952Y41SXOOKHIPn3rMvkbYxZQD8PrmSZMbB6p2AmG8FXvhmhba3qb15sMBIZzcc3qltV5AO86Hf/zSHWJVU4vAEx3wPaFD9A/Y0iQOIeMsHkCsPFSyVcd/zP9//Mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NI+8VuiSZQPh23FSjynwla8g8vjLDcUKZXNngAV3RgY=;
+ b=ts1BlNwd4te2xHQXSVTy1MTL45WlyPHspGKOamm0Fp3Uekox8yNjdXnuKitj96jNgcZZqnKKjW6lBB0HuVOKOxlSYumZmqSpKzHaNj/U/LNUJo4VVCmhd4Rcd5oOJxLtrRvLibWS9U24lNUlyFS7wVpogIKPLCmsswJyUIoB2+A=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3615.namprd04.prod.outlook.com
+ (2603:10b6:803:47::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27; Fri, 17 Apr
+ 2020 17:48:20 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2921.027; Fri, 17 Apr 2020
+ 17:48:20 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH v7 00/11] Introduce Zone Append for writing to zoned block
+ devices
+Thread-Topic: [PATCH v7 00/11] Introduce Zone Append for writing to zoned
+ block devices
+Thread-Index: AQHWFLHx0jzddk9TS0yhYXDfmQ7NPQ==
+Date:   Fri, 17 Apr 2020 17:48:20 +0000
+Message-ID: <SN4PR0401MB3598F054B867C929827E23F49BD90@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
+ <20200417160326.GK5187@mit.edu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Johannes.Thumshirn@wdc.com; 
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: cdf777e4-6a62-4e4f-aed6-08d7e2f7847f
+x-ms-traffictypediagnostic: SN4PR0401MB3615:
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN4PR0401MB36155C9879E21FF34998C8F99BD90@SN4PR0401MB3615.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0376ECF4DD
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(376002)(396003)(136003)(366004)(39860400002)(346002)(9686003)(5660300002)(186003)(4326008)(33656002)(8936002)(53546011)(66946007)(478600001)(2906002)(71200400001)(7696005)(81156014)(316002)(6506007)(76116006)(66476007)(26005)(91956017)(6916009)(66446008)(64756008)(55016002)(54906003)(86362001)(8676002)(66556008)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /MyVk1Xr4TNOBmlrS2wgEN9T6ayoPVwJR4BgpwHEjrUkNlNZ+G2JkW5TpFApTnHvGoi0qQ9SpKEJtFSHiAMWWRZ6Txps0ZDpXak9ERID+WyluHEjf4kHm7JFREuaXVT6348IuGm1gaqn9DkHOdJbx6QUnFBexmA3oRiuxSagFLYorG64mfssrPHN3djBfgmcqbf/4sX9oL9mptAtZYAUIQEJi4ZcwOD6dvSQHX/x3/QgeVxvvcLhxCKJEI5mplOx5LiRTNBS9C9AtIQQTQaOyI7LiAomV2zDEZQWIl8tJVkohj8K2084+6KgReODZctaTwJxyXjUVaiYk5Wf02S759dhqzCJNjmhFDxFwghamBW96FRtotFmaZvYhOKipelGzc/uZ/ySNqPLtjCtx3H0YNNJiMMT0K7XzyOabaQpxDm00C9oFLre4JI1VjLJ+gN9
+x-ms-exchange-antispam-messagedata: KdQHw4/Q/YAq0F3dTXNG8WRqt+uC1XNDqgpdBW9XKPs/N18SPnCd0Qjfia8o05A9/+CuphPVDQ7BwNUkiplq5qRkVsmedeyoP1Hic7ryA9ubP/z04xkU9u6SBZFVeob4HoOPdj7iv62DtgSsp5zZWA==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cdf777e4-6a62-4e4f-aed6-08d7e2f7847f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2020 17:48:20.2422
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jr7mA1IK6sbWD/DTx3LPdNgiKVem/GFITTN5oYhH+xm5NNvdIDnDCesNjzRAqVlEDQa1n6OvL2+j4UBX5f2VSMgiOjXYns4/3c+hThoVuC0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3615
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 17 Apr 2020 09:13:28 -0600:
-
-> git://git.kernel.dk/linux-block.git tags/block-5.7-2020-04-17
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bf9196d51f7d7222875916c685653981088668b1
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+On 17/04/2020 18:04, Theodore Y. Ts'o wrote:=0A=
+> What sort of reordering can take place due to I/O schedulers and or=0A=
+> racing write appends from different CPU's?  Is it purely the=0A=
+> userspace's responsibility to avoid racings writes to a particular=0A=
+> zone?=0A=
+=0A=
+For normal writes (i.e.: REQ_OP_WRITE) the zone will be locked by the =0A=
+I/O scheduler (namely mq-deadline as it's currently the one which does =0A=
+have support for zoned block devices). For REQ_OP_ZONE_APPEND we have a =0A=
+trylock scheme in the SCSI emulation of ZONE_APPEND, which is fine, as =0A=
+SCSI disks are single queue only.=0A=
+=0A=
+A scenario that can of cause happen is concurring REQ_OP_ZONE_APPEND =0A=
+writes from different CPUs to the same zone. This is fine *iff* the sum =0A=
+of all writes stays within the free space of the zone. If one if the =0A=
+writes will cross a zone boundary it'll get EIO, obviously.=0A=
+=0A=
+For "userspace's responsibility", I'd re-phrase this as "a consumer's =0A=
+responsibility", as we don't have an interface which aims at user-space =0A=
+yet. The only consumer this series implements is zonefs, although we did =
+=0A=
+have an AIO implementation for early testing and io_uring shouldn't be =0A=
+too hard to implement.=0A=
