@@ -2,83 +2,135 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67651C2BA2B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 00:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5808FC2BB1D
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 04:09:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F4D9221F4
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 00:53:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=jgottula-com.20150623.gappssmtp.com header.i=@jgottula-com.20150623.gappssmtp.com header.b="TzohkwjG"
+	by mail.kernel.org (Postfix) with ESMTP id 2289021D93
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 04:09:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587096577;
+	bh=/aAOMVOP3MZQGTBFo0xdiu+n9iKYVv70X4AkPfYDRUY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=AScZtUEqOjWJZJYDtfLKPQ2zn0XdJbwVbM++v0t4tQwnNa888ZflbQGtaykGusnJf
+	 u9YgpwdvA5+mu2DhFIvc04V5EzU5yP7BhX73foWHqUFQ8hsINaGQIeKUhshsj+CTVK
+	 O5aOrNnPKEFFQ4fJS/zJHoc7LbOmG0Ix4j75v79I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728475AbgDQAxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Apr 2020 20:53:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49836 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728454AbgDQAxG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Apr 2020 20:53:06 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8587C061A0C
-        for <linux-block@vger.kernel.org>; Thu, 16 Apr 2020 17:53:05 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id 74so77741uau.11
-        for <linux-block@vger.kernel.org>; Thu, 16 Apr 2020 17:53:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jgottula-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QXpaYcM38eFB67KwCt1Jc+C3DFRaou4chRNhAdr9Drk=;
-        b=TzohkwjGPu93u+uoaV1E/xBsqITd23SUw2sElHtGpNG3AIau0zjMyxDcJ8oAwIYWCU
-         BtqS/oikJfPV8Yj8A+WI+zPJeygqHyTf2+6hF0gR/E7sPiJdXSO3rYm102WFfiQxfahy
-         ZycsZkbCTwkSf/AkanunUMi83CynOLyrQ25vThm7Tdtz3wmr7P8Ddnvs7aU188kV4KZs
-         gt9smKRa0bNqw8bVfycQHBD+JlQlvT/mETDCug1Rq2aykKxOpSPvWIFl9w3YP1Hn7UA8
-         chi3yjVqQnPx0jZAMKIfv1Tl7y+hUNqVUMSxE8o3WA7w845hdO7IPKrMmHKoTF0ZBMvZ
-         3oGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QXpaYcM38eFB67KwCt1Jc+C3DFRaou4chRNhAdr9Drk=;
-        b=ke1vWGZUCtF5/XNhvRn5WybELaTFXlf62AKcFTUirE0yDv9kMmx/Zo/oVZ2J5iPgMS
-         2z/Yt94xlsymwQuUG0GzzIKC1XTFgdHqX3FLt2dr4/WXecomh1MoeozvfDXLhcU/9cQM
-         MpKwiank3sEh0Z+vOjZIfropC73QzycEHsp1Uh/+1wrKV/viuPnaPSWrW2CroRewaYaR
-         iqf0qgqhYJKhU/I9ejIt8M9J5YutEFXT76yZaKezy+hbrlf9Xb+zYtOik8+gQUkYEm3D
-         WsPBYvsUIMlfrRZvMftxgB0iYkHCNZLhuR+tXHVg9WN3hLXgHycb2MTODn/qHpJ7MHmt
-         FmZA==
-X-Gm-Message-State: AGi0PubaENMQ2s9hWd1If10zE6Yz9ruAk1MqKbLzGyH1ZP8IGwIh/thU
-        T+pUMJxoAPlmYtOQyNm1mu6q020p2xOkCFuoy0CkzA==
-X-Google-Smtp-Source: APiQypIjQeD0xbl0pQkYtPwJq9AE4eIXIMTcKwyOgHP/M2El9rtHAOyIzpwWPtBZinQy+KY8nlq4hF1xffnIsgkQwRA=
-X-Received: by 2002:ab0:29da:: with SMTP id i26mr558953uaq.29.1587084785007;
- Thu, 16 Apr 2020 17:53:05 -0700 (PDT)
+        id S1726167AbgDQEJg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 00:09:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725900AbgDQEJf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 00:09:35 -0400
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CF70922250;
+        Fri, 17 Apr 2020 04:09:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587096575;
+        bh=/aAOMVOP3MZQGTBFo0xdiu+n9iKYVv70X4AkPfYDRUY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Gyt0aCIAKdLM3LASetND1QH5Wfx32kCgTTnBxG2zuGNZrZ5A+Uuyt+EWvqojWwS5D
+         zo4tgkaCD0hTcasyZJ7j/nTI6TtMjrTbvxEv3IIfeepWgrn5l7XiWcWDXVNXOJm1L+
+         +zIEAsvTYvKFPhvJ4etnosn3KdqzsUfe3B4cENx8=
+Received: by mail-ej1-f45.google.com with SMTP id s9so562727eju.1;
+        Thu, 16 Apr 2020 21:09:34 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZNPhNoQAkTKyBDr33jnGgVBB9DN5jxGH+ZDHjahcuPmUK5fbz/
+        JuKsLUQp6g23YwDG/75hsDcrkp5qhVRaUNb6Zp4=
+X-Google-Smtp-Source: APiQypIdKCMgMXNdIoKxA+hJgxlg7THMOt/IQ9RE95/qKc1hrmrQknmbKq/g59E4lMJ6Zg4qLEjnmgHh/BtY8F2Saqg=
+X-Received: by 2002:a17:906:7c2:: with SMTP id m2mr1049847ejc.339.1587096573102;
+ Thu, 16 Apr 2020 21:09:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAKuMfTUPzPjuNk+T_GQMCKoB9ssh2arr6xRiu6VODwwB0PMdZw@mail.gmail.com>
- <20200416214649.GA60148@google.com> <CAKuMfTVpaetB0qQ_hm8cSowtZN8HUKXdADWhKXC=4eKd1i5oSw@mail.gmail.com>
-In-Reply-To: <CAKuMfTVpaetB0qQ_hm8cSowtZN8HUKXdADWhKXC=4eKd1i5oSw@mail.gmail.com>
-From:   Justin Gottula <justin@jgottula.com>
-Date:   Thu, 16 Apr 2020 17:52:31 -0700
-Message-ID: <CAKuMfTX3PW8FgpGyp1g=CZm4yC6pQ_MK4LFmBoin2zCTqDF0xQ@mail.gmail.com>
-Subject: Re: [PATCH] zram: fix writeback_store returning zero in most situations
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Nitin Gupta <ngupta@vflare.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200414041902.16769-1-mcgrof@kernel.org> <20200414041902.16769-3-mcgrof@kernel.org>
+ <20200416021036.GA2717677@T590> <20200416052524.GH11244@42.do-not-panic.com>
+ <20200416054750.GA2723777@T590> <20200416062054.GL11244@42.do-not-panic.com> <20200416062856.GD2723777@T590>
+In-Reply-To: <20200416062856.GD2723777@T590>
+From:   Luis Chamberlain <mcgrof@kernel.org>
+Date:   Thu, 16 Apr 2020 22:09:24 -0600
+X-Gmail-Original-Message-ID: <CAB=NE6VFj4w_o+NA57iBzGaXCGF0afeHy1N_2C9awGcFz5pnQw@mail.gmail.com>
+Message-ID: <CAB=NE6VFj4w_o+NA57iBzGaXCGF0afeHy1N_2C9awGcFz5pnQw@mail.gmail.com>
+Subject: Re: [PATCH 2/5] blktrace: fix debugfs use after free
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, Jan Kara <jack@suse.cz>,
+        Nicolai Stange <nstange@suse.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>, yu kuai <yukuai3@huawei.com>,
+        linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 16, 2020 at 5:45 PM Justin Gottula <justin@jgottula.com> wrote:
+On Thu, Apr 16, 2020 at 12:29 AM Ming Lei <ming.lei@redhat.com> wrote:
 >
-> 2. There is a bit of a predicament with the keep-going-even-if-an-error-
-> happened approach. [...]
+> On Thu, Apr 16, 2020 at 06:20:54AM +0000, Luis Chamberlain wrote:
+> > On Thu, Apr 16, 2020 at 01:47:50PM +0800, Ming Lei wrote:
+> > > On Thu, Apr 16, 2020 at 05:25:24AM +0000, Luis Chamberlain wrote:
+> > > > On Thu, Apr 16, 2020 at 10:10:36AM +0800, Ming Lei wrote:
+> > > > > In theory, multiple partitions can be traced concurrently, but looks
+> > > > > it never works, so it won't cause trouble for multiple partition trace.
+> > > > >
+> > > > > One userspace visible change is that blktrace debugfs dir name is switched
+> > > > > to disk name from partition name in case of partition trace, will it
+> > > > > break some utilities?
+> > > >
+> > > > How is this possible, its not clear to me, we go from:
+> > > >
+> > > > - q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> > > > -                                     blk_debugfs_root);
+> > > >
+> > > > To this:
+> > > >
+> > > > + q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> > > > +                                     blk_debugfs_root);
+> > > >
+> > > >
+> > > > Maybe I am overlooking something.
+> > >
+> > > Your patch removes the blktrace debugfs dir:
+> > >
+> > > do_blk_trace_setup()
+> > >
+> > > -       dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> > > -       if (!dir)
+> > > -               bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> > > -
+> > >
+> > > Then create blktrace attributes under the dir of q->debugfs_dir.
+> > >
+> > > However, buts->name could be one partition device name, but
+> >
+> > I can see how buts->name is set to bdevname() which expands to
+> > disk_name(bdev->bd_disk, bdev->bd_part->partno, buf).
+> >
+> > > q->debugfs_dir has to be disk name.
+> >
+> > I can't see this, can you point me to where it is clear the
+> > request_queue kobject's parent is sure to be the disk name?
+>
+> blk_register_queue():
+>         ...
+>         ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
+>         ...
 
-Oops. I meant to also include this in my reply:
+Alright, I have a fix for this now, and I do have also a further
+explanation as to *why* the debugfs_lookup() doesn't help us here.
+I'll follow up with more patches.
 
-I suppose a reasonable way to address #2 might be to condense any error(s)
-arising from submit_bio_wait into one writeback_store error return value
-whose purpose is to indicate that the backing device itself had some sort
-of write problem(s).
+  Luis
