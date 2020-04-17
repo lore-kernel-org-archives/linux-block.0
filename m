@@ -2,226 +2,130 @@ Return-Path: <SRS0=bgcA=6B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641F6C38A29
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 12:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C8CC2D0EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 13:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C83A21D94
-	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 12:25:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B13FE2084D
+	for <linux-block@archiver.kernel.org>; Fri, 17 Apr 2020 13:00:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nokia.onmicrosoft.com header.i=@nokia.onmicrosoft.com header.b="VtzJa/XV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728992AbgDQMZW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 08:25:22 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45982 "EHLO huawei.com"
+        id S1729853AbgDQNAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 09:00:37 -0400
+Received: from mail-vi1eur05on2125.outbound.protection.outlook.com ([40.107.21.125]:62305
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728751AbgDQMZW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 08:25:22 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id EBCD24DFF128255D29B4;
-        Fri, 17 Apr 2020 20:25:16 +0800 (CST)
-Received: from huawei.com (10.175.124.28) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Fri, 17 Apr 2020
- 20:25:07 +0800
-From:   yu kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <bvanassche@acm.org>
-CC:     <yukuai3@huawei.com>, <yi.zhang@huawei.com>, <yuyufen@huawei.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RFC] block: fix access of uninitialized pointer address in bt_for_each()
-Date:   Fri, 17 Apr 2020 20:51:34 +0800
-Message-ID: <20200417125134.45117-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.21.1
+        id S1729851AbgDQNAg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 09:00:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y0+ozMGo5zLiUJTiN3uY0jwTza2CWrRZru7nxbd6zHLfiqK5DcpVyv2I4btM2RFrpP0Cnij6uQGhHj1dRgQJWnXAOJLUc5bOf/bGmJkAGTrA1F5Zw7EiDP85750s3gsXM7EV6IDdamjMw4kKV6rSw5GgH3kZ604tyEDCFZ+eRbP6V3eMXHuhr1V+Lam8/f5tmeLaZ1PC+SETSNjsmroGiGor6O0+gRbYPHoEwuETn3P9jAy0GdnVXkdpthZxLInzMUdbjAXObMo32rYD3BCF3PPjO/1LOjn8MEBsNukpUiHEUleqTsl3ZvMdiPlseNWqhyoDoP3jRqLrTQhXyoQXQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DcORvX4h+njomY+HB0hkU39yI0fVkD5zK0okFSN5yXE=;
+ b=dJqqG11JTD7+QanlubrYb9+DXO7f8+oujyhapvOSv4ogKfQ6EdiOL1ln+q1sb59mFC69T2L9AWCVe7GzSqjs26nKVcKsXMiogU1YLoQjoLwj4E2fD3KT8sQHfaFjh38a2n6UoqTU/cEuBdVQUSyNfbcpPaohPFQlFCDFix/CyhP0sGzlB2zVAk2BqNlBhKUjjuVku4ON2UXX376AzK8BxS8UmRxfX7qNdg5ltl3PHaJMchRxOqshAH5OOKHvCE22H3tkSP1eqrydSQiQUMMh/HfR7fvUvh06+46nwrbPIfDPSoK/EIPs0d5GqD2LcEwooe/9em9Fy//0Z5DzMj8UVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
+ dkim=pass header.d=nokia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.onmicrosoft.com;
+ s=selector1-nokia-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DcORvX4h+njomY+HB0hkU39yI0fVkD5zK0okFSN5yXE=;
+ b=VtzJa/XV6fgKAcRhju9mltZhsDLPuS1V4TU2yvDHVk3eo/vVIkL/KYFdUzuqYGVcAeRb1KG+nIKtaqUAd2IXXm9IDcTb9ygGTcXG8w2dW0uUUXOnWvOaMxJU2SZCayxgitje/uEpHgsmn7YUiMlBAGqPKkWRlXvAK0pd2KIWamE=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=tommi.t.rantala@nokia.com; 
+Received: from HE1PR0701MB2938.eurprd07.prod.outlook.com (2603:10a6:3:4b::11)
+ by HE1PR0701MB2409.eurprd07.prod.outlook.com (2603:10a6:3:6e::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.24; Fri, 17 Apr
+ 2020 13:00:33 +0000
+Received: from HE1PR0701MB2938.eurprd07.prod.outlook.com
+ ([fe80::7877:564:f523:aece]) by HE1PR0701MB2938.eurprd07.prod.outlook.com
+ ([fe80::7877:564:f523:aece%10]) with mapi id 15.20.2921.027; Fri, 17 Apr 2020
+ 13:00:33 +0000
+From:   Tommi Rantala <tommi.t.rantala@nokia.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tommi Rantala <tommi.t.rantala@nokia.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] blk-wbt: Use tracepoint_string() for wbt_step tracepoint string literals
+Date:   Fri, 17 Apr 2020 16:00:22 +0300
+Message-Id: <20200417130023.104481-1-tommi.t.rantala@nokia.com>
+X-Mailer: git-send-email 2.25.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: HE1P18901CA0001.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:3:8b::11) To HE1PR0701MB2938.eurprd07.prod.outlook.com
+ (2603:10a6:3:4b::11)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.28]
-X-CFilter-Loop: Reflected
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from trfedora.emea.nsn-net.net (131.228.2.16) by HE1P18901CA0001.EURP189.PROD.OUTLOOK.COM (2603:10a6:3:8b::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25 via Frontend Transport; Fri, 17 Apr 2020 13:00:32 +0000
+X-Mailer: git-send-email 2.25.2
+X-Originating-IP: [131.228.2.16]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7c39c8e9-1af5-43bc-7e0a-08d7e2cf4fdd
+X-MS-TrafficTypeDiagnostic: HE1PR0701MB2409:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0701MB24096B0F02B6451B5F9F5F0AB4D90@HE1PR0701MB2409.eurprd07.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
+X-Forefront-PRVS: 0376ECF4DD
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0701MB2938.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(39860400002)(346002)(136003)(366004)(396003)(376002)(8936002)(2616005)(478600001)(36756003)(4744005)(8676002)(5660300002)(2906002)(81156014)(103116003)(86362001)(6666004)(52116002)(6916009)(4326008)(956004)(66556008)(6486002)(16526019)(6512007)(26005)(1076003)(316002)(6506007)(186003)(66946007)(66476007);DIR:OUT;SFP:1102;
+Received-SPF: None (protection.outlook.com: nokia.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nkTB8OC/FvXB3hzPFtDMXrqBjr5v51W9chTUKbfqPUa/YI4SWiCU0pVjOboOCRLBXCcoal71V2jX0EVyMQPpyOzO6dWHCG3u35BfqMX4UOSNBv0nvcUzULUeAIXT6wPmyvd7EV2GhL6hmi7IT5G+RmCd1APt73cfhWxOHr8DfeHv/2BOn1y20DCTU+bViHkVyoGZgtGTDZdO8WMZvhectt8wtYRQoTkR/Aolbd2beLOvQANEfn1uYhg8hsSkePw09cVtBmiEWB3GpQCL8POnlzF3zqXJyl3vynN82aZdx4GCjhjMVjuKIifYf4MXiR/NUV+aZ+E7El4OJkFfFZgAVo8SOjBH3aEGtlmp4t/lbsc9+jxL3szdX73RNcX8sxWz9uTvRAzHwsA8DbuveYnPatXUypdWsp9f+3b3W6yA4yaTBtW3nOi0oSa362MCoMCM
+X-MS-Exchange-AntiSpam-MessageData: d/bKokA/RAP18Y+NPJDPPEiOhIL5SNkWEUMKXF9jEvOfzxks4Jp4qQ2QPwpfj2PK1K0Z2W+wVVtcAgwMDtXclC/999kDCjTdCImrjgmtoqeCeU0TJ8Fn3/c4zKeVI7NyBUGoQhDci+TJ0yH++WvNMA==
+X-OriginatorOrg: nokia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c39c8e9-1af5-43bc-7e0a-08d7e2cf4fdd
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2020 13:00:32.9145
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bBjob277dcqqBZ7FlaYAEQDezAQFg0wHvYUoczb58Uf3a9xC7gTc4rZmx+ddJ7CaqIjnEeW3zXOCKlXHlENAKxj2N+wGqbDeL47A369Vm5s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0701MB2409
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I recently got a KASAN warning like this in our 4.19 kernel:
+Use tracepoint_string() for string literals that are used in the
+wbt_step tracepoint, so that userspace tools can display the string
+content.
 
- ==================================================================
- BUG: KASAN: slab-out-of-bounds in bt_for_each+0x1dc/0x2c0
- Read of size 8 at addr ffff8000c0865000 by task sh/2023305
-
- Call trace:
- dump_backtrace+0x0/0x310
- show_stack+0x28/0x38
- dump_stack+0xd8/0x108
- print_address_description+0x68/0x2d0
- kasan_report+0x124/0x2e0
- __asan_load8+0x88/0xb0
- bt_for_each+0x1dc/0x2c0
- blk_mq_queue_tag_busy_iter+0x1f0/0x3e8
- blk_mq_in_flight+0xb4/0xe0
- part_in_flight+0x124/0x178
- part_round_stats+0x128/0x3b0
- blk_account_io_start+0x2b4/0x3f0
- blk_mq_bio_to_request+0x170/0x258
- blk_mq_make_request+0x734/0xdd8
- generic_make_request+0x388/0x740
- submit_bio+0xd8/0x3d0
- ext4_io_submit+0xb4/0xe0 [ext4]
- ext4_writepages+0xb44/0x1c00 [ext4]
- do_writepages+0xc8/0x1f8
- __filemap_fdatawrite_range+0x200/0x2a0
- filemap_flush+0x30/0x40
- ext4_alloc_da_blocks+0x54/0x200 [ext4]
- ext4_release_file+0xfc/0x150 [ext4]
- __fput+0x15c/0x3a8
- ____fput+0x24/0x30
- task_work_run+0x1a4/0x208
- do_notify_resume+0x1a8/0x1c0
- work_pending+0x8/0x10
-
- Allocated by task 3515778:
- kasan_kmalloc+0xe0/0x190
- kmem_cache_alloc_trace+0x18c/0x418
- alloc_pipe_info+0x74/0x240
- create_pipe_files+0x74/0x2f8
- __do_pipe_flags+0x48/0x168
- do_pipe2+0xa0/0x1d0
- __arm64_sys_pipe2+0x3c/0x50
- el0_svc_common+0xb4/0x1d8
- el0_svc_handler+0x50/0xa8
- el0_svc+0x8/0xc
-
- Freed by task 3515778:
- __kasan_slab_free+0x120/0x228
- kasan_slab_free+0x10/0x18
- kfree+0x88/0x3d8
- free_pipe_info+0x150/0x178
- put_pipe_info+0x138/0x1c0
- pipe_release+0xe8/0x120
- __fput+0x15c/0x3a8
- ____fput+0x24/0x30
- task_work_run+0x1a4/0x208
- do_notify_resume+0x1a8/0x1c0
- work_pending+0x8/0x10
-
- The buggy address belongs to the object at ffff8000c0864f00#012 which belongs to the cache kmalloc-256 of size 256
- The buggy address is located 0 bytes to the right of#012 256-byte region [ffff8000c0864f00, ffff8000c0865000)
- The buggy address belongs to the page:
- page:ffff7e0003021900 count:1 mapcount:0 mapping:ffff80036d00fc00 index:0x0 compound_mapcount: 0
- flags: 0xffffe0000008100(slab|head)
- raw: 0ffffe0000008100 ffff7e0003617f88 ffff7e000d1a6208 ffff80036d00fc00
- raw: 0000000000000000 0000000000150015 00000001ffffffff 0000000000000000
- page dumped because: kasan: bad access detected
-
- Memory state around the buggy address:
- ffff8000c0864f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8000c0864f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- >ffff8000c0865000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ^
- ffff8000c0865080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8000c0865100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ==================================================================
-
-After looking into it, I think it's because bt_for_each() accessed
-uninitialized pointer address:
-
-thread1			thread2
-blk_mq_alloc_tag_set
-...
-blk_mq_init_queue
-...
-submit_bio(bio1)	submit_bio(bio2)
- blk_mq_get_request
-  blk_mq_get_tag
-  			 ...
-  			 bt_for_each
-  			  bt_iter
-  			   rq = tags->rqs[b]
-  			    rq->q		----> here
-  blk_mq_rq_ctx_init
-   tags->rqs[a] = rq
-
-blk_mq_get_tag() is called before blk_mq_rq_ctx_init(), which leaves a
-window for bt_for_each() to access 'tags->rqs[tag]->q' before
-'tags->rqs[tag]' is set in blk_mq_rq_ctx_init(). While blk_mq_init_tags()
-is using 'kcalloc()' for 'tags->rqs'. And I think the problem exist in
-mainline, too.
-
-The problem haven't been reporduced unless I manually sleep a while
-before 'tags->rqs[tag]' is set:
-
-@@ -275,6 +275,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-        struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
-        struct request *rq = tags->static_rqs[tag];
-        req_flags_t rq_flags = 0;
-+       static int debug_count = 0;
-
-        if (data->flags & BLK_MQ_REQ_INTERNAL) {
-                rq->tag = -1;
-@@ -286,6 +287,12 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-                }
-                rq->tag = tag;
-                rq->internal_tag = -1;
-+               if (!strcmp(dev_name(data->q->backing_dev_info->dev), "250:0")) {
-+                       if (debug_count == 0) {
-+                               debug_count++;
-+                               msleep(5000);
-+                       }
-+               }
-                data->hctx->tags->rqs[rq->tag] = rq;
-        }
-
-BTW, I noticed there is a similar problem that haven't been solved yet:
-https://lore.kernel.org/linux-block/1545261885.185366.488.camel@acm.org/
-
-I'm trying to fix the problem by replacing 'kcalloc' as 'kzalloc' for
-'tags->rqs', and set 'tags->rqs[tag]' to 'NULL' before putting the tag.
-
+Signed-off-by: Tommi Rantala <tommi.t.rantala@nokia.com>
 ---
- block/blk-mq.c | 3 ++-
- block/blk-mq.h | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ block/blk-wbt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7ed16ed13976..48b74d0085c7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -485,6 +485,7 @@ static void __blk_mq_free_request(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	const int sched_tag = rq->internal_tag;
- 
-+	hctx->tags->rqs[rq->tag] = NULL;
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
- 	if (sched_tag != -1)
-@@ -1999,7 +2000,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	if (!tags)
- 		return NULL;
- 
--	tags->rqs = kcalloc_node(nr_tags, sizeof(struct request *),
-+	tags->rqs = kzalloc_node(nr_tags, sizeof(struct request *),
- 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
- 				 node);
- 	if (!tags->rqs) {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a6094c27b827..2a55292d3d51 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -196,6 +196,7 @@ static inline void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
- 	if (rq->tag == -1 || rq->internal_tag == -1)
- 		return;
- 
-+	hctx->tags->rqs[rq->tag] = NULL;
- 	__blk_mq_put_driver_tag(hctx, rq);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 8641ba9793c5..9cb082f38b93 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -313,7 +313,7 @@ static void scale_up(struct rq_wb *rwb)
+ 	calc_wb_limits(rwb);
+ 	rwb->unknown_cnt = 0;
+ 	rwb_wake_all(rwb);
+-	rwb_trace_step(rwb, "scale up");
++	rwb_trace_step(rwb, tracepoint_string("scale up"));
  }
  
-@@ -207,6 +208,7 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
+ static void scale_down(struct rq_wb *rwb, bool hard_throttle)
+@@ -322,7 +322,7 @@ static void scale_down(struct rq_wb *rwb, bool hard_throttle)
  		return;
- 
- 	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
-+	hctx->tags->rqs[rq->tag] = NULL;
- 	__blk_mq_put_driver_tag(hctx, rq);
+ 	calc_wb_limits(rwb);
+ 	rwb->unknown_cnt = 0;
+-	rwb_trace_step(rwb, "scale down");
++	rwb_trace_step(rwb, tracepoint_string("scale down"));
  }
  
+ static void rwb_arm_timer(struct rq_wb *rwb)
 -- 
-2.21.1
+2.25.2
 
