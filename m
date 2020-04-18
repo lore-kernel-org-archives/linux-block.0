@@ -2,55 +2,53 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8357C38A2F
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B908EC38A29
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D273D21D6C
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:27:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DDFA221F7
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:35:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726412AbgDRP1A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 11:27:00 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44344 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725903AbgDRP07 (ORCPT
+        id S1725887AbgDRPfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 11:35:45 -0400
+Received: from mail-pl1-f169.google.com ([209.85.214.169]:42276 "EHLO
+        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgDRPfo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 11:26:59 -0400
-Received: by mail-pg1-f195.google.com with SMTP id 2so2681088pgp.11;
-        Sat, 18 Apr 2020 08:26:59 -0700 (PDT)
+        Sat, 18 Apr 2020 11:35:44 -0400
+Received: by mail-pl1-f169.google.com with SMTP id v2so2168816plp.9;
+        Sat, 18 Apr 2020 08:35:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=YY/W9I/pR8UrVEkJQ+YbeNp0mBSqe7CYOsNczXxVtrs=;
-        b=cusYDrAtdct1smeJtZO8TRFl6NgokYz35oNHdQp0PFtgddJaPfhBIOFbzrFXuVaTLw
-         Y4Uk3fHW6I66XRPsFPswOAxCkpRzJrad5UzJkX63M5kYmdq57LIuXJOiZuSahBxhIqhz
-         n8J/Z4ZwNL4jne3wG5C7vBr33fcWE1XL97AxUsvEivnXDjML3qPRTh3OtgW/zglB9SDf
-         TQWLSipN8Tg1FiERF2Ua9WKTGZuHOOWxLhYIfpVFais2D+Wm3TG0Oagb5N80SsAdfFf7
-         ZNeVSL+jx8+HHCTtv18pHjEJHEgJ16n1D31Qhkma8a2PQt9Z92hLtMhtnw4JnZPYumKY
-         Ak4Q==
-X-Gm-Message-State: AGi0PuZ8WlvuJG17ave0KnQ5JztUrK2thZb9B/N2sZ7atPnropBQtppF
-        bFexhvqr1fwmvvbVZzgUI0/d8t4Ydsg=
-X-Google-Smtp-Source: APiQypINHxu/cSuMU/AWpxkaKYXPISoRnvDwv01qsf8oXKe7/nwMIiH8VNtvdKHAukG7DRS2G3+tgg==
-X-Received: by 2002:a63:b954:: with SMTP id v20mr7919808pgo.100.1587223618050;
-        Sat, 18 Apr 2020 08:26:58 -0700 (PDT)
+        bh=Psgi+/zrePQOhbWgK7zRQLxFfOZeE3TDZRkvLpnxtPc=;
+        b=ONOa7NptWWhRjwR2mD5E3phOOYvrq5yK+HzrdTSlreVnKyCdKxNMLjFYyNW4QcZhfK
+         sjipXjXVjMg8lVn++8i71kMzTfQ65ngGQjhTWqU/WRLjNaJ+YgiPu4dcxvA1hr2Esu0R
+         1sD1K0FYr2TUKtRCXb4lY7puWttJLwFGxdhyrPhk2uqKpPMqy+pXksFROFwkouuHC00m
+         194vraJx2WylFZSf/1isUxgxV4Y2uFb2/W1M6MOUD8BUee0BHX1a2sG+FKAYF/AkcgHG
+         NQgRt6FWhiH6cnUPADVe+/Uz+3aEzVly172KyJmgv6tzE1tAbqLONSFZu7xqjZjLu0Rp
+         0a4A==
+X-Gm-Message-State: AGi0PubpRX/VynJCA9umps8z6NyZy2DMyQn5+spiRvyyAt5lrC079cFj
+        arBFkK0qPQ4NlH15yDc2HaEJ5Oz37vQ=
+X-Google-Smtp-Source: APiQypKtOCRfcwVK3kxcv5Sh+mJi8Qa9YmrLFrob+FEdCJLFU14HhMbn46LPMbjC19W2hm7zOZJl9w==
+X-Received: by 2002:a17:90a:6fe4:: with SMTP id e91mr11144937pjk.28.1587224143340;
+        Sat, 18 Apr 2020 08:35:43 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id t7sm18975981pfh.143.2020.04.18.08.26.56
+        by smtp.gmail.com with ESMTPSA id a12sm15973752pfr.28.2020.04.18.08.35.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 08:26:56 -0700 (PDT)
-Subject: Re: [RFC] block: fix access of uninitialized pointer address in
- bt_for_each()
-To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
-        ming.lei@redhat.com
-Cc:     yi.zhang@huawei.com, yuyufen@huawei.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200417125134.45117-1-yukuai3@huawei.com>
- <340bed9b-e14d-5a22-1601-8fb7aad4ce7f@acm.org>
- <ad7e4125-c90f-4dda-6029-940b9dfeb8c4@huawei.com>
+        Sat, 18 Apr 2020 08:35:42 -0700 (PDT)
+Subject: Re: [PATCH 1/8] bdi: move bdi_dev_name out of line
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200416165453.1080463-1-hch@lst.de>
+ <20200416165453.1080463-2-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -75,37 +73,23 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <c503f186-9098-0b67-8ade-572fcbc4bf24@acm.org>
-Date:   Sat, 18 Apr 2020 08:26:55 -0700
+Message-ID: <331b41d1-948a-a5c0-b77d-714773ab4174@acm.org>
+Date:   Sat, 18 Apr 2020 08:35:41 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <ad7e4125-c90f-4dda-6029-940b9dfeb8c4@huawei.com>
+In-Reply-To: <20200416165453.1080463-2-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-18 02:42, yukuai (C) wrote:
-> [   61.988933] BUG: KASAN: use-after-free in bt_iter+0x29e/0x310
-> [   61.989446] Read of size 8 at addr ffff88824f5d8c00 by task dd/2659
-> [   61.989996]
-> [   61.990136] CPU: 2 PID: 2659 Comm: dd Not tainted
-> 4.19.90-00001-g9c3fb8226112-dirty #44
+On 2020-04-16 09:54, Christoph Hellwig wrote:
+> bdi_dev_name is not a fast path function, move it out of line.  This
+> prepares for using it from modular callers without having to export
+> an implementation detail like bdi_unknown_name.
 
-Hi Yu Kuai,
-
-So this use-after-free was encountered with kernel version 4.19? Please
-develop block layer kernel patches against Jens' for-next branch from
-git://git.kernel.dk/linux-block. If it wouldn't be possible to reproduce
-this issue with Jens' for-next branch, the next step is to check which
-patch(es) fixed this issue and to ask Greg KH to backport these patches
-to the stable tree.
-
-Thanks,
-
-Bart.
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
