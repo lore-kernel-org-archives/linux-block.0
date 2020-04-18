@@ -2,48 +2,48 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B4FC2BB1D
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625E6C2BA19
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBBB9221F7
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35E56221F7
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g88Jd7u9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlcZR9Zy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725985AbgDRDKI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 23:10:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56285 "EHLO
+        id S1725991AbgDRDKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 23:10:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45588 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725867AbgDRDKI (ORCPT
+        with ESMTP id S1725867AbgDRDKO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 23:10:08 -0400
+        Fri, 17 Apr 2020 23:10:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587179405;
+        s=mimecast20190719; t=1587179412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ASIMmUvmJu5xtUINiX4AFPjbCO1AEBrY+Tyt7TrLt5E=;
-        b=g88Jd7u9SSh5VELKTddIDjcu7gjfk+I21wKlWI1hIAqixhUx104jBozH/heGoNkNuyzzoY
-        oNF/r2SQ8Yso/kuICdrj7nO2FaoN/OMtgMTgLNeCmI+J7Z0msuikRUpyYhfzPmWoXQqrbR
-        htZeZt2Pjn5hXpILijWZIZRoka27DkM=
+        bh=aDrOfGZhMsylqonXn56cuXumPSnAs37TmhqyYzAC4HI=;
+        b=VlcZR9ZyMzm0j3dtGicHZGIa0N9rpC37Sar+4HGQnMQLWgay1VD5nQu/V2e03+/9ReJ7WJ
+        MfSg53T8fa0+QJNnkg7mOrtbnrmQwoTd3oJvb+7vdUOt5bwJT5vdK1tM1XPnQpRXRu66cp
+        T9Xn7ufbXND1+4dE0y7ZAh81V9A7KNE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-m2CXZWfcPKWcWWXeyyKgbg-1; Fri, 17 Apr 2020 23:10:01 -0400
-X-MC-Unique: m2CXZWfcPKWcWWXeyyKgbg-1
+ us-mta-170-OVxNY_WpMVOQUg_YblZFBg-1; Fri, 17 Apr 2020 23:10:08 -0400
+X-MC-Unique: OVxNY_WpMVOQUg_YblZFBg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B833A107ACC4;
-        Sat, 18 Apr 2020 03:09:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A597107ACCD;
+        Sat, 18 Apr 2020 03:10:07 +0000 (UTC)
 Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 70AF911A034;
-        Sat, 18 Apr 2020 03:09:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 411BE11A0F9;
+        Sat, 18 Apr 2020 03:10:04 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -52,9 +52,9 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V7 5/9] blk-mq: stop to handle IO and drain IO before hctx becomes inactive
-Date:   Sat, 18 Apr 2020 11:09:21 +0800
-Message-Id: <20200418030925.31996-6-ming.lei@redhat.com>
+Subject: [PATCH V7 7/9] blk-mq: re-submit IO in case that hctx is inactive
+Date:   Sat, 18 Apr 2020 11:09:23 +0800
+Message-Id: <20200418030925.31996-8-ming.lei@redhat.com>
 In-Reply-To: <20200418030925.31996-1-ming.lei@redhat.com>
 References: <20200418030925.31996-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -65,12 +65,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before one CPU becomes offline, check if it is the last online CPU
-of hctx. If yes, mark this hctx as inactive, meantime wait for
-completion of all in-flight IOs originated from this hctx.
+When all CPUs in one hctx are offline and this hctx becomes inactive,
+we shouldn't run this hw queue for completing request any more.
 
-This way guarantees that there isn't any inflight IO before shutdowning
-the managed IRQ line.
+So steal bios from the request, and resubmit them, and finally free
+the request in blk_mq_hctx_notify_dead().
 
 Cc: John Garry <john.garry@huawei.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
@@ -79,256 +78,165 @@ Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c |   1 +
- block/blk-mq.c         | 118 ++++++++++++++++++++++++++++++++++++++---
- block/blk-mq.h         |   3 +-
- include/linux/blk-mq.h |   3 ++
- 4 files changed, 116 insertions(+), 9 deletions(-)
+ block/blk-mq.c | 130 +++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 121 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 8e745826eb86..b62390918ca5 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -213,6 +213,7 @@ static const char *const hctx_state_name[] =3D {
- 	HCTX_STATE_NAME(STOPPED),
- 	HCTX_STATE_NAME(TAG_ACTIVE),
- 	HCTX_STATE_NAME(SCHED_RESTART),
-+	HCTX_STATE_NAME(INACTIVE),
- };
- #undef HCTX_STATE_NAME
-=20
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a28daefd7dd6..0b56d7d78269 100644
+index 0b56d7d78269..ae1e57c64ca1 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1021,7 +1021,7 @@ static inline unsigned int queued_to_index(unsigned=
- int queued)
- 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
- }
-=20
--static bool blk_mq_get_driver_tag(struct request *rq)
-+static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
- {
- 	struct blk_mq_alloc_data data =3D {
- 		.q =3D rq->q,
-@@ -1054,6 +1054,23 @@ static bool blk_mq_get_driver_tag(struct request *=
-rq)
- 		data.hctx->tags->rqs[rq->tag] =3D rq;
- 	}
- allocated:
-+	/*
-+	 * Add one memory barrier in case that direct issue IO process
-+	 * is migrated to other CPU which may not belong to this hctx,
-+	 * so we can order driver tag assignment and checking
-+	 * BLK_MQ_S_INACTIVE. Otherwise, barrier() is enough given the
-+	 * two code paths are run on single CPU in case that
-+	 * BLK_MQ_S_INACTIVE is set.
-+	 */
-+	if (unlikely(direct_issue && rq->mq_ctx->cpu !=3D raw_smp_processor_id(=
-)))
-+		smp_mb();
-+	else
-+		barrier();
-+
-+	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state))) {
-+		blk_mq_put_driver_tag(rq);
-+		return false;
-+	}
- 	return rq->tag !=3D -1;
- }
-=20
-@@ -1103,7 +1120,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_c=
-tx *hctx,
- 		 * Don't clear RESTART here, someone else could have set it.
- 		 * At most this will cost an extra queue run.
- 		 */
--		return blk_mq_get_driver_tag(rq);
-+		return blk_mq_get_driver_tag(rq, false);
- 	}
-=20
- 	wait =3D &hctx->dispatch_wait;
-@@ -1129,7 +1146,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_c=
-tx *hctx,
- 	 * allocation failure and adding the hardware queue to the wait
- 	 * queue.
- 	 */
--	ret =3D blk_mq_get_driver_tag(rq);
-+	ret =3D blk_mq_get_driver_tag(rq, false);
- 	if (!ret) {
- 		spin_unlock(&hctx->dispatch_wait_lock);
- 		spin_unlock_irq(&wq->lock);
-@@ -1226,7 +1243,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *=
-q, struct list_head *list,
- 		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
- 			break;
-=20
--		if (!blk_mq_get_driver_tag(rq)) {
-+		if (!blk_mq_get_driver_tag(rq, false)) {
- 			/*
- 			 * The initial allocation attempt failed, so we need to
- 			 * rerun the hardware queue when a tag is freed. The
-@@ -1258,7 +1275,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *=
-q, struct list_head *list,
- 			bd.last =3D true;
- 		else {
- 			nxt =3D list_first_entry(list, struct request, queuelist);
--			bd.last =3D !blk_mq_get_driver_tag(nxt);
-+			bd.last =3D !blk_mq_get_driver_tag(nxt, false);
- 		}
-=20
- 		ret =3D q->mq_ops->queue_rq(hctx, &bd);
-@@ -1851,7 +1868,7 @@ static blk_status_t __blk_mq_try_issue_directly(str=
-uct blk_mq_hw_ctx *hctx,
- 	if (!blk_mq_get_dispatch_budget(hctx))
- 		goto insert;
-=20
--	if (!blk_mq_get_driver_tag(rq)) {
-+	if (!blk_mq_get_driver_tag(rq, true)) {
- 		blk_mq_put_dispatch_budget(hctx);
- 		goto insert;
- 	}
-@@ -2259,13 +2276,95 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, =
-struct blk_mq_tags *tags,
- 	return -ENOMEM;
- }
-=20
--static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node=
- *node)
-+struct count_inflight_data {
-+	unsigned count;
-+	struct blk_mq_hw_ctx *hctx;
-+};
-+
-+static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
-+				     bool reserved)
- {
--	return 0;
-+	struct count_inflight_data *count_data =3D data;
-+
-+	/*
-+	 * Can't check rq's state because it is updated to MQ_RQ_IN_FLIGHT
-+	 * in blk_mq_start_request(), at that time we can't prevent this rq
-+	 * from being issued.
-+	 *
-+	 * So check if driver tag is assigned, if yes, count this rq as
-+	 * inflight.
-+	 */
-+	if (rq->tag >=3D 0 && rq->mq_hctx =3D=3D count_data->hctx)
-+		count_data->count++;
-+
-+	return true;
-+}
-+
-+static bool blk_mq_inflight_rq(struct request *rq, void *data,
-+			       bool reserved)
-+{
-+	return rq->tag >=3D 0;
-+}
-+
-+static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct count_inflight_data count_data =3D {
-+		.count	=3D 0,
-+		.hctx	=3D hctx,
-+	};
-+
-+	blk_mq_all_tag_busy_iter(hctx->tags, blk_mq_count_inflight_rq,
-+			blk_mq_inflight_rq, &count_data);
-+
-+	return count_data.count;
-+}
-+
-+static void blk_mq_hctx_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+	while (1) {
-+		if (!blk_mq_tags_inflight_rqs(hctx))
-+			break;
-+		msleep(5);
-+	}
- }
-=20
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_nod=
-e *node)
- {
-+	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_online);
-+
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-+		return 0;
-+
-+	if ((cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) !=3D cpu) ||
-+			(cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask)
-+			 < nr_cpu_ids))
-+		return 0;
-+
-+	/*
-+	 * The current CPU is the last one in this hctx, S_INACTIVE
-+	 * can be observed in dispatch path without any barrier needed,
-+	 * cause both are run on one same CPU.
-+	 */
-+	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-+	/*
-+	 * Order setting BLK_MQ_S_INACTIVE and checking rq->tag & rqs[tag],
-+	 * and its pair is the smp_mb() in blk_mq_get_driver_tag
-+	 */
-+	smp_mb();
-+	blk_mq_hctx_drain_inflight_rqs(hctx);
-+	return 0;
-+}
-+
-+static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node=
- *node)
-+{
-+	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_online);
-+
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-+		return 0;
-+
-+	clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+@@ -2368,10 +2368,98 @@ static int blk_mq_hctx_notify_online(unsigned int=
+ cpu, struct hlist_node *node)
  	return 0;
  }
 =20
-@@ -2281,6 +2380,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu=
-, struct hlist_node *node)
- 	LIST_HEAD(tmp);
- 	enum hctx_type type;
-=20
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-+		return 0;
++static void blk_mq_resubmit_end_io(struct request *rq, blk_status_t erro=
+r)
++{
++	struct request *orig_rq =3D rq->end_io_data;
 +
- 	hctx =3D hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
- 	ctx =3D __blk_mq_get_ctx(hctx->queue, cpu);
- 	type =3D hctx->type;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index d0c72d7d07c8..a1fbd0b8657b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -167,7 +167,8 @@ static inline struct blk_mq_tags *blk_mq_tags_from_da=
-ta(struct blk_mq_alloc_data
-=20
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
++	blk_mq_cleanup_rq(orig_rq);
++	blk_mq_end_request(orig_rq, error);
++
++	blk_put_request(rq);
++}
++
++static void blk_mq_resubmit_passthrough_io(struct request *rq)
++{
++	struct request *nrq;
++	unsigned int flags =3D 0, cmd_flags =3D 0;
++	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
++	struct blk_mq_tags *tags =3D rq->q->elevator ? hctx->sched_tags :
++		hctx->tags;
++	bool reserved =3D blk_mq_tag_is_reserved(tags, rq->internal_tag);
++
++	if (rq->rq_flags & RQF_PREEMPT)
++		flags |=3D BLK_MQ_REQ_PREEMPT;
++	if (reserved)
++		flags |=3D BLK_MQ_REQ_RESERVED;
++
++	/* avoid allocation failure & IO merge */
++	cmd_flags =3D (rq->cmd_flags & ~REQ_NOWAIT) | REQ_NOMERGE;
++
++	nrq =3D blk_get_request(rq->q, cmd_flags, flags);
++	if (!nrq)
++		return;
++
++	nrq->__sector =3D blk_rq_pos(rq);
++	nrq->__data_len =3D blk_rq_bytes(rq);
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD) {
++		nrq->rq_flags |=3D RQF_SPECIAL_PAYLOAD;
++		nrq->special_vec =3D rq->special_vec;
++	}
++#if defined(CONFIG_BLK_DEV_INTEGRITY)
++	nrq->nr_integrity_segments =3D rq->nr_integrity_segments;
++#endif
++	nrq->nr_phys_segments =3D rq->nr_phys_segments;
++	nrq->ioprio =3D rq->ioprio;
++	nrq->extra_len =3D rq->extra_len;
++	nrq->rq_disk =3D rq->rq_disk;
++	nrq->part =3D rq->part;
++	nrq->write_hint =3D rq->write_hint;
++	nrq->timeout =3D rq->timeout;
++
++	memcpy(blk_mq_rq_to_pdu(nrq), blk_mq_rq_to_pdu(rq),
++			rq->q->tag_set->cmd_size);
++
++	nrq->end_io =3D blk_mq_resubmit_end_io;
++	nrq->end_io_data =3D rq;
++	nrq->bio =3D rq->bio;
++	nrq->biotail =3D rq->biotail;
++
++	blk_account_io_start(nrq, true);
++	blk_mq_sched_insert_request(nrq, true, true, true);
++}
++
++static void blk_mq_resubmit_fs_io(struct request *rq)
++{
++	struct bio_list list;
++	struct bio *bio;
++
++	bio_list_init(&list);
++	blk_steal_bios(&list, rq);
++
++	while (true) {
++		bio =3D bio_list_pop(&list);
++		if (!bio)
++			break;
++
++		generic_make_request(bio);
++	}
++
++	blk_mq_cleanup_rq(rq);
++	blk_mq_end_request(rq, 0);
++}
++
++static void blk_mq_resubmit_io(struct request *rq)
++{
++	if (rq->end_io || blk_rq_is_passthrough(rq))
++		blk_mq_resubmit_passthrough_io(rq);
++	else
++		blk_mq_resubmit_fs_io(rq);
++}
++
+ /*
+- * 'cpu' is going away. splice any existing rq_list entries from this
+- * software queue to the hw queue dispatch list, and ensure that it
+- * gets run.
++ * 'cpu' has gone away. If this hctx is inactive, we can't dispatch requ=
+est
++ * to the hctx any more, so steal bios from requests of this hctx, and
++ * re-submit them to the request queue, and free these requests finally.
+  */
+ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
+node)
  {
--	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	return test_bit(BLK_MQ_S_STOPPED, &hctx->state) ||
-+		test_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+@@ -2394,14 +2482,38 @@ static int blk_mq_hctx_notify_dead(unsigned int c=
+pu, struct hlist_node *node)
+ 	}
+ 	spin_unlock(&ctx->lock);
+=20
+-	if (list_empty(&tmp))
+-		return 0;
++	if (!test_bit(BLK_MQ_S_INACTIVE, &hctx->state)) {
++		if (!list_empty(&tmp)) {
++			spin_lock(&hctx->lock);
++			list_splice_tail_init(&tmp, &hctx->dispatch);
++			spin_unlock(&hctx->lock);
++			blk_mq_run_hw_queue(hctx, true);
++		}
++	} else {
++		LIST_HEAD(flush_in);
++		LIST_HEAD(flush_out);
++		struct request *rq, *nxt;
+=20
+-	spin_lock(&hctx->lock);
+-	list_splice_tail_init(&tmp, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++		/* requests in dispatch list have to be re-submitted too */
++		spin_lock(&hctx->lock);
++		list_splice_tail_init(&hctx->dispatch, &tmp);
++		spin_unlock(&hctx->lock);
++
++		/* blk_end_flush_machinery will cover flush request */
++		list_for_each_entry_safe(rq, nxt, &tmp, queuelist) {
++			if (rq->rq_flags & RQF_FLUSH_SEQ)
++				list_move(&rq->queuelist, &flush_in);
++		}
++		blk_end_flush_machinery(hctx, &flush_in, &flush_out);
++		list_splice_tail(&flush_out, &tmp);
++
++		while (!list_empty(&tmp)) {
++			rq =3D list_first_entry(&tmp, struct request, queuelist);
++			list_del_init(&rq->queuelist);
++			blk_mq_resubmit_io(rq);
++		}
++	}
+=20
+-	blk_mq_run_hw_queue(hctx, true);
+ 	return 0;
  }
 =20
- static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 786614753d73..650b208b42ea 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -403,6 +403,9 @@ enum {
- 	BLK_MQ_S_TAG_ACTIVE	=3D 1,
- 	BLK_MQ_S_SCHED_RESTART	=3D 2,
-=20
-+	/* hw queue is inactive after all its CPUs become offline */
-+	BLK_MQ_S_INACTIVE	=3D 3,
-+
- 	BLK_MQ_MAX_DEPTH	=3D 10240,
-=20
- 	BLK_MQ_CPU_WORK_BATCH	=3D 8,
 --=20
 2.25.2
 
