@@ -2,135 +2,116 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77CCAC2BA19
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2577C2BA19
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:25:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F37722201
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:10:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKkzEiEL"
+	by mail.kernel.org (Postfix) with ESMTP id C6488221EA
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:25:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726006AbgDRDKX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 23:10:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59659 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725867AbgDRDKX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 23:10:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587179422;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dGXP2A7v6gjOA92AaZWVcIQWKr9flBcDouQg5o4Pn7k=;
-        b=cKkzEiEL0wBGm1vw4mrTDArFUC886664F7jLbe8766J8us5qvyY0101fxyyOu2KXVJNcPT
-        FXnsTX05O5fq7Sm9eFKslwDTs++bjSBXo4cIoXpioBiXMi4V8Gp6HKYf1jq3gfq/oh3emD
-        JeQi/0OOI8Gef15kpQ3JdgJlo/dFmfg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-R_7rVqDoMpCdBNfJ14cAjA-1; Fri, 17 Apr 2020 23:10:20 -0400
-X-MC-Unique: R_7rVqDoMpCdBNfJ14cAjA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CE7C1005509;
-        Sat, 18 Apr 2020 03:10:19 +0000 (UTC)
-Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A09A5C1D6;
-        Sat, 18 Apr 2020 03:10:15 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V7 9/9] block: deactivate hctx when the hctx is actually inactive
-Date:   Sat, 18 Apr 2020 11:09:25 +0800
-Message-Id: <20200418030925.31996-10-ming.lei@redhat.com>
-In-Reply-To: <20200418030925.31996-1-ming.lei@redhat.com>
-References: <20200418030925.31996-1-ming.lei@redhat.com>
+        id S1725939AbgDRDZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 23:25:17 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39716 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725320AbgDRDZQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Apr 2020 23:25:16 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id B2E1FCF64FC93CB46B2A;
+        Sat, 18 Apr 2020 11:25:01 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.204) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Sat, 18 Apr 2020
+ 11:24:54 +0800
+Subject: Re: [RFC] block: fix access of uninitialized pointer address in
+ bt_for_each()
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <yi.zhang@huawei.com>, <yuyufen@huawei.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20200417125134.45117-1-yukuai3@huawei.com>
+ <340bed9b-e14d-5a22-1601-8fb7aad4ce7f@acm.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <f74ca075-7d29-a944-b49b-7b432f2a60c9@huawei.com>
+Date:   Sat, 18 Apr 2020 11:24:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <340bed9b-e14d-5a22-1601-8fb7aad4ce7f@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.166.215.204]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Run queue on dead CPU still may be triggered in some corner case,
-such as one request is requeued after CPU hotplug is handled.
+on 2020/4/17 22:26, Bart Van Assche wrote:
 
-So handle this corner case during run queue.
+> The alloc/free info refers to a data structure owned by the pipe
+> implementation. The use-after-free report refers to a data structure
+> owned by the block layer. How can that report make sense?
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 30 ++++++++++--------------------
- 1 file changed, 10 insertions(+), 20 deletions(-)
+Indeed, I'm comfused here, too.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 54ba8a9c3c93..2babe96b2883 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -43,6 +43,8 @@
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
-=20
-+static void blk_mq_hctx_deactivate(struct blk_mq_hw_ctx *hctx);
-+
- static int blk_mq_poll_stats_bkt(const struct request *rq)
- {
- 	int ddir, sectors, bucket;
-@@ -1371,28 +1373,16 @@ static void __blk_mq_run_hw_queue(struct blk_mq_h=
-w_ctx *hctx)
- 	int srcu_idx;
-=20
- 	/*
--	 * We should be running this queue from one of the CPUs that
--	 * are mapped to it.
--	 *
--	 * There are at least two related races now between setting
--	 * hctx->next_cpu from blk_mq_hctx_next_cpu() and running
--	 * __blk_mq_run_hw_queue():
--	 *
--	 * - hctx->next_cpu is found offline in blk_mq_hctx_next_cpu(),
--	 *   but later it becomes online, then this warning is harmless
--	 *   at all
--	 *
--	 * - hctx->next_cpu is found online in blk_mq_hctx_next_cpu(),
--	 *   but later it becomes offline, then the warning can't be
--	 *   triggered, and we depend on blk-mq timeout handler to
--	 *   handle dispatched requests to this hctx
-+	 * BLK_MQ_S_INACTIVE may not deal with some requeue corner case:
-+	 * one request is requeued after cpu unplug is handled, so check
-+	 * if the hctx is actually inactive. If yes, deactive it and
-+	 * re-submit all requests in the queue.
- 	 */
- 	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
--		cpu_online(hctx->next_cpu)) {
--		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
--			raw_smp_processor_id(),
--			cpumask_empty(hctx->cpumask) ? "inactive": "active");
--		dump_stack();
-+	    cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) >=3D
-+	    nr_cpu_ids) {
-+		blk_mq_hctx_deactivate(hctx);
-+		return;
- 	}
-=20
- 	/*
---=20
-2.25.2
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 7ed16ed13976..48b74d0085c7 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -485,6 +485,7 @@ static void __blk_mq_free_request(struct request *rq)
+>>   	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
+>>   	const int sched_tag = rq->internal_tag;
+>>   
+>> +	hctx->tags->rqs[rq->tag] = NULL;
+>>   	if (rq->tag != -1)
+>>   		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+>>   	if (sched_tag != -1)
+> 
+> Can the above change trigger the following assignment?
+> 
+> hctx->tags->rqs[-1] = NULL?
+
+My bad, should be inside 'if'.
+
+> static inline void *kcalloc_node(size_t n, size_t size, gfp_t flags,
+>                                   int node)
+> {
+> 	return kmalloc_array_node(n, size, flags | __GFP_ZERO, node);
+> }
+> 
+> I think this means that kcalloc_node() already zeroes the allocated
+> memory and hence that changing kcalloc() into kzalloc() is not necessary.
+
+You are right.
+
+>> @@ -196,6 +196,7 @@ static inline void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
+>>   	if (rq->tag == -1 || rq->internal_tag == -1)
+>>   		return;
+>>   
+>> +	hctx->tags->rqs[rq->tag] = NULL;
+>>   	__blk_mq_put_driver_tag(hctx, rq);
+>>   }
+>>   
+>> @@ -207,6 +208,7 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
+>>   		return;
+>>   
+>>   	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
+>> +	hctx->tags->rqs[rq->tag] = NULL;
+>>   	__blk_mq_put_driver_tag(hctx, rq);
+>>   }
+> 
+> I don't think the above changes are sufficient to fix the
+> use-after-free. Has it been considered to free the memory that backs
+> tags->bitmap_tags only after an RCU grace period has expired? See also
+> blk_mq_free_tags().
+
+As you pointed out, kcalloc_node() already zeroes out the memory. What I 
+don't understand is that how could 'slab-out-of-bounds in bt_for_each' 
+triggered instead UAF.
+
+Thanks!
+Yu Kuai
+
 
