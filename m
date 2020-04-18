@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F84AC38A29
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CCDC38A29
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:45:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0189A214AF
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F31A21D93
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:45:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726069AbgDRPoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 11:44:32 -0400
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:36593 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbgDRPoc (ORCPT
+        id S1726677AbgDRPpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 11:45:17 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:36750 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgDRPpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 11:44:32 -0400
-Received: by mail-pl1-f170.google.com with SMTP id g2so2191308plo.3;
-        Sat, 18 Apr 2020 08:44:31 -0700 (PDT)
+        Sat, 18 Apr 2020 11:45:17 -0400
+Received: by mail-pf1-f194.google.com with SMTP id g30so2657780pfr.3;
+        Sat, 18 Apr 2020 08:45:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=ZamkwpxxpgEyM+B+GmITRT2zINDFcwHae2UE6fcwVeI=;
-        b=rkTSEQf3/9Et7DylOQejH/QXTVS2GTIGOjZwi3N4k1mEclPHMlhaIkSRxCP2gBvn+I
-         rNLBAFRXngDHL2Ut5JwBdPbORKKHd304cVek33wFc4osWnsaR6FRcc9+uOoOI67gl9W2
-         lKXJH+8UchwK3YOCB7UG1sjzDEUczKfuRogN7YqbpS6GQZsGUoGWUTwepOyqfPAFHvRs
-         X+y6CZcxG2v531a4o0hYf1nwZ8K/Bo1divJX9UPaRs1cKtxFHl8M2nmpdgtTLYu1+3MZ
-         nw3Dn0Xd1MFNjH4TF85Z/cgwKiXijSrOgUqf41i6nV4BVI5h+WK1dkJBFxi+xwS1DoJn
-         UaqQ==
-X-Gm-Message-State: AGi0PuZQ82ZaPALhuvgoNR+6iVKUpD8JR97NFlyRccnJySPA4xytZYL4
-        FHeHinRPf7ZWbwzHNPy0mencXXC4gmQ=
-X-Google-Smtp-Source: APiQypKc0icC6V3EzeYpE1butC2jWyAXIpBwQjx69RKwKx/FX7Pt8Sse/PbuYkYi6EYq/izo1T7RDA==
-X-Received: by 2002:a17:90a:d985:: with SMTP id d5mr10734662pjv.171.1587224670783;
-        Sat, 18 Apr 2020 08:44:30 -0700 (PDT)
+        bh=F9trQMVmAOWCLQsKB2sYCuVUT5JCnvtNV+CwOfLq/sU=;
+        b=s1rvnU+WVB3ZvZT3iPiCqXirAZp5plLjaKbpqS/AjyrDf94T2kTOeLPoI4HbvFYwVB
+         ykINIIJawbKoNDedEJAAUXqW69PjeJ6FONbjhQF3mPaisjGJRO474ZqCl1yd0KCxtUln
+         9RQFwQwEycSF+hh/7psAhB+IwtUWoq011qy5vByiWGirWL9/djHf/AhYBTHmDdaNHqWi
+         /IGXOLHMDMUGNhnFK72IGw+o5oXH5r4y8k97KJoQKffu78d64h1q/1SHsSv84gT9hMJh
+         E9FyET9VZraZFR+WD74MGjNHBfLmlOtk2pDkQM9WKP3QwXiQDw962H6BfmNlBGL+GXXs
+         vzDQ==
+X-Gm-Message-State: AGi0PubZye9tplZ/R8prZXH7XhB2SMCILqsD/zf9eEZpnde05Tiwryl0
+        /AAbNvnIzizDRB3TE8z213c66SSzhuw=
+X-Google-Smtp-Source: APiQypKFSQ8J722lyWtt38wYHQklhupdDcj14k8xthipP1TvVHvuQio3EMzKJLj8ZBC/ebaDY7EWgQ==
+X-Received: by 2002:a63:f13:: with SMTP id e19mr8067462pgl.135.1587224716061;
+        Sat, 18 Apr 2020 08:45:16 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id y126sm16526608pgy.91.2020.04.18.08.44.29
+        by smtp.gmail.com with ESMTPSA id f30sm8786026pje.29.2020.04.18.08.45.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 08:44:30 -0700 (PDT)
-Subject: Re: [PATCH 7/8] bdi: simplify bdi_alloc
+        Sat, 18 Apr 2020 08:45:15 -0700 (PDT)
+Subject: Re: [PATCH 8/8] bdi: remove the name field in struct backing_dev_info
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
         gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200416165453.1080463-1-hch@lst.de>
- <20200416165453.1080463-8-hch@lst.de>
+ <20200416165453.1080463-9-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +73,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <5fa5c23e-174f-657e-f7ce-d2ccbd3e149e@acm.org>
-Date:   Sat, 18 Apr 2020 08:44:28 -0700
+Message-ID: <bd29b176-6bdd-b593-afda-63fd1f9fa570@acm.org>
+Date:   Sat, 18 Apr 2020 08:45:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200416165453.1080463-8-hch@lst.de>
+In-Reply-To: <20200416165453.1080463-9-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,6 +88,8 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-04-16 09:54, Christoph Hellwig wrote:
-> Merge the _node vs normal version and drop the superflous gfp_t argument.
+> The name is only printed for a not registered bdi in writeback.  Use the
+> device name there as is more useful anyway for the unlike case that the
+> warning triggers.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
