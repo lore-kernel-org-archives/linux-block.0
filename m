@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2625C5321D
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B894C38A2F
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:02:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C4B221D93
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 173DD2223D
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbgDRP4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 11:56:53 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:56012 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbgDRP4w (ORCPT
+        id S1726832AbgDRQC4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 12:02:56 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:36541 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgDRQC4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 11:56:52 -0400
-Received: by mail-pj1-f65.google.com with SMTP id a32so2519421pje.5;
-        Sat, 18 Apr 2020 08:56:51 -0700 (PDT)
+        Sat, 18 Apr 2020 12:02:56 -0400
+Received: by mail-pg1-f194.google.com with SMTP id o185so2208141pgo.3;
+        Sat, 18 Apr 2020 09:02:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=HnN+4R9VnGvVtFRaSn9immSfu526GuFnV34NPuc3GJ4=;
-        b=FgYy+wT1Ser6GDI8gBVjfFmegC/sMorPV9TSU0pIowGot5Ct+OjQ6LbWxK8K0EMjwY
-         Vvy7yqyqh8CrPruPezePLxC64VJGwDm9JPJp2aWVorcfKENUM32p0+Q219BnwG7nxDSD
-         YfnkQySlxHdcvrC3IYvolq2SxhfN5RQnara3I10/FUIDvubBqviEDe9s0CszcsnhvZ0K
-         FA5yO/b4AM6WqDCurCRON8crDbaQgJ1Sebv3ow/2FRoHvGksoOmIW4GjuSnmgkEOMgB2
-         jOaCLnilHAzF/v1ZVyn9hjYEohKg4k+vV6Q8OU9pV2SGwZi8peVT1OqLHXFi8W0GdsOf
-         rl9A==
-X-Gm-Message-State: AGi0PuYSSJn99JxwcE5P8VU0msbnveSn6+Z0BpxkX/x/zWAqTqSuj2rV
-        9+OnygSVTGTQ/x6zgfishqw=
-X-Google-Smtp-Source: APiQypJQm7KDxqeoXzsUCOSRwsfZZCKF62wDEpEX9w3v38O0ZeIERlSVUTpFH4OkBtpVHSsww5t6fg==
-X-Received: by 2002:a17:902:b418:: with SMTP id x24mr585768plr.260.1587225411195;
-        Sat, 18 Apr 2020 08:56:51 -0700 (PDT)
+        bh=dj8lEaoE6e4YhmuN/RNuMwlwOm9tt21HvHz1R+SzXXY=;
+        b=dDQXYrE1uk6syZEhiM6M62d4BDY2cGcHr5TqES3FFYw86hMxwh6UyC9y9yvaXIqAo2
+         /4TLNvPTEOsEpa/EkTsTDcnup29fu7gjeyNTE4BAyv3uMzyPJSA4tHQHcG7fhseZoFHW
+         Qb34a8OYzoeevAwxTRXlRdQByIkqhbVEBIuYNGbBPwlRlg8MAkzLMv/vu/h6BkSNxWA8
+         tB1ETC1MRFDL/SQIQSsV41jwyesYUrifv24GkZwKBopZEFedvAfRHesv+QgSgzl0u7Ju
+         1gDm6+ZaaSL3mbJ9gq8IkIW5e5vxbBDgShPRGm/0GDdFknO9gQncI7OtwlEHPPDbcru1
+         qm3w==
+X-Gm-Message-State: AGi0Puahm07Ic5PCq2GNVe2we2PFXsfAb/iDH0vceuv7VtbPheFgUACj
+        uUfk1obfpjAtvo/loTC2sl0=
+X-Google-Smtp-Source: APiQypIRb0Wzi2LWy8v0BRKXYlawkazyiLiR4WYqeAKtbG7btR+Rp71LHassaloIwListT0Fh/qoPA==
+X-Received: by 2002:a63:296:: with SMTP id 144mr8367864pgc.110.1587225775161;
+        Sat, 18 Apr 2020 09:02:55 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id 23sm7632557pjb.11.2020.04.18.08.56.49
+        by smtp.gmail.com with ESMTPSA id b2sm20832321pgg.77.2020.04.18.09.02.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 08:56:50 -0700 (PDT)
-Subject: Re: [PATCH v7 00/11] Introduce Zone Append for writing to zoned block
- devices
+        Sat, 18 Apr 2020 09:02:54 -0700 (PDT)
+Subject: Re: [PATCH v7 01/11] scsi: free sgtables in case command setup fails
 To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -53,8 +52,9 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Daniel Wagner <dwagner@suse.de>
+        Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>
 References: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
+ <20200417121536.5393-2-johannes.thumshirn@wdc.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -79,12 +79,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <afefece2-3016-8b58-fda4-1fbd7fcac75c@acm.org>
-Date:   Sat, 18 Apr 2020 08:56:48 -0700
+Message-ID: <de79e1ab-0407-205e-3272-532f0484b49f@acm.org>
+Date:   Sat, 18 Apr 2020 09:02:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
+In-Reply-To: <20200417121536.5393-2-johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -94,16 +94,34 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-04-17 05:15, Johannes Thumshirn wrote:
-> In order to reduce memory consumption, the only cached item is the offset
-> of the write pointer from the start of the zone, everything else can be
-> calculated. On an example drive with 52156 zones, the additional memory
-> consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
-> pages. The performance impact is neglectable for a spinning drive.
+> @@ -1190,6 +1190,7 @@ static blk_status_t scsi_setup_cmnd(struct scsi_device *sdev,
+>  		struct request *req)
+>  {
+>  	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+> +	blk_status_t ret;
+>  
+>  	if (!blk_rq_bytes(req))
+>  		cmd->sc_data_direction = DMA_NONE;
+> @@ -1199,9 +1200,14 @@ static blk_status_t scsi_setup_cmnd(struct scsi_device *sdev,
+>  		cmd->sc_data_direction = DMA_FROM_DEVICE;
+>  
+>  	if (blk_rq_is_scsi(req))
+> -		return scsi_setup_scsi_cmnd(sdev, req);
+> +		ret = scsi_setup_scsi_cmnd(sdev, req);
+>  	else
+> -		return scsi_setup_fs_cmnd(sdev, req);
+> +		ret = scsi_setup_fs_cmnd(sdev, req);
+> +
+> +	if (ret != BLK_STS_OK)
+> +		scsi_free_sgtables(cmd);
+> +
+> +	return ret;
+>  }
 
-What will happen if e.g. syzkaller mixes write() system calls with SG_IO
-writes? Can that cause a mismatch between the cached write pointer and
-the write pointer maintained by the drive? If so, should SG_IO perhaps
-be disallowed if the write pointer is cached?
+If this patch fixes the bug reported in
+https://bugzilla.kernel.org/show_bug.cgi?id=205595, please mention this.
+
+How about adding __must_check to scsi_setup_fs_cmnd()?
 
 Thanks,
 
