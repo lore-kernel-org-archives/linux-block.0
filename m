@@ -4,50 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E972C38A2F
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 13:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 212EAC3A5A0
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:10:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43DBC214AF
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 13:52:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9EDB22244
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587217939;
-	bh=Yb0dT5Mf5FCK4nJCMD4GNxe6Lfw8RlG4lpvc3T+67PM=;
+	s=default; t=1587219044;
+	bh=dyQ/jAoog3/afvIT8/E4Yzhzrzavmt+MBeOOR32Pl3A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iCLcP+SU9f+b24F1FQ54SJqNHoyoDPS6S4Nr5SL+hHOZvZfAnN3X5bjLDgH5XMOUs
-	 rt0vkPW0Svm9i3UVzhElN1iEF51O5/+csVWlo+gNswYqsKvN8xPk7nO41VC4mrlPTj
-	 Pv7KXxRqDuUTnPmlXXdnHOHJNrAASMuRgeDEgAlw=
+	b=PximPdWXb7Hqr7zZhAaSVWPgw8PBbsk7ANLy/AH9OLEBBh88p/NskVwewD32irBpm
+	 V7Mn5FU64qhoZvtjJrXuUq9sMT1wK5FdQROuxQB9YP/tU4FnXBLduA+Wynvn9qBMqJ
+	 vYZiT8Sp6QE6dZJvKfdKk/7LOojX2jCeZFi6Qb6I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726654AbgDRNwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 09:52:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55638 "EHLO mail.kernel.org"
+        id S1727961AbgDROKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 10:10:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39096 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726641AbgDRNs4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 09:48:56 -0400
+        id S1727946AbgDROKm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:10:42 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3F6D822251;
-        Sat, 18 Apr 2020 13:48:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F0C9921BE5;
+        Sat, 18 Apr 2020 14:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587217735;
-        bh=Yb0dT5Mf5FCK4nJCMD4GNxe6Lfw8RlG4lpvc3T+67PM=;
+        s=default; t=1587219041;
+        bh=dyQ/jAoog3/afvIT8/E4Yzhzrzavmt+MBeOOR32Pl3A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zUi75cWiTr5AgK+kt5Kfpr1nZiRt46cten2zm11HgswXSKgaoXO1NNh87XC5fPde3
-         WENXUBCKMvi46pn/wPpw0zSPZxSo1lbeAXZ34qMB45vRr8XQg/p7x5yYyMG7kxfbPw
-         eT+aj/TIZ2EIBzsH4MJNDsYSoo9h8266UPYXpBjM=
+        b=PdlplNxOP9vZTZ0bpCVxuo6LmNdOGMmAbRyRJXnoe8kFz07qnvooMjHBurzJBINH5
+         eUBbRnfn0aW3sjt9899ETWCKEloTkzSs2XwR+AyVTEsR0mzGi+44dJIVAW/dy+ajEc
+         vaX7iKnAJmjPFBYvGVp3BcfAr403+fweJe6T3liI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 32/73] block: fix busy device checking in blk_drop_partitions
-Date:   Sat, 18 Apr 2020 09:47:34 -0400
-Message-Id: <20200418134815.6519-32-sashal@kernel.org>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 74/75] virtio-blk: improve virtqueue error to BLK_STS
+Date:   Sat, 18 Apr 2020 10:09:09 -0400
+Message-Id: <20200418140910.8280-74-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200418134815.6519-1-sashal@kernel.org>
-References: <20200418134815.6519-1-sashal@kernel.org>
+In-Reply-To: <20200418140910.8280-1-sashal@kernel.org>
+References: <20200418140910.8280-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -57,36 +61,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+From: Halil Pasic <pasic@linux.ibm.com>
 
-[ Upstream commit d3ef5536274faf89e626276b833be122a16bdb81 ]
+[ Upstream commit 3d973b2e9a625996ee997c7303cd793b9d197c65 ]
 
-bd_super is only set by get_tree_bdev and mount_bdev, and thus not by
-other openers like btrfs or the XFS realtime and log devices, as well as
-block devices directly opened from user space.  Check bd_openers
-instead.
+Let's change the mapping between virtqueue_add errors to BLK_STS
+statuses, so that -ENOSPC, which indicates virtqueue full is still
+mapped to BLK_STS_DEV_RESOURCE, but -ENOMEM which indicates non-device
+specific resource outage is mapped to BLK_STS_RESOURCE.
 
-Fixes: 77032ca66f86 ("Return EBUSY from BLKRRPART for mounted whole-dev fs")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Link: https://lore.kernel.org/r/20200213123728.61216-3-pasic@linux.ibm.com
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/partition-generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/virtio_blk.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 564fae77711df..5f3b2a959aa51 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -468,7 +468,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c2ed3e9128e3a..a55383b139df9 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -345,9 +345,14 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		if (err == -ENOSPC)
+ 			blk_mq_stop_hw_queue(hctx);
+ 		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+-		if (err == -ENOMEM || err == -ENOSPC)
++		switch (err) {
++		case -ENOSPC:
+ 			return BLK_STS_DEV_RESOURCE;
+-		return BLK_STS_IOERR;
++		case -ENOMEM:
++			return BLK_STS_RESOURCE;
++		default:
++			return BLK_STS_IOERR;
++		}
+ 	}
  
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
--	if (bdev->bd_part_count || bdev->bd_super)
-+	if (bdev->bd_part_count || bdev->bd_openers)
- 		return -EBUSY;
- 	res = invalidate_partition(disk, 0);
- 	if (res)
+ 	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
 -- 
 2.20.1
 
