@@ -2,48 +2,47 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40775C38A29
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 989CEC38A29
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:46:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 234CA20753
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C26321D6C
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 16:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726416AbgDRQDd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 12:03:33 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37762 "EHLO
+        id S1726563AbgDRQqt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 12:46:49 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:47074 "EHLO
         mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbgDRQDd (ORCPT
+        with ESMTP id S1725923AbgDRQqt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 12:03:33 -0400
-Received: by mail-pg1-f193.google.com with SMTP id r4so2744892pgg.4;
-        Sat, 18 Apr 2020 09:03:32 -0700 (PDT)
+        Sat, 18 Apr 2020 12:46:49 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 188so2766161pgj.13;
+        Sat, 18 Apr 2020 09:46:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=zoZtAILUfUQX92tEGLE18ESVtwdo2kiFNl6/6QW1N8U=;
-        b=eywi6SgGF+8ylGHcD0dwm9tmRbls035KGJODibdGR3R8ldcO0RiC5zrAJQPcyo7q1M
-         zWNr6FAIwknRemU+1oUirlP0sAHD6bQp27PikRGK00EGv1kRRKEnP1srMNomnrG1NUdM
-         6g3+4TUGZLGkf/KE/9yF0sJQfzlNenxpOP9rdXqXcmn+wO5fmAh60GPWuVfPdgB4BASf
-         W6Rc04uSCy7nCKf7w5lDf3p1vGrM5FpcnXYbND0VvN3Z+ZlEm8878tgYyxJ46kwFB5qx
-         cpmsC7AjIuDm6NZ1tbubfUMjMPOkswTRDE1YUUx8Bjs3h2hRUpnfMuhhbhbQi7JPWhBh
-         axng==
-X-Gm-Message-State: AGi0Pua1TrBUwR7zv14j7F46ChyoOIbsrsEej2HEhJKM8agnX8Hwr55S
-        VxoCAMKdYoDnKPX1c0Vmu0ccsF4+4Xc=
-X-Google-Smtp-Source: APiQypKG30prnAGMBNDsCBxHQ7X3onWOtEEO2yeCyekxj9Ca6LScuOq4sGOUe/DvW58WldVoprWF8w==
-X-Received: by 2002:a62:7b03:: with SMTP id w3mr2465072pfc.313.1587225812461;
-        Sat, 18 Apr 2020 09:03:32 -0700 (PDT)
+        bh=GWknpOiP7uvC2PT0tJKduvW5TIp5mEE0CRJpCWZXxRw=;
+        b=BLKDhuJrtkKSUfzL9KMXas5jnnVLNARgEiSunL7+jQdGe2OJ7xTCxrXWhLlluOMHFC
+         AfDBThk/j2/sEKWuBpDYVHU9dlZQ8tGMv1OihJA9eCpDXqOuDMM1s4HLr8QhaAsno0c4
+         3mu+vuMH9Oe1pk18hnKzKyKx3EVQDvPxpcRDMhK5GiTHBkZcJjOQxP2eZge2Mo8v5TgI
+         1VA1EpEutBlS68IpbPyj0y6DbMpYkzB1u1LxEDaZwprHQ2+jxtFREHyEqG7X2MG2hQ4Q
+         CICIzE9dkvRfZjpTXVZZ5l4551RGcN0gzbj2PbzBmPfo3MW4sCHVpNowQ1mQ/kwsFntv
+         zEqg==
+X-Gm-Message-State: AGi0PubzrTqSKjYfTIGKBmF1A9W0Az3plfBg8ZuxUlVfRe2MbBSSLBV8
+        kM0ex/XXpb8i/pheTz2/WOE=
+X-Google-Smtp-Source: APiQypIrflAd9+tX0/9gTKSPIFlgllNyiimfnNEuue0C5WqRMWn+iI7/okl9Rv8x3c5gksvzJVNxyg==
+X-Received: by 2002:a62:7d11:: with SMTP id y17mr8671286pfc.127.1587228408072;
+        Sat, 18 Apr 2020 09:46:48 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id v4sm22532109pfb.31.2020.04.18.09.03.31
+        by smtp.gmail.com with ESMTPSA id n9sm9066458pjt.29.2020.04.18.09.46.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 09:03:31 -0700 (PDT)
-Subject: Re: [PATCH v7 02/11] block: provide fallbacks for
- blk_queue_zone_is_seq and blk_queue_zone_no
+        Sat, 18 Apr 2020 09:46:47 -0700 (PDT)
+Subject: Re: [PATCH v7 04/11] block: Introduce REQ_OP_ZONE_APPEND
 To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -55,7 +54,7 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
         Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>
 References: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
- <20200417121536.5393-3-johannes.thumshirn@wdc.com>
+ <20200417121536.5393-5-johannes.thumshirn@wdc.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -80,25 +79,109 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <63dc4014-85ea-d1b8-e7d8-003c06ee27b9@acm.org>
-Date:   Sat, 18 Apr 2020 09:03:30 -0700
+Message-ID: <373bc820-95f2-5728-c102-c4ca9fa8eea5@acm.org>
+Date:   Sat, 18 Apr 2020 09:46:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200417121536.5393-3-johannes.thumshirn@wdc.com>
+In-Reply-To: <20200417121536.5393-5-johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-04-17 05:15, Johannes Thumshirn wrote:
-> blk_queue_zone_is_seq() and blk_queue_zone_no() have not been called with
-> CONFIG_BLK_DEV_ZONED disabled until now.
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> The introduction of REQ_OP_ZONE_APPEND will change this, so we need to
-> provide noop fallbacks for the !CONFIG_BLK_DEV_ZONED case.
+> Define REQ_OP_ZONE_APPEND to append-write sectors to a zone of a zoned
+> block device. This is a no-merge write operation.
+> 
+> A zone append write BIO must:
+> * Target a zoned block device
+> * Have a sector position indicating the start sector of the target zone
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Why the start sector instead of any sector in the target zone? Wouldn't
+the latter make it easier to write software that uses REQ_OP_ZONE_APPEND?
+
+> * The target zone must be a sequential write zone
+> * The BIO must not cross a zone boundary
+> * The BIO size must not be split to ensure that a single range of LBAs
+>   is written with a single command.
+
+"BIO size must" -> "BIO must"?
+
+> diff --git a/block/bio.c b/block/bio.c
+> index 0f0e337e46b4..97baadc6d964 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1006,7 +1006,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  				put_page(page);
+>  		} else {
+>  			if (WARN_ON_ONCE(bio_full(bio, len)))
+> -                                return -EINVAL;
+> +				 return -EINVAL;
+>  			__bio_add_page(bio, page, len, offset);
+>  		}
+>  		offset = 0;
+
+Has the 'return' statement been indented correctly? I see a tab and a
+space in front of that statement instead of only a tab.
+
+> @@ -1451,6 +1501,10 @@ struct bio *bio_split(struct bio *bio, int sectors,
+>  	BUG_ON(sectors <= 0);
+>  	BUG_ON(sectors >= bio_sectors(bio));
+>  
+> +	/* Zone append commands cannot be split */
+> +	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
+> +		return NULL;
+> +
+>  	split = bio_clone_fast(bio, gfp, bs);
+>  	if (!split)
+>  		return NULL;
+
+Zone append commands -> Zone append bio's?
+
+> +/*
+> + * Check write append to a zoned block device.
+> + */
+> +static inline blk_status_t blk_check_zone_append(struct request_queue *q,
+> +						 struct bio *bio)
+> +{
+> +	sector_t pos = bio->bi_iter.bi_sector;
+> +	int nr_sectors = bio_sectors(bio);
+> +
+> +	/* Only applicable to zoned block devices */
+> +	if (!blk_queue_is_zoned(q))
+> +		return BLK_STS_NOTSUPP;
+> +
+> +	/* The bio sector must point to the start of a sequential zone */
+> +	if (pos & (blk_queue_zone_sectors(q) - 1) ||
+> +	    !blk_queue_zone_is_seq(q, pos))
+> +		return BLK_STS_IOERR;
+> +
+> +	/*
+> +	 * Not allowed to cross zone boundaries. Otherwise, the BIO will be
+> +	 * split and could result in non-contiguous sectors being written in
+> +	 * different zones.
+> +	 */
+> +	if (blk_queue_zone_no(q, pos) != blk_queue_zone_no(q, pos + nr_sectors))
+> +		return BLK_STS_IOERR;
+
+Can the above statement be simplified into the following?
+
+	if (nr_sectors > q->limits.chunk_sectors)
+		return BLK_STS_IOERR;
+
+> +	/* Make sure the BIO is small enough and will not get split */
+> +	if (nr_sectors > q->limits.max_zone_append_sectors)
+> +		return BLK_STS_IOERR;
+
+Do we really need a new request queue limit parameter? In which cases
+will max_zone_append_sectors differ from the zone size?
+
+Thanks,
+
+Bart.
