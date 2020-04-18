@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B44EC38A29
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F84AC38A29
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:44:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AC3D206B8
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:43:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0189A214AF
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:44:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbgDRPnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 11:43:31 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44783 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbgDRPnb (ORCPT
+        id S1726069AbgDRPoc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 11:44:32 -0400
+Received: from mail-pl1-f170.google.com ([209.85.214.170]:36593 "EHLO
+        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgDRPoc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 11:43:31 -0400
-Received: by mail-pf1-f195.google.com with SMTP id p25so2633768pfn.11;
-        Sat, 18 Apr 2020 08:43:30 -0700 (PDT)
+        Sat, 18 Apr 2020 11:44:32 -0400
+Received: by mail-pl1-f170.google.com with SMTP id g2so2191308plo.3;
+        Sat, 18 Apr 2020 08:44:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=Q7wexkEZkbWG6i25OTrVmMdwbVLNcktqmp4HLW6bwnc=;
-        b=iLDrapmGLe6xzCmvuGG45H/DSay12QGQFAmM4qR7f+MNx7L8OlWzOieDu18jj/Xgq3
-         JUwLK/8fR78GnMsaZK4eu/LyjnpCPxd9nlS71ucRcK04fDSxqvhnLHj7oTAiLym9rJeA
-         m3MmnIXAJbHyPg0dLVxRzOfSwhMcMhg22EkGNW8TpDtWfvg5y9KSZbPYC5JEyu/IEIEx
-         sr68VR+cla5QcbzEwl3atN6F/GR4MRO9HMF/GPYQ52HYkzjE9wL3ctsyBWLQ1uE5lJJm
-         nPK0b1Z3yaQi6y+up6qTmPK+ZBqnWRX9/P8jfSaVvL6xarKXAkl44ur9uXzpD6ZUYjuk
-         8SLA==
-X-Gm-Message-State: AGi0Pua7yampnj+3Cb/jhw6uF7xjpDIoplxrdSgkWBWYlyXORxO/2KZX
-        obdxLr++LDjaVhSRY//smVma5j1IpXY=
-X-Google-Smtp-Source: APiQypID+J08+/Eiu18gV2CtFLUiKfnt34D//nRNbYGSy7mXhPsThcalyjuD1oMjgHoOex/XPs7lFQ==
-X-Received: by 2002:a63:1a1e:: with SMTP id a30mr8093280pga.368.1587224609919;
-        Sat, 18 Apr 2020 08:43:29 -0700 (PDT)
+        bh=ZamkwpxxpgEyM+B+GmITRT2zINDFcwHae2UE6fcwVeI=;
+        b=rkTSEQf3/9Et7DylOQejH/QXTVS2GTIGOjZwi3N4k1mEclPHMlhaIkSRxCP2gBvn+I
+         rNLBAFRXngDHL2Ut5JwBdPbORKKHd304cVek33wFc4osWnsaR6FRcc9+uOoOI67gl9W2
+         lKXJH+8UchwK3YOCB7UG1sjzDEUczKfuRogN7YqbpS6GQZsGUoGWUTwepOyqfPAFHvRs
+         X+y6CZcxG2v531a4o0hYf1nwZ8K/Bo1divJX9UPaRs1cKtxFHl8M2nmpdgtTLYu1+3MZ
+         nw3Dn0Xd1MFNjH4TF85Z/cgwKiXijSrOgUqf41i6nV4BVI5h+WK1dkJBFxi+xwS1DoJn
+         UaqQ==
+X-Gm-Message-State: AGi0PuZQ82ZaPALhuvgoNR+6iVKUpD8JR97NFlyRccnJySPA4xytZYL4
+        FHeHinRPf7ZWbwzHNPy0mencXXC4gmQ=
+X-Google-Smtp-Source: APiQypKc0icC6V3EzeYpE1butC2jWyAXIpBwQjx69RKwKx/FX7Pt8Sse/PbuYkYi6EYq/izo1T7RDA==
+X-Received: by 2002:a17:90a:d985:: with SMTP id d5mr10734662pjv.171.1587224670783;
+        Sat, 18 Apr 2020 08:44:30 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id 128sm11415695pfx.187.2020.04.18.08.43.28
+        by smtp.gmail.com with ESMTPSA id y126sm16526608pgy.91.2020.04.18.08.44.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 08:43:29 -0700 (PDT)
-Subject: Re: [PATCH 6/8] bdi: remove bdi_register_owner
+        Sat, 18 Apr 2020 08:44:30 -0700 (PDT)
+Subject: Re: [PATCH 7/8] bdi: simplify bdi_alloc
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
         gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200416165453.1080463-1-hch@lst.de>
- <20200416165453.1080463-7-hch@lst.de>
+ <20200416165453.1080463-8-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +73,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <350723f7-1d2c-4fba-3942-f98bc2b34b92@acm.org>
-Date:   Sat, 18 Apr 2020 08:43:28 -0700
+Message-ID: <5fa5c23e-174f-657e-f7ce-d2ccbd3e149e@acm.org>
+Date:   Sat, 18 Apr 2020 08:44:28 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200416165453.1080463-7-hch@lst.de>
+In-Reply-To: <20200416165453.1080463-8-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,7 +88,6 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-04-16 09:54, Christoph Hellwig wrote:
-> Split out a new bdi_set_owner helper to set the owner, and move the policy
-> for creating the bdi name back into genhd.c, where it belongs.
+> Merge the _node vs normal version and drop the superflous gfp_t argument.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
