@@ -2,126 +2,164 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04059C2BB1D
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 02:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29253C2BA19
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:09:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA2E722202
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 02:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0610C221F7
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 03:09:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmwxE0Rx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725914AbgDRCnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Apr 2020 22:43:18 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42557 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725320AbgDRCnR (ORCPT
+        id S1725857AbgDRDJm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Apr 2020 23:09:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20107 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725320AbgDRDJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Apr 2020 22:43:17 -0400
-Received: by mail-pl1-f193.google.com with SMTP id v2so1656715plp.9;
-        Fri, 17 Apr 2020 19:43:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=wWEpP3dqHHbqDPbB1BdY9doWI1aHm0wotxbGSBEcjPo=;
-        b=lVy4eAlLRYmaQN2j/FxZCeIP3pbdjuDFGVrn24iPH+L+Imh086VSnvwnMzB6CNcRjy
-         WYgH7bYK0SPuSv+4bC/EjJx4R1K5wRUnINTEeHTrhlxnum+KY+/OJa5p043zYMFDBjI5
-         G5Vh0oLc4O0l8CF7aDin87neahJn8wctWEJMoS/FrvER+zaXjsSg1H+d4puXAyC1Xmkb
-         TzaOmItPuPePo8/xmIO9q60jFb5O6fZ8AzghJwyZ3rRShCmjYBWsN/3McSBuwzXcbKNx
-         g4Md8e6j560zUIjz4OQq5P2mA048YyrSXK2G80KodIBPY+h1qLW31BW76WK13NDhsy9Z
-         63vg==
-X-Gm-Message-State: AGi0PuZ+lhvelMU/F+lq0I0MaLkx5Z5xUU8b/cmhZw4crJ+9M/nUBGgJ
-        PuLEjlxfw4M8HuUx0pYZ6+w=
-X-Google-Smtp-Source: APiQypIRxe1KKh738FTrj5rdo+tAVRK4BqKjO7lWQ+PaJD/yPCQ44ug9hSe8z53G75yqVuPimmu+8Q==
-X-Received: by 2002:a17:902:b186:: with SMTP id s6mr6777103plr.16.1587177796924;
-        Fri, 17 Apr 2020 19:43:16 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:54eb:5dc7:79c2:2fa2? ([2601:647:4000:d7:54eb:5dc7:79c2:2fa2])
-        by smtp.gmail.com with ESMTPSA id 62sm13841436pfu.181.2020.04.17.19.43.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Apr 2020 19:43:15 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: Put driver tag in blk_mq_dispatch_rq_list() when
- no budget
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com
-References: <1587035931-125028-1-git-send-email-john.garry@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <e5416179-2ba0-c9a8-1b86-d52eae29e146@acm.org>
-Date:   Fri, 17 Apr 2020 19:43:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Fri, 17 Apr 2020 23:09:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587179380;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=edPtkMdUynYJbE9ImvLuFgFO9T+6IN61hiCZVEgkLCg=;
+        b=LmwxE0Rx+9DZvAgHF2ey/oDA1kUJeEdR4suXBXnWiVCWcvCIx7SSAdtTtv2gDS9bOrjKSb
+        iDnpjjEP4nGOWIeYZBixBCPpNu6/zpPXa7HtI7klKMdYPRHDZjCY+FwxC02JsSyqQiLARg
+        cee9kmG+hUBXY5yKA2cUq6xIa9tLuag=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-503-p8Fy_bQMNiKxBnKXN8qr1A-1; Fri, 17 Apr 2020 23:09:36 -0400
+X-MC-Unique: p8Fy_bQMNiKxBnKXN8qr1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BB0A13FB;
+        Sat, 18 Apr 2020 03:09:35 +0000 (UTC)
+Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB85960BFB;
+        Sat, 18 Apr 2020 03:09:31 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH V7 0/9] blk-mq: improvement CPU hotplug
+Date:   Sat, 18 Apr 2020 11:09:16 +0800
+Message-Id: <20200418030925.31996-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1587035931-125028-1-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-16 04:18, John Garry wrote:
-> If in blk_mq_dispatch_rq_list() we find no budget, then we break of the
-> dispatch loop, but the request may keep the driver tag, evaulated
-> in 'nxt' in the previous loop iteration.
-> 
-> Fix by putting the driver tag for that request.
-> 
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 8e56884fd2e9..a7785df2c944 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1222,8 +1222,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
->  		rq = list_first_entry(list, struct request, queuelist);
->  
->  		hctx = rq->mq_hctx;
-> -		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
-> +		if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
-> +			blk_mq_put_driver_tag(rq);
->  			break;
-> +		}
->  
->  		if (!blk_mq_get_driver_tag(rq)) {
->  			/*
+Hi,
 
-Is this something that can only happen if q->mq_ops->queue_rq(hctx, &bd)
-returns another value than BLK_STS_OK, BLK_STS_RESOURCE and
-BLK_STS_DEV_RESOURCE? If so, please add a comment in the source code
-that explains this.
+Thomas mentioned:
+    "
+     That was the constraint of managed interrupts from the very beginnin=
+g:
+   =20
+      The driver/subsystem has to quiesce the interrupt line and the asso=
+ciated
+      queue _before_ it gets shutdown in CPU unplug and not fiddle with i=
+t
+      until it's restarted by the core when the CPU is plugged in again.
+    "
 
-Is this perhaps a bug fix for 0bca799b9280 ("blk-mq: order getting
-budget and driver tag")? If so, please mention this and add Cc tags for
-the people who were Cc-ed on that patch.
+But no drivers or blk-mq do that before one hctx becomes inactive(all
+CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
 
-Thanks,
+This patchset tries to address the issue by two stages:
 
-Bart.
+1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
+
+- mark the hctx as internal stopped, and drain all in-flight requests
+if the hctx is going to be dead.
+
+2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes =
+dead
+
+- steal bios from the request, and resubmit them via generic_make_request=
+(),
+then these IO will be mapped to other live hctx for dispatch
+
+Thanks John Garry for running lots of tests on arm64 with this patchset
+and co-working on investigating all kinds of issues.
+
+Please comment & review, thanks!
+
+https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-improve-cpu-hotplug
+
+V7:
+	- fix updating .nr_active in get_driver_tag
+	- add hctx->cpumask check in cpuhp handler
+	- only drain requests which tag is >=3D 0
+	- pass more aggressive cpuhotplug&io test
+
+V6:
+	- simplify getting driver tag, so that we can drain in-flight
+	  requests correctly without using synchronize_rcu()
+	- handle re-submission of flush & passthrough request correctly
+
+V5:
+	- rename BLK_MQ_S_INTERNAL_STOPPED as BLK_MQ_S_INACTIVE
+	- re-factor code for re-submit requests in cpu dead hotplug handler
+	- address requeue corner case
+
+V4:
+	- resubmit IOs in dispatch list in case that this hctx is dead=20
+
+V3:
+	- re-organize patch 2 & 3 a bit for addressing Hannes's comment
+	- fix patch 4 for avoiding potential deadlock, as found by Hannes
+
+V2:
+	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+	  them
+	- address comments from John Garry and Minwoo
+
+
+Ming Lei (9):
+  blk-mq: mark blk_mq_get_driver_tag as static
+  blk-mq: assign rq->tag in blk_mq_get_driver_tag
+  blk-mq: prepare for draining IO when hctx's all CPUs are offline
+  blk-mq: support rq filter callback when iterating rqs
+  blk-mq: stop to handle IO and drain IO before hctx becomes inactive
+  block: add blk_end_flush_machinery
+  blk-mq: re-submit IO in case that hctx is inactive
+  blk-mq: handle requests dispatched from IO scheduler in case of
+    inactive hctx
+  block: deactivate hctx when the hctx is actually inactive
+
+ block/blk-flush.c          | 143 +++++++++++---
+ block/blk-mq-debugfs.c     |   2 +
+ block/blk-mq-tag.c         |  39 ++--
+ block/blk-mq-tag.h         |   4 +
+ block/blk-mq.c             | 384 ++++++++++++++++++++++++++++++-------
+ block/blk-mq.h             |  25 ++-
+ block/blk.h                |   9 +-
+ drivers/block/loop.c       |   2 +-
+ drivers/md/dm-rq.c         |   2 +-
+ include/linux/blk-mq.h     |   6 +
+ include/linux/cpuhotplug.h |   1 +
+ 11 files changed, 495 insertions(+), 122 deletions(-)
+
+Cc: John Garry <john.garry@huawei.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+--=20
+2.25.2
 
