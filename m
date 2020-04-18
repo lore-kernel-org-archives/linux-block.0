@@ -4,51 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAC7C3A5A0
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE86AC3A5A0
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:49:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E78221D7E
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B184521D79
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 14:49:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587220976;
-	bh=3AjzAH6sCRBBQIALkZlA3mWNYY6eXAlOgczOsfvavPY=;
+	s=default; t=1587221375;
+	bh=mPI7dZVIo4iPlgnoF2Ep7DFHWMf+nmIW9xdSfeatkag=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=eaq8zpjJ7WfQKWrVJdi8yqUkZOWYNGb/oFCnZfTb94VufTHIpkdZi6WHTwSdiAJLB
-	 MbPePBjwG7rrXGCQPDQxt0l18MBQXc2q2HIdQkXIRz4qdQeRNKqW7GtaORsz6HEFPv
-	 vXmhVYktk/0jpyw7LoX+sXCcSMR+VahdRfT0IPKc=
+	b=gS5Bu2UMyp7ji/2/1WleuK9pH4MrarQ3ZKO/Uv2k7+Ujk0tBw7HN4FkN6INz2b347
+	 u3YKjvIgDhn0oOtHFpY4WV6EJ8VMUndf1c3Qd3QUNAcVQkECaSUXR5JDmTCtA9VUqd
+	 Oyyz3suvw054m9Dfufp7fEkCNQhc1AXnHf4AFxKs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728433AbgDROmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 10:42:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53362 "EHLO mail.kernel.org"
+        id S1728577AbgDROnZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 10:43:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54430 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728455AbgDROmy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 10:42:54 -0400
+        id S1728570AbgDROnY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:43:24 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD44A22263;
-        Sat, 18 Apr 2020 14:42:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3613222251;
+        Sat, 18 Apr 2020 14:43:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587220973;
-        bh=3AjzAH6sCRBBQIALkZlA3mWNYY6eXAlOgczOsfvavPY=;
+        s=default; t=1587221004;
+        bh=mPI7dZVIo4iPlgnoF2Ep7DFHWMf+nmIW9xdSfeatkag=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OiwNCumnsWeYmVHvTiYfIkcuxyyFiJjw4M2Y2HLsrCXirGrlMFxCe9sh9sAJv15b8
-         KxvEg0gMDLPYUIZ5aND0SYuiSAAdCA1WoQDxFJYJH6oMRa5tzY8o4qc33lof1qB3j6
-         b+bhHxEyRjDrlc2toQeFBj8XX831IKp9YvuL1KyM=
+        b=FmzAfwVYaOjh/O88VylBa2OfXxOz+svFYVgNHxTBrPM+rvi0NchqXvJSDVsn/UB7j
+         DJb+htZ0w6Q2HQ1plcHueaKezxKgglkjeYBJKAr42rASeX7vlqzxu6d+8v6GwaJQQk
+         fbClgMoHJONXF8srSs8cP7t+rb9LHXB9MYwXdQtQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Evan Green <evgreen@chromium.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 20/47] loop: Better discard support for block devices
-Date:   Sat, 18 Apr 2020 10:42:00 -0400
-Message-Id: <20200418144227.9802-20-sashal@kernel.org>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 45/47] virtio-blk: improve virtqueue error to BLK_STS
+Date:   Sat, 18 Apr 2020 10:42:25 -0400
+Message-Id: <20200418144227.9802-45-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418144227.9802-1-sashal@kernel.org>
 References: <20200418144227.9802-1-sashal@kernel.org>
@@ -61,115 +61,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Evan Green <evgreen@chromium.org>
+From: Halil Pasic <pasic@linux.ibm.com>
 
-[ Upstream commit c52abf563049e787c1341cdf15c7dbe1bfbc951b ]
+[ Upstream commit 3d973b2e9a625996ee997c7303cd793b9d197c65 ]
 
-If the backing device for a loop device is itself a block device,
-then mirror the "write zeroes" capabilities of the underlying
-block device into the loop device. Copy this capability into both
-max_write_zeroes_sectors and max_discard_sectors of the loop device.
+Let's change the mapping between virtqueue_add errors to BLK_STS
+statuses, so that -ENOSPC, which indicates virtqueue full is still
+mapped to BLK_STS_DEV_RESOURCE, but -ENOMEM which indicates non-device
+specific resource outage is mapped to BLK_STS_RESOURCE.
 
-The reason for this is that REQ_OP_DISCARD on a loop device translates
-into blkdev_issue_zeroout(), rather than blkdev_issue_discard(). This
-presents a consistent interface for loop devices (that discarded data
-is zeroed), regardless of the backing device type of the loop device.
-There should be no behavior change for loop devices backed by regular
-files.
-
-This change fixes blktest block/003, and removes an extraneous
-error print in block/013 when testing on a loop device backed
-by a block device that does not support discard.
-
-Signed-off-by: Evan Green <evgreen@chromium.org>
-Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-[used updated version of Evan's comment in loop_config_discard()]
-[moved backingq to local scope, removed redundant braces]
-Signed-off-by: Andrzej Pietrasiewicz <andrzej.p@collabora.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Link: https://lore.kernel.org/r/20200213123728.61216-3-pasic@linux.ibm.com
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/loop.c | 42 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 11 deletions(-)
+ drivers/block/virtio_blk.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 9cd231a27328e..c1341c86bcded 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -426,11 +426,12 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * information.
- 	 */
- 	struct file *file = lo->lo_backing_file;
-+	struct request_queue *q = lo->lo_queue;
- 	int ret;
- 
- 	mode |= FALLOC_FL_KEEP_SIZE;
- 
--	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-+	if (!blk_queue_discard(q)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 728c9a9609f0c..9a3c2b14ac378 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -277,9 +277,14 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		if (err == -ENOSPC)
+ 			blk_mq_stop_hw_queue(hctx);
+ 		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+-		if (err == -ENOMEM || err == -ENOSPC)
++		switch (err) {
++		case -ENOSPC:
+ 			return BLK_STS_DEV_RESOURCE;
+-		return BLK_STS_IOERR;
++		case -ENOMEM:
++			return BLK_STS_RESOURCE;
++		default:
++			return BLK_STS_IOERR;
++		}
  	}
-@@ -864,28 +865,47 @@ static void loop_config_discard(struct loop_device *lo)
- 	struct inode *inode = file->f_mapping->host;
- 	struct request_queue *q = lo->lo_queue;
  
-+	/*
-+	 * If the backing device is a block device, mirror its zeroing
-+	 * capability. Set the discard sectors to the block device's zeroing
-+	 * capabilities because loop discards result in blkdev_issue_zeroout(),
-+	 * not blkdev_issue_discard(). This maintains consistent behavior with
-+	 * file-backed loop devices: discarded regions read back as zero.
-+	 */
-+	if (S_ISBLK(inode->i_mode) && !lo->lo_encrypt_key_size) {
-+		struct request_queue *backingq;
-+
-+		backingq = bdev_get_queue(inode->i_bdev);
-+		blk_queue_max_discard_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
-+		blk_queue_max_write_zeroes_sectors(q,
-+			backingq->limits.max_write_zeroes_sectors);
-+
- 	/*
- 	 * We use punch hole to reclaim the free space used by the
- 	 * image a.k.a. discard. However we do not support discard if
- 	 * encryption is enabled, because it may give an attacker
- 	 * useful information.
- 	 */
--	if ((!file->f_op->fallocate) ||
--	    lo->lo_encrypt_key_size) {
-+	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
- 		q->limits.discard_granularity = 0;
- 		q->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(q, 0);
- 		blk_queue_max_write_zeroes_sectors(q, 0);
--		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
--		return;
--	}
- 
--	q->limits.discard_granularity = inode->i_sb->s_blocksize;
--	q->limits.discard_alignment = 0;
-+	} else {
-+		q->limits.discard_granularity = inode->i_sb->s_blocksize;
-+		q->limits.discard_alignment = 0;
- 
--	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
--	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
--	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-+		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-+	}
-+
-+	if (q->limits.max_write_zeroes_sectors)
-+		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
- }
- 
- static void loop_unprepare_queue(struct loop_device *lo)
+ 	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
 -- 
 2.20.1
 
