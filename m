@@ -2,53 +2,53 @@ Return-Path: <SRS0=95tF=6C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B908EC38A29
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB7CC38A29
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9DDFA221F7
-	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 124D821D7E
+	for <linux-block@archiver.kernel.org>; Sat, 18 Apr 2020 15:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725887AbgDRPfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Apr 2020 11:35:45 -0400
-Received: from mail-pl1-f169.google.com ([209.85.214.169]:42276 "EHLO
-        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbgDRPfo (ORCPT
+        id S1726235AbgDRPhL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Apr 2020 11:37:11 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38633 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbgDRPhL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Apr 2020 11:35:44 -0400
-Received: by mail-pl1-f169.google.com with SMTP id v2so2168816plp.9;
-        Sat, 18 Apr 2020 08:35:44 -0700 (PDT)
+        Sat, 18 Apr 2020 11:37:11 -0400
+Received: by mail-pl1-f194.google.com with SMTP id w3so2177705plz.5;
+        Sat, 18 Apr 2020 08:37:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=Psgi+/zrePQOhbWgK7zRQLxFfOZeE3TDZRkvLpnxtPc=;
-        b=ONOa7NptWWhRjwR2mD5E3phOOYvrq5yK+HzrdTSlreVnKyCdKxNMLjFYyNW4QcZhfK
-         sjipXjXVjMg8lVn++8i71kMzTfQ65ngGQjhTWqU/WRLjNaJ+YgiPu4dcxvA1hr2Esu0R
-         1sD1K0FYr2TUKtRCXb4lY7puWttJLwFGxdhyrPhk2uqKpPMqy+pXksFROFwkouuHC00m
-         194vraJx2WylFZSf/1isUxgxV4Y2uFb2/W1M6MOUD8BUee0BHX1a2sG+FKAYF/AkcgHG
-         NQgRt6FWhiH6cnUPADVe+/Uz+3aEzVly172KyJmgv6tzE1tAbqLONSFZu7xqjZjLu0Rp
-         0a4A==
-X-Gm-Message-State: AGi0PubpRX/VynJCA9umps8z6NyZy2DMyQn5+spiRvyyAt5lrC079cFj
-        arBFkK0qPQ4NlH15yDc2HaEJ5Oz37vQ=
-X-Google-Smtp-Source: APiQypKtOCRfcwVK3kxcv5Sh+mJi8Qa9YmrLFrob+FEdCJLFU14HhMbn46LPMbjC19W2hm7zOZJl9w==
-X-Received: by 2002:a17:90a:6fe4:: with SMTP id e91mr11144937pjk.28.1587224143340;
-        Sat, 18 Apr 2020 08:35:43 -0700 (PDT)
+        bh=Esvg9PG1p5KQPCJuV3GUR2ErBMGlnls62TFfUHBtNvo=;
+        b=Kh45vfT8gwT6Qges5YzTXafMpzIPBh/JVSsMAnUuQGJsQlYns+7ZwgpXWHipN97ovb
+         vxkstDEGkVOGiZg7vbcM8TM5rRI/BMnHoMZ4MqA2Gc0vY/sI4gbKkTOX7Y0FX5jBZUin
+         T6RtUoeyIV3boETWkl2PVnZ5049Xvw8O/qhUB0DI+610s+MTDdhxIf7GwcOHOMHi8sPd
+         7jZomvt8CgJDrHsJtijHPE5WP1d9mxyC42VYZ1iuyPqb++ZsE2/BUeWbVXwUWGGgadVF
+         pIHzM0Rb1ObfCTOrmHn/6xzYXgyyXLW5pFFMCrx4BZR+2S9qd0LcMc8f1R+DfW2RheJo
+         vlFQ==
+X-Gm-Message-State: AGi0PuZK17e9ssFEMPcRbP/LpfvVeFnjIg56v8p6BJGoHEvR8dayt5vG
+        m05Ia3sJLpaeItTiWZ+QnARe7YbtZx8=
+X-Google-Smtp-Source: APiQypIHnyogyKmSnT7KlShufOg2DMqshTRCa94w3qkEoKMw1LfuovbxJCllxBwTGe2K9PG44UkuYg==
+X-Received: by 2002:a17:90a:f68d:: with SMTP id cl13mr5653690pjb.107.1587224229694;
+        Sat, 18 Apr 2020 08:37:09 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:551:c132:d476:f445? ([2601:647:4000:d7:551:c132:d476:f445])
-        by smtp.gmail.com with ESMTPSA id a12sm15973752pfr.28.2020.04.18.08.35.42
+        by smtp.gmail.com with ESMTPSA id nl7sm9075791pjb.36.2020.04.18.08.37.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2020 08:35:42 -0700 (PDT)
-Subject: Re: [PATCH 1/8] bdi: move bdi_dev_name out of line
+        Sat, 18 Apr 2020 08:37:08 -0700 (PDT)
+Subject: Re: [PATCH 2/8] bdi: use bdi_dev_name() to get device name
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
         gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200416165453.1080463-1-hch@lst.de>
- <20200416165453.1080463-2-hch@lst.de>
+ <20200416165453.1080463-3-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +73,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <331b41d1-948a-a5c0-b77d-714773ab4174@acm.org>
-Date:   Sat, 18 Apr 2020 08:35:41 -0700
+Message-ID: <32a0ac7a-0f20-c020-2087-3d40f723208b@acm.org>
+Date:   Sat, 18 Apr 2020 08:37:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200416165453.1080463-2-hch@lst.de>
+In-Reply-To: <20200416165453.1080463-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,8 +88,12 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-04-16 09:54, Christoph Hellwig wrote:
-> bdi_dev_name is not a fast path function, move it out of line.  This
-> prepares for using it from modular callers without having to export
-> an implementation detail like bdi_unknown_name.
+> From: Yufen Yu <yuyufen@huawei.com>
+> 
+> Use the common interface bdi_dev_name() to get device name.
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
