@@ -6,149 +6,173 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88895C38A29
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AFFC3A5A0
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:37:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6887320B1F
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE9722075E
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:37:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725947AbgDSWXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 18:23:36 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38484 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725891AbgDSWXg (ORCPT
+        id S1725905AbgDSWhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 18:37:02 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:51636 "EHLO
+        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725848AbgDSWhB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 18:23:36 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y25so4002446pfn.5;
-        Sun, 19 Apr 2020 15:23:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PxxckLMR2d23G7JoN6ozKi6ERyzYCtE5BsAkT8xkLNU=;
-        b=QqQQiz3OpOQReE1Q2jwf/c85i8xCPktW9WOr5FoOxCQyC1qtu+jtotqAtlte4MKmdu
-         pi/kqpGTGsLK2YyLi1agBZMVLa4bJd2NHG/9HeE0yGOwkhE+x4uk0LiVlrKjwsB1Ok66
-         AsxdpEJjL9xdA0naosS9WcekQLTc8sDu2XvGapGMvvarFEbEznvvtzAOrIe0A5U0qKbw
-         hk2d9L5nW02Ggw+jeXhA3VSShIlUI4+ZJIRI+c9OvpVssJp/rSP8TJFa8/f7iOJBKCm2
-         OduyQuSZ3w6BnH8bobw9roQkeD4+M60TsFnIq1LRFagg/jdO9Ilg8z+T5UIebMPIWdez
-         CbCg==
-X-Gm-Message-State: AGi0PuYIdCD6agVH8ZcXeHJDXybdblXpBAOTnaC1aSJcdGd9YshlPbkd
-        nNlMMmOHWyxODnwJ3aYtXIw=
-X-Google-Smtp-Source: APiQypJKXdia+liMhX0/hlemOsS2zbQv5lseIECGPkTjiAMuvfNJzjg5PKXUFzaG+2drmrCSZSz94w==
-X-Received: by 2002:aa7:9484:: with SMTP id z4mr14283395pfk.144.1587335015542;
-        Sun, 19 Apr 2020 15:23:35 -0700 (PDT)
-Received: from [100.124.11.78] ([104.129.199.4])
-        by smtp.gmail.com with ESMTPSA id 135sm26218134pfu.207.2020.04.19.15.23.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Apr 2020 15:23:34 -0700 (PDT)
-Subject: Re: [PATCH v2 04/10] block: revert back to synchronous request_queue
- removal
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
-Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-5-mcgrof@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <749d56bd-1d66-e47b-a356-8d538e9c99b4@acm.org>
-Date:   Sun, 19 Apr 2020 15:23:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Sun, 19 Apr 2020 18:37:01 -0400
+Received: from dread.disaster.area (pa49-180-0-232.pa.nsw.optusnet.com.au [49.180.0.232])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id DCF9E3A354F;
+        Mon, 20 Apr 2020 08:36:47 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1jQIYQ-0006ON-43; Mon, 20 Apr 2020 08:36:46 +1000
+Date:   Mon, 20 Apr 2020 08:36:46 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>, hch@lst.de,
+        darrick.wong@oracle.com, axboe@kernel.dk, tytso@mit.edu,
+        adilger.kernel@dilger.ca, ming.lei@redhat.com, jthumshirn@suse.de,
+        minwoo.im.dev@gmail.com, damien.lemoal@wdc.com,
+        andrea.parri@amarulasolutions.com, hare@suse.com, tj@kernel.org,
+        hannes@cmpxchg.org, khlebnikov@yandex-team.ru, ajay.joshi@wdc.com,
+        bvanassche@acm.org, arnd@arndb.de, houtao1@huawei.com,
+        asml.silence@gmail.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org
+Subject: Re: [PATCH 0/4] block: Add support for REQ_OP_ASSIGN_RANGE
+Message-ID: <20200419223646.GB9765@dread.disaster.area>
+References: <20200329174714.32416-1-chaitanya.kulkarni@wdc.com>
+ <20200402224124.GK10737@dread.disaster.area>
+ <yq1imih4aj0.fsf@oracle.com>
+ <20200403025757.GL10737@dread.disaster.area>
+ <yq1a73t44h1.fsf@oracle.com>
+ <20200407022705.GA24067@dread.disaster.area>
+ <yq1sghe1uu3.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200419194529.4872-5-mcgrof@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1sghe1uu3.fsf@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=W5xGqiek c=1 sm=1 tr=0
+        a=XYjVcjsg+1UI/cdbgX7I7g==:117 a=XYjVcjsg+1UI/cdbgX7I7g==:17
+        a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10 a=7-415B0cAAAA:8
+        a=9_JA7O5G14uhOetSDJ0A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/19/20 12:45 PM, Luis Chamberlain wrote:
-> +/**
-> + * blk_put_queue - decrement the request_queue refcount
-> + *
-> + * @q: the request_queue structure to decrement the refcount for
-> + *
+On Wed, Apr 08, 2020 at 12:10:12AM -0400, Martin K. Petersen wrote:
+> 
+> Hi Dave!
+> 
+> >> In the standards space, the allocation concept was mainly aimed at
+> >> protecting filesystem internals against out-of-space conditions on
+> >> devices that dedup identical blocks and where simply zeroing the blocks
+> >> therefore is ineffective.
+> 
+> > Um, so we're supposed to use space allocation before overwriting
+> > existing metadata in the filesystem?
+> 
+> Not before overwriting, no. Once you have allocated an LBA it remains
+> allocated until you discard it.
 
-How about following the example from 
-Documentation/doc-guide/kernel-doc.rst and not leaving a blank line 
-above the function argument documentation?
+That is not a consistent argument. If the data has been deduped and
+we overwrite, the storage array has to allocate new physical space
+for an overwrite to an existing LBA. i.e. deduped data has multiple
+LBAs pointing to the same physical storage. Any overwrite of an LBA
+that maps to mulitply referenced physical storage requires the
+storage array to allocate new physical space for that overwrite.
 
-> + * Decrements the refcount to the request_queue kobject, when this reaches
-                               ^^
-                               of?
-> + * 0 we'll have blk_release_queue() called. You should avoid calling
-> + * this function in atomic context but if you really have to ensure you
-> + * first refcount the block device with bdgrab() / bdput() so that the
-> + * last decrement happens in blk_cleanup_queue().
-> + */
+i.e. allocation is not determined by whether the LBA has been
+written to, "pinned" or not - it's whether the act of writing to
+that LBA requires the storage to allocate new space to allow the
+write to proceed.
 
-Is calling bdgrab() and bdput() an option from a context in which it is 
-not guaranteed that the block device is open?
+That's my point here - one particular shared data overwrite case is
+being special cased by preallocation (avoiding dedupe of zero filled
+data) to prevent ENOSPC, ignoring all the other cases where we
+overwrite shared non-zero data and will also require new physical
+space for the new data. In all those cases, the storage has to take
+the same action - allocation on overwrite - and so all of them are
+susceptible to ENOSPC.
 
-Does every context that calls blk_put_queue() also call blk_cleanup_queue()?
+> > So that the underlying storage can reserve space for it before we
+> > write it? Which would mean we have to issue a space allocation before
+> > we dirty the metadata, which means before we dirty any metadata in a
+> > transaction. Which means we'll basically have to redesign the
+> > filesystems from the ground up, yes?
+> 
+> My understanding is that this facility was aimed at filesystems that do
+> not dynamically allocate metadata. The intent was that mkfs would
+> preallocate the metadata LBA ranges, not the filesystem. For filesystems
+> that allocate metadata dynamically, then yes, an additional step is
+> required if you want to pin the LBAs.
 
-How about avoiding confusion by changing the last sentence of that 
-comment into something like the following: "The last reference must not 
-be dropped from atomic context. If it is necessary to call 
-blk_put_queue() from atomic context, make sure that that call does not 
-decrease the request queue refcount to zero."
+Ok, so you are confirming what I thought: it's almost completely
+useless to us.
 
->   /**
->    * blk_cleanup_queue - shutdown a request queue
-> + *
->    * @q: request queue to shutdown
->    *
+i.e. this requires issuing IO to "reserve" space whilst preserving
+data before every metadata object goes from clean to dirty in
+memory.  But the problem with that is we don't know how much
+metadata we are going to dirty in any specific operation. Worse is
+that we don't know exactly *what* metadata we will modify until we
+walk structures and do lookups, which often happen after we've
+dirtied other structures. An ENOSPC from a space reservation at that
+point is fatal to the filesystem anyway, so there's no point in even
+trying to do this.  Like I said, functionality like this cannot be
+retrofitted to existing filesysetms.
 
-How about following the example from 
-Documentation/doc-guide/kernel-doc.rst and not leaving a blank line 
-above the function argument documentation?
+IOWs, this is pretty much useless functionality for the filesystem
+layer, and if the only use is for some mythical filesystem with
+completely static metadata then the standards space really jumped
+the shark on this one....
 
->    * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
->    * put it.  All future requests will be failed immediately with -ENODEV.
-> + *
-> + * You should not call this function in atomic context. If you need to
-> + * refcount a request_queue in atomic context, instead refcount the
-> + * block device with bdgrab() / bdput().
+> > You might be talking about filesystem metadata and block devices,
+> > but this patchset ends up connecting ext4's user data fallocate() to
+> > the block device, thereby allowing users to reserve space directly
+> > in the underlying block device and directly exposing this issue to
+> > userspace.
+> 
+> I missed that Chaitanya's repost of this series included the ext4 patch.
+> Sorry!
+> 
+> >> How XFS decides to enforce space allocation policy and potentially
+> >> leverage this plumbing is entirely up to you.
+> >
+> > Do I understand this correctly? i.e. that it is the filesystem's
+> > responsibility to prevent users from preallocating more space than
+> > exists in an underlying storage pool that has been intentionally
+> > hidden from the filesystem so it can be underprovisioned?
+> 
+> No. But as an administrative policy it is useful to prevent runaway
+> applications from writing a petabyte of random garbage to media. My
+> point was that it is up to you and the other filesystem developers to
+> decide how you want to leverage the low-level allocation capability and
+> how you want to provide it to processes. And whether CAP_SYS_ADMIN,
+> ulimit, or something else is the appropriate policy interface for this.
 
-Surrounding blk_cleanup_queue() with bdgrab() / bdput() does not help. 
-This blk_cleanup_queue() must not be called from atomic context.
+My cynical translation: the storage standards space haven't given
+any thought to how it can be used and/or administered in the real
+world. Pass the buck - let the filesystem people work that out.
 
->   /**
-> - * __blk_release_queue - release a request queue
-> - * @work: pointer to the release_work member of the request queue to be released
-> + * blk_release_queue - release a request queue
-> + *
-> + * This function is called as part of the process when a block device is being
-> + * unregistered. Releasing a request queue starts with blk_cleanup_queue(),
-> + * which set the appropriate flags and then calls blk_put_queue() as the last
-> + * step. blk_put_queue() decrements the reference counter of the request queue
-> + * and once the reference counter reaches zero, this function is called to
-> + * release all allocated resources of the request queue.
->    *
-> - * Description:
-> - *     This function is called when a block device is being unregistered. The
-> - *     process of releasing a request queue starts with blk_cleanup_queue, which
-> - *     set the appropriate flags and then calls blk_put_queue, that decrements
-> - *     the reference counter of the request queue. Once the reference counter
-> - *     of the request queue reaches zero, blk_release_queue is called to release
-> - *     all allocated resources of the request queue.
-> + * This function can sleep, and so we must ensure that the very last
-> + * blk_put_queue() is never called from atomic context.
-> + *
-> + * @kobj: pointer to a kobject, who's container is a request_queue
->    */
+What I'm hearing is that this wasn't designed for typical filesystem
+use, it wasn't designed for typical user application use, and how to
+prevent abuse wasn't thought about at all.
 
-Please follow the style used elsewhere in the kernel and move function 
-argument documentation just below the line with the function name.
+That sounds like a big fat NACK to me....
 
-Thanks,
+> In terms of thin provisioning and space management there are various
+> thresholds that may be reported by the device. In past discussions there
+> haven't been much interest in getting these exposed. It is also unclear
+> to me whether it is actually beneficial to send low space warnings to
+> hundreds or thousands of hosts attached to an array. In many cases the
+> individual server admins are not even the right audience. The most
+> common notification mechanism is a message to the storage array admin
+> saying "click here to buy more disk".
 
-Bart.
+Notifications are not relevant to preallocation functionality at all.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
