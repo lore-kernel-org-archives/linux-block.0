@@ -6,60 +6,62 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 161F3C54F70
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABC3C38A29
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:55:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E70C521973
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:11:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56D8A20735
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:55:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgDSVLh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 17:11:37 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42021 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725891AbgDSVLg (ORCPT
+        id S1726055AbgDSVzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 17:55:47 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42208 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725848AbgDSVzr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 17:11:36 -0400
-Received: by mail-pg1-f194.google.com with SMTP id g6so4015273pgs.9;
-        Sun, 19 Apr 2020 14:11:35 -0700 (PDT)
+        Sun, 19 Apr 2020 17:55:47 -0400
+Received: by mail-pf1-f193.google.com with SMTP id r20so3970153pfh.9;
+        Sun, 19 Apr 2020 14:55:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=C7h+slJzaOOCm5ilaZtNlrSSL1NQaxEFbMPqFtrHmfA=;
-        b=GADc50Iyy6PcJBKLxMg5AaZM8KQaV3SnvWfNRh/m2hOtuT5FZP+22DtlsQaHtb2+db
-         nV8iDSeVfolwfgDEimHDLH3gVl9kU6sytkBj/HgZvZA5WajD4a8AFmIj1kXmTRSE1Y7k
-         lRaz6h2nmsxxcv4GUDjTRTgFQn9QObdCyCPXED8J7Hlh5zEBsfQFbfCs1HwzHKFAIOpz
-         +fQ9pyqcpjIPFWqRp+0meNCqACL96Zj6pWZi8WshfBpQGC1Gh00857KFkloZqgfX1iVi
-         epG3ne6avFvtx1ub10QkvsHasgFHUNL/8ZFXK10088eSn5TCsolHs0zXk91mgIk7r833
-         wIMw==
-X-Gm-Message-State: AGi0PuagOAi3ed6JXsJ0Y7yMNxNCdUMGOtzzNzF+evdqfrUHcvm98EaL
-        rWciWy+eJL22PQsuWyagS2tisJwZX+w=
-X-Google-Smtp-Source: APiQypJxk2QSVrkL9cmFour823yUEb2xji+EHimzyAE7WsAoDYVROUkbqxgYFFzOeCB1v34V42DQdg==
-X-Received: by 2002:aa7:9a52:: with SMTP id x18mr13547868pfj.139.1587330694432;
-        Sun, 19 Apr 2020 14:11:34 -0700 (PDT)
-Received: from [100.124.11.78] ([104.129.198.66])
-        by smtp.gmail.com with ESMTPSA id k63sm11871301pjb.6.2020.04.19.14.11.32
+        bh=Br4qVD6vNcOTeGAPUTvXdaMBJRDE1FMGq+EEBulVyKA=;
+        b=HvvLL0OcZZ1bO0VhqygCu2a/3agaSD8bIGaoA5TyCemvfAvwMCUOWEpKw0GwvpHoVF
+         wVqxvbHAOA1o1YUJiBWHctCaanntEF8zi7PP9ohtah8I4MTGZZ/jRoW5QFl5AbdncZmo
+         IYK/LA6ZWY7pV5Zw1rv69RopcPv3dTNobpM2Vw88Jqhs1GV/zLsJ5g3hkFXDGUL6JulW
+         GvZ7YUO95/kD0GhEtORikQBld6wbQL69dcX+xFLczky0RVdz/QeR7bcd0FpYSzyCMo3u
+         1SPUbHMo/Av9FJofP0O/dLZxPgbhHBTHBc3I0SeRytLeb3fOmTDZyQHuaQVH2zAXmRRx
+         3dHQ==
+X-Gm-Message-State: AGi0PuYibJc/+rGrYfXM8hKy+Ycu24G/ZOEFfXmFm66lb4Zh2dl/3yit
+        qFOgBrx6NHB+tHalI4WuceU=
+X-Google-Smtp-Source: APiQypILUJeV066/FeccQlF/yOmA6aYxTTF0zi1MK6KK770wqgS/jEy9+PKiMhVDohfqUAoAFP9Tjw==
+X-Received: by 2002:aa7:8429:: with SMTP id q9mr13601282pfn.205.1587333345858;
+        Sun, 19 Apr 2020 14:55:45 -0700 (PDT)
+Received: from [100.124.11.78] ([104.129.198.64])
+        by smtp.gmail.com with ESMTPSA id 80sm24479420pgb.45.2020.04.19.14.55.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Apr 2020 14:11:33 -0700 (PDT)
-Subject: Re: [PATCH v2 02/10] blktrace: move blktrace debugfs creation to
- helper function
+        Sun, 19 Apr 2020 14:55:44 -0700 (PDT)
+Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
 To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
         viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
         rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
         ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
 Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
 References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-3-mcgrof@kernel.org>
+ <20200419194529.4872-4-mcgrof@kernel.org>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <beadd64b-cdad-bd6d-ebe1-43b5969c3cf3@acm.org>
-Date:   Sun, 19 Apr 2020 14:11:31 -0700
+Message-ID: <91c82e6a-24ce-0b7d-e6e4-e8aa89f3fb79@acm.org>
+Date:   Sun, 19 Apr 2020 14:55:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200419194529.4872-3-mcgrof@kernel.org>
+In-Reply-To: <20200419194529.4872-4-mcgrof@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,9 +71,68 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/19/20 12:45 PM, Luis Chamberlain wrote:
-> Move the work to create the debugfs directory used into a helper.
-> It will make further checks easier to read. This commit introduces
-> no functional changes.
+> +int __must_check blk_queue_debugfs_register(struct request_queue *q)
+> +{
+> +	struct dentry *dir = NULL;
+> +
+> +	/* This can happen if we have a bug in the lower layers */
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+What does "this" refer to? Which layers does "lower layers" refer to? 
+Most software developers consider a module that calls directly into 
+another module as a higher layer (callbacks through function pointers do 
+not count; see also https://en.wikipedia.org/wiki/Modular_programming). 
+According to that definition block drivers are a software layer 
+immediately above the block layer core.
 
+How about changing that comment into the following to make it 
+unambiguous (if this is what you meant)?
+
+	/*
+	 * Check whether the debugfs directory already exists. This can
+	 * only happen as the result of a bug in a block driver.
+	 */
+
+> +	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
+> +	if (dir) {
+> +		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
+> +			kobject_name(q->kobj.parent));
+> +		dput(dir);
+> +		return -EALREADY;
+> +	}
+> +
+> +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> +					    blk_debugfs_root);
+> +	if (!q->debugfs_dir)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+
+kobject_name(q->kobj.parent) is used three times in the above function. 
+How about introducing a local variable that holds the result of that 
+expression?
+
+> +static bool blk_trace_target_disk(const char *target, const char *diskname)
+> +{
+> +	if (strlen(target) != strlen(diskname))
+> +		return false;
+> +
+> +	if (!strncmp(target, diskname,
+> +		     min_t(size_t, strlen(target), strlen(diskname))))
+> +		return true;
+> +
+> +	return false;
+> +}
+
+The above code looks weird to me. When the second if-statement is 
+reached, it is guaranteed that 'target' and 'diskname' have the same 
+length. So why to calculate the minimum length in the second 
+if-statement of two strings that have the same length?
+
+Independent of what the purpose of the above code is, can that code be 
+rewritten such that it does not depend on the details of how names are 
+assigned to disks and partitions? Would disk_get_part() be useful here?
+
+Thanks,
+
+Bart.
