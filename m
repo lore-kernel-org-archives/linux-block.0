@@ -2,55 +2,55 @@ Return-Path: <SRS0=58UM=6D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB18C3A5A9
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A18C38A30
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:48:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA93A2145D
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:46:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4B8621744
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587325593;
-	bh=4ONcGkkyKJlTlK+skbEzye/8BidjVXjSzA7CQngLmDA=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=iRjjxHzBb0+qvbI55h9e4lz03dO+A2MCCwLuFTPVhLgMUvX3inBikOG3hDOanUMcx
-	 WfO/gJGIV+qEWqXTYkykxIbp4+r+GLWhrYbfgfW9exnEl268JHMHuL9URUQqIp2atQ
-	 yVAYVOdUQa7a3D5/tTJoAxLi2ZTIO58TVAGCt7dM=
+	s=default; t=1587325684;
+	bh=KJT1cJALkjH8IPN8SBj5aVqN0kfQwNBytF/bn6zKVfI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=niunkDToa740GIa/ZuvOiZOU8iDNLJ5KcJfNV9rlqo3rl44tG0T9C+1zMxAQ8SUev
+	 ws/go+0toWq5NSz5jPypDIYrI2PTKhcBNUKDNFJPx3/qv9kHE8mrooJp5Swm61QXvo
+	 wwI4/NQ//QWd30SrXdGOtxJIagtQ3cSchc38HZh4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726606AbgDSTpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 15:45:43 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:33992 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726472AbgDSTpn (ORCPT
+        id S1726287AbgDSTsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 15:48:03 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:38492 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725932AbgDSTsD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 15:45:43 -0400
-Received: by mail-pj1-f68.google.com with SMTP id q16so3964008pje.1;
-        Sun, 19 Apr 2020 12:45:40 -0700 (PDT)
+        Sun, 19 Apr 2020 15:48:03 -0400
+Received: by mail-pl1-f193.google.com with SMTP id w3so3132142plz.5;
+        Sun, 19 Apr 2020 12:48:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4nBDa0rXFg9iHiCCMSKdC08ZVJ5XJ1HD+NLLqlL75QE=;
-        b=VZ9lJynRjwhVOzBhr/090oEVTfHvBAjUakYCvEmwHJNI/Eic4xKL00g28UQ/7kkRGT
-         vSKpJ2BlInjVsGPkIGUoymgEaddOpUnrLPzaCRbBA0EZRuMcdk1zyY/7V7jiLDu+1AXT
-         PDvPeqAHkJyb6eIz7AR3sIl5nKn2V85iAinrAN05a0sZJLwJY5Iqyhkg6hTwNdJforI2
-         fEqVBufo1r9eRyW89gwT4kqhcufSAT46AUdxe6hl5v283WFCwmBDcqzyqP/QkYxn+ktY
-         v5jkI8M6k1qTkmxWaFdqsaAYa0FEXpgxDr5B4cEVBetLgdRUrbEj/WwxyJRCj0NlEYEO
-         KzbQ==
-X-Gm-Message-State: AGi0PuZ5Mu0ALFPcNosNOwHirjQmN/IZ3VkFSHqESlnzBzWGDBB1hyNu
-        YRq9zjL9z+75NjQm+eCSE/o=
-X-Google-Smtp-Source: APiQypJayFgKefqgg6H/JR67sswmZGgea+8/ivT+/Vf5pPT068xt+HAMYcOsqSUtrFH/BBGo5pJ52w==
-X-Received: by 2002:a17:90a:9202:: with SMTP id m2mr8028414pjo.109.1587325540421;
-        Sun, 19 Apr 2020 12:45:40 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=XVDLAqmmcNsGZA6DvUaFp5wX8Hdu6VgQb85DAfNU9EE=;
+        b=lOCiewXaWuIhT+rg/o8v4JApXcvRnpksTRE3Kw0vfKHLXwuVhzBcNzR0kqbhOw+Vng
+         m14i67jOVvuRQr8Qn6Ms3K5d3wlRRAy4nhpO4k5asso7oy2GebtvyAW09GOuzYkr6n0u
+         4pU48d6aomWuZRpuoQrLQWeHAvTX5zkNDMKFAO2N7TCTsebzfJY8EA7Ft5SEz2kag3vU
+         BoVprPad7P7/XohUYkrjCARlfVkQIsqwuNR6M79D8dRXw6WeI0Lo0VpncHQCn1nSUUPk
+         vAFN1KuY+1BBElsrFSfEtyYUFphI1g5kN9Z1e3YhwP1gT31Fpf/I5dJue7No/vDXfR3b
+         ocPQ==
+X-Gm-Message-State: AGi0PubDEqkzp2mGj+eA4IrYARxi670rslD65IhlNBmHg0WAIP+BToF9
+        38L40J7qAG95ZxGTVw7OZWQ=
+X-Google-Smtp-Source: APiQypL/oNNU12e6hvfturuFLEKJm2Tcw6XS1ihtc1V9GAkRooHVTN400PWDSxk8Iks2Ql8Gg519ag==
+X-Received: by 2002:a17:90a:bf8c:: with SMTP id d12mr17598558pjs.11.1587325682585;
+        Sun, 19 Apr 2020 12:48:02 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id i8sm22879992pgr.82.2020.04.19.12.45.39
+        by smtp.gmail.com with ESMTPSA id z190sm23620136pgz.73.2020.04.19.12.48.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Apr 2020 12:45:39 -0700 (PDT)
+        Sun, 19 Apr 2020 12:48:01 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 7E737403EA; Sun, 19 Apr 2020 19:45:38 +0000 (UTC)
+        id F000E403EA; Sun, 19 Apr 2020 19:48:00 +0000 (UTC)
+Date:   Sun, 19 Apr 2020 19:48:00 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -58,120 +58,23 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         akpm@linux-foundation.org
 Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 00/10] block: fix blktrace debugfs use after free
-Date:   Sun, 19 Apr 2020 19:45:19 +0000
-Message-Id: <20200419194529.4872-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.23.0.rc1
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/10] block: fix blktrace debugfs use after free
+Message-ID: <20200419194800.GF11244@42.do-not-panic.com>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200419194529.4872-1-mcgrof@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Upstream kernel.org korg#205713 [0] states that there is a UAF in the
-core debugfs debugfs_remove() function, and has gone through pushing for
-a CVE for this, CVE-2019-19770 [1].
+I forgot to mention that I've dropped Reviewed-by tags to patches
+I have changed considerably like patch 3/10 which actually fixes
+the race. So if you had provided a review before, a new review
+would be appreciated.
 
-This patch series disputes that CVE, and shows how the issue was just
-a complex misuse of debugfs within blktrace and fixes it.
-
-On this v2 I've dropped two patches from my last series which are not
-needed to ensure we can move back to a synchronous request_queue
-removal. I've also addressed Ming's feedback on ensuring we keep
-functionality working for when paritions are used for a blktrace.  That
-effort lead me to ensuring we don't try to overwrite the request_queue
-debugfs_dir, and add sanity checks in place so that what we give back
-only what is expected.
-
-Although my v1 patches also had fixed the kernel splat we get when we
-try to reproduce the issue:
-
-debugfs: Directory 'loop0' with parent 'block' already present!
-
-This v2 series now provides a clear explanation for *why* this was
-ultimately one of the reasons why we ended up with a crash.
-
-The commit log for the actual fix, patch 3/10, "blktrace: fix debugfs
-use after free" has also been extended to provide a better explanation
-as to *how* overwriting the debugfs_dir leads to an eventual panic with
-blktrace. I hope that helps, as it seems the root cause was still not
-well explained in the commit log.
-
-To make review easier, I've also added some helper functions with no
-functional changes at first, and only extended them later.
-
-Also changed is blk_queue_debugfs_register() to return an int, we do
-this to not make the fact that we don't check for errors on
-register_disk() or add_disk() any worse.
-
-After the patch 3/10 "blktrace: fix debugfs use after free", is applied,
-with the pr_warns(), and prior to reverting back to synchronous request_queue
-removal, if we try to reproduce the issue with break-blktrace [2]'s
-./run_0001.sh script, we'd see::
-
-blk_debugfs: loop0 : registering request_queue debugfs directory twice is not allowed
-blktrace: loop0: request_queue parent is gone
-
-And sometimes only:
-
-blk_debugfs: loop0 : registering request_queue debugfs directory twice is not allowed
-
-After we revert back to synchronous request_queue removal this should no
-longer be possible, and if it is, we want to hear about it. To help with
-this two patches are added which change pr_warn() to BUG_ON()s after we flip
-back to synchronous request_queue removal.
-
-Note that on patch 6/10 "blk-debugfs: upgrade warns to BUG_ON() if
-directory" I explain the syfs layout between a gendisk and the
-request_queue. By reverting back to synchronous request_queue removal,
-if someone manages to figure out a way to create a clash with
-registering block devices, we expect to see a sysfs clash now instead of
-a clash with debugfs, as the debugfs directory is removed now always
-first, prior to clearing out the sysfs dir. *If* there are races
-possible in these areas, we want to hear about them, and the BUG_ON()s
-should make it clearer *where* the real issue is coming from.
-
-Having an asynchronous request_queue removal has exposed other bugs
-lingering around, however most importantly I think its revealing more
-the value of adding error handling for __device_add_disk() and friends.
-If its encouraged I could take a stab at finally addressing that for
-good.
-
-You can find this code on my git tree, on the 20200417-blktrace-fixes
-branch, which is based on linux-next tag next-20200417 [3].
-
-[0] https://bugzilla.kernel.org/show_bug.cgi?id=205713                          
-[1] https://nvd.nist.gov/vuln/detail/CVE-2019-19770 
-[2] https://github.com/mcgrof/break-blktrace
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200417-blktrace-fixes
-
-Luis Chamberlain (10):
-  block: move main block debugfs initialization to its own file
-  blktrace: move blktrace debugfs creation to helper function
-  blktrace: fix debugfs use after free
-  block: revert back to synchronous request_queue removal
-  blktrace: upgrade warns to BUG_ON() on unexpected circmunstances
-  blk-debugfs: upgrade warns to BUG_ON() if directory is already found
-  blktrace: move debugfs file creation to its own function
-  blktrace: add checks for created debugfs files on setup
-  block: panic if block debugfs dir is not created
-  block: put_device() if device_add() fails
-
- block/Makefile               |   1 +
- block/blk-core.c             |  28 +++++---
- block/blk-debugfs.c          |  39 ++++++++++++
- block/blk-mq-debugfs.c       |   5 --
- block/blk-sysfs.c            |  47 ++++++++------
- block/blk.h                  |  18 ++++++
- block/genhd.c                |   4 +-
- include/linux/blkdev.h       |   7 +-
- include/linux/blktrace_api.h |   1 +
- kernel/trace/blktrace.c      | 120 +++++++++++++++++++++++++++++++----
- 10 files changed, 218 insertions(+), 52 deletions(-)
- create mode 100644 block/blk-debugfs.c
-
--- 
-2.25.1
-
+  Luis
