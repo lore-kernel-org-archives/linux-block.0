@@ -2,94 +2,85 @@ Return-Path: <SRS0=58UM=6D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82332C38A29
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 23:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206FFC3A5A0
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 23:08:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54938212CC
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 23:07:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587337654;
-	bh=cTFXH+nC+zRZbE8EhghzJMgogTvzjTYaBvxKVlP+iYE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=TsevZzcSwdqgUf4OqFVGth87SCulB+zCn7eNDblOf24HY+00tIhd14clMJ059zy5Q
-	 6SHDO23ROv1QNiavUVOkxsvnsPIQMdIwrug+/LTWq1ye2vLMDbNxJFbcLfKDAJ6drr
-	 ZDm4ImfTzVR9i2893jNsQtpJ7CKrvfmLZbQz5NYI=
+	by mail.kernel.org (Postfix) with ESMTP id EC85D21974
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 23:08:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725947AbgDSXHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 19:07:33 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45654 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725834AbgDSXHd (ORCPT
+        id S1725834AbgDSXIa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 19:08:30 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:40288 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725891AbgDSXIa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 19:07:33 -0400
-Received: by mail-pl1-f193.google.com with SMTP id t4so3224648plq.12;
-        Sun, 19 Apr 2020 16:07:32 -0700 (PDT)
+        Sun, 19 Apr 2020 19:08:30 -0400
+Received: by mail-pj1-f67.google.com with SMTP id a22so3598101pjk.5;
+        Sun, 19 Apr 2020 16:08:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tFxZ+ZZUaggPPpHpQbCDub6ZVjuhRM1u2yrwFwGS11s=;
-        b=UFms+5ZF+WhFcPrgQOCp7bJUaR5PXOf0DAgPnUd7eexKBdOIkfjIsAf6iXcOc2Fy7Q
-         hsaB6VXb2chUqLideX3AQckD61j3+Y52EqXXPBDpmTqSrNHAMrPOw66Ml5RRQRoKMdG/
-         RNqGzjyAuvTxgLkzfh0Xl48TH3OUV9nuOYFFQUiAtzi/YpAd7eJSs+0elXvHGLtAKWIu
-         5TMUpIjIh38QJEn66AWWOwGharSN/q8QUisYgda73tvTf0cSOeYli28ZY5hFP++RirOR
-         kWp0bVIZ3oOHsWj8Qj+19lS2lcjS1Us28bhxGs9mkkoFXe8KQFwEB3fhFfK+FvyPxNuS
-         5bNQ==
-X-Gm-Message-State: AGi0Pub5i5r9G1vNM0slMbVL8KsKxEKIVLhPFyFTKUXHCfFpodWMTgdz
-        Z55qS8HbL6iY2DVkb7+viOc=
-X-Google-Smtp-Source: APiQypLXezuyQozND6kDt0/xmPqZ/Bzs10NpjYea6DC9fcMtQhW2OQWoIzjRAUFX8lFILoXU2v/o1Q==
-X-Received: by 2002:a17:90a:a113:: with SMTP id s19mr18785003pjp.161.1587337652483;
-        Sun, 19 Apr 2020 16:07:32 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id a18sm12089121pjh.25.2020.04.19.16.07.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Apr 2020 16:07:31 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id CBDD3403EA; Sun, 19 Apr 2020 23:07:30 +0000 (UTC)
-Date:   Sun, 19 Apr 2020 23:07:30 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] blktrace: upgrade warns to BUG_ON() on
- unexpected circmunstances
-Message-ID: <20200419230730.GH11244@42.do-not-panic.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bRxhA0JDlymvbxLQC4SO4UF/oBfb68GM9K/X50RbA9I=;
+        b=a5+RgLNK3bdSXwen8lXty6rYjFPrnprqDgEnb9O4agwR7uwEMpz0fYUyf8TfdZfAt1
+         t+FeC0DOfunPXHDBbZ41YiRVIjWypzeBu2ZGgQrmu31BpmmQnbOFx+c2s9MARmX+FMt1
+         OoQotOzSohSwAiXdvaN+tMcshAVEBsyP0JFkkSeoanxRcMluCesQviEQzG1jkG1ZG3ZH
+         edDNy+7hAgxS/7NdeXRLoNrnED+hpS1Qu0vLZQH/leZoBNRg1trPxLEkiNzdg6H+tW6z
+         84NvbFGz4a84NyeRNdEBO7uW3mfxxKL0Pru4rmdcJFoTOsi4UsSA2NUtBUod9BIBMhff
+         8ozg==
+X-Gm-Message-State: AGi0PuYXBoVrRjPSU9qXfByhWVofIm1g2CRfjitH12/JpVhO7XnlrYUq
+        mA66GNX1l9zZ+rs7akezcxBgZJgukPo=
+X-Google-Smtp-Source: APiQypJ54vcVp1Xjf2NI19ielKB4SrpJ7y9ED790pSYxLzCyQKmTRUWLzMV3huGmnbqkdg34nUOdEw==
+X-Received: by 2002:a17:902:6acc:: with SMTP id i12mr13979270plt.61.1587337708936;
+        Sun, 19 Apr 2020 16:08:28 -0700 (PDT)
+Received: from [100.124.11.78] ([104.129.199.4])
+        by smtp.gmail.com with ESMTPSA id w125sm8133840pgw.22.2020.04.19.16.08.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Apr 2020 16:08:27 -0700 (PDT)
+Subject: Re: [PATCH v2 09/10] block: panic if block debugfs dir is not created
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
 References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-6-mcgrof@kernel.org>
- <54b63fd9-0c73-5fdc-b43d-6ab4aec3a00d@acm.org>
+ <20200419194529.4872-10-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <01cd1694-7d13-67c1-827d-301dafd7a35b@acm.org>
+Date:   Sun, 19 Apr 2020 16:08:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54b63fd9-0c73-5fdc-b43d-6ab4aec3a00d@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200419194529.4872-10-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 03:50:13PM -0700, Bart Van Assche wrote:
-> On 4/19/20 12:45 PM, Luis Chamberlain wrote:
-> > @@ -498,10 +498,7 @@ static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
-> >   	struct dentry *dir = NULL;
-> >   	/* This can only happen if we have a bug on our lower layers */
-> > -	if (!q->kobj.parent) {
-> > -		pr_warn("%s: request_queue parent is gone\n", buts->name);
-> > -		return NULL;
-> > -	}
-> > +	BUG_ON(!q->kobj.parent);
-> 
-> Does the following quote from Linus also apply to this patch: "there is NO
-> F*CKING EXCUSE to knowingly kill the kernel." See also
-> https://lkml.org/lkml/2016/10/4/1.
+On 4/19/20 12:45 PM, Luis Chamberlain wrote:
+> --- a/block/blk-debugfs.c
+> +++ b/block/blk-debugfs.c
+> @@ -15,6 +15,8 @@ struct dentry *blk_debugfs_root;
+>   void blk_debugfs_register(void)
+>   {
+>   	blk_debugfs_root = debugfs_create_dir("block", NULL);
+> +	if (!blk_debugfs_root)
+> +		panic("Failed to create block debugfs directory\n");
+>   }
 
-We can use WARN_ON() and keep the return NULL, sure.
+Does Linus' "don't kill the kernel" rant apply to this patch?
 
-  Luis
+Thanks,
+
+Bart.
+
