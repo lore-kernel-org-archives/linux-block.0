@@ -6,43 +6,44 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABC3C38A29
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88895C38A29
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:23:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56D8A20735
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 21:55:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6887320B1F
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 22:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbgDSVzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 17:55:47 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42208 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbgDSVzr (ORCPT
+        id S1725947AbgDSWXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 18:23:36 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:38484 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725891AbgDSWXg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 17:55:47 -0400
-Received: by mail-pf1-f193.google.com with SMTP id r20so3970153pfh.9;
-        Sun, 19 Apr 2020 14:55:46 -0700 (PDT)
+        Sun, 19 Apr 2020 18:23:36 -0400
+Received: by mail-pf1-f195.google.com with SMTP id y25so4002446pfn.5;
+        Sun, 19 Apr 2020 15:23:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Br4qVD6vNcOTeGAPUTvXdaMBJRDE1FMGq+EEBulVyKA=;
-        b=HvvLL0OcZZ1bO0VhqygCu2a/3agaSD8bIGaoA5TyCemvfAvwMCUOWEpKw0GwvpHoVF
-         wVqxvbHAOA1o1YUJiBWHctCaanntEF8zi7PP9ohtah8I4MTGZZ/jRoW5QFl5AbdncZmo
-         IYK/LA6ZWY7pV5Zw1rv69RopcPv3dTNobpM2Vw88Jqhs1GV/zLsJ5g3hkFXDGUL6JulW
-         GvZ7YUO95/kD0GhEtORikQBld6wbQL69dcX+xFLczky0RVdz/QeR7bcd0FpYSzyCMo3u
-         1SPUbHMo/Av9FJofP0O/dLZxPgbhHBTHBc3I0SeRytLeb3fOmTDZyQHuaQVH2zAXmRRx
-         3dHQ==
-X-Gm-Message-State: AGi0PuYibJc/+rGrYfXM8hKy+Ycu24G/ZOEFfXmFm66lb4Zh2dl/3yit
-        qFOgBrx6NHB+tHalI4WuceU=
-X-Google-Smtp-Source: APiQypILUJeV066/FeccQlF/yOmA6aYxTTF0zi1MK6KK770wqgS/jEy9+PKiMhVDohfqUAoAFP9Tjw==
-X-Received: by 2002:aa7:8429:: with SMTP id q9mr13601282pfn.205.1587333345858;
-        Sun, 19 Apr 2020 14:55:45 -0700 (PDT)
-Received: from [100.124.11.78] ([104.129.198.64])
-        by smtp.gmail.com with ESMTPSA id 80sm24479420pgb.45.2020.04.19.14.55.43
+        bh=PxxckLMR2d23G7JoN6ozKi6ERyzYCtE5BsAkT8xkLNU=;
+        b=QqQQiz3OpOQReE1Q2jwf/c85i8xCPktW9WOr5FoOxCQyC1qtu+jtotqAtlte4MKmdu
+         pi/kqpGTGsLK2YyLi1agBZMVLa4bJd2NHG/9HeE0yGOwkhE+x4uk0LiVlrKjwsB1Ok66
+         AsxdpEJjL9xdA0naosS9WcekQLTc8sDu2XvGapGMvvarFEbEznvvtzAOrIe0A5U0qKbw
+         hk2d9L5nW02Ggw+jeXhA3VSShIlUI4+ZJIRI+c9OvpVssJp/rSP8TJFa8/f7iOJBKCm2
+         OduyQuSZ3w6BnH8bobw9roQkeD4+M60TsFnIq1LRFagg/jdO9Ilg8z+T5UIebMPIWdez
+         CbCg==
+X-Gm-Message-State: AGi0PuYIdCD6agVH8ZcXeHJDXybdblXpBAOTnaC1aSJcdGd9YshlPbkd
+        nNlMMmOHWyxODnwJ3aYtXIw=
+X-Google-Smtp-Source: APiQypJKXdia+liMhX0/hlemOsS2zbQv5lseIECGPkTjiAMuvfNJzjg5PKXUFzaG+2drmrCSZSz94w==
+X-Received: by 2002:aa7:9484:: with SMTP id z4mr14283395pfk.144.1587335015542;
+        Sun, 19 Apr 2020 15:23:35 -0700 (PDT)
+Received: from [100.124.11.78] ([104.129.199.4])
+        by smtp.gmail.com with ESMTPSA id 135sm26218134pfu.207.2020.04.19.15.23.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Apr 2020 14:55:44 -0700 (PDT)
-Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
+        Sun, 19 Apr 2020 15:23:34 -0700 (PDT)
+Subject: Re: [PATCH v2 04/10] block: revert back to synchronous request_queue
+ removal
 To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
         viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
         rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
@@ -51,17 +52,16 @@ Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+        Michal Hocko <mhocko@kernel.org>
 References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-4-mcgrof@kernel.org>
+ <20200419194529.4872-5-mcgrof@kernel.org>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <91c82e6a-24ce-0b7d-e6e4-e8aa89f3fb79@acm.org>
-Date:   Sun, 19 Apr 2020 14:55:42 -0700
+Message-ID: <749d56bd-1d66-e47b-a356-8d538e9c99b4@acm.org>
+Date:   Sun, 19 Apr 2020 15:23:31 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200419194529.4872-4-mcgrof@kernel.org>
+In-Reply-To: <20200419194529.4872-5-mcgrof@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,67 +71,83 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/19/20 12:45 PM, Luis Chamberlain wrote:
-> +int __must_check blk_queue_debugfs_register(struct request_queue *q)
-> +{
-> +	struct dentry *dir = NULL;
-> +
-> +	/* This can happen if we have a bug in the lower layers */
+> +/**
+> + * blk_put_queue - decrement the request_queue refcount
+> + *
+> + * @q: the request_queue structure to decrement the refcount for
+> + *
 
-What does "this" refer to? Which layers does "lower layers" refer to? 
-Most software developers consider a module that calls directly into 
-another module as a higher layer (callbacks through function pointers do 
-not count; see also https://en.wikipedia.org/wiki/Modular_programming). 
-According to that definition block drivers are a software layer 
-immediately above the block layer core.
+How about following the example from 
+Documentation/doc-guide/kernel-doc.rst and not leaving a blank line 
+above the function argument documentation?
 
-How about changing that comment into the following to make it 
-unambiguous (if this is what you meant)?
+> + * Decrements the refcount to the request_queue kobject, when this reaches
+                               ^^
+                               of?
+> + * 0 we'll have blk_release_queue() called. You should avoid calling
+> + * this function in atomic context but if you really have to ensure you
+> + * first refcount the block device with bdgrab() / bdput() so that the
+> + * last decrement happens in blk_cleanup_queue().
+> + */
 
-	/*
-	 * Check whether the debugfs directory already exists. This can
-	 * only happen as the result of a bug in a block driver.
-	 */
+Is calling bdgrab() and bdput() an option from a context in which it is 
+not guaranteed that the block device is open?
 
-> +	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
-> +	if (dir) {
-> +		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
-> +			kobject_name(q->kobj.parent));
-> +		dput(dir);
-> +		return -EALREADY;
-> +	}
-> +
-> +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> +					    blk_debugfs_root);
-> +	if (!q->debugfs_dir)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
+Does every context that calls blk_put_queue() also call blk_cleanup_queue()?
 
-kobject_name(q->kobj.parent) is used three times in the above function. 
-How about introducing a local variable that holds the result of that 
-expression?
+How about avoiding confusion by changing the last sentence of that 
+comment into something like the following: "The last reference must not 
+be dropped from atomic context. If it is necessary to call 
+blk_put_queue() from atomic context, make sure that that call does not 
+decrease the request queue refcount to zero."
 
-> +static bool blk_trace_target_disk(const char *target, const char *diskname)
-> +{
-> +	if (strlen(target) != strlen(diskname))
-> +		return false;
-> +
-> +	if (!strncmp(target, diskname,
-> +		     min_t(size_t, strlen(target), strlen(diskname))))
-> +		return true;
-> +
-> +	return false;
-> +}
+>   /**
+>    * blk_cleanup_queue - shutdown a request queue
+> + *
+>    * @q: request queue to shutdown
+>    *
 
-The above code looks weird to me. When the second if-statement is 
-reached, it is guaranteed that 'target' and 'diskname' have the same 
-length. So why to calculate the minimum length in the second 
-if-statement of two strings that have the same length?
+How about following the example from 
+Documentation/doc-guide/kernel-doc.rst and not leaving a blank line 
+above the function argument documentation?
 
-Independent of what the purpose of the above code is, can that code be 
-rewritten such that it does not depend on the details of how names are 
-assigned to disks and partitions? Would disk_get_part() be useful here?
+>    * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
+>    * put it.  All future requests will be failed immediately with -ENODEV.
+> + *
+> + * You should not call this function in atomic context. If you need to
+> + * refcount a request_queue in atomic context, instead refcount the
+> + * block device with bdgrab() / bdput().
+
+Surrounding blk_cleanup_queue() with bdgrab() / bdput() does not help. 
+This blk_cleanup_queue() must not be called from atomic context.
+
+>   /**
+> - * __blk_release_queue - release a request queue
+> - * @work: pointer to the release_work member of the request queue to be released
+> + * blk_release_queue - release a request queue
+> + *
+> + * This function is called as part of the process when a block device is being
+> + * unregistered. Releasing a request queue starts with blk_cleanup_queue(),
+> + * which set the appropriate flags and then calls blk_put_queue() as the last
+> + * step. blk_put_queue() decrements the reference counter of the request queue
+> + * and once the reference counter reaches zero, this function is called to
+> + * release all allocated resources of the request queue.
+>    *
+> - * Description:
+> - *     This function is called when a block device is being unregistered. The
+> - *     process of releasing a request queue starts with blk_cleanup_queue, which
+> - *     set the appropriate flags and then calls blk_put_queue, that decrements
+> - *     the reference counter of the request queue. Once the reference counter
+> - *     of the request queue reaches zero, blk_release_queue is called to release
+> - *     all allocated resources of the request queue.
+> + * This function can sleep, and so we must ensure that the very last
+> + * blk_put_queue() is never called from atomic context.
+> + *
+> + * @kobj: pointer to a kobject, who's container is a request_queue
+>    */
+
+Please follow the style used elsewhere in the kernel and move function 
+argument documentation just below the line with the function name.
 
 Thanks,
 
