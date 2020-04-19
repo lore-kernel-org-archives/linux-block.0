@@ -2,71 +2,119 @@ Return-Path: <SRS0=58UM=6D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF44C38A30
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 16:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7B1C3A5A9
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78C4E214D8
-	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 16:06:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F96E2145D
+	for <linux-block@archiver.kernel.org>; Sun, 19 Apr 2020 19:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587325544;
+	bh=mEncwTlPQ/QwNpZrdXPAXFRaRHDlumsKGBnaQpNcAaM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=BzjcT2Dug4b8qfGD5LgKlCQ0Pd1fG3VaUhvp6X3iXmBEuMxPJU9qKQIAnbukOC9bs
+	 oVRIwsdp7jq7i9VJS8EkKR1fsQ4mBNtVpzUipO91htVuxBhF8uA5J0OZzT2/mwmcF1
+	 iM6aLpP7EO2a+SlGJ/3wdo1gtOHDwbnDequaRy/w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726160AbgDSQG4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 12:06:56 -0400
-Received: from verein.lst.de ([213.95.11.211]:36927 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725939AbgDSQGz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 12:06:55 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 21F0368BFE; Sun, 19 Apr 2020 18:06:52 +0200 (CEST)
-Date:   Sun, 19 Apr 2020 18:06:51 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        axboe@kernel.dk, yuyufen@huawei.com, tj@kernel.org, tytso@mit.edu,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/8] bdi: add a ->dev_name field to struct
- backing_dev_info
-Message-ID: <20200419160651.GA18308@lst.de>
-References: <20200416165453.1080463-1-hch@lst.de> <20200416165453.1080463-4-hch@lst.de> <20200417085909.GA12234@quack2.suse.cz> <70f001cd-eaec-874f-9742-c44e66368a2a@acm.org> <20200419075809.GA12222@lst.de> <a37e947d-c49a-837e-e97d-647ca9d378c3@acm.org>
+        id S1726576AbgDSTpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Apr 2020 15:45:43 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:33992 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726557AbgDSTpn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 19 Apr 2020 15:45:43 -0400
+Received: by mail-pj1-f67.google.com with SMTP id q16so3964021pje.1;
+        Sun, 19 Apr 2020 12:45:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=M3p9eZkDL4rEHA+mf+DziMPxePr/ZoUmDl5szec5+p8=;
+        b=kR7P3BpAumPQtEMpAMmv0uihs24LdWxJtNtJ2omS7Ox0qs9r5J2qp9RrtvD88kWJY1
+         ij8zHez55DsUUyQZWftPGU1YUdc8en78zP8XOvjclDo1rvYNdRXFKnc3RyI71JVcWsiJ
+         bCieHoiHNVERbif90e3YALOBbdp+lt2cRnllLMiELsK2jfJEQk+2+WFWS5FIGgad9vN7
+         Yq3Yj5/Cz80aSvUyHNUvKv8styN7QUgVcUuRotby0/HidFwnpisc8UtwedwlcYPJPr9d
+         aUp3+zepgDIPzVZ+iHZRafmCRC+9gDXhAWr1fuwzWFR+EtKXxZeSmzAOHOa2IfggiSI+
+         Ir3A==
+X-Gm-Message-State: AGi0PuaJXAlcfUFCX6nxyLaZHUjg6T9zn9mmnYE2mo9fNogCLeaokZ1Y
+        EVtbjyw4CmdDM1+UtiB5UDE=
+X-Google-Smtp-Source: APiQypKEQ+ZAqACW0RZLGTrbfImbk5QqwTv9Koug1Ir4h4Bs5C6QKAeh0qwqzCBFedbk3w1nTzpjvQ==
+X-Received: by 2002:a17:90a:5b:: with SMTP id 27mr16351976pjb.190.1587325542367;
+        Sun, 19 Apr 2020 12:45:42 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id v4sm25201600pfb.31.2020.04.19.12.45.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Apr 2020 12:45:39 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 99AAB40E7B; Sun, 19 Apr 2020 19:45:38 +0000 (UTC)
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v2 02/10] blktrace: move blktrace debugfs creation to helper function
+Date:   Sun, 19 Apr 2020 19:45:21 +0000
+Message-Id: <20200419194529.4872-3-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.23.0.rc1
+In-Reply-To: <20200419194529.4872-1-mcgrof@kernel.org>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a37e947d-c49a-837e-e97d-647ca9d378c3@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 08:29:21AM -0700, Bart Van Assche wrote:
-> On 4/19/20 12:58 AM, Christoph Hellwig wrote:
->> On Sat, Apr 18, 2020 at 08:40:20AM -0700, Bart Van Assche wrote:
->>>> This can have a sideeffect not only bdi->dev_name will be truncated to 64
->>>> chars (which generally doesn't matter) but possibly also kobject name will
->>>> be truncated in the same way.  Which may have user visible effects. E.g.
->>>> for fs/vboxsf 64 chars need not be enough. So shouldn't we rather do it the
->>>> other way around - i.e., let device_create_vargs() create the device name
->>>> and then copy to bdi->dev_name whatever fits?
->>>
->>> How about using kvasprintf() instead of vsnprintf()?
->>
->> That is what v1 did, see the thread in response to that on why it isn't
->> a good idea.
->
-> Are you perhaps referring to patch "[PATCH 3/8] bdi: add a ->dev_name field 
-> to struct backing_dev_info" 
-> (https://lore.kernel.org/linux-block/20200416071519.807660-4-hch@lst.de/) 
-> and also to the replies to that patch? This is what I found in the replies: 
-> "When driver try to to re-register bdi but without release_bdi(), the old 
-> dev_name will be cover directly by the newer in bdi_register_va(). So, I am 
-> not sure whether it can cause memory leak for bdi->dev_name."
->
-> Has it been considered to avoid that leak by freeing bdi->dev_name from 
-> unregister_bdi(), e.g. as follows?
+Move the work to create the debugfs directory used into a helper.
+It will make further checks easier to read. This commit introduces
+no functional changes.
 
-We'd need some protection against concurrent accesses as unregister_bdi
-can race with them.  But with RCU that could be handled, so let me try
-that.
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ kernel/trace/blktrace.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index ca39dc3230cb..2c6e6c386ace 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -468,6 +468,18 @@ static void blk_trace_setup_lba(struct blk_trace *bt,
+ 	}
+ }
+ 
++static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
++					    struct blk_trace *bt)
++{
++	struct dentry *dir = NULL;
++
++	dir = debugfs_lookup(buts->name, blk_debugfs_root);
++	if (!dir)
++		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
++
++	return dir;
++}
++
+ /*
+  * Setup everything required to start tracing
+  */
+@@ -509,9 +521,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 
+ 	ret = -ENOENT;
+ 
+-	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+-	if (!dir)
+-		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
++	dir = blk_trace_debugfs_dir(buts, bt);
+ 
+ 	bt->dev = dev;
+ 	atomic_set(&bt->dropped, 0);
+-- 
+2.25.1
+
