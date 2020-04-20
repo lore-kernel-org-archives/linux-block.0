@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25000C3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D37FC3815B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:02:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 005FF2078E
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC06B2078E
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="MgGtdqwv"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="gDVywrrS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726009AbgDTHAr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 03:00:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36376 "EHLO
+        id S1725994AbgDTHCB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 03:02:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726006AbgDTHAr (ORCPT
+        by vger.kernel.org with ESMTP id S1725773AbgDTHCB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 03:00:47 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D12C061A0F
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 00:00:47 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id r2so2063024ilo.6
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 00:00:47 -0700 (PDT)
+        Mon, 20 Apr 2020 03:02:01 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E10B4C061A0C
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 00:02:00 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id c16so1801794ilr.3
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 00:02:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FXlpspJEbDHoQKzTWZ7OoJ0DmgN59WGOBFVzZ9ECAqQ=;
-        b=MgGtdqwvkxDCWV/ys6L9qG4ozrCBAixZ6iysWCPYpc/7PZKSM43UYUnXg8tVZVxZll
-         Xfde+dd8EVxYj8DBhtERhrbDBVu2ZKs4wMpj/imwAxmcZkrEuAEsFf6ZDl4EbGd1ICJZ
-         n0HeyCNKixRjOGN/dGYyVLUhsmD8iB0bJIQfNQvJQtZdWZHvel9Vf9dcQ+tmlz04pEZl
-         S0q3YxBkqFOqwMPcUabyzqcoZlys9Qof4QqYbV5O340sHLAsZx+/toOXDO9dzmGSrEpl
-         /MnoP5VMxTmJhF97M+Trvz36pc9iP5ls3Lm6RR7nKKFQW3yjnzrakoz8kCdQ9zssp+OY
-         SeHA==
+        bh=UeK1G+MEeshIQlAw2ukA6k5dmclkKmqKslpAbKo5XIY=;
+        b=gDVywrrS8MK11AaOEaiZpPlE9hTMRnk8bhDUYeX21LT2dQjIQrltq74rWmkaMXkjca
+         ssdYH/LmLgwPZp7f9qCUyxzF8aDiX9h4JPSRRTbWAYqaogj3iTDOQ8tTHvNEaDLDHdmX
+         juAdFHBKpT1FgGBZm7RQiq/tfjGijW2pjyVyM+FHALn7gX1aMI/F1i2M33P8hgNXyEwu
+         A/Y7igRWjr3uGe/hCDYR/sD58TchP9gf34DwZ6p6izliWTaSQSTWoqzxPL3qFknkKFs4
+         9RiIYwITqbQfjLGdsQyKZm3ri1wIzWxmI3syu+m6gkXAPW5IStI06YSn4hOCR+SwqY7P
+         oxXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FXlpspJEbDHoQKzTWZ7OoJ0DmgN59WGOBFVzZ9ECAqQ=;
-        b=mZbe1w5P2ajEsIe/W98BmThAilka4P2T7hv6juBq9Ln7JgN3R0RMh2dH/O4aao6yOW
-         oVoNPxvnudkz7qSAO/pMWxrmb674KEWQCFjL7bNpS4CXccsFhLwOngGbEQvae8GWZXOh
-         NDe+Xkiwc8UcyQtBHP0aJPjKOGk6d3p75WFkxEKG6l2gggYkfTfa4vUCkrLE1lPX4qOw
-         P9vP0lCYXLyucJ2PFdIk8AeASG8nKI6m8uhLKWYjZbJkCHDKDE+YySi7LRq/uTbyNTVH
-         9XQncnJO6UAc+qCYxlvOxnG1dOqJFlEuXJB0LKTw9ZYoL69zUC3AH7N3ZYUaS93T8k3i
-         1R+A==
-X-Gm-Message-State: AGi0PuZqCVnMZQvBpggfomrWYwP5DxjX2TfzrjEXvfhoJXk2HwvgWxl8
-        5YobCiCmIJkR2BkJ9829+U+hEWNHOvzZKojlXtznkQ==
-X-Google-Smtp-Source: APiQypKVKmZRHiGPVWXVvY9+klgoFYg/ZzKF0xk1aCtXv/786RkD707yD8EhFnvTqR/eKHRQnf43BmUs5pj0hn8e1tg=
-X-Received: by 2002:a92:ba01:: with SMTP id o1mr13961843ili.217.1587366046506;
- Mon, 20 Apr 2020 00:00:46 -0700 (PDT)
+        bh=UeK1G+MEeshIQlAw2ukA6k5dmclkKmqKslpAbKo5XIY=;
+        b=swns6vG8hXhg6SIdNZYG3SuC//x4J63gV2OeI4mbHg0yhDZTYpAxFKgK0xnpzTKkG5
+         3woYOgDfE/Mc62m/ZmscSrKdzlfDNDU2lifzxf47nW0PmGOaur6nUVODPWZO0ugRm5zb
+         uN+Gbt17Li2WAb2pC2Ur1N3JBezI2XCgC1O2xDGE+JFtosBMv3jIPBs1Vx/rvk2SjWv1
+         DA8LkK/DkGo9Qzncsm24CfS0se+qUJ3ooo6EPlcp5aR2HWEV1iwFCun3ZEp9L3o1Id57
+         Fcp45P8T7xcSPBckoSVcA6U5JoiweqQzYEBWp0PTqKlJ5r9zi+T7boi/JsFYD3NktURB
+         Rukg==
+X-Gm-Message-State: AGi0PuYBP7za9wxnl65deXtfvwu0acu+juP2P1pHHOWR0KJm9+Cw2xf2
+        3c0lOfogc71a3KF9GjxAGOgkgNyDqTx/uVBbus7vrg==
+X-Google-Smtp-Source: APiQypJK/oBDMpDFUCDDfHGhTJVdFzlBHky4uJxOcT9LqRZzFl3VVHMuGoObVkLbtdMkq8lVkx+wY99J6GyU9p2ejF0=
+X-Received: by 2002:a92:485b:: with SMTP id v88mr14365464ila.271.1587366120347;
+ Mon, 20 Apr 2020 00:02:00 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
- <20200415092045.4729-23-danil.kipnis@cloud.ionos.com> <0b161f96-c6de-ff6a-e71c-b0e2e623105a@acm.org>
-In-Reply-To: <0b161f96-c6de-ff6a-e71c-b0e2e623105a@acm.org>
+ <20200415092045.4729-18-danil.kipnis@cloud.ionos.com> <feb3bb89-5258-6c86-0a14-1b9a4d94188e@acm.org>
+In-Reply-To: <feb3bb89-5258-6c86-0a14-1b9a4d94188e@acm.org>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Mon, 20 Apr 2020 09:00:38 +0200
-Message-ID: <CAMGffEm+O8tOTDuZX++T1mDOJA4GuoT9xZMNH83JTNfJk4uPBg@mail.gmail.com>
-Subject: Re: [PATCH v12 22/25] block/rnbd: server: sysfs interface functions
+Date:   Mon, 20 Apr 2020 09:01:52 +0200
+Message-ID: <CAMGffEkHXn0KR+5sGrrQjXfkXR3kGiCw5CrdB6kTJSxtNwhBjg@mail.gmail.com>
+Subject: Re: [PATCH v12 17/25] block/rnbd: client: main functionality
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
         linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
@@ -77,23 +77,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 1:39 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Sun, Apr 19, 2020 at 1:17 AM Bart Van Assche <bvanassche@acm.org> wrote:
 >
 > On 4/15/20 2:20 AM, Danil Kipnis wrote:
-> > This is the sysfs interface to rnbd mapped devices on server side:
-> >
-> >    /sys/class/rnbd-server/ctl/devices/<device_name>/
-> >      |- block_dev
-> >      |  *** link pointing to the corresponding block device sysfs entry
-> >      |
-> >      |- sessions/<session-name>/
-> >      |  *** sessions directory
-> >         |
-> >         |- read_only
-> >         |  *** is devices mapped as read only
-> >         |
-> >         |- mapping_path
-> >            *** relative device path provided by the client during mapping
+> > This is main functionality of rnbd-client module, which provides
+> > interface to map remote device as local block device /dev/rnbd<N>
+> > and feeds RTRS with IO requests.
 >
 > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+>
 Thanks Bart!
