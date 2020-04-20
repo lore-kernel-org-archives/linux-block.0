@@ -2,92 +2,162 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F42C3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 19:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E767C54FCF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:11:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F5BA20782
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 19:31:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YXOCt/vm"
+	by mail.kernel.org (Postfix) with ESMTP id 6BCF420782
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:11:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587413466;
+	bh=KLlWVaAqNkpR57zpuZ37ho0Y/eR5zLBukf7yTdX44Vc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=zFduRZNeebsthXu7pm108gHBhn1Yql3q0fxkjd2T1Y+K3mAk+9MYdcgADYd3XQ/Jf
+	 JYbPbxqu3en81Cwh1a4F+gb9QAOaZgt4bQyd6O+rq69bwsTihxhTDbLKy33oJzJDWT
+	 YT7O++TtzkB1f8yh8E3Wdq+uURRHZ3WA6L1ZsNeg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725896AbgDTTbE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 15:31:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725550AbgDTTbD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 15:31:03 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F564C061A0C
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 12:31:02 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id ng8so313466pjb.2
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 12:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=tP4YOAYejpYYmGjqnTMgmuvgf6bkGxAGggfYj5zNTqk=;
-        b=YXOCt/vmrvkiHPQ+LYP+Rw1Y4MwUNVgX+5xqpv6STtfilyH/A9aQ4IlwT7FC674Nxh
-         +esNn1mEFx0EXnI8bcx2vpaalkfFeUAtibS4F/wxWjAxBGP0w/QDle4MEa1UTRR9fkc8
-         9W7kIt9cy9rNqw1Wo8HMD3qG14+mu/45qY+gqv8wiQc9zeSKJ7YS5fHAVhB/3g4UxgoI
-         opIJ4Tnxluz+njEy2mkzwW/9bV6QTA4TCKPuSFODJYAkyQYHUg4vOkxLOcS8Z1SFMOb+
-         bUyoXUe5M9mLhLxYecwvnJoJqfUIc7Lrxa3fvPLwxs2OPu4mnK0rPb6EO9v7yfIS8UC9
-         NhdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tP4YOAYejpYYmGjqnTMgmuvgf6bkGxAGggfYj5zNTqk=;
-        b=c7cBLUVv4lK919V+eXSiZdk3iRtmwhCET+u2rYwsQAY4Zfu7kbMn2cYZhver1YJmJj
-         wqgUytrqn9AFFHWjSKGRBujNoLpK1avWI/meLjS+lRQsI3Z+9B2USmuNRbB/GJEQCley
-         1N3oEeQ0uqs4SZPcwQBP3vJhqYTYOt1T/4/zb2Mbi4QCLPn/BcZAXyW+pHTGlsawrtWq
-         PJbAIccIP2UgwXCYRZhbX7Yks8qENOz3c7ZTrw4QRHjBz83+hcUyYHXnWRO+CItofm3f
-         YlqeEAYrpzdSM/3PqQv2kXC6vKhzQzU/LpP0vAjS+MYfZhTw2A0HHcEY6nf7TwuQOjJ5
-         kpmQ==
-X-Gm-Message-State: AGi0PuYNnCO3eVDZCIRIAOBXQ7c+UsvATWOMRBLL4UVvG9luB8w+9EjV
-        fOd7BUCGoRY15CLqDeMbgyATVA==
-X-Google-Smtp-Source: APiQypIRLolceCASZsVEdrG4amYe906vCp6zyCHbpiqrERmubQB9cn6xcQS5s1qTUAyVN58Kt/gWdg==
-X-Received: by 2002:a17:90a:1954:: with SMTP id 20mr1210442pjh.106.1587411061882;
-        Mon, 20 Apr 2020 12:31:01 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id x123sm282247pfb.1.2020.04.20.12.31.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2020 12:31:01 -0700 (PDT)
-Subject: Re: [PATCH v3 0/7] Fix potential kernel panic when increase hardware
- queue
-To:     Weiping Zhang <zwp10758@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-References: <cover.1586199103.git.zhangweiping@didiglobal.com>
- <CAA70yB7mNEt+H5xd+hpeRDLXDi+V+Qmuvuy27wJ63dtmcKDpzQ@mail.gmail.com>
- <CAA70yB7k5siarFfK0Bfko73HwzpTrC=c-8u=4X9fGuxkbrdbMQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5d926e69-f25c-f79e-0878-fb3c158ab8ab@kernel.dk>
-Date:   Mon, 20 Apr 2020 13:30:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726141AbgDTULF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 16:11:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38258 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725988AbgDTULF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Apr 2020 16:11:05 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D007820736;
+        Mon, 20 Apr 2020 20:11:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587413463;
+        bh=KLlWVaAqNkpR57zpuZ37ho0Y/eR5zLBukf7yTdX44Vc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=v80VgvMhfFBBd0i7hOVtPAGu8wGHazDbzENqiH4/g1SHRqDbY8fA9nxNIAzJNpZsE
+         ouLoSvUSHSEkMTIF5OjNKZ5ofeEFVQwwVNwIzdqq7Vu8DW60oa5ttJgjGj4+RrmEKp
+         ZvMmHcF94i5x8g4Hv6qf6bzoQvJHYNIr53k423Z4=
+Date:   Mon, 20 Apr 2020 22:11:01 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 08/10] blktrace: add checks for created debugfs files
+ on setup
+Message-ID: <20200420201101.GB302402@kroah.com>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
+ <20200419194529.4872-9-mcgrof@kernel.org>
+ <38240225-e48e-3035-0baa-4929948b23a3@acm.org>
+ <20200419230537.GG11244@42.do-not-panic.com>
+ <c69b67d1-f887-600b-f3ab-54ab0b7dcb13@acm.org>
+ <20200420114038.GE3906674@kroah.com>
+ <20200420184445.GK11244@42.do-not-panic.com>
 MIME-Version: 1.0
-In-Reply-To: <CAA70yB7k5siarFfK0Bfko73HwzpTrC=c-8u=4X9fGuxkbrdbMQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420184445.GK11244@42.do-not-panic.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/20/20 5:15 AM, Weiping Zhang wrote:
-> Hi Jens,
+On Mon, Apr 20, 2020 at 06:44:45PM +0000, Luis Chamberlain wrote:
+> On Mon, Apr 20, 2020 at 01:40:38PM +0200, Greg KH wrote:
+> > On Sun, Apr 19, 2020 at 04:17:46PM -0700, Bart Van Assche wrote:
+> > > On 4/19/20 4:05 PM, Luis Chamberlain wrote:
+> > > > On Sun, Apr 19, 2020 at 03:57:58PM -0700, Bart Van Assche wrote:
+> > > > > On 4/19/20 12:45 PM, Luis Chamberlain wrote:
+> > > > > > Even though debugfs can be disabled, enabling BLK_DEV_IO_TRACE will
+> > > > > > select DEBUG_FS, and blktrace exposes an API which userspace uses
+> > > > > > relying on certain files created in debugfs. If files are not created
+> > > > > > blktrace will not work correctly, so we do want to ensure that a
+> > > > > > blktrace setup creates these files properly, and otherwise inform
+> > > > > > userspace.
+> > > > > > 
+> > > > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > > > > > ---
+> > > > > >    kernel/trace/blktrace.c | 8 +++++---
+> > > > > >    1 file changed, 5 insertions(+), 3 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > > > > > index 9cc0153849c3..fc32a8665ce8 100644
+> > > > > > --- a/kernel/trace/blktrace.c
+> > > > > > +++ b/kernel/trace/blktrace.c
+> > > > > > @@ -552,17 +552,19 @@ static int blk_trace_create_debugfs_files(struct blk_user_trace_setup *buts,
+> > > > > >    					  struct dentry *dir,
+> > > > > >    					  struct blk_trace *bt)
+> > > > > >    {
+> > > > > > -	int ret = -EIO;
+> > > > > > -
+> > > > > >    	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
+> > > > > >    					       &blk_dropped_fops);
+> > > > > > +	if (!bt->dropped_file)
+> > > > > > +		return -ENOMEM;
+> > > > > >    	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
+> > > > > > +	if (!bt->msg_file)
+> > > > > > +		return -ENOMEM;
+> > > > > >    	bt->rchan = relay_open("trace", dir, buts->buf_size,
+> > > > > >    				buts->buf_nr, &blk_relay_callbacks, bt);
+> > > > > >    	if (!bt->rchan)
+> > > > > > -		return ret;
+> > > > > > +		return -EIO;
+> > > > > >    	return 0;
+> > > > > >    }
+> > > > > 
+> > > > > I should have had a look at this patch before I replied to the previous
+> > > > > patch.
+> > > > > 
+> > > > > Do you agree that the following code can be triggered by
+> > > > > debugfs_create_file() and also that debugfs_create_file() never returns
+> > > > > NULL?
+> > > > 
+> > > > If debugfs is enabled, and not that we know it is in this blktrace code,
+> > > > as we select it, it can return ERR_PTR(-ERROR) if an error occurs.
+> > > 
+> > > This is what I found in include/linux/debugfs.h in case debugfs is disabled:
+> > > 
+> > > static inline struct dentry *debugfs_create_file(const char *name,
+> > > 	umode_t mode, struct dentry *parent, void *data,
+> > > 	const struct file_operations *fops)
+> > > {
+> > > 	return ERR_PTR(-ENODEV);
+> > > }
+> > > 
+> > > I have not found any code path that can cause debugfs_create_file() to
+> > > return NULL. Did I perhaps overlook something? If not, it's not clear to me
+> > > why the above patch adds checks that check whether debugfs_create_file()
+> > > returns NULL?
+> > 
+> > Short answer, yes, it can return NULL.  Correct answer is, you don't
+> > care, don't check the value and don't do anything about it.  It's
+> > debugging code, userspace doesn't care, so just keep moving on.
 > 
-> Ping
+> Thing is this code *exposes* knobs to userspace for an API that *does*
+> exepect those files to exist. That is, blktrace *relies* on these
+> debugfs files to exist. So the kconfig which enables blktrace
+> CONFIG_BLK_DEV_IO_TRACE selects DEBUG_FS.
 
-I'd really like for Bart/Ming to weigh in here.
+That's nice, but again, no kernel code should do anything different
+depending on what debugfs happens to be doing at that point in time.
 
--- 
-Jens Axboe
+> So typically we don't care if these files were created or not on regular
+> drivers, but in this case this code is only compiled when debugfs is
+> enabled and CONFIG_BLK_DEV_IO_TRACE, and the userspace interaction with
+> debugfs *expects* these files.
+> 
+> So what do you recommend?
 
+Make sure that userspace can handle the files not being there and keep
+on working properly if they aren't.
+
+As you can't "recover" from debugfs failing, there's no need to check
+anything with it.
+
+thanks,
+
+greg k-h
