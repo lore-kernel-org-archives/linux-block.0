@@ -2,116 +2,268 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3B6C55181
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D32E8C55183
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:42:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4218E206E9
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD71C206E9
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 20:42:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587415324;
+	bh=C/H7Vqw4eLAo+bqTMZDWofBTBU9RjPsgGEVTUDrNvCc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=jTnDp8w1cLp+V+3vHw26klu2sDDtpqcpLCKS4aKkEuuUGhQ5mQDaTFVIWGGns6REj
+	 SDwY2T160tSVuvR+1Lrj9GOCGkOr0mngpa6M8PnZTOUHHhELBjc0c3F/0/oekIfbvz
+	 2r/+YHx8zrVrQ/Fx0LHfjshQKQ/SjMteqKYaPPlg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725774AbgDTUlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 16:41:07 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:36920 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726100AbgDTUlH (ORCPT
+        id S1726373AbgDTUmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 16:42:00 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:53302 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726100AbgDTUmA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 16:41:07 -0400
-Received: by mail-pj1-f65.google.com with SMTP id a7so374761pju.2
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 13:41:06 -0700 (PDT)
+        Mon, 20 Apr 2020 16:42:00 -0400
+Received: by mail-pj1-f66.google.com with SMTP id hi11so392321pjb.3;
+        Mon, 20 Apr 2020 13:41:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5llEQW4n3S6sqVp7YYVstmfl+Xs5blzM3eVsTmbMn6U=;
-        b=Mqht2fCTFbeinWosKxHoFfjLf/YOvPLsEmBJmM9VX654hl5275HMJIBiGSOcZt39g8
-         ZuamzSogISdGm8W81zw6zB+gVRJbCRbus2r5mHUieC3mSKmEK0mWIVqveqzIaGj3sHHV
-         bYPkbZY9J/MGCZ1F0jtVo0p8/z8sk5p8BcB3sRcE5A5WQfAs4l1//uUFdFR4xJpnNSaW
-         yla7Hig+Zl6lXw7TAzkk27rn//OLfbPnWVDcitwhRyt5WaP0yXJ4sQtgP6MVjU7Z0Qmz
-         yNPFhYsddM9TQ3zM9yW1Hc8TYftM8f9XqLiwDexmJPLUfYcwzcf35tsqmkvqUv3U+CFP
-         72oA==
-X-Gm-Message-State: AGi0PuZmELwgfW8YdnwQb8PslCjamcZP+f/UT2zGoVr3q0GnzCgtEDs6
-        NUsVLcXDC2X97TRvTclQH4oaVarm
-X-Google-Smtp-Source: APiQypIlGdbODLdwERpllCLZtnvWLIxC1RxEM/7fRq6DFYRfyk2HT+f6oMNBGj/pb9F9M2eIzieeOg==
-X-Received: by 2002:a17:90a:65c8:: with SMTP id i8mr1411383pjs.156.1587415266236;
-        Mon, 20 Apr 2020 13:41:06 -0700 (PDT)
-Received: from [100.124.9.192] ([104.129.198.105])
-        by smtp.gmail.com with ESMTPSA id y13sm359342pfc.78.2020.04.20.13.41.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2020 13:41:05 -0700 (PDT)
-Subject: Re: [PATCH v3 1/7] block: rename __blk_mq_alloc_rq_map
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Weiping Zhang <zhangweiping@didiglobal.com>
-References: <cover.1586199103.git.zhangweiping@didiglobal.com>
- <9e542bceca1c467c99f114be7ab958066b8c7bf5.1586199103.git.zhangweiping@didiglobal.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a0fd4ea9-750a-92a1-11ae-a95d5f5dc74f@acm.org>
-Date:   Mon, 20 Apr 2020 13:41:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=W70HODHvPGy2tybwv11DFoJ/NeBLhWW5ThLnvqLq4jw=;
+        b=eb8zlzSL6tus+C3+TZcbLqFKdwfa5hEJDHF2PYriyHB+N2NDeZ18TBmwr+hBf7RqP9
+         qs+rJKmiwVrFZTc2g3IjLlsbnoLsrvPujOirPjKlU+x/jnyhzMrmyL1Vkf/humbuOmL4
+         qrmeuHapgqI9TLvTNE8GNicIZnKryfZTT6B8o9QhgYRCG2O1jSsNjp7Zvlmizex6wBLL
+         Ctliuil7f1Pc3Z7qxp55M83rwnZljNNh8qsooiuS2KLFzG8VjgNwmY4QZKH7bHRLZEKf
+         q0uSdV3BV6oSOlp+6FpkTzR8fnuOlNIMgidLNgZLxyrsBiXqhxhe5kooJYXKTR5qwSeM
+         4DpA==
+X-Gm-Message-State: AGi0PuZdJkxQhTKaMVsZjyED0x5mPLE4qQMnkk5Ip69wYwNeGluGYsYe
+        IhJ3mhhYPqyS9e+/13AhDYk=
+X-Google-Smtp-Source: APiQypJ4sR9R+DlVxqQS0MoSp3x92ejjwbDh/Pdx52htFHQWU9alTiU9j5K9HouA86h3GL82FtnQHQ==
+X-Received: by 2002:a17:902:8487:: with SMTP id c7mr16757665plo.251.1587415318778;
+        Mon, 20 Apr 2020 13:41:58 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id n16sm369107pfq.61.2020.04.20.13.41.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2020 13:41:57 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id DCAF84028E; Mon, 20 Apr 2020 20:41:56 +0000 (UTC)
+Date:   Mon, 20 Apr 2020 20:41:56 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
+Message-ID: <20200420204156.GO11244@42.do-not-panic.com>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
+ <20200419194529.4872-4-mcgrof@kernel.org>
+ <20200420201615.GC302402@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <9e542bceca1c467c99f114be7ab958066b8c7bf5.1586199103.git.zhangweiping@didiglobal.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420201615.GC302402@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/20 12:36 PM, Weiping Zhang wrote:
-> rename __blk_mq_alloc_rq_map to __blk_mq_alloc_rq_map_and_request,
-> actually it alloc both map and request, make function name
-> align with function.
+On Mon, Apr 20, 2020 at 10:16:15PM +0200, Greg KH wrote:
+> On Sun, Apr 19, 2020 at 07:45:22PM +0000, Luis Chamberlain wrote:
 > 
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> ---
->   block/blk-mq.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+> This patch triggered gmail's spam detection, your changelog text is
+> whack...
+
+Oh? What do you think triggered it?
+
+> > diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
+> > index 19091e1effc0..d84038bce0a5 100644
+> > --- a/block/blk-debugfs.c
+> > +++ b/block/blk-debugfs.c
+> > @@ -3,6 +3,9 @@
+> >  /*
+> >   * Shared request-based / make_request-based functionality
+> >   */
+> > +
+> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > +
+> >  #include <linux/kernel.h>
+> >  #include <linux/blkdev.h>
+> >  #include <linux/debugfs.h>
+> > @@ -13,3 +16,30 @@ void blk_debugfs_register(void)
+> >  {
+> >  	blk_debugfs_root = debugfs_create_dir("block", NULL);
+> >  }
+> > +
+> > +int __must_check blk_queue_debugfs_register(struct request_queue *q)
+> > +{
+> > +	struct dentry *dir = NULL;
+> > +
+> > +	/* This can happen if we have a bug in the lower layers */
+> > +	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
+> > +	if (dir) {
+> > +		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
+> > +			kobject_name(q->kobj.parent));
+> > +		dput(dir);
+> > +		return -EALREADY;
+> > +	}
+> > +
+> > +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+> > +					    blk_debugfs_root);
+> > +	if (!q->debugfs_dir)
+> > +		return -ENOMEM;
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f6291ceedee4..3a482ce7ed28 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2468,7 +2468,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
->   	}
->   }
->   
-> -static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
-> +static bool __blk_mq_alloc_rq_map_and_request(struct blk_mq_tag_set *set, int hctx_idx)
->   {
->   	int ret = 0;
->   
-> @@ -2519,7 +2519,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
->   		hctx_idx = set->map[HCTX_TYPE_DEFAULT].mq_map[i];
->   		/* unmapped hw queue can be remapped after CPU topo changed */
->   		if (!set->tags[hctx_idx] &&
-> -		    !__blk_mq_alloc_rq_map(set, hctx_idx)) {
-> +		    !__blk_mq_alloc_rq_map_and_request(set, hctx_idx)) {
->   			/*
->   			 * If tags initialization fail for some hctx,
->   			 * that hctx won't be brought online.  In this
-> @@ -2983,7 +2983,7 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
->   	int i;
->   
->   	for (i = 0; i < set->nr_hw_queues; i++)
-> -		if (!__blk_mq_alloc_rq_map(set, i))
-> +		if (!__blk_mq_alloc_rq_map_and_request(set, i))
->   			goto out_unwind;
->   
->   	return 0;
+> Why doesn't the directory just live in the request queue, or somewhere
+> else, so that you save it when it is created and then that's it.  No
+> need to "look it up" anywhere else.
 
-What the __blk_mq_alloc_rq_map() function allocates is a request map and 
-requests. The new name is misleading because it suggests that only a 
-single request is allocated instead of multiple. The name 
-__blk_mq_alloc_rq_map_and_requests() is probably a better choice than 
-__blk_mq_alloc_rq_map_and_request().
+Its already there. And yes, after my changes it is technically possible
+to just re-use it directly. But this is complicated by a few things. One
+is that at this point in time, asynchronous request_queue removal is
+still possible, and so a race was exposed where a requeust_queue may be
+lingering but its old device is gone. That race is fixed by reverting us
+back to synchronous request_queue removal, therefore ensuring that the
+debugfs dir exists so long as the device does.
 
-My opinion is that the old name is clear enough. I prefer the current name.
+I can remove the debugfs_lookup() *after* we revert to synchronous
+request_queue removal, or we just re-order the patches so that the
+revert happens first. That should simplify this patch.
 
-Thanks,
+The code in this patch was designed to help dispute the logic behind
+the CVE, in particular it shows exactly where debugfs_dir *is* the
+one found by debugfs_lookup(), and shows the real issue behind the
+removal.
 
-Bart.
+But yeah, now that that is done, I hope its clear to all, and I think
+this patch can be simplified if we just revert the async requeust_queue
+removal first.
+
+> Or do you do that in later patches?  I only see this one at the moment,
+> sorry...
+> 
+> >  static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
+> > +					    struct request_queue *q,
+> >  					    struct blk_trace *bt)
+> >  {
+> >  	struct dentry *dir = NULL;
+> >  
+> > +	/* This can only happen if we have a bug on our lower layers */
+> > +	if (!q->kobj.parent) {
+> > +		pr_warn("%s: request_queue parent is gone\n", buts->name);
+> 
+> A kobject always has a parent, unless it has not been registered yet, so
+> I don't know what you are testing could ever happen.
+
+Or it has been kobject_del()'d?
+
+A deferred requeust_queue removal shows this is possible, the parent is
+taken underneath from us because the refcounting of this kobject is
+already kobject_del()'d, and its actual removal scheduled for later.
+The parent is taken underneath from us prior to the scheduled removal
+completing.
+
+> 
+> > +		return NULL;
+> > +	}
+> > +
+> > +	/*
+> > +	 * From a sysfs kobject perspective, the request_queue sits on top of
+> > +	 * the gendisk, which has the name of the disk. We always create a
+> > +	 * debugfs directory upon init for this gendisk kobject, so we re-use
+> > +	 * that if blktrace is going to be done for it.
+> > +	 */
+> > +	if (blk_trace_target_disk(buts->name, kobject_name(q->kobj.parent))) {
+> > +		if (!q->debugfs_dir) {
+> > +			pr_warn("%s: expected request_queue debugfs_dir is not set\n",
+> > +				buts->name);
+> 
+> What is userspace supposed to be able to do if they see this warning?
+
+Userspace doesn't parse warnings, but the NULL ensures it won't crash
+the kernel. The warn informs the kernel of a possible block layer bug.
+
+> > +			return NULL;
+> > +		}
+> > +		/*
+> > +		 * debugfs_lookup() is used to ensure the directory is not
+> > +		 * taken from underneath us. We must dput() it later once
+> > +		 * done with it within blktrace.
+> > +		 */
+> > +		dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> > +		if (!dir) {
+> > +			pr_warn("%s: expected request_queue debugfs_dir dentry is gone\n",
+> > +				buts->name);
+> 
+> Again, can't we just save the pointer when we create it and not have to
+> look it up again?
+
+Only if we do the revert of the requeust_queue removal first.
+
+> > +			return NULL;
+> > +		}
+> > +		 /*
+> > +		 * This is a reaffirmation that debugfs_lookup() shall always
+> > +		 * return the same dentry if it was already set.
+> > +		 */
+> 
+> I'm all for reaffirmation and the like, but really, is this needed???
+
+To those who were still not sure that the issue was not a debugfs issue
+I hoped this to make it clear. But indeed, if we revert back to
+synchronous request_queue removal, that should simplify this.
+
+> > +		if (dir != q->debugfs_dir) {
+> > +			dput(dir);
+> > +			pr_warn("%s: expected dentry dir != q->debugfs_dir\n",
+> > +				buts->name);
+> > +			return NULL;
+> 
+> Why are you testing to see if debugfs really is working properly?
+> SHould all users do crazy things like this (hint, rhetorical
+> question...)
+
+No, this can happen with the race I mentioned above.
+
+> > +		}
+> > +		bt->backing_dir = q->debugfs_dir;
+> > +		return bt->backing_dir;
+> > +	}
+> > +
+> > +	/*
+> > +	 * If not using blktrace on the gendisk, we are going to create a
+> > +	 * temporary debugfs directory for it, however this cannot be shared
+> > +	 * between two concurrent blktraces since the path is not unique, so
+> > +	 * ensure this is only done once.
+> > +	 */
+> >  	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> > -	if (!dir)
+> > -		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> > +	if (dir) {
+> > +		pr_warn("%s: temporary blktrace debugfs directory already present\n",
+> > +			buts->name);
+> > +		dput(dir);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	bt->dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> > +	if (!bt->dir) {
+> > +		pr_warn("%s: temporary blktrace debugfs directory could not be created\n",
+> > +			buts->name);
+> 
+> Again, do not test the return value, you do not care.  I've been
+> removing these checks from everywhere.
+
+Sure, the question still stands on what *should* the kernel do if the
+blktrace setup failed to create the debugfs files.
+
+  Luis
