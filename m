@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60339C54FCC
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D43CAC54FCC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:05:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A5B0218AC
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:04:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE6C6218AC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:05:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="DQMB+4zc"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="qe6tvDXH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbgDTIEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 04:04:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46354 "EHLO
+        id S1726434AbgDTIFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 04:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726422AbgDTIEr (ORCPT
+        with ESMTP id S1726422AbgDTIEu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 04:04:47 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF56C061A10
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:45 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id j1so5481906wrt.1
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:45 -0700 (PDT)
+        Mon, 20 Apr 2020 04:04:50 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF24C061A0F
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:49 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id y24so10233644wma.4
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=android.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A01NMrXjS7VtgqWCD0bD53SNdf5elrWrIS2BaQX/HrY=;
-        b=DQMB+4zcBMFzGtBiegZ5VZEaEfV9ctHofixe0ajqjYHu4uXEOGV/nh+ERiW6Gc7sNM
-         Wmcq3zKq+22nFDk/NAZk9pZH0mmkbaUkVD/rKEtkUZkF+RE+7EQhGOVLEu3GtVP0ASYC
-         7B13Uf3v8QuL4/VjhJM1s8tg+goPB48LWrk2tlO1VlUmt6DfF1fuOOfHxdZ4Usl6/JTy
-         HVxpJkwODhr7RozBUqj46NXJ99H4p+MoBrLdv6Z3vBOVrGtO0M4ZzT2CEl87RaOIzrwT
-         sinQXxa9Pk2Ks7y6CVfnnL8i6EIiWhUMNAmnTXixMphNQYX1Gd3TEUBKGbzDc0ii9KRL
-         5uaw==
+        bh=tc+S3HgfyfdxhrTS98UbamV+05nkl5d7bc/WuRwN1Qo=;
+        b=qe6tvDXHpsvBdMw4xakoapBOVAqHRztAR8E3Dv9b9ZDWQtZb3TSehvqOmRCoak7AA3
+         oKGHahL++03wcJN0vvAu3OdgnbN7Hh8KSlhssvZYObHwUSaiBO3wA5KYVUPlHs9fW9ur
+         5JRbj/go9YzdH05Wpf030wTbNe6pmwkqOVR2fv+Bi3Rk2Eh18AHrOrih5JtMGVOawGUh
+         tkECRyxcf3Z7PTk5ndycd0Aq6iMdmvbNp+14U0gdcO0+5htbNcpJ0Mb+Rm5ACRZxMQGf
+         pfOSN8uI4cAcqKfYG+o7vmnAcEBekRN/r3lPIfoVh//QNALzgu/CV/tGhKvLxm+jhszE
+         LYmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A01NMrXjS7VtgqWCD0bD53SNdf5elrWrIS2BaQX/HrY=;
-        b=odmaKpHxTuZNtWPS3ncngbAuHlLGtuqqznZB0yCHjiVZkOKtBHaBppKA3UMjCmHDbs
-         7iDOama62/p3AzDBD4qmmQEKg8IHQjj3NkooQjfEiuhztKm8hCFM5gJqqi0QTAMZf3+r
-         goS8I2t+obqk7EdKSIozNpGtTWybnaxifLv05Uq7n+i7i2DVKi7LueBjgQP4zy6a1RIV
-         1KHeCa9tBiIYdWoD23+kazUiFefBIUgtnm7AhckeVHVtR+S3EbKisTZn2LqWr8Y/S7Jd
-         /wJC/J1EzGe+u3/cvJD8+XVAyY+e8BUtYi9BJCEJYfSbr7cMsGyPlBhDPZFdlNCIw//J
-         lRRw==
-X-Gm-Message-State: AGi0PuZ2mtlvpQT21YNMsbdGW3ITaxDLYvO1V1D7aXL+UuVnvxKUd3zo
-        pPf8X3HJCGljUGE+7holfsjWMA==
-X-Google-Smtp-Source: APiQypI6epwI8aFZAU9m3HCB1a2zvbI20vpWZwmWLwYpp+66bEnAAuTiO+VfjHTeVtYr1AJym04T3Q==
-X-Received: by 2002:a5d:5230:: with SMTP id i16mr18675235wra.71.1587369884431;
-        Mon, 20 Apr 2020 01:04:44 -0700 (PDT)
+        bh=tc+S3HgfyfdxhrTS98UbamV+05nkl5d7bc/WuRwN1Qo=;
+        b=jJJFvUMxv4ihZ2NiaoK7wC+S1KFgbEDCoYcg4Epqq6UtjcGFQsPq7sVvgydSxdkeyT
+         RFq0eMb7lqy5cBjBoZNrgTzDsmpWTNWYqSN+i1APYzgyqQDdocLlPa7fQyH8RTDVEZ7I
+         io522e584tnyuXB8KuntMaJma7RFboQCIfsLPa5Aaa8lCVdhKPd2VTe/fRYVAJXxR2dc
+         eJ9q4885+s9nvqCeiT/cpspr7gN+nlj6lAMB4tM8nsqMKuIK+tJPa1AsOfEuw+co+pV2
+         KPJQqYnmf378JdMHGHacvkLXlIEU+9jq9jq0njW1u1i8hcKW14giUV0Com4sOG/MKYs/
+         j4Lg==
+X-Gm-Message-State: AGi0PuY5IS3CuQU8Vf2vXLVPZQROg9x9WZIYJqhfdrqN1kLGG5PIjJ6f
+        wP3F1LX+o9Q/irYfYzkT6/tCcQ==
+X-Google-Smtp-Source: APiQypKZxpuT5O3h01mQCUTLigkQ8Uq18mdWOYae4joVaZgmSxGWGFRAjQz76vnv12P3B5/8zRNZSg==
+X-Received: by 2002:a1c:e284:: with SMTP id z126mr17151119wmg.32.1587369888037;
+        Mon, 20 Apr 2020 01:04:48 -0700 (PDT)
 Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id a67sm335827wmc.30.2020.04.20.01.04.43
+        by smtp.gmail.com with ESMTPSA id a67sm335827wmc.30.2020.04.20.01.04.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2020 01:04:43 -0700 (PDT)
+        Mon, 20 Apr 2020 01:04:47 -0700 (PDT)
 From:   Martijn Coenen <maco@android.com>
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
 Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
         Martijn Coenen <maco@android.com>
-Subject: [PATCH 1/4] loop: Refactor size calculation.
-Date:   Mon, 20 Apr 2020 10:04:06 +0200
-Message-Id: <20200420080409.111693-2-maco@android.com>
+Subject: [PATCH 4/4] loop: Add LOOP_SET_FD_AND_STATUS ioctl.
+Date:   Mon, 20 Apr 2020 10:04:09 +0200
+Message-Id: <20200420080409.111693-5-maco@android.com>
 X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
 In-Reply-To: <20200420080409.111693-1-maco@android.com>
 References: <20200420080409.111693-1-maco@android.com>
@@ -77,181 +77,177 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-figure_loop_size() calculates the loop size based on the passed in
-parameters, but at the same time it updates the offset and sizelimit
-parameters in the loop device configuration. That is a somewhat
-unexpected side effect of a function with this name, and it is only only
-needed by one of the two callers of this function - loop_set_status().
+This allows userspace to completely setup a loop device with a single
+ioctl, removing the in-between state where the device can be partially
+configured - eg the loop device has a backing file associated with it,
+but is reading from the wrong offset.
 
-Move the lo_offset and lo_sizelimit assignment back into loop_set_status(),
-and factor out a new function (loop_set_size()) to apply a newly
-calculated size that has been validated to fit in sector_t, and notify
-user-space.
+Besides removing the intermediate state, another big benefit of this
+ioctl is that LOOP_SET_STATUS can be slow; the main reason for this
+slowness is that LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to
+freeze the associated queue; this requires waiting for RCU
+synchronization, which I've measured can take about 15-20ms on this
+device on average.
 
-loop_update_size() is now solely used by loop_set_capacity to compute an
-updated size, and loop_set_status() uses a combination of functions to
-validate the loop size, and only apply it later.
+Here's setting up ~70 regular loop devices with an offset on an x86
+Android device, using LOOP_SET_FD and LOOP_SET_STATUS:
+
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m03.40s real     0m00.02s user     0m00.03s system
+
+Here's configuring ~70 devices in the same way, but using a modified
+losetup that uses the new LOOP_SET_FD_AND_STATUS ioctl:
+
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m01.94s real     0m00.01s user     0m00.01s system
 
 Signed-off-by: Martijn Coenen <maco@android.com>
 ---
- drivers/block/loop.c | 88 ++++++++++++++++++++++++++++----------------
- 1 file changed, 56 insertions(+), 32 deletions(-)
+ drivers/block/loop.c      | 47 ++++++++++++++++++++++++++++++---------
+ include/uapi/linux/loop.h |  6 +++++
+ 2 files changed, 42 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f1754262fc94..d934d65dbe92 100644
+index 6e656390b285..e1dbd70d6d6e 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -228,23 +228,42 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- }
- 
-+/**
-+ * loop_set_size - sets device size and notifies userspace
-+ * @lo: struct loop_device to set the size for
-+ * @size: new size of the loop device
-+ *
-+ * Callers must validate that the size passed into this function fits into
-+ * a sector_t.
-+ */
-+static void loop_set_size(struct loop_device *lo, loff_t size)
-+{
-+	struct block_device *bdev = lo->lo_device;
-+
-+	set_capacity(lo->lo_disk, size);
-+	bd_set_size(bdev, size << 9);
-+	/* let user-space know about the new size */
-+	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+}
-+
-+/**
-+ * loop_update_size - updates device size from the backing file
-+ * @lo: struct loop_device to update the size for
-+ *
-+ * Recomputes the device size from the backing file, and updates the device
-+ * with the new size.
-+ */
- static int
--figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
-+loop_update_size(struct loop_device *lo)
- {
--	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
-+	loff_t size = get_loop_size(lo, lo->lo_backing_file);
- 	sector_t x = (sector_t)size;
--	struct block_device *bdev = lo->lo_device;
- 
- 	if (unlikely((loff_t)x != size))
- 		return -EFBIG;
--	if (lo->lo_offset != offset)
--		lo->lo_offset = offset;
--	if (lo->lo_sizelimit != sizelimit)
--		lo->lo_sizelimit = sizelimit;
--	set_capacity(lo->lo_disk, x);
--	bd_set_size(bdev, (loff_t)get_capacity(bdev->bd_disk) << 9);
--	/* let user-space know about the new size */
--	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+
-+	loop_set_size(lo, size);
-+
+@@ -1065,8 +1065,9 @@ loop_set_from_status(struct loop_device *lo, const struct loop_info64 *info)
  	return 0;
  }
  
-@@ -1040,11 +1059,8 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+-static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+-		       struct block_device *bdev, unsigned int arg)
++static int loop_set_fd_and_status(struct loop_device *lo, fmode_t mode,
++				  struct block_device *bdev, unsigned int fd,
++				  const struct loop_info64 *info)
+ {
+ 	struct file	*file;
+ 	struct inode	*inode;
+@@ -1081,7 +1082,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	__module_get(THIS_MODULE);
  
- 	loop_update_rotational(lo);
- 	loop_update_dio(lo);
--	set_capacity(lo->lo_disk, size);
--	bd_set_size(bdev, size << 9);
- 	loop_sysfs_init(lo);
--	/* let user-space know about the new size */
--	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+	loop_set_size(lo, size);
+ 	error = -EBADF;
+-	file = fget(arg);
++	file = fget(fd);
+ 	if (!file)
+ 		goto out;
  
- 	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
- 		      block_size(inode->i_bdev) : PAGE_SIZE);
-@@ -1267,6 +1283,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	kuid_t uid = current_uid();
- 	struct block_device *bdev;
- 	bool partscan = false;
-+	bool size_changed = false;
-+	loff_t validated_size;
+@@ -1090,7 +1091,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * here to avoid changing device under exclusive owner.
+ 	 */
+ 	if (!(mode & FMODE_EXCL)) {
+-		claimed_bdev = bd_start_claiming(bdev, loop_set_fd);
++		claimed_bdev = bd_start_claiming(bdev, loop_set_fd_and_status);
+ 		if (IS_ERR(claimed_bdev)) {
+ 			error = PTR_ERR(claimed_bdev);
+ 			goto out_putf;
+@@ -1117,9 +1118,24 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 		lo_flags |= LO_FLAGS_READ_ONLY;
  
- 	err = mutex_lock_killable(&loop_ctl_mutex);
- 	if (err)
-@@ -1288,6 +1306,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
-+		size_t size = get_size(info->lo_offset, info->lo_sizelimit,
-+				       lo->lo_backing_file);
-+		if ((loff_t)(sector_t)size != size) {
-+			err = -EFBIG;
+ 	error = -EFBIG;
+-	size = get_loop_size(lo, file);
++	if (info)
++		size = get_size(info->lo_offset, info->lo_sizelimit,
++				file);
++	else
++		size = get_loop_size(lo, file);
+ 	if ((loff_t)(sector_t)size != size)
+ 		goto out_unlock;
++
++	if (info) {
++		error = loop_set_from_status(lo, info);
++		if (error)
 +			goto out_unlock;
-+		}
-+		size_changed = true;
-+		validated_size = size;
- 		sync_blockdev(lo->lo_device);
- 		kill_bdev(lo->lo_device);
- 	}
-@@ -1295,6 +1321,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	/* I/O need to be drained during transfer transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
-+	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
-+		/* kill_bdev should have truncated all the pages */
-+		err = -EAGAIN;
-+		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-+			__func__, lo->lo_number, lo->lo_file_name,
-+			lo->lo_device->bd_inode->i_mapping->nrpages);
-+		goto out_unfreeze;
++	} else {
++		lo->transfer = NULL;
++		lo->ioctl = NULL;
++		lo->lo_sizelimit = 0;
++		lo->lo_offset = 0;
 +	}
+ 	error = loop_prepare_queue(lo);
+ 	if (error)
+ 		goto out_unlock;
+@@ -1132,9 +1148,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_device = bdev;
+ 	lo->lo_flags = lo_flags;
+ 	lo->lo_backing_file = file;
+-	lo->transfer = NULL;
+-	lo->ioctl = NULL;
+-	lo->lo_sizelimit = 0;
+ 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
+ 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+ 
+@@ -1172,14 +1185,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ 	return 0;
+ 
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ out_bdev:
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ out_putf:
+ 	fput(file);
+ out:
+@@ -1653,7 +1666,18 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 
+ 	switch (cmd) {
+ 	case LOOP_SET_FD:
+-		return loop_set_fd(lo, mode, bdev, arg);
++		return loop_set_fd_and_status(lo, mode, bdev, arg, NULL);
++	case LOOP_SET_FD_AND_STATUS: {
++		struct loop_fd_and_status fds;
 +
- 	err = loop_release_xfer(lo);
- 	if (err)
- 		goto out_unfreeze;
-@@ -1318,22 +1353,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (err)
- 		goto out_unfreeze;
- 
--	if (lo->lo_offset != info->lo_offset ||
--	    lo->lo_sizelimit != info->lo_sizelimit) {
--		/* kill_bdev should have truncated all the pages */
--		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
--			err = -EAGAIN;
--			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
--				__func__, lo->lo_number, lo->lo_file_name,
--				lo->lo_device->bd_inode->i_mapping->nrpages);
--			goto out_unfreeze;
--		}
--		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
--			err = -EFBIG;
--			goto out_unfreeze;
--		}
--	}
--
-+	lo->lo_offset = info->lo_offset;
-+	lo->lo_sizelimit = info->lo_sizelimit;
- 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
- 	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
- 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
-@@ -1357,6 +1378,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		lo->lo_key_owner = uid;
- 	}
- 
-+	if (size_changed)
-+		loop_set_size(lo, validated_size);
++		if (copy_from_user(&fds,
++				   (struct loop_fd_and_status __user *) arg,
++				   sizeof(fds)))
++			return -EFAULT;
 +
- 	loop_config_discard(lo);
++		return loop_set_fd_and_status(lo, mode, bdev, fds.fd,
++					      &fds.info);
++	}
+ 	case LOOP_CHANGE_FD:
+ 		return loop_change_fd(lo, bdev, arg);
+ 	case LOOP_CLR_FD:
+@@ -1827,6 +1851,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_CLR_FD:
+ 	case LOOP_GET_STATUS64:
+ 	case LOOP_SET_STATUS64:
++	case LOOP_SET_FD_AND_STATUS:
+ 		arg = (unsigned long) compat_ptr(arg);
+ 		/* fall through */
+ 	case LOOP_SET_FD:
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 080a8df134ef..fcc9a693b588 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -60,6 +60,11 @@ struct loop_info64 {
+ 	__u64		   lo_init[2];
+ };
  
- 	/* update dio if lo_offset or transfer is changed */
-@@ -1534,7 +1558,7 @@ static int loop_set_capacity(struct loop_device *lo)
- 	if (unlikely(lo->lo_state != Lo_bound))
- 		return -ENXIO;
++struct loop_fd_and_status {
++	struct loop_info64	info;
++	__u32			fd;
++};
++
+ /*
+  * Loop filter types
+  */
+@@ -90,6 +95,7 @@ struct loop_info64 {
+ #define LOOP_SET_CAPACITY	0x4C07
+ #define LOOP_SET_DIRECT_IO	0x4C08
+ #define LOOP_SET_BLOCK_SIZE	0x4C09
++#define LOOP_SET_FD_AND_STATUS	0x4C0A
  
--	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit);
-+	return loop_update_size(lo);
- }
- 
- static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ /* /dev/loop-control interface */
+ #define LOOP_CTL_ADD		0x4C80
 -- 
 2.26.1.301.g55bc3eb7cb9-goog
 
