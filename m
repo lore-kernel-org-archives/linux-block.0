@@ -2,151 +2,120 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A5A3C3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 11:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FEFC3A5A0
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 11:36:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4359820735
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 11:16:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JN4PGe9W"
+	by mail.kernel.org (Postfix) with ESMTP id C81F62078C
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 11:36:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587382581;
+	bh=Ttxo4ShYqlkWnXjbFggOt9MCuzR3OQsdnOZ8YyHwteQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RUDp4Xhq8NfMh7B6ywnddpbiHLb19WIkB1CntfD7bIWA+GSJtJ8d7BCRMLYjnJXBJ
+	 Rq/ST3x8uZwVR5krZjBwXIIKhzydSUaGa2jq4xMjrAoEDsCT5xesL6mJ5iGogdHYcI
+	 zhi+IIQIIRkX5TJYHhuQsis9bVLxQag9q4a1rOM0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbgDTLQE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 07:16:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726089AbgDTLQE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 07:16:04 -0400
-Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D14C061A0C
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 04:16:04 -0700 (PDT)
-Received: by mail-qt1-x843.google.com with SMTP id s30so8062683qth.2
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 04:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=FDanc0qyY40aLCWZhz2kFtt9PDQMlJqIeZHPy7WlsG0=;
-        b=JN4PGe9WHYU76wJHQsMsR15Z/0ZJpru8q+3ka6H4xb4Fk/10Miv/GWGpfoiFg03bxL
-         RY8GAOeoRN9eqmtUIvXcpBNaEER9oK1GLw5W8r0gcZ9vwG556lXMzbVurKUW/Pg1j/z9
-         ljkb4bRrWgVEd3a0leSCrheFciMQgKJWEXHIWB+O2VC3OE84RuGB2T3GobOkrTTUvX7R
-         xDWrYk7dIeb6+vb9vJRBBcPUa5u8YW2qXd0Vdfgehwi7a5JpJi9oSJ89Je2FNTetRCSW
-         syqkbWChVm8sCswRI/MXI72Ol+VmlJfRDzokbH4fbfHp/x1i9TIchtoCG6fJUZVl8E0u
-         H+cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=FDanc0qyY40aLCWZhz2kFtt9PDQMlJqIeZHPy7WlsG0=;
-        b=hX5fbAJcQXDMOC1vZQulDtFm5c2ztxMn9LrQ+X1eQ1VjfMCbfPUSbR3NpPDLGYWZj4
-         4w/3W9AqXVcntHUYQ8RgxXOnqWlPPZJZdcHAMXV6om0sg5gMcsTBVi3YV1VPxUFINOGj
-         ELxVCRxr+BZTcpKCjqiBByvXqYHPLeGyzaWU8T+3xAKnEnd0hV/abGlV6Irn0S8OMRZa
-         6d6IE8K3hnTF7MGa7yuyxyTlL/auWQC2KsWRKuXf1LYopv4WnFpm5aYqoS+DKRnSNstM
-         9QeAqHmh/xa87v1qCULbV4jSVPo9v+51arsusSjuyQEwenDE43aTuGhD2GiDcGCPWHoz
-         ZlJA==
-X-Gm-Message-State: AGi0PuaxbG+buydaVB1YIDpbj6AZwXpSG/Vw/9TirE0RGT+Nm8rbWG0Q
-        mHzT6V/hxQ7vI+vUtdahYM8F3CUbM632PysaoK4=
-X-Google-Smtp-Source: APiQypL3De0G0mnNvNvd6lKsyLmFbNMNUCDt9V7bD79r/P1dG33D4xj5qnQ6PAZpbYnKbVOcEGKTsqS7BMiRwQQ11NQ=
-X-Received: by 2002:ac8:3928:: with SMTP id s37mr15717810qtb.115.1587381363392;
- Mon, 20 Apr 2020 04:16:03 -0700 (PDT)
+        id S1726287AbgDTLgT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 07:36:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57324 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725886AbgDTLgT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Apr 2020 07:36:19 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C5BEB206D4;
+        Mon, 20 Apr 2020 11:36:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587382578;
+        bh=Ttxo4ShYqlkWnXjbFggOt9MCuzR3OQsdnOZ8YyHwteQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pZyvrt/ONGuKXMLNymKIUlRFlsD0HNaWXlOnui9JnS6bIFEmXyZHqV9GuDgieyS0v
+         cBo2FFAnsC1Vg0yjQU9nqQkBIvr/BkDhEd2KFbun69AzJA8kv+9wGz43GHneF/LMr1
+         uryFwmhZ3w/t3ulsRV3irbD2gs6+mTw3FD/x9+cM=
+Date:   Mon, 20 Apr 2020 13:36:16 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 06/10] blk-debugfs: upgrade warns to BUG_ON() if
+ directory is already found
+Message-ID: <20200420113616.GA3906674@kroah.com>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
+ <20200419194529.4872-7-mcgrof@kernel.org>
 MIME-Version: 1.0
-References: <cover.1586199103.git.zhangweiping@didiglobal.com> <CAA70yB7mNEt+H5xd+hpeRDLXDi+V+Qmuvuy27wJ63dtmcKDpzQ@mail.gmail.com>
-In-Reply-To: <CAA70yB7mNEt+H5xd+hpeRDLXDi+V+Qmuvuy27wJ63dtmcKDpzQ@mail.gmail.com>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Mon, 20 Apr 2020 19:15:52 +0800
-Message-ID: <CAA70yB7k5siarFfK0Bfko73HwzpTrC=c-8u=4X9fGuxkbrdbMQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] Fix potential kernel panic when increase hardware queue
-To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200419194529.4872-7-mcgrof@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Sun, Apr 19, 2020 at 07:45:25PM +0000, Luis Chamberlain wrote:
+> Now that we have moved release_queue from being asynchronous to
+> synchronous, and fixed how we use the debugfs directory with blktrace
+> we should no longer have expected races with device removal/addition
+> and other operations with the debugfs directory.
+> 
+> If races do happen however, we want to be informed of *how* this races
+> happens rather than dealing with a debugfs splat, so upgrading this to a
+> BUG_ON() should capture better information about how this can happen
+> in the future.
+> 
+> This is specially true these days with funky reproducers in userspace
+> for which we have no access to, but only a bug splat.
+> 
+> Note that on addition the gendisk kobject is used as the parent for the
+> request_queue kobject, and upon removal, now that request_queue removal
+> is synchronous, blk_unregister_queue() is called prior to the gendisk
+> device_del(). This means we expect to see a sysfs clash first now prior
+> to running into a race with the debugfs dentry; so this bug would be
+> considered highly unlikely.
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  block/blk-debugfs.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
+> index d84038bce0a5..761318dcbf40 100644
+> --- a/block/blk-debugfs.c
+> +++ b/block/blk-debugfs.c
+> @@ -19,16 +19,8 @@ void blk_debugfs_register(void)
+>  
+>  int __must_check blk_queue_debugfs_register(struct request_queue *q)
+>  {
+> -	struct dentry *dir = NULL;
+> -
+>  	/* This can happen if we have a bug in the lower layers */
+> -	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
+> -	if (dir) {
+> -		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
+> -			kobject_name(q->kobj.parent));
+> -		dput(dir);
+> -		return -EALREADY;
+> -	}
+> +	BUG_ON(debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root));
 
-Ping
+So you are willing to crash the whole kernel and throw all of
+userspace's data away if this happens?
 
-On Wed, Apr 8, 2020 at 8:25 PM Weiping Zhang <zwp10758@gmail.com> wrote:
->
-> Weiping Zhang <zhangweiping@didiglobal.com> =E4=BA=8E2020=E5=B9=B44=E6=9C=
-=887=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=883:36=E5=86=99=E9=81=93=EF=
-=BC=9A
-> >
-> > Hi,
-> >
-> > This series do some improvement base on V2, and also fix two memleaks.
-> > And V2 import a regression for blktest/block/test/029, this test case
-> > will increase and decrease hardware queue count quickly.
-> >
-> >
-> > Memleak 1:
-> >
-> > __blk_mq_alloc_rq_maps
-> >         __blk_mq_alloc_rq_map
-> >
-> > if fail
-> >         blk_mq_free_rq_map
-> >
-> > Actually, __blk_mq_alloc_rq_map alloc both map and request, here
-> > also need free request.
-> >
-> > Memleak 2:
-> > When driver decrease hardware queue, set->nr_hw_queues will be changed
-> > firstly in blk_mq_realloc_tag_set_tags or __blk_mq_update_nr_hw_queues,
-> > then blk_mq_realloc_hw_ctxs and blk_mq_map_swqueue, even
-> > blk_mq_free_tag_set have no chance to free these hardware queue resourc=
-e,
-> > because they iterate hardware queue by
-> > for (i =3D 0; i < set->nr_hw_queues; i++).
-> >
-> > Patch1~3: rename some function name, no function change.
-> > Patch4: fix first memleak.
-> > Patch5: fix prev_nr_hw_queues issue, need be saved before change.
-> > Patch6: alloc map and request to fix potential kernel panic.
-> >
-> Update patch description:
-> Patch1~3: rename some function name, no function change.
-> Patch4: fix first memleak.
-> Patch5: fix prev_nr_hw_queues issue, need be saved before change.
-> Patch6: add nr_allocated_map_rqs to struct blk_mq_tag_set to record how
-> may rq and maps were allocated for this tag set, and also fix memleak2.
->
-> Patch7: fix kernel panic when update hardware queue count > cpu count,
-> when use multiple maps. Patch7's commit message has more detail informati=
-on
-> about this issue.
->
-> >
-> > Changes since V2:
-> >  * rename some functions name and fix memleak when free map and request=
-s
-> >  * Not free new allocated map and request, they will be relased when ta=
-gset gone
-> >
-> > Changes since V1:
-> >  * Add fix for potential kernel panic when increase hardware queue
-> >
-> > Weiping Zhang (7):
-> >   block: rename __blk_mq_alloc_rq_map
-> >   block: rename __blk_mq_alloc_rq_maps
-> >   block: rename blk_mq_alloc_rq_maps
-> >   block: free both map and request
-> >   block: save previous hardware queue count before udpate
-> >   block: refactor __blk_mq_alloc_rq_map_and_requests
-> >   block: alloc map and request for new hardware queue
-> >
-> >  block/blk-mq.c         | 49 ++++++++++++++++++++++++++++++------------
-> >  include/linux/blk-mq.h |  1 +
-> >  2 files changed, 36 insertions(+), 14 deletions(-)
-> >
-> > --
-> > 2.18.1
-> >
+Ick, no, don't do that, handle the issue correctly and move on.
+
+As proof you shouldn't be doing this, that BUG_ON will trigger if
+debugfs is not enabled, which might be a bit mean for all users of those
+kernels :(
+
+Hard NAK from me, sorry.
+
+greg k-h
