@@ -2,102 +2,88 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2275C54FC9
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 01:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A792C3815B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 06:51:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C4382145D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 01:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C2B520857
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 06:51:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Z5dWzW6B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725950AbgDTBP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Apr 2020 21:15:56 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:36043 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725949AbgDTBP4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Apr 2020 21:15:56 -0400
-X-Greylist: delayed 578 seconds by postgrey-1.27 at vger.kernel.org; Sun, 19 Apr 2020 21:15:55 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id D1AF020424C;
-        Mon, 20 Apr 2020 03:06:15 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id o6RaDLZrkeY2; Mon, 20 Apr 2020 03:06:08 +0200 (CEST)
-Received: from [192.168.48.23] (host-23-251-188-50.dyn.295.ca [23.251.188.50])
-        by smtp.infotech.no (Postfix) with ESMTPA id 54118204157;
-        Mon, 20 Apr 2020 03:06:07 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v7 00/11] Introduce Zone Append for writing to zoned block
- devices
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "hch@infradead.org" <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Daniel Wagner <dwagner@suse.de>
-References: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
- <afefece2-3016-8b58-fda4-1fbd7fcac75c@acm.org>
- <BY5PR04MB6900CA6DD8B3354981DB688BE7D40@BY5PR04MB6900.namprd04.prod.outlook.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <be9f128e-788d-bf0d-2965-feb7305b1a3a@interlog.com>
-Date:   Sun, 19 Apr 2020 21:06:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1725930AbgDTGvl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 02:51:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725773AbgDTGvl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Apr 2020 02:51:41 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C8EC061A0C
+        for <linux-block@vger.kernel.org>; Sun, 19 Apr 2020 23:51:41 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id u11so9771185iow.4
+        for <linux-block@vger.kernel.org>; Sun, 19 Apr 2020 23:51:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9C3JrepzlEGKADW5HtDCdCafm4wqGu05lhff6+4aJMo=;
+        b=Z5dWzW6BfU0AxZMGyd/x/5DWnIt79HKY/2Ig+sWHu3mNttFNGXQUsMaT11ArAmgRYy
+         8wqw3/tKMcLttzqIX+rs0RFmqYsj9b40NBk9SwU8c/QkeRJPAmBoRXEXbWHkqwubRnAL
+         ZXvkI2tF1yjqERyVlJlzSQQsnqAJ92+fDx9AqV16TPYjnAA6A8ebQxEGVY4bdzwqlF5x
+         mpyy8zOJRiXZF4dpK73XfREd7q5bIX19jR5j4RE+u4QdoS16OQBLqw5A2aPYZpxKGH0N
+         bVZooo+1yWSAmuiCBOb/QbDjcnHkBoQf3xctjmFrDHVd9oz3dJBRUf/BXBUUiKcnit5D
+         o02Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9C3JrepzlEGKADW5HtDCdCafm4wqGu05lhff6+4aJMo=;
+        b=JkuD507XKmv8O23i5EthQMlShIlxA456Qn5+kdUGFJMBhf85844hlbQcw/4GBPhc0Z
+         VWB8FZQUWlMqffDS+h9/5olHn7pDt5mDhzVg31rRlRekLOs3gwnkW7wOCTixFpEoMAke
+         3JVBZ9O0ERUZF99qzYLGR2AAOB6prZo4jORBQ6vYk4qdpZYhl7/5JedS63FbHNiP8zYT
+         S6QVus8mheDVy24trS0kZcE2H0Erd2Vn+nHDE965TWUZK1qz0vOfGPiyHGguz1rUBqBc
+         C3SJRF1DL79f6mwYS+NFTlsLYFweyaWqNIOEedGWAvhnpPoktafKFNpnnXO8Jz/dGlkM
+         xHiQ==
+X-Gm-Message-State: AGi0PubPuETkuWGgd5Pi2jn5Ypdo+GHVq6NJEK3/Zcef9zfGd29sXGeT
+        yvEhwjmCXQtKjyEV6nN/qg04sWbw8pwVXGuvldQ2NA==
+X-Google-Smtp-Source: APiQypKLPuWd7ZldCVfSRJfvL21fUUq92hk74PDs5Jvylw5blzaJclVs0sMWwxK36H6w5FLLtDy/Unj9IupikBxv29M=
+X-Received: by 2002:a6b:b955:: with SMTP id j82mr14375012iof.54.1587365500541;
+ Sun, 19 Apr 2020 23:51:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <BY5PR04MB6900CA6DD8B3354981DB688BE7D40@BY5PR04MB6900.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+References: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
+ <20200415092045.4729-16-danil.kipnis@cloud.ionos.com> <d972a2e2-a26d-fa24-d5ba-6beac2ee2b69@acm.org>
+In-Reply-To: <d972a2e2-a26d-fa24-d5ba-6beac2ee2b69@acm.org>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 20 Apr 2020 08:51:32 +0200
+Message-ID: <CAMGffE=ji5Qe+-9gbbTou-qxF54tFzt2FXQtsPEKUvJSi8=iMw@mail.gmail.com>
+Subject: Re: [PATCH v12 15/25] block/rnbd: private headers with rnbd protocol
+ structs and helpers
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-19 8:21 p.m., Damien Le Moal wrote:
-> On 2020/04/19 0:56, Bart Van Assche wrote:
->> On 2020-04-17 05:15, Johannes Thumshirn wrote:
->>> In order to reduce memory consumption, the only cached item is the offset
->>> of the write pointer from the start of the zone, everything else can be
->>> calculated. On an example drive with 52156 zones, the additional memory
->>> consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
->>> pages. The performance impact is neglectable for a spinning drive.
->>
->> What will happen if e.g. syzkaller mixes write() system calls with SG_IO
->> writes? Can that cause a mismatch between the cached write pointer and
->> the write pointer maintained by the drive? If so, should SG_IO perhaps
->> be disallowed if the write pointer is cached?
-> 
-> Bart,
-> 
-> Yes, SG_IO write will change the WP on the device side, causing the driver WP
-> cache to go out of sync with the device. We actually use that for testing and
-> generating write errors.
-> 
-> But that is not a problem limited to this new write pointer caching scheme. Any
-> zoned drive user can hit this problem (dm-zoned or f2fs currently). More
-> generally speaking, SG_IO writes can corrupt data/metadata on any regular disk
-> without (for instance) the file system noticing until the corrupted
-> data/metadata is accessed. SG_IO to a disk is not disabled if the disk has a
-> mounted file system. Also, since the series adds unconditional write pointer
-> caching with CONFIG_BLK_DEV_ZONED enabled, that would disable SG_IO permanently
-> in this case, and negatively impact a lot of userspace tools relying on it (FW
-> update, power management, SMART, etc).
-
-Putting my smartmontools maintainer hat on, I don't like the sound of that.
-We have spent time in the past discussing black and white lists, but they
-can't cope with vendor specific commands. Then there are commands that both
-sd and smartmontools might have good cause to use; MODE SELECT comes to
-mind. Changing the setting of the URSWRZ_M bit in the Zoned Block Device
-Control page, for example, could upset the apple cart.
-
-Doug Gilbert
-
-
+On Sun, Apr 19, 2020 at 1:01 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 4/15/20 2:20 AM, Danil Kipnis wrote:
+> > These are common private headers with rnbd protocol structures,
+> > logging, sysfs and other helper functions, which are used on
+> > both client and server sides.
+>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Thanks Bart!
