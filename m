@@ -2,163 +2,102 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B76A8C3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 18:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13188C54FCF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 18:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9395F206E9
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 18:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4E4D206E9
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 18:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587408289;
-	bh=iVzyP6DNXTkbZ21gDYems+ZWb/fMP0UI7p+n8EDLe/8=;
+	s=default; t=1587408370;
+	bh=vLJotPVJ+IWIvmV6SZePZHbxS7rJiHHTqQLq4BsCKDo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=aTayfOtya0gsuz92p2F2OU4d8biXYOfdcjeJuMhm+EKAKVAnr0qvXD+p/lfJSYV30
-	 B8WLIVddykJVVWndUD1RVe2gvmdA7vQqIUc3A2YxDHH5G5obJOofXmSYTp+0rLQZqQ
-	 yQ6G3vd7SA4C+kPab0mgKKY+Wk1/SkMbRvxSKJUk=
+	b=JDHR7c31I35StO27b4fP3Q911UW10WCLz3U/rTB1ib1Oc9eFNpciJVRme/TTQVZH+
+	 q267Z6+DWpcsurAUJzqLQCCSeQvRfckNgsJc90OYAsDPbEuh4q5H4tLmLdqwtoCgCj
+	 NzVZpCLXt1+G3J2Frw6/E7Zc7z+2eJUK3iQJdMbg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726748AbgDTSot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 14:44:49 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:37414 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726013AbgDTSos (ORCPT
+        id S1727828AbgDTSqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 14:46:10 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40763 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728012AbgDTSqJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 14:44:48 -0400
-Received: by mail-pg1-f196.google.com with SMTP id r4so5512733pgg.4;
-        Mon, 20 Apr 2020 11:44:48 -0700 (PDT)
+        Mon, 20 Apr 2020 14:46:09 -0400
+Received: by mail-pf1-f194.google.com with SMTP id x3so5370391pfp.7;
+        Mon, 20 Apr 2020 11:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=FUfNLpNHPYCuu6qXvFrOeL6KdE2kN6fmlQUEM0ie7Is=;
-        b=o4wv3tyzRaLoHSyQmnT8fEqT9ZTeJBjAqdE1Yn8xU1ALPxF+sm41Oo47x2qWhPBPK5
-         LLOGQRw9J9DuGOXd/VtNeUKLN4I9VJZUYpfDjjI14EwK07mWcG+aYJYypEwD3/Jw37nw
-         Ngo0xfN6jq7tmVpN9G578NT8nC6rX9qkgkznZMJ8PeHBmhMLs0wHN4tG/1jAqKvHqhz0
-         PxKw36uagaOnP7YkaPCO5C8TzJm2ICecN1kE8j1lBrAhSEPnJV5/vD0xpI1CzE1ZxoTM
-         lfC2Vj5ZyqpD9i/wpIH4kX7/dsnqnxfPbM2dllVFDWCc1wz4V12jI89qiLb2Dr3L7W1K
-         auDQ==
-X-Gm-Message-State: AGi0PuaKRb1pLimUGtE9nxs6nWfNorTps6D6/b54KP+L932DB7MsBHCI
-        Bb5XFtn5sR6ZtdHTQ22V5Pc=
-X-Google-Smtp-Source: APiQypI49bd4lok0sfjqJQ6PNeDCZHCQZDa8a1IiCSMa0/uVW4qkkeflkikFnQEGOovYxyx6W7LuDw==
-X-Received: by 2002:a62:cf81:: with SMTP id b123mr17473835pfg.84.1587408287775;
-        Mon, 20 Apr 2020 11:44:47 -0700 (PDT)
+        bh=4Io2UxyXTaCPuKOP2Bcw5aenPOuxwH4U0YvtYfrCaCI=;
+        b=X4YGDPTBKHqEefDhOrWLLqydfcx/aT4LCN3ygNUl4916NriKSbQKk4X8DDrHTrUFQx
+         me5JhrSS03ekaJsuUNJsFBrTxeG1InxTcdUZr4DCx0xi3plIP2TKtA66wLZYUV/EtKC5
+         xzzy/FvrbAmh/SA68qKoWlAPKOqBKa08PnyQk2+w75/D6ostx2t399oC/Jk2ZLRvOlse
+         BP7rihnHp7dBEPrcfTXm1BHlssKVwVZgyrfPLhI2fwf4/A27baHha+NphLBxsOJXxuS5
+         DPvri22IcgZi5NBZ4ohB7ZEKNFg8KjwWsHyGgjrK3xltFbdiC8eIMzLhcIc4pDx4MaHq
+         fY2Q==
+X-Gm-Message-State: AGi0PuYgtF78Q91Wdb0wIivJpmdPVdt7EJWlOuYYWmhtaTwJkl71rw3H
+        ZyFpqLPSnJFJqhqlJzoqW5U=
+X-Google-Smtp-Source: APiQypI6Vlthr/j9m1nHRSqAt0W3ii5OsrFyBv0qofjqF/joa/2eogFginfYqIUYfb7fmsyKSIjB/w==
+X-Received: by 2002:a63:8b44:: with SMTP id j65mr17495589pge.411.1587408368815;
+        Mon, 20 Apr 2020 11:46:08 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id p64sm92874pjp.7.2020.04.20.11.44.46
+        by smtp.gmail.com with ESMTPSA id g11sm86161pjs.17.2020.04.20.11.46.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2020 11:44:46 -0700 (PDT)
+        Mon, 20 Apr 2020 11:46:07 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 825824028E; Mon, 20 Apr 2020 18:44:45 +0000 (UTC)
-Date:   Mon, 20 Apr 2020 18:44:45 +0000
+        id 2E8454028E; Mon, 20 Apr 2020 18:46:07 +0000 (UTC)
+Date:   Mon, 20 Apr 2020 18:46:07 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, rostedt@goodmis.org, mingo@redhat.com,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
         jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
         akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 08/10] blktrace: add checks for created debugfs files
- on setup
-Message-ID: <20200420184445.GK11244@42.do-not-panic.com>
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
+Message-ID: <20200420184607.GL11244@42.do-not-panic.com>
 References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-9-mcgrof@kernel.org>
- <38240225-e48e-3035-0baa-4929948b23a3@acm.org>
- <20200419230537.GG11244@42.do-not-panic.com>
- <c69b67d1-f887-600b-f3ab-54ab0b7dcb13@acm.org>
- <20200420114038.GE3906674@kroah.com>
+ <20200419194529.4872-4-mcgrof@kernel.org>
+ <91c82e6a-24ce-0b7d-e6e4-e8aa89f3fb79@acm.org>
+ <20200420000436.GI11244@42.do-not-panic.com>
+ <b77a39c1-6010-24a4-0815-2f26664b6208@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200420114038.GE3906674@kroah.com>
+In-Reply-To: <b77a39c1-6010-24a4-0815-2f26664b6208@acm.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 01:40:38PM +0200, Greg KH wrote:
-> On Sun, Apr 19, 2020 at 04:17:46PM -0700, Bart Van Assche wrote:
-> > On 4/19/20 4:05 PM, Luis Chamberlain wrote:
-> > > On Sun, Apr 19, 2020 at 03:57:58PM -0700, Bart Van Assche wrote:
-> > > > On 4/19/20 12:45 PM, Luis Chamberlain wrote:
-> > > > > Even though debugfs can be disabled, enabling BLK_DEV_IO_TRACE will
-> > > > > select DEBUG_FS, and blktrace exposes an API which userspace uses
-> > > > > relying on certain files created in debugfs. If files are not created
-> > > > > blktrace will not work correctly, so we do want to ensure that a
-> > > > > blktrace setup creates these files properly, and otherwise inform
-> > > > > userspace.
-> > > > > 
-> > > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > > > > ---
-> > > > >    kernel/trace/blktrace.c | 8 +++++---
-> > > > >    1 file changed, 5 insertions(+), 3 deletions(-)
-> > > > > 
-> > > > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> > > > > index 9cc0153849c3..fc32a8665ce8 100644
-> > > > > --- a/kernel/trace/blktrace.c
-> > > > > +++ b/kernel/trace/blktrace.c
-> > > > > @@ -552,17 +552,19 @@ static int blk_trace_create_debugfs_files(struct blk_user_trace_setup *buts,
-> > > > >    					  struct dentry *dir,
-> > > > >    					  struct blk_trace *bt)
-> > > > >    {
-> > > > > -	int ret = -EIO;
-> > > > > -
-> > > > >    	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
-> > > > >    					       &blk_dropped_fops);
-> > > > > +	if (!bt->dropped_file)
-> > > > > +		return -ENOMEM;
-> > > > >    	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
-> > > > > +	if (!bt->msg_file)
-> > > > > +		return -ENOMEM;
-> > > > >    	bt->rchan = relay_open("trace", dir, buts->buf_size,
-> > > > >    				buts->buf_nr, &blk_relay_callbacks, bt);
-> > > > >    	if (!bt->rchan)
-> > > > > -		return ret;
-> > > > > +		return -EIO;
-> > > > >    	return 0;
-> > > > >    }
-> > > > 
-> > > > I should have had a look at this patch before I replied to the previous
-> > > > patch.
-> > > > 
-> > > > Do you agree that the following code can be triggered by
-> > > > debugfs_create_file() and also that debugfs_create_file() never returns
-> > > > NULL?
-> > > 
-> > > If debugfs is enabled, and not that we know it is in this blktrace code,
-> > > as we select it, it can return ERR_PTR(-ERROR) if an error occurs.
+On Sun, Apr 19, 2020 at 05:38:59PM -0700, Bart Van Assche wrote:
+> On 4/19/20 5:04 PM, Luis Chamberlain wrote:
+> > > Independent of what the purpose of the above code is, can that code be
+> > > rewritten such that it does not depend on the details of how names are
+> > > assigned to disks and partitions? Would disk_get_part() be useful here?
 > > 
-> > This is what I found in include/linux/debugfs.h in case debugfs is disabled:
-> > 
-> > static inline struct dentry *debugfs_create_file(const char *name,
-> > 	umode_t mode, struct dentry *parent, void *data,
-> > 	const struct file_operations *fops)
-> > {
-> > 	return ERR_PTR(-ENODEV);
-> > }
-> > 
-> > I have not found any code path that can cause debugfs_create_file() to
-> > return NULL. Did I perhaps overlook something? If not, it's not clear to me
-> > why the above patch adds checks that check whether debugfs_create_file()
-> > returns NULL?
+> > I did try, but couldn't figure out a way. I'll keep looking but likewise
+> > let me know if you find a way.
 > 
-> Short answer, yes, it can return NULL.  Correct answer is, you don't
-> care, don't check the value and don't do anything about it.  It's
-> debugging code, userspace doesn't care, so just keep moving on.
+> How about making blk_trace_setup() pass the result of the following
+> expression as an additional argument to blk_trace_setup():
+> 
+> 	bdev != bdev->bd_contains
+> 
+> I think that is a widely used approach to verify after a block device has
+> been opened whether or not 'bdev' refers to a partition (bdev !=
+> bdev->bd_contains means that 'bdev' represents a partition).
 
-Thing is this code *exposes* knobs to userspace for an API that *does*
-exepect those files to exist. That is, blktrace *relies* on these
-debugfs files to exist. So the kconfig which enables blktrace
-CONFIG_BLK_DEV_IO_TRACE selects DEBUG_FS.
-
-So typically we don't care if these files were created or not on regular
-drivers, but in this case this code is only compiled when debugfs is
-enabled and CONFIG_BLK_DEV_IO_TRACE, and the userspace interaction with
-debugfs *expects* these files.
-
-So what do you recommend?
+Sweet, that should simplify this considerbly, thanks!
 
   Luis
