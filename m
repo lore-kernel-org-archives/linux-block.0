@@ -6,54 +6,65 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3982AC55181
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 21:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0ACDC54FD0
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 21:11:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 213EE2078C
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 21:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A3B8218AC
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 21:11:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbgDTVHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 17:07:18 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:42457 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726294AbgDTVHR (ORCPT
+        id S1727048AbgDTVLS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 17:11:18 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:40292 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727040AbgDTVLR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:07:17 -0400
-Received: by mail-pg1-f195.google.com with SMTP id g6so5679253pgs.9
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 14:07:16 -0700 (PDT)
+        Mon, 20 Apr 2020 17:11:17 -0400
+Received: by mail-pj1-f67.google.com with SMTP id a22so401176pjk.5;
+        Mon, 20 Apr 2020 14:11:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iQg8BsGeC+oOIpY/hDtjQO5kX8dYwBU+ORWYPV3pRHA=;
-        b=XLNcbTgZI3MNstR5/xy0vbOWG0/9cCxu80BcMAzvm1tKekoheGzObHJ8auqAFhs+yu
-         VmiLshqzD4Ja03xhZCQiwCO4uHuTDbgBk2Za66NLjZ5uqvuIXjvqYZZqjItCAB/r6O9Q
-         6taBiAoT19nyd8Bd8URtdNrr5BaA6nz2uvRNFernUiZU39GcbdPMF/xbJBfdVh3T1U8c
-         7bnvYiqtwOVzxthJrlzGfsO5fsJYfzjLl0m32/zpmXW1ypd8XcFLwYwAytFF5j6jCK12
-         ED8fm7oYCjJPDDPCwgRNO1DtXxtUYfH4ozB4XGDSAuK3zEqBXOkDiuvr7Iaw98qbk3Io
-         RTmQ==
-X-Gm-Message-State: AGi0PuYyUfw+phrrSk+YLoVEaJjVyMz1XLbFlFHfKd+zs7d+e43+8HJ2
-        dhJXJvAQaZx2V6xeL4NjU7Y=
-X-Google-Smtp-Source: APiQypLtDg9rYPey8bDQOP5kpd6av+j7Gm/TynlB9952pZ0S/5RMzwEoqsguPmlFH6EIgifBnFcr1A==
-X-Received: by 2002:a63:d906:: with SMTP id r6mr18874048pgg.416.1587416836219;
-        Mon, 20 Apr 2020 14:07:16 -0700 (PDT)
-Received: from [100.124.9.192] ([104.129.198.105])
-        by smtp.gmail.com with ESMTPSA id x25sm379010pfm.203.2020.04.20.14.07.14
+        bh=wrPH749mUN8hliBUrahYDBfQbFobH/RtFO+RluKgR0c=;
+        b=LivDrY5Ouu2czO0qIGWzXiVMlitkGzsLsQF2wFYUanuha55j6R1l/v3f6fbr5Yn97V
+         a1Nf1cKwKMlxNBx8gvh0B9TxG4lOjU8tn5EVF9NpQb6fvWIIlkndzF045ASxLmEFjgwo
+         Izmjb7PYRGKCrAHCZmYWquUI0m4pbaIP0OkP3ADy4jb/fJyqiVvA6xUqB0le0qSfKkaf
+         HGKGzxXrnYLD64A2zGsu3vVflmLlAp5HV+BJ02o4cXHRuwcObLIUWZL33s4I/kDOkUlR
+         ZMtAiHQiP9UPIibIM1t8GIN9FU7FyrXU7ilHN0xgyoMFSjZgH+hkSyJUnybkp4myk0+J
+         FtwA==
+X-Gm-Message-State: AGi0PuavJARo54tgWtDazrPA9nPgNBAIy9bluHK6W300PLR36cs+t77P
+        HZ9tmlDaRI8GylWusyvkoSCkLtEtyZs=
+X-Google-Smtp-Source: APiQypLpcT/SUkIQmuuXSrPoqK0E8Cp2xLvNfCZASPQMFboRu2ZZ34NFyvthqIVZYVdzDqs93Z4ZTg==
+X-Received: by 2002:a17:90b:3751:: with SMTP id ne17mr1574517pjb.114.1587417077115;
+        Mon, 20 Apr 2020 14:11:17 -0700 (PDT)
+Received: from [100.124.9.192] ([104.129.199.10])
+        by smtp.gmail.com with ESMTPSA id 71sm394670pfw.111.2020.04.20.14.11.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2020 14:07:15 -0700 (PDT)
-Subject: Re: [PATCH v3 6/7] block: refactor __blk_mq_alloc_rq_map_and_requests
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Weiping Zhang <zhangweiping@didiglobal.com>
-References: <cover.1586199103.git.zhangweiping@didiglobal.com>
- <eb995b7a9c5a942c596eb21856043c4a1b2135f1.1586199103.git.zhangweiping@didiglobal.com>
+        Mon, 20 Apr 2020 14:11:16 -0700 (PDT)
+Subject: Re: [PATCH v2 04/10] block: revert back to synchronous request_queue
+ removal
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
+ <20200419194529.4872-5-mcgrof@kernel.org>
+ <749d56bd-1d66-e47b-a356-8d538e9c99b4@acm.org>
+ <20200420185943.GM11244@42.do-not-panic.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <e289ea06-c799-8444-2b2a-720f5d75f2c2@acm.org>
-Date:   Mon, 20 Apr 2020 14:07:13 -0700
+Message-ID: <eba2a91b-62a6-839d-df54-2a1cf8262652@acm.org>
+Date:   Mon, 20 Apr 2020 14:11:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <eb995b7a9c5a942c596eb21856043c4a1b2135f1.1586199103.git.zhangweiping@didiglobal.com>
+In-Reply-To: <20200420185943.GM11244@42.do-not-panic.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -62,23 +73,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/20 12:37 PM, Weiping Zhang wrote:
-> This patch add a new member nr_allocated_map_rqs to the
-> struct blk_mq_tag_set to record the number of maps and requests have
-> been allocated for this tagset.
+On 4/20/20 11:59 AM, Luis Chamberlain wrote:
+> On Sun, Apr 19, 2020 at 03:23:31PM -0700, Bart Van Assche wrote:
+>> On 4/19/20 12:45 PM, Luis Chamberlain wrote:
+>>> + * Decrements the refcount to the request_queue kobject, when this reaches
+>>> + * 0 we'll have blk_release_queue() called. You should avoid calling
+>>> + * this function in atomic context but if you really have to ensure you
+>>> + * first refcount the block device with bdgrab() / bdput() so that the
+>>> + * last decrement happens in blk_cleanup_queue().
+>>> + */
+>>
+>> Is calling bdgrab() and bdput() an option from a context in which it is not
+>> guaranteed that the block device is open?
 > 
-> Now there is a problem when we increase hardware queue count, we do not
-> allocate maps and request for the new allocated hardware queue, it will
-> be fixed in the next patch.
+> If the block device is not open, nope. For that blk_get_queue() can
+> be used, and is used by the block layer. This begs the question:
 > 
-> Since request needs lots of memory, it's not easy alloc so many memory
-> dynamically, espeicially when system is under memory pressure.
-> 
-> This patch allow nr_hw_queues does not equal to the nr_allocated_map_rqs,
-> to avoid alloc/free memory when change hardware queue count.
+> Do we have *drivers* which requires access to the request_queue from
+> atomic context when the block device is not open?
 
-It seems to me that patches 6 and 7 combined fix a single issue. How 
-about combining these two patches into a single patch?
+Instead of trying to answer that question, how about changing the 
+references to bdgrab() and bdput() into references to blk_get_queue() 
+and blk_put_queue()? I think if that change is made that we won't have 
+to research what the answer to the bdgrab()/bdput() question is.
 
 Thanks,
 
