@@ -2,303 +2,106 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE28C3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD99BC3815B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F4BB21D79
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:05:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="D2rOL6OR"
+	by mail.kernel.org (Postfix) with ESMTP id B1B56206D5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:23:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbgDTIFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 04:05:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbgDTIEs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 04:04:48 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36615C0610D5
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:48 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id t14so10860126wrw.12
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=srpwwZicRuHBaaZczdyiKE9b7NuCR4Sz5/p3TPFLESI=;
-        b=D2rOL6ORsWExuyJKdQ0qmNjMSCtCedN18tQBrtmS1+oejMNKf5FHFRJGNul1HOrNCI
-         5qtd9pGVSGFhu2ZjszBRq8FtfVL9a0rsUe2Df9yeIpFoxbEcnAlOqEuq2BSa6sgr5btq
-         zQ/nYtyFk+XjqpEhsDKXsEK9IV3g2LMYQJJVZRR9ZzwAoIWm38Ug+zQjCL/W8IKMczHE
-         MRv8o5e6qZ1O2TeKp8DQ47JCJbSo5hCKM3nVl99hDdksGaqpGFd2eQTpRAI6owoPPapp
-         oIIHvE6P4/AN5mANLYsEGnO95rLd2Yv2w1QO3zJqXbajF+NHseOuubdRjvrAfosS4vVc
-         7UJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=srpwwZicRuHBaaZczdyiKE9b7NuCR4Sz5/p3TPFLESI=;
-        b=hM6Qru45uNr0M2Xt1hT+e3x76cVLUigksh4ltEYhtS+Gj5bizcHURlU1Mn9sPKjsnE
-         76F8wl0kWo4ESWga71Bm8uAmobX/Z62rHlsP2PW7VcQLeaLhtwnPY8piH4lMrpNtlAhd
-         e6fGy6MiUtRBLTQDK3MG86Q0S3G1SfadwHpLAVXlymRdbIY3mEQnS8J8eKKu49Ydqf1w
-         oqnzMwLc01Iq1i73dKUx2QzpNeswt7fTJNApGk/Kdi2pFM+T33wYKtbBozZ0joHSc6YF
-         GWUYdAouc/m+ac8HCEBkCwBCa9SDFm2xKaoWkuxPAIxQxrA5Gqlg+nxKUrPXKCyoQEJd
-         ktQg==
-X-Gm-Message-State: AGi0Pua28VC4VV0zkz3ry7hM59J011OAJs/aCAWNsVgNpl+zB63BG2Zb
-        p4Pr53DQ8YsZkA3x4LecHlVVZA==
-X-Google-Smtp-Source: APiQypIvClCsiATXQsfdANkumpU6IrAtquSg5QOsnzdnkNuHCIoh2CZE66ozOTEgiQdNZciRfgG48Q==
-X-Received: by 2002:adf:84c2:: with SMTP id 60mr16995427wrg.65.1587369886949;
-        Mon, 20 Apr 2020 01:04:46 -0700 (PDT)
-Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id a67sm335827wmc.30.2020.04.20.01.04.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2020 01:04:46 -0700 (PDT)
-From:   Martijn Coenen <maco@android.com>
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
-Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
-        Martijn Coenen <maco@android.com>
-Subject: [PATCH 3/4] loop: Move loop_set_from_status() and friends up.
-Date:   Mon, 20 Apr 2020 10:04:08 +0200
-Message-Id: <20200420080409.111693-4-maco@android.com>
-X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
-In-Reply-To: <20200420080409.111693-1-maco@android.com>
-References: <20200420080409.111693-1-maco@android.com>
+        id S1726303AbgDTIXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 04:23:35 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2060 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725959AbgDTIXe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Apr 2020 04:23:34 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 79AE012A1BE46888B769;
+        Mon, 20 Apr 2020 09:23:32 +0100 (IST)
+Received: from [127.0.0.1] (10.47.7.108) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 20 Apr
+ 2020 09:23:31 +0100
+Subject: Re: [PATCH] blk-mq: Put driver tag in blk_mq_dispatch_rq_list() when
+ no budget
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>
+References: <1587035931-125028-1-git-send-email-john.garry@huawei.com>
+ <e5416179-2ba0-c9a8-1b86-d52eae29e146@acm.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <663d472a-5bde-4b89-3137-c7bfdf4d7b97@huawei.com>
+Date:   Mon, 20 Apr 2020 09:22:58 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e5416179-2ba0-c9a8-1b86-d52eae29e146@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.7.108]
+X-ClientProxiedBy: lhreml715-chm.china.huawei.com (10.201.108.66) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So we can use it without forward declaration. This is a separate commit
-to make it easier to verify that this is just a move, without functional
-modifications.
+On 18/04/2020 03:43, Bart Van Assche wrote:
+> On 2020-04-16 04:18, John Garry wrote:
+>> If in blk_mq_dispatch_rq_list() we find no budget, then we break of the
+>> dispatch loop, but the request may keep the driver tag, evaulated
+>> in 'nxt' in the previous loop iteration.
+>>
+>> Fix by putting the driver tag for that request.
+>>
+>> Signed-off-by: John Garry <john.garry@huawei.com>
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 8e56884fd2e9..a7785df2c944 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1222,8 +1222,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+>>   		rq = list_first_entry(list, struct request, queuelist);
+>>   
+>>   		hctx = rq->mq_hctx;
+>> -		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
+>> +		if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
+>> +			blk_mq_put_driver_tag(rq);
+>>   			break;
+>> +		}
+>>   
+>>   		if (!blk_mq_get_driver_tag(rq)) {
+>>   			/*
+> 
+> Is this something that can only happen if q->mq_ops->queue_rq(hctx, &bd)
+> returns another value than BLK_STS_OK, BLK_STS_RESOURCE and
+> BLK_STS_DEV_RESOURCE? 
 
-Signed-off-by: Martijn Coenen <maco@android.com>
----
- drivers/block/loop.c | 188 +++++++++++++++++++++----------------------
- 1 file changed, 94 insertions(+), 94 deletions(-)
+Right, as that case is handled in blk_mq_handle_dev_resource()
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e0f9674fe568..6e656390b285 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -971,6 +971,100 @@ static void loop_update_rotational(struct loop_device *lo)
- 		blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
- }
- 
-+static int
-+loop_release_xfer(struct loop_device *lo)
-+{
-+	int err = 0;
-+	struct loop_func_table *xfer = lo->lo_encryption;
-+
-+	if (xfer) {
-+		if (xfer->release)
-+			err = xfer->release(lo);
-+		lo->transfer = NULL;
-+		lo->lo_encryption = NULL;
-+		module_put(xfer->owner);
-+	}
-+	return err;
-+}
-+
-+static int
-+loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
-+	       const struct loop_info64 *i)
-+{
-+	int err = 0;
-+
-+	if (xfer) {
-+		struct module *owner = xfer->owner;
-+
-+		if (!try_module_get(owner))
-+			return -EINVAL;
-+		if (xfer->init)
-+			err = xfer->init(lo, i);
-+		if (err)
-+			module_put(owner);
-+		else
-+			lo->lo_encryption = xfer;
-+	}
-+	return err;
-+}
-+
-+static int
-+loop_set_from_status(struct loop_device *lo, const struct loop_info64 *info)
-+{
-+	int err;
-+	struct loop_func_table *xfer;
-+	kuid_t uid = current_uid();
-+
-+	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
-+		return -EINVAL;
-+
-+	err = loop_release_xfer(lo);
-+	if (err)
-+		return err;
-+
-+	if (info->lo_encrypt_type) {
-+		unsigned int type = info->lo_encrypt_type;
-+
-+		if (type >= MAX_LO_CRYPT)
-+			return -EINVAL;
-+		xfer = xfer_funcs[type];
-+		if (xfer == NULL)
-+			return -EINVAL;
-+	} else
-+		xfer = NULL;
-+
-+	err = loop_init_xfer(lo, xfer, info);
-+	if (err)
-+		return err;
-+
-+	lo->lo_offset = info->lo_offset;
-+	lo->lo_sizelimit = info->lo_sizelimit;
-+	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
-+	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
-+	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
-+	lo->lo_crypt_name[LO_NAME_SIZE-1] = 0;
-+
-+	if (!xfer)
-+		xfer = &none_funcs;
-+	lo->transfer = xfer->transfer;
-+	lo->ioctl = xfer->ioctl;
-+
-+	if ((lo->lo_flags & LO_FLAGS_AUTOCLEAR) !=
-+	     (info->lo_flags & LO_FLAGS_AUTOCLEAR))
-+		lo->lo_flags ^= LO_FLAGS_AUTOCLEAR;
-+
-+	lo->lo_encrypt_key_size = info->lo_encrypt_key_size;
-+	lo->lo_init[0] = info->lo_init[0];
-+	lo->lo_init[1] = info->lo_init[1];
-+	if (info->lo_encrypt_key_size) {
-+		memcpy(lo->lo_encrypt_key, info->lo_encrypt_key,
-+		       info->lo_encrypt_key_size);
-+		lo->lo_key_owner = uid;
-+	}
-+
-+	return 0;
-+}
-+
- static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 		       struct block_device *bdev, unsigned int arg)
- {
-@@ -1094,43 +1188,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static int
--loop_release_xfer(struct loop_device *lo)
--{
--	int err = 0;
--	struct loop_func_table *xfer = lo->lo_encryption;
--
--	if (xfer) {
--		if (xfer->release)
--			err = xfer->release(lo);
--		lo->transfer = NULL;
--		lo->lo_encryption = NULL;
--		module_put(xfer->owner);
--	}
--	return err;
--}
--
--static int
--loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
--	       const struct loop_info64 *i)
--{
--	int err = 0;
--
--	if (xfer) {
--		struct module *owner = xfer->owner;
--
--		if (!try_module_get(owner))
--			return -EINVAL;
--		if (xfer->init)
--			err = xfer->init(lo, i);
--		if (err)
--			module_put(owner);
--		else
--			lo->lo_encryption = xfer;
--	}
--	return err;
--}
--
- static int __loop_clr_fd(struct loop_device *lo, bool release)
- {
- 	struct file *filp = NULL;
-@@ -1275,63 +1332,6 @@ static int loop_clr_fd(struct loop_device *lo)
- 	return __loop_clr_fd(lo, false);
- }
- 
--static int
--loop_set_from_status(struct loop_device *lo, const struct loop_info64 *info)
--{
--	int err;
--	struct loop_func_table *xfer;
--	kuid_t uid = current_uid();
--
--	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
--		return -EINVAL;
--
--	err = loop_release_xfer(lo);
--	if (err)
--		return err;
--
--	if (info->lo_encrypt_type) {
--		unsigned int type = info->lo_encrypt_type;
--
--		if (type >= MAX_LO_CRYPT)
--			return -EINVAL;
--		xfer = xfer_funcs[type];
--		if (xfer == NULL)
--			return -EINVAL;
--	} else
--		xfer = NULL;
--
--	err = loop_init_xfer(lo, xfer, info);
--	if (err)
--		return err;
--
--	lo->lo_offset = info->lo_offset;
--	lo->lo_sizelimit = info->lo_sizelimit;
--	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
--	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
--	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
--	lo->lo_crypt_name[LO_NAME_SIZE-1] = 0;
--
--	if (!xfer)
--		xfer = &none_funcs;
--	lo->transfer = xfer->transfer;
--	lo->ioctl = xfer->ioctl;
--
--	if ((lo->lo_flags & LO_FLAGS_AUTOCLEAR) !=
--	     (info->lo_flags & LO_FLAGS_AUTOCLEAR))
--		lo->lo_flags ^= LO_FLAGS_AUTOCLEAR;
--
--	lo->lo_encrypt_key_size = info->lo_encrypt_key_size;
--	lo->lo_init[0] = info->lo_init[0];
--	lo->lo_init[1] = info->lo_init[1];
--	if (info->lo_encrypt_key_size) {
--		memcpy(lo->lo_encrypt_key, info->lo_encrypt_key,
--		       info->lo_encrypt_key_size);
--		lo->lo_key_owner = uid;
--	}
--
--	return 0;
--}
--
- static int
- loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- {
--- 
-2.26.1.301.g55bc3eb7cb9-goog
+If so, please add a comment in the source code
+> that explains this.
 
+So important that we should now do this in an extra patch?
+
+> 
+> Is this perhaps a bug fix for 0bca799b9280 ("blk-mq: order getting
+> budget and driver tag")? If so, please mention this and add Cc tags for
+> the people who were Cc-ed on that patch.
+
+So it looks like 0bca799b9280 had a flaw, but I am not sure if anything 
+got broken there and worthy of stable backport.
+
+I found this issue while debugging Ming's blk-mq cpu hotplug patchset, 
+which I feel is ready to merge.
+
+Having said that, this nasty issue did take > 1 day for me to debug... 
+so let me know.
+
+Thanks,
+John
