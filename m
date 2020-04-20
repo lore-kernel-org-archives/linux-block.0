@@ -2,61 +2,105 @@ Return-Path: <SRS0=3ryC=6E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF7CC3815B
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7068C3815B
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:04:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1534222272
-	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 07:48:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A10A021927
+	for <linux-block@archiver.kernel.org>; Mon, 20 Apr 2020 08:04:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="jcFahNVC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725773AbgDTHsG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Apr 2020 03:48:06 -0400
-Received: from verein.lst.de ([213.95.11.211]:39146 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725930AbgDTHsG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Apr 2020 03:48:06 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6582968C4E; Mon, 20 Apr 2020 09:48:01 +0200 (CEST)
-Date:   Mon, 20 Apr 2020 09:48:01 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        axboe@kernel.dk, yuyufen@huawei.com, tj@kernel.org, tytso@mit.edu,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/8] bdi: add a ->dev_name field to struct
- backing_dev_info
-Message-ID: <20200420074801.GA30795@lst.de>
-References: <20200416165453.1080463-1-hch@lst.de> <20200416165453.1080463-4-hch@lst.de> <20200417085909.GA12234@quack2.suse.cz> <70f001cd-eaec-874f-9742-c44e66368a2a@acm.org> <20200419075809.GA12222@lst.de> <a37e947d-c49a-837e-e97d-647ca9d378c3@acm.org> <20200419160651.GA18308@lst.de>
+        id S1725988AbgDTIEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Apr 2020 04:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725815AbgDTIEo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Apr 2020 04:04:44 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84290C061A0C
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:44 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id g12so10226405wmh.3
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2020 01:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fv2Oi9ufX0LkGa3j+9DwW6rcNLKbTdnyozIfpaN2Whs=;
+        b=jcFahNVCM1FBuXtg3EweZLC281pBCbnwwWQTVjrnL/WcgQZhHqVBIjCzie6c2d8nyb
+         vNgcVmnhtHIAgNL64bNehP28fil40pHJ2BsfMiHRGbzUMLfUckJTpIHI4NmQPFOX0KsJ
+         4WAnubBP4jvYNcJK43JeJLC+iDj9pMHl4iZ51OmpcVcQEk5BBdKHa8p+2eLMbMGOjC2N
+         1Jz3LuDQCwWxj1CXv/MWN79JSY6enw5AeRPLmc14IXq9VFYWdFQXcJ/c8N6tiQYXjoeR
+         8qEBixXQQLjX9IvILjpvb85YZePx9lzxQWjBqiu+AjxHqMXU+j9UtmYFlRYsfB/xNXQP
+         WpqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fv2Oi9ufX0LkGa3j+9DwW6rcNLKbTdnyozIfpaN2Whs=;
+        b=abpyDtzSq5VHInm7tb7His4NgfSs/7SCR0LvnQQR4pGMJFM+GASOaaOBWF3bAD6Cg9
+         MOdKGDskvB107ZscG+tAo8WV92IJEtKMktWpnzeSM/6cg89xv5LA4EdyH4kBvYFEwOfs
+         B0py6u9+eC/Cctunbqgyyb4gMJgqPNWkxqC2HEsABNA4eY02OKKhMsfMfFHZ59kLhz0N
+         VaAv2bBsS/QD0Uv8qD5X6Ith+HKgKXL5igWLvKiEHwLgmia/By72UvY8vM2nq43xuqcp
+         AaO67ENwMMydzEyIMK+Dj+VV2unUvRYE5EekYY9/h+v7R1LapTSAKYlaT1Bak17GaOmQ
+         VwBA==
+X-Gm-Message-State: AGi0PuadAM37y3YurKwXPoR5KNsuPM1JpbtDpuIkX3BumLVWWLv/THBa
+        1OMkq/IxO4tqikb4XGhP5Whnvw==
+X-Google-Smtp-Source: APiQypJjiSUFYYQJVEwwmdO78/PS77Qb2pg5Locx//XIF9CmAuSIYC86/h+9eaBWFWJIxbf1MCg9mw==
+X-Received: by 2002:a7b:ce88:: with SMTP id q8mr17515560wmj.161.1587369883251;
+        Mon, 20 Apr 2020 01:04:43 -0700 (PDT)
+Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
+        by smtp.gmail.com with ESMTPSA id a67sm335827wmc.30.2020.04.20.01.04.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2020 01:04:42 -0700 (PDT)
+From:   Martijn Coenen <maco@android.com>
+To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
+Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
+        Martijn Coenen <maco@android.com>
+Subject: [PATCH 0/4] Add a new LOOP_SET_FD_AND_STATUS ioctl.
+Date:   Mon, 20 Apr 2020 10:04:05 +0200
+Message-Id: <20200420080409.111693-1-maco@android.com>
+X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200419160651.GA18308@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 06:06:51PM +0200, Christoph Hellwig wrote:
-> > (https://lore.kernel.org/linux-block/20200416071519.807660-4-hch@lst.de/) 
-> > and also to the replies to that patch? This is what I found in the replies: 
-> > "When driver try to to re-register bdi but without release_bdi(), the old 
-> > dev_name will be cover directly by the newer in bdi_register_va(). So, I am 
-> > not sure whether it can cause memory leak for bdi->dev_name."
-> >
-> > Has it been considered to avoid that leak by freeing bdi->dev_name from 
-> > unregister_bdi(), e.g. as follows?
-> 
-> We'd need some protection against concurrent accesses as unregister_bdi
-> can race with them.  But with RCU that could be handled, so let me try
-> that.
+This series introduces a new ioctl that makes it possible to atomically
+configure a loop device. Previously, if you wanted to set parameters
+such as the offset on a loop device, this required calling LOOP_SET_FD
+to set the backing file, and then LOOP_SET_STATUS to set the offset.
+However, in between these two calls, the loop device is available and
+would accept requests, which is generally not desirable.
 
-I looked into it, and while it seems doable I think this goes in the
-wrong direction as it pushed the RCU knowledge into the callers.  I'd
-rather get something like this series in ASAP, and then for 5.8 or 5.9
-move the bdi pointer to the gendisk and stop re-registering it and thus
-solve the problems root cause for real.
+There are also performance benefits with combining these two ioctls into
+one, which is described in more detail in the last change in the series.
+
+Note that this series depends on
+"loop: Call loop_config_discard() only after new config is applied."
+[0], which I sent as a separate patch as it fixes an unrelated bug.
+
+[0]: https://lkml.org/lkml/2020/3/31/755
+
+Martijn Coenen (4):
+  loop: Refactor size calculation.
+  loop: Factor out configuring loop from status.
+  loop: Move loop_set_from_status() and friends up.
+  loop: Add LOOP_SET_FD_AND_STATUS ioctl.
+
+ drivers/block/loop.c      | 309 ++++++++++++++++++++++----------------
+ include/uapi/linux/loop.h |   6 +
+ 2 files changed, 189 insertions(+), 126 deletions(-)
+
+-- 
+2.26.1.301.g55bc3eb7cb9-goog
+
