@@ -2,104 +2,167 @@ Return-Path: <SRS0=KmMx=6F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E463CC54FC9
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 06:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A28DC2BA19
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 06:55:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C15C120CC7
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 06:12:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bcdEPkBf"
+	by mail.kernel.org (Postfix) with ESMTP id 07C242074B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 06:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587452140;
+	bh=zJ60yvTqB3tFZq6e5i0uFpw0aBM0sbkbs4gVEDscwcc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=iepIU0wmrUYEA5AK5YGYaxz2yk5PlOWGismPsMX0YsJvasTkXwkg9axWUNh2WZVDH
+	 oBDEtYGFJkjqq0rH8MeXVAp4X25TwnTaiq5I6MMSJpLiZ85d+sxEZ+h2ciNOBt4H5n
+	 UoylvTUr8dQJpMeltOvkbwMLo6bNLL7+r1nxQJIM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726961AbgDUGMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Apr 2020 02:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726628AbgDUGMm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Apr 2020 02:12:42 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844C3C061A0F;
-        Mon, 20 Apr 2020 23:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Fs0wPMYxvGmO2IT3Wvj2CTBXvnvcNivwuYu4FRE1SCI=; b=bcdEPkBfhKOPABDQ5Dsha37HM3
-        eiUij9xN/DG0iEUE2o4+ymVZLXy4WTHEZ93i2poYzXi35OEw0UaBNRCm3UsBgg7WNR3KoPmruhr/f
-        Tt1f1l2KDEI5rtmjNRHaRnSEi8NEoX+foGuKXs/UKBrK4hLSFO5WKIx+MuLWRFDoBZl9/tom0LjvL
-        cMc+fqi77vKCxaNuCR0ezJ69UZ4M47yK9VJWZ+NadNl/qN521hJSN1uCz91OFkf2D96u10vgrxuDg
-        afXttZeFQSKeSpoFZG8emNnEtWtBBpYYGRPESwFvXeXzwCtxh0SUBj/5wVxPD7Kij8oDkhJIYT/m9
-        Ni0TgIVQ==;
-Received: from [2001:4bb8:191:e12c:292e:7dec:cf13:becd] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jQm9B-0000MF-HQ; Tue, 21 Apr 2020 06:12:41 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] partitions/ibm: stop using ioctl_by_bdev
-Date:   Tue, 21 Apr 2020 08:12:26 +0200
-Message-Id: <20200421061226.33731-4-hch@lst.de>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200421061226.33731-1-hch@lst.de>
-References: <20200421061226.33731-1-hch@lst.de>
+        id S1725989AbgDUGzj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Apr 2020 02:55:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56284 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725926AbgDUGzj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Apr 2020 02:55:39 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BFF8D2072D;
+        Tue, 21 Apr 2020 06:55:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587452137;
+        bh=zJ60yvTqB3tFZq6e5i0uFpw0aBM0sbkbs4gVEDscwcc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rOvT1pf71YXBkdb+1cDESYAuVzGz9Pfk05UHBuTjyKfXBGV8Jwl3nLgA8xfppe4Gy
+         3rQRUzHq43ryklylYJLxHNa0hUAmBU4i2wDKLh3QDBBLU8xmzuY6g/vZ/rjhX3FvfR
+         l9NazMlSeEbaWkalX0L3KNeQ72f9/by4M0/j7BI8=
+Date:   Tue, 21 Apr 2020 08:55:35 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 08/10] blktrace: add checks for created debugfs files
+ on setup
+Message-ID: <20200421065535.GC347130@kroah.com>
+References: <20200419194529.4872-1-mcgrof@kernel.org>
+ <20200419194529.4872-9-mcgrof@kernel.org>
+ <38240225-e48e-3035-0baa-4929948b23a3@acm.org>
+ <20200419230537.GG11244@42.do-not-panic.com>
+ <c69b67d1-f887-600b-f3ab-54ab0b7dcb13@acm.org>
+ <20200420114038.GE3906674@kroah.com>
+ <20200420184445.GK11244@42.do-not-panic.com>
+ <20200420201101.GB302402@kroah.com>
+ <20200420202046.GN11244@42.do-not-panic.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420202046.GN11244@42.do-not-panic.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just call the getgeo and biodasdinfo methods directly.
+On Mon, Apr 20, 2020 at 08:20:46PM +0000, Luis Chamberlain wrote:
+> On Mon, Apr 20, 2020 at 10:11:01PM +0200, Greg KH wrote:
+> > On Mon, Apr 20, 2020 at 06:44:45PM +0000, Luis Chamberlain wrote:
+> > > On Mon, Apr 20, 2020 at 01:40:38PM +0200, Greg KH wrote:
+> > > > On Sun, Apr 19, 2020 at 04:17:46PM -0700, Bart Van Assche wrote:
+> > > > > On 4/19/20 4:05 PM, Luis Chamberlain wrote:
+> > > > > > On Sun, Apr 19, 2020 at 03:57:58PM -0700, Bart Van Assche wrote:
+> > > > > > > On 4/19/20 12:45 PM, Luis Chamberlain wrote:
+> > > > > > > > Even though debugfs can be disabled, enabling BLK_DEV_IO_TRACE will
+> > > > > > > > select DEBUG_FS, and blktrace exposes an API which userspace uses
+> > > > > > > > relying on certain files created in debugfs. If files are not created
+> > > > > > > > blktrace will not work correctly, so we do want to ensure that a
+> > > > > > > > blktrace setup creates these files properly, and otherwise inform
+> > > > > > > > userspace.
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > > > > > > > ---
+> > > > > > > >    kernel/trace/blktrace.c | 8 +++++---
+> > > > > > > >    1 file changed, 5 insertions(+), 3 deletions(-)
+> > > > > > > > 
+> > > > > > > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > > > > > > > index 9cc0153849c3..fc32a8665ce8 100644
+> > > > > > > > --- a/kernel/trace/blktrace.c
+> > > > > > > > +++ b/kernel/trace/blktrace.c
+> > > > > > > > @@ -552,17 +552,19 @@ static int blk_trace_create_debugfs_files(struct blk_user_trace_setup *buts,
+> > > > > > > >    					  struct dentry *dir,
+> > > > > > > >    					  struct blk_trace *bt)
+> > > > > > > >    {
+> > > > > > > > -	int ret = -EIO;
+> > > > > > > > -
+> > > > > > > >    	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
+> > > > > > > >    					       &blk_dropped_fops);
+> > > > > > > > +	if (!bt->dropped_file)
+> > > > > > > > +		return -ENOMEM;
+> > > > > > > >    	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
+> > > > > > > > +	if (!bt->msg_file)
+> > > > > > > > +		return -ENOMEM;
+> > > > > > > >    	bt->rchan = relay_open("trace", dir, buts->buf_size,
+> > > > > > > >    				buts->buf_nr, &blk_relay_callbacks, bt);
+> > > > > > > >    	if (!bt->rchan)
+> > > > > > > > -		return ret;
+> > > > > > > > +		return -EIO;
+> > > > > > > >    	return 0;
+> > > > > > > >    }
+> > > > > > > 
+> > > > > > > I should have had a look at this patch before I replied to the previous
+> > > > > > > patch.
+> > > > > > > 
+> > > > > > > Do you agree that the following code can be triggered by
+> > > > > > > debugfs_create_file() and also that debugfs_create_file() never returns
+> > > > > > > NULL?
+> > > > > > 
+> > > > > > If debugfs is enabled, and not that we know it is in this blktrace code,
+> > > > > > as we select it, it can return ERR_PTR(-ERROR) if an error occurs.
+> > > > > 
+> > > > > This is what I found in include/linux/debugfs.h in case debugfs is disabled:
+> > > > > 
+> > > > > static inline struct dentry *debugfs_create_file(const char *name,
+> > > > > 	umode_t mode, struct dentry *parent, void *data,
+> > > > > 	const struct file_operations *fops)
+> > > > > {
+> > > > > 	return ERR_PTR(-ENODEV);
+> > > > > }
+> > > > > 
+> > > > > I have not found any code path that can cause debugfs_create_file() to
+> > > > > return NULL. Did I perhaps overlook something? If not, it's not clear to me
+> > > > > why the above patch adds checks that check whether debugfs_create_file()
+> > > > > returns NULL?
+> > > > 
+> > > > Short answer, yes, it can return NULL.  Correct answer is, you don't
+> > > > care, don't check the value and don't do anything about it.  It's
+> > > > debugging code, userspace doesn't care, so just keep moving on.
+> > > 
+> > > Thing is this code *exposes* knobs to userspace for an API that *does*
+> > > exepect those files to exist. That is, blktrace *relies* on these
+> > > debugfs files to exist. So the kconfig which enables blktrace
+> > > CONFIG_BLK_DEV_IO_TRACE selects DEBUG_FS.
+> > 
+> > That's nice, but again, no kernel code should do anything different
+> > depending on what debugfs happens to be doing at that point in time.
+> 
+> So even if the debugfs files were *not* created, and this code executes only
+> if DEBUG_FS, you don't think we should inform userspace if the blktrace
+> setup ioctl, which sets up these debugfs, didn't happen?
+> 
+> The "recovery" here would just be to destroy the blktrace setup, and
+> inform userspace that the blktrace setup ioctl failed.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/partitions/ibm.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Hm, ok, but comment the heck out of this saying _why_ you are testing
+the return value, and how that differs from 99% of the other users of
+this function in the kernel tree please.
 
-diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
-index 073faa6a69b8..21dc6da20ff2 100644
---- a/block/partitions/ibm.c
-+++ b/block/partitions/ibm.c
-@@ -289,6 +289,7 @@ static int find_cms1_partitions(struct parsed_partitions *state,
- int ibm_partition(struct parsed_partitions *state)
- {
- 	struct block_device *bdev = state->bdev;
-+	struct gendisk *disk = bdev->bd_disk;
- 	int blocksize, res;
- 	loff_t i_size, offset, size;
- 	dasd_information2_t *info;
-@@ -308,15 +309,16 @@ int ibm_partition(struct parsed_partitions *state)
- 	info = kmalloc(sizeof(dasd_information2_t), GFP_KERNEL);
- 	if (info == NULL)
- 		goto out_exit;
--	geo = kmalloc(sizeof(struct hd_geometry), GFP_KERNEL);
-+	geo = kzalloc(sizeof(struct hd_geometry), GFP_KERNEL);
- 	if (geo == NULL)
- 		goto out_nogeo;
- 	label = kmalloc(sizeof(union label_t), GFP_KERNEL);
- 	if (label == NULL)
- 		goto out_nolab;
--	if (ioctl_by_bdev(bdev, HDIO_GETGEO, (unsigned long)geo) != 0)
-+	geo->start = get_start_sect(bdev);
-+	if (!disk->fops->getgeo || disk->fops->getgeo(bdev, geo))
- 		goto out_freeall;
--	if (ioctl_by_bdev(bdev, BIODASDINFO2, (unsigned long)info) != 0) {
-+	if (!disk->fops->biodasdinfo || disk->fops->biodasdinfo(disk, info)) {
- 		kfree(info);
- 		info = NULL;
- 	}
--- 
-2.26.1
+Otherwise I will end up removing the checks again with my semi-regular
+sweep of the tree...
 
+thanks,
+
+greg k-h
