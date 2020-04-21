@@ -2,92 +2,96 @@ Return-Path: <SRS0=KmMx=6F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4BAC54FCC
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 19:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 811B3C55183
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 19:56:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4C57206D5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 19:35:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWAo4xkz"
+	by mail.kernel.org (Postfix) with ESMTP id 57EFF20767
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 19:56:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587498990;
+	bh=2mt0X8VBZiX2mA4QQHhFfNXW9PQPT6mIJsAXtaOJlZ8=;
+	h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=elMuEz/XuKelIx2hBB8GQj0GQZfcL3B4yfOgDEMXtEJHNdogmCk9VVAQ2xp/QbWsy
+	 2b6yamLtVXdZ4lNZx0qBTB6H2kdhY2FCznlxrWVjYVxQGI6Sf0mEi9/9JO0qwG930P
+	 Jcuj01AkNBHK42Nk+pR/ve68c1wGIpkPo6XDtE0Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726021AbgDUTfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Apr 2020 15:35:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43185 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725987AbgDUTfJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Apr 2020 15:35:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587497707;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RDbNCpaQ63uuID2gepUGZxv4j3nJ6Y3J26CZxvwRo5k=;
-        b=PWAo4xkzu6z29Jox/HJYN/892kVtmn4xyQqMKfFOXAiS3YMtFiBeYy/JMGMfL4Sa/izDzR
-        hVUfqa+Z5kYuzK6y/+JtcnmaAz1TWaDW2VE9xt7ysUavrNZfl3vAVJPwRdd2OcnvvRAMyc
-        Xgk6kkzgiK20nBW75m8AZpFyJNB5SU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-3wgr-Z2eMkSi9uCIkh26bQ-1; Tue, 21 Apr 2020 15:28:56 -0400
-X-MC-Unique: 3wgr-Z2eMkSi9uCIkh26bQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726245AbgDUT43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Apr 2020 15:56:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47800 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726337AbgDUT4V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Apr 2020 15:56:21 -0400
+Received: from localhost (unknown [137.135.114.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 178FF8024D3;
-        Tue, 21 Apr 2020 19:28:55 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-114-241.rdu2.redhat.com [10.10.114.241])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A37D7B3A8C;
-        Tue, 21 Apr 2020 19:28:49 +0000 (UTC)
-Subject: Re: [PATCH] blk-iocost: Fix systemtap error on iocost_ioc_vrate_adj
-To:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>
-Cc:     Ingo Molnar <mingo@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20200421130755.18370-1-longman@redhat.com>
- <20200421105948.4f5a36f5@gandalf.local.home>
- <22ccb042-7d6f-3717-4024-9ec094b2f363@redhat.com>
- <20200421151649.11300568@gandalf.local.home>
- <3a747a8f-629e-f9d2-088d-963791d99486@kernel.dk>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <7faa2e43-5b3b-fe36-2f51-3791490048fb@redhat.com>
-Date:   Tue, 21 Apr 2020 15:28:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <3a747a8f-629e-f9d2-088d-963791d99486@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        by mail.kernel.org (Postfix) with ESMTPSA id D4B432076B;
+        Tue, 21 Apr 2020 19:56:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587498981;
+        bh=2mt0X8VBZiX2mA4QQHhFfNXW9PQPT6mIJsAXtaOJlZ8=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=Ccb0GTBtFXTjO+ltbJAAzxFW0VkL9xgzUuMaAKbhGKYtu0GgJmdrUpYHCHfBvOmSh
+         CdNGhiiTw8MBrCNDwREjUN+Zr9bvgjr85qbxtPrpHXzVgf+lMziXZrergbeWkfa7Y2
+         KRNWH4Bedo/rZdivam2/R70VyHfl6ZmpqCjENhQE=
+Date:   Tue, 21 Apr 2020 19:56:20 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Tuomas Tynkkynen <tuomas.tynkkynen@iki.fi>
+To:     axboe@kernel.dk, josef@toxicpanda.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org
+Cc:     stable@kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH] nbd: Fix memory leak from krealloc() if another allocation fails
+In-Reply-To: <20200410122913.14339-1-tuomas.tynkkynen@iki.fi>
+References: <20200410122913.14339-1-tuomas.tynkkynen@iki.fi>
+Message-Id: <20200421195620.D4B432076B@mail.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/21/20 3:17 PM, Jens Axboe wrote:
-> On 4/21/20 1:16 PM, Steven Rostedt wrote:
->> On Tue, 21 Apr 2020 14:36:29 -0400
->> Waiman Long <longman@redhat.com> wrote:
->>
->>>> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
->>>>
->>>> -- Steve
->>>>  
->>> OK, will send a v2 patch to update the commit log. Thanks for the review.
->> I think Jens already took this patch.  Doesn't sound like a v2 is needed.
-> I did, with modified subject line.
->
->
-Oh, I see. Thanks for taking that.
+Hi
 
-Cheers,
-Longman
+[This is an automated email]
 
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: .+
+
+The bot has tested the following trees: v5.6.5, v5.5.18, v5.4.33, v4.19.116, v4.14.176, v4.9.219, v4.4.219.
+
+v5.6.5: Build OK!
+v5.5.18: Build OK!
+v5.4.33: Build OK!
+v4.19.116: Build OK!
+v4.14.176: Build OK!
+v4.9.219: Failed to apply! Possible dependencies:
+    20032ec38d16 ("nbd: reset the setup task for NBD_CLEAR_SOCK")
+    5ea8d10802ec ("nbd: separate out the config information")
+    9442b739207a ("nbd: cleanup ioctl handling")
+    9561a7ade0c2 ("nbd: add multi-connection support")
+    feffa5cc7b47 ("nbd: fix setting of 'error' in NBD_DO_IT ioctl")
+
+v4.4.219: Failed to apply! Possible dependencies:
+    0e4f0f6f63d3 ("nbd: Cleanup reset of nbd and bdev after a disconnect")
+    1f7b5cf1be43 ("nbd: Timeouts are not user requested disconnects")
+    23272a6754b8 ("nbd: Remove signal usage")
+    37091fdd831f ("nbd: Create size change events for userspace")
+    5ea8d10802ec ("nbd: separate out the config information")
+    9561a7ade0c2 ("nbd: add multi-connection support")
+    97240963eb30 ("nbd: fix race in ioctl")
+    9b4a6ba9185a ("nbd: use flags instead of bool")
+    fd8383fd88a2 ("nbd: convert to blkmq")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
+-- 
+Thanks
+Sasha
