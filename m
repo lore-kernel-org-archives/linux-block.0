@@ -2,242 +2,432 @@ Return-Path: <SRS0=KmMx=6F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35ACC55182
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 07:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C02C2BA19
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 07:34:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADB18206F4
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 07:00:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587452455;
-	bh=zj9d9cwdHZ5qHikaJDBubllxAlkLIGcOH7Hj3crnKcA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=WVrHw5sSZeKG8iiKcZDLS3NDaYW9+In6YOsIjjSy24UMy92ulyx/oYjHVM5zjDSGg
-	 kLwUeHnJ2alq0uX9Y2icsRasSaISMWNxLlwQ0KmXGHPvQQbg7tHreQ6XvGxk5KUPeF
-	 CwBRcv+lJLdHJLlHOEaJEj/+vKRjPRCBjK6/lMx0=
+	by mail.kernel.org (Postfix) with ESMTP id D5B392087E
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 07:34:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbgDUHAw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Apr 2020 03:00:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57796 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbgDUHAv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Apr 2020 03:00:51 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 59138206A5;
-        Tue, 21 Apr 2020 07:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587452450;
-        bh=zj9d9cwdHZ5qHikaJDBubllxAlkLIGcOH7Hj3crnKcA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TMK6nl0EyaFuaRtNuMsz/e5jUwPHi2u02DWp2g2sLTfVNXzMWYILZOM6BCKprGkE9
-         8q8w0L+SDJwuCI+QnBVkBTOjUnHqyH9jqEdAfZdiUJsRrHOgGPo0tmntLaBRl8HKJF
-         I1zhcg99WhKMQsTb606k/nO+lmvevgM/peUuU1BI=
-Date:   Tue, 21 Apr 2020 09:00:48 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
-Message-ID: <20200421070048.GD347130@kroah.com>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-4-mcgrof@kernel.org>
- <20200420201615.GC302402@kroah.com>
- <20200420204156.GO11244@42.do-not-panic.com>
+        id S1726095AbgDUHeL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Apr 2020 03:34:11 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48404 "EHLO
+        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbgDUHeL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Apr 2020 03:34:11 -0400
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
+        by charlie.dont.surf (Postfix) with ESMTPSA id A2CC6BF7CB;
+        Tue, 21 Apr 2020 07:34:07 +0000 (UTC)
+From:   Klaus Jensen <its@irrelevant.dk>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Klaus Jensen <its@irrelevant.dk>,
+        Klaus Jensen <k.jensen@samsung.com>
+Subject: [PATCH blktests v2] Fix unintentional skipping of tests
+Date:   Tue, 21 Apr 2020 09:33:21 +0200
+Message-Id: <20200421073321.92302-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200420204156.GO11244@42.do-not-panic.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 08:41:56PM +0000, Luis Chamberlain wrote:
-> On Mon, Apr 20, 2020 at 10:16:15PM +0200, Greg KH wrote:
-> > On Sun, Apr 19, 2020 at 07:45:22PM +0000, Luis Chamberlain wrote:
-> > 
-> > This patch triggered gmail's spam detection, your changelog text is
-> > whack...
-> 
-> Oh? What do you think triggered it?
+From: Klaus Jensen <k.jensen@samsung.com>
 
-No idea.
+cd11d001fe86 ("Support skipping tests from test{,_device}()") breaks a
+handful of tests in the block group.
 
-> 
-> > > diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
-> > > index 19091e1effc0..d84038bce0a5 100644
-> > > --- a/block/blk-debugfs.c
-> > > +++ b/block/blk-debugfs.c
-> > > @@ -3,6 +3,9 @@
-> > >  /*
-> > >   * Shared request-based / make_request-based functionality
-> > >   */
-> > > +
-> > > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > > +
-> > >  #include <linux/kernel.h>
-> > >  #include <linux/blkdev.h>
-> > >  #include <linux/debugfs.h>
-> > > @@ -13,3 +16,30 @@ void blk_debugfs_register(void)
-> > >  {
-> > >  	blk_debugfs_root = debugfs_create_dir("block", NULL);
-> > >  }
-> > > +
-> > > +int __must_check blk_queue_debugfs_register(struct request_queue *q)
-> > > +{
-> > > +	struct dentry *dir = NULL;
-> > > +
-> > > +	/* This can happen if we have a bug in the lower layers */
-> > > +	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
-> > > +	if (dir) {
-> > > +		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
-> > > +			kobject_name(q->kobj.parent));
-> > > +		dput(dir);
-> > > +		return -EALREADY;
-> > > +	}
-> > > +
-> > > +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> > > +					    blk_debugfs_root);
-> > > +	if (!q->debugfs_dir)
-> > > +		return -ENOMEM;
-> > 
-> > Why doesn't the directory just live in the request queue, or somewhere
-> > else, so that you save it when it is created and then that's it.  No
-> > need to "look it up" anywhere else.
-> 
-> Its already there. And yes, after my changes it is technically possible
-> to just re-use it directly. But this is complicated by a few things. One
-> is that at this point in time, asynchronous request_queue removal is
-> still possible, and so a race was exposed where a requeust_queue may be
-> lingering but its old device is gone. That race is fixed by reverting us
-> back to synchronous request_queue removal, therefore ensuring that the
-> debugfs dir exists so long as the device does.
-> 
-> I can remove the debugfs_lookup() *after* we revert to synchronous
-> request_queue removal, or we just re-order the patches so that the
-> revert happens first. That should simplify this patch.
-> 
-> The code in this patch was designed to help dispute the logic behind
-> the CVE, in particular it shows exactly where debugfs_dir *is* the
-> one found by debugfs_lookup(), and shows the real issue behind the
-> removal.
-> 
-> But yeah, now that that is done, I hope its clear to all, and I think
-> this patch can be simplified if we just revert the async requeust_queue
-> removal first.
+For example, block/005 uses _test_dev_is_rotational to check if the
+device is rotational and uses the result to size up the fio run. As a
+side-effect, _test_dev_is_rotational also sets SKIP_REASON, which (since
+commit cd11d001fe86) causes the test to print out a "[not run]" even
+through the test actually ran successfully.
 
-Don't try to "dispute" crazyness, that's not what kernel code is for.
-Just do the right thing, and simply saving off the pointer to the
-debugfs file when created is the "correct" thing to do, no matter what.
-No race conditions or anything else can happen when you do that.
+Fix this by renaming the existing helpers to _require_foo (e.g. a
+_require_test_dev_is_rotational) and add the non-_require variant where
+needed.
 
-> > Or do you do that in later patches?  I only see this one at the moment,
-> > sorry...
-> > 
-> > >  static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
-> > > +					    struct request_queue *q,
-> > >  					    struct blk_trace *bt)
-> > >  {
-> > >  	struct dentry *dir = NULL;
-> > >  
-> > > +	/* This can only happen if we have a bug on our lower layers */
-> > > +	if (!q->kobj.parent) {
-> > > +		pr_warn("%s: request_queue parent is gone\n", buts->name);
-> > 
-> > A kobject always has a parent, unless it has not been registered yet, so
-> > I don't know what you are testing could ever happen.
-> 
-> Or it has been kobject_del()'d?
+Fixes: cd11d001fe86 ("Support skipping tests from test{,_device}()")
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ check           | 10 ++++------
+ common/iopoll   |  4 ++--
+ common/rc       | 35 ++++++++++++++++++++++++++++-------
+ new             | 12 ++++++------
+ tests/block/004 |  8 ++++----
+ tests/block/007 |  3 ++-
+ tests/block/011 |  2 +-
+ tests/block/019 |  2 +-
+ tests/nvme/032  |  2 +-
+ tests/nvme/rc   |  4 ++--
+ tests/scsi/006  |  2 +-
+ tests/scsi/rc   |  6 +++---
+ tests/zbd/007   |  2 +-
+ tests/zbd/rc    | 11 +++++++++--
+ 14 files changed, 65 insertions(+), 38 deletions(-)
 
-If that happened, how in the world are you in this function anyway, as
-the request_queue is an invalid pointer at that point in time???
+diff --git a/check b/check
+index 398eca05e3a4..84ec086c408b 100755
+--- a/check
++++ b/check
+@@ -423,18 +423,16 @@ _call_test() {
+ _test_dev_is_zoned() {
+ 	if [[ ! -f "${TEST_DEV_SYSFS}/queue/zoned" ]] ||
+ 	      grep -q none "${TEST_DEV_SYSFS}/queue/zoned"; then
+-		SKIP_REASON="${TEST_DEV} is not a zoned block device"
+ 		return 1
+ 	fi
+ 	return 0
+ }
+ 
+-_test_dev_is_not_zoned() {
+-	if _test_dev_is_zoned; then
+-		SKIP_REASON="${TEST_DEV} is a zoned block device"
++_require_test_dev_is_zoned() {
++	if ! _test_dev_is_zoned; then
++		SKIP_REASON="${TEST_DEV} is not a zoned block device"
+ 		return 1
+ 	fi
+-	unset SKIP_REASON
+ 	return 0
+ }
+ 
+@@ -497,7 +495,7 @@ _run_test() {
+ 			local unset_skip_reason=0
+ 			if [[ ! -v SKIP_REASON ]]; then
+ 				unset_skip_reason=1
+-				if (( !CAN_BE_ZONED )) && ! _test_dev_is_not_zoned; then
++				if (( !CAN_BE_ZONED )) && _test_dev_is_zoned; then
+ 					SKIP_REASON="${TEST_DEV} is a zoned block device"
+ 				elif declare -fF device_requires >/dev/null; then
+ 					device_requires
+diff --git a/common/iopoll b/common/iopoll
+index 80a5f99b08ca..dfdd2cf6f08f 100644
+--- a/common/iopoll
++++ b/common/iopoll
+@@ -17,7 +17,7 @@ _have_fio_with_poll() {
+ 	return 0
+ }
+ 
+-_test_dev_supports_io_poll() {
++_require_test_dev_supports_io_poll() {
+ 	local old_io_poll
+ 	if ! old_io_poll="$(cat "${TEST_DEV_SYSFS}/queue/io_poll" 2>/dev/null)"; then
+ 		SKIP_REASON="kernel does not support polling"
+@@ -30,7 +30,7 @@ _test_dev_supports_io_poll() {
+ 	return 0
+ }
+ 
+-_test_dev_supports_io_poll_delay() {
++_require_test_dev_supports_io_poll_delay() {
+ 	local old_io_poll_delay
+ 	if ! old_io_poll_delay="$(cat "${TEST_DEV_SYSFS}/queue/io_poll_delay" 2>/dev/null)"; then
+ 		SKIP_REASON="kernel does not support hybrid polling"
+diff --git a/common/rc b/common/rc
+index 1893dda2b2f7..dfa7ac0e4ffc 100644
+--- a/common/rc
++++ b/common/rc
+@@ -181,22 +181,36 @@ _have_tracepoint() {
+ 	return 0
+ }
+ 
+-_test_dev_can_discard() {
+-	if [[ $(cat "${TEST_DEV_SYSFS}/queue/discard_max_bytes") -eq 0 ]]; then
+-		SKIP_REASON="$TEST_DEV does not support discard"
++_test_dev_is_rotational() {
++	if [[ $(cat "${TEST_DEV_SYSFS}/queue/rotational") -eq 0 ]]; then
+ 		return 1
+ 	fi
+ 	return 0
+ }
+ 
+-_test_dev_is_rotational() {
+-	if [[ $(cat "${TEST_DEV_SYSFS}/queue/rotational") -eq 0 ]]; then
++_require_test_dev_is_rotational() {
++	if ! _test_dev_is_rotational; then
+ 		SKIP_REASON="$TEST_DEV is not rotational"
+ 		return 1
+ 	fi
+ 	return 0
+ }
+ 
++_test_dev_can_discard() {
++	if [[ $(cat "${TEST_DEV_SYSFS}/queue/discard_max_bytes") -eq 0 ]]; then
++		return 1
++	fi
++	return 0
++}
++
++_require_test_dev_can_discard() {
++	if ! _test_dev_can_discard; then
++		SKIP_REASON="$TEST_DEV does not support discard"
++		return 1
++	fi
++	return 0
++}
++
+ _test_dev_queue_get() {
+ 	if [[ $1 = scheduler ]]; then
+ 		sed -e 's/.*\[//' -e 's/\].*//' "${TEST_DEV_SYSFS}/queue/scheduler"
+@@ -214,7 +228,7 @@ _test_dev_queue_set() {
+ 	echo "$2" >"${TEST_DEV_SYSFS}/queue/$1"
+ }
+ 
+-_test_dev_is_pci() {
++_require_test_dev_is_pci() {
+ 	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q pci; then
+ 		# nvme needs some special casing
+ 		if readlink -f "$TEST_DEV_SYSFS/device" | grep -q nvme; then
+@@ -247,7 +261,7 @@ _get_pci_parent_from_blkdev() {
+ 		tail -2 | head -1
+ }
+ 
+-_test_dev_in_hotplug_slot() {
++_require_test_dev_in_hotplug_slot() {
+ 	local parent
+ 	parent="$(_get_pci_parent_from_blkdev)"
+ 
+@@ -262,6 +276,13 @@ _test_dev_in_hotplug_slot() {
+ 
+ _test_dev_is_partition() {
+ 	if [[ -z ${TEST_DEV_PART_SYSFS} ]]; then
++		return 1
++	fi
++	return 0
++}
++
++_require_test_dev_is_partition() {
++	if ! _test_dev_is_partition; then
+ 		SKIP_REASON="${TEST_DEV} is not a partition device"
+ 		return 1
+ 	fi
+diff --git a/new b/new
+index 31973ed1add2..73f0faa8fa96 100755
+--- a/new
++++ b/new
+@@ -85,10 +85,10 @@ group_requires() {
+ #
+ # Usually, group_device_requires() just needs to check that the test device is
+ # the right type of hardware or supports any necessary features using the
+-# _test_dev_foo helpers. If group_device_requires() sets \$SKIP_REASON, all
+-# tests in this group will be skipped on that device.
++# _require_test_dev_foo helpers. If group_device_requires() sets \$SKIP_REASON,
++# all tests in this group will be skipped on that device.
+ # group_device_requires() {
+-# 	_test_dev_is_foo && _test_dev_supports_bar
++# 	_require_test_dev_is_foo && _require_test_dev_supports_bar
+ # }
+ 
+ # TODO: define any helpers that are specific to this group.
+@@ -171,10 +171,10 @@ DESCRIPTION=""
+ #
+ # Usually, device_requires() just needs to check that the test device is the
+ # right type of hardware or supports any necessary features using the
+-# _test_dev_foo helpers. If device_requires() sets \$SKIP_REASON, the test will
+-# be skipped on that device.
++# _require_test_dev_foo helpers. If device_requires() sets \$SKIP_REASON, the
++# test will be skipped on that device.
+ # device_requires() {
+-# 	_test_dev_is_foo && _test_dev_supports_bar
++# 	_require_test_dev_is_foo && _require_test_dev_supports_bar
+ # }
+ 
+ # TODO: define the test. The output of this function (stdout and stderr) will
+diff --git a/tests/block/004 b/tests/block/004
+index d181725e6f80..92060858d4c6 100755
+--- a/tests/block/004
++++ b/tests/block/004
+@@ -14,10 +14,6 @@ requires() {
+ 	_have_fio
+ }
+ 
+-device_requires() {
+-	! _test_dev_is_zoned || _have_fio_zbd_zonemode
+-}
+-
+ test_device() {
+ 	echo "Running ${TEST_NAME}"
+ 
+@@ -25,6 +21,10 @@ test_device() {
+ 	local zbdmode=""
+ 
+ 	if _test_dev_is_zoned; then
++		if ! _have_fio_zbd_zonemode; then
++			return
++		fi
++
+ 		_test_dev_queue_set scheduler deadline
+ 		directio="--direct=1"
+ 		zbdmode="--zonemode=zbd"
+diff --git a/tests/block/007 b/tests/block/007
+index f03935084ce6..b19a57024b42 100755
+--- a/tests/block/007
++++ b/tests/block/007
+@@ -15,7 +15,8 @@ requires() {
+ }
+ 
+ device_requires() {
+-	_test_dev_supports_io_poll && _test_dev_supports_io_poll_delay
++	_require_test_dev_supports_io_poll && \
++		_require_test_dev_supports_io_poll_delay
+ }
+ 
+ run_fio_job() {
+diff --git a/tests/block/011 b/tests/block/011
+index c3432a63e274..4f331b4a7522 100755
+--- a/tests/block/011
++++ b/tests/block/011
+@@ -15,7 +15,7 @@ requires() {
+ }
+ 
+ device_requires() {
+-	_test_dev_is_pci
++	_require_test_dev_is_pci
+ }
+ 
+ test_device() {
+diff --git a/tests/block/019 b/tests/block/019
+index 7cd26bd512bc..113a3d6e8986 100755
+--- a/tests/block/019
++++ b/tests/block/019
+@@ -14,7 +14,7 @@ requires() {
+ }
+ 
+ device_requires() {
+-	_test_dev_is_pci && _test_dev_in_hotplug_slot
++	_require_test_dev_is_pci && _require_test_dev_in_hotplug_slot
+ }
+ 
+ test_device() {
+diff --git a/tests/nvme/032 b/tests/nvme/032
+index a91a473ac5df..ce45657951a1 100755
+--- a/tests/nvme/032
++++ b/tests/nvme/032
+@@ -19,7 +19,7 @@ requires() {
+ }
+ 
+ device_requires() {
+-	_test_dev_is_nvme
++	_require_test_dev_is_nvme
+ }
+ 
+ test_device() {
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 40f0413d32d2..6ffa971b4308 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -11,12 +11,12 @@ group_requires() {
+ }
+ 
+ group_device_requires() {
+-	_test_dev_is_nvme
++	_require_test_dev_is_nvme
+ }
+ 
+ NVMET_CFS="/sys/kernel/config/nvmet/"
+ 
+-_test_dev_is_nvme() {
++_require_test_dev_is_nvme() {
+ 	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q nvme; then
+ 		SKIP_REASON="$TEST_DEV is not a NVMe device"
+ 		return 1
+diff --git a/tests/scsi/006 b/tests/scsi/006
+index f220f61e3c1e..05ed6520d600 100755
+--- a/tests/scsi/006
++++ b/tests/scsi/006
+@@ -12,7 +12,7 @@ DESCRIPTION="toggle SCSI cache type"
+ QUICK=1
+ 
+ device_requires() {
+-	_test_dev_is_scsi_disk
++	_require_test_dev_is_scsi_disk
+ }
+ 
+ test_device() {
+diff --git a/tests/scsi/rc b/tests/scsi/rc
+index 2a192fd0f969..1477cecc5593 100644
+--- a/tests/scsi/rc
++++ b/tests/scsi/rc
+@@ -11,14 +11,14 @@ group_requires() {
+ }
+ 
+ group_device_requires() {
+-	_test_dev_is_scsi
++	_require_test_dev_is_scsi
+ }
+ 
+ _have_scsi_generic() {
+ 	_have_modules sg
+ }
+ 
+-_test_dev_is_scsi() {
++_require_test_dev_is_scsi() {
+ 	if [[ ! -d ${TEST_DEV_SYSFS}/device/scsi_device ]]; then
+ 		SKIP_REASON="$TEST_DEV is not a SCSI device"
+ 		return 1
+@@ -26,7 +26,7 @@ _test_dev_is_scsi() {
+ 	return 0
+ }
+ 
+-_test_dev_is_scsi_disk() {
++_require_test_dev_is_scsi_disk() {
+ 	if [[ ! -d ${TEST_DEV_SYSFS}/device/scsi_disk ]]; then
+ 		SKIP_REASON="$TEST_DEV is not a SCSI disk"
+ 		return 1
+diff --git a/tests/zbd/007 b/tests/zbd/007
+index b4dcbd89f179..2376b3aedaa0 100755
+--- a/tests/zbd/007
++++ b/tests/zbd/007
+@@ -18,7 +18,7 @@ requires() {
+ }
+ 
+ device_requires() {
+-	_test_dev_is_logical
++	_require_test_dev_is_logical
+ }
+ 
+ # Select test target zones. Pick up the first sequential required zones. If
+diff --git a/tests/zbd/rc b/tests/zbd/rc
+index 9c1dc5210b1a..a910a2425567 100644
+--- a/tests/zbd/rc
++++ b/tests/zbd/rc
+@@ -18,7 +18,7 @@ group_requires() {
+ }
+ 
+ group_device_requires() {
+-	_test_dev_is_zoned
++	_require_test_dev_is_zoned
+ }
+ 
+ _fallback_null_blk_zoned() {
+@@ -254,13 +254,20 @@ _find_two_contiguous_seq_zones() {
+ 
+ _test_dev_is_dm() {
+ 	if [[ ! -r "${TEST_DEV_SYSFS}/dm/name" ]]; then
++		return 1
++	fi
++	return 0
++}
++
++_require_test_dev_is_dm() {
++	if ! _test_dev_is_dm; then
+ 		SKIP_REASON="$TEST_DEV is not device-mapper"
+ 		return 1
+ 	fi
+ 	return 0
+ }
+ 
+-_test_dev_is_logical() {
++_require_test_dev_is_logical() {
+ 	if ! _test_dev_is_partition && ! _test_dev_is_dm; then
+ 		SKIP_REASON="$TEST_DEV is not a logical device"
+ 		return 1
+-- 
+2.26.2
 
-> A deferred requeust_queue removal shows this is possible, the parent is
-> taken underneath from us because the refcounting of this kobject is
-> already kobject_del()'d, and its actual removal scheduled for later.
-> The parent is taken underneath from us prior to the scheduled removal
-> completing.
-
-No, a parent's reference is always valid while the child pointer is
-alive.
-
-There is an odd race condition right now that we are working on fixing
-if you notice another lkml thread, but that race will soon be fixed.  So
-no need for every single user in the kernel to try to test for something
-like this (hint, this check is still wrong as with this logic, what
-could prevent parent from going away right _after_ you check it???)
-
-Just remove this invalid check please.
-
-> > > +		return NULL;
-> > > +	}
-> > > +
-> > > +	/*
-> > > +	 * From a sysfs kobject perspective, the request_queue sits on top of
-> > > +	 * the gendisk, which has the name of the disk. We always create a
-> > > +	 * debugfs directory upon init for this gendisk kobject, so we re-use
-> > > +	 * that if blktrace is going to be done for it.
-> > > +	 */
-> > > +	if (blk_trace_target_disk(buts->name, kobject_name(q->kobj.parent))) {
-> > > +		if (!q->debugfs_dir) {
-> > > +			pr_warn("%s: expected request_queue debugfs_dir is not set\n",
-> > > +				buts->name);
-> > 
-> > What is userspace supposed to be able to do if they see this warning?
-> 
-> Userspace doesn't parse warnings, but the NULL ensures it won't crash
-> the kernel. The warn informs the kernel of a possible block layer bug.
-
-Again, the code should not care if the pointer is NULL, as only debugfs
-deals with those pointers (and it can handle a NULL pointer just fine.)
-
-> > > +			return NULL;
-> > > +		}
-> > > +		/*
-> > > +		 * debugfs_lookup() is used to ensure the directory is not
-> > > +		 * taken from underneath us. We must dput() it later once
-> > > +		 * done with it within blktrace.
-> > > +		 */
-> > > +		dir = debugfs_lookup(buts->name, blk_debugfs_root);
-> > > +		if (!dir) {
-> > > +			pr_warn("%s: expected request_queue debugfs_dir dentry is gone\n",
-> > > +				buts->name);
-> > 
-> > Again, can't we just save the pointer when we create it and not have to
-> > look it up again?
-> 
-> Only if we do the revert of the requeust_queue removal first.
-
-Your end goal should be no more debugfs_lookup() calls.  Hopefully by
-the end of this patch series, that is the result.
-
-> > > +			return NULL;
-> > > +		}
-> > > +		 /*
-> > > +		 * This is a reaffirmation that debugfs_lookup() shall always
-> > > +		 * return the same dentry if it was already set.
-> > > +		 */
-> > 
-> > I'm all for reaffirmation and the like, but really, is this needed???
-> 
-> To those who were still not sure that the issue was not a debugfs issue
-> I hoped this to make it clear. But indeed, if we revert back to
-> synchronous request_queue removal, that should simplify this.
-
-Again, don't pander to crazies :)
-
-thanks,
-
-greg k-h
