@@ -2,94 +2,92 @@ Return-Path: <SRS0=KmMx=6F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA0CC54FCC
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 13:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0497BC54FCC
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 13:55:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44AF82078C
-	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 13:24:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C92562071E
+	for <linux-block@archiver.kernel.org>; Tue, 21 Apr 2020 13:55:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oa3l8piB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbgDUNYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Apr 2020 09:24:50 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:28699 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1728786AbgDUNYu (ORCPT
+        id S1726741AbgDUNzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Apr 2020 09:55:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726691AbgDUNzh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Apr 2020 09:24:50 -0400
-X-ASG-Debug-ID: 1587475487-0e4088442c28d4e0001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.143]) by bsf01.didichuxing.com with ESMTP id 3tlo80HeEEHLg13Z; Tue, 21 Apr 2020 21:24:47 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 21 Apr
- 2020 21:24:46 +0800
-Date:   Tue, 21 Apr 2020 21:24:45 +0800
-From:   weiping zhang <zhangweiping@didichuxing.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        Weiping Zhang <zhangweiping@didiglobal.com>
-Subject: Re: [PATCH v3 6/7] block: refactor __blk_mq_alloc_rq_map_and_requests
-Message-ID: <20200421132440.GB20391@192.168.3.9>
-X-ASG-Orig-Subj: Re: [PATCH v3 6/7] block: refactor __blk_mq_alloc_rq_map_and_requests
-Mail-Followup-To: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org,
-        Weiping Zhang <zhangweiping@didiglobal.com>
-References: <cover.1586199103.git.zhangweiping@didiglobal.com>
- <eb995b7a9c5a942c596eb21856043c4a1b2135f1.1586199103.git.zhangweiping@didiglobal.com>
- <e289ea06-c799-8444-2b2a-720f5d75f2c2@acm.org>
+        Tue, 21 Apr 2020 09:55:37 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B449C061A10;
+        Tue, 21 Apr 2020 06:55:37 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id v7so14556472qkc.0;
+        Tue, 21 Apr 2020 06:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JdVf9BN3VBYjlAhO1URHy0+Z7z5xubg6gKNXsMj3SD4=;
+        b=Oa3l8piBEzFzpUodpAlB8sX2rIFN5rCXcXoK/64lBT5B4WYoVSwHlYi34Q5qywt28H
+         cfvMFt9WTY5nAH/3jZaU6gCro5xLxShm8sZTIbJ663fFyYihQBaJ2+KIrIjmiuNvsaZH
+         xLXvGjPvLO80jKeV+hYT8pMCUHQ1ECHN+VH4USRvsCwp7x5nC+1YpdZsFWdg6nteG+wS
+         TPWaFEd1X/gT+pZzFfJPhG/793rk8haj9S21poT71hz4YSMj3z9lCUchhCA0+yE2LAyu
+         +JBhENAXBxxMFHMnxjf4MuOG9FD3Womgna2yC/rHmrY24iXI1lb/8e3XQHAhRKi83BwG
+         D9Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JdVf9BN3VBYjlAhO1URHy0+Z7z5xubg6gKNXsMj3SD4=;
+        b=rPN8vrYPtvaG1PZdBEU07g5ErXvFtkil8SOKvvtKPSW877h/TwNSMqIupkBsgzOmtf
+         /5j1ZujVG3ZUlQrH3YkO9TArb62Am5/lL3R1Bj+vBBNBYDDyrCc5v7ZcouO4hwkoMqC2
+         wczaEbSzdBM4HsN25t6RAiFbEYRAz4QttIiMbsQCwSBgbwOkzwh/WuTmO2yCL16oRxBj
+         hYH3b1ZntMUhTlTebXXu6WzRhGb8p1bf1DSQ7Hki/iU/iGpq8i764PAO98tHVp5V2cNn
+         J55ttZ7pY2xFJhsInl8K3X+1lZQBUNi4JAqQ8xQO+ul4LnA6CMuxbo+klA1ReQT4OXuv
+         u0Ew==
+X-Gm-Message-State: AGi0Pua1MRRxLJjqvyNCKM5Q7y4pljWxlR1w60PXzoeAGY4sn+F+CRNB
+        sC1he2TY7hqE5RUU4oCNTGg=
+X-Google-Smtp-Source: APiQypInKCW27Sksr2RruGrr84Fcf0glvObAa7VP5aoCxArIj1/PHlvxTm9HsNw6U4bBzMxqrk+G7w==
+X-Received: by 2002:a37:b93:: with SMTP id 141mr21368378qkl.192.1587477336425;
+        Tue, 21 Apr 2020 06:55:36 -0700 (PDT)
+Received: from dschatzberg-fedora-PC0Y6AEN ([2620:10d:c091:480::1:6809])
+        by smtp.gmail.com with ESMTPSA id g6sm1774808qtc.52.2020.04.21.06.55.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2020 06:55:35 -0700 (PDT)
+Date:   Tue, 21 Apr 2020 09:55:33 -0400
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 1/4] loop: Use worker per cgroup instead of kworker
+Message-ID: <20200421135533.GA9623@dschatzberg-fedora-PC0Y6AEN>
+References: <20200420223936.6773-1-schatzberg.dan@gmail.com>
+ <20200421024845.6948-1-hdanton@sina.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e289ea06-c799-8444-2b2a-720f5d75f2c2@acm.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS02.didichuxing.com (172.20.36.211) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.143]
-X-Barracuda-Start-Time: 1587475487
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 1158
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81316
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+In-Reply-To: <20200421024845.6948-1-hdanton@sina.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 02:07:13PM -0700, Bart Van Assche wrote:
-> On 4/6/20 12:37 PM, Weiping Zhang wrote:
-> >This patch add a new member nr_allocated_map_rqs to the
-> >struct blk_mq_tag_set to record the number of maps and requests have
-> >been allocated for this tagset.
-> >
-> >Now there is a problem when we increase hardware queue count, we do not
-> >allocate maps and request for the new allocated hardware queue, it will
-> >be fixed in the next patch.
-> >
-> >Since request needs lots of memory, it's not easy alloc so many memory
-> >dynamically, espeicially when system is under memory pressure.
-> >
-> >This patch allow nr_hw_queues does not equal to the nr_allocated_map_rqs,
-> >to avoid alloc/free memory when change hardware queue count.
+On Tue, Apr 21, 2020 at 10:48:45AM +0800, Hillf Danton wrote:
 > 
-> It seems to me that patches 6 and 7 combined fix a single issue. How
-> about combining these two patches into a single patch?
+> On Mon, 20 Apr 2020 18:39:29 -0400 Dan Schatzberg wrote:
+> > 
+> > @@ -1140,8 +1215,17 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+> >  	blk_mq_freeze_queue(lo->lo_queue);
+> >  
+> >  	spin_lock_irq(&lo->lo_lock);
+> > +	destroy_workqueue(lo->workqueue);
 > 
-It's ok for me, the reason why I split two patches is that make patch
-review more easily, since patch-6 actually does not change original
-logic. If you think combined them is more better, I can merge these
-two patches.
+> Destruct it out of atomic context.
 
-Thanks
-> Thanks,
-> 
-> Bart.
+I may as well do this, but it doesn't matter, does it? The
+blk_mq_freeze_queue above should drain all I/O so the workqueue will
+be idle.
