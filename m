@@ -2,101 +2,84 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD15FC5518B
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE6CC5518A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:39:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC881206A1
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:34:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587540894;
-	bh=ZJ3LnVNeUd8TjGzB3gxTQsGRsV+WnJqj8S4ZhM+URXI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VVyL9iDaf788EE0Ta+Xb5Kk/NWu/7RcHLBHuEFbSShFMsu4z5lRx2EJMA5sm0s549
-	 raigVIU+1pDGLk9QyWTKkM5w/3dczp/SrzkpoVaeiJvcrAgevuu5XcqVcM4FwwYYrH
-	 qRH3TyfpkyT2jsTi5XhOtPg8tD4K2AVK0pDyBIQA=
+	by mail.kernel.org (Postfix) with ESMTP id 2D418206D4
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:39:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KOZVBoF7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725899AbgDVHev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 03:34:51 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43031 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725786AbgDVHev (ORCPT
+        id S1725961AbgDVHjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 03:39:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725786AbgDVHjE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 03:34:51 -0400
-Received: by mail-pf1-f196.google.com with SMTP id v63so640460pfb.10;
-        Wed, 22 Apr 2020 00:34:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=xv3CClgNM59iAjDs4jAyjCmiyK+zMtMkYtDjchx4A/4=;
-        b=dDk/SQA0IzXPjgeu0yIb59yzu/kuKns0rKQq87n8XIcrAxHumqcENxj2+eAuhKxk0F
-         40kJJi6H0DZqd+/XcpiIfK/Me0m2Jg1sgIfBZvN3paYjvzankAcdd0fU/tBoChoXVfz0
-         CZ9UAwJB5OpgSp5qpOxqbSPkO/ddOAOcfl1Jn/cqE8SKOVABaHIIUM5GFthJGqGu/uIr
-         eNfapxl8h67kdmsfrly9dbu52f4+309RhXfGrczpIpybsKKTDiBseDH3yERmAKah5AVL
-         e7f0bV8HOPu9GfgbOXFJ57el2+gDCMJhZVUxwoDVoWO08grmVYKQiW28lRsTVz9zw9sI
-         Jezg==
-X-Gm-Message-State: AGi0PuZ1hUFIINEytbqdOfWCFYu7fwRBmqjSEYHwAC8v8uytqioCF9Fr
-        LocQD90YJ41IktoIBMcOzNA=
-X-Google-Smtp-Source: APiQypIMihueeTQ943/uTYtrvog7ersMvpf7K7XYY8myv59EdZuGEtFE1ttqG91Zu2F3zNVNy168tQ==
-X-Received: by 2002:a62:1bd0:: with SMTP id b199mr25631509pfb.283.1587540890239;
-        Wed, 22 Apr 2020 00:34:50 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id a13sm4534042pjq.0.2020.04.22.00.34.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2020 00:34:49 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 64CC1402A1; Wed, 22 Apr 2020 07:34:48 +0000 (UTC)
-Date:   Wed, 22 Apr 2020 07:34:48 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, bvanassche@acm.org, rostedt@goodmis.org,
-        mingo@redhat.com, jack@suse.cz, ming.lei@redhat.com,
-        nstange@suse.de, akpm@linux-foundation.org, mhocko@suse.com,
-        yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
-Message-ID: <20200422073448.GR11244@42.do-not-panic.com>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-4-mcgrof@kernel.org>
- <20200420201615.GC302402@kroah.com>
- <20200420204156.GO11244@42.do-not-panic.com>
- <20200422072942.GD19116@infradead.org>
+        Wed, 22 Apr 2020 03:39:04 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44EB0C03C1A6;
+        Wed, 22 Apr 2020 00:39:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=WtcH9W9UJR7zIdoPQnBUNprDw0gzdRhH+V87MBmxzmA=; b=KOZVBoF7MIc4arL1LFgotKDaNl
+        CGgqIxdSvJ5C+lxlXZBTKlsMAothNUd0o7cmku6oxxZCctumxAIphVrtha/+AgGevK2uOw5vO69u4
+        TSPFNEbgwMuwUysdBSO+0PQKLZNNl+IqZENDFOwTAs+TcU7rLkjh2GtEgkgwBewqBi4qSoXPBFJKD
+        sVzUoeR52ym7SiUPFf+UuZpHOZUXZt3fHlutzQNem9EAnfe2no5bGOsLfL35ikjjOJjeSEqcBoxqK
+        9eVZTYj3w7DLYxpNNKyEphCUipl2dpLbRQg82zUz+OIhxVdc5uoA0LBXF4v4xm0WV3V375l+7RlCs
+        dzjF/Wmw==;
+Received: from [2001:4bb8:191:e12c:c70:4a89:bc61:3] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jR9yB-00008a-Vb; Wed, 22 Apr 2020 07:38:56 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
+        bvanassche@acm.org, tytso@mit.edu, hdegoede@redhat.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/9] vboxsf: don't use the source name in the bdi name
+Date:   Wed, 22 Apr 2020 09:38:43 +0200
+Message-Id: <20200422073851.303714-2-hch@lst.de>
+X-Mailer: git-send-email 2.26.1
+In-Reply-To: <20200422073851.303714-1-hch@lst.de>
+References: <20200422073851.303714-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200422072942.GD19116@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 12:29:42AM -0700, Christoph Hellwig wrote:
-> On Mon, Apr 20, 2020 at 08:41:56PM +0000, Luis Chamberlain wrote:
-> > Its already there. And yes, after my changes it is technically possible
-> > to just re-use it directly. But this is complicated by a few things. One
-> > is that at this point in time, asynchronous request_queue removal is
-> > still possible, and so a race was exposed where a requeust_queue may be
-> > lingering but its old device is gone. That race is fixed by reverting us
-> > back to synchronous request_queue removal, therefore ensuring that the
-> > debugfs dir exists so long as the device does.
-> > 
-> > I can remove the debugfs_lookup() *after* we revert to synchronous
-> > request_queue removal, or we just re-order the patches so that the
-> > revert happens first. That should simplify this patch.
-> 
-> Yes, please move the synchronous removal first instead of working around
-> the current problems.
+Simplify the bdi name to mirror what we are doing elsewhere, and
+drop them name in favor of just using a number.  This avoids a
+potentially very long bdi name.
 
-Sounds good. At first it was questionable, now its understood we need it.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/vboxsf/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Luis
+diff --git a/fs/vboxsf/super.c b/fs/vboxsf/super.c
+index 675e26989376..8fe03b4a0d2b 100644
+--- a/fs/vboxsf/super.c
++++ b/fs/vboxsf/super.c
+@@ -164,7 +164,7 @@ static int vboxsf_fill_super(struct super_block *sb, struct fs_context *fc)
+ 		goto fail_free;
+ 	}
+ 
+-	err = super_setup_bdi_name(sb, "vboxsf-%s.%d", fc->source, sbi->bdi_id);
++	err = super_setup_bdi_name(sb, "vboxsf-%d", sbi->bdi_id);
+ 	if (err)
+ 		goto fail_free;
+ 
+-- 
+2.26.1
+
