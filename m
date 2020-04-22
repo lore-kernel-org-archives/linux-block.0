@@ -2,102 +2,88 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79B1C54FCB
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 15:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3A9C5518B
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 16:35:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B98DF2073A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 15:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A180821473
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 16:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587573301;
+	bh=w4JN5T5oaZgQeBhYVqmXSSTzkWYLzuJOyQMklh0w+mc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=CPexyZlV8i3kv4lNmcQtbwVKbEB/72hKrqYuWty5DKdUDuw1ft6E1HBn9kOophUwT
+	 J+PV/2ftD2BoTlER4lmTzVeaFXdR/vFqKlF0K/RBFubckzxpxTd3rhbDtFhZYds9KZ
+	 ih2+50k4vXeA4UrgCh/8Y0eDxipjNNvXmu/kB1As=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbgDVPLA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 11:11:00 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:46664 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbgDVPK7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 11:10:59 -0400
-Received: by mail-pf1-f195.google.com with SMTP id 145so1210961pfw.13;
-        Wed, 22 Apr 2020 08:10:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BpWmzLO4boJS/3NuyjpxKLUJHU99G06c2WaRP9JRw3U=;
-        b=pv1y3mvya9UT5qCckTHElRSTa/3ZxMp6OvEOz4YukVN8LvMBgBXvcqPjZt80R9hBCY
-         KXopewmlKcgaz0/g59tHdTDQkbDfj8OfOcEQx4EFqEhwRjczzxc61FlQOjbnayBuV1cG
-         vix3qtLpuZ+5GoPPA5lUewe8HqbredHNugBr9F1DmLEWdxHnVGiiSDsOAVMnOglmVnUF
-         uXMqLAZRQqjfoW/F0Sp1/znTg8iOr2NMKUOLZ0SxGRRge/1SJFQ7gyjUruZikZ4O+AHq
-         Lgrod/f/JCrk2nHfP8+nV7n0zZcouVPeM9sAyOXhTXcv+fTACimpOA5KcsiqgzOZnx1k
-         iCGQ==
-X-Gm-Message-State: AGi0PuYrCiFJ7VvyVE4R/Gq3jd7rSVDzCDE6bEBRtSbsQj6ZvXTAzFis
-        BnT7QIEHmuAWgopa7vnWMjg=
-X-Google-Smtp-Source: APiQypKxUUHnj/wIbVHs6Yr09dany3cagZOY3KdJIbbj3FYX6ZdtyChy0un+L44MwTvT/APFqhlYaw==
-X-Received: by 2002:a65:4548:: with SMTP id x8mr26677950pgr.223.1587568258821;
-        Wed, 22 Apr 2020 08:10:58 -0700 (PDT)
-Received: from [100.124.11.187] ([104.129.198.222])
-        by smtp.gmail.com with ESMTPSA id w9sm5990767pff.101.2020.04.22.08.10.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2020 08:10:58 -0700 (PDT)
-Subject: Re: [PATCH 4/4] loop: Add LOOP_SET_FD_AND_STATUS ioctl.
-To:     Martijn Coenen <maco@android.com>, axboe@kernel.dk, hch@lst.de,
-        ming.lei@redhat.com
-Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maco@google.com, Chaitanya.Kulkarni@wdc.com
-References: <20200420080409.111693-1-maco@android.com>
- <20200420080409.111693-5-maco@android.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <9eaa4dc8-cd8f-a4e9-e83d-f49f8b00ec0e@acm.org>
-Date:   Wed, 22 Apr 2020 08:10:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726245AbgDVQe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 12:34:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45550 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725808AbgDVQez (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Apr 2020 12:34:55 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EC2C42082E;
+        Wed, 22 Apr 2020 16:34:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587573295;
+        bh=w4JN5T5oaZgQeBhYVqmXSSTzkWYLzuJOyQMklh0w+mc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aZf1+a1hml5uJnZaaGENlJlwC+gD2DiStpvw9MbJN79Of1MS4pCvEtSRkFH8HgEAs
+         7fOVd35T+0Gzr+lcs/fPBzcOfZwgU1mtNIXUpTpq/zVTT1FP1lqMBaln4BIhmCMnnX
+         BYRK3509URKr1fwMf23OLyAXB9dtNLLPLUEV5wns=
+Date:   Wed, 22 Apr 2020 18:34:53 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Christian Brauner <christian.brauner@ubuntu.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-api@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Serge Hallyn <serge@hallyn.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Saravana Kannan <saravanak@google.com>,
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        Seth Forshee <seth.forshee@canonical.com>,
+        David Rheinsberg <david.rheinsberg@gmail.com>,
+        Tom Gundersen <teg@jklm.no>,
+        Christian Kellner <ckellner@redhat.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        =?iso-8859-1?Q?St=E9phane?= Graber <stgraber@ubuntu.com>,
+        linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+        Steve Barber <smbarber@google.com>,
+        Dylan Reid <dgreid@google.com>,
+        Filipe Brandenburger <filbranden@gmail.com>,
+        Kees Cook <keescook@chromium.org>,
+        Benjamin Elder <bentheelder@google.com>,
+        Akihiro Suda <suda.kyoto@gmail.com>
+Subject: Re: [PATCH v2 1/7] kobject_uevent: remove unneeded netlink_ns check
+Message-ID: <20200422163453.GA3438121@kroah.com>
+References: <20200422145437.176057-1-christian.brauner@ubuntu.com>
+ <20200422145437.176057-2-christian.brauner@ubuntu.com>
 MIME-Version: 1.0
-In-Reply-To: <20200420080409.111693-5-maco@android.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422145437.176057-2-christian.brauner@ubuntu.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/20/20 1:04 AM, Martijn Coenen wrote:
-> diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
-> index 080a8df134ef..fcc9a693b588 100644
-> --- a/include/uapi/linux/loop.h
-> +++ b/include/uapi/linux/loop.h
-> @@ -60,6 +60,11 @@ struct loop_info64 {
->   	__u64		   lo_init[2];
->   };
->   
-> +struct loop_fd_and_status {
-> +	struct loop_info64	info;
-> +	__u32			fd;
-> +};
-> +
->   /*
->    * Loop filter types
->    */
-> @@ -90,6 +95,7 @@ struct loop_info64 {
->   #define LOOP_SET_CAPACITY	0x4C07
->   #define LOOP_SET_DIRECT_IO	0x4C08
->   #define LOOP_SET_BLOCK_SIZE	0x4C09
-> +#define LOOP_SET_FD_AND_STATUS	0x4C0A
->   
->   /* /dev/loop-control interface */
->   #define LOOP_CTL_ADD		0x4C80
+On Wed, Apr 22, 2020 at 04:54:31PM +0200, Christian Brauner wrote:
+> Back when I rewrote large chunks of uevent sending I should have removed
+> the .netlink_ns method completely after having removed it's last user in
+> [1]. Let's remove it now and also remove the helper associated with it
+> that is unused too.
+> 
+> Fixes: a3498436b3a0 ("netns: restrict uevents") /* No backport needed. */
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
 
-Should linux-api be Cc'ed for this patch or the entire patch series? 
- From https://www.kernel.org/doc/man-pages/linux-api-ml.html: "Among 
-other things, a primary goal of the list is to help answer the question: 
-How do we even know when an interface has been added or changed?".
-
-Thanks,
-
-Bart.
-
-
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
