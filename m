@@ -2,158 +2,141 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E00C55185
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 20:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9014BC54FCB
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 21:29:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B55C021473
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 20:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B34420781
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 21:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbgDVU5Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 16:57:25 -0400
-Received: from mail.hallyn.com ([178.63.66.53]:45876 "EHLO mail.hallyn.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726105AbgDVU5Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 16:57:25 -0400
-X-Greylist: delayed 391 seconds by postgrey-1.27 at vger.kernel.org; Wed, 22 Apr 2020 16:57:22 EDT
-Received: by mail.hallyn.com (Postfix, from userid 1001)
-        id 2555C9A3; Wed, 22 Apr 2020 15:50:51 -0500 (CDT)
-Date:   Wed, 22 Apr 2020 15:50:51 -0500
-From:   "Serge E. Hallyn" <serge@hallyn.com>
-To:     Christian Brauner <christian.brauner@ubuntu.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Serge Hallyn <serge@hallyn.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Saravana Kannan <saravanak@google.com>,
-        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
-        Seth Forshee <seth.forshee@canonical.com>,
-        David Rheinsberg <david.rheinsberg@gmail.com>,
-        Tom Gundersen <teg@jklm.no>,
-        Christian Kellner <ckellner@redhat.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        =?iso-8859-1?Q?St=E9phane?= Graber <stgraber@ubuntu.com>,
-        linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-        Steve Barber <smbarber@google.com>,
-        Dylan Reid <dgreid@google.com>,
-        Filipe Brandenburger <filbranden@gmail.com>,
-        Kees Cook <keescook@chromium.org>,
-        Benjamin Elder <bentheelder@google.com>,
-        Akihiro Suda <suda.kyoto@gmail.com>
-Subject: Re: [PATCH v2 3/7] loop: use ns_capable for some loop operations
-Message-ID: <20200422205051.GA31944@mail.hallyn.com>
-References: <20200422145437.176057-1-christian.brauner@ubuntu.com>
- <20200422145437.176057-4-christian.brauner@ubuntu.com>
+        id S1726116AbgDVV3X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 17:29:23 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2085 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726112AbgDVV3X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Apr 2020 17:29:23 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id EC4CB9844C771D4063A1;
+        Wed, 22 Apr 2020 22:29:20 +0100 (IST)
+Received: from [127.0.0.1] (10.47.1.29) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Wed, 22 Apr
+ 2020 22:29:19 +0100
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
+To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.de>,
+        <don.brace@microsemi.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>, <hch@infradead.org>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
+ <1583409280-158604-9-git-send-email-john.garry@huawei.com>
+ <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com>
+ <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
+ <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
+ <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
+ <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com>
+ <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
+ <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com>
+Message-ID: <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
+Date:   Wed, 22 Apr 2020 22:28:44 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200422145437.176057-4-christian.brauner@ubuntu.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.1.29]
+X-ClientProxiedBy: lhreml702-chm.china.huawei.com (10.201.108.51) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 04:54:33PM +0200, Christian Brauner wrote:
-> The following  LOOP_GET_STATUS, LOOP_SET_STATUS, and LOOP_SET_BLOCK_SIZE
-> operations are now allowed in non-initial namespaces. Most other
-> operations were already possible before.
-> 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Seth Forshee <seth.forshee@canonical.com>
-> Cc: Tom Gundersen <teg@jklm.no>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Christian Kellner <ckellner@redhat.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Rheinsberg <david.rheinsberg@gmail.com>
-> Cc: Dmitry Vyukov <dvyukov@google.com>
-> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+On 22/04/2020 19:59, Kashyap Desai wrote:
+>>
 
-Reviewed-by: Serge Hallyn <serge@hallyn.com>
+Hi Kashyap,
 
-> ---
-> /* v2 */
-> - Christian Brauner <christian.brauner@ubuntu.com>:
->   - Adapated loop_capable() based on changes in the loopfs
->     implementation patchset. Otherwise it is functionally equivalent to
->     the v1 version.
-> ---
->  drivers/block/loop.c | 20 +++++++++++++++-----
->  1 file changed, 15 insertions(+), 5 deletions(-)
+>> So I tested this on hisi_sas with x12 SAS SSDs, and performance with "mq-
+>> deadline" is comparable with "none" @ ~ 2M IOPs. But after a while
+>> performance drops alot, to maybe 700K IOPS. Do you have a similar
+>> experience?
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 52f7583dd17d..8e21d4b33e01 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1352,6 +1352,16 @@ void loopfs_evict_locked(struct loop_device *lo)
->  	}
->  	mutex_unlock(&loop_ctl_mutex);
->  }
-> +
-> +static bool loop_capable(const struct loop_device *lo, int cap)
-> +{
-> +	return ns_capable(loopfs_ns(lo), cap);
-> +}
-> +#else /* !CONFIG_BLK_DEV_LOOPFS */
-> +static inline bool loop_capable(const struct loop_device *lo, int cap)
-> +{
-> +	return capable(cap);
-> +}
->  #endif /* CONFIG_BLK_DEV_LOOPFS */
->  
->  static int
-> @@ -1368,7 +1378,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  		return err;
->  	if (lo->lo_encrypt_key_size &&
->  	    !uid_eq(lo->lo_key_owner, uid) &&
-> -	    !capable(CAP_SYS_ADMIN)) {
-> +	    !loop_capable(lo, CAP_SYS_ADMIN)) {
->  		err = -EPERM;
->  		goto out_unlock;
->  	}
-> @@ -1499,7 +1509,7 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
->  	memcpy(info->lo_crypt_name, lo->lo_crypt_name, LO_NAME_SIZE);
->  	info->lo_encrypt_type =
->  		lo->lo_encryption ? lo->lo_encryption->number : 0;
-> -	if (lo->lo_encrypt_key_size && capable(CAP_SYS_ADMIN)) {
-> +	if (lo->lo_encrypt_key_size && loop_capable(lo, CAP_SYS_ADMIN)) {
->  		info->lo_encrypt_key_size = lo->lo_encrypt_key_size;
->  		memcpy(info->lo_encrypt_key, lo->lo_encrypt_key,
->  		       lo->lo_encrypt_key_size);
-> @@ -1723,7 +1733,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
->  		return loop_clr_fd(lo);
->  	case LOOP_SET_STATUS:
->  		err = -EPERM;
-> -		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-> +		if ((mode & FMODE_WRITE) || loop_capable(lo, CAP_SYS_ADMIN)) {
->  			err = loop_set_status_old(lo,
->  					(struct loop_info __user *)arg);
->  		}
-> @@ -1732,7 +1742,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
->  		return loop_get_status_old(lo, (struct loop_info __user *) arg);
->  	case LOOP_SET_STATUS64:
->  		err = -EPERM;
-> -		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
-> +		if ((mode & FMODE_WRITE) || loop_capable(lo, CAP_SYS_ADMIN)) {
->  			err = loop_set_status64(lo,
->  					(struct loop_info64 __user *) arg);
->  		}
-> @@ -1742,7 +1752,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
->  	case LOOP_SET_CAPACITY:
->  	case LOOP_SET_DIRECT_IO:
->  	case LOOP_SET_BLOCK_SIZE:
-> -		if (!(mode & FMODE_WRITE) && !capable(CAP_SYS_ADMIN))
-> +		if (!(mode & FMODE_WRITE) && !loop_capable(lo, CAP_SYS_ADMIN))
->  			return -EPERM;
->  		/* Fall through */
->  	default:
-> -- 
-> 2.26.1
+> I am using mq-deadline only for HDD. I have not tried on SSD since it is not
+> useful scheduler for SSDs.
+> 
+
+I ask as I only have SAS SSDs to test.
+
+> I noticed that when I used mq-deadline, performance drop starts if I have
+> more number of drives.
+> I am running <fio> script which has 64 Drives, 64 thread and all treads are
+> bound to local numa node which has 36 logical cores.
+> I noticed that lock contention is in " dd_dispatch_request". I am not sure
+> why there is a no penalty of same lock in nr_hw_queue  = 1 mode.
+
+So this could be just pre-existing issue of exposing multiple queues for 
+SCSI HBAs combined with mq-deadline iosched. I mean, that's really the 
+only significant change in this series, apart from the shared sbitmap, 
+and, at this point, I don't think that is the issue.
+
+> 
+> static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+> {
+>          struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+>          struct request *rq;
+> 
+>          spin_lock(&dd->lock);
+
+So if multiple hctx's are accessing this lock, then much contention 
+possible.
+
+>          rq = __dd_dispatch_request(dd);
+>          spin_unlock(&dd->lock);
+> 
+>          return rq;
+> }
+> 
+> Here is perf report -
+> 
+> -    1.04%     0.99%  kworker/18:1H+k  [kernel.vmlinux]  [k]
+> native_queued_spin_lock_slowpath
+>       0.99% ret_from_fork
+>      -   kthread
+>        - worker_thread
+>           - 0.98% process_one_work
+>              - 0.98% __blk_mq_run_hw_queue
+>                 - blk_mq_sched_dispatch_requests
+>                    - 0.98% blk_mq_do_dispatch_sched
+>                       - 0.97% dd_dispatch_request
+>                          + 0.97% queued_spin_lock_slowpath
+> +    1.04%     0.00%  kworker/18:1H+k  [kernel.vmlinux]  [k]
+> queued_spin_lock_slowpath
+> +    1.03%     0.95%  kworker/19:1H-k  [kernel.vmlinux]  [k]
+> native_queued_spin_lock_slowpath
+> +    1.03%     0.00%  kworker/19:1H-k  [kernel.vmlinux]  [k]
+> queued_spin_lock_slowpath
+> +    1.02%     0.97%  kworker/20:1H+k  [kernel.vmlinux]  [k]
+> native_queued_spin_lock_slowpath
+> +    1.02%     0.00%  kworker/20:1H+k  [kernel.vmlinux]  [k]
+> queued_spin_lock_slowpath
+> +    1.01%     0.96%  kworker/21:1H+k  [kernel.vmlinux]  [k]
+> native_queued_spin_lock_slowpath
+> 
+
+I'll try to capture a perf report and compare to mine.
+
+Thanks very much,
+john
