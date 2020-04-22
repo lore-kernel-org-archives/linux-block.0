@@ -2,47 +2,74 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D802AC54FCC
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 06:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2700C54FCC
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 06:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C02A6206E9
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 06:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98E042070B
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 06:44:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NQJRNZk+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgDVGly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 02:41:54 -0400
-Received: from verein.lst.de ([213.95.11.211]:50470 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726539AbgDVGly (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 02:41:54 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id CE82E68C7B; Wed, 22 Apr 2020 08:41:51 +0200 (CEST)
-Date:   Wed, 22 Apr 2020 08:41:51 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: clean up DMA draining
-Message-ID: <20200422064151.GA23271@lst.de>
-References: <20200414074225.332324-1-hch@lst.de>
+        id S1726413AbgDVGog (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 02:44:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726041AbgDVGof (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Apr 2020 02:44:35 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC103C03C1A6;
+        Tue, 21 Apr 2020 23:44:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=R3Wcm6CbR/G6SLD4XVnk7GpiQZBdrcFoabboLjiCXlQ=; b=NQJRNZk+/BeYMRqupYqT78Xm3c
+        lUHnX1+AoijrHjRNNPRMqd69eOFSctktIO/ZIi232xkEOjE7IKKc3qy/cDK6GKxexH6xqtHuGC8Wj
+        Qf+1BoxBR5jrLE8abr6u4QZ7Tg8SXsjoyID0NawIg+a995SvhAeciWRQh7MGc1knkwEd4L2SrwP7w
+        dSUNSgSynR4vKot2UhL11knNyxFmtrA9PZspvbvAJGO6WClEg9BOm57RRiE3fxqo3gqiP2FWBvPwg
+        G9uWfO08I77P5IXANZE9CvFR676D7PN9EZvqEem9VMFMZfNOwwnoIPzF3IiwXBWcWu/HtQMjcBuWy
+        qQSzRiQg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jR97X-0004Z0-Bx; Wed, 22 Apr 2020 06:44:31 +0000
+Date:   Tue, 21 Apr 2020 23:44:31 -0700
+From:   "hch@infradead.org" <hch@infradead.org>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v7 01/11] scsi: free sgtables in case command setup fails
+Message-ID: <20200422064431.GG20318@infradead.org>
+References: <20200417121536.5393-1-johannes.thumshirn@wdc.com>
+ <20200417121536.5393-2-johannes.thumshirn@wdc.com>
+ <de79e1ab-0407-205e-3272-532f0484b49f@acm.org>
+ <SN4PR0401MB3598B2774CD52FAB68C726249BD40@SN4PR0401MB3598.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200414074225.332324-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <SN4PR0401MB3598B2774CD52FAB68C726249BD40@SN4PR0401MB3598.namprd04.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 14, 2020 at 09:42:20AM +0200, Christoph Hellwig wrote:
-> Hi all,
+On Mon, Apr 20, 2020 at 10:46:21AM +0000, Johannes Thumshirn wrote:
+> On 18/04/2020 18:02, Bart Van Assche wrote:
+> > How about adding __must_check to scsi_setup_fs_cmnd()?
 > 
-> currently the dma draining and alignining specific to ATA CDROMs
-> and the UFS driver has its ugly hooks in core block code.  Move
-> this out into the scsi and ide drivers instead.
+> I'm actually not sure if __must_check helps us anything given that with 
+> this patch applied:
 
-Any commens?
+It doesn't.  __must_check on static functions with a single caller does
+not make any sense.
