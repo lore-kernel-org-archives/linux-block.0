@@ -2,97 +2,114 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8ACC5518A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFA7C5518A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:18:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB956206CD
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LZ9bLGtU"
+	by mail.kernel.org (Postfix) with ESMTP id E8A1320738
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 07:18:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgDVHMm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 03:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34200 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725811AbgDVHMl (ORCPT
+        id S1725811AbgDVHSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 03:18:10 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:50382 "EHLO
+        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725786AbgDVHSK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 03:12:41 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C805CC03C1A6;
-        Wed, 22 Apr 2020 00:12:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tKRtOF2AB7kDWsb4QG4ECyPWPTRwKsuq3B30I2Zar6w=; b=LZ9bLGtUvmC5vkvma34usMEMF0
-        6jiVpQ+hILuiLZnqq6x6MRbc/+tNYrzzUPrlqJBt1U+ETOYrj3+DplO5+QHABaxI4jpz4JB2T8G1m
-        MrURYBwCdOEUktkz4847EAey9kE2p7b+XvoC+kcvoOhIC7Yu7d561QMAYfzOIgL4kRHSvrf8UWL3J
-        UloJWAMKAKVj2bFTfjlGpSvkA2Qu9L0gOnbnW9ylzL8FdE7ElCLbAwce6DqvqwS2SZZZo5bM5DCyT
-        i9DwxIg+vGLTaV0Tyxl06IQntzMQp5bNRxe4+RZegfhKHwRRP9PeeT/qdoPyI0GbgQujm7/w3sLcT
-        q47lG8vw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jR9YF-00056g-7f; Wed, 22 Apr 2020 07:12:07 +0000
-Date:   Wed, 22 Apr 2020 00:12:07 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/10] blktrace: move blktrace debugfs creation to
- helper function
-Message-ID: <20200422071207.GB19116@infradead.org>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-3-mcgrof@kernel.org>
+        Wed, 22 Apr 2020 03:18:10 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
+        by charlie.dont.surf (Postfix) with ESMTPSA id 772F6BF5D9;
+        Wed, 22 Apr 2020 07:18:08 +0000 (UTC)
+Date:   Wed, 22 Apr 2020 09:18:05 +0200
+From:   Klaus Birkelund Jensen <its@irrelevant.dk>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Omar Sandoval <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Klaus Jensen <k.jensen@samsung.com>
+Subject: Re: [PATCH blktests v2] Fix unintentional skipping of tests
+Message-ID: <20200422071805.a6sunwaqb2uf6rfa@apples.localdomain>
+References: <20200421073321.92302-1-its@irrelevant.dk>
+ <20200422011250.bsl5epjclhri4fqd@shindev.dhcp.fujisawa.hgst.com>
+ <20200422051300.w2efeam752fa56ew@apples.localdomain>
+ <20200422052949.z4pcqzhvgtpaqmhl@apples.localdomain>
+ <20200422064924.3f57azcl6tsdlhsk@shindev.dhcp.fujisawa.hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200419194529.4872-3-mcgrof@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200422064924.3f57azcl6tsdlhsk@shindev.dhcp.fujisawa.hgst.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 07:45:21PM +0000, Luis Chamberlain wrote:
-> Move the work to create the debugfs directory used into a helper.
-> It will make further checks easier to read. This commit introduces
-> no functional changes.
+On Apr 22 06:49, Shinichiro Kawasaki wrote:
+> On Apr 22, 2020 / 07:29, Klaus Birkelund Jensen wrote:
+> > On Apr 22 07:13, Klaus Birkelund Jensen wrote:
+> > > On Apr 22 01:12, Shinichiro Kawasaki wrote:
+> > > > On Apr 21, 2020 / 09:33, Klaus Jensen wrote:
+> > > > >  
+> > > > > -device_requires() {
+> > > > > -	! _test_dev_is_zoned || _have_fio_zbd_zonemode
+> > > > > -}
+> > > > > -
+> > > > >  test_device() {
+> > > > >  	echo "Running ${TEST_NAME}"
+> > > > >  
+> > > > > @@ -25,6 +21,10 @@ test_device() {
+> > > > >  	local zbdmode=""
+> > > > >  
+> > > > >  	if _test_dev_is_zoned; then
+> > > > > +		if ! _have_fio_zbd_zonemode; then
+> > > > > +			return
+> > > > > +		fi
+> > > > > +
+> > > > 
+> > > > This check is equivalent to device_requires() you removed, isn't it?
+> > > > If the skip check in test_device() is the last resort, it would be the
+> > > > better to check in device_requires(), I think.
+> > > > 
+> > > 
+> > > I did fix something... just not the real problem I think.
+> > > 
+> > > Negations doesnt really work well in device_requires. If changed to
+> > > 
+> > >     ! _require_test_dev_is_zoned || _have_fio_zbd_zonemode
+> > > 
+> > > then, for non-zoned devices, even though device_requires returns 0,
+> > > SKIP_REASON ends up being set to "is not a zoned block device" and skips
+> > > the test in _call_test due to this.
+> > > 
+> > > There are two fixes; either we add a _require_test_dev_is_not_zoned
+> > > again or put the negated check in an arithmetic context, that is
+> > > 
+> > >     (( !_require_test_dev_is_zoned )) || _have_fio_zbd_zonemode
+> > > 
+> > > I think the second option is a hack, so we'd better go with the first
+> > > choice.
+> > 
+> > Doh.
+> > 
+> > The _is_not_zoned version would of course just cause the test to be
+> > skipped for zoned devices instead.
+> > 
+> > So I actually think my original fix is the best option here.
 > 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  kernel/trace/blktrace.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
+> Thank you for sharing your thoghts. I agree not to use _is_not_zoned version.
 > 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index ca39dc3230cb..2c6e6c386ace 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -468,6 +468,18 @@ static void blk_trace_setup_lba(struct blk_trace *bt,
->  	}
->  }
->  
-> +static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
-> +					    struct blk_trace *bt)
-> +{
-> +	struct dentry *dir = NULL;
-> +
-> +	dir = debugfs_lookup(buts->name, blk_debugfs_root);
-> +	if (!dir)
-> +		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
-> +
+> I think _test_dev_is_zoned in device_requires() does not need to be replaced
+> with _require_test_dev_is_zoned. It does not check requirement. It just checks
+> if _have_fio_zbd_zonemode check is required or not.
 
-This creates an > 80 char line.  But I also think it is rather confusing
-anyway, why not:
+Right, that is a good observation. I'll revert my change there and keep
+it as
 
-	dir = debugfs_lookup(buts->name, blk_debugfs_root);
-	if (dir)
-		return dir;
-	bt->dir = debugfs_create_dir(buts->name, blk_debugfs_root);
-	return bt->dir;
+    device_requires() {
+        ! _test_dev_is_zoned || _have_fio_zbd_zonemode
+    }
+
+
+Thanks,
+Klaus
