@@ -2,113 +2,122 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E55C55186
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 08:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 087DBC55189
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 08:15:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E6FB206E9
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 08:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D52FD206E9
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 08:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CtPbMAnP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="By00QkCS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726601AbgDVIKn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 04:10:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725842AbgDVIKn (ORCPT
+        id S1725842AbgDVIPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 04:15:39 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57601 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725786AbgDVIPi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 04:10:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBDBC03C1A6;
-        Wed, 22 Apr 2020 01:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=67WpxxlCgmhP33pDM7+RRLK1Dw/Wlqp6Mzgtcg8F0+s=; b=CtPbMAnP7cpzodaISmc1Wdoj00
-        2ojUWAmmpSmN1TFTleYUebzjMSwlh8pw1C4LDZAM7BI/5vd44YDklxmJGVq33vu9939PUzqZyCvSM
-        d3oLyz2n+XFctDKmW2cRhZnPLLmeIRyCo9PbvCS2f5JSPTkzIYZ/GAsz2B9DPfMLMESpafZ3A37dM
-        kuhv7SZXlnMBRrRAvj+1fOi1E/OR1UPt1f9i9rVjYc68381u9Azn83v/CsMlUFKvIlL4c6lkbXozV
-        5szWgtf/8d4UdKL5e1bw8b/kuiQgqNaz/6uGaAr1YIWwxEHuLfgoct85LnxSNG7vuO/HwE5XvTsQe
-        ydyoqRfQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jRASR-000054-Eh; Wed, 22 Apr 2020 08:10:11 +0000
-Date:   Wed, 22 Apr 2020 01:10:11 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
-Message-ID: <20200422081011.GA22409@infradead.org>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-4-mcgrof@kernel.org>
- <20200422072715.GC19116@infradead.org>
- <20200422074802.GS11244@42.do-not-panic.com>
+        Wed, 22 Apr 2020 04:15:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587543337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PXurTIYnOIPkTIWMnh3upHjfMNa21BNU9O3zU5Qjfj0=;
+        b=By00QkCSxFKbNND44Top3PAbY3fOzosCfpEf/f7xKzpUMRw2amHp3HA/dXW+Ie6MM/3TMB
+        owqb+GOCzwXWzVA/+AlmIN49i3MOm9bPjiuAgp07NW6S+3bBXhJ+3Vjxat4dt32RYK2x5b
+        vHDXP9bqnQmdzU5c5LXTah9Pi7mnRjo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-512-9trcfl1GOg-pgdIAX0sJug-1; Wed, 22 Apr 2020 04:15:35 -0400
+X-MC-Unique: 9trcfl1GOg-pgdIAX0sJug-1
+Received: by mail-wr1-f71.google.com with SMTP id 11so687214wrc.3
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 01:15:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PXurTIYnOIPkTIWMnh3upHjfMNa21BNU9O3zU5Qjfj0=;
+        b=LMajqyNUbybdGt9g7osTfYfnv+4/IYR3xYpelZWGL8XprdzjT+GIbn2yl2dwNxlKAH
+         TlzyxFdxuaVO1J2nTMPHiQ1hv8veromVsEN30lmmypVmEab8XYfrtwikVwK52Qzcpq5k
+         k2d/i98Dh0znXy89FNE6CP8pRcKrN/AqjkyZmX4O4tu2e6yk/0iEnjSczIA8T7DQqaIl
+         B+wglHeZr8Db5ALVrPft4mWfTfG688Y7DyxqWQItETAMmh6MJbprxYyzRuAj1c4UdGdz
+         8zaU3OrWRoAbAnn4iwlZFd80pbUF/nJCaJ2aO0RuRphVlU4ed70whYpbBo2m92i1+fYb
+         KhaQ==
+X-Gm-Message-State: AGi0PuZnzFWsgcp1WPgVZdWTNucBSCI/zbZbwy8/eSrDkMAuE9nhANHA
+        jNS5XeLPCONdUonHd37s56v8vShPSuAFc1gT02gnU58tni8K/1GE/8okf6SDM6wAGRnkm9u6B+v
+        76RkF7zZyepfF2RJF2PaXiFw=
+X-Received: by 2002:adf:fecd:: with SMTP id q13mr30110675wrs.12.1587543334662;
+        Wed, 22 Apr 2020 01:15:34 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK8ri1CshnlO1XFFdM+QKzk3a4Kr/Em91ovuJ/P1UV1w2OrtY8Flej8WviighrL8SP4ZX9a6A==
+X-Received: by 2002:adf:fecd:: with SMTP id q13mr30110647wrs.12.1587543334384;
+        Wed, 22 Apr 2020 01:15:34 -0700 (PDT)
+Received: from x1.localdomain (2001-1c00-0c0c-fe00-d2ea-f29d-118b-24dc.cable.dynamic.v6.ziggo.nl. [2001:1c00:c0c:fe00:d2ea:f29d:118b:24dc])
+        by smtp.gmail.com with ESMTPSA id n2sm7933262wrq.74.2020.04.22.01.15.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Apr 2020 01:15:33 -0700 (PDT)
+Subject: Re: [PATCH 1/9] vboxsf: don't use the source name in the bdi name
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
+        bvanassche@acm.org, tytso@mit.edu, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200422073851.303714-1-hch@lst.de>
+ <20200422073851.303714-2-hch@lst.de>
+From:   Hans de Goede <hdegoede@redhat.com>
+Message-ID: <2db7b68b-5117-4dab-ce57-6e8011711c23@redhat.com>
+Date:   Wed, 22 Apr 2020 10:15:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200422074802.GS11244@42.do-not-panic.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200422073851.303714-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 07:48:02AM +0000, Luis Chamberlain wrote:
-> > I don't see why we need this check.  If it is valueable enough we
-> > should have a debugfs_create_dir_exclusive or so that retunrns an error
-> > for an exsting directory, instead of reimplementing it in the caller in
-> > a racy way.  But I'm not really sure we need it to start with.
+Hi,
+
+On 4/22/20 9:38 AM, Christoph Hellwig wrote:
+> Simplify the bdi name to mirror what we are doing elsewhere, and
+> drop them name in favor of just using a number.  This avoids a
+> potentially very long bdi name.
 > 
-> In short races, and even with synchronous request_queue removal I'm
-> seeing the race is still possible, but that's due to some other races
-> I'm going to chase down now.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+Looks good to me:
+
+Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+Regards,
+
+Hans
+
+
+> ---
+>   fs/vboxsf/super.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> The easier solution really is to just have a debugfs dir created for
-> each partition if debugfs is enabled, this way the directory will
-> always be there, and the lookups are gone.
-
-That sounds like the best plan to me.
-
+> diff --git a/fs/vboxsf/super.c b/fs/vboxsf/super.c
+> index 675e26989376..8fe03b4a0d2b 100644
+> --- a/fs/vboxsf/super.c
+> +++ b/fs/vboxsf/super.c
+> @@ -164,7 +164,7 @@ static int vboxsf_fill_super(struct super_block *sb, struct fs_context *fc)
+>   		goto fail_free;
+>   	}
+>   
+> -	err = super_setup_bdi_name(sb, "vboxsf-%s.%d", fc->source, sbi->bdi_id);
+> +	err = super_setup_bdi_name(sb, "vboxsf-%d", sbi->bdi_id);
+>   	if (err)
+>   		goto fail_free;
+>   
 > 
-> > > +
-> > > +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> > > +					    blk_debugfs_root);
-> > > +	if (!q->debugfs_dir)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +void blk_queue_debugfs_unregister(struct request_queue *q)
-> > > +{
-> > > +	debugfs_remove_recursive(q->debugfs_dir);
-> > > +	q->debugfs_dir = NULL;
-> > > +}
-> > 
-> > Which to me suggests we can just fold these two into the callers,
-> > with an IS_ENABLED for the creation case given that we check for errors
-> > and the stub will always return an error.
-> 
-> Sorry not sure I follow this.
 
-Don't both with the two above functions and just open code them in
-the callers.  IFF you still want to check for errors after the
-discussion with Greg, wrap the call in a
-
-	if (IS_ENABLED(CONFIG_DEBUG_FS))
-
-to ensure that you don't fail queue creation in the !DEBUG_FS
-case.
