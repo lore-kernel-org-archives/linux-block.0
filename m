@@ -2,301 +2,251 @@ Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A45EC55186
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C592EC55185
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:55:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7654B2073A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587551494;
-	bh=BbabzF3lfULpuvgbw3Gsj/Y61Fyfm5KLtaaeG3atcxY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=PhjomVPxUH6D06zjrwKkuVmqyW6eQpcp6opz8oHc+UxrixE3r479CPHH09sTYApOt
-	 66MiotZ+JJkA3K4SRft2VJ3i2zXzAl2NXb4DO60YvFECsvF1qGIuA0MBeG7F/farSL
-	 FoSxHqeiwu9FtskEeaVjbspFpdyx/yzLHhPcLYng=
+	by mail.kernel.org (Postfix) with ESMTP id A13F920774
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:55:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="MqLCjCBa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbgDVKbd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 06:31:33 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43084 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728067AbgDVKb2 (ORCPT
+        id S1728483AbgDVKzt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 06:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728411AbgDVKGu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 06:31:28 -0400
-Received: by mail-pg1-f195.google.com with SMTP id x26so852675pgc.10;
-        Wed, 22 Apr 2020 03:31:27 -0700 (PDT)
+        Wed, 22 Apr 2020 06:06:50 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F73EC03C1A8
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:50 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id x4so1630640wmj.1
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=THMN4kP405JoezGxug3/jLYghdWABJDJj1NIGrZsvzY=;
+        b=MqLCjCBae6u/cisLXNU9BKKy5mlwl+lR89m3evzk5jHVdtgHECXawMzGDYv/IFKav8
+         WMCsm2BD2btn6Wfk/aoY5GbFBkAlrORyWPQfYoP7lof3wmub/4P4yDYiNgMdrcjfNFPS
+         ugaSWkaL6YfG3N/LS+fRU6NbOYiMlME6WDW1ahHUj5VW+hEP2NLytNtMVFIrutahMcfm
+         gyh1nx5egQLK+7S5C+FBFUSw11TemEx3i7S57c+leiSSmWVnrn2CkiYjIPg9n/51iSZU
+         /arZrXRjnpcxNCb9S19xJEuKU3cJ1FqyHYl7jldGiZ0a7lyAwUrdgrIW1rrfUcXuQomv
+         LeaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=sU5xzgRL9RpSHNkAgLs8EtgXTwr6bOsubaD2iUSY1Fs=;
-        b=I0qyr+FslyFMwqVlZGTwCF8eGulhQ+Sla4hkwuDKlPpeh30mpTXOndmylfv+y/1KXb
-         gtuzYM6hVqZvDnZnuHbCNeof99l4s3M4Dq3CaXr6cyrZfHeWXRBkb1MCWqGWMimWCeyY
-         QUbct7h1ggnF3By4fRltGdEkWoFo2StVqaOv/THeTMVYDCkKl9vKhoQSs7HaVWVpqib5
-         65AlGNIGnJeaOerlHFIWoznCYfG5D4SqAEVBkFpPUEimk9bkfK5lz+CouA+5Wg+3jgIj
-         hA1qm0gr/BS98SsCzNCJialErzMHv3MbL3WgvOtAuwAFyl18xiNtkbLC/Pd6r6nYON3b
-         wp6g==
-X-Gm-Message-State: AGi0PuZh8LsImmDRCyRhgLjhZVnLdgQE3yc9OYVjkU3BxRR+Yg4Q0TY8
-        /vVTbiYtKfDSsSZ/mORkaaQ=
-X-Google-Smtp-Source: APiQypIV81fj+bXglVsbtncDM9L75Hd8mImMYXT3HWlSXBskgXvCbUNjOqpLlZfJQBjJpx92UT03pA==
-X-Received: by 2002:a62:3784:: with SMTP id e126mr26417473pfa.303.1587551487018;
-        Wed, 22 Apr 2020 03:31:27 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id g3sm4809475pgd.64.2020.04.22.03.31.25
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=THMN4kP405JoezGxug3/jLYghdWABJDJj1NIGrZsvzY=;
+        b=scZay4jz5rEldbzAAuf+8gB9j988nWhesl9XpqjBH0HylQhdYOXDneq5Bh454DP0rB
+         TcKKoAcLlg7DxXiclE1WI7wJ7lfQOmlvqaQnig1UslZGNS7OVx4OTG1pRjiyEJ+D+sr0
+         JYy855UpVS7Rc1DBfUJnJ//EWKznSVWOwpCZ52ESavXL2JDCap4WiISGSPkMfhL0fVL7
+         Pq219r+EV/VfErmYy8c1lDd9+t5C271JqK+ePYjw44CI/cSa60rahTxHf8l2F3JDO4rq
+         vd6LzH7RtMxXVgPMjKKd+FhbP5YIvMkmWx501Gb3nnI6yCDKrX6AtB+2Eh6jBQKh6xys
+         1nrA==
+X-Gm-Message-State: AGi0PuZrytZ15LBUtYzIWyVSi/VlGc5A66bgDFZVJy5BB1vA5OQfIPP4
+        o7Xb+ju2M0gcu6Vela8pHZ++RQ==
+X-Google-Smtp-Source: APiQypKEoEkeuuC3Cb8hP8uwpIT0HcCTtV5Fqb4J9R+piXg7Q4lFlJnRgP9KeP2Y3/l4DG4WebT/tg==
+X-Received: by 2002:a7b:cc0e:: with SMTP id f14mr9695075wmh.39.1587550008974;
+        Wed, 22 Apr 2020 03:06:48 -0700 (PDT)
+Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
+        by smtp.gmail.com with ESMTPSA id j13sm7812462wrq.24.2020.04.22.03.06.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2020 03:31:25 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 1F267402A1; Wed, 22 Apr 2020 10:31:25 +0000 (UTC)
-Date:   Wed, 22 Apr 2020 10:31:25 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, bvanassche@acm.org, rostedt@goodmis.org,
-        mingo@redhat.com, jack@suse.cz, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2 03/10] blktrace: fix debugfs use after free
-Message-ID: <20200422103124.GX11244@42.do-not-panic.com>
-References: <20200419194529.4872-1-mcgrof@kernel.org>
- <20200419194529.4872-4-mcgrof@kernel.org>
- <20200420201615.GC302402@kroah.com>
- <20200420204156.GO11244@42.do-not-panic.com>
- <20200421070048.GD347130@kroah.com>
- <20200422072859.GQ11244@42.do-not-panic.com>
- <20200422094320.GH299948@T590>
+        Wed, 22 Apr 2020 03:06:48 -0700 (PDT)
+From:   Martijn Coenen <maco@android.com>
+To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
+Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
+        jaegeuk@kernel.org, Martijn Coenen <maco@android.com>
+Subject: [PATCH v2 5/5] loop: Add LOOP_SET_FD_AND_STATUS ioctl
+Date:   Wed, 22 Apr 2020 12:06:36 +0200
+Message-Id: <20200422100636.46357-6-maco@android.com>
+X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
+In-Reply-To: <20200422100636.46357-1-maco@android.com>
+References: <20200422100636.46357-1-maco@android.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200422094320.GH299948@T590>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 05:43:20PM +0800, Ming Lei wrote:
-> On Wed, Apr 22, 2020 at 07:28:59AM +0000, Luis Chamberlain wrote:
-> > On Tue, Apr 21, 2020 at 09:00:48AM +0200, Greg KH wrote:
-> > > On Mon, Apr 20, 2020 at 08:41:56PM +0000, Luis Chamberlain wrote:
-> > > > On Mon, Apr 20, 2020 at 10:16:15PM +0200, Greg KH wrote:
-> > > > > On Sun, Apr 19, 2020 at 07:45:22PM +0000, Luis Chamberlain wrote:
-> > > > > 
-> > > > > This patch triggered gmail's spam detection, your changelog text is
-> > > > > whack...
-> > > > 
-> > > > Oh? What do you think triggered it?
-> > > 
-> > > No idea.
-> > 
-> > Alright, well I'm going to move most of the analysis to the bug report
-> > and be as concise as possible on the commit log.
-> > 
-> > > > > > diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
-> > > > > > index 19091e1effc0..d84038bce0a5 100644
-> > > > > > --- a/block/blk-debugfs.c
-> > > > > > +++ b/block/blk-debugfs.c
-> > > > > > @@ -3,6 +3,9 @@
-> > > > > >  /*
-> > > > > >   * Shared request-based / make_request-based functionality
-> > > > > >   */
-> > > > > > +
-> > > > > > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > > > > > +
-> > > > > >  #include <linux/kernel.h>
-> > > > > >  #include <linux/blkdev.h>
-> > > > > >  #include <linux/debugfs.h>
-> > > > > > @@ -13,3 +16,30 @@ void blk_debugfs_register(void)
-> > > > > >  {
-> > > > > >  	blk_debugfs_root = debugfs_create_dir("block", NULL);
-> > > > > >  }
-> > > > > > +
-> > > > > > +int __must_check blk_queue_debugfs_register(struct request_queue *q)
-> > > > > > +{
-> > > > > > +	struct dentry *dir = NULL;
-> > > > > > +
-> > > > > > +	/* This can happen if we have a bug in the lower layers */
-> > > > > > +	dir = debugfs_lookup(kobject_name(q->kobj.parent), blk_debugfs_root);
-> > > > > > +	if (dir) {
-> > > > > > +		pr_warn("%s: registering request_queue debugfs directory twice is not allowed\n",
-> > > > > > +			kobject_name(q->kobj.parent));
-> > > > > > +		dput(dir);
-> > > > > > +		return -EALREADY;
-> > > > > > +	}
-> > > > > > +
-> > > > > > +	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-> > > > > > +					    blk_debugfs_root);
-> > > > > > +	if (!q->debugfs_dir)
-> > > > > > +		return -ENOMEM;
-> > > > > 
-> > > > > Why doesn't the directory just live in the request queue, or somewhere
-> > > > > else, so that you save it when it is created and then that's it.  No
-> > > > > need to "look it up" anywhere else.
-> > > > 
-> > > > Its already there. And yes, after my changes it is technically possible
-> > > > to just re-use it directly. But this is complicated by a few things. One
-> > > > is that at this point in time, asynchronous request_queue removal is
-> > > > still possible, and so a race was exposed where a requeust_queue may be
-> > > > lingering but its old device is gone. That race is fixed by reverting us
-> > > > back to synchronous request_queue removal, therefore ensuring that the
-> > > > debugfs dir exists so long as the device does.
-> > > > 
-> > > > I can remove the debugfs_lookup() *after* we revert to synchronous
-> > > > request_queue removal, or we just re-order the patches so that the
-> > > > revert happens first. That should simplify this patch.
-> > > > 
-> > > > The code in this patch was designed to help dispute the logic behind
-> > > > the CVE, in particular it shows exactly where debugfs_dir *is* the
-> > > > one found by debugfs_lookup(), and shows the real issue behind the
-> > > > removal.
-> > > > 
-> > > > But yeah, now that that is done, I hope its clear to all, and I think
-> > > > this patch can be simplified if we just revert the async requeust_queue
-> > > > removal first.
-> > > 
-> > > Don't try to "dispute" crazyness, that's not what kernel code is for.
-> > > Just do the right thing, and simply saving off the pointer to the
-> > > debugfs file when created is the "correct" thing to do, no matter what.
-> > > No race conditions or anything else can happen when you do that.
-> > 
-> > Nope, races are still possible even if we move revert back to sync
-> > request_queue removal, but I do believe that just reveals a bug
-> > elsewhere, which I'll just fix as I think I know where this is.
-> > 
-> > > > > Or do you do that in later patches?  I only see this one at the moment,
-> > > > > sorry...
-> > > > > 
-> > > > > >  static struct dentry *blk_trace_debugfs_dir(struct blk_user_trace_setup *buts,
-> > > > > > +					    struct request_queue *q,
-> > > > > >  					    struct blk_trace *bt)
-> > > > > >  {
-> > > > > >  	struct dentry *dir = NULL;
-> > > > > >  
-> > > > > > +	/* This can only happen if we have a bug on our lower layers */
-> > > > > > +	if (!q->kobj.parent) {
-> > > > > > +		pr_warn("%s: request_queue parent is gone\n", buts->name);
-> > > > > 
-> > > > > A kobject always has a parent, unless it has not been registered yet, so
-> > > > > I don't know what you are testing could ever happen.
-> > > > 
-> > > > Or it has been kobject_del()'d?
-> > > 
-> > > If that happened, how in the world are you in this function anyway, as
-> > > the request_queue is an invalid pointer at that point in time???
-> > 
-> > Nope, the block layer still finishes some work on it.
-> > 
-> > Drivers are allowed to cleanup a block device in this order, this
-> > example,  is from the loop block driver:
-> > 
-> > static void loop_remove(struct loop_device *lo)                                 
-> > {
-> > 	del_gendisk(lo->lo_disk);
-> > 	blk_cleanup_queue(lo->lo_queue);
-> > 	blk_mq_free_tag_set(&lo->tag_set);
-> > 	put_disk(lo->lo_disk);
-> > 	kfree(lo);
-> > }   
-> > 
-> > At this point in time patch-wise we still haven't reverted back to
-> > synchronous request_queue removal. Considering this, a race with the
-> > parent disappearing can happen because the request_queue removal is
-> > deferred, that is, the request_queue's kobject's release() call used
-> > schedule_work() to finish off its removal. We expect the last
-> > blk_put_queue() to be called at the end of blk_cleanup_queue(). Since
-> 
-> Actually no, we expect that request queue is released after disk is
-> released. Don't forget that gendisk does hold one extra refcount of
-> request queue.
+This allows userspace to completely setup a loop device with a single
+ioctl, removing the in-between state where the device can be partially
+configured - eg the loop device has a backing file associated with it,
+but is reading from the wrong offset.
 
-Ah yes.
+Besides removing the intermediate state, another big benefit of this
+ioctl is that LOOP_SET_STATUS can be slow; the main reason for this
+slowness is that LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to
+freeze the associated queue; this requires waiting for RCU
+synchronization, which I've measured can take about 15-20ms on this
+device on average.
 
-Still the device_del() occurs before, this means the sysfs path
-is cleared for a new device to come in as well, and this can happen
-even with synchronous request_queue removal.
+Here's setting up ~70 regular loop devices with an offset on an x86
+Android device, using LOOP_SET_FD and LOOP_SET_STATUS:
 
-I have some changes to try to help address this now.
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m03.40s real     0m00.02s user     0m00.03s system
 
-> > that is deferred and device_del() is called also at the end of
-> > del_gendisk(), it means the release of the queue can happen in a
-> > context where the disk is gone.
-> > 
-> > Although this issue is triggerable easily with the current async
-> > request_queue removal, I can think of other ways to trigger an issue
-> > here and one of them was suggested as possible by Christoph on the last
-> > v1 patch series.
-> > 
-> > blk_queue_get() is not atomic and so what it returns can be incorrect:
-> > 
-> > bool blk_get_queue(struct request_queue *q)
-> > {
-> > 	if (likely(!blk_queue_dying(q))) {
-> > 		__blk_get_queue(q);
-> > 		return true;
-> > 	}
-> > 	----> we can schedule here easily and move the queue to dying
-> > 	----> and race with blk_cleanup_queue() which will then allow
-> > 	----> code paths to incorrectly trigger the release of the queue
-> > 	----> in places we don't want
-> 
-> Right, actually caller of blk_get_queue() has to guarantee that
-> the request queue is alive.
+Here's configuring ~70 devices in the same way, but using a modified
+losetup that uses the new LOOP_SET_FD_AND_STATUS ioctl:
 
-Sure.
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m01.94s real     0m00.01s user     0m00.01s system
 
-> Some users of blk_get_queue() aren't necessary, such as rbd and mmc.
+Signed-off-by: Martijn Coenen <maco@android.com>
+---
+ drivers/block/loop.c      | 45 ++++++++++++++++++++++++++++-----------
+ include/uapi/linux/loop.h |  7 ++++++
+ 2 files changed, 40 insertions(+), 12 deletions(-)
 
-Are you saying we can remove those calls on rbd / mmc or something else?
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b10f1d5306a2..4df1f03de27e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1074,8 +1074,9 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	return 0;
+ }
+ 
+-static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+-		       struct block_device *bdev, unsigned int arg)
++static int loop_set_fd_and_status(struct loop_device *lo, fmode_t mode,
++				  struct block_device *bdev, unsigned int fd,
++				  const struct loop_info64 *info)
+ {
+ 	struct file	*file;
+ 	struct inode	*inode;
+@@ -1090,7 +1091,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	__module_get(THIS_MODULE);
+ 
+ 	error = -EBADF;
+-	file = fget(arg);
++	file = fget(fd);
+ 	if (!file)
+ 		goto out;
+ 
+@@ -1099,7 +1100,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * here to avoid changing device under exclusive owner.
+ 	 */
+ 	if (!(mode & FMODE_EXCL)) {
+-		claimed_bdev = bd_start_claiming(bdev, loop_set_fd);
++		claimed_bdev = bd_start_claiming(bdev, loop_set_fd_and_status);
+ 		if (IS_ERR(claimed_bdev)) {
+ 			error = PTR_ERR(claimed_bdev);
+ 			goto out_putf;
+@@ -1126,9 +1127,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 		lo_flags |= LO_FLAGS_READ_ONLY;
+ 
+ 	error = -EFBIG;
+-	size = get_loop_size(lo, file);
++	size = get_size(info->lo_offset, info->lo_sizelimit, file);
+ 	if ((loff_t)(sector_t)size != size)
+ 		goto out_unlock;
++
++	error = loop_set_status_from_info(lo, info);
++	if (error)
++		goto out_unlock;
++
+ 	error = loop_prepare_queue(lo);
+ 	if (error)
+ 		goto out_unlock;
+@@ -1141,9 +1147,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_device = bdev;
+ 	lo->lo_flags = lo_flags;
+ 	lo->lo_backing_file = file;
+-	lo->transfer = NULL;
+-	lo->ioctl = NULL;
+-	lo->lo_sizelimit = 0;
+ 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
+ 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+ 
+@@ -1181,14 +1184,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ 	return 0;
+ 
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ out_bdev:
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ out_putf:
+ 	fput(file);
+ out:
+@@ -1662,8 +1665,25 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	int err;
+ 
+ 	switch (cmd) {
+-	case LOOP_SET_FD:
+-		return loop_set_fd(lo, mode, bdev, arg);
++	case LOOP_SET_FD: {
++		/* legacy case - pass in a zeroed out loop_info64, which
++		 * corresponds with the default parameters we'd have used
++		 * otherwise.
++		 */
++		struct loop_info64 info;
++
++		memset(&info, 0, sizeof(info));
++		return loop_set_fd_and_status(lo, mode, bdev, arg, &info);
++	}
++	case LOOP_SET_FD_AND_STATUS: {
++		struct loop_fd_and_status fds;
++
++		if (copy_from_user(&fds, argp, sizeof(fds)))
++			return -EFAULT;
++
++		return loop_set_fd_and_status(lo, mode, bdev, fds.fd,
++					      &fds.info);
++	}
+ 	case LOOP_CHANGE_FD:
+ 		return loop_change_fd(lo, bdev, arg);
+ 	case LOOP_CLR_FD:
+@@ -1835,6 +1855,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_CLR_FD:
+ 	case LOOP_GET_STATUS64:
+ 	case LOOP_SET_STATUS64:
++	case LOOP_SET_FD_AND_STATUS:
+ 		arg = (unsigned long) compat_ptr(arg);
+ 		/* fall through */
+ 	case LOOP_SET_FD:
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 080a8df134ef..05ab625c40db 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -60,6 +60,12 @@ struct loop_info64 {
+ 	__u64		   lo_init[2];
+ };
+ 
++struct loop_fd_and_status {
++	struct loop_info64	info;
++	__u32			fd;
++	__u32			__pad;
++};
++
+ /*
+  * Loop filter types
+  */
+@@ -90,6 +96,7 @@ struct loop_info64 {
+ #define LOOP_SET_CAPACITY	0x4C07
+ #define LOOP_SET_DIRECT_IO	0x4C08
+ #define LOOP_SET_BLOCK_SIZE	0x4C09
++#define LOOP_SET_FD_AND_STATUS	0x4C0A
+ 
+ /* /dev/loop-control interface */
+ #define LOOP_CTL_ADD		0x4C80
+-- 
+2.26.2.303.gf8c07b1a785-goog
 
-> 
-> > 	return false;
-> > }
-> > EXPORT_SYMBOL(blk_get_queue);
-> > 
-> > Another area of concern I am seeing through code inspection is that
-> > since the request_queue life depends on the disk, it seemse odd we call
-> > device_del() before we remove the request_queue. If this is indeed
-> > wrong, we could move the device_del() from del_gendisk() to
-> > disk_release() triggered by the last put_disk().
-> 
-> Why do you think it is odd and want to change this way? Disk has to be
-> removed first for draining dirty pages to queue, then we can cleanup
-> queue. Once we start to clean up request queue, all data may not land
-> disk any more.
-
-I think that all that can be done as-is today, an issue I suspect exists
-is that we remove the disk from syfs hierarchy prior to the request
-queue, whereas we expect this to be in the inverse order.
-
-> > I have a test now which shows that even if we revert back to synchronous
-> > request_queue removal I can trigger a panic on the same use-after-free
-> > case on debugfs on blktrace, and this is because we are overwriting the
-> > same debugfs directory, and I think the above are its root causes.
-> 
-> The reason should be shared debugfs dir between blktrace and blk-mq
-> debugfs.
-
-I think its something else.
-
-> > I can fix this bug, but that just moves the bug to conflicts within
-> > two sysfs objects already existing, and this is because add_disk()
-> > (which calls __device_add_disk() doesn't return errors). This is both
-> > a blk layer bug in the sense we never check for error and a driver bug
-> > for allowing conflicts. All this just needs to be fixed, and although I
-> > thought this could be done later, I think I'm just going to fix all this
-> > now.
-> 
-> Yeah, we talked that several times, looks no one tries to post patch to
-> fix that.
-
-Consider this done, just need to brush it up now and send for review.
-
-  Luis
