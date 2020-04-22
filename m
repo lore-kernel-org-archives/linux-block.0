@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D7CC5518A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759F8C55185
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 341C720774
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56BDD20774
+	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 10:56:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="AGnsBpbL"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="oeHrjjDV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728439AbgDVKzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 06:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32900 "EHLO
+        id S1728953AbgDVK4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 06:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728405AbgDVKGt (ORCPT
+        with ESMTP id S1728400AbgDVKGq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 06:06:49 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E693C03C1A9
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:49 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id t14so1640500wrw.12
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:48 -0700 (PDT)
+        Wed, 22 Apr 2020 06:06:46 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACF8C03C1A9
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:46 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id r26so1663258wmh.0
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 03:06:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=android.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=036klsi1gy6LVGjlEiXf5owP/duZTlgIzaFa2SKIQ+E=;
-        b=AGnsBpbL1Vv97wQdW5Fl6CpGMUP+uNTbK+GJDqlM0qWbEAKocpTbFy+1IuXyLhL9vi
-         TmWwRi5LQEO5YyOpsIzWDbJvLb3LEfMaSZlXkExDzWHUC3QgxUtWRzgNsHU5zwA8LdGj
-         ZabDa89WpHCUGMlYOJGVBbicZ0ydSxwBxhmnglFV1YiYSroCuVWrwvocUIvbHktgB7R0
-         VodH1uOLUXzAHseEhgDYgGAM30wWlsOP79P4BvWHi7aaiypzyLdnTvmgzfqciYQvYJ4Q
-         jRV4+mind6zTplTznFQst8dF88z4c6N5KBCoNdO66ahcc97Ip/HNzklCngM2HCakzjtn
-         RjSQ==
+        bh=Jyo8ye8PIhzgdKAIi2DN9FqA/i7QGb6jE4ELaahTUdI=;
+        b=oeHrjjDVrskgRR/vnSC0Kw+k7XEQ+0JHZIQurMmOFnwzHeCwO+WGJey7RSZToOK0aN
+         /9NbohcIQeN0O8/Dxd2m6gI2sJNFh0ibz6y9Ghm/xrgN4tJo9LmPpVLL5ZlQuw1VzcdA
+         Y+rEb6vpxEi56dVE+Omi1RdFVrkEnaFERf2lGwXCBwFybk0ThujfbwyDtqnWoV2gVZCX
+         ezMpvTloc2YTxeWxZx7NDiuSg0Ko0I2e5kLsaVTx71WLl89gaZQ9ULO7el7YW7IWx316
+         olmzwj3XRm0QTJXGfBo6VflS92L7mKshZpfZM4fWpS5NhXSxHc57nmNVnEpMsDFUwk82
+         xlxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=036klsi1gy6LVGjlEiXf5owP/duZTlgIzaFa2SKIQ+E=;
-        b=AunuGhbHEePXfnH7bsgL8+SBVHVsFe+gJoSNuW4o8r3wioCEPwhJFJXtGJqJAN4s5N
-         ibJ5VRtbpSKAXX64ehOwlffiGmamaxCTQMUtkiv2st1IXYto1FQQvFGKiE0XpQKk+hig
-         GSGqr/tvtJf3+Dec75it863xu2K/XroX3eEXPKgpiPlrO7Yk8iiC2EILVSJkRFLXfpm7
-         keESoE5zVO6YWsKJbYFhoV5OtWJMq2BMnzmHuQQud/a/p5TtY93C1M2knLfpL6Kn74aC
-         Y5TS2w1++HWldix70YYInaFx+CNOBIZvASXYJkd23zaKgUrwAZUYKKkbed8Luro3Tgwk
-         D5pg==
-X-Gm-Message-State: AGi0PubYCoax6P75QP4uwHgJ9qCQhWAqLeWAmZ0mWV3J4cRvpcl5E2ZY
-        Zn/Z0u22at4QBCIu94KmbGuwZw==
-X-Google-Smtp-Source: APiQypLlDCW6YqrrqBm8HcLF8OPMG3dwPXmFwVPNRqcL0hBDSspSlK+avLUHLixbDTxoHv5uFV5UwQ==
-X-Received: by 2002:adf:fac8:: with SMTP id a8mr20639878wrs.311.1587550007842;
-        Wed, 22 Apr 2020 03:06:47 -0700 (PDT)
+        bh=Jyo8ye8PIhzgdKAIi2DN9FqA/i7QGb6jE4ELaahTUdI=;
+        b=bo4e4nng8hh/wJsvVpOCMpmA9RGr3wmXSfMYpiN0CDT/5Gy2ot90xCNB0jNntSow1N
+         vqA7y2rb6p9JoMr7bXE/AtnxJFypZWRdfUC7/ZEIN6zxS+KiwgxVZ1UAWAczKEDX+7Dx
+         xM4/iPalT2BVd/OjL45F2/0DJrBO1JBangYaIu6bfFXqpU/LtsPyb/oakH8w/HubYW4u
+         jdTXqifWq6u2GfS7uvUD9ZaqJ1BZiXzZZk+rLRmFFLdp42AnYlt5hS/olKvPxir6utba
+         UTvUxe8noGQRWnQuQ+evzBgt9N1AojjzjTk3THeaGFI9KtQ0+mSkPqkLKKwayh33EryQ
+         CWog==
+X-Gm-Message-State: AGi0PuYY8UTzgudD8hgAYeGhoDqrE1/T0bZXHG8gnZu3VqLf26lKITgI
+        5QRL4u+6E6ywAdDMrDBPmyOf0w==
+X-Google-Smtp-Source: APiQypKHvDI64iD2AdYtrAT2zOe/a0I1w+st9gtBcL2PFw288hPuqwYvPnIKlJWt43lqDTQy5KIcog==
+X-Received: by 2002:a1c:6545:: with SMTP id z66mr9388327wmb.81.1587550004869;
+        Wed, 22 Apr 2020 03:06:44 -0700 (PDT)
 Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id j13sm7812462wrq.24.2020.04.22.03.06.46
+        by smtp.gmail.com with ESMTPSA id j13sm7812462wrq.24.2020.04.22.03.06.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2020 03:06:47 -0700 (PDT)
+        Wed, 22 Apr 2020 03:06:43 -0700 (PDT)
 From:   Martijn Coenen <maco@android.com>
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
 Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
         jaegeuk@kernel.org, Martijn Coenen <maco@android.com>
-Subject: [PATCH v2 4/5] loop: rework lo_ioctl() __user argument casting
-Date:   Wed, 22 Apr 2020 12:06:35 +0200
-Message-Id: <20200422100636.46357-5-maco@android.com>
+Subject: [PATCH v2 2/5] loop: Factor out configuring loop from status
+Date:   Wed, 22 Apr 2020 12:06:33 +0200
+Message-Id: <20200422100636.46357-3-maco@android.com>
 X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
 In-Reply-To: <20200422100636.46357-1-maco@android.com>
 References: <20200422100636.46357-1-maco@android.com>
@@ -77,52 +77,165 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for a new ioctl that needs to copy_from_user(); makes the
-code easier to read as well.
+Factor out this code into a separate function, so it can be reused by
+other code more easily.
 
 Signed-off-by: Martijn Coenen <maco@android.com>
 ---
- drivers/block/loop.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/block/loop.c | 117 +++++++++++++++++++++++++------------------
+ 1 file changed, 67 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f6c6036324bf..b10f1d5306a2 100644
+index 4f5c765c73d8..3f8051d3115e 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1658,6 +1658,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	unsigned int cmd, unsigned long arg)
- {
- 	struct loop_device *lo = bdev->bd_disk->private_data;
-+	void __user *argp = (void __user *) arg;
- 	int err;
+@@ -1275,13 +1275,78 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	return __loop_clr_fd(lo, false);
+ }
  
- 	switch (cmd) {
-@@ -1670,21 +1671,19 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = loop_set_status_old(lo,
--					(struct loop_info __user *)arg);
-+			err = loop_set_status_old(lo, argp);
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
--		return loop_get_status_old(lo, (struct loop_info __user *) arg);
-+		return loop_get_status_old(lo, argp);
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = loop_set_status64(lo,
--					(struct loop_info64 __user *) arg);
-+			err = loop_set_status64(lo, argp);
- 		}
- 		break;
- 	case LOOP_GET_STATUS64:
--		return loop_get_status64(lo, (struct loop_info64 __user *) arg);
-+		return loop_get_status64(lo, argp);
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
- 	case LOOP_SET_BLOCK_SIZE:
++/**
++ * loop_set_status_from_info - configure device from loop_info
++ * @lo: struct loop_device to configure
++ * @info: struct loop_info64 to configure the device with
++ *
++ * Configures the loop device parameters according to the passed
++ * in loop_info64 configuration.
++ */
+ static int
+-loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
++loop_set_status_from_info(struct loop_device *lo,
++			  const struct loop_info64 *info)
+ {
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++
++	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
++		return -EINVAL;
++
++	err = loop_release_xfer(lo);
++	if (err)
++		return err;
++
++	if (info->lo_encrypt_type) {
++		unsigned int type = info->lo_encrypt_type;
++
++		if (type >= MAX_LO_CRYPT)
++			return -EINVAL;
++		xfer = xfer_funcs[type];
++		if (xfer == NULL)
++			return -EINVAL;
++	} else
++		xfer = NULL;
++
++	err = loop_init_xfer(lo, xfer, info);
++	if (err)
++		return err;
++
++	lo->lo_offset = info->lo_offset;
++	lo->lo_sizelimit = info->lo_sizelimit;
++	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
++	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
++	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
++	lo->lo_crypt_name[LO_NAME_SIZE-1] = 0;
++
++	if (!xfer)
++		xfer = &none_funcs;
++	lo->transfer = xfer->transfer;
++	lo->ioctl = xfer->ioctl;
++
++	if ((lo->lo_flags & LO_FLAGS_AUTOCLEAR) !=
++	     (info->lo_flags & LO_FLAGS_AUTOCLEAR))
++		lo->lo_flags ^= LO_FLAGS_AUTOCLEAR;
++
++	lo->lo_encrypt_key_size = info->lo_encrypt_key_size;
++	lo->lo_init[0] = info->lo_init[0];
++	lo->lo_init[1] = info->lo_init[1];
++	if (info->lo_encrypt_key_size) {
++		memcpy(lo->lo_encrypt_key, info->lo_encrypt_key,
++		       info->lo_encrypt_key_size);
++		lo->lo_key_owner = uid;
++	}
++
++	return 0;
++}
++
++static int
++loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
++{
++	int err;
+ 	struct block_device *bdev;
++	kuid_t uid = current_uid();
+ 	bool partscan = false;
+ 	bool size_changed = false;
+ 	loff_t validated_size;
+@@ -1299,10 +1364,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		err = -ENXIO;
+ 		goto out_unlock;
+ 	}
+-	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
+-		err = -EINVAL;
+-		goto out_unlock;
+-	}
+ 
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+@@ -1330,54 +1391,10 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		goto out_unfreeze;
+ 	}
+ 
+-	err = loop_release_xfer(lo);
++	err = loop_set_status_from_info(lo, info);
+ 	if (err)
+ 		goto out_unfreeze;
+ 
+-	if (info->lo_encrypt_type) {
+-		unsigned int type = info->lo_encrypt_type;
+-
+-		if (type >= MAX_LO_CRYPT) {
+-			err = -EINVAL;
+-			goto out_unfreeze;
+-		}
+-		xfer = xfer_funcs[type];
+-		if (xfer == NULL) {
+-			err = -EINVAL;
+-			goto out_unfreeze;
+-		}
+-	} else
+-		xfer = NULL;
+-
+-	err = loop_init_xfer(lo, xfer, info);
+-	if (err)
+-		goto out_unfreeze;
+-
+-	lo->lo_offset = info->lo_offset;
+-	lo->lo_sizelimit = info->lo_sizelimit;
+-	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+-	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
+-	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
+-	lo->lo_crypt_name[LO_NAME_SIZE-1] = 0;
+-
+-	if (!xfer)
+-		xfer = &none_funcs;
+-	lo->transfer = xfer->transfer;
+-	lo->ioctl = xfer->ioctl;
+-
+-	if ((lo->lo_flags & LO_FLAGS_AUTOCLEAR) !=
+-	     (info->lo_flags & LO_FLAGS_AUTOCLEAR))
+-		lo->lo_flags ^= LO_FLAGS_AUTOCLEAR;
+-
+-	lo->lo_encrypt_key_size = info->lo_encrypt_key_size;
+-	lo->lo_init[0] = info->lo_init[0];
+-	lo->lo_init[1] = info->lo_init[1];
+-	if (info->lo_encrypt_key_size) {
+-		memcpy(lo->lo_encrypt_key, info->lo_encrypt_key,
+-		       info->lo_encrypt_key_size);
+-		lo->lo_key_owner = uid;
+-	}
+-
+ 	if (size_changed)
+ 		loop_set_size(lo, validated_size);
+ 
 -- 
 2.26.2.303.gf8c07b1a785-goog
 
