@@ -2,198 +2,156 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE417C54FCB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 16:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB20FC55191
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 20:14:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A6A920857
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 16:32:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4DE720776
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 20:14:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uAeBnTv9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729453AbgDWQcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 12:32:39 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2091 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729423AbgDWQcj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 12:32:39 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 751AA79CD0BB64364E6E;
-        Thu, 23 Apr 2020 17:32:35 +0100 (IST)
-Received: from [127.0.0.1] (10.47.5.255) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 23 Apr
- 2020 17:32:33 +0100
-Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
-From:   John Garry <john.garry@huawei.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <ming.lei@redhat.com>, <bvanassche@acm.org>, <hare@suse.de>,
-        <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>, <hch@infradead.org>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <esc.storagedev@microsemi.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
- <1583409280-158604-9-git-send-email-john.garry@huawei.com>
- <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com>
- <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
- <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
- <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
- <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com>
- <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
- <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com>
- <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
-Message-ID: <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com>
-Date:   Thu, 23 Apr 2020 17:31:56 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726102AbgDWUN6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 16:13:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726071AbgDWUN5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Apr 2020 16:13:57 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C228C09B043
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 13:13:57 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id m18so8378089otq.9
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 13:13:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c2rUn6OEE/SyUFvNfSs4xf0M3jM82iEbBd70o6oUd2c=;
+        b=uAeBnTv9ZhEDHEM0R2gYPziVyPUzWcc2FZmKHluszWUeQZ+mlcnJNqx+toFeod+rG2
+         5CtqzTIfz4EdeBuiId/090yid1X5A7Wl4mg8teizN+JkxYqU446/EKbttIrGvbCXSLY4
+         tH4L7LN6h0n0BjbA9qqt2ovfOmTZDTphMD5L7tzI1e1nqOT7l1c2ZP4jBOKHerk8o+2u
+         7Wcz5PX5oyRcYAec+aWyToiXprU9h0QgmqHWNfVR00m4ilAJ7k574PeLLCBKbD6wtKJ3
+         Spw5vgab2z50d/5me4yy3csoIGoeL7v0BZdJIhy3gXOsc842o2ssePflinAKaP6Acq4y
+         7kCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c2rUn6OEE/SyUFvNfSs4xf0M3jM82iEbBd70o6oUd2c=;
+        b=eN3OfGXqMUwmv1YzeFC6PdbTWcNBSXEAu3q21wTmA6HUne+fn/7NgEpqoJ5z1rSPl7
+         N63l5QV7oTg/84aruWlhcfITR5Uncy/828BhyF5R4nqY2IK/lOmTqsk/+tT3egB+gDSa
+         FnPSv8MwdPDf+YK2pXcN7JGyiHg1PIT2kA4bkLToo3cxFJz/pf/zDNuAaVUVQCpRilMF
+         q+cP+EeKv4dZwKnGeAV2ZqY4FIaExeOp5Xkxrf2VsIn0M1lOV9bfLYIojbtM/TfcGM14
+         gB5URAQah9rbg4Sdaa65BGXIU+6tauTmM92j1ZvA0qXL1QplBOZznUJC/xedF4wl/FV+
+         0lFA==
+X-Gm-Message-State: AGi0PuYOnwBzMKh/zVkswtrb0uVYmyDKK16xLS2Anb4M2h9lXH8nPoli
+        Exxg+rJNGsmQb2DaAky70LnuLbfm1X0rFrnwmF0N4A==
+X-Google-Smtp-Source: APiQypJ5t6fji8Z2rpOwfgYmXZuKaiHhYHNgNK+IwyP9bjp4jWKiR46a48ICy6o3dAe/KAxDyKi5qjmcOvKfU/4ihq0=
+X-Received: by 2002:a05:6830:23b5:: with SMTP id m21mr5146009ots.63.1587672836590;
+ Thu, 23 Apr 2020 13:13:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.47.5.255]
-X-ClientProxiedBy: lhreml722-chm.china.huawei.com (10.201.108.73) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20200206101833.GA20943@ming.t460p> <20200206211222.83170-1-sqazi@google.com>
+ <5707b17f-e5d7-c274-de6a-694098c4e9a2@acm.org> <CAKUOC8X0OFqJ09Y+nrPQiMLiRjpKMm0Ucci_33UJEM8HvQ=H1Q@mail.gmail.com>
+ <10c64a02-91fe-c2af-4c0c-dc9677f9b223@acm.org> <CAKUOC8X=fzXjt=5qZ+tkq3iKnu7NHhPfT_t0JyzcmZg49ZEq4A@mail.gmail.com>
+ <CAD=FV=WgfAgHSuDRXSUWFUV8CB3tPq7HG0+E7q2fRQniiJwa1w@mail.gmail.com>
+In-Reply-To: <CAD=FV=WgfAgHSuDRXSUWFUV8CB3tPq7HG0+E7q2fRQniiJwa1w@mail.gmail.com>
+From:   Jesse Barnes <jsbarnes@google.com>
+Date:   Thu, 23 Apr 2020 13:13:45 -0700
+Message-ID: <CAJmaN=m4sPCUjS1oy3yOavjN2wcwhMWvZE9sVehySuhibTmABQ@mail.gmail.com>
+Subject: Re: [PATCH] block: Limit number of items taken from the I/O scheduler
+ in one go
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Salman Qazi <sqazi@google.com>, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Gwendal Grignou <gwendal@google.com>,
+        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> 
->>> So I tested this on hisi_sas with x12 SAS SSDs, and performance with 
->>> "mq-
->>> deadline" is comparable with "none" @ ~ 2M IOPs. But after a while
->>> performance drops alot, to maybe 700K IOPS. Do you have a similar
->>> experience?
->>
->> I am using mq-deadline only for HDD. I have not tried on SSD since it 
->> is not
->> useful scheduler for SSDs.
->>
-> 
-> I ask as I only have SAS SSDs to test.
-> 
->> I noticed that when I used mq-deadline, performance drop starts if I have
->> more number of drives.
->> I am running <fio> script which has 64 Drives, 64 thread and all 
->> treads are
->> bound to local numa node which has 36 logical cores.
->> I noticed that lock contention is in " dd_dispatch_request". I am not 
->> sure
->> why there is a no penalty of same lock in nr_hw_queue  = 1 mode.
-> 
-> So this could be just pre-existing issue of exposing multiple queues for 
-> SCSI HBAs combined with mq-deadline iosched. I mean, that's really the 
-> only significant change in this series, apart from the shared sbitmap, 
-> and, at this point, I don't think that is the issue.
-
-As an experiment, I modified hisi_sas mainline driver to expose hw 
-queues and manage tags itself, and I see the same issue I mentioned:
-
-Jobs: 12 (f=12): [R(12)] [14.8% done] [7592MB/0KB/0KB /s] [1943K/0/0 
-iops] [eta
-Jobs: 12 (f=12): [R(12)] [16.4% done] [7949MB/0KB/0KB /s] [2035K/0/0 
-iops] [eta
-Jobs: 12 (f=12): [R(12)] [18.0% done] [7940MB/0KB/0KB /s] [2033K/0/0 
-iops] [eta
-Jobs: 12 (f=12): [R(12)] [19.7% done] [7984MB/0KB/0KB /s] [2044K/0/0 
-iops] [eta
-Jobs: 12 (f=12): [R(12)] [21.3% done] [7984MB/0KB/0KB /s] [2044K/0/0 
-iops] [eta
-Jobs: 12 (f=12): [R(12)] [23.0% done] [2964MB/0KB/0KB /s] [759K/0/0 
-iops] [eta 0
-Jobs: 12 (f=12): [R(12)] [24.6% done] [2417MB/0KB/0KB /s] [619K/0/0 
-iops] [eta 0
-Jobs: 12 (f=12): [R(12)] [26.2% done] [2909MB/0KB/0KB /s] [745K/0/0 
-iops] [eta 0
-Jobs: 12 (f=12): [R(12)] [27.9% done] [2366MB/0KB/0KB /s] [606K/0/0 
-iops] [eta 0
-
-The odd time I see "sched: RT throttling activated" around the time the 
-throughput falls. I think issue is the per-queue threaded irq threaded 
-handlers consuming too many cycles. With "none" io scheduler, IOPS is 
-flat at around 2M.
-
-> 
->>
->> static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->> {
->>          struct deadline_data *dd = hctx->queue->elevator->elevator_data;
->>          struct request *rq;
->>
->>          spin_lock(&dd->lock);
-> 
-> So if multiple hctx's are accessing this lock, then much contention 
-> possible.
-> 
->>          rq = __dd_dispatch_request(dd);
->>          spin_unlock(&dd->lock);
->>
->>          return rq;
->> }
->>
->> Here is perf report -
->>
->> -    1.04%     0.99%  kworker/18:1H+k  [kernel.vmlinux]  [k]
->> native_queued_spin_lock_slowpath
->>       0.99% ret_from_fork
->>      -   kthread
->>        - worker_thread
->>           - 0.98% process_one_work
->>              - 0.98% __blk_mq_run_hw_queue
->>                 - blk_mq_sched_dispatch_requests
->>                    - 0.98% blk_mq_do_dispatch_sched
->>                       - 0.97% dd_dispatch_request
->>                          + 0.97% queued_spin_lock_slowpath
->> +    1.04%     0.00%  kworker/18:1H+k  [kernel.vmlinux]  [k]
->> queued_spin_lock_slowpath
->> +    1.03%     0.95%  kworker/19:1H-k  [kernel.vmlinux]  [k]
->> native_queued_spin_lock_slowpath
->> +    1.03%     0.00%  kworker/19:1H-k  [kernel.vmlinux]  [k]
->> queued_spin_lock_slowpath
->> +    1.02%     0.97%  kworker/20:1H+k  [kernel.vmlinux]  [k]
->> native_queued_spin_lock_slowpath
->> +    1.02%     0.00%  kworker/20:1H+k  [kernel.vmlinux]  [k]
->> queued_spin_lock_slowpath
->> +    1.01%     0.96%  kworker/21:1H+k  [kernel.vmlinux]  [k]
->> native_queued_spin_lock_slowpath
->>
-> 
-> I'll try to capture a perf report and compare to mine.
-
-Mine is spending a huge amount of time (circa 33% on a cpu servicing 
-completion irqs) in mod_delayed_work_on():
-
---79.89%--sas_scsi_task_done |
-    |--76.72%--scsi_mq_done
-    |    |
-    |     --76.53%--blk_mq_complete_request
-    |    |
-    |    |--74.81%--scsi_softirq_done
-    |    |    |
-    |    |     --73.91%--scsi_finish_command
-    |    |    |
-    |    |    |--72.11%--scsi_io_completion
-    |    |    |    |
-    |    |    |     --71.89%--scsi_end_request
-    |    |    |    |
-    |    |    |    |--40.82%--blk_mq_run_hw_queues
-    |    |    |    |    |
-    |    |    |    |    |--35.86%--blk_mq_run_hw_queue
-    |    |    |    |    |    |
-    |    |    |    |    |     --33.59%--__blk_mq_delay_run_hw_queue
-    |    |    |    |    |    |
-    |    |    |    |    |     --33.38%--kblockd_mod_delayed_work_on
-    |    |    |    |    |          |
-    |    |    |    |    |                --33.31%--mod_delayed_work_on
-
-hmmmm...
+Jens, Bart, Ming, any update here?  Or is this already applied (I didn't check)?
 
 Thanks,
-John
+Jesse
+
+
+On Mon, Apr 20, 2020 at 9:43 AM Doug Anderson <dianders@chromium.org> wrote:
+>
+> Hi,
+>
+> On Fri, Feb 7, 2020 at 12:38 PM Salman Qazi <sqazi@google.com> wrote:
+> >
+> > On Fri, Feb 7, 2020 at 12:19 PM Bart Van Assche <bvanassche@acm.org> wrote:
+> > >
+> > > On 2/7/20 10:45 AM, Salman Qazi wrote:
+> > > > If I were to write this as a for-loop, it will look like this:
+> > > >
+> > > > for (i = 0; i == 0 || (run_again && i < 2); i++) {
+> > > > /* another level of 8 character wide indentation */
+> > > >      run_again = false;
+> > > >     /* a bunch of code that possibly sets run_again to true
+> > > > }
+> > > >
+> > > > if (run_again)
+> > > >      blk_mq_run_hw_queue(hctx, true);
+> > >
+> > > That's not what I meant. What I meant is a loop that iterates at most
+> > > two times and also to break out of the loop if run_again == false.
+> > >
+> >
+> > I picked the most compact variant to demonstrate the problem.  Adding
+> > breaks isn't
+> > really helping the readability.
+> >
+> > for (i = 0; i < 2; i++) {
+> >   run_again = false;
+> > /* bunch of code that possibly sets it to true */
+> > ...
+> >  if (!run_again)
+> >     break;
+> > }
+> > if (run_again)
+> >     blk_mq_run_hw_queue(hctx, true);
+> >
+> > When I read this, I initially assume that the loop in general runs
+> > twice and that this is the common case.  It has the
+> > same problem with conveying intent.  Perhaps, more importantly, the
+> > point of using programming constructs is to shorten and simplify the
+> > code.
+> > There are still two if-statements in addition to the loop. We haven't
+> > gained much by introducing the loop.
+> >
+> > > BTW, I share your concern about the additional indentation by eight
+> > > positions. How about avoiding deeper indentation by introducing a new
+> > > function?
+> >
+> > If there was a benefit to introducing the loop, this would be a good
+> > call.  But the way I see it, the introduction of another
+> > function is yet another way in which the introduction of the loop
+> > makes the code less readable.
+> >
+> > This is not a hill I want to die on.  If the maintainer agrees with
+> > you on this point, I will use a loop.
+>
+> I haven't done a massive amount of analysis of this patch, but since I
+> noticed it while debugging my own block series I've been keeping track
+> of it.  Is there any status update here?  We've been carrying this
+> "FROMLIST" in our Chrome OS trees for a little while, but that's not a
+> state we want to be in long-term.  If it needs to spin before landing
+> upstream we should get the spin out and land it.  If it's OK as-is
+> then it'd be nice to see it in mainline.
+>
+> From the above I guess Salman was waiting for Jens to weigh in with an
+> opinion on the prefered bike shed color?
+>
+> -Doug
