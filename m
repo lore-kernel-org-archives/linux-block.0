@@ -2,25 +2,25 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168CFC2BA19
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DADC2BA19
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:52:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB08D21582
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF20421582
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726169AbgDWHuQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 03:50:16 -0400
-Received: from verein.lst.de ([213.95.11.211]:56633 "EHLO verein.lst.de"
+        id S1726078AbgDWHwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 03:52:01 -0400
+Received: from verein.lst.de ([213.95.11.211]:56647 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726909AbgDWHuP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 03:50:15 -0400
+        id S1726027AbgDWHwA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Apr 2020 03:52:00 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id CE08468BEB; Thu, 23 Apr 2020 09:50:11 +0200 (CEST)
-Date:   Thu, 23 Apr 2020 09:50:11 +0200
+        id DC276227A8C; Thu, 23 Apr 2020 09:51:56 +0200 (CEST)
+Date:   Thu, 23 Apr 2020 09:51:55 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -29,117 +29,129 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V7 7/9] blk-mq: re-submit IO in case that hctx is
- inactive
-Message-ID: <20200423075011.GH10951@lst.de>
-References: <20200418030925.31996-1-ming.lei@redhat.com> <20200418030925.31996-8-ming.lei@redhat.com>
+Subject: Re: [PATCH V7 8/9] blk-mq: handle requests dispatched from IO
+ scheduler in case of inactive hctx
+Message-ID: <20200423075155.GI10951@lst.de>
+References: <20200418030925.31996-1-ming.lei@redhat.com> <20200418030925.31996-9-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200418030925.31996-8-ming.lei@redhat.com>
+In-Reply-To: <20200418030925.31996-9-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static void blk_mq_resubmit_passthrough_io(struct request *rq)
+On Sat, Apr 18, 2020 at 11:09:24AM +0800, Ming Lei wrote:
+> If one hctx becomes inactive when its CPUs are all offline, all in-queue
+> requests aimed at this hctx have to be re-submitted.
+> 
+> Re-submit requests from both sw queue or scheduler queue when the hctx
+> is found as inactive.
+> 
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c | 100 ++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 62 insertions(+), 38 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ae1e57c64ca1..54ba8a9c3c93 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2456,6 +2456,52 @@ static void blk_mq_resubmit_io(struct request *rq)
+>  		blk_mq_resubmit_fs_io(rq);
+>  }
+>  
+> +static void blk_mq_hctx_deactivate(struct blk_mq_hw_ctx *hctx)
 > +{
-> +	struct request *nrq;
-> +	unsigned int flags = 0, cmd_flags = 0;
-> +	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-> +	struct blk_mq_tags *tags = rq->q->elevator ? hctx->sched_tags :
-> +		hctx->tags;
-> +	bool reserved = blk_mq_tag_is_reserved(tags, rq->internal_tag);
+> +	LIST_HEAD(sched_tmp);
+> +	LIST_HEAD(re_submit);
+> +	LIST_HEAD(flush_in);
+> +	LIST_HEAD(flush_out);
+> +	struct request *rq, *nxt;
+> +	struct elevator_queue *e = hctx->queue->elevator;
 > +
-> +	if (rq->rq_flags & RQF_PREEMPT)
-> +		flags |= BLK_MQ_REQ_PREEMPT;
-> +	if (reserved)
-> +		flags |= BLK_MQ_REQ_RESERVED;
-> +
-> +	/* avoid allocation failure & IO merge */
-> +	cmd_flags = (rq->cmd_flags & ~REQ_NOWAIT) | REQ_NOMERGE;
-> +
-> +	nrq = blk_get_request(rq->q, cmd_flags, flags);
-> +	if (!nrq)
-> +		return;
-> +
-> +	nrq->__sector = blk_rq_pos(rq);
-> +	nrq->__data_len = blk_rq_bytes(rq);
-> +	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD) {
-> +		nrq->rq_flags |= RQF_SPECIAL_PAYLOAD;
-> +		nrq->special_vec = rq->special_vec;
+> +	if (!e) {
+> +		blk_mq_flush_busy_ctxs(hctx, &re_submit);
+> +	} else {
+> +		while ((rq = e->type->ops.dispatch_request(hctx))) {
+> +			if (rq->mq_hctx != hctx)
+> +				list_add(&rq->queuelist, &sched_tmp);
+> +			else
+> +				list_add(&rq->queuelist, &re_submit);
+> +		}
 > +	}
-> +#if defined(CONFIG_BLK_DEV_INTEGRITY)
-> +	nrq->nr_integrity_segments = rq->nr_integrity_segments;
-> +#endif
-> +	nrq->nr_phys_segments = rq->nr_phys_segments;
-> +	nrq->ioprio = rq->ioprio;
-> +	nrq->extra_len = rq->extra_len;
-> +	nrq->rq_disk = rq->rq_disk;
-> +	nrq->part = rq->part;
-> +	nrq->write_hint = rq->write_hint;
-> +	nrq->timeout = rq->timeout;
-
-This should share code with blk_rq_prep_clone() using a helper.
-Note that blk_rq_prep_clone seems to miss things like the
-write_hint and timeout, which we should fix as well.
-
-> +static void blk_mq_resubmit_fs_io(struct request *rq)
-> +{
-> +	struct bio_list list;
-> +	struct bio *bio;
-> +
-> +	bio_list_init(&list);
-> +	blk_steal_bios(&list, rq);
-> +
-> +	while (true) {
-> +		bio = bio_list_pop(&list);
-> +		if (!bio)
-> +			break;
-> +
-> +		generic_make_request(bio);
+> +	while (!list_empty(&sched_tmp)) {
+> +		rq = list_entry(sched_tmp.next, struct request,
+> +				queuelist);
+> +		list_del_init(&rq->queuelist);
+> +		blk_mq_sched_insert_request(rq, true, true, true);
 > +	}
-
-This could be simplified to:
-
-	while ((bio = bio_list_pop(&list)))
-		generic_make_request(bio);
-
-but then again the generic_make_request seems weird.  Do we need
-actually need any of the checks in generic_make_request?  Shouldn't
-we call into blk_mq_make_request directly?
-
-Then again I wonder why the passthrough case doesn't work for
-FS requests?
-
+> +
+> +	/* requests in dispatch list have to be re-submitted too */
+> +	spin_lock(&hctx->lock);
+> +	list_splice_tail_init(&hctx->dispatch, &re_submit);
+> +	spin_unlock(&hctx->lock);
+> +
+> +	/* blk_end_flush_machinery will cover flush request */
+> +	list_for_each_entry_safe(rq, nxt, &re_submit, queuelist) {
+> +		if (rq->rq_flags & RQF_FLUSH_SEQ)
+> +			list_move(&rq->queuelist, &flush_in);
+> +	}
+> +	blk_end_flush_machinery(hctx, &flush_in, &flush_out);
+> +	list_splice_tail(&flush_out, &re_submit);
+> +
+> +	while (!list_empty(&re_submit)) {
+> +		rq = list_first_entry(&re_submit, struct request, queuelist);
+> +		list_del_init(&rq->queuelist);
+> +		blk_mq_resubmit_io(rq);
+> +	}
+> +}
+> +
+>  /*
+>   * 'cpu' has gone away. If this hctx is inactive, we can't dispatch request
+>   * to the hctx any more, so steal bios from requests of this hctx, and
+> @@ -2463,54 +2509,32 @@ static void blk_mq_resubmit_io(struct request *rq)
+>   */
 >  static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
 >  {
-> @@ -2394,14 +2482,38 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
->  	}
->  	spin_unlock(&ctx->lock);
+> +	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+> +			struct blk_mq_hw_ctx, cpuhp_dead);
 >  
-> +	if (!test_bit(BLK_MQ_S_INACTIVE, &hctx->state)) {
-> +		if (!list_empty(&tmp)) {
-> +			spin_lock(&hctx->lock);
-> +			list_splice_tail_init(&tmp, &hctx->dispatch);
-> +			spin_unlock(&hctx->lock);
-> +			blk_mq_run_hw_queue(hctx, true);
+>  	if (!cpumask_test_cpu(cpu, hctx->cpumask))
+>  		return 0;
+>  
+> +	if (test_bit(BLK_MQ_S_INACTIVE, &hctx->state)) {
+> +		blk_mq_hctx_deactivate(hctx);
+
+Actually it probably also makes sense to introduce the
+blk_mq_hctx_deactivate helper in the previous patch to avoid some
+churn here.
+
+> +	} else if (!hctx->queue->elevator) {
+> +		struct blk_mq_ctx *ctx = __blk_mq_get_ctx(hctx->queue, cpu);
+> +		enum hctx_type type = hctx->type;
+> +		LIST_HEAD(tmp);
+> +
+> +		spin_lock(&ctx->lock);
+> +		if (!list_empty(&ctx->rq_lists[type])) {
+> +			list_splice_init(&ctx->rq_lists[type], &tmp);
+> +			blk_mq_hctx_clear_pending(hctx, ctx);
 > +		}
-> +	} else {
+> +		spin_unlock(&ctx->lock);
+>  
+>  		if (!list_empty(&tmp)) {
+>  			spin_lock(&hctx->lock);
+>  			list_splice_tail_init(&tmp, &hctx->dispatch);
+>  			spin_unlock(&hctx->lock);
+>  
+> +			blk_mq_run_hw_queue(hctx, true);
+>  		}
 
-What about an early return or two here to save a level of indentation
-later?
-
-	if (!test_bit(BLK_MQ_S_INACTIVE, &hctx->state)) {
-		if (list_empty(&tmp))
-			return 0;
-
-		spin_lock(&hctx->lock);
-		list_splice_tail_init(&tmp, &hctx->dispatch);
-		spin_unlock(&hctx->lock);
-		blk_mq_run_hw_queue(hctx, true);
-		return 0;
-	}
-
-	...
+And another helper for the !inactive case.
