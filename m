@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519D2C55185
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FFCC55185
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:08:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A8322075A
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B2EA20776
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:08:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725913AbgDWAHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 20:07:04 -0400
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:40823 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgDWAHE (ORCPT
+        id S1725961AbgDWAIT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 20:08:19 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:38318 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgDWAIS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 20:07:04 -0400
-Received: by mail-pg1-f182.google.com with SMTP id n16so1942123pgb.7;
-        Wed, 22 Apr 2020 17:07:04 -0700 (PDT)
+        Wed, 22 Apr 2020 20:08:18 -0400
+Received: by mail-pj1-f67.google.com with SMTP id t40so1694362pjb.3;
+        Wed, 22 Apr 2020 17:08:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XN5Qa+fH8eY+1o/rOoaxua89YSt7GiBoktgAB1yAGQg=;
-        b=tuFeyBAQ6Slm4sOREzvskvRHgQ1OA3cAgi4ufkVR4CHRdmbLJe4BZwyiRX83KSFRdx
-         n1wybnm28OggCldf4MQLX4XcKMVoiIMmOvQ1B+aJvSr4tX15+hRSU53RkPatk33lbgyw
-         umEjC9oMljhHVDAJCqnWxelC3M0l79wc4m0PUGQltA75NExFbeUNmrwasqqcrC2UaL6O
-         ZW3XgljV40FteEOCCdxX2pJIE2B2yFsTSBKw+0/Dbuyitnfsi1rK+PlBDnLuqifJ+g/Q
-         MbLmtEyXmxrvrgg/635GvsWUwtakZwoqeBKR7wuAKK2vtDuNbH6iEvZN58W7IkQG5KYX
-         T2+g==
-X-Gm-Message-State: AGi0PuZbWFj8dmBlDZ/SOskrCcIjFBZ7AQVJlOaQsRrZIYWna/F+GM3E
-        +hs3xIpHVqiBi69EpkdzKpvAnNACt1A=
-X-Google-Smtp-Source: APiQypLIl7HO/VWGaXLuLeu+hduJ2XqK16EKHt6fNxBavCo1mKyvylK3Nye+5JRghFaG6OGmcZfzuA==
-X-Received: by 2002:a63:41c2:: with SMTP id o185mr1448747pga.139.1587600423020;
-        Wed, 22 Apr 2020 17:07:03 -0700 (PDT)
+        bh=b8MI707XPUmbVBAHMkRUlSdETaigvCBuJWiM5vEnnQY=;
+        b=VL6AvHwHItydmqCwRicH/9w6ecpnto4VAkk7OYKOPgnUwmozf99MXCNDC+6HcNmKNx
+         9ytZqWD4wfR71R/rp16cYRZofgqT+EiTzRdNWKninDyolmWxc+uimJ5kddo8OpTJ1wS8
+         d14FDQ3xnk80EX+wlx+/stc1LOIZI7RX2YBg/mbgflxRw0u/KkKICXgomBk6pPHUfqZk
+         rNLuNxMgBOHJAwtLiHHnPPmEx9wc18KqdJ7Huy3c8BZTYb7XjuD9/Yjc+E1lwDiaMNZb
+         EPPmBOTyokV48FXyKD3/PNH9YoXxjRDtL542NpW4myEtFEI05CJyXTgNjJk0a8ZbkHrj
+         FOUw==
+X-Gm-Message-State: AGi0Puap0Do/oz9L3UHicyLVvg91B4YUOQZu1xVIM+lmyT2OtVU99fux
+        WD3a9oZD75mpb+gqvKRFZRTXqi1efYs=
+X-Google-Smtp-Source: APiQypJihfVSc9CfqAV+1F/S2/EpyZjF9KKfzUlRSXpWDlow/vWnYMyVxMD12AZVN1IlJIWHVD2hvg==
+X-Received: by 2002:a17:902:a713:: with SMTP id w19mr1243857plq.197.1587600498096;
+        Wed, 22 Apr 2020 17:08:18 -0700 (PDT)
 Received: from [100.124.12.67] ([104.129.198.228])
-        by smtp.gmail.com with ESMTPSA id x193sm688039pfd.54.2020.04.22.17.07.01
+        by smtp.gmail.com with ESMTPSA id 128sm614323pfx.187.2020.04.22.17.08.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2020 17:07:02 -0700 (PDT)
-Subject: Re: [PATCH 2/9] bdi: move bdi_dev_name out of line
+        Wed, 22 Apr 2020 17:08:17 -0700 (PDT)
+Subject: Re: [PATCH 3/9] bdi: use bdi_dev_name() to get device name
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
         hdegoede@redhat.com, gregkh@linuxfoundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200422073851.303714-1-hch@lst.de>
- <20200422073851.303714-3-hch@lst.de>
+ <20200422073851.303714-4-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ac629ce1-dde6-1d58-f46d-be29366efe34@acm.org>
-Date:   Wed, 22 Apr 2020 17:07:00 -0700
+Message-ID: <ff0f4b9a-3724-fcaf-bf52-2c99507cafb7@acm.org>
+Date:   Wed, 22 Apr 2020 17:08:15 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200422073851.303714-3-hch@lst.de>
+In-Reply-To: <20200422073851.303714-4-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,9 +64,6 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/22/20 12:38 AM, Christoph Hellwig wrote:
-> bdi_dev_name is not a fast path function, move it out of line.  This
-> prepares for using it from modular callers without having to export
-> an implementation detail like bdi_unknown_name.
-
+On 4/22/20 12:38 AM, Christoph Hellwig wrote:> Use the common interface 
+bdi_dev_name() to get device name.
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
