@@ -2,80 +2,58 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B933C54FCB
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 12:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C76C54FCB
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 14:13:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35A292077D
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 12:51:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8513420857
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 14:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9htQ05n"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="swS5ZZWP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728385AbgDWMv0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 08:51:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52757 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726444AbgDWMv0 (ORCPT
+        id S1726840AbgDWONp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 10:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41244 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726450AbgDWONo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 08:51:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587646284;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oFynhrdn2AeeDCMTi/GbcSIhzhXYtqVnBO1H8k4rM8s=;
-        b=F9htQ05nXy2kV/9bra2esbF+0idxxQGa6/ghPa53rw0b4snroPZldv5GifmTDk2voFjX+v
-        3W+VoOEq4t3t+0ouOghLU+MdjtJ6JQywex+dWmAJoMcZ3k5/guXsFz4F5gTXt7hXRnzEht
-        0ET/T8qmTDf3NgmaJ1Ol7euvOOU5xOg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-aC8K-M7NMy6aG0FUusb2sw-1; Thu, 23 Apr 2020 08:51:23 -0400
-X-MC-Unique: aC8K-M7NMy6aG0FUusb2sw-1
-Received: by mail-wr1-f69.google.com with SMTP id y10so2802200wrn.5
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 05:51:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oFynhrdn2AeeDCMTi/GbcSIhzhXYtqVnBO1H8k4rM8s=;
-        b=K0ibI6d2jKFlKQ/iYHzjaRYQC27u0rOcNbp0T8UW/QWnITZ4O1fqIuiC7xlbgH7OHN
-         7dpF6Fc1Tosbc+0ULYMe18eeHYsWzfjF0mHw938kyMAfXeGVZ2rv14M9T3U18MFcdDvq
-         Bxht0m1YpxX3xAzT+1Oy0ljVXKK+2eXKDU8ehHRjOfU0P6xsql7N75o++hd4rEoTWqRo
-         DuLTg0OJ5BN5LVqM0avNeQDLc04ZlxasfqGFnB09kjvc5juJVDf6P2r1lW1UVk62XIgi
-         Gzdd8iOptxFCJu1dfGr7BFI03OB74w/8d+KRk+dtX6nOysS5uq2XTOGNiA7ljK24e5wf
-         GmSg==
-X-Gm-Message-State: AGi0PuZeCd4xhuD89cr/s176jDzd+ylZ5miKyS0XxQR1l8x2zgPamXE0
-        /0Yv/W4O+LWSCacvvGr8AQRD0kK2CS9uhhfl8H25kRCAuEpA0qAeiNlX2Keg7fW8Expel3FoLWL
-        otB7wFoOPp7RbIxz7zpY4G3E=
-X-Received: by 2002:adf:f34f:: with SMTP id e15mr4890720wrp.275.1587646282059;
-        Thu, 23 Apr 2020 05:51:22 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI/kzDW73KAZYZbxhnpJuArcvjawCoIOFrcjvuGR9Ia4oEPXtyQVUt1e61nouVHczLBSQLGAg==
-X-Received: by 2002:adf:f34f:: with SMTP id e15mr4890704wrp.275.1587646281858;
-        Thu, 23 Apr 2020 05:51:21 -0700 (PDT)
-Received: from redhat.com (bzq-109-65-97-189.red.bezeqint.net. [109.65.97.189])
-        by smtp.gmail.com with ESMTPSA id l4sm3745135wrv.60.2020.04.23.05.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2020 05:51:21 -0700 (PDT)
-Date:   Thu, 23 Apr 2020 08:51:19 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
+        Thu, 23 Apr 2020 10:13:44 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E20C08E934;
+        Thu, 23 Apr 2020 07:13:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=F6RH6jVuqtLpOUJiHYNSU4twCT8kCbptB6JR+OvixTE=; b=swS5ZZWPVv2ZNdoDtEloS7FPCQ
+        9VkH59EYRVFIGHIQ09n/4DelunQqbADmE9Evrr/bW9PmjLiilFLbtcfkK7SlwD1TNafToBkXgOj05
+        IRTrRzfdX1SfmG7lnggi89FfUNGkWhiBdYTuBTi0rYtmeXBHsS6zpMdgCi+qzCXZjNNv9n4pXcR/8
+        l4vlwVRO7bAa2EKKMjjzCQPliiKoZivwbxj//NA3ToOeg8WNIqwi9m0E0pyv7peSyw5kM0s3Pz9nn
+        pzCP9kKWcCGw/lOQsT4dl49x6yAAwbnlgvfdIlBaA1CcWthIuB0nNxkXspepp69INe8Yrv3AaR68K
+        wsmwjKVA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jRcbi-0002wR-FU; Thu, 23 Apr 2020 14:13:38 +0000
+Date:   Thu, 23 Apr 2020 07:13:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Stefan Hajnoczi <stefanha@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Lance Digby <ldigby@redhat.com>
 Subject: Re: [PATCH] virtio-blk: handle block_device_operations callbacks
  after hot unplug
-Message-ID: <20200423084914-mutt-send-email-mst@kernel.org>
+Message-ID: <20200423141338.GA29646@infradead.org>
 References: <20200423123717.139141-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200423123717.139141-1-stefanha@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -112,32 +90,6 @@ On Thu, Apr 23, 2020 at 01:37:17PM +0100, Stefan Hajnoczi wrote:
 > +	/* Driver instance has been removed */
 > +	if (!vblk)
 > +		return -ENOTTY;
-> +
->  	/* see if the host passed in geometry config */
->  	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
->  		virtio_cread(vblk->vdev, struct virtio_blk_config,
 
-Just so I understand, what serializes this access?
-See below for what looks like a race condition ...
-
-> @@ -835,6 +839,7 @@ static void virtblk_remove(struct virtio_device *vdev)
->  	vdev->config->reset(vdev);
->  
->  	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
-
-So what if private_data is tested at this time ...
-
-> +	vblk->disk->private_data = NULL;
->  	put_disk(vblk->disk);
->  	vdev->config->del_vqs(vdev);
->  	kfree(vblk->vqs);
-
-... and then used at this time?
-
-What prevents this?
-
-
-> -- 
-> 2.25.1
-> 
-
+If this ever hits you have a nasty race condition and this is not
+going to fix it, as it could be removed just after this check as well.
