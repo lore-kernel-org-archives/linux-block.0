@@ -2,128 +2,93 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 228EBC55193
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 11:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 647EBC2BA19
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 11:07:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 009652076C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 11:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4157C2076C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 11:07:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727903AbgDWLFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 07:05:54 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46262 "EHLO mx2.suse.de"
+        id S1727918AbgDWLHq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 07:07:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47186 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726805AbgDWLFy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 07:05:54 -0400
+        id S1726805AbgDWLHq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Apr 2020 07:07:46 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id AF96BB08C;
-        Thu, 23 Apr 2020 11:05:51 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id F2BF91E1293; Thu, 23 Apr 2020 13:05:51 +0200 (CEST)
-Date:   Thu, 23 Apr 2020 13:05:51 +0200
-From:   Jan Kara <jack@suse.cz>
+        by mx2.suse.de (Postfix) with ESMTP id 1DA16B0B8;
+        Thu, 23 Apr 2020 11:07:43 +0000 (UTC)
+Date:   Thu, 23 Apr 2020 13:07:38 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        Borislav Petkov <bp@alien8.de>, Jan Kara <jack@suse.com>,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 7/7] udf: stop using ioctl_by_bdev
-Message-ID: <20200423110551.GF3737@quack2.suse.cz>
-References: <20200423071224.500849-1-hch@lst.de>
- <20200423071224.500849-8-hch@lst.de>
+Cc:     Qian Cai <cai@lca.pw>, Jens Axboe <axboe@kernel.dk>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-block@vger.kernel.org, linux-s390@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: s390 boot woe due to "block: fix busy device checking in
+ blk_drop_partitions"
+Message-ID: <20200423110738.GA102241@blackbook>
+References: <AD16A450-794F-4EEA-A7BF-42452F18294A@lca.pw>
+ <20200410054544.GA17923@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
 Content-Disposition: inline
-In-Reply-To: <20200423071224.500849-8-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200410054544.GA17923@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 23-04-20 09:12:24, Christoph Hellwig wrote:
-> Instead just call the CD-ROM layer functionality directly.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-The patch looks good to me. You can add:
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Hi.
 
-								Honza
+On Fri, Apr 10, 2020 at 07:45:44AM +0200, Christoph Hellwig <hch@lst.de> wrote:
+> @@ -496,7 +496,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
+> -	if (bdev->bd_part_count || bdev->bd_openers)
+> +	if (bdev->bd_part_count || bdev->bd_openers > 1)
+>  		return -EBUSY;
+I noticed this (and the previous patch) change unmasks race between
+ioctl(LOOP_SET_STATUS64, ... lo_flags=LO_FLAGS_PARTSCAN ...) and udev
+processing loop device uevents. See [1] for details.
 
-> ---
->  fs/udf/lowlevel.c | 29 +++++++++++++----------------
->  1 file changed, 13 insertions(+), 16 deletions(-)
-> 
-> diff --git a/fs/udf/lowlevel.c b/fs/udf/lowlevel.c
-> index 5c7ec121990d..f1094cdcd6cd 100644
-> --- a/fs/udf/lowlevel.c
-> +++ b/fs/udf/lowlevel.c
-> @@ -27,41 +27,38 @@
->  
->  unsigned int udf_get_last_session(struct super_block *sb)
->  {
-> +	struct cdrom_device_info *cdi = disk_to_cdi(sb->s_bdev->bd_disk);
->  	struct cdrom_multisession ms_info;
-> -	unsigned int vol_desc_start;
-> -	struct block_device *bdev = sb->s_bdev;
-> -	int i;
->  
-> -	vol_desc_start = 0;
-> -	ms_info.addr_format = CDROM_LBA;
-> -	i = ioctl_by_bdev(bdev, CDROMMULTISESSION, (unsigned long)&ms_info);
-> +	if (!cdi) {
-> +		udf_debug("CDROMMULTISESSION not supported.\n");
-> +		return 0;
-> +	}
->  
-> -	if (i == 0) {
-> +	ms_info.addr_format = CDROM_LBA;
-> +	if (cdrom_multisession(cdi, &ms_info) == 0) {
->  		udf_debug("XA disk: %s, vol_desc_start=%d\n",
->  			  ms_info.xa_flag ? "yes" : "no", ms_info.addr.lba);
->  		if (ms_info.xa_flag) /* necessary for a valid ms_info.addr */
-> -			vol_desc_start = ms_info.addr.lba;
-> -	} else {
-> -		udf_debug("CDROMMULTISESSION not supported: rc=%d\n", i);
-> +			return ms_info.addr.lba;
->  	}
-> -	return vol_desc_start;
-> +	return 0;
->  }
->  
->  unsigned long udf_get_last_block(struct super_block *sb)
->  {
->  	struct block_device *bdev = sb->s_bdev;
-> +	struct cdrom_device_info *cdi = disk_to_cdi(bdev->bd_disk);
->  	unsigned long lblock = 0;
->  
->  	/*
-> -	 * ioctl failed or returned obviously bogus value?
-> +	 * The cdrom layer call failed or returned obviously bogus value?
->  	 * Try using the device size...
->  	 */
-> -	if (ioctl_by_bdev(bdev, CDROM_LAST_WRITTEN, (unsigned long) &lblock) ||
-> -	    lblock == 0)
-> +	if (!cdi || cdrom_get_last_written(cdi, &lblock) || lblock == 0)
->  		lblock = i_size_read(bdev->bd_inode) >> sb->s_blocksize_bits;
->  
->  	if (lblock)
->  		return lblock - 1;
-> -	else
-> -		return 0;
-> +	return 0;
->  }
-> -- 
-> 2.26.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Should the condition be changed in the case of newly setup loop devices?
+(Or shouldn't the ioctl propagate EBUSY in its return value?)
+
+Thanks,
+Michal
+
+[1] https://bugzilla.opensuse.org/show_bug.cgi?id=1169932
+
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAl6hdvAACgkQia1+riC5
+qSgT0A/9HF8wBP+q81PKssmN3OAiHSEBVgWuK2oRpZDemVZOk7Ju4HOdfgFW//7y
+3HREuHE2FTBMSvd+kp6B8PRSA8Qzw1GaJEHRCeh2+3nfUT4UmMDlJiw9mB7oN2pH
+fmVdjfTWhsdEx1FhOTvKnPWzwrWJIdhCyqB8xnRzosIdCaeXPM7HLwbSG64GZ/VE
+biTAGgAGXZGXexNVfi0UWbxll6td64pNFr+XMoToCzRNUvyxu9jMDBvyyAB7F5et
+pOGedkxdysYujjFle3o3Lw6ifJ+dZh3BLgZfFWAPW59J/b6ZTi1k4vzv40vPdSju
+fho2c4Q3QPPFC0o5SMws3Vu92woJfrzRbUdzqSpnCrXZY//8/0fyuuPyjgBEglDs
+daxWBKhAdrAb4tsIul+jc3nSY7KGCgy1Eef7rU7TC5rduJ0a65dco4POXHL1CGk6
+pppFxjAmupe6tevT/C7HtSWOaSvoWkaKPq7MQ0VSEMTyuErYhdv7402+IzSjLuxJ
+z6uG/k52yUce51P1z8LW57BRiHW0rBB4Qs6nSN3qu2O+Hul2OBZAgCp5qpzYcIBG
+qH0L4V39Q1U6PILsDkQYX9GLM3hEWf4LaSg7xCYcjYLn3YbXXMiUzmVvl/igXbBe
+zBFiBwslvrRk/71wSdK7xYT1NbnqSNcRJLe6ePYnCNP8p2i77dI=
+=pl+J
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
