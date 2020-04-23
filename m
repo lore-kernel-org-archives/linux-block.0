@@ -1,80 +1,61 @@
-Return-Path: <SRS0=ObBg=6G=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DB2C5518E
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 23:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 519D2C55185
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27DB320724
-	for <linux-block@archiver.kernel.org>; Wed, 22 Apr 2020 23:14:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="roi6w8e5"
+	by mail.kernel.org (Postfix) with ESMTP id 3A8322075A
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:07:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726457AbgDVXO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 19:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42658 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726458AbgDVXO0 (ORCPT
+        id S1725913AbgDWAHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 20:07:04 -0400
+Received: from mail-pg1-f182.google.com ([209.85.215.182]:40823 "EHLO
+        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgDWAHE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 19:14:26 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97689C03C1AD
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 16:14:25 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id t3so4479688qkg.1
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2020 16:14:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=yutIE/3Yrasa++aWOCa3PZNUoPlrlPERr3vYpXHco/M=;
-        b=roi6w8e5qBgfrEAFnX0ITcdhSDL8WSk9M0K+Pi5JsvodaNNOas+t0Q1f3de9phX1r3
-         zH9nNHarNQ5F0bPzz7BOwaRNKmtglTqtN0NM6aiRDb1o0ARGr4RLUKq2Ljipggfzmq4f
-         4lue9ey15OIgipQe2SFDgP3Zg483GPNPRk1b8P8tkH8JOTSig5IAtEHFk48/ttXK/xW3
-         HXoY6IUYmJ/pTBF9GpTUhyyw7weiMGNPNlwjMBnBqpgI6X0Q/tR6jaPPDUnk4ojUthH4
-         sJ/35wr3LbgYPfPQAvyDm9c7nFllFe/TQ0modirFmWgoD/qWXe5K3H06giTotm5Z7P3Z
-         jarQ==
+        Wed, 22 Apr 2020 20:07:04 -0400
+Received: by mail-pg1-f182.google.com with SMTP id n16so1942123pgb.7;
+        Wed, 22 Apr 2020 17:07:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=yutIE/3Yrasa++aWOCa3PZNUoPlrlPERr3vYpXHco/M=;
-        b=NRKyVV4Gvm8ynge7RwmQ3eTbw7BVkkqTtQNQm+6CGHcR6q+3sfgO1xgSZAgWoBblk7
-         L76d8BDr+0UQzds3GJcXaw+S+yp1ctrIPP9Gnl++IlmL9OgXpU6xnzVcIDaMzpx1nHDN
-         NELBCmGWHh0UjcunN0ZAlFcN3F4BmzTdDJhh8zQ2xMt5lJI17nQ06QVRN8NAtOz9o//S
-         RXVT7c9wzzQPGsXLQ+/dDMYinCR6nB5QIzM9w4xjvqQv6ZLAkpziUD96ury9GmlE606z
-         53MgEhil1OFMz0fQ8DVslxfprIMYKrEOPeWk0VJ0+BARJrm606wf/fY2KsSQ3Wn1q4de
-         66tg==
-X-Gm-Message-State: AGi0PuZstvv16nkopxxfTF1a9JZedo7PC8EqMrzG4TSpdXH/icKQOhnR
-        Vns2A3xaFc/2omTXVOaKfFAhOw==
-X-Google-Smtp-Source: APiQypKpwv318za6PvBDHu/CmZW2XLyq7lRBmFefrk1Y5QT6hBrl33XFhRuafmp5OdsdRdB+WGIptg==
-X-Received: by 2002:a37:6415:: with SMTP id y21mr792941qkb.258.1587597263810;
-        Wed, 22 Apr 2020 16:14:23 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c0a8:1102:ce0:3629:8daa:1271? ([2620:10d:c091:480::1:af35])
-        by smtp.gmail.com with ESMTPSA id q6sm534297qtd.61.2020.04.22.16.14.22
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XN5Qa+fH8eY+1o/rOoaxua89YSt7GiBoktgAB1yAGQg=;
+        b=tuFeyBAQ6Slm4sOREzvskvRHgQ1OA3cAgi4ufkVR4CHRdmbLJe4BZwyiRX83KSFRdx
+         n1wybnm28OggCldf4MQLX4XcKMVoiIMmOvQ1B+aJvSr4tX15+hRSU53RkPatk33lbgyw
+         umEjC9oMljhHVDAJCqnWxelC3M0l79wc4m0PUGQltA75NExFbeUNmrwasqqcrC2UaL6O
+         ZW3XgljV40FteEOCCdxX2pJIE2B2yFsTSBKw+0/Dbuyitnfsi1rK+PlBDnLuqifJ+g/Q
+         MbLmtEyXmxrvrgg/635GvsWUwtakZwoqeBKR7wuAKK2vtDuNbH6iEvZN58W7IkQG5KYX
+         T2+g==
+X-Gm-Message-State: AGi0PuZbWFj8dmBlDZ/SOskrCcIjFBZ7AQVJlOaQsRrZIYWna/F+GM3E
+        +hs3xIpHVqiBi69EpkdzKpvAnNACt1A=
+X-Google-Smtp-Source: APiQypLIl7HO/VWGaXLuLeu+hduJ2XqK16EKHt6fNxBavCo1mKyvylK3Nye+5JRghFaG6OGmcZfzuA==
+X-Received: by 2002:a63:41c2:: with SMTP id o185mr1448747pga.139.1587600423020;
+        Wed, 22 Apr 2020 17:07:03 -0700 (PDT)
+Received: from [100.124.12.67] ([104.129.198.228])
+        by smtp.gmail.com with ESMTPSA id x193sm688039pfd.54.2020.04.22.17.07.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2020 16:14:23 -0700 (PDT)
-To:     Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvme@vger.kernel.org" <linux-nvme@vger.kernel.org>
-Cc:     lsf-pc <lsf-pc@lists.linuxfoundation.org>
-From:   Josef Bacik <josef@toxicpanda.com>
-Subject: LSFMMBPF 2020 Cancellation announcement
-Message-ID: <0b6d3d6f-99de-3603-4b42-c3db5113633d@toxicpanda.com>
-Date:   Wed, 22 Apr 2020 19:14:21 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        Wed, 22 Apr 2020 17:07:02 -0700 (PDT)
+Subject: Re: [PATCH 2/9] bdi: move bdi_dev_name out of line
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
+        hdegoede@redhat.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200422073851.303714-1-hch@lst.de>
+ <20200422073851.303714-3-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <ac629ce1-dde6-1d58-f46d-be29366efe34@acm.org>
+Date:   Wed, 22 Apr 2020 17:07:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200422073851.303714-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,35 +64,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Each year, we look forward to gathering at Linux Storage, Filesystem, Memory
-Management, and BPF Summit to share information, collaborate, and learn
-together. Due to continual assessments and growing concerns around COVID-19, we
-have made the decision to cancel Linux Storage, Filesystem, Memory Management,
-and BPF Summit this year. Next year the summit will be held in Palm Springs, on
-May 12-14, 2021 at the Riviera Palm Springs.  A new CFP and registration will be
-held again, along with a new round of invites.  The program committee will
-remain the same, and next year we will choose new members.
+On 4/22/20 12:38 AM, Christoph Hellwig wrote:
+> bdi_dev_name is not a fast path function, move it out of line.  This
+> prepares for using it from modular callers without having to export
+> an implementation detail like bdi_unknown_name.
 
-Event Registration
-
-The Linux Foundation will take care of canceling all event registrations - you
-do not need to do anything.
-
-We thank you for your patience and understanding while we work through this very
-fluid situation. A great deal of work and preparation has gone into the
-information and content planned to be delivered at LSFMMBPF and we look forward
-to sharing it all with our community next year.
-
-Thank you again for your support. Our sincere sympathies are with all those
-being affected and we wish for good health and safety for all.
-
-Thank you on behalf of the program committee:
-
-         Josef Bacik (Filesystems)
-         Amir Goldstein (Filesystems)
-         Martin K. Petersen (Storage)
-         Omar Sandoval (Storage)
-         Michal Hocko (MM)
-         Dan Williams (MM)
-         Alexei Starovoitov (BPF)
-         Daniel Borkmann (BPF)
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
