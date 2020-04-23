@@ -2,232 +2,108 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F1BC54FD0
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 21:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9FF5C54FD0
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 21:30:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C2EA20776
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 21:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A12902077D
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 21:30:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MjMAt3Q+"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AYAOBoRP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726287AbgDWVG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 17:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49642 "EHLO
+        id S1726864AbgDWVaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 17:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725877AbgDWVG3 (ORCPT
+        with ESMTP id S1726849AbgDWVaE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 17:06:29 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354A8C09B042
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 14:06:29 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 33so5724278pgx.17
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 14:06:29 -0700 (PDT)
+        Thu, 23 Apr 2020 17:30:04 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63922C09B043
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 14:30:04 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id y6so3027086pjc.4
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 14:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=yS4CittGbOhF42R8TWWDdhwDXYai0/leJlv4gqT/NmU=;
-        b=MjMAt3Q+mlUPCn3Q31RVo9VFUEZSn/fgCsj2+47u/QF2NPz4QbAe/vq4BuaTBVgsaW
-         Ald4CFbyRy+x7ubqf4RwZVLcYYeL9DqaoDJ4buPw+2FLaOg6PLBmWUwJ33KYAkBB6iLs
-         vrBWVcAmzLHI5AsoiHSQcFHPf0aQaHBf94lKu9Ot+btIm/j1xgONPA9lDUGGM8mzJ0sM
-         Jr9Qum+CkfMwOw/OeL3WY/01JZ11dC/ncINYa2KAWzo1XcjrXnedfMuYvyeBTmbD+MIg
-         THl5MVODRKtpY856nLQIgy8RMRyfpaUfo5leFwSIFzg8ZVZRmvRfTQDOZv9YmxvBmyAH
-         UpTw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=AB5ZytMJUHXlVP3YSGszONFmfmZDNo7x3Nwusr7BT0s=;
+        b=AYAOBoRPdl6L/4Fo8en+/tV7gIy3BGyiJxf1u0Q5zwc99fvgnmRJXkmtVr6jR39d+q
+         83VZkgYzjB9OM3N0fxgPOHfRhFq+h6b7m14l4K8JOxA7rFdbwU+2WBO3+SBhascU1Q/7
+         GECquPJtqeF20GT/66R6waHmNFAmQb0wN/QGWT5f7jwW0ZWkpbz/Znpc8gaEjr0rZX8z
+         8V+iB9bpFKH15nrdSOGKrZMbMCIRCa0IfzmGdVCtD13aatKaloeC5wG7IUskQzQesIoB
+         tkmM7hGNu/2oo9juHmsp7Iqv9bTqNp3xeH6OxMXRuAgx8PcasCs/PI3mcbOtfi22koTM
+         Hwyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=yS4CittGbOhF42R8TWWDdhwDXYai0/leJlv4gqT/NmU=;
-        b=OzsY5MmF1P7a5H41LHARRPlddlT6H4VtA9jrUfMBNg1IZq5iVseN5yJgOryVsOxs22
-         MnM49dlTFnu8w4J7zm9ANloB4p0Vcqr19n29TC618ST11aTNDzjmLgs3cxZOPfV0I4Dw
-         cbXAs3HuzOqc/ntqcEhcX1glIVehKDDB9TrBptlJl3JlxPFBs8AZ/QttEmooHy6rW6Uk
-         xlB1WGXpBogJarjQkMhzq9Y5JHPxkYdFA628P38VQjVa5RURf+uG8Wq0virppfBr55bB
-         I4ITUS52lrwfNQQN9CQdjZRmR16jIteGCjbE7Kl3paCjL2W7lZwApzLZGacM8xXCSrIX
-         Qilg==
-X-Gm-Message-State: AGi0PubPJzjJhgodPllHwtB+2MDjIfV2NiOs8H4KP8lv1i6N8Xy3Q64n
-        Qrzxlx3OLnI2EhAja9T1bliqMo3UNw==
-X-Google-Smtp-Source: APiQypKUsdB4kXM10psaIqd8GHuFR98krDXOwGDqbfD5wKpd5DBiRPeNbwHv//n+Z6ripoplsdXHoUG/hA==
-X-Received: by 2002:a63:e708:: with SMTP id b8mr5914784pgi.128.1587675988521;
- Thu, 23 Apr 2020 14:06:28 -0700 (PDT)
-Date:   Thu, 23 Apr 2020 14:05:23 -0700
-Message-Id: <20200423210523.52833-1-sqazi@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
-Subject: [PATCH v2] block: Limit number of items taken from the I/O scheduler
- in one go
-From:   Salman Qazi <sqazi@google.com>
-To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AB5ZytMJUHXlVP3YSGszONFmfmZDNo7x3Nwusr7BT0s=;
+        b=n89PB85IcnSWAUJw+Wnvp0yXjwbaVZ5RgH5U1HxXLHa2k9x0mGDzsMkcX7268cQ59d
+         A3/Cly4+WfqImogEkWphQ6Jpgqvg0rJPtjOUOdR0ys0eDg1C8MqUmLdSGs7YiPkMuwyY
+         2nvVMIhIsnEF0/txc9sLH2qNub9K6m6QICpM62+2NGuSNUeTJLW4no84gv0fZYzFdMFi
+         +aKMlFw1uYkGxX6wzfsCCn0O0GAmTQ8eT6sI2i32zuqH98JU3wBUHR+3geEygo28WcUF
+         9AmQGFiTGt2Xd5i4c8O3oOlpEoy3RdajcEGwD5iOrn1bHMHNSrB4/zzdanAbz5IpKkWQ
+         GshA==
+X-Gm-Message-State: AGi0PuZC9TaEkdtFqVqY6TTqBJsJKxtHFx06BZam2t3Ae779JqzfaQKc
+        fD74HpMnCNdOxsAbgsbWjP+Q+w==
+X-Google-Smtp-Source: APiQypLk93Z6mp1zYN4+eqxN7io/bR8mOsfCahnoGFL41slET+uQx9jM/f/OKAoyswJF8zlisvTMrw==
+X-Received: by 2002:a17:90a:3086:: with SMTP id h6mr2859548pjb.49.1587677403695;
+        Thu, 23 Apr 2020 14:30:03 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id 202sm2916212pgf.41.2020.04.23.14.30.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Apr 2020 14:30:02 -0700 (PDT)
+Subject: Re: [PATCH v2] block: Limit number of items taken from the I/O
+ scheduler in one go
+To:     Salman Qazi <sqazi@google.com>, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jesse Barnes <jsbarnes@google.com>,
         Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>, Salman Qazi <sqazi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
+References: <20200423210523.52833-1-sqazi@google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <83078447-831c-2921-db5e-9cab4c4c12df@kernel.dk>
+Date:   Thu, 23 Apr 2020 15:30:01 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200423210523.52833-1-sqazi@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Flushes bypass the I/O scheduler and get added to hctx->dispatch
-in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
-hctx->run_work work item and is past the point in
-blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
+On 4/23/20 3:05 PM, Salman Qazi wrote:
+> Flushes bypass the I/O scheduler and get added to hctx->dispatch
+> in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
+> hctx->run_work work item and is past the point in
+> blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
+> 
+> The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
+> because the I/O scheduler can feed an arbitrary number of commands.
+> 
+> Since we have only one hctx->run_work, the commands waiting in
+> hctx->dispatch will wait an arbitrary length of time for run_work to be
+> rerun.
+> 
+> A similar phenomenon exists with dispatches from the software queue.
+> 
+> The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
+> blk_mq_do_dispatch_ctx and return from the run_work handler and let it
+> rerun.
 
-The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
-because the I/O scheduler can feed an arbitrary number of commands.
+Any changes since v1? It's customary to put that in here too, below
+the --- lines.
 
-Since we have only one hctx->run_work, the commands waiting in
-hctx->dispatch will wait an arbitrary length of time for run_work to be
-rerun.
-
-A similar phenomenon exists with dispatches from the software queue.
-
-The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
-blk_mq_do_dispatch_ctx and return from the run_work handler and let it
-rerun.
-
-Signed-off-by: Salman Qazi <sqazi@google.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 49 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 43 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 74cedea56034..b69b780351c1 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -84,12 +84,17 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
-  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-  * its queue by itself in its completion handler, so we don't need to
-  * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-+ *
-+ * Returns true if hctx->dispatch was found non-empty and
-+ * run_work has to be run again.  This is necessary to avoid
-+ * starving flushes.
-  */
--static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	LIST_HEAD(rq_list);
-+	bool ret = false;
- 
- 	do {
- 		struct request *rq;
-@@ -97,6 +102,11 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
- 			break;
- 
-+		if (!list_empty_careful(&hctx->dispatch)) {
-+			ret = true;
-+			break;
-+		}
-+
- 		if (!blk_mq_get_dispatch_budget(hctx))
- 			break;
- 
-@@ -113,6 +123,8 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 		 */
- 		list_add(&rq->queuelist, &rq_list);
- 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-+
-+	return ret;
- }
- 
- static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-@@ -130,16 +142,26 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-  * its queue by itself in its completion handler, so we don't need to
-  * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-+ *
-+ * Returns true if hctx->dispatch was found non-empty and
-+ * run_work has to be run again.  This is necessary to avoid
-+ * starving flushes.
-  */
--static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	LIST_HEAD(rq_list);
- 	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
-+	bool ret = false;
- 
- 	do {
- 		struct request *rq;
- 
-+		if (!list_empty_careful(&hctx->dispatch)) {
-+			ret = true;
-+			break;
-+		}
-+
- 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
- 			break;
- 
-@@ -165,6 +187,7 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
- 
- 	WRITE_ONCE(hctx->dispatch_from, ctx);
-+	return ret;
- }
- 
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-@@ -172,6 +195,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.dispatch_request;
-+	bool run_again;
-+	bool restarted = false;
- 	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -180,6 +205,9 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 
- 	hctx->run++;
- 
-+again:
-+	run_again = false;
-+
- 	/*
- 	 * If we have previous entries on our dispatch list, grab them first for
- 	 * more fair dispatch.
-@@ -208,19 +236,28 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
- 			if (has_sched_dispatch)
--				blk_mq_do_dispatch_sched(hctx);
-+				run_again = blk_mq_do_dispatch_sched(hctx);
- 			else
--				blk_mq_do_dispatch_ctx(hctx);
-+				run_again = blk_mq_do_dispatch_ctx(hctx);
- 		}
- 	} else if (has_sched_dispatch) {
--		blk_mq_do_dispatch_sched(hctx);
-+		run_again = blk_mq_do_dispatch_sched(hctx);
- 	} else if (hctx->dispatch_busy) {
- 		/* dequeue request one by one from sw queue if queue is busy */
--		blk_mq_do_dispatch_ctx(hctx);
-+		run_again = blk_mq_do_dispatch_ctx(hctx);
- 	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list, false);
- 	}
-+
-+	if (run_again) {
-+		if (!restarted) {
-+			restarted = true;
-+			goto again;
-+		}
-+
-+		blk_mq_run_hw_queue(hctx, true);
-+	}
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
 -- 
-2.26.1.301.g55bc3eb7cb9-goog
+Jens Axboe
 
