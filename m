@@ -2,57 +2,68 @@ Return-Path: <SRS0=9GNQ=6H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E53C2BA19
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D542C54FD0
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19BB920736
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4417921569
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 07:15:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cjCHEJXr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgDWHPC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 03:15:02 -0400
-Received: from verein.lst.de ([213.95.11.211]:56373 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725562AbgDWHPC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 03:15:02 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6C23268BEB; Thu, 23 Apr 2020 09:14:59 +0200 (CEST)
-Date:   Thu, 23 Apr 2020 09:14:58 +0200
+        id S1726958AbgDWHPF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 03:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60698 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726899AbgDWHPD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Apr 2020 03:15:03 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0266FC02C444;
+        Thu, 23 Apr 2020 00:15:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=gGIezwoY+wPfofEZ1lSEnumbrPybt4TeEDGCmleYRVk=; b=cjCHEJXrRAidHBgUlrzxZC/fle
+        6aRF/LQkYXWyhYn+xnvtY8jr0dBUsFP2ZQlUR3lkW77YbBZZBY4T768OzPWq492BOMwnY/25ACE/O
+        OeMIP5IJxDCCym6J6FGH7EfUcX4c6i3WSXYMoe4MG7G2h/lAkKSYra2V3Xr4jOxBsJkRtN6zVJSFq
+        Xshmruu+Geep+v60XY/1RJLLcAe06HYEigmPwDyMdsSsn0W+Xk3mYwI9gj5xe7xw8tDMNc7Qiehko
+        gVZn3gHgTOq6DkEeIjaPW/LYlfVCUzE8I3B9xmwmuKV0gKBPjjT8Ilm3957M2BCoBBqygmk0rwvHH
+        TyclIpmw==;
+Received: from 089144193245.atnat0002.highway.a1.net ([89.144.193.245] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jRW4D-0008RO-GU; Thu, 23 Apr 2020 07:14:37 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH V7 1/9] blk-mq: mark blk_mq_get_driver_tag as static
-Message-ID: <20200423071458.GA10951@lst.de>
-References: <20200418030925.31996-1-ming.lei@redhat.com> <20200418030925.31996-2-ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: stop using ioctl_by_bdev for file system access to CDROMs
+Date:   Thu, 23 Apr 2020 09:12:17 +0200
+Message-Id: <20200423071224.500849-1-hch@lst.de>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200418030925.31996-2-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 18, 2020 at 11:09:17AM +0800, Ming Lei wrote:
-> Now all callers of blk_mq_get_driver_tag are in blk-mq.c, so mark
-> it as static.
-> 
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: John Garry <john.garry@huawei.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Hi Jens,
 
-Looks good,
+except for the DASD case under discussion the last users of ioctl_by_bdev
+are the file system drivers that want to query CDROM information using
+ioctls.  This series switches them to use function calls directly into
+the CDROM midlayer instead, which implies:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+ - adding a cdrom_device_info pointer to the gendisk, so that file systems
+   can find it without going to the low-level driver first
+ - ensuring that the CDROM midlayer (which isn't a lot of code) is built
+   in if the file systems are built in so that they can actually call the
+   exported functions
