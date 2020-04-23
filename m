@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FFCC55185
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D583C55185
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:09:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B2EA20776
-	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64F372075A
+	for <linux-block@archiver.kernel.org>; Thu, 23 Apr 2020 00:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725961AbgDWAIT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Apr 2020 20:08:19 -0400
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:38318 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgDWAIS (ORCPT
+        id S1726078AbgDWAJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Apr 2020 20:09:06 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40430 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgDWAJG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Apr 2020 20:08:18 -0400
-Received: by mail-pj1-f67.google.com with SMTP id t40so1694362pjb.3;
-        Wed, 22 Apr 2020 17:08:18 -0700 (PDT)
+        Wed, 22 Apr 2020 20:09:06 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n16so1944485pgb.7;
+        Wed, 22 Apr 2020 17:09:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=b8MI707XPUmbVBAHMkRUlSdETaigvCBuJWiM5vEnnQY=;
-        b=VL6AvHwHItydmqCwRicH/9w6ecpnto4VAkk7OYKOPgnUwmozf99MXCNDC+6HcNmKNx
-         9ytZqWD4wfR71R/rp16cYRZofgqT+EiTzRdNWKninDyolmWxc+uimJ5kddo8OpTJ1wS8
-         d14FDQ3xnk80EX+wlx+/stc1LOIZI7RX2YBg/mbgflxRw0u/KkKICXgomBk6pPHUfqZk
-         rNLuNxMgBOHJAwtLiHHnPPmEx9wc18KqdJ7Huy3c8BZTYb7XjuD9/Yjc+E1lwDiaMNZb
-         EPPmBOTyokV48FXyKD3/PNH9YoXxjRDtL542NpW4myEtFEI05CJyXTgNjJk0a8ZbkHrj
-         FOUw==
-X-Gm-Message-State: AGi0Puap0Do/oz9L3UHicyLVvg91B4YUOQZu1xVIM+lmyT2OtVU99fux
-        WD3a9oZD75mpb+gqvKRFZRTXqi1efYs=
-X-Google-Smtp-Source: APiQypJihfVSc9CfqAV+1F/S2/EpyZjF9KKfzUlRSXpWDlow/vWnYMyVxMD12AZVN1IlJIWHVD2hvg==
-X-Received: by 2002:a17:902:a713:: with SMTP id w19mr1243857plq.197.1587600498096;
-        Wed, 22 Apr 2020 17:08:18 -0700 (PDT)
+        bh=sm2s9oTr54AuFPui/oDg5EqpKZfyC2+O0n8zH1kfUfU=;
+        b=FOYd160y9Cfutu0h5hPjR+WOk+Ohy3nCaI3mp7dxbN4S8U6y2NngDnuk5TIqrXECTy
+         jGR0XtKH2RtZA5JhBBLzPw+OANIC6WZa+8tVSd1Erj3hpNVIrrzS9oUvve8Zfb1oEWDi
+         JFk1Os/mHre7s7Y/Gcj7joOzRItczg2bCl8KK1580V2/W1WOMHbEwEBXkS0GVnY4SKVC
+         aubqNSDk2pFOIZNCOppwa3bOwLYtleHZFyd3oqLNbu96dOr1rbdG27kVoFiiuToFzJCp
+         d5vvEgP2xYxQHdzt7Zu7Jf4Bs5sDjLoi5DxgDqPQhxyXvgsiBdfJmAqSElZXQUBnvIpD
+         bWrg==
+X-Gm-Message-State: AGi0PubuWZAdjOZyIWgMUA9eGxkKHZ5UxMD2BhYcEwyD4Tga4oesuYpQ
+        n3aqgXUjK4I37LW/HT4SZtfL7FjL8G8=
+X-Google-Smtp-Source: APiQypJIsXmqbm0r0JIFrqjbyNs2skkIhzf5QnQP81/l0CsVnrHEMngDXoNFko8+jzfCsmDdnqhKSw==
+X-Received: by 2002:a63:564e:: with SMTP id g14mr1527375pgm.63.1587600545568;
+        Wed, 22 Apr 2020 17:09:05 -0700 (PDT)
 Received: from [100.124.12.67] ([104.129.198.228])
-        by smtp.gmail.com with ESMTPSA id 128sm614323pfx.187.2020.04.22.17.08.16
+        by smtp.gmail.com with ESMTPSA id z5sm644931pfn.142.2020.04.22.17.09.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2020 17:08:17 -0700 (PDT)
-Subject: Re: [PATCH 3/9] bdi: use bdi_dev_name() to get device name
+        Wed, 22 Apr 2020 17:09:04 -0700 (PDT)
+Subject: Re: [PATCH 4/9] bdi: add a ->dev_name field to struct
+ backing_dev_info
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz, tytso@mit.edu,
         hdegoede@redhat.com, gregkh@linuxfoundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200422073851.303714-1-hch@lst.de>
- <20200422073851.303714-4-hch@lst.de>
+ <20200422073851.303714-5-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ff0f4b9a-3724-fcaf-bf52-2c99507cafb7@acm.org>
-Date:   Wed, 22 Apr 2020 17:08:15 -0700
+Message-ID: <dfdba0c2-7a52-eb75-355d-a2cfaab80d7a@acm.org>
+Date:   Wed, 22 Apr 2020 17:09:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200422073851.303714-4-hch@lst.de>
+In-Reply-To: <20200422073851.303714-5-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,6 +65,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/22/20 12:38 AM, Christoph Hellwig wrote:> Use the common interface 
-bdi_dev_name() to get device name.
+On 4/22/20 12:38 AM, Christoph Hellwig wrote:
+> Cache a copy of the name for the life time of the backing_dev_info
+> structure so that we can reference it even after unregistering.
+
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+
