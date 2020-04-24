@@ -2,145 +2,136 @@ Return-Path: <SRS0=nYW3=6I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 025DFC2BA1A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 07:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26B5C2BA1A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEFE420700
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 07:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E54620736
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:42:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EW70wBtr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726056AbgDXHTE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 03:19:04 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2092 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726051AbgDXHTD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 03:19:03 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id DC1392CAC0741D5FB70B;
-        Fri, 24 Apr 2020 08:19:01 +0100 (IST)
-Received: from [127.0.0.1] (10.47.6.64) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 24 Apr
- 2020 08:19:00 +0100
-Subject: Re: [PATCH] blk-mq: Put driver tag in blk_mq_dispatch_rq_list() when
- no budget
-To:     Ming Lei <ming.lei@redhat.com>,
-        Doug Anderson <dianders@chromium.org>
-CC:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Guenter Roeck <groeck@chromium.org>
-References: <1587035931-125028-1-git-send-email-john.garry@huawei.com>
- <e5416179-2ba0-c9a8-1b86-d52eae29e146@acm.org>
- <663d472a-5bde-4b89-3137-c7bfdf4d7b97@huawei.com>
- <CAD=FV=XBrKgng+vYzJx+qsOEZ-cZ10A0t+pRh=FcbQMop2ht4Q@mail.gmail.com>
- <20200424013519.GA355437@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <3b91a730-0923-c049-bbe4-68fc5a7ae793@huawei.com>
-Date:   Fri, 24 Apr 2020 08:18:25 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726383AbgDXImF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 04:42:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54935 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726317AbgDXImF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Apr 2020 04:42:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587717724;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eRBkH5/Xmo1XGOKZTIj29qxMagsUMmu9LlrB6+bvzhA=;
+        b=EW70wBtr1F6SmUMHajB+MYX1jdUm3XualGWMRnZ6XPeYqa1/aHrF2333ns9kJ9X4VCA7Lc
+        EW/iZq4hjF/oKFyL2aSp9+dcqieufvTKwdCmJZ2Ewts8vHWmnPNwairkJ55xxF5YJ8Og5K
+        7INLAC5wTiA1+Gv6VvPg7ePSYA4jpm4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-rC2jIYZHMI6yeriZj2-ZAw-1; Fri, 24 Apr 2020 04:42:02 -0400
+X-MC-Unique: rC2jIYZHMI6yeriZj2-ZAw-1
+Received: by mail-wm1-f71.google.com with SMTP id u11so3895204wmc.7
+        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2020 01:42:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eRBkH5/Xmo1XGOKZTIj29qxMagsUMmu9LlrB6+bvzhA=;
+        b=PEBlo3Al0gQ06zj0Ugxq/Vi0hP307z3bkTFS6+RagCjpudEyqvHxiz7ChT+DVgzPyg
+         hFOQQE6z3lcLvUQnZ1y3JQzR5ej6TzbbN7D/0fJP9qb3Kj4QKFQH7bkGVRkDLSqxoZa4
+         Cg7GGGdFbCcKMgCb4X4GgJzvZpbX9Zr38Fj+D2TKMQTHwSyv15nRWbdtPiZo1kW4BmNr
+         BUN6jXtNMbOZotU59DNEX3SXrOT3CsE3v5wBGFwMv++wzLHXYBgjbAS2/aV/haSh4dCk
+         BsWNArmxqdme9ulY98RleOWWHJ9/ryVirwOhoUGI3qxpcPNQqdTK49BrGYd01YpPD+Ue
+         /YdA==
+X-Gm-Message-State: AGi0Pub+2tzBLMn18BNl/QOZ9qeD2jJc9VVgr3mzhB52ykeNCO3gFXJY
+        /8zoyOEqXIFhYkfsKI+E5I4Filvfg1QKDmBqPNPW7bDwcy5E6Y3eLnwAf2aGByAF3YNgtDGj4ux
+        fkcH+kOblBXq7xj0QNAStzNc=
+X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8507232wmj.3.1587717721286;
+        Fri, 24 Apr 2020 01:42:01 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKxuCqGvW3NHNyEw4+X3HPjqbYB2EyJcTmS/3W+wWEll8LclKWavyc7mGG0iFRlqlH/YaX6NQ==
+X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8507206wmj.3.1587717721017;
+        Fri, 24 Apr 2020 01:42:01 -0700 (PDT)
+Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
+        by smtp.gmail.com with ESMTPSA id s12sm1831955wmc.7.2020.04.24.01.41.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Apr 2020 01:42:00 -0700 (PDT)
+Date:   Fri, 24 Apr 2020 10:41:58 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Lance Digby <ldigby@redhat.com>
+Subject: Re: [PATCH] virtio-blk: handle block_device_operations callbacks
+ after hot unplug
+Message-ID: <20200424084158.uayekt5c3lus4532@steredhat>
+References: <20200423123717.139141-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200424013519.GA355437@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.6.64]
-X-ClientProxiedBy: lhreml722-chm.china.huawei.com (10.201.108.73) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200423123717.139141-1-stefanha@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24/04/2020 02:35, Ming Lei wrote:
-> On Thu, Apr 23, 2020 at 03:42:37PM -0700, Doug Anderson wrote:
->> Hi,
->>
->> On Mon, Apr 20, 2020 at 1:23 AM John Garry <john.garry@huawei.com> wrote:
->>>
->>> On 18/04/2020 03:43, Bart Van Assche wrote:
->>>> On 2020-04-16 04:18, John Garry wrote:
->>>>> If in blk_mq_dispatch_rq_list() we find no budget, then we break of the
->>>>> dispatch loop, but the request may keep the driver tag, evaulated
->>>>> in 'nxt' in the previous loop iteration.
->>>>>
->>>>> Fix by putting the driver tag for that request.
->>>>>
->>>>> Signed-off-by: John Garry <john.garry@huawei.com>
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index 8e56884fd2e9..a7785df2c944 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -1222,8 +1222,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
->>>>>               rq = list_first_entry(list, struct request, queuelist);
->>>>>
->>>>>               hctx = rq->mq_hctx;
->>>>> -            if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
->>>>> +            if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
->>>>> +                    blk_mq_put_driver_tag(rq);
->>>>>                       break;
->>>>> +            }
->>>>>
->>>>>               if (!blk_mq_get_driver_tag(rq)) {
->>>>>                       /*
->>>>
->>>> Is this something that can only happen if q->mq_ops->queue_rq(hctx, &bd)
->>>> returns another value than BLK_STS_OK, BLK_STS_RESOURCE and
->>>> BLK_STS_DEV_RESOURCE?
->>>
->>> Right, as that case is handled in blk_mq_handle_dev_resource()
->>>
->>> If so, please add a comment in the source code
->>>> that explains this.
->>>
->>> So important that we should now do this in an extra patch?
->>>
->>>>
->>>> Is this perhaps a bug fix for 0bca799b9280 ("blk-mq: order getting
->>>> budget and driver tag")? If so, please mention this and add Cc tags for
->>>> the people who were Cc-ed on that patch.
->>>
->>> So it looks like 0bca799b9280 had a flaw, but I am not sure if anything
->>> got broken there and worthy of stable backport.
->>>
->>> I found this issue while debugging Ming's blk-mq cpu hotplug patchset,
->>> which I feel is ready to merge.
->>>
->>> Having said that, this nasty issue did take > 1 day for me to debug...
->>> so let me know.
->>
->> As per the above conversation, presumably this should go to stable
->> then for any kernel that has commit 0bca799b9280 ("blk-mq: order
->> getting budget and driver tag")?  For instance, I think 4.19 would be
->> affected?  When I picked it there I got a conflict due to not having
->> commit ea4f995ee8b8 ("blk-mq: cache request hardware queue mapping")
->> but I think it's just a context collision and easy to resolve.
->>
->> I'm no expert in the block code, but I posted my backport to 4.19 at
->> <https://crrev.com/c/2163313>.  I'm happy to send an email as a patch
->> to the list too or double-check that someone else's conflict
->> resolution matches mine.
+On Thu, Apr 23, 2020 at 01:37:17PM +0100, Stefan Hajnoczi wrote:
+> A virtio_blk block device can still be referenced after hot unplug by
+> userspace processes that hold the file descriptor.  In this case
+> virtblk_getgeo() can be invoked after virtblk_remove() was called.  For
+> example, a program that has /dev/vdb open can call ioctl(HDIO_GETGEO)
+> after hot unplug.
 > 
-> The thing is that there may not user visible effect by this issue,
-> when one tag isn't freed, this request will be re-dispatched soon.
-> That said it just makes the tag lifetime longer.
+> Fix this by clearing vblk->disk->private_data and checking that the
+> virtio_blk driver instance is still around in virtblk_getgeo().
 > 
-> It could only be an issue in case of request dependency, meantime
-> the tag space is quite limited. However, not sure if there is such
-> case in reality.
+> Note that the virtblk_getgeo() function itself is guaranteed to remain
+> in memory after hot unplug because the virtio_blk module refcount is
+> still held while a block device reference exists.
 > 
+> Originally-by: Lance Digby <ldigby@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  drivers/block/virtio_blk.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 93468b7c6701..b50cdf37a6f7 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -300,6 +300,10 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+>  {
+>  	struct virtio_blk *vblk = bd->bd_disk->private_data;
+>  
+> +	/* Driver instance has been removed */
+> +	if (!vblk)
+> +		return -ENOTTY;
+> +
+>  	/* see if the host passed in geometry config */
+>  	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
+>  		virtio_cread(vblk->vdev, struct virtio_blk_config,
+> @@ -835,6 +839,7 @@ static void virtblk_remove(struct virtio_device *vdev)
+>  	vdev->config->reset(vdev);
+>  
+>  	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
+> +	vblk->disk->private_data = NULL;
+>  	put_disk(vblk->disk);
+>  	vdev->config->del_vqs(vdev);
+>  	kfree(vblk->vqs);
 
-FWIW, this was pretty nasty to debug, and if it's not going to cause 
-harm, then I'd be more inclined to add to stable. In addition, some 
-distro may backport patches on a stable baseline where it is visible 
-separately, and miss this one.
+As pointed out, can be a race. We had a very similar issue in
+virtio-vsock, and we solved using RCU to assign and get the pointer [1],
+maybe the same solution can work here.
 
-Thanks,
-John
+Cheers,
+Stefano
+
+[1] 0deab087b16a vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock
+
