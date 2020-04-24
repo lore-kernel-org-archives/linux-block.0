@@ -7,150 +7,107 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EC0C2BA1A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD8AC54FCB
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:24:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8265D20728
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:24:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 080E620736
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:24:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UqbvmZEc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJdYFp+b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726289AbgDXKYg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 06:24:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55974 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726193AbgDXKYf (ORCPT
+        id S1726813AbgDXKYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 06:24:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20227 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726806AbgDXKYi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:24:35 -0400
+        Fri, 24 Apr 2020 06:24:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587723874;
+        s=mimecast20190719; t=1587723877;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FIXU3sXsBP4ihx6mA2VIsZ2SduoBR3eW2MgbSsatcyk=;
-        b=UqbvmZEcie3LnkQtWapdc2uioaCcbGXrFPfvxBTDbryr2Nn29iIhDa+Ll6BJ1gvD1E4zoR
-        qrsoVtS8bKcaOLXdfbTvrPitdyTRx+mph3mw3UDvGqV4s/5O5GDaA+MJaod5AyP7LwlVSo
-        uuwvgtzTlT/bcm3jQzhV5/30F8LZ0uE=
+        bh=Jy6SeT6VWkIZDXssfD8JdG74CdKwrZPo+WBzzDlVJSA=;
+        b=EJdYFp+bW3A3Z1nsWRaYI4JuhJn6E44yGsZzjks+Xi3T7YPbN/ZJJq/As7qreTeUsGEiQB
+        gUO9Z0kKZlrjyhA0SQA9Wh4r45/bPG2bdood7fbBEyE7mZtneVwI7MKoCIUw2O3cosf7Ce
+        7iLEg5gO3yNPGG63KiT04bonFHZOBpA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-RVYdI1j_OK-D_erlZFEa-g-1; Fri, 24 Apr 2020 06:24:27 -0400
-X-MC-Unique: RVYdI1j_OK-D_erlZFEa-g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-13-LEo5JnkSOCGtodYHyKQQKg-1; Fri, 24 Apr 2020 06:24:33 -0400
+X-MC-Unique: LEo5JnkSOCGtodYHyKQQKg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E5DC8018AD;
-        Fri, 24 Apr 2020 10:24:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4D1264AD9;
+        Fri, 24 Apr 2020 10:24:31 +0000 (UTC)
 Received: from localhost (ovpn-8-38.pek2.redhat.com [10.72.8.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C5411002389;
-        Fri, 24 Apr 2020 10:24:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E3A55D9D3;
+        Fri, 24 Apr 2020 10:24:28 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Subject: [PATCH V8 02/11] block: add helper for copying request
-Date:   Fri, 24 Apr 2020 18:23:42 +0800
-Message-Id: <20200424102351.475641-3-ming.lei@redhat.com>
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH V8 03/11] blk-mq: mark blk_mq_get_driver_tag as static
+Date:   Fri, 24 Apr 2020 18:23:43 +0800
+Message-Id: <20200424102351.475641-4-ming.lei@redhat.com>
 In-Reply-To: <20200424102351.475641-1-ming.lei@redhat.com>
 References: <20200424102351.475641-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add one new helper of blk_rq_copy_request() to copy request, and the help=
-er
-will be used in this patch for re-submitting request, so make it as a blo=
-ck
-layer internal helper.
+Now all callers of blk_mq_get_driver_tag are in blk-mq.c, so mark
+it as static.
 
-Cc: John Garry <john.garry@huawei.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com
+Cc: John Garry <john.garry@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c | 33 +++++++++++++++++++--------------
- block/blk.h      |  2 ++
- 2 files changed, 21 insertions(+), 14 deletions(-)
+ block/blk-mq.c | 2 +-
+ block/blk-mq.h | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 91537e526b45..76405551d09e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1587,6 +1587,24 @@ void blk_rq_unprep_clone(struct request *rq)
- }
- EXPORT_SYMBOL_GPL(blk_rq_unprep_clone);
-=20
-+void blk_rq_copy_request(struct request *rq, struct request *rq_src)
-+{
-+	/* Copy attributes of the original request to the clone request. */
-+	rq->__sector =3D blk_rq_pos(rq_src);
-+	rq->__data_len =3D blk_rq_bytes(rq_src);
-+	if (rq_src->rq_flags & RQF_SPECIAL_PAYLOAD) {
-+		rq->rq_flags |=3D RQF_SPECIAL_PAYLOAD;
-+		rq->special_vec =3D rq_src->special_vec;
-+	}
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+	rq->nr_integrity_segments =3D rq_src->nr_integrity_segments;
-+#endif
-+	rq->nr_phys_segments =3D rq_src->nr_phys_segments;
-+	rq->ioprio =3D rq_src->ioprio;
-+	rq->extra_len =3D rq_src->extra_len;
-+	rq->write_hint =3D rq_src->write_hint;
-+}
-+
- /**
-  * blk_rq_prep_clone - Helper function to setup clone request
-  * @rq: the request to be setup
-@@ -1629,20 +1647,7 @@ int blk_rq_prep_clone(struct request *rq, struct r=
-equest *rq_src,
- 			rq->bio =3D rq->biotail =3D bio;
- 	}
-=20
--	/* Copy attributes of the original request to the clone request. */
--	rq->__sector =3D blk_rq_pos(rq_src);
--	rq->__data_len =3D blk_rq_bytes(rq_src);
--	if (rq_src->rq_flags & RQF_SPECIAL_PAYLOAD) {
--		rq->rq_flags |=3D RQF_SPECIAL_PAYLOAD;
--		rq->special_vec =3D rq_src->special_vec;
--	}
--#ifdef CONFIG_BLK_DEV_INTEGRITY
--	rq->nr_integrity_segments =3D rq_src->nr_integrity_segments;
--#endif
--	rq->nr_phys_segments =3D rq_src->nr_phys_segments;
--	rq->ioprio =3D rq_src->ioprio;
--	rq->extra_len =3D rq_src->extra_len;
--	rq->write_hint =3D rq_src->write_hint;
-+	blk_rq_copy_request(rq, rq_src);
-=20
- 	return 0;
-=20
-diff --git a/block/blk.h b/block/blk.h
-index 0a94ec68af32..bbbced0b3c8c 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -120,6 +120,8 @@ static inline void blk_rq_bio_prep(struct request *rq=
-, struct bio *bio,
- 		rq->rq_disk =3D bio->bi_disk;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a7785df2c944..79267f2e8960 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1027,7 +1027,7 @@ static inline unsigned int queued_to_index(unsigned=
+ int queued)
+ 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
  }
 =20
-+void blk_rq_copy_request(struct request *rq, struct request *rq_src);
-+
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- void blk_flush_integrity(void);
- bool __bio_integrity_endio(struct bio *);
+-bool blk_mq_get_driver_tag(struct request *rq)
++static bool blk_mq_get_driver_tag(struct request *rq)
+ {
+ 	struct blk_mq_alloc_data data =3D {
+ 		.q =3D rq->q,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 10bfdfb494fa..e7d1da4b1f73 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -44,7 +44,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *, st=
+ruct list_head *, bool);
+ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ 				bool kick_requeue_list);
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head=
+ *list);
+-bool blk_mq_get_driver_tag(struct request *rq);
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+ 					struct blk_mq_ctx *start);
+=20
 --=20
 2.25.2
 
