@@ -2,136 +2,144 @@ Return-Path: <SRS0=nYW3=6I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26B5C2BA1A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF06C2BA1A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:57:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E54620736
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:42:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EW70wBtr"
+	by mail.kernel.org (Postfix) with ESMTP id 830A120736
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 08:57:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726383AbgDXImF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 04:42:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54935 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726317AbgDXImF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 04:42:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587717724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eRBkH5/Xmo1XGOKZTIj29qxMagsUMmu9LlrB6+bvzhA=;
-        b=EW70wBtr1F6SmUMHajB+MYX1jdUm3XualGWMRnZ6XPeYqa1/aHrF2333ns9kJ9X4VCA7Lc
-        EW/iZq4hjF/oKFyL2aSp9+dcqieufvTKwdCmJZ2Ewts8vHWmnPNwairkJ55xxF5YJ8Og5K
-        7INLAC5wTiA1+Gv6VvPg7ePSYA4jpm4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-rC2jIYZHMI6yeriZj2-ZAw-1; Fri, 24 Apr 2020 04:42:02 -0400
-X-MC-Unique: rC2jIYZHMI6yeriZj2-ZAw-1
-Received: by mail-wm1-f71.google.com with SMTP id u11so3895204wmc.7
-        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2020 01:42:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eRBkH5/Xmo1XGOKZTIj29qxMagsUMmu9LlrB6+bvzhA=;
-        b=PEBlo3Al0gQ06zj0Ugxq/Vi0hP307z3bkTFS6+RagCjpudEyqvHxiz7ChT+DVgzPyg
-         hFOQQE6z3lcLvUQnZ1y3JQzR5ej6TzbbN7D/0fJP9qb3Kj4QKFQH7bkGVRkDLSqxoZa4
-         Cg7GGGdFbCcKMgCb4X4GgJzvZpbX9Zr38Fj+D2TKMQTHwSyv15nRWbdtPiZo1kW4BmNr
-         BUN6jXtNMbOZotU59DNEX3SXrOT3CsE3v5wBGFwMv++wzLHXYBgjbAS2/aV/haSh4dCk
-         BsWNArmxqdme9ulY98RleOWWHJ9/ryVirwOhoUGI3qxpcPNQqdTK49BrGYd01YpPD+Ue
-         /YdA==
-X-Gm-Message-State: AGi0Pub+2tzBLMn18BNl/QOZ9qeD2jJc9VVgr3mzhB52ykeNCO3gFXJY
-        /8zoyOEqXIFhYkfsKI+E5I4Filvfg1QKDmBqPNPW7bDwcy5E6Y3eLnwAf2aGByAF3YNgtDGj4ux
-        fkcH+kOblBXq7xj0QNAStzNc=
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8507232wmj.3.1587717721286;
-        Fri, 24 Apr 2020 01:42:01 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKxuCqGvW3NHNyEw4+X3HPjqbYB2EyJcTmS/3W+wWEll8LclKWavyc7mGG0iFRlqlH/YaX6NQ==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8507206wmj.3.1587717721017;
-        Fri, 24 Apr 2020 01:42:01 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id s12sm1831955wmc.7.2020.04.24.01.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 01:42:00 -0700 (PDT)
-Date:   Fri, 24 Apr 2020 10:41:58 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Lance Digby <ldigby@redhat.com>
-Subject: Re: [PATCH] virtio-blk: handle block_device_operations callbacks
- after hot unplug
-Message-ID: <20200424084158.uayekt5c3lus4532@steredhat>
-References: <20200423123717.139141-1-stefanha@redhat.com>
+        id S1726716AbgDXI5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 04:57:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47364 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726324AbgDXI5p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Apr 2020 04:57:45 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id E7A5AAAC7;
+        Fri, 24 Apr 2020 08:57:42 +0000 (UTC)
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Cc:     linux-block@vger.kernel.org
+References: <7c92cd67-8e62-7d55-c520-345c30513bfa@suse.de>
+ <140de6d9-b5ff-0736-ddbd-5b9e1ae70f5b@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+Autocrypt: addr=colyli@suse.de; keydata=
+ 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
+Subject: Re: Request For Suggestion: how to handle udevd timeout for bcache
+ registration
+Message-ID: <b2cf1d0e-b710-4e11-7ea8-f01364986c4a@suse.de>
+Date:   Fri, 24 Apr 2020 16:57:39 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200423123717.139141-1-stefanha@redhat.com>
+In-Reply-To: <140de6d9-b5ff-0736-ddbd-5b9e1ae70f5b@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 01:37:17PM +0100, Stefan Hajnoczi wrote:
-> A virtio_blk block device can still be referenced after hot unplug by
-> userspace processes that hold the file descriptor.  In this case
-> virtblk_getgeo() can be invoked after virtblk_remove() was called.  For
-> example, a program that has /dev/vdb open can call ioctl(HDIO_GETGEO)
-> after hot unplug.
+On 2020/4/23 23:08, Jens Axboe wrote:
+> On 4/23/20 5:23 AM, Coly Li wrote:
+>> Hi folk,
+>>
+>> I want to listen to your suggestion on how to handle the udevd timeout
+>> for bcache registration.
+>>
+>> First of all let me introduce the background of this timeout problem.
+>>
+>> Now the bcache registration is synchronized, the registering process
+>> will be blocked until the whole registration done. In boot up time, such
+>> registration can be initiated from a bcache udev rule. Normally it won't
+>> be problem, but for very large cached data size there might be a large
+>> internal btree on the cache device. During the registration checking all
+>> the btree nodes may take 50+ minutes as a udev task, it exceeds 180
+>> seconds timeout and udevd will kill it. The killing signal will make
+>> kthread_create() fail during bcache initialization, then the automatic
+>> bcache registration in boot up time will fail.
+>>
+>> The above text describes the problem I need to solve: make boot up time
+>> automatic bache registration always success no mater how long it will take.
+>>
+>> I know there are several solutions to solve such problem, I do
+>> appreciate if you may share the solution so that I may learn good ideas
+>> from them.
+>>
+>> Thank you in advance for the information sharing of my request of
+>> suggestion.
 > 
-> Fix this by clearing vblk->disk->private_data and checking that the
-> virtio_blk driver instance is still around in virtblk_getgeo().
+> The way I see it, you have only two choices:
 > 
-> Note that the virtblk_getgeo() function itself is guaranteed to remain
-> in memory after hot unplug because the virtio_blk module refcount is
-> still held while a block device reference exists.
+> 1) Make the registration async (or lazy), so that starting the device is
+>    fast, but the btree verification happens on-demand or in the
+>    background.
 > 
-> Originally-by: Lance Digby <ldigby@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  drivers/block/virtio_blk.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 93468b7c6701..b50cdf37a6f7 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -300,6 +300,10 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  {
->  	struct virtio_blk *vblk = bd->bd_disk->private_data;
->  
-> +	/* Driver instance has been removed */
-> +	if (!vblk)
-> +		return -ENOTTY;
-> +
->  	/* see if the host passed in geometry config */
->  	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
->  		virtio_cread(vblk->vdev, struct virtio_blk_config,
-> @@ -835,6 +839,7 @@ static void virtblk_remove(struct virtio_device *vdev)
->  	vdev->config->reset(vdev);
->  
->  	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
-> +	vblk->disk->private_data = NULL;
->  	put_disk(vblk->disk);
->  	vdev->config->del_vqs(vdev);
->  	kfree(vblk->vqs);
 
-As pointed out, can be a race. We had a very similar issue in
-virtio-vsock, and we solved using RCU to assign and get the pointer [1],
-maybe the same solution can work here.
+Yes, this is what I plan to do now, make whole initialization to be
+asynchronous.
 
-Cheers,
-Stefano
+Currently there are points not clear to me.
+- During the boot up time, if a bcache device is listed in /etc/fstab.
+How can I block the fs mount step before the bcache device
+/dev/bcache<N> shows up. I guess it should be done in systemd, and not
+sure whether there is another timeout value.
+- When the bcache device registration done and /dev/bcache<N> show up,
+if it is listed in /etc/fstab, how to only mount this bcache device only
+and not touch other mount points.
 
-[1] 0deab087b16a vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock
+udev rules and systemd are both magic to me at this moment. If anybody
+may give a hint, or some similar example to learn and understand, it
+will be very helpful.
+
+Thanks.
+
+Coly Li
 
