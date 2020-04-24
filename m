@@ -2,152 +2,114 @@ Return-Path: <SRS0=nYW3=6I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F92C2BA19
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF80C2BA19
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:42:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD0832074F
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23A032071C
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgJ/we3V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBYxr6F+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726060AbgDXBfl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 21:35:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25288 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726008AbgDXBfl (ORCPT
+        id S1726027AbgDXBmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 21:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36016 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726151AbgDXBmH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 21:35:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587692140;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mE9Xh8mrcpOk6T4hIIq35lM4lacrhC50tnRMlWlgS+c=;
-        b=HgJ/we3VauxEEoSOgrF9S0mVfiI4JBOilwaNNLChY4Urmd6LYJAwMW4iMEmLz+ttGtSGqb
-        cQUYMM/TKYGFfE3fApf3AEvMpaGr0sLA7hJRknaUYgHqxRLVogKOcYBJ45e0t0/OKUk6MW
-        8868veXU6cFLCbptoTaiMNFlCgUgEbk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-ArNzbblSNFSNTtHtyJheKw-1; Thu, 23 Apr 2020 21:35:35 -0400
-X-MC-Unique: ArNzbblSNFSNTtHtyJheKw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85AB280B70B;
-        Fri, 24 Apr 2020 01:35:33 +0000 (UTC)
-Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42BF060C81;
-        Fri, 24 Apr 2020 01:35:23 +0000 (UTC)
-Date:   Fri, 24 Apr 2020 09:35:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Guenter Roeck <groeck@chromium.org>
-Subject: Re: [PATCH] blk-mq: Put driver tag in blk_mq_dispatch_rq_list() when
- no budget
-Message-ID: <20200424013519.GA355437@T590>
-References: <1587035931-125028-1-git-send-email-john.garry@huawei.com>
- <e5416179-2ba0-c9a8-1b86-d52eae29e146@acm.org>
- <663d472a-5bde-4b89-3137-c7bfdf4d7b97@huawei.com>
- <CAD=FV=XBrKgng+vYzJx+qsOEZ-cZ10A0t+pRh=FcbQMop2ht4Q@mail.gmail.com>
+        Thu, 23 Apr 2020 21:42:07 -0400
+Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931FDC09B043
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 18:42:07 -0700 (PDT)
+Received: by mail-yb1-xb41.google.com with SMTP id l5so4209692ybf.5
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 18:42:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=l23qZuUbbo3ViqI2ySplyyQqRUP3mFV2loomTBalDSY=;
+        b=aBYxr6F+mvuF4RXiZhZ7/TOOGek5Jbyxwkt0+kilTkf25Svp4JNtAznaaYMgJ0zZ2V
+         boCsgBrE6gAWZuSAb+yXGK13hoTcOdG0BzrLNe8eI1wJwAuHhwnJXMY4WWYxUzOiWWg2
+         59XkDBcRCM5sXCuWkJT7KifzI9p3kRz53WDtTRUB33pY2ELqKulePRiTtSHHwguyjgLU
+         quQSa7k/sAIrC/AHdoJ+sOFh/zYRJOkRDVb36tJ4A+Ayd/84eSZY00bREHMni3TLB2U0
+         YyRRhn0dqt3We39e8uXhyWsHjFamurc+3GipKEQ9KDKfAMs4GusXDoCM8IGvDwJfl1li
+         2buw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l23qZuUbbo3ViqI2ySplyyQqRUP3mFV2loomTBalDSY=;
+        b=a3PEK0IOrhwRV8Bb8kbSlnSTuxptl1IgcFkUL+5C1RP58iJfE4HafYDSXDI4SoExjP
+         X1JlLZUrFn6eH9b7y9xcJJmPpjv+kvHakQE6ff5UEJQMlVBdy3SUEHicNSpzaOaqREyp
+         ct3GaOppF2gpZlDUARETMREVk38xtV0ceyPfEgYWzzm3uIlElCS9BZzGQnRs2BYxh0xh
+         EnrqUFc39PbCkf0BBpiMhd5XKHX7VKQa4fp4tyJw33sS5+bNjNIjTpx445WX8TlhVL1P
+         62/iXvrhrBmtbj96ORBGexPHpOgjwP9/nf4M1fVKGWggdRmLsyf2Xhxylgc2GS9kvj9p
+         esTA==
+X-Gm-Message-State: AGi0PuZD9k6ALi2mFKNl+U/capL+P6p7purtx+ZG0FYGzJ2UqzMiA+7Q
+        AksmuJU3Yw9NOlNhauC7qLD6AhL7jWdP/SpBn+QeBtfNJ79syylJ
+X-Google-Smtp-Source: APiQypLCqGM186vZ/gOE5YTUOSqHd/vjc482HoZb0OM4rEIGLXuSpbnF7IuR9Vjy6xOqXF4+FyAS+kD9KRjNVATW/Ho=
+X-Received: by 2002:a25:df03:: with SMTP id w3mr11870988ybg.224.1587692526417;
+ Thu, 23 Apr 2020 18:42:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAD=FV=XBrKgng+vYzJx+qsOEZ-cZ10A0t+pRh=FcbQMop2ht4Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200423210523.52833-1-sqazi@google.com> <83078447-831c-2921-db5e-9cab4c4c12df@kernel.dk>
+In-Reply-To: <83078447-831c-2921-db5e-9cab4c4c12df@kernel.dk>
+From:   Salman Qazi <sqazi@google.com>
+Date:   Thu, 23 Apr 2020 18:41:54 -0700
+Message-ID: <CAKUOC8Vb4AZnU_Sm=rxGk7QDK9=NvQT+G3Kp1cV8uVcebxsVWQ@mail.gmail.com>
+Subject: Re: [PATCH v2] block: Limit number of items taken from the I/O
+ scheduler in one go
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Gwendal Grignou <gwendal@google.com>,
+        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 03:42:37PM -0700, Doug Anderson wrote:
-> Hi,
-> 
-> On Mon, Apr 20, 2020 at 1:23 AM John Garry <john.garry@huawei.com> wrote:
-> >
-> > On 18/04/2020 03:43, Bart Van Assche wrote:
-> > > On 2020-04-16 04:18, John Garry wrote:
-> > >> If in blk_mq_dispatch_rq_list() we find no budget, then we break of the
-> > >> dispatch loop, but the request may keep the driver tag, evaulated
-> > >> in 'nxt' in the previous loop iteration.
-> > >>
-> > >> Fix by putting the driver tag for that request.
-> > >>
-> > >> Signed-off-by: John Garry <john.garry@huawei.com>
-> > >>
-> > >> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > >> index 8e56884fd2e9..a7785df2c944 100644
-> > >> --- a/block/blk-mq.c
-> > >> +++ b/block/blk-mq.c
-> > >> @@ -1222,8 +1222,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-> > >>              rq = list_first_entry(list, struct request, queuelist);
-> > >>
-> > >>              hctx = rq->mq_hctx;
-> > >> -            if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
-> > >> +            if (!got_budget && !blk_mq_get_dispatch_budget(hctx)) {
-> > >> +                    blk_mq_put_driver_tag(rq);
-> > >>                      break;
-> > >> +            }
-> > >>
-> > >>              if (!blk_mq_get_driver_tag(rq)) {
-> > >>                      /*
-> > >
-> > > Is this something that can only happen if q->mq_ops->queue_rq(hctx, &bd)
-> > > returns another value than BLK_STS_OK, BLK_STS_RESOURCE and
-> > > BLK_STS_DEV_RESOURCE?
-> >
-> > Right, as that case is handled in blk_mq_handle_dev_resource()
-> >
-> > If so, please add a comment in the source code
-> > > that explains this.
-> >
-> > So important that we should now do this in an extra patch?
-> >
-> > >
-> > > Is this perhaps a bug fix for 0bca799b9280 ("blk-mq: order getting
-> > > budget and driver tag")? If so, please mention this and add Cc tags for
-> > > the people who were Cc-ed on that patch.
-> >
-> > So it looks like 0bca799b9280 had a flaw, but I am not sure if anything
-> > got broken there and worthy of stable backport.
-> >
-> > I found this issue while debugging Ming's blk-mq cpu hotplug patchset,
-> > which I feel is ready to merge.
-> >
-> > Having said that, this nasty issue did take > 1 day for me to debug...
-> > so let me know.
-> 
-> As per the above conversation, presumably this should go to stable
-> then for any kernel that has commit 0bca799b9280 ("blk-mq: order
-> getting budget and driver tag")?  For instance, I think 4.19 would be
-> affected?  When I picked it there I got a conflict due to not having
-> commit ea4f995ee8b8 ("blk-mq: cache request hardware queue mapping")
-> but I think it's just a context collision and easy to resolve.
-> 
-> I'm no expert in the block code, but I posted my backport to 4.19 at
-> <https://crrev.com/c/2163313>.  I'm happy to send an email as a patch
-> to the list too or double-check that someone else's conflict
-> resolution matches mine.
+I remailed it with the changes since v1 added.  But just to answer directly:
 
-The thing is that there may not user visible effect by this issue,
-when one tag isn't freed, this request will be re-dispatched soon.
-That said it just makes the tag lifetime longer.
+Changes since v1:
 
-It could only be an issue in case of request dependency, meantime
-the tag space is quite limited. However, not sure if there is such
-case in reality.
+* Removed max_sched_batch.
+* Extended the fix to the software queue.
+* Use a return value from blk_mq_do_dispatch_sched to indicate if
+  the dispatch should be rerun.
+* Some comments added.
 
-
-Thanks,
-Ming
-
+On Thu, Apr 23, 2020 at 2:30 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 4/23/20 3:05 PM, Salman Qazi wrote:
+> > Flushes bypass the I/O scheduler and get added to hctx->dispatch
+> > in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
+> > hctx->run_work work item and is past the point in
+> > blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
+> >
+> > The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
+> > because the I/O scheduler can feed an arbitrary number of commands.
+> >
+> > Since we have only one hctx->run_work, the commands waiting in
+> > hctx->dispatch will wait an arbitrary length of time for run_work to be
+> > rerun.
+> >
+> > A similar phenomenon exists with dispatches from the software queue.
+> >
+> > The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
+> > blk_mq_do_dispatch_ctx and return from the run_work handler and let it
+> > rerun.
+>
+> Any changes since v1? It's customary to put that in here too, below
+> the --- lines.
+>
+> --
+> Jens Axboe
+>
