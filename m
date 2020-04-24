@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E497DC2BA1A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4743FC2BA1A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA060206D7
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28E7220736
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 10:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgDXKiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 06:38:55 -0400
-Received: from verein.lst.de ([213.95.11.211]:34307 "EHLO verein.lst.de"
+        id S1726717AbgDXKlk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 06:41:40 -0400
+Received: from verein.lst.de ([213.95.11.211]:34319 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726289AbgDXKiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 06:38:55 -0400
+        id S1726707AbgDXKlk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Apr 2020 06:41:40 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6055868CEE; Fri, 24 Apr 2020 12:38:51 +0200 (CEST)
-Date:   Fri, 24 Apr 2020 12:38:51 +0200
+        id 43D3C68CEE; Fri, 24 Apr 2020 12:41:37 +0200 (CEST)
+Date:   Fri, 24 Apr 2020 12:41:36 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -29,32 +29,48 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200424103851.GD28156@lst.de>
-References: <20200424102351.475641-1-ming.lei@redhat.com> <20200424102351.475641-8-ming.lei@redhat.com>
+Subject: Re: [PATCH V8 08/11] block: add blk_end_flush_machinery
+Message-ID: <20200424104136.GE28156@lst.de>
+References: <20200424102351.475641-1-ming.lei@redhat.com> <20200424102351.475641-9-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200424102351.475641-8-ming.lei@redhat.com>
+In-Reply-To: <20200424102351.475641-9-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 06:23:47PM +0800, Ming Lei wrote:
-> Before one CPU becomes offline, check if it is the last online CPU of hctx.
-> If yes, mark this hctx as inactive, meantime wait for completion of all
-> in-flight IOs originated from this hctx. Meantime check if this hctx has
-> become inactive in blk_mq_get_driver_tag(), if yes, release the
-> allocated tag.
-> 
-> This way guarantees that there isn't any inflight IO before shutdowning
-> the managed IRQ line when all CPUs of this IRQ line is offline.
+On Fri, Apr 24, 2020 at 06:23:48PM +0800, Ming Lei wrote:
+> +/* complete requests which just requires one flush command */
+> +static void blk_complete_flush_requests(struct blk_flush_queue *fq,
+> +		struct list_head *flush_list)
+> +{
+> +	struct block_device *bdev;
+> +	struct request *rq;
+> +	int error = -ENXIO;
+> +
+> +	if (list_empty(flush_list))
+> +		return;
+> +
+> +	rq = list_first_entry(flush_list, struct request, queuelist);
+> +
+> +	/* Send flush via one active hctx so we can move on */
+> +	bdev = bdget_disk(rq->rq_disk, 0);
+> +	if (bdev) {
+> +		error = blkdev_issue_flush(bdev, GFP_KERNEL, NULL);
+> +		bdput(bdev);
+> +	}
 
-Can you take a look at all my comments on the previous version here
-(splitting blk_mq_get_driver_tag for direct_issue vs not, what is
-the point of barrier(), smp_mb__before_atomic and
-smp_mb__after_atomic), as none seems to be addressed and I also didn't
-see a reply.
+FYI, we don't really need the bdev to send a bio anymore, this could just
+do:
+
+	bio = bio_alloc(GFP_KERNEL, 0); // XXX: shouldn't this be GFP_NOIO??
+	bio->bi_disk = rq->rq_disk;
+	bio->bi_partno = 0;
+	bio_associate_blkg(bio); // XXX: actually, shouldn't this come from rq?
+	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
+	error = submit_bio_wait(bio);
+	bio_put(bio);
+
