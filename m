@@ -2,114 +2,76 @@ Return-Path: <SRS0=nYW3=6I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF80C2BA19
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B343C2BA19
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 02:08:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23A032071C
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 01:42:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBYxr6F+"
+	by mail.kernel.org (Postfix) with ESMTP id 1A0AD20CC7
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 02:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726027AbgDXBmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Apr 2020 21:42:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726151AbgDXBmH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Apr 2020 21:42:07 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931FDC09B043
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 18:42:07 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id l5so4209692ybf.5
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2020 18:42:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=l23qZuUbbo3ViqI2ySplyyQqRUP3mFV2loomTBalDSY=;
-        b=aBYxr6F+mvuF4RXiZhZ7/TOOGek5Jbyxwkt0+kilTkf25Svp4JNtAznaaYMgJ0zZ2V
-         boCsgBrE6gAWZuSAb+yXGK13hoTcOdG0BzrLNe8eI1wJwAuHhwnJXMY4WWYxUzOiWWg2
-         59XkDBcRCM5sXCuWkJT7KifzI9p3kRz53WDtTRUB33pY2ELqKulePRiTtSHHwguyjgLU
-         quQSa7k/sAIrC/AHdoJ+sOFh/zYRJOkRDVb36tJ4A+Ayd/84eSZY00bREHMni3TLB2U0
-         YyRRhn0dqt3We39e8uXhyWsHjFamurc+3GipKEQ9KDKfAMs4GusXDoCM8IGvDwJfl1li
-         2buw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=l23qZuUbbo3ViqI2ySplyyQqRUP3mFV2loomTBalDSY=;
-        b=a3PEK0IOrhwRV8Bb8kbSlnSTuxptl1IgcFkUL+5C1RP58iJfE4HafYDSXDI4SoExjP
-         X1JlLZUrFn6eH9b7y9xcJJmPpjv+kvHakQE6ff5UEJQMlVBdy3SUEHicNSpzaOaqREyp
-         ct3GaOppF2gpZlDUARETMREVk38xtV0ceyPfEgYWzzm3uIlElCS9BZzGQnRs2BYxh0xh
-         EnrqUFc39PbCkf0BBpiMhd5XKHX7VKQa4fp4tyJw33sS5+bNjNIjTpx445WX8TlhVL1P
-         62/iXvrhrBmtbj96ORBGexPHpOgjwP9/nf4M1fVKGWggdRmLsyf2Xhxylgc2GS9kvj9p
-         esTA==
-X-Gm-Message-State: AGi0PuZD9k6ALi2mFKNl+U/capL+P6p7purtx+ZG0FYGzJ2UqzMiA+7Q
-        AksmuJU3Yw9NOlNhauC7qLD6AhL7jWdP/SpBn+QeBtfNJ79syylJ
-X-Google-Smtp-Source: APiQypLCqGM186vZ/gOE5YTUOSqHd/vjc482HoZb0OM4rEIGLXuSpbnF7IuR9Vjy6xOqXF4+FyAS+kD9KRjNVATW/Ho=
-X-Received: by 2002:a25:df03:: with SMTP id w3mr11870988ybg.224.1587692526417;
- Thu, 23 Apr 2020 18:42:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200423210523.52833-1-sqazi@google.com> <83078447-831c-2921-db5e-9cab4c4c12df@kernel.dk>
-In-Reply-To: <83078447-831c-2921-db5e-9cab4c4c12df@kernel.dk>
-From:   Salman Qazi <sqazi@google.com>
-Date:   Thu, 23 Apr 2020 18:41:54 -0700
-Message-ID: <CAKUOC8Vb4AZnU_Sm=rxGk7QDK9=NvQT+G3Kp1cV8uVcebxsVWQ@mail.gmail.com>
-Subject: Re: [PATCH v2] block: Limit number of items taken from the I/O
- scheduler in one go
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
+        id S1725982AbgDXCIo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Apr 2020 22:08:44 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:51194 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725884AbgDXCIo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Apr 2020 22:08:44 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 3DCA95F6857A8304BE3;
+        Fri, 24 Apr 2020 10:08:40 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.55) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Fri, 24 Apr 2020
+ 10:08:36 +0800
+Subject: Re: [PATCH 1/1] brd: remove a redundant check
+To:     Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20200422012811.1606-1-thunder.leizhen@huawei.com>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <b156aad6-fc0f-8623-acdf-ba59f7b6558a@huawei.com>
+Date:   Fri, 24 Apr 2020 10:08:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200422012811.1606-1-thunder.leizhen@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.166.215.55]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I remailed it with the changes since v1 added.  But just to answer directly:
 
-Changes since v1:
 
-* Removed max_sched_batch.
-* Extended the fix to the software queue.
-* Use a return value from blk_mq_do_dispatch_sched to indicate if
-  the dispatch should be rerun.
-* Some comments added.
+On 2020/4/22 9:28, Zhen Lei wrote:
+> Because pages[i] can't be NULL, otherwise "pos = pages[i]->index;" will
+> panic. So when "ret" is NULL, it can't be equal to pages[i].
 
-On Thu, Apr 23, 2020 at 2:30 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 4/23/20 3:05 PM, Salman Qazi wrote:
-> > Flushes bypass the I/O scheduler and get added to hctx->dispatch
-> > in blk_mq_sched_bypass_insert.  This can happen while a kworker is running
-> > hctx->run_work work item and is past the point in
-> > blk_mq_sched_dispatch_requests where hctx->dispatch is checked.
-> >
-> > The blk_mq_do_dispatch_sched call is not guaranteed to end in bounded time,
-> > because the I/O scheduler can feed an arbitrary number of commands.
-> >
-> > Since we have only one hctx->run_work, the commands waiting in
-> > hctx->dispatch will wait an arbitrary length of time for run_work to be
-> > rerun.
-> >
-> > A similar phenomenon exists with dispatches from the software queue.
-> >
-> > The solution is to poll hctx->dispatch in blk_mq_do_dispatch_sched and
-> > blk_mq_do_dispatch_ctx and return from the run_work handler and let it
-> > rerun.
->
-> Any changes since v1? It's customary to put that in here too, below
-> the --- lines.
->
-> --
-> Jens Axboe
->
+In fact, "ret != pages[i]" is clear enough.
+
+> 
+> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> ---
+>  drivers/block/brd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+> index 2fb25c348d53..59fec4a8ac93 100644
+> --- a/drivers/block/brd.c
+> +++ b/drivers/block/brd.c
+> @@ -147,7 +147,7 @@ static void brd_free_pages(struct brd_device *brd)
+>  			BUG_ON(pages[i]->index < pos);
+>  			pos = pages[i]->index;
+>  			ret = radix_tree_delete(&brd->brd_pages, pos);
+> -			BUG_ON(!ret || ret != pages[i]);
+> +			BUG_ON(ret != pages[i]);
+>  			__free_page(pages[i]);
+>  		}
+>  
+> 
+
