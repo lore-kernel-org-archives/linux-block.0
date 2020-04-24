@@ -3,65 +3,141 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A347C55199
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 09:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF2B3C2BA1A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 09:49:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5388920724
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 09:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8F9A20728
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 09:49:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbgDXJV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 05:21:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39218 "EHLO mx2.suse.de"
+        id S1726668AbgDXJty (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 05:49:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59438 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726298AbgDXJV1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 05:21:27 -0400
+        id S1726647AbgDXJty (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Apr 2020 05:49:54 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 3DC11ACC3;
-        Fri, 24 Apr 2020 09:21:25 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 229841E128C; Fri, 24 Apr 2020 11:21:25 +0200 (CEST)
-Date:   Fri, 24 Apr 2020 11:21:25 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/7] isofs: stop using ioctl_by_bdev
-Message-ID: <20200424092125.GA13069@quack2.suse.cz>
-References: <20200423071224.500849-1-hch@lst.de>
- <20200423071224.500849-7-hch@lst.de>
- <20200423110347.GE3737@quack2.suse.cz>
- <20200424065253.GB23754@lst.de>
+        by mx2.suse.de (Postfix) with ESMTP id 220DDAECE;
+        Fri, 24 Apr 2020 09:49:51 +0000 (UTC)
+Subject: Re: Request For Suggestion: how to handle udevd timeout for bcache
+ registration
+To:     Coly Li <colyli@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Cc:     linux-block@vger.kernel.org
+References: <7c92cd67-8e62-7d55-c520-345c30513bfa@suse.de>
+ <140de6d9-b5ff-0736-ddbd-5b9e1ae70f5b@kernel.dk>
+ <b2cf1d0e-b710-4e11-7ea8-f01364986c4a@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <569e5b5b-bc4d-8882-51f2-a295dfe6c1b6@suse.de>
+Date:   Fri, 24 Apr 2020 11:49:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200424065253.GB23754@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <b2cf1d0e-b710-4e11-7ea8-f01364986c4a@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 24-04-20 08:52:53, Christoph Hellwig wrote:
-> On Thu, Apr 23, 2020 at 01:03:47PM +0200, Jan Kara wrote:
-> > There's no error handling in the caller and this function actually returns
-> > unsigned int... So I believe you need to return 0 here to maintain previous
-> > behavior (however suspicious it may be)?
+On 4/24/20 10:57 AM, Coly Li wrote:
+> On 2020/4/23 23:08, Jens Axboe wrote:
+>> On 4/23/20 5:23 AM, Coly Li wrote:
+>>> Hi folk,
+>>>
+>>> I want to listen to your suggestion on how to handle the udevd timeout
+>>> for bcache registration.
+>>>
+>>> First of all let me introduce the background of this timeout problem.
+>>>
+>>> Now the bcache registration is synchronized, the registering process
+>>> will be blocked until the whole registration done. In boot up time, such
+>>> registration can be initiated from a bcache udev rule. Normally it won't
+>>> be problem, but for very large cached data size there might be a large
+>>> internal btree on the cache device. During the registration checking all
+>>> the btree nodes may take 50+ minutes as a udev task, it exceeds 180
+>>> seconds timeout and udevd will kill it. The killing signal will make
+>>> kthread_create() fail during bcache initialization, then the automatic
+>>> bcache registration in boot up time will fail.
+>>>
+>>> The above text describes the problem I need to solve: make boot up time
+>>> automatic bache registration always success no mater how long it will take.
+>>>
+>>> I know there are several solutions to solve such problem, I do
+>>> appreciate if you may share the solution so that I may learn good ideas
+>>> from them.
+>>>
+>>> Thank you in advance for the information sharing of my request of
+>>> suggestion.
+>>
+>> The way I see it, you have only two choices:
+>>
+>> 1) Make the registration async (or lazy), so that starting the device is
+>>     fast, but the btree verification happens on-demand or in the
+>>     background.
+>>
 > 
-> Indeed, and I don't think it is suspicious at all - if we have no CDROM
-> info we should assume session 0, which is the same as for non-CDROM
-> devices.  Fixed for the next version.
+> Yes, this is what I plan to do now, make whole initialization to be
+> asynchronous.
+> 
+> Currently there are points not clear to me.
+> - During the boot up time, if a bcache device is listed in /etc/fstab.
+> How can I block the fs mount step before the bcache device
+> /dev/bcache<N> shows up. I guess it should be done in systemd, and not
+> sure whether there is another timeout value.
+In short: you don't.
 
-Right, I've realized that once I've checked UDF version and thought about
-it for a while...
+Asynchronous initialization means that the device node /dev/bcache<N>
+only shows up once registration is complete.
 
-								Honza
+> - When the bcache device registration done and /dev/bcache<N> show up,
+> if it is listed in /etc/fstab, how to only mount this bcache device only
+> and not touch other mount points.
+> 
+That's done by systemd, and typically nothing to worry about.
+If we can stick with the udev rules and start initialization from an 
+udev event everything should 'just work' (tm).
+
+> udev rules and systemd are both magic to me at this moment. If anybody
+> may give a hint, or some similar example to learn and understand, it
+> will be very helpful.
+> 
+The proposed sequence of events is:
+
+- backing device generates uevent
+-> udev rule triggers bcache initialisation
+    -> bcache driver starts initialistion workqueue
+    -> bcache driver returns
+-> udev event completed
+
+bcache initialisation workqueue starts
+    -> bcache driver registers backing device
+
+- cache device generates uevent
+-> udev rule triggers bcache initialisation
+   -> bcache driver starts initialisation workqueue
+   -> bcache driver returns
+
+- bcache initialisation workqueue starts
+-> bcache driver registers cache device
+   -> bcache driver starts bcache initialisation
+     -> bcache driver registers /dev/bcache<N>
+
+
+With that the uevent handling / bcache userspace initialisation
+just submits a workqueue element, and the uevent won't be held off
+by an overly long initialisation process.
+
+Cheers,
+
+Hannes
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
