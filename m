@@ -6,56 +6,46 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42402C2BA1A
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 06:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF53C55193
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 06:53:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2841620857
-	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 06:42:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 359A121707
+	for <linux-block@archiver.kernel.org>; Fri, 24 Apr 2020 06:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726051AbgDXGmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 02:42:11 -0400
-Received: from verein.lst.de ([213.95.11.211]:33378 "EHLO verein.lst.de"
+        id S1726383AbgDXGw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 02:52:57 -0400
+Received: from verein.lst.de ([213.95.11.211]:33420 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725898AbgDXGmL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 02:42:11 -0400
+        id S1725898AbgDXGw5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Apr 2020 02:52:57 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 12ED568CEC; Fri, 24 Apr 2020 08:42:07 +0200 (CEST)
-Date:   Fri, 24 Apr 2020 08:42:06 +0200
+        id D49B568CEC; Fri, 24 Apr 2020 08:52:53 +0200 (CEST)
+Date:   Fri, 24 Apr 2020 08:52:53 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Salman Qazi <sqazi@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jesse Barnes <jsbarnes@google.com>,
-        Gwendal Grignou <gwendal@google.com>,
-        Hannes Reinecke <hare@suse.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2] block: Limit number of items taken from the I/O
- scheduler in one go
-Message-ID: <20200424064206.GA23666@lst.de>
-References: <20200423210523.52833-1-sqazi@google.com> <20200424061529.GA23303@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/7] isofs: stop using ioctl_by_bdev
+Message-ID: <20200424065253.GB23754@lst.de>
+References: <20200423071224.500849-1-hch@lst.de> <20200423071224.500849-7-hch@lst.de> <20200423110347.GE3737@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200424061529.GA23303@lst.de>
+In-Reply-To: <20200423110347.GE3737@quack2.suse.cz>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 08:15:29AM +0200, Christoph Hellwig wrote:
-> This is a weird loop.  I'd split the code betweem the again label and
-> the run_again check here into a __blk_mq_sched_dispatch_requests
-> helper, and then you can do:
-> 
-> 	if (__blk_mq_sched_dispatch_requests()) {
-> 		if (__blk_mq_sched_dispatch_requests())
-> 			blk_mq_run_hw_queue(hctx, true);
-> 	}
-> 
-> here.  Preferably with ha good comment explaining the logic.
+On Thu, Apr 23, 2020 at 01:03:47PM +0200, Jan Kara wrote:
+> There's no error handling in the caller and this function actually returns
+> unsigned int... So I believe you need to return 0 here to maintain previous
+> behavior (however suspicious it may be)?
 
-Also I wonder if inverting the return values in the lower level function
-would make things a little more readable - a true return suggests
-everything worked fine.  Alternative 0 for sucess and -EAGAIN for needs
-a retry also would be pretty self-documenting.
+Indeed, and I don't think it is suspicious at all - if we have no CDROM
+info we should assume session 0, which is the same as for non-CDROM
+devices.  Fixed for the next version.
