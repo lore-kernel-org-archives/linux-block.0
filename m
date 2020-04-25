@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2473AC2BA1A
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 03:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B641FC2BA1A
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 03:30:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED3DB2076C
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 03:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80F1420748
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 03:30:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aobbsTFe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHIdvm/Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726110AbgDYDZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Apr 2020 23:25:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53405 "EHLO
+        id S1726044AbgDYDar (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Apr 2020 23:30:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45199 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726044AbgDYDZV (ORCPT
+        by vger.kernel.org with ESMTP id S1726040AbgDYDar (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Apr 2020 23:25:21 -0400
+        Fri, 24 Apr 2020 23:30:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587785118;
+        s=mimecast20190719; t=1587785444;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MStiXEta93seJi87BlpRbxyODpFIzbfptZksm5v6dVE=;
-        b=aobbsTFeDJnQv6q4uo5keu0Te9srL4rdGUYGkmHMHPnFPx1HMZDHw4APHQqd5E6hPT8k0I
-        ViwzlNOdVmeu5Px/VNCI+2Z5/4daoXp+R3g32zMCemNF++e8UMGwtavNp17y7y+IKvDQdf
-        94W5Xux0E+vu5tdoYOSr0m9pNhy/OMw=
+        bh=3X1wry2Pw8oVpXlm//mFjv2y5YAESGu+9v+6ZZUCv9U=;
+        b=WHIdvm/YWLAbrFSq6J9I9+o+heiCTUSgopNKdUsDIPEXkzp3qxNAGhkDXsP+QCN5eYMUJy
+        SZOH96JmNCCabDWYUuMdZwLlkpY+doJ0t7GSHphuTpzIfunRcAKx44gTRSfAIGshGV+H0I
+        o9dhUCmTXu6d9P/B9+7ZX3cNvBmnJJk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-L6dn99bEOzeC9ACNfUp6AQ-1; Fri, 24 Apr 2020 23:25:12 -0400
-X-MC-Unique: L6dn99bEOzeC9ACNfUp6AQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-35-wbS4J9WHOOmLPaR45Bd5Zg-1; Fri, 24 Apr 2020 23:30:42 -0400
+X-MC-Unique: wbS4J9WHOOmLPaR45Bd5Zg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5739A8014D5;
-        Sat, 25 Apr 2020 03:25:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59A3B8005B7;
+        Sat, 25 Apr 2020 03:30:41 +0000 (UTC)
 Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F33FD60F8A;
-        Sat, 25 Apr 2020 03:24:59 +0000 (UTC)
-Date:   Sat, 25 Apr 2020 11:24:53 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 68BAD60300;
+        Sat, 25 Apr 2020 03:30:31 +0000 (UTC)
+Date:   Sat, 25 Apr 2020 11:30:26 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Hannes Reinecke <hare@suse.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -52,53 +52,32 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V8 06/11] blk-mq: prepare for draining IO when hctx's all
- CPUs are offline
-Message-ID: <20200425032453.GD477579@T590>
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200425033026.GE477579@T590>
 References: <20200424102351.475641-1-ming.lei@redhat.com>
- <20200424102351.475641-7-ming.lei@redhat.com>
- <adaaadf2-7b8e-e8a0-0cee-35b170d45c77@suse.de>
+ <20200424102351.475641-8-ming.lei@redhat.com>
+ <69554493-db0b-228c-94a1-0f6f50580675@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adaaadf2-7b8e-e8a0-0cee-35b170d45c77@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <69554493-db0b-228c-94a1-0f6f50580675@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 03:23:08PM +0200, Hannes Reinecke wrote:
+On Fri, Apr 24, 2020 at 03:27:45PM +0200, Hannes Reinecke wrote:
 > On 4/24/20 12:23 PM, Ming Lei wrote:
-> > Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
-> > up queue mapping. Thomas mentioned the following point[1]:
+> > Before one CPU becomes offline, check if it is the last online CPU of hctx.
+> > If yes, mark this hctx as inactive, meantime wait for completion of all
+> > in-flight IOs originated from this hctx. Meantime check if this hctx has
+> > become inactive in blk_mq_get_driver_tag(), if yes, release the
+> > allocated tag.
 > > 
-> > "
-> >   That was the constraint of managed interrupts from the very beginning:
-> > 
-> >    The driver/subsystem has to quiesce the interrupt line and the associated
-> >    queue _before_ it gets shutdown in CPU unplug and not fiddle with it
-> >    until it's restarted by the core when the CPU is plugged in again.
-> > "
-> > 
-> > However, current blk-mq implementation doesn't quiesce hw queue before
-> > the last CPU in the hctx is shutdown. Even worse, CPUHP_BLK_MQ_DEAD is
-> > one cpuhp state handled after the CPU is down, so there isn't any chance
-> > to quiesce hctx for blk-mq wrt. CPU hotplug.
-> > 
-> > Add new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE for blk-mq to stop queues
-> > and wait for completion of in-flight requests.
-> > 
-> > We will stop hw queue and wait for completion of in-flight requests
-> > when one hctx is becoming dead in the following patch. This way may
-> > cause dead-lock for some stacking blk-mq drivers, such as dm-rq and
-> > loop.
-> > 
-> > Add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ and mark it for dm-rq and
-> > loop, so we needn't to wait for completion of in-flight requests from
-> > dm-rq & loop, then the potential dead-lock can be avoided.
-> > 
-> > [1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
+> > This way guarantees that there isn't any inflight IO before shutdowning
+> > the managed IRQ line when all CPUs of this IRQ line is offline.
 > > 
 > > Cc: John Garry <john.garry@huawei.com>
 > > Cc: Bart Van Assche <bvanassche@acm.org>
@@ -107,157 +86,166 @@ On Fri, Apr 24, 2020 at 03:23:08PM +0200, Hannes Reinecke wrote:
 > > Cc: Thomas Gleixner <tglx@linutronix.de>
 > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > > ---
-> >   block/blk-mq-debugfs.c     |  1 +
-> >   block/blk-mq.c             | 19 +++++++++++++++++++
-> >   drivers/block/loop.c       |  2 +-
-> >   drivers/md/dm-rq.c         |  2 +-
-> >   include/linux/blk-mq.h     |  3 +++
-> >   include/linux/cpuhotplug.h |  1 +
-> >   6 files changed, 26 insertions(+), 2 deletions(-)
+> >   block/blk-mq-debugfs.c |   1 +
+> >   block/blk-mq.c         | 124 +++++++++++++++++++++++++++++++++++++----
+> >   include/linux/blk-mq.h |   3 +
+> >   3 files changed, 117 insertions(+), 11 deletions(-)
 > > 
 > > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> > index b3f2ba483992..8e745826eb86 100644
+> > index 8e745826eb86..b62390918ca5 100644
 > > --- a/block/blk-mq-debugfs.c
 > > +++ b/block/blk-mq-debugfs.c
-> > @@ -239,6 +239,7 @@ static const char *const hctx_flag_name[] = {
-> >   	HCTX_FLAG_NAME(TAG_SHARED),
-> >   	HCTX_FLAG_NAME(BLOCKING),
-> >   	HCTX_FLAG_NAME(NO_SCHED),
-> > +	HCTX_FLAG_NAME(NO_MANAGED_IRQ),
+> > @@ -213,6 +213,7 @@ static const char *const hctx_state_name[] = {
+> >   	HCTX_STATE_NAME(STOPPED),
+> >   	HCTX_STATE_NAME(TAG_ACTIVE),
+> >   	HCTX_STATE_NAME(SCHED_RESTART),
+> > +	HCTX_STATE_NAME(INACTIVE),
 > >   };
-> >   #undef HCTX_FLAG_NAME
+> >   #undef HCTX_STATE_NAME
 > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 65f0aaed55ff..d432cc74ef78 100644
+> > index d432cc74ef78..4d0c271d9f6f 100644
 > > --- a/block/blk-mq.c
 > > +++ b/block/blk-mq.c
-> > @@ -2261,6 +2261,16 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+> > @@ -1050,11 +1050,31 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+> >   	return true;
+> >   }
+> > -static bool blk_mq_get_driver_tag(struct request *rq)
+> > +static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+> >   {
+> >   	if (rq->tag != -1)
+> >   		return true;
+> > -	return __blk_mq_get_driver_tag(rq);
+> > +
+> > +	if (!__blk_mq_get_driver_tag(rq))
+> > +		return false;
+> > +	/*
+> > +	 * Add one memory barrier in case that direct issue IO process is
+> > +	 * migrated to other CPU which may not belong to this hctx, so we can
+> > +	 * order driver tag assignment and checking BLK_MQ_S_INACTIVE.
+> > +	 * Otherwise, barrier() is enough given both setting BLK_MQ_S_INACTIVE
+> > +	 * and driver tag assignment are run on the same CPU in case that
+> > +	 * BLK_MQ_S_INACTIVE is set.
+> > +	 */
+> > +	if (unlikely(direct_issue && rq->mq_ctx->cpu != raw_smp_processor_id()))
+> > +		smp_mb();
+> > +	else
+> > +		barrier();
+> > +
+> > +	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))) {
+> > +		blk_mq_put_driver_tag(rq);
+> > +		return false;
+> > +	}
+> > +	return true;
+> >   }
+> >   static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+> > @@ -1103,7 +1123,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+> >   		 * Don't clear RESTART here, someone else could have set it.
+> >   		 * At most this will cost an extra queue run.
+> >   		 */
+> > -		return blk_mq_get_driver_tag(rq);
+> > +		return blk_mq_get_driver_tag(rq, false);
+> >   	}
+> >   	wait = &hctx->dispatch_wait;
+> > @@ -1129,7 +1149,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+> >   	 * allocation failure and adding the hardware queue to the wait
+> >   	 * queue.
+> >   	 */
+> > -	ret = blk_mq_get_driver_tag(rq);
+> > +	ret = blk_mq_get_driver_tag(rq, false);
+> >   	if (!ret) {
+> >   		spin_unlock(&hctx->dispatch_wait_lock);
+> >   		spin_unlock_irq(&wq->lock);
+> > @@ -1228,7 +1248,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+> >   			break;
+> >   		}
+> > -		if (!blk_mq_get_driver_tag(rq)) {
+> > +		if (!blk_mq_get_driver_tag(rq, false)) {
+> >   			/*
+> >   			 * The initial allocation attempt failed, so we need to
+> >   			 * rerun the hardware queue when a tag is freed. The
+> > @@ -1260,7 +1280,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+> >   			bd.last = true;
+> >   		else {
+> >   			nxt = list_first_entry(list, struct request, queuelist);
+> > -			bd.last = !blk_mq_get_driver_tag(nxt);
+> > +			bd.last = !blk_mq_get_driver_tag(nxt, false);
+> >   		}
+> >   		ret = q->mq_ops->queue_rq(hctx, &bd);
+> > @@ -1853,7 +1873,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >   	if (!blk_mq_get_dispatch_budget(hctx))
+> >   		goto insert;
+> > -	if (!blk_mq_get_driver_tag(rq)) {
+> > +	if (!blk_mq_get_driver_tag(rq, true)) {
+> >   		blk_mq_put_dispatch_budget(hctx);
+> >   		goto insert;
+> >   	}
+> > @@ -2261,13 +2281,92 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
 > >   	return -ENOMEM;
 > >   }
-> > +static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
-> > +{
-> > +	return 0;
+> > -static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
+> > +struct count_inflight_data {
+> > +	unsigned count;
+> > +	struct blk_mq_hw_ctx *hctx;
+> > +};
+> > +
+> > +static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
+> > +				     bool reserved)
+> >   {
+> > -	return 0;
+> > +	struct count_inflight_data *count_data = data;
+> > +
+> > +	/*
+> > +	 * Can't check rq's state because it is updated to MQ_RQ_IN_FLIGHT
+> > +	 * in blk_mq_start_request(), at that time we can't prevent this rq
+> > +	 * from being issued.
+> > +	 *
+> > +	 * So check if driver tag is assigned, if yes, count this rq as
+> > +	 * inflight.
+> > +	 */
+> > +	if (rq->tag >= 0 && rq->mq_hctx == count_data->hctx)
+> > +		count_data->count++;
+> > +
+> > +	return true;
 > > +}
 > > +
-> > +static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+> > +static bool blk_mq_inflight_rq(struct request *rq, void *data,
+> > +			       bool reserved)
 > > +{
-> > +	return 0;
+> > +	return rq->tag >= 0;
 > > +}
 > > +
-> >   /*
-> >    * 'cpu' is going away. splice any existing rq_list entries from this
-> >    * software queue to the hw queue dispatch list, and ensure that it
-> > @@ -2297,6 +2307,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-> >   static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
-> >   {
-> > +	if (!(hctx->flags & BLK_MQ_F_NO_MANAGED_IRQ))
-> > +		cpuhp_state_remove_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-> > +						    &hctx->cpuhp_online);
-> >   	cpuhp_state_remove_instance_nocalls(CPUHP_BLK_MQ_DEAD,
-> >   					    &hctx->cpuhp_dead);
-> >   }
-> > @@ -2356,6 +2369,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
-> >   {
-> >   	hctx->queue_num = hctx_idx;
-> > +	if (!(hctx->flags & BLK_MQ_F_NO_MANAGED_IRQ))
-> > +		cpuhp_state_add_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-> > +				&hctx->cpuhp_online);
-> >   	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
-> >   	hctx->tags = set->tags[hctx_idx];
-> > @@ -3610,6 +3626,9 @@ static int __init blk_mq_init(void)
-> >   {
-> >   	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
-> >   				blk_mq_hctx_notify_dead);
-> > +	cpuhp_setup_state_multi(CPUHP_AP_BLK_MQ_ONLINE, "block/mq:online",
-> > +				blk_mq_hctx_notify_online,
-> > +				blk_mq_hctx_notify_offline);
-> >   	return 0;
-> >   }
-> >   subsys_initcall(blk_mq_init);
-> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > index da693e6a834e..784f2e038b55 100644
-> > --- a/drivers/block/loop.c
-> > +++ b/drivers/block/loop.c
-> > @@ -2037,7 +2037,7 @@ static int loop_add(struct loop_device **l, int i)
-> >   	lo->tag_set.queue_depth = 128;
-> >   	lo->tag_set.numa_node = NUMA_NO_NODE;
-> >   	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
-> > -	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-> > +	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
-> >   	lo->tag_set.driver_data = lo;
-> >   	err = blk_mq_alloc_tag_set(&lo->tag_set);
-> > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> > index 3f8577e2c13b..5f1ff70ac029 100644
-> > --- a/drivers/md/dm-rq.c
-> > +++ b/drivers/md/dm-rq.c
-> > @@ -547,7 +547,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
-> >   	md->tag_set->ops = &dm_mq_ops;
-> >   	md->tag_set->queue_depth = dm_get_blk_mq_queue_depth();
-> >   	md->tag_set->numa_node = md->numa_node_id;
-> > -	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
-> > +	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
-> >   	md->tag_set->nr_hw_queues = dm_get_blk_mq_nr_hw_queues();
-> >   	md->tag_set->driver_data = md;
-> > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> > index b45148ba3291..f550b5274b8b 100644
-> > --- a/include/linux/blk-mq.h
-> > +++ b/include/linux/blk-mq.h
-> > @@ -140,6 +140,8 @@ struct blk_mq_hw_ctx {
-> >   	 */
-> >   	atomic_t		nr_active;
-> > +	/** @cpuhp_online: List to store request if CPU is going to die */
-> > +	struct hlist_node	cpuhp_online;
-> >   	/** @cpuhp_dead: List to store request if some CPU die. */
-> >   	struct hlist_node	cpuhp_dead;
-> >   	/** @kobj: Kernel object for sysfs. */
-> > @@ -391,6 +393,7 @@ struct blk_mq_ops {
-> >   enum {
-> >   	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
-> >   	BLK_MQ_F_TAG_SHARED	= 1 << 1,
-> > +	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
-> >   	BLK_MQ_F_BLOCKING	= 1 << 5,
-> >   	BLK_MQ_F_NO_SCHED	= 1 << 6,
-> >   	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
-> > diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> > index 77d70b633531..24b3a77810b6 100644
-> > --- a/include/linux/cpuhotplug.h
-> > +++ b/include/linux/cpuhotplug.h
-> > @@ -152,6 +152,7 @@ enum cpuhp_state {
-> >   	CPUHP_AP_SMPBOOT_THREADS,
-> >   	CPUHP_AP_X86_VDSO_VMA_ONLINE,
-> >   	CPUHP_AP_IRQ_AFFINITY_ONLINE,
-> > +	CPUHP_AP_BLK_MQ_ONLINE,
-> >   	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
-> >   	CPUHP_AP_X86_INTEL_EPB_ONLINE,
-> >   	CPUHP_AP_PERF_ONLINE,
-> > 
-> Ho-hum.
+> > +static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_hw_ctx *hctx)
+> > +{
+> > +	struct count_inflight_data count_data = {
+> > +		.count	= 0,
+> > +		.hctx	= hctx,
+> > +	};
+> > +
+> > +	blk_mq_all_tag_busy_iter(hctx->tags, blk_mq_count_inflight_rq,
+> > +			blk_mq_inflight_rq, &count_data);
+> > +
+> > +	return count_data.count;
+> > +}
+> > +
 > 
-> I do agree for the loop and the CPUHP part (not that I'm qualified to just
-> the latter, but anyway).
-> For the dm side I'm less certain.
-> Thing is, we rarely get hardware interrupts directly to the device-mapper
-> device, but rather to the underlying hardware LLD.
-> I even not quite sure what exactly the implications of managed interrupts
-> with dm are; after all, we're using softirqs here, don't we?
-> 
-> So for DM I'd rather wait for the I/O on the underlying devices' hctx to
-> become quiesce, and not kill them ourselves.
-> Not sure if the device-mapper framework _can_ do this right now, though.
-> Mike?
+> Remind me again: Why do we need the 'filter' function here?
+> Can't we just move the filter function into the main iterator and
+> stay with the original implementation?
 
-The problem the patchset tries to address is drivers applying
-managed interrupt. When all CPUs of one managed interrupt line are
-offline, the IO interrupt may be never to trigger, so IO timeout may
-be triggered or IO hang if no timeout handler is provided.
+This is a good question, cause it takes John and me days for figuring
+out reason of one IO hang.
 
-So any drivers which don't use managed interrupt can be marked as
-BLK_MQ_F_NO_MANAGED_IRQ.
+The main iterator only iterates requests which blk_mq_request_started()
+returns true, see bt_tags_iter().
 
-For dm-rq, request completion is always triggered by underlying request,
-so once underlying request is guaranteed to be completed, dm-rq's
-request can be completed too.
+However, we prevent rq from being allocated a driver tag in
+blk_mq_get_driver_tag(). There is still some distance between assigning
+driver tag and calling into blk_mq_start_request() which is called from
+.queue_rq().
+
+More importantly we can check nothing in blk_mq_start_request().
 
 
-Thanks,
+Thanks, 
 Ming
 
