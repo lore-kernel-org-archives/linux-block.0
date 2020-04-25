@@ -2,177 +2,135 @@ Return-Path: <SRS0=horf=6J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D652BC55185
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 09:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8972CC55185
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 09:35:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B05AA2074F
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 09:17:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53B2420704
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 09:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7DhfGU0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HKa7CK+B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726022AbgDYJRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Apr 2020 05:17:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41307 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725837AbgDYJRT (ORCPT
+        id S1726022AbgDYJfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Apr 2020 05:35:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58069 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725837AbgDYJfA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Apr 2020 05:17:19 -0400
+        Sat, 25 Apr 2020 05:35:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587806237;
+        s=mimecast20190719; t=1587807298;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zvEI1720n3vEl4/2KLPpHW4NO4oKTsPUQdAdAubauvI=;
-        b=M7DhfGU0MbfaPNPBRS3gGAwwa5ETtuwjvYysLUoLvr7g1D1A4tNOoH5HwXaPyi0DwC5IA3
-        9hCbW/FWTLEVzZu6921JNm8Thl4a3Hzjpa2S5etTcSMyinux2f6qiEMpAQ+gHZuSE+MsjS
-        quALfdW6xr8aSBuwkl8pNeMdYS1gqwY=
+        bh=DnX0/8su+mvIjq7pIaWX++imcXEuwmfhSWsS2IEw6cU=;
+        b=HKa7CK+BtZS5u5znJ+fLVW5gy1mK/LnhiW2lCzQzrEGQRgC7P8a5MYgbwlX6jx/yve3AX0
+        RLb6aaJgmMQablb9ZiSg7nDMIJTl+4GNomYIxyyAVrZFEMJyBeJWLD4rpgoBzXZs4NbLUF
+        MT3P5hwdoHuQUOErWscvRomXX2/ir0U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-xssfc_K4OwiLHKClQQmcQw-1; Sat, 25 Apr 2020 05:17:15 -0400
-X-MC-Unique: xssfc_K4OwiLHKClQQmcQw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-186-tQSTiobsOvqHNlZ5LOOHnw-1; Sat, 25 Apr 2020 05:34:54 -0400
+X-MC-Unique: tQSTiobsOvqHNlZ5LOOHnw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AA37800580;
-        Sat, 25 Apr 2020 09:17:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E8A81800D4A;
+        Sat, 25 Apr 2020 09:34:52 +0000 (UTC)
 Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BED71001DC2;
-        Sat, 25 Apr 2020 09:17:05 +0000 (UTC)
-Date:   Sat, 25 Apr 2020 17:17:00 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4004B5D9CA;
+        Sat, 25 Apr 2020 09:34:42 +0000 (UTC)
+Date:   Sat, 25 Apr 2020 17:34:37 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Tejun Heo <tj@kernel.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 1/2] pktcdvd: Fix pkt_setup_dev() error path
-Message-ID: <20200425091601.GA492109@T590>
-References: <20180102193948.22656-1-bart.vanassche@wdc.com>
- <20180102193948.22656-2-bart.vanassche@wdc.com>
- <CAB=NE6Uhn88Vrymb2x+=7YmieRguGKm9Dk1LiDqw6oggZJpp8g@mail.gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, will@kernel.org,
+        peterz@infradead.org, paulmck@kernel.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200425093437.GA495669@T590>
+References: <20200424102351.475641-1-ming.lei@redhat.com>
+ <20200424102351.475641-8-ming.lei@redhat.com>
+ <20200424103851.GD28156@lst.de>
+ <20200425031723.GC477579@T590>
+ <20200425083224.GA5634@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAB=NE6Uhn88Vrymb2x+=7YmieRguGKm9Dk1LiDqw6oggZJpp8g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200425083224.GA5634@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 07:39:47PM -0600, Luis Chamberlain wrote:
-> So I hopped on a time machine to revise some old collateral due to
-> 523e1d399ce ("block: make gendisk hold a reference to its queue")
-> merged on v3.2 which added the conditional check for the disk->queue
-> before calling blk_put_queue() on release_disk(). I started wondering
-> *why* the conditional was added, but I checked the original patch and
-> I could not find discussion around it.
+On Sat, Apr 25, 2020 at 10:32:24AM +0200, Christoph Hellwig wrote:
+> On Sat, Apr 25, 2020 at 11:17:23AM +0800, Ming Lei wrote:
+> > I am not sure if it helps by adding two helper, given only two
+> > parameters are needed, and the new parameter is just a constant.
+> > 
+> > > the point of barrier(), smp_mb__before_atomic and
+> > > smp_mb__after_atomic), as none seems to be addressed and I also didn't
+> > > see a reply.
+> > 
+> > I believe it has been documented:
+> > 
+> > +   /*
+> > +    * Add one memory barrier in case that direct issue IO process is
+> > +    * migrated to other CPU which may not belong to this hctx, so we can
+> > +    * order driver tag assignment and checking BLK_MQ_S_INACTIVE.
+> > +    * Otherwise, barrier() is enough given both setting BLK_MQ_S_INACTIVE
+> > +    * and driver tag assignment are run on the same CPU in case that
+> > +    * BLK_MQ_S_INACTIVE is set.
+> > +    */
+> > 
+> > OK, I can add more:
+> > 
+> > In case of not direct issue, __blk_mq_delay_run_hw_queue() guarantees
+> > that dispatch is done on CPUs of this hctx.
+> > 
+> > In case of direct issue, the direct issue IO process may be migrated to
+> > other CPU which doesn't belong to hctx->cpumask even though the chance
+> > is quite small, but still possible.
+> > 
+> > This patch sets hctx as inactive in the last CPU of hctx, so barrier()
+> > is enough for not direct issue. Otherwise, one smp_mb() is added for
+> > ordering tag assignment(include setting rq) and checking S_INACTIVE in
+> > blk_mq_get_driver_tag().
 > 
-> Tejun, do you call why you added that conditional on
-> 
-> if (disk->queue)
->   blk_put_queue(disk->queue);
-> 
-> This patch however struck me as one I should highlight, since I'm
-> reviewing all this now and dealing with adding error paths on
-> add_disk(). Below some notes.
+> How do you prevent a cpu migration between the call to raw_smp_processor_id
+> and barrier? 
 
-disk->queue is assigned by drivers, I guess that is why the check
-is needed, given the disk may be released in error path before driver
-assigns queue to it.
-
-Also some driver may only allocate disk and not add disk, then not
-necessary to assign disk->queue, such as drivers/scsi/sg.c
+Fine, we may have to use get_cpu()/put_cpu() for direct issue to cover
+the check. For non-direct issue, either preempt is disabled or the work is
+run on specified CPU.
 
 > 
-> On Tue, Jan 2, 2018 at 1:40 PM Bart Van Assche <bart.vanassche@wdc.com> wrote:
-> >
-> > Commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
-> > modified add_disk() and disk_release() but did not update any of the
-> > error paths that trigger a put_disk() call after disk->queue has been
-> > assigned. That introduced the following behavior in the pktcdvd driver
-> > if pkt_new_dev() fails:
-> >
-> > Kernel BUG at 00000000e98fd882 [verbose debug info unavailable]
-> >
-> > Since disk_release() calls blk_put_queue() anyway if disk->queue != NULL,
-> > fix this by removing the blk_cleanup_queue() call from the pkt_setup_dev()
-> > error path.
-> >
-> > Fixes: commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
-> > Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> > Cc: Tejun Heo <tj@kernel.org>
-> > Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-> > Cc: <stable@vger.kernel.org> # v3.2
-> > ---
-> >  drivers/block/pktcdvd.c | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-> > index 67974796c350..2659b2534073 100644
-> > --- a/drivers/block/pktcdvd.c
-> > +++ b/drivers/block/pktcdvd.c
-> > @@ -2745,7 +2745,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
-> >         pd->pkt_dev = MKDEV(pktdev_major, idx);
-> >         ret = pkt_new_dev(pd, dev);
-> >         if (ret)
-> > -               goto out_new_dev;
-> > +               goto out_mem2;
-> >
-> >         /* inherit events of the host device */
-> >         disk->events = pd->bdev->bd_disk->events;
-> > @@ -2763,8 +2763,6 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
-> >         mutex_unlock(&ctl_mutex);
-> >         return 0;
-> >
-> > -out_new_dev:
-> > -       blk_cleanup_queue(disk->queue);
-> >  out_mem2:
-> >         put_disk(disk);
-> >  out_mem:
-> > --
+> Also as far as I can tell Documentation/core-api/atomic_ops.rst ask
+> you to use smp_mb__before_atomic and smp_mb__after_atomic for any
+> ordering with non-updating bitops.  Quote:
 > 
-> As we have it now drivers *do* call blk_cleanup_queue() on error paths
-> prior to add_disk(). An example today is on drivers/block/loop.c where
-> in loop_add(), if alloc_disk() fails we call  blk_cleanup_queue()
-> *but* this error path *never* called put_disk() as
-> drivers/block/pktcdvd.c did on error, and that is because it doesn't
-> need to as the last error-path-induced call was alloc_disk(). So it
-> doesn't need to free the disk as its not created on the error path of
-> loop_add().
+> --------------------------------- snip ---------------------------------
+> If explicit memory barriers are required around {set,clear}_bit() (which do
+> not return a value, and thus does not need to provide memory barrier
+> semantics), two interfaces are provided::
 > 
-> This will of course change once we make add_disk() return int, and
-> capture errors, and it brings the question if we want to follow
-> similar strategy for other drivers, however note that blk_put_queue()
-> doesn't do everything blk_cleanup_queue() does, and in fact
-> blk_cleanup_queue() states it sets up "the appropriate flags" *and*
-> then calls blk_put_queue().
+>         void smp_mb__before_atomic(void);
+> 	void smp_mb__after_atomic(void);
+> --------------------------------- snip ---------------------------------
 > 
-> We'll have a a bit more collateral evolutions if we embrace the
-> strategy in this commit, for those drivers that wish to start taking
-> advantage of the error checks, but other then considering this, I
-> thought it would be good to think about the fact that *today* we call
-> blk_cleanup_queue() on error paths *without* the disk being yet
-> associated either. This, in spite of the fact that the way we designed
+> I really want someone who knows the memory model to look over this scheme,
+> as it looks dangerous.
 
-Some drivers may have only request queue, and not have disk, such as
-NVMe's admin queue, so I think blk_cleanup_queue() has to cover this
-case.
-
-> the queue, it sits on top of the disk from a kobject perspective once
-> registered. Since we call blk_cleanup_queue() on error paths today --
-> without a disk parent being possible -- it means nothing on
-> blk_cleanup_queue() should not rely on it having a functional disk. Do
-> we want to keep it that way? If we keep the practice of drivers using
-
-Yes, see the reason above.
+smp_mb() is enough, the version of _[before|after]_atomic might be
+a little lightweight in some ARCH I guess. Given smp_mb() or its variant
+is only needed in very unlikely case of slow path, it is fine to just
+use smp_mb(), IMO.
 
 
 Thanks,
