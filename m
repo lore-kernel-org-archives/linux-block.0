@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BCAC55186
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 07:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1A5C55185
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 07:55:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D7E320706
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 07:55:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4775E20706
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 07:55:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NJB5UfKQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Uv4E4jqD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726100AbgDYHzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Apr 2020 03:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36390 "EHLO
+        id S1726062AbgDYHzx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Apr 2020 03:55:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726035AbgDYHzS (ORCPT
+        by vger.kernel.org with ESMTP id S1726035AbgDYHzx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Apr 2020 03:55:18 -0400
+        Sat, 25 Apr 2020 03:55:53 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9DB1C09B049
-        for <linux-block@vger.kernel.org>; Sat, 25 Apr 2020 00:55:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B705C09B049
+        for <linux-block@vger.kernel.org>; Sat, 25 Apr 2020 00:55:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
         Content-ID:Content-Description:In-Reply-To:References;
-        bh=UyAUy+JHO+8ihOoIsMujG21NrtExsGz+YKMe1J7KKTs=; b=NJB5UfKQSi4Za1wvX48EAh5Sb2
-        WUU0mr5XAo+1CWT3fZXr2drA5Q4wefNz79P9dw/2L392K3ASae/iU4vh1P0J4rxDAbZPTWl6GAulq
-        e0VTHTjCefKIA8fws0BIIFetTkrBdk3u7mevvZIIlBV1mIBzFrDiclVruw+Zik0ShVSY1BCWANeMw
-        dgsUKzIADnWHnN+WK3dExRemTejvUrpEJPy3EjxSUr8b5s5uxcJKwBhvnVF1YEF5FR/ENe8sEMfqX
-        gp1No845FjK7UC4Q/iBXCgvbS423hKCk9CRfEXIT0QKjXBVFs5sbIpQRVciG5JW+vjFquUn34uUTs
-        OCdT7Hew==;
+        bh=QRSbladImqpG0qRZzcmSBTq43meBv+lGZdXTt1vOGjo=; b=Uv4E4jqDzLHkqrSs6v9degTn4Q
+        hyaHHwC+0zbmgzc1FIo2+18xW79Jm+YsDmE0vOBIwEoL4r1yRuRvOb7fG4Lpr/k6RvO5nTjBPyM9Z
+        zflaVvbv3gMZ8MeUXwO8vIY3idZnrWQC1O7ifMNvduDc3nWdAGku/oRCtz68UhCDu4VqqFRcpBYAB
+        G+X4z9N/kjia6GOEcGWbeyctOsTZfflYIV+NNNueAW7KyPjDQi4qErQzCmV6EFFPSC+Gx/ilNLUY6
+        45ewK1fMjBtLJo2scYGL6ZLbwt+M2YGUh1BAqkxKabRwhM9zJeCqBAAstS8xzSePLH7jRV1uyfUXW
+        bPb/ZjAw==;
 Received: from [2001:4bb8:193:f203:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jSFeg-0001pK-BN; Sat, 25 Apr 2020 07:55:18 +0000
+        id 1jSFfE-0001uJ-TB; Sat, 25 Apr 2020 07:55:53 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: remove create_io_context
-Date:   Sat, 25 Apr 2020 09:55:16 +0200
-Message-Id: <20200425075516.721532-1-hch@lst.de>
+Subject: [PATCH v2] block: remove create_io_context
+Date:   Sat, 25 Apr 2020 09:55:51 +0200
+Message-Id: <20200425075551.721581-1-hch@lst.de>
 X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -58,6 +58,11 @@ even use the return value.  Just open code it there.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
+
+Changes since v1:
+
+ - add a commit log
+
  block/blk-core.c | 11 ++++++-----
  block/blk.h      | 20 --------------------
  2 files changed, 6 insertions(+), 25 deletions(-)
