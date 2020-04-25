@@ -2,95 +2,218 @@ Return-Path: <SRS0=horf=6J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C307CC55185
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 15:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 302DAC54FCB
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 15:48:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9959F20644
-	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 15:45:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wA6w0yXn"
+	by mail.kernel.org (Postfix) with ESMTP id 1640120700
+	for <linux-block@archiver.kernel.org>; Sat, 25 Apr 2020 15:48:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbgDYPph (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Apr 2020 11:45:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726108AbgDYPpg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Apr 2020 11:45:36 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE7EC09B04B
-        for <linux-block@vger.kernel.org>; Sat, 25 Apr 2020 08:45:36 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id hi11so5176237pjb.3
-        for <linux-block@vger.kernel.org>; Sat, 25 Apr 2020 08:45:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WbXqUvy6Zx4jWra7/mKAUkU8JyHGv+EMw9mv1e/ZXrw=;
-        b=wA6w0yXnoRQod/x9kLNhbiBia/FHpGoN4xQViR4JBH8y01Ngws6t68NvQVilPaLZx2
-         xJ8vIdznCP+MwPFk8khyg9Dnz+lLcCtj3agOmaFX1EpIyhoxTy4HLil0x6mua7/yvGMt
-         uS2/H+3/kBL6nnbMDD0r515N0pxGXyEcLW1+xvH+xm0sJyoEHnshgNhAjnpoCmXDZiSe
-         qLlNf1VLRJmTlrMx33woZMj9ZerpbqLYpTsOeEJcGnm7SyM3wd4ynvkjiZsQK9fNgDKW
-         o3bV3ow/MslKyJPLXYeG4o2M5aiMMJ2iR9uPTQlp17n66iJH3swYfMTzxnJ8aSiFbP3a
-         smJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WbXqUvy6Zx4jWra7/mKAUkU8JyHGv+EMw9mv1e/ZXrw=;
-        b=i4tu2fIBjBvYZ9QvLYUU02qudHBorjdaNYbwk1R7n40vkKnqf+bZgbK130wwqnGZsE
-         P/rVfxWyKvB7HEvmIdTrEga6B3DOM0ZpkC1FSwMqmhOYSfaeldmkzaPseGzlzKbUGGAz
-         oGtay+/KaQUTOgu38hqu+qn6yf4UPaq7c8+26CjlEdsMxDzCVVFaJ2SLyxeN+8Go8B3a
-         HbNk983wLGY6+sLFBPrQ0d72qW40o64Dq95ibzRborptaKOKhZzQxWS36cNMzMDmBFMv
-         ZXUMe3MCFRR7fHOcwRt4lTXnXksO9NWKXOdeO6mkNoT0Fes2FHrHMVUxgR83nM6yFmE9
-         ID1Q==
-X-Gm-Message-State: AGi0Pub6xoz+RWYcJTUgIqW+loQHYM8vg5DbNfUD9LMnZXLdqljwC7p3
-        oa2WEJL7XfOywCo7TOhhiFxbp5rA2OOy4g==
-X-Google-Smtp-Source: APiQypIlBZtsrMImuPudY2tg2Rzjk77JhIq2anQwrD+xO4v3/vehSA9N2sPj2aHncEr8sTNiiKhqHQ==
-X-Received: by 2002:a17:902:59cc:: with SMTP id d12mr7704421plj.237.1587829535828;
-        Sat, 25 Apr 2020 08:45:35 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.145])
-        by smtp.gmail.com with ESMTPSA id f21sm8454701pfn.71.2020.04.25.08.45.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Apr 2020 08:45:35 -0700 (PDT)
-Subject: Re: avoid the ->make_request_fn indirect for blk-mq drivers
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dm-devel@redhat.com, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20200425075336.721021-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <98cd7aac-e4ee-8de0-e7aa-0d3e1a2b20e0@kernel.dk>
-Date:   Sat, 25 Apr 2020 09:45:34 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726117AbgDYPsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Apr 2020 11:48:36 -0400
+Received: from verein.lst.de ([213.95.11.211]:40193 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726112AbgDYPsg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Apr 2020 11:48:36 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CF6FA68CEC; Sat, 25 Apr 2020 17:48:32 +0200 (CEST)
+Date:   Sat, 25 Apr 2020 17:48:32 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, will@kernel.org,
+        peterz@infradead.org, paulmck@kernel.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200425154832.GA16004@lst.de>
+References: <20200424102351.475641-1-ming.lei@redhat.com> <20200424102351.475641-8-ming.lei@redhat.com> <20200424103851.GD28156@lst.de> <20200425031723.GC477579@T590> <20200425083224.GA5634@lst.de> <20200425093437.GA495669@T590> <20200425095351.GC495669@T590>
 MIME-Version: 1.0
-In-Reply-To: <20200425075336.721021-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200425095351.GC495669@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/20 1:53 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this small series avoids an indirect call for every submitted bio that
-> eventually ends up being handled by blk-mq drivers.  Let me know what
-> you think.
+FYI, here is what I think we should be doing (but the memory model
+experts please correct me):
 
-I like it, I've been pondering something like this for a bit, but
-I like the simplicity of this one and changing it so that only
-non-regular make_request_fn is set.
+ - just drop the direct_issue flag and check for the CPU, which is
+   cheap enough
+ - replace the raw_smp_processor_id with a get_cpu to make sure we
+   don't hit the tiny migration windows
+ - a bunch of random cleanups to make the code easier to read, mostly
+   by being more self-documenting or improving the comments.
 
-I'll apply this.
-
--- 
-Jens Axboe
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bfa4020256ae9..da749865f6eed 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1049,28 +1049,16 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ 		atomic_inc(&data.hctx->nr_active);
+ 	}
+ 	data.hctx->tags->rqs[rq->tag] = rq;
+-	return true;
+-}
+-
+-static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+-{
+-	if (rq->tag != -1)
+-		return true;
+ 
+-	if (!__blk_mq_get_driver_tag(rq))
+-		return false;
+ 	/*
+-	 * Add one memory barrier in case that direct issue IO process is
+-	 * migrated to other CPU which may not belong to this hctx, so we can
+-	 * order driver tag assignment and checking BLK_MQ_S_INACTIVE.
+-	 * Otherwise, barrier() is enough given both setting BLK_MQ_S_INACTIVE
+-	 * and driver tag assignment are run on the same CPU in case that
+-	 * BLK_MQ_S_INACTIVE is set.
++	 * Ensure updates to rq->tag and tags->rqs[] are seen by
++	 * blk_mq_tags_inflight_rqs.  This pairs with the smp_mb__after_atomic
++	 * in blk_mq_hctx_notify_offline.  This only matters in case a process
++	 * gets migrated to another CPU that is not mapped to this hctx.
+ 	 */
+-	if (unlikely(direct_issue && rq->mq_ctx->cpu != raw_smp_processor_id()))
++	if (rq->mq_ctx->cpu != get_cpu())
+ 		smp_mb();
+-	else
+-		barrier();
++	put_cpu();
+ 
+ 	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))) {
+ 		blk_mq_put_driver_tag(rq);
+@@ -1079,6 +1067,13 @@ static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+ 	return true;
+ }
+ 
++static bool blk_mq_get_driver_tag(struct request *rq)
++{
++	if (rq->tag != -1)
++		return true;
++	return __blk_mq_get_driver_tag(rq);
++}
++
+ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+ 				int flags, void *key)
+ {
+@@ -1125,7 +1120,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 		 * Don't clear RESTART here, someone else could have set it.
+ 		 * At most this will cost an extra queue run.
+ 		 */
+-		return blk_mq_get_driver_tag(rq, false);
++		return blk_mq_get_driver_tag(rq);
+ 	}
+ 
+ 	wait = &hctx->dispatch_wait;
+@@ -1151,7 +1146,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+ 	 * allocation failure and adding the hardware queue to the wait
+ 	 * queue.
+ 	 */
+-	ret = blk_mq_get_driver_tag(rq, false);
++	ret = blk_mq_get_driver_tag(rq);
+ 	if (!ret) {
+ 		spin_unlock(&hctx->dispatch_wait_lock);
+ 		spin_unlock_irq(&wq->lock);
+@@ -1252,7 +1247,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			break;
+ 		}
+ 
+-		if (!blk_mq_get_driver_tag(rq, false)) {
++		if (!blk_mq_get_driver_tag(rq)) {
+ 			/*
+ 			 * The initial allocation attempt failed, so we need to
+ 			 * rerun the hardware queue when a tag is freed. The
+@@ -1284,7 +1279,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			bd.last = true;
+ 		else {
+ 			nxt = list_first_entry(list, struct request, queuelist);
+-			bd.last = !blk_mq_get_driver_tag(nxt, false);
++			bd.last = !blk_mq_get_driver_tag(nxt);
+ 		}
+ 
+ 		ret = q->mq_ops->queue_rq(hctx, &bd);
+@@ -1886,7 +1881,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (!blk_mq_get_dispatch_budget(hctx))
+ 		goto insert;
+ 
+-	if (!blk_mq_get_driver_tag(rq, true)) {
++	if (!blk_mq_get_driver_tag(rq)) {
+ 		blk_mq_put_dispatch_budget(hctx);
+ 		goto insert;
+ 	}
+@@ -2327,23 +2322,24 @@ static bool blk_mq_inflight_rq(struct request *rq, void *data,
+ static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct count_inflight_data count_data = {
+-		.count	= 0,
+ 		.hctx	= hctx,
+ 	};
+ 
+ 	blk_mq_all_tag_busy_iter(hctx->tags, blk_mq_count_inflight_rq,
+ 			blk_mq_inflight_rq, &count_data);
+-
+ 	return count_data.count;
+ }
+ 
+-static void blk_mq_hctx_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
++static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
++		struct blk_mq_hw_ctx *hctx)
+ {
+-	while (1) {
+-		if (!blk_mq_tags_inflight_rqs(hctx))
+-			break;
+-		msleep(5);
+-	}
++	if (!cpumask_test_cpu(cpu, hctx->cpumask))
++		return false;
++	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu)
++		return false;
++	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
++		return false;
++	return true;
+ }
+ 
+ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+@@ -2351,25 +2347,19 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+ 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+ 			struct blk_mq_hw_ctx, cpuhp_online);
+ 
+-	if (!cpumask_test_cpu(cpu, hctx->cpumask))
+-		return 0;
+-
+-	if ((cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu) ||
+-	    (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids))
++	if (!blk_mq_last_cpu_in_hctx(cpu, hctx))
+ 		return 0;
+ 
+ 	/*
+-	 * The current CPU is the last one in this hctx, S_INACTIVE
+-	 * can be observed in dispatch path without any barrier needed,
+-	 * cause both are run on one same CPU.
++	 * Order setting BLK_MQ_S_INACTIVE versus checking rq->tag and rqs[tag],
++	 * in blk_mq_tags_inflight_rqs.  It pairs with the smp_mb() in
++	 * blk_mq_get_driver_tag.
+ 	 */
+ 	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+-	/*
+-	 * Order setting BLK_MQ_S_INACTIVE and checking rq->tag & rqs[tag],
+-	 * and its pair is the smp_mb() in blk_mq_get_driver_tag
+-	 */
+ 	smp_mb__after_atomic();
+-	blk_mq_hctx_drain_inflight_rqs(hctx);
++
++	while (blk_mq_tags_inflight_rqs(hctx))
++		msleep(5);
+ 	return 0;
+ }
+ 
