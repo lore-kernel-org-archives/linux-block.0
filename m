@@ -2,128 +2,316 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BAEC54FCB
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23DBC4CECC
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 18:58:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDE192076A
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8690205C9
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 18:58:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I5VZ+vH7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbgD0RaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 13:30:09 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:56029 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725980AbgD0RaI (ORCPT
+        id S1726735AbgD0S6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 14:58:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726695AbgD0S6x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 13:30:08 -0400
-Received: by mail-pj1-f68.google.com with SMTP id a32so7793753pje.5
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 10:30:08 -0700 (PDT)
+        Mon, 27 Apr 2020 14:58:53 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94467C0610D5
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 11:58:53 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id q2so9112817qvd.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 11:58:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=1pcdW5IEsmo/9V+gfzp2K9uy1wudscu5jDh3JoOw2Pc=;
+        b=I5VZ+vH7LpGcQtIpNN8UoToOYU8SRKCZ9vjisOYPQOfdwW4lkqToh7M8JKSTs5ZROp
+         pBo+BTLmABy8LtxgToKWCEFior8W8I1zbW0L8CwleZ9MdHv0drHdjzQ9w16jkrgWFn/r
+         WCGXvisWAoWQFKqXwPGha7vGrnCFhNvBhNmZ4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=Q/waOpkeU8bo6Doc8NIp3kRxTaFNq1zSuupdNHjBmtA=;
-        b=Ku/2f9F+KbCsOa1XJA9pOqMdmCALxrs+ZkMOxvTq9PY3K/US/oMIh/i5kX4rURrKtq
-         4HFtOO0U5xEne9XMpZYNwmTiW8TMSXfI8pAm3vLReSYuq1eSMQL0X/hLjC8vGf4q1lXD
-         ydW3ApNLnzKwCI8mu/kp67mZiMowmk1wjfDhqNdGHpsu3nA1QiTxrINt3U+uM2FJlAef
-         4ltMuefDouSLcqwZ7PAbxnoP1r9WygFAhlxoVDEri/RY5IDTsIObI6Jg1uCbN2cahja+
-         Ua4sqP/n02HyOuvoGrFyIk1z0gr8V6+IEcN36SVLxVjksKh+P7Ulf4HCZXYu05KWQNML
-         C/sg==
-X-Gm-Message-State: AGi0PuYZQq6Nzuvh0vd0d35dNPTOG549ru7hqqw8w3ZS7eb5E0f4PmGQ
-        QZ2L+2Tx86BFYLQTKpONK6M=
-X-Google-Smtp-Source: APiQypKtnIphH7q5xttIhTqUhogS5CI3JVS54S6HcvbNiOEe2+HphS9XOXtVXV8bgzhj9IsWdH3tgA==
-X-Received: by 2002:a17:902:7208:: with SMTP id ba8mr6223921plb.246.1588008607878;
-        Mon, 27 Apr 2020 10:30:07 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:a598:4365:d06:a875? ([2601:647:4000:d7:a598:4365:d06:a875])
-        by smtp.gmail.com with ESMTPSA id r28sm13354557pfg.186.2020.04.27.10.30.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Apr 2020 10:30:07 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq-debugfs: update blk_queue_flag_name[] accordingly
- for new flags
-To:     Hou Tao <houtao1@huawei.com>, linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-References: <20200427133445.26215-1-houtao1@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <e1e28027-2dac-3ae3-21c1-9ba779a5a566@acm.org>
-Date:   Mon, 27 Apr 2020 10:30:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=1pcdW5IEsmo/9V+gfzp2K9uy1wudscu5jDh3JoOw2Pc=;
+        b=tJWegSjn1hHqX5wMbyF6/akJ7Hz/9lDQLMtRltS3Aox86lFgPeV/BptL8GYBbXC4he
+         WW3ChZ8TWsVdVYCX4oVNGNGgZSSBKIzcfcViFyb1JrVK0kT90SRD2xcLqeTo0KmypSZL
+         Hr4dpdF+SIqFL5oMOjvAZfD9ZdcHGkE3MBxKEFlvuRluR4UWW4uxvDeNqInqMqLgj1KY
+         +HPe5HcX5s0xEVugLbqqFkK0zmruP87av+2YD5m/eEA3+tSi4JLc3Le0AyCrWyGnOn6X
+         E3Fj03pLDS2nV57aVcR5CNSO6uqfKctDXKa4Wqxv+ZwCXNbygRp+WI2WZGExQYLktmoe
+         ZRhQ==
+X-Gm-Message-State: AGi0PuaYhwLblvY1IBsFRY/bZ240zHUnJzUnAZvlYJ76LW1HhiIN/edz
+        EwjWnTPcrkQwnbjb4Zaj3EzVDN8SFlGOA1LLDjYIrg==
+X-Google-Smtp-Source: APiQypLBJmnJTryb9NCMq6/UXWiaazrNmD5zo71VtPJBymGfKV3j6RW3otqZ6Af86PLXzHuh88Q7I09wenMs6HtJn9A=
+X-Received: by 2002:a05:6214:1848:: with SMTP id d8mr22124216qvy.136.1588013932365;
+ Mon, 27 Apr 2020 11:58:52 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
+ <1583409280-158604-9-git-send-email-john.garry@huawei.com>
+ <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com> <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
+ <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com> <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
+ <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com> <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
+ <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com> <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
+ <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com> <d2ae343770a83466b870a33ffae5fa23@mail.gmail.com>
+ <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
+In-Reply-To: <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200427133445.26215-1-houtao1@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQLPD/Iw6Rn2DAIn/TfwmBaZDWGoTwIxkurkAqxUgoEByxhGKAL7c9G/AhAFW6UBYJrDDwOh6RKhA6E3S3MDBK8nrwGGgqJUAkB+JNsCgDRgnKWuO18g
+Date:   Tue, 28 Apr 2020 00:28:49 +0530
+Message-ID: <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
+Subject: RE: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.de,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        hch@infradead.org,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Cc:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, Hannes Reinecke <hare@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-27 06:34, Hou Tao wrote:
-> Else there may be magic numbers in /sys/kernel/debug/block/*/state.
-> 
-> Signed-off-by: Hou Tao <houtao1@huawei.com>
-> ---
->  block/blk-mq-debugfs.c | 3 +++
->  include/linux/blkdev.h | 1 +
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 7a79db81a63f..49fdbc8a025f 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -125,6 +125,9 @@ static const char *const blk_queue_flag_name[] = {
->  	QUEUE_FLAG_NAME(REGISTERED),
->  	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
->  	QUEUE_FLAG_NAME(QUIESCED),
-> +	QUEUE_FLAG_NAME(PCI_P2PDMA),
-> +	QUEUE_FLAG_NAME(ZONE_RESETALL),
-> +	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
->  };
->  #undef QUEUE_FLAG_NAME
->  
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 32868fbedc9e..d56ef0def78b 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -585,6 +585,7 @@ struct request_queue {
->  	u64			write_hints[BLK_MAX_WRITE_HINTS];
->  };
->  
-> +/* Need to update blk_queue_flag_name[] accordingly */
->  #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
->  #define QUEUE_FLAG_DYING	1	/* queue being torn down */
->  #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
+> Hi Kashyap,
+>
+> >> hmmmm...
+> >
+> > I did some more experiments. It looks like issue is with both <none>
+> > and <mq-deadline> scheduler.  Let me simplify what happens with
+> > ioscheduler = <none>.
+>
+> I know it's good to compare like-for-like, but, as I understand, "none"
+> is more suited for MQ host, while deadline is more suited for SQ host.
 
-Changing "Need to update blk_queue_flag_name[] accordingly" into "Keep
-blk_queue_flag_name[] in sync with the definitions below" probably would
-be more clear. Anyway:
+I am using <mq-deadline> which is MQ version of SQ deadline.
+For now we can just consider case without scheduler.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+I have some more findings. May be someone from upstream community can
+connect the dots.
+
+#1. hctx_may_queue() throttle the IO at hctx level. This is eventually per
+sdev throttling for megaraid_sas driver because It creates only one
+context - hctx0 for each scsi device.
+
+If driver is using only one h/w queue,  active_queues will be always steady.
+In my test it was 64 thread, so active_queues=64.
+Even though <fio> thread is shared among allowed cpumask
+(cpus_allowed_policy=shared option in fio),  active_queues will be always 64
+because we have only one h/w queue.
+All the logical cpus are mapped to one h/w queue. It means, thread moving
+from one cpu to another cpu will not change active_queues per hctx.
+
+In case of this RFC, active_queues are now per hctx and there are multiple
+hctx, but tags are shared. This can create unwanted throttling and
+eventually more lock contention in sbitmap.
+I added below patch and things improved a bit, but not a full proof.
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 586c9d6..c708fbc 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -60,10 +60,12 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+  * For shared tag users, we track the number of currently active users
+  * and attempt to provide a fair share of the tag depth for each of them.
+  */
+-static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
++static inline bool hctx_may_queue(struct request_queue *q,
++                                 struct blk_mq_hw_ctx *hctx,
+                                  struct sbitmap_queue *bt)
+ {
+-       unsigned int depth, users;
++       unsigned int depth, users, i, outstanding = 0;
++       struct blk_mq_hw_ctx *hctx_iter;
+
+        if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
+                return true;
+@@ -84,14 +86,18 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx
+*hctx,
+         * Allow at least some tags
+         */
+        depth = max((bt->sb.depth + users - 1) / users, 4U);
+-       return atomic_read(&hctx->nr_active) < depth;
++
++       queue_for_each_hw_ctx(q, hctx_iter, i)
++               outstanding += atomic_read(&hctx_iter->nr_active);
++
++       return outstanding < depth;
+ }
+
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+                            struct sbitmap_queue *bt)
+ {
+        if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+-           !hctx_may_queue(data->hctx, bt))
+
+
+#2 - In completion path, scsi module call blk_mq_run_hw_queues() upon IO
+completion.  I am not sure if it is good to run all the h/w queue or just
+h/w queue of current reference is good enough.
+Below patch helped to reduce contention in hcxt_lock().
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 610ee41..f72de2a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -572,6 +572,7 @@ static bool scsi_end_request(struct request *req,
+blk_status_t error,
+        struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+        struct scsi_device *sdev = cmd->device;
+        struct request_queue *q = sdev->request_queue;
++       struct blk_mq_hw_ctx *mq_hctx = req->mq_hctx;
+
+        if (blk_update_request(req, error, bytes))
+                return true;
+@@ -613,7 +614,7 @@ static bool scsi_end_request(struct request *req,
+blk_status_t error,
+            !list_empty(&sdev->host->starved_list))
+                kblockd_schedule_work(&sdev->requeue_work);
+        else
+-               blk_mq_run_hw_queues(q, true);
++               blk_mq_run_hw_queue(mq_hctx, true);
+
+        percpu_ref_put(&q->q_usage_counter);
+        return false;
+
+#3 -  __blk_mq_tag_idle() calls blk_mq_tag_wakeup_all which may not be
+optimal for shared queue.
+There is a penalty if we are calling __sbq_wake_up() frequently. In case of
+nr_hw_queue = 1, things are better because one hctx and hctx->state will
+avoid multiple calls.
+If blk_mq_tag_wakeup_all is called from hctx0 context, there is no need to
+call from hctx1, hctx2 etc.
+
+I have added below patch in my testing.
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 586c9d6..5b331e5 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -53,7 +53,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+
+        atomic_dec(&tags->active_queues);
+
+-       blk_mq_tag_wakeup_all(tags, false);
++       /* TBD - Do this only for hctx->flags & BLK_MQ_F_TAG_HCTX_SHARED */
++       if (hctx->queue_num == 0)
++               blk_mq_tag_wakeup_all(tags, false);
+ }
+
+ /*
+
+
+With all above mentioned changes, I see performance improved from 2.2M IOPS
+to 2.7M on same workload and profile.
+
+
+Kashyap
+
+>
+> >
+> > Old Driver which has nr_hw_queue = 1 and I issue IOs from <fio>  queue
+> > depth = 128. We get 3.1M IOPS in this config. This eventually exhaust
+> > host can_queue.
+>
+> So I think I need to find a point where we start to get throttled.
+>
+> > Note - Very low contention in sbitmap_get()
+> >
+> > -   23.58%     0.25%  fio              [kernel.vmlinux]            [k]
+> > blk_mq_make_request
+> >     - 23.33% blk_mq_make_request
+> >        - 21.68% blk_mq_get_request
+> >           - 20.19% blk_mq_get_tag
+> >              + 10.08% prepare_to_wait_exclusive
+> >              + 4.51% io_schedule
+> >              - 3.59% __sbitmap_queue_get
+> >                 - 2.82% sbitmap_get
+> >                      0.86% __sbitmap_get_word
+> >                      0.75% _raw_spin_lock_irqsave
+> >                      0.55% _raw_spin_unlock_irqrestore
+> >
+> > Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
+> > queue depth = 128. We get 2.3 M IOPS in this config. This eventually
+> > exhaust host can_queue.
+> > Note - Very high contention in sbitmap_get()
+> >
+> > -   42.39%     0.12%  fio              [kernel.vmlinux]            [k]
+> > generic_make_request
+> >     - 42.27% generic_make_request
+> >        - 41.00% blk_mq_make_request
+> >           - 38.28% blk_mq_get_request
+> >              - 33.76% blk_mq_get_tag
+> >                 - 30.25% __sbitmap_queue_get
+> >                    - 29.90% sbitmap_get
+> >                       + 9.06% _raw_spin_lock_irqsave
+> >                       + 7.94% _raw_spin_unlock_irqrestore
+> >                       + 3.86% __sbitmap_get_word
+> >                       + 1.78% call_function_single_interrupt
+> >                       + 0.67% ret_from_intr
+> >                 + 1.69% io_schedule
+> >                   0.59% prepare_to_wait_exclusive
+> >                   0.55% __blk_mq_get_tag
+> >
+> > In this particular case, I observed alloc_hint = zeros which means,
+> > sbitmap_get is not able to find free tags from hint. That may lead to
+> > contention.
+> > This condition is not happening with nr_hw_queue=1 (without RFC) driver.
+> >
+> > alloc_hint=
+> > {663, 2425, 3060, 54, 3149, 4319, 4175, 4867, 543, 2481, 0, 4779, 377,
+> > ***0***, 2010, 0, 909, 3350, 1546, 2179, 2875, 659, 3902, 2224, 3212,
+> > 836, 1892, 1669, 2420, 3415, 1904, 512, 3027, 4810, 2845, 4690, 712,
+> > 3105, 0, 0, 0, 3268, 4915, 3897, 1349, 547, 4, 733, 1765, 2068, 979,
+> > 51, 880, 0, 370, 3520, 2877, 4097, 418, 4501, 3717, 2893, 604, 508,
+> > 759, 3329, 4038, 4829, 715, 842, 1443, 556}
+> >
+> > Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
+> > queue depth = 32. We get 3.1M IOPS in this config. This workload does
+> > *not* exhaust host can_queue.
+>
+> Please ensure .host_tagset is set for whenever nr_hw_queue = N. This is as
+> per
+> RFC, and I don't think you modified from the RFC for your test.
+> But I just wanted to mention that to be crystal clear.
+
+Yes I have two separate driver copy. One with RFC change and another without
+RFC.
+>
+> >
+> > -    5.07%     0.14%  fio              [kernel.vmlinux]  [k]
+> > generic_make_request
+> >     - 4.93% generic_make_request
+> >        - 3.61% blk_mq_make_request
+> >           - 2.04% blk_mq_get_request
+> >              - 1.08% blk_mq_get_tag
+> >                 - 0.70% __sbitmap_queue_get
+> >                      0.67% sbitmap_get
+> >
+> > In summary, RFC has some performance bottleneck in sbitmap_get () if
+> > outstanding per shost is about to exhaust.  Without this RFC also
+> > driver works in nr_hw_queue = 1, but that case is managed very well.
+> > I am not sure why it happens only with shared host tag ? Theoretically
+> > all the hctx is sharing the same bitmaptag which is same as
+> > nr_hw_queue=1, so why contention is only visible in shared host tag
+> > case.
+>
+> Let me check this.
+>
+> >
+> > If you want to reproduce this issue, may be you have to reduce the
+> > can_queue in hisi_sas driver.
+> >
+>
+> Thanks,
+> John
