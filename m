@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ED0C7C823
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B82C7C820
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68388206B6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20D0C206BF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SasPAiD5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mQfo5a/8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727045AbgD0LcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 07:32:13 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54642 "EHLO
+        id S1727062AbgD0LcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 07:32:19 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54662 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727029AbgD0LcL (ORCPT
+        with ESMTP id S1727074AbgD0LcT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 07:32:11 -0400
+        Mon, 27 Apr 2020 07:32:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1587987131; x=1619523131;
+  t=1587987138; x=1619523138;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SY0Wik29lfzxhuqWL8UsmF57KoKwo8Pbt5R5sJenmqE=;
-  b=SasPAiD5/x0AkmzGbD1tJo6uuMfNb9FhTGiVci2DUySClr2HYlhP1TFP
-   qkPNPaOh5YUyydwjQOyKweZUFeYtjtQxNLHJSsZVNrgDFjONTYLbmBwz2
-   mkn9KcQdsZT8GQwHz4o8q0wcsw9NElXZzzCft0VE0H5a7RxZMs1MvqkZ+
-   DX6FCaClytrZtXhtNdYtgYlAMKuQSe1unSS/ayVhvgWnm5iY/LvzjcGh/
-   7fcbvx5zn9c35YMJPmzh/glzKeF6VsxruyhhSXmg8MKn5ge1kiTQJ4CuQ
-   Z51CBEWbEEgX7SMiOymnkffMAnsBTsVom/TfXjFenz/sJEtAUi4o9e7eO
-   Q==;
-IronPort-SDR: MnSLueEWJQ004cvAz2stI+EvR4GSbiOYQcjRLWkUvfux+BbEcqjVd7JdE8Jk57c0jIt83FBMCS
- VYUUbEcgGJRt8WA8/LML2KmWPGsOvUXrbuTw4TPhsnHgrwgXvZaqI/AI9REYW6qPTX8IGxhgJv
- AMLkbtLplVowQpbO95PYzxoGu91UcRTPJXqhUswSX046PkZbSgKUbKcVmMrMBLD6XRnAZXMNdV
- 00X3nAQnTg7FhJvtiyX++IvGrNXlPH1PZ+siewVwfjU/lfsB++BlJEhw1GV4Qy1qx87lHvtja8
- 3VY=
+  bh=zFmgwmTxjC+sbphVDhCYyIoBuOIJEGPFUItXUjKg8cI=;
+  b=mQfo5a/86TnzgwtzN/IPLwEWwapa7ZaWwycFdWYW9kRhE8YetPS2dfOR
+   g8w/jzvMsaNznGa8V5ILkzLLzxGEhQ6TuBsC27LFfnGRQEPH+AfMBbaVh
+   GwDHb7x+vX6h0XH01PvrmvKglr9apGgvsUZ2v61fl3yXecSlkN6juS3F7
+   pJ6ujRSI7PDHPtzKfxLOw2phn+CIBuZmsHuozA5k2QMYgAbXdd9gdv27G
+   a4HTJ97cmmsiNyenE/HBN8x59Puxw0lnjDhsHUCZzr6gw3kI3YbEKfMfc
+   n8OGWXPX4b3Vjte+d5nrqHW9buQKUOimQlNWzvcVgYHr5m+CB3AWCn4yw
+   g==;
+IronPort-SDR: oKEpO2+PggN7KWXhjH8nNj0DjuKlWg6x+2XLmWK4zsd+1erzAvC8Pu5i4Q9hU8xFuTulwOxdow
+ KTvzHhKkk1lG7CJ8OhND78G+Va1mNI879yZEmNJADFuKRZ33Q8hwgNhGRbMe3dYJKYXgV45yDY
+ rS/BOC8+aFuvURTxWAQws6y4vZpsOJ8W6KZcyGio/9XuuG/cPDnzr5tNU8rDBifFdZgFNP+KTt
+ Mz/yTLhA3ER8mFuQN27iH+riYJJIUGM29NncmbkSajT6F3g7shjXHpfdud32YSDKQJo/zVkULw
+ jKo=
 X-IronPort-AV: E=Sophos;i="5.73,323,1583164800"; 
-   d="scan'208";a="136551997"
+   d="scan'208";a="136552030"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2020 19:32:10 +0800
-IronPort-SDR: /H0Dl21VZSzdRjq+DIS9esXZnedqJGhkdJNLLKjfBqn4EMDtyjgyDY+Hv9cu7sqMcduHZjNAp4
- /kv3oClTL9TZq2lxx1TIu8JR0C2+zUr54=
+  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2020 19:32:18 +0800
+IronPort-SDR: VslJYdGq1MezGdKv3VnwKHw+v9FKuBNHJe6npeWG79Q8CYFoQUvZOixd4orgf3zDL7bIFx3epP
+ W268kCLgdmJUWaqUHG/XKTbVijgrLK7LQ=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 04:22:52 -0700
-IronPort-SDR: Xlkd7ukAXCT2iEsSu0VerM/ZsJGoGjLASp81+P0kjsmFKebxB8mprDuhyiTDlK49LPywpZzxNU
- l2QK9KvmKOCA==
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 04:22:59 -0700
+IronPort-SDR: 266jVkF81rsrkzc8O5KMbs675Gtc7/F9owzw2goNnv/v9NXWmL46Wx+yoEvVOcRRPXNSP8GS7i
+ BJcThrhY9tsQ==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Apr 2020 04:32:09 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Apr 2020 04:32:16 -0700
 From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -64,9 +64,9 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v8 04/11] block: Introduce REQ_OP_ZONE_APPEND
-Date:   Mon, 27 Apr 2020 20:31:46 +0900
-Message-Id: <20200427113153.31246-5-johannes.thumshirn@wdc.com>
+Subject: [PATCH v8 08/11] scsi: sd_zbc: emulate ZONE_APPEND commands
+Date:   Mon, 27 Apr 2020 20:31:50 +0900
+Message-Id: <20200427113153.31246-9-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
 References: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
@@ -77,462 +77,660 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+Emulate ZONE_APPEND for SCSI disks using a regular WRITE(16) command
+with a start LBA set to the target zone write pointer position.
 
-Define REQ_OP_ZONE_APPEND to append-write sectors to a zone of a zoned
-block device. This is a no-merge write operation.
+In order to always know the write pointer position of a sequential write
+zone, the write pointer of all zones is tracked using an array of 32bits
+zone write pointer offset attached to the scsi disk structure. Each
+entry of the array indicate a zone write pointer position relative to
+the zone start sector. The write pointer offsets are maintained in sync
+with the device as follows:
+1) the write pointer offset of a zone is reset to 0 when a
+   REQ_OP_ZONE_RESET command completes.
+2) the write pointer offset of a zone is set to the zone size when a
+   REQ_OP_ZONE_FINISH command completes.
+3) the write pointer offset of a zone is incremented by the number of
+   512B sectors written when a write, write same or a zone append
+   command completes.
+4) the write pointer offset of all zones is reset to 0 when a
+   REQ_OP_ZONE_RESET_ALL command completes.
 
-A zone append write BIO must:
-* Target a zoned block device
-* Have a sector position indicating the start sector of the target zone
-* The target zone must be a sequential write zone
-* The BIO must not cross a zone boundary
-* The BIO size must not be split to ensure that a single range of LBAs
-  is written with a single command.
+Since the block layer does not write lock zones for zone append
+commands, to ensure a sequential ordering of the regular write commands
+used for the emulation, the target zone of a zone append command is
+locked when the function sd_zbc_prepare_zone_append() is called from
+sd_setup_read_write_cmnd(). If the zone write lock cannot be obtained
+(e.g. a zone append is in-flight or a regular write has already locked
+the zone), the zone append command dispatching is delayed by returning
+BLK_STS_ZONE_RESOURCE.
 
-Implement these checks in generic_make_request_checks() using the
-helper function blk_check_zone_append(). To avoid write append BIO
-splitting, introduce the new max_zone_append_sectors queue limit
-attribute and ensure that a BIO size is always lower than this limit.
-Export this new limit through sysfs and check these limits in bio_full().
+To avoid the need for write locking all zones for REQ_OP_ZONE_RESET_ALL
+requests, use a spinlock to protect accesses and modifications of the
+zone write pointer offsets. This spinlock is initialized from sd_probe()
+using the new function sd_zbc_init().
 
-Also when a LLDD can't dispatch a request to a specific zone, it
-will return BLK_STS_ZONE_RESOURCE indicating this request needs to
-be delayed, e.g.  because the zone it will be dispatched to is still
-write-locked. If this happens set the request aside in a local list
-to continue trying dispatching requests such as READ requests or a
-WRITE/ZONE_APPEND requests targetting other zones. This way we can
-still keep a high queue depth without starving other requests even if
-one request can't be served due to zone write-locking.
-
-Finally, make sure that the bio sector position indicates the actual
-write position as indicated by the device on completion.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-[ jth: added zone-append specific add_page and merge_page helpers ]
+Co-developed-by: Damien Le Moal <Damien.LeMoal@wdc.com>
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c               | 62 ++++++++++++++++++++++++++++++++++++---
- block/blk-core.c          | 52 ++++++++++++++++++++++++++++++++
- block/blk-mq.c            | 27 +++++++++++++++++
- block/blk-settings.c      | 23 +++++++++++++++
- block/blk-sysfs.c         | 13 ++++++++
- drivers/scsi/scsi_lib.c   |  1 +
- include/linux/blk_types.h | 14 +++++++++
- include/linux/blkdev.h    | 11 +++++++
- 8 files changed, 199 insertions(+), 4 deletions(-)
+ drivers/scsi/sd.c     |  24 ++-
+ drivers/scsi/sd.h     |  43 ++++-
+ drivers/scsi/sd_zbc.c | 361 ++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 390 insertions(+), 38 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 0f0e337e46b4..6dffc45ba895 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1016,6 +1016,50 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	return 0;
- }
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index a793cb08d025..66ff5f04c0ce 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1206,6 +1206,12 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
+ 		}
+ 	}
  
-+static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
-+{
-+	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-+	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-+	struct request_queue *q = bio->bi_disk->queue;
-+	unsigned int max_append_sectors = queue_max_zone_append_sectors(q);
-+	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
-+	struct page **pages = (struct page **)bv;
-+	ssize_t size, left;
-+	unsigned len, i;
-+	size_t offset;
-+
-+	if (WARN_ON_ONCE(!max_append_sectors))
-+		return 0;
-+
-+	/*
-+	 * Move page array up in the allocated memory for the bio vecs as far as
-+	 * possible so that we can start filling biovecs from the beginning
-+	 * without overwriting the temporary page array.
-+	 */
-+	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-+	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
-+
-+	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-+	if (unlikely(size <= 0))
-+		return size ? size : -EFAULT;
-+
-+	for (left = size, i = 0; left > 0; left -= len, i++) {
-+		struct page *page = pages[i];
-+		bool same_page = false;
-+
-+		len = min_t(size_t, PAGE_SIZE - offset, left);
-+		if (bio_add_hw_page(q, bio, page, len, offset,
-+				max_append_sectors, &same_page) != len)
-+			return -EINVAL;
-+		if (same_page)
-+			put_page(page);
-+		offset = 0;
++	if (req_op(rq) == REQ_OP_ZONE_APPEND) {
++		ret = sd_zbc_prepare_zone_append(cmd, &lba, nr_blocks);
++		if (ret)
++			return ret;
 +	}
 +
-+	iov_iter_advance(iter, size);
+ 	fua = rq->cmd_flags & REQ_FUA ? 0x8 : 0;
+ 	dix = scsi_prot_sg_count(cmd);
+ 	dif = scsi_host_dif_capable(cmd->device->host, sdkp->protection_type);
+@@ -1287,6 +1293,7 @@ static blk_status_t sd_init_command(struct scsi_cmnd *cmd)
+ 		return sd_setup_flush_cmnd(cmd);
+ 	case REQ_OP_READ:
+ 	case REQ_OP_WRITE:
++	case REQ_OP_ZONE_APPEND:
+ 		return sd_setup_read_write_cmnd(cmd);
+ 	case REQ_OP_ZONE_RESET:
+ 		return sd_zbc_setup_zone_mgmt_cmnd(cmd, ZO_RESET_WRITE_POINTER,
+@@ -2055,7 +2062,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)
+ 
+  out:
+ 	if (sd_is_zoned(sdkp))
+-		sd_zbc_complete(SCpnt, good_bytes, &sshdr);
++		good_bytes = sd_zbc_complete(SCpnt, good_bytes, &sshdr);
+ 
+ 	SCSI_LOG_HLCOMPLETE(1, scmd_printk(KERN_INFO, SCpnt,
+ 					   "sd_done: completed %d of %d bytes\n",
+@@ -3372,6 +3379,10 @@ static int sd_probe(struct device *dev)
+ 	sdkp->first_scan = 1;
+ 	sdkp->max_medium_access_timeouts = SD_MAX_MEDIUM_TIMEOUTS;
+ 
++	error = sd_zbc_init_disk(sdkp);
++	if (error)
++		goto out_free_index;
++
+ 	sd_revalidate_disk(gd);
+ 
+ 	gd->flags = GENHD_FL_EXT_DEVT;
+@@ -3409,6 +3420,7 @@ static int sd_probe(struct device *dev)
+  out_put:
+ 	put_disk(gd);
+  out_free:
++	sd_zbc_release_disk(sdkp);
+ 	kfree(sdkp);
+  out:
+ 	scsi_autopm_put_device(sdp);
+@@ -3485,6 +3497,8 @@ static void scsi_disk_release(struct device *dev)
+ 	put_disk(disk);
+ 	put_device(&sdkp->device->sdev_gendev);
+ 
++	sd_zbc_release_disk(sdkp);
++
+ 	kfree(sdkp);
+ }
+ 
+@@ -3665,19 +3679,19 @@ static int __init init_sd(void)
+ 	if (!sd_page_pool) {
+ 		printk(KERN_ERR "sd: can't init discard page pool\n");
+ 		err = -ENOMEM;
+-		goto err_out_ppool;
++		goto err_out_cdb_pool;
+ 	}
+ 
+ 	err = scsi_register_driver(&sd_template.gendrv);
+ 	if (err)
+-		goto err_out_driver;
++		goto err_out_ppool;
+ 
+ 	return 0;
+ 
+-err_out_driver:
++err_out_ppool:
+ 	mempool_destroy(sd_page_pool);
+ 
+-err_out_ppool:
++err_out_cdb_pool:
+ 	mempool_destroy(sd_cdb_pool);
+ 
+ err_out_cache:
+diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+index 50fff0bf8c8e..6009311105ef 100644
+--- a/drivers/scsi/sd.h
++++ b/drivers/scsi/sd.h
+@@ -79,6 +79,12 @@ struct scsi_disk {
+ 	u32		zones_optimal_open;
+ 	u32		zones_optimal_nonseq;
+ 	u32		zones_max_open;
++	u32		*zones_wp_ofst;
++	spinlock_t	zones_wp_ofst_lock;
++	u32		*rev_wp_ofst;
++	struct mutex	rev_mutex;
++	struct work_struct zone_wp_ofst_work;
++	char		*zone_wp_update_buf;
+ #endif
+ 	atomic_t	openers;
+ 	sector_t	capacity;	/* size in logical blocks */
+@@ -207,17 +213,35 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 
++int sd_zbc_init_disk(struct scsi_disk *sdkp);
++void sd_zbc_release_disk(struct scsi_disk *sdkp);
+ extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
+ extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
+ blk_status_t sd_zbc_setup_zone_mgmt_cmnd(struct scsi_cmnd *cmd,
+ 					 unsigned char op, bool all);
+-extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+-			    struct scsi_sense_hdr *sshdr);
++unsigned int sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
++			     struct scsi_sense_hdr *sshdr);
+ int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
+ 		unsigned int nr_zones, report_zones_cb cb, void *data);
+ 
++blk_status_t sd_zbc_prepare_zone_append(struct scsi_cmnd *cmd, sector_t *lba,
++				        unsigned int nr_blocks);
++
+ #else /* CONFIG_BLK_DEV_ZONED */
+ 
++static inline int sd_zbc_init(void)
++{
 +	return 0;
 +}
 +
- /**
-  * bio_iov_iter_get_pages - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-@@ -1045,10 +1089,16 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 		return -EINVAL;
- 
- 	do {
--		if (is_bvec)
--			ret = __bio_iov_bvec_add_pages(bio, iter);
--		else
--			ret = __bio_iov_iter_get_pages(bio, iter);
-+		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
-+			if (WARN_ON_ONCE(is_bvec))
-+				return -EINVAL;
-+			ret = __bio_iov_append_get_pages(bio, iter);
-+		} else {
-+			if (is_bvec)
-+				ret = __bio_iov_bvec_add_pages(bio, iter);
-+			else
-+				ret = __bio_iov_iter_get_pages(bio, iter);
-+		}
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
- 
- 	if (is_bvec)
-@@ -1451,6 +1501,10 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 	BUG_ON(sectors <= 0);
- 	BUG_ON(sectors >= bio_sectors(bio));
- 
-+	/* Zone append commands cannot be split */
-+	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
-+		return NULL;
++static inline int sd_zbc_init_disk(struct scsi_disk *sdkp)
++{
++	return 0;
++}
 +
- 	split = bio_clone_fast(bio, gfp, bs);
- 	if (!split)
- 		return NULL;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index dffff2100888..c6a34d2a4eea 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -135,6 +135,7 @@ static const char *const blk_op_name[] = {
- 	REQ_OP_NAME(ZONE_OPEN),
- 	REQ_OP_NAME(ZONE_CLOSE),
- 	REQ_OP_NAME(ZONE_FINISH),
-+	REQ_OP_NAME(ZONE_APPEND),
- 	REQ_OP_NAME(WRITE_SAME),
- 	REQ_OP_NAME(WRITE_ZEROES),
- 	REQ_OP_NAME(SCSI_IN),
-@@ -240,6 +241,17 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
++static inline void sd_zbc_exit(void) {}
++static inline void sd_zbc_release_disk(struct scsi_disk *sdkp) {}
++
+ static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
+ 				    unsigned char *buf)
+ {
+@@ -233,9 +257,18 @@ static inline blk_status_t sd_zbc_setup_zone_mgmt_cmnd(struct scsi_cmnd *cmd,
+ 	return BLK_STS_TARGET;
+ }
  
- 	bio_advance(bio, nbytes);
+-static inline void sd_zbc_complete(struct scsi_cmnd *cmd,
+-				   unsigned int good_bytes,
+-				   struct scsi_sense_hdr *sshdr) {}
++static inline unsigned int sd_zbc_complete(struct scsi_cmnd *cmd,
++			unsigned int good_bytes, struct scsi_sense_hdr *sshdr)
++{
++	return 0;
++}
++
++static inline blk_status_t sd_zbc_prepare_zone_append(struct scsi_cmnd *cmd,
++						      sector_t *lba,
++						      unsigned int nr_blocks)
++{
++	return BLK_STS_TARGET;
++}
  
-+	if (req_op(rq) == REQ_OP_ZONE_APPEND && error == BLK_STS_OK) {
+ #define sd_zbc_report_zones NULL
+ 
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index ee156fbf3780..39ba9cd7e1fa 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -11,6 +11,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/vmalloc.h>
+ #include <linux/sched/mm.h>
++#include <linux/mutex.h>
+ 
+ #include <asm/unaligned.h>
+ 
+@@ -19,11 +20,36 @@
+ 
+ #include "sd.h"
+ 
++static unsigned int sd_zbc_get_zone_wp_ofst(struct blk_zone *zone)
++{
++	if (zone->type == ZBC_ZONE_TYPE_CONV)
++		return 0;
++
++	switch (zone->cond) {
++	case BLK_ZONE_COND_IMP_OPEN:
++	case BLK_ZONE_COND_EXP_OPEN:
++	case BLK_ZONE_COND_CLOSED:
++		return zone->wp - zone->start;
++	case BLK_ZONE_COND_FULL:
++		return zone->len;
++	case BLK_ZONE_COND_EMPTY:
++	case BLK_ZONE_COND_OFFLINE:
++	case BLK_ZONE_COND_READONLY:
++	default:
 +		/*
-+		 * Partial zone append completions cannot be supported as the
-+		 * BIO fragments may end up not being written sequentially.
++		 * Offline and read-only zones do not have a valid
++		 * write pointer. Use 0 as for an empty zone.
 +		 */
-+		if (bio->bi_iter.bi_size)
-+			bio->bi_status = BLK_STS_IOERR;
-+		else
-+			bio->bi_iter.bi_sector = rq->__sector;
++		return 0;
++	}
++}
++
+ static int sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
+ 			       unsigned int idx, report_zones_cb cb, void *data)
+ {
+ 	struct scsi_device *sdp = sdkp->device;
+ 	struct blk_zone zone = { 0 };
++	int ret;
+ 
+ 	zone.type = buf[0] & 0x0f;
+ 	zone.cond = (buf[1] >> 4) & 0xf;
+@@ -39,7 +65,14 @@ static int sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
+ 	    zone.cond == ZBC_ZONE_COND_FULL)
+ 		zone.wp = zone.start + zone.len;
+ 
+-	return cb(&zone, idx, data);
++	ret = cb(&zone, idx, data);
++	if (ret)
++		return ret;
++
++	if (sdkp->rev_wp_ofst)
++		sdkp->rev_wp_ofst[idx] = sd_zbc_get_zone_wp_ofst(&zone);
++
++	return 0;
+ }
+ 
+ /**
+@@ -229,6 +262,116 @@ static blk_status_t sd_zbc_cmnd_checks(struct scsi_cmnd *cmd)
+ 	return BLK_STS_OK;
+ }
+ 
++#define SD_ZBC_INVALID_WP_OFST	(~0u)
++#define SD_ZBC_UPDATING_WP_OFST	(SD_ZBC_INVALID_WP_OFST - 1)
++
++static int sd_zbc_update_wp_ofst_cb(struct blk_zone *zone, unsigned int idx,
++				    void *data)
++{
++	struct scsi_disk *sdkp = data;
++
++	lockdep_assert_held(&sdkp->zones_wp_ofst_lock);
++
++	sdkp->zones_wp_ofst[idx] = sd_zbc_get_zone_wp_ofst(zone);
++
++	return 0;
++}
++
++static void sd_zbc_update_wp_ofst_workfn(struct work_struct *work)
++{
++	struct scsi_disk *sdkp;
++	unsigned int zno;
++	int ret;
++
++	sdkp = container_of(work, struct scsi_disk, zone_wp_ofst_work);
++
++	spin_lock_bh(&sdkp->zones_wp_ofst_lock);
++	for (zno = 0; zno < sdkp->nr_zones; zno++) {
++		if (sdkp->zones_wp_ofst[zno] != SD_ZBC_UPDATING_WP_OFST)
++			continue;
++
++		spin_unlock_bh(&sdkp->zones_wp_ofst_lock);
++		ret = sd_zbc_do_report_zones(sdkp, sdkp->zone_wp_update_buf,
++					     SD_BUF_SIZE,
++					     zno * sdkp->zone_blocks, true);
++		spin_lock_bh(&sdkp->zones_wp_ofst_lock);
++		if (!ret)
++			sd_zbc_parse_report(sdkp, sdkp->zone_wp_update_buf + 64,
++					    zno, sd_zbc_update_wp_ofst_cb,
++					    sdkp);
++	}
++	spin_unlock_bh(&sdkp->zones_wp_ofst_lock);
++
++	scsi_device_put(sdkp->device);
++}
++
++/**
++ * sd_zbc_prepare_zone_append() - Prepare an emulated ZONE_APPEND command.
++ * @cmd: the command to setup
++ * @lba: the LBA to patch
++ * @nr_blocks: the number of LBAs to be written
++ *
++ * Called from sd_setup_read_write_cmnd() for REQ_OP_ZONE_APPEND.
++ * @sd_zbc_prepare_zone_append() handles the necessary zone wrote locking and
++ * patching of the lba for an emulated ZONE_APPEND command.
++ *
++ * In case the cached write pointer offset is %SD_ZBC_INVALID_WP_OFST it will
++ * schedule a REPORT ZONES command and return BLK_STS_IOERR.
++ */
++blk_status_t sd_zbc_prepare_zone_append(struct scsi_cmnd *cmd, sector_t *lba,
++					unsigned int nr_blocks)
++{
++	struct request *rq = cmd->request;
++	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
++	unsigned int wp_ofst, zno = blk_rq_zone_no(rq);
++	blk_status_t ret;
++
++	ret = sd_zbc_cmnd_checks(cmd);
++	if (ret != BLK_STS_OK)
++		return ret;
++
++	if (!blk_rq_zone_is_seq(rq))
++		return BLK_STS_IOERR;
++
++	/* Unlock of the write lock will happen in sd_zbc_complete() */
++	if (!blk_req_zone_write_trylock(rq))
++		return BLK_STS_ZONE_RESOURCE;
++
++	spin_lock_bh(&sdkp->zones_wp_ofst_lock);
++	wp_ofst = sdkp->zones_wp_ofst[zno];
++	switch (wp_ofst) {
++	case SD_ZBC_INVALID_WP_OFST:
++		/*
++		 * We are about to schedule work to update a zone write pointer
++		 * offset, which will cause the zone append command to be
++		 * requeued. So make sure that the scsi device does not go away
++		 * while the work is being processed.
++		 */
++		if (scsi_device_get(sdkp->device)) {
++			ret = BLK_STS_IOERR;
++			break;
++		}
++		sdkp->zones_wp_ofst[zno] = SD_ZBC_UPDATING_WP_OFST;
++		schedule_work(&sdkp->zone_wp_ofst_work);
++		/*FALLTHRU*/
++	case SD_ZBC_UPDATING_WP_OFST:
++		ret = BLK_STS_DEV_RESOURCE;
++		break;
++	default:
++		wp_ofst = sectors_to_logical(sdkp->device, wp_ofst);
++		if (wp_ofst + nr_blocks > sdkp->zone_blocks) {
++			ret = BLK_STS_IOERR;
++			break;
++		}
++
++		*lba += wp_ofst;
++	}
++	spin_unlock_bh(&sdkp->zones_wp_ofst_lock);
++	if (ret)
++		blk_req_zone_write_unlock(rq);
++	return ret;
++}
++
+ /**
+  * sd_zbc_setup_zone_mgmt_cmnd - Prepare a zone ZBC_OUT command. The operations
+  *			can be RESET WRITE POINTER, OPEN, CLOSE or FINISH.
+@@ -269,16 +412,104 @@ blk_status_t sd_zbc_setup_zone_mgmt_cmnd(struct scsi_cmnd *cmd,
+ 	return BLK_STS_OK;
+ }
+ 
++static bool sd_zbc_need_zone_wp_update(struct request *rq)
++{
++	switch (req_op(rq)) {
++	case REQ_OP_ZONE_APPEND:
++	case REQ_OP_ZONE_FINISH:
++	case REQ_OP_ZONE_RESET:
++	case REQ_OP_ZONE_RESET_ALL:
++		return true;
++	case REQ_OP_WRITE:
++	case REQ_OP_WRITE_ZEROES:
++	case REQ_OP_WRITE_SAME:
++		return blk_rq_zone_is_seq(rq);
++	default:
++		return false;
++	}
++}
++
++/**
++ * sd_zbc_zone_wp_update - Update cached zone write pointer upon cmd completion
++ * @cmd: Completed command
++ * @good_bytes: Command reply bytes
++ *
++ * Called from sd_zbc_complete() to handle the update of the cached zone write
++ * pointer value in case an update is needed.
++ */
++static unsigned int sd_zbc_zone_wp_update(struct scsi_cmnd *cmd,
++					  unsigned int good_bytes)
++{
++	int result = cmd->result;
++	struct request *rq = cmd->request;
++	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
++	unsigned int zno = blk_rq_zone_no(rq);
++	enum req_opf op = req_op(rq);
++
++	/*
++	 * If we got an error for a command that needs updating the write
++	 * pointer offset cache, we must mark the zone wp offset entry as
++	 * invalid to force an update from disk the next time a zone append
++	 * command is issued.
++	 */
++	spin_lock_bh(&sdkp->zones_wp_ofst_lock);
++
++	if (result && op != REQ_OP_ZONE_RESET_ALL) {
++		if (op == REQ_OP_ZONE_APPEND) {
++			/* Force complete completion (no retry) */
++			good_bytes = 0;
++			scsi_set_resid(cmd, blk_rq_bytes(rq));
++		}
++
++		/*
++		 * Force an update of the zone write pointer offset on
++		 * the next zone append access.
++		 */
++		if (sdkp->zones_wp_ofst[zno] != SD_ZBC_UPDATING_WP_OFST)
++			sdkp->zones_wp_ofst[zno] = SD_ZBC_INVALID_WP_OFST;
++		goto unlock_wp_ofst;
 +	}
 +
- 	/* don't actually finish bio if it's part of flush sequence */
- 	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
- 		bio_endio(bio);
-@@ -871,6 +883,41 @@ static inline int blk_partition_remap(struct bio *bio)
- 	return ret;
- }
- 
-+/*
-+ * Check write append to a zoned block device.
-+ */
-+static inline blk_status_t blk_check_zone_append(struct request_queue *q,
-+						 struct bio *bio)
-+{
-+	sector_t pos = bio->bi_iter.bi_sector;
-+	int nr_sectors = bio_sectors(bio);
-+
-+	/* Only applicable to zoned block devices */
-+	if (!blk_queue_is_zoned(q))
-+		return BLK_STS_NOTSUPP;
-+
-+	/* The bio sector must point to the start of a sequential zone */
-+	if (pos & (blk_queue_zone_sectors(q) - 1) ||
-+	    !blk_queue_zone_is_seq(q, pos))
-+		return BLK_STS_IOERR;
-+
-+	/*
-+	 * Not allowed to cross zone boundaries. Otherwise, the BIO will be
-+	 * split and could result in non-contiguous sectors being written in
-+	 * different zones.
-+	 */
-+	if (blk_queue_zone_no(q, pos) != blk_queue_zone_no(q, pos + nr_sectors))
-+		return BLK_STS_IOERR;
-+
-+	/* Make sure the BIO is small enough and will not get split */
-+	if (nr_sectors > q->limits.max_zone_append_sectors)
-+		return BLK_STS_IOERR;
-+
-+	bio->bi_opf |= REQ_NOMERGE;
-+
-+	return BLK_STS_OK;
-+}
-+
- static noinline_for_stack bool
- generic_make_request_checks(struct bio *bio)
- {
-@@ -943,6 +990,11 @@ generic_make_request_checks(struct bio *bio)
- 		if (!q->limits.max_write_same_sectors)
- 			goto not_supported;
- 		break;
++	switch (op) {
 +	case REQ_OP_ZONE_APPEND:
-+		status = blk_check_zone_append(q, bio);
-+		if (status != BLK_STS_OK)
-+			goto end_io;
++		rq->__sector += sdkp->zones_wp_ofst[zno];
++		/* fallthrough */
++	case REQ_OP_WRITE_ZEROES:
++	case REQ_OP_WRITE_SAME:
++	case REQ_OP_WRITE:
++		if (sdkp->zones_wp_ofst[zno] < sd_zbc_zone_sectors(sdkp))
++			sdkp->zones_wp_ofst[zno] += good_bytes >> SECTOR_SHIFT;
 +		break;
- 	case REQ_OP_ZONE_RESET:
- 	case REQ_OP_ZONE_OPEN:
- 	case REQ_OP_ZONE_CLOSE:
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bcc3a2397d4a..0b8567ef23bb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1183,6 +1183,19 @@ static void blk_mq_handle_dev_resource(struct request *rq,
- 	__blk_mq_requeue_request(rq);
- }
- 
-+static void blk_mq_handle_zone_resource(struct request *rq,
-+					struct list_head *zone_list)
-+{
-+	/*
-+	 * If we end up here it is because we cannot dispatch a request to a
-+	 * specific zone due to LLD level zone-write locking or other zone
-+	 * related resource not being available. In this case, set the request
-+	 * aside in zone_list for retrying it later.
-+	 */
-+	list_add(&rq->queuelist, zone_list);
-+	__blk_mq_requeue_request(rq);
++	case REQ_OP_ZONE_RESET:
++		sdkp->zones_wp_ofst[zno] = 0;
++		break;
++	case REQ_OP_ZONE_FINISH:
++		sdkp->zones_wp_ofst[zno] = sd_zbc_zone_sectors(sdkp);
++		break;
++	case REQ_OP_ZONE_RESET_ALL:
++		memset(sdkp->zones_wp_ofst, 0,
++		       sdkp->nr_zones * sizeof(unsigned int));
++		break;
++	default:
++		break;
++	}
++
++unlock_wp_ofst:
++	spin_unlock_bh(&sdkp->zones_wp_ofst_lock);
++
++	return good_bytes;
 +}
-+
- /*
-  * Returns true if we did some work AND can potentially do more.
-  */
-@@ -1195,6 +1208,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	int errors, queued;
- 	blk_status_t ret = BLK_STS_OK;
- 	bool no_budget_avail = false;
-+	LIST_HEAD(zone_list);
- 
- 	if (list_empty(list))
- 		return false;
-@@ -1256,6 +1270,16 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
- 			blk_mq_handle_dev_resource(rq, list);
- 			break;
-+		} else if (ret == BLK_STS_ZONE_RESOURCE) {
-+			/*
-+			 * Move the request to zone_list and keep going through
-+			 * the dispatch list to find more requests the drive can
-+			 * accept.
-+			 */
-+			blk_mq_handle_zone_resource(rq, &zone_list);
-+			if (list_empty(list))
-+				break;
-+			continue;
- 		}
- 
- 		if (unlikely(ret != BLK_STS_OK)) {
-@@ -1267,6 +1291,9 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		queued++;
- 	} while (!list_empty(list));
- 
-+	if (!list_empty(&zone_list))
-+		list_splice_tail_init(&zone_list, list);
-+
- 	hctx->dispatched[queued_to_index(queued)]++;
- 
- 	/*
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 2ab1967b9716..8452ffd33cfc 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -48,6 +48,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->chunk_sectors = 0;
- 	lim->max_write_same_sectors = 0;
- 	lim->max_write_zeroes_sectors = 0;
-+	lim->max_zone_append_sectors = 0;
- 	lim->max_discard_sectors = 0;
- 	lim->max_hw_discard_sectors = 0;
- 	lim->discard_granularity = 0;
-@@ -83,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- 	lim->max_dev_sectors = UINT_MAX;
- 	lim->max_write_same_sectors = UINT_MAX;
- 	lim->max_write_zeroes_sectors = UINT_MAX;
-+	lim->max_zone_append_sectors = UINT_MAX;
- }
- EXPORT_SYMBOL(blk_set_stacking_limits);
- 
-@@ -221,6 +223,25 @@ void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
- 
-+/**
-+ * blk_queue_max_zone_append_sectors - set max sectors for a single zone append
-+ * @q:  the request queue for the device
-+ * @max_zone_append_sectors: maximum number of sectors to write per command
-+ **/
-+void blk_queue_max_zone_append_sectors(struct request_queue *q,
-+		unsigned int max_zone_append_sectors)
-+{
-+	unsigned int max_sectors;
-+
-+	max_sectors = min(q->limits.max_hw_sectors, max_zone_append_sectors);
-+	if (max_sectors)
-+		max_sectors = min_not_zero(q->limits.chunk_sectors,
-+					   max_sectors);
-+
-+	q->limits.max_zone_append_sectors = max_sectors;
-+}
-+EXPORT_SYMBOL_GPL(blk_queue_max_zone_append_sectors);
 +
  /**
-  * blk_queue_max_segments - set max hw segments for a request for this queue
-  * @q:  the request queue for the device
-@@ -470,6 +491,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 					b->max_write_same_sectors);
- 	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
- 					b->max_write_zeroes_sectors);
-+	t->max_zone_append_sectors = min(t->max_zone_append_sectors,
-+					b->max_zone_append_sectors);
- 	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
- 
- 	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fca9b158f4a0..02643e149d5e 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -218,6 +218,13 @@ static ssize_t queue_write_zeroes_max_show(struct request_queue *q, char *page)
- 		(unsigned long long)q->limits.max_write_zeroes_sectors << 9);
- }
- 
-+static ssize_t queue_zone_append_max_show(struct request_queue *q, char *page)
-+{
-+	unsigned long long max_sectors = q->limits.max_zone_append_sectors;
-+
-+	return sprintf(page, "%llu\n", max_sectors << SECTOR_SHIFT);
-+}
-+
- static ssize_t
- queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
+  * sd_zbc_complete - ZBC command post processing.
+  * @cmd: Completed command
+  * @good_bytes: Command reply bytes
+  * @sshdr: command sense header
+  *
+- * Called from sd_done(). Process report zones reply and handle reset zone
+- * and write commands errors.
++ * Called from sd_done() to handle zone commands errors and updates to the
++ * device queue zone write pointer offset cahce.
+  */
+-void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
++unsigned int sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+ 		     struct scsi_sense_hdr *sshdr)
  {
-@@ -639,6 +646,11 @@ static struct queue_sysfs_entry queue_write_zeroes_max_entry = {
- 	.show = queue_write_zeroes_max_show,
- };
- 
-+static struct queue_sysfs_entry queue_zone_append_max_entry = {
-+	.attr = {.name = "zone_append_max_bytes", .mode = 0444 },
-+	.show = queue_zone_append_max_show,
-+};
+ 	int result = cmd->result;
+@@ -294,7 +525,13 @@ void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+ 		 * so be quiet about the error.
+ 		 */
+ 		rq->rq_flags |= RQF_QUIET;
+-	}
++	} else if (sd_zbc_need_zone_wp_update(rq))
++		good_bytes = sd_zbc_zone_wp_update(cmd, good_bytes);
 +
- static struct queue_sysfs_entry queue_nonrot_entry = {
- 	.attr = {.name = "rotational", .mode = 0644 },
- 	.show = queue_show_nonrot,
-@@ -749,6 +761,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_discard_zeroes_data_entry.attr,
- 	&queue_write_same_max_entry.attr,
- 	&queue_write_zeroes_max_entry.attr,
-+	&queue_zone_append_max_entry.attr,
- 	&queue_nonrot_entry.attr,
- 	&queue_zoned_entry.attr,
- 	&queue_nr_zones_entry.attr,
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index f0cb26b3da6a..af00e4a3f006 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1712,6 +1712,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	case BLK_STS_OK:
- 		break;
- 	case BLK_STS_RESOURCE:
-+	case BLK_STS_ZONE_RESOURCE:
- 		if (atomic_read(&sdev->device_busy) ||
- 		    scsi_device_blocked(sdev))
- 			ret = BLK_STS_DEV_RESOURCE;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 31eb92876be7..dbee2b0d56b6 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -63,6 +63,18 @@ typedef u8 __bitwise blk_status_t;
-  */
- #define BLK_STS_DEV_RESOURCE	((__force blk_status_t)13)
- 
-+/*
-+ * BLK_STS_ZONE_RESOURCE is returned from the driver to the block layer if zone
-+ * related resources are unavailable, but the driver can guarantee the queue
-+ * will be rerun in the future once the resources become available again.
-+ *
-+ * This is different from BLK_STS_DEV_RESOURCE in that it explicitly references
-+ * a zone specific resource and IO to a different zone on the same device could
-+ * still be served. Examples of that are zones that are write-locked, but a read
-+ * to the same zone could be served.
-+ */
-+#define BLK_STS_ZONE_RESOURCE	((__force blk_status_t)14)
-+
- /**
-  * blk_path_error - returns true if error may be path related
-  * @error: status the request was completed with
-@@ -296,6 +308,8 @@ enum req_opf {
- 	REQ_OP_ZONE_CLOSE	= 11,
- 	/* Transition a zone to full */
- 	REQ_OP_ZONE_FINISH	= 12,
-+	/* write data at the current zone write pointer */
-+	REQ_OP_ZONE_APPEND	= 13,
- 
- 	/* SCSI passthrough using struct scsi_request */
- 	REQ_OP_SCSI_IN		= 32,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 91c6e413bf6b..158641fbc7cd 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -331,6 +331,7 @@ struct queue_limits {
- 	unsigned int		max_hw_discard_sectors;
- 	unsigned int		max_write_same_sectors;
- 	unsigned int		max_write_zeroes_sectors;
-+	unsigned int		max_zone_append_sectors;
- 	unsigned int		discard_granularity;
- 	unsigned int		discard_alignment;
- 
-@@ -749,6 +750,9 @@ static inline bool rq_mergeable(struct request *rq)
- 	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
- 		return false;
- 
 +	if (req_op(rq) == REQ_OP_ZONE_APPEND)
-+		return false;
++		blk_req_zone_write_unlock(rq);
 +
- 	if (rq->cmd_flags & REQ_NOMERGE_FLAGS)
- 		return false;
- 	if (rq->rq_flags & RQF_NOMERGE_FLAGS)
-@@ -1083,6 +1087,8 @@ extern void blk_queue_max_write_same_sectors(struct request_queue *q,
- extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- 		unsigned int max_write_same_sectors);
- extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
-+extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
-+		unsigned int max_zone_append_sectors);
- extern void blk_queue_physical_block_size(struct request_queue *, unsigned int);
- extern void blk_queue_alignment_offset(struct request_queue *q,
- 				       unsigned int alignment);
-@@ -1300,6 +1306,11 @@ static inline unsigned int queue_max_segment_size(const struct request_queue *q)
- 	return q->limits.max_segment_size;
++	return good_bytes;
  }
  
-+static inline unsigned int queue_max_zone_append_sectors(const struct request_queue *q)
+ /**
+@@ -396,11 +633,67 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf,
+ 	return 0;
+ }
+ 
++static void sd_zbc_revalidate_zones_cb(struct gendisk *disk)
 +{
-+	return q->limits.max_zone_append_sectors;
++	struct scsi_disk *sdkp = scsi_disk(disk);
++
++	swap(sdkp->zones_wp_ofst, sdkp->rev_wp_ofst);
 +}
 +
- static inline unsigned queue_logical_block_size(const struct request_queue *q)
++static int sd_zbc_revalidate_zones(struct scsi_disk *sdkp,
++				   u32 zone_blocks,
++				   unsigned int nr_zones)
++{
++	struct gendisk *disk = sdkp->disk;
++	int ret = 0;
++
++	/*
++	 * Make sure revalidate zones are serialized to ensure exclusive
++	 * updates of the scsi disk data.
++	 */
++	mutex_lock(&sdkp->rev_mutex);
++
++	/*
++	 * Revalidate the disk zones to update the device request queue zone
++	 * bitmaps and the zone write pointer offset array. Do this only once
++	 * the device capacity is set on the second revalidate execution for
++	 * disk scan or if something changed when executing a normal revalidate.
++	 */
++	if (sdkp->first_scan) {
++		sdkp->zone_blocks = zone_blocks;
++		sdkp->nr_zones = nr_zones;
++		goto unlock;
++	}
++
++	if (sdkp->zone_blocks == zone_blocks &&
++	    sdkp->nr_zones == nr_zones &&
++	    disk->queue->nr_zones == nr_zones)
++		goto unlock;
++
++	sdkp->rev_wp_ofst = kvcalloc(nr_zones, sizeof(u32), GFP_NOIO);
++	if (!sdkp->rev_wp_ofst) {
++		ret = -ENOMEM;
++		goto unlock;
++	}
++
++	ret = blk_revalidate_disk_zones(disk, sd_zbc_revalidate_zones_cb);
++
++	kvfree(sdkp->rev_wp_ofst);
++	sdkp->rev_wp_ofst = NULL;
++
++unlock:
++	mutex_unlock(&sdkp->rev_mutex);
++
++	return ret;
++}
++
+ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
  {
- 	int retval = 512;
+ 	struct gendisk *disk = sdkp->disk;
++	struct request_queue *q = disk->queue;
+ 	unsigned int nr_zones;
+ 	u32 zone_blocks = 0;
++	u32 max_append;
+ 	int ret;
+ 
+ 	if (!sd_is_zoned(sdkp))
+@@ -420,36 +713,23 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 	if (ret != 0)
+ 		goto err;
+ 
++	max_append = min_t(u32, logical_to_sectors(sdkp->device, zone_blocks),
++			   q->limits.max_segments << (PAGE_SHIFT - 9));
++	max_append = min_t(u32, max_append, queue_max_hw_sectors(q));
++
+ 	/* The drive satisfies the kernel restrictions: set it up */
+-	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, sdkp->disk->queue);
+-	blk_queue_required_elevator_features(sdkp->disk->queue,
+-					     ELEVATOR_F_ZBD_SEQ_WRITE);
++	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
++	blk_queue_required_elevator_features(q, ELEVATOR_F_ZBD_SEQ_WRITE);
++	blk_queue_max_zone_append_sectors(q, max_append);
+ 	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
+ 
+ 	/* READ16/WRITE16 is mandatory for ZBC disks */
+ 	sdkp->device->use_16_for_rw = 1;
+ 	sdkp->device->use_10_for_rw = 0;
+ 
+-	/*
+-	 * Revalidate the disk zone bitmaps once the block device capacity is
+-	 * set on the second revalidate execution during disk scan and if
+-	 * something changed when executing a normal revalidate.
+-	 */
+-	if (sdkp->first_scan) {
+-		sdkp->zone_blocks = zone_blocks;
+-		sdkp->nr_zones = nr_zones;
+-		return 0;
+-	}
+-
+-	if (sdkp->zone_blocks != zone_blocks ||
+-	    sdkp->nr_zones != nr_zones ||
+-	    disk->queue->nr_zones != nr_zones) {
+-		ret = blk_revalidate_disk_zones(disk);
+-		if (ret != 0)
+-			goto err;
+-		sdkp->zone_blocks = zone_blocks;
+-		sdkp->nr_zones = nr_zones;
+-	}
++	ret = sd_zbc_revalidate_zones(sdkp, zone_blocks, nr_zones);
++	if (ret)
++		goto err;
+ 
+ 	return 0;
+ 
+@@ -475,3 +755,28 @@ void sd_zbc_print_zones(struct scsi_disk *sdkp)
+ 			  sdkp->nr_zones,
+ 			  sdkp->zone_blocks);
+ }
++
++int sd_zbc_init_disk(struct scsi_disk *sdkp)
++{
++	if (!sd_is_zoned(sdkp))
++		return 0;
++
++	sdkp->zones_wp_ofst = NULL;
++	spin_lock_init(&sdkp->zones_wp_ofst_lock);
++	sdkp->rev_wp_ofst = NULL;
++	mutex_init(&sdkp->rev_mutex);
++	INIT_WORK(&sdkp->zone_wp_ofst_work, sd_zbc_update_wp_ofst_workfn);
++	sdkp->zone_wp_update_buf = kzalloc(SD_BUF_SIZE, GFP_KERNEL);
++	if (!sdkp->zone_wp_update_buf)
++		return -ENOMEM;
++
++	return 0;
++}
++
++void sd_zbc_release_disk(struct scsi_disk *sdkp)
++{
++	kvfree(sdkp->zones_wp_ofst);
++	sdkp->zones_wp_ofst = NULL;
++	kfree(sdkp->zone_wp_update_buf);
++	sdkp->zone_wp_update_buf = NULL;
++}
 -- 
 2.24.1
 
