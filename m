@@ -4,69 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8537FC55199
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7B5C5519A
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62CED214D8
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:42:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B2D221D80
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="oGC3hWAK"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="GT76iOHW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbgD0Hmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 03:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55232 "EHLO
+        id S1726792AbgD0Hmr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 03:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725785AbgD0Hmg (ORCPT
+        with ESMTP id S1726781AbgD0Hmr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 03:42:36 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1674C061A41
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:35 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id k13so19293928wrw.7
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:35 -0700 (PDT)
+        Mon, 27 Apr 2020 03:42:47 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB02C061A0F
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:45 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id r26so19279653wmh.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=android.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qpydbUORH6esAS5gi+cl+9hT95SHJdDoYerkBD0BMSQ=;
-        b=oGC3hWAK5PSMXwewUJVSLEn3ogH9c7x5GKyIHrpt9Un7/DBlDORpuf62nVnG49Srxq
-         CBPr6rjegtfdy4HmaesOJcdbArkYcmrSclkKdby2Szkv2vZysdmhW/l8xsDWAw2iyPnq
-         jfboZFx7R4wbNNSHjoAWW5eMpNn76nkOspz55Y5+OFrUkDYZ8p0wXuqCEi45cqbxXUBG
-         TeFDLDb0OfgPptEIe47XWWQm/bN+bVLTlgFBc4gekSc6hGd2QXs2dBk0V1KbvDBHqQW+
-         3g1EWvZ+w2B1/oRR4QmdxkGkGcsOVE2LCqMRuxP+CV8IuHcnno6CdC3EKkUvtBdSkHpL
-         gEZw==
+        bh=X5F50p+vZUxpVs6G1Sij0eAs6fVJw9OhKD5dcn7Nhqk=;
+        b=GT76iOHWX38pFtAPcXhMHsG0oXaug+HDpaN2ONpegjBg+3dLkZFpxCr/kfZYDXO8VF
+         GEOToh+uwVDBj22S3PsngayTgpk3D5yHevxw9m7+UqRsbGyYFjCHGTZd7oERXdLMhHwW
+         yCIth/TR3VZMwAtdHoRuOvENcw5jXjN13Fq9xDHFD/HM4Gn3wdNsoNFKFOJdnOy6MTPt
+         pR8pXfQsBiqshnrj1BTgXSVh9Mbd/wyJE4oE6IIs34vOGWERjRKXpEi/Q+YUzvSJpSio
+         65ITJiTs/MZWd7Hx5qtzuA7iPgXhxWEHez0S4VZwsG/JcUkrIc+11UwlTSULIwKDg45W
+         11qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qpydbUORH6esAS5gi+cl+9hT95SHJdDoYerkBD0BMSQ=;
-        b=beX5YpgTD8ozmwn2pFv6L8P7H+25x/Ew/4qgQJ/0mUgnil8QKc3vsoAb0Gk78ZYCkb
-         17L7+FV/mR3ECHETLkTtjWBLHJH3DzZEnpZ+0xzJ2OMdHmDG2cZL/+bBylSZ2MI2a0Uu
-         Z9H0RDCmDPoAWJGXcl4k9MXa3kw/HPjMr4SR42poc1SNuZwtKnikWzP7FFUnye9nXxWY
-         UTn8DVpULuW7sf2KuuNRpbo+BIRDoEAYTp9McPTXPY1wMkU4AKV5aoSsZfs3liqkFZmP
-         sP2NFW3lk10wRpLb/k7j9Be1voi1KYOoHTxI3zrIPdClODap3KXCtY2M/h3Gnhdys7ua
-         +n2w==
-X-Gm-Message-State: AGi0PuYVdfKH3ZSH52FodnotaU5INtgfip0dDQKUz5+s132ldNOrCgN6
-        5obmPC+r754vW4tEGqhaEn+9kg==
-X-Google-Smtp-Source: APiQypLFrOdL4tryNZXtOTQNslh1ABY9mm0tKM345BBzQpNwqTXF9WQtd8sATSSGF3XCbbu98PFwRA==
-X-Received: by 2002:a05:6000:12c7:: with SMTP id l7mr26755993wrx.239.1587973354636;
-        Mon, 27 Apr 2020 00:42:34 -0700 (PDT)
+        bh=X5F50p+vZUxpVs6G1Sij0eAs6fVJw9OhKD5dcn7Nhqk=;
+        b=aZB/eW23J7PC0WzBJcNhzwQu/bPiQK5BJvxBpLHH33nwrvUUcLgcvPe99XSG4QJD4J
+         KGVc5Jhy+3l0o8n403hCfP1FkSMNC4cf783rsCLrRHZYdW3YUVeSCDQy8LveS+2yKF00
+         tvISM8hMlhswIDtjxbeaec8vAXg7CGji4QUI7mB8K7B6BIXvehJz0HMVtuN3d8avrmce
+         p8Y/+apLtedsWAqvgxp1vyQmrjruUISGJyR6cIQ2Z4mnGjpOy6tenWslRZQIdD9zlKRh
+         37BpqkDAYFDOYawyD+PCB5XBQVsfzrWVWdPNxKk1emanguMt5SfiYLxqgHDHEoQbWD6j
+         U4ig==
+X-Gm-Message-State: AGi0PuYnRxfxa2roGDBON2TfsrGBDdCvd+fvgdfUKxBTu2nJ7EfUXS8/
+        ++V/HBySPpFPhCHKtnEwFbZJPw==
+X-Google-Smtp-Source: APiQypLMsONfT/ydInrYnq3ss7muzDFkNCSsJMBb0dPqQNbOekEWl0Ts3hcELQB/bsXzFc92NOIx3w==
+X-Received: by 2002:a1c:4e16:: with SMTP id g22mr23666626wmh.157.1587973364411;
+        Mon, 27 Apr 2020 00:42:44 -0700 (PDT)
 Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id x132sm15091658wmg.33.2020.04.27.00.42.33
+        by smtp.gmail.com with ESMTPSA id x132sm15091658wmg.33.2020.04.27.00.42.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 00:42:34 -0700 (PDT)
+        Mon, 27 Apr 2020 00:42:43 -0700 (PDT)
 From:   Martijn Coenen <maco@android.com>
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
 Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
-        jaegeuk@kernel.org, Martijn Coenen <maco@android.com>
-Subject: [PATCH v3 1/9] loop: Factor out loop size validation
-Date:   Mon, 27 Apr 2020 09:42:14 +0200
-Message-Id: <20200427074222.65369-2-maco@android.com>
+        jaegeuk@kernel.org, Martijn Coenen <maco@android.com>,
+        Linux API <linux-api@vger.kernel.org>
+Subject: [PATCH v3 9/9] loop: Add LOOP_SET_FD_AND_STATUS ioctl
+Date:   Mon, 27 Apr 2020 09:42:22 +0200
+Message-Id: <20200427074222.65369-10-maco@android.com>
 X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
 In-Reply-To: <20200427074222.65369-1-maco@android.com>
 References: <20200427074222.65369-1-maco@android.com>
@@ -77,64 +78,174 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ensuring we don't truncate loff_t when casting to sector_t is done in
-multiple places; factor it out.
+This allows userspace to completely setup a loop device with a single
+ioctl, removing the in-between state where the device can be partially
+configured - eg the loop device has a backing file associated with it,
+but is reading from the wrong offset.
+
+Besides removing the intermediate state, another big benefit of this
+ioctl is that LOOP_SET_STATUS can be slow; the main reason for this
+slowness is that LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to
+freeze the associated queue; this requires waiting for RCU
+synchronization, which I've measured can take about 15-20ms on this
+device on average.
+
+Here's setting up ~70 regular loop devices with an offset on an x86
+Android device, using LOOP_SET_FD and LOOP_SET_STATUS:
+
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m03.40s real     0m00.02s user     0m00.03s system
+
+Here's configuring ~70 devices in the same way, but using a modified
+losetup that uses the new LOOP_SET_FD_AND_STATUS ioctl:
+
+vsoc_x86:/system/apex # time for i in `seq 30 100`;
+do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+    0m01.94s real     0m00.01s user     0m00.01s system
 
 Signed-off-by: Martijn Coenen <maco@android.com>
 ---
- drivers/block/loop.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/block/loop.c      | 45 +++++++++++++++++++++++++++++----------
+ include/uapi/linux/loop.h |  7 ++++++
+ 2 files changed, 41 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f1754262fc94..f812f11649d3 100644
+index 92bbe368ab62..3c9b5d469ded 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -228,15 +228,30 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
+@@ -1066,8 +1066,9 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	return 0;
  }
  
-+/**
-+ * loop_validate_size() - validates that the passed in size fits in a sector_t
-+ * @size: size to validate
-+ */
-+static int
-+loop_validate_size(loff_t size)
-+{
-+	if ((loff_t)(sector_t)size != size)
-+		return -EFBIG;
-+	else
-+		return 0;
-+}
-+
- static int
- figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
+-static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+-		       struct block_device *bdev, unsigned int arg)
++static int loop_set_fd_and_status(struct loop_device *lo, fmode_t mode,
++				  struct block_device *bdev,
++				  const struct loop_fd_and_status *fds)
  {
-+	int err;
- 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
--	sector_t x = (sector_t)size;
- 	struct block_device *bdev = lo->lo_device;
+ 	struct file	*file;
+ 	struct inode	*inode;
+@@ -1082,7 +1083,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	__module_get(THIS_MODULE);
  
--	if (unlikely((loff_t)x != size))
--		return -EFBIG;
-+	err = loop_validate_size(size);
-+	if (err)
-+		return err;
-+
- 	if (lo->lo_offset != offset)
- 		lo->lo_offset = offset;
- 	if (lo->lo_sizelimit != sizelimit)
-@@ -1003,9 +1018,9 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	    !file->f_op->write_iter)
- 		lo_flags |= LO_FLAGS_READ_ONLY;
+ 	error = -EBADF;
+-	file = fget(arg);
++	file = fget(fds->fd);
+ 	if (!file)
+ 		goto out;
  
--	error = -EFBIG;
- 	size = get_loop_size(lo, file);
--	if ((loff_t)(sector_t)size != size)
-+	error = loop_validate_size(size);
-+	if (error)
+@@ -1091,7 +1092,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	 * here to avoid changing device under exclusive owner.
+ 	 */
+ 	if (!(mode & FMODE_EXCL)) {
+-		claimed_bdev = bd_start_claiming(bdev, loop_set_fd);
++		claimed_bdev = bd_start_claiming(bdev, loop_set_fd_and_status);
+ 		if (IS_ERR(claimed_bdev)) {
+ 			error = PTR_ERR(claimed_bdev);
+ 			goto out_putf;
+@@ -1121,6 +1122,11 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	error = loop_validate_size(size);
+ 	if (error)
  		goto out_unlock;
++
++	error = loop_set_status_from_info(lo, &fds->info);
++	if (error)
++		goto out_unlock;
++
  	error = loop_prepare_queue(lo);
  	if (error)
+ 		goto out_unlock;
+@@ -1133,9 +1139,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_device = bdev;
+ 	lo->lo_flags = lo_flags;
+ 	lo->lo_backing_file = file;
+-	lo->transfer = NULL;
+-	lo->ioctl = NULL;
+-	lo->lo_sizelimit = 0;
+ 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
+ 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+ 
+@@ -1173,14 +1176,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	if (partscan)
+ 		loop_reread_partitions(lo, bdev);
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ 	return 0;
+ 
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
+ out_bdev:
+ 	if (claimed_bdev)
+-		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd);
++		bd_abort_claiming(bdev, claimed_bdev, loop_set_fd_and_status);
+ out_putf:
+ 	fput(file);
+ out:
+@@ -1664,8 +1667,27 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	int err;
+ 
+ 	switch (cmd) {
+-	case LOOP_SET_FD:
+-		return loop_set_fd(lo, mode, bdev, arg);
++	case LOOP_SET_FD: {
++		/*
++		 * Legacy case - pass in a struct loop_fd_and_status with
++		 * a zeroed out loop_info64, which corresponds with the default
++		 * parameters we'd have used otherwise.
++		 */
++		struct loop_fd_and_status fds;
++
++		memset(&fds, 0, sizeof(fds));
++		fds.fd = arg;
++
++		return loop_set_fd_and_status(lo, mode, bdev, &fds);
++	}
++	case LOOP_SET_FD_AND_STATUS: {
++		struct loop_fd_and_status fds;
++
++		if (copy_from_user(&fds, argp, sizeof(fds)))
++			return -EFAULT;
++
++		return loop_set_fd_and_status(lo, mode, bdev, &fds);
++	}
+ 	case LOOP_CHANGE_FD:
+ 		return loop_change_fd(lo, bdev, arg);
+ 	case LOOP_CLR_FD:
+@@ -1837,6 +1859,7 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_CLR_FD:
+ 	case LOOP_GET_STATUS64:
+ 	case LOOP_SET_STATUS64:
++	case LOOP_SET_FD_AND_STATUS:
+ 		arg = (unsigned long) compat_ptr(arg);
+ 		/* fall through */
+ 	case LOOP_SET_FD:
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 080a8df134ef..05ab625c40db 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -60,6 +60,12 @@ struct loop_info64 {
+ 	__u64		   lo_init[2];
+ };
+ 
++struct loop_fd_and_status {
++	struct loop_info64	info;
++	__u32			fd;
++	__u32			__pad;
++};
++
+ /*
+  * Loop filter types
+  */
+@@ -90,6 +96,7 @@ struct loop_info64 {
+ #define LOOP_SET_CAPACITY	0x4C07
+ #define LOOP_SET_DIRECT_IO	0x4C08
+ #define LOOP_SET_BLOCK_SIZE	0x4C09
++#define LOOP_SET_FD_AND_STATUS	0x4C0A
+ 
+ /* /dev/loop-control interface */
+ #define LOOP_CTL_ADD		0x4C80
 -- 
 2.26.2.303.gf8c07b1a785-goog
 
