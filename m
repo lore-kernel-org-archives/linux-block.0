@@ -2,150 +2,145 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A29C7C7E2
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 724FEC54FD0
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 09:50:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C26422087E
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="arVADTHp"
+	by mail.kernel.org (Postfix) with ESMTP id 58900206BF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 09:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726680AbgD0Hmi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 03:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726661AbgD0Hmh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 03:42:37 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54CCC0610D5
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:36 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id 188so18383689wmc.2
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=WklQum+x0z5V9R5tHm2+hiPAk8mSt3Evh9Pc0IUIHmE=;
-        b=arVADTHpoWcouRgjhe2ruxU3zURDN9Du+CEQ3uvkL+e/yzk8bWfu5JZuOvtahupy+Z
-         8vuK68H2XLgMvUUZhwopsrfOgJX2mXCEoxIfDMQketXBXKOXXgUgV5R1RvJZYDWCY1uA
-         tCWS4wIePmfaRCnzzQ4iZxcu3tQyS0pydLrasKCdnnlRffNYZFauFEADls78CJvfTadT
-         C4ACE26NgonIzFM0LtE2vjET/1mIet+4YB+wtRIE/05eTFrQYYM9HA+wJyrCDHybnnm2
-         3wDqJiAG8oYB9ATo4V9C27V1VHEKXvx4VTykGP3TMIIQoQND7zhBVs6v6Yfm6PUB5s3w
-         vGQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WklQum+x0z5V9R5tHm2+hiPAk8mSt3Evh9Pc0IUIHmE=;
-        b=d8HO7R6TjO0r5/MUWp321K+r24hOkrDDD1g5WBlchGRdWiHh5OEOFqrQqRE1Kvilqx
-         bURtWhTcVX/YOCryGXYtLmoiI6OnpT/DsVhRKqnxtvFuss+8pZXSb92381Rp0r+RValo
-         3xkKSmusrUvCwB6WSJDy64g4yn6MeSWQ0GpC/GktgOBJuNXmUUJ0E6QVp4KwllCs3tiR
-         tHRPZqr5inmpvwDL3KDIFXAKw4X1ZF4v0JLhtRRkTfP9eY/5uAcrXGdIXXGQ7fA2ieUq
-         y1CZKtPdyY/EpyK/W0Abs/M2hTCKo3dRTZvd9ZJs/7VjapFwqCuYcE9Uwd1bfFFXCfYw
-         PJ5Q==
-X-Gm-Message-State: AGi0PuYP+gPRsVnLkAZ7gcizOxPpLvZsvbDkj7Qg7jtUGEVRITLGqoTC
-        yZAFFHEjzUOAwAlGPhMADXVd3g==
-X-Google-Smtp-Source: APiQypJ83XmOkAsrqagWwyC9NoAKpSuxzYwOYns2jlzw0+6U75xJxgkndNV5WRm/GeYCC+L0SLqcFA==
-X-Received: by 2002:a1c:7c18:: with SMTP id x24mr23185171wmc.146.1587973355743;
-        Mon, 27 Apr 2020 00:42:35 -0700 (PDT)
-Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id x132sm15091658wmg.33.2020.04.27.00.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 00:42:35 -0700 (PDT)
-From:   Martijn Coenen <maco@android.com>
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
-Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
-        jaegeuk@kernel.org, Martijn Coenen <maco@android.com>
-Subject: [PATCH v3 2/9] loop: Factor out setting loop device size
-Date:   Mon, 27 Apr 2020 09:42:15 +0200
-Message-Id: <20200427074222.65369-3-maco@android.com>
-X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
-In-Reply-To: <20200427074222.65369-1-maco@android.com>
-References: <20200427074222.65369-1-maco@android.com>
+        id S1726621AbgD0Jus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 05:50:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46542 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726485AbgD0Jus (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 05:50:48 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 9A11FABC2;
+        Mon, 27 Apr 2020 09:50:45 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 64CBB1E129C; Mon, 27 Apr 2020 11:50:45 +0200 (CEST)
+Date:   Mon, 27 Apr 2020 11:50:45 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        Borislav Petkov <bp@alien8.de>, Jan Kara <jack@suse.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: Re: [PATCH 6/7] isofs: stop using ioctl_by_bdev
+Message-ID: <20200427095045.GA15107@quack2.suse.cz>
+References: <20200425075706.721917-1-hch@lst.de>
+ <20200425075706.721917-7-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200425075706.721917-7-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This code is used repeatedly.
+On Sat 25-04-20 09:57:05, Christoph Hellwig wrote:
+> Instead just call the CDROM layer functionality directly, and turn the
+> hot mess in isofs_get_last_session into remotely readable code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-Signed-off-by: Martijn Coenen <maco@android.com>
----
- drivers/block/loop.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+Looks good to me. You can add:
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f812f11649d3..4630d098cc54 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -241,12 +241,29 @@ loop_validate_size(loff_t size)
- 		return 0;
- }
- 
-+/**
-+ * loop_set_size() - sets device size and notifies userspace
-+ * @lo: struct loop_device to set the size for
-+ * @size: new size of the loop device
-+ *
-+ * Callers must validate that the size passed into this function fits into
-+ * a sector_t, eg using loop_validate_size()
-+ */
-+static void loop_set_size(struct loop_device *lo, loff_t size)
-+{
-+	struct block_device *bdev = lo->lo_device;
-+
-+	set_capacity(lo->lo_disk, size);
-+	bd_set_size(bdev, size << SECTOR_SHIFT);
-+	/* let user-space know about the new size */
-+	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+}
-+
- static int
- figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
- {
- 	int err;
- 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
--	struct block_device *bdev = lo->lo_device;
- 
- 	err = loop_validate_size(size);
- 	if (err)
-@@ -256,10 +273,9 @@ figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
- 		lo->lo_offset = offset;
- 	if (lo->lo_sizelimit != sizelimit)
- 		lo->lo_sizelimit = sizelimit;
--	set_capacity(lo->lo_disk, x);
--	bd_set_size(bdev, (loff_t)get_capacity(bdev->bd_disk) << 9);
--	/* let user-space know about the new size */
--	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+
-+	loop_set_size(lo, size);
-+
- 	return 0;
- }
- 
-@@ -1055,11 +1071,8 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 
- 	loop_update_rotational(lo);
- 	loop_update_dio(lo);
--	set_capacity(lo->lo_disk, size);
--	bd_set_size(bdev, size << 9);
- 	loop_sysfs_init(lo);
--	/* let user-space know about the new size */
--	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
-+	loop_set_size(lo, size);
- 
- 	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
- 		      block_size(inode->i_bdev) : PAGE_SIZE);
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/isofs/inode.c | 54 +++++++++++++++++++++++-------------------------
+>  1 file changed, 26 insertions(+), 28 deletions(-)
+> 
+> diff --git a/fs/isofs/inode.c b/fs/isofs/inode.c
+> index 62c0462dc89f3..276107cdaaf13 100644
+> --- a/fs/isofs/inode.c
+> +++ b/fs/isofs/inode.c
+> @@ -544,43 +544,41 @@ static int isofs_show_options(struct seq_file *m, struct dentry *root)
+>  
+>  static unsigned int isofs_get_last_session(struct super_block *sb, s32 session)
+>  {
+> -	struct cdrom_multisession ms_info;
+> -	unsigned int vol_desc_start;
+> -	struct block_device *bdev = sb->s_bdev;
+> -	int i;
+> +	struct cdrom_device_info *cdi = disk_to_cdi(sb->s_bdev->bd_disk);
+> +	unsigned int vol_desc_start = 0;
+>  
+> -	vol_desc_start=0;
+> -	ms_info.addr_format=CDROM_LBA;
+>  	if (session > 0) {
+> -		struct cdrom_tocentry Te;
+> -		Te.cdte_track=session;
+> -		Te.cdte_format=CDROM_LBA;
+> -		i = ioctl_by_bdev(bdev, CDROMREADTOCENTRY, (unsigned long) &Te);
+> -		if (!i) {
+> +		struct cdrom_tocentry te;
+> +
+> +		if (!cdi)
+> +			return 0;
+> +
+> +		te.cdte_track = session;
+> +		te.cdte_format = CDROM_LBA;
+> +		if (cdrom_read_tocentry(cdi, &te) == 0) {
+>  			printk(KERN_DEBUG "ISOFS: Session %d start %d type %d\n",
+> -				session, Te.cdte_addr.lba,
+> -				Te.cdte_ctrl&CDROM_DATA_TRACK);
+> -			if ((Te.cdte_ctrl&CDROM_DATA_TRACK) == 4)
+> -				return Te.cdte_addr.lba;
+> +				session, te.cdte_addr.lba,
+> +				te.cdte_ctrl & CDROM_DATA_TRACK);
+> +			if ((te.cdte_ctrl & CDROM_DATA_TRACK) == 4)
+> +				return te.cdte_addr.lba;
+>  		}
+>  
+>  		printk(KERN_ERR "ISOFS: Invalid session number or type of track\n");
+>  	}
+> -	i = ioctl_by_bdev(bdev, CDROMMULTISESSION, (unsigned long) &ms_info);
+> -	if (session > 0)
+> -		printk(KERN_ERR "ISOFS: Invalid session number\n");
+> -#if 0
+> -	printk(KERN_DEBUG "isofs.inode: CDROMMULTISESSION: rc=%d\n",i);
+> -	if (i==0) {
+> -		printk(KERN_DEBUG "isofs.inode: XA disk: %s\n",ms_info.xa_flag?"yes":"no");
+> -		printk(KERN_DEBUG "isofs.inode: vol_desc_start = %d\n", ms_info.addr.lba);
+> -	}
+> -#endif
+> -	if (i==0)
+> +
+> +	if (cdi) {
+> +		struct cdrom_multisession ms_info;
+> +
+> +		ms_info.addr_format = CDROM_LBA;
+> +		if (cdrom_multisession(cdi, &ms_info) == 0) {
+>  #if WE_OBEY_THE_WRITTEN_STANDARDS
+> -		if (ms_info.xa_flag) /* necessary for a valid ms_info.addr */
+> +			/* necessary for a valid ms_info.addr */
+> +			if (ms_info.xa_flag)
+>  #endif
+> -			vol_desc_start=ms_info.addr.lba;
+> +				vol_desc_start = ms_info.addr.lba;
+> +		}
+> +	}
+> +
+>  	return vol_desc_start;
+>  }
+>  
+> -- 
+> 2.26.1
+> 
 -- 
-2.26.2.303.gf8c07b1a785-goog
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
