@@ -2,110 +2,67 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8B7C54FD0
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8F0C55199
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:43:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 762CA20728
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 271D820575
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgD0MbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 08:31:03 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43490 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726260AbgD0MbD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 08:31:03 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 2A168AD93;
-        Mon, 27 Apr 2020 12:31:01 +0000 (UTC)
-Subject: Re: [PATCH v8 04/11] block: Introduce REQ_OP_ZONE_APPEND
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
- <20200427113153.31246-5-johannes.thumshirn@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <6aaf3d41-c097-b5da-9539-c34b1a02a644@suse.de>
-Date:   Mon, 27 Apr 2020 14:30:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726604AbgD0MnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 08:43:04 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:33436 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726651AbgD0MnE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 08:43:04 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 7E3BDCF084310AEA3F0F;
+        Mon, 27 Apr 2020 20:43:01 +0800 (CST)
+Received: from huawei.com (10.175.113.49) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Mon, 27 Apr 2020
+ 20:43:00 +0800
+From:   Hou Tao <houtao1@huawei.com>
+To:     <linux-block@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH 1/1] blk-mq: remove the pointless call of list_entry_rq() in hctx_show_busy_rq()
+Date:   Mon, 27 Apr 2020 21:12:50 +0800
+Message-ID: <20200427131250.13725-1-houtao1@huawei.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200427113153.31246-5-johannes.thumshirn@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.49]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/27/20 1:31 PM, Johannes Thumshirn wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Define REQ_OP_ZONE_APPEND to append-write sectors to a zone of a zoned
-> block device. This is a no-merge write operation.
-> 
-> A zone append write BIO must:
-> * Target a zoned block device
-> * Have a sector position indicating the start sector of the target zone
-> * The target zone must be a sequential write zone
-> * The BIO must not cross a zone boundary
-> * The BIO size must not be split to ensure that a single range of LBAs
->    is written with a single command.
-> 
-> Implement these checks in generic_make_request_checks() using the
-> helper function blk_check_zone_append(). To avoid write append BIO
-> splitting, introduce the new max_zone_append_sectors queue limit
-> attribute and ensure that a BIO size is always lower than this limit.
-> Export this new limit through sysfs and check these limits in bio_full().
-> 
-> Also when a LLDD can't dispatch a request to a specific zone, it
-> will return BLK_STS_ZONE_RESOURCE indicating this request needs to
-> be delayed, e.g.  because the zone it will be dispatched to is still
-> write-locked. If this happens set the request aside in a local list
-> to continue trying dispatching requests such as READ requests or a
-> WRITE/ZONE_APPEND requests targetting other zones. This way we can
-> still keep a high queue depth without starving other requests even if
-> one request can't be served due to zone write-locking.
-> 
-> Finally, make sure that the bio sector position indicates the actual
-> write position as indicated by the device on completion.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> [ jth: added zone-append specific add_page and merge_page helpers ]
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/bio.c               | 62 ++++++++++++++++++++++++++++++++++++---
->   block/blk-core.c          | 52 ++++++++++++++++++++++++++++++++
->   block/blk-mq.c            | 27 +++++++++++++++++
->   block/blk-settings.c      | 23 +++++++++++++++
->   block/blk-sysfs.c         | 13 ++++++++
->   drivers/scsi/scsi_lib.c   |  1 +
->   include/linux/blk_types.h | 14 +++++++++
->   include/linux/blkdev.h    | 11 +++++++
->   8 files changed, 199 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+And use rq directly.
 
-Cheers,
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ block/blk-mq-debugfs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Hannes
-
-
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b3f2ba483992..7a79db81a63f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -400,8 +400,7 @@ static bool hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
+ 	const struct show_busy_params *params = data;
+ 
+ 	if (rq->mq_hctx == params->hctx)
+-		__blk_mq_debugfs_rq_show(params->m,
+-					 list_entry_rq(&rq->queuelist));
++		__blk_mq_debugfs_rq_show(params->m, rq);
+ 
+ 	return true;
+ }
 -- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.21.1
+
