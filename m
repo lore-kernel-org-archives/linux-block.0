@@ -2,316 +2,253 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F23DBC4CECC
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 18:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C0C8C4CECD
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 19:03:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8690205C9
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 18:58:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I5VZ+vH7"
+	by mail.kernel.org (Postfix) with ESMTP id 1DB0720B1F
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 19:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588014219;
+	bh=xqDU3aTzpyVy0HZwtgJghSBIPOFiLHnK3GAPMOq9oD0=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
+	 From;
+	b=cAmfvTyAFyNbJ1Lls0263XGaY0ir3pr5hVHxw9UF285InU1Zgir93k87xtzqPrIu4
+	 0l19qG3Tm9KIdsvGJx5To20WJTvQFP0rpdqR22/HEm/HonScdyqgqgGx0vWH1I2tWB
+	 SEAC4ZfkkU+P/K5kr+vmQfVJUf0maSH9hhEhvWqI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbgD0S6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 14:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48386 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726695AbgD0S6x (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 14:58:53 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94467C0610D5
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 11:58:53 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id q2so9112817qvd.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 11:58:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=1pcdW5IEsmo/9V+gfzp2K9uy1wudscu5jDh3JoOw2Pc=;
-        b=I5VZ+vH7LpGcQtIpNN8UoToOYU8SRKCZ9vjisOYPQOfdwW4lkqToh7M8JKSTs5ZROp
-         pBo+BTLmABy8LtxgToKWCEFior8W8I1zbW0L8CwleZ9MdHv0drHdjzQ9w16jkrgWFn/r
-         WCGXvisWAoWQFKqXwPGha7vGrnCFhNvBhNmZ4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=1pcdW5IEsmo/9V+gfzp2K9uy1wudscu5jDh3JoOw2Pc=;
-        b=tJWegSjn1hHqX5wMbyF6/akJ7Hz/9lDQLMtRltS3Aox86lFgPeV/BptL8GYBbXC4he
-         WW3ChZ8TWsVdVYCX4oVNGNGgZSSBKIzcfcViFyb1JrVK0kT90SRD2xcLqeTo0KmypSZL
-         Hr4dpdF+SIqFL5oMOjvAZfD9ZdcHGkE3MBxKEFlvuRluR4UWW4uxvDeNqInqMqLgj1KY
-         +HPe5HcX5s0xEVugLbqqFkK0zmruP87av+2YD5m/eEA3+tSi4JLc3Le0AyCrWyGnOn6X
-         E3Fj03pLDS2nV57aVcR5CNSO6uqfKctDXKa4Wqxv+ZwCXNbygRp+WI2WZGExQYLktmoe
-         ZRhQ==
-X-Gm-Message-State: AGi0PuaYhwLblvY1IBsFRY/bZ240zHUnJzUnAZvlYJ76LW1HhiIN/edz
-        EwjWnTPcrkQwnbjb4Zaj3EzVDN8SFlGOA1LLDjYIrg==
-X-Google-Smtp-Source: APiQypLBJmnJTryb9NCMq6/UXWiaazrNmD5zo71VtPJBymGfKV3j6RW3otqZ6Af86PLXzHuh88Q7I09wenMs6HtJn9A=
-X-Received: by 2002:a05:6214:1848:: with SMTP id d8mr22124216qvy.136.1588013932365;
- Mon, 27 Apr 2020 11:58:52 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
- <1583409280-158604-9-git-send-email-john.garry@huawei.com>
- <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com> <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
- <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com> <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
- <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com> <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
- <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com> <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
- <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com> <d2ae343770a83466b870a33ffae5fa23@mail.gmail.com>
- <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
-In-Reply-To: <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
+        id S1726746AbgD0TDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 15:03:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34214 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726744AbgD0TDi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 15:03:38 -0400
+Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5983D20775;
+        Mon, 27 Apr 2020 19:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588014217;
+        bh=xqDU3aTzpyVy0HZwtgJghSBIPOFiLHnK3GAPMOq9oD0=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=qM7QeZWUKCB2Uk0YzvlT1nmg86w5hB5k2HbjDOg0W4uNj84w2+i2gGA1wNFZWLbSy
+         zZPx/MPAAwJRiYMkZoRvro9twPBRjRQ9SvDNfRyWTtkVwSdce8WJqGs5WEHhmhiQkV
+         NjDsaamZ/WZJJ4Rkb38DPW0ex6bDXr8DqH9VtInk=
+Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
+        id 3DF1335227CC; Mon, 27 Apr 2020 12:03:37 -0700 (PDT)
+Date:   Mon, 27 Apr 2020 12:03:37 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, will@kernel.org,
+        peterz@infradead.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200427190337.GK7560@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200424102351.475641-1-ming.lei@redhat.com>
+ <20200424102351.475641-8-ming.lei@redhat.com>
+ <20200424103851.GD28156@lst.de>
+ <20200425031723.GC477579@T590>
+ <20200425083224.GA5634@lst.de>
+ <20200425093437.GA495669@T590>
+ <20200425095351.GC495669@T590>
+ <20200425154832.GA16004@lst.de>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQLPD/Iw6Rn2DAIn/TfwmBaZDWGoTwIxkurkAqxUgoEByxhGKAL7c9G/AhAFW6UBYJrDDwOh6RKhA6E3S3MDBK8nrwGGgqJUAkB+JNsCgDRgnKWuO18g
-Date:   Tue, 28 Apr 2020 00:28:49 +0530
-Message-ID: <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
-Subject: RE: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.de,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        hch@infradead.org,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-Cc:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, Hannes Reinecke <hare@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200425154832.GA16004@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Hi Kashyap,
->
-> >> hmmmm...
-> >
-> > I did some more experiments. It looks like issue is with both <none>
-> > and <mq-deadline> scheduler.  Let me simplify what happens with
-> > ioscheduler = <none>.
->
-> I know it's good to compare like-for-like, but, as I understand, "none"
-> is more suited for MQ host, while deadline is more suited for SQ host.
+On Sat, Apr 25, 2020 at 05:48:32PM +0200, Christoph Hellwig wrote:
+> FYI, here is what I think we should be doing (but the memory model
+> experts please correct me):
 
-I am using <mq-deadline> which is MQ version of SQ deadline.
-For now we can just consider case without scheduler.
+I would be happy to, but could you please tell me what to apply this
+against?  I made several wrong guesses, and am not familiar enough with
+this code to evaluate this patch in isolation.
 
-I have some more findings. May be someone from upstream community can
-connect the dots.
+							Thanx, Paul
 
-#1. hctx_may_queue() throttle the IO at hctx level. This is eventually per
-sdev throttling for megaraid_sas driver because It creates only one
-context - hctx0 for each scsi device.
-
-If driver is using only one h/w queue,  active_queues will be always steady.
-In my test it was 64 thread, so active_queues=64.
-Even though <fio> thread is shared among allowed cpumask
-(cpus_allowed_policy=shared option in fio),  active_queues will be always 64
-because we have only one h/w queue.
-All the logical cpus are mapped to one h/w queue. It means, thread moving
-from one cpu to another cpu will not change active_queues per hctx.
-
-In case of this RFC, active_queues are now per hctx and there are multiple
-hctx, but tags are shared. This can create unwanted throttling and
-eventually more lock contention in sbitmap.
-I added below patch and things improved a bit, but not a full proof.
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 586c9d6..c708fbc 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -60,10 +60,12 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
-  * For shared tag users, we track the number of currently active users
-  * and attempt to provide a fair share of the tag depth for each of them.
-  */
--static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
-+static inline bool hctx_may_queue(struct request_queue *q,
-+                                 struct blk_mq_hw_ctx *hctx,
-                                  struct sbitmap_queue *bt)
- {
--       unsigned int depth, users;
-+       unsigned int depth, users, i, outstanding = 0;
-+       struct blk_mq_hw_ctx *hctx_iter;
-
-        if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
-                return true;
-@@ -84,14 +86,18 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx
-*hctx,
-         * Allow at least some tags
-         */
-        depth = max((bt->sb.depth + users - 1) / users, 4U);
--       return atomic_read(&hctx->nr_active) < depth;
-+
-+       queue_for_each_hw_ctx(q, hctx_iter, i)
-+               outstanding += atomic_read(&hctx_iter->nr_active);
-+
-+       return outstanding < depth;
- }
-
- static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
-                            struct sbitmap_queue *bt)
- {
-        if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
--           !hctx_may_queue(data->hctx, bt))
-
-
-#2 - In completion path, scsi module call blk_mq_run_hw_queues() upon IO
-completion.  I am not sure if it is good to run all the h/w queue or just
-h/w queue of current reference is good enough.
-Below patch helped to reduce contention in hcxt_lock().
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 610ee41..f72de2a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -572,6 +572,7 @@ static bool scsi_end_request(struct request *req,
-blk_status_t error,
-        struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
-        struct scsi_device *sdev = cmd->device;
-        struct request_queue *q = sdev->request_queue;
-+       struct blk_mq_hw_ctx *mq_hctx = req->mq_hctx;
-
-        if (blk_update_request(req, error, bytes))
-                return true;
-@@ -613,7 +614,7 @@ static bool scsi_end_request(struct request *req,
-blk_status_t error,
-            !list_empty(&sdev->host->starved_list))
-                kblockd_schedule_work(&sdev->requeue_work);
-        else
--               blk_mq_run_hw_queues(q, true);
-+               blk_mq_run_hw_queue(mq_hctx, true);
-
-        percpu_ref_put(&q->q_usage_counter);
-        return false;
-
-#3 -  __blk_mq_tag_idle() calls blk_mq_tag_wakeup_all which may not be
-optimal for shared queue.
-There is a penalty if we are calling __sbq_wake_up() frequently. In case of
-nr_hw_queue = 1, things are better because one hctx and hctx->state will
-avoid multiple calls.
-If blk_mq_tag_wakeup_all is called from hctx0 context, there is no need to
-call from hctx1, hctx2 etc.
-
-I have added below patch in my testing.
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 586c9d6..5b331e5 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -53,7 +53,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
-
-        atomic_dec(&tags->active_queues);
-
--       blk_mq_tag_wakeup_all(tags, false);
-+       /* TBD - Do this only for hctx->flags & BLK_MQ_F_TAG_HCTX_SHARED */
-+       if (hctx->queue_num == 0)
-+               blk_mq_tag_wakeup_all(tags, false);
- }
-
- /*
-
-
-With all above mentioned changes, I see performance improved from 2.2M IOPS
-to 2.7M on same workload and profile.
-
-
-Kashyap
-
->
-> >
-> > Old Driver which has nr_hw_queue = 1 and I issue IOs from <fio>  queue
-> > depth = 128. We get 3.1M IOPS in this config. This eventually exhaust
-> > host can_queue.
->
-> So I think I need to find a point where we start to get throttled.
->
-> > Note - Very low contention in sbitmap_get()
-> >
-> > -   23.58%     0.25%  fio              [kernel.vmlinux]            [k]
-> > blk_mq_make_request
-> >     - 23.33% blk_mq_make_request
-> >        - 21.68% blk_mq_get_request
-> >           - 20.19% blk_mq_get_tag
-> >              + 10.08% prepare_to_wait_exclusive
-> >              + 4.51% io_schedule
-> >              - 3.59% __sbitmap_queue_get
-> >                 - 2.82% sbitmap_get
-> >                      0.86% __sbitmap_get_word
-> >                      0.75% _raw_spin_lock_irqsave
-> >                      0.55% _raw_spin_unlock_irqrestore
-> >
-> > Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
-> > queue depth = 128. We get 2.3 M IOPS in this config. This eventually
-> > exhaust host can_queue.
-> > Note - Very high contention in sbitmap_get()
-> >
-> > -   42.39%     0.12%  fio              [kernel.vmlinux]            [k]
-> > generic_make_request
-> >     - 42.27% generic_make_request
-> >        - 41.00% blk_mq_make_request
-> >           - 38.28% blk_mq_get_request
-> >              - 33.76% blk_mq_get_tag
-> >                 - 30.25% __sbitmap_queue_get
-> >                    - 29.90% sbitmap_get
-> >                       + 9.06% _raw_spin_lock_irqsave
-> >                       + 7.94% _raw_spin_unlock_irqrestore
-> >                       + 3.86% __sbitmap_get_word
-> >                       + 1.78% call_function_single_interrupt
-> >                       + 0.67% ret_from_intr
-> >                 + 1.69% io_schedule
-> >                   0.59% prepare_to_wait_exclusive
-> >                   0.55% __blk_mq_get_tag
-> >
-> > In this particular case, I observed alloc_hint = zeros which means,
-> > sbitmap_get is not able to find free tags from hint. That may lead to
-> > contention.
-> > This condition is not happening with nr_hw_queue=1 (without RFC) driver.
-> >
-> > alloc_hint=
-> > {663, 2425, 3060, 54, 3149, 4319, 4175, 4867, 543, 2481, 0, 4779, 377,
-> > ***0***, 2010, 0, 909, 3350, 1546, 2179, 2875, 659, 3902, 2224, 3212,
-> > 836, 1892, 1669, 2420, 3415, 1904, 512, 3027, 4810, 2845, 4690, 712,
-> > 3105, 0, 0, 0, 3268, 4915, 3897, 1349, 547, 4, 733, 1765, 2068, 979,
-> > 51, 880, 0, 370, 3520, 2877, 4097, 418, 4501, 3717, 2893, 604, 508,
-> > 759, 3329, 4038, 4829, 715, 842, 1443, 556}
-> >
-> > Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
-> > queue depth = 32. We get 3.1M IOPS in this config. This workload does
-> > *not* exhaust host can_queue.
->
-> Please ensure .host_tagset is set for whenever nr_hw_queue = N. This is as
-> per
-> RFC, and I don't think you modified from the RFC for your test.
-> But I just wanted to mention that to be crystal clear.
-
-Yes I have two separate driver copy. One with RFC change and another without
-RFC.
->
-> >
-> > -    5.07%     0.14%  fio              [kernel.vmlinux]  [k]
-> > generic_make_request
-> >     - 4.93% generic_make_request
-> >        - 3.61% blk_mq_make_request
-> >           - 2.04% blk_mq_get_request
-> >              - 1.08% blk_mq_get_tag
-> >                 - 0.70% __sbitmap_queue_get
-> >                      0.67% sbitmap_get
-> >
-> > In summary, RFC has some performance bottleneck in sbitmap_get () if
-> > outstanding per shost is about to exhaust.  Without this RFC also
-> > driver works in nr_hw_queue = 1, but that case is managed very well.
-> > I am not sure why it happens only with shared host tag ? Theoretically
-> > all the hctx is sharing the same bitmaptag which is same as
-> > nr_hw_queue=1, so why contention is only visible in shared host tag
-> > case.
->
-> Let me check this.
->
-> >
-> > If you want to reproduce this issue, may be you have to reduce the
-> > can_queue in hisi_sas driver.
-> >
->
-> Thanks,
-> John
+>  - just drop the direct_issue flag and check for the CPU, which is
+>    cheap enough
+>  - replace the raw_smp_processor_id with a get_cpu to make sure we
+>    don't hit the tiny migration windows
+>  - a bunch of random cleanups to make the code easier to read, mostly
+>    by being more self-documenting or improving the comments.
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index bfa4020256ae9..da749865f6eed 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1049,28 +1049,16 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+>  		atomic_inc(&data.hctx->nr_active);
+>  	}
+>  	data.hctx->tags->rqs[rq->tag] = rq;
+> -	return true;
+> -}
+> -
+> -static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+> -{
+> -	if (rq->tag != -1)
+> -		return true;
+>  
+> -	if (!__blk_mq_get_driver_tag(rq))
+> -		return false;
+>  	/*
+> -	 * Add one memory barrier in case that direct issue IO process is
+> -	 * migrated to other CPU which may not belong to this hctx, so we can
+> -	 * order driver tag assignment and checking BLK_MQ_S_INACTIVE.
+> -	 * Otherwise, barrier() is enough given both setting BLK_MQ_S_INACTIVE
+> -	 * and driver tag assignment are run on the same CPU in case that
+> -	 * BLK_MQ_S_INACTIVE is set.
+> +	 * Ensure updates to rq->tag and tags->rqs[] are seen by
+> +	 * blk_mq_tags_inflight_rqs.  This pairs with the smp_mb__after_atomic
+> +	 * in blk_mq_hctx_notify_offline.  This only matters in case a process
+> +	 * gets migrated to another CPU that is not mapped to this hctx.
+>  	 */
+> -	if (unlikely(direct_issue && rq->mq_ctx->cpu != raw_smp_processor_id()))
+> +	if (rq->mq_ctx->cpu != get_cpu())
+>  		smp_mb();
+> -	else
+> -		barrier();
+> +	put_cpu();
+>  
+>  	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))) {
+>  		blk_mq_put_driver_tag(rq);
+> @@ -1079,6 +1067,13 @@ static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+>  	return true;
+>  }
+>  
+> +static bool blk_mq_get_driver_tag(struct request *rq)
+> +{
+> +	if (rq->tag != -1)
+> +		return true;
+> +	return __blk_mq_get_driver_tag(rq);
+> +}
+> +
+>  static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+>  				int flags, void *key)
+>  {
+> @@ -1125,7 +1120,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+>  		 * Don't clear RESTART here, someone else could have set it.
+>  		 * At most this will cost an extra queue run.
+>  		 */
+> -		return blk_mq_get_driver_tag(rq, false);
+> +		return blk_mq_get_driver_tag(rq);
+>  	}
+>  
+>  	wait = &hctx->dispatch_wait;
+> @@ -1151,7 +1146,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
+>  	 * allocation failure and adding the hardware queue to the wait
+>  	 * queue.
+>  	 */
+> -	ret = blk_mq_get_driver_tag(rq, false);
+> +	ret = blk_mq_get_driver_tag(rq);
+>  	if (!ret) {
+>  		spin_unlock(&hctx->dispatch_wait_lock);
+>  		spin_unlock_irq(&wq->lock);
+> @@ -1252,7 +1247,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+>  			break;
+>  		}
+>  
+> -		if (!blk_mq_get_driver_tag(rq, false)) {
+> +		if (!blk_mq_get_driver_tag(rq)) {
+>  			/*
+>  			 * The initial allocation attempt failed, so we need to
+>  			 * rerun the hardware queue when a tag is freed. The
+> @@ -1284,7 +1279,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+>  			bd.last = true;
+>  		else {
+>  			nxt = list_first_entry(list, struct request, queuelist);
+> -			bd.last = !blk_mq_get_driver_tag(nxt, false);
+> +			bd.last = !blk_mq_get_driver_tag(nxt);
+>  		}
+>  
+>  		ret = q->mq_ops->queue_rq(hctx, &bd);
+> @@ -1886,7 +1881,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	if (!blk_mq_get_dispatch_budget(hctx))
+>  		goto insert;
+>  
+> -	if (!blk_mq_get_driver_tag(rq, true)) {
+> +	if (!blk_mq_get_driver_tag(rq)) {
+>  		blk_mq_put_dispatch_budget(hctx);
+>  		goto insert;
+>  	}
+> @@ -2327,23 +2322,24 @@ static bool blk_mq_inflight_rq(struct request *rq, void *data,
+>  static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	struct count_inflight_data count_data = {
+> -		.count	= 0,
+>  		.hctx	= hctx,
+>  	};
+>  
+>  	blk_mq_all_tag_busy_iter(hctx->tags, blk_mq_count_inflight_rq,
+>  			blk_mq_inflight_rq, &count_data);
+> -
+>  	return count_data.count;
+>  }
+>  
+> -static void blk_mq_hctx_drain_inflight_rqs(struct blk_mq_hw_ctx *hctx)
+> +static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
+> +		struct blk_mq_hw_ctx *hctx)
+>  {
+> -	while (1) {
+> -		if (!blk_mq_tags_inflight_rqs(hctx))
+> -			break;
+> -		msleep(5);
+> -	}
+> +	if (!cpumask_test_cpu(cpu, hctx->cpumask))
+> +		return false;
+> +	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu)
+> +		return false;
+> +	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
+> +		return false;
+> +	return true;
+>  }
+>  
+>  static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+> @@ -2351,25 +2347,19 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+>  	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+>  			struct blk_mq_hw_ctx, cpuhp_online);
+>  
+> -	if (!cpumask_test_cpu(cpu, hctx->cpumask))
+> -		return 0;
+> -
+> -	if ((cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu) ||
+> -	    (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids))
+> +	if (!blk_mq_last_cpu_in_hctx(cpu, hctx))
+>  		return 0;
+>  
+>  	/*
+> -	 * The current CPU is the last one in this hctx, S_INACTIVE
+> -	 * can be observed in dispatch path without any barrier needed,
+> -	 * cause both are run on one same CPU.
+> +	 * Order setting BLK_MQ_S_INACTIVE versus checking rq->tag and rqs[tag],
+> +	 * in blk_mq_tags_inflight_rqs.  It pairs with the smp_mb() in
+> +	 * blk_mq_get_driver_tag.
+>  	 */
+>  	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+> -	/*
+> -	 * Order setting BLK_MQ_S_INACTIVE and checking rq->tag & rqs[tag],
+> -	 * and its pair is the smp_mb() in blk_mq_get_driver_tag
+> -	 */
+>  	smp_mb__after_atomic();
+> -	blk_mq_hctx_drain_inflight_rqs(hctx);
+> +
+> +	while (blk_mq_tags_inflight_rqs(hctx))
+> +		msleep(5);
+>  	return 0;
+>  }
+>  
