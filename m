@@ -2,61 +2,75 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04505C54FD0
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 05:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E2DC55199
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 06:16:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC2722084D
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 05:50:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DqQbbRjN"
+	by mail.kernel.org (Postfix) with ESMTP id 63E9A206B6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 06:16:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbgD0Fuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 01:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726527AbgD0Fuf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 01:50:35 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E880EC061A0F;
-        Sun, 26 Apr 2020 22:50:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=DqQbbRjN48qdiyxsw8aeuawdwp
-        FT1K4puKCLqD5Zw0D4JNaDdTf8MxvlTTR2PrGt6f0hLPsFK2YEul5L6i5+wAgYR6XvgLg5yv5r0fI
-        tdNis3LtVmsFwNhuJC0UIFtua1SSiI4dcHgWPsJoKqeBEMZSt+IR35LQoZNc5nCCW5JU80fp9Wvt5
-        9MBube3J8cZZYnnmlig46fBn6RGIBy5mbhmnT7QWkKwMaS4gKZylTklVr1nMsI4WRgPxYbSohJYTp
-        oQZFWIczkLjgmIgxE75O3Se4M47wZNVnJAC3w+akQpo+RNTU4ftljjpfbYTO/+J7IAUt/hrEPyeJU
-        +ybaO01Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jSwf4-0004Ji-QP; Mon, 27 Apr 2020 05:50:34 +0000
-Date:   Sun, 26 Apr 2020 22:50:34 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-block@vger.kernel.org, Willy Tarreau <w@1wt.eu>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] floppy: suppress UBSAN warning in
- setup_rw_floppy()
-Message-ID: <20200427055034.GC4159@infradead.org>
-References: <20200426130728.63399-1-efremov@linux.com>
- <20200426130728.63399-4-efremov@linux.com>
+        id S1726557AbgD0GQC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 02:16:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42184 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726231AbgD0GQC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 02:16:02 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 0E0A7AC6D;
+        Mon, 27 Apr 2020 06:16:00 +0000 (UTC)
+Subject: Re: [PATCH 1/7] block: add a cdrom_device_info pointer to struct
+ gendisk
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>
+References: <20200425075706.721917-1-hch@lst.de>
+ <20200425075706.721917-2-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <262e6cc4-a0e7-821c-9e51-03a2ed5cba86@suse.de>
+Date:   Mon, 27 Apr 2020 08:15:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200426130728.63399-4-efremov@linux.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200425075706.721917-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On 4/25/20 9:57 AM, Christoph Hellwig wrote:
+> Add a pointer to the CDROM information structure to struct gendisk.
+> This will allow various removable media file systems to call directly
+> into the CDROM layer instead of abusing ioctls with kernel pointers.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>   drivers/block/paride/pcd.c | 2 +-
+>   drivers/cdrom/cdrom.c      | 5 ++++-
+>   drivers/cdrom/gdrom.c      | 2 +-
+>   drivers/ide/ide-cd.c       | 3 +--
+>   drivers/scsi/sr.c          | 3 +--
+>   include/linux/cdrom.h      | 2 +-
+>   include/linux/genhd.h      | 9 +++++++++
+>   7 files changed, 18 insertions(+), 8 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
