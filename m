@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2858C7C829
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0C5C7C822
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ADE4206D6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04265206D9
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 11:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J0/Ayq4J"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Bl2M0rx6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbgD0LcS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 07:32:18 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54659 "EHLO
+        id S1727089AbgD0LcY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 07:32:24 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54664 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727062AbgD0LcQ (ORCPT
+        with ESMTP id S1727085AbgD0LcW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 07:32:16 -0400
+        Mon, 27 Apr 2020 07:32:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1587987136; x=1619523136;
+  t=1587987141; x=1619523141;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Y2y9JE2e+xhXqZBIOpMaxRGLIW82IAv0qwYVeR1gK3Q=;
-  b=J0/Ayq4JGu/lc0+gt3w7LDrYAk0j+zM/M0BSWeaq85xrHFLFUkSqRiX3
-   2u8HIFR9YaUAqEvw2++J6VP8CPrnhPM/vCZDRPSl7hGv9x3IaOIwJyxhl
-   IvdGIrv8+hJ4MkgjFytjAjjd9JymgpQ+PPLgoiekKtiAI/BJAUYh/BUqT
-   7USXMLl6dbA91Ppg+I04gfbF2tRHBecKyaG3AX7g0kv21joMDHWX5HNP9
-   8301aiVMqzTqkSlX+3wwZFqXqYIWou/BCEs06OWlqMh33bYo7Kn6ghzCi
-   q6wCFEt0Md9edETOGYQ2BmI1WeDUdMpHxQXWk2T4y90gyVfXp6xXFK2DB
-   w==;
-IronPort-SDR: 2TB4LewquZxMyoBtAF9Y+iB5V4sZWpfSDVTAY2LbJPA65pEOd58ZIDi2ul2ORQ1wmVuir+shzU
- NYbYWBS5sOrMWp5TwY1aoSL/vaHUlH39rSoYkZBPUX2/PBX8FVY5KxiifQDTt6ZTWA6KrHEgnr
- KyFV2MhUaG4hmFuNnk56NaCLOXkLW7MOfAAGROtRhy53pEK1qP10uvu3rBAcVO58T2GljDcvck
- DY/AjbncOjApwr6s5QEhoUhuWK8X0YtIZQm/tmvhH6PFj73ht+L1IGfWGT8m3jnTIkHwIZYET4
- GHI=
+  bh=rnxX2qGcJ5HPe7ZiFJY/S56JEW3gBwG3lQwqa1XfisQ=;
+  b=Bl2M0rx67aknKODBeN0PSmzMr9KumK1CPPkNGgMYbjkILQNjtDMiGbMl
+   sl1PCYtEIbIV6MKMnRNfVUk4TmcSRCicSFPTZdQ/jw3iy3im2r/sEzf4r
+   Bi1svYGYBmW7iPYNPfDThEBEKbEIIGbX+7kZcX+ZbHviegv733O+MVxIN
+   q5wtvU8c+/FRUGpLaf4X6SWiUM5TNv51Weu5i+gqFQWtVY7ipPEf3zEa/
+   4AarXU8W5kijxvzK27eIdeF20cCSY3fOQbk8VoBxQ3MEIhgqq+H9pyfsY
+   ZwwXxOlZ06VqNP5ynby68AJFkKU11V6dOD206kWgeI9/hxPDaG9NyLWH8
+   Q==;
+IronPort-SDR: dj6Ty46ay7MZyPncZvMxx8MdT631cTKzrDjmCxJRwR95HqDotb9UXTZjBmjz3LsleMA9Gmbqx1
+ OHl9axo7W0kRs/5Uc1OlmOxbcne1ukfzfHxS3aLb/axZC93XymgP2sgFJ2jiB9jBqzrpfH6FDa
+ IYPxl0/bmyXkNzaViMM+tUyjKJ9Tuloq2zYX7f9UzlPn5gMFEGHZxNybI/qP+30rHwBPDAiYpp
+ 9Je+xuBCvlLxF8rhM9z80zpyasypIS0SptmFE/sn+eC8P3iyPjqplARnc75L831rXuxCkvnGV2
+ yLo=
 X-IronPort-AV: E=Sophos;i="5.73,323,1583164800"; 
-   d="scan'208";a="136552019"
+   d="scan'208";a="136552036"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2020 19:32:16 +0800
-IronPort-SDR: Rtsup6uA2WpuNojgGyod5w5naESK9sLZq8wg4FLAnsOu01/Nns1/zdJJsm+YOKzCABNIImg5qN
- b/EYq3hnH/9tBpp8JKD6ILNUoUaQzanlE=
+  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2020 19:32:21 +0800
+IronPort-SDR: wycErS0EU9NVjCnbNqaynKAsIuOHc8Xfbt27NEvVAMBoNxlJVXyrCoF9V7dX3ppOUE9uxSQQ/8
+ SnXJumumDhj0yyUlUP4NdXAMw9fGC5H/8=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 04:22:57 -0700
-IronPort-SDR: CKAwR6QaVrB1QDyA7yBgX6DGKWWaZlTYkj6ldt7Wv9kB0o1Joc+lAhIzWllcEFegxFgf4NCEa5
- N6BysOaxD/SQ==
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2020 04:23:03 -0700
+IronPort-SDR: bjOVeH3sTlwiih3zSwFE766SoxMhwmTwFPNqz57IzwkVhJuyGqTDuX/WCwnjbsDG35SjLh6qFo
+ nRP31XC0XO5g==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Apr 2020 04:32:14 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Apr 2020 04:32:20 -0700
 From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -62,12 +62,10 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v8 07/11] scsi: sd_zbc: factor out sanity checks for zoned commands
-Date:   Mon, 27 Apr 2020 20:31:49 +0900
-Message-Id: <20200427113153.31246-8-johannes.thumshirn@wdc.com>
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v8 10/11] block: export bio_release_pages and bio_iov_iter_get_pages
+Date:   Mon, 27 Apr 2020 20:31:52 +0900
+Message-Id: <20200427113153.31246-11-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
 References: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
@@ -78,74 +76,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Factor sanity checks for zoned commands from sd_zbc_setup_zone_mgmt_cmnd().
-
-This will help with the introduction of an emulated ZONE_APPEND command.
+Export bio_release_pages and bio_iov_iter_get_pages, so they can be used
+from modular code.
 
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/sd_zbc.c | 36 +++++++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 11 deletions(-)
+ block/bio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index f45c22b09726..ee156fbf3780 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -209,6 +209,26 @@ int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
- 	return ret;
+diff --git a/block/bio.c b/block/bio.c
+index 6dffc45ba895..d3a42cb5fb92 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -942,6 +942,7 @@ void bio_release_pages(struct bio *bio, bool mark_dirty)
+ 		put_page(bvec->bv_page);
+ 	}
  }
++EXPORT_SYMBOL_GPL(bio_release_pages);
  
-+static blk_status_t sd_zbc_cmnd_checks(struct scsi_cmnd *cmd)
-+{
-+	struct request *rq = cmd->request;
-+	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
-+	sector_t sector = blk_rq_pos(rq);
-+
-+	if (!sd_is_zoned(sdkp))
-+		/* Not a zoned device */
-+		return BLK_STS_IOERR;
-+
-+	if (sdkp->device->changed)
-+		return BLK_STS_IOERR;
-+
-+	if (sector & (sd_zbc_zone_sectors(sdkp) - 1))
-+		/* Unaligned request */
-+		return BLK_STS_IOERR;
-+
-+	return BLK_STS_OK;
-+}
-+
- /**
-  * sd_zbc_setup_zone_mgmt_cmnd - Prepare a zone ZBC_OUT command. The operations
-  *			can be RESET WRITE POINTER, OPEN, CLOSE or FINISH.
-@@ -223,20 +243,14 @@ blk_status_t sd_zbc_setup_zone_mgmt_cmnd(struct scsi_cmnd *cmd,
- 					 unsigned char op, bool all)
+ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
  {
- 	struct request *rq = cmd->request;
--	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 	sector_t sector = blk_rq_pos(rq);
-+	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 	sector_t block = sectors_to_logical(sdkp->device, sector);
-+	blk_status_t ret;
+@@ -1105,6 +1106,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		bio_set_flag(bio, BIO_NO_PAGE_REF);
+ 	return bio->bi_vcnt ? 0 : ret;
+ }
++EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
  
--	if (!sd_is_zoned(sdkp))
--		/* Not a zoned device */
--		return BLK_STS_IOERR;
--
--	if (sdkp->device->changed)
--		return BLK_STS_IOERR;
--
--	if (sector & (sd_zbc_zone_sectors(sdkp) - 1))
--		/* Unaligned request */
--		return BLK_STS_IOERR;
-+	ret = sd_zbc_cmnd_checks(cmd);
-+	if (ret != BLK_STS_OK)
-+		return ret;
- 
- 	cmd->cmd_len = 16;
- 	memset(cmd->cmnd, 0, cmd->cmd_len);
+ static void submit_bio_wait_endio(struct bio *bio)
+ {
 -- 
 2.24.1
 
