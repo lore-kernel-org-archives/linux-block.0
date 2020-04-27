@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AE2C55199
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BAEC54FCB
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:30:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D921B2076A
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDE192076A
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 17:30:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725995AbgD0R16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 13:27:58 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:33924 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725963AbgD0R16 (ORCPT
+        id S1726486AbgD0RaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 13:30:09 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:56029 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725980AbgD0RaI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 13:27:58 -0400
-Received: by mail-pl1-f194.google.com with SMTP id s10so7254607plr.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 10:27:57 -0700 (PDT)
+        Mon, 27 Apr 2020 13:30:08 -0400
+Received: by mail-pj1-f68.google.com with SMTP id a32so7793753pje.5
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 10:30:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=FyumsHkIOBNQqFwiJRL4Ly7xeGVZh/BMRajGpMy1t9I=;
-        b=FHcrMyY9nrEOgccQSks4N2PCONgLrtgwWdLr3nAI13SgedHSWNRbQ6fq1K2IfurPJo
-         5g3fzFFD0q8yM+PXSm41sPLIi7adlLaJCj9ZFF6bivAtEMhRB/OmI6QByYJmBqyabkyW
-         0Ret7MudzIhNlRgx8r/8WCsTqpnsDgnxe1YV2n6M0e1FtmonlFny248V0Aj27svzyxjt
-         GU/RM1Kqs0qyj1GDcWpeUWxuaB/T9D5Mmfj12RKtFjykpWXHRgbkxOG891a5k3HbQjbT
-         LmiNDYoW4ERV+GVZqfaKpYmEXLUN+DvPnE+x9UtnrOh+IpD4bP95JF1e0409irozMk4M
-         HQeg==
-X-Gm-Message-State: AGi0PuYiKffZdLBFMJJcGV0dAJeU1D7S07loxdCXTcreGknVnBv6kriu
-        AehjpJMQeuNR/0RqqBP0YfLXajMBNIs=
-X-Google-Smtp-Source: APiQypK4aS6a9R53oLhxXUpvnT/WLw/iW+8+0lFpfkUdHLezsmbzaBaQVZqXIs51GGe46u+yMMh1mQ==
-X-Received: by 2002:a17:902:a40b:: with SMTP id p11mr24906103plq.304.1588008477192;
-        Mon, 27 Apr 2020 10:27:57 -0700 (PDT)
+        bh=Q/waOpkeU8bo6Doc8NIp3kRxTaFNq1zSuupdNHjBmtA=;
+        b=Ku/2f9F+KbCsOa1XJA9pOqMdmCALxrs+ZkMOxvTq9PY3K/US/oMIh/i5kX4rURrKtq
+         4HFtOO0U5xEne9XMpZYNwmTiW8TMSXfI8pAm3vLReSYuq1eSMQL0X/hLjC8vGf4q1lXD
+         ydW3ApNLnzKwCI8mu/kp67mZiMowmk1wjfDhqNdGHpsu3nA1QiTxrINt3U+uM2FJlAef
+         4ltMuefDouSLcqwZ7PAbxnoP1r9WygFAhlxoVDEri/RY5IDTsIObI6Jg1uCbN2cahja+
+         Ua4sqP/n02HyOuvoGrFyIk1z0gr8V6+IEcN36SVLxVjksKh+P7Ulf4HCZXYu05KWQNML
+         C/sg==
+X-Gm-Message-State: AGi0PuYZQq6Nzuvh0vd0d35dNPTOG549ru7hqqw8w3ZS7eb5E0f4PmGQ
+        QZ2L+2Tx86BFYLQTKpONK6M=
+X-Google-Smtp-Source: APiQypKtnIphH7q5xttIhTqUhogS5CI3JVS54S6HcvbNiOEe2+HphS9XOXtVXV8bgzhj9IsWdH3tgA==
+X-Received: by 2002:a17:902:7208:: with SMTP id ba8mr6223921plb.246.1588008607878;
+        Mon, 27 Apr 2020 10:30:07 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:a598:4365:d06:a875? ([2601:647:4000:d7:a598:4365:d06:a875])
-        by smtp.gmail.com with ESMTPSA id h27sm11316620pgb.90.2020.04.27.10.27.55
+        by smtp.gmail.com with ESMTPSA id r28sm13354557pfg.186.2020.04.27.10.30.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Apr 2020 10:27:56 -0700 (PDT)
-Subject: Re: [PATCH 1/1] blk-mq: remove the pointless call of list_entry_rq()
- in hctx_show_busy_rq()
+        Mon, 27 Apr 2020 10:30:07 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq-debugfs: update blk_queue_flag_name[] accordingly
+ for new flags
 To:     Hou Tao <houtao1@huawei.com>, linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-References: <20200427131250.13725-1-houtao1@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20200427133445.26215-1-houtao1@huawei.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -71,12 +72,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <244626f4-3469-1127-377c-d54c589d829b@acm.org>
-Date:   Mon, 27 Apr 2020 10:27:54 -0700
+Message-ID: <e1e28027-2dac-3ae3-21c1-9ba779a5a566@acm.org>
+Date:   Mon, 27 Apr 2020 10:30:06 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200427131250.13725-1-houtao1@huawei.com>
+In-Reply-To: <20200427133445.26215-1-houtao1@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,27 +86,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-04-27 06:12, Hou Tao wrote:
-> And use rq directly.
+On 2020-04-27 06:34, Hou Tao wrote:
+> Else there may be magic numbers in /sys/kernel/debug/block/*/state.
 > 
 > Signed-off-by: Hou Tao <houtao1@huawei.com>
 > ---
->  block/blk-mq-debugfs.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  block/blk-mq-debugfs.c | 3 +++
+>  include/linux/blkdev.h | 1 +
+>  2 files changed, 4 insertions(+)
 > 
 > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index b3f2ba483992..7a79db81a63f 100644
+> index 7a79db81a63f..49fdbc8a025f 100644
 > --- a/block/blk-mq-debugfs.c
 > +++ b/block/blk-mq-debugfs.c
-> @@ -400,8 +400,7 @@ static bool hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
->  	const struct show_busy_params *params = data;
+> @@ -125,6 +125,9 @@ static const char *const blk_queue_flag_name[] = {
+>  	QUEUE_FLAG_NAME(REGISTERED),
+>  	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
+>  	QUEUE_FLAG_NAME(QUIESCED),
+> +	QUEUE_FLAG_NAME(PCI_P2PDMA),
+> +	QUEUE_FLAG_NAME(ZONE_RESETALL),
+> +	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
+>  };
+>  #undef QUEUE_FLAG_NAME
 >  
->  	if (rq->mq_hctx == params->hctx)
-> -		__blk_mq_debugfs_rq_show(params->m,
-> -					 list_entry_rq(&rq->queuelist));
-> +		__blk_mq_debugfs_rq_show(params->m, rq);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 32868fbedc9e..d56ef0def78b 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -585,6 +585,7 @@ struct request_queue {
+>  	u64			write_hints[BLK_MAX_WRITE_HINTS];
+>  };
 >  
->  	return true;
->  }
+> +/* Need to update blk_queue_flag_name[] accordingly */
+>  #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
+>  #define QUEUE_FLAG_DYING	1	/* queue being torn down */
+>  #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
+
+Changing "Need to update blk_queue_flag_name[] accordingly" into "Keep
+blk_queue_flag_name[] in sync with the definitions below" probably would
+be more clear. Anyway:
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
