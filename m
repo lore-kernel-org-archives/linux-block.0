@@ -2,67 +2,110 @@ Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8F0C55199
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B92C5519A
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:52:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 271D820575
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07FEF206CD
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 12:52:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726604AbgD0MnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 08:43:04 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33436 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726651AbgD0MnE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 08:43:04 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 7E3BDCF084310AEA3F0F;
-        Mon, 27 Apr 2020 20:43:01 +0800 (CST)
-Received: from huawei.com (10.175.113.49) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Mon, 27 Apr 2020
- 20:43:00 +0800
-From:   Hou Tao <houtao1@huawei.com>
-To:     <linux-block@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 1/1] blk-mq: remove the pointless call of list_entry_rq() in hctx_show_busy_rq()
-Date:   Mon, 27 Apr 2020 21:12:50 +0800
-Message-ID: <20200427131250.13725-1-houtao1@huawei.com>
-X-Mailer: git-send-email 2.21.1
+        id S1727825AbgD0MwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 08:52:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55214 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727823AbgD0MwF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 08:52:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 19DBAAB89;
+        Mon, 27 Apr 2020 12:52:03 +0000 (UTC)
+Subject: Re: [PATCH v8 05/11] block: introduce blk_req_zone_write_trylock
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200427113153.31246-1-johannes.thumshirn@wdc.com>
+ <20200427113153.31246-6-johannes.thumshirn@wdc.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <889a6ff2-7c43-52b9-1e69-a20ee6c8227b@suse.de>
+Date:   Mon, 27 Apr 2020 14:52:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.49]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200427113153.31246-6-johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-And use rq directly.
+On 4/27/20 1:31 PM, Johannes Thumshirn wrote:
+> Introduce blk_req_zone_write_trylock(), which either grabs the write-lock
+> for a sequential zone or returns false, if the zone is already locked.
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-zoned.c      | 14 ++++++++++++++
+>   include/linux/blkdev.h |  1 +
+>   2 files changed, 15 insertions(+)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index f87956e0dcaf..c822cfa7a102 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -82,6 +82,20 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
+>   }
+>   EXPORT_SYMBOL_GPL(blk_req_needs_zone_write_lock);
+>   
+> +bool blk_req_zone_write_trylock(struct request *rq)
+> +{
+> +	unsigned int zno = blk_rq_zone_no(rq);
+> +
+> +	if (test_and_set_bit(zno, rq->q->seq_zones_wlock))
+> +		return false;
+> +
+> +	WARN_ON_ONCE(rq->rq_flags & RQF_ZONE_WRITE_LOCKED);
+> +	rq->rq_flags |= RQF_ZONE_WRITE_LOCKED;
+> +
+> +	return true;
+> +}
+> +EXPORT_SYMBOL_GPL(blk_req_zone_write_trylock);
+> +
+>   void __blk_req_zone_write_lock(struct request *rq)
+>   {
+>   	if (WARN_ON_ONCE(test_and_set_bit(blk_rq_zone_no(rq),
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 158641fbc7cd..d6e6ce3dc656 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1737,6 +1737,7 @@ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+>   
+>   #ifdef CONFIG_BLK_DEV_ZONED
+>   bool blk_req_needs_zone_write_lock(struct request *r
+> +bool blk_req_zone_write_trylock(struct request *rq);
+>   void __blk_req_zone_write_lock(struct request *rq);
+>   void __blk_req_zone_write_unlock(struct request *rq);
+>   
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- block/blk-mq-debugfs.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Cheers,
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b3f2ba483992..7a79db81a63f 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -400,8 +400,7 @@ static bool hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
- 	const struct show_busy_params *params = data;
- 
- 	if (rq->mq_hctx == params->hctx)
--		__blk_mq_debugfs_rq_show(params->m,
--					 list_entry_rq(&rq->queuelist));
-+		__blk_mq_debugfs_rq_show(params->m, rq);
- 
- 	return true;
- }
+Hannes
 -- 
-2.21.1
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
