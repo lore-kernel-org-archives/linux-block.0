@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE9BC7C7E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97027C7C7E2
 	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC2992087E
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 774712087E
+	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 07:43:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="j1gbTsin"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="gVLXq5UT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726779AbgD0HnD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 03:43:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55270 "EHLO
+        id S1726757AbgD0HnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 03:43:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726757AbgD0Hmn (ORCPT
+        with ESMTP id S1726752AbgD0Hmn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 27 Apr 2020 03:42:43 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39438C061A41
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:43 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id z6so19301579wml.2
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:43 -0700 (PDT)
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D267CC061A10
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:41 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id x4so18395548wmj.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 00:42:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=android.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=z6AdbaZw5amSpR1OTBUs1mGG2xOgZkTKod8u323wdnU=;
-        b=j1gbTsinaBOHHCiTpWUuIBw9z4yKIJrmeAQ+2qtSbwgf64HKByFWL1UsWv/dpI2Iuy
-         5IsrEQhr+7buKe6hGb3g07bYK+h2iESqSLVYBcv+v61glE4FygZFrR3zoevQdul6rcrz
-         YFel6MbOauDSI8Tnd1TKpKl+GdhPB9RoALzH4jiFfSMVHm0JJqgmI6WMIoReOL7MZovg
-         cShdx7UyPklTnp4u6n5kx0cFAmYxIiMIYvEYSCU/ZxNisjPnJKipycXLG8Fx1OZU9od1
-         37rfY10qYzd3Afk+ZskE2EjLJInDJYuX1a/D7d1KMQx8JaUgmUngxCLHhtUYii1eiSWj
-         4+dw==
+        bh=BPVCBcZ+vxq/vE4PZ944u0smAG80GpkLUfGejPD/RBc=;
+        b=gVLXq5UTLy0Ky0X9RXtF7PmsN+x21+1ldkywUzJDwSyOyLmpHneDPQ2I+VDgFJ/mn7
+         XuC4a8Kaiz+KkMu4MSvu+lqv+7aY3X1rc96lLpuBhsKGWTWEa6voZHHh8/5dA0q65fVd
+         dX4V2Yt1Z+y9vkCTwk4Q7IJ1JD6U/4ggynoMWpUsIdYeWwzLRp+N1MwjaJEQuRxxTrx5
+         AKz5M/dllwEAHos70YtDbiHgGSaS3ll5T6UzwFIS7FvC1Icfo4sENqlzM80dgdXYkpPm
+         OFpfaCmFtir8qeTArrTCXBCySxDTy2jyHHXn25HSYy8CoHx48mnCNNTq3duMpcfsjV1H
+         iVZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=z6AdbaZw5amSpR1OTBUs1mGG2xOgZkTKod8u323wdnU=;
-        b=JVBCMI0ncUiFxdr5tsceNaHu6SHMwj80uJStR5MUIbkSGObW3qtA+hvPN5DeBokL1D
-         jkK/+Xn6/vEUUcYsQ4SBhe1RMWEI9kX0k/D1L6IwNZYELEXhyfvA0dNKSbERYV6QY1by
-         j0i+31DVn6546YbxokrDwN7z4tG1zuXMufHZh3vruhLZmGrqksYAOZ+CR1iNLGoIdtn9
-         DzwYUqUtcan6kWz3QTPz+SKLElQi3CcDsJ3NYRd59qMeSw2fLz390PT2o1DAu4rI4Y80
-         SlyYm84yHn5UCiV0ti2v14QyHTQNjwEbbj3ooARfG6OKTlFWW2j7kFuhBsKLN2WYkko3
-         X7pg==
-X-Gm-Message-State: AGi0Pubb1ibxNdo6O+ka0PAlm99CN3R3/2EIxHw7X+Z6mN4WdPT6LM9s
-        xfpPW2V+MN+i86rdd23q+nCK9w==
-X-Google-Smtp-Source: APiQypKz0yDPUhaz7yPws4piP/BM54W17wyzklqe4uMkwsqVg9PlCsrCQpVHVAsiyoFRLvd1PTXldw==
-X-Received: by 2002:a7b:ce09:: with SMTP id m9mr24019050wmc.156.1587973361938;
-        Mon, 27 Apr 2020 00:42:41 -0700 (PDT)
+        bh=BPVCBcZ+vxq/vE4PZ944u0smAG80GpkLUfGejPD/RBc=;
+        b=IvdOt37KTcs9IJceVN4a/H3Ak5hckYxI63z9w2JIvEojWxXcBwS+0drLDb/gKrJKHh
+         ullCE8WKR7v8vfn0mS9L70ufoK+cXMwon4JP/MkXwkZ8mQ4r4vF5i3eqgsLEcBRsa50v
+         Rf5X4SWk1PzpKgU6bwoFN1+pGVOMXvqir8QJKRljyvzkqCk561I5uER70T+QD+UHmn1G
+         F/cQOSv2dPifLS3TR3w3sQcoNn7WCcmFra5sb8HUgeeZoqGLP3SDRFGtj2IMXTOP2bJf
+         eW0FkXscDafHlmjUODCxGw5qPKKG1gOt8IKV+xpRNDVN/DlKnUOQxWIg7RzUOgmDgy0K
+         u4Rw==
+X-Gm-Message-State: AGi0PuZ+G/cXjXwTTNHQ5/nA7MxgCJC1PzSHRho++Un903Z/oUltsyi2
+        NqnfUCIBtDloKJf27QU9SKhhrQ==
+X-Google-Smtp-Source: APiQypLpcwPdjusrbnmQUpHn2u+iuCu0JjOhCwJKZM9cdOEV08wmidKyKi1vkkGnkx6Ew9J/oslyXQ==
+X-Received: by 2002:a1c:49:: with SMTP id 70mr23488300wma.184.1587973360626;
+        Mon, 27 Apr 2020 00:42:40 -0700 (PDT)
 Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id x132sm15091658wmg.33.2020.04.27.00.42.40
+        by smtp.gmail.com with ESMTPSA id x132sm15091658wmg.33.2020.04.27.00.42.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 00:42:41 -0700 (PDT)
+        Mon, 27 Apr 2020 00:42:39 -0700 (PDT)
 From:   Martijn Coenen <maco@android.com>
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
 Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
         jaegeuk@kernel.org, Martijn Coenen <maco@android.com>
-Subject: [PATCH v3 7/9] loop: Move loop_set_status_from_info() and friends up
-Date:   Mon, 27 Apr 2020 09:42:20 +0200
-Message-Id: <20200427074222.65369-8-maco@android.com>
+Subject: [PATCH v3 6/9] loop: Factor out configuring loop from status
+Date:   Mon, 27 Apr 2020 09:42:19 +0200
+Message-Id: <20200427074222.65369-7-maco@android.com>
 X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
 In-Reply-To: <20200427074222.65369-1-maco@android.com>
 References: <20200427074222.65369-1-maco@android.com>
@@ -77,60 +77,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So we can use it without forward declaration. This is a separate commit
-to make it easier to verify that this is just a move, without functional
-modifications.
+Factor out this code into a separate function, so it can be reused by
+other code more easily.
 
 Signed-off-by: Martijn Coenen <maco@android.com>
 ---
- drivers/block/loop.c | 206 +++++++++++++++++++++----------------------
- 1 file changed, 103 insertions(+), 103 deletions(-)
+ drivers/block/loop.c | 117 +++++++++++++++++++++++++------------------
+ 1 file changed, 67 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index b55569fce975..cd1efe0eec5a 100644
+index d9a1a7e8b192..b55569fce975 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -963,6 +963,109 @@ static void loop_update_rotational(struct loop_device *lo)
- 		blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
+@@ -1267,13 +1267,78 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	return __loop_clr_fd(lo, false);
  }
  
-+static int
-+loop_release_xfer(struct loop_device *lo)
-+{
-+	int err = 0;
-+	struct loop_func_table *xfer = lo->lo_encryption;
-+
-+	if (xfer) {
-+		if (xfer->release)
-+			err = xfer->release(lo);
-+		lo->transfer = NULL;
-+		lo->lo_encryption = NULL;
-+		module_put(xfer->owner);
-+	}
-+	return err;
-+}
-+
-+static int
-+loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
-+	       const struct loop_info64 *i)
-+{
-+	int err = 0;
-+
-+	if (xfer) {
-+		struct module *owner = xfer->owner;
-+
-+		if (!try_module_get(owner))
-+			return -EINVAL;
-+		if (xfer->init)
-+			err = xfer->init(lo, i);
-+		if (err)
-+			module_put(owner);
-+		else
-+			lo->lo_encryption = xfer;
-+	}
-+	return err;
-+}
-+
 +/**
 + * loop_set_status_from_info - configure device from loop_info
 + * @lo: struct loop_device to configure
@@ -139,13 +101,14 @@ index b55569fce975..cd1efe0eec5a 100644
 + * Configures the loop device parameters according to the passed
 + * in loop_info64 configuration.
 + */
-+static int
+ static int
+-loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
 +loop_set_status_from_info(struct loop_device *lo,
 +			  const struct loop_info64 *info)
-+{
-+	int err;
-+	struct loop_func_table *xfer;
-+	kuid_t uid = current_uid();
+ {
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
 +
 +	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
 +		return -EINVAL;
@@ -197,94 +160,53 @@ index b55569fce975..cd1efe0eec5a 100644
 +	return 0;
 +}
 +
- static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 		       struct block_device *bdev, unsigned int arg)
- {
-@@ -1086,43 +1189,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static int
--loop_release_xfer(struct loop_device *lo)
--{
--	int err = 0;
--	struct loop_func_table *xfer = lo->lo_encryption;
--
--	if (xfer) {
--		if (xfer->release)
--			err = xfer->release(lo);
--		lo->transfer = NULL;
--		lo->lo_encryption = NULL;
--		module_put(xfer->owner);
++static int
++loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
++{
++	int err;
+ 	struct block_device *bdev;
++	kuid_t uid = current_uid();
+ 	bool partscan = false;
+ 	bool size_changed = false;
+ 	loff_t validated_size;
+@@ -1291,10 +1356,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		err = -ENXIO;
+ 		goto out_unlock;
+ 	}
+-	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
+-		err = -EINVAL;
+-		goto out_unlock;
 -	}
--	return err;
--}
--
--static int
--loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
--	       const struct loop_info64 *i)
--{
--	int err = 0;
--
--	if (xfer) {
--		struct module *owner = xfer->owner;
--
--		if (!try_module_get(owner))
--			return -EINVAL;
--		if (xfer->init)
--			err = xfer->init(lo, i);
--		if (err)
--			module_put(owner);
--		else
--			lo->lo_encryption = xfer;
--	}
--	return err;
--}
--
- static int __loop_clr_fd(struct loop_device *lo, bool release)
- {
- 	struct file *filp = NULL;
-@@ -1267,72 +1333,6 @@ static int loop_clr_fd(struct loop_device *lo)
- 	return __loop_clr_fd(lo, false);
- }
  
--/**
-- * loop_set_status_from_info - configure device from loop_info
-- * @lo: struct loop_device to configure
-- * @info: struct loop_info64 to configure the device with
-- *
-- * Configures the loop device parameters according to the passed
-- * in loop_info64 configuration.
-- */
--static int
--loop_set_status_from_info(struct loop_device *lo,
--			  const struct loop_info64 *info)
--{
--	int err;
--	struct loop_func_table *xfer;
--	kuid_t uid = current_uid();
--
--	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
--		return -EINVAL;
--
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+@@ -1321,54 +1382,10 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		goto out_unfreeze;
+ 	}
+ 
 -	err = loop_release_xfer(lo);
--	if (err)
--		return err;
--
++	err = loop_set_status_from_info(lo, info);
+ 	if (err)
+ 		goto out_unfreeze;
+ 
 -	if (info->lo_encrypt_type) {
 -		unsigned int type = info->lo_encrypt_type;
 -
--		if (type >= MAX_LO_CRYPT)
--			return -EINVAL;
+-		if (type >= MAX_LO_CRYPT) {
+-			err = -EINVAL;
+-			goto out_unfreeze;
+-		}
 -		xfer = xfer_funcs[type];
--		if (xfer == NULL)
--			return -EINVAL;
+-		if (xfer == NULL) {
+-			err = -EINVAL;
+-			goto out_unfreeze;
+-		}
 -	} else
 -		xfer = NULL;
 -
 -	err = loop_init_xfer(lo, xfer, info);
 -	if (err)
--		return err;
+-		goto out_unfreeze;
 -
 -	lo->lo_offset = info->lo_offset;
 -	lo->lo_sizelimit = info->lo_sizelimit;
@@ -311,12 +233,9 @@ index b55569fce975..cd1efe0eec5a 100644
 -		lo->lo_key_owner = uid;
 -	}
 -
--	return 0;
--}
--
- static int
- loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- {
+ 	if (size_changed)
+ 		loop_set_size(lo, validated_size);
+ 
 -- 
 2.26.2.303.gf8c07b1a785-goog
 
