@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12328C83000
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80378C83000
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEC6B206E2
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:25:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64B85206D6
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726882AbgD1NZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 09:25:37 -0400
-Received: from mx1.didichuxing.com ([111.202.154.82]:10843 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1727844AbgD1NZg (ORCPT
+        id S1726827AbgD1N3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 09:29:25 -0400
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:14359 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726900AbgD1N3Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 09:25:36 -0400
-X-ASG-Debug-ID: 1588080321-0e4088442c55ffb0001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.236]) by bsf01.didichuxing.com with ESMTP id fR989kaJ7i6xxYRV; Tue, 28 Apr 2020 21:25:21 +0800 (CST)
+        Tue, 28 Apr 2020 09:29:25 -0400
+X-ASG-Debug-ID: 1588080560-0e41085959572b70001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.203]) by bsf02.didichuxing.com with ESMTP id lS6zGcTx2iNckKRN; Tue, 28 Apr 2020 21:29:20 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 28 Apr
- 2020 21:25:20 +0800
-Date:   Tue, 28 Apr 2020 21:25:19 +0800
+ 2020 21:29:20 +0800
+Date:   Tue, 28 Apr 2020 21:29:19 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>
 CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v4 0/6] Fix potential kernel panic when increase hardware
- queue
+Subject: [RESEND PATCH v4 0/6] Fix potential kernel panic when increase
+ hardware queue
 Message-ID: <cover.1588078594.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [PATCH v4 0/6] Fix potential kernel panic when increase hardware
- queue
+X-ASG-Orig-Subj: [RESEND PATCH v4 0/6] Fix potential kernel panic when increase
+ hardware queue
 Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
         bvanassche@acm.org, linux-block@vger.kernel.org
 MIME-Version: 1.0
@@ -43,9 +43,9 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.236]
-X-Barracuda-Start-Time: 1588080321
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Barracuda-Connect: localhost[172.20.36.203]
+X-Barracuda-Start-Time: 1588080560
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
 X-Barracuda-Scan-Msg-Size: 1993
 X-Barracuda-BRTS-Status: 1
@@ -60,6 +60,7 @@ Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+Message-ID: <20200428132919.9bHRgAY3SfYS2tSRPt1En2xSg9DiFTW2zmfXG-Ot570@z>
 
 Hi,
 
