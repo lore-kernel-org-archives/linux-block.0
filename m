@@ -1,4 +1,4 @@
-Return-Path: <SRS0=2FWQ=6L=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=S1TO=6M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,97 +6,97 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBF8C4CECC
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 20:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8824FC83002
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 01:10:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE603206D4
-	for <linux-block@archiver.kernel.org>; Mon, 27 Apr 2020 20:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58553206D9
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 01:10:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="uCMDj0u3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1CvNqYx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726561AbgD0Uet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 16:34:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726205AbgD0Ues (ORCPT
+        id S1726251AbgD1BKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 21:10:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57667 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726233AbgD1BKg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 16:34:48 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DC4C03C1A7
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 13:34:48 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id u15so19097098ljd.3
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 13:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=g4dBzvzaYSmwe+gN0bTSxOguahuOK70qElh1uq5WJTY=;
-        b=uCMDj0u3BZLTUsCCRaRdr9xL9loSXFm7wGZEF7Ya1WoOmLRGy+nA1AMMNXR/ILJZVw
-         z8y4K4UI1gIuel/XaDugIU1GIeoXHJYXmAJ4/SejjNBnmMN8IxPFUZt/FnZg1mBDJnmC
-         8rkdL7wa67XKNfQhX9nVJln/EqqVnmaen/3TUFAldcbLr+xTor60OpBWNATy369XqToC
-         e3/tNcque2dmIaoRPmusn3BazbMH3ZXWjAcB/IKIMqzXaw8KsmhUm8dkDv59SBstlAca
-         whboOeW+ydNPEEjw6fPQutYz4fkfXkJ8NqlM4WJcMSF31Y/p8hOSDl05n7ZqzNrJSHFM
-         UbyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=g4dBzvzaYSmwe+gN0bTSxOguahuOK70qElh1uq5WJTY=;
-        b=ERMFtPta90yZ3RvbyL3EBRiECKsIs/hmT5xRET3fwUjZMOdtIOLbU9z+hkCshbZ1bR
-         13KclUoh42BEeg/e17pL1LM2Y9i//kxaJza2OKcy8Rfy8MWm8G0Rm6CfNdbGtvPwuzXa
-         4+a5I5UrMxgMSvWaPt5mlZVT8TYmb8Y5xP8/a14eM8mg1OYGEuuQSu0v+21Va3SlCl6V
-         jgP1jR/hs8Sz8U2+0APSzh0jHiWqv+MyoLBT4BmuTjMzsvBOekhqbFq0Zww9GdwJwM1N
-         u6PP6chd8ltRrmkffcH+QflA5GXnXG1qlTTOSvaXX66U+KJUuONz/9el1+ipeEZO44wr
-         WZhQ==
-X-Gm-Message-State: AGi0PuY8V6TUrGN8uVeWdkkbbIbnkTqRWoxRRUeXHOpT6oR/qFBopFfB
-        TxqaR2oSyQnVt8KXDipafyW0ycmgxYMGN4ZYQ8mAfw==
-X-Google-Smtp-Source: APiQypJ0k6z02gQOm9RJYPAfBsYkzEtyCANSfITp19EEVZRfK4V472Q83W1EunxwohzuVywk3Dyj5f6RuGciuIt8I1E=
-X-Received: by 2002:a2e:8e98:: with SMTP id z24mr15758173ljk.134.1588019686261;
- Mon, 27 Apr 2020 13:34:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200427074222.65369-1-maco@android.com> <20200427170613.GA13686@lst.de>
-In-Reply-To: <20200427170613.GA13686@lst.de>
-From:   Martijn Coenen <maco@android.com>
-Date:   Mon, 27 Apr 2020 22:34:35 +0200
-Message-ID: <CAB0TPYGZc_n-b5xtNsbJxEiqpLMqE=RcXGuy7C2vbY18mKZ6_A@mail.gmail.com>
-Subject: Re: [PATCH v3 0/9] Add a new LOOP_SET_FD_AND_STATUS ioctl
+        Mon, 27 Apr 2020 21:10:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588036235;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Lakza7Mu2g9x2rU8Ax4iFe6mUdEXOZQS631bq7FPROk=;
+        b=a1CvNqYxaHIFvbAStQ/YCN4gqCf0QdJvPpIkcyMrykoPc6Y1IKAUo/kcg6PVrFia+nFDZG
+        MYaN3aNTwHoUzoYxV6Q58Bg4YpQPbqfzTWg+QoWu4gDHOGNkmhUMmgjjs5gVK9/2vigTxy
+        L/Pgste2CA1FEYyEP2UoLBuLa5lt8As=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-oLJzwAzZNpC0pM00MasEZA-1; Mon, 27 Apr 2020 21:10:31 -0400
+X-MC-Unique: oLJzwAzZNpC0pM00MasEZA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68BCD8015CE;
+        Tue, 28 Apr 2020 01:10:29 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DC155D9DD;
+        Tue, 28 Apr 2020 01:10:20 +0000 (UTC)
+Date:   Tue, 28 Apr 2020 09:10:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Narayan Kamath <narayan@google.com>,
-        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Martijn Coenen <maco@google.com>,
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, will@kernel.org,
+        peterz@infradead.org, paulmck@kernel.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200428011014.GA603273@T590>
+References: <20200424102351.475641-1-ming.lei@redhat.com>
+ <20200424102351.475641-8-ming.lei@redhat.com>
+ <20200424103851.GD28156@lst.de>
+ <20200425031723.GC477579@T590>
+ <20200425083224.GA5634@lst.de>
+ <20200425093437.GA495669@T590>
+ <20200425095351.GC495669@T590>
+ <20200425154832.GA16004@lst.de>
+ <20200426020621.GA511475@T590>
+ <20200427153601.GA7802@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200427153601.GA7802@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On Mon, Apr 27, 2020 at 05:36:01PM +0200, Christoph Hellwig wrote:
+> On Sun, Apr 26, 2020 at 10:06:21AM +0800, Ming Lei wrote:
+> > On Sat, Apr 25, 2020 at 05:48:32PM +0200, Christoph Hellwig wrote:
+> > > FYI, here is what I think we should be doing (but the memory model
+> > > experts please correct me):
+> > >=20
+> > >  - just drop the direct_issue flag and check for the CPU, which is
+> > >    cheap enough
+> >=20
+> > That isn't correct because the CPU for running async queue may not be
+> > same with rq->mq_ctx->cpu since hctx->cpumask may include several CPU=
+s
+> > and we run queue in RR style and it is really a normal case.
+>=20
+> But in that case the memory barrier really doesn't matter anywa=E1=BA=8F=
+.
 
-On Mon, Apr 27, 2020 at 7:06 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> I've just been looking over the loop driver for other reasons,
-> and noticed that setting the block size still isn't possible
-> with LOOP_SET_FD_AND_STATUS as far as I can tell.  Might that
-> be worth it?
+It might be true, however we can save the cost with zero cost, why
+not do it? Also with document benefit.
 
-That's a good point, I didn't think about it because that path is no
-longer slow in our setup, but I think it makes sense to include it.
-
-> Also maybe an explicit direct I/O flag, and maybe
-> enough padding with a future proof flags bitmap that we can easily
-> extend it for new features if they pop up?
-
-Sounds good. I'm thinking these flags should be separate from
-LO_FLAGS_; even though there is already a LO_FLAGS_DIRECT_IO, as far
-as I can tell it can only be used to tell whether it's enabled, not to
-actually enable it. And it would just get confusing if we add more
-flags later. Maybe something like LO_FD_STATUS_FLAG_DIRECT_IO ?
 
 Thanks,
-Martijn
+Ming
+
