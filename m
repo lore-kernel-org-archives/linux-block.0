@@ -6,34 +6,32 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9701AC83000
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1585C83008
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71E08206D6
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A8E4206D9
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbgD1N3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 09:29:45 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:15008 "HELO
-        bsf02.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1726825AbgD1N3p (ORCPT
+        id S1726900AbgD1N35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 09:29:57 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:13349 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726825AbgD1N34 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 09:29:45 -0400
-X-ASG-Debug-ID: 1588080583-0e4108595c572bd0001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.244]) by bsf02.didichuxing.com with ESMTP id Nh6F0sN2F8w2LoFQ; Tue, 28 Apr 2020 21:29:43 +0800 (CST)
+        Tue, 28 Apr 2020 09:29:56 -0400
+X-ASG-Debug-ID: 1588080591-0e4088442b5603c0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.175]) by bsf01.didichuxing.com with ESMTP id H7tc4hIPOuxPlAxw; Tue, 28 Apr 2020 21:29:51 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 28 Apr
- 2020 21:29:42 +0800
-Date:   Tue, 28 Apr 2020 21:29:41 +0800
+ 2020 21:29:51 +0800
+Date:   Tue, 28 Apr 2020 21:29:49 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>
 CC:     <linux-block@vger.kernel.org>
-Subject: [RESEND v4 2/6] block: save previous hardware queue count before
- udpate
-Message-ID: <ea9f8241d420025a1e9e553d2c966fcc8b32335c.1588080449.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [RESEND v4 2/6] block: save previous hardware queue count before
- udpate
+Subject: [RESEND v4 3/6] block: refactor __blk_mq_alloc_rq_maps
+Message-ID: <099ba8795dd54ad79939ff3c32eca48c665e498f.1588080449.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [RESEND v4 3/6] block: refactor __blk_mq_alloc_rq_maps
 Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
         bvanassche@acm.org, linux-block@vger.kernel.org
 References: <cover.1588080449.git.zhangweiping@didiglobal.com>
@@ -45,11 +43,11 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.244]
-X-Barracuda-Start-Time: 1588080583
-X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
+X-Barracuda-Connect: localhost[172.20.36.175]
+X-Barracuda-Start-Time: 1588080591
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 865
+X-Barracuda-Scan-Msg-Size: 3877
 X-Barracuda-BRTS-Status: 1
 X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
 X-Barracuda-Spam-Score: -2.02
@@ -63,32 +61,120 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_realloc_tag_set_tags will update set->nr_hw_queues, so
-save old set->nr_hw_queues before call this function.
+This patch add a new member nr_allocated_map_rqs to the
+struct blk_mq_tag_set to record the number of maps and requests have
+been allocated for this tagset.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Now there are two problems when we increase/decrease hardware queue:
+
+For increase, we do not allocate maps and request for the new
+allocated hardware queue, it will be fixed in the next patch.
+
+For decrease, when driver decrease hardware queue, set->nr_hw_queues
+will be changed firstly in blk_mq_realloc_tag_set_tags or
+__blk_mq_update_nr_hw_queues, then blk_mq_realloc_hw_ctxs and
+blk_mq_map_swqueue, even blk_mq_free_tag_set have no chance to free
+these hardware queue resource, because they iterate hardware queue by
+for (i = 0; i < set->nr_hw_queues; i++).
+
+Since request needs lots of memory, it's not easy alloc so many memory
+dynamically, espeicially when system is under memory pressure.
+
+This patch allow nr_hw_queues does not equal to the nr_allocated_map_rqs,
+to avoid alloc/free memory when change hardware queue count.
+
 Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c         | 26 +++++++++++++++++++-------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f789b3e1b3ab..a79afbe60ca6 100644
+index a79afbe60ca6..8393cb50bdc8 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -3347,11 +3347,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_sysfs_unregister(q);
+@@ -2484,8 +2484,10 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
+ 
+ 	ret = blk_mq_alloc_rqs(set, set->tags[hctx_idx], hctx_idx,
+ 				set->queue_depth);
+-	if (!ret)
++	if (!ret) {
++		set->nr_allocated_map_rqs++;
+ 		return true;
++	}
+ 
+ 	blk_mq_free_rq_map(set->tags[hctx_idx]);
+ 	set->tags[hctx_idx] = NULL;
+@@ -2499,6 +2501,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+ 		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+ 		blk_mq_free_rq_map(set->tags[hctx_idx]);
+ 		set->tags[hctx_idx] = NULL;
++		set->nr_allocated_map_rqs--;
  	}
+ }
  
-+	prev_nr_hw_queues = set->nr_hw_queues;
- 	if (blk_mq_realloc_tag_set_tags(set, set->nr_hw_queues, nr_hw_queues) <
- 	    0)
- 		goto reregister;
+@@ -2983,18 +2986,27 @@ void blk_mq_exit_queue(struct request_queue *q)
+ 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+ }
  
--	prev_nr_hw_queues = set->nr_hw_queues;
- 	set->nr_hw_queues = nr_hw_queues;
- 	blk_mq_update_queue_map(set);
- fallback:
+-static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
++/*
++ * Only append new map and requests, if new > now, all of these maps and
++ * request will be released when cleanup whole tag set. Because requests
++ * will cost lots memory, if system's memory is under a pressure, it's not
++ * easy to allocate too much memory.
++ */
++static int blk_mq_realloc_map_and_requests(struct blk_mq_tag_set *set, int new)
+ {
+-	int i;
++	int i, now = set->nr_allocated_map_rqs;
++
++	if (new <= now)
++		return 0;
+ 
+-	for (i = 0; i < set->nr_hw_queues; i++)
++	for (i = now; i < new; i++)
+ 		if (!__blk_mq_alloc_rq_map(set, i))
+ 			goto out_unwind;
+ 
+ 	return 0;
+ 
+ out_unwind:
+-	while (--i >= 0)
++	while (--i >= now)
+ 		blk_mq_free_map_and_requests(set, i);
+ 
+ 	return -ENOMEM;
+@@ -3012,7 +3024,7 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 
+ 	depth = set->queue_depth;
+ 	do {
+-		err = __blk_mq_alloc_rq_maps(set);
++		err = blk_mq_realloc_map_and_requests(set, set->nr_hw_queues);
+ 		if (!err)
+ 			break;
+ 
+@@ -3189,7 +3201,7 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ {
+ 	int i, j;
+ 
+-	for (i = 0; i < set->nr_hw_queues; i++)
++	for (i = 0; i < set->nr_allocated_map_rqs; i++)
+ 		blk_mq_free_map_and_requests(set, i);
+ 
+ 	for (j = 0; j < set->nr_maps; j++) {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index f389d7c724bd..d950435cd3c6 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -240,6 +240,7 @@ struct blk_mq_tag_set {
+ 	unsigned int		nr_maps;
+ 	const struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
++	unsigned int		nr_allocated_map_rqs;
+ 	unsigned int		queue_depth;
+ 	unsigned int		reserved_tags;
+ 	unsigned int		cmd_size;
 -- 
 2.18.1
 
