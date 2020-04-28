@@ -2,84 +2,130 @@ Return-Path: <SRS0=S1TO=6M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396F0C83002
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 01:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E816C83003
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 02:14:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14C34206E2
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 01:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73472206D9
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 02:14:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KnwnZ++v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726259AbgD1BZH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Apr 2020 21:25:07 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3314 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726233AbgD1BZH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Apr 2020 21:25:07 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 5B09E9406323141899A7;
-        Tue, 28 Apr 2020 09:25:04 +0800 (CST)
-Received: from huawei.com (10.175.113.49) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Tue, 28 Apr 2020
- 09:25:02 +0800
-From:   Hou Tao <houtao1@huawei.com>
-To:     <linux-block@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] blk-mq-debugfs: update blk_queue_flag_name[] accordingly for new flags
-Date:   Tue, 28 Apr 2020 09:54:56 +0800
-Message-ID: <20200428015456.1194-1-houtao1@huawei.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <e1e28027-2dac-3ae3-21c1-9ba779a5a566@acm.org>
-References: <e1e28027-2dac-3ae3-21c1-9ba779a5a566@acm.org>
+        id S1726359AbgD1COr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Apr 2020 22:14:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726279AbgD1COr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Apr 2020 22:14:47 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69783C03C1A9
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 19:14:47 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id a5so453431pjh.2
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2020 19:14:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dNDHgCC2Tbezyzaz1jik79FYVEDQH+X+/Zl/FX9zdvE=;
+        b=KnwnZ++vm3JMJEkBfjFTzuMZedHlKQkCikCMg8o+5SWaFUknNqNFJgJ3P2p9Bu58HM
+         uf017eQcybmhKeNlI5fCSw+3L8DgrWC0bVbQgF+oc8afCfYiOFaqp3b/LyOGYDXw57Uj
+         QuOKGbFyCv2xwx1rc1Vb7FqncrawNMyBdsB/86iAof/qDTTDi8hg+1WYx/5AFR7ebw4n
+         sQ/ZxXJZQZcKzI3CfLRPf/Fz31PKeWGx/2vzUUpwYkPulnIEOq6wrS3fwVu+YWWfJChZ
+         N8ChLbccFNspOjuqbjvUfB4gcGKYV27YIq0wzgMlqrHmCRN1evUqwui+9EvxyLrUj/S8
+         NQQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dNDHgCC2Tbezyzaz1jik79FYVEDQH+X+/Zl/FX9zdvE=;
+        b=omT0E0/r5I/Wcz2lFbqMCkLWM+aVM8N3FO4C98DE56iWxeF1YltsCJHYllU910u4oZ
+         9t/0M0Nk4P9MsKkmZcaHGISCNuOIa8kDOmz6GfPyxTxCeRPIWPEpaoKZK2B1p6vABmZk
+         3OySnEHHrPy4lBDYT5Yhm/ng93HxRnp7yyB+XXY1FBb29EAVi5pa4QzEApg/T4RYPl6J
+         TMyHwnPPYICWRDmtawgN3NNpKTdn2KGJ7Psom0jwcymSAMqfYGTQmrzrPAQWfvyOj4Rv
+         LrPuYqL8jZI0aCHNbyhSkaU3eunWZaSqFX1oquyv17rWYESXswpbI5z09aFW970EqjZP
+         oMFA==
+X-Gm-Message-State: AGi0PubWmmIXVRCErj3OeMQqzqZzdXO8PoiQw5OQhfeSqK4gx7T60cCx
+        3Y+tceV1Hpvtyj92qHJF/UBjtVxIFLWPdQ==
+X-Google-Smtp-Source: APiQypJ+Q+7kB5uiF6PP1T5S7xnrAVLUajbrQdNpmN5RmNLCd3B63jV5Haw2iF8Xd19BTMuAfLQl5w==
+X-Received: by 2002:a17:90a:68cb:: with SMTP id q11mr2161545pjj.15.1588040086489;
+        Mon, 27 Apr 2020 19:14:46 -0700 (PDT)
+Received: from google.com (56.4.82.34.bc.googleusercontent.com. [34.82.4.56])
+        by smtp.gmail.com with ESMTPSA id q64sm13385299pfc.112.2020.04.27.19.14.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2020 19:14:45 -0700 (PDT)
+Date:   Tue, 28 Apr 2020 02:14:41 +0000
+From:   Satya Tangirala <satyat@google.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v10 02/12] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200428021441.GA52406@google.com>
+References: <20200408035654.247908-1-satyat@google.com>
+ <20200408035654.247908-3-satyat@google.com>
+ <20200422092250.GA12290@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.49]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422092250.GA12290@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Else there may be magic numbers in /sys/kernel/debug/block/*/state.
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
----
-v2: comments update as suggested by Bart
----
- block/blk-mq-debugfs.c | 3 +++
- include/linux/blkdev.h | 1 +
- 2 files changed, 4 insertions(+)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7a79db81a63f..49fdbc8a025f 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -125,6 +125,9 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
-+	QUEUE_FLAG_NAME(PCI_P2PDMA),
-+	QUEUE_FLAG_NAME(ZONE_RESETALL),
-+	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
- };
- #undef QUEUE_FLAG_NAME
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 32868fbedc9e..02809e4dd661 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -585,6 +585,7 @@ struct request_queue {
- 	u64			write_hints[BLK_MAX_WRITE_HINTS];
- };
- 
-+/* Keep blk_queue_flag_name[] in sync with the definitions below */
- #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
- #define QUEUE_FLAG_DYING	1	/* queue being torn down */
- #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
--- 
-2.21.1
-
+On Wed, Apr 22, 2020 at 02:22:50AM -0700, Christoph Hellwig wrote:
+> > +bool blk_ksm_crypto_cfg_supported(struct blk_keyslot_manager *ksm,
+> > +				  const struct blk_crypto_config *cfg)
+> > +{
+> > +	if (!ksm)
+> > +		return false;
+> > +	return (ksm->crypto_modes_supported[cfg->crypto_mode] &
+> > +		cfg->data_unit_size) &&
+> > +	       (ksm->max_dun_bytes_supported >= cfg->dun_bytes);
+> 
+> Nit: why not expand this a bit to be more readable:
+> 
+> 	if (!(ksm->crypto_modes_supported[cfg->crypto_mode] &
+> 			cfg->data_unit_size))
+> 		return false;
+> 	if (ksm->max_dun_bytes_supported < cfg->dun_bytes)
+> 		return false;
+> 	return true;
+> 
+> > +int blk_ksm_evict_key(struct blk_keyslot_manager *ksm,
+> > +		      const struct blk_crypto_key *key)
+> > +{
+> > +	struct blk_ksm_keyslot *slot;
+> > +	int err = 0;
+> > +
+> > +	blk_ksm_hw_enter(ksm);
+> > +	slot = blk_ksm_find_keyslot(ksm, key);
+> > +	if (!slot)
+> > +		goto out_unlock;
+> > +
+> > +	if (atomic_read(&slot->slot_refs) != 0) {
+> > +		err = -EBUSY;
+> > +		goto out_unlock;
+> > +	}
+> 
+> This check looks racy.
+Yes, this could in theory race with blk_ksm_put_slot (e.g. if it's
+called while there's still IO in flight/IO that just finished) - But
+it's currently only called by fscrypt when a key is being destroyed,
+which only happens after all the inodes using that key are evicted, and
+no data is in flight, so when this function is called, slot->slot_refs
+will be 0. In particular, this function should only be called when the
+key isn't being used for IO anymore. I'll add a WARN_ON_ONCE and also
+make the assumption clearer. We could also instead make this wait for
+the slot_refs to become 0 and then evict the key instead of just
+returning -EBUSY as it does now, but I'm not sure if it's really what
+we want to do/worth doing right now...
