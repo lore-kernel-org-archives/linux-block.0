@@ -2,139 +2,121 @@ Return-Path: <SRS0=S1TO=6M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345A0C83000
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 12:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12328C83000
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:25:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F9952075E
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 12:41:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WpdqH2v/"
+	by mail.kernel.org (Postfix) with ESMTP id EEC6B206E2
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 13:25:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726746AbgD1Mll (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 08:41:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45478 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726544AbgD1Mll (ORCPT
+        id S1726882AbgD1NZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 09:25:37 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:10843 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1727844AbgD1NZg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 08:41:41 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C37C03C1A9
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2020 05:41:40 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id n4so17094042ejs.11
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2020 05:41:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2jb9elzh/74ZWm4bFfjq7/QUpnKgP6S86qUXhjXdPl8=;
-        b=WpdqH2v/MZNbC1y2LwFDPVj6TJ8XVB8xtVoaSjQGJjuuIts2SvG/F1aCWEsMgZNz5V
-         b8DiEjUBpMGtx9ZZ383qetmnIgvNvrB+SikeXNDp7lsxjyJlhoSEbJRj9vxeKb1NCZWP
-         dESZdJFqkC0j6aCmKbtHVRMoZASgG4GTN2qfuvSHwNZis3DNMjshfxvnjgO1KiQHtpCE
-         pJzmoHcmgfAtzMcTfD/p28CIl76uMkp/9LQP+ThqL2EI1y90zMeul+C9USJ1pS9wHiPb
-         uIVe8riqcxOCdzmI1/tmJD6yWKjsHem5M9pl92ecTHEEZS091dKHfxJYYCpeUVwvanSU
-         IMXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2jb9elzh/74ZWm4bFfjq7/QUpnKgP6S86qUXhjXdPl8=;
-        b=dZm8WY/+nYeByyz2olBd05I0W8BAWQE2OzMtpXx9nUOXbm8u+0O98O8hSMwkVzwFj0
-         lxCoZC2q9Pq4EHgtkWr0xFRV0uyh/FPnDr/ZUbmpaUd1WgKypmKs8eZqgpyol4v5FOMy
-         RGX/pPINMrk/W06MhZMC4+aJ7GmJ4/iBe7rOnj+V797zIUPkAQI1y5raVCF/8Re4d6pu
-         zxpMiFogytscM9QiwBG9F47cBZAzDcUgeKRc4BMGB2T4Qtncoy0r6RXUaHTB91MVkQ4d
-         TrJGqJ8tTGMCcqCmVYD7wEQivcOQmWR66vtz4yR5ue3VlE/0TdpzsUZOEhYAECfCyjck
-         zUbg==
-X-Gm-Message-State: AGi0PuaoaBLBI6p8qVY7yEXakF5m2IJIPRmgoI+9oLZTQy4s+O/50KYr
-        iOUGeCXwNM/5R4T+G/J+cJbxMU0N89pKOjKUyEW3cQ==
-X-Google-Smtp-Source: APiQypIt5QxH0bocTs9uxDt53Avl+v2Af4RfA+4Dq3POVZYa8RWwnjwHZjjbmBgwTmnGmeTVQr7ZOmZVgX1p+JMfxH0=
-X-Received: by 2002:a17:906:9494:: with SMTP id t20mr23467353ejx.51.1588077699476;
- Tue, 28 Apr 2020 05:41:39 -0700 (PDT)
+        Tue, 28 Apr 2020 09:25:36 -0400
+X-ASG-Debug-ID: 1588080321-0e4088442c55ffb0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.236]) by bsf01.didichuxing.com with ESMTP id fR989kaJ7i6xxYRV; Tue, 28 Apr 2020 21:25:21 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 28 Apr
+ 2020 21:25:20 +0800
+Date:   Tue, 28 Apr 2020 21:25:19 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH v4 0/6] Fix potential kernel panic when increase hardware
+ queue
+Message-ID: <cover.1588078594.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [PATCH v4 0/6] Fix potential kernel panic when increase hardware
+ queue
+Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
+        bvanassche@acm.org, linux-block@vger.kernel.org
 MIME-Version: 1.0
-References: <20200415092045.4729-1-danil.kipnis@cloud.ionos.com>
- <CAMGffE=R2zaL6Ao3gZ_XvKPvG0YX5bmo18o3cJ_SLBEjZ0Mv_g@mail.gmail.com> <20200428123151.GS26002@ziepe.ca>
-In-Reply-To: <20200428123151.GS26002@ziepe.ca>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Tue, 28 Apr 2020 14:41:28 +0200
-Message-ID: <CAMGffEkEQ37bbG5BFixnESor8kjyLkEu4jC99a5g=xiCkyXECw@mail.gmail.com>
-Subject: Re: [PATCH v12 00/25] RTRS (former IBTRS) RDMA Transport Library and
- RNBD (former IBNBD) RDMA Network Block Device
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>
-Cc:     Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        linux-block@vger.kernel.org,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.236]
+X-Barracuda-Start-Time: 1588080321
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 1993
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81478
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 2:31 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Sat, Apr 25, 2020 at 10:31:55AM +0200, Jinpu Wang wrote:
->
-> > >  create mode 100644 Documentation/ABI/testing/sysfs-block-rnbd
-> > >  create mode 100644 Documentation/ABI/testing/sysfs-class-rnbd-client
-> > >  create mode 100644 Documentation/ABI/testing/sysfs-class-rnbd-server
-> > >  create mode 100644 Documentation/ABI/testing/sysfs-class-rtrs-client
-> > >  create mode 100644 Documentation/ABI/testing/sysfs-class-rtrs-server
-> > >  create mode 100644 drivers/block/rnbd/Kconfig
-> > >  create mode 100644 drivers/block/rnbd/Makefile
-> > >  create mode 100644 drivers/block/rnbd/README
-> > >  create mode 100644 drivers/block/rnbd/rnbd-clt-sysfs.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-clt.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-clt.h
-> > >  create mode 100644 drivers/block/rnbd/rnbd-common.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-log.h
-> > >  create mode 100644 drivers/block/rnbd/rnbd-proto.h
-> > >  create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
-> > >  create mode 100644 drivers/block/rnbd/rnbd-srv-sysfs.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-srv.c
-> > >  create mode 100644 drivers/block/rnbd/rnbd-srv.h
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Kconfig
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/Makefile
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/README
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-sysfs.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt.h
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-log.h
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-pri.h
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv-stats.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv-sysfs.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.h
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.c
-> > >  create mode 100644 drivers/infiniband/ulp/rtrs/rtrs.h
-> > >
-> > >
-> > Hi Jason, hi Leon, hi Doug, hi all,
-> >
-> > We now have Reviewed-by for RNBD part from Bart (Thanks again), Do you
-> > have new comments regarding RTRS, should we send another round to do a
-> > rebase to latest rc?
->
-> We'd need an ack from Jens before the block stuff could go through the
-> RDMA tree
->
-> Jason
-Hi Jason
-Thanks for reply.
+Hi,
 
-Hi Jens,
+This series do some improvement base on V2, and also fix two memleaks.
+And V2 import a regression for blktest/block/test/029, this test case
+will increase and decrease hardware queue count quickly.
 
-Could you give your ack so Jason could take RNBD/RTRS through RDMA
-tree, Jason mentioned in the past, we should get it ready at around
-rc4ish,  so we still can get about 2 weeks of little bug fixes from
-all the cross-arch compilation if any.
 
-Thanks!
+Memleak 1:
+
+__blk_mq_alloc_rq_maps
+	__blk_mq_alloc_rq_map
+
+if fail
+	blk_mq_free_rq_map
+
+Actually, __blk_mq_alloc_rq_map alloc both map and request, here
+also need free request.
+
+Memleak 2:
+When driver decrease hardware queue, set->nr_hw_queues will be changed
+firstly in blk_mq_realloc_tag_set_tags or __blk_mq_update_nr_hw_queues,
+then blk_mq_realloc_hw_ctxs and blk_mq_map_swqueue, even
+blk_mq_free_tag_set have no chance to free these hardware queue resource,
+because they iterate hardware queue by
+for (i = 0; i < set->nr_hw_queues; i++).
+
+Patch1: fix Memleak 1.
+Patch2: fix prev_nr_hw_queues issue, need be saved before change.
+Patch3: refactor __blk_mq_alloc_rq_maps and fix Memleak 2.
+Patch4: fix potential kernel panic when increase hardware queue.
+Patch5~6: rename two function, because these two function alloc both
+map and request, and keep in pair with blk_mq_free_map_and_request(s).
+
+Changes since V3:
+* record patchset, fix issue fistly then rename.
+* rename function to blk_mq_alloc_map_and_request
+
+Changes since V2:
+ * rename some functions name and fix memleak when free map and requests
+ * Not free new allocated map and request, they will be relased when tagset gone
+
+Changes since V1:
+ * Add fix for potential kernel panic when increase hardware queue
+
+Weiping Zhang (6):
+  block: free both rq_map and request
+  block: save previous hardware queue count before udpate
+  block: refactor __blk_mq_alloc_rq_maps
+  block: alloc map and request for new hardware queue
+  block: rename __blk_mq_alloc_rq_map
+  block: rename blk_mq_alloc_rq_maps
+
+ block/blk-mq.c         | 47 +++++++++++++++++++++++++++++-------------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 34 insertions(+), 14 deletions(-)
+
+-- 
+2.18.1
+
