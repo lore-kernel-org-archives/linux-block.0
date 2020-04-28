@@ -2,326 +2,322 @@ Return-Path: <SRS0=S1TO=6M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAC1C83008
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 15:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3372C83001
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 15:56:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63D5220730
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 15:25:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZlTyg/TM"
+	by mail.kernel.org (Postfix) with ESMTP id B7F0B206C0
+	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 15:56:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728377AbgD1PZU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 11:25:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38142 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728653AbgD1PZT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 11:25:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588087517;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5MtNMEGePoQeOLLhuNO9qh1Kt/0hKDl+pM06audhEQE=;
-        b=ZlTyg/TMhfVAN2vOxeRHhGYGcLIJrt+jXSaFw38lcGpxlv78G36jThwsFDluLnb3VE3FuA
-        N9rhS1ze8PTxtB4QbT7qXb1tCe60RckWtxBPIu4+uetkiw0i2hMOJEcZEIVTmXUimk6AP5
-        +mvtxCobA8eq1ymbK2s/q99g91CxMRw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-ILCGOwV9MDCUzojvdsmf-Q-1; Tue, 28 Apr 2020 11:25:13 -0400
-X-MC-Unique: ILCGOwV9MDCUzojvdsmf-Q-1
-Received: by mail-wr1-f69.google.com with SMTP id 11so12494508wrc.3
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2020 08:25:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5MtNMEGePoQeOLLhuNO9qh1Kt/0hKDl+pM06audhEQE=;
-        b=BU8DPXaoFNAnZ0Qr0El5ANqfu1ylDnPyRi0XicqplkByIBDRjmca8FvhFoU0XUMmKc
-         xbwzExZ1YrbECUuyjy4Dhr8fqy+rsFlpvFoQ9l+qRZFs51ThzAJGsEGcjWWg/HH8T5aD
-         zI8S9PzUnQqvmJl26SOZQTZdPBkD72Eokg7nZ1Lj7h4yGULSA56rBP+nU9kaYnq2SOTj
-         XBFRt2xCjrl2DYdPNrDqSGeFGLj4FTaZ7V6E7WJOo/oyrqD3XDlt5je2/7nNM0pI4MDR
-         9o6s0eleTW+6TL2Y7Y129h99JeCvTdYS3Akt9nELH5FgqeS9u3VbLarURGL+nuhtCKZO
-         gDnQ==
-X-Gm-Message-State: AGi0Pub2bA1huPy4ito6rcxd7pe5WkytF+te4PH0AwQYb1dw1BaFs39I
-        es+2FfMhjyGhoQ3wHQNm2rjkh43wLzU9EEjHqHutT+FBY9FHnIw7vVjWB/6+EmkenTZP/7BudV7
-        w+YsERjDnPGDqMGPD6ss8+oM=
-X-Received: by 2002:a1c:66d5:: with SMTP id a204mr5197817wmc.69.1588087512163;
-        Tue, 28 Apr 2020 08:25:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIJdX3FBeU0e1jJbzapSQEZb33vOn2eVbDhxsWqrn0qFTot27aYfiyyqxJOctswjaoqI4z3Xg==
-X-Received: by 2002:a1c:66d5:: with SMTP id a204mr5197790wmc.69.1588087511757;
-        Tue, 28 Apr 2020 08:25:11 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
-        by smtp.gmail.com with ESMTPSA id a205sm3990772wmh.29.2020.04.28.08.25.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2020 08:25:10 -0700 (PDT)
-Date:   Tue, 28 Apr 2020 11:25:07 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
-        Lance Digby <ldigby@redhat.com>
-Subject: Re: [PATCH v2] virtio-blk: handle block_device_operations callbacks
- after hot unplug
-Message-ID: <20200428110515-mutt-send-email-mst@kernel.org>
-References: <20200428143009.107645-1-stefanha@redhat.com>
+        id S1727884AbgD1P4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 11:56:06 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2122 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727865AbgD1P4G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Apr 2020 11:56:06 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 689E37CCE431A6F85A86;
+        Tue, 28 Apr 2020 16:56:04 +0100 (IST)
+Received: from [127.0.0.1] (10.47.4.245) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Tue, 28 Apr
+ 2020 16:56:02 +0100
+Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "hare@suse.de" <hare@suse.de>,
+        "don.brace@microsemi.com" <don.brace@microsemi.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "esc.storagedev@microsemi.com" <esc.storagedev@microsemi.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
+ <1583409280-158604-9-git-send-email-john.garry@huawei.com>
+ <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com>
+ <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
+ <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
+ <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
+ <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com>
+ <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
+ <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com>
+ <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
+ <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com>
+ <d2ae343770a83466b870a33ffae5fa23@mail.gmail.com>
+ <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
+ <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <538dd70d-7edb-c66c-4205-d91f24a907ea@huawei.com>
+Date:   Tue, 28 Apr 2020 16:55:22 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200428143009.107645-1-stefanha@redhat.com>
+In-Reply-To: <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.4.245]
+X-ClientProxiedBy: lhreml706-chm.china.huawei.com (10.201.108.55) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 03:30:09PM +0100, Stefan Hajnoczi wrote:
-> A userspace process holding a file descriptor to a virtio_blk device can
-> still invoke block_device_operations after hot unplug.  For example, a
-> program that has /dev/vdb open can call ioctl(HDIO_GETGEO) after hot
-> unplug to invoke virtblk_getgeo().
+Hi Kashyap,
 
+> I am using <mq-deadline> which is MQ version of SQ deadline.
+> For now we can just consider case without scheduler.
+> 
+> I have some more findings. May be someone from upstream community can
+> connect the dots.
+> 
+> #1. hctx_may_queue() throttle the IO at hctx level. This is eventually per
+> sdev throttling for megaraid_sas driver because It creates only one
+> context - hctx0 for each scsi device.
+> 
+> If driver is using only one h/w queue,  active_queues will be always steady.
+> In my test it was 64 thread, so active_queues=64.
 
-which causes what? a use after free?
+So I figure that 64 threads comes from 64 having disks.
+
+> Even though <fio> thread is shared among allowed cpumask
+> (cpus_allowed_policy=shared option in fio),  active_queues will be always 64
+> because we have only one h/w queue.
+> All the logical cpus are mapped to one h/w queue. It means, thread moving
+> from one cpu to another cpu will not change active_queues per hctx.
+> 
+> In case of this RFC, active_queues are now per hctx and there are multiple
+> hctx, but tags are shared. 
+
+Right, so we need a policy to divide up the shared tags across request 
+queues, based on principle of fairness.
+
+This can create unwanted throttling and
+> eventually more lock contention in sbitmap.
+> I added below patch and things improved a bit, but not a full proof.
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 586c9d6..c708fbc 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -60,10 +60,12 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>    * For shared tag users, we track the number of currently active users
+>    * and attempt to provide a fair share of the tag depth for each of them.
+>    */
+> -static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+> +static inline bool hctx_may_queue(struct request_queue *q,
+> +                                 struct blk_mq_hw_ctx *hctx,
+>                                    struct sbitmap_queue *bt)
+>   {
+> -       unsigned int depth, users;
+> +       unsigned int depth, users, i, outstanding = 0;
+> +       struct blk_mq_hw_ctx *hctx_iter;
+> 
+>          if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_SHARED))
+>                  return true;
+> @@ -84,14 +86,18 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx
+> *hctx,
+>           * Allow at least some tags
+>           */
+>          depth = max((bt->sb.depth + users - 1) / users, 4U);
+> -       return atomic_read(&hctx->nr_active) < depth;
+> +
+> +       queue_for_each_hw_ctx(q, hctx_iter, i)
+> +               outstanding += atomic_read(&hctx_iter->nr_active);
+> +
+
+OK,  I think that we need to find a cleaner way to do this.
+
+> +       return outstanding < depth;
+>   }
+> 
+>   static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+>                              struct sbitmap_queue *bt)
+>   {
+>          if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+> -           !hctx_may_queue(data->hctx, bt))
+> 
+> 
+> #2 - In completion path, scsi module call blk_mq_run_hw_queues() upon IO
+> completion.  I am not sure if it is good to run all the h/w queue or just
+> h/w queue of current reference is good enough.
+> Below patch helped to reduce contention in hcxt_lock().
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 610ee41..f72de2a 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -572,6 +572,7 @@ static bool scsi_end_request(struct request *req,
+> blk_status_t error,
+>          struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+>          struct scsi_device *sdev = cmd->device;
+>          struct request_queue *q = sdev->request_queue;
+> +       struct blk_mq_hw_ctx *mq_hctx = req->mq_hctx;
+> 
+>          if (blk_update_request(req, error, bytes))
+>                  return true;
+> @@ -613,7 +614,7 @@ static bool scsi_end_request(struct request *req,
+> blk_status_t error,
+>              !list_empty(&sdev->host->starved_list))
+>                  kblockd_schedule_work(&sdev->requeue_work);
+>          else
+> -               blk_mq_run_hw_queues(q, true);
+> +               blk_mq_run_hw_queue(mq_hctx, true);
+
+Not sure on this. But, indeed, I found running all queues did add lots 
+of extra load for when enabling the deadline scheduler.
 
 > 
-> Introduce a reference count in struct virtio_blk so that its lifetime
-> covers both virtio_driver probe/remove and block_device_operations
-> open/release users.  This ensures that block_device_operations functions
-> like virtblk_getgeo() can safely access struct virtio_blk.
+>          percpu_ref_put(&q->q_usage_counter);
+>          return false;
 > 
-> Add remove_mutex to prevent block_device_operations functions from
-> accessing vblk->vdev during virtblk_remove() and let the safely check
-
-let the -> let them?
-
-> for !vblk->vdev after virtblk_remove() returns.
+> #3 -  __blk_mq_tag_idle() calls blk_mq_tag_wakeup_all which may not be
+> optimal for shared queue.
+> There is a penalty if we are calling __sbq_wake_up() frequently. In case of
+> nr_hw_queue = 1, things are better because one hctx and hctx->state will
+> avoid multiple calls.
+> If blk_mq_tag_wakeup_all is called from hctx0 context, there is no need to
+> call from hctx1, hctx2 etc.
 > 
-> Switching to a reference count also solves the vd_index_ida leak where
-> vda, vdb, vdc, etc indices were lost when the device was hot unplugged
-> while the block device was still open.
+> I have added below patch in my testing.
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 586c9d6..5b331e5 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -53,7 +53,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+> 
+>          atomic_dec(&tags->active_queues);
+> 
+> -       blk_mq_tag_wakeup_all(tags, false);
+> +       /* TBD - Do this only for hctx->flags & BLK_MQ_F_TAG_HCTX_SHARED */
+> +       if (hctx->queue_num == 0)
+> +               blk_mq_tag_wakeup_all(tags, false);
 
-Can you move this statement up so we list both issues (use after free
-and leak) upfront, then discuss the fix?
+ok, I see. But, again, I think we need to find a cleaner way to do this.
+
+>   }
+> 
+>   /*
+> 
+> 
+> With all above mentioned changes, I see performance improved from 2.2M IOPS
+> to 2.7M on same workload and profile.
+
+But still short of nr_hw_queue = 1, which got 3.1M IOPS, as below, right?
+
+Thanks,
+John
 
 > 
-> Reported-by: Lance Digby <ldigby@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> If someone has a simpler solution please let me know.  I looked at
-> various approaches including reusing device_lock(&vblk->vdev.dev) but
-> they were more complex and extending the lifetime of virtio_device after
-> remove() has been called seems questionable.
-> ---
->  drivers/block/virtio_blk.c | 85 ++++++++++++++++++++++++++++++++++----
->  1 file changed, 77 insertions(+), 8 deletions(-)
+>>
+>>>
+>>> Old Driver which has nr_hw_queue = 1 and I issue IOs from <fio>  queue
+>>> depth = 128. We get 3.1M IOPS in this config. This eventually exhaust
+>>> host can_queue.
+>>
+>> So I think I need to find a point where we start to get throttled.
+>>
+>>> Note - Very low contention in sbitmap_get()
+>>>
+>>> -   23.58%     0.25%  fio              [kernel.vmlinux]            [k]
+>>> blk_mq_make_request
+>>>      - 23.33% blk_mq_make_request
+>>>         - 21.68% blk_mq_get_request
+>>>            - 20.19% blk_mq_get_tag
+>>>               + 10.08% prepare_to_wait_exclusive
+>>>               + 4.51% io_schedule
+>>>               - 3.59% __sbitmap_queue_get
+>>>                  - 2.82% sbitmap_get
+>>>                       0.86% __sbitmap_get_word
+>>>                       0.75% _raw_spin_lock_irqsave
+>>>                       0.55% _raw_spin_unlock_irqrestore
+>>>
+>>> Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
+>>> queue depth = 128. We get 2.3 M IOPS in this config. This eventually
+>>> exhaust host can_queue.
+>>> Note - Very high contention in sbitmap_get()
+>>>
+>>> -   42.39%     0.12%  fio              [kernel.vmlinux]            [k]
+>>> generic_make_request
+>>>      - 42.27% generic_make_request
+>>>         - 41.00% blk_mq_make_request
+>>>            - 38.28% blk_mq_get_request
+>>>               - 33.76% blk_mq_get_tag
+>>>                  - 30.25% __sbitmap_queue_get
+>>>                     - 29.90% sbitmap_get
+>>>                        + 9.06% _raw_spin_lock_irqsave
+>>>                        + 7.94% _raw_spin_unlock_irqrestore
+>>>                        + 3.86% __sbitmap_get_word
+>>>                        + 1.78% call_function_single_interrupt
+>>>                        + 0.67% ret_from_intr
+>>>                  + 1.69% io_schedule
+>>>                    0.59% prepare_to_wait_exclusive
+>>>                    0.55% __blk_mq_get_tag
+>>>
+>>> In this particular case, I observed alloc_hint = zeros which means,
+>>> sbitmap_get is not able to find free tags from hint. That may lead to
+>>> contention.
+>>> This condition is not happening with nr_hw_queue=1 (without RFC) driver.
+>>>
+>>> alloc_hint=
+>>> {663, 2425, 3060, 54, 3149, 4319, 4175, 4867, 543, 2481, 0, 4779, 377,
+>>> ***0***, 2010, 0, 909, 3350, 1546, 2179, 2875, 659, 3902, 2224, 3212,
+>>> 836, 1892, 1669, 2420, 3415, 1904, 512, 3027, 4810, 2845, 4690, 712,
+>>> 3105, 0, 0, 0, 3268, 4915, 3897, 1349, 547, 4, 733, 1765, 2068, 979,
+>>> 51, 880, 0, 370, 3520, 2877, 4097, 418, 4501, 3717, 2893, 604, 508,
+>>> 759, 3329, 4038, 4829, 715, 842, 1443, 556}
+>>>
+>>> Driver with RFC which has nr_hw_queue = N and I issue IOs from <fio>
+>>> queue depth = 32. We get 3.1M IOPS in this config. This workload does
+>>> *not* exhaust host can_queue.
+>>
+>> Please ensure .host_tagset is set for whenever nr_hw_queue = N. This is as
+>> per
+>> RFC, and I don't think you modified from the RFC for your test.
+>> But I just wanted to mention that to be crystal clear.
 > 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 93468b7c6701..3dd53b445cc1 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -44,6 +44,13 @@ struct virtio_blk {
->  	/* Process context for config space updates */
->  	struct work_struct config_work;
->  
-> +	/*
-> +	 * Tracks references from block_device_operations open/release and
-> +	 * virtio_driver probe/remove so this object can be freed once no
-> +	 * longer in use.
-> +	 */
-> +	refcount_t refs;
-> +
->  	/* What host tells us, plus 2 for header & tailer. */
->  	unsigned int sg_elems;
->  
-> @@ -53,6 +60,9 @@ struct virtio_blk {
->  	/* num of vqs */
->  	int num_vqs;
->  	struct virtio_blk_vq *vqs;
-> +
-> +	/* Provides mutual exclusion with virtblk_remove(). */
-
-This is not the best way to document access rules.
-Which fields does this protect, exactly?
-I think it's just vdev. Right?
-Pls add to the comment.
-
-> +	struct mutex remove_mutex;
->  };
->  
->  struct virtblk_req {
-> @@ -295,10 +305,54 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
->  	return err;
->  }
->  
-> +static void virtblk_get(struct virtio_blk *vblk)
-> +{
-> +	refcount_inc(&vblk->refs);
-> +}
-> +
-> +static void virtblk_put(struct virtio_blk *vblk)
-> +{
-> +	if (refcount_dec_and_test(&vblk->refs)) {
-> +		ida_simple_remove(&vd_index_ida, vblk->index);
-> +		mutex_destroy(&vblk->remove_mutex);
-> +		kfree(vblk);
-> +	}
-> +}
-> +
-> +static int virtblk_open(struct block_device *bd, fmode_t mode)
-> +{
-> +	struct virtio_blk *vblk = bd->bd_disk->private_data;
-> +	int ret = -ENXIO;
-
-
-It's more common to do
-
-	int ret = 0;
-
-and on error:
-	ret = -ENXIO;
-
-
-let's do this.
-
-
-> +
-> +	mutex_lock(&vblk->remove_mutex);
-> +
-> +	if (vblk->vdev) {
-> +		virtblk_get(vblk);
-> +		ret = 0;
-> +	}
-
-I prefer
-	else
-		ret = -ENXIO
-
-here.
-
-
-> +
-> +	mutex_unlock(&vblk->remove_mutex);
-> +	return ret;
-> +}
-> +
-> +static void virtblk_release(struct gendisk *disk, fmode_t mode)
-> +{
-> +	struct virtio_blk *vblk = disk->private_data;
-> +
-> +	virtblk_put(vblk);
-> +}
-> +
->  /* We provide getgeo only to please some old bootloader/partitioning tools */
->  static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  {
->  	struct virtio_blk *vblk = bd->bd_disk->private_data;
-> +	int ret = -ENXIO;
-
-It's more common to do
-
-	int ret = 0;
-
-and on error:
-	ret = -ENXIO;
-
-
-let's do this.
-
-> +
-> +	mutex_lock(&vblk->remove_mutex);
-> +
-> +	if (!vblk->vdev) {
-> +		goto out;
-> +	}
-
-
-single lines are not supposed to use {}.
-if you add ret = -ENXIO here then it won't be a single line anymore
-though.
-
->  
->  	/* see if the host passed in geometry config */
->  	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
-> @@ -314,11 +368,17 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  		geo->sectors = 1 << 5;
->  		geo->cylinders = get_capacity(bd->bd_disk) >> 11;
->  	}
-> -	return 0;
-> +
-> +	ret = 0;
-> +out:
-> +	mutex_unlock(&vblk->remove_mutex);
-> +	return ret;
->  }
->  
->  static const struct block_device_operations virtblk_fops = {
->  	.owner  = THIS_MODULE,
-> +	.open = virtblk_open,
-> +	.release = virtblk_release,
->  	.getgeo = virtblk_getgeo,
->  };
->  
-> @@ -655,6 +715,10 @@ static int virtblk_probe(struct virtio_device *vdev)
->  		goto out_free_index;
->  	}
->  
-> +	/* This reference is dropped in virtblk_remove(). */
-> +	refcount_set(&vblk->refs, 1);
-> +	mutex_init(&vblk->remove_mutex);
-> +
->  	vblk->vdev = vdev;
->  	vblk->sg_elems = sg_elems;
->  
-> @@ -820,8 +884,12 @@ static int virtblk_probe(struct virtio_device *vdev)
->  static void virtblk_remove(struct virtio_device *vdev)
->  {
->  	struct virtio_blk *vblk = vdev->priv;
-> -	int index = vblk->index;
-> -	int refc;
-> +
-> +	/*
-> +	 * Virtqueue processing is stopped safely here but mutual exclusion is
-> +	 * needed for block_device_operations.
-> +	 */
-> +	mutex_lock(&vblk->remove_mutex);
->  
->  	/* Make sure no work handler is accessing the device. */
->  	flush_work(&vblk->config_work);
-> @@ -834,15 +902,16 @@ static void virtblk_remove(struct virtio_device *vdev)
->  	/* Stop all the virtqueues. */
->  	vdev->config->reset(vdev);
->  
-> -	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
-> +	/* Virtqueue are stopped, nothing can use vblk->vdev anymore. */
-
-Virtqueues?
-
-> +	vblk->vdev = NULL;
-> +
->  	put_disk(vblk->disk);
->  	vdev->config->del_vqs(vdev);
->  	kfree(vblk->vqs);
-> -	kfree(vblk);
->  
-> -	/* Only free device id if we don't have any users */
-> -	if (refc == 1)
-> -		ida_simple_remove(&vd_index_ida, index);
-> +	mutex_unlock(&vblk->remove_mutex);
-> +
-> +	virtblk_put(vblk);
->  }
->  
->  #ifdef CONFIG_PM_SLEEP
-> -- 
-> 2.25.3
-> 
+> Yes I have two separate driver copy. One with RFC change and another without
+> RFC.
+>>
+>>>
+>>> -    5.07%     0.14%  fio              [kernel.vmlinux]  [k]
+>>> generic_make_request
+>>>      - 4.93% generic_make_request
+>>>         - 3.61% blk_mq_make_request
+>>>            - 2.04% blk_mq_get_request
+>>>               - 1.08% blk_mq_get_tag
+>>>                  - 0.70% __sbitmap_queue_get
+>>>                       0.67% sbitmap_get
+>>>
+>>> In summary, RFC has some performance bottleneck in sbitmap_get () if
+>>> outstanding per shost is about to exhaust.  Without this RFC also
+>>> driver works in nr_hw_queue = 1, but that case is managed very well.
+>>> I am not sure why it happens only with shared host tag ? Theoretically
+>>> all the hctx is sharing the same bitmaptag which is same as
+>>> nr_hw_queue=1, so why contention is only visible in shared host tag
+>>> case.
+>>
+>> Let me check this.
+>>
+>>>
+>>> If you want to reproduce this issue, may be you have to reduce the
+>>> can_queue in hisi_sas driver.
+>>>
+>>
+>> Thanks,
+>> John
 
