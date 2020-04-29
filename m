@@ -2,110 +2,64 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FFDC83007
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 06:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0146C83003
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D37992083B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 06:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC2EF20775
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FkvWc81q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YLHQWhFr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbgD2GGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 02:06:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37010 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726181AbgD2GGH (ORCPT
+        id S1726366AbgD2HUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 03:20:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50670 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726483AbgD2HUk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 02:06:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588140366;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J/xBa/OqsaiL4lL+AQ8xqe2ItBrcnopvFJln8kxnfZA=;
-        b=FkvWc81q+4vUcRtLWvN3/837+hoYJeSMCfgU5OxQ7gGRIecGXoF2L6ZhN1+uiiiH+JVY2R
-        CULlukrP66MuvrAxDGSa9ablB/1CWy2HtP+tIi0H1L3BCKuk/Mffrpv0bRFhrS9gNWqqQ6
-        ns1SM1VEVK2TvAlkPdP53DbaanCRPn4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-3eUndRugPI--HZYTarMLDw-1; Wed, 29 Apr 2020 02:06:04 -0400
-X-MC-Unique: 3eUndRugPI--HZYTarMLDw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8117D800C78;
-        Wed, 29 Apr 2020 06:06:02 +0000 (UTC)
-Received: from work (unknown [10.40.192.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 90802614E7;
-        Wed, 29 Apr 2020 06:06:00 +0000 (UTC)
-Date:   Wed, 29 Apr 2020 08:05:56 +0200
-From:   Lukas Czerner <lczerner@redhat.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     viro@zeniv.linux.org.uk, Ian Kent <raven@themaw.net>,
-        torvalds@linux-foundation.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix use after free in get_tree_bdev()
-Message-ID: <20200429060556.zeci7z7jwazly4ga@work>
-References: <158810566883.1168184.8679527126430822408.stgit@warthog.procyon.org.uk>
+        Wed, 29 Apr 2020 03:20:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB998C03C1AD
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 00:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pWZiUOr50LUZPcsWwoXvBliBtclfygG5ruoitObx0l4=; b=YLHQWhFrqHDXvBQJhqrh1hlIV/
+        cnnNVB2TZgufIKFaj6OW4iK8VljbtQenFLJS/Lay7WaEKnAWH28ZMNwhU3IpbEZ/3mDJHebpLebdH
+        EWd5u/fLeBbfZW2bCl6l2r6GNBEua1BMygq7ZBaag9BDnfcDhugLgog2qaiDOMyDPidMZDOvNskPJ
+        7nBfvt9CsKEGY+IPu+cMa2hPC/1L8AtuhmxOECNDAiyQ/yUFdKFqIiHKPZlgowmi2HRODKiY733zX
+        8/SvgPmH6OVGxwHmcgNj7QyFmzCG1HjQHoEFm63azb1uxqFi2QRqv8mS4F1EgcBwr2wfBRck31dMJ
+        zrQ+Yx+g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jTh1K-0005Qz-FT; Wed, 29 Apr 2020 07:20:38 +0000
+Date:   Wed, 29 Apr 2020 00:20:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCH 1/3] block: remove blk_queue_root_blkg
+Message-ID: <20200429072038.GA11410@infradead.org>
+References: <20200428164434.1517-1-johannes.thumshirn@wdc.com>
+ <20200428164434.1517-2-johannes.thumshirn@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <158810566883.1168184.8679527126430822408.stgit@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200428164434.1517-2-johannes.thumshirn@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 09:27:48PM +0100, David Howells wrote:
-> Commit 6fcf0c72e4b9, a fix to get_tree_bdev() put a missing blkdev_put() in
-> the wrong place, before a warnf() that displays the bdev under
-> consideration rather after it.
+On Wed, Apr 29, 2020 at 01:44:32AM +0900, Johannes Thumshirn wrote:
+> blk_queue_root_blkg() has no callers, remove it.
 > 
-> This results in a silent lockup in printk("%pg") called via warnf() from
-> get_tree_bdev() under some circumstances when there's a race with the
-> blockdev being frozen.  This can be caused by xfstests/tests/generic/085 in
-> combination with Lukas Czerner's ext4 mount API conversion patchset.  It
-> looks like it ought to occur with other users of get_tree_bdev() such as
-> XFS, but apparently doesn't.
-> 
-> Fix this by switching the order of the lines.
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-This fixes the problem I was seeing. Thanks David.
+Looks good,
 
-Reviewed-by: Lukas Czerner <lczerner@redhat.com>
-
-> 
-> Fixes: 6fcf0c72e4b9 ("vfs: add missing blkdev_put() in get_tree_bdev()")
-> Reported-by: Lukas Czerner <lczerner@redhat.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Ian Kent <raven@themaw.net>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> ---
-> 
->  fs/super.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/super.c b/fs/super.c
-> index cd352530eca9..a288cd60d2ae 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -1302,8 +1302,8 @@ int get_tree_bdev(struct fs_context *fc,
->  	mutex_lock(&bdev->bd_fsfreeze_mutex);
->  	if (bdev->bd_fsfreeze_count > 0) {
->  		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-> -		blkdev_put(bdev, mode);
->  		warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
-> +		blkdev_put(bdev, mode);
->  		return -EBUSY;
->  	}
->  
-> 
-> 
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
