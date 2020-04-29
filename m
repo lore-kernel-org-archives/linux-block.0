@@ -2,89 +2,68 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76038C83000
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:17:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDF1C83000
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:29:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E87820731
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:17:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEBUF+Ay"
+	by mail.kernel.org (Postfix) with ESMTP id B7F0B2070B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:29:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726474AbgD2BRn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 21:17:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50772 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726353AbgD2BRn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 21:17:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588123062;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a9rWN0ISEDMcvYISG0NzTefsKNinJfINEugf2xFfHd0=;
-        b=eEBUF+Ayqw7LMuuNcHky22VWo9O/zkgfq51RPtDC2YT/I0Da0nPFVmBTZH4aGSB8KixuEu
-        eod1QOBM2CsRFLFl+ps2wyWqXElKQ5LuECudh6Y2Jy7eGz+aBxCIBAcW8TuYgY0v8CsjfM
-        KnuN/hkRzHi90qRqQI6hX0iZY5BuHbs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-kQrsfha6M0iStoZNoGDQpA-1; Tue, 28 Apr 2020 21:17:40 -0400
-X-MC-Unique: kQrsfha6M0iStoZNoGDQpA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 222DB107ACCA;
-        Wed, 29 Apr 2020 01:17:39 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 46F1510013BD;
-        Wed, 29 Apr 2020 01:17:32 +0000 (UTC)
-Date:   Wed, 29 Apr 2020 09:17:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Salman Qazi <sqazi@google.com>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 1/2] block: add blk_default_io_timeout() for avoiding
- task hung in sync IO
-Message-ID: <20200429011728.GA671522@T590>
-References: <20200428074657.645441-1-ming.lei@redhat.com>
- <20200428074657.645441-2-ming.lei@redhat.com>
- <7e339c3d-8600-4a9b-99bf-24afb023c4dd@acm.org>
+        id S1726363AbgD2B3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 21:29:32 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34934 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726181AbgD2B3c (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Apr 2020 21:29:32 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 2E4526A54B010EB47AA9;
+        Wed, 29 Apr 2020 09:29:30 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Wed, 29 Apr 2020
+ 09:29:23 +0800
+From:   Zheng Bin <zhengbin13@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <zhengbin13@huawei.com>
+Subject: [PATCH] blk-mq: make function '__blk_mq_sched_dispatch_requests' static
+Date:   Wed, 29 Apr 2020 09:36:32 +0800
+Message-ID: <20200429013632.38276-1-zhengbin13@huawei.com>
+X-Mailer: git-send-email 2.26.0.106.g9fadedd
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e339c3d-8600-4a9b-99bf-24afb023c4dd@acm.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 07:19:33AM -0700, Bart Van Assche wrote:
-> On 2020-04-28 00:46, Ming Lei wrote:
-> > +/*
-> > + * Used in sync IO for avoiding to triger task hung warning, which may
-> > + * cause system panic or reboot.
-> > + */
-> > +static inline unsigned long blk_default_io_timeout(void)
-> > +{
-> > +	return sysctl_hung_task_timeout_secs * (HZ / 2);
-> > +}
-> > +
-> >  #endif
-> 
-> This function is only used inside the block layer. Has it been
-> considered to move this function from the public block layer API into a
-> private header file, e.g. block/blk.h?
+Fix sparse warnings:
 
-Please look at the commit log or the 2nd patch, and the helper will be
-used in 2nd patch in dio code.
+block/blk-mq-sched.c:209:5: warning: symbol '__blk_mq_sched_dispatch_requests' was not declared. Should it be static?
 
-Thanks,
-Ming
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zheng Bin <zhengbin13@huawei.com>
+---
+ block/blk-mq-sched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 702ce525933c..fdcc2c1dd178 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -206,7 +206,7 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 	return ret;
+ }
+
+-int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
++static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+--
+2.26.0.106.g9fadedd
 
