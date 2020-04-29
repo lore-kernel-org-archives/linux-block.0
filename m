@@ -2,99 +2,103 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA268C83006
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4023CC83000
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:12:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB2362082E
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:06:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EB8720B80
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:12:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="hRK69Fjp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Toqt+Q9M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgD2OGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 10:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728306AbgD2OGO (ORCPT
+        id S1726815AbgD2OMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 10:12:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49455 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726516AbgD2OMw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 10:06:14 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2DFC03C1AD
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:06:13 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id j3so2728497ljg.8
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/5dFXvkHlFL4ZD9k3m+cudI2M3jreB1NrwloZ96EAJw=;
-        b=hRK69FjpTSEspooL3pngL3RWCh2k42g9+qRkAdCL+irtc4FBd8usHLppdKZiUO37H4
-         dVtIaQds7wIJpD4FvJmA66WsFpFfircv+CumTEfc64ZSOaC04mVKNMUiibqxvwXKlthW
-         uV/x8yUF7yTSwotvszuUAYM3u62kvRUPdUhak5B9N3l1WIRWV5MaiV84IC2e8djDPvwE
-         Yr8AcLkIr1KWLn53YcTtBcJGoRPGQ1Pqr7OnW/qaqaIkm3e2ejq+sjpqgO3w+/wHVZQ8
-         3Jmoz2QNSIxgVhyhS7eHhnQ7OHVYaCMFrOcDADZh3gAbG5a3TT0Y72ntLo6SHcnf3IBB
-         uj0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/5dFXvkHlFL4ZD9k3m+cudI2M3jreB1NrwloZ96EAJw=;
-        b=E7hjbC7/9UVVAEoUXFI2nF7V8zHh2FVI1yK8pNiET3YFVanwMcz5u1iYbb+3u+6/4w
-         oZMlcKUaiQKTwyxg5dFF6y7wHDySP8cFL/Qa+aK3DzMw6Vhawpqc/7qnEx+FNhBZ4nKk
-         GLrTR5jwcx1tj1cmk0It2ZjpRZbFQR2g/ftlmibPPhTfDy4193psaiDYou8WvPkKTFEG
-         Q4Nc+nYRiX4f8C+16MrYw4bXkSCSLcBIq/7bCYZMXuRgn5M6yksMc7drZG+0UCaT2DxG
-         ww2sZ6uMilIC0T/zb68gCLHgePtomkOM9v7dW086jtWNfV1tRrqD3gXOTmbUaWPz2Q37
-         Aa7g==
-X-Gm-Message-State: AGi0PuZHhkaONQizqCh81TZiDBG4uS88ApbNvFgFGmzN/OTZLX0WLmj6
-        CekGdLfVCQpr9GCwiGnlGQSvueR+xDpGkHTmDnaHZA==
-X-Google-Smtp-Source: APiQypKeyYViSeG3LDYxj8g69kihbk0QRE6mRva/Grt1UgVyN/1ZIYYoZXAzChs4XfsXoPtgXgLAGZsvsvLk5MwjgfQ=
-X-Received: by 2002:a2e:8e98:: with SMTP id z24mr21704390ljk.134.1588169171856;
- Wed, 29 Apr 2020 07:06:11 -0700 (PDT)
+        Wed, 29 Apr 2020 10:12:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588169570;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k/c2OUq86MJcfNlBcO0fpqAK43s5QsWMF0jpIrxBr1s=;
+        b=Toqt+Q9MqaMdx6Wyj8sC3WuIz/2MNSYgc5uHJgKb3H4h2+udQQk5hVix0sRnJBwf+Fmt6D
+        FdTcBbHD1QKimLGcGQXyrKk2ZV6/xtayEaibMCARO8RmT/Giw+dDdqjCCFdM1c7E9Pg8Dw
+        XMKJXeMhPknC5p27tdS5TghgPBLt19U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-6dKzlqqnNaCDSQnyz49PXg-1; Wed, 29 Apr 2020 10:12:46 -0400
+X-MC-Unique: 6dKzlqqnNaCDSQnyz49PXg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E880106BF98;
+        Wed, 29 Apr 2020 14:12:44 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33DDF5D9C9;
+        Wed, 29 Apr 2020 14:12:33 +0000 (UTC)
+Date:   Wed, 29 Apr 2020 22:12:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Martijn Coenen <maco@android.com>
+Cc:     axboe@kernel.dk, hch@lst.de, narayan@google.com,
+        zezeozue@google.com, kernel-team@android.com, maco@google.com,
+        bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 01/10] loop: Factor out loop size validation
+Message-ID: <20200429141229.GE700644@T590>
+References: <20200429140341.13294-1-maco@android.com>
+ <20200429140341.13294-2-maco@android.com>
 MIME-Version: 1.0
-References: <20200427074222.65369-1-maco@android.com> <20200427170613.GA13686@lst.de>
- <CAB0TPYGZc_n-b5xtNsbJxEiqpLMqE=RcXGuy7C2vbY18mKZ6_A@mail.gmail.com>
- <20200428070200.GC18754@lst.de> <CAB0TPYF4yHwXTG2xb5yci9-KJiT5=VbwWz9yj+uyBwb2rSi8Rg@mail.gmail.com>
-In-Reply-To: <CAB0TPYF4yHwXTG2xb5yci9-KJiT5=VbwWz9yj+uyBwb2rSi8Rg@mail.gmail.com>
-From:   Martijn Coenen <maco@android.com>
-Date:   Wed, 29 Apr 2020 16:06:00 +0200
-Message-ID: <CAB0TPYEkuCe-z2nNDRadGV3ASFXdZ3OVcB16yZ4PnNc2cokHAw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/9] Add a new LOOP_SET_FD_AND_STATUS ioctl
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Narayan Kamath <narayan@google.com>,
-        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Martijn Coenen <maco@google.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200429140341.13294-2-maco@android.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 4:57 PM Martijn Coenen <maco@android.com> wrote:
-> and it allows requesting a partition scan. It makes sense to maintain
-> that behavior, but what about LO_FLAGS_DIRECT_IO? I think you're
-> proposing LOOP_SET_STATUS(64) should keep ignoring that like it used
-> to?
+On Wed, Apr 29, 2020 at 04:03:32PM +0200, Martijn Coenen wrote:
+> Ensuring we don't truncate loff_t when casting to sector_t is done in
+> multiple places; factor it out.
+> 
+> Signed-off-by: Martijn Coenen <maco@android.com>
+> ---
+>  drivers/block/loop.c | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index f1754262fc94..396b8bd4d75c 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -228,15 +228,30 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+>  		blk_mq_unfreeze_queue(lo->lo_queue);
+>  }
+>  
+> +/**
+> + * loop_validate_size() - validates that the passed in size fits in a sector_t
+> + * @size: size to validate
+> + */
+> +static int
+> +loop_validate_size(loff_t size)
+> +{
+> +	if ((loff_t)(sector_t)size != size)
+> +		return -EFBIG;
+> +
+> +	return 0;
+> +}
+> +
 
-I've just sent a v4 which basically implements that and your other suggestions.
+Now sector_t has been switched to u64 unconditionally, do we still need such
+validation?
 
-Thanks,
-Martijn
 
->
-> Thanks,
-> Martijn
->
-> > and then in the main function reject anything not known.
-> >
-> > And then maybe add something like 64 bytes of padding to the end of the
-> > new structure, so that we can use flags to expand to it.
+Thanks, 
+Ming
+
