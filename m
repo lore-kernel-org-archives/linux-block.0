@@ -2,108 +2,99 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4C4C83004
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA268C83006
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:06:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AF34208FE
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB2362082E
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:06:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUPuFXyv"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="hRK69Fjp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbgD2OFg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 10:05:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29467 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726691AbgD2OFf (ORCPT
+        id S1726974AbgD2OGP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 10:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728306AbgD2OGO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 10:05:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588169134;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=15mWh+Q+04E+O3p3+W4qaQIE3K1ImLyGac8MlS9sbR0=;
-        b=NUPuFXyvKAUnepUN08REGGfAM8eT824kF0soUTqbJGmnwFUQZTEKwfOn2L4KM4Kbp2hbjt
-        Cvd/aKkVEbPdM22QmOooEaBpsAZwJbFrjMb7ypYlNujDF1sfyvSoMBL6FJn7Ge0wTmT/3k
-        yPJviV5yGalgI/aMlDnI4PohvEHCa/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-4U-OHgS5MwmQkHZ3Cn2JOg-1; Wed, 29 Apr 2020 10:05:32 -0400
-X-MC-Unique: 4U-OHgS5MwmQkHZ3Cn2JOg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B07118FF661;
-        Wed, 29 Apr 2020 14:05:30 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 193705D9C9;
-        Wed, 29 Apr 2020 14:05:18 +0000 (UTC)
-Date:   Wed, 29 Apr 2020 22:05:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 6/6] loop: be paranoid on exit and prevent new
- additions / removals
-Message-ID: <20200429140513.GD700644@T590>
-References: <20200429074627.5955-1-mcgrof@kernel.org>
- <20200429074627.5955-7-mcgrof@kernel.org>
+        Wed, 29 Apr 2020 10:06:14 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2DFC03C1AD
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:06:13 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id j3so2728497ljg.8
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/5dFXvkHlFL4ZD9k3m+cudI2M3jreB1NrwloZ96EAJw=;
+        b=hRK69FjpTSEspooL3pngL3RWCh2k42g9+qRkAdCL+irtc4FBd8usHLppdKZiUO37H4
+         dVtIaQds7wIJpD4FvJmA66WsFpFfircv+CumTEfc64ZSOaC04mVKNMUiibqxvwXKlthW
+         uV/x8yUF7yTSwotvszuUAYM3u62kvRUPdUhak5B9N3l1WIRWV5MaiV84IC2e8djDPvwE
+         Yr8AcLkIr1KWLn53YcTtBcJGoRPGQ1Pqr7OnW/qaqaIkm3e2ejq+sjpqgO3w+/wHVZQ8
+         3Jmoz2QNSIxgVhyhS7eHhnQ7OHVYaCMFrOcDADZh3gAbG5a3TT0Y72ntLo6SHcnf3IBB
+         uj0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/5dFXvkHlFL4ZD9k3m+cudI2M3jreB1NrwloZ96EAJw=;
+        b=E7hjbC7/9UVVAEoUXFI2nF7V8zHh2FVI1yK8pNiET3YFVanwMcz5u1iYbb+3u+6/4w
+         oZMlcKUaiQKTwyxg5dFF6y7wHDySP8cFL/Qa+aK3DzMw6Vhawpqc/7qnEx+FNhBZ4nKk
+         GLrTR5jwcx1tj1cmk0It2ZjpRZbFQR2g/ftlmibPPhTfDy4193psaiDYou8WvPkKTFEG
+         Q4Nc+nYRiX4f8C+16MrYw4bXkSCSLcBIq/7bCYZMXuRgn5M6yksMc7drZG+0UCaT2DxG
+         ww2sZ6uMilIC0T/zb68gCLHgePtomkOM9v7dW086jtWNfV1tRrqD3gXOTmbUaWPz2Q37
+         Aa7g==
+X-Gm-Message-State: AGi0PuZHhkaONQizqCh81TZiDBG4uS88ApbNvFgFGmzN/OTZLX0WLmj6
+        CekGdLfVCQpr9GCwiGnlGQSvueR+xDpGkHTmDnaHZA==
+X-Google-Smtp-Source: APiQypKeyYViSeG3LDYxj8g69kihbk0QRE6mRva/Grt1UgVyN/1ZIYYoZXAzChs4XfsXoPtgXgLAGZsvsvLk5MwjgfQ=
+X-Received: by 2002:a2e:8e98:: with SMTP id z24mr21704390ljk.134.1588169171856;
+ Wed, 29 Apr 2020 07:06:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429074627.5955-7-mcgrof@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200427074222.65369-1-maco@android.com> <20200427170613.GA13686@lst.de>
+ <CAB0TPYGZc_n-b5xtNsbJxEiqpLMqE=RcXGuy7C2vbY18mKZ6_A@mail.gmail.com>
+ <20200428070200.GC18754@lst.de> <CAB0TPYF4yHwXTG2xb5yci9-KJiT5=VbwWz9yj+uyBwb2rSi8Rg@mail.gmail.com>
+In-Reply-To: <CAB0TPYF4yHwXTG2xb5yci9-KJiT5=VbwWz9yj+uyBwb2rSi8Rg@mail.gmail.com>
+From:   Martijn Coenen <maco@android.com>
+Date:   Wed, 29 Apr 2020 16:06:00 +0200
+Message-ID: <CAB0TPYEkuCe-z2nNDRadGV3ASFXdZ3OVcB16yZ4PnNc2cokHAw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/9] Add a new LOOP_SET_FD_AND_STATUS ioctl
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Narayan Kamath <narayan@google.com>,
+        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Martijn Coenen <maco@google.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 07:46:27AM +0000, Luis Chamberlain wrote:
-> Be pedantic on removal as well and hold the mutex.
-> This should prevent uses of addition while we exit.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  drivers/block/loop.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index da693e6a834e..6dccba22c9b5 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2333,6 +2333,8 @@ static void __exit loop_exit(void)
->  
->  	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
->  
-> +	mutex_lock(&loop_ctl_mutex);
-> +
->  	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
->  	idr_destroy(&loop_index_idr);
->  
-> @@ -2340,6 +2342,8 @@ static void __exit loop_exit(void)
->  	unregister_blkdev(LOOP_MAJOR, "loop");
->  
->  	misc_deregister(&loop_misc);
-> +
-> +	mutex_unlock(&loop_ctl_mutex);
->  }
->  
->  module_init(loop_init);
-> -- 
-> 2.25.1
-> 
+On Tue, Apr 28, 2020 at 4:57 PM Martijn Coenen <maco@android.com> wrote:
+> and it allows requesting a partition scan. It makes sense to maintain
+> that behavior, but what about LO_FLAGS_DIRECT_IO? I think you're
+> proposing LOOP_SET_STATUS(64) should keep ignoring that like it used
+> to?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+I've just sent a v4 which basically implements that and your other suggestions.
 
--- 
-Ming
+Thanks,
+Martijn
 
+>
+> Thanks,
+> Martijn
+>
+> > and then in the main function reject anything not known.
+> >
+> > And then maybe add something like 64 bytes of padding to the end of the
+> > new structure, so that we can use flags to expand to it.
