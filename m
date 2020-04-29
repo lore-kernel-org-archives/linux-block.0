@@ -2,43 +2,43 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF40C83007
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 09:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDD9C83003
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 09:50:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9FE2083B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 09:49:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 644612083B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 09:50:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588153785;
-	bh=WsmEci1RYX3gAXKaPKi6kDaOGwHuQghjcCQy84kcjQ8=;
+	s=default; t=1588153840;
+	bh=pulymwHUCy+ILUA/eItQyTrcE9Pq+/nb//736se0uVU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DudYBQfRxJCHeQ8hD7nTkRAcNoaljVijd0Zxq00FE9GK0D4zhtbl9SvN3qelasxVk
-	 VK3VK/MnXUTDA5NLFn5C0WMfnaHuC68lh+5TKJzctlwu53Gy1kaPiQnEO8r3vpNxUH
-	 CHZ0x21qo3HryJ/0aiYOV97mX7GSrM7vlfwkxy94=
+	b=g2vAkSX6fbwq/Tgg/UfPktElxpb2xgsyLsBugdayjMUHCozS7f3x/HulIVOtcsGP0
+	 XPb1UnLRM8ai2Racj+WWvPHCjI9lajdmvl3QKj7s2wHPO297T2ExcyQD9ljdr3KJyX
+	 584uW3BZYDjwu0jUSoG1Dw3BiBdGGTOXpIzM8HoU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726493AbgD2Jtl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 05:49:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55124 "EHLO mail.kernel.org"
+        id S1726516AbgD2Jug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 05:50:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58134 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726760AbgD2Jtk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 05:49:40 -0400
+        id S1726366AbgD2Jug (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Apr 2020 05:50:36 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 69AF620775;
-        Wed, 29 Apr 2020 09:49:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8ABC520775;
+        Wed, 29 Apr 2020 09:50:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588153779;
-        bh=WsmEci1RYX3gAXKaPKi6kDaOGwHuQghjcCQy84kcjQ8=;
+        s=default; t=1588153836;
+        bh=pulymwHUCy+ILUA/eItQyTrcE9Pq+/nb//736se0uVU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CagCh6zTlW6+JwlUlk8EMFhgv7Z5QyoiQHoq1ssaAhPo7jVgu2CFYCdEz3uvXNAET
-         hjGNZD2vHO38Fb0/pRRwPTT8U/Wj4qB/QmtzsSYSxQ4QZwlVW8YKKs/SC6Yxq4/ePp
-         k1BWwULan3xoevpUBDH3MlmxEsxQSKxNIN2xQX9g=
-Date:   Wed, 29 Apr 2020 11:49:37 +0200
+        b=pvRgpyuCu/jL6tMLpZQVAitTpFH117anPbvmGsSdTbiAlARdIlYkvVaTYIuq5viUZ
+         zac4jOJIMVsXc8PjaN7NDU9Z6TjOHuuPedW+BNx7K0DCZCJ5UMMcwPgvmuHGk+KxRe
+         btwWd8PTbaYQzqw8QQ38xkiHc7DJTnLS40jtPkxE=
+Date:   Wed, 29 Apr 2020 11:50:34 +0200
 From:   Greg KH <gregkh@linuxfoundation.org>
 To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
@@ -47,89 +47,54 @@ Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/6] blktrace: break out of blktrace setup on
- concurrent calls
-Message-ID: <20200429094937.GB2081185@kroah.com>
+Subject: Re: [PATCH v3 6/6] loop: be paranoid on exit and prevent new
+ additions / removals
+Message-ID: <20200429095034.GC2081185@kroah.com>
 References: <20200429074627.5955-1-mcgrof@kernel.org>
- <20200429074627.5955-6-mcgrof@kernel.org>
+ <20200429074627.5955-7-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200429074627.5955-6-mcgrof@kernel.org>
+In-Reply-To: <20200429074627.5955-7-mcgrof@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 07:46:26AM +0000, Luis Chamberlain wrote:
-> We use one blktrace per request_queue, that means one per the entire
-> disk.  So we cannot run one blktrace on say /dev/vda and then /dev/vda1,
-> or just two calls on /dev/vda.
+On Wed, Apr 29, 2020 at 07:46:27AM +0000, Luis Chamberlain wrote:
+> Be pedantic on removal as well and hold the mutex.
+> This should prevent uses of addition while we exit.
 > 
-> We check for concurrent setup only at the very end of the blktrace setup though.
-> 
-> If we try to run two concurrent blktraces on the same block device the
-> second one will fail, and the first one seems to go on. However when
-> one tries to kill the first one one will see things like this:
-> 
-> The kernel will show these:
-> 
-> ```
-> debugfs: File 'dropped' in directory 'nvme1n1' already present!
-> debugfs: File 'msg' in directory 'nvme1n1' already present!
-> debugfs: File 'trace0' in directory 'nvme1n1' already present!
-> ``
-> 
-> And userspace just sees this error message for the second call:
-> 
-> ```
-> blktrace /dev/nvme1n1
-> BLKTRACESETUP(2) /dev/nvme1n1 failed: 5/Input/output error
-> ```
-> 
-> The first userspace process #1 will also claim that the files
-> were taken underneath their nose as well. The files are taken
-> away form the first process given that when the second blktrace
-> fails, it will follow up with a BLKTRACESTOP and BLKTRACETEARDOWN.
-> This means that even if go-happy process #1 is waiting for blktrace
-> data, we *have* been asked to take teardown the blktrace.
-> 
-> This can easily be reproduced with break-blktrace [0] run_0005.sh test.
-> 
-> Just break out early if we know we're already going to fail, this will
-> prevent trying to create the files all over again, which we know still
-> exist.
-> 
-> [0] https://github.com/mcgrof/break-blktrace
 > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > ---
->  kernel/trace/blktrace.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  drivers/block/loop.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 5c52976bd762..383045f67cb8 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -4,6 +4,8 @@
->   *
->   */
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index da693e6a834e..6dccba22c9b5 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -2333,6 +2333,8 @@ static void __exit loop_exit(void)
 >  
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>  	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
+>  
+> +	mutex_lock(&loop_ctl_mutex);
 > +
->  #include <linux/kernel.h>
->  #include <linux/blkdev.h>
->  #include <linux/blktrace_api.h>
-> @@ -516,6 +518,11 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->  	 */
->  	strreplace(buts->name, '/', '_');
+>  	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
+>  	idr_destroy(&loop_index_idr);
 >  
-> +	if (q->blk_trace) {
-> +		pr_warn("Concurrent blktraces are not allowed\n");
-> +		return -EBUSY;
+> @@ -2340,6 +2342,8 @@ static void __exit loop_exit(void)
+>  	unregister_blkdev(LOOP_MAJOR, "loop");
+>  
+>  	misc_deregister(&loop_misc);
+> +
+> +	mutex_unlock(&loop_ctl_mutex);
+>  }
+>  
+>  module_init(loop_init);
 
-You have access to a block device here, please use dev_warn() instead
-here for that, that makes it obvious as to what device a "concurrent
-blktrace" was attempted for.
+What type of issue is this helping with?  Can it be triggered today?  if
+so, shouldn't it be backported to stable kernels?
 
 thanks,
 
