@@ -2,55 +2,55 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A859DC8300B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43849C83004
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 880912076B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 225732137B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588146397;
-	bh=Wq4LqJ+nrrXv1VxEBB/Y7ZDgLI3kBuL1kdqpBEo8MfI=;
+	s=default; t=1588146408;
+	bh=fqMxSA7ddMeDO4iWOkcr4uOdzXuC6wiC7TMHuR7t5EA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=m8I8hz5wH1KiDmiH3UpfG29ZT4paLT1upjHWO45I+iFStsuO/wV6o8OEfXvW6hLvv
-	 HJFlWi0Mp5IIzeF+e0Cm7yTKMduthvlogQjNC4H3943svRdGAK+FzHAw6x7pzSib5R
-	 WYHjZr5aufZ64PbJIy/MJiwGVs5RJhXHE89zlLcQ=
+	b=Y/70NU+jRbDpOhWTwPvjin/Hn5bLz8kKILhk1+p1kG1nFMKWJUSXuPHRnWpUv+ZfD
+	 YoXPvCut4JDb7doo825EgX9LL2uKrvafx0w7+elEsPdJ0bpxnjES/y1PT2Y3N4CFju
+	 nczSeZaQACdcifVVuVDcXGlxMovQsCQP4/+lx4p0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbgD2Hqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 03:46:35 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:36234 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbgD2Hqe (ORCPT
+        id S1726766AbgD2Hqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 03:46:40 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46917 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726744AbgD2Hqh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 03:46:34 -0400
-Received: by mail-pj1-f65.google.com with SMTP id a31so432801pje.1;
-        Wed, 29 Apr 2020 00:46:34 -0700 (PDT)
+        Wed, 29 Apr 2020 03:46:37 -0400
+Received: by mail-pl1-f194.google.com with SMTP id n24so532531plp.13;
+        Wed, 29 Apr 2020 00:46:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=m8dSq6ES2jPXw5+HnmMcnSKKoOvoW5PINzIJYL/yYY4=;
-        b=TDJ7aFZPCHG0AODkSGqu2hB8yqjXpvA54mpugq0T7jKPXX7bIvgVzeURLYwaB+52Y/
-         m1oCsGQq8E5op0c/dHM+0ryMxIIy6FaOwMB3NUSR2tzGoT5eemoZZPWUumiqNg4LlNPk
-         uB/dojXXbeFju+02WcJapdfYNovU2eazWHBv0rFS21H2qeY597aPaa3fdIqW+4mfxPE4
-         6beiM6xIEn1ENStA6Y3igmF8LJ2TzBtlftQwytAdJmzGHjl1Iw5e8asx32johksb92nG
-         Yfa1HKvzT7yGKuYtqfV/G/EOO5VZZULy6K6yAgrgrxGW82lcgQkGtYA0QVNJm9jAgkzJ
-         9xrQ==
-X-Gm-Message-State: AGi0PubX5lMODNnhBEUpJckVnt26Y+NRUwIxFOn10dIDKkevqUVtcu3I
-        JftO3yjSz3x3nQnEU9Yqbdg=
-X-Google-Smtp-Source: APiQypKnDao+pl7grXlaGqzpC6Us6sQ/cc5Bx3+Kf4IjSfI/lLruTTPQF6zXoAlX0W6PyZPP+Le1Kg==
-X-Received: by 2002:a17:902:b711:: with SMTP id d17mr32928427pls.333.1588146393824;
-        Wed, 29 Apr 2020 00:46:33 -0700 (PDT)
+        bh=lbuhBnmZzFbDhZxSJ1ni5AOA61z3VyXXGZL4QHqGGx0=;
+        b=l6IvqM4q3E67p5USk5cFJW9FjX3zde8syyVjf12bVFyrikESDFS4ZTQ5fCpZ5kPrHb
+         RbZwG/nIb5SNNZlGrgSr4l5fiImSy8ndVVnINrRhRms8GKTRHU0qs3ceQ7G+HSHBYuhV
+         Hn8sJaRpW/0BLF+sXXyppZp41D041/M3PBYYINHKuFuocsG++cfR69bcAkOW4Vvdf/K4
+         3CJfAS0T6dWxG3suJuefkdV4sHPI95g/TCb9q+v2iwRhYkJzdkQAEza7v8TcIKzyz7ok
+         c+DJOiqzWQhDiTq/ca1uL4u+cbnEjopSKakJn0FYVvmV8ZNm5ANuHZXEZYi8Yr82J3iw
+         PnBg==
+X-Gm-Message-State: AGi0PuZk9vBVDnxzjosftK0R17ajExxCBau+MctVeDVB0n8EFLiUkm+a
+        9tlS1aQKwYJ2k8S54qqurlk=
+X-Google-Smtp-Source: APiQypKrREry4NDgPPBJilLfXP5Wql3EjomxOYfYxqGwUMX/NYY+ZmpZXVnkCpQ7jDJW/k/bn9/ubQ==
+X-Received: by 2002:a17:90a:e382:: with SMTP id b2mr1640417pjz.110.1588146396679;
+        Wed, 29 Apr 2020 00:46:36 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id c84sm427219pfb.153.2020.04.29.00.46.30
+        by smtp.gmail.com with ESMTPSA id r31sm387543pgl.86.2020.04.29.00.46.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2020 00:46:30 -0700 (PDT)
+        Wed, 29 Apr 2020 00:46:35 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id D74F941381; Wed, 29 Apr 2020 07:46:29 +0000 (UTC)
+        id 1548241DCA; Wed, 29 Apr 2020 07:46:30 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -58,13 +58,10 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         akpm@linux-foundation.org
 Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>
-Subject: [PATCH v3 2/6] block: move main block debugfs initialization to its own file
-Date:   Wed, 29 Apr 2020 07:46:23 +0000
-Message-Id: <20200429074627.5955-3-mcgrof@kernel.org>
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v3 5/6] blktrace: break out of blktrace setup on concurrent calls
+Date:   Wed, 29 Apr 2020 07:46:26 +0000
+Message-Id: <20200429074627.5955-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
 In-Reply-To: <20200429074627.5955-1-mcgrof@kernel.org>
 References: <20200429074627.5955-1-mcgrof@kernel.org>
@@ -75,107 +72,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-make_request-based drivers and and request-based drivers share some
-debugfs code. By moving this into its own file it makes it easier
-to expand and audit this shared code.
+We use one blktrace per request_queue, that means one per the entire
+disk.  So we cannot run one blktrace on say /dev/vda and then /dev/vda1,
+or just two calls on /dev/vda.
 
-This patch contains no functional changes.
+We check for concurrent setup only at the very end of the blktrace setup though.
 
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Nicolai Stange <nstange@suse.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: yu kuai <yukuai3@huawei.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+If we try to run two concurrent blktraces on the same block device the
+second one will fail, and the first one seems to go on. However when
+one tries to kill the first one one will see things like this:
+
+The kernel will show these:
+
+```
+debugfs: File 'dropped' in directory 'nvme1n1' already present!
+debugfs: File 'msg' in directory 'nvme1n1' already present!
+debugfs: File 'trace0' in directory 'nvme1n1' already present!
+``
+
+And userspace just sees this error message for the second call:
+
+```
+blktrace /dev/nvme1n1
+BLKTRACESETUP(2) /dev/nvme1n1 failed: 5/Input/output error
+```
+
+The first userspace process #1 will also claim that the files
+were taken underneath their nose as well. The files are taken
+away form the first process given that when the second blktrace
+fails, it will follow up with a BLKTRACESTOP and BLKTRACETEARDOWN.
+This means that even if go-happy process #1 is waiting for blktrace
+data, we *have* been asked to take teardown the blktrace.
+
+This can easily be reproduced with break-blktrace [0] run_0005.sh test.
+
+Just break out early if we know we're already going to fail, this will
+prevent trying to create the files all over again, which we know still
+exist.
+
+[0] https://github.com/mcgrof/break-blktrace
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/Makefile      |  1 +
- block/blk-core.c    |  9 +--------
- block/blk-debugfs.c | 15 +++++++++++++++
- block/blk.h         |  7 +++++++
- 4 files changed, 24 insertions(+), 8 deletions(-)
- create mode 100644 block/blk-debugfs.c
+ kernel/trace/blktrace.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block/Makefile b/block/Makefile
-index 206b96e9387f..1d3ab20505d8 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -10,6 +10,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
- 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
- 			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 5c52976bd762..383045f67cb8 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -4,6 +4,8 @@
+  *
+  */
  
-+obj-$(CONFIG_DEBUG_FS)		+= blk-debugfs.o
- obj-$(CONFIG_BOUNCE)		+= bounce.o
- obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
- obj-$(CONFIG_BLK_DEV_BSG)	+= bsg.o
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8a27c772982e..4b26f686e249 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -49,10 +49,6 @@
- #include "blk-pm.h"
- #include "blk-rq-qos.h"
- 
--#ifdef CONFIG_DEBUG_FS
--struct dentry *blk_debugfs_root;
--#endif
--
- EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_remap);
- EXPORT_TRACEPOINT_SYMBOL_GPL(block_rq_remap);
- EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_complete);
-@@ -1828,10 +1824,7 @@ int __init blk_dev_init(void)
- 
- 	blk_requestq_cachep = kmem_cache_create("request_queue",
- 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
--
--#ifdef CONFIG_DEBUG_FS
--	blk_debugfs_root = debugfs_create_dir("block", NULL);
--#endif
-+	blk_debugfs_register();
- 
- 	return 0;
- }
-diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
-new file mode 100644
-index 000000000000..19091e1effc0
---- /dev/null
-+++ b/block/blk-debugfs.c
-@@ -0,0 +1,15 @@
-+// SPDX-License-Identifier: GPL-2.0
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+/*
-+ * Shared request-based / make_request-based functionality
-+ */
-+#include <linux/kernel.h>
-+#include <linux/blkdev.h>
-+#include <linux/debugfs.h>
-+
-+struct dentry *blk_debugfs_root;
-+
-+void blk_debugfs_register(void)
-+{
-+	blk_debugfs_root = debugfs_create_dir("block", NULL);
-+}
-diff --git a/block/blk.h b/block/blk.h
-index 73bd3b1c6938..ec16e8a6049e 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -456,5 +456,12 @@ struct request_queue *__blk_alloc_queue(int node_id);
- int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset,
- 		bool *same_page);
-+#ifdef CONFIG_DEBUG_FS
-+void blk_debugfs_register(void);
-+#else
-+static inline void blk_debugfs_register(void)
-+{
-+}
-+#endif /* CONFIG_DEBUG_FS */
+ #include <linux/kernel.h>
+ #include <linux/blkdev.h>
+ #include <linux/blktrace_api.h>
+@@ -516,6 +518,11 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	 */
+ 	strreplace(buts->name, '/', '_');
  
- #endif /* BLK_INTERNAL_H */
++	if (q->blk_trace) {
++		pr_warn("Concurrent blktraces are not allowed\n");
++		return -EBUSY;
++	}
++
+ 	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
+ 	if (!bt)
+ 		return -ENOMEM;
 -- 
 2.25.1
 
