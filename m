@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BFBEC83010
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4705C83013
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:22:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B4FD2085B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3A8E2076B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:22:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aACNFaM4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7kClOzm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726774AbgD2HVy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 03:21:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50876 "EHLO
+        id S1726420AbgD2HWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 03:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726776AbgD2HVp (ORCPT
+        with ESMTP id S1726617AbgD2HVf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 03:21:45 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D668C08E859
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 00:21:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id l187so2321075ybf.17
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 00:21:45 -0700 (PDT)
+        Wed, 29 Apr 2020 03:21:35 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A590EC09B050
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 00:21:34 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id q57so1659095qte.3
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 00:21:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=8xi+eRNHWgXdVhsYfo5zSJ9HHfQ0KOMyDBcY/UWa0FM=;
-        b=aACNFaM4lJkjm2/TPukWtO0EQPGkWc5eqqxNTyb9Wzh6Ih2BU+nopeyQnNEixxCL5h
-         0ESfx+gugDcbQmAOUtsI7LJikNiEBg08pNWv/9KcMqftrhkWhUuHe6ADWDCCXSWx/rDg
-         0LhAsiO8qIiYP+BouaVUCJHCU2NmDkz09lXYN7WwtRKsTQAF0jC3s2hyUnRrYPg2jllo
-         k96Ph+yUD+JRbJmXCYaYhv5+7U1IS+1DfCX9utApfeU/GN8idHuJN28fyajK8RKD4J8E
-         0L20+ZvOIaC4uSTBRFlfWinE2uaYcyWVzGaYSMSEzTtzT07ruRufn06oujoMXZFwpnx3
-         pCOA==
+        bh=5Mo+7MFFBs4sdz9XooTQaPI4Fqr1H1d4GlYPjtWQb8M=;
+        b=I7kClOzmTA/wrxEymX9+bQY/uNDPHNXeuBH6wJwB7E9qYl97j1h9k4xUVUJbODo3tO
+         JPZ7apzzY/QxnPmjsHNPBCOtBURyQkqwZymtt1uCUNp3xX9ELk1KWfTRAQgfnwlcBNts
+         P6pCs01aabeU4M9ciU88WGASxRihBCxwBbNmA3d9P0AcnnCQI4cymkoXFJeYV5rUmFLr
+         PRKeMz7xwWnkqZ5Fbull+TOmR8d9R38oSISpq1T+6E8mKArYYo7JBwDA4RDjYqIiJVRb
+         S8URvchFKtXCETzCgDab7TavKIsCKuTWBQkdU3yOayOaS3ywEPq72UtGM3DMcZDeaytv
+         hQtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=8xi+eRNHWgXdVhsYfo5zSJ9HHfQ0KOMyDBcY/UWa0FM=;
-        b=EMr9d1YelrA7crLNfryGC3/19HcuCJfbm3JVoxysrokRKWnSclnfydXkg5cVJxZnP0
-         jorq4JuiPx2LLFedMsu0mStC1juGd/mZmgCDAfMA9u8nvvp1Izm81SjbTVJL8ntyTwKP
-         4e30QKozUqYKc8d3g/B5OzL/XXQKs7fR2NfGTzel83TLeLk9NLQzIkBNtOLc0IDlvOTx
-         5MJbV/0To+V9wABID89pEg1Ews+8CD9mVQQKXNKALIdnjpsCzyvIwaOeSyAQrBeCy+Tu
-         xJDXuk2rYhBu5e6w79NMcbLHwEUeBwPWyYp5e850YQyhnM0zmSglpj8y9uZycFZVkv7n
-         buGw==
-X-Gm-Message-State: AGi0PubG0c6frqPGUNm8cQ6vz7F3OMSINMGV15PW3iYB44IXgFcBVC5j
-        saH3E754bULzD75YGt3Sg44LGM69VdyprY3NT7T6WELJQ0XY12Up75pb8ujrauYJs5GTDCr7DCP
-        9hVEY+qnUIwmBXe1KDm729DUmOPb/66EH3ntpsdnvBGqXJV/02TQhcrQzpjROiu2eUsSC
-X-Google-Smtp-Source: APiQypIH8TT4Mo/JtXG1WW1BaePDVhDF3SmNndTfdrJ2kvxBIrAIq1DPQFUWi44O9RM1bynR8pDrQMPxfKA=
-X-Received: by 2002:a25:cad6:: with SMTP id a205mr31258360ybg.377.1588144904760;
- Wed, 29 Apr 2020 00:21:44 -0700 (PDT)
-Date:   Wed, 29 Apr 2020 07:21:20 +0000
+        bh=5Mo+7MFFBs4sdz9XooTQaPI4Fqr1H1d4GlYPjtWQb8M=;
+        b=tkgicggl9FmtFfOuPYtzpPdjVVXMxh1/kHgKnZOI/IyauSXu5IxDjw/o4et0BXkDrS
+         DPT0s/t7RQJaMf6J2aeDWeeg9kClVc5kN1hddUP2pRA38J2EOLoymeZoCW1u3x1M9mKO
+         Rdfe5TtNViTx7292pxugnfffk+ta0HPC6pYWdtUf3KVQM+yLobHT1URMfesp0osB6gCP
+         e49qnK7ysUikdxJzM0A3T6N6Etr9ZYSfyFKQl/IOjeHphDCHS8hCOBiBZ/egec07ea31
+         7T9TxY7OpkRDk9EJiOwcygpC386ooLBsC2g5TN1582vAY0x0Su5GcAA6qPkkbbuleJgu
+         Wpjg==
+X-Gm-Message-State: AGi0PuYWy0hE1Mmqwm+Oy1JXE+nnaA4EX2EN051ae/z1YBVwuUDfpaue
+        Xw4OR01FPyRcTCC7MV/c2+cVSkBPEkMyEJ4QAvljesyBciRKX3UYqNlxNgnd8KwnwaU4+2Vplpr
+        pub9BTn03meit4dMmtS9bKP8SI1rURRvapH6oe7wApWUcZd30U6ZtaSztvmQgplSiGA8C
+X-Google-Smtp-Source: APiQypKMUvPJ1WDTi+RZxM7ebkhMHyaIPvn+6oN+h7e3EzQfL31PHWMOYerxu68ZIum149zO8oAgKyVAGmM=
+X-Received: by 2002:ad4:4e65:: with SMTP id ec5mr32206941qvb.32.1588144893748;
+ Wed, 29 Apr 2020 00:21:33 -0700 (PDT)
+Date:   Wed, 29 Apr 2020 07:21:13 +0000
 In-Reply-To: <20200429072121.50094-1-satyat@google.com>
-Message-Id: <20200429072121.50094-12-satyat@google.com>
+Message-Id: <20200429072121.50094-5-satyat@google.com>
 Mime-Version: 1.0
 References: <20200429072121.50094-1-satyat@google.com>
 X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
-Subject: [PATCH v11 11/12] f2fs: add inline encryption support
+Subject: [PATCH v11 04/12] block: Make blk-integrity preclude hardware inline encryption
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -69,304 +69,157 @@ To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
 Cc:     Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
         Kuohong Wang <kuohong.wang@mediatek.com>,
         Kim Boojin <boojin.kim@samsung.com>,
-        Satya Tangirala <satyat@google.com>,
-        Eric Biggers <ebiggers@google.com>
+        Satya Tangirala <satyat@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Wire up f2fs to support inline encryption via the helper functions which
-fs/crypto/ now provides.  This includes:
+Whenever a device supports blk-integrity, the kernel will now always
+pretend that the device doesn't support inline encryption (essentially
+by setting the keyslot manager in the request queue to NULL).
 
-- Adding a mount option 'inlinecrypt' which enables inline encryption
-  on encrypted files where it can be used.
+There's no hardware currently that supports both integrity and inline
+encryption. However, it seems possible that there will be such hardware
+in the near future (like the NVMe key per I/O support that might support
+both inline encryption and PI).
 
-- Setting the bio_crypt_ctx on bios that will be submitted to an
-  inline-encrypted file.
+But properly integrating both features is not trivial, and without
+real hardware that implements both, it is difficult to tell if it will
+be done correctly by the majority of hardware that support both.
+So it seems best not to support both features together right now, and
+to decide what to do at probe time.
 
-- Not adding logically discontiguous data to bios that will be submitted
-  to an inline-encrypted file.
-
-- Not doing filesystem-layer crypto on inline-encrypted files.
-
-Co-developed-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- Documentation/filesystems/f2fs.rst |  7 ++-
- fs/f2fs/compress.c                 |  2 +-
- fs/f2fs/data.c                     | 68 +++++++++++++++++++++++++-----
- fs/f2fs/super.c                    | 32 ++++++++++++++
- 4 files changed, 97 insertions(+), 12 deletions(-)
+ block/bio-integrity.c   |  3 +++
+ block/blk-integrity.c   |  7 +++++++
+ block/keyslot-manager.c | 19 +++++++++++++++++++
+ include/linux/blkdev.h  | 30 ++++++++++++++++++++++++++++++
+ 4 files changed, 59 insertions(+)
 
-diff --git a/Documentation/filesystems/f2fs.rst b/Documentation/filesystems/f2fs.rst
-index 87d794bc75a47..e0e0353f8a498 100644
---- a/Documentation/filesystems/f2fs.rst
-+++ b/Documentation/filesystems/f2fs.rst
-@@ -254,7 +254,12 @@ compress_extension=%s  Support adding specified extension, so that f2fs can enab
-                        on compression extension list and enable compression on
-                        these file by default rather than to enable it via ioctl.
-                        For other files, we can still enable compression via ioctl.
--====================== ============================================================
-+inlinecrypt
-+                       Encrypt/decrypt the contents of encrypted files using the
-+                       blk-crypto framework rather than filesystem-layer encryption.
-+                       This allows the use of inline encryption hardware. The on-disk
-+                       format is unaffected. For more details, see
-+                       Documentation/block/inline-encryption.rst.
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index bf62c25cde8f4..3579ac0f6ec1f 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -42,6 +42,9 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+ 	struct bio_set *bs = bio->bi_pool;
+ 	unsigned inline_vecs;
  
- Debugfs Entries
- ===============
-diff --git a/fs/f2fs/compress.c b/fs/f2fs/compress.c
-index df7b2d15eacde..a19c093711a68 100644
---- a/fs/f2fs/compress.c
-+++ b/fs/f2fs/compress.c
-@@ -975,7 +975,7 @@ static int f2fs_write_compressed_pages(struct compress_ctx *cc,
- 		.submitted = false,
- 		.io_type = io_type,
- 		.io_wbc = wbc,
--		.encrypted = f2fs_encrypted_file(cc->inode),
-+		.encrypted = fscrypt_inode_uses_fs_layer_crypto(cc->inode),
- 	};
- 	struct dnode_of_data dn;
- 	struct node_info ni;
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index cdf2f626bea7a..0dfa8d3361428 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -14,6 +14,7 @@
- #include <linux/pagevec.h>
- #include <linux/blkdev.h>
- #include <linux/bio.h>
-+#include <linux/blk-crypto.h>
- #include <linux/swap.h>
- #include <linux/prefetch.h>
- #include <linux/uio.h>
-@@ -457,6 +458,33 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
- 	return bio;
- }
- 
-+static void f2fs_set_bio_crypt_ctx(struct bio *bio, const struct inode *inode,
-+				  pgoff_t first_idx,
-+				  const struct f2fs_io_info *fio,
-+				  gfp_t gfp_mask)
-+{
-+	/*
-+	 * The f2fs garbage collector sets ->encrypted_page when it wants to
-+	 * read/write raw data without encryption.
-+	 */
-+	if (!fio || !fio->encrypted_page)
-+		fscrypt_set_bio_crypt_ctx(bio, inode, first_idx, gfp_mask);
-+}
++	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
++		return ERR_PTR(-EOPNOTSUPP);
 +
-+static bool f2fs_crypt_mergeable_bio(struct bio *bio, const struct inode *inode,
-+				     pgoff_t next_idx,
-+				     const struct f2fs_io_info *fio)
-+{
-+	/*
-+	 * The f2fs garbage collector sets ->encrypted_page when it wants to
-+	 * read/write raw data without encryption.
-+	 */
-+	if (fio && fio->encrypted_page)
-+		return !bio_has_crypt_ctx(bio);
+ 	if (!bs || !mempool_initialized(&bs->bio_integrity_pool)) {
+ 		bip = kmalloc(struct_size(bip, bip_inline_vecs, nr_vecs), gfp_mask);
+ 		inline_vecs = nr_vecs;
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index ff1070edbb400..b45711fc37df4 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -409,6 +409,13 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
+ 	bi->tag_size = template->tag_size;
+ 
+ 	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
 +
-+	return fscrypt_mergeable_bio(bio, inode, next_idx);
-+}
-+
- static inline void __submit_bio(struct f2fs_sb_info *sbi,
- 				struct bio *bio, enum page_type type)
- {
-@@ -653,6 +681,9 @@ int f2fs_submit_page_bio(struct f2fs_io_info *fio)
- 	/* Allocate a new bio */
- 	bio = __bio_alloc(fio, 1);
- 
-+	f2fs_set_bio_crypt_ctx(bio, fio->page->mapping->host,
-+			       fio->page->index, fio, GFP_NOIO);
-+
- 	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
- 		bio_put(bio);
- 		return -EFAULT;
-@@ -841,12 +872,16 @@ int f2fs_merge_page_bio(struct f2fs_io_info *fio)
- 	trace_f2fs_submit_page_bio(page, fio);
- 	f2fs_trace_ios(fio, 0);
- 
--	if (bio && !page_is_mergeable(fio->sbi, bio, *fio->last_block,
--						fio->new_blkaddr))
-+	if (bio && (!page_is_mergeable(fio->sbi, bio, *fio->last_block,
-+				       fio->new_blkaddr) ||
-+		    !f2fs_crypt_mergeable_bio(bio, fio->page->mapping->host,
-+					      fio->page->index, fio)))
- 		f2fs_submit_merged_ipu_write(fio->sbi, &bio, NULL);
- alloc_new:
- 	if (!bio) {
- 		bio = __bio_alloc(fio, BIO_MAX_PAGES);
-+		f2fs_set_bio_crypt_ctx(bio, fio->page->mapping->host,
-+				       fio->page->index, fio, GFP_NOIO);
- 		bio_set_op_attrs(bio, fio->op, fio->op_flags);
- 
- 		add_bio_entry(fio->sbi, bio, page, fio->temp);
-@@ -903,8 +938,11 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 
- 	inc_page_count(sbi, WB_DATA_TYPE(bio_page));
- 
--	if (io->bio && !io_is_mergeable(sbi, io->bio, io, fio,
--			io->last_block_in_bio, fio->new_blkaddr))
-+	if (io->bio &&
-+	    (!io_is_mergeable(sbi, io->bio, io, fio, io->last_block_in_bio,
-+			      fio->new_blkaddr) ||
-+	     !f2fs_crypt_mergeable_bio(io->bio, fio->page->mapping->host,
-+				       fio->page->index, fio)))
- 		__submit_merged_bio(io);
- alloc_new:
- 	if (io->bio == NULL) {
-@@ -916,6 +954,8 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
- 			goto skip;
- 		}
- 		io->bio = __bio_alloc(fio, BIO_MAX_PAGES);
-+		f2fs_set_bio_crypt_ctx(io->bio, fio->page->mapping->host,
-+				       fio->page->index, fio, GFP_NOIO);
- 		io->fio = *fio;
- 	}
- 
-@@ -960,11 +1000,14 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
- 								for_write);
- 	if (!bio)
- 		return ERR_PTR(-ENOMEM);
-+
-+	f2fs_set_bio_crypt_ctx(bio, inode, first_idx, NULL, GFP_NOFS);
-+
- 	f2fs_target_device(sbi, blkaddr, bio);
- 	bio->bi_end_io = f2fs_read_end_io;
- 	bio_set_op_attrs(bio, REQ_OP_READ, op_flag);
- 
--	if (f2fs_encrypted_file(inode))
-+	if (fscrypt_inode_uses_fs_layer_crypto(inode))
- 		post_read_steps |= 1 << STEP_DECRYPT;
- 	if (f2fs_compressed_file(inode))
- 		post_read_steps |= 1 << STEP_DECOMPRESS;
-@@ -1988,8 +2031,9 @@ static int f2fs_read_single_page(struct inode *inode, struct page *page,
- 	 * This page will go to BIO.  Do we need to send this
- 	 * BIO off first?
- 	 */
--	if (bio && !page_is_mergeable(F2FS_I_SB(inode), bio,
--				*last_block_in_bio, block_nr)) {
-+	if (bio && (!page_is_mergeable(F2FS_I_SB(inode), bio,
-+				       *last_block_in_bio, block_nr) ||
-+		    !f2fs_crypt_mergeable_bio(bio, inode, page->index, NULL))) {
- submit_and_realloc:
- 		__submit_bio(F2FS_I_SB(inode), bio, DATA);
- 		bio = NULL;
-@@ -2117,8 +2161,9 @@ int f2fs_read_multi_pages(struct compress_ctx *cc, struct bio **bio_ret,
- 		blkaddr = data_blkaddr(dn.inode, dn.node_page,
- 						dn.ofs_in_node + i + 1);
- 
--		if (bio && !page_is_mergeable(sbi, bio,
--					*last_block_in_bio, blkaddr)) {
-+		if (bio && (!page_is_mergeable(sbi, bio,
-+					*last_block_in_bio, blkaddr) ||
-+		    !f2fs_crypt_mergeable_bio(bio, inode, page->index, NULL))) {
- submit_and_realloc:
- 			__submit_bio(sbi, bio, DATA);
- 			bio = NULL;
-@@ -2337,6 +2382,9 @@ int f2fs_encrypt_one_page(struct f2fs_io_info *fio)
- 	/* wait for GCed page writeback via META_MAPPING */
- 	f2fs_wait_on_block_writeback(inode, fio->old_blkaddr);
- 
-+	if (fscrypt_inode_uses_inline_crypto(inode))
-+		return 0;
-+
- retry_encrypt:
- 	fio->encrypted_page = fscrypt_encrypt_pagecache_blocks(page,
- 					PAGE_SIZE, 0, gfp_flags);
-@@ -2510,7 +2558,7 @@ int f2fs_do_write_data_page(struct f2fs_io_info *fio)
- 			f2fs_unlock_op(fio->sbi);
- 		err = f2fs_inplace_write_data(fio);
- 		if (err) {
--			if (f2fs_encrypted_file(inode))
-+			if (fscrypt_inode_uses_fs_layer_crypto(inode))
- 				fscrypt_finalize_bounce_page(&fio->encrypted_page);
- 			if (PageWriteback(page))
- 				end_page_writeback(page);
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index f2dfc21c6abb0..8ccda50f28888 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -138,6 +138,7 @@ enum {
- 	Opt_alloc,
- 	Opt_fsync,
- 	Opt_test_dummy_encryption,
-+	Opt_inlinecrypt,
- 	Opt_checkpoint_disable,
- 	Opt_checkpoint_disable_cap,
- 	Opt_checkpoint_disable_cap_perc,
-@@ -203,6 +204,7 @@ static match_table_t f2fs_tokens = {
- 	{Opt_alloc, "alloc_mode=%s"},
- 	{Opt_fsync, "fsync_mode=%s"},
- 	{Opt_test_dummy_encryption, "test_dummy_encryption"},
-+	{Opt_inlinecrypt, "inlinecrypt"},
- 	{Opt_checkpoint_disable, "checkpoint=disable"},
- 	{Opt_checkpoint_disable_cap, "checkpoint=disable:%u"},
- 	{Opt_checkpoint_disable_cap_perc, "checkpoint=disable:%u%%"},
-@@ -788,6 +790,13 @@ static int parse_options(struct super_block *sb, char *options)
- 			f2fs_info(sbi, "Test dummy encryption mode enabled");
- #else
- 			f2fs_info(sbi, "Test dummy encryption mount option ignored");
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++	if (disk->queue->ksm) {
++		pr_warn("blk-integrity: Integrity and hardware inline encryption are not supported together. Unregistering keyslot manager from request queue, to disable hardware inline encryption.\n");
++		blk_ksm_unregister(disk->queue);
++	}
 +#endif
-+			break;
-+		case Opt_inlinecrypt:
-+#ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
-+			sb->s_flags |= SB_INLINECRYPT;
-+#else
-+			f2fs_info(sbi, "inline encryption not supported");
- #endif
- 			break;
- 		case Opt_checkpoint_disable_cap_perc:
-@@ -1583,6 +1592,8 @@ static void default_options(struct f2fs_sb_info *sbi)
- 	F2FS_OPTION(sbi).compress_ext_cnt = 0;
- 	F2FS_OPTION(sbi).bggc_mode = BGGC_MODE_ON;
+ }
+ EXPORT_SYMBOL(blk_integrity_register);
  
-+	sbi->sb->s_flags &= ~SB_INLINECRYPT;
+diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+index b584723b392ad..834f45fdd33e2 100644
+--- a/block/keyslot-manager.c
++++ b/block/keyslot-manager.c
+@@ -25,6 +25,9 @@
+  * Upper layers will call blk_ksm_get_slot_for_key() to program a
+  * key into some slot in the inline encryption hardware.
+  */
 +
- 	set_opt(sbi, INLINE_XATTR);
- 	set_opt(sbi, INLINE_DATA);
- 	set_opt(sbi, INLINE_DENTRY);
-@@ -2427,6 +2438,25 @@ static void f2fs_get_ino_and_lblk_bits(struct super_block *sb,
- 	*lblk_bits_ret = 8 * sizeof(block_t);
++#define pr_fmt(fmt) "blk_crypto: " fmt
++
+ #include <crypto/algapi.h>
+ #include <linux/keyslot-manager.h>
+ #include <linux/atomic.h>
+@@ -378,3 +381,19 @@ void blk_ksm_destroy(struct blk_keyslot_manager *ksm)
+ 	memzero_explicit(ksm, sizeof(*ksm));
+ }
+ EXPORT_SYMBOL_GPL(blk_ksm_destroy);
++
++bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q)
++{
++	if (blk_integrity_queue_supports_integrity(q)) {
++		pr_warn("Integrity and hardware inline encryption are not supported together. Hardware inline encryption is being disabled.\n");
++		return false;
++	}
++	q->ksm = ksm;
++	return true;
++}
++EXPORT_SYMBOL_GPL(blk_ksm_register);
++
++void blk_ksm_unregister(struct request_queue *q)
++{
++	q->ksm = NULL;
++}
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 98aae4638fda9..17738dab8ae04 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1562,6 +1562,12 @@ struct blk_integrity *bdev_get_integrity(struct block_device *bdev)
+ 	return blk_get_integrity(bdev->bd_disk);
  }
  
-+static int f2fs_get_num_devices(struct super_block *sb)
++static inline bool
++blk_integrity_queue_supports_integrity(struct request_queue *q)
 +{
-+	struct f2fs_sb_info *sbi = F2FS_SB(sb);
-+
-+	if (f2fs_is_multi_device(sbi))
-+		return sbi->s_ndevs;
-+	return 1;
++	return q->integrity.profile;
 +}
 +
-+static void f2fs_get_devices(struct super_block *sb,
-+			     struct request_queue **devs)
+ static inline bool blk_integrity_rq(struct request *rq)
+ {
+ 	return rq->cmd_flags & REQ_INTEGRITY;
+@@ -1642,6 +1648,11 @@ static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
+ {
+ 	return NULL;
+ }
++static inline bool
++blk_integrity_queue_supports_integrity(struct request_queue *q)
 +{
-+	struct f2fs_sb_info *sbi = F2FS_SB(sb);
-+	int i;
-+
-+	for (i = 0; i < sbi->s_ndevs; i++)
-+		devs[i] = bdev_get_queue(FDEV(i).bdev);
++	return false;
 +}
-+
- static const struct fscrypt_operations f2fs_cryptops = {
- 	.key_prefix		= "f2fs:",
- 	.get_context		= f2fs_get_context,
-@@ -2436,6 +2466,8 @@ static const struct fscrypt_operations f2fs_cryptops = {
- 	.max_namelen		= F2FS_NAME_LEN,
- 	.has_stable_inodes	= f2fs_has_stable_inodes,
- 	.get_ino_and_lblk_bits	= f2fs_get_ino_and_lblk_bits,
-+	.get_num_devices	= f2fs_get_num_devices,
-+	.get_devices		= f2fs_get_devices,
- };
- #endif
+ static inline int blk_integrity_compare(struct gendisk *a, struct gendisk *b)
+ {
+ 	return 0;
+@@ -1693,6 +1704,25 @@ static inline struct bio_vec *rq_integrity_vec(struct request *rq)
  
+ #endif /* CONFIG_BLK_DEV_INTEGRITY */
+ 
++#ifdef CONFIG_BLK_INLINE_ENCRYPTION
++
++bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q);
++
++void blk_ksm_unregister(struct request_queue *q);
++
++#else /* CONFIG_BLK_INLINE_ENCRYPTION */
++
++static inline bool blk_ksm_register(struct blk_keyslot_manager *ksm,
++				    struct request_queue *q)
++{
++	return true;
++}
++
++static inline void blk_ksm_unregister(struct request_queue *q) { }
++
++#endif /* CONFIG_BLK_INLINE_ENCRYPTION */
++
++
+ struct block_device_operations {
+ 	int (*open) (struct block_device *, fmode_t);
+ 	void (*release) (struct gendisk *, fmode_t);
 -- 
 2.26.2.303.gf8c07b1a785-goog
 
