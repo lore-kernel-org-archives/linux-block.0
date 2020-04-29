@@ -2,125 +2,180 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B313C83003
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A859DC8300B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 198812073E
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:36:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="j88DNZVD";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="TB4lG5wW"
+	by mail.kernel.org (Postfix) with ESMTP id 880912076B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:46:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588146397;
+	bh=Wq4LqJ+nrrXv1VxEBB/Y7ZDgLI3kBuL1kdqpBEo8MfI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=m8I8hz5wH1KiDmiH3UpfG29ZT4paLT1upjHWO45I+iFStsuO/wV6o8OEfXvW6hLvv
+	 HJFlWi0Mp5IIzeF+e0Cm7yTKMduthvlogQjNC4H3943svRdGAK+FzHAw6x7pzSib5R
+	 WYHjZr5aufZ64PbJIy/MJiwGVs5RJhXHE89zlLcQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbgD2Hgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 03:36:38 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:44652 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbgD2Hgi (ORCPT
+        id S1726705AbgD2Hqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 03:46:35 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:36234 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726355AbgD2Hqe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 03:36:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1588145798; x=1619681798;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=LAS6uuBorisgxYDYDSzzv4tQFvNcWiIaWAc800VmcyM=;
-  b=j88DNZVDA33wsgRcQxirQICOnM69RpRu9HjUvOf42SBwBySvAIl9mWEK
-   h/gjqr65VXGmXqQpyxqGXpAxEJgcX8sZKYroOukhWqUX9bBR9rLEvR6rz
-   qVdq1ff2Ka1Fhk4ri0MF7r0VxYnHOBIXObzrfeCFlgWzrz3Tu47DoqA4f
-   QInlD9VQOlwmKE/V4mQ7M0MWCIaL9ZLF2PCXjYThd4AqWrMajrjiXYRgy
-   p91aNyhxSgp2gEZJ9p28ATLCadtEM1NbwXGBtTo6EyXmVBjn4aMiROMWK
-   UXc/reEkrdi3jHE+fT3ruoKUuzJq3b4NiP8wz6Jby0+nwDxWJhMErOluP
-   A==;
-IronPort-SDR: QaMRmuRCPoETnFY9is54Hj2ZI1hEat+5rB+Aa8urVPkRYt0qJuQ+oVmUWPpe+5mVDvBiDtZMcU
- G8DezoBSNJhU6VN98IsGRCzDg6P39bvehot2HO/ppfT49yk5QkRvIRgzzqc2mS7rW+To54Xzya
- x7ssqj3/VrQEXwPu1yGToDtce6J+nMdCozEuO5PwgCVXPkyxivVEuSZx/+yqAPt4a/Qupcu8ZS
- 93v0EJZHwhJzQ47fiivx1qFx8leEQ7z8dWcSsV3Md2aFvgAsCSnGlWlamzlgNyyAksIJl1o7sx
- L/Y=
-X-IronPort-AV: E=Sophos;i="5.73,330,1583164800"; 
-   d="scan'208";a="137884742"
-Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.40])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Apr 2020 15:36:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PozxSzeXmWBi7jnWmTGv1p5qj9ImHNp40tnH9z2C2WEVv1qpWFBW0f4+KK58O4pVDkHBVXijfsUnPXrvewLnSjBPxTGbgO29FbP4imKp2InVlTTKzedjgByLcAc+0bGcPGz4NqXNy50VUMXg+BqF1ZmNxzFAwmtJsaC55vGhyE2UoO49FzxhJN52P3rEO6tFiCl4692BTYwTjakZCqD7slsf0ovQsEsh98mfB76oIa70BkQ79PvW7nqQypff1N9zVEuLZIKNFV+Lp1DEAuThxitk6/CqMVn+X1uuWSY5ipwqOnOmY1VwMS0UB3o48jInOeW0rboZbFVj7N0gmae7lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LAS6uuBorisgxYDYDSzzv4tQFvNcWiIaWAc800VmcyM=;
- b=XD62p/DpAHmqTKWhmtRennwPt40clnghd6oBMSzvu9duik96+0f8Nb4XqBamhbl8WvYoUUuAu90F3fJL5aTp4YsIzONHeF9cTZOPVg7OecFiiyg8wpYuqfjiMvQaodWYF4iJSbigj3x3Oi+1u6Xtm2FpT+xoKscq0bkO0xd0JT0nSXIQt7tWmZWC9uM9LWQ3L8Kb5ZAX4lRy47VeK0JoPuiDHlMyWsfiTIpRZ5A+acaUKGdtTnFiwCVgsQLIaZgBGAw+K0q8vqvE8qICsO00/NYbvY6BuSlxOhoT+cZRQ13MOXRacrX/yywxeCPsAchdDU7YLh4H8I8Rey3Mc8u/bw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LAS6uuBorisgxYDYDSzzv4tQFvNcWiIaWAc800VmcyM=;
- b=TB4lG5wWgY04tPbOz39P0HiaBt9kX17dQDqTgGPGrlN7WFBX3E3FVyceBzdrtFRyVLCl62kXqPdCfvaUPkfa6LXorWSG0liLMArfKhuw+AE+R1R4Pll/KR3yy9YwlfnIrzGpGtBMb3BTykDFaGHOp3GAraEe1bPT4aEdnKeaWps=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3533.namprd04.prod.outlook.com
- (2603:10b6:803:45::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Wed, 29 Apr
- 2020 07:36:35 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.2937.023; Wed, 29 Apr 2020
- 07:36:35 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     "hch@infradead.org" <hch@infradead.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCH 2/3] block: move blkcg_bio_issue_check out of line
-Thread-Topic: [PATCH 2/3] block: move blkcg_bio_issue_check out of line
-Thread-Index: AQHWHXxRKT7Ntgf71kurctAEAUiQqg==
-Date:   Wed, 29 Apr 2020 07:36:35 +0000
-Message-ID: <SN4PR0401MB359865305C85EB6DA6C81D8C9BAD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20200428164434.1517-1-johannes.thumshirn@wdc.com>
- <20200428164434.1517-3-johannes.thumshirn@wdc.com>
- <20200429072526.GB11410@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a5b86d24-97a5-4aab-59aa-08d7ec100ba3
-x-ms-traffictypediagnostic: SN4PR0401MB3533:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <SN4PR0401MB3533F1314579EB1A9878791B9BAD0@SN4PR0401MB3533.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1247;
-x-forefront-prvs: 03883BD916
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(136003)(366004)(396003)(39860400002)(9686003)(91956017)(4326008)(66476007)(66556008)(64756008)(66446008)(76116006)(55016002)(52536014)(2906002)(66946007)(186003)(8936002)(478600001)(316002)(54906003)(71200400001)(5660300002)(86362001)(6506007)(8676002)(53546011)(558084003)(7696005)(6916009)(33656002)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: C8zf/1YelORGf31kJ0RwP4HZPVyZiADQHg/b0G8l61tqCIMQs2y19ZdBxpNJWH7Xaje85G7hUsLlnbchCZNq6GeHbtvFpwUJg9V5RNgHc6u7YwAmRaTGuZqa/9zIKrbZx5ecEVYRoqLuOaTwuOyH3ONtG+8Q8+FbFgZAAWiJNbEveSWtFLNNyQBNUYYKlqmbT18SXuPSRvx5HZKtWQQ0wlbo1zGMoxY+XCaAbkUNWG1d81DAHAgmb6/s1Nar+llJKh8rFWm+/RX+cVn3mVyHBKntOoABeV04wX7ZDjwzBs1xfXFyr/VhUSL13XEuAL8e8pv3pjYijGpwmZ4OFMi4dyGPW4K5SPJ4zLt66sBJe4kct0aluZXrj3G7EAx9uDRCa2AD8i8613BOa42yoGxh42J2K+Cn7IFbIGkOky9CyReYv+4DfYdRD4UAoEfKV49m
-x-ms-exchange-antispam-messagedata: fhMXyVj99j8GGh6X2EpnTKFj0jz5IDzR3sLeIZaHGcjPahIIsWBgzEKI6z34pXahmNCvgG4Z+FF/IBOF/yrwJCxQLbqLcZJHMSI+9w6XJYdkMmaYKShGJ/EYhVVHNgepCkoiuzeMob6FqWeENXxdqTqkfuVByiodShsElEITWmNEuqOoEAsHz4Ap5HcS9UcKLKE5DPToHmDjfXLkqJt4k2smAkbaNJzrq+H2sK99oM6Ry88WMSlqtkvbfkrjfb9Qr0T1HFS7eOY2jUUjm4NUnKHli2913yVLl0lag8hDRdphC+mLBW1vIT1iHeu41j8tpvdq/jz73xCB+jn5osGMbhD33lq4Skf2PgP1t033QFCsP3wTrzHzYAOscAZxHxD1ftxYCytmZNFsu7aTGssrNeXKBjstG2vIT+5KZz7Cjh/iH8YSg9yKvdOnf+bwHUM3hNEGlTgYtHwrWpOLNMxhdExCx+l05V8zcHbtdD67Fu/p784wd3Da43NDBdp3GTdxCITMZ5MHLymzn5loOId/xcUf6BJ3kiI63TNvoW9n27mjG6gfv28KzKgLdSohkKOZVptuhsSNjqsC0cR+MtXskyXKdJgfGOG20RmoKmEqOhIzfVgamzYESv41+B8quqAdEPhccaOfBlEpmbDM/qQYDa5QLwEJqCAoKK4HrntiEZj3TFG5+Ym4iOHpcpNOtVgeUdTn4wMhxxn6UxdU1Vqy8J0R6Tl0FI8bqLcCrjtgZkmqgXi7yCPZTEuYYP7wDU4ApwvuS2T8rHsMF4+Zzk6XvooaGCGQ84UKoejOQkpx0mI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 29 Apr 2020 03:46:34 -0400
+Received: by mail-pj1-f65.google.com with SMTP id a31so432801pje.1;
+        Wed, 29 Apr 2020 00:46:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=m8dSq6ES2jPXw5+HnmMcnSKKoOvoW5PINzIJYL/yYY4=;
+        b=TDJ7aFZPCHG0AODkSGqu2hB8yqjXpvA54mpugq0T7jKPXX7bIvgVzeURLYwaB+52Y/
+         m1oCsGQq8E5op0c/dHM+0ryMxIIy6FaOwMB3NUSR2tzGoT5eemoZZPWUumiqNg4LlNPk
+         uB/dojXXbeFju+02WcJapdfYNovU2eazWHBv0rFS21H2qeY597aPaa3fdIqW+4mfxPE4
+         6beiM6xIEn1ENStA6Y3igmF8LJ2TzBtlftQwytAdJmzGHjl1Iw5e8asx32johksb92nG
+         Yfa1HKvzT7yGKuYtqfV/G/EOO5VZZULy6K6yAgrgrxGW82lcgQkGtYA0QVNJm9jAgkzJ
+         9xrQ==
+X-Gm-Message-State: AGi0PubX5lMODNnhBEUpJckVnt26Y+NRUwIxFOn10dIDKkevqUVtcu3I
+        JftO3yjSz3x3nQnEU9Yqbdg=
+X-Google-Smtp-Source: APiQypKnDao+pl7grXlaGqzpC6Us6sQ/cc5Bx3+Kf4IjSfI/lLruTTPQF6zXoAlX0W6PyZPP+Le1Kg==
+X-Received: by 2002:a17:902:b711:: with SMTP id d17mr32928427pls.333.1588146393824;
+        Wed, 29 Apr 2020 00:46:33 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id c84sm427219pfb.153.2020.04.29.00.46.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2020 00:46:30 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id D74F941381; Wed, 29 Apr 2020 07:46:29 +0000 (UTC)
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: [PATCH v3 2/6] block: move main block debugfs initialization to its own file
+Date:   Wed, 29 Apr 2020 07:46:23 +0000
+Message-Id: <20200429074627.5955-3-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.23.0.rc1
+In-Reply-To: <20200429074627.5955-1-mcgrof@kernel.org>
+References: <20200429074627.5955-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5b86d24-97a5-4aab-59aa-08d7ec100ba3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2020 07:36:35.3891
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VuKi4qf6pJhNiz1zERFN4JJDHjMQwKLxS2gkm4cTXdOlRV7txsX77IiMV6FqPTAyTru/vl2au9mm10bKoZDtUjeTeRPRKU1g5Aql3ENzupQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3533
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 29/04/2020 09:25, Christoph Hellwig wrote:=0A=
-> As-is this will clash with my BIO_QUEUE_ENTERED cleanup.=0A=
-=0A=
-Bah right, I'll re-base once Jens has applied your series.=0A=
+make_request-based drivers and and request-based drivers share some
+debugfs code. By moving this into its own file it makes it easier
+to expand and audit this shared code.
+
+This patch contains no functional changes.
+
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: yu kuai <yukuai3@huawei.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ block/Makefile      |  1 +
+ block/blk-core.c    |  9 +--------
+ block/blk-debugfs.c | 15 +++++++++++++++
+ block/blk.h         |  7 +++++++
+ 4 files changed, 24 insertions(+), 8 deletions(-)
+ create mode 100644 block/blk-debugfs.c
+
+diff --git a/block/Makefile b/block/Makefile
+index 206b96e9387f..1d3ab20505d8 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
+ 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
+ 			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o
+ 
++obj-$(CONFIG_DEBUG_FS)		+= blk-debugfs.o
+ obj-$(CONFIG_BOUNCE)		+= bounce.o
+ obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
+ obj-$(CONFIG_BLK_DEV_BSG)	+= bsg.o
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8a27c772982e..4b26f686e249 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -49,10 +49,6 @@
+ #include "blk-pm.h"
+ #include "blk-rq-qos.h"
+ 
+-#ifdef CONFIG_DEBUG_FS
+-struct dentry *blk_debugfs_root;
+-#endif
+-
+ EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_remap);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(block_rq_remap);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_complete);
+@@ -1828,10 +1824,7 @@ int __init blk_dev_init(void)
+ 
+ 	blk_requestq_cachep = kmem_cache_create("request_queue",
+ 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
+-
+-#ifdef CONFIG_DEBUG_FS
+-	blk_debugfs_root = debugfs_create_dir("block", NULL);
+-#endif
++	blk_debugfs_register();
+ 
+ 	return 0;
+ }
+diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
+new file mode 100644
+index 000000000000..19091e1effc0
+--- /dev/null
++++ b/block/blk-debugfs.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * Shared request-based / make_request-based functionality
++ */
++#include <linux/kernel.h>
++#include <linux/blkdev.h>
++#include <linux/debugfs.h>
++
++struct dentry *blk_debugfs_root;
++
++void blk_debugfs_register(void)
++{
++	blk_debugfs_root = debugfs_create_dir("block", NULL);
++}
+diff --git a/block/blk.h b/block/blk.h
+index 73bd3b1c6938..ec16e8a6049e 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -456,5 +456,12 @@ struct request_queue *__blk_alloc_queue(int node_id);
+ int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
+ 		struct page *page, unsigned int len, unsigned int offset,
+ 		bool *same_page);
++#ifdef CONFIG_DEBUG_FS
++void blk_debugfs_register(void);
++#else
++static inline void blk_debugfs_register(void)
++{
++}
++#endif /* CONFIG_DEBUG_FS */
+ 
+ #endif /* BLK_INTERNAL_H */
+-- 
+2.25.1
+
