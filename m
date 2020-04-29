@@ -1,121 +1,90 @@
-Return-Path: <SRS0=S1TO=6M=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D49F5C83004
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 22:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76038C83000
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:17:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB2932072A
-	for <linux-block@archiver.kernel.org>; Tue, 28 Apr 2020 22:14:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E87820731
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 01:17:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEBUF+Ay"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726760AbgD1WOY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 18:14:24 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:60412 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726571AbgD1WOY (ORCPT
+        id S1726474AbgD2BRn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 21:17:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50772 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726353AbgD2BRn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 18:14:24 -0400
-Received: from dread.disaster.area (pa49-195-157-175.pa.nsw.optusnet.com.au [49.195.157.175])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 543753A44C1;
-        Wed, 29 Apr 2020 07:47:35 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1jTY4k-0008LL-IM; Wed, 29 Apr 2020 07:47:34 +1000
-Date:   Wed, 29 Apr 2020 07:47:34 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200428214653.GD2005@dread.disaster.area>
-References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
+        Tue, 28 Apr 2020 21:17:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588123062;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a9rWN0ISEDMcvYISG0NzTefsKNinJfINEugf2xFfHd0=;
+        b=eEBUF+Ayqw7LMuuNcHky22VWo9O/zkgfq51RPtDC2YT/I0Da0nPFVmBTZH4aGSB8KixuEu
+        eod1QOBM2CsRFLFl+ps2wyWqXElKQ5LuECudh6Y2Jy7eGz+aBxCIBAcW8TuYgY0v8CsjfM
+        KnuN/hkRzHi90qRqQI6hX0iZY5BuHbs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-kQrsfha6M0iStoZNoGDQpA-1; Tue, 28 Apr 2020 21:17:40 -0400
+X-MC-Unique: kQrsfha6M0iStoZNoGDQpA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 222DB107ACCA;
+        Wed, 29 Apr 2020 01:17:39 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 46F1510013BD;
+        Wed, 29 Apr 2020 01:17:32 +0000 (UTC)
+Date:   Wed, 29 Apr 2020 09:17:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Salman Qazi <sqazi@google.com>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/2] block: add blk_default_io_timeout() for avoiding
+ task hung in sync IO
+Message-ID: <20200429011728.GA671522@T590>
+References: <20200428074657.645441-1-ming.lei@redhat.com>
+ <20200428074657.645441-2-ming.lei@redhat.com>
+ <7e339c3d-8600-4a9b-99bf-24afb023c4dd@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200428161355.6377-1-schatzberg.dan@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=X6os11be c=1 sm=1 tr=0
-        a=ONQRW0k9raierNYdzxQi9Q==:117 a=ONQRW0k9raierNYdzxQi9Q==:17
-        a=kj9zAlcOel0A:10 a=cl8xLZFz6L8A:10 a=7-415B0cAAAA:8
-        a=1gqJplI6GZ5HzG39sUQA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+In-Reply-To: <7e339c3d-8600-4a9b-99bf-24afb023c4dd@acm.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 12:13:46PM -0400, Dan Schatzberg wrote:
-> The loop device runs all i/o to the backing file on a separate kworker
-> thread which results in all i/o being charged to the root cgroup. This
-> allows a loop device to be used to trivially bypass resource limits
-> and other policy. This patch series fixes this gap in accounting.
-
-How is this specific to the loop device? Isn't every block device
-that offloads work to a kthread or single worker thread susceptible
-to the same "exploit"?
-
-Or is the problem simply that the loop worker thread is simply not
-taking the IO's associated cgroup and submitting the IO with that
-cgroup associated with it? That seems kinda simple to fix....
-
-> Naively charging cgroups could result in priority inversions through
-> the single kworker thread in the case where multiple cgroups are
-> reading/writing to the same loop device.
-
-And that's where all the complexity and serialisation comes from,
-right?
-
-So, again: how is this unique to the loop device? Other block
-devices also offload IO to kthreads to do blocking work and IO
-submission to lower layers. Hence this seems to me like a generic
-"block device does IO submission from different task" issue that
-should be handled by generic infrastructure and not need to be
-reimplemented multiple times in every block device driver that
-offloads work to other threads...
-
-> This patch series does some
-> minor modification to the loop driver so that each cgroup can make
-> forward progress independently to avoid this inversion.
+On Tue, Apr 28, 2020 at 07:19:33AM -0700, Bart Van Assche wrote:
+> On 2020-04-28 00:46, Ming Lei wrote:
+> > +/*
+> > + * Used in sync IO for avoiding to triger task hung warning, which may
+> > + * cause system panic or reboot.
+> > + */
+> > +static inline unsigned long blk_default_io_timeout(void)
+> > +{
+> > +	return sysctl_hung_task_timeout_secs * (HZ / 2);
+> > +}
+> > +
+> >  #endif
 > 
-> With this patch series applied, the above script triggers OOM kills
-> when writing through the loop device as expected.
+> This function is only used inside the block layer. Has it been
+> considered to move this function from the public block layer API into a
+> private header file, e.g. block/blk.h?
 
-NACK!
+Please look at the commit log or the 2nd patch, and the helper will be
+used in 2nd patch in dio code.
 
-The IO that is disallowed should fail with ENOMEM or some similar
-error, not trigger an OOM kill that shoots some innocent bystander
-in the head. That's worse than using BUG() to report errors...
+Thanks,
+Ming
 
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
