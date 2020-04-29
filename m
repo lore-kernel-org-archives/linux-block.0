@@ -2,67 +2,65 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D83DC83004
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE076C83003
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2520214AF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACCA620787
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 07:48:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588146425;
-	bh=XSbPH3ffvbS6FsOex/azELqWgSZ2LOUf2GhY1BTNolY=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=aagRng+Pr9fqjTq05Xnox2eWoMAXiSoonHrjyh5y8M+L7rsuaLAjNyJYwf2KMr6gj
-	 e76k9+ScSADiJJnJP5nLWEtqGRKcakd06sfG6a5H9CIkTlSWZ5BaZ2WnZDOV5IGQu2
-	 ca1X2VyQHo1JTzrZV9tGHMqUW0DU7fWRTrE7KnGM=
+	s=default; t=1588146529;
+	bh=N12cB1T0tW1/D8uYYvNBt+N6bWu69JrTpvZIdNYw7dk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=TVxauCb51q1kZrO0Q7n5a9zBZHGX2JGjTzWi1o9Vw0inhTkH/+aAe1e87UfziZCU5
+	 p87Xzn2DD5Non7UJOREz4FGk9DCLCqXYpl2j1yWsAAz4t/4qt2wqctIYPAn2kVwtmo
+	 IPxahANiiQKzEtEsK/7YRzUc+qRHnohcsPCZxDug=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgD2Hqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 03:46:33 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:37452 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbgD2Hqd (ORCPT
+        id S1726457AbgD2Hst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 03:48:49 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38377 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726381AbgD2Hss (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 03:46:33 -0400
-Received: by mail-pj1-f68.google.com with SMTP id a7so433898pju.2;
-        Wed, 29 Apr 2020 00:46:32 -0700 (PDT)
+        Wed, 29 Apr 2020 03:48:48 -0400
+Received: by mail-pf1-f196.google.com with SMTP id y25so710266pfn.5;
+        Wed, 29 Apr 2020 00:48:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NYubAi/xyHN/Pt3WLLDfx9xZYmA2QF+HOc1wknCJjyE=;
-        b=GRVpuSICDDEMtu3XtVD1g71gFPyq25bQVNgOCvuQ6rb6vPCIdZLLdNSc4TJRJBlFKQ
-         b9jCVkwSKfOQTugMOJghCGGcDtGPmC8RZaO47jzLyAe0540nNuPUT2MdoiHfeCOz4Tsp
-         ztGe+W3PH5cdFL9sr2WCbjjWS6sI7PEA2YKMAObzVc750KoLizJHbJZYYjajfsKKmSRe
-         U78O3ER6GJ90k4q+0cJqZv9wdzA4XPuK7soi3+RvSjcuhg/Ouj8xJ5+Jlvv3Deipd8hO
-         Zh+RBHdTgnpLnwrBU/9GqA5tJDs6ICTbYa7Pllt8+uBLk/uM9Z5yaeTnclBgu/EEpJtV
-         z5xg==
-X-Gm-Message-State: AGi0Pub8XD9+hXY3i3fp4niqgVK15y2a/opJIq1dTnNhdTv+vE6xArTO
-        yhh+VCpjAXoS1pIiGvwT27o=
-X-Google-Smtp-Source: APiQypIfWlYu4r9gGMTIUxtKPyw+8rsye9CqmxwCOpf6XM6xFBrcbMQA0lW6oMqBferHgjxE4Y6RAA==
-X-Received: by 2002:a17:90a:8c85:: with SMTP id b5mr1555073pjo.187.1588146392532;
-        Wed, 29 Apr 2020 00:46:32 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5Mprrx+N/1IG0lpOsMC6pFihehpTtLFM4Po0pnJv2xU=;
+        b=UwaRbLLkpgTigexrRgSOt0cpXoDxAirn1VRXH+hIKiioYa2WuSIW9HHXW96AemRLj3
+         oIkzU5FmKEX3bWdR3ORiu+Jw+rHbqRsIyX2Fn+WS6O1vC4igUcARQEEygMmDjm2FqGP/
+         oyNPjZ4vNYj3joriLsdQ38tv6Wqpkh3XHa9l065ytXqFl96wYcu1ByJ9MBNJaK1VTwBT
+         mAaI+4F2aCT3w8N1XtoYlqYN8j9TFuOObhZ2y71O75m45JER8RW3O8BzMqGyBqvwJ9hu
+         5w0IXubowJVK4WRfGWA4KCUYc2lkWsd/Y/3wa31i3I/wCAXlhEY7t+GUDDd8mUwDi5lt
+         jRuA==
+X-Gm-Message-State: AGi0Pua6UqkbosMBEgmCN6xfhc5PMcj0v5SMs+6Psymr9dYxQP1hQj9v
+        yUQGHUPz3ON3mNsU4ZFaYnSZ5hTSWzk=
+X-Google-Smtp-Source: APiQypI7ngW2h14GNvjybk2+5wFMX/mrJjPeSOgs5TfeYAxwwwe7wA+6l1nxeOK2MadAl5dUdWVMbA==
+X-Received: by 2002:a62:c1c1:: with SMTP id i184mr35127925pfg.18.1588146527969;
+        Wed, 29 Apr 2020 00:48:47 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id 141sm411722pfz.171.2020.04.29.00.46.30
+        by smtp.gmail.com with ESMTPSA id 127sm419071pfz.128.2020.04.29.00.48.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2020 00:46:30 -0700 (PDT)
+        Wed, 29 Apr 2020 00:48:46 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id B9830403AB; Wed, 29 Apr 2020 07:46:29 +0000 (UTC)
+        id A483940045; Wed, 29 Apr 2020 07:48:45 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org
-Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+To:     axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com
+Cc:     yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v3 0/6] block: fix blktrace debugfs use after free
-Date:   Wed, 29 Apr 2020 07:46:21 +0000
-Message-Id: <20200429074627.5955-1-mcgrof@kernel.org>
+Subject: [RFC v1 1/6] block: refcount the request_queue early in __device_add_disk()
+Date:   Wed, 29 Apr 2020 07:48:39 +0000
+Message-Id: <20200429074844.6241-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
+In-Reply-To: <20200429074844.6241-1-mcgrof@kernel.org>
+References: <20200429074844.6241-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -70,60 +68,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Alrighty, here is v3 with all the BUG_*() crap removed, and moving
-to just create the debugfs directory needed for the partitions as well
-at initialization. This allows us to get rid of the pesky
-debugfs_lookup() calls which has made this code very awkward, and
-allowed us to find surprising bugs when we went with an
-asynchronous request_queue removal.
+We refcount the request_queue right now towards the end of the
+__device_add_disk(), however when we add error handling on this
+function we'll want to refcount the request_queue first, to help
+make less complicated changes on drivers on their error paths.
 
-I'll note that I still see this:
+For instance, today a driver may call add_disk without error handling
+but still handle other errors:
 
-debugfs: Directory 'loop0' with parent 'block' already present!
+int foo_block_add(...)
+{
+	...
+	queue = blk_mq_init_queue(...);
+	...
+	disk->queue = queue;
+	disk = alloc_disk(...);
+	if (!disk)
+		goto out_free_queue;
+	...
+        add_disk(disk);
+	...
+        return 0;
 
-But only for break-blktrace [0] run_0004.sh. But since we don't
-have any more races with blktrace, this has pushed me to look
-into disk registration / deletion. I'll be posting patches soon
-about some changes to help with that, on the error handling.
+out_free_queue:
+        blk_cleanup_queue(queue);
+	/* Note: we never call put_disk() as add_disk() never failed */
+	...
+}
 
-If, after these patches, you however find the root cause to this
-let me know!
+We want drivers to cleanup with put_disk() on the error path if
+add_disk() fails. However, calling blk_cleanup_queue() will already
+put the queue, and so the last put_disk() on the error path will
+be extra. This can be simplified later if once error handling is
+added to __device_add_disk(), if refcounting the request_queue
+fails right away on __device_add_disk() we just return early and
+set disk->NULL for the driver. That would ensure driver error
+paths chug on with their error paths, and all they'd need to
+expand with is the missing put_disk().
 
-Also, if folks don't disagree, I'll likely follow up to just merge
-break-blktrace as a self-test for blktrace. We can later expand on it
-upstream instead.
+The collateral evolution for adding error paths for add_disk() becomes
+larger with the alternative of replacing the blk_cleanup_queue() with
+a put_disk(). We'd still need to sprinkle then some blk_cleanup_queue()
+calls on the driver paths up above prior to add_disk(). And how would
+we know we reached a part of add_disk() which did refcount then?
 
-These patches are based on linux-next tag next-20200428, you can find
-the code on my 20200428-blktrace-fixes branch [1].
+A related commit is 5a0ec388ef0f ("pktcdvd: Fix pkt_setup_dev() error
+path") which *had* to take the approach of removing the blk_cleanup_queue()
+because otherwise the driver crashes.
 
-[0] https://github.com/mcgrof/break-blktrace
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200428-blktrace-fixes
+Moving this to the top ensure our future error path can easily just
+handle this itself. For instance, if it was not able to refcount the
+request_queue it can disk->queue to NULL, that way allowing a
+blk_cleanup_queue() call followed but a put_disk(). And if the
+refcount was incremented, we'd still be able to keep the same error
+path of blk_cleanup_queue() followed by put_disk().
 
-Luis Chamberlain (6):
-  block: revert back to synchronous request_queue removal
-  block: move main block debugfs initialization to its own file
-  blktrace: move blktrace debugfs creation to helper function
-  blktrace: fix debugfs use after free
-  blktrace: break out of blktrace setup on concurrent calls
-  loop: be paranoid on exit and prevent new additions / removals
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ block/genhd.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
- block/Makefile               |  1 +
- block/blk-core.c             | 32 ++++++++++++----
- block/blk-debugfs.c          | 44 ++++++++++++++++++++++
- block/blk-mq-debugfs.c       |  5 ---
- block/blk-sysfs.c            | 47 ++++++++++++-----------
- block/blk.h                  | 18 +++++++++
- block/genhd.c                | 73 +++++++++++++++++++++++++++++++++++-
- block/partitions/core.c      |  3 ++
- drivers/block/loop.c         |  4 ++
- drivers/scsi/sg.c            |  2 +
- include/linux/blkdev.h       |  7 ++--
- include/linux/blktrace_api.h |  1 -
- include/linux/genhd.h        | 18 +++++++++
- kernel/trace/blktrace.c      | 39 ++++++++++++++++---
- 14 files changed, 249 insertions(+), 45 deletions(-)
- create mode 100644 block/blk-debugfs.c
-
+diff --git a/block/genhd.c b/block/genhd.c
+index a933cffbee2e..5f7faaf9cc83 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -803,6 +803,12 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	dev_t devt;
+ 	int retval;
+ 
++	/*
++	 * Take an extra ref on queue which will be put on disk_release()
++	 * so that it sticks around as long as @disk is there.
++	 */
++	WARN_ON_ONCE(!blk_get_queue(disk->queue));
++
+ 	/*
+ 	 * The disk queue should now be all set with enough information about
+ 	 * the device for the elevator code to pick an adequate default
+@@ -854,12 +860,6 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	if (register_queue)
+ 		blk_register_queue(disk);
+ 
+-	/*
+-	 * Take an extra ref on queue which will be put on disk_release()
+-	 * so that it sticks around as long as @disk is there.
+-	 */
+-	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+-
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
 -- 
 2.25.1
 
