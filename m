@@ -2,125 +2,100 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F17ADC83004
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 16:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7170FC83004
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 16:49:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA8F4206F0
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 16:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4059C208FE
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 16:49:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588178970;
+	bh=d/Pk9fa2P5XG8apv15wGa2uabBPvAQmo72nLeB6UF8E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=l2hHsFuzIHijpOU8Rvn2V0oUsQMeggeVHhe5Sie6Ha/WgmI1OG2aY2mR/0DlQjXfP
+	 7ff/CEwChoFCnHEodhLixYP2ckyJQEaJ9xxe4do90OXhf9qFF6Uk816xaOZPJjU5vb
+	 uLYDccp7Yq1r7cQEfxnx1gRZlo369XkLsTjfkTNk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbgD2QVZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 12:21:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43240 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726526AbgD2QVZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 12:21:25 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 881EDAF77;
-        Wed, 29 Apr 2020 16:21:22 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id D262D1E1298; Wed, 29 Apr 2020 18:21:20 +0200 (CEST)
-Date:   Wed, 29 Apr 2020 18:21:20 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200429162120.GB12716@quack2.suse.cz>
-References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
- <20200428214653.GD2005@dread.disaster.area>
- <20200429102540.GA12716@quack2.suse.cz>
- <20200429142230.GE5462@mtj.thefacebook.com>
+        id S1726481AbgD2Qt3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 12:49:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726743AbgD2Qt1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Apr 2020 12:49:27 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E80FBC035495
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 09:49:26 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id y3so2281883lfy.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 09:49:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=D9Uuz2eH1rEC3Rsd9pWrnSIaGFJoBuGHkEpyj9FO1RU=;
+        b=fNkYlfC7XyU0na36V1nAsEErxJD6SCdd001tONSj5QzCTF5pfnhtkJHTnLvT4RbjHZ
+         Esmpn/Ja4kfMTNbK4V/ULBUaFnl8J/DehN+PSbsUTUNm9u5a0/1rtLVU7yIw59uOmHc1
+         Oz8J1e1DSH0V3mg6CW+Ys3Xe1HiKJDyaEj9z4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=D9Uuz2eH1rEC3Rsd9pWrnSIaGFJoBuGHkEpyj9FO1RU=;
+        b=mZxMX7PhKlaVZyncVQygSdlqLx+TU1Hucx16DCwz56NayTX09DAQPkY71a5xTAiwn8
+         rBh4VzI/G1ynZdcZzRFT12dywpycurLuREhukmKgHIZrNf7IENr9PcFxO+UGFtgNTBco
+         a0zbMF4OUSRn0Hdr6wGAdHc4qL2MfHOg/Hw2eOrQg2GQ5DB9uMmdWfwojzg4Z9/JGzQK
+         xCg55WyVEKoxa1lKyj6UGERI4AtJdImQx7bQnHMeM/ZtL1LxH4FV59wwKIuOyt4u8Lus
+         7x6iGH64x3NK/seQ058QBv5KBIYmLvw0tR8k5pC7QHnO85l3N57Uh7CUxg5wnQ4x6n66
+         iVJg==
+X-Gm-Message-State: AGi0PubHnpQUBpbZJuLYSCM0DL0XJIlp6j4F2wTmV+8Yht24w3LJU311
+        6RZsGUixNqIEvPnC2SjWAyFzEcSxH7A=
+X-Google-Smtp-Source: APiQypL4HkHp6z76NcPO6ZQA7OQ6fgJbqD0MNv95BgJItbtVZIKRWEmeBRFJ38atNiPJy5L09Bj0kA==
+X-Received: by 2002:ac2:47f0:: with SMTP id b16mr23595289lfp.81.1588178964552;
+        Wed, 29 Apr 2020 09:49:24 -0700 (PDT)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
+        by smtp.gmail.com with ESMTPSA id g11sm2623689ljg.24.2020.04.29.09.49.22
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2020 09:49:22 -0700 (PDT)
+Received: by mail-lf1-f48.google.com with SMTP id f8so2242019lfe.12
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 09:49:22 -0700 (PDT)
+X-Received: by 2002:ac2:4466:: with SMTP id y6mr23676248lfl.125.1588178962247;
+ Wed, 29 Apr 2020 09:49:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429142230.GE5462@mtj.thefacebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <158810566883.1168184.8679527126430822408.stgit@warthog.procyon.org.uk>
+ <20200429060556.zeci7z7jwazly4ga@work>
+In-Reply-To: <20200429060556.zeci7z7jwazly4ga@work>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 29 Apr 2020 09:49:04 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiHoa0onB0KTthLXeHNNBupcPOdf38OEoFFy3ok3nOeJA@mail.gmail.com>
+Message-ID: <CAHk-=wiHoa0onB0KTthLXeHNNBupcPOdf38OEoFFy3ok3nOeJA@mail.gmail.com>
+Subject: Re: [PATCH] Fix use after free in get_tree_bdev()
+To:     Lukas Czerner <lczerner@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 29-04-20 10:22:30, Tejun Heo wrote:
-> Hello,
-> 
-> On Wed, Apr 29, 2020 at 12:25:40PM +0200, Jan Kara wrote:
-> > Yeah, I was thinking about the same when reading the patch series
-> > description. We already have some cgroup workarounds for btrfs kthreads if
-> > I remember correctly, we have cgroup handling for flush workers, now we are
-> > adding cgroup handling for loopback device workers, and soon I'd expect
-> > someone comes with a need for DM/MD worker processes and IMHO it's getting
-> > out of hands because the complexity spreads through the kernel with every
-> > subsystem comming with slightly different solution to the problem and also
-> > the number of kthreads gets multiplied by the number of cgroups. So I
-> > agree some generic solution how to approach IO throttling of kthreads /
-> > workers would be desirable.
-> > 
-> > OTOH I don't have a great idea how the generic infrastructure should look
-> > like...
-> 
-> I don't really see a way around that. The only generic solution would be
-> letting all IOs through as root and handle everything through backcharging,
-> which we already can do as backcharging is already in use to handle metadata
-> updates which can't be controlled directly. However, doing that for all IOs
-> would make the control quality a lot worse as all control would be based on
-> first incurring deficit and then try to punish the issuer after the fact.
+On Tue, Apr 28, 2020 at 11:06 PM Lukas Czerner <lczerner@redhat.com> wrote:
+>
+> This fixes the problem I was seeing. Thanks David.
+>
+> Reviewed-by: Lukas Czerner <lczerner@redhat.com>
 
-Yeah, it will be probably somewhat worse but OTOH given we'd track the IO
-balance per cgroup there will deficit only when a cgroup is starting so it
-could be bearable. I'm more concerned about issues like that for some IO
-controllers (e.g. for blk-iolatency or for the work preserving
-controllers), it is not obvious how to sensibly estimate some cost to
-charge to a cgroup since these controllers are more about giving priority
-to IO of some cgroup in presence of IO from another cgroup rather than some
-hard throughput limit or something like that.
+Well, it got applied as obvious before this, so the commit log won't
+show your testing.
 
-> The infrastructure work done to make IO control work for btrfs is generic
-> and the changes needed on btrfs side was pretty small. Most of the work was
-> identifying non-regular IO pathways (bouncing through different kthreads and
-> whatnot) and making sure they're annotating IO ownership and the needed
-> mechanism correctly. The biggest challenge probably is ensuring that the
-> filesystem doesn't add ordering dependency between separate data IOs, which
-> is a nice property to have with or without cgroup support.
-> 
-> That leaves the nesting drivers, loop and md/dm. Given that they sit in the
-> middle of IO stack and proxy a lot of its roles, they'll have to be updated
-> to be transparent in terms of cgroup ownership if IO control is gonna work
-> through them. Maybe we can have a common infra shared between loop, dm and
-> md but they aren't many and may also be sufficiently different. idk
+Commit dd7bc8158b41 ("Fix use after free in get_tree_bdev()") in case
+anybody cares. Didn't make -rc3, but will be in -rc4.
 
-Yeah, as I said, I don't really have a better alternative :-|
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+          Linus
