@@ -2,138 +2,184 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2253BC83006
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 17:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7475C83000
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 17:34:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0184320787
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 17:20:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BaftpZqb"
+	by mail.kernel.org (Postfix) with ESMTP id 7BC00208FE
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 17:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588181647;
+	bh=mgzB4f+p6rmmfScN/90JYMP823FyQiRJhWdBt5NpAyk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=X/wQnM+P1ZV7Q4DTHx0X5YhHDHErDkiZSjtz5XNbQhSWK8rYR9b3rr7Sh2g+Jnea6
+	 F6xnQcOn11PjKDw5gO40aKpE+c9ksseIcrKdBuIcRjKgfHd4Ye5HVijzaiOq2IBSNm
+	 45BC0/NAcmD8rBn/ZR5zc93wYniyOnrP98e1//k8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726580AbgD2RUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 13:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726524AbgD2RUV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 13:20:21 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99246C035493
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 10:20:19 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id 20so2780109qkl.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 10:20:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=mpmSHkWxwgm/LhAcYo3SLWkH0ACT29klkaOxaqVeapg=;
-        b=BaftpZqbKcU3LSUdl2EAMo8xhJ6wB1ilnYyQomJV8QvAIrZ6woGMlhjQPBa4Pkuhj5
-         yx7FNiCccDVVyzMRl8IqarWuhPX/ynoe1ZQgHXorS18x/9Y/YqYHvmfRr91+CmRPZ9bD
-         0uR4D+wPBYCr9Jz0cnUfo0M+MM6/EXe2WkCSMjsa9Eo4IjWhTO0Kx5sqUgYdXLd1sRb0
-         jKdux+HfHqUdTRaXE5YzDuen1XJUNoKrmanc5lasHpkwas3+EqXjMn25UDw6A2P3HpD0
-         YIJVfNcsicp+J7iJVtSqwS7wnAHpLSDgI+kmQUaY7NIu4bs0pNz9yn4jQG8Ggw/9byYN
-         vNFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mpmSHkWxwgm/LhAcYo3SLWkH0ACT29klkaOxaqVeapg=;
-        b=X7myDAEbs+oyj9Qe7kkYDTZnkyUC5eVOjZfH3GYKo5OcMfXw1QLaG42D336nLUoiVN
-         aav6x7KPCrXQMPtXdtqMeZV0R8tH3rtU+X2iv1XsnfrOYDcFIUPbNX1IyMwLMdEPZ9I4
-         lU5NoSHPTjIqq3zYhiUawMwVkSWaY+qsJcWdTd4baGO8oK794seKxnQFoO0JgbyNjcQA
-         H/brPiTQhKIVOvxRu70v7vYk+O7A7aKirBr66NXH6uZaL5JC5b3eic5GNHUUr0WBYf9z
-         ruM++Lx1JIndtdU9FvOSP9JqHvM6C+obOLaHewDa3fBUnxM9PcKmVWllNbLfTMrLqcfj
-         b9jg==
-X-Gm-Message-State: AGi0PuZ3VglV8jyxZHRUBvNJHE9DjjhL7GwFN3yaaSDc+IvFFfeInogN
-        fGy1vcOF0rdKUatmjugE30iujg==
-X-Google-Smtp-Source: APiQypLF04153S2p8VjAH6Hqezdn+VH4SbYIpT5qP9grOE7J2dD8zbHdFDcq4lHoEALrjdD8Yc830w==
-X-Received: by 2002:ae9:f507:: with SMTP id o7mr32525444qkg.262.1588180818856;
-        Wed, 29 Apr 2020 10:20:18 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id x22sm10456093qtr.57.2020.04.29.10.20.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 29 Apr 2020 10:20:18 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jTqNe-0000P8-1Y; Wed, 29 Apr 2020 14:20:18 -0300
-Date:   Wed, 29 Apr 2020 14:20:18 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
-        jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
-Subject: Re: [PATCH v13 19/25] block/rnbd: server: private header with server
- structs and functions
-Message-ID: <20200429172018.GG26002@ziepe.ca>
-References: <20200427141020.655-1-danil.kipnis@cloud.ionos.com>
- <20200427141020.655-20-danil.kipnis@cloud.ionos.com>
+        id S1726511AbgD2ReG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 13:34:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47996 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726456AbgD2ReG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Apr 2020 13:34:06 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6B55720757;
+        Wed, 29 Apr 2020 17:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588181646;
+        bh=mgzB4f+p6rmmfScN/90JYMP823FyQiRJhWdBt5NpAyk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cvIfiFq8gK/KE/rDMQfrmjdqPmn4ieLPAX6uNlveg+jddJfzpAn49gY4b6o6FTcNX
+         lPkj+bGK6AE/AyzgBHUy1wNjhoa7W0Ec+lK3uBi7PDpX5G8EVzpo4sRZyZpZiPTVNC
+         je/qS19NzHo3Rwwuje74XUD+Mpw7maKhstWzgj9M=
+Date:   Wed, 29 Apr 2020 18:34:01 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, paulmck@kernel.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200429173400.GC30247@willie-the-truck>
+References: <20200425083224.GA5634@lst.de>
+ <20200425093437.GA495669@T590>
+ <20200425095351.GC495669@T590>
+ <20200425154832.GA16004@lst.de>
+ <20200428155837.GA16910@hirez.programming.kicks-ass.net>
+ <20200429021612.GD671522@T590>
+ <20200429080728.GB29143@willie-the-truck>
+ <20200429094616.GB700644@T590>
+ <20200429122757.GA30247@willie-the-truck>
+ <20200429134327.GC700644@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200427141020.655-20-danil.kipnis@cloud.ionos.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200429134327.GC700644@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 04:10:14PM +0200, Danil Kipnis wrote:
-> From: Jack Wang <jinpu.wang@cloud.ionos.com>
+On Wed, Apr 29, 2020 at 09:43:27PM +0800, Ming Lei wrote:
+> On Wed, Apr 29, 2020 at 01:27:57PM +0100, Will Deacon wrote:
+> > On Wed, Apr 29, 2020 at 05:46:16PM +0800, Ming Lei wrote:
+> > > On Wed, Apr 29, 2020 at 09:07:29AM +0100, Will Deacon wrote:
+> > > > On Wed, Apr 29, 2020 at 10:16:12AM +0800, Ming Lei wrote:
+> > > > > On Tue, Apr 28, 2020 at 05:58:37PM +0200, Peter Zijlstra wrote:
+> > > > > > On Sat, Apr 25, 2020 at 05:48:32PM +0200, Christoph Hellwig wrote:
+> > > > > > >  		atomic_inc(&data.hctx->nr_active);
+> > > > > > >  	}
+> > > > > > >  	data.hctx->tags->rqs[rq->tag] = rq;
+> > > > > > >  
+> > > > > > >  	/*
+> > > > > > > +	 * Ensure updates to rq->tag and tags->rqs[] are seen by
+> > > > > > > +	 * blk_mq_tags_inflight_rqs.  This pairs with the smp_mb__after_atomic
+> > > > > > > +	 * in blk_mq_hctx_notify_offline.  This only matters in case a process
+> > > > > > > +	 * gets migrated to another CPU that is not mapped to this hctx.
+> > > > > > >  	 */
+> > > > > > > +	if (rq->mq_ctx->cpu != get_cpu())
+> > > > > > >  		smp_mb();
+> > > > > > > +	put_cpu();
+> > > > > > 
+> > > > > > This looks exceedingly weird; how do you think you can get to another
+> > > > > > CPU and not have an smp_mb() implied in the migration itself? Also, what
+> > > > > 
+> > > > > What we need is one smp_mb() between the following two OPs:
+> > > > > 
+> > > > > 1) 
+> > > > >    rq->tag = rq->internal_tag;
+> > > > >    data.hctx->tags->rqs[rq->tag] = rq;
+> > > > > 
+> > > > > 2) 
+> > > > > 	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state)))
+> > > > > 
+> > > > > And the pair of the above barrier is in blk_mq_hctx_notify_offline().
+> > > > 
+> > > > I'm struggling with this, so let me explain why. My understanding of the
+> > > > original patch [1] and your explanation above is that you want *either* of
+> > > > the following behaviours
+> > > > 
+> > > >   - __blk_mq_get_driver_tag() (i.e. (1) above) and test_bit(BLK_MQ_S_INACTIVE, ...)
+> > > >     run on the same CPU with barrier() between them, or
+> > > > 
+> > > >   - There is a migration and therefore an implied smp_mb() between them
+> > > > 
+> > > > However, given that most CPUs can speculate loads (and therefore the
+> > > > test_bit() operation), I don't understand how the "everything runs on the
+> > > > same CPU" is safe if a barrier() is required.  In other words, if the
+> > > > barrier() is needed to prevent the compiler hoisting the load, then the CPU
+> > > > can still cause problems.
+> > > 
+> > > Do you think the speculate loads may return wrong value of
+> > > BLK_MQ_S_INACTIVE bit in case of single CPU? BTW, writing the bit is
+> > > done on the same CPU. If yes, this machine may not obey cache consistency,
+> > > IMO.
+> > 
+> > If the write is on the same CPU, then the read will of course return the
+> > value written by that write, otherwise we'd have much bigger problems!
 > 
-> This header describes main structs and functions used by rnbd-server
-> module, namely structs for managing sessions from different clients
-> and mapped (opened) devices.
+> OK, then it is nothing to with speculate loads.
 > 
-> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->  drivers/block/rnbd/rnbd-srv.h | 79 +++++++++++++++++++++++++++++++++++
->  1 file changed, 79 insertions(+)
->  create mode 100644 drivers/block/rnbd/rnbd-srv.h
+> > 
+> > But then I'm confused, because you're saying that the write is done on the
+> > same CPU, but previously you were saying that migration occuring before (1)
+> > was problematic. Can you explain a bit more about that case, please? What
+> > is running before (1) that is relevant here?
 > 
-> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-> new file mode 100644
-> index 000000000000..89218024325d
-> +++ b/drivers/block/rnbd/rnbd-srv.h
-> @@ -0,0 +1,79 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * RDMA Network Block Driver
-> + *
-> + * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> + */
-> +#ifndef RNBD_SRV_H
-> +#define RNBD_SRV_H
-> +
-> +#include <linux/types.h>
-> +#include <linux/idr.h>
-> +#include <linux/kref.h>
-> +
-> +#include "rtrs.h"
-> +#include "rnbd-proto.h"
-> +#include "rnbd-log.h"
-> +
-> +struct rnbd_srv_session {
-> +	/* Entry inside global sess_list */
-> +	struct list_head        list;
-> +	struct rtrs_srv		*rtrs;
-> +	char			sessname[NAME_MAX];
-> +	int			queue_depth;
-> +	struct bio_set		sess_bio_set;
-> +
-> +	spinlock_t              index_lock ____cacheline_aligned;
-> +	struct idr              index_idr;
+> Please see the following two code paths:
+> 
+> [1] code path1:
+> blk_mq_hctx_notify_offline():
+> 	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+> 
+> 	smp_mb() or smp_mb_after_atomic()
+> 
+> 	blk_mq_hctx_drain_inflight_rqs():
+> 		blk_mq_tags_inflight_rqs()
+> 			rq = hctx->tags->rqs[index]
+> 			and
+> 			READ rq->tag
+> 
+> [2] code path2:
+> 	blk_mq_get_driver_tag():
+> 
+> 		process might be migrated to other CPU here and chance is small,
+> 		then the follow code will be run on CPU different with code path1
+> 
+> 		rq->tag = rq->internal_tag;
+> 		hctx->tags->rqs[rq->tag] = rq;
 
-No new users of idr, use xarray.
+I /think/ this can be distilled to the SB litmus test:
 
-Also no users of radix tree if there are any in here..
+	// blk_mq_hctx_notify_offline()		blk_mq_get_driver_tag();
+	Wstate = INACTIVE			Wtag
+	smp_mb()				smp_mb()
+	Rtag					Rstate
 
-Jason
+and you want to make sure that either blk_mq_get_driver_tag() sees the
+state as INACTIVE and does the cleanup, or it doesn't and
+blk_mq_hctx_notify_offline() sees the newly written tag and waits for the
+request to complete (I don't get how that happens, but hey).
+
+Is that right?
+
+> 		barrier() in case that code path2 is run on same CPU with code path1
+> 		OR
+> 		smp_mb() in case that code path2 is run on different CPU with code path1 because
+> 		of process migration
+> 		
+> 		test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state)
+
+Couldn't you just check this at the start of blk_mq_get_driver_tag() as
+well, and then make the smp_mb() unconditional?
+
+Will
