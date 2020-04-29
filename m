@@ -2,45 +2,58 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E18AC83004
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 12:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E0CC83007
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 12:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3158C2087E
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 12:04:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CXmhYwSf"
+	by mail.kernel.org (Postfix) with ESMTP id 3389A21D7A
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 12:21:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588162916;
+	bh=j8tcJCev0qIHcE+Fa2vI85u4LV/SK/7xXpz/3NnDe/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=GIbIb77HkW/3zqbNZon8rD3Od/x3LBj73mXD3564wGHQuIvc5ewZ0PhmU9mMZ7jF+
+	 QH8GfmHUkQL6MCzH2dHFyxBnrRw/QSD1uvA6bfhzx1rhqRohF5IsZuDGF+8it2cRTD
+	 5o57AsWMpUGC602FOQnUc0cNpsjbzqoYL4ST0Pho=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgD2MEZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 08:04:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726554AbgD2MEZ (ORCPT
+        id S1726930AbgD2MVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 08:21:55 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33764 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726910AbgD2MVz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 08:04:25 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1111FC03C1AD;
-        Wed, 29 Apr 2020 05:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=O385uY4zHGIJRbWSoL99UmJmEY6lnZgJqFnu8+7Cu40=; b=CXmhYwSfXlX1ebl+S79JE2NY6q
-        XnbTqO+F0IktLJMaZ8QCyjvIaMilP1HM0OlazqM9rA2EOGDQVi6NHpZ9pqFV5Fe6AR+VZEClZ6dZj
-        l4Z1seG7fVFOxDf3beKsjJYigCFR3RFYpqlfcuHEKYMp4PT3GN5gz24f14GG8Xqq6ImWpsAfPE6jb
-        hP1Li8bNfuQx7/eCptaxMWX3vgnAvo9HzXfUUvQQIwp23DCBWlqYhRnVos739pnxtIoPeZUMnDQIC
-        Wb31Bv4cGYfn+WdRK28KbdMYbowLQRS6urnSfU35qXmQcXe+q+w30oN4p8SSj0uysStV5c7WTt9/p
-        Jwp7qi5g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jTlRf-0000p0-1K; Wed, 29 Apr 2020 12:04:07 +0000
-Date:   Wed, 29 Apr 2020 05:04:06 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        Wed, 29 Apr 2020 08:21:55 -0400
+Received: by mail-pl1-f196.google.com with SMTP id t7so791347plr.0;
+        Wed, 29 Apr 2020 05:21:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=8hYyIcFg83pPVTyQcqYDesu3NloqLxLSIbckmr0AwHk=;
+        b=JrxAkFrbFloSjpp2rbn9klvLI0OhbYSsdXqkMBfIPNsgqeUA8ADBI1MSnk55XxAMgv
+         u3gl1DTZ4FxFDxbkdYJIv2zOnDx/lolIrBxBsZl19CsIaL+QUnq3MCeu4CWpjkerQ7wD
+         8HB3rDXbUH7Zed0YUqgg5ysDgllZTvZteNmZqbfsFM2ntpZz5CFUOoEvkVeXJUTTSXBs
+         28WcE1DupmcpiO95iS/kSxLmMR1GHCLwf4gwHLdGSH4pQufLwwO6z36UegaV00gT/O4/
+         kcqHFGk44lYltrd6fDJvAsSMY600aVHbUI1yWqN5psNtcW8HhpCzeK2TN2Ggi0AQgNmp
+         wSog==
+X-Gm-Message-State: AGi0PuZI82T/fLIMhjkx6iV6F6OO14Kj44mQzqN8YuxIVMJBC4WkgrpS
+        XapShQfLFSxIj3WmcISSq/c=
+X-Google-Smtp-Source: APiQypK7Azz2+WxwoHE3rVYKcE7BGDyy2jhBIIpR257VCG9YgyRto2jm/uAjKMSpahuJrXm0uANnmA==
+X-Received: by 2002:a17:90a:fa0e:: with SMTP id cm14mr2871825pjb.92.1588162914403;
+        Wed, 29 Apr 2020 05:21:54 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id h9sm966620pfo.129.2020.04.29.05.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2020 05:21:53 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 861A4403AB; Wed, 29 Apr 2020 12:21:52 +0000 (UTC)
+Date:   Wed, 29 Apr 2020 12:21:52 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
         jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
         akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
@@ -51,29 +64,42 @@ Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
         Michal Hocko <mhocko@kernel.org>,
         syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
 Subject: Re: [PATCH v3 4/6] blktrace: fix debugfs use after free
-Message-ID: <20200429120406.GA913@infradead.org>
+Message-ID: <20200429122152.GL11244@42.do-not-panic.com>
 References: <20200429074627.5955-1-mcgrof@kernel.org>
  <20200429074627.5955-5-mcgrof@kernel.org>
  <20200429112637.GD21892@infradead.org>
  <20200429114542.GJ11244@42.do-not-panic.com>
  <20200429115051.GA27378@infradead.org>
  <20200429120230.GK11244@42.do-not-panic.com>
+ <20200429120406.GA913@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200429120230.GK11244@42.do-not-panic.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200429120406.GA913@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 12:02:30PM +0000, Luis Chamberlain wrote:
-> > Err, that function is static and has two callers.
+On Wed, Apr 29, 2020 at 05:04:06AM -0700, Christoph Hellwig wrote:
+> On Wed, Apr 29, 2020 at 12:02:30PM +0000, Luis Chamberlain wrote:
+> > > Err, that function is static and has two callers.
+> > 
+> > Yes but that is to make it easier to look for who is creating the
+> > debugfs_dir for either the request_queue or partition. I'll export
+> > blk_debugfs_root and we'll open code all this.
 > 
-> Yes but that is to make it easier to look for who is creating the
-> debugfs_dir for either the request_queue or partition. I'll export
-> blk_debugfs_root and we'll open code all this.
+> No, please not.  exported variables are usually a bad idea.  Just
+> skip the somewhat pointless trivial static function.
 
-No, please not.  exported variables are usually a bad idea.  Just
-skip the somewhat pointless trivial static function.
+Alrighty. It has me thinking we might want to only export those symbols
+to a specific namespace. Thoughts, preferences?
+
+BLOCK_GENHD_PRIVATE ?
+
+The scsi-generic driver seems... rather unique, and I'd imagine we'd
+want to discourage such concoctions in the future, so proliferations
+of these symbols.
+
+  Luis
