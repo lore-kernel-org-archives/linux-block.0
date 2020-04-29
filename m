@@ -2,146 +2,124 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28DCAC83001
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 02:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEEB2C83001
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 02:27:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00DD620784
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 02:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7E8220731
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 02:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vs/5fecC"
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="yIS7iHAs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726503AbgD2CQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Apr 2020 22:16:34 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39378 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726158AbgD2CQe (ORCPT
+        id S1726519AbgD2C1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Apr 2020 22:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33496 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbgD2C1o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Apr 2020 22:16:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588126592;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=X6ASSfj7kdH67HWu3L/nYZw/tdStNtr5OBtpC7mpx88=;
-        b=Vs/5fecCposwNDTX9+cC+j/X3gKxI9kDjHf71JRP/TVjghQFOENk7SOkOMBV3JLobCZySO
-        6Hfb018ljk6nwKCLBgAbGGDvy7rWvlKkSJB4c8piWHoOReaDoSX2ZSToYv1J1O8iRKKsQJ
-        gsx1pUPKQCkNLDGy1QUug3V4rY9+iQ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-HKjnAzb2OJ6mndOtIIi9EQ-1; Tue, 28 Apr 2020 22:16:28 -0400
-X-MC-Unique: HKjnAzb2OJ6mndOtIIi9EQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BF871009610;
-        Wed, 29 Apr 2020 02:16:26 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18097600D2;
-        Wed, 29 Apr 2020 02:16:16 +0000 (UTC)
-Date:   Wed, 29 Apr 2020 10:16:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>, will@kernel.org,
-        paulmck@kernel.org
-Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200429021612.GD671522@T590>
-References: <20200424102351.475641-1-ming.lei@redhat.com>
- <20200424102351.475641-8-ming.lei@redhat.com>
- <20200424103851.GD28156@lst.de>
- <20200425031723.GC477579@T590>
- <20200425083224.GA5634@lst.de>
- <20200425093437.GA495669@T590>
- <20200425095351.GC495669@T590>
- <20200425154832.GA16004@lst.de>
- <20200428155837.GA16910@hirez.programming.kicks-ass.net>
+        Tue, 28 Apr 2020 22:27:44 -0400
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E316C03C1AD
+        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2020 19:27:44 -0700 (PDT)
+Received: by mail-qt1-x843.google.com with SMTP id e17so673040qtp.7
+        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2020 19:27:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=j2BqRPlqFlKV+qbCocfSi2x/JssbK9MFgCKLqYpp14M=;
+        b=yIS7iHAsJKIugA/8A/w12xYgJlTB3URYy1+zVBuG/07z9SfuYhVCBj5PiJkT0Sl+ji
+         cXf8c1c1kahDA3yAOtTmKXArjKHd14VfmKaMdkMTPmYUTGT9rsh59FKalKFxHpPk83j/
+         6h5k65Ipm/JdoKcB0TayOyf566CF1TYMAnhztvxsSe+BwiBqA3qd2wd4dPDUqUbXZhpF
+         uHbegIniPpIGde6atAbSiqkWT/YfgXbyfmFXEoZf/A4Dbl49g/JVdbycBygXIQdXrWsS
+         7yHAyDqE2Kg2ihWZShc7QF2VtZtp/xOzHOrit4A75A9vYuKtIEkgUrnHDttEgHdPRgAE
+         B1jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=j2BqRPlqFlKV+qbCocfSi2x/JssbK9MFgCKLqYpp14M=;
+        b=BR0hUbxnCbpJP79I+a3Dfbhwz5dE53q1CR/mOg127ni0Xnwx0yMh4MwLXN8Mi20g9X
+         MT2mhgoo8gw/iQZqBVUZQyPfJiCN6+d4STr0UKlGcue2VBr9BXp4xSH1JjuOyb3M9KXz
+         PFrfbBYbWbcjjW8y+6HGaBWMioA3i03iJXYG9kcc2hTOLea0nuxhzySaSpQAjKcqKmba
+         2vDzUCFsxF1n3kAdqhdsSO0QXkf+ylt8IaCu2+DkKRTxp9ILbjZ2O7QoAsfP7vQBNKFB
+         eBgzXVYSlL34QSW++wtgGig0ufM07D9lJyjLTqONW86gEYBNKSYykpuZ4uG1toQtAdHn
+         YhAQ==
+X-Gm-Message-State: AGi0PubG4LkPX//evVyPFx8xiH9UWY5pLJ4ErkT6jhmivSs2P9+cW7mz
+        6GIZgVLrJiXubXDuzzL3J+mmBg==
+X-Google-Smtp-Source: APiQypLsEKenWN4WzB6ddMhGOd0xHUK1mWQIdZD+RG622mVERdaN6cZAXO8dAWWRsrXwQyIKvlFoGA==
+X-Received: by 2002:ac8:4ccc:: with SMTP id l12mr31941572qtv.129.1588127263372;
+        Tue, 28 Apr 2020 19:27:43 -0700 (PDT)
+Received: from localhost (70.44.39.90.res-cmts.bus.ptd.net. [70.44.39.90])
+        by smtp.gmail.com with ESMTPSA id s190sm5345219qkh.23.2020.04.28.19.27.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2020 19:27:42 -0700 (PDT)
+Date:   Tue, 28 Apr 2020 22:27:32 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
+Message-ID: <20200429022732.GA401038@cmpxchg.org>
+References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
+ <20200428214653.GD2005@dread.disaster.area>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200428155837.GA16910@hirez.programming.kicks-ass.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200428214653.GD2005@dread.disaster.area>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Peter,
-
-On Tue, Apr 28, 2020 at 05:58:37PM +0200, Peter Zijlstra wrote:
-> On Sat, Apr 25, 2020 at 05:48:32PM +0200, Christoph Hellwig wrote:
-> >  		atomic_inc(&data.hctx->nr_active);
-> >  	}
-> >  	data.hctx->tags->rqs[rq->tag] = rq;
-> >  
-> >  	/*
-> > +	 * Ensure updates to rq->tag and tags->rqs[] are seen by
-> > +	 * blk_mq_tags_inflight_rqs.  This pairs with the smp_mb__after_atomic
-> > +	 * in blk_mq_hctx_notify_offline.  This only matters in case a process
-> > +	 * gets migrated to another CPU that is not mapped to this hctx.
-> >  	 */
-> > +	if (rq->mq_ctx->cpu != get_cpu())
-> >  		smp_mb();
-> > +	put_cpu();
+On Wed, Apr 29, 2020 at 07:47:34AM +1000, Dave Chinner wrote:
+> On Tue, Apr 28, 2020 at 12:13:46PM -0400, Dan Schatzberg wrote:
+> > This patch series does some
+> > minor modification to the loop driver so that each cgroup can make
+> > forward progress independently to avoid this inversion.
+> > 
+> > With this patch series applied, the above script triggers OOM kills
+> > when writing through the loop device as expected.
 > 
-> This looks exceedingly weird; how do you think you can get to another
-> CPU and not have an smp_mb() implied in the migration itself? Also, what
-
-What we need is one smp_mb() between the following two OPs:
-
-1) 
-   rq->tag = rq->internal_tag;
-   data.hctx->tags->rqs[rq->tag] = rq;
-
-2) 
-	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state)))
-
-And the pair of the above barrier is in blk_mq_hctx_notify_offline().
-
-So if this process is migrated before 1), the implied smp_mb() is useless.
-
-> stops the migration from happening right after the put_cpu() ?
-
-If the migration happens after put_cpu(), the above two OPs are still
-ordered by the implied smp_mb(), so looks not a problem.
-
+> NACK!
 > 
-> 
-> >  	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))) {
-> >  		blk_mq_put_driver_tag(rq);
-> 
-> 
-> > +static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
-> > +		struct blk_mq_hw_ctx *hctx)
-> >  {
-> > +	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-> > +		return false;
-> > +	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu)
-> > +		return false;
-> > +	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
-> > +		return false;
-> > +	return true;
-> >  }
-> 
-> Does this want something like:
-> 
-> 	lockdep_assert_held(*set->tag_list_lock);
-> 
-> to make sure hctx->cpumask is stable? Those mask ops are not stable vs
-> concurrenct set/clear at all.
+> The IO that is disallowed should fail with ENOMEM or some similar
+> error, not trigger an OOM kill that shoots some innocent bystander
+> in the head. That's worse than using BUG() to report errors...
 
-hctx->cpumask is only updated in __blk_mq_update_nr_hw_queues(), in
-which all request queues in the tagset have been frozen, and no any
-in-flight IOs, so we needn't to pay attention to that case.
+Did you actually read the script?
 
+It's OOMing because it's creating 256M worth of tmpfs pages inside a
+64M cgroup. It's not killing an innocent bystander, it's killing in
+the cgroup that is allocating all that memory - after Dan makes sure
+that memory is accounted to its rightful owner.
 
-Thanks, 
-Ming
-
+As opposed to before this series, where all this memory isn't
+accounted properly and goes to the root cgroup - where, ironically, it
+could cause OOM and kill an actually innocent bystander.
