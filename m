@@ -2,175 +2,143 @@ Return-Path: <SRS0=GTSZ=6N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3FDC83003
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 13:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 247FAC83000
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:03:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99701206B8
-	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 13:43:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBC012082E
+	for <linux-block@archiver.kernel.org>; Wed, 29 Apr 2020 14:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKw4pqp6"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="i0G80BZP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbgD2Nnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Apr 2020 09:43:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51011 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726599AbgD2Nnt (ORCPT
+        id S1726923AbgD2ODr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Apr 2020 10:03:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726885AbgD2ODr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Apr 2020 09:43:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588167827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rcn9/AvAN/EsgNMm8MtuQD1T5du/+Rn8L3sXN6Mnriw=;
-        b=VKw4pqp68zehkuxR3w30/nOy9a3n98w2kJjhF49XduqfoKo42NKcG4SNMI3X/VrcgfQ/CM
-        NCFTNQv+GHj51t3jap/JTm3xc3+k8rLusv80LWXEC96wJjkF9g54T/h0E4sNPYnUBRtlon
-        /5cW9TiY9ZTREd4jvloCUmJYXfIBk0I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-o2sNc6h7NbyTyYBYT5YEQg-1; Wed, 29 Apr 2020 09:43:42 -0400
-X-MC-Unique: o2sNc6h7NbyTyYBYT5YEQg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC0EA106B38C;
-        Wed, 29 Apr 2020 13:43:40 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AEC671001281;
-        Wed, 29 Apr 2020 13:43:32 +0000 (UTC)
-Date:   Wed, 29 Apr 2020 21:43:27 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>, paulmck@kernel.org
-Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200429134327.GC700644@T590>
-References: <20200425031723.GC477579@T590>
- <20200425083224.GA5634@lst.de>
- <20200425093437.GA495669@T590>
- <20200425095351.GC495669@T590>
- <20200425154832.GA16004@lst.de>
- <20200428155837.GA16910@hirez.programming.kicks-ass.net>
- <20200429021612.GD671522@T590>
- <20200429080728.GB29143@willie-the-truck>
- <20200429094616.GB700644@T590>
- <20200429122757.GA30247@willie-the-truck>
+        Wed, 29 Apr 2020 10:03:47 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB7D6C03C1AE
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:03:46 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id r26so2173894wmh.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 07:03:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/N1h32tUQUjUvbbVh9Sx0ldWuhfL7NViXIQbgOtPfHU=;
+        b=i0G80BZPAm1av9kXUevS62676qW5KOO6kLiBwdV+1UWaQThQ90GQpKI0ph1mvO4BVu
+         jiNxY/PNluCXb1YA19LsvSwYN4H84/FQa/FgQOHxB/zk/grBc4TOo+ct2ThdUv4lGOYC
+         XYDvpJr4oy31138O+l6/L25Rw19V8HgwqzH/mruMC3gSnvsk/qJF2LRZGKYvw0oG3PCN
+         jegxRxSVqRk6QlL117n9HGP86LqIyW5IpjmyrJaY7TFy74U8k8TWAmS4RaPSnNnVSX83
+         +NTOdHFd1z9NEnkFMlOsPHjiXruY2OiiTaPurfWtDhy2E9NArtqZ6j3tCXsBfk/bQkE2
+         v/vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/N1h32tUQUjUvbbVh9Sx0ldWuhfL7NViXIQbgOtPfHU=;
+        b=gFXBJuCdLGpm5f20fwHGuls7SYaZkQ1W3ZKNtjxLWiim+8qvwGlVyePPqn6pPDyE5t
+         +An1kWztVMGdSwll1SKZJ8Va/sJ83eXz+3QsTVQF0+R6CMhtntQK48T0P358sPqrf/Zp
+         uhrz/FXlsjowYQS+xdeOPfSWA6zgQeB6PAORyDObfsvM2GiKQqo5AQvbLX8XSypf1FgH
+         p15bNLMKrz35m0vILP0Jvw6AmsFa81037cA9xt1glQZKVIzmssmfi+17Sx2uqQPe3JRH
+         wYTHCwrv5hm6Gw0GxpStxZkWzZQyoQl31jP0XblElKHmg4P82KI704j8nSRujlnsQKDI
+         5XjQ==
+X-Gm-Message-State: AGi0PuaOgEH5tNYry6tKEvizZsTl9FQPHFKZSoDaRiaB/ZSSPht+i/8N
+        QsxjmdnMjkgI9zcoH/5j9PGcSQ==
+X-Google-Smtp-Source: APiQypKhVVvWGVwyHnc7ndDVd3MQfcksp1Ah1aPBYv179+YC7X76d3YUcZsmi83MJ3DjOOhWMmkMhg==
+X-Received: by 2002:a1c:8084:: with SMTP id b126mr3345914wmd.135.1588169025309;
+        Wed, 29 Apr 2020 07:03:45 -0700 (PDT)
+Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
+        by smtp.gmail.com with ESMTPSA id d133sm8887008wmc.27.2020.04.29.07.03.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2020 07:03:44 -0700 (PDT)
+From:   Martijn Coenen <maco@android.com>
+To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
+Cc:     narayan@google.com, zezeozue@google.com, kernel-team@android.com,
+        maco@google.com, bvanassche@acm.org, Chaitanya.Kulkarni@wdc.com,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Martijn Coenen <maco@android.com>
+Subject: [PATCH v4 00/10] Add a new LOOP_CONFIGURE ioctl
+Date:   Wed, 29 Apr 2020 16:03:31 +0200
+Message-Id: <20200429140341.13294-1-maco@android.com>
+X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429122757.GA30247@willie-the-truck>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 01:27:57PM +0100, Will Deacon wrote:
-> On Wed, Apr 29, 2020 at 05:46:16PM +0800, Ming Lei wrote:
-> > On Wed, Apr 29, 2020 at 09:07:29AM +0100, Will Deacon wrote:
-> > > On Wed, Apr 29, 2020 at 10:16:12AM +0800, Ming Lei wrote:
-> > > > On Tue, Apr 28, 2020 at 05:58:37PM +0200, Peter Zijlstra wrote:
-> > > > > On Sat, Apr 25, 2020 at 05:48:32PM +0200, Christoph Hellwig wrote:
-> > > > > >  		atomic_inc(&data.hctx->nr_active);
-> > > > > >  	}
-> > > > > >  	data.hctx->tags->rqs[rq->tag] = rq;
-> > > > > >  
-> > > > > >  	/*
-> > > > > > +	 * Ensure updates to rq->tag and tags->rqs[] are seen by
-> > > > > > +	 * blk_mq_tags_inflight_rqs.  This pairs with the smp_mb__after_atomic
-> > > > > > +	 * in blk_mq_hctx_notify_offline.  This only matters in case a process
-> > > > > > +	 * gets migrated to another CPU that is not mapped to this hctx.
-> > > > > >  	 */
-> > > > > > +	if (rq->mq_ctx->cpu != get_cpu())
-> > > > > >  		smp_mb();
-> > > > > > +	put_cpu();
-> > > > > 
-> > > > > This looks exceedingly weird; how do you think you can get to another
-> > > > > CPU and not have an smp_mb() implied in the migration itself? Also, what
-> > > > 
-> > > > What we need is one smp_mb() between the following two OPs:
-> > > > 
-> > > > 1) 
-> > > >    rq->tag = rq->internal_tag;
-> > > >    data.hctx->tags->rqs[rq->tag] = rq;
-> > > > 
-> > > > 2) 
-> > > > 	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state)))
-> > > > 
-> > > > And the pair of the above barrier is in blk_mq_hctx_notify_offline().
-> > > 
-> > > I'm struggling with this, so let me explain why. My understanding of the
-> > > original patch [1] and your explanation above is that you want *either* of
-> > > the following behaviours
-> > > 
-> > >   - __blk_mq_get_driver_tag() (i.e. (1) above) and test_bit(BLK_MQ_S_INACTIVE, ...)
-> > >     run on the same CPU with barrier() between them, or
-> > > 
-> > >   - There is a migration and therefore an implied smp_mb() between them
-> > > 
-> > > However, given that most CPUs can speculate loads (and therefore the
-> > > test_bit() operation), I don't understand how the "everything runs on the
-> > > same CPU" is safe if a barrier() is required.  In other words, if the
-> > > barrier() is needed to prevent the compiler hoisting the load, then the CPU
-> > > can still cause problems.
-> > 
-> > Do you think the speculate loads may return wrong value of
-> > BLK_MQ_S_INACTIVE bit in case of single CPU? BTW, writing the bit is
-> > done on the same CPU. If yes, this machine may not obey cache consistency,
-> > IMO.
-> 
-> If the write is on the same CPU, then the read will of course return the
-> value written by that write, otherwise we'd have much bigger problems!
+This series introduces a new ioctl that makes it possible to atomically
+configure a loop device. Previously, if you wanted to set parameters
+such as the offset on a loop device, this required calling LOOP_SET_FD
+to set the backing file, and then LOOP_SET_STATUS to set the offset.
+However, in between these two calls, the loop device is available and
+would accept requests, which is generally not desirable. Similar issues
+exist around setting the block size (LOOP_SET_BLOCK_SIZE) and requesting
+direct I/O mode (LOOP_SET_DIRECT_IO).
 
-OK, then it is nothing to with speculate loads.
+There are also performance benefits with combining these ioctls into
+one, which are described in more detail in the last change in the
+series.
 
-> 
-> But then I'm confused, because you're saying that the write is done on the
-> same CPU, but previously you were saying that migration occuring before (1)
-> was problematic. Can you explain a bit more about that case, please? What
-> is running before (1) that is relevant here?
+Note that this series depends on
+"loop: Call loop_config_discard() only after new config is applied."
+[0], which I sent as a separate patch as it fixes an unrelated bug.
 
-Please see the following two code paths:
+[0]: https://lkml.org/lkml/2020/3/31/755
 
-[1] code path1:
-blk_mq_hctx_notify_offline():
-	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
+---
+v4:
+  - Addressed review comments from Christoph Hellwig:
+    -- Minor code cleanups
+    -- Clarified what lo_flags LOOP_SET_STATUS can set and clear, and
+       made that more explicit in the code (see [9/10])
+    -- LOOP_CONFIGURE can now also be used to configure the block size
+       and to explicitly request Direct I/O and read-only mode.
+    -- Explicitly reject lo_flags we don't know about in LOOP_CONFIGURE
+    -- Renamed LOOP_SET_FD_AND_STATUS to LOOP_CONFIGURE, since the ioctl
+       can now do things LOOP_SET_STATUS couldn't do.
+v3:
+  - Addressed review comments from Christoph Hellwig:
+    -- Factored out loop_validate_size()
+    -- Split up the largish first patch in a few smaller ones
+    -- Use set_capacity_revalidate_and_notify()
+  - Fixed a variable wrongly using size_t instead of loff_t
+v2:
+  - Addressed review comments from Bart van Assche:
+    -- Use SECTOR_SHIFT constant
+    -- Renamed loop_set_from_status() to loop_set_status_from_info()
+    -- Added kerneldoc for loop_set_status_from_info()
+    -- Removed dots in patch subject lines
+  - Addressed review comments from Christoph Hellwig:
+    -- Added missing padding in struct loop_fd_and_status
+    -- Cleaned up some __user pointer handling in lo_ioctl
+    -- Pass in a stack-initialized loop_info64 for the legacy
+       LOOP_SET_FD case
 
-	smp_mb() or smp_mb_after_atomic()
+Martijn Coenen (10):
+  loop: Factor out loop size validation
+  loop: Factor out setting loop device size
+  loop: Switch to set_capacity_revalidate_and_notify()
+  loop: Refactor loop_set_status() size calculation
+  loop: Remove figure_loop_size()
+  loop: Factor out configuring loop from status
+  loop: Move loop_set_status_from_info() and friends up
+  loop: Rework lo_ioctl() __user argument casting
+  loop: Clean up LOOP_SET_STATUS lo_flags handling.
+  loop: Add LOOP_CONFIGURE ioctl
 
-	blk_mq_hctx_drain_inflight_rqs():
-		blk_mq_tags_inflight_rqs()
-			rq = hctx->tags->rqs[index]
-			and
-			READ rq->tag
+ drivers/block/loop.c      | 407 +++++++++++++++++++++++---------------
+ include/uapi/linux/loop.h |  31 ++-
+ 2 files changed, 281 insertions(+), 157 deletions(-)
 
-[2] code path2:
-	blk_mq_get_driver_tag():
-
-		process might be migrated to other CPU here and chance is small,
-		then the follow code will be run on CPU different with code path1
-
-		rq->tag = rq->internal_tag;
-		hctx->tags->rqs[rq->tag] = rq;
-
-		barrier() in case that code path2 is run on same CPU with code path1
-		OR
-		smp_mb() in case that code path2 is run on different CPU with code path1 because
-		of process migration
-		
-		test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state)
-
-
-
-Thanks,
-Ming
+-- 
+2.26.2.303.gf8c07b1a785-goog
 
