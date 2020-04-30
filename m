@@ -2,221 +2,130 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 884B5C47247
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 19:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56FFC47254
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 21:55:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F8CA2072A
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 19:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9135D21775
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 21:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HC0dLmrb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0YJweBxd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbgD3TSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 15:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
+        id S1727947AbgD3Vzh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 17:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726272AbgD3TSu (ORCPT
+        with ESMTP id S1726817AbgD3Vze (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 15:18:50 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C32C035494
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 12:18:49 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id g26so2179969qtv.13
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 12:18:49 -0700 (PDT)
+        Thu, 30 Apr 2020 17:55:34 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09660C035494
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 14:55:33 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id s10so2865834plr.1
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 14:55:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=2kNU/govm7Km3O7A0KcN7K8pmPqtqnw9+vrMQQrBk0g=;
-        b=HC0dLmrbrnIalIMKKVY7PVbKmj7sWCSJ0kthXjOnBl88jTAI9SPSBPwCJ+06dnIWXs
-         BBch5l/Kybx+2N2zeC6DZX+EStZhtfPraj+YZ68a/JTPMQC8VDltD3GpwlI/rXgUOTb5
-         eG5qJ8+xCGI+hOr7V8OASb0w1K/S5VZ2402sk=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rYEprxh5hRkyIRk0SZJ1yYwJF2zaPFW1K1pdxuC7Zuc=;
+        b=0YJweBxdqRGXk8CKADPYZT2TDMDjlejyhecZFIP6Pdqu2Rol0vua+RkjawOc6lW+4C
+         uye8FqmbkqGQFahJuYyZ/sVkYDn8YKcognO7HZN5LGsmML6yIXlmeCxIkANnyZNQ1gTG
+         /9xSR/dOm1broZSmXWyPapxeqpe3M9DwJQedEjQkHUFGZC4OxPB9a94qfaCo8FkfLTG2
+         z4UdgSMg6xqZqbdaMkkKFbSj8MCsvkht1TJbHhLVLcwEjDr92euBMUJXifl8yCQybF3i
+         0VWB+PK6QrXPrkeZTzbIW4Ds0P1gdgZDHzx3P27ENgTnRXQIqNtK/jjJtTG7opYmGATG
+         kgeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=2kNU/govm7Km3O7A0KcN7K8pmPqtqnw9+vrMQQrBk0g=;
-        b=RhEnh22rT+fY8SodY61Ngw9fVF4rs1mlpKUlpc2oYiL5kD/7bEAuf0YQTfSOK5xtJ9
-         vpdka1jUYFPwoVfcsMZCOh1TRybXQQR2UCtye3IWwiT08jwHVkpt/0ZfgBQ2vWD6ztlC
-         ZBY9fxNlGqyb1hYsV3ismQ3JiLsSGvpv7IZCBKoDmoHJTVGeflnXb8pDWTAY+Qo867yF
-         tvFLr6vaL0xjMqiSp5atHG0ZR7etw2vOhLYl70cheQVAamaDHaciepuUPk7aa5TYp50p
-         a9kTSdjOrYg7w/jmgBgzTCkTJL8rRLGTJMvmFRRytHEAsql/04VZrIhAf/JRl032t1gA
-         nIOw==
-X-Gm-Message-State: AGi0PuYXFfvIl/iK2FZpbTI1AnrQ0ETUMXY1a+uhlz3qctqceMu8Jv1P
-        /60xlSn0thj8kEmYiQ2nikJoEckXiMSzmMQZqtBtsw==
-X-Google-Smtp-Source: APiQypKoNUnPcX2MaW1SCM7qMB7NYYpfEyxpyMueEM+BAUSHJd7GNtqHFmBooOlwF+2WWnCYcn1ghPJLQ9RrF01W/tk=
-X-Received: by 2002:ac8:6f66:: with SMTP id u6mr5287706qtv.201.1588274328789;
- Thu, 30 Apr 2020 12:18:48 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
- <1583409280-158604-9-git-send-email-john.garry@huawei.com>
- <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com> <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
- <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com> <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
- <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com> <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
- <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com> <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
- <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com> <d2ae343770a83466b870a33ffae5fa23@mail.gmail.com>
- <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com> <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
- <538dd70d-7edb-c66c-4205-d91f24a907ea@huawei.com> <ca799ed3-0b18-2aa5-7d75-6eac5b0e6e7b@huawei.com>
- <29f8062c1fccace73c45252073232917@mail.gmail.com> <6bfc5fea-d1ce-7220-0023-af3b34e1fa38@huawei.com>
- <eb8bc395-1e62-3a5a-c1f6-5b1d163bf080@huawei.com>
-In-Reply-To: <eb8bc395-1e62-3a5a-c1f6-5b1d163bf080@huawei.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rYEprxh5hRkyIRk0SZJ1yYwJF2zaPFW1K1pdxuC7Zuc=;
+        b=XB/nsskBZIZpquBqNk4+39UMmVlFHPqypoD0aADRv03GC0VsOumMtI5kVj73laGhmy
+         u4u4gjqgftpiZMhU4ZSPJ09udgD8+PKy6i/00LM9mFQNw9iNvYT2ZT8tXyF0+aBFNw+9
+         NdfGM4S4U9b9+tSgMHU94wK4sFWBR7YH9eKnSRhN6zFDj89FHovpSptVZHjyAJci1dWl
+         V3sSSjRdW4m80V9gWVZsvrxLqFXrSXm87T8cnB9VeKKx8JwwEjDqNH6LbVt6oC1Qu4Gh
+         y3rliJ4qP/ZzlNcqQEeadcUtA+nH3U0xri72ZwUVdQ6on0RcAzEEXi80aEAEHYHSI7sT
+         AHww==
+X-Gm-Message-State: AGi0PuZFunLTueRzFQCmt83EqO2XZ8UFcPd/z9kpT4ZHu6tZ0eI/Qu/l
+        R4zuQisaA9hOyR0bw1t0tyrAkw==
+X-Google-Smtp-Source: APiQypKZKsYx7E2CGdgFsbEsXPiGTeppVxcKMSgLFPw/aX5eOiEu/pEAX05ugbUD8BcvAoby192kSA==
+X-Received: by 2002:a17:902:7b94:: with SMTP id w20mr1140125pll.8.1588283732465;
+        Thu, 30 Apr 2020 14:55:32 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.145])
+        by smtp.gmail.com with ESMTPSA id i25sm601473pfo.196.2020.04.30.14.55.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2020 14:55:31 -0700 (PDT)
+Subject: Re: [PATCHSET v2 block/for-5.8] iocost: improve use_delay and latency
+ target handling
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org, newella@fb.com,
+        josef@toxicpanda.com, asml.silence@gmail.com, ming.lei@redhat.com,
+        bvanassche@acm.org
+References: <20200413162758.97252-1-tj@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6ee6360e-1a35-874c-2263-6fb21da66591@kernel.dk>
+Date:   Thu, 30 Apr 2020 15:55:30 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQLPD/Iw6Rn2DAIn/TfwmBaZDWGoTwIxkurkAqxUgoEByxhGKAL7c9G/AhAFW6UBYJrDDwOh6RKhA6E3S3MDBK8nrwGGgqJUAkB+JNsCgDRgnAI/0DHrAq7T5W8B9qtJCwI9L+V1AppqUF4B04hP9aVGgpeA
-Date:   Fri, 1 May 2020 00:48:46 +0530
-Message-ID: <ecaeccf029c6fe377ebd4f30f04df9f1@mail.gmail.com>
-Subject: RE: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        ming.lei@redhat.com, bvanassche@acm.org, hare@suse.de,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        hch@infradead.org,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, Hannes Reinecke <hare@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200413162758.97252-1-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -----Original Message-----
-> From: linux-scsi-owner@vger.kernel.org [mailto:linux-scsi-
-> owner@vger.kernel.org] On Behalf Of John Garry
-> Sent: Thursday, April 30, 2020 11:11 PM
-> To: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: axboe@kernel.dk; jejb@linux.ibm.com; martin.petersen@oracle.com;
-> ming.lei@redhat.com; bvanassche@acm.org; hare@suse.de;
-> don.brace@microsemi.com; Sumit Saxena <sumit.saxena@broadcom.com>;
-> hch@infradead.org; Shivasharan Srikanteshwara
-> <shivasharan.srikanteshwara@broadcom.com>; chenxiang (M)
-> <chenxiang66@hisilicon.com>; linux-block@vger.kernel.org; linux-
-> scsi@vger.kernel.org; esc.storagedev@microsemi.com; Hannes Reinecke
-> <hare@suse.com>
-> Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to
-> MQ
->
-> On 29/04/2020 18:55, John Garry wrote:
-> >
->
-> Hi Kashyap,
->
-> > ok, so it's not proper to use active hctx per request queue as
-> > "users", but rather that the active request_queue's per host (which is
-> > what we effectively have for nr_hw_queues = 1). Just a small comment
-> > at the bottom on your change.
-> >
-> > So I already experimented with reducing shost.can_queue significantly
-> > on hisi_sas (by a factor of 8, from 4096->512, and I use 12x SAS SSD),
-> > and
-> > saw:
-> >
-> > RFC + shost.can_queue reduced: ~1.2M IOPS With RFC + shost.can_queue
-> > unmodified: ~2M IOPS Without RFC + shost.can_queue unmodified: ~2M
-> > IOPS
-> >
-> > And with the change, below, I still get around 1.2M IOPS. But there
-> > may be some sweet spot/zone where this makes a difference, which I'm
-> > not visiting.
-> >
-> >>
-> >> Combination of your patch and below resolves fairness issues. I see
-> >> some better results using " --cpus_allowed_policy=split", but
-> >> --cpus_allowed_policy=shared
-> >
-> > I did not try changing the cpus_allowed_policy policy, and so I would
-> > be using default, which I believe is shared.
-> >
-> > is still having some issue and most likely it
-> >> is to do with fairness. If fairness is not managed properly, there is
-> >> high contention in wait/wakeup handling of sbitmap.
-> >
-> > ok, I can investigate.
->
-> Could you also try this change:
->
-> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h index
-> 0a57e4f041a9..e959971b1cee 100644
-> --- a/block/blk-mq-tag.h
-> +++ b/block/blk-mq-tag.h
-> @@ -46,11 +46,25 @@ extern void blk_mq_tag_wakeup_all(struct
-> blk_mq_tags *tags, bool);
->   void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn
-> *fn,
->   		void *priv);
->
-> +static inline bool blk_mq_is_sbitmap_shared(struct blk_mq_tag_set
-> +*tag_set) {
-> +	return tag_set->flags & BLK_MQ_F_TAG_HCTX_SHARED; }
-> +
->   static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue
-> *bt,
->   						 struct blk_mq_hw_ctx *hctx)
->   {
-> +	struct request_queue *queue;
-> +	struct blk_mq_tag_set *set;
-> +
->   	if (!hctx)
->   		return &bt->ws[0];
-> +	queue = hctx->queue;
-> +	set = queue->tag_set;
-> +
-> +	if (blk_mq_is_sbitmap_shared(set))
-> +		return sbq_wait_ptr(bt, &set->wait_index);
-> +
->   	return sbq_wait_ptr(bt, &hctx->wait_index);
->   }
->
-> diff --git a/block/blk-mq.h b/block/blk-mq.h index
-> 4f12363d56bf..241607806f77 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -158,11 +158,6 @@ struct blk_mq_alloc_data {
->   	struct blk_mq_hw_ctx *hctx;
->   };
->
-> -static inline bool blk_mq_is_sbitmap_shared(struct blk_mq_tag_set
-> *tag_set)
-> -{
-> -	return tag_set->flags & BLK_MQ_F_TAG_HCTX_SHARED;
-> -}
-> -
->   static inline struct blk_mq_tags *blk_mq_tags_from_data(struct
-> blk_mq_alloc_data *data)
->   {
->   	if (data->flags & BLK_MQ_REQ_INTERNAL)
->
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h index
-> 957cb43c5de7..427c7934c29d 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -259,6 +259,8 @@ struct blk_mq_tag_set {
->
->   	struct mutex		tag_list_lock;
->   	struct list_head	tag_list;
-> +
-> +	atomic_t		wait_index;
->   };
+On 4/13/20 10:27 AM, Tejun Heo wrote:
+> Changes from v1[1]
+> 
+> * Dropped 0002-block-add-request-io_data_len.patch and updated to use
+>   rq->stats_sectors instead as suggested by Pavel Begunkov.
+> 
+> This patchset improves the following two iocost control behaviors.
+> 
+> * iocost was failing to punish heavy shared IO generators (file metadata, memory
+>   reclaim) through use_delay mechanism - use_delay automatically decays which
+>   works well for iolatency but doesn't match how iocost behaves. This led to
+>   e.g. memory bombs which generate a lot of swap IOs to use over their allotted
+>   amount. This is fixed by adding non-decaying use_delay mechanism.
+> 
+> * The same latency targets were being applied regardless of the IO sizes. While
+>   this works fine for loose targets, it gets in the way when trying to tigthen
+>   them - a latency target adequate for a 4k IO is too short for a 1 meg IO.
+>   iocost now discounts the size portion of cost when testing whether a given IO
+>   met or missed its latency target.
+> 
+> While at it, it also makes minor changse to iocost_monitor.py.
+> 
+> This patchset contains the following five patches.
+> 
+>  0001-blk-iocost-switch-to-fixed-non-auto-decaying-use_del.patch
+>  0002-blk-iocost-account-for-IO-size-when-testing-latencie.patch
+>  0003-iocost_monitor-exit-successfully-if-interval-is-zero.patch
+>  0004-iocost_monitor-drop-string-wrap-around-numbers-when-.patch
+> 
+> and is also available in the following git branch.
+> 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git iocost-delay-latency-v2
+> 
+> diffstat follows. Thanks.
+> 
+>  block/Kconfig                  |    1 
+>  block/blk-cgroup.c             |    6 ++++
+>  block/blk-iocost.c             |   56 +++++++++++++++++++++++++++++------------
+>  include/linux/blk-cgroup.h     |   43 ++++++++++++++++++++++++-------
+>  tools/cgroup/iocost_monitor.py |   48 +++++++++++++++++++----------------
+>  5 files changed, 106 insertions(+), 48 deletions(-)
 
-John -
+Applied, thanks Tejun.
 
-I have this patch in my local repo as I was doing similar change. Your above
-exact patch is not tested, but similar attempt was done. It is good to
-include in next revision.
-There is no significant performance up or down using this change.
-Currently system is not available for me to test. I will resume testing once
-system is available.
+-- 
+Jens Axboe
 
-
->
->   /**
->
->
-> Thanks,
-> John
