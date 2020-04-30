@@ -2,55 +2,105 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFF4C8300A
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 13:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91390C8300A
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 13:20:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CC84208CA
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 13:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D63820873
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 13:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgD3NN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 09:13:57 -0400
-Received: from verein.lst.de ([213.95.11.211]:40633 "EHLO verein.lst.de"
+        id S1726832AbgD3NU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 09:20:57 -0400
+Received: from verein.lst.de ([213.95.11.211]:40689 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726520AbgD3NN4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 09:13:56 -0400
+        id S1726819AbgD3NU5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 09:20:57 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A164968D07; Thu, 30 Apr 2020 15:13:52 +0200 (CEST)
-Date:   Thu, 30 Apr 2020 15:13:52 +0200
+        id 6051968D07; Thu, 30 Apr 2020 15:20:54 +0200 (CEST)
+Date:   Thu, 30 Apr 2020 15:20:53 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] s390/dasd: remove ioctl_by_bdev from DASD driver
-Message-ID: <20200430131351.GA24813@lst.de>
-References: <20200430111754.98508-1-sth@linux.ibm.com> <20200430111754.98508-2-sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 8/7] hfs: stop using ioctl_by_bdev
+Message-ID: <20200430132053.GA25428@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200430111754.98508-2-sth@linux.ibm.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 01:17:54PM +0200, Stefan Haberland wrote:
-> Remove the calls to ioctl_by_bdev from the DASD partition detection code
-> to enable the removal of the specific code.
-> 
-> To do so reuse the gendisk private_data pointer and not only provide a
-> pointer to the devmap but provide a new structure containing a pointer
-> to the devmap as well as all required information for the partition
-> detection. This makes it independent from the dasd_information2_t
-> structure.
+Instead just call the CDROM layer functionality directly.
 
-I think sharing the data structure in private data is pretty dangerous.
-In the meantime I thought of another idea - the partition code could
-do a symbol_get of a symbol exported by the dasd driver and use that
-to query the information.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+
+This one got lost.  Basically exactly the same as hfsplus.
+
+ fs/hfs/mdb.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/fs/hfs/mdb.c b/fs/hfs/mdb.c
+index 460281b1299eb..cdf0edeeb2781 100644
+--- a/fs/hfs/mdb.c
++++ b/fs/hfs/mdb.c
+@@ -32,29 +32,35 @@
+ static int hfs_get_last_session(struct super_block *sb,
+ 				sector_t *start, sector_t *size)
+ {
+-	struct cdrom_multisession ms_info;
+-	struct cdrom_tocentry te;
+-	int res;
++	struct cdrom_device_info *cdi = disk_to_cdi(sb->s_bdev->bd_disk);
+ 
+ 	/* default values */
+ 	*start = 0;
+ 	*size = i_size_read(sb->s_bdev->bd_inode) >> 9;
+ 
+ 	if (HFS_SB(sb)->session >= 0) {
++		struct cdrom_tocentry te;
++	
++		if (!cdi)
++			return -EINVAL;
++
+ 		te.cdte_track = HFS_SB(sb)->session;
+ 		te.cdte_format = CDROM_LBA;
+-		res = ioctl_by_bdev(sb->s_bdev, CDROMREADTOCENTRY, (unsigned long)&te);
+-		if (!res && (te.cdte_ctrl & CDROM_DATA_TRACK) == 4) {
+-			*start = (sector_t)te.cdte_addr.lba << 2;
+-			return 0;
++		if (cdrom_read_tocentry(cdi, &te) ||
++		    (te.cdte_ctrl & CDROM_DATA_TRACK) != 4) {
++			pr_err("invalid session number or type of track\n");
++			return -EINVAL;
+ 		}
+-		pr_err("invalid session number or type of track\n");
+-		return -EINVAL;
++
++		*start = (sector_t)te.cdte_addr.lba << 2;
++	} else if (cdi) {
++		struct cdrom_multisession ms_info;
++
++		ms_info.addr_format = CDROM_LBA;
++		if (cdrom_multisession(cdi, &ms_info) == 0 && ms_info.xa_flag)
++			*start = (sector_t)ms_info.addr.lba << 2;
+ 	}
+-	ms_info.addr_format = CDROM_LBA;
+-	res = ioctl_by_bdev(sb->s_bdev, CDROMMULTISESSION, (unsigned long)&ms_info);
+-	if (!res && ms_info.xa_flag)
+-		*start = (sector_t)ms_info.addr.lba << 2;
++
+ 	return 0;
+ }
+ 
+-- 
+2.26.2
+
