@@ -2,186 +2,144 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D7EC47247
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 17:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D37CDC4724C
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 19:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E79220731
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 17:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEBC12073E
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 19:02:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="A3F/LQbR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgD3RlY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 13:41:24 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2136 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726318AbgD3RlY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 13:41:24 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 11E203577ECD3A49A8D9;
-        Thu, 30 Apr 2020 18:41:22 +0100 (IST)
-Received: from [127.0.0.1] (10.47.0.178) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 30 Apr
- 2020 18:41:20 +0100
-Subject: Re: [PATCH RFC v6 08/10] megaraid_sas: switch fusion adapters to MQ
-From:   John Garry <john.garry@huawei.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "hare@suse.de" <hare@suse.de>,
-        "don.brace@microsemi.com" <don.brace@microsemi.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "esc.storagedev@microsemi.com" <esc.storagedev@microsemi.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <1583409280-158604-1-git-send-email-john.garry@huawei.com>
- <1583409280-158604-9-git-send-email-john.garry@huawei.com>
- <a1f0399e2e85b2244a9ae40e4a2f1089@mail.gmail.com>
- <f839f040-8bf4-cf83-7670-dfc208b77326@huawei.com>
- <7cac3eb9fd79b5b988e25da542305b35@mail.gmail.com>
- <40faaef8-8bfc-639f-747f-cacd4e61464f@huawei.com>
- <7b8c79b0453722023c6c7d53cd24441d@mail.gmail.com>
- <b759a8ed-09ba-bfe8-8916-c05ab9671cbf@huawei.com>
- <260c5decdb38db9f74994988ce7fcaf1@mail.gmail.com>
- <380d3bf2-67ee-a09a-3098-51b24b98f912@huawei.com>
- <e0c5a076-9fe5-4401-fd41-97f457888ad3@huawei.com>
- <d2ae343770a83466b870a33ffae5fa23@mail.gmail.com>
- <8e16d68b-4d71-58f1-ede9-92ffe5d65ba9@huawei.com>
- <f712fd935562dcff73f0f6cf15f9cce7@mail.gmail.com>
- <538dd70d-7edb-c66c-4205-d91f24a907ea@huawei.com>
- <ca799ed3-0b18-2aa5-7d75-6eac5b0e6e7b@huawei.com>
- <29f8062c1fccace73c45252073232917@mail.gmail.com>
- <6bfc5fea-d1ce-7220-0023-af3b34e1fa38@huawei.com>
-Message-ID: <eb8bc395-1e62-3a5a-c1f6-5b1d163bf080@huawei.com>
-Date:   Thu, 30 Apr 2020 18:40:38 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726420AbgD3TCg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 15:02:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726318AbgD3TCf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 15:02:35 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC2FC035494
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 12:02:35 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id t16so2617810plo.7
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 12:02:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FROnpU6hscmOBgzrwIxZlxfKUCyrhuvr2YDegRzZaNw=;
+        b=A3F/LQbRdACepkwO1i+2YyWP0vZ9DwbpFD0EsAGWjdGXCDqkF+6CFnmDOjEI4Idvn2
+         nKMmT/Uho58m4ha5YaQYqeJPaEtOsW8JKmRdTyGEux0fTjlL3e7m7KdZSvN2IjMyt8Gi
+         XCIK2MAt+FgjJbJzpPRvi3r5Y3hK3du605UmqGcb9oiw8KR1N13g0jhu18wXKddxwHSh
+         Vz38clGHYXQH+hQJedUbTxDPdllleLIrdAZDSjISzWmN/1BmwYV3y5lEGOviV5wa3uQB
+         WhK0tiEAfKbSpvsqlJnRs1Gda5vFl2V2TsSmDFUc8RQezymK6/rHHpW1IcnptPLiIeDZ
+         DrVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FROnpU6hscmOBgzrwIxZlxfKUCyrhuvr2YDegRzZaNw=;
+        b=JgX0aB8wKXJ8znESA6jeMoD6+LfEt3W1zL7cNUxW3qDNdhbR8Yq+d+vEsNx2EzkOr8
+         cQU2mmdtmJWKJ95qq1L1gAse3yninFIMxX40ZyfY+M8ByjXrvuEMjxKUgpRXL43SFxS5
+         xUFR8yijHba/NCGtoVNvpT9OMyRvv851WGH0V48S8J1ZoYgow/4y6F7bGF4ne35WP+JG
+         RL3JFSazlMR/Df7lm/o1rv5BNUTGANftmm5WOj4WtEdUxUSP4JlLiJUXlk+exSYkFF/u
+         R0K4zf5ehVme0TkRijzazBskyPdN5Spy26EEoM74i/I18wOBWlH3IpJ/cVBL8syHqChq
+         a+Rg==
+X-Gm-Message-State: AGi0PubX2dAP3OdQ4kopVCC15mF2c1d/tOyeGej27RELWp5KXwqCut2D
+        VSPr9xb7ZVJo/T105CjEq1JtitKFv00=
+X-Google-Smtp-Source: APiQypICIlpvQQSt3u4Du/DNWCbYvbOgwLpbc5FSJ5kkKnVI+IMbO1f01K5xmO3iqEX6KIA/VYvcwA==
+X-Received: by 2002:a17:90a:9202:: with SMTP id m2mr246691pjo.109.1588273355039;
+        Thu, 30 Apr 2020 12:02:35 -0700 (PDT)
+Received: from vader ([2620:10d:c090:400::5:d243])
+        by smtp.gmail.com with ESMTPSA id a23sm442256pfo.145.2020.04.30.12.02.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2020 12:02:33 -0700 (PDT)
+Date:   Thu, 30 Apr 2020 12:02:27 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Klaus Jensen <its@irrelevant.dk>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Klaus Jensen <k.jensen@samsung.com>
+Subject: Re: [PATCH blktests v3] Fix unintentional skipping of tests
+Message-ID: <20200430190227.GA1232639@vader>
+References: <20200422074436.376476-1-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <6bfc5fea-d1ce-7220-0023-af3b34e1fa38@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.0.178]
-X-ClientProxiedBy: lhreml731-chm.china.huawei.com (10.201.108.82) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422074436.376476-1-its@irrelevant.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 29/04/2020 18:55, John Garry wrote:
+On Wed, Apr 22, 2020 at 09:44:36AM +0200, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-
-Hi Kashyap,
-
-> ok, so it's not proper to use active hctx per request queue as "users", 
-> but rather that the active request_queue's per host (which is what we 
-> effectively have for nr_hw_queues = 1). Just a small comment at the 
-> bottom on your change.
+> cd11d001fe86 ("Support skipping tests from test{,_device}()") breaks a
+> good handful of tests.
 > 
-> So I already experimented with reducing shost.can_queue significantly on 
-> hisi_sas (by a factor of 8, from 4096->512, and I use 12x SAS SSD), and 
-> saw:
+> For example, block/005 uses _test_dev_is_rotational to check if the
+> device is rotational and uses the result to size up the fio run. As a
+> side-effect, _test_dev_is_rotational also sets SKIP_REASON, which (since
+> commit cd11d001fe86) causes the test to print out a "[not run]" even
+> through the test actually ran successfully.
 > 
-> RFC + shost.can_queue reduced: ~1.2M IOPS
-> With RFC + shost.can_queue unmodified: ~2M IOPS
-> Without RFC + shost.can_queue unmodified: ~2M IOPS
+> Fix this by renaming the existing helpers to _require_foo (e.g. a
+> _require_test_dev_is_rotational) and add the non-_require variant where
+> needed.
 > 
-> And with the change, below, I still get around 1.2M IOPS. But there may 
-> be some sweet spot/zone where this makes a difference, which I'm not 
-> visiting.
+> Fixes: cd11d001fe86 ("Support skipping tests from test{,_device}()")
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+
+Thanks! I'll apply this assuming it looks good after a full test run. A
+couple of comments below, but I fixed those up.
+
+> ---
 > 
->>
->> Combination of your patch and below resolves fairness issues. I see some
->> better results using " --cpus_allowed_policy=split", but
->> --cpus_allowed_policy=shared 
+> Changes since v2
+> ~~~~~~~~~~~~~~~~
+> * Fix missing _test_dev -> _require_test_dev in block/003 (Shinichiro)
+> * Revert change in block/004 (Shinichiro)
 > 
-> I did not try changing the cpus_allowed_policy policy, and so I would be 
-> using default, which I believe is shared.
+>  check           | 10 ++++------
+>  common/iopoll   |  4 ++--
+>  common/rc       | 35 ++++++++++++++++++++++++++++-------
+>  new             | 12 ++++++------
+>  tests/block/003 |  2 +-
+>  tests/block/007 |  3 ++-
+>  tests/block/011 |  2 +-
+>  tests/block/019 |  2 +-
+>  tests/nvme/032  |  2 +-
+>  tests/nvme/rc   |  4 ++--
+>  tests/scsi/006  |  2 +-
+>  tests/scsi/rc   |  6 +++---
+>  tests/zbd/007   |  2 +-
+>  tests/zbd/rc    | 11 +++++++++--
+>  14 files changed, 62 insertions(+), 35 deletions(-)
 > 
-> is still having some issue and most likely it
->> is to do with fairness. If fairness is not managed properly, there is 
->> high
->> contention in wait/wakeup handling of sbitmap.
-> 
-> ok, I can investigate.
+> diff --git a/check b/check
+> index 398eca05e3a4..84ec086c408b 100755
+> --- a/check
+> +++ b/check
+> @@ -423,18 +423,16 @@ _call_test() {
+>  _test_dev_is_zoned() {
+>  	if [[ ! -f "${TEST_DEV_SYSFS}/queue/zoned" ]] ||
+>  	      grep -q none "${TEST_DEV_SYSFS}/queue/zoned"; then
+> -		SKIP_REASON="${TEST_DEV} is not a zoned block device"
+>  		return 1
+>  	fi
+>  	return 0
+>  }
 
-Could you also try this change:
+This can be simplified to:
 
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 0a57e4f041a9..e959971b1cee 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -46,11 +46,25 @@ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags 
-*tags, bool);
-  void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-  		void *priv);
+_test_dev_is_zoned() {
+	[[ -e "${TEST_DEV_SYSFS}/queue/zoned" &&
+	    $(cat "${TEST_DEV_SYSFS}/queue/zoned") != none ]]
+}
 
-+static inline bool blk_mq_is_sbitmap_shared(struct blk_mq_tag_set *tag_set)
-+{
-+	return tag_set->flags & BLK_MQ_F_TAG_HCTX_SHARED;
-+}
-+
-  static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
-  						 struct blk_mq_hw_ctx *hctx)
-  {
-+	struct request_queue *queue;
-+	struct blk_mq_tag_set *set;
-+
-  	if (!hctx)
-  		return &bt->ws[0];
-+	queue = hctx->queue;
-+	set = queue->tag_set;
-+
-+	if (blk_mq_is_sbitmap_shared(set))
-+		return sbq_wait_ptr(bt, &set->wait_index);
-+	
-  	return sbq_wait_ptr(bt, &hctx->wait_index);
-  }
-
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 4f12363d56bf..241607806f77 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -158,11 +158,6 @@ struct blk_mq_alloc_data {
-  	struct blk_mq_hw_ctx *hctx;
-  };
-
--static inline bool blk_mq_is_sbitmap_shared(struct blk_mq_tag_set *tag_set)
--{
--	return tag_set->flags & BLK_MQ_F_TAG_HCTX_SHARED;
--}
--
-  static inline struct blk_mq_tags *blk_mq_tags_from_data(struct 
-blk_mq_alloc_data *data)
-  {
-  	if (data->flags & BLK_MQ_REQ_INTERNAL)
-
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 957cb43c5de7..427c7934c29d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -259,6 +259,8 @@ struct blk_mq_tag_set {
-
-  	struct mutex		tag_list_lock;
-  	struct list_head	tag_list;
-+
-+	atomic_t		wait_index;
-  };
-
-  /**
-
-
-Thanks,
-John
+A few of the other _test_dev helpers can be cleaned up in the same way.
