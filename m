@@ -2,175 +2,112 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE202C83001
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00FAC8300C
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:11:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8BFC214D8
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:08:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="OoH6QPCy"
+	by mail.kernel.org (Postfix) with ESMTP id BD4C020838
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:11:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588230683;
+	bh=s4l9m6sDXPEeXraZWK6wigMAQG4mKfDnswEgISGvnS4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=KxAMy2m8s2O2OcLSAcmV3/ycF6w1YbZhdGoXqdph5Kyh/+AQDH2UzceOjL+NtxSIE
+	 xALMgKv56rqdKRR9uUcMH9wfK/N+fMu+shRT9F3ekJULjaS/IbJQUJN7sgxC/SrjFT
+	 /GL11XTyoiZGPDoteGuPB0j9LxgUtBW5xqIM8xIw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgD3HII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 03:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48170 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726337AbgD3HIH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 03:08:07 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F70C035494
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 00:08:07 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id j20so3683317edj.0
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 00:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ilrgyHn4HSahavwDefbY4dNtFwNc/j2Wi6eqEv+YAHw=;
-        b=OoH6QPCyaZqQzTQCwTisHLWl3iL2JWLqf0ytp1yTgOtLocNy/YoXirSm47OKv1yRP+
-         RJMoG4ml+Njpj+9CL0REwgz28tVN0dBJjXo+u14xNO2vl4MFEQwlD0PvMLT6KfDrHOwz
-         PrEuYpIWxMHRZZiaLhYSyh9fomkqnjNUmCuuCwKhAq4CjU5jAsL8/OwRuSFBbgWCkMEw
-         F6Vq20IeTnaarHU6gSv0uBf42u0Pzp8JG+mbtIKv+FjxwPk7dndeHJ2bjNqIDdp/TI9I
-         v9nk2loz7VZqRqlOtWb3vzwSvzSE1ry/zww27vAAs0U9rjVqgLgwFKLRr3M/nKwQ2lhJ
-         2OBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ilrgyHn4HSahavwDefbY4dNtFwNc/j2Wi6eqEv+YAHw=;
-        b=tTYS94b6PXchtszcecRLXdLbRmzh3m5zNgVBDwvo+AjEWyKpnLdAXiEXbx/OeAqdYu
-         WDtYXrL/+ufxshJ0aOu6U0LkPzsbGbRr7R3aLAa6eEWf9IC+vyGsJ0v5mzAlELAYieOa
-         C/8gQP0ZpqgS3OXUOTuKqILo24Vk0+boL2t+raIamlFw2g4QLy058jc0C+3817HuuWIQ
-         Dp3JQI3ZglV9lT1DQgGLvdoqsdJMMhhJSvHloQPYaJ4JqkgYw6jxkieyf+Ur8IefMUku
-         VeCLUWztglmNhrGdGmkLu26GHbnqvklLvsEStHlbGUkKIQBnjhiE1utIKPM3sNlsZh5T
-         pyXQ==
-X-Gm-Message-State: AGi0PuYri/C2Wcw315P2R4iqNx8pIZm+WPUJmGU1ozn52HtW549t+Nd2
-        Oyv7xXsOQdSCEeZR90nlMn1shfiT4PFu4Rel7jHkWg==
-X-Google-Smtp-Source: APiQypI+JGTwQ5nRWNJAx2DqgEPWmAT4HIKqZhHQ6ejgOQ9m4eC8eSA4MPE0Mufz5RQEnG0OqZ4dpKsXAp5ByoQ4cjE=
-X-Received: by 2002:aa7:d306:: with SMTP id p6mr1323655edq.35.1588230486184;
- Thu, 30 Apr 2020 00:08:06 -0700 (PDT)
+        id S1726412AbgD3HLV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 03:11:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34230 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726337AbgD3HLV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 03:11:21 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9395B2082E;
+        Thu, 30 Apr 2020 07:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588230680;
+        bh=s4l9m6sDXPEeXraZWK6wigMAQG4mKfDnswEgISGvnS4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WOFPPzjWYYk044D2ZqXzNihzxX9ZCs2Qval8oNKQ5jkpKlAK60K2eo54sIknbSZka
+         GDRnyym19w1K4XbzS+5amFW2gGHEZuL1NSNHCZhxN7SQk9dq7oQAebzSEcU3f7G90B
+         oW5WU2MvB6hnKQWldY8GUKtiTgXqapiPHdOoqk98=
+Date:   Thu, 30 Apr 2020 00:11:19 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v11 04/12] block: Make blk-integrity preclude hardware
+ inline encryption
+Message-ID: <20200430071119.GC16238@sol.localdomain>
+References: <20200429072121.50094-1-satyat@google.com>
+ <20200429072121.50094-5-satyat@google.com>
 MIME-Version: 1.0
-References: <20200427141020.655-1-danil.kipnis@cloud.ionos.com>
- <20200427141020.655-24-danil.kipnis@cloud.ionos.com> <20200429171804.GE26002@ziepe.ca>
-In-Reply-To: <20200429171804.GE26002@ziepe.ca>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 30 Apr 2020 09:07:55 +0200
-Message-ID: <CAMGffE=W2a1ZXgtKhmGMwMn74OkGwOjKi3KX8HxrBBFkzc5j6Q@mail.gmail.com>
-Subject: Re: [PATCH v13 23/25] block/rnbd: include client and server modules
- into kernel compilation
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200429072121.50094-5-satyat@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 7:18 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Mon, Apr 27, 2020 at 04:10:18PM +0200, Danil Kipnis wrote:
-> > From: Jack Wang <jinpu.wang@cloud.ionos.com>
-> >
-> > Add rnbd Makefile, Kconfig and also corresponding lines into upper
-> > block layer files.
-> >
-> > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> >  drivers/block/Kconfig       |  2 ++
-> >  drivers/block/Makefile      |  1 +
-> >  drivers/block/rnbd/Kconfig  | 28 ++++++++++++++++++++++++++++
-> >  drivers/block/rnbd/Makefile | 15 +++++++++++++++
-> >  4 files changed, 46 insertions(+)
-> >  create mode 100644 drivers/block/rnbd/Kconfig
-> >  create mode 100644 drivers/block/rnbd/Makefile
-> >
-> > diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-> > index 025b1b77b11a..084b9efcefca 100644
-> > +++ b/drivers/block/Kconfig
-> > @@ -458,4 +458,6 @@ config BLK_DEV_RSXX
-> >         To compile this driver as a module, choose M here: the
-> >         module will be called rsxx.
-> >
-> > +source "drivers/block/rnbd/Kconfig"
-> > +
-> >  endif # BLK_DEV
-> > diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-> > index 795facd8cf19..e1f63117ee94 100644
-> > +++ b/drivers/block/Makefile
-> > @@ -39,6 +39,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)      += mtip32xx/
-> >
-> >  obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
-> >  obj-$(CONFIG_ZRAM) += zram/
-> > +obj-$(CONFIG_BLK_DEV_RNBD)   += rnbd/
-> >
-> >  obj-$(CONFIG_BLK_DEV_NULL_BLK)       += null_blk.o
-> >  null_blk-objs        := null_blk_main.o
-> > diff --git a/drivers/block/rnbd/Kconfig b/drivers/block/rnbd/Kconfig
-> > new file mode 100644
-> > index 000000000000..4b6d3d816d1f
-> > +++ b/drivers/block/rnbd/Kconfig
-> > @@ -0,0 +1,28 @@
-> > +# SPDX-License-Identifier: GPL-2.0-or-later
-> > +
-> > +config BLK_DEV_RNBD
-> > +     bool
-> > +
-> > +config BLK_DEV_RNBD_CLIENT
-> > +     tristate "RDMA Network Block Device driver client"
-> > +     depends on INFINIBAND_RTRS_CLIENT
-> > +     select BLK_DEV_RNBD
-> > +     help
-> > +       RNBD client is a network block device driver using rdma transport.
-> > +
-> > +       RNBD client allows for mapping of a remote block devices over
-> > +       RTRS protocol from a target system where RNBD server is running.
-> > +
-> > +       If unsure, say N.
-> > +
-> > +config BLK_DEV_RNBD_SERVER
-> > +     tristate "RDMA Network Block Device driver server"
-> > +     depends on INFINIBAND_RTRS_SERVER
-> > +     select BLK_DEV_RNBD
-> > +     help
-> > +       RNBD server is the server side of RNBD using rdma transport.
-> > +
-> > +       RNBD server allows for exporting local block devices to a remote client
-> > +       over RTRS protocol.
-> > +
-> > +       If unsure, say N.
-> > diff --git a/drivers/block/rnbd/Makefile b/drivers/block/rnbd/Makefile
-> > new file mode 100644
-> > index 000000000000..450a9e4974d7
-> > +++ b/drivers/block/rnbd/Makefile
-> > @@ -0,0 +1,15 @@
-> > +# SPDX-License-Identifier: GPL-2.0-or-later
-> > +
-> > +ccflags-y := -Idrivers/infiniband/ulp/rtrs
-> > +
-> > +rnbd-client-y := rnbd-clt.o \
-> > +               rnbd-common.o \
-> > +               rnbd-clt-sysfs.o
-> > +
-> > +rnbd-server-y := rnbd-srv.o \
-> > +               rnbd-common.o \
-> > +               rnbd-srv-dev.o \
-> > +               rnbd-srv-sysfs.o
->
-> keep lists of things sorted
->
-> Jason
-Will do, thanks
+On Wed, Apr 29, 2020 at 07:21:13AM +0000, Satya Tangirala wrote:
+> Whenever a device supports blk-integrity, the kernel will now always
+> pretend that the device doesn't support inline encryption (essentially
+> by setting the keyslot manager in the request queue to NULL).
+
+"the kernel will now always" => "make the kernel", so that it's clear that this
+patch is doing this.  I.e. it's not describing the state prior to the patch.
+
+> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+> index ff1070edbb400..b45711fc37df4 100644
+> --- a/block/blk-integrity.c
+> +++ b/block/blk-integrity.c
+> @@ -409,6 +409,13 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
+>  	bi->tag_size = template->tag_size;
+>  
+>  	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
+> +
+> +#ifdef CONFIG_BLK_INLINE_ENCRYPTION
+> +	if (disk->queue->ksm) {
+> +		pr_warn("blk-integrity: Integrity and hardware inline encryption are not supported together. Unregistering keyslot manager from request queue, to disable hardware inline encryption.\n");
+> +		blk_ksm_unregister(disk->queue);
+> +	}
+> +#endif
+>  }
+
+Make this shorter by removing the mention of the keyslot manager?:
+
+	pr_warn("blk-integrity: Integrity and hardware inline encryption are not supported together. Disabling hardware inline encryption.\n");
+
+
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> index b584723b392ad..834f45fdd33e2 100644
+> --- a/block/keyslot-manager.c
+> +++ b/block/keyslot-manager.c
+> @@ -25,6 +25,9 @@
+>   * Upper layers will call blk_ksm_get_slot_for_key() to program a
+>   * key into some slot in the inline encryption hardware.
+>   */
+> +
+> +#define pr_fmt(fmt) "blk_crypto: " fmt
+
+"blk-crypto", not "blk_crypto".
+
+> +bool blk_ksm_register(struct blk_keyslot_manager *ksm, struct request_queue *q)
+> +{
+> +	if (blk_integrity_queue_supports_integrity(q)) {
+> +		pr_warn("Integrity and hardware inline encryption are not supported together. Hardware inline encryption is being disabled.\n");
+
+"Disabling hardware inline encryption" to match my suggestion for the other one?
+
+- Eric
