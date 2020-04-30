@@ -2,96 +2,69 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FF9C47247
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 16:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B1DC47247
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 17:02:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4B79208D5
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 16:26:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="llVhiT3H"
+	by mail.kernel.org (Postfix) with ESMTP id D23A820873
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 17:02:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588266161;
+	bh=KyZuJnDBqEdGS6iPd0QsY0M5oYS5mvkpln5O+Lo+8+w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Nztk4/f5WGeQPv8z6r0o51qeHrJwbqL9oqqZDKxOKygE7FaVsu0/KDh92eUxSFVRf
+	 CIdBDGjHj5Ron03kNjLic6FDfZKvIFLBg22YOCTYbupZQGFIp7LRBd3uWR22G2mfTQ
+	 8Ly0EA0uvhA/poONgHc870etLhUqDmSWE+HaSMSI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726410AbgD3Q0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 12:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726336AbgD3Q0M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 12:26:12 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A69C035494
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 09:26:11 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id y26so2120385ioj.2
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 09:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jUJ3QDX1EKapBMNpqnE+k5isQzU8JnV6lw5xLL5DTC8=;
-        b=llVhiT3HoTM3Z9CBI8BOwBCp4ox0zSyrVf9qMzTz6TXgj4cAPewe4Y66mt8JZhhl06
-         7zb8pq3Jtm6Ddpw806yL0hcKcqNNLh0/N4GLueIk4LIeOrGN4nDidkHNHwGRmEYjUKWS
-         4VHDKR1I4Zj8NaPwKRQ9uzOL6xYx4pRjVcb9lWFQ71cgc0Jmdh4rm8c+B2vklWYySdQY
-         eOgWZTrRW2Mpbh38bERnWPxrpjoSWwHIzzbyrPjq9aeqJ/2GMeeO3who0S2tIGwQhQMA
-         UeP9AZR3vq9UQoaBYy5DAqsUXk8oq1PX/KlNfc6FhbZ3gQlezSaWx4m/+6sH9FB1xHza
-         lOgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jUJ3QDX1EKapBMNpqnE+k5isQzU8JnV6lw5xLL5DTC8=;
-        b=U6rQiSDjk+DxACPXBqE32j0hsyL2eqG3TmnYJxHguGK4X9L+9D9lX+VYJUAJy7HnXr
-         kztEKr/uOs6pwAuBwbHzjuVwYkcQldVImKAxTOPwQyMAVE1mZ3LpoCT2mUTmW6pAiD3L
-         vQUyX/IPRLc1fAw2rliCuNPZH6fnApQCxUSIbGJLt1Wj44E/BhUgCuxiW8t/JlPEQXxM
-         N4qgHORJ/Gs8pGk23IGUkd/pGBo8h2e84EHcu9H8x2RYoiZ1SPaF+dZjnL3QKUhrSNZp
-         L3U0kx5ZohedqpB/ONAG7hy94rTH+wrSMgRTUjSo3YapRNMBLnjPk5f/b+zjQN/M1jF9
-         f4VQ==
-X-Gm-Message-State: AGi0PuYv8LRSTTTxEG6ZRlGeD0Chs5pk3FpVv/mhgBVUue7c8lD5v3ob
-        Z8xyZTQwJkzlkF1dr8pTAK6rPg==
-X-Google-Smtp-Source: APiQypLgDALh01yIUl3IS1obQt2cDMoWKTFJ1ogUlTywVw00cxI9amOr9GQLTFbR5TvgN9JVEwWzUw==
-X-Received: by 2002:a5e:8e44:: with SMTP id r4mr2650949ioo.47.1588263971055;
-        Thu, 30 Apr 2020 09:26:11 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id b11sm112190ile.3.2020.04.30.09.26.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2020 09:26:10 -0700 (PDT)
-Subject: Re: [PATCH] block: remove the bd_openers checks in
- blk_drop_partitions
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     sandeen@sandeen.net, linux-block@vger.kernel.org,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        Yang Xu <xuyang2018.jy@cn.fujitsu.com>
-References: <20200428085203.1852494-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5452acd0-96d0-e3ec-f0e4-a322d540dc0e@kernel.dk>
-Date:   Thu, 30 Apr 2020 10:26:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726547AbgD3RCl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 13:02:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49670 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726440AbgD3RCl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 13:02:41 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A4B720787;
+        Thu, 30 Apr 2020 17:02:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588266160;
+        bh=KyZuJnDBqEdGS6iPd0QsY0M5oYS5mvkpln5O+Lo+8+w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MLXYWxhR97lhm1QqB4s/La6Baka75kWzkYwMsHuQcUnNEUisGpvdwC8LrmJ+1L5Hh
+         kbu7U8SLxdXVpPtxUXUEG0B46G8E9DAOYRz+0I7pW7zMpZjvXOeEDIiPKi8UBcYYmI
+         rBPBZEqP7AS27RXTEObKuIwLfjDPZF+M4NANJcxg=
+Date:   Thu, 30 Apr 2020 10:02:33 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v12 00/12] Inline Encryption Support
+Message-ID: <20200430170233.GA1003@sol.localdomain>
+References: <20200430115959.238073-1-satyat@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200428085203.1852494-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200430115959.238073-1-satyat@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/20 2:52 AM, Christoph Hellwig wrote:
-> When replacing the bd_super check with a bd_openers I followed a logical
-> conclusion, which turns out to be utterly wrong.  When a block device has
-> bd_super sets it has a mount file system on it (although not every
-> mounted file system sets bd_super), but that also implies it doesn't even
-> have partitions to start with.
-> 
-> So instead of trying to come up with a logical check for all openers,
-> just remove the check entirely.
+On Thu, Apr 30, 2020 at 11:59:47AM +0000, Satya Tangirala wrote:
+> This patch series adds support for Inline Encryption to the block layer,
+> UFS, fscrypt, f2fs and ext4.
 
-Applied, thanks.
+Thanks, that was fast!  As usual I pushed this out to
 
--- 
-Jens Axboe
+        Repo: https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git
+        Tag: inline-encryption-v12
 
+- Eric
