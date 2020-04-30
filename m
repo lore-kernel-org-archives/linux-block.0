@@ -2,89 +2,143 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092AAC83002
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 06:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AF3C83001
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 06:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4FE620784
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 06:43:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="QRvMrhdy"
+	by mail.kernel.org (Postfix) with ESMTP id C3A6F21775
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 06:46:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588229184;
+	bh=S8VnrcC8lJzFcPUaXFPCvyn46mx7gp2QMp+KtHDb6+E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NW7r65jZbSZ2GZ8ZMKSCNfvmciOt1lG3XUvPHraOA6kA+QODaZUz5g/j7+vosWW/8
+	 brz5uusTNCEwJPTNdEqU4fP4KJQN01lHbs/EIKfscJt+o0IC3QnUXt29Kx38EvEgfy
+	 /D6jY4UfmjIpPk4EBNZmRekzdkJXxsOK1g/7H67U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726411AbgD3GnP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 02:43:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44238 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726180AbgD3GnO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 02:43:14 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B32C035495
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 23:43:13 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id i10so5383861wrv.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2020 23:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KfLKPd6WdwwFQZMqYshsvE6IdIFdc2Vgh7Bb3+Jqfik=;
-        b=QRvMrhdyxAmtsKtLU5lwSwPavpXqMbzey9WokLc7dB5ct6lPUIPGKhIdx9RJCLWfMS
-         1VlIo5KWPZPsJ3KVU20Rtpt6pbCuDdkLEi8T8oqWhVbm0sAsX9R4OOmaQMnDreHCOvLQ
-         qp0tY5FV5vxVeeJrjqmDhHTAh52d4CjFIkhmhm8n99NnGv8ZPEX7c7yEs2Q44kWqibS0
-         2x1cN7BJ48LiI3Kemru2kDpYgCy7hBMu1eXtDUJxu8EeUP9baGi3I50GqH3VCC2uwDhG
-         O3/ljnECBXzDIDIg9CTgCtlASko1AqC28we+6yAxeOsuAn2a/0439z+2ytS3ELUv8NZ9
-         tIXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KfLKPd6WdwwFQZMqYshsvE6IdIFdc2Vgh7Bb3+Jqfik=;
-        b=t90pC5QWVwaG8/xrFw1CPMi2BBoqUEmdT98Bptd2UW6UEEagNM6trzUlT/hXCyhU8L
-         +fyNa2NTVRpjwClYxxXsfW6E3qG0frzK6i5GqL7jLP1fPcxSbqcpeh9sVl/atncEZqrc
-         REN4O1CZl+gSLEMgLtviuvSQSXr5vC0Er5OZe6Snj1/vGxly669Vb6EFwBz1LsKkkDi4
-         7eyXIZSq6oBTsJsjTHuhW9O+E+Jz5WEc5BtNpP3kzSN9NQhN4qDAhOayf99joukEV55F
-         wopJLIEBbl411rAhUbDk8WNRIhqU3MS/5Py1VQmxxcZUw2yLlNX5yw8OpY70rXRlcQ3M
-         veqA==
-X-Gm-Message-State: AGi0Puaem8ewtLDzrE8u2x0OZWar661vgSuR2cCjEKSKwqIEY7Czs3QG
-        rACPZRgTf9r7lMqSgu852Zxd6IHVtMcf/6O4iQGx
-X-Google-Smtp-Source: APiQypLGfEl3giFfsoU/P6XTGhs3BHM5vTrm5Gava6IXSWX5Q8m8RHTDn32FvpFYv6r0345z9rRdCS7ET9tjtWz4VKA=
-X-Received: by 2002:a5d:6841:: with SMTP id o1mr2039673wrw.412.1588228992516;
- Wed, 29 Apr 2020 23:43:12 -0700 (PDT)
+        id S1726337AbgD3GqY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 02:46:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49308 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726180AbgD3GqY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 02:46:24 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B66C8214D8;
+        Thu, 30 Apr 2020 06:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588229183;
+        bh=S8VnrcC8lJzFcPUaXFPCvyn46mx7gp2QMp+KtHDb6+E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AnHSkbJzWg0a+1u5u9ySsA8JJGJo6Pq7XgC03hxGia+a3xwYv0092zLFCF3QnpAmA
+         R4z1iy7z2j2vd4IB8SXqek9ackjWIhsx9Xkdt4njmPINY3adLhUHAJbz5HoRzHDybp
+         vR9e01b8EZprxcbpv7WK50etU4yWaGtZxHT7uueg=
+Date:   Wed, 29 Apr 2020 23:46:21 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v11 02/12] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200430064621.GA16238@sol.localdomain>
+References: <20200429072121.50094-1-satyat@google.com>
+ <20200429072121.50094-3-satyat@google.com>
 MIME-Version: 1.0
-References: <20200427141020.655-1-danil.kipnis@cloud.ionos.com>
- <20200427141020.655-20-danil.kipnis@cloud.ionos.com> <20200429172018.GG26002@ziepe.ca>
-In-Reply-To: <20200429172018.GG26002@ziepe.ca>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Thu, 30 Apr 2020 08:43:01 +0200
-Message-ID: <CAHg0HuxO+6+on6g-YRmMK8z_n7g1E7gd4fndmUb_w+A8mqBeHg@mail.gmail.com>
-Subject: Re: [PATCH v13 19/25] block/rnbd: server: private header with server
- structs and functions
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200429072121.50094-3-satyat@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 7:20 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Mon, Apr 27, 2020 at 04:10:14PM +0200, Danil Kipnis wrote:
-> > +     struct idr              index_idr;
->
-> No new users of idr, use xarray.
->
-> Also no users of radix tree if there are any in here..
+A few very minor comments:
 
-We don't use radiy tree. Will look into xarray to replace idr. Thank you.
+On Wed, Apr 29, 2020 at 07:21:11AM +0000, Satya Tangirala wrote:
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> new file mode 100644
+> index 0000000000000..b584723b392ad
+> --- /dev/null
+> +++ b/block/keyslot-manager.c
+> @@ -0,0 +1,380 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright 2019 Google LLC
+> + */
+> +
+> +/**
+> + * DOC: The Keyslot Manager
+> + *
+> + * Many devices with inline encryption support have a limited number of "slots"
+> + * into which encryption contexts may be programmed, and requests can be tagged
+> + * with a slot number to specify the key to use for en/decryption.
+> + *
+> + * As the number of slots are limited, and programming keys is expensive on
+> + * many inline encryption hardware, we don't want to program the same key into
+> + * multiple slots - if multiple requests are using the same key, we want to
+> + * program just one slot with that key and use that slot for all requests.
+> + *
+> + * The keyslot manager manages these keyslots appropriately, and also acts as
+> + * an abstraction between the inline encryption hardware and the upper layers.
+> + *
+> + * Lower layer devices will set up a keyslot manager in their request queue
+> + * and tell it how to perform device specific operations like programming/
+> + * evicting keys from keyslots.
+> + *
+> + * Upper layers will call blk_ksm_get_slot_for_key() to program a
+> + * key into some slot in the inline encryption hardware.
+> + */
+> +#include <crypto/algapi.h>
+
+Now that this file doesn't use crypto_memneq(), the include of <crypto/algapi.h>
+can be removed.
+
+> +/**
+> + * blk_ksm_get_slot_for_key() - Program a key into a keyslot.
+> + * @ksm: The keyslot manager to program the key into.
+> + * @key: Pointer to the key object to program, including the raw key, crypto
+> + *	 mode, and data unit size.
+> + * @keyslot: A pointer to return the pointer of the allocated keyslot.
+> + *
+> + * Get a keyslot that's been programmed with the specified key.  If one already
+> + * exists, return it with incremented refcount.  Otherwise, wait for a keyslot
+> + * to become idle and program it.
+> + *
+> + * Context: Process context. Takes and releases ksm->lock.
+> + * Return: BLK_STS_OK on success (and keyslot is set to the pointer of the
+> + *	   allocated keyslot), or some other blk_status_t otherwise (and
+> + *	   keyslot is set to NULL).
+> + */
+> +blk_status_t blk_ksm_get_slot_for_key(struct blk_keyslot_manager *ksm,
+> +				      const struct blk_crypto_key *key,
+> +				      struct blk_ksm_keyslot **slot_ptr)
+
+The comment should say @slot_ptr, not @keyslot.  You can find kerneldoc warnings
+using 'scripts/kernel-doc -v -none $file'.
+
+> +/**
+> + * blk_ksm_crypto_cfg_supported() - Find out if the crypto_mode, dusize, dun
+> + *				    bytes of a crypto_config are supported by a
+> + *				    ksm.
+
+IMO, shorten this a bit to something like "Find out if a crypto configuration is
+supported by a ksm", so that less of the comment becomes outdated when someone
+adds a new field.
+
+> + * @ksm: The keyslot manager to check
+> + * @cfg: The crypto configuration to check for.
+> + *
+> + * Checks for crypto_mode/data unit size/dun bytes support.
+> + *
+> + * Return: Whether or not this ksm supports the specified crypto key.
+
+"config", not "key".
+
+- Eric
