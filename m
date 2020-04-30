@@ -2,192 +2,136 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6117EC8300A
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 10:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D498C8300B
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 323FB20838
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 10:44:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LedLzuZJ"
+	by mail.kernel.org (Postfix) with ESMTP id 1B7ED20870
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:04:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588244676;
+	bh=CedaVmhMJydNlN3+5OOqHxPQXAjgO7wa5lpISSfhzNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=LlOhsh1dwtnf+uwLe3rFP6Zws6B+gxE4jYUv3dNp28VY9NoNhIR8x/9gJkpbxzxc4
+	 ADjYWDAK+nmTEwTRiO2CWK7gZ9n4du7AcDnxb6cQVqQG5cpIVfbUzpO/imuhu8H6Xq
+	 N7ePsfox336B1vgnpTLRTwdIfBNc5tqNv0/NYHmo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726378AbgD3KoN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 06:44:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36200 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725280AbgD3KoN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 06:44:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588243451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=c/BSehBAKSN0nwBzw1nOctUAYHBMNoV8xn17tmQQttA=;
-        b=LedLzuZJ2iukfulLBibxyaZI56SGfeOFGfM3dAMCj4FuABRD12TP2KHF9i38dSrOWBoqem
-        N09MoOGyQtzVuJbEleD6/W/4hFJwXTUT7RkRFqY+QN2KNYOx78NBciPNkOgRRv24JBYf0V
-        Kosw6ZRhyZLEBYGw0upF7N3sVR7QjzQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-zu9ndSBsNrGNUHTUiHMmNQ-1; Thu, 30 Apr 2020 06:44:10 -0400
-X-MC-Unique: zu9ndSBsNrGNUHTUiHMmNQ-1
-Received: by mail-wm1-f69.google.com with SMTP id n17so429828wmi.3
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 03:44:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=c/BSehBAKSN0nwBzw1nOctUAYHBMNoV8xn17tmQQttA=;
-        b=o92vrwuAS+4jk/Zxo7yv69Yekd9bgKnO1HHO4amWgBBxkmXG0aSjBN89cC3dpZCAwR
-         Ht0emh+L0ptfmc8hKissFXD7WhqsVlQa6YPNaYgC1wZwxx/8B1pyGK/v4GEd4TXUEyZ3
-         jIoFjILvCEEKx2X74VQuu7GtTJmkHxybmv4Ch5UN8eiiI78zWAE6ROB47CUa8isdL4Lh
-         dWlIpBz2dIbZJvrhYyf71+cR6UdVVPD/VNg0hOqDTr9+NZOskHc1VS/FOO3CMYVKeugP
-         J6qB7QaJGpuGwkKqd3cAuvr0Bd+scg/sRAU1KRrzHWmMgy71BxeZ77kqrxlQAFxqF0lW
-         pjdQ==
-X-Gm-Message-State: AGi0PuYs2aORjO78GYiXoB/oIoVTKX0DLePDTx8uen27jN6ODzbd/0tN
-        IaTr8rLsTQ6paCHHhd48NOzYiqgUgZi2HCD8R9uVsyDvXycrKbwSK0L+ndkfvRU0lgzuFzclAh7
-        tR34LHw+0e2Undf39HKG3Xqs=
-X-Received: by 2002:a5d:4252:: with SMTP id s18mr3112394wrr.367.1588243448997;
-        Thu, 30 Apr 2020 03:44:08 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ1quCNpfJZHUNzPMjzd9Th59ts8HRWcQGuNOmO8/gQLyE28fsfGJakOa0t33lAO/qw4cInug==
-X-Received: by 2002:a5d:4252:: with SMTP id s18mr3112376wrr.367.1588243448703;
-        Thu, 30 Apr 2020 03:44:08 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id m188sm11659549wme.47.2020.04.30.03.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2020 03:44:07 -0700 (PDT)
-Date:   Thu, 30 Apr 2020 12:44:05 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, cohuck@redhat.com,
-        Jason Wang <jasowang@redhat.com>,
-        Lance Digby <ldigby@redhat.com>
-Subject: Re: [PATCH v3] virtio-blk: handle block_device_operations callbacks
- after hot unplug
-Message-ID: <20200430104405.vtpuro47dqseiyxl@steredhat>
-References: <20200429165345.144702-1-stefanha@redhat.com>
- <20200430084323.qts2q5ql7rkclk2h@steredhat>
- <20200430101410.GA164094@stefanha-x1.localdomain>
- <20200430062549-mutt-send-email-mst@kernel.org>
+        id S1726886AbgD3LEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 07:04:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33948 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726636AbgD3LEf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 07:04:35 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EC5DA20774;
+        Thu, 30 Apr 2020 11:04:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588244674;
+        bh=CedaVmhMJydNlN3+5OOqHxPQXAjgO7wa5lpISSfhzNo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=1rgIXW36JneHRbDm+1eNCEIFkD+V2E/2FC0wzmIIznr58uBsRzswu/TjCunzgW8z9
+         A7H6N79/4UM+W27QvDQ8af7KVwzKcaPq0WZTOEPq5sT9Th2WjbYAP/HO3qT6NTquIz
+         gbJGk3u8D0j3s5haMvpC+MqPKv+w4ncWwwVFTRUE=
+Date:   Thu, 30 Apr 2020 12:04:29 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, paulmck@kernel.org
+Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+Message-ID: <20200430110429.GI19932@willie-the-truck>
+References: <20200425095351.GC495669@T590>
+ <20200425154832.GA16004@lst.de>
+ <20200428155837.GA16910@hirez.programming.kicks-ass.net>
+ <20200429021612.GD671522@T590>
+ <20200429080728.GB29143@willie-the-truck>
+ <20200429094616.GB700644@T590>
+ <20200429122757.GA30247@willie-the-truck>
+ <20200429134327.GC700644@T590>
+ <20200429173400.GC30247@willie-the-truck>
+ <20200430003945.GA719313@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200430062549-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200430003945.GA719313@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 06:28:21AM -0400, Michael S. Tsirkin wrote:
-> On Thu, Apr 30, 2020 at 11:14:10AM +0100, Stefan Hajnoczi wrote:
-> > On Thu, Apr 30, 2020 at 10:43:23AM +0200, Stefano Garzarella wrote:
-> > > On Wed, Apr 29, 2020 at 05:53:45PM +0100, Stefan Hajnoczi wrote:
-> > > > A userspace process holding a file descriptor to a virtio_blk device can
-> > > > still invoke block_device_operations after hot unplug.  This leads to a
-> > > > use-after-free accessing vblk->vdev in virtblk_getgeo() when
-> > > > ioctl(HDIO_GETGEO) is invoked:
-> > > > 
-> > > >   BUG: unable to handle kernel NULL pointer dereference at 0000000000000090
-> > > >   IP: [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
-> > > >   PGD 800000003a92f067 PUD 3a930067 PMD 0
-> > > >   Oops: 0000 [#1] SMP
-> > > >   CPU: 0 PID: 1310 Comm: hdio-getgeo Tainted: G           OE  ------------   3.10.0-1062.el7.x86_64 #1
-> > > >   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> > > >   task: ffff9be5fbfb8000 ti: ffff9be5fa890000 task.ti: ffff9be5fa890000
-> > > >   RIP: 0010:[<ffffffffc00e5450>]  [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
-> > > >   RSP: 0018:ffff9be5fa893dc8  EFLAGS: 00010246
-> > > >   RAX: ffff9be5fc3f3400 RBX: ffff9be5fa893e30 RCX: 0000000000000000
-> > > >   RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff9be5fbc10b40
-> > > >   RBP: ffff9be5fa893dc8 R08: 0000000000000301 R09: 0000000000000301
-> > > >   R10: 0000000000000000 R11: 0000000000000000 R12: ffff9be5fdc24680
-> > > >   R13: ffff9be5fbc10b40 R14: ffff9be5fbc10480 R15: 0000000000000000
-> > > >   FS:  00007f1bfb968740(0000) GS:ffff9be5ffc00000(0000) knlGS:0000000000000000
-> > > >   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >   CR2: 0000000000000090 CR3: 000000003a894000 CR4: 0000000000360ff0
-> > > >   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > >   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > >   Call Trace:
-> > > >    [<ffffffffc016ac37>] virtblk_getgeo+0x47/0x110 [virtio_blk]
-> > > >    [<ffffffff8d3f200d>] ? handle_mm_fault+0x39d/0x9b0
-> > > >    [<ffffffff8d561265>] blkdev_ioctl+0x1f5/0xa20
-> > > >    [<ffffffff8d488771>] block_ioctl+0x41/0x50
-> > > >    [<ffffffff8d45d9e0>] do_vfs_ioctl+0x3a0/0x5a0
-> > > >    [<ffffffff8d45dc81>] SyS_ioctl+0xa1/0xc0
-> > > > 
-> > > > A related problem is that virtblk_remove() leaks the vd_index_ida index
-> > > > when something still holds a reference to vblk->disk during hot unplug.
-> > > > This causes virtio-blk device names to be lost (vda, vdb, etc).
-> > > > 
-> > > > Fix these issues by protecting vblk->vdev with a mutex and reference
-> > > > counting vblk so the vd_index_ida index can be removed in all cases.
-> > > > 
-> > > > Fixes: 48e4043d4529523cbc7fa8dd745bd8e2c45ce1d3
-> > > >        ("virtio: add virtio disk geometry feature")
-> > > > Reported-by: Lance Digby <ldigby@redhat.com>
-> > > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > ---
-> > > >  drivers/block/virtio_blk.c | 87 ++++++++++++++++++++++++++++++++++----
-> > > >  1 file changed, 79 insertions(+), 8 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > index 93468b7c6701..6f7f277495f4 100644
-> > > > --- a/drivers/block/virtio_blk.c
-> > > > +++ b/drivers/block/virtio_blk.c
-> > > > @@ -33,6 +33,16 @@ struct virtio_blk_vq {
-> > > >  } ____cacheline_aligned_in_smp;
-> > > >  
-> > > >  struct virtio_blk {
-> > > > +	/*
-> > > > +	 * vdev may be accessed without taking this mutex in blk-mq and
-> > > > +	 * virtqueue code paths because virtblk_remove() stops them before vdev
-> > > > +	 * is freed.
-> > > > +	 *
-> > > > +	 * Everything else must hold this mutex when accessing vdev and must
-> > > > +	 * handle the case where vdev is NULL after virtblk_remove() has been
-> > > > +	 * called.
-> > > > +	 */
-> > > > +	struct mutex vdev_mutex;
+On Thu, Apr 30, 2020 at 08:39:45AM +0800, Ming Lei wrote:
+> On Wed, Apr 29, 2020 at 06:34:01PM +0100, Will Deacon wrote:
+> > On Wed, Apr 29, 2020 at 09:43:27PM +0800, Ming Lei wrote:
+> > > Please see the following two code paths:
 > > > 
-> > > The patch LGTM, I'm just worried about cache_type_store() and
-> > > cache_type_show() because IIUC they aren't in blk-mq and virtqueue code
-> > > paths, but they use vdev.
+> > > [1] code path1:
+> > > blk_mq_hctx_notify_offline():
+> > > 	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
 > > > 
-> > > Do we have to take the mutex there too?
+> > > 	smp_mb() or smp_mb_after_atomic()
+> > > 
+> > > 	blk_mq_hctx_drain_inflight_rqs():
+> > > 		blk_mq_tags_inflight_rqs()
+> > > 			rq = hctx->tags->rqs[index]
+> > > 			and
+> > > 			READ rq->tag
+> > > 
+> > > [2] code path2:
+> > > 	blk_mq_get_driver_tag():
+> > > 
+> > > 		process might be migrated to other CPU here and chance is small,
+> > > 		then the follow code will be run on CPU different with code path1
+> > > 
+> > > 		rq->tag = rq->internal_tag;
+> > > 		hctx->tags->rqs[rq->tag] = rq;
 > > 
-> > No, because del_gendisk() in virtblk_remove() deletes the sysfs
-> > attributes before vblk->vdev is set to NULL.  kernfs deactivates the
-> > kernfs nodes so that further read()/write() operations fail with ENODEV
-> > (see fs/kernfs/dir.c and fs/kernfs/file.c).
-
-Thanks for the clarification!
-
+> > I /think/ this can be distilled to the SB litmus test:
 > > 
-> > I have tested that a userspace process with a sysfs attr file open
-> > cannot access the attribute after virtblk_remove().
-
-Great!
-
+> > 	// blk_mq_hctx_notify_offline()		blk_mq_get_driver_tag();
+> > 	Wstate = INACTIVE			Wtag
+> > 	smp_mb()				smp_mb()
+> > 	Rtag					Rstate
 > > 
-> > Stefan
+> > and you want to make sure that either blk_mq_get_driver_tag() sees the
+> > state as INACTIVE and does the cleanup, or it doesn't and
+> > blk_mq_hctx_notify_offline() sees the newly written tag and waits for the
+> > request to complete (I don't get how that happens, but hey).
+> > 
+> > Is that right?
 > 
-> Sounds good, but pls update the comment adding something like
-> " .. or anything coming from block layer since del_gendisk()
->   in virtblk_remove deletes the disk before vblk->vdev is set to NULL.
-> "
+> Yeah, exactly.
+> 
+> > 
+> > > 		barrier() in case that code path2 is run on same CPU with code path1
+> > > 		OR
+> > > 		smp_mb() in case that code path2 is run on different CPU with code path1 because
+> > > 		of process migration
+> > > 		
+> > > 		test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state)
+> > 
+> > Couldn't you just check this at the start of blk_mq_get_driver_tag() as
+> > well, and then make the smp_mb() unconditional?
+> 
+> As I mentioned, the chance for the current process(calling
+> blk_mq_get_driver_tag()) migration is very small, we do want to
+> avoid the extra smp_mb() in the fast path.
 
-With the comment fixed:
+Hmm, but your suggestion of checking 'rq->mq_ctx->cpu' only works if that
+is the same CPU on which blk_mq_hctx_notify_offline() executes. What
+provides that guarantee?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+If there's any chance of this thing being concurrent, then you need the
+barrier there just in case. So I'd say you either need to prevent the race,
+or live with the barrier. Do you have numbers to show how expensive it is?
 
-Thanks,
-Stefano
-
+Will
