@@ -2,217 +2,96 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B78EC83001
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E3DC83001
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:43:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22848214D8
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588231478;
-	bh=B1510mH7/QkNFP5gDC7/BK6EbcgbEzV8MhuqKtudeLQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=TFYgs0BAs/z4gdo7vcOznknx9DTQDCrM4CYLo8dxQTjxBypc3f4rAjGdos+0SDDNb
-	 1K+wZqY3B9kpAj6i8KUpM01oHSbEEiyZgAVvLlZbv3T60uOwuwEgcb0Lc8u36CbbLk
-	 qIiVHzlIHGN3TP7aYU+rKTD6wHl9TjxP3/yp7HS0=
+	by mail.kernel.org (Postfix) with ESMTP id 0119821973
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 07:43:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Pm0gae2W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726428AbgD3HYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 03:24:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38542 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726411AbgD3HYh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 03:24:37 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DD94A20838;
-        Thu, 30 Apr 2020 07:24:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588231476;
-        bh=B1510mH7/QkNFP5gDC7/BK6EbcgbEzV8MhuqKtudeLQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0jSbTpTIKAp8HftBanaummT3PLxHjd7KNLv7h+rLMtW46sSj4rCYu67IuaiurcWub
-         ndocTRCyPFh7Efb03EY75Tg1wlk8hu+ayQEYKpXdfI7SxyfnlakHfBB7OpKfdPw94L
-         V7tN58WoWf9C3V0q2eTm9gEr1x9xbLPnT2nk/B90=
-Date:   Thu, 30 Apr 2020 00:24:34 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v11 10/12] fscrypt: add inline encryption support
-Message-ID: <20200430072434.GD16238@sol.localdomain>
-References: <20200429072121.50094-1-satyat@google.com>
- <20200429072121.50094-11-satyat@google.com>
+        id S1726440AbgD3Hm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 03:42:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53550 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726424AbgD3Hm7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 03:42:59 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 587D9C035495
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 00:42:58 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id z6so721994wml.2
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 00:42:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Yj3aOOAITkSoQ9HT/kLSsxXrmoC54MHhQnwfKg+EFsA=;
+        b=Pm0gae2WWQGHGGGGOdaSVHtCmsA3TKcvgr8Nj2+qIsy2aELVcARV7qCd1ZjvJEtCOm
+         IbAmWIeKIhTLUxDSeh8VESrrbt3Ygn2crA0bwve3VtBx633ubS3cEfqPlO2wWQOY5Nyz
+         Tno8w9QwO+9xz9CppDJqIb4qnllco8yeygNgsc8FRmjR71xzM/6ubeb551WtgtYcTm+h
+         owYpjqttcka/D0/FP7xQIfATN3FEValTX9qyiPQNUpbr3A9MhvN0yejJ0SHcBcaxiOCt
+         okM0y78WXX4bpPirKvDRd6VJjGX935ZDzSQ7qMnfAFh15LDEfDtdum4d5oQTMSROTdIY
+         YCyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Yj3aOOAITkSoQ9HT/kLSsxXrmoC54MHhQnwfKg+EFsA=;
+        b=DCNS6emBXwEMvSPoXopcgUo4fEMOJ2UGHJHXtxCyeOH0zQC9kK0h05JiFGM+z8aRG4
+         BDYJWXk6vxhkvo3WHW7cLihtjp+tXsBeSrmqErNJg+zZoSj2dLqH94UniOUSBWMy04NU
+         XmzPYLVpcDraYzGD/kW/OMHduVJyirez9G39LOhbL4flkzYxXjHFPijkHFOXa+5wNOjt
+         21IbqoVjdDWNqHoOcBUNRbq8N+vHsvUnb5Mqn6nui0TzHS3BVsXfIdkezahF6Izipy7F
+         Jc7sz/Qku39JV+ljqFJ2sDrQtu5tIJHhDUz3f2s2zO80hQu+0+k7INRVBfPIKFyEGyZR
+         DFjQ==
+X-Gm-Message-State: AGi0PuZrJdpp+A4o3G7UioqEmcwK77d1BsvZ7zdVI2AE1CVtBbzpAXk4
+        XNVA8UcSGR0AVscMr/4vChnospagGH9pw9CXSvYH
+X-Google-Smtp-Source: APiQypLeP/hDfEhBONVBBPo4+ko5WjkMd4EvCY7nuPRLYRkKNJYDO0r9o+eolLYaXHwTLn8a3SMcctnUtcNSRYJt06E=
+X-Received: by 2002:a7b:c84f:: with SMTP id c15mr1403256wml.166.1588232577086;
+ Thu, 30 Apr 2020 00:42:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429072121.50094-11-satyat@google.com>
+References: <20200427141020.655-1-danil.kipnis@cloud.ionos.com>
+ <20200427141020.655-24-danil.kipnis@cloud.ionos.com> <20200429171804.GE26002@ziepe.ca>
+In-Reply-To: <20200429171804.GE26002@ziepe.ca>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Thu, 30 Apr 2020 09:42:46 +0200
+Message-ID: <CAHg0Huyvt1P1To+fxn3RZdGXJfnQXpNxJbpNxquqLw_KVtcDKA@mail.gmail.com>
+Subject: Re: [PATCH v13 23/25] block/rnbd: include client and server modules
+ into kernel compilation
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 07:21:19AM +0000, Satya Tangirala wrote:
-> +/**
-> + * fscrypt_inode_uses_inline_crypto - test whether an inode uses inline
-> + *				      encryption
-> + * @inode: an inode
+On Wed, Apr 29, 2020 at 7:18 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Mon, Apr 27, 2020 at 04:10:18PM +0200, Danil Kipnis wrote:
+> > +rnbd-client-y := rnbd-clt.o \
+> > +               rnbd-common.o \
+> > +               rnbd-clt-sysfs.o
+> > +
+> > +rnbd-server-y := rnbd-srv.o \
+> > +               rnbd-common.o \
+> > +               rnbd-srv-dev.o \
+> > +               rnbd-srv-sysfs.o
+>
+> keep lists of things sorted
 
-I think this should also mention that the key must be setup, like
-
- * @inode: an inode.  If encrypted, its key must be set up.
-
-Likewise in fscrypt_inode_uses_fs_layer_crypto().
-
-> + *
-> + * Return: true if the inode requires file contents encryption and if the
-> + *	   encryption should be done in the block layer via blk-crypto rather
-> + *	   than in the filesystem layer.
-> + */
-> +bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
-> +{
-> +	return fscrypt_needs_contents_encryption(inode) &&
-> +	       inode->i_crypt_info->ci_inlinecrypt;
-> +}
-> +EXPORT_SYMBOL_GPL(fscrypt_inode_uses_inline_crypto);
-> +
-> +/**
-> + * fscrypt_inode_uses_fs_layer_crypto - test whether an inode uses fs-layer
-> + *					encryption
-> + * @inode: an inode
-> + *
-> + * Return: true if the inode requires file contents encryption and if the
-> + *	   encryption should be done in the filesystem layer rather than in the
-> + *	   block layer via blk-crypto.
-> + */
-> +bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
-> +{
-> +	return fscrypt_needs_contents_encryption(inode) &&
-> +	       !inode->i_crypt_info->ci_inlinecrypt;
-> +}
-> +EXPORT_SYMBOL_GPL(fscrypt_inode_uses_fs_layer_crypto);
-
-It might also make sense to implement these as inline functions in fscrypt.h:
-
-diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
-index 0676832817a74a..6d44d89087b4e5 100644
---- a/fs/crypto/inline_crypt.c
-+++ b/fs/crypto/inline_crypt.c
-@@ -178,37 +178,10 @@ void fscrypt_destroy_inline_crypt_key(struct fscrypt_prepared_key *prep_key)
- 	}
- }
- 
--/**
-- * fscrypt_inode_uses_inline_crypto - test whether an inode uses inline
-- *				      encryption
-- * @inode: an inode
-- *
-- * Return: true if the inode requires file contents encryption and if the
-- *	   encryption should be done in the block layer via blk-crypto rather
-- *	   than in the filesystem layer.
-- */
--bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
--{
--	return fscrypt_needs_contents_encryption(inode) &&
--	       inode->i_crypt_info->ci_inlinecrypt;
--}
--EXPORT_SYMBOL_GPL(fscrypt_inode_uses_inline_crypto);
--
--/**
-- * fscrypt_inode_uses_fs_layer_crypto - test whether an inode uses fs-layer
-- *					encryption
-- * @inode: an inode
-- *
-- * Return: true if the inode requires file contents encryption and if the
-- *	   encryption should be done in the filesystem layer rather than in the
-- *	   block layer via blk-crypto.
-- */
--bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
-+bool __fscrypt_inode_uses_inline_crypto(const struct inode *inode)
- {
--	return fscrypt_needs_contents_encryption(inode) &&
--	       !inode->i_crypt_info->ci_inlinecrypt;
-+	return inode->i_crypt_info->ci_inlinecrypt;
- }
--EXPORT_SYMBOL_GPL(fscrypt_inode_uses_fs_layer_crypto);
- 
- static void fscrypt_generate_dun(const struct fscrypt_info *ci, u64 lblk_num,
- 				 u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE])
-diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
-index e02820b8e981e1..df30d3dde6ce02 100644
---- a/include/linux/fscrypt.h
-+++ b/include/linux/fscrypt.h
-@@ -508,9 +508,7 @@ static inline void fscrypt_set_ops(struct super_block *sb,
- 
- /* inline_crypt.c */
- #ifdef CONFIG_FS_ENCRYPTION_INLINE_CRYPT
--extern bool fscrypt_inode_uses_inline_crypto(const struct inode *inode);
--
--extern bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode);
-+extern bool __fscrypt_inode_uses_inline_crypto(const struct inode *inode);
- 
- extern void fscrypt_set_bio_crypt_ctx(struct bio *bio,
- 				      const struct inode *inode,
-@@ -527,16 +525,11 @@ extern bool fscrypt_mergeable_bio_bh(struct bio *bio,
- 				     const struct buffer_head *next_bh);
- 
- #else /* CONFIG_FS_ENCRYPTION_INLINE_CRYPT */
--static inline bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
-+static inline bool __fscrypt_inode_uses_inline_crypto(const struct inode *inode)
- {
- 	return false;
- }
- 
--static inline bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
--{
--	return fscrypt_needs_contents_encryption(inode);
--}
--
- static inline void fscrypt_set_bio_crypt_ctx(struct bio *bio,
- 					     const struct inode *inode,
- 					     u64 first_lblk, gfp_t gfp_mask) { }
-@@ -560,6 +553,36 @@ static inline bool fscrypt_mergeable_bio_bh(struct bio *bio,
- }
- #endif /* !CONFIG_FS_ENCRYPTION_INLINE_CRYPT */
- 
-+/**
-+ * fscrypt_inode_uses_inline_crypto - test whether an inode uses inline
-+ *				      encryption
-+ * @inode: an inode.  If encrypted, its key must be set up.
-+ *
-+ * Return: true if the inode requires file contents encryption and if the
-+ *	   encryption should be done in the block layer via blk-crypto rather
-+ *	   than in the filesystem layer.
-+ */
-+static inline bool fscrypt_inode_uses_inline_crypto(const struct inode *inode)
-+{
-+	return fscrypt_needs_contents_encryption(inode) &&
-+	       __fscrypt_inode_uses_inline_crypto(inode);
-+}
-+
-+/**
-+ * fscrypt_inode_uses_fs_layer_crypto - test whether an inode uses fs-layer
-+ *					encryption
-+ * @inode: an inode.  If encrypted, its key must be set up.
-+ *
-+ * Return: true if the inode requires file contents encryption and if the
-+ *	   encryption should be done in the filesystem layer rather than in the
-+ *	   block layer via blk-crypto.
-+ */
-+static inline bool fscrypt_inode_uses_fs_layer_crypto(const struct inode *inode)
-+{
-+	return fscrypt_needs_contents_encryption(inode) &&
-+	       !__fscrypt_inode_uses_inline_crypto(inode);
-+}
-+
- /**
-  * fscrypt_require_key - require an inode's encryption key
-  * @inode: the inode we need the key for
-
+Hi Jason, I understand you mean to sort the order of object files
+here, right? Is that the reason the kbuild robot couldn't find the
+rtrs.h include file?
