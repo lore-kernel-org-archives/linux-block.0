@@ -7,19 +7,19 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5D3C47253
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4DAC47254
 	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 15:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6781920775
+	by mail.kernel.org (Postfix) with ESMTP id BB0D52082E
 	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 15:04:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d0NlCypw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OIA7jp+O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgD3PED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 11:04:03 -0400
+        id S1726662AbgD3PEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 11:04:04 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:20784 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726662AbgD3PED (ORCPT
+        with ESMTP id S1727023AbgD3PED (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 30 Apr 2020 11:04:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
@@ -27,40 +27,40 @@ DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   t=1588259043; x=1619795043;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OjMSKiBrvds+SLYkA3MrkyrBH9G9Ewa8M9wwMfkEBlU=;
-  b=d0NlCypwFHIhKUO2BbOtZTcm2ySvwwMrEGuunnFYUYAOanKTAqz4nyUm
-   xSlE2LWtb8sRkjjOpQA2rQS4RBwbPmhFUz2EVb/+KW0fhpBTVFE7ibh7i
-   fmjjIpfv4zP1d3M0UqjGXM7sC/05itOYEAfeG50XpKeggBUjJdp6kbte9
-   aYrvVFC3+SmvHT/XLvAluy7Km6g+hJna8wOWb6PYIyg2+9ZXqh8YuKZAT
-   wr39ZsDRCt+7LvnhTrvJNKXBISXG6xRqzdTTNq6cR7KY0BkujKv1wPiFG
-   eYB64GNuoIK+LzU/6oEKCLk/yE/Hl3XVUfu6ecz9et4WJQMQ45jHJ+5yP
-   Q==;
-IronPort-SDR: NGmwtcHPUrwqXkQvT/CLJj/AZ0UBC364s59eg9YIspsl/cODPGwPlRIqmXvkY9Rng7HbUwRGNT
- uULCDIvGuUSk7f2y9OKVcbJXYjP1gRzjlS0808Np0TxV0TLV+aFuJaIg4/unVM+t3Slzg2H/HJ
- kytXi2px47kViBMZeH5gtxSUGxRlFI66zlRsgaRo4G/REXRTwoIPEHioCpK2J+FWVhd+tb6rKQ
- YAiAWwsfqILzRlJsjFQEyGB78ksNHmqbApqrJZyV24ntp7FAeGPQw+mIDxxfoOCH7whZ2tLf+5
- IgM=
+  bh=7nS6FlViSHcumKei79u9znQZZkzR2NNtzyPGkp843A4=;
+  b=OIA7jp+OCfHQ9EvQXVhyZ3NMhbTUGXvS/lUAHVpVxF9+IL1+lugpUPlL
+   NcStZFKoHF5KhGGc6YAALOaMDLSIVI5rls1etcN6BjFIHVWGo2eKkykFR
+   F6S9NrEzVIzI4dCsPdfDJdlwMNvfrEVjuvh39jlDv/6IxIVHar2hM7fJb
+   Xlu4Swa+V1TjMDhk20fruKojOklRbJrQOjS2kMHcD5zd6cd8QL088PHgW
+   g+yPK0b/42VsEumq2L2PweXlCwK1LkbYK3Jlqj8XSvxV3dCOfQh87+gUc
+   6cQwUoslMhUqcoLEqFX6+0JJHgvk1JIQlsdaHgRyWlmG0EwdV0jk2enfF
+   A==;
+IronPort-SDR: EA1SXK9rb5WVNC7trMHoXOM/elIh49PRaaq4NB2cfuRlX67wa8q487TjgzpabiBQtIQqWPNDah
+ xLuEk66T1xMKqPya2qxD/lrEJ2pRcHJgcVvu3TkHto8pSj+i9NSgwHFTXmCQGSnPXQfHN/6zVo
+ rRoZDSGzOTwNk/Kbn+KZaWJhPQbqdH43L2wIrte1BQScmRm3jWTcQDNMJ+awjpbgkntV+vknKn
+ a4pas2u+tleRbhshLD/Wivxse1QukSOy7oA8OXJjXLCFxH8qG/R2oK5Aazb06Mgb0PsqTrN0xw
+ Tf0=
 X-IronPort-AV: E=Sophos;i="5.73,336,1583164800"; 
-   d="scan'208";a="140916561"
+   d="scan'208";a="140916568"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 23:04:02 +0800
-IronPort-SDR: RJwdccjVF+KMI8UiggoC65raDiVufEO+RXdLEH5EE1suzYqqxKSPdOmUsnGM9PLK8JdvzB640u
- 3XtLY5ZnFt9u+Jng9E7lMwIS0kmAq7g4o=
+  by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 23:04:03 +0800
+IronPort-SDR: GR9BQAIwowaDOsBv1l2Ne8l7U9JnQDGRbMP53AaRNld6ehtahv9t6zk9foueg4QkI19xDWqMiP
+ 9DtH7fSvwFkVctZ04ZDmzEwL0ynDQUv1s=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2020 07:54:05 -0700
-IronPort-SDR: EAxAPlSByo4XljlhcJ/bS8CFMnquwY2DGOh9jE5/NVpCTQgHerPHfcRRd2gIaMp2JDJ1dqd1Uy
- lQT5wsq+K9yQ==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2020 07:54:06 -0700
+IronPort-SDR: J3AwICK6z2iUXA0mGMC9t43WUn3LlaXpnPz6k/HjZGKE94JBkIZXoxcnRvOaQdPd51QRt5hr+h
+ 0cW+PK8lgzkA==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2020 08:04:02 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Apr 2020 08:04:03 -0700
 From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 1/3] block: remove blk_queue_root_blkg
-Date:   Fri,  1 May 2020 00:03:54 +0900
-Message-Id: <20200430150356.35691-2-johannes.thumshirn@wdc.com>
+Subject: [PATCH v2 2/3] block: move blkcg_bio_issue_check out of line
+Date:   Fri,  1 May 2020 00:03:55 +0900
+Message-Id: <20200430150356.35691-3-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200430150356.35691-1-johannes.thumshirn@wdc.com>
 References: <20200430150356.35691-1-johannes.thumshirn@wdc.com>
@@ -71,45 +71,173 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_queue_root_blkg() has no callers, remove it.
+blkcg_bio_issue_check() is way to big to be an inline function, move it to
+the other blkcg related functions in block/blk-cgroup.c.
+
+According to the bloat-o-meter this brings it's sole caller
+generic_make_request_checks() down from 2417 to 1881 bytes (~22%).
+
+$ ./scripts/bloat-o-meter -t vmlinux.old vmlinux
+add/remove: 1/0 grow/shrink: 1/1 up/down: 667/-539 (128)
+Function                                     old     new   delta
+blkcg_bio_issue_check                          -     664    +664
+generic_make_request_checks.cold              45      48      +3
+generic_make_request_checks                 2372    1833    -539
+Total: Before=9624970, After=9625098, chg +0.00%
 
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/blk-cgroup.h | 13 -------------
- 1 file changed, 13 deletions(-)
+ block/blk-cgroup.c         | 57 ++++++++++++++++++++++++++++++++++++
+ include/linux/blk-cgroup.h | 60 +-------------------------------------
+ 2 files changed, 58 insertions(+), 59 deletions(-)
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 4deb8bb7b6af..a606767cdcc7 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -364,17 +364,6 @@ static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg,
- 	return __blkg_lookup(blkcg, q, false);
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index c5dc833212e1..88453cb866bb 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1706,6 +1706,63 @@ void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay)
+ 	set_notify_resume(current);
  }
  
--/**
-- * blk_queue_root_blkg - return blkg for the (blkcg_root, @q) pair
-- * @q: request_queue of interest
-- *
-- * Lookup blkg for @q at the root level. See also blkg_lookup().
-- */
--static inline struct blkcg_gq *blk_queue_root_blkg(struct request_queue *q)
++bool blkcg_bio_issue_check(struct request_queue *q, struct bio *bio)
++{
++	struct blkcg_gq *blkg;
++	bool throtl = false;
++
++	rcu_read_lock();
++
++	if (!bio->bi_blkg) {
++		char b[BDEVNAME_SIZE];
++
++		WARN_ONCE(1,
++			  "no blkg associated for bio on block-device: %s\n",
++			  bio_devname(bio, b));
++		bio_associate_blkg(bio);
++	}
++
++	blkg = bio->bi_blkg;
++
++	throtl = blk_throtl_bio(q, blkg, bio);
++	if (!throtl) {
++		struct blkg_iostat_set *bis;
++		int rwd, cpu;
++
++		if (op_is_discard(bio->bi_opf))
++			rwd = BLKG_IOSTAT_DISCARD;
++		else if (op_is_write(bio->bi_opf))
++			rwd = BLKG_IOSTAT_WRITE;
++		else
++			rwd = BLKG_IOSTAT_READ;
++
++		cpu = get_cpu();
++		bis = per_cpu_ptr(blkg->iostat_cpu, cpu);
++		u64_stats_update_begin(&bis->sync);
++
++		/*
++		 * If the bio is flagged with BIO_CGROUP_ACCT it means this is a
++		 * split bio and we would have already accounted for the size of
++		 * the bio.
++		 */
++		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
++			bio_set_flag(bio, BIO_CGROUP_ACCT);
++			bis->cur.bytes[rwd] += bio->bi_iter.bi_size;
++		}
++		bis->cur.ios[rwd]++;
++
++		u64_stats_update_end(&bis->sync);
++		if (cgroup_subsys_on_dfl(io_cgrp_subsys))
++			cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
++		put_cpu();
++	}
++
++	blkcg_bio_issue_init(bio);
++
++	rcu_read_unlock();
++	return !throtl;
++}
++
+ /**
+  * blkcg_add_delay - add delay to this blkg
+  * @blkg: blkg of interest
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index a606767cdcc7..b356d4eed08d 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -559,65 +559,6 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
+ 	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+ }
+ 
+-static inline bool blkcg_bio_issue_check(struct request_queue *q,
+-					 struct bio *bio)
 -{
--	return q->root_blkg;
+-	struct blkcg_gq *blkg;
+-	bool throtl = false;
+-
+-	rcu_read_lock();
+-
+-	if (!bio->bi_blkg) {
+-		char b[BDEVNAME_SIZE];
+-
+-		WARN_ONCE(1,
+-			  "no blkg associated for bio on block-device: %s\n",
+-			  bio_devname(bio, b));
+-		bio_associate_blkg(bio);
+-	}
+-
+-	blkg = bio->bi_blkg;
+-
+-	throtl = blk_throtl_bio(q, blkg, bio);
+-
+-	if (!throtl) {
+-		struct blkg_iostat_set *bis;
+-		int rwd, cpu;
+-
+-		if (op_is_discard(bio->bi_opf))
+-			rwd = BLKG_IOSTAT_DISCARD;
+-		else if (op_is_write(bio->bi_opf))
+-			rwd = BLKG_IOSTAT_WRITE;
+-		else
+-			rwd = BLKG_IOSTAT_READ;
+-
+-		cpu = get_cpu();
+-		bis = per_cpu_ptr(blkg->iostat_cpu, cpu);
+-		u64_stats_update_begin(&bis->sync);
+-
+-		/*
+-		 * If the bio is flagged with BIO_CGROUP_ACCT it means this is a
+-		 * split bio and we would have already accounted for the size of
+-		 * the bio.
+-		 */
+-		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
+-			bio_set_flag(bio, BIO_CGROUP_ACCT);
+-			bis->cur.bytes[rwd] += bio->bi_iter.bi_size;
+-		}
+-		bis->cur.ios[rwd]++;
+-
+-		u64_stats_update_end(&bis->sync);
+-		if (cgroup_subsys_on_dfl(io_cgrp_subsys))
+-			cgroup_rstat_updated(blkg->blkcg->css.cgroup, cpu);
+-		put_cpu();
+-	}
+-
+-	blkcg_bio_issue_init(bio);
+-
+-	rcu_read_unlock();
+-	return !throtl;
 -}
 -
- /**
-  * blkg_to_pdata - get policy private data
-  * @blkg: blkg of interest
-@@ -709,8 +698,6 @@ static inline bool blk_cgroup_congested(void) { return false; }
- static inline void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay) { }
+ static inline void blkcg_use_delay(struct blkcg_gq *blkg)
+ {
+ 	if (atomic_add_return(1, &blkg->use_delay) == 1)
+@@ -668,6 +609,7 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
+ 	}
+ }
  
- static inline struct blkcg_gq *blkg_lookup(struct blkcg *blkcg, void *key) { return NULL; }
--static inline struct blkcg_gq *blk_queue_root_blkg(struct request_queue *q)
--{ return NULL; }
- static inline int blkcg_init_queue(struct request_queue *q) { return 0; }
- static inline void blkcg_exit_queue(struct request_queue *q) { }
- static inline int blkcg_policy_register(struct blkcg_policy *pol) { return 0; }
++bool blkcg_bio_issue_check(struct request_queue *q, struct bio *bio);
+ void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta);
+ void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
+ void blkcg_maybe_throttle_current(void);
 -- 
 2.24.1
 
