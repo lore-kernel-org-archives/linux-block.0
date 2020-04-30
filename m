@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DEDC83010
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 12:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDBDC8300F
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 12:00:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA74D207DD
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 12:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABE9A20775
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 12:00:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVjua0bo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lHUzr6c6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgD3MAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 08:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
+        id S1727089AbgD3MAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 08:00:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726942AbgD3MAS (ORCPT
+        by vger.kernel.org with ESMTP id S1726906AbgD3MAN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 08:00:18 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D239EC08ED7D
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 05:00:16 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id w9so6099573qvs.22
-        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 05:00:16 -0700 (PDT)
+        Thu, 30 Apr 2020 08:00:13 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE98C09B043
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 05:00:12 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id k138so6178594qke.15
+        for <linux-block@vger.kernel.org>; Thu, 30 Apr 2020 05:00:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=dcBMNhJyVF3JG7u2k+hpIfX5J5/+YNOMhft7o2B+Ju4=;
-        b=WVjua0boMZFfyXRxNHxXtkkQlvtsd9hMr76JSeSRnGAS4i4rb0v5hyP/xpU/t08yAU
-         8iFqQJRhyAkwJFM1oK1XZBTqXHm3CqsdLruIVMn/pVnKPy3fC4DShhJRinGldvR/S/PE
-         BRJ35yKgDNYU78xLeadViChpObrcGpoomH0GOf1yWskNC6xGjTXCQ70zRp3w8mJsEov1
-         wnopsVuB0htL7AZ3eqUvciTbLOa1LCZTKOiayOWzgpDf/NefzgdtHrk8kZ6h2I0f2Ln0
-         gH8rvRj4IA4NAJmjknAgox3uK+dYnH04ADDO1Fq1XchcZcytltv69jWbnlNIl/trv1Tn
-         lHrg==
+        bh=6QyXfeGvk0WJl1C/wpxTI5v1ePziEcWn5TI+lV37Q2o=;
+        b=lHUzr6c6MetvkriJhe93sddCtRY+ZweoxlpD0BwPFJmdTfXeYzzmA0Gu6yNBk+pP7/
+         UH3cuhC+GVG6blJxjxnaR14HtfobUHdOEuWUBCG9E4APIacaE87QXzbYvQ6Rw0FgVixT
+         Lrv3AjdK2vLcyJY5/nQjDZadmjZ5GS1BIwHMA1iUvaEhMYcoNSZ2nkWtHLPEAAz6sLPJ
+         K9wZ0HuxMknqy+Zm4SNjyA0FVkgVj3KAtW6afgV1oOwAJO0H160AKm6PQhRWmvgESXEo
+         I5A+pDK5p7T6fE/S+NgWww/J/0MTwLXj3aut4jaBorKo5yWxAViQloDNDeQrCDWEjwKM
+         lErQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=dcBMNhJyVF3JG7u2k+hpIfX5J5/+YNOMhft7o2B+Ju4=;
-        b=F0ZYdIEcJGvRMmFeZ3l1cYQcpxZF39OuZAVrDqk4PSNWEfHf0O49RmnG596pBfF7dB
-         E7yKO3bJYsvgSqrBo0GvNlPspoFvZV5DK+fiKop6y+4zobDlnFeZcw9T4OgFaoKJS+14
-         NEUZRP4HTKkd4gEexFywiW7RkReMlD/dYQn/iFN+ddGScB6ITtOO7VsUh1EBmIVNdbJX
-         oYq3AWPh4ZHvWA90KZrt+lHAa71RjAUIdmG+2097q8eusFakKqLwUzJ1/gK6FNIf76Bo
-         EYv2c4zvBaxfRMFoQUc5paWsJWW1jh1EghRrVQJsZVjLA5Ndd7I9KVt4RoEznZ251ERr
-         c2MQ==
-X-Gm-Message-State: AGi0PuY/aOsXXPEYLG8Z1IZmc8KGaTbvrAQ+HasRxgTg73jA8dIfHkI0
-        N5iMk53RDlh9yUG+0Qu7lLyXDFKPZfdiyGgT8rqKPXsjBYpf2rVK4L+iFmuSni3ZCF6Gpkgjy3G
-        n1HeHAivN2yw/LytBH5xLlFFNo85nCi3LINK+ulMfnJD9htnmlQK0yssYQTGuuvzrweQV
-X-Google-Smtp-Source: APiQypIqTjtVoRaD2OhqjnO9XpfMgccnF/80vIjLwCBdsxgR6aNsuU+7iyNxHrHcnYjkH2WPjyT1Rf+7CFc=
-X-Received: by 2002:a05:6214:1804:: with SMTP id o4mr2636288qvw.10.1588248015930;
- Thu, 30 Apr 2020 05:00:15 -0700 (PDT)
-Date:   Thu, 30 Apr 2020 11:59:56 +0000
+        bh=6QyXfeGvk0WJl1C/wpxTI5v1ePziEcWn5TI+lV37Q2o=;
+        b=CyrOMnYgzU4G4dBB0PsLW02/lmMO8b27P6Ng0td4LbOpHnWCTGdbjJmibi6FM9u0px
+         rPV4orZZKN5B1YcVi2JHps8aUmXaXFeMdH8GCbfc6L96LtoYIe8pQLG1vbNEeImY4vbe
+         1t01fNYJ17OfGZ18y9hVZrdakcdmrNyyXSLb1y02cbjGzAOIQDAcQYskTUYOq19d2ONY
+         8OZP4B4ZNm4X40Hr0wPY9Lzar6WqXH6NJsOQ1kKxUJdqTQSmGD30RdRBM6x7Ykk1i6mv
+         K0FC54el1h5z7Kyb0Pg7W4GavW4XjZ1C+4CXmZeoqcaqRq0uoVNKOHvtqNPvs0qyfYu7
+         GulA==
+X-Gm-Message-State: AGi0PuaZ+wRxys23LNNaYOO2HzlHLdZbT2YXl6LkkMYOi/BKSgK3VYtq
+        v9tiwprpRYfoWh9J8rc8wT8+A7V4FjuAH5xb0zJKaXI/dY6/oEe4CEgdnkpOES7xmiGupfAumF0
+        PKQiCN3nDOzrg+AOZpHXQ7ijScqlZuWXCS0u3SYXJDDZpbhe1FRbtdPxzT9JqGUu6//bl
+X-Google-Smtp-Source: APiQypIDxjrS53bQMz1ZhsGabL71kNE3BCHX5TKFPBqWa9Jy0h4WLpOEn1s7JAofh6AmX6n7tb14oN8ZFGE=
+X-Received: by 2002:a0c:b31b:: with SMTP id s27mr2671309qve.158.1588248011455;
+ Thu, 30 Apr 2020 05:00:11 -0700 (PDT)
+Date:   Thu, 30 Apr 2020 11:59:53 +0000
 In-Reply-To: <20200430115959.238073-1-satyat@google.com>
-Message-Id: <20200430115959.238073-10-satyat@google.com>
+Message-Id: <20200430115959.238073-7-satyat@google.com>
 Mime-Version: 1.0
 References: <20200430115959.238073-1-satyat@google.com>
 X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
-Subject: [PATCH v12 09/12] fs: introduce SB_INLINECRYPT
+Subject: [PATCH v12 06/12] scsi: ufs: UFS driver v2.1 spec crypto additions
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -76,42 +76,163 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce SB_INLINECRYPT, which is set by filesystems that wish to use
-blk-crypto for file content en/decryption. This flag maps to the
-'-o inlinecrypt' mount option which multiple filesystems will implement,
-and code in fs/crypto/ needs to be able to check for this mount option
-in a filesystem-independent way.
+Add the crypto registers and structs defined in v2.1 of the JEDEC UFSHCI
+specification in preparation to add support for inline encryption to
+UFS.
 
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- fs/proc_namespace.c | 1 +
- include/linux/fs.h  | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/scsi/ufs/ufshcd.c |  2 ++
+ drivers/scsi/ufs/ufshcd.h |  6 ++++
+ drivers/scsi/ufs/ufshci.h | 67 +++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 73 insertions(+), 2 deletions(-)
 
-diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
-index 273ee82d8aa97..8bf195d3bda69 100644
---- a/fs/proc_namespace.c
-+++ b/fs/proc_namespace.c
-@@ -49,6 +49,7 @@ static int show_sb_opts(struct seq_file *m, struct super_block *sb)
- 		{ SB_DIRSYNC, ",dirsync" },
- 		{ SB_MANDLOCK, ",mand" },
- 		{ SB_LAZYTIME, ",lazytime" },
-+		{ SB_INLINECRYPT, ",inlinecrypt" },
- 		{ 0, NULL }
- 	};
- 	const struct proc_fs_info *fs_infop;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 4f6f59b4f22a8..38fc6c8d4f45b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1376,6 +1376,7 @@ extern int send_sigurg(struct fown_struct *fown);
- #define SB_NODIRATIME	2048	/* Do not update directory access times */
- #define SB_SILENT	32768
- #define SB_POSIXACL	(1<<16)	/* VFS does not apply the umask */
-+#define SB_INLINECRYPT	(1<<17)	/* Use blk-crypto for encrypted files */
- #define SB_KERNMOUNT	(1<<22) /* this is a kern_mount call */
- #define SB_I_VERSION	(1<<23) /* Update inode I_version field */
- #define SB_LAZYTIME	(1<<25) /* Update the on-disk [acm]times lazily */
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 698e8d20b4bac..2435c600cb2d9 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -4767,6 +4767,8 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
+ 	case OCS_MISMATCH_RESP_UPIU_SIZE:
+ 	case OCS_PEER_COMM_FAILURE:
+ 	case OCS_FATAL_ERROR:
++	case OCS_INVALID_CRYPTO_CONFIG:
++	case OCS_GENERAL_CRYPTO_ERROR:
+ 	default:
+ 		result |= DID_ERROR << 16;
+ 		dev_err(hba->dev,
+diff --git a/drivers/scsi/ufs/ufshcd.h b/drivers/scsi/ufs/ufshcd.h
+index 6ffc08ad85f63..1eebb589159d6 100644
+--- a/drivers/scsi/ufs/ufshcd.h
++++ b/drivers/scsi/ufs/ufshcd.h
+@@ -555,6 +555,12 @@ enum ufshcd_caps {
+ 	 * for userspace to control the power management.
+ 	 */
+ 	UFSHCD_CAP_RPM_AUTOSUSPEND			= 1 << 6,
++
++	/*
++	 * This capability allows the host controller driver to use the
++	 * inline crypto engine, if it is present
++	 */
++	UFSHCD_CAP_CRYPTO				= (1 << 7),
+ };
+ 
+ /**
+diff --git a/drivers/scsi/ufs/ufshci.h b/drivers/scsi/ufs/ufshci.h
+index c2961d37cc1cf..c0651fe6dbbc6 100644
+--- a/drivers/scsi/ufs/ufshci.h
++++ b/drivers/scsi/ufs/ufshci.h
+@@ -90,6 +90,7 @@ enum {
+ 	MASK_64_ADDRESSING_SUPPORT		= 0x01000000,
+ 	MASK_OUT_OF_ORDER_DATA_DELIVERY_SUPPORT	= 0x02000000,
+ 	MASK_UIC_DME_TEST_MODE_SUPPORT		= 0x04000000,
++	MASK_CRYPTO_SUPPORT			= 0x10000000,
+ };
+ 
+ #define UFS_MASK(mask, offset)		((mask) << (offset))
+@@ -143,6 +144,7 @@ enum {
+ #define DEVICE_FATAL_ERROR			0x800
+ #define CONTROLLER_FATAL_ERROR			0x10000
+ #define SYSTEM_BUS_FATAL_ERROR			0x20000
++#define CRYPTO_ENGINE_FATAL_ERROR		0x40000
+ 
+ #define UFSHCD_UIC_HIBERN8_MASK	(UIC_HIBERNATE_ENTER |\
+ 				UIC_HIBERNATE_EXIT)
+@@ -155,11 +157,13 @@ enum {
+ #define UFSHCD_ERROR_MASK	(UIC_ERROR |\
+ 				DEVICE_FATAL_ERROR |\
+ 				CONTROLLER_FATAL_ERROR |\
+-				SYSTEM_BUS_FATAL_ERROR)
++				SYSTEM_BUS_FATAL_ERROR |\
++				CRYPTO_ENGINE_FATAL_ERROR)
+ 
+ #define INT_FATAL_ERRORS	(DEVICE_FATAL_ERROR |\
+ 				CONTROLLER_FATAL_ERROR |\
+-				SYSTEM_BUS_FATAL_ERROR)
++				SYSTEM_BUS_FATAL_ERROR |\
++				CRYPTO_ENGINE_FATAL_ERROR)
+ 
+ /* HCS - Host Controller Status 30h */
+ #define DEVICE_PRESENT				0x1
+@@ -318,6 +322,61 @@ enum {
+ 	INTERRUPT_MASK_ALL_VER_21	= 0x71FFF,
+ };
+ 
++/* CCAP - Crypto Capability 100h */
++union ufs_crypto_capabilities {
++	__le32 reg_val;
++	struct {
++		u8 num_crypto_cap;
++		u8 config_count;
++		u8 reserved;
++		u8 config_array_ptr;
++	};
++};
++
++enum ufs_crypto_key_size {
++	UFS_CRYPTO_KEY_SIZE_INVALID	= 0x0,
++	UFS_CRYPTO_KEY_SIZE_128		= 0x1,
++	UFS_CRYPTO_KEY_SIZE_192		= 0x2,
++	UFS_CRYPTO_KEY_SIZE_256		= 0x3,
++	UFS_CRYPTO_KEY_SIZE_512		= 0x4,
++};
++
++enum ufs_crypto_alg {
++	UFS_CRYPTO_ALG_AES_XTS			= 0x0,
++	UFS_CRYPTO_ALG_BITLOCKER_AES_CBC	= 0x1,
++	UFS_CRYPTO_ALG_AES_ECB			= 0x2,
++	UFS_CRYPTO_ALG_ESSIV_AES_CBC		= 0x3,
++};
++
++/* x-CRYPTOCAP - Crypto Capability X */
++union ufs_crypto_cap_entry {
++	__le32 reg_val;
++	struct {
++		u8 algorithm_id;
++		u8 sdus_mask; /* Supported data unit size mask */
++		u8 key_size;
++		u8 reserved;
++	};
++};
++
++#define UFS_CRYPTO_CONFIGURATION_ENABLE (1 << 7)
++#define UFS_CRYPTO_KEY_MAX_SIZE 64
++/* x-CRYPTOCFG - Crypto Configuration X */
++union ufs_crypto_cfg_entry {
++	__le32 reg_val[32];
++	struct {
++		u8 crypto_key[UFS_CRYPTO_KEY_MAX_SIZE];
++		u8 data_unit_size;
++		u8 crypto_cap_idx;
++		u8 reserved_1;
++		u8 config_enable;
++		u8 reserved_multi_host;
++		u8 reserved_2;
++		u8 vsb[2];
++		u8 reserved_3[56];
++	};
++};
++
+ /*
+  * Request Descriptor Definitions
+  */
+@@ -339,6 +398,7 @@ enum {
+ 	UTP_NATIVE_UFS_COMMAND		= 0x10000000,
+ 	UTP_DEVICE_MANAGEMENT_FUNCTION	= 0x20000000,
+ 	UTP_REQ_DESC_INT_CMD		= 0x01000000,
++	UTP_REQ_DESC_CRYPTO_ENABLE_CMD	= 0x00800000,
+ };
+ 
+ /* UTP Transfer Request Data Direction (DD) */
+@@ -358,6 +418,9 @@ enum {
+ 	OCS_PEER_COMM_FAILURE		= 0x5,
+ 	OCS_ABORTED			= 0x6,
+ 	OCS_FATAL_ERROR			= 0x7,
++	OCS_DEVICE_FATAL_ERROR		= 0x8,
++	OCS_INVALID_CRYPTO_CONFIG	= 0x9,
++	OCS_GENERAL_CRYPTO_ERROR	= 0xA,
+ 	OCS_INVALID_COMMAND_STATUS	= 0x0F,
+ 	MASK_OCS			= 0x0F,
+ };
 -- 
 2.26.2.303.gf8c07b1a785-goog
 
