@@ -2,136 +2,98 @@ Return-Path: <SRS0=29BZ=6O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D498C8300B
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C68BC8300A
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B7ED20870
-	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:04:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588244676;
-	bh=CedaVmhMJydNlN3+5OOqHxPQXAjgO7wa5lpISSfhzNo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=LlOhsh1dwtnf+uwLe3rFP6Zws6B+gxE4jYUv3dNp28VY9NoNhIR8x/9gJkpbxzxc4
-	 ADjYWDAK+nmTEwTRiO2CWK7gZ9n4du7AcDnxb6cQVqQG5cpIVfbUzpO/imuhu8H6Xq
-	 N7ePsfox336B1vgnpTLRTwdIfBNc5tqNv0/NYHmo=
+	by mail.kernel.org (Postfix) with ESMTP id 86EF020774
+	for <linux-block@archiver.kernel.org>; Thu, 30 Apr 2020 11:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726886AbgD3LEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Apr 2020 07:04:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33948 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726636AbgD3LEf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Apr 2020 07:04:35 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EC5DA20774;
-        Thu, 30 Apr 2020 11:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588244674;
-        bh=CedaVmhMJydNlN3+5OOqHxPQXAjgO7wa5lpISSfhzNo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1rgIXW36JneHRbDm+1eNCEIFkD+V2E/2FC0wzmIIznr58uBsRzswu/TjCunzgW8z9
-         A7H6N79/4UM+W27QvDQ8af7KVwzKcaPq0WZTOEPq5sT9Th2WjbYAP/HO3qT6NTquIz
-         gbJGk3u8D0j3s5haMvpC+MqPKv+w4ncWwwVFTRUE=
-Date:   Thu, 30 Apr 2020 12:04:29 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>, paulmck@kernel.org
-Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200430110429.GI19932@willie-the-truck>
-References: <20200425095351.GC495669@T590>
- <20200425154832.GA16004@lst.de>
- <20200428155837.GA16910@hirez.programming.kicks-ass.net>
- <20200429021612.GD671522@T590>
- <20200429080728.GB29143@willie-the-truck>
- <20200429094616.GB700644@T590>
- <20200429122757.GA30247@willie-the-truck>
- <20200429134327.GC700644@T590>
- <20200429173400.GC30247@willie-the-truck>
- <20200430003945.GA719313@T590>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200430003945.GA719313@T590>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726784AbgD3LSE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Apr 2020 07:18:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28634 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726309AbgD3LSE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Apr 2020 07:18:04 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03UB3CQN140103;
+        Thu, 30 Apr 2020 07:18:00 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30me47b9cp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Apr 2020 07:18:00 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03UBG6BG013757;
+        Thu, 30 Apr 2020 11:17:58 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 30mcu5aknm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Apr 2020 11:17:57 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03UBHtKL65012140
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 Apr 2020 11:17:55 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1EF6FAE058;
+        Thu, 30 Apr 2020 11:17:55 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B0E5AE055;
+        Thu, 30 Apr 2020 11:17:55 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 30 Apr 2020 11:17:55 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id B233BE0260; Thu, 30 Apr 2020 13:17:54 +0200 (CEST)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     axboe@kernel.dk, hch@lst.de
+Cc:     linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
+        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/1] remove ioclt_by_bdev from DASD
+Date:   Thu, 30 Apr 2020 13:17:53 +0200
+Message-Id: <20200430111754.98508-1-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-30_07:2020-04-30,2020-04-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ spamscore=0 malwarescore=0 mlxlogscore=751 clxscore=1015 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004300087
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 08:39:45AM +0800, Ming Lei wrote:
-> On Wed, Apr 29, 2020 at 06:34:01PM +0100, Will Deacon wrote:
-> > On Wed, Apr 29, 2020 at 09:43:27PM +0800, Ming Lei wrote:
-> > > Please see the following two code paths:
-> > > 
-> > > [1] code path1:
-> > > blk_mq_hctx_notify_offline():
-> > > 	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-> > > 
-> > > 	smp_mb() or smp_mb_after_atomic()
-> > > 
-> > > 	blk_mq_hctx_drain_inflight_rqs():
-> > > 		blk_mq_tags_inflight_rqs()
-> > > 			rq = hctx->tags->rqs[index]
-> > > 			and
-> > > 			READ rq->tag
-> > > 
-> > > [2] code path2:
-> > > 	blk_mq_get_driver_tag():
-> > > 
-> > > 		process might be migrated to other CPU here and chance is small,
-> > > 		then the follow code will be run on CPU different with code path1
-> > > 
-> > > 		rq->tag = rq->internal_tag;
-> > > 		hctx->tags->rqs[rq->tag] = rq;
-> > 
-> > I /think/ this can be distilled to the SB litmus test:
-> > 
-> > 	// blk_mq_hctx_notify_offline()		blk_mq_get_driver_tag();
-> > 	Wstate = INACTIVE			Wtag
-> > 	smp_mb()				smp_mb()
-> > 	Rtag					Rstate
-> > 
-> > and you want to make sure that either blk_mq_get_driver_tag() sees the
-> > state as INACTIVE and does the cleanup, or it doesn't and
-> > blk_mq_hctx_notify_offline() sees the newly written tag and waits for the
-> > request to complete (I don't get how that happens, but hey).
-> > 
-> > Is that right?
-> 
-> Yeah, exactly.
-> 
-> > 
-> > > 		barrier() in case that code path2 is run on same CPU with code path1
-> > > 		OR
-> > > 		smp_mb() in case that code path2 is run on different CPU with code path1 because
-> > > 		of process migration
-> > > 		
-> > > 		test_bit(BLK_MQ_S_INACTIVE, &data.hctx->state)
-> > 
-> > Couldn't you just check this at the start of blk_mq_get_driver_tag() as
-> > well, and then make the smp_mb() unconditional?
-> 
-> As I mentioned, the chance for the current process(calling
-> blk_mq_get_driver_tag()) migration is very small, we do want to
-> avoid the extra smp_mb() in the fast path.
+Hi Christoph and Jens,
 
-Hmm, but your suggestion of checking 'rq->mq_ctx->cpu' only works if that
-is the same CPU on which blk_mq_hctx_notify_offline() executes. What
-provides that guarantee?
+here I have a different proposal how to remove the ioctl_by_bdev calls
+from the DASD device driver. The patch is tested and from my perspective
+OK to be integrated.
+If you find it acceptable please feel free to integrate it into your tree.
+Otherwise I am open for suggestions.
 
-If there's any chance of this thing being concurrent, then you need the
-barrier there just in case. So I'd say you either need to prevent the race,
-or live with the barrier. Do you have numbers to show how expensive it is?
+Regards,
+Stefan
 
-Will
+Stefan Haberland (1):
+  s390/dasd: remove ioctl_by_bdev from DASD driver
+
+ block/partitions/ibm.c           | 67 ++++++++++++++++++--------------
+ drivers/s390/block/dasd_devmap.c | 17 +++++++-
+ drivers/s390/block/dasd_diag.c   | 10 +++++
+ drivers/s390/block/dasd_eckd.c   | 10 +++++
+ drivers/s390/block/dasd_fba.c    |  8 ++++
+ drivers/s390/block/dasd_genhd.c  |  1 +
+ drivers/s390/block/dasd_int.h    | 10 +++++
+ 7 files changed, 91 insertions(+), 32 deletions(-)
+
+-- 
+2.17.1
+
