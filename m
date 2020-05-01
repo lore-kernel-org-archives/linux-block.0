@@ -2,64 +2,97 @@ Return-Path: <SRS0=jnOf=6P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A12C47257
-	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 15:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD287C47253
+	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 15:40:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8B342173E
-	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 15:36:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gUq93X7u"
+	by mail.kernel.org (Postfix) with ESMTP id A8B0C24957
+	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 15:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588347654;
+	bh=0j6iKzudNGaTWFi+ujr0qfeHuN6vDP8imrT9T+Alri4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=jA5ItH49pySc70Xx0jm1N5DiUKfOv2xKiO6VPLfRBWO5vfgwU8yQ/K0JZBOWZgC1v
+	 oovHAgXt/LxKNmRpYV928omg1R15gizB+VhZCCRjUI6gfgaQpKz8jZViWiw2Cxl5r7
+	 rVNVnZPQGJXG/2sHEllX1iCUEDpaciQ6euYdwwPw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729374AbgEAPgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 May 2020 11:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729192AbgEAPgA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 May 2020 11:36:00 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B95FEC061A0C;
-        Fri,  1 May 2020 08:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HsrfycC9F4gKazlY38RjqD/p4LVNAXXHW9C6abpgCD4=; b=gUq93X7ub8035oC97Ilk3m/Oje
-        QO28Jw9UtfshJEL1j7z4GkCeUtAeGUe3nwbyYz7rdav/6UzfN4WriB/Chnc4DtD4D+oB52TvqrdP5
-        5bIm8qgpd5B1H5ITfQl61+enY8j4KQ1xvx+ergx5pObGzDMU5b+ctje6L1tlDCCdXxd8f/VvasYAR
-        VHDzsN0kXZ6dA3Codnydpt0fyWNQWzi0A4YWRM9dJ/Hj4/eTucDnmHfIR+9Te05t3cNLIsMXj/hne
-        CGF3jp1gz2X8UQW74diVJJsxM9wTOTCPvSlLpQ0HpAraVWUHiaXRcGd3IxEMYfHRm+SRyRPkRslfu
-        O5t1EV5Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jUXho-0006lH-Gd; Fri, 01 May 2020 15:36:00 +0000
-Date:   Fri, 1 May 2020 08:36:00 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-block@vger.kernel.org, Willy Tarreau <w@1wt.eu>,
-        Christoph Hellwig <hch@infradead.org>,
-        Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] floppy: add FD_AUTODETECT_SIZE define for struct
- floppy_drive_params
-Message-ID: <20200501153600.GC12469@infradead.org>
-References: <20200501134416.72248-1-efremov@linux.com>
- <20200501134416.72248-3-efremov@linux.com>
+        id S1729037AbgEAPky (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 May 2020 11:40:54 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40644 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729022AbgEAPkx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 May 2020 11:40:53 -0400
+Received: by mail-pg1-f195.google.com with SMTP id n16so4701410pgb.7;
+        Fri, 01 May 2020 08:40:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=EZb14EGk3wI78w7Kr9UulRwJ6g15wvU8vvLNiIxNBjg=;
+        b=p85/pEcepwCvDEMMuhC3JtSmlyDv7wucv6fCJKJoOAAIKM5hQv/D2z5jGvE+6W5T4E
+         YYGCEgIVBwjV1fuaCg9+9NVvz8GhxVXEUMpRychYvBIT2xpm6UkCcDidhbecyQ8D+7EX
+         ZUIbf3hQcjZfr1UdnSWEkKswDIJ9/tHKD7Hjx1qUalMvC3XLu4UE/NE5KXyfZ9lgjq6o
+         2mrC40+CCN8tbjPTGqNJGv9H2kD4b1hDspIlLA2KsJ7rYULRTaTTrzuyLmEYn0+AZplA
+         pBuQEnGASwnvZVIsOqRb1hqd8S4Vs5Vdj+U61MimKImtAgSR6V4aaW+sYh7005ldgPxu
+         HnTQ==
+X-Gm-Message-State: AGi0Pub6twUk4nU1LhE4DOeW5krnmdLe7No9nNSaImdTiODX4mkORswY
+        TKQUbYSrc7un02EG6VBDWq0=
+X-Google-Smtp-Source: APiQypIKENGcjQ8wEJnG/jVN4jklP+/LYCHW7WJrZ1nUigoylvteSvXK0XEmW6rptAeYZk2lCgDJWg==
+X-Received: by 2002:a63:3d05:: with SMTP id k5mr4023956pga.302.1588347652702;
+        Fri, 01 May 2020 08:40:52 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id p65sm2305859pgp.51.2020.05.01.08.40.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2020 08:40:51 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id D6D414046C; Fri,  1 May 2020 15:40:50 +0000 (UTC)
+Date:   Fri, 1 May 2020 15:40:50 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Greg KH <gregkh@linuxfoundation.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bvanassche@acm.org, rostedt@goodmis.org,
+        mingo@redhat.com, jack@suse.cz, ming.lei@redhat.com,
+        nstange@suse.de, akpm@linux-foundation.org, mhocko@suse.com,
+        yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/6] blktrace: break out of blktrace setup on
+ concurrent calls
+Message-ID: <20200501154050.GO11244@42.do-not-panic.com>
+References: <20200429074627.5955-1-mcgrof@kernel.org>
+ <20200429074627.5955-6-mcgrof@kernel.org>
+ <20200429094937.GB2081185@kroah.com>
+ <20200501150626.GM11244@42.do-not-panic.com>
+ <20200501153423.GA12469@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200501134416.72248-3-efremov@linux.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200501153423.GA12469@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 01, 2020 at 04:44:14PM +0300, Denis Efremov wrote:
-> Use FD_AUTODETECT_SIZE for autodetect buffer size in struct
-> floppy_drive_params instead of a magic number.
+On Fri, May 01, 2020 at 08:34:23AM -0700, Christoph Hellwig wrote:
+> On Fri, May 01, 2020 at 03:06:26PM +0000, Luis Chamberlain wrote:
+> > > You have access to a block device here, please use dev_warn() instead
+> > > here for that, that makes it obvious as to what device a "concurrent
+> > > blktrace" was attempted for.
+> > 
+> > The block device may be empty, one example is for scsi-generic, but I'll
+> > use buts->name.
+> 
+> Is blktrace on /dev/sg something we intentionally support, or just by
+> some accident of history?  Given all the pains it causes I'd be tempted
+> to just remove the support and see if anyone screams.
 
-Looks good,
+From what I can tell I think it was a historic and brutal mistake. I am
+more than happy to remove it.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Re-adding support would just be a symlink.
+
+  Luis
