@@ -2,99 +2,96 @@ Return-Path: <SRS0=jnOf=6P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D06C47253
-	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 11:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23C3C4724C
+	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 13:44:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AAC5C20757
-	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 11:33:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="u2Fn21QM"
+	by mail.kernel.org (Postfix) with ESMTP id B089C216FD
+	for <linux-block@archiver.kernel.org>; Fri,  1 May 2020 13:44:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728659AbgEALd0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 May 2020 07:33:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728581AbgEALdZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 May 2020 07:33:25 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A61C061A0C
-        for <linux-block@vger.kernel.org>; Fri,  1 May 2020 04:33:23 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id f18so2299146lja.13
-        for <linux-block@vger.kernel.org>; Fri, 01 May 2020 04:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GLXTIf6sR5xPtNtzDzFOIjNOdFUZv31CNDN3CIrYk74=;
-        b=u2Fn21QMaMPaZhF3+p+phpGjItMvJ1fijPvTZnhWnBQ3Kl2NkKZ5DUcXIzboWaIEpq
-         PHc7d76JBxNUX5u/aYisCd6toonq3zSOF/ex2HXvg3IoiL8y/yh4H2s+lAIWpquRciYA
-         xCHQvMC7Qd+ijRUZkez2UtctZ9S6/th8SKbPTj/ZGKoJbOCC+u6O/UQvFBCgR5nAbISH
-         TVdWz40fnaVIaXSFGCvZqNiefervOGniYKEr0SmaLZ72q9G0oRni14BDVvt8mwv9tWwI
-         M4MqgyKsvuj8xpLN4bDmoV9q+0fCYbIqRqjK21n2KFbY9LknNXTRUI3SjvIgTaXGvDWR
-         GR3Q==
+        id S1731771AbgEANoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 May 2020 09:44:46 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:36174 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731770AbgEANop (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 May 2020 09:44:45 -0400
+Received: by mail-lj1-f194.google.com with SMTP id u15so2664127ljd.3;
+        Fri, 01 May 2020 06:44:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GLXTIf6sR5xPtNtzDzFOIjNOdFUZv31CNDN3CIrYk74=;
-        b=GA6bn6xFGltEbDdMvGczUeRGTmo25QA/9H8+dXZYSemDTjUU1kSXeL6Hfz84WUGlZ4
-         FVyxVWrBafYnNO9gdMD4N0CHfyN0pcDWEDZijxAOnqgco22umCzHIwvdIMOJzKtaFy6s
-         QGaZdU29xbl0d6CVT9Sh/2hzPA5+Ao5KB1Tgt+xMc9afLddye65YZlzXZQzZyJa6tWlU
-         mi3G7/+LRlJ5uwGOut8TEhthmxkLdEdWSxhyZNPdk3e/vldQnC29R8nn2qkVgbKddvYN
-         GiSYS1MfO4/M4qGhRen0asJ7CCGUxxV96Odfeoq065+ChKUu6c2/pUh2kyFonOCpCarw
-         ehDQ==
-X-Gm-Message-State: AGi0PuZ/pnyeRffNRNyBb0sv0Oj4np9MP/heMR2nxYwD/0XmzvqnfYVo
-        XXiR29EGim3eu8J2i3BUkCIEdyF02xHVdy4CCkJcCQ==
-X-Google-Smtp-Source: APiQypLl1X0WceEbqV3CCseqAkA/BN/GLFhmaw9zT23HVad8Rb4QtYfdfJzDvxOQ7nGW4agmDAH/UpYKT6hStRyKGLQ=
-X-Received: by 2002:a2e:9f13:: with SMTP id u19mr2242405ljk.42.1588332802396;
- Fri, 01 May 2020 04:33:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fufigKI63pVyUaq3ivgITv7pbSzOzXF6p0tNBdZRj2M=;
+        b=Kc14vMhsTa0Rg8ljOV1XNnvTefZ0J1Tqkg4i6kZf+k3ok4YHQuhZ2uJ0sSNFxq64AQ
+         /VxODNDpaZspnv0issrQspLi2zNro8YvGqSw+RWEvFGVJRMhFnFxET24Vbl1Va7pz9Un
+         oSdZfTWPv+EyXAREh0xxoPPlE4f2bSvEL63Z6opawq/ngHa9HEXwkxK7ELN6lnoH+iib
+         vaEeqxooV8MRkYeiAz26tHhkjusem03q22gvCNvnTtYl4b9FhLTFoZWErIFd0iAO6S/v
+         BAgeoSfa4WfPZU4/MiYnDUNMHYVH9IXZ9QscwurH42k035l8Nl9wyrjo9b24DU2zqV17
+         Y9Vw==
+X-Gm-Message-State: AGi0PuYAcCnhcEumIY7wE3UYR6jER8sRfckqnDTHgxWRvjrZOmGW8sS0
+        Y3H+vTcHT8Y4FhwXhqb9MeKr61XOAOA=
+X-Google-Smtp-Source: APiQypLo9C82ia9SxfYVZ0sEooi2E7ScJlipjbSBikdjMFaputKL+PfdMhPwCiTxqEMNHBS7o4alKQ==
+X-Received: by 2002:a2e:a37b:: with SMTP id i27mr2363790ljn.36.1588340682811;
+        Fri, 01 May 2020 06:44:42 -0700 (PDT)
+Received: from localhost.localdomain ([213.87.150.177])
+        by smtp.googlemail.com with ESMTPSA id b2sm2269194lfi.14.2020.05.01.06.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2020 06:44:42 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     linux-block@vger.kernel.org
+Cc:     Denis Efremov <efremov@linux.com>, Willy Tarreau <w@1wt.eu>,
+        Christoph Hellwig <hch@infradead.org>,
+        Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/4] floppy: suppress UBSAN warning in setup_rw_floppy()
+Date:   Fri,  1 May 2020 16:44:12 +0300
+Message-Id: <20200501134416.72248-1-efremov@linux.com>
+X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
-References: <20200429140341.13294-1-maco@android.com> <20200429140341.13294-2-maco@android.com>
- <20200429141229.GE700644@T590>
-In-Reply-To: <20200429141229.GE700644@T590>
-From:   Martijn Coenen <maco@android.com>
-Date:   Fri, 1 May 2020 13:33:11 +0200
-Message-ID: <CAB0TPYHSbjDGRHdvBRf-=WWtLP3T30Hx_hMOOera376DmATQgg@mail.gmail.com>
-Subject: Re: [PATCH v4 01/10] loop: Factor out loop size validation
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Narayan Kamath <narayan@google.com>,
-        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
-        Martijn Coenen <maco@google.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+These patches are based on Willy's cleanup patches
+https://lkml.org/lkml/2020/3/31/609.
 
-On Wed, Apr 29, 2020 at 4:12 PM Ming Lei <ming.lei@redhat.com> wrote:
-> Now sector_t has been switched to u64 unconditionally, do we still need such
-> validation?
+The first patch removes pr_cont() in setup_DMA() and prints the contents of
+cmd buffer with print_hex_dump(). The last patch also touches these lines
+and changes cmd buffer to fullcmd. The 2,3 patches introduce defines to
+make it more clear why cmd_count in struct floppy_raw_cmd allows
+out-of-bounds access for cmd, reply_count, reply fields. Last patch
+handles the warning.
 
-I think you're right; I hadn't seen that change, but truncating
-because of sector_t shouldn't be an issue anymore. I wondered if we
-could actually have a smaller loff_t, but looks like that is 'long
-long', which should always be 8 bytes as well. I might send this as a
-separate patch, I don't want to drag this series on for too long.
+There is the checkpatch warning because of the line length 81 > 80 in
+the definition of valid_floppy_drive_params(). This function
+intentionally uses autodetect[8] as argument to highlight that this
+is exactly the autodetect field from structs floppy_drive_params and
+compat_floppy_drive_params. I think that this warning is not a big
+problem since next function definition is 85 chars long and whole
+driver requires "restyling".
 
-Thanks,
-Martijn
+Changes in v3:
+ - fix indentation in the second patch
+ - remove FD_RAW_REPLY_SIZE from print_hex_dump() in the third patch
 
->
->
-> Thanks,
-> Ming
->
->
+Changes in v2:
+ - add FD_RAW_CMD_FULLSIZE to the second patch
+ - add union with fullcmd to struct floppy_raw_cmd in the last patch
+
+Denis Efremov (4):
+  floppy: use print_hex_dump() in setup_DMA()
+  floppy: add FD_AUTODETECT_SIZE define for struct floppy_drive_params
+  floppy: add defines for sizes of cmd & reply buffers of floppy_raw_cmd
+  floppy: suppress UBSAN warning in setup_rw_floppy()
+
+ drivers/block/floppy.c  | 39 ++++++++++++++-------------------------
+ include/uapi/linux/fd.h | 26 ++++++++++++++++++++++----
+ 2 files changed, 36 insertions(+), 29 deletions(-)
+
+-- 
+2.25.3
+
