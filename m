@@ -7,42 +7,43 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D75C3A5A9
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70CBAC3A5A9
+	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1ECC620757
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47D762137B
+	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJKkMKv+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aAf3WWNd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726580AbgEBX4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 May 2020 19:56:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29386 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbgEBX4L (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 May 2020 19:56:11 -0400
+        id S1726587AbgEBX4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 May 2020 19:56:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35819 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725798AbgEBX4S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 May 2020 19:56:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588463770;
+        s=mimecast20190719; t=1588463776;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ALPAdvtUh5zZQ0CekDAR2jJsyxPgrFmti13KYPrz2fU=;
-        b=AJKkMKv+e1mySYT0T9bc16TMN3Jo6z8A/hEUW+yZfnkeugL6Ty+/s46Oz6E+wqP9FXK4HU
-        8hcLpYftU8kmLxoSlxAv7+hcB05FbquYK1yaFFrNGu7+qeOHics775DUre0qjErR7mlCFJ
-        6RBZWTQFSzX48jN+UdMkcvPzfZuOZso=
+        bh=fPQPfCG9JPbAFPbDPYgzhBfBf5xwjmeYNQuoIFyRJNk=;
+        b=aAf3WWNdJhgbFLTEw7XU1UV4KtfIFOw6a7FlLEifTmmGJuKjQlq1PZdqhjvkgqa2sD4T6j
+        oaLpSa8gNGfuzYkUebp5mV1l5kA2M3MmYXriWFRQMFR+NokfdCWqY6ENUsyVaz3WkN/LEr
+        /Hen1tTizNbQ5HSBPq9JYet7JE2G8nA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-OP0JVzyqMZC5S6kqtPqvXg-1; Sat, 02 May 2020 19:56:08 -0400
-X-MC-Unique: OP0JVzyqMZC5S6kqtPqvXg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-190-2loDGNlqMo--yeMp3VqWrw-1; Sat, 02 May 2020 19:56:01 -0400
+X-MC-Unique: 2loDGNlqMo--yeMp3VqWrw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E251345F;
-        Sat,  2 May 2020 23:56:06 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07B3F80058A;
+        Sat,  2 May 2020 23:56:00 +0000 (UTC)
 Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC4E26B8D7;
-        Sat,  2 May 2020 23:56:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2408A61526;
+        Sat,  2 May 2020 23:55:54 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,97 +52,238 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V9 09/11] blk-mq: add blk_mq_hctx_handle_dead_cpu for handling cpu dead
-Date:   Sun,  3 May 2020 07:54:52 +0800
-Message-Id: <20200502235454.1118520-10-ming.lei@redhat.com>
+Subject: [PATCH V9 08/11] block: add blk_end_flush_machinery
+Date:   Sun,  3 May 2020 07:54:51 +0800
+Message-Id: <20200502235454.1118520-9-ming.lei@redhat.com>
 In-Reply-To: <20200502235454.1118520-1-ming.lei@redhat.com>
 References: <20200502235454.1118520-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add helper of blk_mq_hctx_handle_dead_cpu for handling cpu dead,
-and prepare for handling inactive hctx.
+Flush requests aren't same with normal FS request:
 
-No functional change.
+1) one dedicated per-hctx flush rq is pre-allocated for sending flush req=
+uest
+
+2) flush request si issued to hardware via one machinary so that flush me=
+rge
+can be applied
+
+We can't simply re-submit flush rqs via blk_steal_bios(), so add
+blk_end_flush_machinery to collect flush requests which needs to
+be resubmitted:
+
+- if one flush command without DATA is enough, send one flush, complete t=
+his
+kind of requests
+
+- otherwise, add the request into a list and let caller re-submit it.
 
 Cc: John Garry <john.garry@huawei.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ block/blk-flush.c | 123 +++++++++++++++++++++++++++++++++++++++++++---
+ block/blk.h       |   4 ++
+ 2 files changed, 120 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4a2250ac4fbb..73e1a1d4c1c5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2382,22 +2382,13 @@ static int blk_mq_hctx_notify_online(unsigned int=
- cpu, struct hlist_node *node)
- 	return 0;
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 977edf95d711..745d878697ed 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -170,10 +170,11 @@ static void blk_flush_complete_seq(struct request *=
+rq,
+ 	unsigned int cmd_flags;
+=20
+ 	BUG_ON(rq->flush.seq & seq);
+-	rq->flush.seq |=3D seq;
++	if (!error)
++		rq->flush.seq |=3D seq;
+ 	cmd_flags =3D rq->cmd_flags;
+=20
+-	if (likely(!error))
++	if (likely(!error && !fq->flush_queue_terminating))
+ 		seq =3D blk_flush_cur_seq(rq);
+ 	else
+ 		seq =3D REQ_FSEQ_DONE;
+@@ -200,9 +201,15 @@ static void blk_flush_complete_seq(struct request *r=
+q,
+ 		 * normal completion and end it.
+ 		 */
+ 		BUG_ON(!list_empty(&rq->queuelist));
+-		list_del_init(&rq->flush.list);
+-		blk_flush_restore_request(rq);
+-		blk_mq_end_request(rq, error);
++
++		/* Terminating code will end the request from flush queue */
++		if (likely(!fq->flush_queue_terminating)) {
++			list_del_init(&rq->flush.list);
++			blk_flush_restore_request(rq);
++			blk_mq_end_request(rq, error);
++		} else {
++			list_move_tail(&rq->flush.list, pending);
++		}
+ 		break;
+=20
+ 	default:
+@@ -279,7 +286,8 @@ static void blk_kick_flush(struct request_queue *q, s=
+truct blk_flush_queue *fq,
+ 	struct request *flush_rq =3D fq->flush_rq;
+=20
+ 	/* C1 described at the top of this file */
+-	if (fq->flush_pending_idx !=3D fq->flush_running_idx || list_empty(pend=
+ing))
++	if (fq->flush_pending_idx !=3D fq->flush_running_idx ||
++			list_empty(pending) || fq->flush_queue_terminating)
+ 		return;
+=20
+ 	/* C2 and C3
+@@ -331,7 +339,7 @@ static void mq_flush_data_end_io(struct request *rq, =
+blk_status_t error)
+ 	struct blk_flush_queue *fq =3D blk_get_flush_queue(q, ctx);
+=20
+ 	if (q->elevator) {
+-		WARN_ON(rq->tag < 0);
++		WARN_ON(rq->tag < 0 && !fq->flush_queue_terminating);
+ 		blk_mq_put_driver_tag(rq);
+ 	}
+=20
+@@ -503,3 +511,104 @@ void blk_free_flush_queue(struct blk_flush_queue *f=
+q)
+ 	kfree(fq->flush_rq);
+ 	kfree(fq);
  }
-=20
--/*
-- * 'cpu' is going away. splice any existing rq_list entries from this
-- * software queue to the hw queue dispatch list, and ensure that it
-- * gets run.
-- */
--static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
-node)
-+static void blk_mq_hctx_handle_dead_cpu(struct blk_mq_hw_ctx *hctx,
-+		unsigned int cpu)
- {
--	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
--			struct blk_mq_hw_ctx, cpuhp_dead);
- 	struct blk_mq_ctx *ctx;
- 	LIST_HEAD(tmp);
- 	enum hctx_type type;
-=20
--	if (!cpumask_test_cpu(cpu, hctx->cpumask))
--		return 0;
--
- 	ctx =3D __blk_mq_get_ctx(hctx->queue, cpu);
- 	type =3D hctx->type;
-=20
-@@ -2409,13 +2400,27 @@ static int blk_mq_hctx_notify_dead(unsigned int c=
-pu, struct hlist_node *node)
- 	spin_unlock(&ctx->lock);
-=20
- 	if (list_empty(&tmp))
--		return 0;
++
++static void __blk_end_queued_flush(struct blk_flush_queue *fq,
++		unsigned int queue_idx, struct list_head *resubmit_list,
++		struct list_head *flush_list)
++{
++	struct list_head *queue =3D &fq->flush_queue[queue_idx];
++	struct request *rq, *nxt;
++
++	list_for_each_entry_safe(rq, nxt, queue, flush.list) {
++		unsigned int seq =3D blk_flush_cur_seq(rq);
++
++		list_del_init(&rq->flush.list);
++		blk_flush_restore_request(rq);
++		if (!blk_rq_sectors(rq) || seq =3D=3D REQ_FSEQ_POSTFLUSH )
++			list_add_tail(&rq->queuelist, flush_list);
++		else
++			list_add_tail(&rq->queuelist, resubmit_list);
++	}
++}
++
++static void blk_end_queued_flush(struct blk_flush_queue *fq,
++		struct list_head *resubmit_list, struct list_head *flush_list)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&fq->mq_flush_lock, flags);
++	__blk_end_queued_flush(fq, 0, resubmit_list, flush_list);
++	__blk_end_queued_flush(fq, 1, resubmit_list, flush_list);
++	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
++}
++
++/* complete requests which just requires one flush command */
++static void blk_complete_flush_requests(struct blk_flush_queue *fq,
++		struct list_head *flush_list)
++{
++	struct block_device *bdev;
++	struct request *rq;
++	int error =3D -ENXIO;
++
++	if (list_empty(flush_list))
 +		return;
-=20
- 	spin_lock(&hctx->lock);
- 	list_splice_tail_init(&tmp, &hctx->dispatch);
- 	spin_unlock(&hctx->lock);
-=20
- 	blk_mq_run_hw_queue(hctx, true);
++
++	rq =3D list_first_entry(flush_list, struct request, queuelist);
++
++	/* Send flush via one active hctx so we can move on */
++	bdev =3D bdget_disk(rq->rq_disk, 0);
++	if (bdev) {
++		error =3D blkdev_issue_flush(bdev, GFP_KERNEL, NULL);
++		bdput(bdev);
++	}
++
++	while (!list_empty(flush_list)) {
++		rq =3D list_first_entry(flush_list, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		blk_mq_end_request(rq, error);
++	}
 +}
 +
 +/*
-+ * 'cpu' is going away. splice any existing rq_list entries from this
-+ * software queue to the hw queue dispatch list, and ensure that it
-+ * gets run.
++ * Called when this hctx is inactive and all CPUs of this hctx is dead,
++ * otherwise don't reuse this function.
++ *
++ * Terminate this hw queue's flush machinery, and try to complete flush
++ * IO requests if possible, such as any flush IO without data, or flush
++ * data IO in POSTFLUSH stage. Otherwise, add the flush IOs into @list
++ * and let caller to re-submit them.
 + */
-+static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
-node)
++void blk_end_flush_machinery(struct blk_mq_hw_ctx *hctx,
++		struct list_head *in, struct list_head *out)
 +{
-+	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_dead);
++	LIST_HEAD(resubmit_list);
++	LIST_HEAD(flush_list);
++	struct blk_flush_queue *fq =3D hctx->fq;
++	struct request *rq, *nxt;
++	unsigned long flags;
 +
-+	if (cpumask_test_cpu(cpu, hctx->cpumask))
-+		blk_mq_hctx_handle_dead_cpu(hctx, cpu);
- 	return 0;
- }
++	spin_lock_irqsave(&fq->mq_flush_lock, flags);
++	fq->flush_queue_terminating =3D 1;
++	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
++
++	/* End inflight flush requests */
++	list_for_each_entry_safe(rq, nxt, in, queuelist) {
++		WARN_ON(!(rq->rq_flags & RQF_FLUSH_SEQ));
++		list_del_init(&rq->queuelist);
++		rq->end_io(rq, BLK_STS_AGAIN);
++	}
++
++	/* End queued requests */
++	blk_end_queued_flush(fq, &resubmit_list, &flush_list);
++
++	/* Send flush and complete requests which just need one flush req */
++	blk_complete_flush_requests(fq, &flush_list);
++
++	spin_lock_irqsave(&fq->mq_flush_lock, flags);
++	/* reset flush queue so that it is ready to work next time */
++	fq->flush_pending_idx =3D fq->flush_running_idx =3D 0;
++	fq->flush_queue_terminating =3D 0;
++	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
++
++	list_splice_init(&resubmit_list, out);
++}
+diff --git a/block/blk.h b/block/blk.h
+index 591cc07e40f9..133fb0b99759 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -20,6 +20,7 @@ struct blk_flush_queue {
+ 	unsigned int		flush_queue_delayed:1;
+ 	unsigned int		flush_pending_idx:1;
+ 	unsigned int		flush_running_idx:1;
++	unsigned int		flush_queue_terminating:1;
+ 	blk_status_t 		rq_status;
+ 	unsigned long		flush_pending_since;
+ 	struct list_head	flush_queue[2];
+@@ -454,4 +455,7 @@ int __bio_add_pc_page(struct request_queue *q, struct=
+ bio *bio,
+ 		struct page *page, unsigned int len, unsigned int offset,
+ 		bool *same_page);
 =20
++void blk_end_flush_machinery(struct blk_mq_hw_ctx *hctx,
++		struct list_head *in, struct list_head *out);
++
+ #endif /* BLK_INTERNAL_H */
 --=20
 2.25.2
 
