@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF692C3A5A9
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FEBC47257
+	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:55:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B917A20721
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:55:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91CD920721
+	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:55:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y23fFyub"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUojJOB8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726570AbgEBXzz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 May 2020 19:55:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28871 "EHLO
+        id S1726579AbgEBXz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 May 2020 19:55:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20227 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725798AbgEBXzz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 May 2020 19:55:55 -0400
+        with ESMTP id S1725798AbgEBXz4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 May 2020 19:55:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588463753;
+        s=mimecast20190719; t=1588463755;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4cYmu8u7Su/YfxI55lR2XgTo3nEgPIwvTivtINlM90A=;
-        b=Y23fFyubpw4a2l7oMEAY1mLXNpdflMGQfJZUcNGXkzdPh8vt1yVlAT09Zx5fZXyX+3GawI
-        cylVJ5KZdDs6WvckiIo4HhF55/80hdzur0NmHq0SwNY+S0U4gFt564CiGOtnhM2vAZt0vu
-        4OTsyVj/B4ULRTX6Vg6soamY8rpc3FA=
+        bh=jmiZH921k9UZn6ArAL1L3ESjAJcRXKac7zyRsLtPvWg=;
+        b=fUojJOB8gDtHxVcI6PipthHLVvPDQTc+rCZxMGdaZvicdlmQbxfqkAZz6rz/gn/OFceWJ7
+        fOSW396l5794Mq57Q1kABlTQxmMkuLInnuFOIyrvJw3LUhb65obCCQUEvG9gQFCTeEb4bL
+        E8M1FYaNjOp7BG1TP0D8wV1/IejBlQ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-4OzhKVm1OW2QX_uy5z9-1g-1; Sat, 02 May 2020 19:55:47 -0400
-X-MC-Unique: 4OzhKVm1OW2QX_uy5z9-1g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-158-d9mbVnlpPZuIu0wfVk5yDw-1; Sat, 02 May 2020 19:55:53 -0400
+X-MC-Unique: d9mbVnlpPZuIu0wfVk5yDw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65AEB87308F;
-        Sat,  2 May 2020 23:55:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D6A287308F;
+        Sat,  2 May 2020 23:55:52 +0000 (UTC)
 Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8610260612;
-        Sat,  2 May 2020 23:55:45 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EF46460C05;
+        Sat,  2 May 2020 23:55:48 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,50 +51,28 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V9 06/11] blk-mq: prepare for draining IO when hctx's all CPUs are offline
-Date:   Sun,  3 May 2020 07:54:49 +0800
-Message-Id: <20200502235454.1118520-7-ming.lei@redhat.com>
+Subject: [PATCH V9 07/11] blk-mq: stop to handle IO and drain IO before hctx becomes inactive
+Date:   Sun,  3 May 2020 07:54:50 +0800
+Message-Id: <20200502235454.1118520-8-ming.lei@redhat.com>
 In-Reply-To: <20200502235454.1118520-1-ming.lei@redhat.com>
 References: <20200502235454.1118520-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
-up queue mapping. Thomas mentioned the following point[1]:
+Before one CPU becomes offline, check if it is the last online CPU of hct=
+x.
+If yes, mark this hctx as inactive, meantime wait for completion of all
+in-flight IOs originated from this hctx. Meantime check if this hctx has
+become inactive in blk_mq_get_driver_tag(), if yes, release the
+allocated tag.
 
-"
- That was the constraint of managed interrupts from the very beginning:
-
-  The driver/subsystem has to quiesce the interrupt line and the associat=
-ed
-  queue _before_ it gets shutdown in CPU unplug and not fiddle with it
-  until it's restarted by the core when the CPU is plugged in again.
-"
-
-However, current blk-mq implementation doesn't quiesce hw queue before
-the last CPU in the hctx is shutdown. Even worse, CPUHP_BLK_MQ_DEAD is
-one cpuhp state handled after the CPU is down, so there isn't any chance
-to quiesce hctx for blk-mq wrt. CPU hotplug.
-
-Add new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE for blk-mq to stop queues
-and wait for completion of in-flight requests.
-
-We will stop hw queue and wait for completion of in-flight requests
-when one hctx is becoming dead in the following patch. This way may
-cause dead-lock for some stacking blk-mq drivers, such as dm-rq and
-loop.
-
-Add blk-mq flag of BLK_MQ_F_NO_MANAGED_IRQ and mark it for dm-rq and
-loop, so we needn't to wait for completion of in-flight requests from
-dm-rq & loop, then the potential dead-lock can be avoided.
-
-[1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.180=
-2@nanos.tec.linutronix.de/
+This way guarantees that there isn't any inflight IO before shutdowning
+the managed IRQ line when all CPUs of this IRQ line is offline.
 
 Cc: John Garry <john.garry@huawei.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
@@ -103,142 +81,247 @@ Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c     |  1 +
- block/blk-mq.c             | 19 +++++++++++++++++++
- drivers/block/loop.c       |  2 +-
- drivers/md/dm-rq.c         |  2 +-
- include/linux/blk-mq.h     |  3 +++
- include/linux/cpuhotplug.h |  1 +
- 6 files changed, 26 insertions(+), 2 deletions(-)
+ block/blk-mq-debugfs.c |   1 +
+ block/blk-mq.c         | 124 +++++++++++++++++++++++++++++++++++++----
+ include/linux/blk-mq.h |   3 +
+ 3 files changed, 117 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 96b7a35c898a..ddec58743e88 100644
+index ddec58743e88..dc66cb689d2f 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -239,6 +239,7 @@ static const char *const hctx_flag_name[] =3D {
- 	HCTX_FLAG_NAME(TAG_SHARED),
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
-+	HCTX_FLAG_NAME(NO_MANAGED_IRQ),
+@@ -213,6 +213,7 @@ static const char *const hctx_state_name[] =3D {
+ 	HCTX_STATE_NAME(STOPPED),
+ 	HCTX_STATE_NAME(TAG_ACTIVE),
+ 	HCTX_STATE_NAME(SCHED_RESTART),
++	HCTX_STATE_NAME(INACTIVE),
  };
- #undef HCTX_FLAG_NAME
+ #undef HCTX_STATE_NAME
 =20
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6569d802e0d8..54c107be7a47 100644
+index 54c107be7a47..4a2250ac4fbb 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2273,6 +2273,16 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, s=
-truct blk_mq_tags *tags,
+@@ -1038,11 +1038,36 @@ static bool __blk_mq_get_driver_tag(struct reques=
+t *rq)
+ 	return true;
+ }
+=20
+-static bool blk_mq_get_driver_tag(struct request *rq)
++static bool blk_mq_get_driver_tag(struct request *rq, bool direct_issue)
+ {
+ 	if (rq->tag !=3D -1)
+ 		return true;
+-	return __blk_mq_get_driver_tag(rq);
++
++	if (!__blk_mq_get_driver_tag(rq))
++		return false;
++	/*
++	 * In case that direct issue IO process is migrated to other CPU
++	 * which may not belong to this hctx, add one memory barrier so we
++	 * can order driver tag assignment and checking BLK_MQ_S_INACTIVE.
++	 * Otherwise, barrier() is enough given both setting BLK_MQ_S_INACTIVE
++	 * and driver tag assignment are run on the same CPU because
++	 * BLK_MQ_S_INACTIVE is only set after the last CPU of this hctx is
++	 * becoming offline.
++	 *
++	 * Process migration might happen after the check on current processor
++	 * id, smp_mb() is implied by processor migration, so no need to worry
++	 * about it.
++	 */
++	if (unlikely(direct_issue && rq->mq_ctx->cpu !=3D raw_smp_processor_id(=
+)))
++		smp_mb();
++	else
++		barrier();
++
++	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))) {
++		blk_mq_put_driver_tag(rq);
++		return false;
++	}
++	return true;
+ }
+=20
+ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+@@ -1091,7 +1116,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_c=
+tx *hctx,
+ 		 * Don't clear RESTART here, someone else could have set it.
+ 		 * At most this will cost an extra queue run.
+ 		 */
+-		return blk_mq_get_driver_tag(rq);
++		return blk_mq_get_driver_tag(rq, false);
+ 	}
+=20
+ 	wait =3D &hctx->dispatch_wait;
+@@ -1117,7 +1142,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_c=
+tx *hctx,
+ 	 * allocation failure and adding the hardware queue to the wait
+ 	 * queue.
+ 	 */
+-	ret =3D blk_mq_get_driver_tag(rq);
++	ret =3D blk_mq_get_driver_tag(rq, false);
+ 	if (!ret) {
+ 		spin_unlock(&hctx->dispatch_wait_lock);
+ 		spin_unlock_irq(&wq->lock);
+@@ -1218,7 +1243,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *=
+q, struct list_head *list,
+ 			break;
+ 		}
+=20
+-		if (!blk_mq_get_driver_tag(rq)) {
++		if (!blk_mq_get_driver_tag(rq, false)) {
+ 			/*
+ 			 * The initial allocation attempt failed, so we need to
+ 			 * rerun the hardware queue when a tag is freed. The
+@@ -1250,7 +1275,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *=
+q, struct list_head *list,
+ 			bd.last =3D true;
+ 		else {
+ 			nxt =3D list_first_entry(list, struct request, queuelist);
+-			bd.last =3D !blk_mq_get_driver_tag(nxt);
++			bd.last =3D !blk_mq_get_driver_tag(nxt, false);
+ 		}
+=20
+ 		ret =3D q->mq_ops->queue_rq(hctx, &bd);
+@@ -1864,7 +1889,7 @@ static blk_status_t __blk_mq_try_issue_directly(str=
+uct blk_mq_hw_ctx *hctx,
+ 	if (!blk_mq_get_dispatch_budget(hctx))
+ 		goto insert;
+=20
+-	if (!blk_mq_get_driver_tag(rq)) {
++	if (!blk_mq_get_driver_tag(rq, true)) {
+ 		blk_mq_put_dispatch_budget(hctx);
+ 		goto insert;
+ 	}
+@@ -2273,13 +2298,87 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, =
+struct blk_mq_tags *tags,
  	return -ENOMEM;
  }
 =20
+-static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node=
+ *node)
++struct count_inflight_data {
++	unsigned count;
++	struct blk_mq_hw_ctx *hctx;
++};
++
++static bool blk_mq_count_inflight_rq(struct request *rq, void *data,
++				     bool reserved)
+ {
+-	return 0;
++	struct count_inflight_data *count_data =3D data;
++
++	/*
++	 * Can't check rq's state because it is updated to MQ_RQ_IN_FLIGHT
++	 * in blk_mq_start_request(), at that time we can't prevent this rq
++	 * from being issued.
++	 *
++	 * So check if driver tag is assigned, if yes, count this rq as
++	 * inflight.
++	 */
++	if (rq->tag >=3D 0 && rq->mq_hctx =3D=3D count_data->hctx)
++		count_data->count++;
++
++	return true;
++}
++
++static bool blk_mq_inflight_rq(struct request *rq, void *data,
++			       bool reserved)
++{
++	return rq->tag >=3D 0;
++}
++
++static unsigned blk_mq_tags_inflight_rqs(struct blk_mq_hw_ctx *hctx)
++{
++	struct count_inflight_data count_data =3D {
++		.hctx	=3D hctx,
++	};
++
++	blk_mq_all_tag_busy_iter(hctx->tags, blk_mq_count_inflight_rq,
++			blk_mq_inflight_rq, &count_data);
++	return count_data.count;
++}
++
++static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
++		struct blk_mq_hw_ctx *hctx)
++{
++	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) !=3D cpu)
++		return false;
++	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
++		return false;
++	return true;
+ }
+=20
+ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_nod=
+e *node)
+ {
++	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
++			struct blk_mq_hw_ctx, cpuhp_online);
++
++	if (!cpumask_test_cpu(cpu, hctx->cpumask))
++		return 0;
++
++	if (!blk_mq_last_cpu_in_hctx(cpu, hctx))
++		return 0;
++
++	/*
++	 * Order setting BLK_MQ_S_INACTIVE versus checking rq->tag and rqs[tag]=
+,
++	 * in blk_mq_tags_inflight_rqs.  It pairs with the smp_mb() in
++	 * blk_mq_get_driver_tag.
++	 */
++	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
++	smp_mb__after_atomic();
++	while (blk_mq_tags_inflight_rqs(hctx))
++		msleep(5);
++	return 0;
++}
++
 +static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node=
  *node)
 +{
-+	return 0;
-+}
++	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
++			struct blk_mq_hw_ctx, cpuhp_online);
 +
-+static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_nod=
-e *node)
-+{
-+	return 0;
-+}
-+
- /*
-  * 'cpu' is going away. splice any existing rq_list entries from this
-  * software queue to the hw queue dispatch list, and ensure that it
-@@ -2309,6 +2319,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu=
-, struct hlist_node *node)
-=20
- static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
- {
-+	if (!(hctx->flags & BLK_MQ_F_NO_MANAGED_IRQ))
-+		cpuhp_state_remove_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-+						    &hctx->cpuhp_online);
- 	cpuhp_state_remove_instance_nocalls(CPUHP_BLK_MQ_DEAD,
- 					    &hctx->cpuhp_dead);
- }
-@@ -2368,6 +2381,9 @@ static int blk_mq_init_hctx(struct request_queue *q=
-,
- {
- 	hctx->queue_num =3D hctx_idx;
-=20
-+	if (!(hctx->flags & BLK_MQ_F_NO_MANAGED_IRQ))
-+		cpuhp_state_add_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-+				&hctx->cpuhp_online);
- 	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
-=20
- 	hctx->tags =3D set->tags[hctx_idx];
-@@ -3621,6 +3637,9 @@ static int __init blk_mq_init(void)
- {
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
-+	cpuhp_setup_state_multi(CPUHP_AP_BLK_MQ_ONLINE, "block/mq:online",
-+				blk_mq_hctx_notify_online,
-+				blk_mq_hctx_notify_offline);
++	if (cpumask_test_cpu(cpu, hctx->cpumask))
++		clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
  	return 0;
  }
- subsys_initcall(blk_mq_init);
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index da693e6a834e..784f2e038b55 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2037,7 +2037,7 @@ static int loop_add(struct loop_device **l, int i)
- 	lo->tag_set.queue_depth =3D 128;
- 	lo->tag_set.numa_node =3D NUMA_NO_NODE;
- 	lo->tag_set.cmd_size =3D sizeof(struct loop_cmd);
--	lo->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
-+	lo->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
- 	lo->tag_set.driver_data =3D lo;
 =20
- 	err =3D blk_mq_alloc_tag_set(&lo->tag_set);
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 3f8577e2c13b..5f1ff70ac029 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -547,7 +547,7 @@ int dm_mq_init_request_queue(struct mapped_device *md=
-, struct dm_table *t)
- 	md->tag_set->ops =3D &dm_mq_ops;
- 	md->tag_set->queue_depth =3D dm_get_blk_mq_queue_depth();
- 	md->tag_set->numa_node =3D md->numa_node_id;
--	md->tag_set->flags =3D BLK_MQ_F_SHOULD_MERGE;
-+	md->tag_set->flags =3D BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_NO_MANAGED_IRQ;
- 	md->tag_set->nr_hw_queues =3D dm_get_blk_mq_nr_hw_queues();
- 	md->tag_set->driver_data =3D md;
+@@ -2290,12 +2389,15 @@ static int blk_mq_hctx_notify_offline(unsigned in=
+t cpu, struct hlist_node *node)
+  */
+ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
+node)
+ {
+-	struct blk_mq_hw_ctx *hctx;
++	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
++			struct blk_mq_hw_ctx, cpuhp_dead);
+ 	struct blk_mq_ctx *ctx;
+ 	LIST_HEAD(tmp);
+ 	enum hctx_type type;
+=20
+-	hctx =3D hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
++	if (!cpumask_test_cpu(cpu, hctx->cpumask))
++		return 0;
++
+ 	ctx =3D __blk_mq_get_ctx(hctx->queue, cpu);
+ 	type =3D hctx->type;
 =20
 diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d7307795439a..3763207d88eb 100644
+index 3763207d88eb..77bf861d72ec 100644
 --- a/include/linux/blk-mq.h
 +++ b/include/linux/blk-mq.h
-@@ -140,6 +140,8 @@ struct blk_mq_hw_ctx {
- 	 */
- 	atomic_t		nr_active;
+@@ -403,6 +403,9 @@ enum {
+ 	BLK_MQ_S_TAG_ACTIVE	=3D 1,
+ 	BLK_MQ_S_SCHED_RESTART	=3D 2,
 =20
-+	/** @cpuhp_online: List to store request if CPU is going to die */
-+	struct hlist_node	cpuhp_online;
- 	/** @cpuhp_dead: List to store request if some CPU die. */
- 	struct hlist_node	cpuhp_dead;
- 	/** @kobj: Kernel object for sysfs. */
-@@ -391,6 +393,7 @@ struct blk_mq_ops {
- enum {
- 	BLK_MQ_F_SHOULD_MERGE	=3D 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	=3D 1 << 1,
-+	BLK_MQ_F_NO_MANAGED_IRQ	=3D 1 << 2,
- 	BLK_MQ_F_BLOCKING	=3D 1 << 5,
- 	BLK_MQ_F_NO_SCHED	=3D 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT =3D 8,
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 77d70b633531..24b3a77810b6 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -152,6 +152,7 @@ enum cpuhp_state {
- 	CPUHP_AP_SMPBOOT_THREADS,
- 	CPUHP_AP_X86_VDSO_VMA_ONLINE,
- 	CPUHP_AP_IRQ_AFFINITY_ONLINE,
-+	CPUHP_AP_BLK_MQ_ONLINE,
- 	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
- 	CPUHP_AP_X86_INTEL_EPB_ONLINE,
- 	CPUHP_AP_PERF_ONLINE,
++	/* hw queue is inactive after all its CPUs become offline */
++	BLK_MQ_S_INACTIVE	=3D 3,
++
+ 	BLK_MQ_MAX_DEPTH	=3D 10240,
+=20
+ 	BLK_MQ_CPU_WORK_BATCH	=3D 8,
 --=20
 2.25.2
 
