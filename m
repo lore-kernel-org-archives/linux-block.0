@@ -2,102 +2,116 @@ Return-Path: <SRS0=GZIg=6R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B076C28CBC
-	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 03:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751A6C28CBC
+	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 09:09:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA9A920767
-	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 03:37:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPldElCp"
+	by mail.kernel.org (Postfix) with ESMTP id 4E14520787
+	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 09:09:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588496967;
+	bh=kxtHFfYEuwMXOhI8Am9W2ACuZqr+iqZ7DGprxsKv56g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=0VHGpuKIQ++f8Ws+5Gqz+PwDcpEnNeWfbum3sfEBntXKuKHLH/dprpJS+kGNLfTaZ
+	 Al9jFA+8ohkPblJQe21p/SSdpzX5dSy8EPSiWjvXaJwxEezcMof1inypZ/pSZN4CSN
+	 WpPJ2ph+su3o1srJOKCPyx2H6aKwxwxA1G+ce+wc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbgECDhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 May 2020 23:37:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32630 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726805AbgECDhv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 May 2020 23:37:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588477069;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ih5sJSXDiDITENARHkGGCjTEa7Fn57RFFrfG4x14fLw=;
-        b=cPldElCpJCHcYZS1+DYGKeJN9J/Ul4KgKRCkyOKIkdkAjT0JGHTEOM3QyEf0dI/mqeiGb/
-        Z73UUKK6oZhm9fER/jPXT5lOkvJtC1VEBFkLntv2eOXUVVK/SXodTZWIh2Umkz2N2L9e0N
-        lNpWEtTTOCtt6WOYNRex8K7OXWprdak=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-Neb2c5G8No6g9jD31yZtCQ-1; Sat, 02 May 2020 23:37:42 -0400
-X-MC-Unique: Neb2c5G8No6g9jD31yZtCQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 298EA80B70A;
-        Sun,  3 May 2020 03:37:41 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15CEA60612;
-        Sun,  3 May 2020 03:37:32 +0000 (UTC)
-Date:   Sun, 3 May 2020 11:37:27 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     axboe@kernel.dk, tom.leiming@gmail.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org
-Subject: Re: [RESEND v4 6/6] block: rename blk_mq_alloc_rq_maps
-Message-ID: <20200503033727.GC1128091@T590>
-References: <cover.1588080449.git.zhangweiping@didiglobal.com>
- <35b2fc8a9648ed16c9a465fd43c928d4393d1c4a.1588080449.git.zhangweiping@didiglobal.com>
+        id S1727842AbgECJJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 May 2020 05:09:26 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44519 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726445AbgECJJ0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 May 2020 05:09:26 -0400
+Received: by mail-pg1-f194.google.com with SMTP id l20so7035684pgb.11;
+        Sun, 03 May 2020 02:09:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Pz+7fmmOLiHvlX4Oa/JOFFvJP8vnA71Hx7aLAhOtAu4=;
+        b=SUmNDkSQ0A3u0BOYvFBjYHivpe1MFTFZMMyzm/M6IiSrrWfiP+nRA12eUuO7jAZ770
+         F62VBNynJeHA+WG4ABqmsTfPzYjH/1Tff1DL1RLeqdEA3xrRXPk1wzmbPQYMfMSnfb63
+         OutwncfcWAuePPSk8XjzmUT7hkILB+FeMRLip+aib2Qz9ENDoSJW4VZUjTAPEJjOt9hS
+         ijbqPt+hnOUOHo8+ZSf6rDmJ8LYYZFr3dBX6T27YSp/lzVOKhLXrvCQFs4O0E0tc5hLU
+         bwaQpOnAVqNu/d+dM3I1cOYTEDaK2zJ7D7VScaAxXlWrc6mZWQh6i8DxmAozFv7XZ9Dx
+         ZQsw==
+X-Gm-Message-State: AGi0PuZvph7MqHHPR7jfhfbtnQLuY2lQsGSE9Gqmj/Z+FeeIfYvfpuZ0
+        Kqe5nUICBmgq2ug0xSH16P0=
+X-Google-Smtp-Source: APiQypIdYUfg+5dhTvIoYTyrqqWdYIDeNhDSPlvSkIws0w55SQ7aMbgV4xFiIfN1Yg3LnHw9AHMQzw==
+X-Received: by 2002:a62:7c16:: with SMTP id x22mr12008122pfc.267.1588496965480;
+        Sun, 03 May 2020 02:09:25 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id o99sm3886559pjo.8.2020.05.03.02.09.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 May 2020 02:09:24 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id AD1C640256; Sun,  3 May 2020 09:09:23 +0000 (UTC)
+Date:   Sun, 3 May 2020 09:09:23 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 6/6] loop: be paranoid on exit and prevent new
+ additions / removals
+Message-ID: <20200503090923.GP11244@42.do-not-panic.com>
+References: <20200429074627.5955-1-mcgrof@kernel.org>
+ <20200429074627.5955-7-mcgrof@kernel.org>
+ <20200429095034.GC2081185@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <35b2fc8a9648ed16c9a465fd43c928d4393d1c4a.1588080449.git.zhangweiping@didiglobal.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200429095034.GC2081185@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 09:30:28PM +0800, Weiping Zhang wrote:
-> rename blk_mq_alloc_rq_maps to blk_mq_alloc_map_and_requests,
-> this function allocs both map and request, make function name align
-> with funtion.
+On Wed, Apr 29, 2020 at 11:50:34AM +0200, Greg KH wrote:
+> On Wed, Apr 29, 2020 at 07:46:27AM +0000, Luis Chamberlain wrote:
+> > Be pedantic on removal as well and hold the mutex.
+> > This should prevent uses of addition while we exit.
+> > 
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  drivers/block/loop.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index da693e6a834e..6dccba22c9b5 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -2333,6 +2333,8 @@ static void __exit loop_exit(void)
+> >  
+> >  	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
+> >  
+> > +	mutex_lock(&loop_ctl_mutex);
+> > +
+> >  	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
+> >  	idr_destroy(&loop_index_idr);
+> >  
+> > @@ -2340,6 +2342,8 @@ static void __exit loop_exit(void)
+> >  	unregister_blkdev(LOOP_MAJOR, "loop");
+> >  
+> >  	misc_deregister(&loop_misc);
+> > +
+> > +	mutex_unlock(&loop_ctl_mutex);
+> >  }
+> >  
+> >  module_init(loop_init);
 > 
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> ---
->  block/blk-mq.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b6c907dbbb30..8ae9e375fe53 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3017,7 +3017,7 @@ static int blk_mq_realloc_map_and_requests(struct blk_mq_tag_set *set, int new)
->   * may reduce the depth asked for, if memory is tight. set->queue_depth
->   * will be updated to reflect the allocated depth.
->   */
-> -static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
-> +static int blk_mq_alloc_map_and_requests(struct blk_mq_tag_set *set)
->  {
->  	unsigned int depth;
->  	int err;
-> @@ -3177,7 +3177,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
->  	if (ret)
->  		goto out_free_mq_map;
->  
-> -	ret = blk_mq_alloc_rq_maps(set);
-> +	ret = blk_mq_alloc_map_and_requests(set);
->  	if (ret)
->  		goto out_free_mq_map;
->  
-> -- 
-> 2.18.1
-> 
+> What type of issue is this helping with?  Can it be triggered today?  if
+> so, shouldn't it be backported to stable kernels?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Just code inspection. I can't trigger a userspace test script to crash
+the kernel yet, but suspect a race still does exist.
 
--- 
-Ming
-
+  Luis
