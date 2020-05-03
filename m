@@ -1,220 +1,102 @@
-Return-Path: <SRS0=Yh1G=6Q=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=GZIg=6R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825AFC47247
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41930C3A5A9
+	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 01:44:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62B9820757
-	for <linux-block@archiver.kernel.org>; Sat,  2 May 2020 23:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1254C21835
+	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 01:44:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7uUf1Xy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgfSnaGN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725798AbgEBX4W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 May 2020 19:56:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23427 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726599AbgEBX4W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 May 2020 19:56:22 -0400
+        id S1726686AbgECBoK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 May 2020 21:44:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32677 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726684AbgECBoK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 May 2020 21:44:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588463780;
+        s=mimecast20190719; t=1588470248;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7yiS/4+UH0HFtyS/j7BW3iy+VtDUz4EgaInqbF4vfD4=;
-        b=U7uUf1XyIbc51z+KlRrikClIIUDHfE6MDZyZuWneQonfv9U5tLu3Tlvh/mJ8p/FqHWZBKI
-        HAOYeCSy6OSYRB79DPYkx9Fo6JIj5sYFYyucmtOyKogFvzLjScKeuHXE7aTt6ydAj6EGpE
-        UabqMKbs4xyDRZGe0gU1eifhavw/8zw=
+        bh=GDdv1M7hX8nZEdrcY713baUdG44eVKvPf/toFMXtYiQ=;
+        b=EgfSnaGNuvnauxqNRalNtsjQYtVjYml610zjL6JhooLfg1S/W/VlcRHXX8jafpq0n/D44Q
+        MkZPKlnyq0465JDmVvZOFZ2JvqMnasW9pFTdXsUKvweaRVBmdmVpXbg+/oqRXvT2heaom5
+        dQGvcziyYR80pSAquPXPE+ncbO6UV/s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-NbscUYTcNOeX_GESwzlycQ-1; Sat, 02 May 2020 19:56:14 -0400
-X-MC-Unique: NbscUYTcNOeX_GESwzlycQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-123-cB7eZPHaNHm9pz6liCeauQ-1; Sat, 02 May 2020 21:43:57 -0400
+X-MC-Unique: cB7eZPHaNHm9pz6liCeauQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B42C1005510;
-        Sat,  2 May 2020 23:56:13 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA32D5D9CD;
-        Sat,  2 May 2020 23:56:09 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC0FE80B70B;
+        Sun,  3 May 2020 01:43:55 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 53EEE2B4DF;
+        Sun,  3 May 2020 01:43:48 +0000 (UTC)
+Date:   Sun, 3 May 2020 09:43:43 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V9 10/11] blk-mq: re-submit IO in case that hctx is inactive
-Date:   Sun,  3 May 2020 07:54:53 +0800
-Message-Id: <20200502235454.1118520-11-ming.lei@redhat.com>
-In-Reply-To: <20200502235454.1118520-1-ming.lei@redhat.com>
-References: <20200502235454.1118520-1-ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Salman Qazi <sqazi@google.com>,
+        Jesse Barnes <jsbarnes@google.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/2] block: add blk_default_io_timeout() for avoiding
+ task hung in sync IO
+Message-ID: <20200503014343.GA1120601@T590>
+References: <20200428074657.645441-1-ming.lei@redhat.com>
+ <20200428074657.645441-2-ming.lei@redhat.com>
+ <7e339c3d-8600-4a9b-99bf-24afb023c4dd@acm.org>
+ <20200429011728.GA671522@T590>
+ <61520b08-326d-036b-e69d-08e2cad4d3c8@acm.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <61520b08-326d-036b-e69d-08e2cad4d3c8@acm.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When all CPUs in one hctx are offline and this hctx becomes inactive, we
-shouldn't run this hw queue for completing request any more.
+On Wed, Apr 29, 2020 at 08:08:03PM -0700, Bart Van Assche wrote:
+> On 2020-04-28 18:17, Ming Lei wrote:
+> > On Tue, Apr 28, 2020 at 07:19:33AM -0700, Bart Van Assche wrote:
+> >> On 2020-04-28 00:46, Ming Lei wrote:
+> >>> +/*
+> >>> + * Used in sync IO for avoiding to triger task hung warning, which may
+> >>> + * cause system panic or reboot.
+> >>> + */
+> >>> +static inline unsigned long blk_default_io_timeout(void)
+> >>> +{
+> >>> +	return sysctl_hung_task_timeout_secs * (HZ / 2);
+> >>> +}
+> >>> +
+> >>>  #endif
+> >>
+> >> This function is only used inside the block layer. Has it been
+> >> considered to move this function from the public block layer API into a
+> >> private header file, e.g. block/blk.h?
+> > 
+> > Please look at the commit log or the 2nd patch, and the helper will be
+> > used in 2nd patch in dio code.
+> 
+> Has it been considered to use the expression
+> "sysctl_hung_task_timeout_secs * (HZ / 2)" directly instead of wrapping
+> that expression in a function? I think using the expression directly may
+> be more clear. Additionally, it is slightly confusing that the function
+> name starts with "blk_" but that nothing in the implementation of that
+> function is specific to the block layer.
 
-So allocate request from one live hctx, and clone & resubmit the request,
-either it is from sw queue or scheduler queue.
+Fine, will do it in V2.
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 100 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 73e1a1d4c1c5..3b777d9fd4ee 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2382,6 +2382,98 @@ static int blk_mq_hctx_notify_online(unsigned int =
-cpu, struct hlist_node *node)
- 	return 0;
- }
-=20
-+static void blk_mq_resubmit_end_rq(struct request *rq, blk_status_t erro=
-r)
-+{
-+	struct request *orig_rq =3D rq->end_io_data;
-+
-+	blk_mq_cleanup_rq(orig_rq);
-+	blk_mq_end_request(orig_rq, error);
-+
-+	blk_put_request(rq);
-+}
-+
-+static void blk_mq_resubmit_rq(struct request *rq)
-+{
-+	struct request *nrq;
-+	unsigned int flags =3D 0;
-+	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
-+	struct blk_mq_tags *tags =3D rq->q->elevator ? hctx->sched_tags :
-+		hctx->tags;
-+	bool reserved =3D blk_mq_tag_is_reserved(tags, rq->internal_tag);
-+
-+	if (rq->rq_flags & RQF_PREEMPT)
-+		flags |=3D BLK_MQ_REQ_PREEMPT;
-+	if (reserved)
-+		flags |=3D BLK_MQ_REQ_RESERVED;
-+
-+	/* avoid allocation failure by clearing NOWAIT */
-+	nrq =3D blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
-+	if (!nrq)
-+		return;
-+
-+	blk_rq_copy_request(nrq, rq);
-+
-+	nrq->timeout =3D rq->timeout;
-+	nrq->rq_disk =3D rq->rq_disk;
-+	nrq->part =3D rq->part;
-+
-+	memcpy(blk_mq_rq_to_pdu(nrq), blk_mq_rq_to_pdu(rq),
-+			rq->q->tag_set->cmd_size);
-+
-+	nrq->end_io =3D blk_mq_resubmit_end_rq;
-+	nrq->end_io_data =3D rq;
-+	nrq->bio =3D rq->bio;
-+	nrq->biotail =3D rq->biotail;
-+
-+	if (blk_insert_cloned_request(nrq->q, nrq) !=3D BLK_STS_OK)
-+		blk_mq_request_bypass_insert(nrq, false, true);
-+}
-+
-+static void blk_mq_hctx_deactivate(struct blk_mq_hw_ctx *hctx)
-+{
-+	LIST_HEAD(sched);
-+	LIST_HEAD(re_submit);
-+	LIST_HEAD(flush_in);
-+	LIST_HEAD(flush_out);
-+	struct request *rq, *nxt;
-+	struct elevator_queue *e =3D hctx->queue->elevator;
-+
-+	if (!e) {
-+		blk_mq_flush_busy_ctxs(hctx, &re_submit);
-+	} else {
-+		while ((rq =3D e->type->ops.dispatch_request(hctx))) {
-+			if (rq->mq_hctx !=3D hctx)
-+				list_add(&rq->queuelist, &sched);
-+			else
-+				list_add(&rq->queuelist, &re_submit);
-+		}
-+	}
-+	while (!list_empty(&sched)) {
-+		rq =3D list_first_entry(&sched, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		blk_mq_sched_insert_request(rq, true, true, true);
-+	}
-+
-+	/* requests in dispatch list have to be re-submitted too */
-+	spin_lock(&hctx->lock);
-+	list_splice_tail_init(&hctx->dispatch, &re_submit);
-+	spin_unlock(&hctx->lock);
-+
-+	/* blk_end_flush_machinery will cover flush request */
-+	list_for_each_entry_safe(rq, nxt, &re_submit, queuelist) {
-+		if (rq->rq_flags & RQF_FLUSH_SEQ)
-+			list_move(&rq->queuelist, &flush_in);
-+	}
-+	blk_end_flush_machinery(hctx, &flush_in, &flush_out);
-+	list_splice_tail(&flush_out, &re_submit);
-+
-+	while (!list_empty(&re_submit)) {
-+		rq =3D list_first_entry(&re_submit, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		blk_mq_resubmit_rq(rq);
-+	}
-+}
-+
- static void blk_mq_hctx_handle_dead_cpu(struct blk_mq_hw_ctx *hctx,
- 		unsigned int cpu)
- {
-@@ -2410,17 +2502,20 @@ static void blk_mq_hctx_handle_dead_cpu(struct bl=
-k_mq_hw_ctx *hctx,
- }
-=20
- /*
-- * 'cpu' is going away. splice any existing rq_list entries from this
-- * software queue to the hw queue dispatch list, and ensure that it
-- * gets run.
-+ * @cpu has gone away. If this hctx is inactive, we can't dispatch reque=
-st
-+ * to the hctx any more, so clone and re-submit requests from this hctx
-  */
- static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
-node)
- {
- 	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_dead);
-=20
--	if (cpumask_test_cpu(cpu, hctx->cpumask))
--		blk_mq_hctx_handle_dead_cpu(hctx, cpu);
-+	if (cpumask_test_cpu(cpu, hctx->cpumask)) {
-+		if (test_bit(BLK_MQ_S_INACTIVE, &hctx->state))
-+			blk_mq_hctx_deactivate(hctx);
-+		else
-+			blk_mq_hctx_handle_dead_cpu(hctx, cpu);
-+	}
- 	return 0;
- }
-=20
---=20
-2.25.2
+thanks,
+Ming
 
