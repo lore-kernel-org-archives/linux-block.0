@@ -2,81 +2,84 @@ Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838D8C3A5A9
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB63C4724C
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:16:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53471206A4
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:10:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UONfpzmR"
+	by mail.kernel.org (Postfix) with ESMTP id 3A6FC206E6
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:16:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588608972;
+	bh=K+S2293wHeAgafy2SDse4IKf+ihjDNZZKkwZfEW3uOU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=T8Hi3LmABwn7Ymj9OAPXmVSKY5zfhOR72yt/jHQi/a23JO73UdVLgmbmTs2DXLUw/
+	 7mYkT4FIM0GZPeHYHspn0Gqh+LaE6EhGhvAuviEmcysv+eJDkWWNtgiR38jUhPmkcm
+	 8QsB6u2R+tSqjVO54RBt07v1OzW/c4iFBhhsTfpg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728294AbgEDQKK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 12:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728251AbgEDQKK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 12:10:10 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCB3C061A0E
-        for <linux-block@vger.kernel.org>; Mon,  4 May 2020 09:10:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=IIGYnujbUjOP6Ca3tu+jdAjGkH250qvDplGhSMY5VmM=; b=UONfpzmRAf+mZv2Sk+gREhSn1y
-        409xdODnTCqFT82/+3gLMqnBWDkEgQdLrcOaBKsAbvzrvUOrrRv96naJ9vV4OJ26gBRbNUMSsmWjT
-        uyZ2LRWg4JnRY2iZlwdvK1bvrajwGMcDJIoJnakr3s/hJ+3Mo8qKpade7HgKt2hRgVJ/Il7xGZx1h
-        Fa7nS0ojl8Rf79dDbliYx3DlGZtmT2j4+UOw8Ck8klEqdm6kNCtDyOOVt4MxTCg2aYmumKgFgC0vy
-        3W8BGWTGonKxqrCqa3BK0FICGdCaybXo2Y4VVHYYRwtZ84RdXpHJ3hk3seYdzcsf8y/LxiQudjQSh
-        G9yPmdXQ==;
-Received: from [2001:4bb8:18c:10bd:c70:4a89:bc61:2] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jVdfW-00059n-3F; Mon, 04 May 2020 16:10:10 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: remove the REQ_NOWAIT_INLINE flag
-Date:   Mon,  4 May 2020 18:10:05 +0200
-Message-Id: <20200504161005.2841033-1-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
+        id S1729415AbgEDQQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 12:16:03 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:42511 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729297AbgEDQQD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 12:16:03 -0400
+Received: by mail-pl1-f195.google.com with SMTP id v2so6937241plp.9;
+        Mon, 04 May 2020 09:16:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=2qr/Rk79g2nyCpDovhCY1s+LWpouRn7/uoh4iQYGd3A=;
+        b=bbZ4Z5WpjtQ/DIbg3J0QTujULI9KDWOJo6Z+xzSyFMeQU72ezGxp6NcY9YiO4gPvCk
+         nO2JIi8nlfhW4iu78U6pLD5k7Bq+Mt5wv6t+2syb+shj+9EGpH+hu5z1Jj6zA8f8hKFI
+         TNYQlYBSUJWdYWVoeIGPDdLUMwnH0ZjwkSXcfQzVqhNnsdL84GgwuncyxrnCkQpC1BJl
+         53xPX2G3QVAx3qVvLHuo3YC5gr/IzP/6bTHtl676+QUqVFHOa3+8bgav3pNTzwk6EYXr
+         mg36GidhX73kb2hYzldMleIwBFF347olBGPbQqwOyv40JO1xU5MoSeYYDuNqwtuj/tug
+         HipQ==
+X-Gm-Message-State: AGi0PuZB7L/p0fFPaXActO6Slp6Nimf+b+hUyOgtsvMCXAUuuLOX0uZU
+        eXXR2z01ffzbBPmga1+3PY8=
+X-Google-Smtp-Source: APiQypI11dj1BVZm0pIlZtfQDOMV2Dgjh1v2g/gqiPgsYO6t7Us71OisiFDj5bDWYh1D4JNJCy0RzQ==
+X-Received: by 2002:a17:902:8608:: with SMTP id f8mr9045plo.110.1588608962714;
+        Mon, 04 May 2020 09:16:02 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id h13sm9193057pfk.86.2020.05.04.09.16.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2020 09:16:01 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 8F58F403EA; Mon,  4 May 2020 16:16:00 +0000 (UTC)
+Date:   Mon, 4 May 2020 16:16:00 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [PATCH v3 1/6] block: revert back to synchronous request_queue
+ removal
+Message-ID: <20200504161600.GQ11244@42.do-not-panic.com>
+References: <20200429074627.5955-1-mcgrof@kernel.org>
+ <20200429074627.5955-2-mcgrof@kernel.org>
+ <a2c64413-d0a4-e5c8-e0fa-904285a1189e@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2c64413-d0a4-e5c8-e0fa-904285a1189e@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 2 --
- 1 file changed, 2 deletions(-)
+On Fri, May 01, 2020 at 05:22:12PM -0700, Bart Van Assche wrote:
+> Please fix the spelling errors. Otherwise this patch looks good to me.
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 90895d594e647..7443e474cdad5 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -323,7 +323,6 @@ enum req_flag_bits {
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
- 	__REQ_NOWAIT,           /* Don't wait if request will block */
--	__REQ_NOWAIT_INLINE,	/* Return would-block error inline */
- 	/*
- 	 * When a shared kthread needs to issue a bio for a cgroup, doing
- 	 * so synchronously can lead to priority inversions as the kthread
-@@ -358,7 +357,6 @@ enum req_flag_bits {
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
--#define REQ_NOWAIT_INLINE	(1ULL << __REQ_NOWAIT_INLINE)
- #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
--- 
-2.26.2
+Fixed, thanks for the review.
 
+  Luis
