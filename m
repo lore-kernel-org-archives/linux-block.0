@@ -1,99 +1,79 @@
-Return-Path: <SRS0=GZIg=6R=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 810D9C28CBC
-	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 22:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AD0C28CBC
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 03:02:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CFD5206E9
-	for <linux-block@archiver.kernel.org>; Sun,  3 May 2020 22:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72DC3206E6
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 03:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729156AbgECW2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 May 2020 18:28:16 -0400
-Received: from mail-pj1-f52.google.com ([209.85.216.52]:37913 "EHLO
-        mail-pj1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729151AbgECW2Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 May 2020 18:28:16 -0400
-Received: by mail-pj1-f52.google.com with SMTP id t40so2861998pjb.3
-        for <linux-block@vger.kernel.org>; Sun, 03 May 2020 15:28:16 -0700 (PDT)
+        id S1726404AbgEDDCH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 May 2020 23:02:07 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:49255 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726930AbgEDDCG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 May 2020 23:02:06 -0400
+Received: by mail-io1-f72.google.com with SMTP id z13so11920175iog.16
+        for <linux-block@vger.kernel.org>; Sun, 03 May 2020 20:02:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=VNb3nmcyDAtasiVcFrkJB6HEYcctrEofi/ZSBI7/Z78=;
-        b=MJ+G6dPO2DyxxfHHlRlW3+Z8Rn+0Hl/MZU4+Bep5LyvVSZsDO1NLvX4IQ3aU01nXZ+
-         jznH3r1Z6O1b62af0wb6/LuzzusuStZ5xxmlTGokG8dCxh3EKqqNDXizK7LDeqYg9q2u
-         b8z8V4TwecTfVv6VDdGocc4Z83z8O5J5ySAIzT4UZeXxU51q57c/Quhf8V98Jw7c05tC
-         LVjSUffvoVsWch1ZtYGpH87B2Xkaa/7rklWK3krybaXcFxveUWfpKNTb4yghv9dYVvYj
-         zChOhirfhDQuiXIzRpuirxbqqMQWTBXZt1xoWHg7cDXj/M0SaOnIasAbVQX3oE/ORbGW
-         5m/Q==
-X-Gm-Message-State: AGi0PuYj21ukZQaZYUn67rTVY40wUHpFcFjTx2wX+MV8cISF8F/jM8IY
-        nNRzuwsz0tOTNaJ7GJFHyYE=
-X-Google-Smtp-Source: APiQypLZGXrIdNaJNEBp8F4FKFlvuYgybIumVOCpKt900G6V2lgH6S9EIbKL4dwLc2cF8HKjnfBDFw==
-X-Received: by 2002:a17:90b:3014:: with SMTP id hg20mr13903153pjb.56.1588544895663;
-        Sun, 03 May 2020 15:28:15 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:cbe:bdc0:6452:4260? ([2601:647:4000:d7:cbe:bdc0:6452:4260])
-        by smtp.gmail.com with ESMTPSA id f64sm5240099pjd.5.2020.05.03.15.28.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 May 2020 15:28:14 -0700 (PDT)
-Subject: Re: [PATCH V2] block: add blk_io_schedule() for avoiding task hung in
- sync dio
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
-References: <20200503015422.1123994-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <666e4dbd-1454-0cf3-4855-9e40054bab75@acm.org>
-Date:   Sun, 3 May 2020 15:28:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=VsgFqYSkkd5RuUdbSLmpmT3wYB5MsDwArGNEdSX9o6A=;
+        b=ZHF73b3WELunNE+NLT3WGBfZW1xN7kh97VepTi9DycOL9dunzySx8VcRkPG2GLlZ5E
+         mHZ+92dr+GdXOFtgeNqaYfI0w/hgKxuEZknE7GvoDH+NibJ5rRFUkRjUAj4xPHb5kLNM
+         iTyMr5854kofiryrQX56/PnuLVXD87PkjS1PzyXD/xWjEBv9Wr2ADZ+oexqAgrKOO527
+         nckMZQSZ2d+Sj2Y1p97qh/ADyCUJLF6fwCdrBuwtdO+3rfJz/qkkg0qy3rKILFgEfn6K
+         EFSVsuAEDLiarB1R2yf4++GCLiZJhg6vMbS+8NofU+JW3DymIPuhp0c0TXYfyFqz3O22
+         lxuA==
+X-Gm-Message-State: AGi0PuZxBV/ZF0YKKQsZjuyk00Ay7WpeX0PO9SNlMLITD1kk2ZckGy2f
+        HBwmlR8gDW5OAXorwBiDmnTg7x6c8+oLE6ceIhd0lRJyQera
+X-Google-Smtp-Source: APiQypKVjvGUSvnQLOwHaUNc3oSLx1OL9IDYU+TwsaaCuFKXkqDorCljUIAIiJwrVKP9h2yMm1lLreb2XNEBCIfKdpGQt0q5p9WS
 MIME-Version: 1.0
-In-Reply-To: <20200503015422.1123994-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a6b:4113:: with SMTP id n19mr13759133ioa.187.1588561324819;
+ Sun, 03 May 2020 20:02:04 -0700 (PDT)
+Date:   Sun, 03 May 2020 20:02:04 -0700
+In-Reply-To: <0000000000001b1a1d057e776c92@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007851da05a4c9c169@google.com>
+Subject: Re: WARNING in hsr_addr_subst_dest
+From:   syzbot <syzbot+b92e4f1472a54e1c7dec@syzkaller.appspotmail.com>
+To:     ap420073@gmail.com, arvid.brodin@alten.se, axboe@fb.com,
+        axboe@kernel.dk, davem@davemloft.net, dvyukov@google.com,
+        hch@lst.de, kuba@kernel.org, linux-block@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, mkl@pengutronix.de, netdev@vger.kernel.org,
+        socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-02 18:54, Ming Lei wrote:
-> Sync dio could be big, or may take long time in discard or in case of
-> IO failure.
-> 
-> We have prevented task hung in submit_bio_wait() and blk_execute_rq(),
-> so apply the same trick for prevent task hung from happening in sync dio.
-> 
-> Add helper of blk_io_schedule() and use io_schedule_timeout() to prevent
-> task hung warning.
+syzbot suspects this bug was fixed by commit:
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+commit 4b793acdca0050739b99ace6a8b9e7f717f57c6b
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Fri Feb 28 18:01:46 2020 +0000
+
+    hsr: use netdev_err() instead of WARN_ONCE()
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=130746ffe00000
+start commit:   ea200dec Merge tag 'armsoc-fixes' of git://git.kernel.org/..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dcf10bf83926432a
+dashboard link: https://syzkaller.appspot.com/bug?extid=b92e4f1472a54e1c7dec
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14b5cafee00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12574271e00000
+
+If the result looks correct, please mark the bug fixed by replying with:
+
+#syz fix: hsr: use netdev_err() instead of WARN_ONCE()
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
