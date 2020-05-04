@@ -2,51 +2,57 @@ Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A31FC47258
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 14:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB5EC47257
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 14:00:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3459920705
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 14:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B3E52078E
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 14:00:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rJyjevkJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="c2UJn86G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728439AbgEDN75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1728360AbgEDN75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 4 May 2020 09:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47414 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728110AbgEDN74 (ORCPT
+        by vger.kernel.org with ESMTP id S1728088AbgEDN74 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 4 May 2020 09:59:56 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E01AC0610D5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA99C061A41;
         Mon,  4 May 2020 06:59:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=CT9TPYB1gBir/yelz692kCRjhkXIcgo4vO0zDJE8gwk=; b=rJyjevkJ4AJbP004OHAOCBnof1
-        YIafKltJ9MfSxyThjuPBAXEj2GLR36kE4nJ8GJokvQILLT6qSQIiWp+GRKXEXjYXAchKjJUjaFHM9
-        G4BDqH+3RH3n+9LXVGpwy1cuq3UH+2+nGccvKrTVdOYkcBsY5MrBgX9uTpFQ1ehd/gRhiTBOyxzcb
-        YQWNTTvHhkrZa8Ve1OkkvMoQhddwnMoc2+UyoOoynmMQmnsrzOt8TbVI9BbWtuG0vTa+itpKcNdb3
-        wwxjlmc4iIzipoTy5Pa8SOYpmy9Ssli5sz+ho9ZZ/CpO6i1dEEOiT0nzFyQ+ixNZZTh6od2ml6tqf
-        KBmtyCAw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=U//7dJcVU8Y3pHY5ljTkEwmYgkA64gPl3bOWhYC99c0=; b=c2UJn86GjfReLqes8s5dn8SneA
+        hAz6rzjtbgjbuTGPTNSWlnb7ZxvTITVderF9+NG9oLxzLIIFp6XYbCxwcA2EVUQlx4Whcmd/u/qsX
+        O7zmlb08sF6a2CAgV3egRXvpkN3B6uQ4xfwESwdSV1mkaG6bKNuZIaBqBlM9oKKdzNrX2tTHUcqYs
+        O6yQnxyeqM7sUTmUv9ZEZWyCzvATkX6mzYBbP8zipKGSsIU1L6IkeE0dWC3UNCMdOTNzVmhSG3kTb
+        tijeuFnFAZoAh+RWwTHc58YUiUETWQBcFaEFtD4rZqQs1THxQomeB/I29o2+h5LA7OhNHT4oOySkI
+        26ryfOxQ==;
 Received: from [2001:4bb8:18c:10bd:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jVbd5-0007Y5-DB; Mon, 04 May 2020 13:59:31 +0000
+        id 1jVbdO-0007b2-Qj; Mon, 04 May 2020 13:59:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
         Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
         linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: stop using ioctl_by_bdev for file system access to CDROMs v3
-Date:   Mon,  4 May 2020 15:59:19 +0200
-Message-Id: <20200504135927.2835750-1-hch@lst.de>
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jan Kara <jack@suse.cz>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 8/8] udf: stop using ioctl_by_bdev
+Date:   Mon,  4 May 2020 15:59:27 +0200
+Message-Id: <20200504135927.2835750-9-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200504135927.2835750-1-hch@lst.de>
+References: <20200504135927.2835750-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -55,23 +61,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Instead just call the CDROM layer functionality directly.
 
-can you pick up this series?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ fs/udf/lowlevel.c | 29 +++++++++++++----------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
 
-Except for the DASD case under discussion the last users of ioctl_by_bdev
-are the file system drivers that want to query CDROM information using
-ioctls.  This series switches them to use function calls directly into
-the CDROM midlayer instead, which implies:
+diff --git a/fs/udf/lowlevel.c b/fs/udf/lowlevel.c
+index 5c7ec121990da..f1094cdcd6cde 100644
+--- a/fs/udf/lowlevel.c
++++ b/fs/udf/lowlevel.c
+@@ -27,41 +27,38 @@
+ 
+ unsigned int udf_get_last_session(struct super_block *sb)
+ {
++	struct cdrom_device_info *cdi = disk_to_cdi(sb->s_bdev->bd_disk);
+ 	struct cdrom_multisession ms_info;
+-	unsigned int vol_desc_start;
+-	struct block_device *bdev = sb->s_bdev;
+-	int i;
+ 
+-	vol_desc_start = 0;
+-	ms_info.addr_format = CDROM_LBA;
+-	i = ioctl_by_bdev(bdev, CDROMMULTISESSION, (unsigned long)&ms_info);
++	if (!cdi) {
++		udf_debug("CDROMMULTISESSION not supported.\n");
++		return 0;
++	}
+ 
+-	if (i == 0) {
++	ms_info.addr_format = CDROM_LBA;
++	if (cdrom_multisession(cdi, &ms_info) == 0) {
+ 		udf_debug("XA disk: %s, vol_desc_start=%d\n",
+ 			  ms_info.xa_flag ? "yes" : "no", ms_info.addr.lba);
+ 		if (ms_info.xa_flag) /* necessary for a valid ms_info.addr */
+-			vol_desc_start = ms_info.addr.lba;
+-	} else {
+-		udf_debug("CDROMMULTISESSION not supported: rc=%d\n", i);
++			return ms_info.addr.lba;
+ 	}
+-	return vol_desc_start;
++	return 0;
+ }
+ 
+ unsigned long udf_get_last_block(struct super_block *sb)
+ {
+ 	struct block_device *bdev = sb->s_bdev;
++	struct cdrom_device_info *cdi = disk_to_cdi(bdev->bd_disk);
+ 	unsigned long lblock = 0;
+ 
+ 	/*
+-	 * ioctl failed or returned obviously bogus value?
++	 * The cdrom layer call failed or returned obviously bogus value?
+ 	 * Try using the device size...
+ 	 */
+-	if (ioctl_by_bdev(bdev, CDROM_LAST_WRITTEN, (unsigned long) &lblock) ||
+-	    lblock == 0)
++	if (!cdi || cdrom_get_last_written(cdi, &lblock) || lblock == 0)
+ 		lblock = i_size_read(bdev->bd_inode) >> sb->s_blocksize_bits;
+ 
+ 	if (lblock)
+ 		return lblock - 1;
+-	else
+-		return 0;
++	return 0;
+ }
+-- 
+2.26.2
 
- - adding a cdrom_device_info pointer to the gendisk, so that file systems
-   can find it without going to the low-level driver first
- - ensuring that the CDROM midlayer (which isn't a lot of code) is built
-   in if the file systems are built in so that they can actually call the
-   exported functions
-
-Changes since v2:
- - add a patch to also convert hfs (exactly duplicate of the hfsplus code)
-Changes since v1:
- - fix up the no-CDROM error case in isofs_get_last_session to return 0
-   instead of -EINVAL.
