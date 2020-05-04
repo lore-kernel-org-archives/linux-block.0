@@ -2,108 +2,95 @@ Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFF3C4724C
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1F5C4724C
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:18:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CE1620721
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:16:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JtB9E0VA"
+	by mail.kernel.org (Postfix) with ESMTP id 03F5E20707
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 16:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588609126;
+	bh=M54VjNTZhNFKXJ1H8k/Td/2NU3VjKN5+TvO6qS3wjcM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=T6f5XSck906DsRcq6RIxrMActmUlSRiaS9ltTTPRlz6u2gpSsdF5QwE2aGc+W7FyH
+	 yciH8c2p2Il2I/fd72a//j0RJl87eWD0/91kfK0ACbeQaPyMuMe5Y47PUBrs+loSFg
+	 5jQ7FqO1vSkIlWQ/qI0kgzzjWgKTxnvkFbfySe2o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726551AbgEDQQo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 12:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729540AbgEDQQn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 12:16:43 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6298EC061A0F
-        for <linux-block@vger.kernel.org>; Mon,  4 May 2020 09:16:42 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id i16so11784172ils.12
-        for <linux-block@vger.kernel.org>; Mon, 04 May 2020 09:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=O2NAB+HJ6UzNB91gndqrDrOBWBRRYdtXc0RXwgVqjIU=;
-        b=JtB9E0VAIJLFoltqJ/EHP5uJ1L/CC5gPEHBmZzWmKIrxbjl26Ne5XpvBSLm41xSBIg
-         t1xVdmJvdqBHaspjtVCP0vgnGV8j2MBTNBjG6GfJcM4fXOhB5+xGf03i727pyog2NP6D
-         GccF27GbRs4QZX7lndDIpxFVeOCoMgIl3dOrXZVf+VRPY7WwOdamJ/8xOXsiov24FI4J
-         cg7O0CG65PADdLp8q2dvOrT5ZwuaButnO4gv0VIES92fKah6Zco3/qNsmkTYiehcGMU9
-         Q2MWvAeM0Qng2AHkE9aLevizkhC1L0KUTdxlOLZZymREU3y6Lz7t6E+UeIP0pi9e0AJ9
-         6new==
+        id S1729498AbgEDQSm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 12:18:42 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:54753 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729352AbgEDQSm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 12:18:42 -0400
+Received: by mail-pj1-f68.google.com with SMTP id y6so15871pjc.4;
+        Mon, 04 May 2020 09:18:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=O2NAB+HJ6UzNB91gndqrDrOBWBRRYdtXc0RXwgVqjIU=;
-        b=YGyprQ2ZnLyT7t688Kx+36AnuUyIIrLuxCwg61J+H+uhyZzz4dGvj5OGeMSablQ5mv
-         QFEdSWv/JYW2rnX/z2JgyEMJSvqvGA5q4HxVzKbJ7qDBTvZQhvQT+xkl+Q5YpcyhdQYZ
-         rVA2owSecBmg1UuY/vI1PgwU5O2F6HzatObV/JKAKYFR2H8k/yif8++8k7OydO/ufjf3
-         t4ZX2iuz2hDeeQzp8Svq6pRNapwdEuHzwxYXH8MaLbmphGHYMZnte8Ut6yYh9Xuvow12
-         oPjCuqkfwbIwa84WbvPFjBQCoYt+IndklUn9eyfkBCDhiGAV6j2kEk7NOJBObE52ZVYJ
-         1sbQ==
-X-Gm-Message-State: AGi0PuZxIfuzWCGhf8AalYRYYrcziVVrXf4RYEigqpWYHD+eIVPmTuFY
-        cixKiuD/J0zXPMephZJp1boUyw==
-X-Google-Smtp-Source: APiQypLOM7ihGkQHTNt/pKRC46v+xHKsvR0zC0Gq/TKe4vXwyBmsBEqqQDWLYSJ6GF4HlBlFg2BYoQ==
-X-Received: by 2002:a92:d6c6:: with SMTP id z6mr16340696ilp.32.1588609001697;
-        Mon, 04 May 2020 09:16:41 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id m22sm4250384iow.35.2020.05.04.09.16.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 09:16:41 -0700 (PDT)
-Subject: Re: [PATCH 5/7] hfsplus: stop using ioctl_by_bdev
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tim Waugh <tim@cyberelk.net>, Borislav Petkov <bp@alien8.de>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20200425075706.721917-1-hch@lst.de>
- <20200425075706.721917-6-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6c47f731-7bff-f186-da55-7ce6cffacdc3@kernel.dk>
-Date:   Mon, 4 May 2020 10:16:40 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=UcAes9dKbhDmITA6s1NANGpIuREAaX05wcOATAsEP80=;
+        b=pJS/yV71GHbU8tcmcKHP5GO5gebehXT+ADQYy1OjCKpfghPJUtgNHF/Yv5JZ8dkliO
+         K5XhoNinpRKpaaBE4CG1OUOzdP5XkAAhhP3v6Tb9uAMXkXBOTEICurR/cV1v8UJ3GJ04
+         i2PAAUe6RiM9W4mR34/Ffxqrh4Qwb2AIbOUJc4K0qgkLmBmbRo+D79mJhHRbPRfAoqOi
+         q+gtdIZPISxunU2CrvY5FJOXH2HInMerJbQjAHJqwsDfTFGfEHsCvtqCNAwRGDlUSjzP
+         4/m00CMW4MrtJ56JVZT1LzLYoiqjj1tp4xVZUR6wSf//xMY4ILRPEXHzhptCt6LiDjBm
+         9nvQ==
+X-Gm-Message-State: AGi0PuY+gUopi4/77musSdHH1Y+FRI5XcuWHerWP7N5FLj8BuZYKck4w
+        cEr2UYGrFh2g6sqlmIcXmks=
+X-Google-Smtp-Source: APiQypIv/J90mnsPJN65xf0xV0HC1YW0vCs74bDiiHPXvyMF1oLWZjZWNKSxRycaJe/7fs7j1AMBbg==
+X-Received: by 2002:a17:902:b78b:: with SMTP id e11mr18437920pls.311.1588609120522;
+        Mon, 04 May 2020 09:18:40 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id 1sm9345233pff.180.2020.05.04.09.18.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2020 09:18:39 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id AAE17403EA; Mon,  4 May 2020 16:18:38 +0000 (UTC)
+Date:   Mon, 4 May 2020 16:18:38 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [PATCH v3 1/6] block: revert back to synchronous request_queue
+ removal
+Message-ID: <20200504161838.GR11244@42.do-not-panic.com>
+References: <20200429074627.5955-1-mcgrof@kernel.org>
+ <20200429074627.5955-2-mcgrof@kernel.org>
+ <a2c64413-d0a4-e5c8-e0fa-904285a1189e@acm.org>
+ <20200503103245.GG29705@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200425075706.721917-6-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200503103245.GG29705@bombadil.infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/20 1:57 AM, Christoph Hellwig wrote:
->  	if (HFSPLUS_SB(sb)->session >= 0) {
-> +		struct cdrom_tocentry te;
-> +
-> +		if (!cdi)
-> +			return -EINVAL;
-> +
->  		te.cdte_track = HFSPLUS_SB(sb)->session;
->  		te.cdte_format = CDROM_LBA;
-> -		res = ioctl_by_bdev(sb->s_bdev,
-> -			CDROMREADTOCENTRY, (unsigned long)&te);
-> -		if (!res && (te.cdte_ctrl & CDROM_DATA_TRACK) == 4) {
-> -			*start = (sector_t)te.cdte_addr.lba << 2;
-> -			return 0;
-> +		if (cdrom_read_tocentry(cdi, &te) ||
-> +		    (te.cdte_ctrl & CDROM_DATA_TRACK) != 4) {
-> +			pr_err("invalid session number or type of track\n");
-> +			return -EINVAL;
->  		}
+On Sun, May 03, 2020 at 03:32:45AM -0700, Matthew Wilcox wrote:
+> On Fri, May 01, 2020 at 05:22:12PM -0700, Bart Van Assche wrote:
+> > > expected behaviour before and it now fails as the device is still present
+> >            ^^^^^^^^^
+> >            behavior?
+> 
+> That's UK/US spelling.  We do not "correct" one to the other.
+> 
+> Documentation/doc-guide/contributing.rst: - Both American and British English spellings are allowed within the
+> Documentation/doc-guide/contributing.rst-   kernel documentation.  There is no need to fix one by replacing it with
+> Documentation/doc-guide/contributing.rst-   the other.
 
-I must be missing something obvious from just looking over the patches,
-but how does this work if cdrom is modular and hfsplus is builtin?
+I already changed it at Bart's request. I'll leave at like that to honor
+US as being the leader in COVID19 cases.
 
--- 
-Jens Axboe
-
+  Luis
