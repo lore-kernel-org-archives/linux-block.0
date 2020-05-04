@@ -4,48 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BBDC3A5A9
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 15:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 819FAC3A5A9
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 15:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EE622073B
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 15:54:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E8262073B
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 15:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="tAU9zHpB"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="PI2azLgj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728582AbgEDPy5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 11:54:57 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:50070 "EHLO
-        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725941AbgEDPy5 (ORCPT
+        id S1728437AbgEDPzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 11:55:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725941AbgEDPzB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 May 2020 11:54:57 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::301])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 18D6F2E09E9;
-        Mon,  4 May 2020 18:54:55 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
-        by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id cnviD0Vdqo-srbWrmGi;
-        Mon, 04 May 2020 18:54:55 +0300
+        Mon, 4 May 2020 11:55:01 -0400
+Received: from forwardcorp1p.mail.yandex.net (forwardcorp1p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b6:217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222BFC061A0E;
+        Mon,  4 May 2020 08:55:01 -0700 (PDT)
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
+        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 1C45A2E14BE;
+        Mon,  4 May 2020 18:54:59 +0300 (MSK)
+Received: from vla1-81430ab5870b.qloud-c.yandex.net (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
+        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id unjaBONJEP-svAi9BRl;
+        Mon, 04 May 2020 18:54:59 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1588607695; bh=0FKUDXZII6543UwYfLVn60N9RWRP2M0duzvLt3V5HU0=;
-        h=Message-ID:Date:To:From:Subject:Cc;
-        b=tAU9zHpBxpqFihRlc9C7NpH8T2004p5g5r8q3zRNcUk6xkE8jwnR0YReumnAHUR/k
-         ornfqLVWTWhvjoHi1/rcjUn5koQ5NsvtE/Y8v7vSnqMebZ1be8Uya/E5HWC41EB6uR
-         7WAX+PvsaZARkBXxDs0da+mf8StU0w+0NO3PHF0U=
-Authentication-Results: mxbackcorp1o.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+        t=1588607699; bh=ENcg5Bf9VUdHKlHIUgm/DkthSsQoFPP4xREmFmfnUxI=;
+        h=In-Reply-To:Message-ID:References:Date:To:From:Subject:Cc;
+        b=PI2azLgj/qi1u4obicwsghWBMKHSF7d2CVimRri+0mk15qdEuEJw3kD6ayLzlDmfZ
+         LRsGm2CP2MnHAvOPsI3QMnT5qQVWUJ5bMXxeU2IDl4VAZJzH63nXlsED2Hfd2Y9myf
+         XjO8paKl1j+KQDJA6WQDIF2VvNKk5puP/QNTJWWY=
+Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b081:409::1:8])
-        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id EpnOoMbJTQ-srWuiU9X;
-        Mon, 04 May 2020 18:54:53 +0300
+        by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id oIkNNHFTF1-svX88CIP;
+        Mon, 04 May 2020 18:54:57 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
-Subject: [PATCH RFC 1/2] fs/iomap/direct-io: pass NOWAIT to bio flags
+Subject: [PATCH RFC 2/2] fs/direct-io: pass NOWAIT to also for read requests
 From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-Date:   Mon, 04 May 2020 18:54:53 +0300
-Message-ID: <158860769311.32485.8003552176738816448.stgit@buzz>
+Date:   Mon, 04 May 2020 18:54:57 +0300
+Message-ID: <158860769737.32485.3674517821826063792.stgit@buzz>
+In-Reply-To: <158860769311.32485.8003552176738816448.stgit@buzz>
+References: <158860769311.32485.8003552176738816448.stgit@buzz>
 User-Agent: StGit/0.22-32-g6a05
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -55,24 +60,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is required to avoid waiting in lower layers.
+For some reason NOWAIT currently is passed only for writes.
 
 Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Fixes: 03a07c92a9ed ("block: return on congested block device")
 ---
- fs/iomap/direct-io.c |    2 ++
- 1 file changed, 2 insertions(+)
+ fs/direct-io.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 20dde5aadcdd..9b53fa7651e3 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -63,6 +63,8 @@ static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap *iomap,
- {
- 	atomic_inc(&dio->ref);
- 
-+	if (dio->iocb->ki_flags & IOCB_NOWAIT)
-+		bio->bi_opf |= REQ_NOWAIT;
- 	if (dio->iocb->ki_flags & IOCB_HIPRI)
- 		bio_set_polled(bio, dio->iocb);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 00b4d15bb811..dbb6afef6be9 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -1234,11 +1234,11 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+ 	if (iov_iter_rw(iter) == WRITE) {
+ 		dio->op = REQ_OP_WRITE;
+ 		dio->op_flags = REQ_SYNC | REQ_IDLE;
+-		if (iocb->ki_flags & IOCB_NOWAIT)
+-			dio->op_flags |= REQ_NOWAIT;
+ 	} else {
+ 		dio->op = REQ_OP_READ;
+ 	}
++	if (iocb->ki_flags & IOCB_NOWAIT)
++		dio->op_flags |= REQ_NOWAIT;
+ 	if (iocb->ki_flags & IOCB_HIPRI)
+ 		dio->op_flags |= REQ_HIPRI;
  
 
