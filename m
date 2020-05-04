@@ -2,131 +2,91 @@ Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UPPERCASE_75_100,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 215A7C47257
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 17:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 598DDC3A5A9
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 19:33:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3B852068E
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 17:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 331D220707
+	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 19:33:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="ZcYngXLR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729777AbgEDRf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 13:35:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41708 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729597AbgEDRf1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 May 2020 13:35:27 -0400
-Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55B4320663;
-        Mon,  4 May 2020 17:35:26 +0000 (UTC)
-Date:   Mon, 4 May 2020 13:35:24 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-bcache@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH RFC 2/2] tracing/block: add request operation and flags
- into trace events
-Message-ID: <20200504133524.686c7be5@gandalf.local.home>
-In-Reply-To: <158860538157.30407.6389633238674780245.stgit@buzz>
-References: <158860537783.30407.1084087380643625249.stgit@buzz>
-        <158860538157.30407.6389633238674780245.stgit@buzz>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1725981AbgEDTdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 15:33:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725956AbgEDTdB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 May 2020 15:33:01 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B81C061A0E
+        for <linux-block@vger.kernel.org>; Mon,  4 May 2020 12:33:00 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id u15so10953075ljd.3
+        for <linux-block@vger.kernel.org>; Mon, 04 May 2020 12:33:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=android.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+tdFYvcT41YTzDNkVNPYHdUeYPdsLJc2p6xhg5qcub4=;
+        b=ZcYngXLRhMQTpLXO72cOeMJqVDo7zn5U+X30jFwooH99mYem72aqdll6QcOUOdolf1
+         yZ2Nw1UT5jrg3DuyEjncVGxoizLKmC/DdOaZ1wK9181qeWP04byoxNFMI6AfdXGKrlIf
+         bdh+9WykdVshHWpexorcenm6Pk8eK9pH7PvgonOmco+g2AnCZHAlvQjBACS0RWebJ2Nc
+         3NzDgJ5swnjBSZSrLFr7bBZgo523Nr+2sAGgtLmqKrtwQjypJuiOlm6B6OvZBZ6uYzMI
+         aRxUQfxBnTuEu/je27gvbezsso5Hpvpf8YjK6ziAGiJIIpkuugzwl2VuRCdE42+OxM9e
+         F1Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+tdFYvcT41YTzDNkVNPYHdUeYPdsLJc2p6xhg5qcub4=;
+        b=PJ7Qxc2erMYwdAUsZApl/mae/YyweT7OWdFv7LnOg/QGQNuM3MQy2Q9MDvUEkkPkct
+         DK81kTPhMsQxOVAEd+q7qjiDBhe9UHQ7etbi+Uw9q2fquXsOKcmLl898apo2VvkKeVmm
+         LFyg5sPIEegnjJZPnAj3gL66dJ0Ep24nsApvGnS5oMH4CBXIsINXiAtrYTjsd75HuP5U
+         pPBg+o87LUYRh4eEcUC77us1gX/9/MeMo2GfCPI6jtbUPVBrWeLfH3Ww2UlV7IRrZ3wU
+         Uj1GvJa9cFVy9uKnU3LbmZTY8bs7xfQtnlHyZAv1wyVzBl4oJE+rLcI2ohBvCQvqKvVW
+         eJ2w==
+X-Gm-Message-State: AGi0Pua64iDPb4VYAJtd6B5+4qjyUX1ibffdtLWozGjwMMc9z2ncli3J
+        AZsD4zkmifrw1zVmu5iGGaGFShAMgnQxRHfEGPVKFPGe5bs=
+X-Google-Smtp-Source: APiQypJu4Wc5TNYHL7fFHBQGROIySU294VVImxL3I24hySbhKnWnxQmTtqGmH5Sad8lXifiP/QcTsVhMmn0uJmvSP00=
+X-Received: by 2002:a2e:8e98:: with SMTP id z24mr11422070ljk.134.1588620778130;
+ Mon, 04 May 2020 12:32:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20200331114116.21642-1-maco@android.com> <3cd82069-0ed6-688f-0d7c-bb0c5ccb0e5b@acm.org>
+In-Reply-To: <3cd82069-0ed6-688f-0d7c-bb0c5ccb0e5b@acm.org>
+From:   Martijn Coenen <maco@android.com>
+Date:   Mon, 4 May 2020 21:32:47 +0200
+Message-ID: <CAB0TPYHMF0rMkVryEW0oshbdkjdjGhfL_Z5E-Dy0vnYK8m2KNQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: Call loop_config_discard() only after new config is applied.
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, kernel-team@android.com,
+        Bart Van Assche <bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 04 May 2020 18:16:21 +0300
-Konstantin Khlebnikov <khlebnikov@yandex-team.ru> wrote:
+Hi Jens,
 
-> +/* Request operations, see enum req_opf */
-> +
-> +TRACE_DEFINE_ENUM(REQ_OP_READ);
-> +TRACE_DEFINE_ENUM(REQ_OP_WRITE);
-> +TRACE_DEFINE_ENUM(REQ_OP_FLUSH);
-> +TRACE_DEFINE_ENUM(REQ_OP_DISCARD);
-> +TRACE_DEFINE_ENUM(REQ_OP_SECURE_ERASE);
-> +TRACE_DEFINE_ENUM(REQ_OP_ZONE_RESET);
-> +TRACE_DEFINE_ENUM(REQ_OP_WRITE_SAME);
-> +TRACE_DEFINE_ENUM(REQ_OP_ZONE_RESET_ALL);
-> +TRACE_DEFINE_ENUM(REQ_OP_WRITE_ZEROES);
-> +TRACE_DEFINE_ENUM(REQ_OP_ZONE_OPEN);
-> +TRACE_DEFINE_ENUM(REQ_OP_ZONE_CLOSE);
-> +TRACE_DEFINE_ENUM(REQ_OP_ZONE_FINISH);
-> +TRACE_DEFINE_ENUM(REQ_OP_SCSI_IN);
-> +TRACE_DEFINE_ENUM(REQ_OP_SCSI_OUT);
-> +TRACE_DEFINE_ENUM(REQ_OP_DRV_IN);
-> +TRACE_DEFINE_ENUM(REQ_OP_DRV_OUT);
-> +
-> +#define BLOCK_REQ_OP_STRINGS					\
-> +	{ REQ_OP_READ,		"READ" },			\
-> +	{ REQ_OP_WRITE,		"WRITE" },			\
-> +	{ REQ_OP_FLUSH,		"FLUSH" },			\
-> +	{ REQ_OP_DISCARD,	"DISCARD" },			\
-> +	{ REQ_OP_SECURE_ERASE,	"SECURE_ERASE" },		\
-> +	{ REQ_OP_ZONE_RESET,	"ZONE_RESET" },			\
-> +	{ REQ_OP_WRITE_SAME,	"WRITE_SAME" },			\
-> +	{ REQ_OP_ZONE_RESET_ALL,"ZONE_RESET_ALL" },		\
-> +	{ REQ_OP_WRITE_ZEROES,	"WRITE_ZEROES" },		\
-> +	{ REQ_OP_ZONE_OPEN,	"ZONE_OPEN" },			\
-> +	{ REQ_OP_ZONE_CLOSE,	"ZONE_CLOSE" },			\
-> +	{ REQ_OP_ZONE_FINISH,	"ZONE_FINISH" },		\
-> +	{ REQ_OP_SCSI_IN,	"SCSI_IN" },			\
-> +	{ REQ_OP_SCSI_OUT,	"SCSI_OUT" },			\
-> +	{ REQ_OP_DRV_IN,	"DRV_IN" },			\
-> +	{ REQ_OP_DRV_OUT,	"DRV_OUT" }
-> +
-> +#define show_block_req_op(req)					\
-> +	__print_symbolic((req) & REQ_OP_MASK, BLOCK_REQ_OP_STRINGS)
-> +
+Are you ok with this one? One of my later series depends on it, but so
+far I've kept it separate because it's a bug fix.
 
-A common trick to avoid the duplication from above is to do this:
+Thanks,
+Martijn
 
-#define BLOCK_REQ_OP_STRINGS					\
-	EM( REQ_OP_READ,	"READ" )			\
-	EM( REQ_OP_WRITE,	"WRITE" )			\
-	EM( REQ_OP_FLUSH,	"FLUSH" )			\
-	EM( REQ_OP_DISCARD,	"DISCARD" )			\
-	EM( REQ_OP_SECURE_ERASE, "SECURE_ERASE" )		\
-	EM( REQ_OP_ZONE_RESET,	"ZONE_RESET" )			\
-	EM( REQ_OP_WRITE_SAME,	"WRITE_SAME" )			\
-	EM( REQ_OP_ZONE_RESET_ALL,"ZONE_RESET_ALL" )		\
-	EM( REQ_OP_WRITE_ZEROES, "WRITE_ZEROES" )		\
-	EM( REQ_OP_ZONE_OPEN,	"ZONE_OPEN" )			\
-	EM( REQ_OP_ZONE_CLOSE,	"ZONE_CLOSE" )			\
-	EM( REQ_OP_ZONE_FINISH,	"ZONE_FINISH" )			\
-	EM( REQ_OP_SCSI_IN,	"SCSI_IN" )			\
-	EM( REQ_OP_SCSI_OUT,	"SCSI_OUT" )			\
-	EM( REQ_OP_DRV_IN,	"DRV_IN" )			\
-	EMe( REQ_OP_DRV_OUT,	"DRV_OUT" )
-
-#undef EM
-#undef EMe
-
-#define EM(a, b) TRACE_DEFINE_ENUM(a);
-#define EMe(a, b) TRACE_DEFINE_ENUM(a);
-
-BLOCK_REQ_OP_STRINGS
-
-#undef EM
-#undef EMe
-
-#define EM(a, b) { a, b },
-#define EMe(a, b)  { a , b }
-
-#define show_block_req_op(req)
-	__print_symbolic((req) & REQ_OP_MASK, BLOCK_REQ_OP_STRINGS)
-
-
-Several other event files in include/trace/events do this.
-
--- Steve
-
+On Sat, Apr 18, 2020 at 5:46 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-03-31 04:41, Martijn Coenen wrote:
+> > loop_set_status() calls loop_config_discard() to configure discard for
+> > the loop device; however, the discard configuration depends on whether
+> > the loop device uses encryption, and when we call it the encryption
+> > configuration has not been updated yet. Move the call down so we apply
+> > the correct discard configuration based on the new configuration.
+>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
