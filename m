@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F138BC3A5A9
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E93C3A5A9
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D13A6206D7
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1914206D7
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rq98XDow"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZjOJdkf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbgEECK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 22:10:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20873 "EHLO
+        id S1727854AbgEECK7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 22:10:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35462 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726549AbgEECK4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 22:10:56 -0400
+        with ESMTP id S1726549AbgEECK7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 22:10:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588644654;
+        s=mimecast20190719; t=1588644657;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gAxdaOm9FlUEqCCJZl96GkCvvlNikmfNWwfhROYSelc=;
-        b=Rq98XDowmKpwQOlSLb9NkuM6gDNgIFfYqLr2Gu7uL+iXdRrteD/fgeGQ0Ku2Q5M9XlZWjT
-        CQOdGJs9FJtdj5Jo1sjK+/mbHTEDI84taPyKTmN2m3Cteull/14w0OhS0j+nkiPgSBQLH1
-        ZDCUigXaaxyjFm24vLEyQwjWWrkptqY=
+        bh=h7qrmkOVGamtJN+YJ3kYE45V7wvcIuPXIP3JEzPHQtI=;
+        b=MZjOJdkfRSgskneElLPx9zduBQHkekYdfrGvrne/+zFkz1v6d+xn13N0+W1hOlQIf+i3kR
+        TdfGepPt3wuBnxsPWY8TR3i464Nk+PZona+av4I9GB1nUUq7HE214SIa6o86Kp8IgTJawA
+        IqUOrZagtVONDR9xg7sVlvdDuOz9xEA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-YKcVxDBLNxuJX4sNCxseVQ-1; Mon, 04 May 2020 22:10:50 -0400
-X-MC-Unique: YKcVxDBLNxuJX4sNCxseVQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-102-QxaKjea1P8qjeAknAdKtrg-1; Mon, 04 May 2020 22:10:54 -0400
+X-MC-Unique: QxaKjea1P8qjeAknAdKtrg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4514A1840426;
-        Tue,  5 May 2020 02:10:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4C98107ACF2;
+        Tue,  5 May 2020 02:10:52 +0000 (UTC)
 Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 597131001B30;
-        Tue,  5 May 2020 02:10:45 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E35915C1B2;
+        Tue,  5 May 2020 02:10:51 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,95 +51,171 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH V10 09/11] blk-mq: add blk_mq_hctx_handle_dead_cpu for handling cpu dead
-Date:   Tue,  5 May 2020 10:09:28 +0800
-Message-Id: <20200505020930.1146281-10-ming.lei@redhat.com>
+Subject: [PATCH V10 10/11] blk-mq: re-submit IO in case that hctx is inactive
+Date:   Tue,  5 May 2020 10:09:29 +0800
+Message-Id: <20200505020930.1146281-11-ming.lei@redhat.com>
 In-Reply-To: <20200505020930.1146281-1-ming.lei@redhat.com>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add helper of blk_mq_hctx_handle_dead_cpu for handling cpu dead,
-and prepare for handling inactive hctx.
+When all CPUs in one hctx are offline and this hctx becomes inactive, we
+shouldn't run this hw queue for completing request any more.
 
-No functional change.
+So allocate request from one live hctx, and clone & resubmit the request,
+either it is from sw queue or scheduler queue.
 
 Cc: John Garry <john.garry@huawei.com>
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 Tested-by: John Garry <john.garry@huawei.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ block/blk-mq.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 104 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4a2250ac4fbb..73e1a1d4c1c5 100644
+index 73e1a1d4c1c5..d639bcd89811 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2382,22 +2382,13 @@ static int blk_mq_hctx_notify_online(unsigned int=
+@@ -2382,6 +2382,102 @@ static int blk_mq_hctx_notify_online(unsigned int=
  cpu, struct hlist_node *node)
  	return 0;
  }
 =20
--/*
++static void blk_mq_resubmit_end_rq(struct request *rq, blk_status_t erro=
+r)
++{
++	struct request *orig_rq =3D rq->end_io_data;
++
++	blk_mq_cleanup_rq(orig_rq);
++	blk_mq_end_request(orig_rq, error);
++
++	blk_put_request(rq);
++}
++
++static void blk_mq_resubmit_rq(struct request *rq)
++{
++	struct request *nrq;
++	unsigned int flags =3D 0;
++	struct blk_mq_hw_ctx *hctx =3D rq->mq_hctx;
++	struct blk_mq_tags *tags =3D rq->q->elevator ? hctx->sched_tags :
++		hctx->tags;
++	bool reserved =3D blk_mq_tag_is_reserved(tags, rq->internal_tag);
++
++	if (rq->rq_flags & RQF_PREEMPT)
++		flags |=3D BLK_MQ_REQ_PREEMPT;
++	if (reserved)
++		flags |=3D BLK_MQ_REQ_RESERVED;
++
++	/* avoid allocation failure by clearing NOWAIT */
++	nrq =3D blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
++	if (!nrq)
++		return;
++
++	blk_rq_copy_request(nrq, rq);
++
++	nrq->timeout =3D rq->timeout;
++	nrq->rq_disk =3D rq->rq_disk;
++	nrq->part =3D rq->part;
++
++	memcpy(blk_mq_rq_to_pdu(nrq), blk_mq_rq_to_pdu(rq),
++			rq->q->tag_set->cmd_size);
++
++	nrq->end_io =3D blk_mq_resubmit_end_rq;
++	nrq->end_io_data =3D rq;
++	nrq->bio =3D rq->bio;
++	nrq->biotail =3D rq->biotail;
++
++	/* bios ownership has been transfered to new request */
++	rq->bio =3D rq->biotail =3D NULL;
++	rq->__data_len =3D 0;
++
++	if (blk_insert_cloned_request(nrq->q, nrq) !=3D BLK_STS_OK)
++		blk_mq_request_bypass_insert(nrq, false, true);
++}
++
++static void blk_mq_hctx_deactivate(struct blk_mq_hw_ctx *hctx)
++{
++	LIST_HEAD(sched);
++	LIST_HEAD(re_submit);
++	LIST_HEAD(flush_in);
++	LIST_HEAD(flush_out);
++	struct request *rq, *nxt;
++	struct elevator_queue *e =3D hctx->queue->elevator;
++
++	if (!e) {
++		blk_mq_flush_busy_ctxs(hctx, &re_submit);
++	} else {
++		while ((rq =3D e->type->ops.dispatch_request(hctx))) {
++			if (rq->mq_hctx !=3D hctx)
++				list_add(&rq->queuelist, &sched);
++			else
++				list_add(&rq->queuelist, &re_submit);
++		}
++	}
++	while (!list_empty(&sched)) {
++		rq =3D list_first_entry(&sched, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		blk_mq_sched_insert_request(rq, true, true, true);
++	}
++
++	/* requests in dispatch list have to be re-submitted too */
++	spin_lock(&hctx->lock);
++	list_splice_tail_init(&hctx->dispatch, &re_submit);
++	spin_unlock(&hctx->lock);
++
++	/* blk_end_flush_machinery will cover flush request */
++	list_for_each_entry_safe(rq, nxt, &re_submit, queuelist) {
++		if (rq->rq_flags & RQF_FLUSH_SEQ)
++			list_move(&rq->queuelist, &flush_in);
++	}
++	blk_end_flush_machinery(hctx, &flush_in, &flush_out);
++	list_splice_tail(&flush_out, &re_submit);
++
++	while (!list_empty(&re_submit)) {
++		rq =3D list_first_entry(&re_submit, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		blk_mq_resubmit_rq(rq);
++	}
++}
++
+ static void blk_mq_hctx_handle_dead_cpu(struct blk_mq_hw_ctx *hctx,
+ 		unsigned int cpu)
+ {
+@@ -2410,17 +2506,20 @@ static void blk_mq_hctx_handle_dead_cpu(struct bl=
+k_mq_hw_ctx *hctx,
+ }
+=20
+ /*
 - * 'cpu' is going away. splice any existing rq_list entries from this
 - * software queue to the hw queue dispatch list, and ensure that it
 - * gets run.
-- */
--static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
++ * @cpu has gone away. If this hctx is inactive, we can't dispatch reque=
+st
++ * to the hctx any more, so clone and re-submit requests from this hctx
+  */
+ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
 node)
-+static void blk_mq_hctx_handle_dead_cpu(struct blk_mq_hw_ctx *hctx,
-+		unsigned int cpu)
  {
--	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
--			struct blk_mq_hw_ctx, cpuhp_dead);
- 	struct blk_mq_ctx *ctx;
- 	LIST_HEAD(tmp);
- 	enum hctx_type type;
+ 	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
+ 			struct blk_mq_hw_ctx, cpuhp_dead);
 =20
--	if (!cpumask_test_cpu(cpu, hctx->cpumask))
--		return 0;
--
- 	ctx =3D __blk_mq_get_ctx(hctx->queue, cpu);
- 	type =3D hctx->type;
-=20
-@@ -2409,13 +2400,27 @@ static int blk_mq_hctx_notify_dead(unsigned int c=
-pu, struct hlist_node *node)
- 	spin_unlock(&ctx->lock);
-=20
- 	if (list_empty(&tmp))
--		return 0;
-+		return;
-=20
- 	spin_lock(&hctx->lock);
- 	list_splice_tail_init(&tmp, &hctx->dispatch);
- 	spin_unlock(&hctx->lock);
-=20
- 	blk_mq_run_hw_queue(hctx, true);
-+}
-+
-+/*
-+ * 'cpu' is going away. splice any existing rq_list entries from this
-+ * software queue to the hw queue dispatch list, and ensure that it
-+ * gets run.
-+ */
-+static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *=
-node)
-+{
-+	struct blk_mq_hw_ctx *hctx =3D hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_dead);
-+
-+	if (cpumask_test_cpu(cpu, hctx->cpumask))
-+		blk_mq_hctx_handle_dead_cpu(hctx, cpu);
+-	if (cpumask_test_cpu(cpu, hctx->cpumask))
+-		blk_mq_hctx_handle_dead_cpu(hctx, cpu);
++	if (cpumask_test_cpu(cpu, hctx->cpumask)) {
++		if (test_bit(BLK_MQ_S_INACTIVE, &hctx->state))
++			blk_mq_hctx_deactivate(hctx);
++		else
++			blk_mq_hctx_handle_dead_cpu(hctx, cpu);
++	}
  	return 0;
  }
 =20
