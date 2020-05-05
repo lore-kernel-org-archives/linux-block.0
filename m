@@ -2,258 +2,182 @@ Return-Path: <SRS0=vpK8=6T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5BCC47259
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8589C47257
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:10:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57E3D20746
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:03:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="RKuEVxru"
+	by mail.kernel.org (Postfix) with ESMTP id AE13021655
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729806AbgEEPDB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 11:03:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729261AbgEEPC7 (ORCPT
+        id S1730196AbgEEPKJ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 11:10:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22764 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729349AbgEEPKJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 May 2020 11:02:59 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2048EC0610D5
-        for <linux-block@vger.kernel.org>; Tue,  5 May 2020 08:02:58 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id i14so2531721qka.10
-        for <linux-block@vger.kernel.org>; Tue, 05 May 2020 08:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7FjP91SkgrTdYmk4uoRk09PuVQ/Ji8rbi00yg++Yf4U=;
-        b=RKuEVxru2LByEM9bQeia+4mJabGJDno/R9rUAInjwZGfh9YKnSSuCDxLcYxGy9TOzw
-         0rcQwQcW3xR7BIpr/DREFpixUUJmiEVNXQLle85uNTXW3ddIWv9KeChX3FapZ7aPuGGU
-         ponHAXH9g24XomYlw/zn6jraGPFAHTw6bRgXaHdAkI94j7YaiB1i1fGhEFbbA159Jkiw
-         fnUiHCHbCr8wPbqC5x/S8p51yP5oZoKLWwcgMhSBqIaKoGHyzbQOTlWJfENuYm6rKmOA
-         7q6tit7c1RASFtWztKETHyySqzMrYfJNFchoylbqZ0/hktjMn5vUy+Y6pYG2KBkOPe0B
-         Av7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7FjP91SkgrTdYmk4uoRk09PuVQ/Ji8rbi00yg++Yf4U=;
-        b=EbDt90MauXnRCja7tWqTK3Sk7CCH4VMQ7GdJ8r6yiZVeUf6zvXl260ifHMZa8lCIRc
-         2X1qcm6zpKDk4BCPuDPugQ3dNn4crpLQuSTtIr9cD02I15i22tCwPc7NWhz6puFw3QIu
-         PqjG/GsioG9wbPcqDpm+0wPrtht4zNNn45dZHu9JOpI6ux14k48TxG4k9ArvCLHelWqz
-         NfOubsu5evNp1w+6DMN6CmgWVSKGbBhOZe0kJ1ZPJ6TQThLT4FnKH61Ljr1lUjB/ZTqI
-         bgCtAFxdj9hfNQZrSoiw4arasJjIs35Bz1gsdzUo4Hsvc2w1tAwNJSl6gtbUgazSfBcN
-         BAFw==
-X-Gm-Message-State: AGi0PuYW9f3seTidCC2Z4JsvT433vzMgqV/4bK9rgPhRx/EFNyHDhdX6
-        soWbc6BtJ0hFhkr4AiOOQ0/xog==
-X-Google-Smtp-Source: APiQypKgpRBdJBUH5vYr9buD5cxFxsKftYnVKJs9ZxvIG0y9aRPVDNXcpfa4cGPTvEHifDzJpopDDA==
-X-Received: by 2002:a05:620a:943:: with SMTP id w3mr3796419qkw.71.1588690976818;
-        Tue, 05 May 2020 08:02:56 -0700 (PDT)
-Received: from localhost (70.44.39.90.res-cmts.bus.ptd.net. [70.44.39.90])
-        by smtp.gmail.com with ESMTPSA id e3sm661471qkd.113.2020.05.05.08.02.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 08:02:56 -0700 (PDT)
-Date:   Tue, 5 May 2020 11:02:41 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200505150241.GA58018@cmpxchg.org>
-References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
- <20200428214653.GD2005@dread.disaster.area>
- <20200429022732.GA401038@cmpxchg.org>
- <20200505062946.GH2005@dread.disaster.area>
+        Tue, 5 May 2020 11:10:09 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045EYsYr040018;
+        Tue, 5 May 2020 11:10:04 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30u8sgva69-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 May 2020 11:10:02 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045FA0QL021493;
+        Tue, 5 May 2020 15:10:00 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 30s0g5jwnf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 May 2020 15:10:00 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045F9v4T60883002
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 May 2020 15:09:57 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2796DA4055;
+        Tue,  5 May 2020 15:09:57 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B191FA4040;
+        Tue,  5 May 2020 15:09:56 +0000 (GMT)
+Received: from linux.fritz.box (unknown [9.145.182.49])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 May 2020 15:09:56 +0000 (GMT)
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        hoeppner@linux.ibm.com, linux-s390@vger.kernel.org,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, linux-kernel@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>
+References: <20200430111754.98508-1-sth@linux.ibm.com>
+ <20200430111754.98508-2-sth@linux.ibm.com> <20200430131351.GA24813@lst.de>
+ <4ab11558-9f2b-02ee-d191-c9a5cc38de0f@linux.ibm.com>
+ <70f541fe-a678-8952-0753-32707d21e337@linux.ibm.com>
+ <20200505124423.GA26313@lst.de>
+From:   Stefan Haberland <sth@linux.ibm.com>
+Autocrypt: addr=sth@linux.ibm.com; keydata=
+ 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
+ cH4TNHyhiR0KAbxE8qKx3Jc=
+Subject: Re: [PATCH 1/1] s390/dasd: remove ioctl_by_bdev from DASD driver
+Message-ID: <a6c99eba-44f2-2944-a135-50ed75ef2c55@linux.ibm.com>
+Date:   Tue, 5 May 2020 17:09:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200505062946.GH2005@dread.disaster.area>
+In-Reply-To: <20200505124423.GA26313@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-05-05_08:2020-05-04,2020-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ priorityscore=1501 adultscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=895 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005050119
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 05, 2020 at 04:29:46PM +1000, Dave Chinner wrote:
-> On Tue, Apr 28, 2020 at 10:27:32PM -0400, Johannes Weiner wrote:
-> > On Wed, Apr 29, 2020 at 07:47:34AM +1000, Dave Chinner wrote:
-> > > On Tue, Apr 28, 2020 at 12:13:46PM -0400, Dan Schatzberg wrote:
-> > > > This patch series does some
-> > > > minor modification to the loop driver so that each cgroup can make
-> > > > forward progress independently to avoid this inversion.
-> > > > 
-> > > > With this patch series applied, the above script triggers OOM kills
-> > > > when writing through the loop device as expected.
-> > > 
-> > > NACK!
-> > > 
-> > > The IO that is disallowed should fail with ENOMEM or some similar
-> > > error, not trigger an OOM kill that shoots some innocent bystander
-> > > in the head. That's worse than using BUG() to report errors...
-> > 
-> > Did you actually read the script?
-> 
-> Of course I did. You specifically mean this bit:
-> 
-> echo 64M > $CGROUP/memory.max;
-> mount -t tmpfs -o size=512m tmpfs /tmp;
-> truncate -s 512m /tmp/backing_file
-> losetup $LOOP_DEV /tmp/backing_file
-> dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
-> 
-> And with this patch set the dd gets OOM killed because the
-> /tmp/backing_file usage accounted to the cgroup goes over 64MB and
-> so tmpfs OOM kills the IO...
-> 
-> As I said: that's very broken behaviour from a storage stack
-> perspective.
-> 
-> > It's OOMing because it's creating 256M worth of tmpfs pages inside a
-> > 64M cgroup. It's not killing an innocent bystander, it's killing in
-> > the cgroup that is allocating all that memory - after Dan makes sure
-> > that memory is accounted to its rightful owner.
-> 
-> What this example does is turn /tmp into thinly provisioned storage
-> for $CGROUP via a restricted quota. It has a device size of 512MB,
-> but only has physical storage capacity of 64MB, as constrained by
-> the cgroup memory limit.  You're dealing with management of -storage
-> devices- and -IO error reporting- here, not memory management.
-> 
-> When thin provisioned storage runs out of space - for whatever
-> reason - and it cannot resolve the issue by blocking, then it *must*
-> return ENOSPC to the IO submitter to tell it the IO has failed. This
-> is no different to if we set a quota on /tmp/backing_file and it is
-> exhausted at 64MB of data written - we fail the IO with ENOSPC or
-> EDQUOT, depending on which quota we used.
-> 
-> IOWs, we have solid expectations on how block devices report
-> unsolvable resource shortages during IO because those errors have to
-> be handled correctly by whatever is submitting the IO. We do not use
-> the OOM-killer to report or resolve ENOSPC errors.
+Am 05.05.20 um 14:44 schrieb Christoph Hellwig:
+> On Mon, May 04, 2020 at 10:45:33AM +0200, Stefan Haberland wrote:
+>>> findthe corresponding device for example. Not sure if this is that easy.
+>> I did some additional research on this.
+>> What I could imagine:
+>>
+>> The gendisk->private_data pointer currently contains a pointer to
+>> the dasd_devmap structure. This one is also reachable by iterating
+>> over an exported dasd_hashlist.
+>> So I could export the dasd_hashlist symbol, iterate over it and try
+>> to find the dasd_devmap pointer I have from the gendisk->private_data
+>> pointer.
+>> This would ensure that the gendisk belongs to the DASD driver and I
+>> could use the additional information that is somehow reachable through
+>> the gendisk->private_data pointer.
+>>
+>> But again, I am not sure if this additional code and effort is needed.
+>> From my point of view checking the gendisk->major for DASD_MAJOR is
+>> OK to ensure that the device belongs to the DASD driver.
+> With CONFIG_DEBUG_BLOCK_EXT_DEVT you can't rely on major numbers.
+
+OK, thanks for the hint.I did not have this in mind. And I still have
+to look up how this is working at all.
+But isn't this only a real issue for devices with more than 16 minors
+or partitions? So it should not be a problem for DASDs with our limit
+of 3 partitions and the fixed amount of minors, right?
+
+Just tested with CONFIG_DEBUG_BLOCK_EXT_DEVT enabled and about 1000
+unlabeled devices. Did not see an issue.
+
+While I see the SCSI devices with MAJOR 259 and quite a random MINOR
+all the DASD devices keep their MAJOR 94 and ascending MINOR.
+
 >
-> Indeed, once you've killed the dd, that CGROUP still consumes 64MB
-> of tmpfs space in /tmp/backing_file, in which case any further IO to
-> $LOOP_DEV is also going to OOM kill. These are horrible semantics
-> for reporting errors to userspace.
->
-> And if the OOM-killer actually frees the 64MB of data written to
-> /tmp/backing_file through the $LOOP_DEV, then you're actually
-> corrupting the storage and ensuring that nobody can read the data
-> that was written to $LOOP_DEV.
+> And compared to all the complications I think the biodasdinfo method
+> is the least of all those evils.
 
-Right, but that's just tmpfs. It doesn't have much to do with the loop
-device or its semantics as a block device. (Although I don't think
-most users really see loop as a true block device, but rather as a
-namespacing tool that for better or worse happens to be implemented at
-the block layer). But remove the loop device indirection and the tmpfs
-semantics would be exactly the same.
+Are you talking about your first patch suggestion?Then I disagree.
+I still do not like to force the driver to be built in if there is an
+alternative.
 
-tmpfs returns -ENOSPC when you run out of filesystem quota, but when
-it tries to allocate memory and can't, it'll invoke the OOM killer as
-a means to reclaim memory. And when that fails, it'll return -ENOMEM.
+If the major number is an issue also for DASD device than I prefer
+to implement the devmap lookup to ensure that the device belongs to
+the DASD driver.
 
-Dan's patches don't change the block device semantics of loop. They
-just ensure that the chain of causality between writer and memory
-allocation isn't broken.
+But I am open to alternatives as well.
 
-In fact, it barely has anything to do with loop itself. If loop were
-to do its redirections synchronously and in the context of the process
-that is making requests, we wouldn't have this problem.
+Side note: I am planning to deprecate the implicit DASD partition for
+unlabeled devices so we might get rid of this stuff at all at some point
+in time. We just have to discuss how this might be done properly.
 
-The generic problem is that of one process performing work on behalf
-of another process with side-effects relevant to the originator. The
-generic solution is to have the worker impersonate the process that
-created the work in all the various aspects that matter.
 
-Like io_uring and various other kthreads and workers doing use_mm()
-when the address space of the process creating the work matters.
+> Jens, any opinion?
 
-> So now lets put a filesystem on $LOOP_DEV in the above example, and
-> write out data to the filesystem which does IO to $LOOP_DEV. Just by
-> chance, the filesystem does some metadata writes iin the context of
-> the user process doing the writes (because journalling, etc) and
-> that metadata IO is what pushes the loop device over the cgroup's
-> memory limit.
-> 
-> You kill the user application even though it wasn't directly
-> responsible for going over the 64MB limit of space in $LOOP_DEV.
-> What happens now to the filesystem's metadata IO?  Did $LOOP_DEV
-> return an error, or after the OOM kill did the IO succeed?  What
-> happens if all the IO being generated from the user application is
-> metadata and that starts failing - killing the user application
-> doesn't help anything - the filesystem IO is failing and that's
-> where the errors need to be reported.
-> 
-> And if the answer is "metadata IO isn't accounted to the $CGROUP"
-> then what happens when the tmpfs actually runs out of it's 512MB of
-> space because of all the metadata the filesystem wrote (e.g. create
-> lots of zero length files)? That's an ENOSPC error, and we'll get
-> that from $LOOP_DEV just fine.
 
-Well, what happens today if you write to a loop mount backed by tmpfs,
-but the machine is *physically* out of memory?
 
-None of these questions are new in the context of this patch set. The
-cgroup annotations don't inject anything that isn't already happening.
-
-When you use the loop device on a tmpfs backing today, logically
-speaking you're charging the root cgroup. That may not have a user-set
-limit, but it's limited by physical RAM.
-
-With or without cgroup annotation, tmpfs needs to allocate memory, and
-that can fail. The function that charges to a specific cgroup is just
-a few lines below the function that physically allocates the
-page. Both can invoke the OOM killer for slightly different reasons
-that aren't really relevant to the loop device on top of it.
-
-> So why should the same error - running out of tmpfs space vs running
-> out of CGROUP quota space on tmpfs be handled differently? Either
-> they are both ENOSPC IO errors, or they are both OOM kill vectors
-> because tmpfs space has run out...
-
-Because charging memory has allocation semantics, and tmpfs already
-defines what those are.
-
-> > As opposed to before this series, where all this memory isn't
-> > accounted properly and goes to the root cgroup - where, ironically, it
-> > could cause OOM and kill an actually innocent bystander.
-> 
-> Johannes, I didn't question the need for the functionality. I
-> questioned the implementation and pointed out fundamental problems
-> it has as well as the architectural questions raised by needing
-> special kthread-based handling for correct accounting of
-> cgroup-aware IO.
->
-> It's a really bad look to go shoot the messenger when it's clear you
-> haven't understood the message that was delivered.
-
-Do I need to point out the irony here? ;)
-
-Maybe let's focus on the technical questions and misunderstandings
-first before throwing NAKs around.
