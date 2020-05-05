@@ -3,140 +3,113 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20479C47257
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 06:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6296C47247
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 06:43:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0632F206CC
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 06:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB8EE206CC
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 06:43:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbgEEGl0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 02:41:26 -0400
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:60640 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725766AbgEEGl0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 May 2020 02:41:26 -0400
-Received: from dread.disaster.area (pa49-195-157-175.pa.nsw.optusnet.com.au [49.195.157.175])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id AEABB58BF91;
-        Tue,  5 May 2020 16:41:14 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1jVrGU-000355-3x; Tue, 05 May 2020 16:41:14 +1000
-Date:   Tue, 5 May 2020 16:41:14 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:FILESYSTEMS (VFS and infrastructure)" 
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
-        <linux-mm@kvack.org>
-Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
-Message-ID: <20200505064114.GI2005@dread.disaster.area>
-References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
- <20200428214653.GD2005@dread.disaster.area>
- <20200429102540.GA12716@quack2.suse.cz>
+        id S1725766AbgEEGnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 02:43:17 -0400
+Received: from mx2.didichuxing.com ([36.110.17.22]:2825 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1725320AbgEEGnQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 May 2020 02:43:16 -0400
+X-ASG-Debug-ID: 1588660986-0e4108595c82c750001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.143]) by bsf02.didichuxing.com with ESMTP id NzA2Gvrz4lknqfjj; Tue, 05 May 2020 14:43:06 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 5 May
+ 2020 14:43:06 +0800
+Date:   Tue, 5 May 2020 14:43:05 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH v5 0/5] Fix potential kernel panic when increase hardware
+ queue
+Message-ID: <cover.1588660550.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [PATCH v5 0/5] Fix potential kernel panic when increase hardware
+ queue
+Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
+        bvanassche@acm.org, linux-block@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20200429102540.GA12716@quack2.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=QIgWuTDL c=1 sm=1 tr=0
-        a=ONQRW0k9raierNYdzxQi9Q==:117 a=ONQRW0k9raierNYdzxQi9Q==:17
-        a=kj9zAlcOel0A:10 a=sTwFKg_x9MkA:10 a=7-415B0cAAAA:8
-        a=rN2gyzmqWffP1ZJC7qsA:9 a=cE_fTOozNYi_-d1b:21 a=OBp7IKyJAvioFFSQ:21
-        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.143]
+X-Barracuda-Start-Time: 1588660986
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 1522
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0857 1.0000 -1.4792
+X-Barracuda-Spam-Score: -1.48
+X-Barracuda-Spam-Status: No, SCORE=-1.48 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81632
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 12:25:40PM +0200, Jan Kara wrote:
-> On Wed 29-04-20 07:47:34, Dave Chinner wrote:
-> > On Tue, Apr 28, 2020 at 12:13:46PM -0400, Dan Schatzberg wrote:
-> > > The loop device runs all i/o to the backing file on a separate kworker
-> > > thread which results in all i/o being charged to the root cgroup. This
-> > > allows a loop device to be used to trivially bypass resource limits
-> > > and other policy. This patch series fixes this gap in accounting.
-> > 
-> > How is this specific to the loop device? Isn't every block device
-> > that offloads work to a kthread or single worker thread susceptible
-> > to the same "exploit"?
-> > 
-> > Or is the problem simply that the loop worker thread is simply not
-> > taking the IO's associated cgroup and submitting the IO with that
-> > cgroup associated with it? That seems kinda simple to fix....
-> > 
-> > > Naively charging cgroups could result in priority inversions through
-> > > the single kworker thread in the case where multiple cgroups are
-> > > reading/writing to the same loop device.
-> > 
-> > And that's where all the complexity and serialisation comes from,
-> > right?
-> > 
-> > So, again: how is this unique to the loop device? Other block
-> > devices also offload IO to kthreads to do blocking work and IO
-> > submission to lower layers. Hence this seems to me like a generic
-> > "block device does IO submission from different task" issue that
-> > should be handled by generic infrastructure and not need to be
-> > reimplemented multiple times in every block device driver that
-> > offloads work to other threads...
-> 
-> Yeah, I was thinking about the same when reading the patch series
-> description. We already have some cgroup workarounds for btrfs kthreads if
-> I remember correctly, we have cgroup handling for flush workers, now we are
-> adding cgroup handling for loopback device workers, and soon I'd expect
-> someone comes with a need for DM/MD worker processes and IMHO it's getting
-> out of hands because the complexity spreads through the kernel with every
-> subsystem comming with slightly different solution to the problem and also
-> the number of kthreads gets multiplied by the number of cgroups. So I
-> agree some generic solution how to approach IO throttling of kthreads /
-> workers would be desirable.
+Hi,
 
-Yup, that's pretty much what I was thinking: it's yet another
-special snowflake for cgroup-aware IO....
+This series mainly fix the kernel panic when increase hardware queue,
+and also fix some other misc issue.
 
-> OTOH I don't have a great idea how the generic infrastructure should look
-> like...
+Memleak 1:
 
-I haven't given it any thought - it's not something I have any
-bandwidth to spend time on.  I'll happily review a unified
-generic cgroup-aware kthread-based IO dispatch mechanism, but I
-don't have the time to design and implement that myself....
+__blk_mq_alloc_rq_maps
+	__blk_mq_alloc_rq_map
 
-OTOH, I will make time to stop people screwing up filesystems and
-block devices with questionable complexity and unique, storage
-device dependent userspace visible error behaviour. This sort of
-change is objectively worse for users than not supporting the
-functionality in the first place.
+if fail
+	blk_mq_free_rq_map
 
-Cheers,
+Actually, __blk_mq_alloc_rq_map alloc both map and request, here
+also need free request.
 
-Dave.
+
+Patch1: fix Memleak 1.
+Patch2: fix prev_nr_hw_queues issue, need be saved before change.
+Patch3: From Ming, fix potential kernel panic when increase hardware queue.
+Patch4~5: rename two function, because these two function alloc both
+map and request, and keep in pair with blk_mq_free_map_and_request(s).
+
+Changes since V4:
+ * use another way to fix kernel panic when increase hardware queue,
+   this patch from Ming.
+
+Changes since V3:
+* record patchset, fix issue fistly then rename.
+* rename function to blk_mq_alloc_map_and_request
+
+Changes since V2:
+ * rename some functions name and fix memleak when free map and requests
+ * Not free new allocated map and request, they will be relased when tagset gone
+
+Changes since V1:
+ * Add fix for potential kernel panic when increase hardware queue
+
+Ming Lei (1):
+  block: alloc map and request for new hardware queue
+
+Weiping Zhang (4):
+  block: free both rq_map and request
+  block: save previous hardware queue count before udpate
+  block: rename __blk_mq_alloc_rq_map
+  block: rename blk_mq_alloc_rq_maps
+
+ block/blk-mq.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
 -- 
-Dave Chinner
-david@fromorbit.com
+2.18.1
+
