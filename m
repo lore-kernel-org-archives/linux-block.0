@@ -2,125 +2,166 @@ Return-Path: <SRS0=vpK8=6T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B13C47254
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AC0C47247
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 773B42078D
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:23:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W1y7ye3x"
+	by mail.kernel.org (Postfix) with ESMTP id 531CF20746
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 15:38:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588693127;
+	bh=3W26vIyawNWhQZ3IQGVthLbTU/RzTxftlZGZOraRRp8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=j3inHHvql8wSLeJX/bofxoGf5rXmqGIUarzqsnuyQXhBpTtY6pNE75IDD0+hbS9rc
+	 BhnsySIT8LQaguTkh6F4Wfp+S+WQpu7phGsbhlmXy76s2mIW9kCfJWXW3nIfFSvxFL
+	 IppR5IhegGwCD5Zxbk/TcI47I9ewHiAznSJGi+jw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729365AbgEEPXn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 11:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
+        id S1730159AbgEEPik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 11:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729749AbgEEPXm (ORCPT
+        by vger.kernel.org with ESMTP id S1729276AbgEEPij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 May 2020 11:23:42 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE639C061A10
-        for <linux-block@vger.kernel.org>; Tue,  5 May 2020 08:23:40 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id j8so1699789iog.13
-        for <linux-block@vger.kernel.org>; Tue, 05 May 2020 08:23:40 -0700 (PDT)
+        Tue, 5 May 2020 11:38:39 -0400
+Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36230C061A0F;
+        Tue,  5 May 2020 08:38:39 -0700 (PDT)
+Received: by mail-qv1-xf44.google.com with SMTP id fb4so1198841qvb.7;
+        Tue, 05 May 2020 08:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=TPwxKE0klTjrvpCqkN/+GZfurYoGuk/drCYIDVYxA1Q=;
-        b=W1y7ye3xLvDWbdVRSKUUL0S+8HrvaPz16PwNA1IjuoxOj8GVxyKW6B6/eMTtHRlIiw
-         ocp5PbDJkd5E3DLCWaXeitPpzuGHudOfwlWg5LSj3q6nff83JSBz6DvAeONP/hmEapQN
-         2PMBRjrlNEg2eUMQbLK8DAdexla7k7MjnyfemM6nfThLo7eD7rFlFkWVMDUygtBKHDAT
-         EPuG8ZLDOPKyb2jXLzt4Midt4KUy4VERIq5gbofnW+NSfKhJpCNaV2ggpvueRJd3SYgV
-         vJ5Ed3Tpb+IfkIPJNBfbUrpSCFTJ1tXMu2dTSd1JsQcgNW0A9aaSgJdy9OWOhe932euT
-         CXdQ==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BXdArichtJxJSpMdJATI60C/n/3lvsy1fL/KOG1aR0o=;
+        b=Qgxse7dVakSkufrx/Jt+udb+ymexH65VUMnEUWLtLKEfqRpwkmZlz5vI4O25vYATuy
+         VVaC5aOnEDpNMe0z4vb1MBK8RuTdKfE1z+9MXMsUa8Z7ppPI9jeLSH+Y8Hs6hSeLIt7Z
+         XdQeFLLxaDYlVJjnLRQT2fRAPqAx2+GxrlAFS5lYDNwWv5TZOo8aje30hyhqww7q5VgE
+         hFxkjqHOBiRON9nOAlxbQxTz+54tsN16QGn69GNDWSv9wEK3DmoNTZSaJqVrx9A7Mk8y
+         00VmVkyFxFDtx76koAUjHf4CeJ1KqeHm5lGGRIjrmR90TSFZ8z6JZKNkLs+fowxAlB76
+         0AAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TPwxKE0klTjrvpCqkN/+GZfurYoGuk/drCYIDVYxA1Q=;
-        b=kSd+4em+8kfkQx7EWWa457+zLFxBWbF3K5uIssVpJu80Me9xrD+YrYpVSyzdUnoawM
-         8JYS7AOMgvHSphHjoNInGFtcb7af6LTHaWE5w8N8gJbTZ1ncpbdh+XXpkSl0fZYBNJSe
-         MWRWEhNIjRfqT4WejPgwd7Ti6XeBuEgCeQTC3FNWq9Uy6jdp7WkghqQLFXXl77LQ91IJ
-         CF64RY6a5WXwbs0l011Ho5t+SMAk80lFmMZR3f2v+IK3kGaYEAlUzaFqc6JK3NQey4hU
-         KulDdyL0EElEN294dUD1j8IV021WhY7vCTT2mbKBx1O5IGmGEiFp4YxFOJja2Pja4pBA
-         lZcA==
-X-Gm-Message-State: AGi0PuYZRY3JLNXqvwTsK3jLmEo6Ib6/3heJGaafV2bpc8zTiHHphiYn
-        JiwF6xSQo9SoSeXWWDumSYrHHQ==
-X-Google-Smtp-Source: APiQypJAq2tEbNFshdQhYM92AuCn6z2zFmJm/tKNnvOKeooJrHtg/Dbe1zAetTS+9IMeiH2nlyuzxg==
-X-Received: by 2002:a5e:a607:: with SMTP id q7mr3877260ioi.109.1588692218512;
-        Tue, 05 May 2020 08:23:38 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id y70sm1893526ilk.47.2020.05.05.08.23.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2020 08:23:37 -0700 (PDT)
-Subject: Re: [block/for-5.7] iocost: protect iocg->abs_vdebt with
- iocg->waitq.lock
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org,
-        Vlad Dmitriev <vvd@fb.com>
-References: <20200504232754.GB3209250@mtj.thefacebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e4377265-1605-077b-9415-183c8efe3da5@kernel.dk>
-Date:   Tue, 5 May 2020 09:23:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=BXdArichtJxJSpMdJATI60C/n/3lvsy1fL/KOG1aR0o=;
+        b=uB/V30Cj7YoQf1AEnOguVgXUGjpsszGm5LVJ3F7+IN8zbdibi2WVeP9e9444Rd2pH0
+         ro8VB/suqlKhXvsR1ykUuDSWDP0HjJFLStniprmmBcsyY0IYtOA2ehnq5/snr775W7bY
+         J6nvr2WhH42k/3ka3LwPlYm4a1q52M7oycaRAcU+mSYghClHun5d8KVDwmMOkDraWdlB
+         ka/PwO6y9bAFJhMFC5PcFfIWvN6F74Z5DrevXJcu0MrR+lrFJMAZ2X5WY1n15kcVaz5x
+         8qXGAr4gqIf1xlv0UqeJQxdDtd+NwL5picZPxzNp8WV8MVBDK96APRkVX6gO+aNcyoYx
+         n74g==
+X-Gm-Message-State: AGi0PuayvpkTS0FEa5hpe3eIl1x6rKOnVnDNZkejbr9lvYYSBOf9tu7Y
+        BkpN1Zf5Yu5bXPiFPiApBDs=
+X-Google-Smtp-Source: APiQypIPmFzcysooPjiBb3SJnZHAzyV6pGruCekUBQbAVqyGjNBnCjfYXl4LmSQBc0QeZ7N4HNPQQA==
+X-Received: by 2002:ad4:434a:: with SMTP id q10mr3378243qvs.81.1588693118118;
+        Tue, 05 May 2020 08:38:38 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:5ece])
+        by smtp.gmail.com with ESMTPSA id q62sm2071319qke.22.2020.05.05.08.38.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2020 08:38:37 -0700 (PDT)
+Date:   Tue, 5 May 2020 11:38:34 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Jan Kara <jack@suse.cz>, Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Amir Goldstein <amir73il@gmail.com>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:FILESYSTEMS (VFS and infrastructure)" 
+        <linux-fsdevel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:CONTROL GROUP - MEMORY RESOURCE CONTROLLER (MEMCG)" 
+        <linux-mm@kvack.org>
+Subject: Re: [PATCH v5 0/4] Charge loop device i/o to issuing cgroup
+Message-ID: <20200505153834.GA12217@mtj.thefacebook.com>
+References: <20200428161355.6377-1-schatzberg.dan@gmail.com>
+ <20200428214653.GD2005@dread.disaster.area>
+ <20200429102540.GA12716@quack2.suse.cz>
+ <20200505064114.GI2005@dread.disaster.area>
 MIME-Version: 1.0
-In-Reply-To: <20200504232754.GB3209250@mtj.thefacebook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200505064114.GI2005@dread.disaster.area>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/4/20 5:27 PM, Tejun Heo wrote:
-> Subject: iocost: protect iocg->abs_vdebt with iocg->waitq.lock
-> 
-> abs_vdebt is an atomic_64 which tracks how much over budget a given cgroup
-> is and controls the activation of use_delay mechanism. Once a cgroup goes
-> over budget from forced IOs, it has to pay it back with its future budget.
-> The progress guarantee on debt paying comes from the iocg being active -
-> active iocgs are processed by the periodic timer, which ensures that as time
-> passes the debts dissipate and the iocg returns to normal operation.
-> 
-> However, both iocg activation and vdebt handling are asynchronous and a
-> sequence like the following may happen.
-> 
-> 1. The iocg is in the process of being deactivated by the periodic timer.
-> 
-> 2. A bio enters ioc_rqos_throttle(), calls iocg_activate() which returns
->    without anything because it still sees that the iocg is already active.
-> 
-> 3. The iocg is deactivated.
-> 
-> 4. The bio from #2 is over budget but needs to be forced. It increases
->    abs_vdebt and goes over the threshold and enables use_delay.
-> 
-> 5. IO control is enabled for the iocg's subtree and now IOs are attributed
->    to the descendant cgroups and the iocg itself no longer issues IOs.
-> 
-> This leaves the iocg with stuck abs_vdebt - it has debt but inactive and no
-> further IOs which can activate it. This can end up unduly punishing all the
-> descendants cgroups.
-> 
-> The usual throttling path has the same issue - the iocg must be active while
-> throttled to ensure that future event will wake it up - and solves the
-> problem by synchronizing the throttling path with a spinlock. abs_vdebt
-> handling is another form of overage handling and shares a lot of
-> characteristics including the fact that it isn't in the hottest path.
-> 
-> This patch fixes the above and other possible races by strictly
-> synchronizing abs_vdebt and use_delay handling with iocg->waitq.lock.
+Hello, Dave.
 
-Applied, thanks.
+On Tue, May 05, 2020 at 04:41:14PM +1000, Dave Chinner wrote:
+> > OTOH I don't have a great idea how the generic infrastructure should look
+> > like...
+> 
+> I haven't given it any thought - it's not something I have any
+> bandwidth to spend time on.  I'll happily review a unified
+> generic cgroup-aware kthread-based IO dispatch mechanism, but I
+> don't have the time to design and implement that myself....
+> 
+> OTOH, I will make time to stop people screwing up filesystems and
+> block devices with questionable complexity and unique, storage
+> device dependent userspace visible error behaviour. This sort of
+> change is objectively worse for users than not supporting the
+> functionality in the first place.
+
+That probably is too strong a position to hold without spending at least
+some thoughts on a subject, whatever the subject may be, and it doesn't seem
+like your understanding of userspace implications is accurate.
+
+I don't necessarily disagree that it'd be nice to have a common
+infrastructure and there may be some part which can actually be factored
+out. However, there isn't gonna be a magic bullet which magically makes
+every IO thing in the kernel cgroup aware automatically. Please consider the
+followings.
+
+* Avoding IO priority inversions requires splitting IO channels according to
+  cgroups and working around (e.g. with backcharging) when they can't be.
+  It's a substantial feature which may require substantial changes. Each IO
+  subsystem has different constraints and existing structures and many of
+  them would require their own solutions. It's not different from different
+  filesystems needing their own solutions for similar problems.
+
+* Because different filesystems and IO stacking layers already have their
+  own internal infrastructure, the right way to add cgroup support is
+  adapting to and modifying the existing infrastructure rather than trying
+  to restructure them to use the same cgroup mechanism, which I don't think
+  would be possible in many cases.
+
+* Among the three IO stacking / redirecting mechanisms - md/dm, loop and
+  fuse - the requirements and what's possible vary quite a bit. md/dm
+  definitely need to support full-on IO channel splitting cgroup support.
+  loop can go either way, but given existing uses, full splitting makes a
+  sense. fuse, as it currently stands, can't support that because the
+  priority inversions extend all the way to userspace and the kernel API
+  isn't built for that. If it wants to support cgroup containment, each
+  instance would have to be assigned to a cgroup.
+
+Between dm/md and loop, it's maybe possible that some of the sub-threading
+code can be reused, but I don't see a point in blocking loop updates given
+that it clearly fixes userspace visible malfunctions, is not that much code
+and how the shared code should look is unclear yet. We'll be able to answer
+the sharing question when we actually get to dm/md conversion.
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
