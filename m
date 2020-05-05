@@ -1,369 +1,184 @@
-Return-Path: <SRS0=XB/C=6S=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=vpK8=6T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7C0C3A5A9
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 23:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE709C3A5A9
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:09:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E1DD2068E
-	for <linux-block@archiver.kernel.org>; Mon,  4 May 2020 23:27:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588634879;
-	bh=ZXzR09uGuRbjIzhfkDHxYAsP/QvYBcC85V44m3Lykos=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=gyx2ImmMScOhMTAx27XRaWDJ4IhG6jtb4+4hIx1frPlnvyG7B0wf9ldnV8TqMwf+I
-	 N1SL/omXff12o2WZRWXUtZweqzH3nYMvu5JGnAfd09M9lXz5FJ+/3Ju1Fgka1Pc5mY
-	 fM8t3vP3v9tqOUHyGAwrC8r1vgZ4w5ikxLOG13bQ=
+	by mail.kernel.org (Postfix) with ESMTP id 88534206D7
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 02:09:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/YV2G0B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728280AbgEDX16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 May 2020 19:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51756 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728182AbgEDX16 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 May 2020 19:27:58 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD40C061A0E;
-        Mon,  4 May 2020 16:27:57 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id f83so505038qke.13;
-        Mon, 04 May 2020 16:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=ip3zhTzFNO8GaDSRR5Xv3BK5YgA2YXgYzXwyja3RCNc=;
-        b=uJZyLFH7OYZRQopRfg8qLOZSE+chPXLsRuaPH2UtwWV2adHuHG980H3af9BMlE2Fjb
-         pqyFPQyiG6weqr2LIpMsxpcgeu2rij/dY+GAc7rOWgQasesMzK6EI9RehyqdQq7pUTPQ
-         Z2jAhRNEZxvliEHRbRI0xQ9HNHbj6UI+9hZxr3jFBFFclkzKvoQHyPWuBATQXVpHtSe4
-         +wFeEzG/1uLqh5N/MU4bgmFYBEcr9zYt+FOqSCWZLIATYXo10kR5oFNPZXrnw+OcivOJ
-         P/XTWWbf1kEsdGGHH1X2lBNIKDrnDz8UL/7EWglUibLhiK3QbGi6Wp/97YiKdemTPg1R
-         tXdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=ip3zhTzFNO8GaDSRR5Xv3BK5YgA2YXgYzXwyja3RCNc=;
-        b=LjV0WBnOYQNfxhrY4ufv/Jp2hoCbRgyh9kAxhQneYBKPkAA/eXmYk6NTOOpes58Kiu
-         cHrvsqoFhhqym/kNoUfs6ihkEPT8LrP1PA7smJcE9SrrfIpVlwCJfLHu92XjmMckeAWX
-         98jqSQxdhgnTXJhDsoXWF5XedbD6fW0mKSBzxKVGCpJ5sNAmySf+FtYIgmLJ4fmvSEwr
-         vZogqx/09i3DLcD15eKTB7Xo2tOp9kg7Yz8BZUlhgn2Wob9Vu3kLEVSXb65mX31ai3Ji
-         IrPVGODkJrC0zTn/qz0p0sztH8+U9OqdYnfxfpgszsk7G/TkrmRUS3hx17hosg9Ixqtz
-         Cgyg==
-X-Gm-Message-State: AGi0PuZNSMLkaJCkLa1JFA+n09Adjw4S2xSYn5GiVV7gqo7VbsffEpdi
-        gQ3uSwa95AB3+AZmBqEG9AOFHLXq4sM=
-X-Google-Smtp-Source: APiQypKcO3GAJ8hdRsEq35pFlniR0GDTRVzDZNCOUE05DlSMcNtW/HXuII4sRaSUy9Xd6HvScaKguA==
-X-Received: by 2002:a05:620a:62c:: with SMTP id 12mr884394qkv.234.1588634876483;
-        Mon, 04 May 2020 16:27:56 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::1:5ece])
-        by smtp.gmail.com with ESMTPSA id i4sm424538qkh.66.2020.05.04.16.27.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2020 16:27:55 -0700 (PDT)
-Date:   Mon, 4 May 2020 19:27:54 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org,
-        Vlad Dmitriev <vvd@fb.com>
-Subject: [block/for-5.7] iocost: protect iocg->abs_vdebt with iocg->waitq.lock
-Message-ID: <20200504232754.GB3209250@mtj.thefacebook.com>
+        id S1726635AbgEECJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 May 2020 22:09:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40406 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726551AbgEECJt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 May 2020 22:09:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588644587;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=WYnkD58WxeGhOck7Zlrajuf0o20cMqrAWncxJYevXaA=;
+        b=S/YV2G0BID44AYG/hOHKXZtPTtYiqls6ib3wuHGzd6q7c5hTu9Yvv1MBqDqm7E1Mu4nM84
+        iLck7DkupDrt2X8kvTjs7afYxZ7DdlxKwefUEXhs9Sf3v9m2SbAsMKEHnunWrqKF/0n6IJ
+        Rt8k59Cy+vdMHpmAShIKxjen3QnQK28=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-Arvhap67Nwik-fcXhmYa-g-1; Mon, 04 May 2020 22:09:44 -0400
+X-MC-Unique: Arvhap67Nwik-fcXhmYa-g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89CBE1800D4A;
+        Tue,  5 May 2020 02:09:42 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AC4DF62490;
+        Tue,  5 May 2020 02:09:37 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH V10 00/11] blk-mq: improvement CPU hotplug
+Date:   Tue,  5 May 2020 10:09:19 +0800
+Message-Id: <20200505020930.1146281-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Subject: iocost: protect iocg->abs_vdebt with iocg->waitq.lock
+Hi,
 
-abs_vdebt is an atomic_64 which tracks how much over budget a given cgroup
-is and controls the activation of use_delay mechanism. Once a cgroup goes
-over budget from forced IOs, it has to pay it back with its future budget.
-The progress guarantee on debt paying comes from the iocg being active -
-active iocgs are processed by the periodic timer, which ensures that as time
-passes the debts dissipate and the iocg returns to normal operation.
+Thomas mentioned:
+    "
+     That was the constraint of managed interrupts from the very beginnin=
+g:
+   =20
+      The driver/subsystem has to quiesce the interrupt line and the asso=
+ciated
+      queue _before_ it gets shutdown in CPU unplug and not fiddle with i=
+t
+      until it's restarted by the core when the CPU is plugged in again.
+    "
 
-However, both iocg activation and vdebt handling are asynchronous and a
-sequence like the following may happen.
+But no drivers or blk-mq do that before one hctx becomes inactive(all
+CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
 
-1. The iocg is in the process of being deactivated by the periodic timer.
+This patchset tries to address the issue by two stages:
 
-2. A bio enters ioc_rqos_throttle(), calls iocg_activate() which returns
-   without anything because it still sees that the iocg is already active.
+1) add one new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE
 
-3. The iocg is deactivated.
+- mark the hctx as internal stopped, and drain all in-flight requests
+if the hctx is going to be dead.
 
-4. The bio from #2 is over budget but needs to be forced. It increases
-   abs_vdebt and goes over the threshold and enables use_delay.
+2) re-submit IO in the state of CPUHP_BLK_MQ_DEAD after the hctx becomes =
+dead
 
-5. IO control is enabled for the iocg's subtree and now IOs are attributed
-   to the descendant cgroups and the iocg itself no longer issues IOs.
+- steal bios from the request, and resubmit them via generic_make_request=
+(),
+then these IO will be mapped to other live hctx for dispatch
 
-This leaves the iocg with stuck abs_vdebt - it has debt but inactive and no
-further IOs which can activate it. This can end up unduly punishing all the
-descendants cgroups.
+Thanks John Garry for running lots of tests on arm64 with this patchset
+and co-working on investigating all kinds of issues.
 
-The usual throttling path has the same issue - the iocg must be active while
-throttled to ensure that future event will wake it up - and solves the
-problem by synchronizing the throttling path with a spinlock. abs_vdebt
-handling is another form of overage handling and shares a lot of
-characteristics including the fact that it isn't in the hottest path.
+Thanks Christoph's review on V7 & V8.
 
-This patch fixes the above and other possible races by strictly
-synchronizing abs_vdebt and use_delay handling with iocg->waitq.lock.
+Please comment & review, thanks!
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Vlad Dmitriev <vvd@fb.com>
-Cc: stable@vger.kernel.org # v5.4+
-Fixes: e1518f63f246 ("blk-iocost: Don't let merges push vtime into the future")
----
- block/blk-iocost.c             |  117 ++++++++++++++++++++++++-----------------
- tools/cgroup/iocost_monitor.py |    7 ++
- 2 files changed, 77 insertions(+), 47 deletions(-)
+https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-improve-cpu-hotplug
 
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -466,7 +466,7 @@ struct ioc_gq {
- 	 */
- 	atomic64_t			vtime;
- 	atomic64_t			done_vtime;
--	atomic64_t			abs_vdebt;
-+	u64				abs_vdebt;
- 	u64				last_vtime;
- 
- 	/*
-@@ -1142,7 +1142,7 @@ static void iocg_kick_waitq(struct ioc_g
- 	struct iocg_wake_ctx ctx = { .iocg = iocg };
- 	u64 margin_ns = (u64)(ioc->period_us *
- 			      WAITQ_TIMER_MARGIN_PCT / 100) * NSEC_PER_USEC;
--	u64 abs_vdebt, vdebt, vshortage, expires, oexpires;
-+	u64 vdebt, vshortage, expires, oexpires;
- 	s64 vbudget;
- 	u32 hw_inuse;
- 
-@@ -1152,18 +1152,15 @@ static void iocg_kick_waitq(struct ioc_g
- 	vbudget = now->vnow - atomic64_read(&iocg->vtime);
- 
- 	/* pay off debt */
--	abs_vdebt = atomic64_read(&iocg->abs_vdebt);
--	vdebt = abs_cost_to_cost(abs_vdebt, hw_inuse);
-+	vdebt = abs_cost_to_cost(iocg->abs_vdebt, hw_inuse);
- 	if (vdebt && vbudget > 0) {
- 		u64 delta = min_t(u64, vbudget, vdebt);
- 		u64 abs_delta = min(cost_to_abs_cost(delta, hw_inuse),
--				    abs_vdebt);
-+				    iocg->abs_vdebt);
- 
- 		atomic64_add(delta, &iocg->vtime);
- 		atomic64_add(delta, &iocg->done_vtime);
--		atomic64_sub(abs_delta, &iocg->abs_vdebt);
--		if (WARN_ON_ONCE(atomic64_read(&iocg->abs_vdebt) < 0))
--			atomic64_set(&iocg->abs_vdebt, 0);
-+		iocg->abs_vdebt -= abs_delta;
- 	}
- 
- 	/*
-@@ -1219,12 +1216,18 @@ static bool iocg_kick_delay(struct ioc_g
- 	u64 expires, oexpires;
- 	u32 hw_inuse;
- 
-+	lockdep_assert_held(&iocg->waitq.lock);
-+
- 	/* debt-adjust vtime */
- 	current_hweight(iocg, NULL, &hw_inuse);
--	vtime += abs_cost_to_cost(atomic64_read(&iocg->abs_vdebt), hw_inuse);
-+	vtime += abs_cost_to_cost(iocg->abs_vdebt, hw_inuse);
- 
--	/* clear or maintain depending on the overage */
--	if (time_before_eq64(vtime, now->vnow)) {
-+	/*
-+	 * Clear or maintain depending on the overage. Non-zero vdebt is what
-+	 * guarantees that @iocg is online and future iocg_kick_delay() will
-+	 * clear use_delay. Don't leave it on when there's no vdebt.
-+	 */
-+	if (!iocg->abs_vdebt || time_before_eq64(vtime, now->vnow)) {
- 		blkcg_clear_delay(blkg);
- 		return false;
- 	}
-@@ -1258,9 +1261,12 @@ static enum hrtimer_restart iocg_delay_t
- {
- 	struct ioc_gq *iocg = container_of(timer, struct ioc_gq, delay_timer);
- 	struct ioc_now now;
-+	unsigned long flags;
- 
-+	spin_lock_irqsave(&iocg->waitq.lock, flags);
- 	ioc_now(iocg->ioc, &now);
- 	iocg_kick_delay(iocg, &now, 0);
-+	spin_unlock_irqrestore(&iocg->waitq.lock, flags);
- 
- 	return HRTIMER_NORESTART;
- }
-@@ -1368,14 +1374,13 @@ static void ioc_timer_fn(struct timer_li
- 	 * should have woken up in the last period and expire idle iocgs.
- 	 */
- 	list_for_each_entry_safe(iocg, tiocg, &ioc->active_iocgs, active_list) {
--		if (!waitqueue_active(&iocg->waitq) &&
--		    !atomic64_read(&iocg->abs_vdebt) && !iocg_is_idle(iocg))
-+		if (!waitqueue_active(&iocg->waitq) && iocg->abs_vdebt &&
-+		    !iocg_is_idle(iocg))
- 			continue;
- 
- 		spin_lock(&iocg->waitq.lock);
- 
--		if (waitqueue_active(&iocg->waitq) ||
--		    atomic64_read(&iocg->abs_vdebt)) {
-+		if (waitqueue_active(&iocg->waitq) || iocg->abs_vdebt) {
- 			/* might be oversleeping vtime / hweight changes, kick */
- 			iocg_kick_waitq(iocg, &now);
- 			iocg_kick_delay(iocg, &now, 0);
-@@ -1718,28 +1723,49 @@ static void ioc_rqos_throttle(struct rq_
- 	 * tests are racy but the races aren't systemic - we only miss once
- 	 * in a while which is fine.
- 	 */
--	if (!waitqueue_active(&iocg->waitq) &&
--	    !atomic64_read(&iocg->abs_vdebt) &&
-+	if (!waitqueue_active(&iocg->waitq) && !iocg->abs_vdebt &&
- 	    time_before_eq64(vtime + cost, now.vnow)) {
- 		iocg_commit_bio(iocg, bio, cost);
- 		return;
- 	}
- 
- 	/*
--	 * We're over budget.  If @bio has to be issued regardless,
--	 * remember the abs_cost instead of advancing vtime.
--	 * iocg_kick_waitq() will pay off the debt before waking more IOs.
-+	 * We activated above but w/o any synchronization. Deactivation is
-+	 * synchronized with waitq.lock and we won't get deactivated as long
-+	 * as we're waiting or has debt, so we're good if we're activated
-+	 * here. In the unlikely case that we aren't, just issue the IO.
-+	 */
-+	spin_lock_irq(&iocg->waitq.lock);
-+
-+	if (unlikely(list_empty(&iocg->active_list))) {
-+		spin_unlock_irq(&iocg->waitq.lock);
-+		iocg_commit_bio(iocg, bio, cost);
-+		return;
-+	}
-+
-+	/*
-+	 * We're over budget. If @bio has to be issued regardless, remember
-+	 * the abs_cost instead of advancing vtime. iocg_kick_waitq() will pay
-+	 * off the debt before waking more IOs.
-+	 *
- 	 * This way, the debt is continuously paid off each period with the
--	 * actual budget available to the cgroup.  If we just wound vtime,
--	 * we would incorrectly use the current hw_inuse for the entire
--	 * amount which, for example, can lead to the cgroup staying
--	 * blocked for a long time even with substantially raised hw_inuse.
-+	 * actual budget available to the cgroup. If we just wound vtime, we
-+	 * would incorrectly use the current hw_inuse for the entire amount
-+	 * which, for example, can lead to the cgroup staying blocked for a
-+	 * long time even with substantially raised hw_inuse.
-+	 *
-+	 * An iocg with vdebt should stay online so that the timer can keep
-+	 * deducting its vdebt and [de]activate use_delay mechanism
-+	 * accordingly. We don't want to race against the timer trying to
-+	 * clear them and leave @iocg inactive w/ dangling use_delay heavily
-+	 * penalizing the cgroup and its descendants.
- 	 */
- 	if (bio_issue_as_root_blkg(bio) || fatal_signal_pending(current)) {
--		atomic64_add(abs_cost, &iocg->abs_vdebt);
-+		iocg->abs_vdebt += abs_cost;
- 		if (iocg_kick_delay(iocg, &now, cost))
- 			blkcg_schedule_throttle(rqos->q,
- 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
-+		spin_unlock_irq(&iocg->waitq.lock);
- 		return;
- 	}
- 
-@@ -1756,20 +1782,6 @@ static void ioc_rqos_throttle(struct rq_
- 	 * All waiters are on iocg->waitq and the wait states are
- 	 * synchronized using waitq.lock.
- 	 */
--	spin_lock_irq(&iocg->waitq.lock);
--
--	/*
--	 * We activated above but w/o any synchronization.  Deactivation is
--	 * synchronized with waitq.lock and we won't get deactivated as
--	 * long as we're waiting, so we're good if we're activated here.
--	 * In the unlikely case that we are deactivated, just issue the IO.
--	 */
--	if (unlikely(list_empty(&iocg->active_list))) {
--		spin_unlock_irq(&iocg->waitq.lock);
--		iocg_commit_bio(iocg, bio, cost);
--		return;
--	}
--
- 	init_waitqueue_func_entry(&wait.wait, iocg_wake_fn);
- 	wait.wait.private = current;
- 	wait.bio = bio;
-@@ -1801,6 +1813,7 @@ static void ioc_rqos_merge(struct rq_qos
- 	struct ioc_now now;
- 	u32 hw_inuse;
- 	u64 abs_cost, cost;
-+	unsigned long flags;
- 
- 	/* bypass if disabled or for root cgroup */
- 	if (!ioc->enabled || !iocg->level)
-@@ -1820,15 +1833,28 @@ static void ioc_rqos_merge(struct rq_qos
- 		iocg->cursor = bio_end;
- 
- 	/*
--	 * Charge if there's enough vtime budget and the existing request
--	 * has cost assigned.  Otherwise, account it as debt.  See debt
--	 * handling in ioc_rqos_throttle() for details.
-+	 * Charge if there's enough vtime budget and the existing request has
-+	 * cost assigned.
- 	 */
- 	if (rq->bio && rq->bio->bi_iocost_cost &&
--	    time_before_eq64(atomic64_read(&iocg->vtime) + cost, now.vnow))
-+	    time_before_eq64(atomic64_read(&iocg->vtime) + cost, now.vnow)) {
- 		iocg_commit_bio(iocg, bio, cost);
--	else
--		atomic64_add(abs_cost, &iocg->abs_vdebt);
-+		return;
-+	}
-+
-+	/*
-+	 * Otherwise, account it as debt if @iocg is online, which it should
-+	 * be for the vast majority of cases. See debt handling in
-+	 * ioc_rqos_throttle() for details.
-+	 */
-+	spin_lock_irqsave(&iocg->waitq.lock, flags);
-+	if (likely(!list_empty(&iocg->active_list))) {
-+		iocg->abs_vdebt += abs_cost;
-+		iocg_kick_delay(iocg, &now, cost);
-+	} else {
-+		iocg_commit_bio(iocg, bio, cost);
-+	}
-+	spin_unlock_irqrestore(&iocg->waitq.lock, flags);
- }
- 
- static void ioc_rqos_done_bio(struct rq_qos *rqos, struct bio *bio)
-@@ -1998,7 +2024,6 @@ static void ioc_pd_init(struct blkg_poli
- 	iocg->ioc = ioc;
- 	atomic64_set(&iocg->vtime, now.vnow);
- 	atomic64_set(&iocg->done_vtime, now.vnow);
--	atomic64_set(&iocg->abs_vdebt, 0);
- 	atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
- 	INIT_LIST_HEAD(&iocg->active_list);
- 	iocg->hweight_active = HWEIGHT_WHOLE;
---- a/tools/cgroup/iocost_monitor.py
-+++ b/tools/cgroup/iocost_monitor.py
-@@ -159,7 +159,12 @@ class IocgStat:
-         else:
-             self.inflight_pct = 0
- 
--        self.debt_ms = iocg.abs_vdebt.counter.value_() / VTIME_PER_USEC / 1000
-+        # vdebt used to be an atomic64_t and is now u64, support both
-+        try:
-+            self.debt_ms = iocg.abs_vdebt.counter.value_() / VTIME_PER_USEC / 1000
-+        except:
-+            self.debt_ms = iocg.abs_vdebt.value_() / VTIME_PER_USEC / 1000
-+
-         self.use_delay = blkg.use_delay.counter.value_()
-         self.delay_ms = blkg.delay_nsec.counter.value_() / 1_000_000
- 
+V10:
+	- fix double bio complete in request resubmission(10/11)
+	- add tested-by tag
+
+V9:
+	- add Reviewed-by tag
+	- document more on memory barrier usage between getting driver tag
+	and handling cpu offline(7/11)
+	- small code cleanup as suggested by Chritoph(7/11)
+	- rebase against for-5.8/block(1/11, 2/11)
+V8:
+	- add patches to share code with blk_rq_prep_clone
+	- code re-organization as suggested by Christoph, most of them are
+	in 04/11, 10/11
+	- add reviewed-by tag
+
+V7:
+	- fix updating .nr_active in get_driver_tag
+	- add hctx->cpumask check in cpuhp handler
+	- only drain requests which tag is >=3D 0
+	- pass more aggressive cpuhotplug&io test
+
+V6:
+	- simplify getting driver tag, so that we can drain in-flight
+	  requests correctly without using synchronize_rcu()
+	- handle re-submission of flush & passthrough request correctly
+
+V5:
+	- rename BLK_MQ_S_INTERNAL_STOPPED as BLK_MQ_S_INACTIVE
+	- re-factor code for re-submit requests in cpu dead hotplug handler
+	- address requeue corner case
+
+V4:
+	- resubmit IOs in dispatch list in case that this hctx is dead=20
+
+V3:
+	- re-organize patch 2 & 3 a bit for addressing Hannes's comment
+	- fix patch 4 for avoiding potential deadlock, as found by Hannes
+
+V2:
+	- patch4 & patch 5 in V1 have been merged to block tree, so remove
+	  them
+	- address comments from John Garry and Minwoo
+
+Ming Lei (11):
+  block: clone nr_integrity_segments and write_hint in blk_rq_prep_clone
+  block: add helper for copying request
+  blk-mq: mark blk_mq_get_driver_tag as static
+  blk-mq: assign rq->tag in blk_mq_get_driver_tag
+  blk-mq: support rq filter callback when iterating rqs
+  blk-mq: prepare for draining IO when hctx's all CPUs are offline
+  blk-mq: stop to handle IO and drain IO before hctx becomes inactive
+  block: add blk_end_flush_machinery
+  blk-mq: add blk_mq_hctx_handle_dead_cpu for handling cpu dead
+  blk-mq: re-submit IO in case that hctx is inactive
+  block: deactivate hctx when the hctx is actually inactive
+
+ block/blk-core.c           |  27 ++-
+ block/blk-flush.c          | 141 ++++++++++++---
+ block/blk-mq-debugfs.c     |   2 +
+ block/blk-mq-tag.c         |  39 ++--
+ block/blk-mq-tag.h         |   4 +
+ block/blk-mq.c             | 356 +++++++++++++++++++++++++++++--------
+ block/blk-mq.h             |  22 ++-
+ block/blk.h                |  11 +-
+ drivers/block/loop.c       |   2 +-
+ drivers/md/dm-rq.c         |   2 +-
+ include/linux/blk-mq.h     |   6 +
+ include/linux/cpuhotplug.h |   1 +
+ 12 files changed, 481 insertions(+), 132 deletions(-)
+
+Cc: John Garry <john.garry@huawei.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+--=20
+2.25.2
+
