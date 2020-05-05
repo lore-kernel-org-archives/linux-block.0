@@ -6,31 +6,34 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C88C47256
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 07:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257ABC47256
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 07:39:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12893206A5
-	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 07:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BAEE20663
+	for <linux-block@archiver.kernel.org>; Tue,  5 May 2020 07:39:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726065AbgEEHC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 03:02:58 -0400
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:17332 "HELO
+        id S1726575AbgEEHjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 03:39:03 -0400
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:17497 "HELO
         bsf01.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1725320AbgEEHC6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 May 2020 03:02:58 -0400
-X-ASG-Debug-ID: 1588662164-0e4088442c82dbb0001-Cu09wu
-Received: from mail.didiglobal.com (localhost [172.20.36.245]) by bsf01.didichuxing.com with ESMTP id UQTiowsAz45ef3G7; Tue, 05 May 2020 15:02:44 +0800 (CST)
+        with SMTP id S1725320AbgEEHjC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 May 2020 03:39:02 -0400
+X-ASG-Debug-ID: 1588664338-0e4088442c8301a0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.127]) by bsf01.didichuxing.com with ESMTP id btDkXTxetjdT1VMR; Tue, 05 May 2020 15:38:58 +0800 (CST)
 X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
 Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
  (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 5 May
- 2020 15:02:44 +0800
-Date:   Tue, 5 May 2020 15:02:43 +0800
+ 2020 15:38:58 +0800
+Date:   Tue, 5 May 2020 15:38:54 +0800
 From:   Weiping Zhang <zhangweiping@didiglobal.com>
 To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>
 CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v5 3/5] block: alloc map and request for new hardware queue
-Message-ID: <2a1eff382447d6e37e1803b1ef3e230c1091b0e5.1588660550.git.zhangweiping@didiglobal.com>
-X-ASG-Orig-Subj: [PATCH v5 3/5] block: alloc map and request for new hardware queue
+Subject: [RESEND PATCH v5 3/5] block: alloc map and request for new hardware
+ queue
+Message-ID:
+ <2a1eff382447d6e37e1803b1ef3e230c1091b0e5.1588660550.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [RESEND PATCH v5 3/5] block: alloc map and request for new hardware
+ queue
 Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
         bvanassche@acm.org, linux-block@vger.kernel.org
 References: <cover.1588660550.git.zhangweiping@didiglobal.com>
@@ -42,13 +45,13 @@ User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Originating-IP: [172.22.50.20]
 X-ClientProxiedBy: BJEXCAS03.didichuxing.com (172.20.36.245) To
  BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: localhost[172.20.36.245]
-X-Barracuda-Start-Time: 1588662164
+X-Barracuda-Connect: localhost[172.20.36.127]
+X-Barracuda-Start-Time: 1588664338
 X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 8593
+X-Barracuda-Scan-Msg-Size: 8633
 X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0014 1.0000 -2.0116
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0014 1.0000 -2.0117
 X-Barracuda-Spam-Score: -2.01
 X-Barracuda-Spam-Status: No, SCORE=-2.01 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
 X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81631
@@ -59,6 +62,9 @@ Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+Message-ID: <20200505073854.3PYztTnSCxUOsanlnepWB54q59VcP-8-OgckrPUlVxg@z>
+
+From: Ming Lei <ming.lei@redhat.com>
 
 Alloc new map and request for new hardware queue when increse
 hardware queue count. Before this patch, it will show a
