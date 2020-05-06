@@ -3,71 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F07CC4725C
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 04:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C35D9C28CBC
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 05:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 035F1206F9
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 04:53:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA047206F9
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 05:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725813AbgEFExC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 May 2020 00:53:02 -0400
-Received: from verein.lst.de ([213.95.11.211]:38744 "EHLO verein.lst.de"
+        id S1726948AbgEFFKn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 May 2020 01:10:43 -0400
+Received: from verein.lst.de ([213.95.11.211]:38823 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725771AbgEFExC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 May 2020 00:53:02 -0400
+        id S1725821AbgEFFKm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 May 2020 01:10:42 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 46CD968C4E; Wed,  6 May 2020 06:52:59 +0200 (CEST)
-Date:   Wed, 6 May 2020 06:52:58 +0200
+        id 87DA468C4E; Wed,  6 May 2020 07:10:39 +0200 (CEST)
+Date:   Wed, 6 May 2020 07:10:39 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, hoeppner@linux.ibm.com,
-        linux-s390@vger.kernel.org, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-kernel@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/dasd: remove ioctl_by_bdev from DASD driver
-Message-ID: <20200506045258.GB9846@lst.de>
-References: <20200430111754.98508-1-sth@linux.ibm.com> <20200430111754.98508-2-sth@linux.ibm.com> <20200430131351.GA24813@lst.de> <4ab11558-9f2b-02ee-d191-c9a5cc38de0f@linux.ibm.com> <70f541fe-a678-8952-0753-32707d21e337@linux.ibm.com> <20200505124423.GA26313@lst.de> <a6c99eba-44f2-2944-a135-50ed75ef2c55@linux.ibm.com>
+To:     Martijn Coenen <maco@android.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>,
+        Narayan Kamath <narayan@google.com>,
+        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
+        Martijn Coenen <maco@google.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 04/10] loop: Refactor loop_set_status() size
+ calculation
+Message-ID: <20200506051039.GA9983@lst.de>
+References: <20200429140341.13294-1-maco@android.com> <20200429140341.13294-5-maco@android.com> <20200501173032.GD22792@lst.de> <CAB0TPYFJT5A-+T-B6tD1O0X8GGK_LFOpBDZv+fFc7LqDyN_aAg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a6c99eba-44f2-2944-a135-50ed75ef2c55@linux.ibm.com>
+In-Reply-To: <CAB0TPYFJT5A-+T-B6tD1O0X8GGK_LFOpBDZv+fFc7LqDyN_aAg@mail.gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 05, 2020 at 05:09:56PM +0200, Stefan Haberland wrote:
-> OK, thanks for the hint.I did not have this in mind. And I still have
-> to look up how this is working at all.
-> But isn't this only a real issue for devices with more than 16 minors
-> or partitions? So it should not be a problem for DASDs with our limit
-> of 3 partitions and the fixed amount of minors, right?
+On Fri, May 01, 2020 at 09:33:23PM +0200, Martijn Coenen wrote:
+> On Fri, May 1, 2020 at 7:30 PM Christoph Hellwig <hch@lst.de> wrote:
+> >
+> > For some reason this fails to apply for me against both
+> > Jens' for-5.8/block and Linus' current tree.
+> >
+> > What is the baseline for this series?
 > 
-> Just tested with CONFIG_DEBUG_BLOCK_EXT_DEVT enabled and about 1000
-> unlabeled devices. Did not see an issue.
+> This was based on Linus' tree from a week or two ago or so, but I
+> think you're most likely missing this one?
 > 
-> While I see the SCSI devices with MAJOR 259 and quite a random MINOR
-> all the DASD devices keep their MAJOR 94 and ascending MINOR.
-
-Looks like it only changes the minors, and not the majors.  Still
-checking for major and relying on a shared structure define in different
-places just doesn't look maintainable.
-
-> > And compared to all the complications I think the biodasdinfo method
-> > is the least of all those evils.
+> https://lkml.org/lkml/2020/3/31/755
 > 
-> Are you talking about your first patch suggestion?Then I disagree.
-> I still do not like to force the driver to be built in if there is an
-> alternative.
+> (I mentioned it in the cover letter, but can make it a part of this
+> series if you prefer).
 
-No, I mean the series that I actually sent out:
-
-https://lkml.org/lkml/2020/4/21/66
-https://lkml.org/lkml/2020/4/21/68
-https://lkml.org/lkml/2020/4/21/69
+Yes, I missed that one.
