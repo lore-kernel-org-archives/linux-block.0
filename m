@@ -2,100 +2,138 @@ Return-Path: <SRS0=ToMJ=6U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77B5C28CBC
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 09:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BB7C47257
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 09:44:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 878D320714
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 09:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66E892070B
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 09:44:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwKkH16L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728881AbgEFJQM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 May 2020 05:16:12 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44108 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728385AbgEFJQM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 May 2020 05:16:12 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 49EA1F029C3B287432E4;
-        Wed,  6 May 2020 17:16:08 +0800 (CST)
-Received: from [127.0.0.1] (10.166.215.55) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 6 May 2020
- 17:16:05 +0800
-Subject: Re: [PATCH 2/4] mm/swap: use SECTORS_PER_PAGE_SHIFT to clean up code
-From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-To:     Matthew Wilcox <willy@infradead.org>
-CC:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-mm <linux-mm@kvack.org>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel <dm-devel@redhat.com>, Song Liu <song@kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20200505115543.1660-1-thunder.leizhen@huawei.com>
- <20200505115543.1660-3-thunder.leizhen@huawei.com>
- <20200505172520.GI16070@bombadil.infradead.org>
- <32ba9907-60ad-27c0-c565-e7b5c80ab03c@huawei.com>
- <bddd596b-2e8e-42aa-70cc-41583b15c548@huawei.com>
-Message-ID: <8fefbfb2-1100-fab2-0383-e57343dc44f5@huawei.com>
-Date:   Wed, 6 May 2020 17:16:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1729186AbgEFJod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 May 2020 05:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729173AbgEFJod (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 May 2020 05:44:33 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E5EC061A0F;
+        Wed,  6 May 2020 02:44:31 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id i15so960644wrx.10;
+        Wed, 06 May 2020 02:44:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=cc:subject:to:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=zogrk4yKNPGjGulfAcYpBrIv088QASAAIJAwuPc2cMc=;
+        b=nwKkH16LhWlT+bRmDLOqlb62L7lMOBj0lVHGmMoYjf9KKOPZxhGT+veeUtA8edrqhV
+         DaQxZ77L9pT8ZFbKIQ2twphPpWq+YRHSny61w6yS1mBJQVHGPMFypuN2Ih+XzYQqkd47
+         jXUNaoJzkfNBFF5xpT2FREDat5xloD6IAvdaYpXDdmyqpLJHwHp4pW+8ciJ/UnKuLLfe
+         3DU4b/SkgyPwyMtIyvEH3CejIUprI3VIgsjContx4T5R2j3fh12z0R7L/hEvqvXam33j
+         zpYn835hwfGOZJw41AgyawJ4ZR2TFfk3SHt2kvAbK/37lpXS3ttcAJ//jdxqDWOGROdx
+         yw6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:cc:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zogrk4yKNPGjGulfAcYpBrIv088QASAAIJAwuPc2cMc=;
+        b=If0bhn+Uxcn2dc2nUPax2pQwIDKNJRbpHRsAoGZLl7MntjUbPtc6M0pLiFcVje/ghX
+         cjjE+D+/KDunWKpX1e1YeB7xXS9qmrM054KSbSLb0WB/wmubDZXNfloA+/XueB/5kOCj
+         MOhhXir53QNSLYfk89f20hVbMiVJO77HmT+CMluYqn92QlfLg1uZGoCusFcWzPI0dD8W
+         qqqnhDwZfb4Rb5UZmnoLsOucxjCaONqfjawL2A6dcUAU1510/yeZKjS5c8wMfAR9oIP0
+         OCXYbLvlEqZ+gs3fR5Unyun1dscu4j7Hn+v6Jr2HH0vViVKbeAvVdITDTCBvI1GwV66c
+         GHXA==
+X-Gm-Message-State: AGi0PuaEHWTBI7ggsigqnk9gsqHS4OadJDDQefuFAnvbM+lecesp09mv
+        tvQQaIa+YVhhRHFjxZ9Osu3+ZAIh
+X-Google-Smtp-Source: APiQypJ5g4ZBJNyJkYTa3cLcRX63ovlHVbsJD9mSh0LKDOqUMhT6uYN+uW0OeMr72zLKmm7geZtWhA==
+X-Received: by 2002:a5d:5230:: with SMTP id i16mr9271796wra.71.1588758270228;
+        Wed, 06 May 2020 02:44:30 -0700 (PDT)
+Received: from ?IPv6:2001:a61:2482:101:a081:4793:30bf:f3d5? ([2001:a61:2482:101:a081:4793:30bf:f3d5])
+        by smtp.gmail.com with ESMTPSA id d27sm1939555wra.30.2020.05.06.02.44.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 May 2020 02:44:29 -0700 (PDT)
+Cc:     mtk.manpages@gmail.com, narayan@google.com, zezeozue@google.com,
+        kernel-team@android.com, maco@google.com, bvanassche@acm.org,
+        Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>
+Subject: Re: [PATCH v4 10/10] loop: Add LOOP_CONFIGURE ioctl
+To:     Martijn Coenen <maco@android.com>, axboe@kernel.dk, hch@lst.de,
+        ming.lei@redhat.com
+References: <20200429140341.13294-1-maco@android.com>
+ <20200429140341.13294-11-maco@android.com>
+From:   "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
+Message-ID: <7d73bafe-5228-b02e-5b53-4a41543aebe3@gmail.com>
+Date:   Wed, 6 May 2020 11:44:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <bddd596b-2e8e-42aa-70cc-41583b15c548@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200429140341.13294-11-maco@android.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.166.215.55]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Martijn,
 
-
-On 2020/5/6 11:47, Leizhen (ThunderTown) wrote:
+On 4/29/20 4:03 PM, Martijn Coenen wrote:
+> This allows userspace to completely setup a loop device with a single
+> ioctl, removing the in-between state where the device can be partially
+> configured - eg the loop device has a backing file associated with it,
+> but is reading from the wrong offset.
 > 
+> Besides removing the intermediate state, another big benefit of this
+> ioctl is that LOOP_SET_STATUS can be slow; the main reason for this
+> slowness is that LOOP_SET_STATUS(64) calls blk_mq_freeze_queue() to
+> freeze the associated queue; this requires waiting for RCU
+> synchronization, which I've measured can take about 15-20ms on this
+> device on average.
 > 
-> On 2020/5/6 9:33, Leizhen (ThunderTown) wrote:
->>
->>
->> On 2020/5/6 1:25, Matthew Wilcox wrote:
->>> On Tue, May 05, 2020 at 07:55:41PM +0800, Zhen Lei wrote:
->>>> +++ b/mm/swapfile.c
->>>> @@ -177,8 +177,8 @@ static int discard_swap(struct swap_info_struct *si)
->>>>  
->>>>  	/* Do not discard the swap header page! */
->>>>  	se = first_se(si);
->>>> -	start_block = (se->start_block + 1) << (PAGE_SHIFT - 9);
->>>> -	nr_blocks = ((sector_t)se->nr_pages - 1) << (PAGE_SHIFT - 9);
->>>> +	start_block = (se->start_block + 1) << SECTORS_PER_PAGE_SHIFT;
->>>> +	nr_blocks = ((sector_t)se->nr_pages - 1) << SECTORS_PER_PAGE_SHIFT;
->>>
->>> Thinking about this some more, wouldn't this look better?
->>>
->>> 	start_block = page_sectors(se->start_block + 1);
->>> 	nr_block = page_sectors(se->nr_pages - 1);
->>>
->>
->> OK，That's fine, it's clearer. And in this way, there won't be more than 80 columns.
+> In addition to doing what LOOP_SET_STATUS can do, LOOP_CONFIGURE can
+> also be used to:
+> - Set the correct block size immediately by setting
+>   loop_config.block_size (avoids LOOP_SET_BLOCK_SIZE)
+> - Explicitly request direct I/O mode by setting LO_FLAGS_DIRECT_IO
+>   in loop_config.info.lo_flags (avoids LOOP_SET_DIRECT_IO)
+> - Explicitly request read-only mode by setting LO_FLAGS_READ_ONLY
+>   in loop_config.info.lo_flags
 > 
-> Should we rename "page_sectors" to "page_to_sectors"? Because we may need to define
-> "sectors_to_page" also.
-
-Change the "sectors_to_page" to "sectors_to_npage", npage means "number of pages"
-or "page number". To distinguish the use case of "pfn_to_page()" etc. The latter
-returns the pointer of "struct page".
-
+> Here's setting up ~70 regular loop devices with an offset on an x86
+> Android device, using LOOP_SET_FD and LOOP_SET_STATUS:
 > 
->>
->>>
->>> .
->>>
+> vsoc_x86:/system/apex # time for i in `seq 30 100`;
+> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+>     0m03.40s real     0m00.02s user     0m00.03s system
+> 
+> Here's configuring ~70 devices in the same way, but using a modified
+> losetup that uses the new LOOP_CONFIGURE ioctl:
+> 
+> vsoc_x86:/system/apex # time for i in `seq 30 100`;
+> do losetup -r -o 4096 /dev/block/loop$i com.android.adbd.apex; done
+>     0m01.94s real     0m00.01s user     0m00.01s system
+> 
+> Signed-off-by: Martijn Coenen <maco@android.com>
 
+
+Can we have also a patch for the loop.4 manual page please?
+
+Thanks,
+
+Michael
+
+
+-- 
+Michael Kerrisk
+Linux man-pages maintainer; http://www.kernel.org/doc/man-pages/
+Linux/UNIX System Programming Training: http://man7.org/training/
