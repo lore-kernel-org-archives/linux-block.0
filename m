@@ -2,99 +2,91 @@ Return-Path: <SRS0=ToMJ=6U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E10C28CBC
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 03:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4042CC28CBC
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 03:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFF6120757
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 03:25:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LRW3T0bv"
+	by mail.kernel.org (Postfix) with ESMTP id 14D952075E
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 03:47:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726308AbgEFDZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 23:25:21 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46680 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725900AbgEFDZV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 May 2020 23:25:21 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0463JLEp137684;
-        Wed, 6 May 2020 03:25:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=3dzvCOrBHdmxYrucJrODcoh+LS2TSuy2nuN5tRQD+qM=;
- b=LRW3T0bvqwJ4arIjBEU72TnqcfvwIQIlyqfpFFUf8Y8QHImOt0EMSxYTwcvpUsdBGIuF
- cQa0kMC698Dp1eY4ohNAoYQI9mUxM1iY/X1sK4NKs5XLauSSSrx8UW+In2sqyBKseSBY
- BpJYFEv6oiJcKtDJwO2UK6o4pHYILOWCzgc1Ux6lj0FvxTuq0YAOy18d71rndNOy4JER
- rYrBfMs1jaaQCCQh98JZo8Ww+FU6yGFbWiCWAl+1XAvwc7VmOngLvePgwCaMu7SfuHkw
- UWAzWuguhLRebc8nUajHgDS2Gj/jBwvkSARufC+dxu2vdH0EVcVFAWaa9o4QG9s0n8W6 iw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 30s0tmg1ka-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 May 2020 03:25:16 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0463Gl0Y139450;
-        Wed, 6 May 2020 03:23:16 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 30sjdueh75-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 May 2020 03:23:16 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0463NFlV022146;
-        Wed, 6 May 2020 03:23:15 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 05 May 2020 20:23:15 -0700
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
+        id S1726367AbgEFDrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 23:47:47 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:33852 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726477AbgEFDrr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 May 2020 23:47:47 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id EAB4A1CEDB2C3B6D3534;
+        Wed,  6 May 2020 11:47:44 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.55) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Wed, 6 May 2020
+ 11:47:41 +0800
+Subject: Re: [PATCH 2/4] mm/swap: use SECTORS_PER_PAGE_SHIFT to clean up code
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v9 10/11] block: export bio_release_pages and
- bio_iov_iter_get_pages
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20200428104605.8143-1-johannes.thumshirn@wdc.com>
-        <20200428104605.8143-11-johannes.thumshirn@wdc.com>
-Date:   Tue, 05 May 2020 23:23:13 -0400
-In-Reply-To: <20200428104605.8143-11-johannes.thumshirn@wdc.com> (Johannes
-        Thumshirn's message of "Tue, 28 Apr 2020 19:46:04 +0900")
-Message-ID: <yq1r1vx9272.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.0.91 (gnu/linux)
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-mm <linux-mm@kvack.org>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel <dm-devel@redhat.com>, Song Liu <song@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20200505115543.1660-1-thunder.leizhen@huawei.com>
+ <20200505115543.1660-3-thunder.leizhen@huawei.com>
+ <20200505172520.GI16070@bombadil.infradead.org>
+ <32ba9907-60ad-27c0-c565-e7b5c80ab03c@huawei.com>
+Message-ID: <bddd596b-2e8e-42aa-70cc-41583b15c548@huawei.com>
+Date:   Wed, 6 May 2020 11:47:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 mlxscore=0
- bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=886 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005060025
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=0
- phishscore=0 clxscore=1015 bulkscore=0 mlxlogscore=931 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005060025
+In-Reply-To: <32ba9907-60ad-27c0-c565-e7b5c80ab03c@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.166.215.55]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Johannes,
 
-> Export bio_release_pages and bio_iov_iter_get_pages, so they can be
-> used from modular code.
+On 2020/5/6 9:33, Leizhen (ThunderTown) wrote:
+> 
+> 
+> On 2020/5/6 1:25, Matthew Wilcox wrote:
+>> On Tue, May 05, 2020 at 07:55:41PM +0800, Zhen Lei wrote:
+>>> +++ b/mm/swapfile.c
+>>> @@ -177,8 +177,8 @@ static int discard_swap(struct swap_info_struct *si)
+>>>  
+>>>  	/* Do not discard the swap header page! */
+>>>  	se = first_se(si);
+>>> -	start_block = (se->start_block + 1) << (PAGE_SHIFT - 9);
+>>> -	nr_blocks = ((sector_t)se->nr_pages - 1) << (PAGE_SHIFT - 9);
+>>> +	start_block = (se->start_block + 1) << SECTORS_PER_PAGE_SHIFT;
+>>> +	nr_blocks = ((sector_t)se->nr_pages - 1) << SECTORS_PER_PAGE_SHIFT;
+>>
+>> Thinking about this some more, wouldn't this look better?
+>>
+>> 	start_block = page_sectors(se->start_block + 1);
+>> 	nr_block = page_sectors(se->nr_pages - 1);
+>>
+> 
+> OK，That's fine, it's clearer. And in this way, there won't be more than 80 columns.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Should we rename "page_sectors" to "page_to_sectors"? Because we may need to define
+"sectors_to_page" also.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+> 
+>>
+>> .
+>>
+
