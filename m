@@ -2,267 +2,101 @@ Return-Path: <SRS0=ToMJ=6U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3972C47257
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 13:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C941C28CBC
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 13:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7A5C20746
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 13:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A20720757
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 13:49:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A+3/1T5y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728522AbgEFNjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 May 2020 09:39:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52166 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728489AbgEFNjk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 May 2020 09:39:40 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id D82B7AEA1;
-        Wed,  6 May 2020 13:39:41 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id ABB791E12F9; Wed,  6 May 2020 15:39:38 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/3] blkparse: Handle cgroup information
-Date:   Wed,  6 May 2020 15:39:31 +0200
-Message-Id: <20200506133933.4773-2-jack@suse.cz>
-X-Mailer: git-send-email 2.16.4
+        id S1728640AbgEFNtT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 May 2020 09:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725801AbgEFNtT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 May 2020 09:49:19 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA61C061A0F
+        for <linux-block@vger.kernel.org>; Wed,  6 May 2020 06:49:18 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id k1so2299193wrx.4
+        for <linux-block@vger.kernel.org>; Wed, 06 May 2020 06:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HOocdAGVHf5tl8B0zmCdAbwFif/Kuk3Eu+ebI2TS9Tw=;
+        b=A+3/1T5yYgiE37J6a0mg9MaofDpWg3kb8CAxC3IVW72r+O3W5+DM6eRAX0YRZ1PZQQ
+         h5AbkDpDLZALWz+oBveXZxSgkrfkiR/9VJIxJsdFx7AC//uq/af4mDh0RjTh+dgmpzWB
+         ZNRVuQNQQw6cVy7VMjDebQ59c/I0nOwHdAUBsKWsmOuQUWsnYdm6WluuaLU1lOxH3clE
+         WDGD7WX5zDXlRrszRt0uImFqZfVfKRq5QHWNen8coDFgzvMn9vde73TjaBMe87IbyDSl
+         C6WnsPskZ2BKqDWDCkRrsm5bYsRHugu6gOOTIZUjyDlc9Ascuxqlracv60bW84EzwAfJ
+         tgbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HOocdAGVHf5tl8B0zmCdAbwFif/Kuk3Eu+ebI2TS9Tw=;
+        b=AHUdrXxaJ0mS6KlVaDrUD9jpyPXySIHin5KjKuxlCmQzvt4DuVz3m+0AdW/nT59bQL
+         CWNOQNtsbaOGxomdKwM/WttK+ZZfFMwdNU0xJ2AOIBMGzGBsq0iZfcZb3scGXXwoRJVQ
+         Wn5RTxaTaXba0hT55Yi/+xz92/ksuHZ2xJ2a2i7rf5dpaSPScWmlHwX7EbXYCGRu0w6l
+         SuyUkar19GorbRsvjqlafN0dlA5ZpSzpYgZ2mllNRLpT+yzA5ruphuZevvoScHZhTU51
+         LkgWpxd/ksO1r2ysmHTlOxSKo/Wo+sjrnWzbO533xT7LkgtlFzNeIBxnKrAQjgfWcxCh
+         KRvw==
+X-Gm-Message-State: AGi0PuZi36MVnl4XUTLPfsiLYQiP+W20tuiBEFQsv3cFBq2PHWzEqys7
+        hF7jZlGI5w3n8f55/H17AFWiJw==
+X-Google-Smtp-Source: APiQypIGL7RxMTCpIu8hxFdIY4uRotvLa8Eq2mhQU4O0u1U+YQXJ+GTqvxRxX+wZlJX0AcY8ju066w==
+X-Received: by 2002:a5d:510f:: with SMTP id s15mr10602180wrt.103.1588772956658;
+        Wed, 06 May 2020 06:49:16 -0700 (PDT)
+Received: from [192.168.0.101] ([84.33.163.133])
+        by smtp.gmail.com with ESMTPSA id p6sm2738060wrt.3.2020.05.06.06.49.15
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 May 2020 06:49:16 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 0/3] Fix blkparse and iowatcher for kernels >= 4.14
+From:   Paolo Valente <paolo.valente@linaro.org>
 In-Reply-To: <20200506133933.4773-1-jack@suse.cz>
+Date:   Wed, 6 May 2020 15:50:30 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E027D84B-27AE-4426-80A7-269E9357A03A@linaro.org>
 References: <20200506133933.4773-1-jack@suse.cz>
+To:     Jan Kara <jack@suse.cz>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since Linux kernel commit 35fe6d763229 "block: use standard blktrace API
-to output cgroup info for debug notes" the kernel can pass
-__BLK_TA_CGROUP flag in the action field of generated events. blkparse
-does not count with this and so it will get confused by such events and
-either ignore them or misreport them. Teach blkparse how to properly
-process events with __BLK_TA_CGROUP flag.
+Does this fix make process names (with PIDS) be shown too in bfq log =
+messages?
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- blkparse.c       | 41 ++++++++++++++++++++++++++---------------
- blkparse_fmt.c   | 15 +++++++++++++++
- blktrace_api.h   | 10 ++++++++++
- doc/blkparse.1   |  4 ++++
- doc/blktrace.tex |  3 +++
- 5 files changed, 58 insertions(+), 15 deletions(-)
-
-diff --git a/blkparse.c b/blkparse.c
-index 28bdf1543ddb..ae4cb4433944 100644
---- a/blkparse.c
-+++ b/blkparse.c
-@@ -597,7 +597,7 @@ static void handle_notify(struct blk_io_trace *bit)
- 	void	*payload = (caddr_t) bit + sizeof(*bit);
- 	__u32	two32[2];
- 
--	switch (bit->action) {
-+	switch (bit->action & ~__BLK_TN_CGROUP) {
- 	case BLK_TN_PROCESS:
- 		add_ppm_hash(bit->pid, payload);
- 		break;
-@@ -623,16 +623,27 @@ static void handle_notify(struct blk_io_trace *bit)
- 	case BLK_TN_MESSAGE:
- 		if (bit->pdu_len > 0) {
- 			char msg[bit->pdu_len+1];
-+			int len = bit->pdu_len;
-+			char cgidstr[24];
- 
--			memcpy(msg, (char *)payload, bit->pdu_len);
--			msg[bit->pdu_len] = '\0';
-+			cgidstr[0] = 0;
-+			if (bit->action & __BLK_TN_CGROUP) {
-+				struct blk_io_cgroup_payload *cgid = payload;
-+
-+				sprintf(cgidstr, "%x,%x ", cgid->ino,
-+					cgid->gen);
-+				payload += sizeof(struct blk_io_cgroup_payload);
-+				len -= sizeof(struct blk_io_cgroup_payload);
-+			}
-+			memcpy(msg, (char *)payload, len);
-+			msg[len] = '\0';
- 
- 			fprintf(ofp,
--				"%3d,%-3d %2d %8s %5d.%09lu %5u %2s %3s %s\n",
-+				"%3d,%-3d %2d %8s %5d.%09lu %5u %s%2s %3s %s\n",
- 				MAJOR(bit->device), MINOR(bit->device),
--				bit->cpu, "0", (int) SECONDS(bit->time),
--				(unsigned long) NANO_SECONDS(bit->time),
--				0, "m", "N", msg);
-+				bit->cpu, "0", (int)SECONDS(bit->time),
-+				(unsigned long)NANO_SECONDS(bit->time),
-+				0, cgidstr, "m", "N", msg);
- 		}
- 		break;
- 
-@@ -1511,7 +1522,7 @@ static void dump_trace_pc(struct blk_io_trace *t, struct per_dev_info *pdi,
- 			  struct per_cpu_info *pci)
- {
- 	int w = (t->action & BLK_TC_ACT(BLK_TC_WRITE)) != 0;
--	int act = t->action & 0xffff;
-+	int act = (t->action & 0xffff) & ~__BLK_TA_CGROUP;
- 
- 	switch (act) {
- 		case __BLK_TA_QUEUE:
-@@ -1560,7 +1571,7 @@ static void dump_trace_fs(struct blk_io_trace *t, struct per_dev_info *pdi,
- 			  struct per_cpu_info *pci)
- {
- 	int w = (t->action & BLK_TC_ACT(BLK_TC_WRITE)) != 0;
--	int act = t->action & 0xffff;
-+	int act = (t->action & 0xffff) & ~__BLK_TA_CGROUP;
- 
- 	switch (act) {
- 		case __BLK_TA_QUEUE:
-@@ -1643,7 +1654,7 @@ static void dump_trace(struct blk_io_trace *t, struct per_cpu_info *pci,
- 		       struct per_dev_info *pdi)
- {
- 	if (text_output) {
--		if (t->action == BLK_TN_MESSAGE)
-+		if ((t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE)
- 			handle_notify(t);
- 		else if (t->action & BLK_TC_ACT(BLK_TC_PC))
- 			dump_trace_pc(t, pdi, pci);
-@@ -1658,7 +1669,7 @@ static void dump_trace(struct blk_io_trace *t, struct per_cpu_info *pci,
- 
- 	if (bin_output_msgs ||
- 			    !(t->action & BLK_TC_ACT(BLK_TC_NOTIFY) &&
--			      t->action == BLK_TN_MESSAGE))
-+			      (t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE))
- 		output_binary(t, sizeof(*t) + t->pdu_len);
- }
- 
-@@ -2234,7 +2245,7 @@ static void show_entries_rb(int force)
- 			break;
- 		}
- 
--		if (!(bit->action == BLK_TN_MESSAGE) &&
-+		if (!((bit->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE) &&
- 		    check_sequence(pdi, t, force))
- 			break;
- 
-@@ -2246,7 +2257,7 @@ static void show_entries_rb(int force)
- 		if (!pci || pci->cpu != bit->cpu)
- 			pci = get_cpu_info(pdi, bit->cpu);
- 
--		if (!(bit->action == BLK_TN_MESSAGE))
-+		if (!((bit->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE))
- 			pci->last_sequence = bit->sequence;
- 
- 		pci->nelems++;
-@@ -2380,7 +2391,7 @@ static int read_events(int fd, int always_block, int *fdblock)
- 		/*
- 		 * not a real trace, so grab and handle it here
- 		 */
--		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && bit->action != BLK_TN_MESSAGE) {
-+		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && (bit->action & ~__BLK_TN_CGROUP) != BLK_TN_MESSAGE) {
- 			handle_notify(bit);
- 			output_binary(bit, sizeof(*bit) + bit->pdu_len);
- 			continue;
-@@ -2529,7 +2540,7 @@ static int ms_prime(struct ms_stream *msp)
- 			continue;
- 		}
- 
--		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && bit->action != BLK_TN_MESSAGE) {
-+		if (bit->action & BLK_TC_ACT(BLK_TC_NOTIFY) && (bit->action & ~__BLK_TN_CGROUP) != BLK_TN_MESSAGE) {
- 			handle_notify(bit);
- 			output_binary(bit, sizeof(*bit) + bit->pdu_len);
- 			bit_free(bit);
-diff --git a/blkparse_fmt.c b/blkparse_fmt.c
-index c42e6d7b7219..df2f6ce2148a 100644
---- a/blkparse_fmt.c
-+++ b/blkparse_fmt.c
-@@ -205,6 +205,21 @@ static void print_field(char *act, struct per_cpu_info *pci,
- 	case 'e':
- 		fprintf(ofp, strcat(format, "d"), t->error);
- 		break;
-+	case 'g': {
-+		char cgidstr[24];
-+		u32 ino = 0, gen = 0;
-+
-+		if (t->action & __BLK_TA_CGROUP) {
-+			struct blk_io_cgroup_payload *cgid =
-+				(struct blk_io_cgroup_payload *)pdu_buf;
-+
-+			ino = cgid->ino;
-+			gen = cgid->gen;
-+		}
-+		sprintf(cgidstr, "%x,%x", ino, gen);
-+		fprintf(ofp, strcat(format, "s"), cgidstr);
-+		break;
-+	}
- 	case 'M':
- 		fprintf(ofp, strcat(format, "d"), MAJOR(t->device));
- 		break;
-diff --git a/blktrace_api.h b/blktrace_api.h
-index b22221828f41..8c760b8dd260 100644
---- a/blktrace_api.h
-+++ b/blktrace_api.h
-@@ -51,6 +51,7 @@ enum {
- 	__BLK_TA_REMAP,			/* bio was remapped */
- 	__BLK_TA_ABORT,			/* request aborted */
- 	__BLK_TA_DRV_DATA,		/* binary driver data */
-+	__BLK_TA_CGROUP = 1 << 8,
- };
- 
- /*
-@@ -60,6 +61,7 @@ enum blktrace_notify {
- 	__BLK_TN_PROCESS = 0,		/* establish pid/name mapping */
- 	__BLK_TN_TIMESTAMP,		/* include system clock */
- 	__BLK_TN_MESSAGE,               /* Character string message */
-+	__BLK_TN_CGROUP = __BLK_TA_CGROUP,
- };
- 
- /*
-@@ -116,6 +118,14 @@ struct blk_io_trace_remap {
- 	__u64 sector_from;
- };
- 
-+/*
-+ * Payload with originating cgroup info
-+ */
-+struct blk_io_cgroup_payload {
-+	__u32 ino;
-+	__u32 gen;
-+};
-+
- /*
-  * User setup structure passed with BLKSTARTTRACE
-  */
-diff --git a/doc/blkparse.1 b/doc/blkparse.1
-index e494b6eca223..4c26baffc56c 100644
---- a/doc/blkparse.1
-+++ b/doc/blkparse.1
-@@ -332,6 +332,10 @@ the event's device (separated by a comma).
- .IP \fBe\fR 4
- Error value
- 
-+.IP \fBg\fR 4
-+Cgroup identifier of the cgroup that generated the IO. Note that this requires
-+appropriate kernel support (kernel version at least 4.14).
-+
- .IP \fBm\fR 4
- Minor number of event's device.
- 
-diff --git a/doc/blktrace.tex b/doc/blktrace.tex
-index 3647c7502142..836ac4a35f86 100644
---- a/doc/blktrace.tex
-+++ b/doc/blktrace.tex
-@@ -601,6 +601,9 @@ Specifier & \\ \hline\hline
- the event's device \\
-          & (separated by a comma). \\ \hline
- \emph{e} & Error value \\ \hline
-+\emph{g} & Cgroup identifier of the cgroup that generated the IO. Note that this requires
-+appropriate \\
-+         & kernel support (kernel version at least 4.14). \\ \hline
- \emph{m} & Minor number of event's device. \\ \hline
- \emph{M} & Major number of event's device. \\ \hline
- \emph{n} & Number of blocks \\ \hline
--- 
-2.16.4
+> Il giorno 6 mag 2020, alle ore 15:39, Jan Kara <jack@suse.cz> ha =
+scritto:
+>=20
+> I was investigating a performance issue with BFQ IO scheduler and I =
+was
+> pondering why I'm not seeing informational messages from BFQ. After =
+quite
+> some debugging I have found out that commit 35fe6d763229 "block: use
+> standard blktrace API to output cgroup info for debug notes" broke =
+standard
+> blktrace API - namely the informational messages logged by =
+bfq_log_bfqq()
+> are no longer displayed by blkparse(8) tool. This is because these =
+messages
+> have now __BLK_TA_CGROUP bit set and that breaks flags checking in
+> blkparse(1) and iowatcher(1). This series fixes both tools to be able =
+to
+> cope with events with __BLK_TA_CGROUP flag set.
+>=20
+> 								Honza
 
