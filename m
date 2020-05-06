@@ -2,96 +2,83 @@ Return-Path: <SRS0=ToMJ=6U=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A9CC47254
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 01:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A885C47254
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 01:33:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCBDF20735
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 01:24:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DeEFxxGc"
+	by mail.kernel.org (Postfix) with ESMTP id 44AD120752
+	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 01:33:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729744AbgEFBYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 May 2020 21:24:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48612 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729457AbgEFBYn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 May 2020 21:24:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588728282;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tt4i4Nh4xWPSAsQ3lja/irt2LqFsTaeYy4zp5iGG8yk=;
-        b=DeEFxxGc+8HDQXdCE1RkRQJLinkXTQE5SB23tlCzMDw0+9DAPxuX3ZnqbILgtA84LYxAGd
-        pqlrz6FjQ52bnQHKWjbdyQ1zMXaeEfSnLvWiu5fuCilG8CjF/fZHBJQYhcsigLMjLOV3q5
-        qrG8nw3xBoD24cid5dCkSnfzuXth9rQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-285rhgcbONKCUKzQNhiBeg-1; Tue, 05 May 2020 21:24:40 -0400
-X-MC-Unique: 285rhgcbONKCUKzQNhiBeg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38CA5800687;
-        Wed,  6 May 2020 01:24:39 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CAD8264431;
-        Wed,  6 May 2020 01:24:30 +0000 (UTC)
-Date:   Wed, 6 May 2020 09:24:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>, paulmck@kernel.org
-Subject: Re: [PATCH V8 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200506012425.GA1177270@T590>
-References: <20200429021612.GD671522@T590>
- <20200429080728.GB29143@willie-the-truck>
- <20200429094616.GB700644@T590>
- <20200429122757.GA30247@willie-the-truck>
- <20200429134327.GC700644@T590>
- <20200429173400.GC30247@willie-the-truck>
- <20200430003945.GA719313@T590>
- <20200430110429.GI19932@willie-the-truck>
- <20200430140254.GA996887@T590>
- <20200505154618.GA3644@lst.de>
+        id S1728609AbgEFBd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 May 2020 21:33:58 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3849 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727989AbgEFBd6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 May 2020 21:33:58 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 44882CD09A619D1254D8;
+        Wed,  6 May 2020 09:33:53 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.55) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Wed, 6 May 2020
+ 09:33:52 +0800
+Subject: Re: [PATCH 2/4] mm/swap: use SECTORS_PER_PAGE_SHIFT to clean up code
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-mm <linux-mm@kvack.org>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel <dm-devel@redhat.com>, Song Liu <song@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20200505115543.1660-1-thunder.leizhen@huawei.com>
+ <20200505115543.1660-3-thunder.leizhen@huawei.com>
+ <20200505172520.GI16070@bombadil.infradead.org>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <32ba9907-60ad-27c0-c565-e7b5c80ab03c@huawei.com>
+Date:   Wed, 6 May 2020 09:33:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200505154618.GA3644@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200505172520.GI16070@bombadil.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.166.215.55]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 05, 2020 at 05:46:18PM +0200, Christoph Hellwig wrote:
-> On Thu, Apr 30, 2020 at 10:02:54PM +0800, Ming Lei wrote:
-> > BLK_MQ_S_INACTIVE is only set when the last cpu of this hctx is becoming
-> > offline, and blk_mq_hctx_notify_offline() is called from cpu hotplug
-> > handler. So if there is any request of this hctx submitted from somewhere,
-> > it has to this last cpu. That is done by blk-mq's queue mapping.
-> > 
-> > In case of direct issue, basically blk_mq_get_driver_tag() is run after
-> > the request is allocated, that is why I mentioned the chance of
-> > migration is very small.
+
+
+On 2020/5/6 1:25, Matthew Wilcox wrote:
+> On Tue, May 05, 2020 at 07:55:41PM +0800, Zhen Lei wrote:
+>> +++ b/mm/swapfile.c
+>> @@ -177,8 +177,8 @@ static int discard_swap(struct swap_info_struct *si)
+>>  
+>>  	/* Do not discard the swap header page! */
+>>  	se = first_se(si);
+>> -	start_block = (se->start_block + 1) << (PAGE_SHIFT - 9);
+>> -	nr_blocks = ((sector_t)se->nr_pages - 1) << (PAGE_SHIFT - 9);
+>> +	start_block = (se->start_block + 1) << SECTORS_PER_PAGE_SHIFT;
+>> +	nr_blocks = ((sector_t)se->nr_pages - 1) << SECTORS_PER_PAGE_SHIFT;
 > 
-> "very small" does not cut it, it has to be zero.  And it seems the
-> new version still has this hack.
+> Thinking about this some more, wouldn't this look better?
+> 
+> 	start_block = page_sectors(se->start_block + 1);
+> 	nr_block = page_sectors(se->nr_pages - 1);
+> 
 
-But smp_mb() is used for ordering the WRITE and READ, so it is correct.
+OK，That's fine, it's clearer. And in this way, there won't be more than 80 columns.
 
-barrier() is enough when process migration doesn't happen.
-
-thank, 
-Ming
+> 
+> .
+> 
 
