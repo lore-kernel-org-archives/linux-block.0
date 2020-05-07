@@ -2,102 +2,97 @@ Return-Path: <SRS0=Cb6v=6V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089DDC38A2A
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 14:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC5B4C38A24
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 14:57:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2E0720659
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 14:36:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588862172;
-	bh=8Shtm4idk430UQGobbDZvLe300fCi968VhfPAQDmda0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lyl36V2CWMQnl3I8H+WMmHBMVjqLquUmSVA5PpXyK/znV4+0UHrRCGXWepL15MvgR
-	 sFpzkKAkl0+CvC0sWP3LWH6Ol9a7xh0eBfwpgaQcqAJc5eqcwl+FnwL08MBY+qXo+k
-	 j7MMxQuH1id/w6trauqRsryRB8VLkGKQZ/oPkGJM=
+	by mail.kernel.org (Postfix) with ESMTP id 7EA5B20736
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 14:57:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WrN8B/Fh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728089AbgEGO2X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 May 2020 10:28:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55014 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728083AbgEGO2W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 May 2020 10:28:22 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 81CEC20870;
-        Thu,  7 May 2020 14:28:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588861702;
-        bh=8Shtm4idk430UQGobbDZvLe300fCi968VhfPAQDmda0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FSS6IB43nfDsPmrtIIJXbfp2WdFI1JdPblqaYOB5s1xcjQGthFlO8rtuZCCxvnBgK
-         krjn1v9je9JcLexujuoaolQnQTyH6aoMEGxqdbJJtKo98hB1p+vxO/BJUhpiKiiDzu
-         l8UkH3tG/9u8J1TuVShCF88P3krDVAJ04+G4i++o=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        Yang Xu <xuyang2018.jy@cn.fujitsu.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 43/50] block: remove the bd_openers checks in blk_drop_partitions
-Date:   Thu,  7 May 2020 10:27:19 -0400
-Message-Id: <20200507142726.25751-43-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200507142726.25751-1-sashal@kernel.org>
-References: <20200507142726.25751-1-sashal@kernel.org>
+        id S1726408AbgEGO5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 May 2020 10:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725969AbgEGO5k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 May 2020 10:57:40 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ECECC05BD43
+        for <linux-block@vger.kernel.org>; Thu,  7 May 2020 07:57:40 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id u11so6553224iow.4
+        for <linux-block@vger.kernel.org>; Thu, 07 May 2020 07:57:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=b5LGB9U5mr0ssbQpTapfFOTOTVm3j7jCi0JK44bqEyw=;
+        b=WrN8B/FhVmqT7+rHqd9W58bKtQYTI02+ycf8FUg/7vrUtF87HaMP/IE6eiI80zAxh6
+         sSjLlHhf7rlZkQx8+nTUVrSu+WO+bt7ci87LoHw2F7ZggtxNr+C1WnSFGqN0jL8zEcHC
+         qxzkr6SlGFQiPlKTHENPwbr6kj6BLbzBaLdSl0+eynrrA0vKj4ybsgELTISuEnfW42Yv
+         dQok9g3ruMJ/rCKZ8pk4s++xxyjTo5Qc/jouz356inWtvxr0sPBd+y7q8U8gREY0yHtR
+         i9tDU6K8xUYh8/k9swuBk8t2ji6cxGJgOCx244/tZwrzVKIn/zpxfVxsGi02lUa+sThP
+         nBug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=b5LGB9U5mr0ssbQpTapfFOTOTVm3j7jCi0JK44bqEyw=;
+        b=j3qknwYxBM74IV9P2vZTyWI7xZWuIWBjWMiT7kC2+Lv2Q8kv1kE2fq+wAGXzbA9wko
+         4EQ9wBiUhRLZHzH7dNrkRJuoYoKQQoGPXS5WePSnR/R6y7CuokP6tgeQuPwbvsHUuQDs
+         ryxDsiuf4Uh0qV/sH0mP03EVMbg2azXQerZkJtVB8lAWvASGCzmTneKxwFl1mVFmRF2B
+         6dwtlCU/hroR6UtnXDdEgpxoGkv4Texsh/crGopO6Dj1PvilkdmcWlWArpaVWBgacWjC
+         GlpFD2PyR/PkFnD+aIe1u2PfNsjPlTDjhkdAzUTQbpvRieXc3PkThY+29If1x7F05WyA
+         lHwg==
+X-Gm-Message-State: AGi0PuaniFv+2z0OucVxCc6Cif2tphXMn5TxhzQYvv98P+bKwv1B1I4a
+        pkDloLlKV/lwEkaRgJ3hcNZD1A==
+X-Google-Smtp-Source: APiQypJ2pfnQ5mtWTdwxdgb+WT1d5T3KXYSjVr1M6UMi0PTH+3ibjDMAUvwZW7JwXzLLFSk/FGvg9g==
+X-Received: by 2002:a05:6638:155:: with SMTP id y21mr14505534jao.79.1588863459503;
+        Thu, 07 May 2020 07:57:39 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id r18sm2662960ioj.15.2020.05.07.07.57.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 May 2020 07:57:38 -0700 (PDT)
+Subject: Re: PING for Re: bdi: fix use-after-free for dev_name(bdi->dev) v3
+ (resend)
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
+        bvanassche@acm.org, tytso@mit.edu, hdegoede@redhat.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200504124801.2832087-1-hch@lst.de>
+ <20200507062743.GA5814@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1753814d-377a-f98e-e670-161b3f17cc43@kernel.dk>
+Date:   Thu, 7 May 2020 08:57:37 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200507062743.GA5814@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+On 5/7/20 12:27 AM, Christoph Hellwig wrote:
+> On Mon, May 04, 2020 at 02:47:52PM +0200, Christoph Hellwig wrote:
+>> Hi Jens,
+>>
+>> can you pick up this series?
+> 
+> ping?  Especially as 1-4 fix a kernel crash and should probably be
+> 5.7 material.
 
-[ Upstream commit 10c70d95c0f2f9a6f52d0e33243d2877370cef51 ]
+I've added 1-4 for 5.7, and the rest for 5.8.
 
-When replacing the bd_super check with a bd_openers I followed a logical
-conclusion, which turns out to be utterly wrong.  When a block device has
-bd_super sets it has a mount file system on it (although not every
-mounted file system sets bd_super), but that also implies it doesn't even
-have partitions to start with.
-
-So instead of trying to come up with a logical check for all openers,
-just remove the check entirely.
-
-Fixes: d3ef5536274f ("block: fix busy device checking in blk_drop_partitions")
-Fixes: cb6b771b05c3 ("block: fix busy device checking in blk_drop_partitions again")
-Reported-by: Michal Koutný <mkoutny@suse.com>
-Reported-by: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/partition-generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index ebe4c2e9834bd..8a7906fa96fd6 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -468,7 +468,7 @@ int blk_drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
--	if (bdev->bd_part_count || bdev->bd_openers > 1)
-+	if (bdev->bd_part_count)
- 		return -EBUSY;
- 	res = invalidate_partition(disk, 0);
- 	if (res)
 -- 
-2.20.1
+Jens Axboe
 
