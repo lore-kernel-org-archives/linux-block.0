@@ -2,103 +2,118 @@ Return-Path: <SRS0=Cb6v=6V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AECBC38A2A
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 12:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F9AC38A24
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 13:03:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3072F2082E
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 12:58:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lcyjC2vu"
+	by mail.kernel.org (Postfix) with ESMTP id E2DAE20870
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 13:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725949AbgEGM65 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 May 2020 08:58:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725903AbgEGM65 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 May 2020 08:58:57 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A5FC05BD43
-        for <linux-block@vger.kernel.org>; Thu,  7 May 2020 05:58:57 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id b6so108346qkh.11
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2020 05:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OwnEBzVwDcojjtYHnHImbVqq41waqshUN9/b/o5AzuY=;
-        b=lcyjC2vuK078yyHvn1/rju0xFuTTuwECrmXq6qh1HZBNp99f+cTplWI88gxI0TiPXK
-         K/bPKcSM4lJMatxZXvtsGJPYSxxQteP++7Yu4u1KgYNQ+feAWyB8ou7OkrlLNKYb75jO
-         RzrcK0oCzF0CMhcId9580w2zG9tpvLxsj9dW98o/BTFtIf6o304wd9U5JBC9HW/Ohb+H
-         JzDr6PAWV9SxrdLObz9nzoDzUlFlHxEqcc/G4I1gqzIw3DtWU6f7imuDWOVpsyFa92bM
-         sRdMufGuXxqNy5qjm380ED2HPd2C0dBa0gQy7/iTDluJ3rCv+iE9c0/evO8f04TEwsnU
-         LzJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OwnEBzVwDcojjtYHnHImbVqq41waqshUN9/b/o5AzuY=;
-        b=AqvGieiVkfpCjDJ5lBY/TG2G4rxOOH+SQRllAqB/gGTjgO6aSG9Ec/0v82QDILyhjc
-         cJAjuxqet6Gs7NqGyNf7L4sfR+9q68usDi6f4nIQy75xtAG5wa+CoZpjPdcMbWb8/dxU
-         rFsLAo6e5Zt0tM7x494IrbmytPli+0DlyfleRWxaFT0BPWgf2rTzeQF5D6Uq7PeQWmbz
-         VaVqN3irXCOmKEwr46WYZnnmIflND4POGR4Jh+b1qPWpqXNOIG0AXkrCt9Iv+GAEit3D
-         9RuYYgehgNhNvgS8EWy9CTEYf7BqXQyQzIiD4QTyGI1I50eDETeLsw84+pQxE1CaIiz4
-         4t8w==
-X-Gm-Message-State: AGi0PuZ5zf+ZU7hCLYHPUjrMWO7okASp3z1ElblJ2v5Lo1J+LXZwI/v0
-        ejLgv9RGBc7itI7pCSvi8uzh1V9rLBG6kcR56l8=
-X-Google-Smtp-Source: APiQypIJdT2tdgfq3eB2eq1A7Y3notP0xAkUKLwbA/Gnqnf7VX7QQk4YzHDcSdEd9cYcrPmmeLROM3K2SpGCtVFUuHM=
-X-Received: by 2002:a37:4d04:: with SMTP id a4mr15051209qkb.222.1588856336537;
- Thu, 07 May 2020 05:58:56 -0700 (PDT)
+        id S1726029AbgEGNDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 May 2020 09:03:35 -0400
+Received: from mx2.didiglobal.com ([111.202.154.82]:13726 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1725857AbgEGNDf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 May 2020 09:03:35 -0400
+X-ASG-Debug-ID: 1588856609-0e4108125419c5f0001-Cu09wu
+Received: from mail.didiglobal.com (localhost [172.20.36.204]) by bsf02.didichuxing.com with ESMTP id i4pDUF5usOkSqUuo; Thu, 07 May 2020 21:03:29 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 7 May
+ 2020 21:03:29 +0800
+Date:   Thu, 7 May 2020 21:03:28 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>, <tom.leiming@gmail.com>, <bvanassche@acm.org>,
+        <hch@infradead.org>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH v6 0/5] Fix potential kernel panic when increase hardware
+ queue
+Message-ID: <cover.1588856361.git.zhangweiping@didiglobal.com>
+X-ASG-Orig-Subj: [PATCH v6 0/5] Fix potential kernel panic when increase hardware
+ queue
+Mail-Followup-To: axboe@kernel.dk, tom.leiming@gmail.com,
+        bvanassche@acm.org, hch@infradead.org, linux-block@vger.kernel.org
 MIME-Version: 1.0
-References: <cover.1588660550.git.zhangweiping@didiglobal.com>
- <7eaff8fdfc394ecb686abb186564d9e1aebcf9ae.1588660550.git.zhangweiping@didiglobal.com>
- <20200507061141.GC23530@infradead.org>
-In-Reply-To: <20200507061141.GC23530@infradead.org>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Thu, 7 May 2020 20:59:06 +0800
-Message-ID: <CAA70yB52KROUWtACb8si2pKdYvshQp-DHhKjL-X1++0cMiHVaQ@mail.gmail.com>
-Subject: Re: [PATCH v5 4/5] block: rename __blk_mq_alloc_rq_map
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, tom.leiming@gmail.com,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS02.didichuxing.com (172.20.36.211) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: localhost[172.20.36.204]
+X-Barracuda-Start-Time: 1588856609
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 1581
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0054 1.0000 -1.9858
+X-Barracuda-Spam-Score: -1.99
+X-Barracuda-Spam-Status: No, SCORE=-1.99 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.81681
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 7, 2020 at 2:12 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Tue, May 05, 2020 at 02:45:58PM +0800, Weiping Zhang wrote:
-> > rename __blk_mq_alloc_rq_map to __blk_mq_alloc_map_and_request,
-> > actually it alloc both map and request, make function name
-> > align with function.
-> >
-> > Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> > Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> > ---
-> >  block/blk-mq.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index c6ba94cba17d..02af33f56daa 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2473,7 +2473,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
-> >       }
-> >  }
-> >
-> > -static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
-> > +static bool __blk_mq_alloc_map_and_request(struct blk_mq_tag_set *set, int hctx_idx)
->
-> Please fix the > 80 char line here.
-OK, fix in v6.
+Hi,
 
-Thanks
+This series mainly fix the kernel panic when increase hardware queue,
+and also fix some other misc issue.
+
+Memleak 1:
+
+__blk_mq_alloc_rq_maps
+	__blk_mq_alloc_rq_map
+
+if fail
+	blk_mq_free_rq_map
+
+Actually, __blk_mq_alloc_rq_map alloc both map and request, here
+also need free request.
+
+
+Patch1: fix Memleak 1.
+Patch2: fix prev_nr_hw_queues issue, need be saved before change.
+Patch3: From Ming, fix potential kernel panic when increase hardware queue.
+Patch4~5: rename two function, because these two function alloc both
+map and request, and keep in pair with blk_mq_free_map_and_request(s).
+
+Changes since V5:
+ * fix 80 char per line for patch-4
+
+Changes since V4:
+ * use another way to fix kernel panic when increase hardware queue,
+   this patch from Ming.
+
+Changes since V3:
+* record patchset, fix issue fistly then rename.
+* rename function to blk_mq_alloc_map_and_request
+
+Changes since V2:
+ * rename some functions name and fix memleak when free map and requests
+ * Not free new allocated map and request, they will be relased when tagset gone
+
+Changes since V1:
+ * Add fix for potential kernel panic when increase hardware queue
+
+Ming Lei (1):
+  block: alloc map and request for new hardware queue
+
+Weiping Zhang (4):
+  block: free both rq_map and request
+  block: save previous hardware queue count before udpate
+  block: rename __blk_mq_alloc_rq_map
+  block: rename blk_mq_alloc_rq_maps
+
+ block/blk-mq.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+-- 
+2.18.2
+
