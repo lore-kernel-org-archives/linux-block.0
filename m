@@ -2,142 +2,87 @@ Return-Path: <SRS0=Cb6v=6V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB07C47247
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F09C38A24
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:44:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CCA1207DD
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:37:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 804FB2080D
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="DxKUKKSF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MW3uq3kM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725809AbgEGHhR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 May 2020 03:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725834AbgEGHhR (ORCPT
+        id S1725834AbgEGHon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 May 2020 03:44:43 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47861 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725809AbgEGHon (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 May 2020 03:37:17 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30B8C061A41
-        for <linux-block@vger.kernel.org>; Thu,  7 May 2020 00:37:16 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id w2so4519753edx.4
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2020 00:37:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YEtUYxGP6c3YM75nf+53+5ZvgqF65+6hKb/BwBYHyPI=;
-        b=DxKUKKSFKxGgS+tfkOV2Q6enXeM8fpLfXXgzHZ8aZsN9ENp+twoIbi2eK0mpXT7wsR
-         Zt33N2wyxxWUoW7peEHUhTOD6ng6MjNqJg3YAjM9rpUp65FWJvN3m4zw9U3TqCzqIqdR
-         qKLOZ7phQFDBGrCDFf1oHEdwHsYXSIyRleqobDWa1UCewndR5LHV44SMq+hDrxjnS+8/
-         t/r4qw3DSOFj+MHKkCVZyKc5S2hVUk38unvCQbF7T53G9gzgp6wcwHoODUiuZDbLAC23
-         Wky3+JlD4Qy05PXJzilh1wStKNjT8xP3VckvjNqAIl/mcUhKO2/CrXT97Qq5pzdbjJz1
-         CAZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YEtUYxGP6c3YM75nf+53+5ZvgqF65+6hKb/BwBYHyPI=;
-        b=frK2RL1cWS6FKVJIKJUlv/LXwTujo+wxs9S7R9Cw6vgbkLt9X0Yj2EWh2o/VT/fOvc
-         iqCBrx9mfIZ5kK3w9IMCtFjxzJ08RKyWsWl5NSgatWaFVX1U8odKuZVvnJ+VLBkjsKiC
-         nHIhclLAOdUobRFw1ophe+myusDGj3a/ueL/LKNbOHHOgjgUASLd2WaCRuwdIe226Y8V
-         ETim+mVW5PJ1kMS7DPq4uUW7utrABLRKbWtibN+3uhHrFotQVsb9kgyqALiNvy29o++b
-         Fr8dD8uJDfhyjvcKXX5CoLDzfDyB8WRZ/zc/fwKi754BY0ePyTDUrtNxhsr+y+jhwLnU
-         JkPg==
-X-Gm-Message-State: AGi0PuYOP943tvdoHtXA0oBSwlZcx+OcaGtQUsQI6F36OhLC7YAjwqXc
-        1Fha8lM8n0LllIQrL7jW0+AFZ2Adbl/5Z6EgkKJgDDl/HJs=
-X-Google-Smtp-Source: APiQypIXS2NXxL6atjZSZzxsg+2LhmOF6fxQlf9Ijva7zvEoOLw7iotmvSqzSMQ9iBEg03+gfEOzr/Vxd++b/9q7YeY=
-X-Received: by 2002:aa7:d306:: with SMTP id p6mr10411834edq.35.1588837035291;
- Thu, 07 May 2020 00:37:15 -0700 (PDT)
+        Thu, 7 May 2020 03:44:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588837482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h6uswedAMjpbqecNSfTjRCenxs9Rh0/ygb45+I7a8eQ=;
+        b=MW3uq3kMmhv9AWEUcCGr6BBHicAFhCoDaqaFuBOaHrsz9NuHEe5PYhkNVABEZYQzoBACq3
+        DmDlddgEvnmXwQfJILei0ZV9FI34wXrboCoy5omstrft2XAiri5zxX7lJ9gVFcfCTMwO7/
+        TFnzgRVlSu3nT5LZv6XZ+iMYv/OnHSc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-9dXyWPYcOxCf54YDKpZcrw-1; Thu, 07 May 2020 03:44:40 -0400
+X-MC-Unique: 9dXyWPYcOxCf54YDKpZcrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D017C1895A2A;
+        Thu,  7 May 2020 07:44:38 +0000 (UTC)
+Received: from T590 (ovpn-8-38.pek2.redhat.com [10.72.8.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60B945D9C5;
+        Thu,  7 May 2020 07:44:27 +0000 (UTC)
+Date:   Thu, 7 May 2020 15:44:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, yuyufen@huawei.com, tj@kernel.org, jack@suse.cz,
+        bvanassche@acm.org, tytso@mit.edu, hdegoede@redhat.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: bdi: fix use-after-free for dev_name(bdi->dev) v3 (resend)
+Message-ID: <20200507074423.GA1285373@T590>
+References: <20200504124801.2832087-1-hch@lst.de>
 MIME-Version: 1.0
-References: <20200504140115.15533-24-danil.kipnis@cloud.ionos.com>
- <202005060522.xI0z2eA6%lkp@intel.com> <CAMGffE=58PZSp3B14d_jCCKwPDr_YHoWxJs9gsmg-2Af60vnrw@mail.gmail.com>
- <20200507071256.GD78674@unreal>
-In-Reply-To: <20200507071256.GD78674@unreal>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Thu, 7 May 2020 09:37:04 +0200
-Message-ID: <CAMGffE==CT2cDfRpPnJze9Z9Jc-vXTX5B61PeZ29F17+n8uxKw@mail.gmail.com>
-Subject: Re: [PATCH v14 23/25] block/rnbd: include client and server modules
- into kernel compilation
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     kbuild test robot <lkp@intel.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        kbuild-all@lists.01.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200504124801.2832087-1-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 7, 2020 at 9:13 AM Leon Romanovsky <leon@kernel.org> wrote:
->
-> On Thu, May 07, 2020 at 09:05:26AM +0200, Jinpu Wang wrote:
-> > Hi, Kbuild test robot,
-> >
-> > On Tue, May 5, 2020 at 11:34 PM kbuild test robot <lkp@intel.com> wrote:
-> > >
-> > > Hi Danil,
-> > >
-> > > I love your patch! Yet something to improve:
-> > >
-> > > [auto build test ERROR on block/for-next]
-> > > [also build test ERROR on driver-core/driver-core-testing rdma/for-next linus/master v5.7-rc4 next-20200505]
-> > > [if your patch is applied to the wrong git tree, please drop us a note to help
-> > > improve the system. BTW, we also suggest to use '--base' option to specify the
-> > > base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
-> > >
-> > > url:    https://github.com/0day-ci/linux/commits/Danil-Kipnis/RTRS-former-IBTRS-RDMA-Transport-Library-and-RNBD-former-IBNBD-RDMA-Network-Block-Device/20200505-072234
-> > > base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-> > > config: c6x-allyesconfig (attached as .config)
-> > > compiler: c6x-elf-gcc (GCC) 9.3.0
-> > > reproduce:
-> > >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> > >         chmod +x ~/bin/make.cross
-> > >         # save the attached .config to linux build tree
-> > >         COMPILER_INSTALL_PATH=$HOME/0day GCC_VERSION=9.3.0 make.cross ARCH=c6x
-> > >
-> > > If you fix the issue, kindly add following tag as appropriate
-> > > Reported-by: kbuild test robot <lkp@intel.com>
-> > >
-> > > All errors (new ones prefixed by >>):
-> > >
-> > >    In file included from drivers/block/rnbd/rnbd-clt.c:19:
-> > > >> drivers/block/rnbd/rnbd-clt.h:19:10: fatal error: rtrs.h: No such file or directory
-> > >       19 | #include <rtrs.h>
-> > >          |          ^~~~~~~~
-> > >    compilation terminated.
-> > > --
-> > >    In file included from drivers/block/rnbd/rnbd-srv.c:15:
-> > > >> drivers/block/rnbd/rnbd-srv.h:16:10: fatal error: rtrs.h: No such file or directory
-> > >       16 | #include <rtrs.h>
-> > >          |          ^~~~~~~~
-> > >    compilation terminated.
-> > >
-> > > vim +19 drivers/block/rnbd/rnbd-clt.h
-> > looks somehow the "ccflags-y := -Idrivers/infiniband/ulp/rtrs " was
-> > ignored in your case
-> >
-> > We'll try to repro on ourside, can you also check on your side why
-> > ccflags is ignored?
->
-> It should be ccflags-y := -I $(srctree)/drivers/infiniband/ulp/rtrs
->
-> Thanks
->
-> >
-> > Thanks!
-> > Jinpu
-Alright, thanks for the hint, I think it is the reason.
+On Mon, May 04, 2020 at 02:47:52PM +0200, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> can you pick up this series?
+> 
+> the first three patches are my take on the proposal from Yufen Yu
+> to fix the use after free of the device name of the bdi device.
+> 
+> The rest is vaguely related cleanups.
+> 
+> Changes since v2:
+>  - switch vboxsf to a shorter bdi name
+> 
+> Changes since v1:
+>  - use a static dev_name buffer inside struct backing_dev_info
+> 
 
-Will fix it soon!
+Looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
+
