@@ -1,106 +1,58 @@
-Return-Path: <SRS0=ToMJ=6U=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Cb6v=6V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86950C28CBC
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 18:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF65C38A24
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 06:11:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E93E2075A
-	for <linux-block@archiver.kernel.org>; Wed,  6 May 2020 18:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CC5D20838
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 06:11:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GPdgl2HH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729579AbgEFSSJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 May 2020 14:18:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46050 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729442AbgEFSSJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 May 2020 14:18:09 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 20C2AAC8F;
-        Wed,  6 May 2020 18:18:10 +0000 (UTC)
-Subject: Re: [PATCH v10 6/9] scsi: sd_zbc: emulate ZONE_APPEND commands
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20200506161145.9841-1-johannes.thumshirn@wdc.com>
- <20200506161145.9841-7-johannes.thumshirn@wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <f031f491-620a-6b72-f16a-3702239b01c6@suse.de>
-Date:   Wed, 6 May 2020 20:18:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1725793AbgEGGLA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 May 2020 02:11:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55960 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbgEGGLA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 May 2020 02:11:00 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93369C061A0F
+        for <linux-block@vger.kernel.org>; Wed,  6 May 2020 23:11:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=GPdgl2HHXZy32q1bPH+6SbcQpl
+        mqFTKHHGuZNNFQsrfk4v1c8FHTEp4LSu/wTmyf6WBiPJPDMjh9ONWKPyPM8COmSXnaHaq/3QnknOo
+        +lDxt4IKcMgs3Sq75p/MoIgJ1eUYQ1lfYxD3I5Re17hjjaiNxLaMzzYFAKe8lq/w0osMNOuJ92PZl
+        k3EumgS8br/0+X2CcP+OZ4ksdAAXbKaOwmnqjz81YBXhYmq/9I+YRd+kz3DkWOjS89+954idSWqGU
+        kNOms/P3dYexPGSs3Ga61axmzTCevgXhAoUQO3FxyqpsWS2HraO9QqDoP2JsdAZ/ihYx65zotwwnO
+        06VbhCfQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jWZkI-0001xV-Js; Thu, 07 May 2020 06:10:58 +0000
+Date:   Wed, 6 May 2020 23:10:58 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     axboe@kernel.dk, tom.leiming@gmail.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 1/5] block: free both rq_map and request
+Message-ID: <20200507061058.GA23530@infradead.org>
+References: <cover.1588660550.git.zhangweiping@didiglobal.com>
+ <b679d39aff2fc337e68f1e5f8c519b36a880b138.1588660550.git.zhangweiping@didiglobal.com>
 MIME-Version: 1.0
-In-Reply-To: <20200506161145.9841-7-johannes.thumshirn@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b679d39aff2fc337e68f1e5f8c519b36a880b138.1588660550.git.zhangweiping@didiglobal.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/6/20 6:11 PM, Johannes Thumshirn wrote:
-> Emulate ZONE_APPEND for SCSI disks using a regular WRITE(16) command
-> with a start LBA set to the target zone write pointer position.
-> 
-> In order to always know the write pointer position of a sequential write
-> zone, the write pointer of all zones is tracked using an array of 32bits
-> zone write pointer offset attached to the scsi disk structure. Each
-> entry of the array indicate a zone write pointer position relative to
-> the zone start sector. The write pointer offsets are maintained in sync
-> with the device as follows:
-> 1) the write pointer offset of a zone is reset to 0 when a
->     REQ_OP_ZONE_RESET command completes.
-> 2) the write pointer offset of a zone is set to the zone size when a
->     REQ_OP_ZONE_FINISH command completes.
-> 3) the write pointer offset of a zone is incremented by the number of
->     512B sectors written when a write, write same or a zone append
->     command completes.
-> 4) the write pointer offset of all zones is reset to 0 when a
->     REQ_OP_ZONE_RESET_ALL command completes.
-> 
-> Since the block layer does not write lock zones for zone append
-> commands, to ensure a sequential ordering of the regular write commands
-> used for the emulation, the target zone of a zone append command is
-> locked when the function sd_zbc_prepare_zone_append() is called from
-> sd_setup_read_write_cmnd(). If the zone write lock cannot be obtained
-> (e.g. a zone append is in-flight or a regular write has already locked
-> the zone), the zone append command dispatching is delayed by returning
-> BLK_STS_ZONE_RESOURCE.
-> 
-> To avoid the need for write locking all zones for REQ_OP_ZONE_RESET_ALL
-> requests, use a spinlock to protect accesses and modifications of the
-> zone write pointer offsets. This spinlock is initialized from sd_probe()
-> using the new function sd_zbc_init().
-> 
-> Co-developed-by: Damien Le Moal <Damien.LeMoal@wdc.com>
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->   drivers/scsi/sd.c     |  16 +-
->   drivers/scsi/sd.h     |  43 ++++-
->   drivers/scsi/sd_zbc.c | 363 +++++++++++++++++++++++++++++++++++++++---
->   3 files changed, 392 insertions(+), 30 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Looks good,
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Reviewed-by: Christoph Hellwig <hch@lst.de>
