@@ -2,122 +2,95 @@ Return-Path: <SRS0=Cb6v=6V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61196C38A24
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B54C38A24
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AE142075E
-	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:13:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588835582;
-	bh=IwJ8TK7JJgivvABXQYUUWOlkINcESWWFm1SmQ0uE4YA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RDYI+W68BrPMfHJr0jBzRHV81H4uBny0y3rzEo09xz5hVET2pnRj8eP5AY6wtn4+g
-	 ZGHI3GMhEVz4Gp+/VcYobOTQZzse6PFWAWxOUdq3A2RuyBhO3OYdnJvJ37ogG2oxmW
-	 6nvLjhUaOk6M4Sqf0Dn+12ENQIsMi5E8hchikZKg=
+	by mail.kernel.org (Postfix) with ESMTP id 1208120753
+	for <linux-block@archiver.kernel.org>; Thu,  7 May 2020 07:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725964AbgEGHNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 May 2020 03:13:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46264 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725783AbgEGHNB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 May 2020 03:13:01 -0400
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0E247207DD;
-        Thu,  7 May 2020 07:12:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588835580;
-        bh=IwJ8TK7JJgivvABXQYUUWOlkINcESWWFm1SmQ0uE4YA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qOBZ7uJaKfC248MnOyKHiJMjaMvNULB8tk4Cms7kSAMMj4HMV7T0pMa5CCwQSncF/
-         D7Y4+R6X7VrFmYTBVC39ofjdRi9/i2fHDimgFFsHFytMEWvo8EbLjhfU9W/CdWd7zJ
-         cFxR6rpahsH4YG0ASk8IXMoYUN/cxmXHP5g4eXbY=
-Date:   Thu, 7 May 2020 10:12:56 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Cc:     kbuild test robot <lkp@intel.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        kbuild-all@lists.01.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v14 23/25] block/rnbd: include client and server modules
- into kernel compilation
-Message-ID: <20200507071256.GD78674@unreal>
-References: <20200504140115.15533-24-danil.kipnis@cloud.ionos.com>
- <202005060522.xI0z2eA6%lkp@intel.com>
- <CAMGffE=58PZSp3B14d_jCCKwPDr_YHoWxJs9gsmg-2Af60vnrw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMGffE=58PZSp3B14d_jCCKwPDr_YHoWxJs9gsmg-2Af60vnrw@mail.gmail.com>
+        id S1725841AbgEGHTx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 May 2020 03:19:53 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:33472 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725802AbgEGHTx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 May 2020 03:19:53 -0400
+X-Greylist: delayed 450 seconds by postgrey-1.27 at vger.kernel.org; Thu, 07 May 2020 03:19:52 EDT
+Received: from ubuntu.localdomain (unknown [111.198.226.155])
+        by APP-01 (Coremail) with SMTP id qwCowACnrOTNtLNeuFdlAA--.20608S2;
+        Thu, 07 May 2020 15:12:13 +0800 (CST)
+From:   Xu Wang <vulab@iscas.ac.cn>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] drivers: block: use set_current_state macro
+Date:   Thu,  7 May 2020 15:12:11 +0800
+Message-Id: <20200507071211.15709-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: qwCowACnrOTNtLNeuFdlAA--.20608S2
+X-Coremail-Antispam: 1UD129KBjvJXoWrZF18uF1UuF45Aw47Jr43Jrb_yoW8Jr4kpF
+        4rKay3tr1xKFW7Ja13JFWDXryYga97K3429as5C3ySqFyYqr1fCr1qq34YqFy7Zr9Iyw17
+        uFy0vrykWa15taUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyIb7Iv0xC_Zr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+        jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4
+        A2jsIEc7CjxVAFwI0_Jr0_Gr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
+        w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
+        vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCFx2Iq
+        xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+        106r1rMI8E67AF67kF1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+        xVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7
+        xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
+        JVW8JbIYCTnIWIevJa73UjIFyTuYvjxUc_-PUUUUU
+X-Originating-IP: [111.198.226.155]
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCgMJA1z4i1LX4QAAsI
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 07, 2020 at 09:05:26AM +0200, Jinpu Wang wrote:
-> Hi, Kbuild test robot,
->
-> On Tue, May 5, 2020 at 11:34 PM kbuild test robot <lkp@intel.com> wrote:
-> >
-> > Hi Danil,
-> >
-> > I love your patch! Yet something to improve:
-> >
-> > [auto build test ERROR on block/for-next]
-> > [also build test ERROR on driver-core/driver-core-testing rdma/for-next linus/master v5.7-rc4 next-20200505]
-> > [if your patch is applied to the wrong git tree, please drop us a note to help
-> > improve the system. BTW, we also suggest to use '--base' option to specify the
-> > base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
-> >
-> > url:    https://github.com/0day-ci/linux/commits/Danil-Kipnis/RTRS-former-IBTRS-RDMA-Transport-Library-and-RNBD-former-IBNBD-RDMA-Network-Block-Device/20200505-072234
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-> > config: c6x-allyesconfig (attached as .config)
-> > compiler: c6x-elf-gcc (GCC) 9.3.0
-> > reproduce:
-> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # save the attached .config to linux build tree
-> >         COMPILER_INSTALL_PATH=$HOME/0day GCC_VERSION=9.3.0 make.cross ARCH=c6x
-> >
-> > If you fix the issue, kindly add following tag as appropriate
-> > Reported-by: kbuild test robot <lkp@intel.com>
-> >
-> > All errors (new ones prefixed by >>):
-> >
-> >    In file included from drivers/block/rnbd/rnbd-clt.c:19:
-> > >> drivers/block/rnbd/rnbd-clt.h:19:10: fatal error: rtrs.h: No such file or directory
-> >       19 | #include <rtrs.h>
-> >          |          ^~~~~~~~
-> >    compilation terminated.
-> > --
-> >    In file included from drivers/block/rnbd/rnbd-srv.c:15:
-> > >> drivers/block/rnbd/rnbd-srv.h:16:10: fatal error: rtrs.h: No such file or directory
-> >       16 | #include <rtrs.h>
-> >          |          ^~~~~~~~
-> >    compilation terminated.
-> >
-> > vim +19 drivers/block/rnbd/rnbd-clt.h
-> looks somehow the "ccflags-y := -Idrivers/infiniband/ulp/rtrs " was
-> ignored in your case
->
-> We'll try to repro on ourside, can you also check on your side why
-> ccflags is ignored?
+Use set_current_state macro instead of current->state = TASK_RUNNING.
 
-It should be ccflags-y := -I $(srctree)/drivers/infiniband/ulp/rtrs
+Signed-off-by: Xu Wang <vulab@iscas.ac.cn>
+---
+ drivers/block/swim.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 4c297f69171d..dd34504382e5 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -327,7 +327,7 @@ static inline void swim_motor(struct swim __iomem *base,
+ 			swim_select(base, RELAX);
+ 			if (swim_readbit(base, MOTOR_ON))
+ 				break;
+-			current->state = TASK_INTERRUPTIBLE;
++			set_current_state(TASK_INTERRUPTIBLE);
+ 			schedule_timeout(1);
+ 		}
+ 	} else if (action == OFF) {
+@@ -346,7 +346,7 @@ static inline void swim_eject(struct swim __iomem *base)
+ 		swim_select(base, RELAX);
+ 		if (!swim_readbit(base, DISK_IN))
+ 			break;
+-		current->state = TASK_INTERRUPTIBLE;
++		set_current_state(TASK_INTERRUPTIBLE);
+ 		schedule_timeout(1);
+ 	}
+ 	swim_select(base, RELAX);
+@@ -370,7 +370,7 @@ static inline int swim_step(struct swim __iomem *base)
+ 
+ 	for (wait = 0; wait < HZ; wait++) {
+ 
+-		current->state = TASK_INTERRUPTIBLE;
++		set_current_state(TASK_INTERRUPTIBLE);
+ 		schedule_timeout(1);
+ 
+ 		swim_select(base, RELAX);
+-- 
+2.17.1
 
->
-> Thanks!
-> Jinpu
