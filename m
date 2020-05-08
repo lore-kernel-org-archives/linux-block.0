@@ -2,149 +2,121 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4217FC38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC94C38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 189732184D
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:22:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPxuMMDs"
+	by mail.kernel.org (Postfix) with ESMTP id DFC462184D
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:26:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728227AbgEHXWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 19:22:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32458 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727110AbgEHXWp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 19:22:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588980164;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KpHdTC3gwhEr9wVRJUc1Ku1W95y0jfMFFIn5VnQTYpQ=;
-        b=YPxuMMDsjXhCkVZryFRIl7UNncb3uBLTFL+/EhRXm5yhMAG4Wb49ExIng+KqeglakidsQ5
-        6lGYe0hQw/D7xfpNipetBLXSDULj4LtJneofwHNWm/0YuVSQvVMJvT2AgSgXBb/iT73+As
-        d38kixAyDokOoXKevoIOfu7liPk0Ptw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-C6J1zO2PN5WKjnTJY3LGGw-1; Fri, 08 May 2020 19:22:40 -0400
-X-MC-Unique: C6J1zO2PN5WKjnTJY3LGGw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38A09800687;
-        Fri,  8 May 2020 23:22:38 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BCD41C8;
-        Fri,  8 May 2020 23:22:27 +0000 (UTC)
-Date:   Sat, 9 May 2020 07:22:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Baolin Wang <baolin.wang7@gmail.com>, axboe@kernel.dk,
-        ulf.hansson@linaro.org, adrian.hunter@intel.com, arnd@arndb.de,
-        linus.walleij@linaro.org, paolo.valente@linaro.org,
-        orsonzhai@gmail.com, zhang.lyra@gmail.com,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 1/7] block: Extand commit_rqs() to do batch
- processing
-Message-ID: <20200508232222.GA1391368@T590>
-References: <cover.1587888520.git.baolin.wang7@gmail.com>
- <c8bd9e5ba815a3f1bc9dac0a4bc2fbadadbc0a43.1587888520.git.baolin.wang7@gmail.com>
- <20200427154645.GA1201@infradead.org>
- <e4d47000-f89c-a135-ae58-011f0e9cc39e@grimberg.me>
- <20200508214639.GA1389136@T590>
- <fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me>
+        id S1727774AbgEHX0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 19:26:21 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:37651 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727110AbgEHX0U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 19:26:20 -0400
+Received: by mail-pj1-f65.google.com with SMTP id a7so4982626pju.2
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 16:26:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Nlj/e6Px8K5MZpy0+0LDNcwTwN8yX1LFH1pzBbBYPwU=;
+        b=Fe+8yoqk3Ft8X+ftdK39OGTt+SEBAmZS7rosfNXsth8XpGJu6oqR1bQCdsK7/bH5Dw
+         Zc++fDypATtnfT7xZd4Vx1kK1J0QS+6QgAWhYY2oVJo1x0hPyR9a2tyK0a/PFyVr5POg
+         CS2OLOcitssREeIAxd8mHpddvxECh8DDQcMpQPOozc0dDjpsgobKVxfEkdu1W65S1YH/
+         7YwVjaK7IAds9+fHf7vEVFVGbs/O4JeXh8TX02ejIEfmMYCFGvOoqBKSLQNG6DGVS9Xo
+         XW5U9FVCa3W/V3wDF6H5XY5KNXw5EwfwKFkCFJaXcFOS1yQa3GSp2wW0Jl3QiehLBGUm
+         CaDA==
+X-Gm-Message-State: AGi0PuYfPT8sQ/XJ2HIyknRDvnDGu+Zr4vuguW4X2cLfGexBahHsroS+
+        bIsMXw5UuSMU7h+Oc/OlcYY=
+X-Google-Smtp-Source: APiQypLfZzYuuWRujYH8vbMqNGe5Q9hAHqLfZ3EEJX9mHf21xJZOrv7hAJDn68aZSXfT1omJNqUI2g==
+X-Received: by 2002:a17:902:6acc:: with SMTP id i12mr4645027plt.61.1588980379712;
+        Fri, 08 May 2020 16:26:19 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:89ed:1db3:8c60:ba90? ([2601:647:4000:d7:89ed:1db3:8c60:ba90])
+        by smtp.gmail.com with ESMTPSA id 131sm2124537pgg.65.2020.05.08.16.26.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2020 16:26:18 -0700 (PDT)
+Subject: Re: [PATCH V10 06/11] blk-mq: prepare for draining IO when hctx's all
+ CPUs are offline
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200505020930.1146281-1-ming.lei@redhat.com>
+ <20200505020930.1146281-7-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <756074a0-ea4b-5dcf-9348-e5b4f4414248@acm.org>
+Date:   Fri, 8 May 2020 16:26:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200505020930.1146281-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sagi,
+On 2020-05-04 19:09, Ming Lei wrote:
+> @@ -391,6 +393,7 @@ struct blk_mq_ops {
+>  enum {
+>  	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+>  	BLK_MQ_F_TAG_SHARED	= 1 << 1,
+> +	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
+>  	BLK_MQ_F_BLOCKING	= 1 << 5,
+>  	BLK_MQ_F_NO_SCHED	= 1 << 6,
+>  	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> index 77d70b633531..24b3a77810b6 100644
+> --- a/include/linux/cpuhotplug.h
+> +++ b/include/linux/cpuhotplug.h
+> @@ -152,6 +152,7 @@ enum cpuhp_state {
+>  	CPUHP_AP_SMPBOOT_THREADS,
+>  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+>  	CPUHP_AP_IRQ_AFFINITY_ONLINE,
+> +	CPUHP_AP_BLK_MQ_ONLINE,
+>  	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
+>  	CPUHP_AP_X86_INTEL_EPB_ONLINE,
+>  	CPUHP_AP_PERF_ONLINE,
 
-On Fri, May 08, 2020 at 03:19:45PM -0700, Sagi Grimberg wrote:
-> Hey Ming,
-> 
-> > > Would it make sense to elevate this flag to a request_queue flag
-> > > (QUEUE_FLAG_ALWAYS_COMMIT)?
-> > 
-> > request queue flag usually is writable, however this case just needs
-> > one read-only flag, so I think it may be better to make it as
-> > tagset/hctx flag.
-> 
-> I actually intended it to be writable.
-> 
-> > > I'm thinking of a possibility that an I/O scheduler may be used
-> > > to activate this functionality rather than having the driver set
-> > > it necessarily...
-> > 
-> > Could you explain a bit why I/O scheduler should activate this
-> > functionality?
-> 
-> Sure, I've recently seen some academic work showing the benefits
-> of batching in tcp/ip based block drivers. The problem with the
-> approaches taken is that I/O scheduling is exercised deep down in the
-> driver, which is not the direction I'd like to go if we are want
-> to adopt some of the batching concepts.
-> 
-> I spent some (limited) time thinking about this, and it seems to
-> me that there is an opportunity to implement this as a dedicated
-> I/O scheduler, and tie it to driver specific LLD stack optimizations
-> (net-stack for example) relying on the commit_rq/bd->last hints.
-> 
-> When scanning the scheduler code, I noticed exactly the phenomenon that
-> this patchset is attempting to solve and Christoph referred me to it.
-> Now I'm thinking if we can extend this batching optimization for both
-> use-cases.
+Wouldn't BLK_MQ_F_NO_IRQ be a better name than BLK_MQ_F_NO_MANAGED_IRQ?
 
-Got it, thanks for the sharing.
-
-> 
-> > batching submission may be good for some drivers, and currently
-> > we only do it in limited way. One reason is that there is extra
-> > cost for full batching submission, such as this patch requires
-> > one extra .commit_rqs() for each dispatch, and lock is often needed
-> > in this callback.
-> 
-> That is not necessarily the case at all.
-
-So far, all in-tree .commit_rqs() implementation requires lock.
-
-> 
-> > IMO it can be a win for some slow driver or device, but may cause
-> > a little performance drop for fast driver/device especially in workload
-> > of not-batching submission.
-> 
-> You're mostly correct. This is exactly why an I/O scheduler may be
-> applicable here IMO. Mostly because I/O schedulers tend to optimize for
-> something specific and always present tradeoffs. Users need to
-> understand what they are optimizing for.
-> 
-> Hence I'd say this functionality can definitely be available to an I/O
-> scheduler should one exist.
-> 
-
-I guess it is just that there can be multiple requests available from
-scheduler queue. Actually it can be so for other non-nvme drivers in
-case of none, such as SCSI.
-
-Another way is to use one per-task list(such as plug list) to hold the
-requests for dispatch, then every drivers may see real .last flag, so they
-may get chance for optimizing batch queuing. I will think about the
-idea further and see if it is really doable.
-
+Please add comments that explain what BLK_MQ_F_NO_MANAGED_IRQ and
+CPUHP_AP_BLK_MQ_ONLINE mean.
 
 Thanks,
-Ming
+
+Bart.
+
 
