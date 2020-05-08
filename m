@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89CAC38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA084C38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7C9A208D6
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C1D2206D5
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLD0U9Bb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CR2y3wAN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbgEHIS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 04:18:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45904 "EHLO
+        id S1726913AbgEHISf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 04:18:35 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38006 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726746AbgEHIS1 (ORCPT
+        by vger.kernel.org with ESMTP id S1726797AbgEHISf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 04:18:27 -0400
+        Fri, 8 May 2020 04:18:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588925905;
+        s=mimecast20190719; t=1588925914;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N/oaaQ4C9wcrt0h4NLM933HxrSlP7xIww0UEPzR3D7U=;
-        b=JLD0U9Bbm0i3xJt8Kc+lh70BxFrIiTI3RyP1Oz3gwj3QlSFTwbA/EWivakyK6tupY+NOng
-        t+GTr/WScu3JQIl6ZXKnOnvk6NNgGXgCV00hhB6yvc4hC9QylB76xIYoJp8yYeTKmkwXgD
-        OAd48pYTd9/Kf+A01b9JSRCm9en6MB4=
+        bh=eqE+VZT6iP5BBQICf6hdfbtPcveHLASDX8yMLp9dHYE=;
+        b=CR2y3wAN2uCvZM08z+VQRpQfGrM/PyTmWjhOtEul2lOEckTbGTvdc6lrQZ0oTGQawaVN/8
+        PI25NBVsYhqJjsESCL1xo6APY0QMwWuWgd/3PCxVy5Xu7jLHlGh9ecJewyeKTwB7PGzL0X
+        HCEnUuDhVkgOPnCVfDFEV7+ynVHNt4Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-5xZj_AqjP5eUydR5Z-IWeA-1; Fri, 08 May 2020 04:18:24 -0400
-X-MC-Unique: 5xZj_AqjP5eUydR5Z-IWeA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-88-qS71B8ypM3K4WnJfbWZgdg-1; Fri, 08 May 2020 04:18:32 -0400
+X-MC-Unique: qS71B8ypM3K4WnJfbWZgdg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48A65473;
-        Fri,  8 May 2020 08:18:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68E921895A2A;
+        Fri,  8 May 2020 08:18:31 +0000 (UTC)
 Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C210C5C1BE;
-        Fri,  8 May 2020 08:18:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AFF6E5D9CA;
+        Fri,  8 May 2020 08:18:26 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Yufen Yu <yuyufen@huawei.com>,
         Christoph Hellwig <hch@infradead.org>,
         Hou Tao <houtao1@huawei.com>
-Subject: [PATCH V3 2/4] block: only define 'nr_sects_seq' in hd_part for 32bit SMP
-Date:   Fri,  8 May 2020 16:17:56 +0800
-Message-Id: <20200508081758.1380673-3-ming.lei@redhat.com>
+Subject: [PATCH V3 3/4] block: re-organize fields of 'struct hd_part'
+Date:   Fri,  8 May 2020 16:17:57 +0800
+Message-Id: <20200508081758.1380673-4-ming.lei@redhat.com>
 In-Reply-To: <20200508081758.1380673-1-ming.lei@redhat.com>
 References: <20200508081758.1380673-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The seqcount of 'nr_sects_seq' is only needed in case of 32bit SMP,
-so define it just for 32bit SMP.
+Put all fields accessed in IO path together at the beginning
+of the struct, so that all can be fetched in single cacheline.
 
 Cc: Yufen Yu <yuyufen@huawei.com>
 Cc: Christoph Hellwig <hch@infradead.org>
@@ -72,65 +72,42 @@ Cc: Hou Tao <houtao1@huawei.com>
 Reviewed-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/genhd.c           | 2 +-
- block/partitions/core.c | 2 +-
- include/linux/genhd.h   | 9 +++++++++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ include/linux/genhd.h | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index ec57d5d7a64d..bf8cbb033d64 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1729,7 +1729,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- 		 * TODO: Ideally set_capacity() and get_capacity() should be
- 		 * converted to make use of bd_mutex and sequence counters.
- 		 */
--		seqcount_init(&disk->part0.nr_sects_seq);
-+		hd_sects_seq_init(&disk->part0);
- 		if (hd_ref_init(&disk->part0)) {
- 			hd_free_part(&disk->part0);
- 			kfree(disk);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index f4000dac23ef..ec81986b358e 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -392,7 +392,7 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 		goto out_free;
- 	}
- 
--	seqcount_init(&p->nr_sects_seq);
-+	hd_sects_seq_init(p);
- 	pdev = part_to_dev(p);
- 
- 	p->start_sect = start;
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index f9c226f9546a..b4744035ae58 100644
+index b4744035ae58..a9384449465a 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
-@@ -68,7 +68,9 @@ struct hd_struct {
- 	 * can be non-atomic on 32bit machines with 64bit sector_t.
- 	 */
- 	sector_t nr_sects;
-+#if BITS_PER_LONG==32 && defined(CONFIG_SMP)
+@@ -71,6 +71,14 @@ struct hd_struct {
+ #if BITS_PER_LONG==32 && defined(CONFIG_SMP)
  	seqcount_t nr_sects_seq;
+ #endif
++	unsigned long stamp;
++#ifdef	CONFIG_SMP
++	struct disk_stats __percpu *dkstats;
++#else
++	struct disk_stats dkstats;
 +#endif
++	struct percpu_ref ref;
++
  	sector_t alignment_offset;
  	unsigned int discard_alignment;
  	struct device __dev;
-@@ -274,6 +276,13 @@ static inline void disk_put_part(struct hd_struct *part)
- 		put_device(part_to_dev(part));
- }
+@@ -80,13 +88,6 @@ struct hd_struct {
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	int make_it_fail;
+ #endif
+-	unsigned long stamp;
+-#ifdef	CONFIG_SMP
+-	struct disk_stats __percpu *dkstats;
+-#else
+-	struct disk_stats dkstats;
+-#endif
+-	struct percpu_ref ref;
+ 	struct rcu_work rcu_work;
+ };
  
-+static inline void hd_sects_seq_init(struct hd_struct *p)
-+{
-+#if BITS_PER_LONG==32 && defined(CONFIG_SMP)
-+	seqcount_init(&p->nr_sects_seq);
-+#endif
-+}
-+
- /*
-  * Smarter partition iterator without context limits.
-  */
 -- 
 2.25.2
 
