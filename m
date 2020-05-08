@@ -2,124 +2,103 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F401C38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0152FC38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:05:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29C14218AC
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:00:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C28F9214D8
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="fdj9m72E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VILEZf/p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgEHWA1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 18:00:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33820 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727838AbgEHWA1 (ORCPT
+        id S1727774AbgEHWFm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 18:05:42 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56161 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727095AbgEHWFm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 18:00:27 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95613C061A0C
-        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 15:00:25 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id k12so11727541wmj.3
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 15:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=2bZEmVPj4bBPSpoxrezTXCxfraC/gVscBnU3FXpehw0=;
-        b=fdj9m72Ets8NDXsiWFaO7GJwzxJsctQZwipDjgjjrqAisSHYUDTubMx2iwb6ZF6wZE
-         HDfLsfdeZoudSXm8OBhapUknILrelw007SvvkN0Z83/elWMsEzQM9hoiK/YUfDTPGz+8
-         6Ry/cj8maY9eX6iBpRlqNXpBpQRqp4mIr/+C6w3NflOfIWlb+jsRO4I+aK9Rpd/0HSBl
-         Rxk/TOa809u9NPoGKeCZWj8lj4/jgLH65OsWPDEJepHH4Suz6lNEeH2kd8RyQR84Icbq
-         pfgYQYNSzqsfKu7sz8mt8Oc2tER9x8XEYsFYsV5kFxbGwjBTL4yEZRO/G3hP2Gbtnp0x
-         A0+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=2bZEmVPj4bBPSpoxrezTXCxfraC/gVscBnU3FXpehw0=;
-        b=a/5sHGwARyYx/rE0yErXkOkf+OVTXraRQzXgdZoybyDM13umrk8b0Xy+5EM7pyeQq9
-         NO4r8N1f0uoEaVzyOh5ndSbmK+cMcn9dTGSijJ1Kc4rzOy6LK8LHlzrY+8EaU572Y1Ha
-         DRlcu0sS9/gWZ+A6tkloT8q3Cbt64gIwDsIGZwZ2IJ4xbOqjX37LkoKHMSORglrF0Z0Q
-         DJoforxfuU+C+rXGfaEKGd4yyLU06Ci/wXTa6otr5hWsK+vk/gpNE8TkLtcou7UpUgBV
-         jTO/t9bAV45lneoZYe9n8UgdvJNsRpRvY6da2zBpCCBNMNkgkLqLk/b6v3ZA1KDoiWDn
-         TnKQ==
-X-Gm-Message-State: AGi0PuaT0jUCjIzV52UiMDcoAU+lRbzRFCMn4N002HstENkm7zbZoY4F
-        pZupegRlkeY+0YHm0gU4z8SIoA==
-X-Google-Smtp-Source: APiQypJKMZoMXF612rYIHvPoDp5Nyo16pxH9Y1FrPnmdSPMAki5tS8NMGZCr1acYa5nOMcDC52GCrw==
-X-Received: by 2002:a1c:23d4:: with SMTP id j203mr19502504wmj.49.1588975224308;
-        Fri, 08 May 2020 15:00:24 -0700 (PDT)
-Received: from ls00508.pb.local ([2001:1438:4010:2540:7d6e:af57:ffe:3087])
-        by smtp.gmail.com with ESMTPSA id h6sm14646878wmf.31.2020.05.08.15.00.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 15:00:23 -0700 (PDT)
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH 4/4] blk-wbt: rename __wbt_update_limits to wbt_update_limits
-Date:   Sat,  9 May 2020 00:00:15 +0200
-Message-Id: <20200508220015.11528-5-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
-References: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
+        Fri, 8 May 2020 18:05:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588975540;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YO5PkIWVSR80jNI+PQamU/zuuSWb1N3GQGlzu5YVVx4=;
+        b=VILEZf/pftu4BGlPN9QAeiuHRRqb9ilN/ThTPo5Ab/ApvS2JAA7Oxd38HX7G1qQ7ek95Ff
+        FMYN/vkuMZnaD5X5PEV+wQWOrUDwwgCFnvyzfKdVhem/obBuAB6SnVJj4iddcElyo4EHDH
+        g12gyv/iMH7U0apDiIxdfBxtfCBzkLs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-453-7jG-iCrvMvK8VqwcdQDsXQ-1; Fri, 08 May 2020 18:05:39 -0400
+X-MC-Unique: 7jG-iCrvMvK8VqwcdQDsXQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE2FD1895A28;
+        Fri,  8 May 2020 22:05:37 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DD8765C3FD;
+        Fri,  8 May 2020 22:05:31 +0000 (UTC)
+Date:   Sat, 9 May 2020 06:05:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Alan Adamson <alan.adamson@oracle.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com, himanshu.madhani@oracle.com
+Subject: Re: [PATCH 0/1] block: don't inject fake timeouts on quiesced queues
+Message-ID: <20200508220526.GC1389136@T590>
+References: <1588974394-15430-1-git-send-email-alan.adamson@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1588974394-15430-1-git-send-email-alan.adamson@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now let's rename __wbt_update_limits to wbt_update_limits after the
-previous one is deleted.
+On Fri, May 08, 2020 at 02:46:34PM -0700, Alan Adamson wrote:
+> While using the block fake timeout injector to reproduce a nvme error handling hang, a hang was
+> observed when the following script was run:
+> 
+> echo 100 > /sys/kernel/debug/fail_io_timeout/probability
+> echo 1000 > /sys/kernel/debug/fail_io_timeout/times
+> echo 1 > /sys/block/nvme0n1/io-timeout-fail
+> dd if=/dev/nvme0n1 of=/dev/null bs=512 count=1 
+> 
+> 
+> dmesg:
+> 
+> [  370.018164] INFO: task kworker/u113:9:1191 blocked for more than 122 seconds.
+> [  370.018849]       Not tainted 5.7.0-rc4 #1
+> [  370.019251] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [  370.019653] kworker/u113:9  D    0  1191      2 0x80004000
+> [  370.019660] Workqueue: nvme-reset-wq nvme_reset_work [nvme]
+> [  370.019661] Call Trace:
+> [  370.019667]  __schedule+0x2dc/0x710
+> [  370.019668]  schedule+0x44/0xb0
+> [  370.019671]  blk_mq_freeze_queue_wait+0x4b/0xb0
+> [  370.019675]  ? finish_wait+0x80/0x80
+> [  370.019681]  nvme_wait_freeze+0x36/0x50 [nvme_core]
+> [  370.019683]  nvme_reset_work+0xb65/0xf2b [nvme]
+> [  370.019688]  process_one_work+0x1ab/0x380
+> [  370.019689]  worker_thread+0x37/0x3b0
+> [  370.019691]  kthread+0x120/0x140
+> [  370.019692]  ? create_worker+0x1b0/0x1b0
+> [  370.019693]  ? kthread_park+0x90/0x90
+> [  370.019696]  ret_from_fork+0x35/0x40
+> 
+> This occurs when a fake timeout is scheduled on a request that is in he process
+> of being cancelled due to the previous fake timeout.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
----
- block/blk-wbt.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Not sure root cause is timeout injection, and in theory request queue shouldn't
+have been quiesced before freezing, otherwise it is easy to cause deadlock.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 78bb624cce53..0fa615eefd52 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -405,7 +405,7 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
- 		rwb_arm_timer(rwb);
- }
- 
--static void __wbt_update_limits(struct rq_wb *rwb)
-+static void wbt_update_limits(struct rq_wb *rwb)
- {
- 	struct rq_depth *rqd = &rwb->rq_depth;
- 
-@@ -433,7 +433,7 @@ void wbt_set_min_lat(struct request_queue *q, u64 val)
- 		return;
- 	RQWB(rqos)->min_lat_nsec = val;
- 	RQWB(rqos)->enable_state = WBT_STATE_ON_MANUAL;
--	__wbt_update_limits(RQWB(rqos));
-+	wbt_update_limits(RQWB(rqos));
- }
- 
- 
-@@ -677,7 +677,7 @@ static int wbt_data_dir(const struct request *rq)
- static void wbt_queue_depth_changed(struct rq_qos *rqos)
- {
- 	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->q);
--	__wbt_update_limits(RQWB(rqos));
-+	wbt_update_limits(RQWB(rqos));
- }
- 
- static void wbt_exit(struct rq_qos *rqos)
-@@ -835,7 +835,7 @@ int wbt_init(struct request_queue *q)
- 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
- 	rwb->wc = 1;
- 	rwb->rq_depth.default_depth = RWB_DEF_DEPTH;
--	__wbt_update_limits(rwb);
-+	wbt_update_limits(rwb);
- 
- 	/*
- 	 * Assign rwb and add the stats callback.
--- 
-2.17.1
+BTW, could you share us how you conclude it is related with queue quiesce?
+
+Thanks,
+Ming
 
