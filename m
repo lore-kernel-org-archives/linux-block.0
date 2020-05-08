@@ -2,97 +2,154 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746F0C38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 19:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70920C47257
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 20:18:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5127B218AC
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 19:22:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CE7A206D3
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 20:18:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=orbekk.com header.i=@orbekk.com header.b="EL43W3mY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jq/X6T0Y"
+	dkim=pass (2048-bit key) header.d=kali-org.20150623.gappssmtp.com header.i=@kali-org.20150623.gappssmtp.com header.b="M4wNj8Yo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726807AbgEHTW5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 15:22:57 -0400
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:36693 "EHLO
-        wout4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726767AbgEHTW5 (ORCPT
+        id S1726885AbgEHUS2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 16:18:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727794AbgEHUS1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 15:22:57 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.west.internal (Postfix) with ESMTP id 46EC74C6;
-        Fri,  8 May 2020 15:22:56 -0400 (EDT)
-Received: from imap1 ([10.202.2.51])
-  by compute4.internal (MEProxy); Fri, 08 May 2020 15:22:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=orbekk.com; h=
-        mime-version:message-id:in-reply-to:references:date:from:to:cc
-        :subject:content-type; s=fm2; bh=pxEyzXWoFGZXI6Arfcxv5uOUuPIVne5
-        6u5opE0FLF4k=; b=EL43W3mYTh/FBLvlnJbO8vBhPBKxVP23vJZkEsO31HEQ27q
-        oIl+J9wtFWSpxGeV5OWyGA9hhRYuQFYvxmxOQk4E/g8ToBvjM7DB3w4AA+hKhDFM
-        NynxZGB4EuS3MDlEBteJzKCjZpY2EewP3vonZjQ1q8A+9kt9u5pOygHf5uR6DZjh
-        I66F+O6PGCw+XX3LzXIxR5lPYfarcgxQBTGhki2cOEDiCJ4jgamNYzOVsUIEzkcn
-        dlBI4klJWOJn6YHuo3vtuvFTFpycpLbMJ0b4zdFRv0tuKpliHrjK5JP+mh8ajrX+
-        szYzdzqM/wekJKKLSahblLsjM2zAWayx2oQW4gA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=pxEyzX
-        WoFGZXI6Arfcxv5uOUuPIVne56u5opE0FLF4k=; b=jq/X6T0YCzVs2Y+3ZcnYtW
-        3CZTxd9K0VJYJzx51HWCAf4ZHf5ulHVPs6EmCjd8nblPy1hVPdX3muDIQJ+nFM/U
-        9xKDYzhasTWWfi0Xmmq4nxWNrl1WiweJlOKg/lXBSxjvlrI4Qr7JMIQRaBou9XRs
-        22bqkqo4ZEzSyjteELnadPmUI7lm1UtkspholjS7WLetTDILeEPvwaZajtJDds9B
-        LRlntFg+0jFect5v6J26fqCzYqyAPunKW6xj1vlotBUIKKCGUXYmH3VlXvNOPoHU
-        N5oNcbfgAW/8ZBvBzP5fBAWlbYIQrD5jbepCAp1olNntKz/A3BYsKif9gWCB30Hw
-        ==
-X-ME-Sender: <xms:j7G1XikzBgVczNg3jVBNBPXtHYhfwUq22JYabuBbvn8Pf_VC6xDHQQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrkeefgdejtdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpehkjhesohhr
-    sggvkhhkrdgtohhmnecuggftrfgrthhtvghrnhepteehuefhudevvdeflefgfeevuefhje
-    fgjeekffefjeelvdetieevffelvdelkeeknecuvehluhhsthgvrhfuihiivgeptdenucfr
-    rghrrghmpehmrghilhhfrhhomhepkhhjsehorhgsvghkkhdrtghomh
-X-ME-Proxy: <xmx:j7G1XtLiP8ICnbAgYdpollYqTfScgh2ftg2WP9BWxtOsVFavJztjWQ>
-    <xmx:j7G1XsctJkdSSDt3QzKngkXF892-cWvHZMQAGbBWfQ6Ql9Q2ocru7w>
-    <xmx:j7G1XpzxDWy9N-hjBX8uBVEh9vwW4JQhfUocrWU8jLbUAVlhF2hq_A>
-    <xmx:j7G1XrU7nBYjcuglBF_n0NVSMSiLPhQcj7jlmmoJmal20w_JDhLj_g>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 2910FC200A4; Fri,  8 May 2020 15:22:55 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-413-g750b809-fmstable-20200507v1
-Mime-Version: 1.0
-Message-Id: <dd7b8b91-776b-4458-a83a-18ab4953d2f4@www.fastmail.com>
-In-Reply-To: <DM6PR04MB49726E28257263F5A1C643B386A20@DM6PR04MB4972.namprd04.prod.outlook.com>
-References: <20200507230532.5733-1-kj@orbekk.com>
- <DM6PR04MB49726E28257263F5A1C643B386A20@DM6PR04MB4972.namprd04.prod.outlook.com>
-Date:   Fri, 08 May 2020 15:22:33 -0400
-From:   kj@orbekk.com
-To:     "Chaitanya Kulkarni" <Chaitanya.Kulkarni@wdc.com>,
-        "Alasdair G Kergon" <agk@redhat.com>,
-        "Mike Snitzer" <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "harshads@google.com" <harshads@google.com>,
-        "Khazhismel Kumykov" <khazhy@google.com>
-Subject: Re: [PATCH] dm: track io errors per mapped device
-Content-Type: text/plain
+        Fri, 8 May 2020 16:18:27 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5D6C05BD0A
+        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 13:18:26 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id j16so9517015oih.10
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 13:18:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kali-org.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=MlAF25STO+yL73T826E97sego/sVxlAzSPlYezFQQ8Y=;
+        b=M4wNj8YoS4oXNM+w8CGcPv9cdsOnbF6k1MPswMkN4CdLOM5RdeVNUzYv+X5YCsEnzi
+         xYZkEqKyVkGQEcxj/htYstjJ0wc1UIMuy0eUZoj1S6c8w9/bLDzVsmynO2XBu3+96nsQ
+         uTSZDLsiyHW6NO8wGBT0nID4rhBc8bn+w+QDfNFEDWU2PEw9Se4UdhcUZ/BC3XQtiHEg
+         VX3cEytz5wr13F0Oqqg20fRXPEplfSqoouLHNDjXWfhvsocPckRpWOgxvOZFD4Y0nThi
+         mk3oVyl/MLOkyL/WZSUXJvtQGIttYyRjdD0zLZFrCloBLZ31RPdgnhrBzpnBYPzoUp97
+         4+Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=MlAF25STO+yL73T826E97sego/sVxlAzSPlYezFQQ8Y=;
+        b=j/GsgXsEVPnlYDs7eN5Fd83jzkBKzhrE2BD2h0P94gvHLy69jT/TgcJfQwTLFCAp7c
+         XVu3ylDNwAOsk/s4/P0w+5GnJNOxrmdV/t9kN7tIi7K+L71OQmCowRqjVj4B/oLHzJLm
+         MS9CGJ9XNy6c/cylEXDwEVvuvRFqSzvfSTAGAZnIEFSWPWZuy+AjChb4cAwdDqReHtru
+         fU72xdWRdXz8VL2IT9HO05L6wft5VWWwEbVAPRWXXNOiwJsyjkoZIJqv5iQ0oNCcQB6z
+         eYFMn9E38e5RaZuYOWumeJ9fnf+P4QRUz2m3XVUPzcJwbHtfQPN2I5j+0l8tX6ME5hBX
+         nn9Q==
+X-Gm-Message-State: AGi0Pub4h9k2bR9C3Mcf641Dw+MuElLO7Bm801xgGN/tx5Qkhlmh6lMH
+        Any9L0KW5jddltnPGwt2bPEgnQ==
+X-Google-Smtp-Source: APiQypKS8r9Jmzko+elY+jhmRk/eq+lV7F00Vg+u5ZpDoj3UGL6QIMuIZ1vm2RILFJAOf49KcfGPog==
+X-Received: by 2002:aca:d585:: with SMTP id m127mr11865717oig.27.1588969105589;
+        Fri, 08 May 2020 13:18:25 -0700 (PDT)
+Received: from Steevs-MBP.hackershack.net (cpe-173-175-113-3.satx.res.rr.com. [173.175.113.3])
+        by smtp.gmail.com with ESMTPSA id q12sm632331otn.57.2020.05.08.13.18.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2020 13:18:24 -0700 (PDT)
+Subject: Re: [RFC PATCH v4 4/4] scsi: ufs-qcom: add Inline Crypto Engine
+ support
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Andy Gross <agross@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Can Guo <cang@codeaurora.org>,
+        Elliot Berman <eberman@codeaurora.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Satya Tangirala <satyat@google.com>
+References: <20200501045111.665881-1-ebiggers@kernel.org>
+ <20200501045111.665881-5-ebiggers@kernel.org>
+ <31fa95e5-7757-96ae-2e86-1f54959e3a6c@linaro.org>
+ <20200507180435.GB236103@gmail.com> <20200507180838.GC236103@gmail.com>
+From:   Steev Klimaszewski <steev@kali.org>
+Message-ID: <150ddaaf-12ec-231e-271a-c65b1d88d30f@kali.org>
+Date:   Fri, 8 May 2020 15:18:23 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200507180838.GC236103@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 7, 2020, at 21:12, Chaitanya Kulkarni wrote:
-> On 05/07/2020 04:06 PM, Kjetil Orbekk wrote:
-> > +		if (tio->error)
-> > +			atomic_inc(&md->ioerr_cnt);
-> 
-> Given that there are so many errors how would user know what
-> kind of error is generated and how many times?
 
-The intended use case is to provide an easy way to check if errors have occurred at all, and then the user needs to investigate using other means. I replied with more detail to Alasdair's email.
+On 5/7/20 1:08 PM, Eric Biggers wrote:
+> On Thu, May 07, 2020 at 11:04:35AM -0700, Eric Biggers wrote:
+>> Hi Thara,
+>>
+>> On Thu, May 07, 2020 at 08:36:58AM -0400, Thara Gopinath wrote:
+>>>
+>>> On 5/1/20 12:51 AM, Eric Biggers wrote:
+>>>> From: Eric Biggers <ebiggers@google.com>
+>>>>
+>>>> Add support for Qualcomm Inline Crypto Engine (ICE) to ufs-qcom.
+>>>>
+>>>> The standards-compliant parts, such as querying the crypto capabilities
+>>>> and enabling crypto for individual UFS requests, are already handled by
+>>>> ufshcd-crypto.c, which itself is wired into the blk-crypto framework.
+>>>> However, ICE requires vendor-specific init, enable, and resume logic,
+>>>> and it requires that keys be programmed and evicted by vendor-specific
+>>>> SMC calls.  Make the ufs-qcom driver handle these details.
+>>>>
+>>>> I tested this on Dragonboard 845c, which is a publicly available
+>>>> development board that uses the Snapdragon 845 SoC and runs the upstream
+>>>> Linux kernel.  This is the same SoC used in the Pixel 3 and Pixel 3 XL
+>>>> phones.  This testing included (among other things) verifying that the
+>>>> expected ciphertext was produced, both manually using ext4 encryption
+>>>> and automatically using a block layer self-test I've written.
+>>> Hello Eric,
+>>>
+>>> I am interested in testing out this series on 845, 855 and if possile on 865
+>>> platforms. Can you give me some more details about your testing please.
+>>>
+>> Great!  You can test this with fscrypt, a.k.a. ext4 or f2fs encryption.
+>>
+>> A basic manual test would be:
+>>
+>> 1. Build a kernel with:
+>>
+>> 	CONFIG_BLK_INLINE_ENCRYPTION=y
+>> 	CONFIG_FS_ENCRYPTION=y
+>> 	CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y
+> Sorry, I forgot: 'CONFIG_SCSI_UFS_CRYPTO=y' is needed too.
+>
+> - Eric
 
--- 
-KJ
+I took a look into this as well - is v12 the latest of the fscrypt
+inline crypto patches?
+
+I see a EXPORT_SYMBOL_GPL(fscrypt_inode_uses_inline_crypto) but it seems
+like it should be EXPORT_SYMBOL_GPL(__fscrypt_inode_uses_inline_crypto)
+otherwise you end up with
+
+
+WARNING: modpost: "fscrypt_inode_uses_inline_crypto" [vmlinux] is a
+static EXPORT_SYMBOL_GPL
+
+
+when you have something like CONFIG_F2FS_FS=m
+
+
+Apologies but I'm not sure where the original patchset is to send as a
+reply to them.
+
