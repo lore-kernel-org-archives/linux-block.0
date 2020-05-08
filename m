@@ -2,118 +2,131 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E0CC38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 635E8C38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48E6920735
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36697208D6
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kjfsQYGa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7aT43h3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726930AbgEHISl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 04:18:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46652 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726797AbgEHISl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 04:18:41 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC6BC05BD43;
-        Fri,  8 May 2020 01:18:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=PThi5otuSmIv87sVwtTG8nfMFGAV/tBkGdHRgwma/LQ=; b=kjfsQYGail38WC8kyZ+p6PMRp9
-        JNo3u24zU9ARRWd5LlGzFEa6bMcRSYaEVj3lPkoMwgcH7Xv2VlXF720v5QrVmMNl6x2EgFWgD9pkP
-        jxr1/BxgnffJmhLLtLafFZx+jCzPR2mYfujXM5tZ2ti/yD/8vDHqYd6IzhamGmfnoSpod9RgWrIMe
-        w4NCjKSljGsgpY5BO6q9Cp1fpnL+Y1GjOsdwckOUBKn3eI5EojEGORDDhc9TfEd4X/faJsktBN3f1
-        Burhw+zkUsx5kS6nj48Ek01HgZ8KOL6jZLrTdny16q2E6lYC2wI5VNtRmKDw4FAs1tx9GsZ4GApU/
-        EvRyBdRA==;
-Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jWyDQ-0004XT-R9; Fri, 08 May 2020 08:18:41 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH] hfs: stop using ioctl_by_bdev
-Date:   Fri,  8 May 2020 10:18:28 +0200
-Message-Id: <20200508081828.590158-2-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200508081828.590158-1-hch@lst.de>
-References: <20200508081828.590158-1-hch@lst.de>
+        id S1726951AbgEHISq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 04:18:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54496 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726797AbgEHISq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 04:18:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588925925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HANsaHy1dU2Rb19yMO1lq4mAO9YTPKvRylOPeyN4Yj0=;
+        b=W7aT43h39n00CMRUhB2IMbX4w8q4meleorse2QNOWFjAE/Ftk+O1G0OEiZyJCNQSRC5BQn
+        MXIAEiinGo8pi2JotA2QEcjvqtZ3CNG7rVHg0HEYsMVY7/yCD7qRRmIHMbn1lIX4b4RKYH
+        JoYweIUHzIwcSDVRYm0NptHi34QYou4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-2kv-ly3vORq6mnEsmyAAfA-1; Fri, 08 May 2020 04:18:39 -0400
+X-MC-Unique: 2kv-ly3vORq6mnEsmyAAfA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47FFA107ACF3;
+        Fri,  8 May 2020 08:18:38 +0000 (UTC)
+Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B88A6F428;
+        Fri,  8 May 2020 08:18:34 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yufen Yu <yuyufen@huawei.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hou Tao <houtao1@huawei.com>
+Subject: [PATCH V3 4/4] block: don't hold part0's refcount in IO path
+Date:   Fri,  8 May 2020 16:17:58 +0800
+Message-Id: <20200508081758.1380673-5-ming.lei@redhat.com>
+In-Reply-To: <20200508081758.1380673-1-ming.lei@redhat.com>
+References: <20200508081758.1380673-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead just call the CDROM layer functionality directly.
+gendisk can't be gone when there is IO activity, so not hold
+part0's refcount in IO path.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Cc: Yufen Yu <yuyufen@huawei.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Hou Tao <houtao1@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/hfs/mdb.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ block/blk.h   | 13 ++++++-------
+ block/genhd.c |  4 ++--
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/fs/hfs/mdb.c b/fs/hfs/mdb.c
-index 460281b1299eb..cdf0edeeb2781 100644
---- a/fs/hfs/mdb.c
-+++ b/fs/hfs/mdb.c
-@@ -32,29 +32,35 @@
- static int hfs_get_last_session(struct super_block *sb,
- 				sector_t *start, sector_t *size)
+diff --git a/block/blk.h b/block/blk.h
+index 133fb0b99759..8efd1ca5c975 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -376,19 +376,18 @@ int bdev_resize_partition(struct block_device *bdev, int partno,
+ int disk_expand_part_tbl(struct gendisk *disk, int target);
+ int hd_ref_init(struct hd_struct *part);
+ 
+-static inline void hd_struct_get(struct hd_struct *part)
+-{
+-	percpu_ref_get(&part->ref);
+-}
+-
++/* no need to get/put refcount of part0 */
+ static inline int hd_struct_try_get(struct hd_struct *part)
  {
--	struct cdrom_multisession ms_info;
--	struct cdrom_tocentry te;
--	int res;
-+	struct cdrom_device_info *cdi = disk_to_cdi(sb->s_bdev->bd_disk);
+-	return percpu_ref_tryget_live(&part->ref);
++	if (part->partno)
++		return percpu_ref_tryget_live(&part->ref);
++	return 1;
+ }
  
- 	/* default values */
- 	*start = 0;
- 	*size = i_size_read(sb->s_bdev->bd_inode) >> 9;
+ static inline void hd_struct_put(struct hd_struct *part)
+ {
+-	percpu_ref_put(&part->ref);
++	if (part->partno)
++		percpu_ref_put(&part->ref);
+ }
  
- 	if (HFS_SB(sb)->session >= 0) {
-+		struct cdrom_tocentry te;
-+	
-+		if (!cdi)
-+			return -EINVAL;
-+
- 		te.cdte_track = HFS_SB(sb)->session;
- 		te.cdte_format = CDROM_LBA;
--		res = ioctl_by_bdev(sb->s_bdev, CDROMREADTOCENTRY, (unsigned long)&te);
--		if (!res && (te.cdte_ctrl & CDROM_DATA_TRACK) == 4) {
--			*start = (sector_t)te.cdte_addr.lba << 2;
--			return 0;
-+		if (cdrom_read_tocentry(cdi, &te) ||
-+		    (te.cdte_ctrl & CDROM_DATA_TRACK) != 4) {
-+			pr_err("invalid session number or type of track\n");
-+			return -EINVAL;
+ static inline void hd_free_part(struct hd_struct *part)
+diff --git a/block/genhd.c b/block/genhd.c
+index bf8cbb033d64..d97b95d1a2fd 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -345,7 +345,8 @@ static inline int sector_in_part(struct hd_struct *part, sector_t sector)
+  *
+  * CONTEXT:
+  * RCU read locked.  The returned partition pointer is always valid
+- * because its refcount is grabbed.
++ * because its refcount is grabbed except for part0, which lifetime
++ * is same with the disk.
+  *
+  * RETURNS:
+  * Found partition on success, part0 is returned if no partition matches
+@@ -378,7 +379,6 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+ 			return part;
  		}
--		pr_err("invalid session number or type of track\n");
--		return -EINVAL;
-+
-+		*start = (sector_t)te.cdte_addr.lba << 2;
-+	} else if (cdi) {
-+		struct cdrom_multisession ms_info;
-+
-+		ms_info.addr_format = CDROM_LBA;
-+		if (cdrom_multisession(cdi, &ms_info) == 0 && ms_info.xa_flag)
-+			*start = (sector_t)ms_info.addr.lba << 2;
  	}
--	ms_info.addr_format = CDROM_LBA;
--	res = ioctl_by_bdev(sb->s_bdev, CDROMMULTISESSION, (unsigned long)&ms_info);
--	if (!res && ms_info.xa_flag)
--		*start = (sector_t)ms_info.addr.lba << 2;
-+
- 	return 0;
+-	hd_struct_get(&disk->part0);
+ 	return &disk->part0;
  }
  
 -- 
-2.26.2
+2.25.2
 
