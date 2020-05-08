@@ -2,54 +2,54 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC94C38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2751C38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:32:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFC462184D
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91BEF21974
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 23:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727774AbgEHX0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 19:26:21 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:37651 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727110AbgEHX0U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 19:26:20 -0400
-Received: by mail-pj1-f65.google.com with SMTP id a7so4982626pju.2
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 16:26:20 -0700 (PDT)
+        id S1727878AbgEHXcg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 19:32:36 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33420 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727774AbgEHXcf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 19:32:35 -0400
+Received: by mail-pl1-f194.google.com with SMTP id t7so1427787plr.0
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 16:32:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=Nlj/e6Px8K5MZpy0+0LDNcwTwN8yX1LFH1pzBbBYPwU=;
-        b=Fe+8yoqk3Ft8X+ftdK39OGTt+SEBAmZS7rosfNXsth8XpGJu6oqR1bQCdsK7/bH5Dw
-         Zc++fDypATtnfT7xZd4Vx1kK1J0QS+6QgAWhYY2oVJo1x0hPyR9a2tyK0a/PFyVr5POg
-         CS2OLOcitssREeIAxd8mHpddvxECh8DDQcMpQPOozc0dDjpsgobKVxfEkdu1W65S1YH/
-         7YwVjaK7IAds9+fHf7vEVFVGbs/O4JeXh8TX02ejIEfmMYCFGvOoqBKSLQNG6DGVS9Xo
-         XW5U9FVCa3W/V3wDF6H5XY5KNXw5EwfwKFkCFJaXcFOS1yQa3GSp2wW0Jl3QiehLBGUm
-         CaDA==
-X-Gm-Message-State: AGi0PuYfPT8sQ/XJ2HIyknRDvnDGu+Zr4vuguW4X2cLfGexBahHsroS+
-        bIsMXw5UuSMU7h+Oc/OlcYY=
-X-Google-Smtp-Source: APiQypLfZzYuuWRujYH8vbMqNGe5Q9hAHqLfZ3EEJX9mHf21xJZOrv7hAJDn68aZSXfT1omJNqUI2g==
-X-Received: by 2002:a17:902:6acc:: with SMTP id i12mr4645027plt.61.1588980379712;
-        Fri, 08 May 2020 16:26:19 -0700 (PDT)
+        bh=tCHckCbpvTDUMW+esQiLUncPPrtgrINSwn6jCxUuE9A=;
+        b=FgcnyyzSL3qvTUTzUyXNXCurVFwzGZCvluToqMVOKE/GEHX7gzxqNCn5UYRF5nfb32
+         2w7bTVEZ1J5IDKPDi2xTt+DCBPA8f/XNmi912EHZ2/5f9cHrW+I2PIlViFHZRPyrYRi1
+         IAneZoAvIHvZekIQ+RdrjV7QJTpKxCO4/Cpjjc/NXE67XnjjZpkaa3bOpUOiVdGhcFqS
+         uN2APHB1h6RNvY0lZAe7eg02dqOwacSIuU5BOoOg9NU9xVYvwhJ8EfY6KzsFDsqH7XXN
+         /aXdz2R6PLfJPqnbKpQWy26zR4EDLmTXYQ5R4BoY/QP6t8kYnTlL1Y3Xu9fSrObdCRMS
+         noQw==
+X-Gm-Message-State: AGi0PubeQOfznATvYN8KWvbkcMx8CVbB+05mypXJcJBvV5FidytLbBs0
+        QbS0kZu4WhdJHYK9Q3Y3jBI=
+X-Google-Smtp-Source: APiQypJnQhBYaikvP4XlXS/nlG5zHGCwouWlPnK85M9DP6PVU2Ah2xwBu0Djel+rhnUwureGY23quA==
+X-Received: by 2002:a17:90a:1983:: with SMTP id 3mr8532597pji.48.1588980754374;
+        Fri, 08 May 2020 16:32:34 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:89ed:1db3:8c60:ba90? ([2601:647:4000:d7:89ed:1db3:8c60:ba90])
-        by smtp.gmail.com with ESMTPSA id 131sm2124537pgg.65.2020.05.08.16.26.18
+        by smtp.gmail.com with ESMTPSA id t5sm2120794pgp.80.2020.05.08.16.32.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2020 16:26:18 -0700 (PDT)
-Subject: Re: [PATCH V10 06/11] blk-mq: prepare for draining IO when hctx's all
- CPUs are offline
+        Fri, 08 May 2020 16:32:33 -0700 (PDT)
+Subject: Re: [PATCH V10 05/11] blk-mq: support rq filter callback when
+ iterating rqs
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-7-ming.lei@redhat.com>
+ <20200505020930.1146281-6-ming.lei@redhat.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -74,12 +74,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <756074a0-ea4b-5dcf-9348-e5b4f4414248@acm.org>
-Date:   Fri, 8 May 2020 16:26:17 -0700
+Message-ID: <8d7a14f8-b36c-4f5c-a4af-d5904d3e9ea1@acm.org>
+Date:   Fri, 8 May 2020 16:32:32 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200505020930.1146281-7-ming.lei@redhat.com>
+In-Reply-To: <20200505020930.1146281-6-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,34 +89,41 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-04 19:09, Ming Lei wrote:
-> @@ -391,6 +393,7 @@ struct blk_mq_ops {
->  enum {
->  	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
->  	BLK_MQ_F_TAG_SHARED	= 1 << 1,
-> +	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
->  	BLK_MQ_F_BLOCKING	= 1 << 5,
->  	BLK_MQ_F_NO_SCHED	= 1 << 6,
->  	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index 77d70b633531..24b3a77810b6 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -152,6 +152,7 @@ enum cpuhp_state {
->  	CPUHP_AP_SMPBOOT_THREADS,
->  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
->  	CPUHP_AP_IRQ_AFFINITY_ONLINE,
-> +	CPUHP_AP_BLK_MQ_ONLINE,
->  	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
->  	CPUHP_AP_X86_INTEL_EPB_ONLINE,
->  	CPUHP_AP_PERF_ONLINE,
+> @@ -310,19 +313,30 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+>  /**
+>   * blk_mq_all_tag_busy_iter - iterate over all started requests in a tag map
+>   * @tags:	Tag map to iterate over.
+> - * @fn:		Pointer to the function that will be called for each started
+> - *		request. @fn will be called as follows: @fn(rq, @priv,
+> - *		reserved) where rq is a pointer to a request. 'reserved'
+> - *		indicates whether or not @rq is a reserved request. Return
+> - *		true to continue iterating tags, false to stop.
+> + * @fn:		Pointer to the function that will be called for each request
+> + * 		when .busy_rq_fn(rq) returns true. @fn will be called as
+> + * 		follows: @fn(rq, @priv, reserved) where rq is a pointer to a
+> + * 		request. 'reserved' indicates whether or not @rq is a reserved
+> + * 		request. Return true to continue iterating tags, false to stop.
+> + * @busy_rq_fn: Pointer to the function that will be called for each request,
+> + * 		@busy_rq_fn's type is same with @fn. Only when @busy_rq_fn(rq,
+> + * 		@priv, reserved) returns true, @fn will be called on this rq.
+>   * @priv:	Will be passed as second argument to @fn.
+>   */
+> -static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+> -		busy_tag_iter_fn *fn, void *priv)
+> +void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+> +		busy_tag_iter_fn *fn, busy_rq_iter_fn *busy_rq_fn,
+> +		void *priv)
+>  {
 
-Wouldn't BLK_MQ_F_NO_IRQ be a better name than BLK_MQ_F_NO_MANAGED_IRQ?
-
-Please add comments that explain what BLK_MQ_F_NO_MANAGED_IRQ and
-CPUHP_AP_BLK_MQ_ONLINE mean.
+The name 'busy_rq_fn' is not ideal because it is named after one
+specific use case, namely checking whether or not a request is busy (has
+already been started). How about using the name 'pred_fn' ('pred' from
+predicate because it controls whether the other function is called)?
+Since only the context that passes 'fn' can know what data structure
+'priv' points to and since 'busy_rq_fn' is passed from another context,
+can 'busy_rq_fn' even know what data 'priv' points at? Has it been
+considered not to pass the 'priv' argument to 'busy_rq_fn'?
 
 Thanks,
 
 Bart.
-
-
