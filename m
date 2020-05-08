@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6ECCC47257
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 16:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B220C4724C
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 16:16:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A46F206B9
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 16:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3687206B9
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 16:16:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gMI4IluX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lK8ZNxOs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726951AbgEHQP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 12:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36398 "EHLO
+        id S1728447AbgEHQPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 12:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728466AbgEHQP4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 12:15:56 -0400
+        with ESMTP id S1728418AbgEHQPt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 12:15:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BE6C061A0C;
-        Fri,  8 May 2020 09:15:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E948C061A0C;
+        Fri,  8 May 2020 09:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=zekiztpHAl5zTc85DlA+lKmHw2vnmnAdlN6jt1NptOQ=; b=gMI4IluXgmfUheyu/l2QveyPlK
-        i4SNHFgRBDop0ixqFR6NOfjpEaxOv7VTbmodIcu9si1cWjVBYQDG6v9N/SQKTcIDdmdtFrMHvMGq4
-        7VwLdfduY/zZm5rbNMNDbCVA2QminS5SQF2Ryon+1776Db6rJUjGBi636TvJ5LPMiPVl8OS/EGTAr
-        QXC8nd4AZMDGOG1P05uL+i5JNI1fZaFdjzwPFpAyn8sUOllj+VeSnBpVCprpcaUI+1pp00GRdNPLh
-        +byhqt7TSgqpa+lXFVFw6v5ZP2qBd37t/EdUBb1ie7tWFtfGUfQDL7IWBNU2HiGAPLQ24l4C0m8Yb
-        nElKlH3Q==;
+        bh=IPRG+JDqkx1viJ/AMjzU5O6Pl2NB/T/FRb+DBspvmGU=; b=lK8ZNxOsc1ITEEKH7PjirEwIjK
+        OwCQ+1EoGDndvVM4y3SjpiZhfHWzaZQ1IFmZtvcORUIwiVxWH5I4Fs8xZq/FghsmwLxIQp4ZRpzyW
+        ST0Kk6+py/T5zYQn4svEwiTfAZhJN6p6zy9KwIwYUlfqNSr5XN/UqH0OjhhghPQDrymdXLL/YsAFO
+        PCe09qBSQho7zUnWU/oNsYd67E9k7WOpOwpZzBV4BFoNV3dvWLGpbkDyERxea3ldLMqFbgowFXhVp
+        Lmlzkhui6FVKhiJFYmRwspKFZ8pnp1a2HmlZrA7yqVLSThE604XkJ1wNbYZt3mPuAwJDyju2pYnen
+        eibxtaOw==;
 Received: from [2001:4bb8:180:9d3f:90d7:9df8:7cd:3504] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jX5fD-0004ke-Gh; Fri, 08 May 2020 16:15:52 +0000
+        id 1jX5f3-0004hP-5Q; Fri, 08 May 2020 16:15:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jim Paris <jim@jtan.com>, Geoff Levand <geoff@infradead.org>,
@@ -50,9 +50,9 @@ Cc:     Jim Paris <jim@jtan.com>, Geoff Levand <geoff@infradead.org>,
         linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org
-Subject: [PATCH 10/15] bcache: stop setting ->queuedata
-Date:   Fri,  8 May 2020 18:15:12 +0200
-Message-Id: <20200508161517.252308-11-hch@lst.de>
+Subject: [PATCH 07/15] umem: stop using ->queuedata
+Date:   Fri,  8 May 2020 18:15:09 +0200
+Message-Id: <20200508161517.252308-8-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200508161517.252308-1-hch@lst.de>
 References: <20200508161517.252308-1-hch@lst.de>
@@ -66,21 +66,31 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/super.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/umem.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d98354fa28e3e..a0fb5af2beeda 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -871,7 +871,6 @@ static int bcache_device_init(struct bcache_device *d, unsigned int block_size,
- 		return -ENOMEM;
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index d84e8a878df24..e59bff24e02cf 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -521,7 +521,8 @@ static int mm_check_plugged(struct cardinfo *card)
  
- 	d->disk->queue			= q;
--	q->queuedata			= d;
- 	q->backing_dev_info->congested_data = d;
- 	q->limits.max_hw_sectors	= UINT_MAX;
- 	q->limits.max_sectors		= UINT_MAX;
+ static blk_qc_t mm_make_request(struct request_queue *q, struct bio *bio)
+ {
+-	struct cardinfo *card = q->queuedata;
++	struct cardinfo *card = bio->bi_disk->private_data;
++
+ 	pr_debug("mm_make_request %llu %u\n",
+ 		 (unsigned long long)bio->bi_iter.bi_sector,
+ 		 bio->bi_iter.bi_size);
+@@ -888,7 +889,6 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	card->queue = blk_alloc_queue(mm_make_request, NUMA_NO_NODE);
+ 	if (!card->queue)
+ 		goto failed_alloc;
+-	card->queue->queuedata = card;
+ 
+ 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
+ 
 -- 
 2.26.2
 
