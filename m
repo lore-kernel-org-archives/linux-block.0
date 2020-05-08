@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C0CC47255
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D663FC47254
 	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:00:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E80F218AC
+	by mail.kernel.org (Postfix) with ESMTP id AC0EB24953
 	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:00:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="FTCqn59Z"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UIKZzo7p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbgEHWAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 18:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33800 "EHLO
+        id S1727774AbgEHWAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 18:00:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727774AbgEHWAW (ORCPT
+        by vger.kernel.org with ESMTP id S1727110AbgEHWAX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 18:00:22 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8139FC05BD0A
-        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 15:00:22 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id k1so3650655wrx.4
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 15:00:22 -0700 (PDT)
+        Fri, 8 May 2020 18:00:23 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC6DC061A0C
+        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 15:00:23 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id h9so3660229wrt.0
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 15:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=nqYXnG0hXHAuFcgizjaOL1g3/nTuWaq2pTGY70YFO3Y=;
-        b=FTCqn59ZXMOJsVXSlArE/0ZWBGzr2XuYwLeHciwR5qzYZRXhR1EZ6Xfd6b7/r8ih0M
-         CfN1XuLLM8m4AnYPs62BvH51dOTAR5+i1qZePVMFNuxE2GVd9zbIWN8A6W5SngNAMtbM
-         rXu+yWKyHjiBcT5SBjH0ANMY+QMONbTD+tH6p8U1ZVzMs9ozYFw13Ur1sZDtPyNal6uH
-         0Fa+wXY+SeyfRIIpUvbNP7+2IC8CiFsof1w9hIOZrSKNptintXW2VO0+TOZPoS4I/rdb
-         4Q7/SUjABCOgY7csXNyxU5xVWEAZcuwTTrxKovuO8/bM3kThIQatghRykiVvYkEk+qrx
-         QtNg==
+        bh=oe6VUiTYsko1zxoPYCZbsMKvQCAiAXB7o0u5C4C7os8=;
+        b=UIKZzo7pCejAlakM2hiG4HdCLnh0Hv+FZak8KGCaKM+kGnJAwThVANiEyWdglZLM+S
+         5mMMkwn71jUD6RsAml4EzcgJ6KiNqgGjzZHgiQ3yVAUfZmhk8CrdxHId4nqZTZ0AhusB
+         StxzkUdXJGP90As1TH59dsDkU+Nrq4j85tT9qfl/s+RXqPSkcO381Gpj4ufneSi7JSsj
+         6Hgfboph161R+bTtlnhprm7PnzNrFFpD8mpHtUaJ+sC10PfTO9AtpKULFOz6gU2NsA8S
+         wnhytYR/j1dkQ/aZI6QfE3zD9FrytikTvcrT/u7ruPZpXgS3Mhi17hOn0A3i3q+V52Gq
+         8cpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=nqYXnG0hXHAuFcgizjaOL1g3/nTuWaq2pTGY70YFO3Y=;
-        b=RjFeGHNrnDafp/zYZRyL1oR6U+jhaKRbkkRHtWyGbgNwshMK23ihWQaXIVJEP9XRbO
-         Q3N5Xh/D8A2e+tYoJp9tTJCkTUJoysW+a/6u36+P09MVJrURulM7mDgmOrTPeMIMiklx
-         V+PB6srwfz+n3+ZPBUQhWCpOpAJu/stsSlf2/r3oprLUr1pGwLtcolMeBr9eqMcdZDz6
-         Y8Yq9VWEZxQKCYsaTnZXYoFfbpVpYzXta3zpDE6WroPLZHx7AGivrrEBFdqmTf6VROgs
-         RSutnNyLwGr0tw0mAnN8ZP4eEHiwyRMQ2QgIWeiu1XfuCBZOjHRPqPZUwRLCwGzkSYA5
-         4vnQ==
-X-Gm-Message-State: AGi0PuYM4Vh9dOu0UC4/y688B9vv8MV4QOKNIp2HMSIFqHCn8G41ek0Y
-        rGhcvs+mzJdCkhDBJKt3z3npUw==
-X-Google-Smtp-Source: APiQypJwRrxLx7KWzivyRTGV5SfN9QEndr8trJgQGYOvCxRWdl1punApZNQc4CEaJ5V0au8REvTl3w==
-X-Received: by 2002:adf:e64c:: with SMTP id b12mr4983758wrn.131.1588975221056;
+        bh=oe6VUiTYsko1zxoPYCZbsMKvQCAiAXB7o0u5C4C7os8=;
+        b=JOQen1VXymATL2I6OhWf/NbajNpitRGD0ZxWQHJ3j7u+O4HFn5hJInFfBRcyZX9ysN
+         ZVZ7YdqqUr6OZ337ystjx6BnzMrJhBaCI9Z5XL/uJk0vZUni7OmGEPCwF5ai60J0phX6
+         V3EFiOro9KAZskvte7/MRrGPgDvQQpA5yY21uUshdZdEjuIzVFJh6MfOpyncgIN6cTpC
+         xgBwsMNXtn2ldtXY+bHMF4Psv4jrZhGHycA0x5sbvIPo+4C7zsqSjITgEGVMoRpybYnP
+         fJOgw0U3LbPP4rU8gUwrA0FOsd/EdQbqhuZDqvrmMSMeTEPS7ihnDTdaQCBoDvsoHDQy
+         saPA==
+X-Gm-Message-State: AGi0PuZ5gBYJxf04NHJ6xZHsmelR4tQuKAL59NuhwpN/vdKj8AEulIw2
+        RZKnY7yOGQwO0sASt9fcGgU+mw==
+X-Google-Smtp-Source: APiQypJmQon21vzDnJA1qjvuqx/qUdbW7qPUG+u5CBe/BtuOAuVSHxiYsvGhy/tK+NKaUFy6zMbGqg==
+X-Received: by 2002:a5d:6145:: with SMTP id y5mr4748201wrt.195.1588975221983;
         Fri, 08 May 2020 15:00:21 -0700 (PDT)
 Received: from ls00508.pb.local ([2001:1438:4010:2540:7d6e:af57:ffe:3087])
-        by smtp.gmail.com with ESMTPSA id h6sm14646878wmf.31.2020.05.08.15.00.20
+        by smtp.gmail.com with ESMTPSA id h6sm14646878wmf.31.2020.05.08.15.00.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 15:00:20 -0700 (PDT)
+        Fri, 08 May 2020 15:00:21 -0700 (PDT)
 From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 To:     tj@kernel.org, axboe@kernel.dk
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH 1/4] blk-throttle: remove blk_throtl_drain
-Date:   Sat,  9 May 2020 00:00:12 +0200
-Message-Id: <20200508220015.11528-2-guoqing.jiang@cloud.ionos.com>
+Subject: [PATCH 2/4] blk-throttle: remove tg_drain_bios
+Date:   Sat,  9 May 2020 00:00:13 +0200
+Message-Id: <20200508220015.11528-3-guoqing.jiang@cloud.ionos.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
 References: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
@@ -72,84 +72,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After the commit 5addeae1bedc4 ("blk-cgroup: remove blkcg_drain_queue"),
-there is no caller of blk_throtl_drain, so let's remove it.
+After blk_throtl_drain is removed, there is no caller of tg_drain_bios,
+so remove it as well.
 
 Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 ---
- block/blk-throttle.c | 41 -----------------------------------------
- block/blk.h          |  2 --
- 2 files changed, 43 deletions(-)
+ block/blk-throttle.c | 22 ----------------------
+ 1 file changed, 22 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 98233c9c65a8..0b2ce7fb77a7 100644
+index 0b2ce7fb77a7..209fdd8939fb 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -2380,47 +2380,6 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
- 	}
+@@ -2358,28 +2358,6 @@ void blk_throtl_bio_endio(struct bio *bio)
  }
+ #endif
  
--/**
-- * blk_throtl_drain - drain throttled bios
-- * @q: request_queue to drain throttled bios for
-- *
-- * Dispatch all currently throttled bios on @q through ->make_request_fn().
+-/*
+- * Dispatch all bios from all children tg's queued on @parent_sq.  On
+- * return, @parent_sq is guaranteed to not have any active children tg's
+- * and all bios from previously active tg's are on @parent_sq->bio_lists[].
 - */
--void blk_throtl_drain(struct request_queue *q)
--	__releases(&q->queue_lock) __acquires(&q->queue_lock)
+-static void tg_drain_bios(struct throtl_service_queue *parent_sq)
 -{
--	struct throtl_data *td = q->td;
--	struct blkcg_gq *blkg;
--	struct cgroup_subsys_state *pos_css;
--	struct bio *bio;
--	int rw;
+-	struct throtl_grp *tg;
 -
--	rcu_read_lock();
+-	while ((tg = throtl_rb_first(parent_sq))) {
+-		struct throtl_service_queue *sq = &tg->service_queue;
+-		struct bio *bio;
 -
--	/*
--	 * Drain each tg while doing post-order walk on the blkg tree, so
--	 * that all bios are propagated to td->service_queue.  It'd be
--	 * better to walk service_queue tree directly but blkg walk is
--	 * easier.
--	 */
--	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
--		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+-		throtl_dequeue_tg(tg);
 -
--	/* finally, transfer bios from top-level tg's into the td */
--	tg_drain_bios(&td->service_queue);
--
--	rcu_read_unlock();
--	spin_unlock_irq(&q->queue_lock);
--
--	/* all bios now should be in td->service_queue, issue them */
--	for (rw = READ; rw <= WRITE; rw++)
--		while ((bio = throtl_pop_queued(&td->service_queue.queued[rw],
--						NULL)))
--			generic_make_request(bio);
--
--	spin_lock_irq(&q->queue_lock);
+-		while ((bio = throtl_peek_queued(&sq->queued[READ])))
+-			tg_dispatch_one_bio(tg, bio_data_dir(bio));
+-		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
+-			tg_dispatch_one_bio(tg, bio_data_dir(bio));
+-	}
 -}
 -
  int blk_throtl_init(struct request_queue *q)
  {
  	struct throtl_data *td;
-diff --git a/block/blk.h b/block/blk.h
-index 73bd3b1c6938..997459de47d0 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -307,12 +307,10 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
-  * Internal throttling interface
-  */
- #ifdef CONFIG_BLK_DEV_THROTTLING
--extern void blk_throtl_drain(struct request_queue *q);
- extern int blk_throtl_init(struct request_queue *q);
- extern void blk_throtl_exit(struct request_queue *q);
- extern void blk_throtl_register_queue(struct request_queue *q);
- #else /* CONFIG_BLK_DEV_THROTTLING */
--static inline void blk_throtl_drain(struct request_queue *q) { }
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
 -- 
 2.17.1
 
