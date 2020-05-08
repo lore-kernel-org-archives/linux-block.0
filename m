@@ -2,76 +2,86 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5BBC38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 15:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A63C5C47247
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 15:42:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39F9D207DD
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 15:39:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8829221841
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 15:42:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZQ6+L0ii"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XZ7DQiFA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727778AbgEHPjz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 11:39:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        id S1728174AbgEHPmx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 11:42:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726873AbgEHPjz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 11:39:55 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A3EC061A0C
-        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 08:39:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=4ZXIhWeQtMsx8PQEY7iapHNgjrI8iMi2OLLnPqcfvBw=; b=ZQ6+L0iiaZOw2vq0wZ+a/mCEBs
-        qhsytno9lt3McZsi5TtWGvTqpNySunHgD+VkPK7KQDOS1/FUW0IMTkKPCOW6QaNyTgYprzLah0piR
-        7hJ7V/YkEiXaGF59sVTT+FWlyPxUpRceVx+exIYVKiuYl8/s5HxBhvdXceH0RBH8ttqJnj5m968oq
-        UXXUfTG1pJYABFpvCEcic1Ics9B+uzrdnh48xVUvOfqc4boNxBzKEMLraZ21wBVfLVwEPaVE0t+1p
-        M0IV1/sT8gZ1MAWvXjLry+PNOJhcIzPMJjeI3dQJbV52NKepLWEjQqWfjDJtxhspLHVrWwcp96m8Z
-        EALuMY6g==;
-Received: from [2001:4bb8:180:9d3f:90d7:9df8:7cd:3504] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jX56P-0004qA-FU; Fri, 08 May 2020 15:39:53 +0000
-Date:   Fri, 8 May 2020 17:39:51 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@fb.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme fixes for 5.7
-Message-ID: <20200508153951.GA250474@infradead.org>
+        with ESMTP id S1727092AbgEHPmx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 11:42:53 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C8FC061A0C
+        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 08:42:52 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id x2so1792426ilp.13
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 08:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=nsc0r+5+ZjurzhOSjY4Y4lgMibKJ6WxK1U7G5gxIfG8=;
+        b=XZ7DQiFAjFR4nQHlDaw40CKmYcpLCFegUPvkAfGrjAmgtNZ+5fzyq0iHzJtEkfdMbS
+         IvD/tgUQJNjMCaOy1OqPw6s2ABZjbZiWoVWwwIF9azyhPPFbOE20HP7thOwa0acqLhdq
+         PHpex97hM8yoMtRN0ehacCJ2d+4Fm49T63zz0XvXrrEmTuyHFwMElTYqShxoeZrnXt3f
+         /YEh09jMp9ZiCYMx49Ds+b2J9I4Ui60C0gzy0ectvVelokPU/sK/J/VG82TyxNOtv8RG
+         7PDZjeIUn8D2OLeMsiqUtxDR9zFue8V6D8qbR6SUVKmbr0ib1OyCN3Y2z3GmkOI/+bOP
+         TTqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nsc0r+5+ZjurzhOSjY4Y4lgMibKJ6WxK1U7G5gxIfG8=;
+        b=UMx/vUfB6X8fv1uriAXCfXx+STEGDrynSdUPF52kCGVztyD6gTbfAKsnn5SPoeIJFy
+         qMH8SEcysnqYVGklWwR/w5Vn/wDGRkO5TTdO7y5UHTZ5DvybLZQBxXUOpPmO/jYbhlfB
+         MqZb9VXOx4FjClhbJ71xcB4rRvz2b959lvHMZg5cHzUfeeea7+vg58ju6anZAfHaBR9d
+         0gNqPMko2e4+q3L0Md2FcN4q+Zn4gRT8OQtMlHGBR1+W4JSfgtCbCUO6vp8UYORsr4KM
+         iFNYp1auYuldzGfG8ASh3/M8O9PZSHIgK2v2MKCyVJKOeZLz8faA9bevSVtxb7eVpVUT
+         dK2A==
+X-Gm-Message-State: AGi0PuagbayJgYmWBA7HS5Ga7EjnxqQdZpsdwbCOHBY7Gyo52EqVHxna
+        AamU2mkavGGAN/WtqIdOEaqDHw==
+X-Google-Smtp-Source: APiQypLHAanSroDF/FH4Tm79CLceEZR7JGIioYNd3m0MytZ6QPPskUL2RZ+Ia2VRaJRuFv64YDjc0Q==
+X-Received: by 2002:a92:89d5:: with SMTP id w82mr3393607ilk.153.1588952571841;
+        Fri, 08 May 2020 08:42:51 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o22sm818896iow.25.2020.05.08.08.42.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2020 08:42:51 -0700 (PDT)
+Subject: Re: [PATCH] hfs: stop using ioctl_by_bdev
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20200508081828.590158-1-hch@lst.de>
+ <20200508081828.590158-2-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b1629593-587f-476d-a534-9336cb9e6d43@kernel.dk>
+Date:   Fri, 8 May 2020 09:42:50 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200508081828.590158-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 860a93ff87acd001eea827b70f4a7a64c0854b81:
+On 5/8/20 2:18 AM, Christoph Hellwig wrote:
+> Instead just call the CDROM layer functionality directly.
 
-  bdi: add a ->dev_name field to struct backing_dev_info (2020-05-07 08:45:47 -0600)
+Applied, thanks.
 
-are available in the Git repository at:
+-- 
+Jens Axboe
 
-  git://git.infradead.org/nvme.git nvme-5.7
-
-for you to fetch changes up to 8874d040ff34285e8b8458a75f9434e19ed06174:
-
-  nvme: fix possible hang when ns scanning fails during error recovery (2020-05-08 17:04:15 +0200)
-
-----------------------------------------------------------------
-Alexey Dobriyan (1):
-      nvme-pci: fix "slimmer CQ head update"
-
-Sagi Grimberg (1):
-      nvme: fix possible hang when ns scanning fails during error recovery
-
- drivers/nvme/host/core.c | 2 +-
- drivers/nvme/host/pci.c  | 6 +++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
