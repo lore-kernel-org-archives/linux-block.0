@@ -7,194 +7,130 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B01DC38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89CAC38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E8EA206D5
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7C9A208D6
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFuU+60k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLD0U9Bb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726770AbgEHISX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 04:18:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29816 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726746AbgEHISX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 04:18:23 -0400
+        id S1726771AbgEHIS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 04:18:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45904 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726746AbgEHIS1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 May 2020 04:18:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588925901;
+        s=mimecast20190719; t=1588925905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6WBjRECCQkmpuPUKvoQf4JSbx7U1smdNEwz5Ik4qAFM=;
-        b=jFuU+60kZVJ/LsAsFU5e70z4fJz38XD5aGAaamZ3aHawSTbzqnNrSH51jxSzFW3Alro8be
-        LZcK4zNpSBnDgClnQgw7xWDW2g+s6SBOSC54PBgS3YFcHYWUqECaSnbrMJQ5zbgAexDOqP
-        JfeV28u1hhyIwD3Q181DY3Zm47KJ9pA=
+        bh=N/oaaQ4C9wcrt0h4NLM933HxrSlP7xIww0UEPzR3D7U=;
+        b=JLD0U9Bbm0i3xJt8Kc+lh70BxFrIiTI3RyP1Oz3gwj3QlSFTwbA/EWivakyK6tupY+NOng
+        t+GTr/WScu3JQIl6ZXKnOnvk6NNgGXgCV00hhB6yvc4hC9QylB76xIYoJp8yYeTKmkwXgD
+        OAd48pYTd9/Kf+A01b9JSRCm9en6MB4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514--WqPH76mNz2A919eC_LZBQ-1; Fri, 08 May 2020 04:18:17 -0400
-X-MC-Unique: -WqPH76mNz2A919eC_LZBQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-283-5xZj_AqjP5eUydR5Z-IWeA-1; Fri, 08 May 2020 04:18:24 -0400
+X-MC-Unique: 5xZj_AqjP5eUydR5Z-IWeA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1EE8461;
-        Fri,  8 May 2020 08:18:16 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48A65473;
+        Fri,  8 May 2020 08:18:23 +0000 (UTC)
 Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 397E169C88;
-        Fri,  8 May 2020 08:18:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C210C5C1BE;
+        Fri,  8 May 2020 08:18:19 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Yufen Yu <yuyufen@huawei.com>,
         Christoph Hellwig <hch@infradead.org>,
         Hou Tao <houtao1@huawei.com>
-Subject: [PATCH V3 1/4] block: fix use-after-free on cached last_lookup partition
-Date:   Fri,  8 May 2020 16:17:55 +0800
-Message-Id: <20200508081758.1380673-2-ming.lei@redhat.com>
+Subject: [PATCH V3 2/4] block: only define 'nr_sects_seq' in hd_part for 32bit SMP
+Date:   Fri,  8 May 2020 16:17:56 +0800
+Message-Id: <20200508081758.1380673-3-ming.lei@redhat.com>
 In-Reply-To: <20200508081758.1380673-1-ming.lei@redhat.com>
 References: <20200508081758.1380673-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-delete_partition() clears the cached last_lookup partition. However the
-.last_lookup cache may be overwritten by one IO path after it is cleared
-from delete_partition(). Then another IO path may use the cached deleting
-partition after hd_struct_free() is called, then use-after-free is triggered
-on the cached partition.
+The seqcount of 'nr_sects_seq' is only needed in case of 32bit SMP,
+so define it just for 32bit SMP.
 
-Fixes the issue by the following approach:
-
-1) always get the partition's refcount via hd_struct_try_get() before
-setting .last_lookup
-
-2) move clearing .last_lookup from delete_partition() to hd_struct_free()
-which is the release handle of the partition's percpu-refcount, so that no
-IO path can cache deleteing partition via .last_lookup.
-
-It is one candidate approach of Yufen's patch[1] which adds overhead
-in fast path by indirect lookup which may introduce one extra cacheline
-in IO path. Also this patch relies on percpu-refcount's protection, and
-it is easier to understand and verify.
-
-[1] https://lore.kernel.org/linux-block/20200109013551.GB9655@ming.t460p/T/#t
-
-Reported-by: Yufen Yu <yuyufen@huawei.com>
+Cc: Yufen Yu <yuyufen@huawei.com>
 Cc: Christoph Hellwig <hch@infradead.org>
 Cc: Hou Tao <houtao1@huawei.com>
 Reviewed-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c        | 12 ------------
- block/genhd.c           | 15 ++++++++++++---
- block/partitions/core.c | 12 +++++++++++-
- 3 files changed, 23 insertions(+), 16 deletions(-)
+ block/genhd.c           | 2 +-
+ block/partitions/core.c | 2 +-
+ include/linux/genhd.h   | 9 +++++++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ec50d7e6be21..826a8980997d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1363,18 +1363,6 @@ void blk_account_io_start(struct request *rq, bool new_io)
- 		part_stat_inc(part, merges[rw]);
- 	} else {
- 		part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
--		if (!hd_struct_try_get(part)) {
--			/*
--			 * The partition is already being removed,
--			 * the request will be accounted on the disk only
--			 *
--			 * We take a reference on disk->part0 although that
--			 * partition will never be deleted, so we can treat
--			 * it as any other partition.
--			 */
--			part = &rq->rq_disk->part0;
--			hd_struct_get(part);
--		}
- 		part_inc_in_flight(rq->q, part, rw);
- 		rq->part = part;
- 	}
 diff --git a/block/genhd.c b/block/genhd.c
-index c05d509877fa..ec57d5d7a64d 100644
+index ec57d5d7a64d..bf8cbb033d64 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -344,11 +344,12 @@ static inline int sector_in_part(struct hd_struct *part, sector_t sector)
-  * primarily used for stats accounting.
-  *
-  * CONTEXT:
-- * RCU read locked.  The returned partition pointer is valid only
-- * while preemption is disabled.
-+ * RCU read locked.  The returned partition pointer is always valid
-+ * because its refcount is grabbed.
-  *
-  * RETURNS:
-  * Found partition on success, part0 is returned if no partition matches
-+ * or the matched partition is being deleted.
-  */
- struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
- {
-@@ -359,17 +360,25 @@ struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
- 	ptbl = rcu_dereference(disk->part_tbl);
- 
- 	part = rcu_dereference(ptbl->last_lookup);
--	if (part && sector_in_part(part, sector))
-+	if (part && sector_in_part(part, sector) && hd_struct_try_get(part))
- 		return part;
- 
- 	for (i = 1; i < ptbl->len; i++) {
- 		part = rcu_dereference(ptbl->part[i]);
- 
- 		if (part && sector_in_part(part, sector)) {
-+			/*
-+			 * only live partition can be cached for lookup,
-+			 * so use-after-free on cached & deleting partition
-+			 * can be avoided
-+			 */
-+			if (!hd_struct_try_get(part))
-+				break;
- 			rcu_assign_pointer(ptbl->last_lookup, part);
- 			return part;
- 		}
- 	}
-+	hd_struct_get(&disk->part0);
- 	return &disk->part0;
- }
- 
+@@ -1729,7 +1729,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ 		 * TODO: Ideally set_capacity() and get_capacity() should be
+ 		 * converted to make use of bd_mutex and sequence counters.
+ 		 */
+-		seqcount_init(&disk->part0.nr_sects_seq);
++		hd_sects_seq_init(&disk->part0);
+ 		if (hd_ref_init(&disk->part0)) {
+ 			hd_free_part(&disk->part0);
+ 			kfree(disk);
 diff --git a/block/partitions/core.c b/block/partitions/core.c
-index c085bf85509b..f4000dac23ef 100644
+index f4000dac23ef..ec81986b358e 100644
 --- a/block/partitions/core.c
 +++ b/block/partitions/core.c
-@@ -288,6 +288,12 @@ static void hd_struct_free_work(struct work_struct *work)
- static void hd_struct_free(struct percpu_ref *ref)
- {
- 	struct hd_struct *part = container_of(ref, struct hd_struct, ref);
-+	struct gendisk *disk = part_to_disk(part);
-+	struct disk_part_tbl *ptbl =
-+		rcu_dereference_protected(disk->part_tbl, 1);
+@@ -392,7 +392,7 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 		goto out_free;
+ 	}
+ 
+-	seqcount_init(&p->nr_sects_seq);
++	hd_sects_seq_init(p);
+ 	pdev = part_to_dev(p);
+ 
+ 	p->start_sect = start;
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index f9c226f9546a..b4744035ae58 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -68,7 +68,9 @@ struct hd_struct {
+ 	 * can be non-atomic on 32bit machines with 64bit sector_t.
+ 	 */
+ 	sector_t nr_sects;
++#if BITS_PER_LONG==32 && defined(CONFIG_SMP)
+ 	seqcount_t nr_sects_seq;
++#endif
+ 	sector_t alignment_offset;
+ 	unsigned int discard_alignment;
+ 	struct device __dev;
+@@ -274,6 +276,13 @@ static inline void disk_put_part(struct hd_struct *part)
+ 		put_device(part_to_dev(part));
+ }
+ 
++static inline void hd_sects_seq_init(struct hd_struct *p)
++{
++#if BITS_PER_LONG==32 && defined(CONFIG_SMP)
++	seqcount_init(&p->nr_sects_seq);
++#endif
++}
 +
-+	rcu_assign_pointer(ptbl->last_lookup, NULL);
-+	put_device(disk_to_dev(disk));
- 
- 	INIT_RCU_WORK(&part->rcu_work, hd_struct_free_work);
- 	queue_rcu_work(system_wq, &part->rcu_work);
-@@ -309,8 +315,12 @@ void delete_partition(struct gendisk *disk, struct hd_struct *part)
- 	struct disk_part_tbl *ptbl =
- 		rcu_dereference_protected(disk->part_tbl, 1);
- 
-+	/*
-+	 * ->part_tbl is referenced in this part's release handler, so
-+	 *  we have to hold the disk device
-+	 */
-+	get_device(disk_to_dev(part_to_disk(part)));
- 	rcu_assign_pointer(ptbl->part[part->partno], NULL);
--	rcu_assign_pointer(ptbl->last_lookup, NULL);
- 	kobject_put(part->holder_dir);
- 	device_del(part_to_dev(part));
- 
+ /*
+  * Smarter partition iterator without context limits.
+  */
 -- 
 2.25.2
 
