@@ -2,78 +2,95 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2810C38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 07:47:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE15EC38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7BDA2070B
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 07:47:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5B16206D5
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 08:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ddWEUMyl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqP1ZkOq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726776AbgEHHrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 03:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41724 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726036AbgEHHrH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 03:47:07 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06755C05BD43
-        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 00:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9b9Bs+uVFeIQOjgP03GnJGkoZPfz/Pb/eL2ur5UaBMQ=; b=ddWEUMyltOXFcPWnckqYkbQiUH
-        x02+JvDrbNDiZjJ3As0uEzrVoaUfKuh/NWDW8AOhIxdSGTo6Zdjl4e7Ggw/S4NCzTCxjocFR4cwFo
-        e5bu6M6hDnuOvdflupdMvBQr54Z8fuk1Lw81AauZFw0Ls33PH3f/2Moli7vwskeqPHzspqVLv7gZl
-        kAZgjWr2nBLQrb6N/bSDBgpty3LKKwW3vbL2FLiLLsjQjfpQVmmwJVqvsrpzGfkAsYdQnSoqfW0ut
-        gElRw/p97CFBx+DEIi2DDyxqsdyEIEecjR6WXazX8P5N2pQ7CyRVpmnZGhtaweMKy+oEJEI4oGadm
-        vOAWdj0w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jWxim-00075r-KY; Fri, 08 May 2020 07:47:00 +0000
-Date:   Fri, 8 May 2020 00:47:00 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Yufen Yu <yuyufen@huawei.com>, Hou Tao <houtao1@huawei.com>
-Subject: Re: [PATCH V2 4/4] block: don't hold part0's refcount in IO path
-Message-ID: <20200508074700.GA27126@infradead.org>
-References: <20200508044407.1371907-1-ming.lei@redhat.com>
- <20200508044407.1371907-5-ming.lei@redhat.com>
- <20200508064133.GA11136@infradead.org>
- <20200508074157.GA1375901@T590>
+        id S1726767AbgEHISP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 04:18:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55159 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726746AbgEHISO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 May 2020 04:18:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588925893;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xokrS0AC1KM6vhqL66Ue+rw6dWaPDWdGK1afSubH4Ik=;
+        b=iqP1ZkOqFPPEqLIqJIsQ+ul6mj+1sDsuDO58kb+H/NMjUbxbLdQkOds1JySje4/R56q307
+        zPCq56Y20J/GUC4Vz3inwzDt4w3aJLUB5/H8yRQoJgG9DKtTilq+Ft4i5zD+3YxXxr/utR
+        bK09xETXeqw1qhwA0dirzYymy6QIAm8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-X0zOJu9hM-mG_JsUnLoF4Q-1; Fri, 08 May 2020 04:18:11 -0400
+X-MC-Unique: X0zOJu9hM-mG_JsUnLoF4Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 681E61005510;
+        Fri,  8 May 2020 08:18:10 +0000 (UTC)
+Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7BA3410013BD;
+        Fri,  8 May 2020 08:18:06 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yufen Yu <yuyufen@huawei.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hou Tao <houtao1@huawei.com>
+Subject: [PATCH V3 0/4] block: fix partition use-after-free and optimization
+Date:   Fri,  8 May 2020 16:17:54 +0800
+Message-Id: <20200508081758.1380673-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200508074157.GA1375901@T590>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 08, 2020 at 03:41:57PM +0800, Ming Lei wrote:
-> On Thu, May 07, 2020 at 11:41:33PM -0700, Christoph Hellwig wrote:
-> > On Fri, May 08, 2020 at 12:44:07PM +0800, Ming Lei wrote:
-> > > gendisk can't be gone when there is IO activity, so not hold
-> > > part0's refcount in IO path.
-> > > 
-> > > Cc: Yufen Yu <yuyufen@huawei.com>
-> > > Cc: Christoph Hellwig <hch@infradead.org>
-> > > Cc: Hou Tao <houtao1@huawei.com>
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > 
-> > This looks correct, although I'd still prefer to centralize the
-> > partno checks in the helpers.  Also hd_struct_get is unused with
-> > this patch isn't it?
->  
-> OK, are you fine with the following patch?
+Hi,
 
-Yes, this looks good:
+The 1st patch fixes one use-after-free on cached last_lookup partition.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The other 3 patches optimizes partition uses in IO path.
+
+V3:
+	- add reviewed-by tag
+	- centralize partno check in the helper(4/4)
+
+V2:
+	- add comment, use part_to_disk() to retrieve disk instead of
+	adding one field to hd_struct
+	- don't put part in blk_account_io_merge
+
+
+Ming Lei (4):
+  block: fix use-after-free on cached last_lookup partition
+  block: only define 'nr_sects_seq' in hd_part for 32bit SMP
+  block: re-organize fields of 'struct hd_part'
+  block: don't hold part0's refcount in IO path
+
+ block/blk-core.c        | 12 ------------
+ block/blk.h             | 13 ++++++-------
+ block/genhd.c           | 17 +++++++++++++----
+ block/partitions/core.c | 14 ++++++++++++--
+ include/linux/genhd.h   | 24 +++++++++++++++++-------
+ 5 files changed, 48 insertions(+), 32 deletions(-)
+
+Cc: Yufen Yu <yuyufen@huawei.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Hou Tao <houtao1@huawei.com>
+-- 
+2.25.2
+
