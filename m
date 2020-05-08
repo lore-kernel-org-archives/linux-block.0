@@ -2,89 +2,125 @@ Return-Path: <SRS0=OuBg=6W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 842E8C38A2A
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF40AC38A2A
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:19:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4691E218AC
-	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RncL95G1"
+	by mail.kernel.org (Postfix) with ESMTP id A3D7E20731
+	for <linux-block@archiver.kernel.org>; Fri,  8 May 2020 22:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbgEHWNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 18:13:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28974 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727095AbgEHWNr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 18:13:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588976026;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7XTZwXR9Z9h3mhkEx2o1bmyDVneFoc2pkGAjVYehhi0=;
-        b=RncL95G1n8XUFTaOJapGjDj95acCt1Ym8G7H4dJNG+Pg/r++EnkX0nzb+ThOgN72Me9yXe
-        WsaRj8D9yI3Ucsci75A3DbsOc8Js8j4XzsO78PM5KE213nqNF+F2VD3K2sda8Jq6P0cAh7
-        ocx771djD+y41WVPdMyFq98Bp9i2vPQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-d2xIQt37O8yux2pmv4ZgAg-1; Fri, 08 May 2020 18:13:42 -0400
-X-MC-Unique: d2xIQt37O8yux2pmv4ZgAg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 828A51005510;
-        Fri,  8 May 2020 22:13:39 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74FBC1001B07;
-        Fri,  8 May 2020 22:13:27 +0000 (UTC)
-Date:   Sat, 9 May 2020 06:13:21 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
-        linux-xtensa@linux-xtensa.org, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org
-Subject: Re: remove a few uses of ->queuedata
-Message-ID: <20200508221321.GD1389136@T590>
-References: <20200508161517.252308-1-hch@lst.de>
+        id S1727838AbgEHWTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 18:19:50 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:34454 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727082AbgEHWTt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 18:19:49 -0400
+Received: by mail-pj1-f67.google.com with SMTP id h12so5717752pjz.1;
+        Fri, 08 May 2020 15:19:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=agEiPPMNgwyK2BliOmzqFg2hxzKUzHpkr6vduFi84gQ=;
+        b=g009fLPX477tOlQmG7l4KRZh5Xah8g5B+/OID4YVwp9l4sl0JKY1w1QXORb6h9LIXc
+         we1Ls8BadeLgc8FTwgyWXFazXmXlDnmsWwQ62wyyxViWE6CnvIdalaOqaCzAx1Hd+05k
+         BGDHH+Qc+/8H+uFajj4pC3oizbPieoRxlft7KE2NBOL4w4ha1NY3Z2e/V6vyCrLAGfJh
+         1mX+/3sQuJngiGq3fHtUVF2U5dz+BvQid04+m+lzU0AC4wds/+1E4870KkqWDQupYKB1
+         0ES98w68POyEZBfZM6x+vXkycWNlAVozPfkpXfN/V8QFpF4XQn1m7lk73Nun+fqJhO9O
+         GrgA==
+X-Gm-Message-State: AGi0PuZ/o10RsWxwcPlYdjy58DZyPzq8IPkqZ5rtiU8WS+zpkw0Qjwhx
+        pt6GZg9OxdrhccVf1z0uTtU2jio7
+X-Google-Smtp-Source: APiQypJ8zZSznj1d26ER6zLx3yrkDj/sxZsgeiqPDzyEjy1E4wJ/TuYQ1jMjgC02OMGhy8Tw7rPAsA==
+X-Received: by 2002:a17:90a:730a:: with SMTP id m10mr8915600pjk.9.1588976388140;
+        Fri, 08 May 2020 15:19:48 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:bc73:49fb:3114:443? ([2601:647:4802:9070:bc73:49fb:3114:443])
+        by smtp.gmail.com with ESMTPSA id a16sm2135918pgg.23.2020.05.08.15.19.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2020 15:19:47 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 1/7] block: Extand commit_rqs() to do batch
+ processing
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Baolin Wang <baolin.wang7@gmail.com>, axboe@kernel.dk,
+        ulf.hansson@linaro.org, adrian.hunter@intel.com, arnd@arndb.de,
+        linus.walleij@linaro.org, paolo.valente@linaro.org,
+        orsonzhai@gmail.com, zhang.lyra@gmail.com,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1587888520.git.baolin.wang7@gmail.com>
+ <c8bd9e5ba815a3f1bc9dac0a4bc2fbadadbc0a43.1587888520.git.baolin.wang7@gmail.com>
+ <20200427154645.GA1201@infradead.org>
+ <e4d47000-f89c-a135-ae58-011f0e9cc39e@grimberg.me>
+ <20200508214639.GA1389136@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me>
+Date:   Fri, 8 May 2020 15:19:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Firefox/68.0 Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200508161517.252308-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200508214639.GA1389136@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 08, 2020 at 06:15:02PM +0200, Christoph Hellwig wrote:
-> Hi all,
+Hey Ming,
+
+>> Would it make sense to elevate this flag to a request_queue flag
+>> (QUEUE_FLAG_ALWAYS_COMMIT)?
 > 
-> various bio based drivers use queue->queuedata despite already having
-> set up disk->private_data, which can be used just as easily.  This
-> series cleans them up to only use a single private data pointer.
+> request queue flag usually is writable, however this case just needs
+> one read-only flag, so I think it may be better to make it as
+> tagset/hctx flag.
+
+I actually intended it to be writable.
+
+>> I'm thinking of a possibility that an I/O scheduler may be used
+>> to activate this functionality rather than having the driver set
+>> it necessarily...
 > 
-> blk-mq based drivers that have code pathes that can't easily get at
-> the gendisk are unaffected by this series.
+> Could you explain a bit why I/O scheduler should activate this
+> functionality?
 
-Yeah, before adding disk, there still may be requests queued to LLD
-for blk-mq based drivers.
+Sure, I've recently seen some academic work showing the benefits
+of batching in tcp/ip based block drivers. The problem with the
+approaches taken is that I/O scheduling is exercised deep down in the
+driver, which is not the direction I'd like to go if we are want
+to adopt some of the batching concepts.
 
-So are there this similar situation for these bio based drivers?
+I spent some (limited) time thinking about this, and it seems to
+me that there is an opportunity to implement this as a dedicated
+I/O scheduler, and tie it to driver specific LLD stack optimizations
+(net-stack for example) relying on the commit_rq/bd->last hints.
 
+When scanning the scheduler code, I noticed exactly the phenomenon that
+this patchset is attempting to solve and Christoph referred me to it.
+Now I'm thinking if we can extend this batching optimization for both
+use-cases.
 
-Thanks,
-Ming
+> batching submission may be good for some drivers, and currently
+> we only do it in limited way. One reason is that there is extra
+> cost for full batching submission, such as this patch requires
+> one extra .commit_rqs() for each dispatch, and lock is often needed
+> in this callback.
 
+That is not necessarily the case at all.
+
+> IMO it can be a win for some slow driver or device, but may cause
+> a little performance drop for fast driver/device especially in workload
+> of not-batching submission.
+
+You're mostly correct. This is exactly why an I/O scheduler may be
+applicable here IMO. Mostly because I/O schedulers tend to optimize for
+something specific and always present tradeoffs. Users need to
+understand what they are optimizing for.
+
+Hence I'd say this functionality can definitely be available to an I/O
+scheduler should one exist.
