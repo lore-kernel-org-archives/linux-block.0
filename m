@@ -6,51 +6,55 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0047C28CBC
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9744C28CBC
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:18:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88FB721655
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EA34208DB
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728081AbgEIOH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 10:07:59 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:40791 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727986AbgEIOH7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 10:07:59 -0400
-Received: by mail-pj1-f65.google.com with SMTP id fu13so5544569pjb.5
-        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 07:07:58 -0700 (PDT)
+        id S1727122AbgEIOSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 10:18:50 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34742 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727106AbgEIOSt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 10:18:49 -0400
+Received: by mail-pg1-f194.google.com with SMTP id f6so2280944pgm.1
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 07:18:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=9QT7xe/DnS4GPTWjS/toteF0CI3JaIr6WJUOKdZe0qE=;
-        b=Vh2WM+KrLjx+JJuGQTITlITUjgq5wLrezKusCudNt+W4LV42WR9RvPLrxVN+qbAMqd
-         mRRhRGqboZE9S782SrqC4rwAyOmVLpu0r7wjruVM6lAiKuCWz1SYetHWdSTocnZZsXmm
-         /NCivjv9stqjKUdx1b5u/AOMAmXsarsT3x6SrbMj+dqUGHHA3zrTj911hhGD2WxaGMF9
-         rVGGLffM84qSig+z94sSP8u0fsngIIO+dq4RV6SYKzU6RnxdreTnrJBPmez8oHMSx7mg
-         aa4crPutAj/Cg5IWnBhMlmMHfSSiRad+4KG4m09zowV/Xuuf/jAIzwzbutwABALTHnnl
-         OnHw==
-X-Gm-Message-State: AGi0PuZ4c+fa0qWh0WWhd3wMKmyu/o+2yqFGJEDHNsAyQdQPuTq6XleM
-        nHmiSIMZOx43RYu13eLVO1k=
-X-Google-Smtp-Source: APiQypKv9D+/H4KeRckdcYgUDPG17eQXTWC8jx7OWUz19s0HOAuDmCviaWA1RutZxx7EG1n/pKL06g==
-X-Received: by 2002:a17:90a:8d12:: with SMTP id c18mr11493692pjo.144.1589033278104;
-        Sat, 09 May 2020 07:07:58 -0700 (PDT)
+        bh=ug51WSI3uS1EQ8RWZPsLJ7XVrzkLQITJXW7sPsFm47o=;
+        b=oYyWfkN4byHlJ+G2e7//GtTT8wHUvl9+b2S9q5Oyy4E4b0MJ6mgzKu9KmQvHUxoCzj
+         Qw2whCwKxC+l/zd4tHHNyJQ2GYY85jiqpuPHQwcv+Mwe/mqhbjnhzkWskE95SB2eBEu8
+         woDR/yUQq03sCzGFA642nOjNmw+JEZk04/haq8hP2kdCNqQ6ND8MU+gY5xdZzaV9wmlq
+         0KwTodKXuCU4xJbnp90tBGrXDSFWe+hcueFsScZmbo28CTxJJkO2ReyEYYplCFDzeOdM
+         ZU3FEDPbXEg2jRzhrLa/MJ/vFMbAScEkxNazGz0y4uKwjdISEw+anoQpECqn4ASL/EJC
+         KZGg==
+X-Gm-Message-State: AGi0PuZ/4qDSjXHacI5f6GJ6NVTNEaxVwNKsu7OHs0j+lluyijG2jDtx
+        xfz2HkzZHhhWKvSelmiQxp0=
+X-Google-Smtp-Source: APiQypISCsZTD1T6O/Q0IKUTSoi5AawP9AosrNZ/IrLhB+TJBKuz2Ib9rzkDPQdUNXkowxQlMHtpKQ==
+X-Received: by 2002:a63:5320:: with SMTP id h32mr6740255pgb.28.1589033928777;
+        Sat, 09 May 2020 07:18:48 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:8ef:746a:4fe7:1df? ([2601:647:4000:d7:8ef:746a:4fe7:1df])
-        by smtp.gmail.com with ESMTPSA id j14sm5054162pjm.27.2020.05.09.07.07.56
+        by smtp.gmail.com with ESMTPSA id v10sm2703711pjy.48.2020.05.09.07.18.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 May 2020 07:07:57 -0700 (PDT)
-Subject: Re: [PATCH V10 11/11] block: deactivate hctx when the hctx is
- actually inactive
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Sat, 09 May 2020 07:18:48 -0700 (PDT)
+Subject: Re: [PATCH V10 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Hannes Reinecke <hare@suse.de>
+        Thomas Gleixner <tglx@linutronix.de>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-12-ming.lei@redhat.com>
+ <20200505020930.1146281-8-ming.lei@redhat.com>
+ <dbada06d-fcc4-55df-935e-2a46433f28a1@acm.org>
+ <20200509022051.GC1392681@T590>
+ <0f578345-5a51-b64a-e150-724cfb18dde4@acm.org>
+ <20200509041042.GG1392681@T590>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -75,12 +79,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
-Date:   Sat, 9 May 2020 07:07:55 -0700
+Message-ID: <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
+Date:   Sat, 9 May 2020 07:18:46 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200505020930.1146281-12-ming.lei@redhat.com>
+In-Reply-To: <20200509041042.GG1392681@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,49 +93,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-04 19:09, Ming Lei wrote:
-> @@ -1373,28 +1375,16 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
->  	int srcu_idx;
->  
-[ ... ]
->  	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-> -		cpu_online(hctx->next_cpu)) {
-> -		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
-> -			raw_smp_processor_id(),
-> -			cpumask_empty(hctx->cpumask) ? "inactive": "active");
-> -		dump_stack();
-> +	    cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) >=
-> +	    nr_cpu_ids) {
-> +		blk_mq_hctx_deactivate(hctx);
-> +		return;
->  	}
+On 2020-05-08 21:10, Ming Lei wrote:
+> queue freezing can only be applied on the request queue level, and not
+> hctx level. When requests can't be completed, wait freezing just hangs
+> for-ever.
 
-The blk_mq_hctx_deactivate() function calls blk_mq_resubmit_rq()
-indirectly. From blk_mq_resubmit_rq():
+That's indeed what I meant: freeze the entire queue instead of
+introducing a new mechanism that freezes only one hardware queue at a time.
 
-+  /* avoid allocation failure by clearing NOWAIT */
-+  nrq = blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
-
-blk_get_request() calls blk_mq_alloc_request(). blk_mq_alloc_request()
-calls blk_queue_enter(). blk_queue_enter() waits until a queue is
-unfrozen if freezing of a queue has started. As one can see freezing a
-queue triggers a queue run:
-
-void blk_freeze_queue_start(struct request_queue *q)
-{
-	mutex_lock(&q->mq_freeze_lock);
-	if (++q->mq_freeze_depth == 1) {
-		percpu_ref_kill(&q->q_usage_counter);
-		mutex_unlock(&q->mq_freeze_lock);
-		if (queue_is_mq(q))
-			blk_mq_run_hw_queues(q, false);
-	} else {
-		mutex_unlock(&q->mq_freeze_lock);
-	}
-}
-
-Does this mean that if queue freezing happens after hot unplugging
-started that a deadlock will occur because the blk_mq_run_hw_queues()
-call in blk_freeze_queue_start() will wait forever?
+Please clarify what "when requests can't be completed" means. Are you
+referring to requests that take longer than expected due to e.g. a
+controller lockup or to requests that take a long time intentionally?
+The former case is handled by the block layer timeout handler. I propose
+to handle the latter case by introducing a new callback function pointer
+in struct blk_mq_ops that aborts all outstanding requests. Request queue
+freezing is such an important block layer mechanism that I think we
+should require that all block drivers support freezing a request queue
+in a short time.
 
 Bart.
