@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 848CFC28CBC
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF194C28CBC
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6188720722
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 999D620722
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:56:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjBvgKgs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjR627R1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728355AbgEIDwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 23:52:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26458 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726415AbgEIDwh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 May 2020 23:52:37 -0400
+        id S1728355AbgEID43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 23:56:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43615 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726415AbgEID42 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 23:56:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588996355;
+        s=mimecast20190719; t=1588996587;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pf6i6X4/eu8UJGgXrpS9lLpC6cdrzW1FPXw7u04Q79M=;
-        b=FjBvgKgsad9LgMR0MWkbFGasZJ4hQNQi/YS2AmPUv9Ecy6B8TgctlpK5lTQ1QkquF0quA6
-        AycBwwFweSyT/y1t23AYt+LAiPctwOyPgwqfz5EvujlxmpL6IQZPhPb0taxym6s/oK/djF
-        OmjVVuU1pSViGW/Zf34sCMtx6BPYB/E=
+        bh=L8HUBPK9PAWz5vQwuWVxBM1qHVuYNuZJuX/G4G7+lzU=;
+        b=cjR627R1oLCt3aIA6lSGHPgn/9hqnpiSFnAjFAti//qbwXirvVunAAST8GAQxg+cWY72ja
+        k7tCOyYyI9ewHhlGFmeKFYnWEZTDRdKkas/9DW4MYgaKpgAOCpJerBh7aiRkQGumuhJCCE
+        CBR3S5++MryLY0lORZKBszaQDIOg1A8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-yw4NQG1MP4m6V8S8six7Mg-1; Fri, 08 May 2020 23:52:33 -0400
-X-MC-Unique: yw4NQG1MP4m6V8S8six7Mg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-291-AN7wLf3DOESsIP8-dPfStg-1; Fri, 08 May 2020 23:56:23 -0400
+X-MC-Unique: AN7wLf3DOESsIP8-dPfStg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25A05800D24;
-        Sat,  9 May 2020 03:52:32 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B61C1835B41;
+        Sat,  9 May 2020 03:56:21 +0000 (UTC)
 Received: from T590 (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 211915D9CA;
-        Sat,  9 May 2020 03:52:23 +0000 (UTC)
-Date:   Sat, 9 May 2020 11:52:19 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E5E65EE0E;
+        Sat,  9 May 2020 03:56:14 +0000 (UTC)
+Date:   Sat, 9 May 2020 11:56:09 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -51,97 +50,79 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V10 05/11] blk-mq: support rq filter callback when
- iterating rqs
-Message-ID: <20200509035219.GE1392681@T590>
+Subject: Re: [PATCH V10 06/11] blk-mq: prepare for draining IO when hctx's
+ all CPUs are offline
+Message-ID: <20200509035609.GF1392681@T590>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-6-ming.lei@redhat.com>
- <8d7a14f8-b36c-4f5c-a4af-d5904d3e9ea1@acm.org>
- <51888b96-1e3b-9810-fb64-47a965b83711@acm.org>
- <20200509020522.GA1392681@T590>
- <a0d48ad1-a0f2-7b3a-37ac-0dfe7f1740a7@acm.org>
+ <20200505020930.1146281-7-ming.lei@redhat.com>
+ <756074a0-ea4b-5dcf-9348-e5b4f4414248@acm.org>
+ <20200509020926.GB1392681@T590>
+ <d59e0c74-981d-6ed4-e80d-09b0cd4c17db@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0d48ad1-a0f2-7b3a-37ac-0dfe7f1740a7@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <d59e0c74-981d-6ed4-e80d-09b0cd4c17db@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 08, 2020 at 08:08:23PM -0700, Bart Van Assche wrote:
-> On 2020-05-08 19:05, Ming Lei wrote:
-> > Fine, then we can save one callback, how about the following way?
+On Fri, May 08, 2020 at 08:11:55PM -0700, Bart Van Assche wrote:
+> On 2020-05-08 19:09, Ming Lei wrote:
+> > On Fri, May 08, 2020 at 04:26:17PM -0700, Bart Van Assche wrote:
+> >> On 2020-05-04 19:09, Ming Lei wrote:
+> >>> @@ -391,6 +393,7 @@ struct blk_mq_ops {
+> >>>  enum {
+> >>>  	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+> >>>  	BLK_MQ_F_TAG_SHARED	= 1 << 1,
+> >>> +	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
+> >>>  	BLK_MQ_F_BLOCKING	= 1 << 5,
+> >>>  	BLK_MQ_F_NO_SCHED	= 1 << 6,
+> >>>  	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+> >>> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> >>> index 77d70b633531..24b3a77810b6 100644
+> >>> --- a/include/linux/cpuhotplug.h
+> >>> +++ b/include/linux/cpuhotplug.h
+> >>> @@ -152,6 +152,7 @@ enum cpuhp_state {
+> >>>  	CPUHP_AP_SMPBOOT_THREADS,
+> >>>  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+> >>>  	CPUHP_AP_IRQ_AFFINITY_ONLINE,
+> >>> +	CPUHP_AP_BLK_MQ_ONLINE,
+> >>>  	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
+> >>>  	CPUHP_AP_X86_INTEL_EPB_ONLINE,
+> >>>  	CPUHP_AP_PERF_ONLINE,
+> >>
+> >> Wouldn't BLK_MQ_F_NO_IRQ be a better name than BLK_MQ_F_NO_MANAGED_IRQ?
 > > 
-> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > index 586c9d6e904a..5e9c743d887b 100644
-> > --- a/block/blk-mq-tag.c
-> > +++ b/block/blk-mq-tag.c
-> > @@ -257,6 +257,7 @@ struct bt_tags_iter_data {
-> >  	busy_tag_iter_fn *fn;
-> >  	void *data;
-> >  	bool reserved;
-> > +	bool iterate_all;
-> >  };
-> >  
-> >  static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> > @@ -274,8 +275,10 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >  	 * test and set the bit before assining ->rqs[].
-> >  	 */
-> >  	rq = tags->rqs[bitnr];
-> > -	if (rq && blk_mq_request_started(rq))
-> > -		return iter_data->fn(rq, iter_data->data, reserved);
-> > +	if (rq) {
-> > +		if (iter_data->iterate_all || blk_mq_request_started(rq))
-> > +			return iter_data->fn(rq, iter_data->data, reserved);
-> > +	}
+> > No, what this patchset tries to do is to address request timeout or hang
+> > issue in case that managed irq is applied in blk-mq driver.
 > 
-> How about combining the two if-statements above in the following single
-> if-statement:
+> What is a managed IRQ? The following query did not produce a useful answer:
 > 
-> if (rq && (iter_data->iterate_all || blk_mq_request_started(rq)))
-> 	...
+> $ git grep -nHi managed.irq
 
-OK.
+[ming@T590 linux]$ git grep -n MANAGED ./kernel/irq
+kernel/irq/chip.c:188:  IRQ_STARTUP_MANAGED,
+kernel/irq/chip.c:226:  return IRQ_STARTUP_MANAGED;
+kernel/irq/chip.c:271:          case IRQ_STARTUP_MANAGED:
+kernel/irq/cpuhotplug.c:179:    if (!housekeeping_enabled(HK_FLAG_MANAGED_IRQ))
+kernel/irq/cpuhotplug.c:182:    hk_mask = housekeeping_cpumask(HK_FLAG_MANAGED_IRQ);
+kernel/irq/debugfs.c:114:       BIT_MASK_DESCR(IRQD_AFFINITY_MANAGED),
+kernel/irq/debugfs.c:115:       BIT_MASK_DESCR(IRQD_MANAGED_SHUTDOWN),
+kernel/irq/internals.h:215:     __irqd_to_state(d) |= IRQD_MANAGED_SHUTDOWN;
+kernel/irq/internals.h:220:     __irqd_to_state(d) &= ~IRQD_MANAGED_SHUTDOWN;
+kernel/irq/irqdesc.c:487:                               flags = IRQD_AFFINITY_MANAGED |
+kernel/irq/irqdesc.c:488:                                       IRQD_MANAGED_SHUTDOWN;
+kernel/irq/manage.c:170: * AFFINITY_MANAGED flag.
+kernel/irq/manage.c:241:            housekeeping_enabled(HK_FLAG_MANAGED_IRQ)) {
+kernel/irq/manage.c:247:                hk_mask = housekeeping_cpumask(HK_FLAG_MANAGED_IRQ);
 
-> 
-> > @@ -321,8 +326,30 @@ static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
-> >  		busy_tag_iter_fn *fn, void *priv)
-> >  {
-> >  	if (tags->nr_reserved_tags)
-> > -		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
-> > -	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
-> > +		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true,
-> > +				 false);
-> > +	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false, false);
-> > +}
-> 
-> How about inserting comments like /*reserved=*/ and /*iterate_all=*/ in
-> the bt_tags_for_each() call in front of "false" to make these calls
-> easier to read?
+The exact name should be AFFINITY_MANAGED, however the name of managed
+irq has been used in commit log and isolation cpus code for a bit long.
 
-I think it isn't necessary, given both two are self-documented from
-the name of bt_tags_for_each's parameters.
+OK, I will add comment on BLK_MQ_F_NO_MANAGED_IRQ a bit in next version.
 
-> 
-> > +/**
-> > + * blk_mq_all_tag_iter - iterate over all requests in a tag map
-> > + * @tags:	Tag map to iterate over.
-> > + * @fn:		Pointer to the function that will be called for each
-> > + *		request. @fn will be called as follows: @fn(rq, @priv,
-> > + *		reserved) where rq is a pointer to a request. 'reserved'
-> > + *		indicates whether or not @rq is a reserved request. Return
-> > + *		true to continue iterating tags, false to stop.
-> > + * @priv:	Will be passed as second argument to @fn.
-> > + *
-> > + * It is the caller's responsility to check rq's state in @fn.
->                          ^^^^^^^^^^^^
->                          responsibility?
-
-OK.
-
- 
-Thanks,
+Thanks, 
 Ming
 
