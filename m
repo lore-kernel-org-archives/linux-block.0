@@ -2,110 +2,146 @@ Return-Path: <SRS0=SfUb=6X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8290C28CBC
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 848CFC28CBC
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:52:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C86520746
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588995796;
-	bh=nWXeJpc0x1vqSAQgcfyf4MiW0bgjg46tgn+2BpKXhV4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dss3Xuss6zC6AjozYcHAQiTKw1Up4YKxRw+xh5kNkfQ72UXyA8pWHU7BoRb6fs6zA
-	 PkmnUAJAvfjZia0DhYGRU43aWeADVzZmlEifJNYugVL7Y4zEY1KmIadtrhY2c1Ohej
-	 Z5Y756skPOaCJ4P0EFEX2OeIu6WGWYG+mNL5DbJc=
+	by mail.kernel.org (Postfix) with ESMTP id 6188720722
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:52:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjBvgKgs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728355AbgEIDnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 23:43:16 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38246 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726415AbgEIDnP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 23:43:15 -0400
-Received: by mail-pl1-f196.google.com with SMTP id m7so1604052plt.5;
-        Fri, 08 May 2020 20:43:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=TjuBVWE/+eZ0TK+8Wvbs1LYOJWs+7y04K5bauGvqpt8=;
-        b=d802CIPVAlLy/bqhbqwxJfO//Cnpr+07SS6LNwLmJsz1xcp/zflEGe/+4zRJXPYpOF
-         0l/ImCivqg2bEDFN8yKz0jVJ1LU70P66sT7z3nqbMlsJMUlEOMqrqfmSg4S96p8qKX9U
-         hFjE1zRWwFBGd9xp2jeG3C4jNDtIPXvAWw5wFnykQTw02TJn5kLwtY+gHHrwd58nir27
-         7/EUYyAg/QrdZxvBtV4MqhfjNTbfsJJ1sp2C6QfTHRz3UjGEwhGn2glZjJYy3e9NBc80
-         A5mW0zXrcpWcahtV5p5sODdjKbvyWX7O/pRyYOcuFX3JFgM0N02cXxRFkxEs3Spy6kC+
-         Au2Q==
-X-Gm-Message-State: AGi0PuaT8MFEP0PxB0qcKb/2qodh4nuk7wiDxqqacqd30TBDna2G6Za7
-        tuU2khwqI5pTnItDc4UDAQg=
-X-Google-Smtp-Source: APiQypLIdVp5JwarFVdiMg5ajBb9Ax3XybAUdje6DcZLjicgg28JrA5/PNlJYvyyw0xjvasWFQRF9w==
-X-Received: by 2002:a17:90a:3327:: with SMTP id m36mr8336012pjb.116.1588995794881;
-        Fri, 08 May 2020 20:43:14 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id 127sm3265500pfw.72.2020.05.08.20.43.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 20:43:13 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id E67004035F; Sat,  9 May 2020 03:43:12 +0000 (UTC)
-Date:   Sat, 9 May 2020 03:43:12 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
+        id S1728355AbgEIDwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 23:52:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26458 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726415AbgEIDwh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 May 2020 23:52:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588996355;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pf6i6X4/eu8UJGgXrpS9lLpC6cdrzW1FPXw7u04Q79M=;
+        b=FjBvgKgsad9LgMR0MWkbFGasZJ4hQNQi/YS2AmPUv9Ecy6B8TgctlpK5lTQ1QkquF0quA6
+        AycBwwFweSyT/y1t23AYt+LAiPctwOyPgwqfz5EvujlxmpL6IQZPhPb0taxym6s/oK/djF
+        OmjVVuU1pSViGW/Zf34sCMtx6BPYB/E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-yw4NQG1MP4m6V8S8six7Mg-1; Fri, 08 May 2020 23:52:33 -0400
+X-MC-Unique: yw4NQG1MP4m6V8S8six7Mg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25A05800D24;
+        Sat,  9 May 2020 03:52:32 +0000 (UTC)
+Received: from T590 (ovpn-8-32.pek2.redhat.com [10.72.8.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 211915D9CA;
+        Sat,  9 May 2020 03:52:23 +0000 (UTC)
+Date:   Sat, 9 May 2020 11:52:19 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v1 0/6] block: add error handling for *add_disk*()
-Message-ID: <20200509034312.GH11244@42.do-not-panic.com>
-References: <20200429074844.6241-1-mcgrof@kernel.org>
- <896ca55e-0daa-fb62-f9cb-0714389936a5@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH V10 05/11] blk-mq: support rq filter callback when
+ iterating rqs
+Message-ID: <20200509035219.GE1392681@T590>
+References: <20200505020930.1146281-1-ming.lei@redhat.com>
+ <20200505020930.1146281-6-ming.lei@redhat.com>
+ <8d7a14f8-b36c-4f5c-a4af-d5904d3e9ea1@acm.org>
+ <51888b96-1e3b-9810-fb64-47a965b83711@acm.org>
+ <20200509020522.GA1392681@T590>
+ <a0d48ad1-a0f2-7b3a-37ac-0dfe7f1740a7@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <896ca55e-0daa-fb62-f9cb-0714389936a5@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <a0d48ad1-a0f2-7b3a-37ac-0dfe7f1740a7@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 05, 2020 at 06:18:22PM -0700, Bart Van Assche wrote:
-> On 2020-04-29 00:48, Luis Chamberlain wrote:
-> > While working on some blktrace races I noticed that we don't do
-> > error handling on *add_disk*() and friends. This is my initial
-> > work on that.
+On Fri, May 08, 2020 at 08:08:23PM -0700, Bart Van Assche wrote:
+> On 2020-05-08 19:05, Ming Lei wrote:
+> > Fine, then we can save one callback, how about the following way?
 > > 
-> > This is based on linux-next tag next-20200428, you can also get this
-> > on my branch 20200428-block-fixes [0].
-> > 
-> > Let me know what you think.
-> Hi Luis,
+> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > index 586c9d6e904a..5e9c743d887b 100644
+> > --- a/block/blk-mq-tag.c
+> > +++ b/block/blk-mq-tag.c
+> > @@ -257,6 +257,7 @@ struct bt_tags_iter_data {
+> >  	busy_tag_iter_fn *fn;
+> >  	void *data;
+> >  	bool reserved;
+> > +	bool iterate_all;
+> >  };
+> >  
+> >  static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+> > @@ -274,8 +275,10 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+> >  	 * test and set the bit before assining ->rqs[].
+> >  	 */
+> >  	rq = tags->rqs[bitnr];
+> > -	if (rq && blk_mq_request_started(rq))
+> > -		return iter_data->fn(rq, iter_data->data, reserved);
+> > +	if (rq) {
+> > +		if (iter_data->iterate_all || blk_mq_request_started(rq))
+> > +			return iter_data->fn(rq, iter_data->data, reserved);
+> > +	}
 > 
-> Thank you for having done this work.
+> How about combining the two if-statements above in the following single
+> if-statement:
+> 
+> if (rq && (iter_data->iterate_all || blk_mq_request_started(rq)))
+> 	...
 
-My pleasure, I just made one minor change to this series, but that's
-all so far. Note that break-blktrace run_0004.sh still yields:
+OK.
 
-debugfs: Directory 'loop0' with parent 'block' already present!
+> 
+> > @@ -321,8 +326,30 @@ static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+> >  		busy_tag_iter_fn *fn, void *priv)
+> >  {
+> >  	if (tags->nr_reserved_tags)
+> > -		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
+> > -	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
+> > +		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true,
+> > +				 false);
+> > +	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false, false);
+> > +}
+> 
+> How about inserting comments like /*reserved=*/ and /*iterate_all=*/ in
+> the bt_tags_for_each() call in front of "false" to make these calls
+> easier to read?
 
-And so I suspect something else is up, this is even after. That's using
-my latest:
+I think it isn't necessary, given both two are self-documented from
+the name of bt_tags_for_each's parameters.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200508-block-fixes
+> 
+> > +/**
+> > + * blk_mq_all_tag_iter - iterate over all requests in a tag map
+> > + * @tags:	Tag map to iterate over.
+> > + * @fn:		Pointer to the function that will be called for each
+> > + *		request. @fn will be called as follows: @fn(rq, @priv,
+> > + *		reserved) where rq is a pointer to a request. 'reserved'
+> > + *		indicates whether or not @rq is a reserved request. Return
+> > + *		true to continue iterating tags, false to stop.
+> > + * @priv:	Will be passed as second argument to @fn.
+> > + *
+> > + * It is the caller's responsility to check rq's state in @fn.
+>                          ^^^^^^^^^^^^
+>                          responsibility?
 
-Some more eyebealls on that would be useful.
+OK.
 
-> Since triggering error paths can be
-> challenging, how about adding fault injection capabilities that make it
-> possible to trigger all modified error paths and how about adding
-> blktests that trigger these paths? That is the strategy that I followed
-> myself recently to fix an error path in blk_mq_realloc_hw_ctxs().
+ 
+Thanks,
+Ming
 
-Sure thing, but I get the impression that adding this may make it odd
-to or harder to review. Shouldn't this be done after we have *some*
-error handling? Right now we shouldn't regress as we never fail, and
-that seemss worse.
-
-Let me know, either way, I'll start work on it.
-
-  Luis
