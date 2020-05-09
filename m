@@ -2,114 +2,136 @@ Return-Path: <SRS0=SfUb=6X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E75D8C54E49
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 10:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0047C28CBC
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0A2420735
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 10:38:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88FB721655
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 14:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728154AbgEIKiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 06:38:16 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:33997 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726877AbgEIKiQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 06:38:16 -0400
-Received: by mail-oi1-f193.google.com with SMTP id c12so9819670oic.1;
-        Sat, 09 May 2020 03:38:15 -0700 (PDT)
+        id S1728081AbgEIOH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 10:07:59 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:40791 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727986AbgEIOH7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 10:07:59 -0400
+Received: by mail-pj1-f65.google.com with SMTP id fu13so5544569pjb.5
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 07:07:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nBe+65cgrmufPqKgCO/WJS9rGOrSoS9DaeQpyO6VPQY=;
-        b=HUXFfZqyQiXplVrHeI/ZPD7fgTu/OyQS1uWandQ6GfholZUozpDA92RXqRtP3552+4
-         QU3UraKKkKBepmI4MM8VVIPVwoKSVc58fm+nR18vHiQTUD114S+ZJ7Z1yqclKOvDyfDw
-         /LAg8vYGyAmWIpSXcfPoxA14/QbxzjQIGrNCcLfV+j4vNoubQ5Lw6Kej6XiDjnDtr/Sm
-         mSjL8ioibecpSpdditmliAoTdksLU0kI/e8QDnJL6gNrAGiDVY9bhRs8tKRKoMOM/4yM
-         fBklMHZ/F0j1KhJwDEC/SGcPxpWd4DK81p+RBhisjz5CIqhRrrNXgUi0x5GI2ktEKXzZ
-         IZ3w==
-X-Gm-Message-State: AGi0Pua8mblCFI4UeA4h/Ojs+ZTIWSRPGsnxdFCxXlARacpXuuCfjEAj
-        oYctl3NkzFVkGH2Q6GDOKkrfZ7dULzyemEM0/O0=
-X-Google-Smtp-Source: APiQypJViR7zf1BxfE4fSiEMumUvdAfdspNngdk/6s5fr4R3Q+whgmTLapvbuOPEuAwW4U0ZD7JgMnKsLrBjVv9lPKw=
-X-Received: by 2002:aca:d50f:: with SMTP id m15mr13605566oig.54.1589020691722;
- Sat, 09 May 2020 03:38:11 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=9QT7xe/DnS4GPTWjS/toteF0CI3JaIr6WJUOKdZe0qE=;
+        b=Vh2WM+KrLjx+JJuGQTITlITUjgq5wLrezKusCudNt+W4LV42WR9RvPLrxVN+qbAMqd
+         mRRhRGqboZE9S782SrqC4rwAyOmVLpu0r7wjruVM6lAiKuCWz1SYetHWdSTocnZZsXmm
+         /NCivjv9stqjKUdx1b5u/AOMAmXsarsT3x6SrbMj+dqUGHHA3zrTj911hhGD2WxaGMF9
+         rVGGLffM84qSig+z94sSP8u0fsngIIO+dq4RV6SYKzU6RnxdreTnrJBPmez8oHMSx7mg
+         aa4crPutAj/Cg5IWnBhMlmMHfSSiRad+4KG4m09zowV/Xuuf/jAIzwzbutwABALTHnnl
+         OnHw==
+X-Gm-Message-State: AGi0PuZ4c+fa0qWh0WWhd3wMKmyu/o+2yqFGJEDHNsAyQdQPuTq6XleM
+        nHmiSIMZOx43RYu13eLVO1k=
+X-Google-Smtp-Source: APiQypKv9D+/H4KeRckdcYgUDPG17eQXTWC8jx7OWUz19s0HOAuDmCviaWA1RutZxx7EG1n/pKL06g==
+X-Received: by 2002:a17:90a:8d12:: with SMTP id c18mr11493692pjo.144.1589033278104;
+        Sat, 09 May 2020 07:07:58 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:8ef:746a:4fe7:1df? ([2601:647:4000:d7:8ef:746a:4fe7:1df])
+        by smtp.gmail.com with ESMTPSA id j14sm5054162pjm.27.2020.05.09.07.07.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 May 2020 07:07:57 -0700 (PDT)
+Subject: Re: [PATCH V10 11/11] block: deactivate hctx when the hctx is
+ actually inactive
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Hannes Reinecke <hare@suse.de>
+References: <20200505020930.1146281-1-ming.lei@redhat.com>
+ <20200505020930.1146281-12-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
+Date:   Sat, 9 May 2020 07:07:55 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200508161517.252308-1-hch@lst.de> <20200508161517.252308-2-hch@lst.de>
-In-Reply-To: <20200508161517.252308-2-hch@lst.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sat, 9 May 2020 12:38:00 +0200
-Message-ID: <CAMuHMdUBRsZQ1BOD9jW99NTm_8NZDootGrqzz3nPeeJ+mUAoTw@mail.gmail.com>
-Subject: Re: [PATCH 01/15] nfblock: use gendisk private_data
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:TENSILICA XTENSA PORT (xtensa)" 
-        <linux-xtensa@linux-xtensa.org>,
-        Lars Ellenberg <drbd-dev@lists.linbit.com>,
-        linux-block@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200505020930.1146281-12-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On 2020-05-04 19:09, Ming Lei wrote:
+> @@ -1373,28 +1375,16 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>  	int srcu_idx;
+>  
+[ ... ]
+>  	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+> -		cpu_online(hctx->next_cpu)) {
+> -		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
+> -			raw_smp_processor_id(),
+> -			cpumask_empty(hctx->cpumask) ? "inactive": "active");
+> -		dump_stack();
+> +	    cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) >=
+> +	    nr_cpu_ids) {
+> +		blk_mq_hctx_deactivate(hctx);
+> +		return;
+>  	}
 
-On Fri, May 8, 2020 at 6:16 PM Christoph Hellwig <hch@lst.de> wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The blk_mq_hctx_deactivate() function calls blk_mq_resubmit_rq()
+indirectly. From blk_mq_resubmit_rq():
 
-Thanks for your patch!
++  /* avoid allocation failure by clearing NOWAIT */
++  nrq = blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
 
-> --- a/arch/m68k/emu/nfblock.c
-> +++ b/arch/m68k/emu/nfblock.c
-> @@ -61,7 +61,7 @@ struct nfhd_device {
->
->  static blk_qc_t nfhd_make_request(struct request_queue *queue, struct bio *bio)
->  {
-> -       struct nfhd_device *dev = queue->queuedata;
-> +       struct nfhd_device *dev = bio->bi_disk->private_data;
->         struct bio_vec bvec;
->         struct bvec_iter iter;
->         int dir, len, shift;
-> @@ -122,7 +122,6 @@ static int __init nfhd_init_one(int id, u32 blocks, u32 bsize)
->         if (dev->queue == NULL)
->                 goto free_dev;
->
-> -       dev->queue->queuedata = dev;
->         blk_queue_logical_block_size(dev->queue, bsize);
->
->         dev->disk = alloc_disk(16);
-> @@ -136,6 +135,7 @@ static int __init nfhd_init_one(int id, u32 blocks, u32 bsize)
->         sprintf(dev->disk->disk_name, "nfhd%u", dev_id);
->         set_capacity(dev->disk, (sector_t)blocks * (bsize / 512));
->         dev->disk->queue = dev->queue;
-> +       dev->disk->private_data = dev;
+blk_get_request() calls blk_mq_alloc_request(). blk_mq_alloc_request()
+calls blk_queue_enter(). blk_queue_enter() waits until a queue is
+unfrozen if freezing of a queue has started. As one can see freezing a
+queue triggers a queue run:
 
-This is already set above, just before the quoted sprintf() call.
+void blk_freeze_queue_start(struct request_queue *q)
+{
+	mutex_lock(&q->mq_freeze_lock);
+	if (++q->mq_freeze_depth == 1) {
+		percpu_ref_kill(&q->q_usage_counter);
+		mutex_unlock(&q->mq_freeze_lock);
+		if (queue_is_mq(q))
+			blk_mq_run_hw_queues(q, false);
+	} else {
+		mutex_unlock(&q->mq_freeze_lock);
+	}
+}
 
->
->         add_disk(dev->disk);
+Does this mean that if queue freezing happens after hot unplugging
+started that a deadlock will occur because the blk_mq_run_hw_queues()
+call in blk_freeze_queue_start() will wait forever?
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Bart.
