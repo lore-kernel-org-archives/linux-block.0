@@ -2,113 +2,121 @@ Return-Path: <SRS0=SfUb=6X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CF6C54E4A
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 15:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D608CC28CBC
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 16:01:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B310220CC7
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 15:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ACBB21775
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 16:01:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="bCOSwnBB"
+	dkim=pass (2048-bit key) header.d=orbekk.com header.i=@orbekk.com header.b="ijD348UM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="J+yVHs6s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728209AbgEIPHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 11:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728053AbgEIPH1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 11:07:27 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52269C05BD0B
-        for <linux-block@vger.kernel.org>; Sat,  9 May 2020 08:07:27 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id s9so3907157eju.1
-        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 08:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yLn1AXHn00bZ+po9Vb7k6qNSHYdWGkkZ6wxI2pwtGRE=;
-        b=bCOSwnBBjfPXdvYGJ+yVECFvPTePDH1ANyISrMhvJ1qWqJvVThnHr98KsSwJqA14nC
-         yCPOxIRhJYUKs+I0Z7zlDnbc2VJgVwWpDdEA4tIPWEVVkzgs6TyhzHr/LnVPIJc5YbZe
-         /Ga31Bb5nRqdr5sF01D+4kD7nuppvALvlvKumT0LdbEKLra5xfeiNf57Wv0ExKnHb7Rg
-         DbJPWuDEL/VR1p8vve4AZ1c4iNgOcgeDoJddMOToTohvJc+NMCp5pllqs5xHvWVFoT1b
-         hZ2eMoVCvm/W3nphozJEpzuE720t10XyAVjkj8Y23QAnpJ3YgiSQvtyoRGLEW8+4DwBB
-         HlzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yLn1AXHn00bZ+po9Vb7k6qNSHYdWGkkZ6wxI2pwtGRE=;
-        b=GeTcuVBOIEH7aXipp2IIuFQSyrcFUXjnRzoAA+FgHuNcxCkbs54q/bZIQ8dgh5e8s+
-         Nug9k3WROM5hmtUn1zmKfsIPdtwhYAOMpDtdY4czBUiEVIetZyJypRl6Ml+PLSzrqVKE
-         Lb/A3Mz7f8/Yp+56VDFVj1V0V225JW2Cntjp5RNr38lOLO2GJy7GZiisHP0GXtMyaikS
-         7muNVNJ2jrGaTblMxcJeZNGW4KqKKyvGGQ8zdoW6P7RzqYX2mMQ6VcfHa62Yxe2ynUOq
-         xXgJuoKfRISBlNG5dy72WTOmn6A5Ns1UaRnIa6z6wwQlACPnC4xBF8R1CkMcFEbz+dgX
-         dGuQ==
-X-Gm-Message-State: AGi0PuYJXV5lg2Z5Gp4c7qDU/+Ev3CcSnh2+vu6x9TDPqeDJ1yZTVCFH
-        C4gnd1w/PQGbIozjdpCwklnGPC6iG61uHKdM1C68cg==
-X-Google-Smtp-Source: APiQypKilW3QgeYL9j+z8BH4y4sSKlWKWi60GEoJhZT78wFbACZI36hD4PovUMVH8UfEyvLbc+3je7NxPGD32jSs39Q=
-X-Received: by 2002:a17:906:855a:: with SMTP id h26mr6685025ejy.56.1589036845508;
- Sat, 09 May 2020 08:07:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200508161517.252308-1-hch@lst.de> <CAPcyv4j3gVqrZWCCc2Q-6JizGAQXW0b+R1BcvWCZOvzaukGLQg@mail.gmail.com>
- <20200509082352.GB21834@lst.de>
-In-Reply-To: <20200509082352.GB21834@lst.de>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Sat, 9 May 2020 08:07:14 -0700
-Message-ID: <CAPcyv4ggb7_rwzGbhHNXSHd+jjSpZC=+DMEztY6Cu8Bc=ZNzag@mail.gmail.com>
-Subject: Re: remove a few uses of ->queuedata
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        linux-m68k@lists.linux-m68k.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-xtensa@linux-xtensa.org, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-bcache@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727857AbgEIQBe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 12:01:34 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:46269 "EHLO
+        out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727092AbgEIQBe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 May 2020 12:01:34 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.nyi.internal (Postfix) with ESMTP id 6717B5C00ED;
+        Sat,  9 May 2020 12:01:32 -0400 (EDT)
+Received: from imap1 ([10.202.2.51])
+  by compute4.internal (MEProxy); Sat, 09 May 2020 12:01:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=orbekk.com; h=
+        mime-version:message-id:in-reply-to:references:date:from:to:cc
+        :subject:content-type; s=fm2; bh=SKNN2JmzVgNS9cbFPRsY/p0I0fqDJ/u
+        zFHPyDwEAkTQ=; b=ijD348UMCObbpbU6cD5PVpJanzvihGYqJREbB8UCTjVAdyi
+        ZUHDZPk/QJuNA1O11GwdFhCGw+c47mYyKnDgmPKtwXLpJcC75KMRGK2FKS7WUqh7
+        oY9nBCZomsdH7OS8+KrjN/rYivb0IgEuP2BDR0pJ7t8fBS/9meRz/3CmSIZxpn6i
+        sxKaxosAzKr2ivSSfzF+y85CYnADXHxQ3ZNHAewGkkkKxJYCfnHZcq52QdTVZxRs
+        Yu1wIsqQWJUrmeB2fL1/1L3jpPhwvm2zKSTaefyQ10sUN9GHrcsOpI55Riqaf+vE
+        8aQv1gO49LBFcEBExbxrHAPKDppYKRqQ/L5NUYg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=SKNN2J
+        mzVgNS9cbFPRsY/p0I0fqDJ/uzFHPyDwEAkTQ=; b=J+yVHs6sGSwWZ8D1PcLIkb
+        66rm1vt0ffc3EaHnHx47FqAtc+YghZlOhvgFZkWX+d5dEM0lju31SPyUsgaZRXr3
+        EhRlFHA1akAg2SsEEHpWppP++s3gBVtryxJW5D9VPshrnTBMHp4WZLE40VWzlqsB
+        hyo3SvibsvNNuH3OSt9MmfxeLG8tcaJZwiMD3//JKUPc+ZNWmXXRdKIMRu3KikHk
+        JIP+h1r26Ekg2/TlUZjd1zSNIIwZOclOSoTds4J4KzT/e6sFxPauqNk/ii3F+K6W
+        Bsjz3ct1wj1d0iWehf+aYgAdPBUeJ0LCywsEPiP0a/Z4Nrvm6uvF61LUZYKXdFbA
+        ==
+X-ME-Sender: <xms:29O2XocUXLF5hFPCQQYzhuVm0jVK7QnFzdHJzMNkXUo-W7Y6jD1svQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrkeehgdelhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpehkjhesohhr
+    sggvkhhkrdgtohhmnecuggftrfgrthhtvghrnhepteehuefhudevvdeflefgfeevuefhje
+    fgjeekffefjeelvdetieevffelvdelkeeknecuvehluhhsthgvrhfuihiivgeptdenucfr
+    rghrrghmpehmrghilhhfrhhomhepkhhjsehorhgsvghkkhdrtghomh
+X-ME-Proxy: <xmx:29O2Xuf8Pt7JkSYiuu4NccR0TxExtTCUsDiJz0er_aKOIsCdX_kRMw>
+    <xmx:29O2XkglqHASt0OzAYSMJuv22PtQB2mWCRS3f-ggrBkhfzNFhUDT5g>
+    <xmx:29O2XiSZdebnkCAmOLpndBxBguYVX3GkS4F-jD4DW7C8wLbc9SIQYw>
+    <xmx:3NO2XkVMTD1WOasQWeDAT7XM06Je1KvCw5snmCK50aCfd-kgvwfCJg>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 8C796C200A4; Sat,  9 May 2020 12:01:31 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.3.0-dev0-413-g750b809-fmstable-20200507v1
+Mime-Version: 1.0
+Message-Id: <bc077a4c-26ce-4fd1-b55c-48bded3c834b@www.fastmail.com>
+In-Reply-To: <20200508210926.GB19773@redhat.com>
+References: <20200507230532.5733-1-kj@orbekk.com>
+ <DM6PR04MB49726E28257263F5A1C643B386A20@DM6PR04MB4972.namprd04.prod.outlook.com>
+ <dd7b8b91-776b-4458-a83a-18ab4953d2f4@www.fastmail.com>
+ <20200508210926.GB19773@redhat.com>
+Date:   Sat, 09 May 2020 12:01:10 -0400
+From:   kj@orbekk.com
+To:     "Mike Snitzer" <snitzer@redhat.com>
+Cc:     "Chaitanya Kulkarni" <Chaitanya.Kulkarni@wdc.com>,
+        "Alasdair G Kergon" <agk@redhat.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "harshads@google.com" <harshads@google.com>,
+        "Khazhismel Kumykov" <khazhy@google.com>
+Subject: Re: dm: track io errors per mapped device
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 9, 2020 at 1:24 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Fri, May 08, 2020 at 11:04:45AM -0700, Dan Williams wrote:
-> > On Fri, May 8, 2020 at 9:16 AM Christoph Hellwig <hch@lst.de> wrote:
-> > >
-> > > Hi all,
-> > >
-> > > various bio based drivers use queue->queuedata despite already having
-> > > set up disk->private_data, which can be used just as easily.  This
-> > > series cleans them up to only use a single private data pointer.
-> >
-> > ...but isn't the queue pretty much guaranteed to be cache hot and the
-> > gendisk cache cold? I'm not immediately seeing what else needs the
-> > gendisk in the I/O path. Is there another motivation I'm missing?
->
-> ->private_data is right next to the ->queue pointer, pat0 and part_tbl
-> which are all used in the I/O submission path (generic_make_request /
-> generic_make_request_checks).  This is mostly a prep cleanup patch to
-> also remove the pointless queue argument from ->make_request - then
-> ->queue is an extra dereference and extra churn.
+On Fri, May 8, 2020, at 17:09, Mike Snitzer wrote:
+> On Fri, May 08 2020 at  3:22pm -0400,
+> kj@orbekk.com <kj@orbekk.com> wrote:
+> 
+> > On Thu, May 7, 2020, at 21:12, Chaitanya Kulkarni wrote:
+> > > On 05/07/2020 04:06 PM, Kjetil Orbekk wrote:
+> > > > +		if (tio->error)
+> > > > +			atomic_inc(&md->ioerr_cnt);
+> > > 
+> > > Given that there are so many errors how would user know what
+> > > kind of error is generated and how many times?
+> > 
+> > The intended use case is to provide an easy way to check if errors
+> > have occurred at all, and then the user needs to investigate using
+> > other means. I replied with more detail to Alasdair's email.
+> 
+> But most operations initiated by the user that fail will be felt by the
+> upper layer that the user is interfacing with.
+> 
+> Only exception that springs to mind is dm-writecache's writeback that
+> occurs after writes have already been acknowledged back to the upper
+> layers -- in that case dm-writecache provides an error flag that is
+> exposed via writecache_status.
+> 
+> Anyway, just not seeing why you need a upper-layer use-case agnostic
+> flag to know an error occurred in DM.  That layers that interface with
+> the DM device will have been notified of all errors.
 
-Ah ok. If the changelogs had been filled in with something like "In
-preparation for removing @q from make_request_fn, stop using
-->queuedata", I probably wouldn't have looked twice.
+It's used as a signal by a probing process which is not in the IO path itself.
 
-For the nvdimm/ driver updates you can add:
+> And why just for DM devices?  Why not all block devices (in which case
+> DM would get this feature "for free")?
 
-    Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-
-...or just let me know if you want me to pick those up through the nvdimm tree.
+This sounds like a good idea to me. Looks like I could add this to disk_stats and expose it through the block/<device>/stats file. I'll try to see if this is feasible.
