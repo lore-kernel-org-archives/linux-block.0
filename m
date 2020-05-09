@@ -2,87 +2,70 @@ Return-Path: <SRS0=SfUb=6X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07352C38A2A
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F9CC38A2A
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:17:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D92D7216FD
-	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:11:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BF1A21974
+	for <linux-block@archiver.kernel.org>; Sat,  9 May 2020 03:17:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jqkuV8Im"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728618AbgEIDL6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 May 2020 23:11:58 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38385 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728353AbgEIDL6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 23:11:58 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y25so1995418pfn.5
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 20:11:57 -0700 (PDT)
+        id S1728567AbgEIDRB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 May 2020 23:17:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728421AbgEIDRB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 May 2020 23:17:01 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511A7C061A0C
+        for <linux-block@vger.kernel.org>; Fri,  8 May 2020 20:17:01 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id d22so1807166pgk.3
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2020 20:17:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=6mc+/P7uDuRdnWbGwn7fDTDVPcB/+OpNkx60HSzCKag=;
+        b=jqkuV8Im5DOffQo03fBUChgmLfbCNtIji5qWJ3SWqgGq5gMdxA4CuIQz8pXYfM61hm
+         z6wc9LOo7Fwdd4nbK81K10SyCwViWTyyHuVK71ihamKr76Yk+lB+YryBpz8nr5KpCkUc
+         LzbPp9vXvAi/1XK1f4pFs5NLiut+gVSFqMthOdcY5/2Vh+mw3TGTsTBHH4uRqkKy6mU4
+         et2t/Uqxm2Jv3CcL3cy0B5zwW9PApVjOCdIuBJtyCRh5//ld3ZhlwKNfMEvrCZh0l6Te
+         QPI9vhBbDfIaMHCrfKgho6Weh+hi+4NreLE9gIF5/Mkp3cS3EgX05ZmCfa/YRyQX4nuY
+         Fm5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=F/EYR5WZ7H19gjg7fUTL9+ugcKnWThveHDKpqmOeqC0=;
-        b=BV8AmHIULSo50aeOoNtFo6pDAf/s9LH4cIaoUMK14jVioFwbaDhOKHwB4uswGenNfK
-         uCj3Z1lHr6WKv8CGxWhbjQ56nuRFZQxSQonR72sp7/2+4fMDvcDBrJRfJqa8NXFFwlEX
-         oT0klSm7jTRD4tOXX8stVudfQnmdxDhlQnahKbaJ7qDUWMBUPRq+qY0udvFoQ6j1cYEM
-         tUtV0Sj+X07ol/vx+Dhygj6jMbxzCXoQFrzBBdvEiuRp9okhizRQmVbMgZrXN9bN4d8L
-         QpKOftPTtsWkrSODPMGwQl4gptPVrD62pzJlA2eJ5XTFATSGd1qO8AjgCYSHQPTX1apj
-         FoIQ==
-X-Gm-Message-State: AGi0PuZUbnbK2KGWslkPlEM7nARwcNK53KmOCXrqlTD92dLszEmJoTta
-        pAYVopLge3XQAR1LqXgtWwk=
-X-Google-Smtp-Source: APiQypLL+IXH9UUY6/DmMJmMmX+lzV1eDa+a8dnSEd1V1cQrGXXlhBPiUq/VFuws8X9gvCOCTPht+w==
-X-Received: by 2002:a05:6a00:a:: with SMTP id h10mr5991054pfk.160.1588993917112;
-        Fri, 08 May 2020 20:11:57 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:1981:d78f:7563:fc3d? ([2601:647:4000:d7:1981:d78f:7563:fc3d])
-        by smtp.gmail.com with ESMTPSA id y10sm3178673pfb.53.2020.05.08.20.11.55
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=6mc+/P7uDuRdnWbGwn7fDTDVPcB/+OpNkx60HSzCKag=;
+        b=FBLhCyOSvTD6HQ7HGQs402Dfyxa5CMjlNltYqFGoohsKGsSB1a4MIy/SlOzkaD8zq0
+         MwWse/39azbKC52mSlE1AcavvpHuWNH0LzpDUiF5bFPzrVNz06tObi2WWkTo5yvBUGNg
+         clIcuuHLmzhFHPDl1ekc4saWpfL4SCQNNod46MgEvGlIvwnim2V3lswsD2oiCMyvLBb3
+         E+lJ0HtqNhdBHVm6pxS1IEf6ajVvkWAqOx/i7E44MShbJaQNr7L5u2tTtgeyK/197wZd
+         CTKgZVoeTcLR+BcbrsxPCc19QjrMgLUgTFHboStgJH4GTJLgvEAE8vVQXZKDJZjgIxsZ
+         3c6A==
+X-Gm-Message-State: AGi0Pua1uSmCYWOD0xvhQw2pCxtsz/p/cMrmGYgsCBbm5WS1O8GboN99
+        kOQtS+q+kGJHbo0pnxwBdvM47Dr3CQo=
+X-Google-Smtp-Source: APiQypKeO1dY7BmFdWnq4h2XyiZ4EDrRGsxH0esPKGPQmwTaKZmHddzM6P20yLg2CrAP57fhk353YQ==
+X-Received: by 2002:a63:5445:: with SMTP id e5mr4743077pgm.185.1588994220436;
+        Fri, 08 May 2020 20:17:00 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id q62sm3570295pjh.57.2020.05.08.20.16.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2020 20:11:56 -0700 (PDT)
-Subject: Re: [PATCH V10 06/11] blk-mq: prepare for draining IO when hctx's all
- CPUs are offline
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-7-ming.lei@redhat.com>
- <756074a0-ea4b-5dcf-9348-e5b4f4414248@acm.org>
- <20200509020926.GB1392681@T590>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <d59e0c74-981d-6ed4-e80d-09b0cd4c17db@acm.org>
-Date:   Fri, 8 May 2020 20:11:55 -0700
+        Fri, 08 May 2020 20:16:59 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.7-rc5
+Message-ID: <cc854168-7859-49f9-63f7-dbaaff8fbb3d@kernel.dk>
+Date:   Fri, 8 May 2020 21:16:58 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200509020926.GB1392681@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,39 +74,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-08 19:09, Ming Lei wrote:
-> On Fri, May 08, 2020 at 04:26:17PM -0700, Bart Van Assche wrote:
->> On 2020-05-04 19:09, Ming Lei wrote:
->>> @@ -391,6 +393,7 @@ struct blk_mq_ops {
->>>  enum {
->>>  	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
->>>  	BLK_MQ_F_TAG_SHARED	= 1 << 1,
->>> +	BLK_MQ_F_NO_MANAGED_IRQ	= 1 << 2,
->>>  	BLK_MQ_F_BLOCKING	= 1 << 5,
->>>  	BLK_MQ_F_NO_SCHED	= 1 << 6,
->>>  	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
->>> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
->>> index 77d70b633531..24b3a77810b6 100644
->>> --- a/include/linux/cpuhotplug.h
->>> +++ b/include/linux/cpuhotplug.h
->>> @@ -152,6 +152,7 @@ enum cpuhp_state {
->>>  	CPUHP_AP_SMPBOOT_THREADS,
->>>  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
->>>  	CPUHP_AP_IRQ_AFFINITY_ONLINE,
->>> +	CPUHP_AP_BLK_MQ_ONLINE,
->>>  	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
->>>  	CPUHP_AP_X86_INTEL_EPB_ONLINE,
->>>  	CPUHP_AP_PERF_ONLINE,
->>
->> Wouldn't BLK_MQ_F_NO_IRQ be a better name than BLK_MQ_F_NO_MANAGED_IRQ?
-> 
-> No, what this patchset tries to do is to address request timeout or hang
-> issue in case that managed irq is applied in blk-mq driver.
+Hi Linus,
 
-What is a managed IRQ? The following query did not produce a useful answer:
+A few fixes that should go into this series:
 
-$ git grep -nHi managed.irq
+- Small series fixing a use-after-free of bdi name (Christoph,Yufen)
 
-Thanks,
+- NVMe pull request, fixing a regression with the smaller CQ update and
+  a hang at namespace scanning error recovery
 
-Bart.
+- Fix race with blk-iocost iocg->abs_vdebt updates (Tejun)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-08
+
+
+----------------------------------------------------------------
+Alexey Dobriyan (1):
+      nvme-pci: fix "slimmer CQ head update"
+
+Christoph Hellwig (3):
+      vboxsf: don't use the source name in the bdi name
+      bdi: move bdi_dev_name out of line
+      bdi: add a ->dev_name field to struct backing_dev_info
+
+Jens Axboe (1):
+      Merge branch 'nvme-5.7' of git://git.infradead.org/nvme into block-5.7
+
+Sagi Grimberg (1):
+      nvme: fix possible hang when ns scanning fails during error recovery
+
+Tejun Heo (1):
+      iocost: protect iocg->abs_vdebt with iocg->waitq.lock
+
+Yufen Yu (1):
+      bdi: use bdi_dev_name() to get device name
+
+ block/bfq-iosched.c              |   5 +-
+ block/blk-cgroup.c               |   2 +-
+ block/blk-iocost.c               | 117 ++++++++++++++++++++++++---------------
+ drivers/nvme/host/core.c         |   2 +-
+ drivers/nvme/host/pci.c          |   6 +-
+ fs/ceph/debugfs.c                |   2 +-
+ fs/vboxsf/super.c                |   2 +-
+ include/linux/backing-dev-defs.h |   1 +
+ include/linux/backing-dev.h      |   9 +--
+ include/trace/events/wbt.h       |   8 +--
+ mm/backing-dev.c                 |  13 ++++-
+ tools/cgroup/iocost_monitor.py   |   7 ++-
+ 12 files changed, 106 insertions(+), 68 deletions(-)
+
+-- 
+Jens Axboe
+
