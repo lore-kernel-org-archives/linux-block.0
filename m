@@ -2,86 +2,71 @@ Return-Path: <SRS0=ZTaq=6Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69828C47255
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD717C47255
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:33:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 424CD20801
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:09:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B439C208DB
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:33:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ETkACeTx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726743AbgEJBJm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 21:09:42 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:53229 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726565AbgEJBJm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 21:09:42 -0400
-Received: by mail-pj1-f65.google.com with SMTP id a5so6006543pjh.2;
-        Sat, 09 May 2020 18:09:41 -0700 (PDT)
+        id S1728783AbgEJBdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 21:33:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35788 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726630AbgEJBdX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 May 2020 21:33:23 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA15C061A0C
+        for <linux-block@vger.kernel.org>; Sat,  9 May 2020 18:33:22 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id k7so1036240pjs.5
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 18:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=WqMnRNBCETALJbMSK3GnwKIEtxXc3JNvPBPsXk/tSgo=;
+        b=ETkACeTx9l39mPfOflhM6DUy1tz5NW4HIsuIuNAGtiGgiqwDnZBRh4JXY2TQPEnoxw
+         vnELAcT71u7Og1BhWEngQUUku1XWvgeQmi2DlsjjTTL1l74VBWOLMi2kKEva5AG6diyZ
+         cm4EAHet8ryTdD2XQrt2Ni+SO7XrIBru5C1SB1aNGKYvKvq5pMZb4NIHs4oXdqVm+a0R
+         KQMcph1bWZhlv5Os/wubAkxb/n3+YmLlMT2HP43OhgnSSGtfi+KLUvxgjOPRp44WzkKY
+         RjtW6kKtUSm+g09lSVMkeK/u5KMYr1w1CIG3zJtTuy5+nu+xhAQWO/0Nkf1iYubXXgWr
+         njag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=gOcLyyohxD8fco16zhhFVMtG6mh2DzURAsZz1+qZQfg=;
-        b=Ylj8y6WB/uCAneP8NB3cNfpzsRxHAVNZoykVmqDT1tYpfUG2Z2dJU8m6zUqkW7TEef
-         jHgoLkM7UcmWRNXiHA869jFcXORzLQNMTGPWtWb68fFzoCnQ9cNhDi1QM3gvt4VgQvNj
-         dC8NPBkHqqa+RzYTdzXjSQG3LzA7Mp/BBrhPTDdLB+lCtSkjMrdFJMIhZ2pV14UdNagq
-         8Yr8kC1RLwZHSbmLTUHMx6Cf1fqiAiOWnlkxmOzVhAJvm8+QPiZPoL2yJpA9ndO3ikBC
-         3kE+CdH/lMFgQaqPuiG8waJo7Nh7jocw8ju2zbf7OPs1IwnRI2gJcZTf8jTu+K3UmvmL
-         8V9A==
-X-Gm-Message-State: AGi0PuaOOaafITySyLwkucHalYue4EfC1f0aQpx4pPaz4tsRG+qBMz3W
-        1bCWe9Id0fPjBr/rlXKg0rqTxPco3AA=
-X-Google-Smtp-Source: APiQypKXnzTMKz71+jj7Jy5Gm44PD+czEJydMUHxGMcmgw2UJtLGXJebGPFv3iZ4X2dYs6A787wQig==
-X-Received: by 2002:a17:90a:3266:: with SMTP id k93mr14580851pjb.118.1589072980528;
-        Sat, 09 May 2020 18:09:40 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:8ef:746a:4fe7:1df? ([2601:647:4000:d7:8ef:746a:4fe7:1df])
-        by smtp.gmail.com with ESMTPSA id go21sm6037539pjb.45.2020.05.09.18.09.39
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=WqMnRNBCETALJbMSK3GnwKIEtxXc3JNvPBPsXk/tSgo=;
+        b=MhmEK3A4iva3OgCo+xQ3A603kdZ3lTmf4mDRBvaSMS2rPMzipIG2zJVM5XxU3LQbAD
+         VzZ5D/PC2xyVaLeT/ouN50IAjPAtxF+sZQ+fJxpuaAVHWAw47ACjFFSpqHGYhetkTn2U
+         6IiLX7SBJL4ksXGnK52VHdnQfEa4GRF9oos+miFw9A3olkQxF6PCYLWNvOmHPtbGiUHw
+         6O8H1XVnQgebp9QWmIf2+GPqqq3wlWIzQFw+gEmIyTKXkZxSjrZ9GGACyV/P1vinOro2
+         gquvhIWJijV6BKpuXy8SupnbcbCdsS/Gj5POOGP+8pVS93w9yvkIh3+fuMGwcpQntIys
+         CL2Q==
+X-Gm-Message-State: AGi0PubkhoCkd0bVG091GmWFdnegB9o13t1QfJtPm8Ul/gtDMtXmQkPI
+        G4kVOeMMDRQAUNy1Nmn+52h360AFTlU=
+X-Google-Smtp-Source: APiQypIX2btDRcBoyVPDrl6wYejYMQeFneybLm6Omyxv4KvxZvfhqwvhVn0+9R7EKt9XWa35HF+mkw==
+X-Received: by 2002:a17:90a:25cb:: with SMTP id k69mr13924869pje.93.1589074401448;
+        Sat, 09 May 2020 18:33:21 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id z190sm5582003pfz.84.2020.05.09.18.33.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 May 2020 18:09:39 -0700 (PDT)
-Subject: Re: [PATCH v4 4/5] blktrace: break out of blktrace setup on
- concurrent calls
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
-Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <20200509031058.8239-1-mcgrof@kernel.org>
- <20200509031058.8239-5-mcgrof@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <e728acea-61c1-fcb5-489b-9be8cafe61ea@acm.org>
-Date:   Sat, 9 May 2020 18:09:38 -0700
+        Sat, 09 May 2020 18:33:20 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL v2] Block fixes for 5.7-rc5
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+Date:   Sat, 9 May 2020 19:33:19 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200509031058.8239-5-mcgrof@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -90,31 +75,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-08 20:10, Luis Chamberlain wrote:
-> @@ -493,6 +496,12 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->  	 */
->  	strreplace(buts->name, '/', '_');
->  
-> +	if (q->blk_trace) {
-> +		pr_warn("Concurrent blktraces are not allowed on %s\n",
-> +			buts->name);
-> +		return -EBUSY;
-> +	}
-> +
->  	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
->  	if (!bt)
->  		return -ENOMEM;
+Hi Linus,
 
-Is this really sufficient? Shouldn't concurrent do_blk_trace_setup()
-calls that refer to the same request queue be serialized to really
-prevent that debugfs attribute creation fails?
+Let's try this again... BFQ was missing a header, I fixed that up. To
+avoid introducing a bisection breakage point, I rebased the branch.
 
-How about using the block device name instead of the partition name in
-the error message since the concurrency context is the block device and
-not the partition?
+A few fixes that should go into this series:
 
-Thanks,
+- Small series fixing a use-after-free of bdi name (Christoph,Yufen)
 
-Bart.
+- NVMe fix for a regression with the smaller CQ update (Alexey)
 
+- NVMe fix for a hang at namespace scanning error recovery (Sagi)
+
+- Fix race with blk-iocost iocg->abs_vdebt updates (Tejun)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-09
+
+
+----------------------------------------------------------------
+Alexey Dobriyan (1):
+      nvme-pci: fix "slimmer CQ head update"
+
+Christoph Hellwig (3):
+      vboxsf: don't use the source name in the bdi name
+      bdi: move bdi_dev_name out of line
+      bdi: add a ->dev_name field to struct backing_dev_info
+
+Sagi Grimberg (1):
+      nvme: fix possible hang when ns scanning fails during error recovery
+
+Tejun Heo (1):
+      iocost: protect iocg->abs_vdebt with iocg->waitq.lock
+
+Yufen Yu (1):
+      bdi: use bdi_dev_name() to get device name
+
+ block/bfq-iosched.c              |   6 +-
+ block/blk-cgroup.c               |   2 +-
+ block/blk-iocost.c               | 117 ++++++++++++++++++++++++---------------
+ drivers/nvme/host/core.c         |   2 +-
+ drivers/nvme/host/pci.c          |   6 +-
+ fs/ceph/debugfs.c                |   2 +-
+ fs/vboxsf/super.c                |   2 +-
+ include/linux/backing-dev-defs.h |   1 +
+ include/linux/backing-dev.h      |   9 +--
+ include/trace/events/wbt.h       |   8 +--
+ mm/backing-dev.c                 |  13 ++++-
+ tools/cgroup/iocost_monitor.py   |   7 ++-
+ 12 files changed, 107 insertions(+), 68 deletions(-)
+
+-- 
+Jens Axboe
 
