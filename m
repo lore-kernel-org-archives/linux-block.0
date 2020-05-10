@@ -2,151 +2,68 @@ Return-Path: <SRS0=ZTaq=6Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263BBC54E8A
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 17:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAB5C38A2A
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 19:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 108B9208DB
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 17:24:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A044324969
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 19:45:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589139909;
+	bh=w/ND34oJzDK32eZMi+NKlKDwwA1JL0hfWyiC5efb6WU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=Yxe97jEydIW3I331B2vE6ZiH5D0JmThAtxwLhnAEraKjFbjujdv2vv97m4I09ctsZ
+	 +FNi91kwD+33qzo1Av7iaySZmQaJw+++DHkz7vgn7bAsPvPGrLs4mgVrmnVmkZTvyk
+	 fvwGsqW/cn4NhTy15PAm9dtRx3hk9jrku3zNiNRg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728926AbgEJRYT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 May 2020 13:24:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58858 "EHLO mx2.suse.de"
+        id S1728823AbgEJTpH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 May 2020 15:45:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56950 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728360AbgEJRYT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 May 2020 13:24:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id AC0D0ACAD;
-        Sun, 10 May 2020 17:24:19 +0000 (UTC)
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.com>
-References: <20200510165232.67500-1-colyli@suse.de>
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Subject: Re: [RFC PATCH v2] bcache: export zoned information for backing
- device
-Message-ID: <db0b8463-4402-41c9-e15c-76eed585caf1@suse.de>
-Date:   Mon, 11 May 2020 01:24:11 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200510165232.67500-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1729305AbgEJTpG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 May 2020 15:45:06 -0400
+Subject: Re: [GIT PULL v2] Block fixes for 5.7-rc5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589139905;
+        bh=w/ND34oJzDK32eZMi+NKlKDwwA1JL0hfWyiC5efb6WU=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=gOAnY0sRsXnY/n54sbQmw2phLmEjBSH45w7q64bQG7qngQEGdqK7mxL/qYuxNuIYb
+         NYvnY7c20N9WAmktZZBFSMrCUqWLbUeWSlYLiwO2Rn0bUXPi+ckn75giFc0cp8A3kI
+         2VtxSS51jYq5L0Lld0aHNJwniVEzbFQkujzBNXo8=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+References: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.7-2020-05-09
+X-PR-Tracked-Commit-Id: 59c7c3caaaf8750df4ec3255082f15eb4e371514
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0a85ed6e7fce8075bb3090f8eac05ca1000f5969
+Message-Id: <158913990587.3456.8851887508779977173.pr-tracker-bot@kernel.org>
+Date:   Sun, 10 May 2020 19:45:05 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/11 00:52, Coly Li wrote:
-> This is a very basic zoned device support. With this patch, bcache
-> device is able to,
-> - Export zoned device attribution via sysfs
-> - Response report zones request, e.g. by command 'blkzone report'
-> But the bcache device is still NOT able to,
-> - Response any zoned device management request or IOCTL command
-> 
-> Here are the testings I have done,
-> - read /sys/block/bcache0/queue/zoned, content is 'host-managed'
-> - read /sys/block/bcache0/queue/nr_zones, content is number of zones
->   including all zone types.
-> - read /sys/block/bcache0/queue/chunk_sectors, content is zone size
->   in sectors.
-> - run 'blkzone report /dev/bcache0', all zones information displayed.
-> - run 'blkzone reset /dev/bcache0', operation is rejected with error
->   information: "blkzone: /dev/bcache0: BLKRESETZONE ioctl failed:
->   Operation not supported"
-> - Sequential writes by dd, I can see some zones' write pointer 'wptr'
->   values updated.
-> 
-> All of these are very basic testings, if you have better testing
-> tools or cases, please offer me hint.
-> 
-> Thanks in advance for your review and comments.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> CC: Hannes Reinecke <hare@suse.com>
-> CC: Damien Le Moal <damien.lemoal@wdc.com>
-> CC: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
+The pull request you sent on Sat, 9 May 2020 19:33:19 -0600:
 
-Hi Damien and Johannes,
+> git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-09
 
-With this patch the bcache device with a SMR drive can export the zone
-information and format zonefs on top of it. Writeback mode does not work
-at this moment (it requires on-disk format change and on my to-do list),
-writethrough and writearound mode can be used on the bcache device to
-accelerate random read when hitting.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0a85ed6e7fce8075bb3090f8eac05ca1000f5969
 
-During my testing, there are 2 things needs to fix.
+Thank you!
 
-1, mkzonefs report the first zone size does not match.
-   Because bcache occupies the first 8KB of the backing SMR drive, so
-the first zone size is 8KB less. By ignoring unmatched zone 0 size,
-mkzonefs works and the bcache device is formated.
-
-2, Direct I/O on files under seq/ directory can not be accessed.
-   I need help here. It seems direct I/O write fails with -EINVAL. I
-found the failure happens in fs/iomap/direct-io.c:iomap_dio_bio_actor(),
-211         if ((pos | length | align) & ((1 << blkbits) - 1))
-212                 return -EINVAL;
-
-When I write to seq/1 file on offset 0 with 4096 bytes, in the above
-line, align is 205427296, and  (pos | length | align) & ((1 << blkbits)
-- 1) is non-zero. Then all writes to files under seq/ fail with -EINVAL.
-
-I guess there should be something missing when I do the direct I/O
-write. Could you all give me some hint ?
-
-Thanks in advance.
-
-Coly Li
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
