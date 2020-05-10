@@ -2,132 +2,107 @@ Return-Path: <SRS0=ZTaq=6Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD717C47255
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F551C35280
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 03:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B439C208DB
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 01:33:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ETkACeTx"
+	by mail.kernel.org (Postfix) with ESMTP id 4AC1520746
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 03:36:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589081801;
+	bh=HN1s+g6bNFKRMOSSvP0y3OkGK/+9CBHcg9pKv2Bm6EM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=fgZVwTnAZn70xaylF1DUq875Sw8rFARknqDLYf60OgxsNAgHibw88rofYP+fHwDoZ
+	 TK0ZesZg9WYjObbF4AMABTqtxKuj1VZyL/P394slx21RMOMzs2Fo04dwEnXfSiUrCx
+	 Qy+xfqhwUYwi1mBqNSzAaZEvx5c0G6fhwlvfXefY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728783AbgEJBdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 21:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35788 "EHLO
+        id S1726660AbgEJDgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 23:36:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726630AbgEJBdX (ORCPT
+        by vger.kernel.org with ESMTP id S1726067AbgEJDgk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 May 2020 21:33:23 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA15C061A0C
-        for <linux-block@vger.kernel.org>; Sat,  9 May 2020 18:33:22 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id k7so1036240pjs.5
-        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 18:33:22 -0700 (PDT)
+        Sat, 9 May 2020 23:36:40 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FE1C061A0C
+        for <linux-block@vger.kernel.org>; Sat,  9 May 2020 20:36:40 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id r17so1524905lff.9
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 20:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=WqMnRNBCETALJbMSK3GnwKIEtxXc3JNvPBPsXk/tSgo=;
-        b=ETkACeTx9l39mPfOflhM6DUy1tz5NW4HIsuIuNAGtiGgiqwDnZBRh4JXY2TQPEnoxw
-         vnELAcT71u7Og1BhWEngQUUku1XWvgeQmi2DlsjjTTL1l74VBWOLMi2kKEva5AG6diyZ
-         cm4EAHet8ryTdD2XQrt2Ni+SO7XrIBru5C1SB1aNGKYvKvq5pMZb4NIHs4oXdqVm+a0R
-         KQMcph1bWZhlv5Os/wubAkxb/n3+YmLlMT2HP43OhgnSSGtfi+KLUvxgjOPRp44WzkKY
-         RjtW6kKtUSm+g09lSVMkeK/u5KMYr1w1CIG3zJtTuy5+nu+xhAQWO/0Nkf1iYubXXgWr
-         njag==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C3sNE7/R3wLoLlTARZrhafNKuUEQMhRiGUVOrVB7ud4=;
+        b=bP4cgr5RHFUE4qTztEKNwBif3xwzOOTJwgJJNzbcSVARklXOsoYWP5EhnQ6fIsYs5h
+         YDDsUNnicR+sfKEEvmcfYEaed4zYCEOyEszhKQT6rNsOuNixbyM9LE1raanDJ8Vhr0wx
+         pSsN64JMNxcRs2VZqlJmj0GdGcexrg2g4z9x0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=WqMnRNBCETALJbMSK3GnwKIEtxXc3JNvPBPsXk/tSgo=;
-        b=MhmEK3A4iva3OgCo+xQ3A603kdZ3lTmf4mDRBvaSMS2rPMzipIG2zJVM5XxU3LQbAD
-         VzZ5D/PC2xyVaLeT/ouN50IAjPAtxF+sZQ+fJxpuaAVHWAw47ACjFFSpqHGYhetkTn2U
-         6IiLX7SBJL4ksXGnK52VHdnQfEa4GRF9oos+miFw9A3olkQxF6PCYLWNvOmHPtbGiUHw
-         6O8H1XVnQgebp9QWmIf2+GPqqq3wlWIzQFw+gEmIyTKXkZxSjrZ9GGACyV/P1vinOro2
-         gquvhIWJijV6BKpuXy8SupnbcbCdsS/Gj5POOGP+8pVS93w9yvkIh3+fuMGwcpQntIys
-         CL2Q==
-X-Gm-Message-State: AGi0PubkhoCkd0bVG091GmWFdnegB9o13t1QfJtPm8Ul/gtDMtXmQkPI
-        G4kVOeMMDRQAUNy1Nmn+52h360AFTlU=
-X-Google-Smtp-Source: APiQypIX2btDRcBoyVPDrl6wYejYMQeFneybLm6Omyxv4KvxZvfhqwvhVn0+9R7EKt9XWa35HF+mkw==
-X-Received: by 2002:a17:90a:25cb:: with SMTP id k69mr13924869pje.93.1589074401448;
-        Sat, 09 May 2020 18:33:21 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id z190sm5582003pfz.84.2020.05.09.18.33.20
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C3sNE7/R3wLoLlTARZrhafNKuUEQMhRiGUVOrVB7ud4=;
+        b=c0BSL31RT2AzxXC9L2IaWHred24VUbHtp1tK+Xv6Qq9+46YLWn1hmbqzaYi5PHENAG
+         skialhA3Evq75ACWCEYtn6g4nkLGAhG4Fcd/wqE9gD06U/Du+gh0bIM5PMjXqzg4c99k
+         ++sE66IL/Cd7lCIUw7cqr7BEQGFtx1TkToHogqV6eqstKAeQUwhTHP3RXtR3ZnzO9QOD
+         wiGpaQGhGmyV9Gt++KF8boshF146mL8rH3Ub6EcTCKSUYjIM0NoLlH98iP33VaIdOND+
+         3ofSUP+CrOMif4Iwc+FTqgne6i6iexWloULEydC7iRk48q3wx8sZXMloMEMrZswOuOv1
+         zMmQ==
+X-Gm-Message-State: AOAM531e0/fUcwOovFWBLBwXFBLtCDH73rlu0kwEVcGPdDwl2Z46bFGF
+        U2r1sFKxg65O6K1I42s43mKWNKqve00=
+X-Google-Smtp-Source: ABdhPJxwgJNGMzjMzThYhKk+f8SB/q0ItREKBCFHemVwM08oO7yPIH0PAN4DWnkLcDVbzpHD2fsUHQ==
+X-Received: by 2002:a19:700b:: with SMTP id h11mr6703302lfc.62.1589081798005;
+        Sat, 09 May 2020 20:36:38 -0700 (PDT)
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
+        by smtp.gmail.com with ESMTPSA id i76sm5916469lfi.83.2020.05.09.20.36.36
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 May 2020 18:33:20 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL v2] Block fixes for 5.7-rc5
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
-Date:   Sat, 9 May 2020 19:33:19 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Sat, 09 May 2020 20:36:37 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id z22so4602483lfd.0
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2020 20:36:36 -0700 (PDT)
+X-Received: by 2002:a19:6e4e:: with SMTP id q14mr6527170lfk.192.1589081796547;
+ Sat, 09 May 2020 20:36:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+In-Reply-To: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 9 May 2020 20:36:20 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wheALnWv1jaZM9yWhyrD_2nWppt96UYCQNE6V-DN_gGuA@mail.gmail.com>
+Message-ID: <CAHk-=wheALnWv1jaZM9yWhyrD_2nWppt96UYCQNE6V-DN_gGuA@mail.gmail.com>
+Subject: Re: [GIT PULL v2] Block fixes for 5.7-rc5
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Sat, May 9, 2020 at 6:33 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Let's try this again... BFQ was missing a header, I fixed that up.
 
-Let's try this again... BFQ was missing a header, I fixed that up. To
-avoid introducing a bisection breakage point, I rebased the branch.
+The fix looked trivial to me. That wasn't what worries me.
 
-A few fixes that should go into this series:
+Why did you send me something that was clearly NOT TESTED AT ALL.
 
-- Small series fixing a use-after-free of bdi name (Christoph,Yufen)
+If it hadn't even gotten build-testing, what _did_ it get?
 
-- NVMe fix for a regression with the smaller CQ update (Alexey)
+The fact that it now builds doesn't make me much happier.
 
-- NVMe fix for a hang at namespace scanning error recovery (Sagi)
+Why should I believe that this clearly totally untested pull request
+is now any good?
 
-- Fix race with blk-iocost iocg->abs_vdebt updates (Tejun)
+Why should I believe that your _future_ pull requests are any good,
+when they clearly have absolutely _zero_ testing at all?
 
-Please pull!
+Jens, in case you didn't catch on, this is a BIG PROBLEM.
 
+Sending me completely untested crap is a bigger deal than "let's just
+polish the crap until it at least compiles".
 
-  git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-09
+What have you done to make sure this doesn't happen again?
 
-
-----------------------------------------------------------------
-Alexey Dobriyan (1):
-      nvme-pci: fix "slimmer CQ head update"
-
-Christoph Hellwig (3):
-      vboxsf: don't use the source name in the bdi name
-      bdi: move bdi_dev_name out of line
-      bdi: add a ->dev_name field to struct backing_dev_info
-
-Sagi Grimberg (1):
-      nvme: fix possible hang when ns scanning fails during error recovery
-
-Tejun Heo (1):
-      iocost: protect iocg->abs_vdebt with iocg->waitq.lock
-
-Yufen Yu (1):
-      bdi: use bdi_dev_name() to get device name
-
- block/bfq-iosched.c              |   6 +-
- block/blk-cgroup.c               |   2 +-
- block/blk-iocost.c               | 117 ++++++++++++++++++++++++---------------
- drivers/nvme/host/core.c         |   2 +-
- drivers/nvme/host/pci.c          |   6 +-
- fs/ceph/debugfs.c                |   2 +-
- fs/vboxsf/super.c                |   2 +-
- include/linux/backing-dev-defs.h |   1 +
- include/linux/backing-dev.h      |   9 +--
- include/trace/events/wbt.h       |   8 +--
- mm/backing-dev.c                 |  13 ++++-
- tools/cgroup/iocost_monitor.py   |   7 ++-
- 12 files changed, 107 insertions(+), 68 deletions(-)
-
--- 
-Jens Axboe
-
+             Linus
