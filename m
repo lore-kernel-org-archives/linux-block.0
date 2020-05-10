@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB24C47257
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 00:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 527E4C47255
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 00:59:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B590C20746
-	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 00:36:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CD1F20820
+	for <linux-block@archiver.kernel.org>; Sun, 10 May 2020 00:59:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728883AbgEJAgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 May 2020 20:36:15 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:46837 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726778AbgEJAgO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 20:36:14 -0400
-Received: by mail-pg1-f193.google.com with SMTP id q124so2700033pgq.13;
-        Sat, 09 May 2020 17:36:13 -0700 (PDT)
+        id S1728005AbgEJA67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 May 2020 20:58:59 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:40702 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726320AbgEJA67 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 May 2020 20:58:59 -0400
+Received: by mail-pf1-f193.google.com with SMTP id x2so2943976pfx.7;
+        Sat, 09 May 2020 17:58:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=SQF8VGNw/LWoe9FfZGxpzTCfdvJXZRTz9yGixScGhPs=;
-        b=qfvcu0K3EvzWUREclK/jjWSv3eUWCHQjL7qjT3vjJqMi4635F4NwrG/3O51IAT1HMF
-         JEKE91L3MA6mKHRHA6flh5vEcJUr8WQNiqJ6RRRgQyr8jespEGnQ23b/r6r/nNPN2Cpq
-         Fp8gyWyF8CmclGQLzKZ0tQGc41wXaXPniBJFwMqRu0/HbtgF44wLbqJ4i6ClfiPas7Xm
-         qO7etrJlOBRs5MTw2B9QOPi8EsDaTq4496iBKTjFE9POjD0U/R9udZ+a+PRig6l6rT1y
-         Z3VhZmDTkX2IBqkOhisbClOemXZIzq/7OGVf+5Csrh/yPjASUF1Be3Lh2O/mjTgaZeDB
-         Uo5w==
-X-Gm-Message-State: AGi0PuYhtSvFybeX4JjaL6E6pzEfm2kow+2aOnK26M9tjO8FgKZ12EqD
-        8zqvGOjJSSwflqB0pURA0V8=
-X-Google-Smtp-Source: APiQypLzWG+D3I3lGRvqUjjthvsCMHM3xjJIhlNwyoTH7tORaG4skYeDsbtO5wgVmwoRSn49F59p9Q==
-X-Received: by 2002:a63:7219:: with SMTP id n25mr8505744pgc.358.1589070972603;
-        Sat, 09 May 2020 17:36:12 -0700 (PDT)
+        bh=yfUa5/GMebpHoQEUALnocZ9Dgl1/06CN6EeJFJKAbNQ=;
+        b=bzmEGyFEbKHMm76nA8qtbSXiofedTme8vxEbJidS4JVG9Z7ZIN/pc6ILxvRUyXzGrG
+         dwN3YptxMaexKNNKW+bp72wqC6fBmgbT+yqhVYrqi+8Nyw2JC1gS5PE4R4nTnQhZ3+e8
+         77xf9X9GmJPUOPwqWgAshYr96qIHSU/lWKwQdgv79y3B5zCP8+fWA3U4DcbXMJ4/cCpr
+         Z3V0uZZC36g4wclPzcwZzZaE0hajGXm1T3ILVneyddYVJk/iSs7KmgiSpJg3XtE6d8UA
+         Bv8gbLwTkK8c1NImuKw87Dp3E+miiBppUyhpiIzu/WrT/ScRSI4MXM04K74rH3uuhELD
+         EcWw==
+X-Gm-Message-State: AGi0PuYBP08aas0v9XjHDqEbXLCSY83Y3BBKflyqQTFWy+6ZsKQFyeVh
+        pBrzA1NCSQjkIFoDZQ6omzo=
+X-Google-Smtp-Source: APiQypLYkSBo0TBjhEQ+R96aJthWe8iLfsZ+cHLA2raK3w24x3SiMYwkLmSdk5dalLwBo3nuhevZxA==
+X-Received: by 2002:aa7:9ae5:: with SMTP id y5mr9892469pfp.294.1589072337962;
+        Sat, 09 May 2020 17:58:57 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:8ef:746a:4fe7:1df? ([2601:647:4000:d7:8ef:746a:4fe7:1df])
-        by smtp.gmail.com with ESMTPSA id z6sm5386018pfb.87.2020.05.09.17.36.10
+        by smtp.gmail.com with ESMTPSA id c4sm4526784pga.73.2020.05.09.17.58.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 May 2020 17:36:11 -0700 (PDT)
-Subject: Re: [PATCH v4 1/5] block: revert back to synchronous request_queue
- removal
+        Sat, 09 May 2020 17:58:57 -0700 (PDT)
+Subject: Re: [PATCH v4 3/5] blktrace: fix debugfs use after free
 To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
         viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
         rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
@@ -52,9 +51,10 @@ Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
         Michal Hocko <mhocko@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
+        Christof Schmitt <christof.schmitt@de.ibm.com>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
 References: <20200509031058.8239-1-mcgrof@kernel.org>
- <20200509031058.8239-2-mcgrof@kernel.org>
+ <20200509031058.8239-4-mcgrof@kernel.org>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -79,12 +79,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <3969cc50-eef7-0b39-58eb-a19535a61d15@acm.org>
-Date:   Sat, 9 May 2020 17:36:09 -0700
+Message-ID: <16fe176f-1dbd-d14c-bfc2-5aee1ca8c64e@acm.org>
+Date:   Sat, 9 May 2020 17:58:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200509031058.8239-2-mcgrof@kernel.org>
+In-Reply-To: <20200509031058.8239-4-mcgrof@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -94,16 +94,74 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-08 20:10, Luis Chamberlain wrote:
-> We revert back to synchronous request_queue removal because asynchronous
-> removal creates a regression with expected userspace interaction with
-> several drivers. An example is when removing the loopback driver, one
-> uses ioctls from userspace to do so, but upon return and if successful,
-> one expects the device to be removed. Likewise if one races to add another
-> device the new one may not be added as it is still being removed. This was
-> expected behavior before and it now fails as the device is still present
-> and busy still. Moving to asynchronous request_queue removal could have
-> broken many scripts which relied on the removal to have been completed if
-> there was no error. Document this expectation as well so that this
-> doesn't regress userspace again.
+> Screenshots of what the debugfs for block looks like after running
+> blktrace on a system with sg0  which has a raid controllerand then sg1
+> as the media changer:
+> 
+>  # ls -l /sys/kernel/debug/block
+> total 0
+> drwxr-xr-x  3 root root 0 May  9 02:31 bsg
+> drwxr-xr-x 19 root root 0 May  9 02:31 nvme0n1
+> drwxr-xr-x 19 root root 0 May  9 02:31 nvme1n1
+> lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p1 -> nvme1n1
+> lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p2 -> nvme1n1
+> lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p3 -> nvme1n1
+> lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p5 -> nvme1n1
+> lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p6 -> nvme1n1
+> drwxr-xr-x  2 root root 0 May  9 02:33 sch0
+> lrwxrwxrwx  1 root root 0 May  9 02:33 sg0 -> bsg/2:0:0:0
+> lrwxrwxrwx  1 root root 0 May  9 02:33 sg1 -> sch0
+> drwxr-xr-x  5 root root 0 May  9 02:31 vda
+> lrwxrwxrwx  1 root root 0 May  9 02:31 vda1 -> vda
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+So this patch creates one soft link per partition at partition creation
+time instead of letting the blktrace code create one directory per
+partition when tracing starts? Does this break running blktrace
+simultaneously for a partition and for the entire block device?
+
+> +static struct dentry *queue_debugfs_symlink_type(struct request_queue *q,
+> +						 const char *src,
+> +						 const char *dst,
+> +						 enum blk_debugfs_dir_type type)
+> +{
+> +	struct dentry *dentry = ERR_PTR(-EINVAL);
+> +	char *dir_dst;
+> +
+> +	dir_dst = kzalloc(PATH_MAX, GFP_KERNEL);
+> +	if (!dir_dst)
+> +		return dentry;
+> +
+> +	switch (type) {
+> +	case BLK_DBG_DIR_BASE:
+> +		if (dst)
+> +			snprintf(dir_dst, PATH_MAX, "%s", dst);
+> +		else if (!IS_ERR_OR_NULL(q->debugfs_dir))
+> +			snprintf(dir_dst, PATH_MAX, "%s",
+> +				 q->debugfs_dir->d_name.name);
+> +		else
+> +			goto out;
+> +		break;
+> +	case BLK_DBG_DIR_BSG:
+> +		if (dst)
+> +			snprintf(dir_dst, PATH_MAX, "bsg/%s", dst);
+> +		else
+> +			goto out;
+> +		break;
+> +	}
+> +
+> +	/*
+> +	 * The base block debugfs directory is always used for the symlinks,
+> +	 * their target is what changes.
+> +	 */
+> +	dentry = debugfs_create_symlink(src, blk_debugfs_root, dir_dst);
+> +out:
+> +	kfree(dir_dst);
+> +
+> +	return dentry;
+> +}
+
+Please use kasprintf() instead of k?alloc() followed by snprintf().
+
+Thanks,
+
+Bart.
