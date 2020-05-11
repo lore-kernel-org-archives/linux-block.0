@@ -2,162 +2,121 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60CFC47255
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F33C54E8D
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0DD3206F5
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:44:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589204650;
-	bh=4h6G9rkMT8l8vBNm1zRhTYwtBa/mOWNiu+MhttV3w70=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=rJcK10Su0BYtA4vtn2oJOU28llIILY9YC1OE3RvOBgWIaMT88g4FOqSSsRBUOSmL4
-	 iGE6weDolb6NvT+iZQof6H9JfPFA5PapYx0dgNKyuRLLZOf8tUrpUK5UjXJE1sbfEq
-	 fgprHt8AoRKiEM2UT2SxxbBgsLqhqR77VW4SQguw=
+	by mail.kernel.org (Postfix) with ESMTP id 134AD206F5
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VYbJbgPu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729744AbgEKNoK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 09:44:10 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39353 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729279AbgEKNoJ (ORCPT
+        id S1730154AbgEKNxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 09:53:09 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:42142 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbgEKNxH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 09:44:09 -0400
-Received: by mail-pg1-f194.google.com with SMTP id u35so1595761pgk.6;
-        Mon, 11 May 2020 06:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5yHRVmEBHBF6KUpzT1FQxGuYFGjZXqYCJKdOUr/BlMY=;
-        b=GQXgi9BOMOKAMnByHXvS5F7TeT4AFu/Ph9GfLIxDab4HGWH4187k7gFSQAcZh0qo1b
-         GoK5GZDGW5KbpdUm7HKshJ8gTaViYQ0tWonkXWj8+v1a3w7G6aMbHHmpD2XNLWSP53Fx
-         4QMtBWlKotFdDB9ZzseM+ERHn1J9HTLeE0z6l7zi1x3xOCHNdpEKwP2gfjUi569ZNs7j
-         uJmQBQg4jbZv/IE6BJHXqiX7bEEjA3OVVhGwLqjUWm6EJfJw2AGEqvnGnW5oVtcivDH2
-         1LwcFEt/c8Gc96R4n0B8nvXmBBtXk/YTcwnh2+M3A5vMcxD7WT/ZTwwcZBpddAXYQGDy
-         rjFw==
-X-Gm-Message-State: AGi0PuaiAFDGmtGlZQhRyt9F0Y8lCS+01gfSePbFzrm8RiG08asWvnCE
-        iYOxGGOSeZNDPYdyjiHo5KM=
-X-Google-Smtp-Source: APiQypJZxZWizCffxSnbXzlu9+47Vc63kaG97XNasN1vCFXE0FAeRKKvcKq6QPjG+beSAzIPcVOfbg==
-X-Received: by 2002:aa7:808e:: with SMTP id v14mr16890723pff.168.1589204648826;
-        Mon, 11 May 2020 06:44:08 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id d203sm9037695pfd.79.2020.05.11.06.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2020 06:44:07 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id A405640605; Mon, 11 May 2020 13:44:06 +0000 (UTC)
-Date:   Mon, 11 May 2020 13:44:06 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Christof Schmitt <christof.schmitt@de.ibm.com>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v4 3/5] blktrace: fix debugfs use after free
-Message-ID: <20200511134406.GN11244@42.do-not-panic.com>
-References: <20200509031058.8239-1-mcgrof@kernel.org>
- <20200509031058.8239-4-mcgrof@kernel.org>
- <16fe176f-1dbd-d14c-bfc2-5aee1ca8c64e@acm.org>
+        Mon, 11 May 2020 09:53:07 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04BDWknA076131;
+        Mon, 11 May 2020 13:53:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=FtM+gMxLTOLf0lKicDrEd2XZcK5uSSAqMnINaDIJG7A=;
+ b=VYbJbgPu9Emlcp83x4XqBnNj4FNHwDgArI9/mxl58Q4wka/TqY13pgRXvEYFlPTEkD3u
+ 22PwikKKaqsTa0tkbEZ8DFFD5fk28XsBgF8gLzsgucrzICukyb4iSuRuOdaI77uBQODB
+ LeiyrA3QRASi1IOMUMs2ubwcUrlG4LZAi4NJSkE+jMBtwx5NOTEW8Vv2VpJ0+70qlekc
+ 7YZQQFDUDKw9gcFbxcPBkO7KIja2MQO3ijsMtBUCzK5ORYltfI1oKm604x+uAauN3dVV
+ ++4sOMuqCCT8bfemAb6F9lSR+vdMXFnvWIFSTJML/aKsNy2FmJCgOr6a72T3KFi92wNd Yg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 30x3gmd6sb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 11 May 2020 13:53:05 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04BDYDwu090002;
+        Mon, 11 May 2020 13:51:05 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 30x69r24gy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 May 2020 13:51:04 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04BDp30S005428;
+        Mon, 11 May 2020 13:51:03 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 11 May 2020 06:51:03 -0700
+Date:   Mon, 11 May 2020 16:50:58 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     javier@javigon.com
+Cc:     linux-block@vger.kernel.org
+Subject: [bug report] lightnvm: pblk: return NVM_ error on failed submission
+Message-ID: <20200511135058.GA216886@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <16fe176f-1dbd-d14c-bfc2-5aee1ca8c64e@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9617 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 adultscore=0
+ spamscore=0 suspectscore=3 mlxscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005110112
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9617 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ clxscore=1011 spamscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 suspectscore=3
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005110112
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 09, 2020 at 05:58:55PM -0700, Bart Van Assche wrote:
-> On 2020-05-08 20:10, Luis Chamberlain wrote:
-> > Screenshots of what the debugfs for block looks like after running
-> > blktrace on a system with sg0  which has a raid controllerand then sg1
-> > as the media changer:
-> > 
-> >  # ls -l /sys/kernel/debug/block
-> > total 0
-> > drwxr-xr-x  3 root root 0 May  9 02:31 bsg
-> > drwxr-xr-x 19 root root 0 May  9 02:31 nvme0n1
-> > drwxr-xr-x 19 root root 0 May  9 02:31 nvme1n1
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p1 -> nvme1n1
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p2 -> nvme1n1
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p3 -> nvme1n1
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p5 -> nvme1n1
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 nvme1n1p6 -> nvme1n1
-> > drwxr-xr-x  2 root root 0 May  9 02:33 sch0
-> > lrwxrwxrwx  1 root root 0 May  9 02:33 sg0 -> bsg/2:0:0:0
-> > lrwxrwxrwx  1 root root 0 May  9 02:33 sg1 -> sch0
-> > drwxr-xr-x  5 root root 0 May  9 02:31 vda
-> > lrwxrwxrwx  1 root root 0 May  9 02:31 vda1 -> vda
-> 
-> So this patch creates one soft link per partition at partition creation
-> time instead of letting the blktrace code create one directory per
-> partition when tracing starts?
+Hello Javier González,
 
-Yes.
+The patch b6730dd4a954: "lightnvm: pblk: return NVM_ error on failed
+submission" from Jun 1, 2018, leads to the following static checker
+warning:
 
-> Does this break running blktrace
-> simultaneously for a partition and for the entire block device?
+	drivers/lightnvm/pblk-recovery.c:473 pblk_recov_scan_oob()
+	warn: 'pblk->inflight_io.counter' not decremented on lines: 426.
 
-blktrace already has this limitation, one blktrace is only allowed per
-request_queue, the next patch clarifies this, as we currently just error
-out without telling the user what has happened.e user what has
-happened.e user what has happened.e user what has happened.
+drivers/lightnvm/pblk-recovery.c
+   417  
+   418                  for (j = 0; j < pblk->min_write_pgs; j++, i++)
+   419                          ppa_list[i] =
+   420                                  addr_to_gen_ppa(pblk, paddr + j, line->id);
+   421          }
+   422  
+   423          ret = pblk_submit_io_sync(pblk, rqd, data);
+   424          if (ret) {
+   425                  pblk_err(pblk, "I/O submission failed: %d\n", ret);
+   426                  return ret;
 
-> > +static struct dentry *queue_debugfs_symlink_type(struct request_queue *q,
-> > +						 const char *src,
-> > +						 const char *dst,
-> > +						 enum blk_debugfs_dir_type type)
-> > +{
-> > +	struct dentry *dentry = ERR_PTR(-EINVAL);
-> > +	char *dir_dst;
-> > +
-> > +	dir_dst = kzalloc(PATH_MAX, GFP_KERNEL);
-> > +	if (!dir_dst)
-> > +		return dentry;
-> > +
-> > +	switch (type) {
-> > +	case BLK_DBG_DIR_BASE:
-> > +		if (dst)
-> > +			snprintf(dir_dst, PATH_MAX, "%s", dst);
-> > +		else if (!IS_ERR_OR_NULL(q->debugfs_dir))
-> > +			snprintf(dir_dst, PATH_MAX, "%s",
-> > +				 q->debugfs_dir->d_name.name);
-> > +		else
-> > +			goto out;
-> > +		break;
-> > +	case BLK_DBG_DIR_BSG:
-> > +		if (dst)
-> > +			snprintf(dir_dst, PATH_MAX, "bsg/%s", dst);
-> > +		else
-> > +			goto out;
-> > +		break;
-> > +	}
-> > +
-> > +	/*
-> > +	 * The base block debugfs directory is always used for the symlinks,
-> > +	 * their target is what changes.
-> > +	 */
-> > +	dentry = debugfs_create_symlink(src, blk_debugfs_root, dir_dst);
-> > +out:
-> > +	kfree(dir_dst);
-> > +
-> > +	return dentry;
-> > +}
-> 
-> Please use kasprintf() instead of k?alloc() followed by snprintf().
+The pblk_submit_io_sync() increments the pblk->inflight_io counter but
+doesn't decrement it on all error paths.  It looks like something a
+little bit subtle is going no but I'm not sure how it works exactly.
 
-Sure thing.
+   427          }
+   428  
+   429          atomic_dec(&pblk->inflight_io);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  Luis
+   430  
+   431          /* If a read fails, do a best effort by padding the line and retrying */
+   432          if (rqd->error && rqd->error != NVM_RSP_WARN_HIGHECC) {
+   433                  int pad_distance, ret;
+   434  
+   435                  if (padded) {
+   436                          pblk_log_read_err(pblk, rqd);
+   437                          return -EINTR;
+   438                  }
+   439  
+
+regards,
+dan carpenter
