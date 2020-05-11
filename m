@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1068EC47255
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F37E8C54E91
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E349B206D6
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0E87206D9
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hw8fpgYL"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="bucyy1Tp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730280AbgEKNxh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 09:53:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
+        id S1730284AbgEKNxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 09:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730272AbgEKNxg (ORCPT
+        by vger.kernel.org with ESMTP id S1730285AbgEKNxj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 09:53:36 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BEEC05BD0A
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:34 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id 50so10536870wrc.11
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:34 -0700 (PDT)
+        Mon, 11 May 2020 09:53:39 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715C9C05BD0A
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:37 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id g14so6926341wme.1
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ABTh14ev+P/f9P0n3v/650QyNCupd96ARjVjo3ZVvN8=;
-        b=hw8fpgYLi38z3qy/Es87v+wJ47AsNXK3mkV0rybmx3+3xu7WvE282cT4G9gCDUT4N+
-         RLLaPEmO1E3C+gNHdJG3voo5xNWVIvu1Top+NemzerKPVKetv+l42vm3eLrk6xV9NYQb
-         Oy09eBG9XCBHuoBPTC9vvD3MPAf5TuKzgFhjZM7OOi9gUAghm9vBjmNoIkYGm/Y7a+OX
-         dWI70kln44YxXwSXf7Hpb78QnBye6vJQjHf4a7CcasvbG98FeOfJRaGqXYSJ7PxXOjsS
-         NyWqcLeuMi8MxrGEdQiWpcd3YK5g/mVe9TX+W0pbhtPS+WJLSfvTDTr0viiJ9aMF0j0e
-         Zitg==
+        bh=gn68bNVSNHciCtQWHr1NVTfhRzOYW2ukgjidraGWe8g=;
+        b=bucyy1TpemLx27yTcVQYpa+K1mmHdqqsNlYZmsXbw3xk3C+wwTUAx8cCSEiPhJaMEN
+         mWJ6s5UziLk5epjQrk4Y2/BS9/UDZWkw6q2uEn/vVm/Z1rAudu0Pr3NT4I1Vzsw8yXSd
+         3oBU2Ne2z4H+GwY8jJ3nCfzpL8Kkm/sUZpK6xD0eJyR/qtM9f+YN5NGLDCZtrAoZKlNd
+         IG5FyRssLsU2I+XtDO5gPr60CLVxXHVR7qIuREJnsQ9n1PcwWXr4LQi9rMGhMNy/UbkY
+         fh4CX2AJ1044eAZa5IbXN65qTzHeYtUSGSEfvElcgtwsLm3N7iJ47644G7Vwztzinr2Z
+         XvNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ABTh14ev+P/f9P0n3v/650QyNCupd96ARjVjo3ZVvN8=;
-        b=GmLHTA4v5k1Jhog0YV45CHqp+QZq7kSc1PYUMiNuUnlXZQtXgXjBi2Ghve2f6no6gC
-         UdSj067H8m+oRIDk1iE0mUfPzlqKDjS5p0Iy9rGL9wmCnsUcdy4WMK2AWY+E4XGebRIH
-         my+vvAPtflfBdFOSWQBIwrENS8shakNNI9x5erENfI03vMjCzI20Stpi/45UKqQE/cEc
-         qjiLYPU8/uT7AI0JR2mUZZNMIL8gwosXfOXOxhnWJ8o5JfXpyHGfd0UWcAII9FsQ1d02
-         JC8L8546jgxKAnjQ1x8DmEpP520KPnmdFg6DthQ0FH/FoDR9ukv2nQhXRaXKSmKpCz3I
-         vuQg==
-X-Gm-Message-State: AGi0PubVYm/UPiekaNbk9RGr4nCBEfmrtoeaxTIqFcKxvuCIvfmUvYk9
-        LRIj3Fp708OutQEysD01d/ZMT+Tim16VjBA=
-X-Google-Smtp-Source: APiQypI70ZI6CrrZHi6tupU41izx6iSy5LN5z1dvsruHYlQwU87WBXpjQ9TktdMB3z0iIj3JUDkclg==
-X-Received: by 2002:a05:6000:1045:: with SMTP id c5mr4882223wrx.31.1589205213411;
-        Mon, 11 May 2020 06:53:33 -0700 (PDT)
+        bh=gn68bNVSNHciCtQWHr1NVTfhRzOYW2ukgjidraGWe8g=;
+        b=t7z/jlxw9oD9aMEtk2/NA+CyNTRexmuYFONUzMJjulwKld2qkVlu99FkM7KlyG3EXq
+         cH3fz0lnByCnYtHX1i7DPg5KiqvLaK6VmvluPDyoJ9ps6M3sLua1Z3bkycUlnVVyH4jI
+         Rl/C+XHt+8ql3qtmVQJSVOr8rhHI0SxtJRqJHGRDd7f+ctMGFT6wT/1yNFxGZZRojOSx
+         /OE01gUpESGMW/az8WnKmX3Z2Cgaxgq8M1bhRteQLF3XeWR5UcPsQ6CdwWSLZPGgfPgp
+         Dr6Kkz24zAT8Egvf48/US9qok4PmLvtidWyPxQ54IAI090r2FIhwikXZdp/D05W3WXy4
+         VEFA==
+X-Gm-Message-State: AGi0Pua9mrHJ4sWiPh19lnIjr+WQypDvEQH8kZh3W/fz1rb0Hoc6svjI
+        WFDjQdT36nQvnA5RQFrrqCc4bkcPC7glzWU=
+X-Google-Smtp-Source: APiQypLjdviCPNoFN3Yjn1XiMU3KjpeXQ4ZgjdKx3N1PwWsWByEmDWKXGaH0ZzPa9NgBEfYetD4J7g==
+X-Received: by 2002:a7b:caf2:: with SMTP id t18mr9342881wml.35.1589205215972;
+        Mon, 11 May 2020 06:53:35 -0700 (PDT)
 Received: from dkxps.local (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
-        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.32
+        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2020 06:53:32 -0700 (PDT)
+        Mon, 11 May 2020 06:53:35 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v15 21/25] block/rnbd: server: functionality for IO submitting to block dev
-Date:   Mon, 11 May 2020 15:51:27 +0200
-Message-Id: <20200511135131.27580-22-danil.kipnis@cloud.ionos.com>
+Subject: [PATCH v15 23/25] block/rnbd: include client and server modules into kernel compilation
+Date:   Mon, 11 May 2020 15:51:29 +0200
+Message-Id: <20200511135131.27580-24-danil.kipnis@cloud.ionos.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
 References: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
@@ -79,256 +79,99 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This provides helper functions for IO submitting to block dev.
+Add rnbd Makefile, Kconfig and also corresponding lines into upper
+block layer files.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/rnbd/rnbd-srv-dev.c | 134 ++++++++++++++++++++++++++++++
- drivers/block/rnbd/rnbd-srv-dev.h |  92 ++++++++++++++++++++
- 2 files changed, 226 insertions(+)
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
- create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
+ drivers/block/Kconfig       |  2 ++
+ drivers/block/Makefile      |  1 +
+ drivers/block/rnbd/Kconfig  | 28 ++++++++++++++++++++++++++++
+ drivers/block/rnbd/Makefile | 15 +++++++++++++++
+ 4 files changed, 46 insertions(+)
+ create mode 100644 drivers/block/rnbd/Kconfig
+ create mode 100644 drivers/block/rnbd/Makefile
 
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 025b1b77b11a..084b9efcefca 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -458,4 +458,6 @@ config BLK_DEV_RSXX
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called rsxx.
+ 
++source "drivers/block/rnbd/Kconfig"
++
+ endif # BLK_DEV
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 795facd8cf19..e1f63117ee94 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -39,6 +39,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
+ 
+ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+ obj-$(CONFIG_ZRAM) += zram/
++obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
+ 
+ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+ null_blk-objs	:= null_blk_main.o
+diff --git a/drivers/block/rnbd/Kconfig b/drivers/block/rnbd/Kconfig
 new file mode 100644
-index 000000000000..5eddfd29ab64
+index 000000000000..4b6d3d816d1f
 --- /dev/null
-+++ b/drivers/block/rnbd/rnbd-srv-dev.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RDMA Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-+ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-+ */
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++++ b/drivers/block/rnbd/Kconfig
+@@ -0,0 +1,28 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
 +
-+#include "rnbd-srv-dev.h"
-+#include "rnbd-log.h"
++config BLK_DEV_RNBD
++	bool
 +
-+struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
-+			       struct bio_set *bs)
-+{
-+	struct rnbd_dev *dev;
-+	int ret;
++config BLK_DEV_RNBD_CLIENT
++	tristate "RDMA Network Block Device driver client"
++	depends on INFINIBAND_RTRS_CLIENT
++	select BLK_DEV_RNBD
++	help
++	  RNBD client is a network block device driver using rdma transport.
 +
-+	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-+	if (!dev)
-+		return ERR_PTR(-ENOMEM);
++	  RNBD client allows for mapping of a remote block devices over
++	  RTRS protocol from a target system where RNBD server is running.
 +
-+	dev->blk_open_flags = flags;
-+	dev->bdev = blkdev_get_by_path(path, flags, THIS_MODULE);
-+	ret = PTR_ERR_OR_ZERO(dev->bdev);
-+	if (ret)
-+		goto err;
++	  If unsure, say N.
 +
-+	dev->blk_open_flags = flags;
-+	bdevname(dev->bdev, dev->name);
-+	dev->ibd_bio_set = bs;
++config BLK_DEV_RNBD_SERVER
++	tristate "RDMA Network Block Device driver server"
++	depends on INFINIBAND_RTRS_SERVER
++	select BLK_DEV_RNBD
++	help
++	  RNBD server is the server side of RNBD using rdma transport.
 +
-+	return dev;
++	  RNBD server allows for exporting local block devices to a remote client
++	  over RTRS protocol.
 +
-+err:
-+	kfree(dev);
-+	return ERR_PTR(ret);
-+}
-+
-+void rnbd_dev_close(struct rnbd_dev *dev)
-+{
-+	blkdev_put(dev->bdev, dev->blk_open_flags);
-+	kfree(dev);
-+}
-+
-+static void rnbd_dev_bi_end_io(struct bio *bio)
-+{
-+	struct rnbd_dev_blk_io *io = bio->bi_private;
-+
-+	rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
-+	bio_put(bio);
-+}
-+
-+/**
-+ *	rnbd_bio_map_kern	-	map kernel address into bio
-+ *	@data: pointer to buffer to map
-+ *	@bs: bio_set to use.
-+ *	@len: length in bytes
-+ *	@gfp_mask: allocation flags for bio allocation
-+ *
-+ *	Map the kernel address into a bio suitable for io to a block
-+ *	device. Returns an error pointer in case of error.
-+ */
-+static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
-+				     unsigned int len, gfp_t gfp_mask)
-+{
-+	unsigned long kaddr = (unsigned long)data;
-+	unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	unsigned long start = kaddr >> PAGE_SHIFT;
-+	const int nr_pages = end - start;
-+	int offset, i;
-+	struct bio *bio;
-+
-+	bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
-+	if (!bio)
-+		return ERR_PTR(-ENOMEM);
-+
-+	offset = offset_in_page(kaddr);
-+	for (i = 0; i < nr_pages; i++) {
-+		unsigned int bytes = PAGE_SIZE - offset;
-+
-+		if (len <= 0)
-+			break;
-+
-+		if (bytes > len)
-+			bytes = len;
-+
-+		if (bio_add_page(bio, virt_to_page(data), bytes,
-+				    offset) < bytes) {
-+			/* we don't support partial mappings */
-+			bio_put(bio);
-+			return ERR_PTR(-EINVAL);
-+		}
-+
-+		data += bytes;
-+		len -= bytes;
-+		offset = 0;
-+	}
-+
-+	bio->bi_end_io = bio_put;
-+	return bio;
-+}
-+
-+int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
-+		       size_t len, u32 bi_size, enum rnbd_io_flags flags,
-+		       short prio, void *priv)
-+{
-+	struct rnbd_dev_blk_io *io;
-+	struct bio *bio;
-+
-+	/* Generate bio with pages pointing to the rdma buffer */
-+	bio = rnbd_bio_map_kern(data, dev->ibd_bio_set, len, GFP_KERNEL);
-+	if (IS_ERR(bio))
-+		return PTR_ERR(bio);
-+
-+	io = container_of(bio, struct rnbd_dev_blk_io, bio);
-+
-+	io->dev	= dev;
-+	io->priv = priv;
-+
-+	bio->bi_end_io = rnbd_dev_bi_end_io;
-+	bio->bi_private	= io;
-+	bio->bi_opf = rnbd_to_bio_flags(flags);
-+	bio->bi_iter.bi_sector = sector;
-+	bio->bi_iter.bi_size = bi_size;
-+	bio_set_prio(bio, prio);
-+	bio_set_dev(bio, dev->bdev);
-+
-+	submit_bio(bio);
-+
-+	return 0;
-+}
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
++	  If unsure, say N.
+diff --git a/drivers/block/rnbd/Makefile b/drivers/block/rnbd/Makefile
 new file mode 100644
-index 000000000000..0f65b09a270e
+index 000000000000..5bb1a7ad1ada
 --- /dev/null
-+++ b/drivers/block/rnbd/rnbd-srv-dev.h
-@@ -0,0 +1,92 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * RDMA Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-+ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-+ */
-+#ifndef RNBD_SRV_DEV_H
-+#define RNBD_SRV_DEV_H
++++ b/drivers/block/rnbd/Makefile
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
 +
-+#include <linux/fs.h>
-+#include "rnbd-proto.h"
++ccflags-y := -I$(srctree)/drivers/infiniband/ulp/rtrs
 +
-+struct rnbd_dev {
-+	struct block_device	*bdev;
-+	struct bio_set		*ibd_bio_set;
-+	fmode_t			blk_open_flags;
-+	char			name[BDEVNAME_SIZE];
-+};
++rnbd-client-y := rnbd-clt.o \
++		  rnbd-clt-sysfs.o \
++		  rnbd-common.o
 +
-+struct rnbd_dev_blk_io {
-+	struct rnbd_dev *dev;
-+	void		 *priv;
-+	/* have to be last member for front_pad usage of bioset_init */
-+	struct bio	bio;
-+};
++rnbd-server-y := rnbd-common.o \
++		  rnbd-srv.o \
++		  rnbd-srv-dev.o \
++		  rnbd-srv-sysfs.o
 +
-+/**
-+ * rnbd_dev_open() - Open a device
-+ * @flags:	open flags
-+ * @bs:		bio_set to use during block io,
-+ */
-+struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
-+			       struct bio_set *bs);
-+
-+/**
-+ * rnbd_dev_close() - Close a device
-+ */
-+void rnbd_dev_close(struct rnbd_dev *dev);
-+
-+void rnbd_endio(void *priv, int error);
-+
-+static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
-+{
-+	return queue_max_segments(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_max_hw_sects(const struct rnbd_dev *dev)
-+{
-+	return queue_max_hw_sectors(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_secure_discard(const struct rnbd_dev *dev)
-+{
-+	return blk_queue_secure_erase(bdev_get_queue(dev->bdev));
-+}
-+
-+static inline int rnbd_dev_get_max_discard_sects(const struct rnbd_dev *dev)
-+{
-+	if (!blk_queue_discard(bdev_get_queue(dev->bdev)))
-+		return 0;
-+
-+	return blk_queue_get_max_sectors(bdev_get_queue(dev->bdev),
-+					 REQ_OP_DISCARD);
-+}
-+
-+static inline int rnbd_dev_get_discard_granularity(const struct rnbd_dev *dev)
-+{
-+	return bdev_get_queue(dev->bdev)->limits.discard_granularity;
-+}
-+
-+static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
-+{
-+	return bdev_get_queue(dev->bdev)->limits.discard_alignment;
-+}
-+
-+/**
-+ * rnbd_dev_submit_io() - Submit an I/O to the disk
-+ * @dev:	device to that the I/O is submitted
-+ * @sector:	address to read/write data to
-+ * @data:	I/O data to write or buffer to read I/O date into
-+ * @len:	length of @data
-+ * @bi_size:	Amount of data that will be read/written
-+ * @prio:       IO priority
-+ * @priv:	private data passed to @io_fn
-+ */
-+int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
-+			size_t len, u32 bi_size, enum rnbd_io_flags flags,
-+			short prio, void *priv);
-+
-+#endif /* RNBD_SRV_DEV_H */
++obj-$(CONFIG_BLK_DEV_RNBD_CLIENT) += rnbd-client.o
++obj-$(CONFIG_BLK_DEV_RNBD_SERVER) += rnbd-server.o
 -- 
 2.20.1
 
