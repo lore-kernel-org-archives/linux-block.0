@@ -2,135 +2,128 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EA0C54E4B
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 11:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BC3C47255
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 12:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D30942075E
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 11:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CBE220722
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 12:58:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UuCHmTpL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GN28oAOF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729679AbgEKLrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 07:47:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36037 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729661AbgEKLrx (ORCPT
+        id S1728090AbgEKM6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 08:58:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728000AbgEKM6P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 07:47:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589197671;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3w35s2VPWNSVC4QQTyJuFQK6xGQBwZTv524lsRRQU4Y=;
-        b=UuCHmTpLYbqr0HtFbWb6kVOgjf2hyzQTZ4Yki1lF6fq2YDXCzawF2y2dNc+JGpMmoHs06V
-        3O/dLnl28VmG73zbSeOmmFSNs1uKM6jxgWdSMX9t1RmcZc0pGZ0Pj7vVtQI/M2T0c8anPh
-        wTRd01KjJIJESr7Bs/y3GmC1u4RusiQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-yydiaoxdN2W6BzEXr0MpJA-1; Mon, 11 May 2020 07:47:48 -0400
-X-MC-Unique: yydiaoxdN2W6BzEXr0MpJA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 111578010FA;
-        Mon, 11 May 2020 11:47:46 +0000 (UTC)
-Received: from T590 (ovpn-13-75.pek2.redhat.com [10.72.13.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C0787526B;
-        Mon, 11 May 2020 11:47:35 +0000 (UTC)
-Date:   Mon, 11 May 2020 19:47:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Baolin Wang <baolin.wang7@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Chunyan Zhang <zhang.lyra@gmail.com>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] block: Extand commit_rqs() to do batch
- processing
-Message-ID: <20200511114731.GA1525935@T590>
-References: <20200427154645.GA1201@infradead.org>
- <e4d47000-f89c-a135-ae58-011f0e9cc39e@grimberg.me>
- <20200508214639.GA1389136@T590>
- <fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me>
- <20200508232222.GA1391368@T590>
- <CADBw62ooysT7TJ5CjpPBC6zs7pvpUQysg8QqP9oW5jN7BSYS7g@mail.gmail.com>
- <20200509094306.GA1414369@T590>
- <6579459b-aa98-78f2-f805-a6cd46f37b6c@grimberg.me>
- <20200511012942.GA1418834@T590>
- <8f2ddabc-01d0-dae9-f958-1b26a6bdf58c@grimberg.me>
+        Mon, 11 May 2020 08:58:15 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D98C061A0C
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 05:58:14 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id j5so10847840wrq.2
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 05:58:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=xgo/W1NTLOik3Gx/GLdLFPd2eOnb6jseacsx6/zbNYQ=;
+        b=GN28oAOFyMLC3eH61pR/o4vAqZFpnTDzqczW9ZsELEz22P5qN0clea3CxZ1Z/+PUxR
+         xfU8edWHtSawVOs9ss2ygpCTBMJ2+9U3vMmQs1RGmIUnguWs0L2hz/3m9IehLJoh9/cq
+         NddR53RE7ACKIONdyBnzBeyNldZh3DtDbNlv2gtjdEX1IhgcY2e6Dobvf/RphcQZQgwt
+         LFSSepULaOF6ASe4LtqlEZlw4b9QYkQJK4SvL/p1H8WKVk9lFolJh9M4moAHuEe4Gbd9
+         hKVB3cLpkDST3dMQZpSpkaXbFf08vIq/MpzksSjL6nWnaaRulG3GCc/YZo1EdnAn8oIr
+         2Czg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=xgo/W1NTLOik3Gx/GLdLFPd2eOnb6jseacsx6/zbNYQ=;
+        b=IJ/LnihePNBwf0ccUHncm3FeAh4ZadPtf2XaBsnv+5FJkC9GDPCKYS1tI5B6SEK0QH
+         QC1v7bHKwtji78XUrMUtha7assrX2WQRuHJQvy56gk3l5+zrwpEKvBk1mGGWGwatNM+V
+         JZG4YVogGfbm3oLTpCJPgXvCn62omLtR8xuRRED9+7k4KndkZy9vPOF+EEgKC3bcnbXz
+         6svI6J6CNfclt7GlppHDVgYlVfjMzcSMB8Xa+x9F02rK4dMOwuepobCDXpx8GTmwzFJg
+         Hbo+95H6RJ6hejx0s0DfVtEdrXR1cVKi660XiF0HoCb+foBWxg+y2rzQaYTmLWkICxMd
+         QsUQ==
+X-Gm-Message-State: AGi0PuZBzJVGue5DURlKTbhNJALgnZW8H5Ykjrpr0FsfCc8/cqK8iDec
+        Mi+e74IUFSySuBCw7R/+Cr5xOZ5v2uhArOf4Zr4+Lw==
+X-Google-Smtp-Source: APiQypI2ntEi+1N5Y3AwLECWfi+aJ7i/YLH5yAXPeoFEYswSY4x8mWRCz1Ev+N61nXRTwiPQdIA31YEr1wGi3ESlmXc=
+X-Received: by 2002:a5d:5682:: with SMTP id f2mr18339836wrv.382.1589201893419;
+ Mon, 11 May 2020 05:58:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f2ddabc-01d0-dae9-f958-1b26a6bdf58c@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <CAG_fn=VBHmBgqLi35tD27NRLH2tEZLH=Y+rTfZ3rKNz9ipG+jQ@mail.gmail.com>
+ <d204a9d7-3722-5e55-d6cc-3018e366981e@kernel.dk> <CAG_fn=XXsjDsA0_MoTF3XfjSuLCc+6wRaOCY_ZDt661P_rSmOg@mail.gmail.com>
+ <BYAPR04MB57495B31CEA65B2B5D76203C864A0@BYAPR04MB5749.namprd04.prod.outlook.com>
+ <CAG_fn=WVHpRQ19MK12pxiizTEvUFLiV7LJgF_LrX_G2SYd=ivQ@mail.gmail.com> <277579c9-9e33-89ea-bfcd-bc14a543726c@acm.org>
+In-Reply-To: <277579c9-9e33-89ea-bfcd-bc14a543726c@acm.org>
+From:   Alexander Potapenko <glider@google.com>
+Date:   Mon, 11 May 2020 14:58:02 +0200
+Message-ID: <CAG_fn=WQXuTuGmC8oQ25f6DYJ4CiMSz7_S7Nkp+z6L1QL7Zokw@mail.gmail.com>
+Subject: Re: null_handle_cmd() doesn't initialize data when reading
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Willem de Bruijn <willemb@google.com>,
+        Dmitriy Vyukov <dvyukov@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 11, 2020 at 02:23:14AM -0700, Sagi Grimberg wrote:
-> 
-> > > > Basically, my idea is to dequeue request one by one, and for each
-> > > > dequeued request:
-> > > > 
-> > > > - we try to get a budget and driver tag, if both succeed, add the
-> > > > request to one per-task list which can be stored in stack variable,
-> > > > then continue to dequeue more request
-> > > > 
-> > > > - if either budget or driver tag can't be allocated for this request,
-> > > > marks the last request in the per-task list as .last, and send the
-> > > > batching requests stored in the list to LLD
-> > > > 
-> > > > - when queueing batching requests to LLD, if one request isn't queued
-> > > > to driver successfully, calling .commit_rqs() like before, meantime
-> > > > adding the remained requests in the per-task list back to scheduler
-> > > > queue or hctx->dispatch.
-> > > 
-> > > Sounds good to me.
-> > > 
-> > > > One issue is that this way might degrade sequential IO performance if
-> > > > the LLD just tells queue busy to blk-mq via return value of .queue_rq(),
-> > > > so I guess we still may need one flag, such as BLK_MQ_F_BATCHING_SUBMISSION.
-> > > 
-> > > Why is that degrading sequential I/O performance? because the specific
-> > 
-> > Some devices may only return BLK_STS_RESOURCE from .queue_rq(), then more
-> > requests are dequeued from scheduler queue if we always queue batching IOs
-> > to LLD, and chance of IO merge is reduced, so sequential IO performance will
-> > be effected.
-> > 
-> > Such as some scsi device which doesn't use sdev->queue_depth for
-> > throttling IOs.
-> > 
-> > For virtio-scsi or virtio-blk, we may stop queue for avoiding the
-> > potential affect.
-> 
-> Do we have a way to characterize such devices? I'd assume that most
+On Sun, May 10, 2020 at 6:20 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-05-10 03:03, Alexander Potapenko wrote:
+> > Thanks for the explanation!
+> > The code has changed recently, and my patch does not apply anymore,
+> > yet the problem still persists.
+> > I ended up just calling null_handle_rq() at the end of
+> > null_process_cmd(), but we probably need a cleaner fix.
+>
+> Does this (totally untested) patch help? copy_to_nullb() guarantees that
+> it will write some data to the pages that it allocates but does not
+> guarantee yet that all data of the pages it allocates is initialized.
 
-It may not be easy.
+No, this does not help. Apparently null_insert_page() is never called
+in this scenario.
+If I modify __page_cache_alloc() to allocate zero-initialized pages,
+the reports go away.
+This means there's no other uninitialized buffer that's copied to the
+page cache, the nullb driver just forgets to write anything to the
+page cache.
 
-> devices will benefit from the batching so maybe the flag needs to be
-> inverted? BLK_MQ_F_DONT_BATCHING_SUBMISSION?
+> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.=
+c
+> index 8efd8778e209..06f5761fccb6 100644
+> --- a/drivers/block/null_blk_main.c
+> +++ b/drivers/block/null_blk_main.c
+> @@ -848,7 +848,7 @@ static struct nullb_page *null_insert_page(struct
+> nullb *nullb,
+>
+>         spin_unlock_irq(&nullb->lock);
+>
+> -       t_page =3D null_alloc_page(GFP_NOIO);
+> +       t_page =3D null_alloc_page(GFP_NOIO | __GFP_ZERO);
+>         if (!t_page)
+>                 goto out_lock;
+>
 
-Actually I'd rather to not add any flag, and we may use some algorithm
-(maybe EWMA or other intelligent stuff, or use hctx->dispatch_busy directly)
-to figure out one dynamic batching number which is used to dequeue requests
-from scheduler or sw queue.
 
-Then just one single dispatch io code path is enough.
+--=20
+Alexander Potapenko
+Software Engineer
 
-Thanks, 
-Ming
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
 
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
