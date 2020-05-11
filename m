@@ -6,123 +6,126 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6CCC38A2A
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 01:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B95C38A2A
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 02:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E74892184D
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 01:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D58C206D7
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 02:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmYsQaBj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5NdBDaa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728873AbgEKBp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 May 2020 21:45:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53430 "EHLO
+        id S1729305AbgEKCLv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 May 2020 22:11:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48305 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728681AbgEKBp5 (ORCPT
+        with ESMTP id S1729102AbgEKCLu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 May 2020 21:45:57 -0400
+        Sun, 10 May 2020 22:11:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589161555;
+        s=mimecast20190719; t=1589163109;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qAtiMDhMtAAEKhNzP9Js1eMEZC/Ea63PvKScW2Iho9c=;
-        b=dmYsQaBj4OXrJ3urqfnnor2bquYnwCozg1B9yJTocZCIFTj9atlyTtYKAk/vVB0o2nWnSR
-        5oEbNlkQoB5E3TQIIC8Yk75DTXTeQwIzyL1xmpSS6VS46Ik9WRiEVDS2XMU6B4K+zkg/Vz
-        IMX8YgOclj6zzqPvk1CkkEqZtWDKdS0=
+        bh=7S8jgKgFppIdleXVmCwDJvLU57zYF6f2ubuP/BVl4Z0=;
+        b=b5NdBDaayCkXuZGXoyDjA28S55P7oJvvn5KdrWwwc5iVXx+nxtt83X3y2zLwTqGM1RwgSX
+        Id1aDRaL/yu/cpYaAFgKVTPEd1s+6sZJH6gZL3dzR+r+9VqkXWcgnvWpNTh2YsLDKF2xdL
+        o9t2GWgRYEvEDGWRgnw3kbpAvn9uJ6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-EaayVF84O7y46W3Cg75Nmg-1; Sun, 10 May 2020 21:45:51 -0400
-X-MC-Unique: EaayVF84O7y46W3Cg75Nmg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-165-1UIPOBwNMBeVbK2NscfUMA-1; Sun, 10 May 2020 22:11:47 -0400
+X-MC-Unique: 1UIPOBwNMBeVbK2NscfUMA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54F99835B41;
-        Mon, 11 May 2020 01:45:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2FE81899521;
+        Mon, 11 May 2020 02:11:45 +0000 (UTC)
 Received: from T590 (ovpn-13-75.pek2.redhat.com [10.72.13.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD27B5C1B2;
-        Mon, 11 May 2020 01:45:42 +0000 (UTC)
-Date:   Mon, 11 May 2020 09:45:38 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B4B325F7D5;
+        Mon, 11 May 2020 02:11:38 +0000 (UTC)
+Date:   Mon, 11 May 2020 10:11:33 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V10 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200511014538.GB1418834@T590>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V10 11/11] block: deactivate hctx when the hctx is
+ actually inactive
+Message-ID: <20200511021133.GC1418834@T590>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-8-ming.lei@redhat.com>
- <dbada06d-fcc4-55df-935e-2a46433f28a1@acm.org>
- <20200509022051.GC1392681@T590>
- <0f578345-5a51-b64a-e150-724cfb18dde4@acm.org>
- <20200509041042.GG1392681@T590>
- <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
+ <20200505020930.1146281-12-ming.lei@redhat.com>
+ <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 09, 2020 at 07:18:46AM -0700, Bart Van Assche wrote:
-> On 2020-05-08 21:10, Ming Lei wrote:
-> > queue freezing can only be applied on the request queue level, and not
-> > hctx level. When requests can't be completed, wait freezing just hangs
-> > for-ever.
+On Sat, May 09, 2020 at 07:07:55AM -0700, Bart Van Assche wrote:
+> On 2020-05-04 19:09, Ming Lei wrote:
+> > @@ -1373,28 +1375,16 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> >  	int srcu_idx;
+> >  
+> [ ... ]
+> >  	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+> > -		cpu_online(hctx->next_cpu)) {
+> > -		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
+> > -			raw_smp_processor_id(),
+> > -			cpumask_empty(hctx->cpumask) ? "inactive": "active");
+> > -		dump_stack();
+> > +	    cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) >=
+> > +	    nr_cpu_ids) {
+> > +		blk_mq_hctx_deactivate(hctx);
+> > +		return;
+> >  	}
 > 
-> That's indeed what I meant: freeze the entire queue instead of
-> introducing a new mechanism that freezes only one hardware queue at a time.
-
-No, the issue is exactly that one single hctx becomes inactive, and
-other hctx are still active and workable.
-
-If one entire queue is frozen because of some of CPUs are offline, how
-can userspace submit IO to this disk? You suggestion justs makes the
-disk not usable, that won't be accepted.
-
+> The blk_mq_hctx_deactivate() function calls blk_mq_resubmit_rq()
+> indirectly. From blk_mq_resubmit_rq():
 > 
-> Please clarify what "when requests can't be completed" means. Are you
-> referring to requests that take longer than expected due to e.g. a
-> controller lockup or to requests that take a long time intentionally?
+> +  /* avoid allocation failure by clearing NOWAIT */
+> +  nrq = blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
+> 
+> blk_get_request() calls blk_mq_alloc_request(). blk_mq_alloc_request()
+> calls blk_queue_enter(). blk_queue_enter() waits until a queue is
+> unfrozen if freezing of a queue has started. As one can see freezing a
+> queue triggers a queue run:
+> 
+> void blk_freeze_queue_start(struct request_queue *q)
+> {
+> 	mutex_lock(&q->mq_freeze_lock);
+> 	if (++q->mq_freeze_depth == 1) {
+> 		percpu_ref_kill(&q->q_usage_counter);
+> 		mutex_unlock(&q->mq_freeze_lock);
+> 		if (queue_is_mq(q))
+> 			blk_mq_run_hw_queues(q, false);
+> 	} else {
+> 		mutex_unlock(&q->mq_freeze_lock);
+> 	}
+> }
+> 
+> Does this mean that if queue freezing happens after hot unplugging
+> started that a deadlock will occur because the blk_mq_run_hw_queues()
+> call in blk_freeze_queue_start() will wait forever?
 
-If all CPUs in one hctx->cpumask are offline, the managed irq of this hw
-queue will be shutdown by genirq code, so any in-flight IO won't be
-completed or timedout after the managed irq is shutdown because of cpu
-offline.
+Yes, looks there is such issue.
 
-Some drivers may implement timeout handler, so these in-flight requests
-will be timed out, but still not friendly behaviour given the default
-timeout is too long.
+However, the wait forever isn't new with this patch, because all queued
+(in scheduler queue or sw queue)request may not be completed after this
+hctx becomes inactive.
 
-Some drivers don't implement timeout handler at all, so these IO won't
-be completed.
+One simple solution is to pass BLK_MQ_REQ_PREEMPT to blk_get_request()
+called in blk_mq_resubmit_rq() because at that time freezing wait won't
+return and it is safe to allocate a new request for completing old
+requests originated from inactive hctx.
 
-> The former case is handled by the block layer timeout handler. I propose
-> to handle the latter case by introducing a new callback function pointer
-> in struct blk_mq_ops that aborts all outstanding requests.
+I will do this way in V11.
 
-As I mentioned, timeout isn't a friendly behavior. Or not every driver
-implements timeout handler or well enough.
-
-> Request queue
-> freezing is such an important block layer mechanism that I think we
-> should require that all block drivers support freezing a request queue
-> in a short time.
-
-Firstly, we just need to drain in-flight requests and re-submit queued
-requests from one single hctx, and queue wide freezing causes whole
-userspace IOs blocked unnecessarily.
-
-Secondly, some requests may not be completed at all, so freezing can't
-work because freeze_wait may hang forever.
-
-
-Thanks, 
+Thanks,
 Ming
 
