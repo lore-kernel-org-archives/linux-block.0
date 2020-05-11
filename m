@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27821C54E92
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1068EC47255
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0316C206D9
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E349B206D6
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="CA+kUg9u"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hw8fpgYL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730240AbgEKNxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 09:53:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730282AbgEKNxh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1730280AbgEKNxh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 11 May 2020 09:53:37 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFE4C061A0E
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:36 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id z72so9756553wmc.2
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:36 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730272AbgEKNxg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 May 2020 09:53:36 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BEEC05BD0A
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:34 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id 50so10536870wrc.11
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=XkffJNStOBvRAiOGwO+3XR0/SnMIarXv0c30avQ1rKg=;
-        b=CA+kUg9uY6XtxhtfDWsF/Elja2ddcYQ2LnUyafCJymfosgbJGvi/pYDnjCZn1z5Myc
-         aQgwSabGqYlr08WTNvN9PIYwUEGjArHvUy6UcwSeWfdBkr1swIOHN3+r8HgLtH/3VgC1
-         13Jhd8A3ou2Lw6eNUqSrVa3f6G8eGfB7FqtJ1KHGVWS1HAJspJNfH4yde+RCfYfKMLkG
-         Uv+NH3RDmwwvALMl+VZaOYuUxiQ148ErynHFjN/khh+aq4+haQuAu8Y/+TWaPkOX7Aun
-         tpAIZUlmLyuk1TuCePMP+jca6QYaD6JjGMhCldxgN1QFzTXFPJnhCniB0wQTomNbYus0
-         PyCA==
+        bh=ABTh14ev+P/f9P0n3v/650QyNCupd96ARjVjo3ZVvN8=;
+        b=hw8fpgYLi38z3qy/Es87v+wJ47AsNXK3mkV0rybmx3+3xu7WvE282cT4G9gCDUT4N+
+         RLLaPEmO1E3C+gNHdJG3voo5xNWVIvu1Top+NemzerKPVKetv+l42vm3eLrk6xV9NYQb
+         Oy09eBG9XCBHuoBPTC9vvD3MPAf5TuKzgFhjZM7OOi9gUAghm9vBjmNoIkYGm/Y7a+OX
+         dWI70kln44YxXwSXf7Hpb78QnBye6vJQjHf4a7CcasvbG98FeOfJRaGqXYSJ7PxXOjsS
+         NyWqcLeuMi8MxrGEdQiWpcd3YK5g/mVe9TX+W0pbhtPS+WJLSfvTDTr0viiJ9aMF0j0e
+         Zitg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XkffJNStOBvRAiOGwO+3XR0/SnMIarXv0c30avQ1rKg=;
-        b=r2gPxdTvmzzzUFLJSX6v3WwEpBMq1XQZiRx7FDDaBVn2RUzgaffmOj8U05mT5t8/og
-         Y7MUYng5KM5fYBzfjXjGkAIl18nUFqTO5W12tg+2AfGlYQMTMjGLu9mCsCG4fxmf1kqD
-         DA9wIq+b4otHYXGVUpWNtCCWHuTG50Wj3ZGfayywutN4MUQsU08gffN6RXR8k+GQ+F+/
-         ty7CyVTwln1ZDqVkZr2XyQ3ilfAiXyABO2UnJVFmmWFiUXZfdEL47hqt47lgtcgSjxaS
-         FlbOCpVHT+7GPig9zgtSlTuvdWfO+qnAoHajoxJjkeWm6NFgu67Po7kj3eusbfGL6jsl
-         HZ4g==
-X-Gm-Message-State: AGi0PubBpZsfZF4/yFUerL/S12PAiQG1twHF5EAcCM1wJDDsHYjees7U
-        93AMkXqU1DiCEaTpa9ssChcti+HdiQ+3Wro=
-X-Google-Smtp-Source: APiQypJb+UpmjE+o3y5WXwGR9FiJuhnNn10lkFa8U3BQNulIPiFb1uZOr2iWQNI2VJ23TnKZzS7uVg==
-X-Received: by 2002:a1c:df46:: with SMTP id w67mr23622556wmg.130.1589205214646;
-        Mon, 11 May 2020 06:53:34 -0700 (PDT)
+        bh=ABTh14ev+P/f9P0n3v/650QyNCupd96ARjVjo3ZVvN8=;
+        b=GmLHTA4v5k1Jhog0YV45CHqp+QZq7kSc1PYUMiNuUnlXZQtXgXjBi2Ghve2f6no6gC
+         UdSj067H8m+oRIDk1iE0mUfPzlqKDjS5p0Iy9rGL9wmCnsUcdy4WMK2AWY+E4XGebRIH
+         my+vvAPtflfBdFOSWQBIwrENS8shakNNI9x5erENfI03vMjCzI20Stpi/45UKqQE/cEc
+         qjiLYPU8/uT7AI0JR2mUZZNMIL8gwosXfOXOxhnWJ8o5JfXpyHGfd0UWcAII9FsQ1d02
+         JC8L8546jgxKAnjQ1x8DmEpP520KPnmdFg6DthQ0FH/FoDR9ukv2nQhXRaXKSmKpCz3I
+         vuQg==
+X-Gm-Message-State: AGi0PubVYm/UPiekaNbk9RGr4nCBEfmrtoeaxTIqFcKxvuCIvfmUvYk9
+        LRIj3Fp708OutQEysD01d/ZMT+Tim16VjBA=
+X-Google-Smtp-Source: APiQypI70ZI6CrrZHi6tupU41izx6iSy5LN5z1dvsruHYlQwU87WBXpjQ9TktdMB3z0iIj3JUDkclg==
+X-Received: by 2002:a05:6000:1045:: with SMTP id c5mr4882223wrx.31.1589205213411;
+        Mon, 11 May 2020 06:53:33 -0700 (PDT)
 Received: from dkxps.local (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
-        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.33
+        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2020 06:53:34 -0700 (PDT)
+        Mon, 11 May 2020 06:53:32 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v15 22/25] block/rnbd: server: sysfs interface functions
-Date:   Mon, 11 May 2020 15:51:28 +0200
-Message-Id: <20200511135131.27580-23-danil.kipnis@cloud.ionos.com>
+Subject: [PATCH v15 21/25] block/rnbd: server: functionality for IO submitting to block dev
+Date:   Mon, 11 May 2020 15:51:27 +0200
+Message-Id: <20200511135131.27580-22-danil.kipnis@cloud.ionos.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
 References: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
@@ -79,35 +79,24 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This is the sysfs interface to rnbd mapped devices on server side:
-
-  /sys/class/rnbd-server/ctl/devices/<device_name>/
-    |- block_dev
-    |  *** link pointing to the corresponding block device sysfs entry
-    |
-    |- sessions/<session-name>/
-    |  *** sessions directory
-       |
-       |- read_only
-       |  *** is devices mapped as read only
-       |
-       |- mapping_path
-          *** relative device path provided by the client during mapping
+This provides helper functions for IO submitting to block dev.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/rnbd/rnbd-srv-sysfs.c | 215 ++++++++++++++++++++++++++++
- 1 file changed, 215 insertions(+)
- create mode 100644 drivers/block/rnbd/rnbd-srv-sysfs.c
+ drivers/block/rnbd/rnbd-srv-dev.c | 134 ++++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-srv-dev.h |  92 ++++++++++++++++++++
+ 2 files changed, 226 insertions(+)
+ create mode 100644 drivers/block/rnbd/rnbd-srv-dev.c
+ create mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
 
-diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
+diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
 new file mode 100644
-index 000000000000..106775c074d1
+index 000000000000..5eddfd29ab64
 --- /dev/null
-+++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-@@ -0,0 +1,215 @@
++++ b/drivers/block/rnbd/rnbd-srv-dev.c
+@@ -0,0 +1,134 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * RDMA Network Block Driver
@@ -119,210 +108,227 @@ index 000000000000..106775c074d1
 +#undef pr_fmt
 +#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 +
-+#include <uapi/linux/limits.h>
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/stat.h>
-+#include <linux/genhd.h>
-+#include <linux/list.h>
-+#include <linux/moduleparam.h>
-+#include <linux/device.h>
++#include "rnbd-srv-dev.h"
++#include "rnbd-log.h"
 +
-+#include "rnbd-srv.h"
-+
-+static struct device *rnbd_dev;
-+static struct class *rnbd_dev_class;
-+static struct kobject *rnbd_devs_kobj;
-+
-+static void rnbd_srv_dev_release(struct kobject *kobj)
++struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
++			       struct bio_set *bs)
 +{
-+	struct rnbd_srv_dev *dev;
-+
-+	dev = container_of(kobj, struct rnbd_srv_dev, dev_kobj);
-+
-+	kfree(dev);
-+}
-+
-+static struct kobj_type dev_ktype = {
-+	.sysfs_ops = &kobj_sysfs_ops,
-+	.release = rnbd_srv_dev_release
-+};
-+
-+int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
-+			       struct block_device *bdev,
-+			       const char *dev_name)
-+{
-+	struct kobject *bdev_kobj;
++	struct rnbd_dev *dev;
 +	int ret;
 +
-+	ret = kobject_init_and_add(&dev->dev_kobj, &dev_ktype,
-+				   rnbd_devs_kobj, dev_name);
-+	if (ret)
-+		return ret;
++	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
++	if (!dev)
++		return ERR_PTR(-ENOMEM);
 +
-+	dev->dev_sessions_kobj = kobject_create_and_add("sessions",
-+							&dev->dev_kobj);
-+	if (!dev->dev_sessions_kobj)
-+		goto put_dev_kobj;
-+
-+	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
-+	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
-+	if (ret)
-+		goto put_sess_kobj;
-+
-+	return 0;
-+
-+put_sess_kobj:
-+	kobject_put(dev->dev_sessions_kobj);
-+put_dev_kobj:
-+	kobject_put(&dev->dev_kobj);
-+	return ret;
-+}
-+
-+void rnbd_srv_destroy_dev_sysfs(struct rnbd_srv_dev *dev)
-+{
-+	sysfs_remove_link(&dev->dev_kobj, "block_dev");
-+	kobject_del(dev->dev_sessions_kobj);
-+	kobject_put(dev->dev_sessions_kobj);
-+	kobject_del(&dev->dev_kobj);
-+	kobject_put(&dev->dev_kobj);
-+}
-+
-+static ssize_t read_only_show(struct kobject *kobj, struct kobj_attribute *attr,
-+			      char *page)
-+{
-+	struct rnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct rnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%d\n",
-+			 !(sess_dev->open_flags & FMODE_WRITE));
-+}
-+
-+static struct kobj_attribute rnbd_srv_dev_session_ro_attr =
-+	__ATTR_RO(read_only);
-+
-+static ssize_t access_mode_show(struct kobject *kobj,
-+				struct kobj_attribute *attr,
-+				char *page)
-+{
-+	struct rnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct rnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n",
-+			 rnbd_access_mode_str(sess_dev->access_mode));
-+}
-+
-+static struct kobj_attribute rnbd_srv_dev_session_access_mode_attr =
-+	__ATTR_RO(access_mode);
-+
-+static ssize_t mapping_path_show(struct kobject *kobj,
-+				 struct kobj_attribute *attr, char *page)
-+{
-+	struct rnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct rnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n", sess_dev->pathname);
-+}
-+
-+static struct kobj_attribute rnbd_srv_dev_session_mapping_path_attr =
-+	__ATTR_RO(mapping_path);
-+
-+static struct attribute *rnbd_srv_default_dev_sessions_attrs[] = {
-+	&rnbd_srv_dev_session_access_mode_attr.attr,
-+	&rnbd_srv_dev_session_ro_attr.attr,
-+	&rnbd_srv_dev_session_mapping_path_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group rnbd_srv_default_dev_session_attr_group = {
-+	.attrs = rnbd_srv_default_dev_sessions_attrs,
-+};
-+
-+void rnbd_srv_destroy_dev_session_sysfs(struct rnbd_srv_sess_dev *sess_dev)
-+{
-+	sysfs_remove_group(&sess_dev->kobj,
-+			   &rnbd_srv_default_dev_session_attr_group);
-+
-+	kobject_del(&sess_dev->kobj);
-+	kobject_put(&sess_dev->kobj);
-+}
-+
-+static void rnbd_srv_sess_dev_release(struct kobject *kobj)
-+{
-+	struct rnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct rnbd_srv_sess_dev, kobj);
-+	rnbd_destroy_sess_dev(sess_dev);
-+}
-+
-+static struct kobj_type rnbd_srv_sess_dev_ktype = {
-+	.sysfs_ops	= &kobj_sysfs_ops,
-+	.release	= rnbd_srv_sess_dev_release,
-+};
-+
-+int rnbd_srv_create_dev_session_sysfs(struct rnbd_srv_sess_dev *sess_dev)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(&sess_dev->kobj, &rnbd_srv_sess_dev_ktype,
-+				   sess_dev->dev->dev_sessions_kobj, "%s",
-+				   sess_dev->sess->sessname);
-+	if (ret)
-+		return ret;
-+
-+	ret = sysfs_create_group(&sess_dev->kobj,
-+				 &rnbd_srv_default_dev_session_attr_group);
++	dev->blk_open_flags = flags;
++	dev->bdev = blkdev_get_by_path(path, flags, THIS_MODULE);
++	ret = PTR_ERR_OR_ZERO(dev->bdev);
 +	if (ret)
 +		goto err;
 +
-+	return 0;
++	dev->blk_open_flags = flags;
++	bdevname(dev->bdev, dev->name);
++	dev->ibd_bio_set = bs;
++
++	return dev;
 +
 +err:
-+	kobject_put(&sess_dev->kobj);
-+
-+	return ret;
++	kfree(dev);
++	return ERR_PTR(ret);
 +}
 +
-+int rnbd_srv_create_sysfs_files(void)
++void rnbd_dev_close(struct rnbd_dev *dev)
 +{
-+	int err;
++	blkdev_put(dev->bdev, dev->blk_open_flags);
++	kfree(dev);
++}
 +
-+	rnbd_dev_class = class_create(THIS_MODULE, "rnbd-server");
-+	if (IS_ERR(rnbd_dev_class))
-+		return PTR_ERR(rnbd_dev_class);
++static void rnbd_dev_bi_end_io(struct bio *bio)
++{
++	struct rnbd_dev_blk_io *io = bio->bi_private;
 +
-+	rnbd_dev = device_create(rnbd_dev_class, NULL,
-+				  MKDEV(0, 0), NULL, "ctl");
-+	if (IS_ERR(rnbd_dev)) {
-+		err = PTR_ERR(rnbd_dev);
-+		goto cls_destroy;
++	rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
++	bio_put(bio);
++}
++
++/**
++ *	rnbd_bio_map_kern	-	map kernel address into bio
++ *	@data: pointer to buffer to map
++ *	@bs: bio_set to use.
++ *	@len: length in bytes
++ *	@gfp_mask: allocation flags for bio allocation
++ *
++ *	Map the kernel address into a bio suitable for io to a block
++ *	device. Returns an error pointer in case of error.
++ */
++static struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
++				     unsigned int len, gfp_t gfp_mask)
++{
++	unsigned long kaddr = (unsigned long)data;
++	unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	unsigned long start = kaddr >> PAGE_SHIFT;
++	const int nr_pages = end - start;
++	int offset, i;
++	struct bio *bio;
++
++	bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
++	if (!bio)
++		return ERR_PTR(-ENOMEM);
++
++	offset = offset_in_page(kaddr);
++	for (i = 0; i < nr_pages; i++) {
++		unsigned int bytes = PAGE_SIZE - offset;
++
++		if (len <= 0)
++			break;
++
++		if (bytes > len)
++			bytes = len;
++
++		if (bio_add_page(bio, virt_to_page(data), bytes,
++				    offset) < bytes) {
++			/* we don't support partial mappings */
++			bio_put(bio);
++			return ERR_PTR(-EINVAL);
++		}
++
++		data += bytes;
++		len -= bytes;
++		offset = 0;
 +	}
-+	rnbd_devs_kobj = kobject_create_and_add("devices", &rnbd_dev->kobj);
-+	if (!rnbd_devs_kobj) {
-+		err = -ENOMEM;
-+		goto dev_destroy;
-+	}
++
++	bio->bi_end_io = bio_put;
++	return bio;
++}
++
++int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
++		       size_t len, u32 bi_size, enum rnbd_io_flags flags,
++		       short prio, void *priv)
++{
++	struct rnbd_dev_blk_io *io;
++	struct bio *bio;
++
++	/* Generate bio with pages pointing to the rdma buffer */
++	bio = rnbd_bio_map_kern(data, dev->ibd_bio_set, len, GFP_KERNEL);
++	if (IS_ERR(bio))
++		return PTR_ERR(bio);
++
++	io = container_of(bio, struct rnbd_dev_blk_io, bio);
++
++	io->dev	= dev;
++	io->priv = priv;
++
++	bio->bi_end_io = rnbd_dev_bi_end_io;
++	bio->bi_private	= io;
++	bio->bi_opf = rnbd_to_bio_flags(flags);
++	bio->bi_iter.bi_sector = sector;
++	bio->bi_iter.bi_size = bi_size;
++	bio_set_prio(bio, prio);
++	bio_set_dev(bio, dev->bdev);
++
++	submit_bio(bio);
 +
 +	return 0;
-+
-+dev_destroy:
-+	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+cls_destroy:
-+	class_destroy(rnbd_dev_class);
-+
-+	return err;
 +}
+diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
+new file mode 100644
+index 000000000000..0f65b09a270e
+--- /dev/null
++++ b/drivers/block/rnbd/rnbd-srv-dev.h
+@@ -0,0 +1,92 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RDMA Network Block Driver
++ *
++ * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
++ * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
++ */
++#ifndef RNBD_SRV_DEV_H
++#define RNBD_SRV_DEV_H
 +
-+void rnbd_srv_destroy_sysfs_files(void)
++#include <linux/fs.h>
++#include "rnbd-proto.h"
++
++struct rnbd_dev {
++	struct block_device	*bdev;
++	struct bio_set		*ibd_bio_set;
++	fmode_t			blk_open_flags;
++	char			name[BDEVNAME_SIZE];
++};
++
++struct rnbd_dev_blk_io {
++	struct rnbd_dev *dev;
++	void		 *priv;
++	/* have to be last member for front_pad usage of bioset_init */
++	struct bio	bio;
++};
++
++/**
++ * rnbd_dev_open() - Open a device
++ * @flags:	open flags
++ * @bs:		bio_set to use during block io,
++ */
++struct rnbd_dev *rnbd_dev_open(const char *path, fmode_t flags,
++			       struct bio_set *bs);
++
++/**
++ * rnbd_dev_close() - Close a device
++ */
++void rnbd_dev_close(struct rnbd_dev *dev);
++
++void rnbd_endio(void *priv, int error);
++
++static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
 +{
-+	kobject_del(rnbd_devs_kobj);
-+	kobject_put(rnbd_devs_kobj);
-+	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+	class_destroy(rnbd_dev_class);
++	return queue_max_segments(bdev_get_queue(dev->bdev));
 +}
++
++static inline int rnbd_dev_get_max_hw_sects(const struct rnbd_dev *dev)
++{
++	return queue_max_hw_sectors(bdev_get_queue(dev->bdev));
++}
++
++static inline int rnbd_dev_get_secure_discard(const struct rnbd_dev *dev)
++{
++	return blk_queue_secure_erase(bdev_get_queue(dev->bdev));
++}
++
++static inline int rnbd_dev_get_max_discard_sects(const struct rnbd_dev *dev)
++{
++	if (!blk_queue_discard(bdev_get_queue(dev->bdev)))
++		return 0;
++
++	return blk_queue_get_max_sectors(bdev_get_queue(dev->bdev),
++					 REQ_OP_DISCARD);
++}
++
++static inline int rnbd_dev_get_discard_granularity(const struct rnbd_dev *dev)
++{
++	return bdev_get_queue(dev->bdev)->limits.discard_granularity;
++}
++
++static inline int rnbd_dev_get_discard_alignment(const struct rnbd_dev *dev)
++{
++	return bdev_get_queue(dev->bdev)->limits.discard_alignment;
++}
++
++/**
++ * rnbd_dev_submit_io() - Submit an I/O to the disk
++ * @dev:	device to that the I/O is submitted
++ * @sector:	address to read/write data to
++ * @data:	I/O data to write or buffer to read I/O date into
++ * @len:	length of @data
++ * @bi_size:	Amount of data that will be read/written
++ * @prio:       IO priority
++ * @priv:	private data passed to @io_fn
++ */
++int rnbd_dev_submit_io(struct rnbd_dev *dev, sector_t sector, void *data,
++			size_t len, u32 bi_size, enum rnbd_io_flags flags,
++			short prio, void *priv);
++
++#endif /* RNBD_SRV_DEV_H */
 -- 
 2.20.1
 
