@@ -2,61 +2,64 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48DAC47255
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C587C54E8D
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E3E6206D7
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 767F320736
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729842AbgEKUwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 16:52:17 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:44494 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727873AbgEKUwR (ORCPT
+        id S1726946AbgEKU4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 16:56:53 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:50280 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbgEKU4w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 16:52:17 -0400
-Received: by mail-pl1-f195.google.com with SMTP id b8so4421161plm.11
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 13:52:17 -0700 (PDT)
+        Mon, 11 May 2020 16:56:52 -0400
+Received: by mail-pj1-f68.google.com with SMTP id t9so8479179pjw.0
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 13:56:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=wpq+eLjryfkksZnP1AfH9y18DVeQNadA/AXUeJKbrOU=;
-        b=r98sag3Vj1I4raeMr5heCp+dZWZGjspxS6qbQckQfovEKM/xbQ6NsLZ1PP/uRe3umr
-         aPPATwwLuGMQc5lG/QZaCdJQclkFRVKXTHRdHinRZl8m/xPk+1NagM2YxX1WGorjf0e8
-         fqt8/U64OjRMErwIjEdQO5yFIXlRly8UDmPuL27UQgXDxLDgFJR9r+ZxIo9tw+RJs8Db
-         QH/83Bk2yLcD/ILpazi7ERhdrMPtWuoFfQ73Uhaog1P9QAtJw9b3oPz9dGfMth9mqFsB
-         4pB0t/s4fFWTqLIIlI1mz07ry31I28vLde+B5sHt5MmfTFQY5HxHkYd/Hmz3DMsbYyNN
-         dfoQ==
-X-Gm-Message-State: AGi0PuaqwtN9jfAP3M+casjNquHk+GRMkTsYDJCGLPpEw4a3Jeqg9xMw
-        2AjcJgpuRow5VYSN8TzEvBhdmWxKXIQ=
-X-Google-Smtp-Source: APiQypKoYjlDJZQz/HVpW+mfdf7zvO+TsoKwWbnU00/2AFGsPkn61i091KscI3pyEA6z6FG7j8B+cg==
-X-Received: by 2002:a17:90a:1941:: with SMTP id 1mr24848168pjh.65.1589230336372;
-        Mon, 11 May 2020 13:52:16 -0700 (PDT)
+        bh=IhpUsO3wYR9QymOo9GLQVcY2Bn0y4Yt+qmSEnYYRyoc=;
+        b=YLtYRehyYQCVuPzrZ+ucGq0oe8BLJJXtdn33v4obpemEZk8y0vdShwjyry0PtI/lvv
+         8uDc+RrZXSpManpmNevUWlODNLHcFrvydEuTw4DxR3JHJNwtEFXgnMJnOQ2H5eWTVZ9T
+         jVACnHrlSgifRH6y9dgUMAYUERG1XYH+3K3F7U/tZ3wcviiX8ZILd3EmCjh7tlJalAHw
+         K4/Pp5kQZHSMAj3h5+wt+2pNpt4dvBBUB4UazY1mgLtCxDslMlCIgOgKWMpUmUBm1LpT
+         xS3gXqN10pTxDg4Vjc4Ue4IRhX/7nMrMTLBPeKqNWA4G583gLUpakn6nkF27A6xHo0Zf
+         Q9Xg==
+X-Gm-Message-State: AGi0Pubp4ppvlBWQF6b3E4NIGOXgNXoHdT8uzNNV2cTVscj3qYgCPr8k
+        cBjGH5fQwVbUVqwbTDllOMc=
+X-Google-Smtp-Source: APiQypJtxrqSIO5QD2tIa7v64M+GXCJL0TmaoPKZuNv1Ql7oJDw0n2df7ahppX82zZIhFAnizm/NkQ==
+X-Received: by 2002:a17:90a:8c83:: with SMTP id b3mr24505036pjo.141.1589230611508;
+        Mon, 11 May 2020 13:56:51 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:c4e5:b27b:830d:5d6e? ([2601:647:4000:d7:c4e5:b27b:830d:5d6e])
-        by smtp.gmail.com with ESMTPSA id v133sm9975375pfc.113.2020.05.11.13.52.15
+        by smtp.gmail.com with ESMTPSA id b1sm9904859pfi.140.2020.05.11.13.56.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 13:52:15 -0700 (PDT)
-Subject: Re: [PATCH V10 11/11] block: deactivate hctx when the hctx is
- actually inactive
+        Mon, 11 May 2020 13:56:50 -0700 (PDT)
+Subject: Re: [PATCH V10 07/11] blk-mq: stop to handle IO and drain IO before
+ hctx becomes inactive
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Hannes Reinecke <hare@suse.de>
+        Thomas Gleixner <tglx@linutronix.de>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-12-ming.lei@redhat.com>
- <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
- <20200511021133.GC1418834@T590>
- <73702cd9-6dcc-a757-be3b-c250e050692c@acm.org>
- <20200511040841.GE1418834@T590>
+ <20200505020930.1146281-8-ming.lei@redhat.com>
+ <dbada06d-fcc4-55df-935e-2a46433f28a1@acm.org>
+ <20200509022051.GC1392681@T590>
+ <0f578345-5a51-b64a-e150-724cfb18dde4@acm.org>
+ <20200509041042.GG1392681@T590>
+ <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
+ <20200511014538.GB1418834@T590>
+ <8ef5352b-a1bb-a3c1-3ad2-696df6e86f1f@acm.org>
+ <20200511034827.GD1418834@T590>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -81,12 +84,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <c4d78e75-91e1-1521-1ba0-d30bf3716f83@acm.org>
-Date:   Mon, 11 May 2020 13:52:14 -0700
+Message-ID: <832f5935-19f5-8dcf-baee-ad61f0c5d966@acm.org>
+Date:   Mon, 11 May 2020 13:56:49 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200511040841.GE1418834@T590>
+In-Reply-To: <20200511034827.GD1418834@T590>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -95,60 +98,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-10 21:08, Ming Lei wrote:
-> OK, just forgot the whole story, but the issue can be fixed quite easily
-> by adding a new request allocation flag in slow path, see the following
-> patch:
+On 2020-05-10 20:48, Ming Lei wrote:
+> On Sun, May 10, 2020 at 08:20:24PM -0700, Bart Van Assche wrote:
+>> What I meant is to freeze a request queue temporarily.
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ec50d7e6be21..d743be1b45a2 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -418,6 +418,11 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
->  		if (success)
->  			return 0;
->  
-> +		if (flags & BLK_MQ_REQ_FORCE) {
-> +			percpu_ref_get(ref);
-> +			return 0;
-> +		}
-> +
->  		if (flags & BLK_MQ_REQ_NOWAIT)
->  			return -EBUSY;
->  
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index c2ea0a6e5b56..2816886d0bea 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -448,6 +448,13 @@ enum {
->  	BLK_MQ_REQ_INTERNAL	= (__force blk_mq_req_flags_t)(1 << 2),
->  	/* set RQF_PREEMPT */
->  	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
-> +
-> +	/*
-> +	 * force to allocate request and caller has to make sure queue
-> +	 * won't be forzen completely during allocation, and this flag
-> +	 * is only applied after queue freeze is started
-> +	 */
-> +	BLK_MQ_REQ_FORCE	= (__force blk_mq_req_flags_t)(1 << 4),
->  };
->  
->  struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+> But what is your motivation to freeze queue temporarily?
 
-I'm not sure that introducing such a flag is a good idea. After
-blk_mq_freeze_queue() has made it clear that a request queue must be
-frozen and before the request queue is really frozen, an RCU grace
-period must expire. Otherwise it cannot be guaranteed that the intention
-to freeze a request queue (by calling percpu_ref_kill()) has been
-observed by all potential blk_queue_enter() callers (blk_queue_enter()
-calls percpu_ref_tryget_live()). Not introducing any new race conditions
-would either require to introduce an smp_mb() call in blk_queue_enter()
-or to let another RCU grace period expire after the last allocation of a
-request with BLK_MQ_REQ_FORCE and before the request queue is really frozen.
-
-Serializing hardware queue quiescing and request queue freezing is
-probably a much simpler solution. I'm not sure of this but maybe holding
-the mq_freeze_lock mutex around hardware queue quiescing is sufficient.
+To achieve a solution for CPU hotplugging that is much simpler than this
+patch series, requires less code and hence is easier to test, debug and
+maintain.
 
 Thanks,
 
