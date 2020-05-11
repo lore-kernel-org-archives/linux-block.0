@@ -2,64 +2,61 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C587C54E8D
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E10DC54E4A
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 23:19:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 767F320736
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 20:56:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC8762078E
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 23:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgEKU4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 16:56:53 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:50280 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726661AbgEKU4w (ORCPT
+        id S1725987AbgEKXTE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 19:19:04 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:40000 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726891AbgEKXTE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 16:56:52 -0400
-Received: by mail-pj1-f68.google.com with SMTP id t9so8479179pjw.0
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 13:56:52 -0700 (PDT)
+        Mon, 11 May 2020 19:19:04 -0400
+Received: by mail-pj1-f66.google.com with SMTP id fu13so8483655pjb.5
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 16:19:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=IhpUsO3wYR9QymOo9GLQVcY2Bn0y4Yt+qmSEnYYRyoc=;
-        b=YLtYRehyYQCVuPzrZ+ucGq0oe8BLJJXtdn33v4obpemEZk8y0vdShwjyry0PtI/lvv
-         8uDc+RrZXSpManpmNevUWlODNLHcFrvydEuTw4DxR3JHJNwtEFXgnMJnOQ2H5eWTVZ9T
-         jVACnHrlSgifRH6y9dgUMAYUERG1XYH+3K3F7U/tZ3wcviiX8ZILd3EmCjh7tlJalAHw
-         K4/Pp5kQZHSMAj3h5+wt+2pNpt4dvBBUB4UazY1mgLtCxDslMlCIgOgKWMpUmUBm1LpT
-         xS3gXqN10pTxDg4Vjc4Ue4IRhX/7nMrMTLBPeKqNWA4G583gLUpakn6nkF27A6xHo0Zf
-         Q9Xg==
-X-Gm-Message-State: AGi0Pubp4ppvlBWQF6b3E4NIGOXgNXoHdT8uzNNV2cTVscj3qYgCPr8k
-        cBjGH5fQwVbUVqwbTDllOMc=
-X-Google-Smtp-Source: APiQypJtxrqSIO5QD2tIa7v64M+GXCJL0TmaoPKZuNv1Ql7oJDw0n2df7ahppX82zZIhFAnizm/NkQ==
-X-Received: by 2002:a17:90a:8c83:: with SMTP id b3mr24505036pjo.141.1589230611508;
-        Mon, 11 May 2020 13:56:51 -0700 (PDT)
+        bh=DRsLRT0udoV+ohvAtfy/CdrVVKmjRrJDJALk4t8Iff8=;
+        b=CUFDiXo5uSwMEgbtprvKz2QcHVsC25E6g04TsOiNKecuxYmY+pfaBUIQDoUdM4WDEQ
+         C82SU9xS2FUUfm3DzJRMQEKoVHhvAM/nCfy28rzDfoL+ozyBxWWFBf6/O9B9CDCM5olG
+         GmJ1/+vyunMyB7IPK/Sqja9cKS54H5ciSHdd/efpzsxlJfHsHyiMC6EWBxZDsDbvOrBg
+         /B318e5Ev71wkUvC8WvfhmsYDEJkJHUFT/HD3kd++71XVZPpUB1s8YSB2oT9Yn6sVQn+
+         CBezs24Hts32kEzQ9cxv78BD3oFqxGZlE71znpcHJo18my+QQMyDumJc5qjmN6v0mHs9
+         us+w==
+X-Gm-Message-State: AGi0PuZo+FnmB1Ca6g9+FmDYj1EZeatj+vFHFci+Az3PhXYVS25X92b+
+        DXoCCFTAekTyDRrxN9v4cfY=
+X-Google-Smtp-Source: APiQypJYLWKbvY2RzLs1Wuyv1hUTfIXfyCqYBESKMWL7et0YiI43iJD2BCgYYd96Ltb6YZiTKO+I1g==
+X-Received: by 2002:a17:90a:1181:: with SMTP id e1mr26661260pja.234.1589239142834;
+        Mon, 11 May 2020 16:19:02 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:c4e5:b27b:830d:5d6e? ([2601:647:4000:d7:c4e5:b27b:830d:5d6e])
-        by smtp.gmail.com with ESMTPSA id b1sm9904859pfi.140.2020.05.11.13.56.50
+        by smtp.gmail.com with ESMTPSA id w69sm10156405pff.168.2020.05.11.16.19.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 13:56:50 -0700 (PDT)
-Subject: Re: [PATCH V10 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-8-ming.lei@redhat.com>
- <dbada06d-fcc4-55df-935e-2a46433f28a1@acm.org>
- <20200509022051.GC1392681@T590>
- <0f578345-5a51-b64a-e150-724cfb18dde4@acm.org>
- <20200509041042.GG1392681@T590>
- <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
- <20200511014538.GB1418834@T590>
- <8ef5352b-a1bb-a3c1-3ad2-696df6e86f1f@acm.org>
- <20200511034827.GD1418834@T590>
+        Mon, 11 May 2020 16:19:01 -0700 (PDT)
+Subject: Re: null_handle_cmd() doesn't initialize data when reading
+To:     Alexander Potapenko <glider@google.com>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Willem de Bruijn <willemb@google.com>,
+        Dmitriy Vyukov <dvyukov@google.com>
+References: <CAG_fn=VBHmBgqLi35tD27NRLH2tEZLH=Y+rTfZ3rKNz9ipG+jQ@mail.gmail.com>
+ <d204a9d7-3722-5e55-d6cc-3018e366981e@kernel.dk>
+ <CAG_fn=XXsjDsA0_MoTF3XfjSuLCc+6wRaOCY_ZDt661P_rSmOg@mail.gmail.com>
+ <BYAPR04MB57495B31CEA65B2B5D76203C864A0@BYAPR04MB5749.namprd04.prod.outlook.com>
+ <CAG_fn=WVHpRQ19MK12pxiizTEvUFLiV7LJgF_LrX_G2SYd=ivQ@mail.gmail.com>
+ <277579c9-9e33-89ea-bfcd-bc14a543726c@acm.org>
+ <CAG_fn=WQXuTuGmC8oQ25f6DYJ4CiMSz7_S7Nkp+z6L1QL7Zokw@mail.gmail.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -84,12 +81,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <832f5935-19f5-8dcf-baee-ad61f0c5d966@acm.org>
-Date:   Mon, 11 May 2020 13:56:49 -0700
+Message-ID: <55674c05-37dc-0646-af78-db4c3b112683@acm.org>
+Date:   Mon, 11 May 2020 16:18:59 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200511034827.GD1418834@T590>
+In-Reply-To: <CAG_fn=WQXuTuGmC8oQ25f6DYJ4CiMSz7_S7Nkp+z6L1QL7Zokw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -98,16 +95,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-10 20:48, Ming Lei wrote:
-> On Sun, May 10, 2020 at 08:20:24PM -0700, Bart Van Assche wrote:
->> What I meant is to freeze a request queue temporarily.
+On 2020-05-11 05:58, Alexander Potapenko wrote:
+> On Sun, May 10, 2020 at 6:20 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> On 2020-05-10 03:03, Alexander Potapenko wrote:
+>>> Thanks for the explanation!
+>>> The code has changed recently, and my patch does not apply anymore,
+>>> yet the problem still persists.
+>>> I ended up just calling null_handle_rq() at the end of
+>>> null_process_cmd(), but we probably need a cleaner fix.
+>>
+>> Does this (totally untested) patch help? copy_to_nullb() guarantees that
+>> it will write some data to the pages that it allocates but does not
+>> guarantee yet that all data of the pages it allocates is initialized.
 > 
-> But what is your motivation to freeze queue temporarily?
+> No, this does not help. Apparently null_insert_page() is never called
+> in this scenario.
+> If I modify __page_cache_alloc() to allocate zero-initialized pages,
+> the reports go away.
+> This means there's no other uninitialized buffer that's copied to the
+> page cache, the nullb driver just forgets to write anything to the
+> page cache.
 
-To achieve a solution for CPU hotplugging that is much simpler than this
-patch series, requires less code and hence is easier to test, debug and
-maintain.
+Hi Alexander,
+
+I had misread the email at the start of this thread. My patch only
+affects the "memory backed" mode while the email at the start of this
+thread explains that the KMSAN report refers to the memory_backed == 0
+mode. Anyway, can you give the patch below a try?
 
 Thanks,
 
 Bart.
+
+
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 06f5761fccb6..682b38ccef57 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1250,8 +1250,36 @@ static inline blk_status_t
+null_handle_memory_backed(struct nullb_cmd *cmd,
+ 	return errno_to_blk_status(err);
+ }
+
++static void nullb_zero_data_buffer(const struct request *rq)
++{
++	struct req_iterator iter;
++	struct bio_vec bvec;
++	struct page *page;
++	void *kaddr;
++	u32 offset, left, len;
++
++	rq_for_each_bvec(bvec, rq, iter) {
++		page = bvec.bv_page;
++		offset = bvec.bv_offset;
++		left = bvec.bv_len;
++		while (left) {
++			kaddr = kmap_atomic(page);
++			len = min_t(u32, left, PAGE_SIZE - offset);
++			memset(kaddr + offset, 0, len);
++			kunmap_atomic(kaddr);
++			page++;
++			left -= len;
++			offset = 0;
++		}
++	}
++}
++
++/* Complete a request. Only called if dev->memory_backed == 0. */
+ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
+ {
++	if (req_op(cmd->rq) == REQ_OP_READ)
++		nullb_zero_data_buffer(cmd->rq);
++
+ 	/* Complete IO by inline, softirq or timer */
+ 	switch (cmd->nq->dev->irqmode) {
+ 	case NULL_IRQ_SOFTIRQ:
