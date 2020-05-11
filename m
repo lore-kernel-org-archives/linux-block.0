@@ -2,195 +2,161 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF228C47255
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 03:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB90CC47255
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 04:08:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C02022070B
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 03:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93B592075E
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 04:08:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXc3KfEi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Syeli+mH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbgEKDsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 May 2020 23:48:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26138 "EHLO
+        id S1725854AbgEKEI6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 00:08:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46324 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728058AbgEKDsq (ORCPT
+        with ESMTP id S1725817AbgEKEI6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 May 2020 23:48:46 -0400
+        Mon, 11 May 2020 00:08:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589168924;
+        s=mimecast20190719; t=1589170137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3IfYj3ViZof2SfY22paUT3NYbCsvIYP1WEr7GqZyZIU=;
-        b=WXc3KfEiwJ9ZrUe2AIwOY0VdI6/54OIdAg6RaSEok1taczgtR90OA/g2JcQa4LwhouR7mn
-        UF2BNbkcI5QDQhHW73VvWJT5dgtkX5Jdo/lM5eM2odi0Kgcj4rwJ5JmVOMv83QW+At42zk
-        OnAPyJuzjCG/AX8ZXDJuRqMCoOl8xn0=
+        bh=zP/+6OjA9hJznhvtBYrqxhj1ahM1z8FANvwBXq5YO+o=;
+        b=Syeli+mHQER6dNyzeDYM9N5zYPEZZhVr5m+71J0S2NnHz6ruhSBZe1U1JG5cuEzcevHzdR
+        arKskGRX971iNnEXtsjrAKAi7kX4dAhjSE9aJ00/34y4+RhcKAptGxWSKsVlDs6krnKeUn
+        FpBB3lgcz1RI1Mks6Lx0e+nlof5dEu8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-gI2lLNy8NmSknGJY8InL1g-1; Sun, 10 May 2020 23:48:41 -0400
-X-MC-Unique: gI2lLNy8NmSknGJY8InL1g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-488-wCG7DOBSNc-3bi6dn3WVUg-1; Mon, 11 May 2020 00:08:54 -0400
+X-MC-Unique: wCG7DOBSNc-3bi6dn3WVUg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894AC1895A4D;
-        Mon, 11 May 2020 03:48:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52BE5461;
+        Mon, 11 May 2020 04:08:53 +0000 (UTC)
 Received: from T590 (ovpn-13-75.pek2.redhat.com [10.72.13.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B16BA5C1D2;
-        Mon, 11 May 2020 03:48:32 +0000 (UTC)
-Date:   Mon, 11 May 2020 11:48:27 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1072A5D9DA;
+        Mon, 11 May 2020 04:08:45 +0000 (UTC)
+Date:   Mon, 11 May 2020 12:08:41 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V10 07/11] blk-mq: stop to handle IO and drain IO before
- hctx becomes inactive
-Message-ID: <20200511034827.GD1418834@T590>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V10 11/11] block: deactivate hctx when the hctx is
+ actually inactive
+Message-ID: <20200511040841.GE1418834@T590>
 References: <20200505020930.1146281-1-ming.lei@redhat.com>
- <20200505020930.1146281-8-ming.lei@redhat.com>
- <dbada06d-fcc4-55df-935e-2a46433f28a1@acm.org>
- <20200509022051.GC1392681@T590>
- <0f578345-5a51-b64a-e150-724cfb18dde4@acm.org>
- <20200509041042.GG1392681@T590>
- <1918187b-2baa-5703-63ee-097a307cf594@acm.org>
- <20200511014538.GB1418834@T590>
- <8ef5352b-a1bb-a3c1-3ad2-696df6e86f1f@acm.org>
+ <20200505020930.1146281-12-ming.lei@redhat.com>
+ <954b942e-3b06-4be7-9f2f-23f87ff514f0@acm.org>
+ <20200511021133.GC1418834@T590>
+ <73702cd9-6dcc-a757-be3b-c250e050692c@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8ef5352b-a1bb-a3c1-3ad2-696df6e86f1f@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <73702cd9-6dcc-a757-be3b-c250e050692c@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 10, 2020 at 08:20:24PM -0700, Bart Van Assche wrote:
-> On 2020-05-10 18:45, Ming Lei wrote:
-> > On Sat, May 09, 2020 at 07:18:46AM -0700, Bart Van Assche wrote:
-> >> On 2020-05-08 21:10, Ming Lei wrote:
-> >>> queue freezing can only be applied on the request queue level, and not
-> >>> hctx level. When requests can't be completed, wait freezing just hangs
-> >>> for-ever.
-> >>
-> >> That's indeed what I meant: freeze the entire queue instead of
-> >> introducing a new mechanism that freezes only one hardware queue at a time.
-> > 
-> > No, the issue is exactly that one single hctx becomes inactive, and
-> > other hctx are still active and workable.
-> > 
-> > If one entire queue is frozen because of some of CPUs are offline, how
-> > can userspace submit IO to this disk? You suggestion justs makes the
-> > disk not usable, that won't be accepted.
+On Sun, May 10, 2020 at 08:30:29PM -0700, Bart Van Assche wrote:
+> On 2020-05-10 19:11, Ming Lei wrote:
+> > One simple solution is to pass BLK_MQ_REQ_PREEMPT to blk_get_request()
+> > called in blk_mq_resubmit_rq() because at that time freezing wait won't
+> > return and it is safe to allocate a new request for completing old
+> > requests originated from inactive hctx.
 > 
-> What I meant is to freeze a request queue temporarily (until hot
-> unplugging of a CPU has finished). I would never suggest to freeze a
-> request queue forever and I think that you already knew that.
-
-But what is your motivation to freeze queue temporarily?
-
-I don's see any help of freezing queue for this issue. Also even though
-it is temporary, IO effect still can be observed for other online CPUs.
-
-If you want to block new allocation from the inactive hctx, that isn't
-necessary cause no new allocation is basically possible because all
-cpus of this hctx will be offline.
-
-If you want to wait completion of in-flight requests, that isn't doable
-because requests may not be completed at all when one hctx becomes
-inactive and the managed interrupt is shutdown.
-
+> I don't think that will help. Freezing a request queue starts with a
+> call of this function:
 > 
-> >> Please clarify what "when requests can't be completed" means. Are you
-> >> referring to requests that take longer than expected due to e.g. a
-> >> controller lockup or to requests that take a long time intentionally?
-> > 
-> > If all CPUs in one hctx->cpumask are offline, the managed irq of this hw
-> > queue will be shutdown by genirq code, so any in-flight IO won't be
-> > completed or timedout after the managed irq is shutdown because of cpu
-> > offline.
-> > 
-> > Some drivers may implement timeout handler, so these in-flight requests
-> > will be timed out, but still not friendly behaviour given the default
-> > timeout is too long.
-> > 
-> > Some drivers don't implement timeout handler at all, so these IO won't
-> > be completed.
+> void blk_freeze_queue_start(struct request_queue *q)
+> {
+> 	mutex_lock(&q->mq_freeze_lock);
+> 	if (++q->mq_freeze_depth == 1) {
+> 		percpu_ref_kill(&q->q_usage_counter);
+> 		mutex_unlock(&q->mq_freeze_lock);
+> 		if (queue_is_mq(q))
+> 			blk_mq_run_hw_queues(q, false);
+> 	} else {
+> 		mutex_unlock(&q->mq_freeze_lock);
+> 	}
+> }
 > 
-> I think that the block layer needs to be notified after the decision has
-
-I have added new cpuhp state of CPUHP_AP_BLK_MQ_ONLINE for getting the
-notification and blk_mq_hctx_notify_online() will be called before this
-cpu is put offline.
-
-> been taken to offline a CPU and before the interrupts associated with
-> that CPU are disabled. That would allow the block layer to freeze a
-> request queue without triggering any timeouts (ignoring block driver and
-> hardware bugs). I'm not familiar with CPU hotplugging so I don't know
-> whether or not such a mechanism already exists.
-
-How can freezing queue avoid to triggering timeout?
-
-Freezing queue basically blocks new request allocation, and follows wait
-for completion of all in-flight request. As I explained, either no new
-allocation on this inactive hctx, or in-flight request won't be completed
-without this patch's solution.
-
+> From blk_queue_enter():
 > 
-> >> The former case is handled by the block layer timeout handler. I propose
-> >> to handle the latter case by introducing a new callback function pointer
-> >> in struct blk_mq_ops that aborts all outstanding requests.
-> > 
-> > As I mentioned, timeout isn't a friendly behavior. Or not every driver
-> > implements timeout handler or well enough.
+> 	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
+> 	[ ... ]
+> 	if (percpu_ref_tryget_live(&q->q_usage_counter)) {
+> 		/*
+> 		 * The code that increments the pm_only counter is
+> 		 * responsible for ensuring that that counter is
+> 		 * globally visible before the queue is unfrozen.
+> 		 */
+> 		if (pm || !blk_queue_pm_only(q)) {
+> 			success = true;
+> 		} else {
+> 			percpu_ref_put(&q->q_usage_counter);
+> 		}
+> 	}
 > 
-> What I propose is to fix those block drivers instead of complicating the
-> block layer core further and instead of introducing potential deadlocks
-> in the block layer core.
+> In other words, setting the BLK_MQ_REQ_PREEMPT flag only makes a
+> difference if blk_queue_pm_only(q) == true. Freezing a request queue
+> involves calling percpu_ref_kill(&q->q_usage_counter). That causes all
+> future percpu_ref_tryget_live() calls to return false until the queue
+> has been unfrozen.
 
-The deadlock you mentioned can be fixed with help of BLK_MQ_REQ_PREEMPT.
+OK, just forgot the whole story, but the issue can be fixed quite easily
+by adding a new request allocation flag in slow path, see the following
+patch:
 
-> 
-> >> Request queue
-> >> freezing is such an important block layer mechanism that I think we
-> >> should require that all block drivers support freezing a request queue
-> >> in a short time.
-> > 
-> > Firstly, we just need to drain in-flight requests and re-submit queued
-> > requests from one single hctx, and queue wide freezing causes whole
-> > userspace IOs blocked unnecessarily.
-> 
-> Freezing a request queue for a short time is acceptable. As you know we
-> already do that when the queue depth is modified, when the write-back
-> throttling latency is modified and also when the I/O scheduler is changed.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ec50d7e6be21..d743be1b45a2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -418,6 +418,11 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ 		if (success)
+ 			return 0;
+ 
++		if (flags & BLK_MQ_REQ_FORCE) {
++			percpu_ref_get(ref);
++			return 0;
++		}
++
+ 		if (flags & BLK_MQ_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index c2ea0a6e5b56..2816886d0bea 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -448,6 +448,13 @@ enum {
+ 	BLK_MQ_REQ_INTERNAL	= (__force blk_mq_req_flags_t)(1 << 2),
+ 	/* set RQF_PREEMPT */
+ 	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
++
++	/*
++	 * force to allocate request and caller has to make sure queue
++	 * won't be forzen completely during allocation, and this flag
++	 * is only applied after queue freeze is started
++	 */
++	BLK_MQ_REQ_FORCE	= (__force blk_mq_req_flags_t)(1 << 4),
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
 
-Again, how can freeze queue help the issue addressed by this patchset?
-
-> 
-> > Secondly, some requests may not be completed at all, so freezing can't
-> > work because freeze_wait may hang forever.
-> 
-> If a request neither can be aborted nor completes then that's a severe
-> bug in the block driver that submitted the request to the block device.
-
-It is hard to implement timeout handler for every driver, or remove all
-BLK_EH_RESET_TIMER returning from driver.
-
-Even for drivers which implementing timeout handler elegantly, it isn't
-friendly to wait several dozens of seconds or more than one hundred seconds
-to wait IO completion during cpu hotplug. Who said that IO timeout has
-to be triggered during cpu hotplug? At least there isn't such issue with
-non-managed interrupt.
 
 
-
-Thanks, 
+thanks, 
 Ming
 
