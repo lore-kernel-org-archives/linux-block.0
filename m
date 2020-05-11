@@ -2,156 +2,121 @@ Return-Path: <SRS0=rKNO=6Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB148C54E8D
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 14:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A855C47255
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 15:02:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C49D7206D3
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 14:03:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589205812;
-	bh=mte4JPSRLJmHbYwoMavjmWzAHC4/NXzrIkz89ccYwJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OJDPvJwHLiMiflLij70muXzCDtWMFa6hy9T+xPIknjzckRXalSXnzCNMyQRLtm/tF
-	 tiOdQQ2RQymWFxrpJG1JfIvzfEPLPgR6ZwPSfCUNvqhSNNLVAP+AXh6yX0e2z6DyBj
-	 cqycZwk/7b6uooq2K7zNTDbljepjcf0ypWYE90Qc=
+	by mail.kernel.org (Postfix) with ESMTP id DF1D9206F9
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 15:02:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c/fzhA4u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730243AbgEKODc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 10:03:32 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37213 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729279AbgEKODc (ORCPT
+        id S1729120AbgEKPCZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 11:02:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44638 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726438AbgEKPCY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 10:03:32 -0400
-Received: by mail-pf1-f194.google.com with SMTP id d184so4793997pfd.4;
-        Mon, 11 May 2020 07:03:31 -0700 (PDT)
+        Mon, 11 May 2020 11:02:24 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A773C061A0C
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 08:02:23 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id t40so7917402pjb.3
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 08:02:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=FfcHG6dCtT1/Beq3duGCw1xmBaWsjgWcZxWLSDufIoo=;
+        b=c/fzhA4ubiZwGdqAM/oYm8GPV6J++F0ESrTunD5wFUlCGqrTJmEEVXtNnP33+MulMK
+         R5BL6TlhxRDhCvuqtTVsIkVVIntI1F4s7vi3lwSnOf0JR7B4oxZdyLs7mfG/HZyQvb/u
+         VZNBPW/nbWYpNetPXn29ruWVt2YWT9q5t8N6EFxgxrUqTS/3f+Un86E9nzgU3Oyk2NXg
+         CU2o6DRkrfyzf5YTK2jrjuMj35CjATcERL8CQGyS39laD2w6qzTPbW5+mHAMQPN5vshy
+         4recjNaRcFrlmx1AsiJWA85xU9KuGrdHK5tF+1Ivb4683ZRCbMgbvEAw2RtOWBIGmlZE
+         OL0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Vf5eO08K8TQtqLIZ8vTORrxsJc6yUCjJkazs1Bh1bj4=;
-        b=lc5Z6Brwq+2+DTyJYO5ysev2ojsZw6u4HFj9raKqUv77O9VPTftOtbcZH0+IPaw2Jm
-         m/FR5c9f8slMae8IC6y2eDIMtNTybWR+YEgoPVE05tRzGuEsgew8u7V661hXw2jlTVyS
-         puJgla520vsq+44Tr4JQsvoxSDN3Ab8NUa9MFtgyXj0Cxmo4OUeHEiKHUBcqN4tdwAxD
-         RCiSbqIj1v/ZtzyIx3IfrEMw67GufyyB+6wWF3+G2hYd/kC6BwAY4h18uKTP3ctDQ2dg
-         gd1fWPaJ3prjXBazNB19fsmU7t1HvyCkAZAVcR59y95R6xERk6rSRbVHhjg5RCqgag5c
-         H+hg==
-X-Gm-Message-State: AGi0PubDmXvjqAO6DaS4Bty9IRB9vXj0gz4WnnOrviCYCMz21tMrjx7x
-        XqqDbveMM4pllG+7vXlSKIA=
-X-Google-Smtp-Source: APiQypLEaFgNrNPd13k7XF1jNCRRMz3QrV3XwtPkQkwwm+0cvcB2J8SaXWT82L5S5cHirPigs0BYhQ==
-X-Received: by 2002:a62:81c1:: with SMTP id t184mr16312244pfd.236.1589205810901;
-        Mon, 11 May 2020 07:03:30 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id x10sm8078137pgq.79.2020.05.11.07.03.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2020 07:03:28 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 12F9040605; Mon, 11 May 2020 14:03:27 +0000 (UTC)
-Date:   Mon, 11 May 2020 14:03:27 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Christof Schmitt <christof.schmitt@de.ibm.com>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v4 3/5] blktrace: fix debugfs use after free
-Message-ID: <20200511140327.GO11244@42.do-not-panic.com>
-References: <20200509031058.8239-1-mcgrof@kernel.org>
- <20200509031058.8239-4-mcgrof@kernel.org>
- <20200510062636.GA3400311@kroah.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FfcHG6dCtT1/Beq3duGCw1xmBaWsjgWcZxWLSDufIoo=;
+        b=gh729y9ybuWLCUViFal2Y2+SX1kDROEUJrZxnyeXfsQixhVEL1rtj8IQ+inJroDNtS
+         ssrKv4hZGssPShjrJQ0+5KfLrtQtq9q4qMlq/wJQjTjflqTwHvD457PFA4UF8c2W4V8O
+         cU5DAzmbf1L+df+xm0t4p1X8K4QjDSrFQHVrjDYp+p1RUtmwwTiFVtZS9iq0OIsl2uUJ
+         OWm/ND7ogr6tsIjuI5jxnTmtkjz4oAVi9hLGfpouRFji2kh0ALUd4LGbNRzERuXixKCW
+         d/4Dl6MY9pU+IbV7gO+nG9d6OZdEafnRbYRxlc/BW1V0hJLhCAX5n74JtPrWlGWv3CVd
+         A7Nw==
+X-Gm-Message-State: AGi0PuY0jmwi5HMKSiHXOsUnHfKVfDG4zgrzIz2AVZaJm6OtSj4dj+M1
+        zNpQOb/jsk8mSw0wpFzpvot8YrrbGnE=
+X-Google-Smtp-Source: APiQypI0v45uQCD1lBJXNAM6fKHMgR7CPdAhrVIQti3ZxMe8Z4JzkZhpOCNCrNm0pl/4uEG+Fk2XSA==
+X-Received: by 2002:a17:90a:fb89:: with SMTP id cp9mr22494808pjb.40.1589209342620;
+        Mon, 11 May 2020 08:02:22 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:2dd6:4c58:486d:263e? ([2605:e000:100e:8c61:2dd6:4c58:486d:263e])
+        by smtp.gmail.com with ESMTPSA id v1sm5861227pgl.11.2020.05.11.08.02.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 May 2020 08:02:21 -0700 (PDT)
+Subject: Re: [GIT PULL v2] Block fixes for 5.7-rc5
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <98383cfe-ef17-45f3-a799-9eff8fc0f2fd@kernel.dk>
+ <CAHk-=wheALnWv1jaZM9yWhyrD_2nWppt96UYCQNE6V-DN_gGuA@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bbbbaa72-bee8-2af0-b05d-9ec31c8b1dca@kernel.dk>
+Date:   Mon, 11 May 2020 09:02:20 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200510062636.GA3400311@kroah.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAHk-=wheALnWv1jaZM9yWhyrD_2nWppt96UYCQNE6V-DN_gGuA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 10, 2020 at 08:26:36AM +0200, Greg KH wrote:
-> On Sat, May 09, 2020 at 03:10:56AM +0000, Luis Chamberlain wrote:
-> > diff --git a/block/blk-debugfs.c b/block/blk-debugfs.c
-> > index 19091e1effc0..d40f12aecf8a 100644
-> > --- a/block/blk-debugfs.c
-> > +++ b/block/blk-debugfs.c
-> > +static struct dentry *queue_debugfs_symlink_type(struct request_queue *q,
-> > +						 const char *src,
-> > +						 const char *dst,
-> > +						 enum blk_debugfs_dir_type type)
-> > +{
-> > +	struct dentry *dentry = ERR_PTR(-EINVAL);
-> > +	char *dir_dst;
-> > +
-> > +	dir_dst = kzalloc(PATH_MAX, GFP_KERNEL);
-> > +	if (!dir_dst)
-> > +		return dentry;
-> > +
-> > +	switch (type) {
-> > +	case BLK_DBG_DIR_BASE:
-> > +		if (dst)
-> > +			snprintf(dir_dst, PATH_MAX, "%s", dst);
-> > +		else if (!IS_ERR_OR_NULL(q->debugfs_dir))
-> > +			snprintf(dir_dst, PATH_MAX, "%s",
-> > +				 q->debugfs_dir->d_name.name);
+On 5/9/20 9:36 PM, Linus Torvalds wrote:
+> On Sat, May 9, 2020 at 6:33 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Let's try this again... BFQ was missing a header, I fixed that up.
 > 
-> How can debugfs_dir be NULL/error here?
-
-If someone were to move blk_queue_debugfs_symlink() to sg_add_device(),
-this can happen as the sd_probe() will run asynchronously. The comment
-in blk_queue_debugfs_symlink() suggest to be mindful of async probes.
-
-I can do-away with this *iff* we add an probe_complete call to the
-driver core class interface.
-
-> And grabbing the name of a debugfs file is sketchy, just use the name
-> that you think you already have, from the device, don't rely on debugfs
-> working here.
+> The fix looked trivial to me. That wasn't what worries me.
 > 
-> And why a symlink anyway?
-
-As the commit log explains, and the comment to the calling functions
-explains, we have a shared request_queue, and this has been the way,
-the symlink makes that sharing explicit. The next patch explains why
-using two blktraces on two separate devices would fail, the symlink
-makes this sharing quite obvious.
-
-It also simplifies the trace/kernel/blktrace.c code to just use the
-debugfs_dir only.
-
-> THat's a new addition, what is going to work
-> with that in userspace?
-
-This already works in userspace with blktrace. If you see a regression,
-please let me know.
-
-> > +#ifdef CONFIG_DEBUG_FS
-> > +	p->debugfs_sym = blk_queue_debugfs_symlink(disk->queue, dev_name(pdev),
-> > +						   disk->disk_name);
-> > +#endif
+> Why did you send me something that was clearly NOT TESTED AT ALL.
 > 
-> No need to #ifdef this, right?
+> If it hadn't even gotten build-testing, what _did_ it get?
+> 
+> The fact that it now builds doesn't make me much happier.
+> 
+> Why should I believe that this clearly totally untested pull request
+> is now any good?
+> 
+> Why should I believe that your _future_ pull requests are any good,
+> when they clearly have absolutely _zero_ testing at all?
+> 
+> Jens, in case you didn't catch on, this is a BIG PROBLEM.
+> 
+> Sending me completely untested crap is a bigger deal than "let's just
+> polish the crap until it at least compiles".
+> 
+> What have you done to make sure this doesn't happen again?
 
-It is needed because of the p->debugfs_sym.
+I was out all day yesterday, so didn't get a chance to follow up on this
+one. I did notice that you pulled it, thanks for that.
 
-> I feel like this patch series keeps getting more complex and messier
-> over time :(
+My test box is currently out of commission. While that doesn't mean it
+gets no testing, it does mean I'm using my laptop and qemu configs.
+Neither one of those have BFQ set, which is why it was missed. While
+that isn't ideal, it's not a core kernel file, or it would have never
+been missed. If you look at the patches, it's also not like they weren't
+reviewed, in fact they were quite heavily reviewed.
 
-I'm afraid that use of blktrace in scsi-generic is the culprit, the
-technical debt of the complexities around how the request_queue is
-shared and properly providing backward compatibilty by removing the
-debufs_looksup() has caught up to us.
+So, yes, I agree this was unfortunate, and I hate having sent something
+that didn't compile for a pretty common option. That sucks.
 
-If we were to agree to remove scsi-generic support from blktrace first,
-that would simplify things hugely.
+-- 
+Jens Axboe
 
-  Luis
