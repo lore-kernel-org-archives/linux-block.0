@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C40C54E95
-	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28295C54E8E
+	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDD10206F5
+	by mail.kernel.org (Postfix) with ESMTP id 04DEE206F5
 	for <linux-block@archiver.kernel.org>; Mon, 11 May 2020 13:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="K9H/XxKR"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="KRXYLnJA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730220AbgEKNxU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 May 2020 09:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33814 "EHLO
+        id S1730237AbgEKNxS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 May 2020 09:53:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730236AbgEKNxT (ORCPT
+        by vger.kernel.org with ESMTP id S1730235AbgEKNxR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 May 2020 09:53:19 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4BBC05BD09
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:18 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id e26so18129702wmk.5
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:18 -0700 (PDT)
+        Mon, 11 May 2020 09:53:17 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021CAC05BD09
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:16 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id d207so3993912wmd.0
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2020 06:53:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AbEb4GO4bkclUwQzLx6sFQQlfkXtWxWn8YWxJIwHuCk=;
-        b=K9H/XxKRhLbw0DBLPx2d/bJT9Hu1owrE1TAQm1u3v0JPG3X4wnmYXyGhRlvlnV1a0x
-         Lheot0hOfsQFo4F89kawwyVfLK5syq8JBaQA635w2BztTnhyKBBPC2EBTngmuEpLZiGM
-         X+Fk1pNTKz7lbBcep8vtRB+WkcFuMu2Yqt3xBg2+wVkrNLb8zjw8L3swDjJ4nh0efVm6
-         36EHJ4I4EN3D9jEK2f8BVr5IBnfJSXWefUj51IKGAnipOmo4n67Y4Llur/6cGnJ06nyI
-         2UJ5jwFBzZrXEBv8MC2dcDf4g5zYmNvQPjhfplqF8XQvCn8JBtHBXjuJ9gM9x6tm/qCG
-         zyog==
+        bh=fr2JN2ONO27tDOSK0FyCuMu7oJhbwCmJkS6mD+zarkc=;
+        b=KRXYLnJA5ct2XH2TXAhLjd8PSDRbazxCMFpmWFIv8uYe0nJ6pGNk9fFYsTikk7EcWi
+         KGTUooyV3II4oVSy6uJcW5DCM7u78KTlbTn4bPS4sKS3ZtVbaAL1KckOJ3h1tcmsRAnN
+         E6WVF/SNXxLAjbmLyQ043W7GkZxPuQFU7eFsEvblYZF1+LC5mC8fg6ELpD3ptFpvoWwL
+         s3UpjSK2RyqwTvO1NuIF9zSE+7O3Cvt6ilcUUn4siM+N7YHwWYUvhdE7BLSXLqneubFM
+         M/Ad0XOdezYRxit7VYcrV0Z6AeVs/I7kkINfRPSJsKV1XaMR4DGrqp8bjlJU9I2TZMRH
+         QMNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AbEb4GO4bkclUwQzLx6sFQQlfkXtWxWn8YWxJIwHuCk=;
-        b=T/Ez6FSXcOhLxCh6qsgfWb8oicQWXFRDnjpuKSvunXv5KAeyU7QnJ6xyX7KES+UN1k
-         DPjjCpDVv7mgAxH9mh6XozA9MirqpBKiZAQSoWTlw6qwpfFNLJUw90eGomEyRB++eSCq
-         lxQz3O+XXXZRzVRAZW1gbRRlHkc7vLfSyXTjHXoYMDaeR4yYrA56FjDsRm15c4AygF4O
-         yArEfzTXURNjo2wiAbzXP2tYJwTIs15+9J/veml3rBEFTbY4v34dItBz5fHJt0uwGOXn
-         Lvvm2gTJzMr51uv4AllHcqMgaCvJqxNx980DM8uPznC++sM9cajrTHLPKAMn5zkFDyb7
-         vMTA==
-X-Gm-Message-State: AGi0PuZGqyEPyLrZmaBbiVvCh8AazXjiL27J1T/wqaX2iONpxSqU3udy
-        ijVZ1srzlfqh6PyKLrE96JpRt5PrbnU20Uo=
-X-Google-Smtp-Source: APiQypIXN2mddvdqmU2pDmiCZC8Ay3wUQ00/clr12WD11pZki5u9pV1LJ2REC1UM9Xfb1vwgxfWx+g==
-X-Received: by 2002:a1c:305:: with SMTP id 5mr16811961wmd.60.1589205197211;
-        Mon, 11 May 2020 06:53:17 -0700 (PDT)
+        bh=fr2JN2ONO27tDOSK0FyCuMu7oJhbwCmJkS6mD+zarkc=;
+        b=Wz3pVvayNQWcH12QwDprB7n53qMuykRCfzSIUoPB7EA9YR1bRBcim+lEirvohKsefd
+         8zzI1Ibw2oDttgpyVZqqalTYBmKISeNiJX61DrBU6G9xdhfgrdp4kQwZj1Wnp43rHndO
+         0qgWZQuSfxbzXGZlcbjhx/AzLOHPORNhRCiP7Ay8liUa/SKfvzwug57KsldDiJzzQ9H3
+         9k+2ggTuj6IUNMXZdXDeTHVY0J0cohY3DmDPPXqIxiLSJHFV5ib0IWsYHfW49t7cVWcX
+         hlTtsGbw0ri1qdCdcvipe5GKUorJjBv2U2/Q1MTTcl9mfS+Pw7xlXfz9eBVYr02DPvjF
+         p5Cw==
+X-Gm-Message-State: AGi0Pua8pmwf0OdMleyKnxVTWScBQMewIu0oSJUsp3TkadDKuGyV3cwD
+        ouwKnQKSbJXXoiHVyRmFwd21ENZqnuEEqV0=
+X-Google-Smtp-Source: APiQypJX2mYxYCbRURKBfNirkzU+kziHPM6J44madwx6io11x6PKxSuYsUNG+ZWo9xkerbh7CnQHDA==
+X-Received: by 2002:a05:600c:21ca:: with SMTP id x10mr30088018wmj.113.1589205194369;
+        Mon, 11 May 2020 06:53:14 -0700 (PDT)
 Received: from dkxps.local (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
-        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.16
+        by smtp.gmail.com with ESMTPSA id v205sm9220018wmg.11.2020.05.11.06.53.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2020 06:53:16 -0700 (PDT)
+        Mon, 11 May 2020 06:53:13 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
 To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
         jgg@ziepe.ca, danil.kipnis@cloud.ionos.com,
         jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
-Subject: [PATCH v15 09/25] RDMA/rtrs: server: private header with server structs and functions
-Date:   Mon, 11 May 2020 15:51:15 +0200
-Message-Id: <20200511135131.27580-10-danil.kipnis@cloud.ionos.com>
+Subject: [PATCH v15 07/25] RDMA/rtrs: client: statistics functions
+Date:   Mon, 11 May 2020 15:51:13 +0200
+Message-Id: <20200511135131.27580-8-danil.kipnis@cloud.ionos.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
 References: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
@@ -79,24 +79,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jack Wang <jinpu.wang@cloud.ionos.com>
 
-This header describes main structs and functions used by rtrs-server
-module, mainly for accepting rtrs sessions, creating/destroying
-sysfs entries, accounting statistics on server side.
+This introduces set of functions used on client side to account
+statistics of RDMA data sent/received, amount of IOs inflight,
+latency, cpu migrations, etc.  Almost all statistics are collected
+using percpu variables.
 
 Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/infiniband/ulp/rtrs/rtrs-srv.h | 148 +++++++++++++++++++++++++
- 1 file changed, 148 insertions(+)
- create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-srv.h
+ drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c | 200 +++++++++++++++++++
+ 1 file changed, 200 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
 
-diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.h b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c b/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
 new file mode 100644
-index 000000000000..dc95b0932f0d
+index 000000000000..26bbe5d6dff5
 --- /dev/null
-+++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.h
-@@ -0,0 +1,148 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt-stats.c
+@@ -0,0 +1,200 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * RDMA Transport Layer
 + *
@@ -104,146 +105,198 @@ index 000000000000..dc95b0932f0d
 + * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
 + * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
 + */
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 +
-+#ifndef RTRS_SRV_H
-+#define RTRS_SRV_H
++#include "rtrs-clt.h"
 +
-+#include <linux/device.h>
-+#include <linux/refcount.h>
-+#include "rtrs-pri.h"
-+
-+/*
-+ * enum rtrs_srv_state - Server states.
-+ */
-+enum rtrs_srv_state {
-+	RTRS_SRV_CONNECTING,
-+	RTRS_SRV_CONNECTED,
-+	RTRS_SRV_CLOSING,
-+	RTRS_SRV_CLOSED,
-+};
-+
-+/* stats for Read and write operation.
-+ * see Documentation/ABI/testing/sysfs-class-rtrs-server for details
-+ */
-+struct rtrs_srv_stats_rdma_stats {
-+	struct {
-+		atomic64_t	cnt;
-+		atomic64_t	size_total;
-+	} dir[2];
-+};
-+
-+struct rtrs_srv_stats {
-+	struct kobject				kobj_stats;
-+	struct rtrs_srv_stats_rdma_stats	rdma_stats;
-+	struct rtrs_srv_sess			*sess;
-+};
-+
-+struct rtrs_srv_con {
-+	struct rtrs_con		c;
-+	atomic_t		wr_cnt;
-+	atomic_t		sq_wr_avail;
-+	struct list_head	rsp_wr_wait_list;
-+	spinlock_t		rsp_wr_wait_lock;
-+};
-+
-+/* IO context in rtrs_srv, each io has one */
-+struct rtrs_srv_op {
-+	struct rtrs_srv_con		*con;
-+	u32				msg_id;
-+	u8				dir;
-+	struct rtrs_msg_rdma_read	*rd_msg;
-+	struct ib_rdma_wr		tx_wr;
-+	struct ib_sge			tx_sg;
-+	struct list_head		wait_list;
-+	int				status;
-+};
-+
-+/*
-+ * server side memory region context, when always_invalidate=Y, we need
-+ * queue_depth of memory regrion to invalidate each memory region.
-+ */
-+struct rtrs_srv_mr {
-+	struct ib_mr	*mr;
-+	struct sg_table	sgt;
-+	struct ib_cqe	inv_cqe;	/* only for always_invalidate=true */
-+	u32		msg_id;		/* only for always_invalidate=true */
-+	u32		msg_off;	/* only for always_invalidate=true */
-+	struct rtrs_iu	*iu;		/* send buffer for new rkey msg */
-+};
-+
-+struct rtrs_srv_sess {
-+	struct rtrs_sess	s;
-+	struct rtrs_srv	*srv;
-+	struct work_struct	close_work;
-+	enum rtrs_srv_state	state;
-+	spinlock_t		state_lock;
-+	int			cur_cq_vector;
-+	struct rtrs_srv_op	**ops_ids;
-+	atomic_t		ids_inflight;
-+	wait_queue_head_t	ids_waitq;
-+	struct rtrs_srv_mr	*mrs;
-+	unsigned int		mrs_num;
-+	dma_addr_t		*dma_addr;
-+	bool			established;
-+	unsigned int		mem_bits;
-+	struct kobject		kobj;
-+	struct rtrs_srv_stats	*stats;
-+};
-+
-+struct rtrs_srv {
-+	struct list_head	paths_list;
-+	int			paths_up;
-+	struct mutex		paths_ev_mutex;
-+	size_t			paths_num;
-+	struct mutex		paths_mutex;
-+	uuid_t			paths_uuid;
-+	refcount_t		refcount;
-+	struct rtrs_srv_ctx	*ctx;
-+	struct list_head	ctx_list;
-+	void			*priv;
-+	size_t			queue_depth;
-+	struct page		**chunks;
-+	struct device		dev;
-+	unsigned int		dev_ref;
-+	struct kobject		*kobj_paths;
-+};
-+
-+struct rtrs_srv_ctx {
-+	struct rtrs_srv_ops ops;
-+	struct rdma_cm_id *cm_id_ip;
-+	struct rdma_cm_id *cm_id_ib;
-+	struct mutex srv_mutex;
-+	struct list_head srv_list;
-+};
-+
-+extern struct class *rtrs_dev_class;
-+
-+void close_sess(struct rtrs_srv_sess *sess);
-+
-+static inline void rtrs_srv_update_rdma_stats(struct rtrs_srv_stats *s,
-+					      size_t size, int d)
++void rtrs_clt_update_wc_stats(struct rtrs_clt_con *con)
 +{
-+	atomic64_inc(&s->rdma_stats.dir[d].cnt);
-+	atomic64_add(size, &s->rdma_stats.dir[d].size_total);
++	struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
++	struct rtrs_clt_stats *stats = sess->stats;
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	cpu = raw_smp_processor_id();
++	s = this_cpu_ptr(stats->pcpu_stats);
++	if (unlikely(con->cpu != cpu)) {
++		s->cpu_migr.to++;
++
++		/* Careful here, override s pointer */
++		s = per_cpu_ptr(stats->pcpu_stats, con->cpu);
++		atomic_inc(&s->cpu_migr.from);
++	}
 +}
 +
-+/* functions which are implemented in rtrs-srv-stats.c */
-+int rtrs_srv_reset_rdma_stats(struct rtrs_srv_stats *stats, bool enable);
-+ssize_t rtrs_srv_stats_rdma_to_str(struct rtrs_srv_stats *stats,
-+				    char *page, size_t len);
-+int rtrs_srv_reset_wc_completion_stats(struct rtrs_srv_stats *stats,
-+					bool enable);
-+int rtrs_srv_stats_wc_completion_to_str(struct rtrs_srv_stats *stats, char *buf,
-+					 size_t len);
-+int rtrs_srv_reset_all_stats(struct rtrs_srv_stats *stats, bool enable);
-+ssize_t rtrs_srv_reset_all_help(struct rtrs_srv_stats *stats,
-+				 char *page, size_t len);
++void rtrs_clt_inc_failover_cnt(struct rtrs_clt_stats *stats)
++{
++	struct rtrs_clt_stats_pcpu *s;
 +
-+/* functions which are implemented in rtrs-srv-sysfs.c */
-+int rtrs_srv_create_sess_files(struct rtrs_srv_sess *sess);
-+void rtrs_srv_destroy_sess_files(struct rtrs_srv_sess *sess);
++	s = this_cpu_ptr(stats->pcpu_stats);
++	s->rdma.failover_cnt++;
++}
 +
-+#endif /* RTRS_SRV_H */
++int rtrs_clt_stats_migration_cnt_to_str(struct rtrs_clt_stats *stats,
++					 char *buf, size_t len)
++{
++	struct rtrs_clt_stats_pcpu *s;
++
++	size_t used;
++	int cpu;
++
++	used = scnprintf(buf, len, "    ");
++	for_each_possible_cpu(cpu)
++		used += scnprintf(buf + used, len - used, " CPU%u", cpu);
++
++	used += scnprintf(buf + used, len - used, "\nfrom:");
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		used += scnprintf(buf + used, len - used, " %d",
++				  atomic_read(&s->cpu_migr.from));
++	}
++
++	used += scnprintf(buf + used, len - used, "\nto  :");
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		used += scnprintf(buf + used, len - used, " %d",
++				  s->cpu_migr.to);
++	}
++	used += scnprintf(buf + used, len - used, "\n");
++
++	return used;
++}
++
++int rtrs_clt_stats_reconnects_to_str(struct rtrs_clt_stats *stats, char *buf,
++				      size_t len)
++{
++	return scnprintf(buf, len, "%d %d\n",
++			 stats->reconnects.successful_cnt,
++			 stats->reconnects.fail_cnt);
++}
++
++ssize_t rtrs_clt_stats_rdma_to_str(struct rtrs_clt_stats *stats,
++				    char *page, size_t len)
++{
++	struct rtrs_clt_stats_rdma sum;
++	struct rtrs_clt_stats_rdma *r;
++	int cpu;
++
++	memset(&sum, 0, sizeof(sum));
++
++	for_each_possible_cpu(cpu) {
++		r = &per_cpu_ptr(stats->pcpu_stats, cpu)->rdma;
++
++		sum.dir[READ].cnt	  += r->dir[READ].cnt;
++		sum.dir[READ].size_total  += r->dir[READ].size_total;
++		sum.dir[WRITE].cnt	  += r->dir[WRITE].cnt;
++		sum.dir[WRITE].size_total += r->dir[WRITE].size_total;
++		sum.failover_cnt	  += r->failover_cnt;
++	}
++
++	return scnprintf(page, len, "%llu %llu %llu %llu %u %llu\n",
++			 sum.dir[READ].cnt, sum.dir[READ].size_total,
++			 sum.dir[WRITE].cnt, sum.dir[WRITE].size_total,
++			 atomic_read(&stats->inflight), sum.failover_cnt);
++}
++
++ssize_t rtrs_clt_reset_all_help(struct rtrs_clt_stats *s,
++				 char *page, size_t len)
++{
++	return scnprintf(page, len, "echo 1 to reset all statistics\n");
++}
++
++int rtrs_clt_reset_rdma_stats(struct rtrs_clt_stats *stats, bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (!enable)
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->rdma, 0, sizeof(s->rdma));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_cpu_migr_stats(struct rtrs_clt_stats *stats, bool enable)
++{
++	struct rtrs_clt_stats_pcpu *s;
++	int cpu;
++
++	if (!enable)
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->cpu_migr, 0, sizeof(s->cpu_migr));
++	}
++
++	return 0;
++}
++
++int rtrs_clt_reset_reconnects_stat(struct rtrs_clt_stats *stats, bool enable)
++{
++	if (!enable)
++		return -EINVAL;
++
++	memset(&stats->reconnects, 0, sizeof(stats->reconnects));
++
++	return 0;
++}
++
++int rtrs_clt_reset_all_stats(struct rtrs_clt_stats *s, bool enable)
++{
++	if (enable) {
++		rtrs_clt_reset_rdma_stats(s, enable);
++		rtrs_clt_reset_cpu_migr_stats(s, enable);
++		rtrs_clt_reset_reconnects_stat(s, enable);
++		atomic_set(&s->inflight, 0);
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static inline void rtrs_clt_update_rdma_stats(struct rtrs_clt_stats *stats,
++					       size_t size, int d)
++{
++	struct rtrs_clt_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++	s->rdma.dir[d].cnt++;
++	s->rdma.dir[d].size_total += size;
++}
++
++void rtrs_clt_update_all_stats(struct rtrs_clt_io_req *req, int dir)
++{
++	struct rtrs_clt_con *con = req->con;
++	struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
++	struct rtrs_clt_stats *stats = sess->stats;
++	unsigned int len;
++
++	len = req->usr_len + req->data_len;
++	rtrs_clt_update_rdma_stats(stats, len, dir);
++	if (sess->clt->mp_policy == MP_POLICY_MIN_INFLIGHT)
++		atomic_inc(&stats->inflight);
++}
++
++int rtrs_clt_init_stats(struct rtrs_clt_stats *stats)
++{
++	stats->pcpu_stats = alloc_percpu(typeof(*stats->pcpu_stats));
++	if (!stats->pcpu_stats)
++		return -ENOMEM;
++
++	/*
++	 * successful_cnt will be set to 0 after session
++	 * is established for the first time
++	 */
++	stats->reconnects.successful_cnt = -1;
++
++	return 0;
++}
 -- 
 2.20.1
 
