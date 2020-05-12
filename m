@@ -2,150 +2,141 @@ Return-Path: <SRS0=GKfo=62=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC61C54E4A
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 11:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C634CC54E4A
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 12:09:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 145F320675
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 11:29:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97F6F20674
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 12:09:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wrkD+sxi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7AkaL4j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729459AbgELL3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 07:29:46 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:32932 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727783AbgELL3q (ORCPT
+        id S1727783AbgELMJR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 08:09:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44478 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726891AbgELMJQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 07:29:46 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CBRh67089068;
-        Tue, 12 May 2020 11:29:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
- bh=ed+pKYBNJp9+4qzB+TxV2zN8WsPsAXnGVqs0RIQ/A1Y=;
- b=wrkD+sxiTH5K1QgidLkC5hAM0uRmg+vT6bL/8D0aVNqDp9JrkeVf3w3DVvC5f2aQPbUd
- S967aQKyAUNUxBh0ysm9XXFC4FTQ8l8lrXocvaSMb9yZuyD4OFB8jMCpuJCWviFA7IFj
- SE1jeZ1k2XPOy96ECw3vcz39YoSaNK6rAroOZjIOMTJSjU94lXctGSzr+ielwBvO72VD
- jKsvLTaEi3ML7RNpGTP2cFJJEcXO63AtIw6mNaIZf/ObnvNn0SZxOMmc6FOTmqDG+AzP
- EIMDclr5h8KfLa4JqD07/Mkjdp1PZY14akRy+6m4lYrwhd9mdNZyh1NMfjszb1xfN8cF gQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 30x3mbtc5s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 12 May 2020 11:29:44 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CBNvto194793;
-        Tue, 12 May 2020 11:29:44 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 30ydsq96cd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 May 2020 11:29:43 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04CBThxT018034;
-        Tue, 12 May 2020 11:29:43 GMT
-Received: from kadam (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 May 2020 04:29:42 -0700
-Date:   Tue, 12 May 2020 14:29:37 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [bug report] lightnvm: pblk: return NVM_ error on failed
- submission
-Message-ID: <20200512112937.GT1992@kadam>
-References: <20200511135058.GA216886@mwanda>
- <20200512090318.svnr2iqpyowh62bs@mpHalley.localdomain>
+        Tue, 12 May 2020 08:09:16 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC9FEC061A0C
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 05:09:16 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id s186so11381389qkd.4
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 05:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=T2fncHwwyBGjLFuee7Yap/yZ6xzfu3YuAgvACLPEZ7Y=;
+        b=A7AkaL4j2ljencVkYQF8gS0KzIaLvcuJEVQA+5p4eJ5gcPiZh1KOiWvwQHaGZWCFQf
+         j3doxibYshyggjkk1HqG1Zzl/TO2FX6V4QtYJeR5r/ZzoDlddYrLXMmoYk7m4Z4uQeUk
+         GA0GuJZrmtJbqCSiiAWgSIHB1R7cJd3yvYgG5i9AoOkZ4il85t9SyHGEr+tXotNFWBYz
+         zWCm+Y2S7trlfafeO+Hfj1etHayYQUVFoCuT7q+jQLJW8ahJS7JyV10hUaRuRcvhvp+C
+         Ab3uZo/wfczGgpu3Rz6l0DDOkH/L79NVkcwR56KQljvUUdwd4M628+9o0wBVnqbbbIDu
+         +xcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=T2fncHwwyBGjLFuee7Yap/yZ6xzfu3YuAgvACLPEZ7Y=;
+        b=aezZUjE5IPAFRT/QjsI2oMtDHB/Z0CO2nJrb6gY3tgrUpEAxDa1W52ozNz8hiGAqFv
+         dZCNZcbaFBu7xLlx7xUCCQoEIGAJd0HGTijQX+uIt+mIeyHnKI1yyJsd9zZzwveX9FUK
+         hub/3iuvmrcG1+OKEnSBX61hxpyybWOxtGhjCUDEQGx5E9fao6s8C+4mA98T2uxyBO06
+         Jrdmp7/nwPeki3aau8t9WE1EZXqBaDpcvCZyjWlsgnAleKzy64M9FWwNzB34EqbwbydV
+         EULFCYehfJCdNSL/AtWV+IWp2406ODedW7n/e0mG0AMDXRoNMgHI5314oWvjQbDapA3q
+         6MIw==
+X-Gm-Message-State: AGi0Pua9hOwihw4YloGvZyB3AcybQc7WhqIbrcSLta7NbO3tm9GWDUMQ
+        R73Y+PdQ0eICJl5TATl207z8yHSUPGd1sdBuwXU=
+X-Google-Smtp-Source: APiQypLQdANhCyKBqghA6PMs+bJNFuVmKNb3pfnA1C3KI3hZ9rxBeZOmHCVdCJkXqYSVTuxxPl5yyMncE5gRyNE/+eo=
+X-Received: by 2002:a37:97c1:: with SMTP id z184mr14862208qkd.249.1589285355848;
+ Tue, 12 May 2020 05:09:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200512090318.svnr2iqpyowh62bs@mpHalley.localdomain>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 impostorscore=0
- mlxscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
- malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120085
+References: <cover.1588856361.git.zhangweiping@didiglobal.com> <5211ebcc-a123-47be-1a59-b2d767bab519@acm.org>
+In-Reply-To: <5211ebcc-a123-47be-1a59-b2d767bab519@acm.org>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Tue, 12 May 2020 20:09:02 +0800
+Message-ID: <CAA70yB6iG3YmMzHDbhv864wi9dOonb9wFY8GiOMjD6DLSHokNA@mail.gmail.com>
+Subject: Re: [PATCH v6 0/5] Fix potential kernel panic when increase hardware queue
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, tom.leiming@gmail.com,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org,
+        Weiping Zhang <zhangweiping@didiglobal.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 12, 2020 at 11:03:18AM +0200, Javier González wrote:
-> On 11.05.2020 16:50, Dan Carpenter wrote:
-> > Hello Javier González,
-> > 
-> > The patch b6730dd4a954: "lightnvm: pblk: return NVM_ error on failed
-> > submission" from Jun 1, 2018, leads to the following static checker
-> > warning:
-> > 
-> > 	drivers/lightnvm/pblk-recovery.c:473 pblk_recov_scan_oob()
-> > 	warn: 'pblk->inflight_io.counter' not decremented on lines: 426.
-> > 
-> > drivers/lightnvm/pblk-recovery.c
-> >   417
-> >   418                  for (j = 0; j < pblk->min_write_pgs; j++, i++)
-> >   419                          ppa_list[i] =
-> >   420                                  addr_to_gen_ppa(pblk, paddr + j, line->id);
-> >   421          }
-> >   422
-> >   423          ret = pblk_submit_io_sync(pblk, rqd, data);
-> >   424          if (ret) {
-> >   425                  pblk_err(pblk, "I/O submission failed: %d\n", ret);
-> >   426                  return ret;
-> > 
-> > The pblk_submit_io_sync() increments the pblk->inflight_io counter but
-> > doesn't decrement it on all error paths.  It looks like something a
-> > little bit subtle is going no but I'm not sure how it works exactly.
-> > 
-> >   427          }
-> >   428
-> >   429          atomic_dec(&pblk->inflight_io);
-> >                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > 
-> >   430
-> >   431          /* If a read fails, do a best effort by padding the line and retrying */
-> >   432          if (rqd->error && rqd->error != NVM_RSP_WARN_HIGHECC) {
-> >   433                  int pad_distance, ret;
-> >   434
-> >   435                  if (padded) {
-> >   436                          pblk_log_read_err(pblk, rqd);
-> >   437                          return -EINTR;
-> >   438                  }
-> >   439
-> > 
-> > regards,
-> > dan carpenter
-> 
-> Hi Dan,
-> 
-> As I recall, we used this counter to see the total I/Os that were
-> submitted through pblk and wanted to keep track of how many of them
-> completed - so the error path did not decrement as it was I/O that had
-> made it to the FTL but had not reached the device.
-> 
-> I can see how this is confusing, as through time we introduced dedicated
-> counters to the failed I/Os and inflight became a counter on I/Os going
-> to the device.
-> 
-> I believe we can fix this by checking the return value on the submit
-> functions and decrementing in case of error.
-> 
-> Do you want me to send a patch or you want to fix it yourself?
+On Tue, May 12, 2020 at 9:31 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 2020-05-07 06:03, Weiping Zhang wrote:
+> > This series mainly fix the kernel panic when increase hardware queue,
+> > and also fix some other misc issue.
+>
+> Does this patch series survive blktests? I'm asking this because
+> blktests triggers the crash shown below for Jens' block-for-next branch.
+> I think this report is the result of a recent change.
+>
+> run blktests block/030
+>
+> null_blk: module loaded
+> Increasing nr_hw_queues to 8 fails, fallback to 1
+> ==================================================================
+> BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x2f2/0x830
+> Read of size 8 at addr 0000000000000128 by task nproc/8541
+>
+> CPU: 5 PID: 8541 Comm: nproc Not tainted 5.7.0-rc4-dbg+ #3
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
+> Call Trace:
+>  dump_stack+0xa5/0xe6
+>  __kasan_report.cold+0x65/0xbb
+>  kasan_report+0x45/0x60
+>  check_memory_region+0x15e/0x1c0
+>  __kasan_check_read+0x15/0x20
+>  blk_mq_map_swqueue+0x2f2/0x830
+>  __blk_mq_update_nr_hw_queues+0x3df/0x690
+>  blk_mq_update_nr_hw_queues+0x32/0x50
+>  nullb_device_submit_queues_store+0xde/0x160 [null_blk]
+>  configfs_write_file+0x1c4/0x250 [configfs]
+>  __vfs_write+0x4c/0x90
+>  vfs_write+0x14b/0x2d0
+>  ksys_write+0xdd/0x180
+>  __x64_sys_write+0x47/0x50
+>  do_syscall_64+0x6f/0x310
+>  entry_SYSCALL_64_after_hwframe+0x49/0xb3
+>
+> Thanks,
+>
 
-Could you send the patch?
+Hi Bart,
 
-regards,
-dan carpenter
+I don't test block/030, since I don't pull blktest very often.
 
+It's a different problem,
+because the mapping cann't be reset when do fallback, so the
+cpu[>=1] will point to a hctx(!=0).
+
+ it should be fixed by:
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bc34d6b572b6..d82cefb0474f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3365,8 +3365,8 @@ static void __blk_mq_update_nr_hw_queues(struct
+blk_mq_tag_set *set,
+                goto reregister;
+
+        set->nr_hw_queues = nr_hw_queues;
+-       blk_mq_update_queue_map(set);
+ fallback:
++       blk_mq_update_queue_map(set);
+        list_for_each_entry(q, &set->tag_list, tag_set_list) {
+                blk_mq_realloc_hw_ctxs(set, q);
+                if (q->nr_hw_queues != set->nr_hw_queues) {
+> Bart.
