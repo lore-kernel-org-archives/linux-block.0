@@ -2,115 +2,106 @@ Return-Path: <SRS0=GKfo=62=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 266DCCA90AF
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 15:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3BFCA90AF
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 16:03:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D09920722
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 15:55:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5488E2054F
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 16:03:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YeLXG78G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726388AbgELPzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 11:55:31 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:47020 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726055AbgELPzb (ORCPT
+        id S1727778AbgELQDJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 12:03:09 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:43342 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbgELQDJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 11:55:31 -0400
-Received: by mail-lf1-f66.google.com with SMTP id v5so6910898lfp.13;
-        Tue, 12 May 2020 08:55:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=g48m6UATo6ittbc8zmiHd+nCnE4Z2O4SkQw3uHErgIM=;
-        b=BNDQwbeY1ZDB10lw58fYQ4j+WD2b1yT+ZA4XOFxYjR9B3XhQ/KQxqC6d3iJLvqX6dO
-         y2k3znKXusqknDB1c5AwQupy82nUEeH+Y0wnpE44Ci2IcLkDb7j9pBBOoZw9LMC9+8Xf
-         dhqZlIBoL2n2vQQ00Voc+SoFydTgnzjnJdfIGYBWfKpU4uV1pJMG9aWgS/cgY34yfHv3
-         tLNRFG8VEJPlxfg17WHT7b2sETzUsfDWdhu2F/JQ7VPRkYif4hXMSGu9crVBVHaV7kEt
-         SDS30T59mKs1DfvUWv4WPCibdC3uMGQHDiuRz7k/1CbKwzSnhipDI3pX0zYN/qFy3Dkq
-         XcQg==
-X-Gm-Message-State: AOAM532vvsOZxd7kTV5ONBf7xyEnfG1D5XPI6x5l/KTjUGRr1Ejn/VG2
-        ssrAqAiaCwR29Wl2RmZ1+3geYzlObjg=
-X-Google-Smtp-Source: ABdhPJxOEeaibVyQ+fGo2bsT6JSeBbnWrXQI8EIzb9lT3B22F/auyapxxqP13EU50WcufaUEdXJtOA==
-X-Received: by 2002:a05:6512:110d:: with SMTP id l13mr14160283lfg.93.1589298927759;
-        Tue, 12 May 2020 08:55:27 -0700 (PDT)
-Received: from [192.168.1.8] ([213.87.130.150])
-        by smtp.gmail.com with ESMTPSA id h6sm13584444ljj.29.2020.05.12.08.55.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2020 08:55:27 -0700 (PDT)
-Subject: Re: [GIT PULL] Floppy cleanups for next
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <8d8cb63b-e1ff-ddef-a6e9-8f7adb21be60@linux.com>
- <51b29c15-39ea-b39e-55d8-ffb578661c44@kernel.dk>
-From:   Denis Efremov <efremov@linux.com>
-Autocrypt: addr=efremov@linux.com; keydata=
- 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
-Message-ID: <0c96d18a-3293-7c52-07b9-d59e3dd2058a@linux.com>
-Date:   Tue, 12 May 2020 18:55:25 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Tue, 12 May 2020 12:03:09 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CFv3dq026382;
+        Tue, 12 May 2020 16:02:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
+ message-id : date : from : to : cc : subject : references : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=xi1fE0OIOYczCayh3JK/aSeCXO3ktTVQ0riZLtwHdH4=;
+ b=YeLXG78GKQ66Yg8stE5C0S1j80EBGkyywTumsNnT/yMFlaWnxd1dv+iqzMLo99hYnkc4
+ 07mRSs9nK9S9dK0O1SMmHN6udMtt0zRCQjVYYvl1l3NwCkKTpp2uWnZL7E7wkZYKQoxC
+ sz3y9ev1QVln+FJoHtZANcUa8dQq30wsCsMGdppdDHH/CJfPUGQSsleV0dIJuM46Fha7
+ 0HRaq726sFLeAfJoFTCWcs+egQpsX5mX/2PpmBYiaiwR4V2YSfRP/waAD8LSVEld6TOE
+ 4x/WuykP5e0nFWdG6xTkYHcR981Q8dtRoKdgMIS9mlTXXbgZhOhOz3Zu/9gZzQVizvpc jg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 30x3gskwrg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 12 May 2020 16:02:58 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CFwZve194131;
+        Tue, 12 May 2020 16:02:58 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 30xbgk4jtf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 May 2020 16:02:58 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04CG2u76018573;
+        Tue, 12 May 2020 16:02:57 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123) by default (Oracle
+ Beehive Gateway v4.0) with ESMTP ; Tue, 12 May 2020 09:01:21 -0700
+ORGANIZATION: Oracle Corporation
+USER-AGENT: Gnus/5.13 (Gnus v5.13) Emacs/27.0.91 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <51b29c15-39ea-b39e-55d8-ffb578661c44@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Message-ID: <yq14ksl2ldd.fsf@oracle.com>
+Date:   Tue, 12 May 2020 09:01:18 -0700 (PDT)
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v11 00/10] Introduce Zone Append for writing to zoned
+ block devices
+References: <20200512085554.26366-1-johannes.thumshirn@wdc.com>
+ <20200512131748.GA15699@infradead.org>
+In-Reply-To: <20200512131748.GA15699@infradead.org> <(Christoph> <Hellwig's>
+ <message> <of> <"Tue> <> <12> <May> <2020> <06:17:48> <-0700")>
+Content-Type: text/plain; charset=ascii
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9619 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=733
+ spamscore=0 suspectscore=0 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005120121
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9619 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=763
+ malwarescore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005120121
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+Christoph,
 
-On 5/12/20 6:23 PM, Jens Axboe wrote:
-> Denis, can you rebase on my for-5.8/drivers branch?
+> The whole series looks good to me:
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>
+> I hope we can get this in 5.8 to help with the btrfs in 5.9.
 
-Yes, of course. I will resend the pull request.
+Yep, I think this looks good.
 
-Denis
+I suspect this series going to clash with my sd revalidate surgery. I
+may have to stick that in a postmerge branch based on Jens' tree.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
