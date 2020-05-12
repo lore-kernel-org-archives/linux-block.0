@@ -2,116 +2,142 @@ Return-Path: <SRS0=GKfo=62=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0EFC2D0F7
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 17:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6820AC2D0F9
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 20:46:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CA9A206B9
-	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 17:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3972A20747
+	for <linux-block@archiver.kernel.org>; Tue, 12 May 2020 20:46:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zA+fDW7r"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WVkcmgJK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgELRgl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 13:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbgELRgk (ORCPT
+        id S1731276AbgELUqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 16:46:03 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:32968 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731230AbgELUqB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 13:36:40 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5400AC061A0C
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 10:36:40 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id 18so6679350pfv.8
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 10:36:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gVLWN+8R61IdmiSJmCy4d5j/vIO/FBU8hJurAn8zeEk=;
-        b=zA+fDW7rsf78djWHisc/zKxTdzFpDcXavv1rH07ojEDeewEhVnsEyFiTm1P5RQl2T7
-         HdNG/EyhEBx5LlfjqJVSbqTKhnug9o6pfsSUJ4YB/V0dQ5QZWwtxBQfIi0hfHpaHE2bf
-         XJQtdLM9EaHOT+HEBDnW0qkgDmgtzmSxcE+ZmVLjdD0Cnb38c9ebVzcs3zl69c4W1uQU
-         Olqhz/0vH4QLgvVPsmO6o61yffHjIwg3O2T8vickdZgFjEKRBJSpSMRTjXDbCJmFes1d
-         iHbLa+wZMCXYThMyH4Txkg13a7EBsKa3RetlMf9ysJrglDypCNm9a+9w/evLE6d8nK1A
-         PUMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gVLWN+8R61IdmiSJmCy4d5j/vIO/FBU8hJurAn8zeEk=;
-        b=gRMTLocm+nh22BOtLfzZ4kGUGk67jeXPSWdvGs0uuVXyGCibfIgdu6Sa2EpDceIj/f
-         e6FTvmXoGdEQklLQpla6r6aC2AUho7DJ0mf3huekFQrYKdkmAnrvXBfd9wZMtK4aF1/Q
-         JFlnwm0Fg+UMKyYqOv1gx3rkEBc3OgT66E0y7bs/OaO/Nvhtn4VNbUhtspcFYQsemc9w
-         SGQchhTv2IhqiUPEfC8ACvcEeeT4By9tJKpeY/yCXR38z+aFpV0Qb9e34+Po+BsTli2L
-         0bnZv9pnzEQop5uxj2qSe6vGmdfEJRUScnIihdX/ah9n0MYhLx9IVcGJWLrJLD53zp62
-         6lUQ==
-X-Gm-Message-State: AGi0PuZsFpNRNxoBxpGDNM7Tg1ACpmdNMP51sX2h9DfdGYfPlWIlzxfA
-        N4AECplTo3jj6ql+ZtFH/YsVzg==
-X-Google-Smtp-Source: APiQypI3Kk35T4p8NhBJk8jfgGwfSQW7xkJf5PLtNEPvhBz2PN2/gQkK1ohTJ1uYwBqOBFtUokhb8g==
-X-Received: by 2002:a63:d850:: with SMTP id k16mr20711664pgj.190.1589304999651;
-        Tue, 12 May 2020 10:36:39 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:3541:a94b:8f16:bfe6? ([2605:e000:100e:8c61:3541:a94b:8f16:bfe6])
-        by smtp.gmail.com with ESMTPSA id t5sm10517208pgp.80.2020.05.12.10.36.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2020 10:36:39 -0700 (PDT)
-Subject: Re: [GIT PULL RESEND] Floppy cleanups for next
-To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <8d8cb63b-e1ff-ddef-a6e9-8f7adb21be60@linux.com>
- <565fc2e1-a790-241f-7a98-52a4c5ff8158@linux.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c6d08f09-7415-c92e-0f94-1eb521f2ecb0@kernel.dk>
-Date:   Tue, 12 May 2020 11:36:37 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Tue, 12 May 2020 16:46:01 -0400
+Received: from [10.137.106.115] (unknown [131.107.174.243])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 8F07520B717B;
+        Tue, 12 May 2020 13:46:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8F07520B717B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1589316360;
+        bh=5CBxyt/dWjF6Q8OMToqpHYiSWTCEtvdB+pOe8gCrEfY=;
+        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
+        b=WVkcmgJKlWO5sd4Ym7b0twaJ+ocp8Snnig3oIZ4pkHn5pnUqY1BXmXCY3Bw+51Z+s
+         X90hUe60ZiR2AqWXSpEUbn/uS2FeXHExR8GoMGidsjLfC2sHzVzjim1o7dW4T+oGkA
+         YCQzgAz1MQbdE6JNrLOTlL8TZo6s1APo8nKYqtFc=
+Subject: Re: [RFC PATCH v3 00/12] Integrity Policy Enforcement LSM (IPE)
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+To:     =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+        agk@redhat.com, axboe@kernel.dk, snitzer@redhat.com,
+        jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, jannh@google.com
+Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
+        sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
+        nramas@linux.microsoft.com, mdsakib@linux.microsoft.com,
+        linux-kernel@vger.kernel.org, corbet@lwn.net
+References: <20200415162550.2324-1-deven.desai@linux.microsoft.com>
+ <b07ac7e1-7cf5-92c9-81d0-64174c3d5024@digikod.net>
+ <0001755a-6b2a-b13b-960c-eb0b065c8e3c@linux.microsoft.com>
+Message-ID: <8ba7b15f-de91-40f7-fc95-115228345fce@linux.microsoft.com>
+Date:   Tue, 12 May 2020 13:46:00 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <565fc2e1-a790-241f-7a98-52a4c5ff8158@linux.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <0001755a-6b2a-b13b-960c-eb0b065c8e3c@linux.microsoft.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/20 11:33 AM, Denis Efremov wrote:
-> Rebased on for-5.8/drivers branch.
-> 
-> The following changes since commit 92decf118f1da4c866515f80387f9cf4d48611d6:
-> 
->   nvme: define constants for identification values (2020-05-09 16:18:36 -0600)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/evdenis/linux-floppy tags/floppy-for-5.8
-> 
-> for you to fetch changes up to 0836275df4db20daf040fff5d9a1da89c4c08a85:
-> 
->   floppy: suppress UBSAN warning in setup_rw_floppy() (2020-05-12 19:34:57 +0300)
-> 
-> ----------------------------------------------------------------
-> Floppy patches for 5.8
-> 
-> Cleanups:
->   - symbolic register names for x86,sparc64,sparc32,powerpc,parisc,m68k
->   - split of local/global variables for drive,fdc
->   - UBSAN warning suppress in setup_rw_floppy()
-> 
-> Changes were compile tested on arm, sparc64, powerpc, m68k. Many patches
-> introduce no binary changes by using defines instead of magic numbers.
-> The patches were also tested with syzkaller and simple write/read/format
-> tests on real hardware.
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
 
-Thanks, pulled.
 
--- 
-Jens Axboe
+On 5/11/2020 11:03 AM, Deven Bowers wrote:
+> 
+> 
+> On 5/10/2020 2:28 AM, Mickaël Salaün wrote:
+> 
+> [...snip]
+> 
+>>>
+>>> Additionally, rules are evaluated top-to-bottom. As a result, any
+>>> revocation rules, or denies should be placed early in the file to ensure
+>>> that these rules are evaluated before a rule with "action=ALLOW" is hit.
+>>>
+>>> IPE policy is designed to be forward compatible and backwards 
+>>> compatible,
+>>> thus any failure to parse a rule will result in the line being ignored,
+>>> and a warning being emitted. If backwards compatibility is not required,
+>>> the kernel commandline parameter and sysctl, ipe.strict_parse can be
+>>> enabled, which will cause these warnings to be fatal.
+>>
+>> Ignoring unknown command may lead to inconsistent beaviors. To achieve
+>> forward compatibility, I think it would be better to never ignore
+>> unknown rule but to give a way to userspace to known what is the current
+>> kernel ABI. This could be done with a securityfs file listing the
+>> current policy grammar.
+>>
+> 
+> That's a fair point. From a manual perspective, I think this is fine.
+> A human-user can interpret a grammar successfully on their own when new
+> syntax is introduced.
+> 
+>  From a producing API perspective, I'd have to think about it a bit 
+> more. Ideally, the grammar would be structured in such a way that the 
+> userland
+> interpreter of this grammar would not have to be updated once new syntax
+> is introduced, avoiding the need to update the userland binary. To do so
+> generically ("op=%s") is easy, but doesn't necessarily convey sufficient
+> information (what happens when a new "op" token is introduced?). I think
+> this may come down to regular expression representations of valid values
+> for these tokens, which worries me as regular expressions are incredibly
+> error-prone[1].
+> 
+> I'll see what I can come up with regarding this.
+
+I have not found a way that I like to expose some kind of grammar
+through securityfs that can be understood by usermode to parse the
+policy. Here's what I propose as a compromise:
+
+	1. I remove the unknown command behavior. This address your
+first point about inconsistent behaviors, and effectively removes the
+strict_parse sysctl (as it is always enabled).
+
+	2. I introduce a versioning system for the properties
+themselves. The valid set of properties and their versions
+can be found in securityfs, under say, ipe/config in a key=value
+format where `key` indicates the understood token, and `value`
+indicates their current version. For example:
+
+	$ cat $SECURITYFS/ipe/config
+	op=1
+	action=1
+	policy_name=1
+	policy_version=1
+	dmverity_signature=1
+	dmverity_roothash=1
+	boot_verified=1
+
+if new syntax is introduced, the version number is increased.
+
+	3. The format of those versions are documented as part of
+the admin-guide around IPE. If user-mode at that point wants to rip
+the documentation formats and correlate with the versioning, then
+it fulfills the same functionality as above, with out the complexity
+around exposing a parsing grammar and interpreting it on-the-fly.
+Many of these are unlikely to move past version 1, however.
+
+Thoughts?
 
