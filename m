@@ -2,42 +2,42 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB6EC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A79F8C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:17:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C339B2065C
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41FB42065C
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:17:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589393778;
-	bh=NzWZMwcALO2Ink36HyIe2Q6IAjI7yALGFMtqrR20MkY=;
+	s=default; t=1589393823;
+	bh=7OdZ4IZArUi+L4mY8bHUPOZTuTiNZ3U2f/N6r1sYvNA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ENaS/HugR2jeuqOP7cNhQBLfCBrSZHrlmTxQh531yLOZWl7qrUJHSsfTSPSY75hjc
-	 FHaljuLXVytw+4YV3SAS0Sy0zJVow9V0snp9blqeCz+iXGdZYpImqDJdg2QYJGbP8W
-	 7+v918Sre1PH6+qmdnBBs8Iq4tTN76N2pN1r6s4s=
+	b=IDMoVzZA0Vc23y2heY3mteq4hJLtSMuhQWN0cS4vao9OYfFmICE0Ui4o1N1//G+8h
+	 HJBXM4pLAMa+8PIDKR5hBfAGtOmqfaKlEKFE9vMqHk/nqH/aOPq89FPdgzvRWq4i31
+	 B2ZczunBUHXlxU7KqAWsmB3Ac5jMYzZhYfJdnPGo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389998AbgEMSQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 14:16:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59858 "EHLO mail.kernel.org"
+        id S2390079AbgEMSRA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 14:17:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60734 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733175AbgEMSQR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 14:16:17 -0400
+        id S1733175AbgEMSRA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 May 2020 14:17:00 -0400
 Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5141A20659;
-        Wed, 13 May 2020 18:16:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7312820659;
+        Wed, 13 May 2020 18:17:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589393777;
-        bh=NzWZMwcALO2Ink36HyIe2Q6IAjI7yALGFMtqrR20MkY=;
+        s=default; t=1589393820;
+        bh=7OdZ4IZArUi+L4mY8bHUPOZTuTiNZ3U2f/N6r1sYvNA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Cq1KZYO+yqMKqCVJa5a+qSnmOdDeU9MYSCzy91/uXLdy/BkeajpPJD0xzF62BtUSi
-         v0car04IsUZjOGWn3W2aZ+zTtfHX798CRa97jEknrFuB/IMQB9tCptjZNaol5OyNRV
-         0MPR7cNoSo5OM4BXzpqeaG6ZWtVSZ8K9dfVGyYm8=
-Date:   Wed, 13 May 2020 11:16:15 -0700
+        b=tksfnANLVmlXEvwcksk10I0WQqNWoydzaZczzHwya8RjqTwR39GMXOEVvQV4MIX04
+         35pvgssetPaGXSG5fZwqJf9km87mgDBWNsN3BLyEF2BGTjgo3GA1B5IhhFkpr9wl3K
+         a7yYuAlxQnWqha8R1PhibTiiwD1Xy5rYh4/0/Evc=
+Date:   Wed, 13 May 2020 11:16:58 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Satya Tangirala <satyat@google.com>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
@@ -46,49 +46,35 @@ Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
         Kuohong Wang <kuohong.wang@mediatek.com>,
         Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v12 06/12] scsi: ufs: UFS driver v2.1 spec crypto
- additions
-Message-ID: <20200513181615.GF1243@sol.localdomain>
+Subject: Re: [PATCH v12 07/12] scsi: ufs: UFS crypto API
+Message-ID: <20200513181658.GG1243@sol.localdomain>
 References: <20200430115959.238073-1-satyat@google.com>
- <20200430115959.238073-7-satyat@google.com>
+ <20200430115959.238073-8-satyat@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200430115959.238073-7-satyat@google.com>
+In-Reply-To: <20200430115959.238073-8-satyat@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 11:59:53AM +0000, Satya Tangirala wrote:
-> Add the crypto registers and structs defined in v2.1 of the JEDEC UFSHCI
-> specification in preparation to add support for inline encryption to
-> UFS.
+On Thu, Apr 30, 2020 at 11:59:54AM +0000, Satya Tangirala wrote:
+> Introduce functions to manipulate UFS inline encryption hardware
+> in line with the JEDEC UFSHCI v2.1 specification and to work with the
+> block keyslot manager.
+> 
+> The UFS crypto API will assume by default that a vendor driver doesn't
+> support UFS crypto, even if the hardware advertises the capability, because
+> a lot of hardware requires some special handling that's not specified in
+> the aforementioned JEDEC spec. Each vendor driver must explicity set
+> hba->caps |= UFSHCD_CAP_CRYPTO before ufshcd_hba_init_crypto is called to
+> opt-in to UFS crypto support.
 > 
 > Signed-off-by: Satya Tangirala <satyat@google.com>
 
 Looks good, you can add:
 
     Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-One nit:
-
-> diff --git a/drivers/scsi/ufs/ufshcd.h b/drivers/scsi/ufs/ufshcd.h
-> index 6ffc08ad85f63..1eebb589159d6 100644
-> --- a/drivers/scsi/ufs/ufshcd.h
-> +++ b/drivers/scsi/ufs/ufshcd.h
-> @@ -555,6 +555,12 @@ enum ufshcd_caps {
->  	 * for userspace to control the power management.
->  	 */
->  	UFSHCD_CAP_RPM_AUTOSUSPEND			= 1 << 6,
-> +
-> +	/*
-> +	 * This capability allows the host controller driver to use the
-> +	 * inline crypto engine, if it is present
-> +	 */
-> +	UFSHCD_CAP_CRYPTO				= (1 << 7),
->  };
-
-The other values of this enum don't use parentheses.
 
 - Eric
