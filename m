@@ -2,233 +2,222 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F5AC433E1
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6846CC433E3
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:05:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 990D520671
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:03:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rgheQSt1"
+	by mail.kernel.org (Postfix) with ESMTP id F33B120671
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589393134;
+	bh=s05yTJaJ2U7VPeAsl86vdaH+LHnd7rgYFl+s/FhtxDQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=d8C2QN4I8zE3tmm7CQEZjlcGl62DmqqYRIJ0fAliKWtnsV6bmO/CpR0W6AF5qvqxi
+	 pg2RnFSZX20fiQrlAACl36WGvJaPB7gMPyXm4CdQrvEOlcWbC2um50rsBkHLcfFM60
+	 bQVs8eukk6Uhn7K5y19mJZ+1T6sQ9Dt+fCcEOLAM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390060AbgEMSDI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 14:03:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390004AbgEMSDH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 14:03:07 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF22EC061A0C;
-        Wed, 13 May 2020 11:03:06 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id l1so577082qtp.6;
-        Wed, 13 May 2020 11:03:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3rJSQfC8qhqPgAdT7p7uqG4zYxw0cOP69JvDMu+AmoU=;
-        b=rgheQSt1YItEgWJaK+D0bGz+/qHfNOAGsXjdVRWwUQiGqsFIGS1wvoYG+aGTafU+PV
-         /Wam8diPaOgVXFRqoqZXtgZpq5ZoS7P+w+jAXFzuJRlWX6AXxlicjH1KtuahsCm7X1oB
-         1KM/eHxvJqcmXNEYPF4b+olwDLqfGRmRJKuO8mBihqp1FZjIXqkKRuN4K2fkmkt1KR4y
-         BY4TuAPJr9Fm34DqlaEou7vS5F0NmzH1lmiODzJGQ+/eBluPCt8Nwyn9o9iFlcChI8ne
-         mr8KP8dnkN8R85f07cGwIMBpujRbjafuA86KSdBGJqLxAx2+yPjgt33/gw2dY8MXvXik
-         E3ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3rJSQfC8qhqPgAdT7p7uqG4zYxw0cOP69JvDMu+AmoU=;
-        b=AL41WpjTzKYqMQaaAILJH7BYfajSEzOyfHxaPEF4CnDEXy/kxPXuWEjq/D9mQThxsY
-         TIgLjPtWoSqCWOknNR7VDtW1t7On35WjZiA25mC8yKRoezaf4y2ClhMjE3PnMtQSbyKa
-         LB757WRGI056kpd2w1hUMj9aziV6fO78R+87CmB3fgSUVI00ejadFvuPQjkqDkP50pZK
-         hr18nETEOZBWwjx5BzZtycI2w/dbnFob37KY3Sra07zsFZCnCcDRWKDM7xWWTz4yPSDt
-         uB8E+ZhDlsKuq9jR0ZH6LQBAxOjtNm2BUub3qj5DMjt+hi0J4XcZjji66ndHsLIE0PZ3
-         y3bA==
-X-Gm-Message-State: AOAM533Tcj/2BCeZkt8pfpcaHALVTC+JgZ8/tdCWDim+uta9d542dxad
-        pBKRtoWJLqwLH74/pSgiy9g=
-X-Google-Smtp-Source: ABdhPJxDn2Ym2XNFWojVR75lfnXVzFyakSG9ONLgdWGtZA79aHqlLy1IZQIR41clkG4iLZ4VQYg8Bg==
-X-Received: by 2002:ac8:67cf:: with SMTP id r15mr355571qtp.258.1589392985891;
-        Wed, 13 May 2020 11:03:05 -0700 (PDT)
-Received: from localhost.localdomain ([168.181.48.228])
-        by smtp.gmail.com with ESMTPSA id f68sm476350qke.74.2020.05.13.11.03.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 11:03:05 -0700 (PDT)
-Received: by localhost.localdomain (Postfix, from userid 1000)
-        id 8AE9BC08DA; Wed, 13 May 2020 15:03:02 -0300 (-03)
-Date:   Wed, 13 May 2020 15:03:02 -0300
-From:   Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
-        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH 32/33] sctp: add sctp_sock_get_primary_addr
-Message-ID: <20200513180302.GC2491@localhost.localdomain>
-References: <20200513062649.2100053-1-hch@lst.de>
- <20200513062649.2100053-33-hch@lst.de>
+        id S2390066AbgEMSFa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 14:05:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53336 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390038AbgEMSFa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 May 2020 14:05:30 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C06BB20659;
+        Wed, 13 May 2020 18:05:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589393130;
+        bh=s05yTJaJ2U7VPeAsl86vdaH+LHnd7rgYFl+s/FhtxDQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l53rt7Jg1VZ1vN8qaLqR66Jj869Gfdem81Rm7UNH+doDXsfeAfBcHsW6f0jhbVxyR
+         rLlwJ0ZJ1tWTRl0PeQzVcYkXg2mktappox+Aya1s8YtjZQufMhI3JeGpkVbA/m8Y/N
+         ScL5AC2Tzm0ntsf6eYnFfhgvw7yA2Nohsr1DH0jo=
+Date:   Wed, 13 May 2020 11:05:27 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Subject: Re: [PATCH v12 05/12] block: blk-crypto-fallback for Inline
+ Encryption
+Message-ID: <20200513180527.GE1243@sol.localdomain>
+References: <20200430115959.238073-1-satyat@google.com>
+ <20200430115959.238073-6-satyat@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200513062649.2100053-33-hch@lst.de>
+In-Reply-To: <20200430115959.238073-6-satyat@google.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 13, 2020 at 08:26:47AM +0200, Christoph Hellwig wrote:
-> Add a helper to directly get the SCTP_PRIMARY_ADDR sockopt from kernel
-> space without going through a fake uaccess.
-
-Same comment as on the other dlm/sctp patch.
-
+On Thu, Apr 30, 2020 at 11:59:52AM +0000, Satya Tangirala wrote:
+> Blk-crypto delegates crypto operations to inline encryption hardware when
+> available. The separately configurable blk-crypto-fallback contains a
+> software fallback to the kernel crypto API - when enabled, blk-crypto
+> will use this fallback for en/decryption when inline encryption hardware is
+> not available. This lets upper layers not have to worry about whether or
+> not the underlying device has support for inline encryption before
+> deciding to specify an encryption context for a bio. It also allows for
+> testing without actual inline encryption hardware - in particular, it
+> makes it possible to test the inline encryption code in ext4 and f2fs
+> simply by running xfstests with the inlinecrypt mount option, which in
+> turn allows for things like the regular upstream regression testing of
+> ext4 to cover the inline encryption code paths. For more details, refer
+> to Documentation/block/inline-encryption.rst.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/dlm/lowcomms.c       | 11 +++-----
->  include/net/sctp/sctp.h |  1 +
->  net/sctp/socket.c       | 57 +++++++++++++++++++++++++----------------
->  3 files changed, 39 insertions(+), 30 deletions(-)
-> 
-> diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-> index 6fa45365666a8..46d2d71b62c57 100644
-> --- a/fs/dlm/lowcomms.c
-> +++ b/fs/dlm/lowcomms.c
-> @@ -855,10 +855,9 @@ static int tcp_accept_from_sock(struct connection *con)
->  static int sctp_accept_from_sock(struct connection *con)
->  {
->  	/* Check that the new node is in the lockspace */
-> -	struct sctp_prim prim;
-> +	struct sctp_prim prim = { };
->  	int nodeid;
-> -	int prim_len, ret;
-> -	int addr_len;
-> +	int addr_len, ret;
->  	struct connection *newcon;
->  	struct connection *addcon;
->  	struct socket *newsock;
-> @@ -876,11 +875,7 @@ static int sctp_accept_from_sock(struct connection *con)
->  	if (ret < 0)
->  		goto accept_err;
->  
-> -	memset(&prim, 0, sizeof(struct sctp_prim));
-> -	prim_len = sizeof(struct sctp_prim);
-> -
-> -	ret = kernel_getsockopt(newsock, IPPROTO_SCTP, SCTP_PRIMARY_ADDR,
-> -				(char *)&prim, &prim_len);
-> +	ret = sctp_sock_get_primary_addr(con->sock->sk, &prim);
->  	if (ret < 0) {
->  		log_print("getsockopt/sctp_primary_addr failed: %d", ret);
->  		goto accept_err;
-> diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-> index b505fa082f254..c98b1d14db853 100644
-> --- a/include/net/sctp/sctp.h
-> +++ b/include/net/sctp/sctp.h
-> @@ -618,5 +618,6 @@ static inline bool sctp_newsk_ready(const struct sock *sk)
->  int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *kaddrs,
->  		int addrs_size, int op);
->  void sctp_sock_set_nodelay(struct sock *sk, bool val);
-> +int sctp_sock_get_primary_addr(struct sock *sk, struct sctp_prim *prim);
->  
->  #endif /* __net_sctp_h__ */
-> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> index 64c395f7a86d5..39bf8090dbe1e 100644
-> --- a/net/sctp/socket.c
-> +++ b/net/sctp/socket.c
-> @@ -6411,6 +6411,35 @@ static int sctp_getsockopt_local_addrs(struct sock *sk, int len,
->  	return err;
->  }
->  
-> +static int __sctp_sock_get_primary_addr(struct sock *sk, struct sctp_prim *prim)
+> Signed-off-by: Satya Tangirala <satyat@google.com>
+
+Generally looks good, you can add:
+
+    Reviewed-by: Eric Biggers <ebiggers@google.com>
+
+A few comments below for when you resend.  Also, can you split the paragraph
+above into multiple?  E.g.
+
+	Blk-crypto delegates...
+
+	This lets upper layers...
+
+	For more details, refer to...
+
+> +static int blk_crypto_keyslot_program(struct blk_keyslot_manager *ksm,
+> +				      const struct blk_crypto_key *key,
+> +				      unsigned int slot)
 > +{
-> +	struct sctp_association *asoc;
+> +	struct blk_crypto_keyslot *slotp = &blk_crypto_keyslots[slot];
+> +	const enum blk_crypto_mode_num crypto_mode =
+> +						key->crypto_cfg.crypto_mode;
+> +	int err;
 > +
-> +	asoc = sctp_id2assoc(sk, prim->ssp_assoc_id);
-> +	if (!asoc)
-> +		return -EINVAL;
-> +	if (!asoc->peer.primary_path)
-> +		return -ENOTCONN;
+> +	if (crypto_mode != slotp->crypto_mode &&
+> +	    slotp->crypto_mode != BLK_ENCRYPTION_MODE_INVALID)
+> +		blk_crypto_evict_keyslot(slot);
 > +
-> +	memcpy(&prim->ssp_addr, &asoc->peer.primary_path->ipaddr,
-> +		asoc->peer.primary_path->af_specific->sockaddr_len);
-> +
-> +	sctp_get_pf_specific(sk->sk_family)->addr_to_user(sctp_sk(sk),
-> +			(union sctp_addr *)&prim->ssp_addr);
+> +	slotp->crypto_mode = crypto_mode;
+> +	err = crypto_skcipher_setkey(slotp->tfms[crypto_mode], key->raw,
+> +				     key->size);
+> +	if (err) {
+> +		blk_crypto_evict_keyslot(slot);
+> +		return -EIO;
+> +	}
 > +	return 0;
 > +}
-> +
-> +int sctp_sock_get_primary_addr(struct sock *sk, struct sctp_prim *prim)
+
+Shouldn't this just return 'err'?  Is there a good reason for EIO?
+
+> +static bool blk_crypto_alloc_cipher_req(struct bio *src_bio,
+> +					struct blk_ksm_keyslot *slot,
+> +					struct skcipher_request **ciph_req_ret,
+> +					struct crypto_wait *wait)
 > +{
-> +	int ret;
+> +	struct skcipher_request *ciph_req;
+> +	const struct blk_crypto_keyslot *slotp;
+> +	int keyslot_idx = blk_ksm_get_slot_idx(slot);
 > +
-> +	lock_sock(sk);
-> +	ret = __sctp_sock_get_primary_addr(sk, prim);
-> +	release_sock(sk);
-> +	return ret;
+> +	slotp = &blk_crypto_keyslots[keyslot_idx];
+> +	ciph_req = skcipher_request_alloc(slotp->tfms[slotp->crypto_mode],
+> +					  GFP_NOIO);
+> +	if (!ciph_req) {
+> +		src_bio->bi_status = BLK_STS_RESOURCE;
+> +		return false;
+> +	}
+> +
+> +	skcipher_request_set_callback(ciph_req,
+> +				      CRYPTO_TFM_REQ_MAY_BACKLOG |
+> +				      CRYPTO_TFM_REQ_MAY_SLEEP,
+> +				      crypto_req_done, wait);
+> +	*ciph_req_ret = ciph_req;
+> +
+> +	return true;
 > +}
-> +EXPORT_SYMBOL(sctp_sock_get_primary_addr);
+
+I think it would be better to remove the 'src_bio' argument from here and make
+the two callers set BLK_STS_RESOURCE instead.  See e.g.
+bio_crypt_check_alignment() which uses a similar convention.
+
+> +/**
+> + * blk_crypto_fallback_decrypt_endio - clean up bio w.r.t fallback decryption
+> + *
+> + * @bio: the bio to clean up.
+> + *
+> + * Restore bi_private and bi_end_io, and queue the bio for decryption into a
+> + * workqueue, since this function will be called from an atomic context.
+> + */
+
+"clean up bio w.r.t fallback decryption" is misleading, since the main point of
+this function is to queue the bio for decryption.  How about:
+
+/**
+ * blk_crypto_fallback_decrypt_endio - queue bio for fallback decryption
+ *
+ * @bio: the bio to queue
+ *
+ * Restore bi_private and bi_end_io, and queue the bio for decryption into a
+ * workqueue, since this function will be called from an atomic context.
+ */
+
+> +bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+> +{
+> +	struct bio *bio = *bio_ptr;
+> +	struct bio_crypt_ctx *bc = bio->bi_crypt_context;
+> +	struct bio_fallback_crypt_ctx *f_ctx;
 > +
->  /* 7.1.10 Set Primary Address (SCTP_PRIMARY_ADDR)
->   *
->   * Requests that the local SCTP stack use the enclosed peer address as
-> @@ -6421,35 +6450,19 @@ static int sctp_getsockopt_primary_addr(struct sock *sk, int len,
->  					char __user *optval, int __user *optlen)
->  {
->  	struct sctp_prim prim;
-> -	struct sctp_association *asoc;
-> -	struct sctp_sock *sp = sctp_sk(sk);
-> +	int ret;
->  
->  	if (len < sizeof(struct sctp_prim))
->  		return -EINVAL;
-> -
-> -	len = sizeof(struct sctp_prim);
-> -
-> -	if (copy_from_user(&prim, optval, len))
-> +	if (copy_from_user(&prim, optval, sizeof(struct sctp_prim)))
->  		return -EFAULT;
->  
-> -	asoc = sctp_id2assoc(sk, prim.ssp_assoc_id);
-> -	if (!asoc)
-> -		return -EINVAL;
-> -
-> -	if (!asoc->peer.primary_path)
-> -		return -ENOTCONN;
-> -
-> -	memcpy(&prim.ssp_addr, &asoc->peer.primary_path->ipaddr,
-> -		asoc->peer.primary_path->af_specific->sockaddr_len);
-> -
-> -	sctp_get_pf_specific(sk->sk_family)->addr_to_user(sp,
-> -			(union sctp_addr *)&prim.ssp_addr);
-> +	ret = __sctp_sock_get_primary_addr(sk, &prim);
-> +	if (ret)
-> +		return ret;
->  
-> -	if (put_user(len, optlen))
-> +	if (put_user(len, optlen) || copy_to_user(optval, &prim, len))
->  		return -EFAULT;
-> -	if (copy_to_user(optval, &prim, len))
-> -		return -EFAULT;
-> -
->  	return 0;
->  }
->  
-> -- 
-> 2.26.2
-> 
+> +	if (!tfms_inited[bc->bc_key->crypto_cfg.crypto_mode]) {
+> +		bio->bi_status = BLK_STS_IOERR;
+> +		return false;
+> +	}
+
+This can only happen if the user forgot to call blk_crypto_start_using_key().
+And if someone does that, it might be hard for them to understand why they're
+getting IOERR.  A WARN_ON_ONCE() and a comment would help:
+
+	if (WARN_ON_ONCE(!tfms_inited[bc->bc_key->crypto_cfg.crypto_mode])) {
+		/* User didn't call blk_crypto_start_using_key() first */
+		bio->bi_status = BLK_STS_IOERR;
+		return false;
+	}
+
+This would be similar to how __blk_crypto_bio_prep() does
+WARN_ON_ONCE(!bio_has_data(bio)) to catch another type of usage error.
+
+> +/*
+> + * Prepare blk-crypto-fallback for the specified crypto mode.
+> + * Returns -ENOPKG if the needed crypto API support is missing.
+> + */
+> +int blk_crypto_fallback_start_using_mode(enum blk_crypto_mode_num mode_num)
+> +{
+> +	const char *cipher_str = blk_crypto_modes[mode_num].cipher_str;
+> +	struct blk_crypto_keyslot *slotp;
+> +	unsigned int i;
+> +	int err = 0;
+> +
+> +	/*
+> +	 * Fast path
+> +	 * Ensure that updates to blk_crypto_keyslots[i].tfms[mode_num]
+> +	 * for each i are visible before we try to access them.
+> +	 */
+> +	if (likely(smp_load_acquire(&tfms_inited[mode_num])))
+> +		return 0;
+> +
+> +	mutex_lock(&tfms_init_lock);
+> +	err = blk_crypto_fallback_init();
+> +	if (err)
+> +		goto out;
+> +
+> +	if (tfms_inited[mode_num])
+> +		goto out;
+
+It would make more sense to check tfms_inited[mode_num] immediately after
+acquiring the mutex, given that it's checked before.
+
+- Eric
