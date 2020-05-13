@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF04C2D0F9
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA64C2D0F9
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51405206F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:30:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E36ED206A5
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sR5EMxLZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K/jg5G3e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730762AbgEMG2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 02:28:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46150 "EHLO
+        id S1730547AbgEMG2n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730668AbgEMG2s (ORCPT
+        with ESMTP id S1730530AbgEMG2l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 02:28:48 -0400
+        Wed, 13 May 2020 02:28:41 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED09BC061A0E;
-        Tue, 12 May 2020 23:28:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D66C061A0C;
+        Tue, 12 May 2020 23:28:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=VriKupxRYsJlL2uxVcilvd0cTKLGSfORdeySMsHEWM0=; b=sR5EMxLZAt8B7bA1KxAxjuv6wd
-        og2rytl6Jc0A+7hlcV8EXWIPDvh8UgyAUErFODUlIipxvuEJxEu+x0A+pFk4I9pySnf1f6T/pJsTu
-        KUB2RdqvTmiJkfhDXGEnvLdf2lvs3k6LXxLu8DoXiOA5hsxN5fm073OAF4CTNSLl0Ep1EftErwAfc
-        ruLPqbJ9CiN7AAnc5ZtNGwBAsO1fO1kYiDgavZXz4LAWVgsG1wmLD7Lx1Aqs0ZTJ+3mTtyrj5sjE6
-        Cyq8JY7tvf4boI1g+6bKr+ilMXPAkaVbj0N5rx+PLXDX6Fpi6bbyIG6W385vcDxJrl4RMddG0+l3X
-        3F/wY21g==;
+        bh=lMcK9CNUbL+jju+sk+Za5xMNx7m0mtw5FFKEm8NMVMg=; b=K/jg5G3eSawPK0UgXqlgiKpniO
+        iQGminHfpsZ0iAQm5G2xvHE6Ts2uFMeueVjStcfcc6mPDGVam7oYNQ5fEdQjya7SUoWTVv+vq+1Av
+        5dyDRT7peBilThhJ541YhcelQiUZw3QUdNPVhiBg9Sm6DJyIbitzrjQ5GQR4ji0cN/BRm4+KMm0ve
+        NaTz4eZNC4YIHuybjoe0Wd4aYxLDNjeqB89uRkKqPLfZmsONQh4VhN2pkjvJbvCcsn+/MGYeqB1pO
+        Ud1BoyUghJ52iAtNvvkZ/HL/8DEkGLSApB9bLnUv/vRUHnGY+E7iDuFilz7K3AqjwPEnrts5UZOx9
+        YsmiuAXQ==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYksL-00054q-LC; Wed, 13 May 2020 06:28:18 +0000
+        id 1jYkri-0004T2-Vl; Wed, 13 May 2020 06:27:39 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -56,9 +56,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 28/33] sctp: add sctp_sock_set_nodelay
-Date:   Wed, 13 May 2020 08:26:43 +0200
-Message-Id: <20200513062649.2100053-29-hch@lst.de>
+Subject: [PATCH 16/33] tcp: add tcp_sock_set_keepintvl
+Date:   Wed, 13 May 2020 08:26:31 +0200
+Message-Id: <20200513062649.2100053-17-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -70,88 +70,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a helper to directly set the SCTP_NODELAY sockopt from kernel space
+Add a helper to directly set the TCP_KEEPINTVL sockopt from kernel space
 without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/dlm/lowcomms.c       | 10 ++--------
- include/net/sctp/sctp.h |  1 +
- net/sctp/socket.c       |  8 ++++++++
- 3 files changed, 11 insertions(+), 8 deletions(-)
+ include/linux/tcp.h   |  1 +
+ net/ipv4/tcp.c        | 12 ++++++++++++
+ net/rds/tcp_listen.c  |  4 +---
+ net/sunrpc/xprtsock.c |  3 +--
+ 4 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-index e4939d770df53..6fa45365666a8 100644
---- a/fs/dlm/lowcomms.c
-+++ b/fs/dlm/lowcomms.c
-@@ -1034,7 +1034,6 @@ static int sctp_bind_addrs(struct connection *con, uint16_t port)
- static void sctp_connect_to_sock(struct connection *con)
- {
- 	struct sockaddr_storage daddr;
--	int one = 1;
- 	int result;
- 	int addr_len;
- 	struct socket *sock;
-@@ -1081,8 +1080,7 @@ static void sctp_connect_to_sock(struct connection *con)
- 	log_print("connecting to %d", con->nodeid);
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 4d3a3e959e45b..dad18ca361c01 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -500,5 +500,6 @@ void tcp_sock_set_quickack(struct sock *sk, int val);
+ int tcp_sock_set_syncnt(struct sock *sk, int val);
+ void tcp_sock_set_user_timeout(struct sock *sk, u32 val);
+ int tcp_sock_set_keepidle(struct sock *sk, int val);
++int tcp_sock_set_keepintvl(struct sock *sk, int val);
  
- 	/* Turn off Nagle's algorithm */
--	kernel_setsockopt(sock, SOL_SCTP, SCTP_NODELAY, (char *)&one,
--			  sizeof(one));
-+	sctp_sock_set_nodelay(sock->sk, true);
- 
- 	/*
- 	 * Make sock->ops->connect() function return in specified time,
-@@ -1296,7 +1294,6 @@ static int sctp_listen_for_all(void)
- 	struct socket *sock = NULL;
- 	int result = -EINVAL;
- 	struct connection *con = nodeid2con(0, GFP_NOFS);
--	int one = 1;
- 
- 	if (!con)
- 		return -ENOMEM;
-@@ -1311,10 +1308,7 @@ static int sctp_listen_for_all(void)
- 	}
- 
- 	sock_set_rcvbuf(sock->sk, NEEDED_RMEM);
--	result = kernel_setsockopt(sock, SOL_SCTP, SCTP_NODELAY, (char *)&one,
--				   sizeof(one));
--	if (result < 0)
--		log_print("Could not set SCTP NODELAY error %d\n", result);
-+	sctp_sock_set_nodelay(sock->sk, true);
- 
- 	write_lock_bh(&sock->sk->sk_callback_lock);
- 	/* Init con struct */
-diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-index f702b14d768ba..b505fa082f254 100644
---- a/include/net/sctp/sctp.h
-+++ b/include/net/sctp/sctp.h
-@@ -617,5 +617,6 @@ static inline bool sctp_newsk_ready(const struct sock *sk)
- 
- int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *kaddrs,
- 		int addrs_size, int op);
-+void sctp_sock_set_nodelay(struct sock *sk, bool val);
- 
- #endif /* __net_sctp_h__ */
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 30c981d9f6158..64c395f7a86d5 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -3066,6 +3066,14 @@ static int sctp_setsockopt_nodelay(struct sock *sk, char __user *optval,
- 	return 0;
+ #endif	/* _LINUX_TCP_H */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 22eb9159c7d05..b714f2b2fa54e 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2923,6 +2923,18 @@ int tcp_sock_set_keepidle(struct sock *sk, int val)
  }
+ EXPORT_SYMBOL(tcp_sock_set_keepidle);
  
-+void sctp_sock_set_nodelay(struct sock *sk, bool val)
++int tcp_sock_set_keepintvl(struct sock *sk, int val)
 +{
++	if (val < 1 || val > MAX_TCP_KEEPINTVL)
++		return -EINVAL;
++
 +	lock_sock(sk);
-+	sctp_sk(sk)->nodelay = val;
++	tcp_sk(sk)->keepalive_intvl = val * HZ;
 +	release_sock(sk);
++	return 0;
 +}
-+EXPORT_SYMBOL(sctp_sock_set_nodelay);
++EXPORT_SYMBOL(tcp_sock_set_keepintvl);
 +
  /*
-  *
-  * 7.1.1 SCTP_RTOINFO
+  *	Socket option code for TCP.
+  */
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index 8c76969d8c878..a5db2f8bb7339 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -53,12 +53,10 @@ int rds_tcp_keepalive(struct socket *sock)
+ 		goto bail;
+ 
+ 	tcp_sock_set_keepidle(sock->sk, keepidle);
+-
+ 	/* KEEPINTVL is the interval between successive probes. We follow
+ 	 * the model in xs_tcp_finish_connecting() and re-use keepidle.
+ 	 */
+-	ret = kernel_setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL,
+-				(char *)&keepidle, sizeof(keepidle));
++	tcp_sock_set_keepintvl(sock->sk, keepidle);
+ bail:
+ 	return ret;
+ }
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index ea79446789c69..e20de4a52edb7 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -2108,8 +2108,7 @@ static void xs_tcp_set_socket_timeouts(struct rpc_xprt *xprt,
+ 	/* TCP Keepalive options */
+ 	sock_set_keepalive(sock->sk, 1);
+ 	tcp_sock_set_keepidle(sock->sk, keepidle);
+-	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPINTVL,
+-			(char *)&keepidle, sizeof(keepidle));
++	tcp_sock_set_keepintvl(sock->sk, keepidle);
+ 	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPCNT,
+ 			(char *)&keepcnt, sizeof(keepcnt));
+ 
 -- 
 2.26.2
 
