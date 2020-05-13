@@ -6,140 +6,99 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7634C2D0FB
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD80C2D0F8
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:30:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A843124927
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67C7B206F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:30:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ODn9WEuN"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Xr8CCr30"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726885AbgEMCWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 22:22:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36254 "EHLO
+        id S1728493AbgEMCaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 22:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728608AbgEMCWM (ORCPT
+        with ESMTP id S1728488AbgEMCaD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 22:22:12 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59328C061A0E
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:22:12 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id f23so6416428pgj.4
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:22:12 -0700 (PDT)
+        Tue, 12 May 2020 22:30:03 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F521C061A0E
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:30:03 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id w65so7317493pfc.12
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WL6LqGqep6zlwpLFE3J2WtwpQ1zPXw+qIg3YMMRroEc=;
-        b=ODn9WEuN3+VIjabru6hxefEEFpSjA/Z6TMKlCJQ8GFk0WbZMHU01ilMeVQ152xyzqB
-         /ksC/wI4GAaRQFkGM4O8JOaS/B0eqajte+SZj6KRKLnHLQ8BqUJms9eBz8gZVf8sT6gV
-         MoCCRNsdZpC+0NXfAmksqDDFCsvvztUei3BoG6I5rR0YbrFIBysb1pPrU1j9tKPVybkN
-         hU/iMaSGS8dfUMgTLlPIhNgX+Mj7E2r3jd4gIO+F+Kans8g9jnYAXmfI9bSUnWZWBHAn
-         VSI0wXCKKLevcpVOIqC0zrrM+vKsBtVAQN1CYpeHITQ6o1hMFVH/d7MNQadn5AZVVH74
-         9dhQ==
+        bh=dRl4YBE3TMl0SsiV0tZC4Iqnfxs3bO+Y25NzUvxt45A=;
+        b=Xr8CCr30EpIbBzcUFmUdyJWqPcgRkkyRgJ8EuNa0FB0nt4+zA1favzlpTbLpHBYluj
+         0/tj98qvnGqD/m6l/2oGIJwAffNk9yJA2BSCxn5LEmEWplcJ+dgJlXrpxRH8DRfcpcYA
+         wS4eohtPzs81f4zWnLjkt0emvJ/qDc7ig6TaFCP3NwmZ7/3sZaN8dgm1FezAXzmmOjQI
+         ApPtLtHQ7JZgaLDQnQwvgal1A8fGW8ejl+PqS9hpr5JUOw/pc/EWAF1PvYOmacb5uWWR
+         pjZ8957+0ACJvt8MyHypjm/HHd0BEubrKizI9BTOATq0bJLhD7Zfgzd13UKC2FouaNPT
+         B5eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=WL6LqGqep6zlwpLFE3J2WtwpQ1zPXw+qIg3YMMRroEc=;
-        b=JwrGSOMK1RPfCLucavIv6NAfmyTiKaOA0zntAKLpVEQhsztPW9JdjiX7i87EEWWQo5
-         UOMDjyxJywiWjRdmEegOnEP5koO8l32DUGJ0N6ckiKicv4x3jAC+LrNJPJOUFhSd/Ot6
-         qUGSqjmCV01RCEgXBL1ThKc5xgmSRwMkRI2G9i7f/XcWdR9cCS2Wa12/BDyNzgfnItYE
-         ACGE4Y37vaVW/gOcWf4ZVuCK9aYakVIgkyKXtoeili/N2UHwnBahKSNA5NlNiMbkQXGr
-         qnMW1x73vT3xtWu2W1xr1WZdPDpGyDL8pMtex43cAMYkqJEOqpbH+/xdReatZw35xTBz
-         NzbQ==
-X-Gm-Message-State: AOAM530AL1o7h6cX5oJDGpBWYjoWLooQsbqgjDKWuP8AWU6M+VO3ncN7
-        BH2ucfEsAJLUZL4gVqRsHJI7pU+4OJM=
-X-Google-Smtp-Source: ABdhPJzBWEZaQALZkzwtMiPWjqkVlIGIbT1og0SaBl+rDkzzwKyMIYkI6jc8cPk19OESIVSdFHSnCA==
-X-Received: by 2002:a65:40c3:: with SMTP id u3mr9448390pgp.305.1589336531879;
-        Tue, 12 May 2020 19:22:11 -0700 (PDT)
+        bh=dRl4YBE3TMl0SsiV0tZC4Iqnfxs3bO+Y25NzUvxt45A=;
+        b=ki2emVD57Ei7WAtwI2euHpOlfnCkqyqux4B/sB884dc9zTMhivyFHDysEPOUIgHAGp
+         +lg43pIlMb+WPM+Nz/jtsZDCVY6zxr4Y42TyFsPKutTk1M/qCPyFRvGB/R/zvB99dZkT
+         zci3MDO6qM5EfRkMqJKtju8Ic3eFVHqSEgkRhR0/q7TtVbz+f4VZbjSlxfnx5QSnd0pf
+         3ws78rbdrJwBp0IffNPi/eiz40s9G4/XT+4wB6WOigzj6HAmvRvKZ0BaspwJawz4COcO
+         7cGwfpgfsrsdE9hspV+4yWpxhB1e9WKzXnti+o3+7gNpCO7p0OF3rZWubu73cLcMCk7l
+         jVMg==
+X-Gm-Message-State: AOAM530NId4lYauSSM1epDCo2LK7iC1KTE1CuDhdf6by0o7fJaaH9ICy
+        5wDh9bAWKrP+Nb9y/p+RC5oLnw==
+X-Google-Smtp-Source: ABdhPJwgw+y9MRoDkNWNDGa5d1jKOUxGsSXi+rxOaTsYZXTBVkbDWUxv6H3GSNMHgnPDg+ecwsEaOQ==
+X-Received: by 2002:aa7:8c0a:: with SMTP id c10mr13866827pfd.177.1589337002687;
+        Tue, 12 May 2020 19:30:02 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:1d8:eb9:1d84:211c? ([2605:e000:100e:8c61:1d8:eb9:1d84:211c])
-        by smtp.gmail.com with ESMTPSA id k10sm13228551pfa.163.2020.05.12.19.22.10
+        by smtp.gmail.com with ESMTPSA id g17sm2797521pgg.43.2020.05.12.19.30.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2020 19:22:10 -0700 (PDT)
-Subject: Re: BUG:loop:blk_update_request: I/O error, dev loop6, sector 49674
- op 0x9:(WRITE_ZEROES)
-To:     "Xu, Yanfei" <yanfei.xu@windriver.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        "Darrick J. Wong" <darrick.wong@oracle.com>
-References: <dac81506-0065-ee64-fcd1-c9f1d002b4fb@windriver.com>
- <c51460e0-1abb-799d-9ee9-de9c39315eda@windriver.com>
+        Tue, 12 May 2020 19:30:02 -0700 (PDT)
+Subject: Re: [PATCH v4 10/10] loop: Add LOOP_CONFIGURE ioctl
+To:     Martijn Coenen <maco@android.com>
+Cc:     Narayan Kamath <narayan@google.com>,
+        Zimuzo Ezeozue <zezeozue@google.com>, kernel-team@android.com,
+        Martijn Coenen <maco@google.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20200429140341.13294-1-maco@android.com>
+ <20200429140341.13294-11-maco@android.com>
+ <CAB0TPYHwor85-fWKu+OMT-1ys2L7OSqVoReJRzNOMAE0xK+yzg@mail.gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8f3eeb22-2e85-aa3f-6287-b3c467d39a8e@kernel.dk>
-Date:   Tue, 12 May 2020 20:22:08 -0600
+Message-ID: <1f3064a9-105f-02bb-6a1a-eb9875d292e3@kernel.dk>
+Date:   Tue, 12 May 2020 20:29:59 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <c51460e0-1abb-799d-9ee9-de9c39315eda@windriver.com>
+In-Reply-To: <CAB0TPYHwor85-fWKu+OMT-1ys2L7OSqVoReJRzNOMAE0xK+yzg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/20 8:14 PM, Xu, Yanfei wrote:
-> Hi,
+On 5/12/20 12:46 AM, Martijn Coenen wrote:
+> Hi Jens,
 > 
-> After operating the /dev/loop which losetup with an image placed in**tmpfs,
-> 
-> I got the following ERROR messages:
-> 
-> ----------------[cut here]---------------------
-> 
-> [  183.110770] blk_update_request: I/O error, dev loop6, sector 524160 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.123949] blk_update_request: I/O error, dev loop6, sector 522 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.137123] blk_update_request: I/O error, dev loop6, sector 16906 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.150314] blk_update_request: I/O error, dev loop6, sector 32774 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.163551] blk_update_request: I/O error, dev loop6, sector 49674 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.176824] blk_update_request: I/O error, dev loop6, sector 65542 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.190029] blk_update_request: I/O error, dev loop6, sector 82442 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.203281] blk_update_request: I/O error, dev loop6, sector 98310 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.216531] blk_update_request: I/O error, dev loop6, sector 115210 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> [  183.229914] blk_update_request: I/O error, dev loop6, sector 131078 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-> 
-> 
-> I have found the commit which introduce this issue by git bisect :
-> 
->     commit :efcfec57[loop: fix no-unmap write-zeroes request behavior]
+> What do you think of this series?
 
-Please CC the author of that commit too. Leaving the rest quoted below.
+Looks acceptable to me, but I'm getting a failure applying it to
+for-5.8/drivers on this patch:
 
-> Kernrel version: Linux version 5.6.0
-> 
-> Frequency: everytime
-> 
-> steps to reproduce:
-> 
->   1.git clone mainline kernel
-> 
->   2.compile kernel with ARCH=x86_64, and then boot the system with it
-> 
->     (seems other arch also can reproduce it )
-> 
->   3.make an image by "dd of=/tmp/image if=/dev/zero bs=1M count=256"
-> 
->   *4.**place the image in tmpfs directory*
-> 
->   5.losetup /dev/loop6 /PATH/TO/image
-> 
->   6.mkfs.ext2 /dev/loop6
-> 
-> 
-> Any comments will be appreciated.
-> 
-> 
-> Thanks,
-> 
-> Yanfei
-> 
-> 
-> 
-> 
-> 
+Applying: loop: Refactor loop_set_status() size calculation
 
+So you'll probably want to respin on the right branch.
 
 -- 
 Jens Axboe
