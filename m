@@ -2,84 +2,102 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C3EC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 17:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B27C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 17:39:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34A4A2065D
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 17:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589391030;
-	bh=DUxmL2DW8AGAbEDV0E3S6D4sSXQdPvCUpnXQhcWR/Ds=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ggMJ9mSpf+d36rkESglChHZOoyApwsj9WizqlMjqjWQZpOsWVEEjflBSXjx1RzaXV
-	 Mi8B4vBvxxzF+vBdaItYczR6AvwpD/Oc+R+Hhww5Qx6oJkTETurZz59AdWnc8Weduc
-	 evvh+LAruWUwocQOMx+caqqFGZK3B4TxRtM/z5bA=
+	by mail.kernel.org (Postfix) with ESMTP id 68F0A20671
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 17:39:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389826AbgEMRa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 13:30:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55432 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732731AbgEMRa2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 13:30:28 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 98B3E2053B;
-        Wed, 13 May 2020 17:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589391028;
-        bh=DUxmL2DW8AGAbEDV0E3S6D4sSXQdPvCUpnXQhcWR/Ds=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Uwum2c3QVIrZZTK8102bH9IE8j/ppIJPr2jA9iSaVCnTI6vRkvuPK9CWKzh9OSW+Q
-         Ja2aYpKfBVoClFrP15T4+vEHspb8GhNnlHfFc/vYHCvXEiydgTWIMXyI/Y6q/kX4zP
-         6Z93+gkKt1WwCVYlW1zTdXo49pvlmgsdvZKt7itM=
-Date:   Wed, 13 May 2020 10:30:26 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v12 04/12] block: Make blk-integrity preclude hardware
- inline encryption
-Message-ID: <20200513173026.GD1243@sol.localdomain>
-References: <20200430115959.238073-1-satyat@google.com>
- <20200430115959.238073-5-satyat@google.com>
+        id S1732848AbgEMRjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 13:39:07 -0400
+Received: from smtprelay0150.hostedemail.com ([216.40.44.150]:54324 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732694AbgEMRjG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 May 2020 13:39:06 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 213E41802912F;
+        Wed, 13 May 2020 17:39:05 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: watch82_4eccc56996d20
+X-Filterd-Recvd-Size: 2964
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 13 May 2020 17:39:01 +0000 (UTC)
+Message-ID: <ecc165c33962d964d518c80de605af632eee0474.camel@perches.com>
+Subject: Re: remove kernel_setsockopt and kernel_getsockopt
+From:   Joe Perches <joe@perches.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
+        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+Date:   Wed, 13 May 2020 10:38:59 -0700
+In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
+References: <20200513062649.2100053-1-hch@lst.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.1-2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200430115959.238073-5-satyat@google.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 11:59:51AM +0000, Satya Tangirala wrote:
-> Whenever a device supports blk-integrity, make the kernel pretend that
-> the device doesn't support inline encryption (essentially by setting the
-> keyslot manager in the request queue to NULL).
+On Wed, 2020-05-13 at 08:26 +0200, Christoph Hellwig wrote:
+> this series removes the kernel_setsockopt and kernel_getsockopt
+> functions, and instead switches their users to small functions that
+> implement setting (or in one case getting) a sockopt directly using
+> a normal kernel function call with type safety and all the other
+> benefits of not having a function call.
 > 
-> There's no hardware currently that supports both integrity and inline
-> encryption. However, it seems possible that there will be such hardware
-> in the near future (like the NVMe key per I/O support that might support
-> both inline encryption and PI).
+> In some cases these functions seem pretty heavy handed as they do
+> a lock_sock even for just setting a single variable, but this mirrors
+> the real setsockopt implementation - counter to that a few kernel
+> drivers just set the fields directly already.
 > 
-> But properly integrating both features is not trivial, and without
-> real hardware that implements both, it is difficult to tell if it will
-> be done correctly by the majority of hardware that support both.
-> So it seems best not to support both features together right now, and
-> to decide what to do at probe time.
+> Nevertheless the diffstat looks quite promising:
 > 
-> Signed-off-by: Satya Tangirala <satyat@google.com>
+>  42 files changed, 721 insertions(+), 799 deletions(-)
 
-Looks good, you can add:
+trivia:
 
-    Reviewed-by: Eric Biggers <ebiggers@google.com>
+It might be useful to show overall object size change.
 
-- Eric
+More EXPORT_SYMBOL uses increase object size a little.
+
+And not sure it matters much except it reduces overall object
+size, but these patches remove (unnecessary) logging on error
+and that could be mentioned in the cover letter too.
+
+e.g.:
+
+-       ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_LINGER,
+-                       (char *)&sol, sizeof(sol));
+-       if (ret) {
+-               dev_err(nctrl->device,
+-                       "failed to set SO_LINGER sock opt %d\n", ret);
+-               goto err_sock;
+-       }
++       sock_set_linger(queue->sock->sk, true, 0);
+
+
+
