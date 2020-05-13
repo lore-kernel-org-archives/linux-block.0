@@ -2,137 +2,184 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC2CC2D0FA
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97702C2D0FA
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:55:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A509E20661
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:22:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77A15205ED
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:55:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jd6eQslI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726778AbgEMJWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 05:22:22 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2203 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726492AbgEMJWV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 05:22:21 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 51264219B84C37D45BE6;
-        Wed, 13 May 2020 10:22:20 +0100 (IST)
-Received: from [127.0.0.1] (10.210.165.35) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Wed, 13 May
- 2020 10:22:18 +0100
-Subject: Re: [PATCH V11 11/12] blk-mq: re-submit IO in case that hctx is
- inactive
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200513034803.1844579-1-ming.lei@redhat.com>
- <20200513034803.1844579-12-ming.lei@redhat.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <657924a4-ec2b-059a-f65d-8eb126d1272b@huawei.com>
-Date:   Wed, 13 May 2020 10:21:25 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S2388209AbgEMJzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 05:55:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47337 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1733142AbgEMJzK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 May 2020 05:55:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589363708;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tzBS/jLdTb068W2nVUtkrki+xUGRQfHWTTRWe8Lr4SY=;
+        b=Jd6eQslIazalWBHpzLGn3G9guPQQpYDOjbIiExt0NaUDdRjHOaDTO9+kPomjOm2p2YbdUp
+        RNsiXwnSUQ4KAX/LRaczLpQyTfIcwXAhQI6c0qtKRSDycHmdDX2GReef+wGMlYnTXWI3pm
+        rtAqtSTqeHpk5GVAQEkyS9neCox189c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-ZeZbhPaFObmAIvf0JF14pQ-1; Wed, 13 May 2020 05:55:06 -0400
+X-MC-Unique: ZeZbhPaFObmAIvf0JF14pQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 335C3461;
+        Wed, 13 May 2020 09:55:05 +0000 (UTC)
+Received: from localhost (ovpn-12-166.pek2.redhat.com [10.72.12.166])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 510697D948;
+        Wed, 13 May 2020 09:55:03 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH 2/9] blk-mq: pass hctx to blk_mq_dispatch_rq_list
+Date:   Wed, 13 May 2020 17:54:36 +0800
+Message-Id: <20200513095443.2038859-3-ming.lei@redhat.com>
+In-Reply-To: <20200513095443.2038859-1-ming.lei@redhat.com>
+References: <20200513095443.2038859-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200513034803.1844579-12-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.165.35]
-X-ClientProxiedBy: lhreml701-chm.china.huawei.com (10.201.108.50) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13/05/2020 04:48, Ming Lei wrote:
-> +static void blk_mq_resubmit_rq(struct request *rq)
-> +{
-> +	struct request *nrq;
-> +	unsigned int flags = 0;
-> +	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-> +	struct blk_mq_tags *tags = rq->q->elevator ? hctx->sched_tags :
-> +		hctx->tags;
-> +	bool reserved = blk_mq_tag_is_reserved(tags, rq->internal_tag);
-> +
-> +	if (rq->rq_flags & RQF_PREEMPT)
-> +		flags |= BLK_MQ_REQ_PREEMPT;
-> +	if (reserved)
-> +		flags |= BLK_MQ_REQ_RESERVED;
-> +	/*
-> +	 * Queue freezing might be in-progress, and wait freeze can't be
-> +	 * done now because we have request not completed yet, so mark this
-> +	 * allocation as BLK_MQ_REQ_FORCE for avoiding this allocation &
-> +	 * freeze hung forever.
-> +	 */
-> +	flags |= BLK_MQ_REQ_FORCE;
-> +
+All requests in the 'list' of blk_mq_dispatch_rq_list belong to same
+hctx, so it is better to pass hctx instead of request queue, because
+blk-mq's dispatch target is hctx instead of request queue.
 
-So setting this flag triggers this WARN:
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Baolin Wang <baolin.wang7@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 14 ++++++--------
+ block/blk-mq.c       |  6 +++---
+ block/blk-mq.h       |  2 +-
+ 3 files changed, 10 insertions(+), 12 deletions(-)
 
-[  101.308666] Modules linked in:
-[  101.311710] CPU: 23 PID: 1491 Comm: bash Not tainted 
-5.7.0-rc2-00106-g63430d85fea8 #337
-[  101.319698] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon 
-D05 IT21 Nemo 2.0 RC0 04/18/2018
-[  101.328816] pstate: 60000005 (nZCv daif -PAN -UAO)
-[  101.333593] pc : blk_get_request+0xa4/0xac
-[  101.337676] lr : blk_get_request+0xa4/0xac
-[  101.341758] sp : ffff800021773aa0
-[  101.345059] x29: ffff800021773aa0 x28: 0000000000000004
-[  101.350357] x27: 0000000000000004 x26: 0000000000000004
-[  101.355655] x25: 0000000000000000 x24: ffff800010414b20
-[  101.360953] x23: 0000000000000008 x22: ffff001fb0ecf900
-[  101.366251] x21: ffff001fb0a42f40 x20: 0000000000004000
-[  101.371549] x19: 0000000000000010 x18: 0000000000000000
-[  101.376846] x17: 0000000000000000 x16: 0000000000000000
-[  101.382144] x15: 0000000000000000 x14: 0000000000000000
-[  101.387441] x13: 0000000000000000 x12: 0000000000000000
-[  101.392739] x11: 000000000000064f x10: 0000000000000008
-[  101.398036] x9 : ffff8000118f1c28 x8 : 2074736575716572
-[  101.403334] x7 : 5f7465675f6b6c62 x6 : ffff041febee21d0
-[  101.408632] x5 : 0000000000000000 x4 : 0000000000000000
-[  101.413930] x3 : 0000000000000000 x2 : ffff041febee9080
-[  101.419229] x1 : 0000000100000000 x0 : 000000000000001a
-[  101.424527] Call trace:
-[  101.426961]  blk_get_request+0xa4/0xac
-[  101.430698]  blk_mq_hctx_deactivate+0x270/0x3e4
-[  101.435215]  blk_mq_hctx_notify_dead+0x198/0x1b4
-[  101.439821]  cpuhp_invoke_callback+0x170/0x1e0
-[  101.444253]  _cpu_down+0x100/0x238
-[  101.447642]  cpu_down+0x40/0x68
-[  101.450770]  cpu_device_down+0x14/0x1c
-[  101.454508]  cpu_subsys_offline+0xc/0x14
-[  101.458417]  device_offline+0x98/0xc4
-[  101.462065]  online_store+0x3c/0x88
-[  101.465541]  dev_attr_store+0x14/0x24
-[  101.469192]  sysfs_kf_write+0x44/0x4c
-[  101.472840]  kernfs_fop_write+0xfc/0x208
-[  101.476751]  __vfs_write+0x18/0x3c
-[  101.480140]  vfs_write+0xb4/0x1b8
-[  101.483442]  ksys_write+0x4c/0xac
-[  101.486743]  __arm64_sys_write+0x1c/0x24
-[  101.490654]  el0_svc_common.constprop.3+0xb8/0x170
-[  101.495431]  do_el0_svc+0x70/0x88
-[  101.498734]  el0_sync_handler+0xf0/0x12c
-[  101.502643]  el0_sync+0x140/0x180
-[  101.505944] ---[ end trace 137fed615521bd97 ]--
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a31e281e9d31..632c6f8b63f7 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -96,10 +96,9 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 	struct elevator_queue *e = q->elevator;
+ 	LIST_HEAD(rq_list);
+ 	int ret = 0;
++	struct request *rq;
+ 
+ 	do {
+-		struct request *rq;
+-
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+ 			break;
+ 
+@@ -131,7 +130,7 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 		 * in blk_mq_dispatch_rq_list().
+ 		 */
+ 		list_add(&rq->queuelist, &rq_list);
+-	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true));
+ 
+ 	return ret;
+ }
+@@ -161,10 +160,9 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 	LIST_HEAD(rq_list);
+ 	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
+ 	int ret = 0;
++	struct request *rq;
+ 
+ 	do {
+-		struct request *rq;
+-
+ 		if (!list_empty_careful(&hctx->dispatch)) {
+ 			ret = -EAGAIN;
+ 			break;
+@@ -200,7 +198,7 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 		/* round robin for fair dispatch */
+ 		ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
+ 
+-	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true));
+ 
+ 	WRITE_ONCE(hctx->dispatch_from, ctx);
+ 	return ret;
+@@ -240,7 +238,7 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
++		if (blk_mq_dispatch_rq_list(hctx, &rq_list, false)) {
+ 			if (has_sched_dispatch)
+ 				ret = blk_mq_do_dispatch_sched(hctx);
+ 			else
+@@ -253,7 +251,7 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 		ret = blk_mq_do_dispatch_ctx(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+-		blk_mq_dispatch_rq_list(q, &rq_list, false);
++		blk_mq_dispatch_rq_list(hctx, &rq_list, false);
+ 	}
+ 
+ 	return ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 74ecaffd2d64..f064e7923ea5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1199,10 +1199,10 @@ static void blk_mq_handle_zone_resource(struct request *rq,
+ /*
+  * Returns true if we did some work AND can potentially do more.
+  */
+-bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
++bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			     bool got_budget)
+ {
+-	struct blk_mq_hw_ctx *hctx;
++	struct request_queue *q = hctx->queue;
+ 	struct request *rq, *nxt;
+ 	bool no_tag = false;
+ 	int errors, queued;
+@@ -1224,7 +1224,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 
+-		hctx = rq->mq_hctx;
++		WARN_ON_ONCE(hctx != rq->mq_hctx);
+ 		if (!got_budget && !blk_mq_get_dispatch_budget(q)) {
+ 			blk_mq_put_driver_tag(rq);
+ 			no_budget_avail = true;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9540770de9dc..9c0e93d4fe38 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -40,7 +40,7 @@ struct blk_mq_ctx {
+ void blk_mq_exit_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+-bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
++bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *, bool);
+ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ 				bool kick_requeue_list);
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+-- 
+2.25.2
 
-(the series tests ok, apart from that)
-
-Thanks,
-John
-
-> +	/* avoid allocation failure by clearing NOWAIT */
-> +	nrq = blk_get_request(rq->q, rq->cmd_flags & ~REQ_NOWAIT, flags);
-> +	if (!nrq)
-> +		return;
