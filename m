@@ -7,189 +7,223 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F7DCA90AF
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1491C2D0F9
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:57:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B9442176D
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0CCC205ED
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 09:57:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHrNRL+H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZrUsSR2w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733242AbgEMJzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 05:55:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29415 "EHLO
+        id S2387994AbgEMJ5C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 05:57:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53487 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732890AbgEMJzl (ORCPT
+        by vger.kernel.org with ESMTP id S1732755AbgEMJzq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 05:55:41 -0400
+        Wed, 13 May 2020 05:55:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589363739;
+        s=mimecast20190719; t=1589363745;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=n6OU/DkDD48PDBgW4Zv7e/nWJ7EMYcyhuxVdos3tCxc=;
-        b=CHrNRL+H5yW5SXXfgOG9PAN9OwEHIkKxXSVtomPL7aXfHp7i2R+B3SPh/VHpwsHEAs4iEG
-        0VlbBG4UgkyYjpH089g8sKeWVlgTjs6SAdTJIk/yF7+aaH6HdT+WkE6bAOOnEfYfNxschg
-        p6rZAvRsi+/arVSJssZv2XjxFN5xRnA=
+        bh=9ZSmOciSTSakM6Vtl7e8s66/+xEcnsSEhy1sbA1S8lg=;
+        b=ZrUsSR2wmjr/F6IPiTOmUAmQDCJdX9SgsYdz6Hiv4uhKPai5pdSAutKBQUtdtJXNpBZnyb
+        KmJn7lADqOxvXFxxaSTfZa9T/H6QhkODP3lgi5/Za9PJrDry7LFMeBw1PG6ZRwnJg4NHHe
+        q/LGyGZb0q+7zLrRDydC0j0cZnkike4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-nvykJyroMZGTYNKgTqHxOw-1; Wed, 13 May 2020 05:55:37 -0400
-X-MC-Unique: nvykJyroMZGTYNKgTqHxOw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-448-C8F3uCocMz-q2sXeOKJxyQ-1; Wed, 13 May 2020 05:55:43 -0400
+X-MC-Unique: C8F3uCocMz-q2sXeOKJxyQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DAA418B6423;
-        Wed, 13 May 2020 09:55:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FA0BEC1A0;
+        Wed, 13 May 2020 09:55:42 +0000 (UTC)
 Received: from localhost (ovpn-12-166.pek2.redhat.com [10.72.12.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7094E60C84;
-        Wed, 13 May 2020 09:55:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2FB85C1BB;
+        Wed, 13 May 2020 09:55:38 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Baolin Wang <baolin.wang7@gmail.com>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH 8/9] blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
-Date:   Wed, 13 May 2020 17:54:42 +0800
-Message-Id: <20200513095443.2038859-9-ming.lei@redhat.com>
+Subject: [PATCH 9/9] blk-mq: support batching dispatch in case of io scheduler
+Date:   Wed, 13 May 2020 17:54:43 +0800
+Message-Id: <20200513095443.2038859-10-ming.lei@redhat.com>
 In-Reply-To: <20200513095443.2038859-1-ming.lei@redhat.com>
 References: <20200513095443.2038859-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass obtained budget count to blk_mq_dispatch_rq_list(), and prepare
-for supporting fully batching submission.
+More and more drivers want to get batching requests queued from
+block layer, such as mmc, and tcp based storage drivers. Also
+current in-tree users have virtio-scsi, virtio-blk and nvme.
 
-With the obtained budget count, it is easier to put extra budgets
-in case of .queue_rq failure.
+For none, we already support batching dispatch.
+
+But for io scheduler, every time we just take one request from scheduler
+and pass the single request to blk_mq_dispatch_rq_list(). This way makes
+batching dispatch not possible when io scheduler is applied. One reason
+is that we don't want to hurt sequential IO performance, becasue IO
+merge chance is reduced if more requests are dequeued from scheduler
+queue.
+
+Try to support batching dispatch for io scheduler by starting with the
+following simple approach:
+
+1) still make sure we can get budget before dequeueing request
+
+2) use hctx->dispatch_busy to evaluate if queue is busy, if it is busy
+we fackback to non-batching dispatch, otherwise dequeue as many as
+possible requests from scheduler, and pass them to blk_mq_dispatch_rq_list().
+
+Wrt. 2), we use similar policy for none, and turns out that SCSI SSD
+performance got improved much.
+
+In future, maybe we can develop more intelligent algorithem for batching
+dispatch.
+
+[1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
+[2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
 
 Cc: Sagi Grimberg <sagi@grimberg.me>
 Cc: Baolin Wang <baolin.wang7@gmail.com>
 Cc: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-sched.c |  8 ++++----
- block/blk-mq.c       | 18 ++++++++++++++----
- block/blk-mq.h       |  3 ++-
- 3 files changed, 20 insertions(+), 9 deletions(-)
+ block/blk-mq-sched.c | 76 +++++++++++++++++++++++++++++++++++++++++++-
+ block/blk-mq.c       |  2 --
+ 2 files changed, 75 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 632c6f8b63f7..78fc8d80caaf 100644
+index 78fc8d80caaf..77d5093916b7 100644
 --- a/block/blk-mq-sched.c
 +++ b/block/blk-mq-sched.c
-@@ -130,7 +130,7 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+@@ -7,6 +7,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/blk-mq.h>
++#include <linux/list_sort.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -80,6 +81,69 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ 	blk_mq_run_hw_queue(hctx, true);
+ }
+ 
++/*
++ * We know bfq and deadline apply single scheduler queue instead of multi
++ * queue. However, the two are often used on single queue devices, also
++ * the current @hctx should affect the real device status most of times
++ * because of locality principle.
++ *
++ * So use current hctx->dispatch_busy directly for figuring out batching
++ * dispatch count.
++ */
++static unsigned int blk_mq_sched_get_batching_nr(struct blk_mq_hw_ctx *hctx)
++{
++	if (hctx->dispatch_busy)
++		return 1;
++	return hctx->queue->nr_requests;
++}
++
++static int sched_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
++{
++	struct request *rqa = container_of(a, struct request, queuelist);
++	struct request *rqb = container_of(b, struct request, queuelist);
++
++	return rqa->mq_hctx > rqb->mq_hctx;
++}
++
++static inline void blk_mq_do_dispatch_rq_lists(struct blk_mq_hw_ctx *hctx,
++		struct list_head *lists, bool multi_hctxs, unsigned count)
++{
++
++	if (likely(!multi_hctxs)) {
++		blk_mq_dispatch_rq_list(hctx, lists, true, count);
++		return;
++	}
++
++	/*
++	 * Requests from different hctx may be dequeued from some scheduler,
++	 * such as bfq and deadline.
++	 *
++	 * Sort the requests in the list according to their hctx, dispatch
++	 * batching requests from same hctx
++	 */
++	list_sort(NULL, lists, sched_rq_cmp);
++
++	while (!list_empty(lists)) {
++		LIST_HEAD(list);
++		struct request *new, *rq = list_first_entry(lists,
++				struct request, queuelist);
++		unsigned cnt = 0;
++
++		list_for_each_entry(new, lists, queuelist) {
++			if (new->mq_hctx != rq->mq_hctx)
++				break;
++			cnt++;
++		}
++
++		if (new->mq_hctx == rq->mq_hctx)
++			list_splice_tail_init(lists, &list);
++		else
++			list_cut_before(&list, lists, &new->queuelist);
++
++		blk_mq_dispatch_rq_list(rq->mq_hctx, &list, true, cnt);
++	}
++}
++
+ #define BLK_MQ_BUDGET_DELAY	3		/* ms units */
+ 
+ /*
+@@ -97,6 +161,9 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 	LIST_HEAD(rq_list);
+ 	int ret = 0;
+ 	struct request *rq;
++	int cnt = 0;
++	unsigned int max_dispatch = blk_mq_sched_get_batching_nr(hctx);
++	bool multi_hctxs = false;
+ 
+ 	do {
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+@@ -130,7 +197,14 @@ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
  		 * in blk_mq_dispatch_rq_list().
  		 */
  		list_add(&rq->queuelist, &rq_list);
--	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true));
-+	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true, 1));
+-	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true, 1));
++		cnt++;
++
++		if (rq->mq_hctx != hctx && !multi_hctxs)
++			multi_hctxs = true;
++	} while (cnt < max_dispatch);
++
++	if (cnt)
++		blk_mq_do_dispatch_rq_lists(hctx, &rq_list, multi_hctxs, cnt);
  
  	return ret;
  }
-@@ -198,7 +198,7 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 		/* round robin for fair dispatch */
- 		ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
- 
--	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true));
-+	} while (blk_mq_dispatch_rq_list(rq->mq_hctx, &rq_list, true, 1));
- 
- 	WRITE_ONCE(hctx->dispatch_from, ctx);
- 	return ret;
-@@ -238,7 +238,7 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		if (blk_mq_dispatch_rq_list(hctx, &rq_list, false)) {
-+		if (blk_mq_dispatch_rq_list(hctx, &rq_list, false, 0)) {
- 			if (has_sched_dispatch)
- 				ret = blk_mq_do_dispatch_sched(hctx);
- 			else
-@@ -251,7 +251,7 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		ret = blk_mq_do_dispatch_ctx(hctx);
- 	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(hctx, &rq_list, false);
-+		blk_mq_dispatch_rq_list(hctx, &rq_list, false, 0);
- 	}
- 
- 	return ret;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3e3fbb13f3b9..bfdfdd61e663 100644
+index bfdfdd61e663..b83c59d640b4 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1212,7 +1212,8 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
- 		 */
- 		if (!blk_mq_mark_tag_wait(hctx, rq)) {
- 			/* budget is always obtained before getting tag */
--			blk_mq_put_dispatch_budget(rq->q);
-+			if (ask_budget)
-+				blk_mq_put_dispatch_budget(rq->q);
- 			return PREP_DISPATCH_NO_TAG;
- 		}
- 	}
-@@ -1233,12 +1234,17 @@ static blk_status_t blk_mq_dispatch_rq(struct request *rq, bool is_last)
- 
- static void blk_mq_handle_partial_dispatch(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list, enum prep_dispatch prep,
--		blk_status_t ret, bool queued)
-+		blk_status_t ret, bool queued, unsigned budgets)
- {
- 	struct request_queue *q = hctx->queue;
- 	bool needs_restart;
- 	bool no_tag = false;
- 	bool no_budget_avail = false;
-+	unsigned i = 0;
-+
-+	/* release got budgets */
-+	while (i++ < budgets)
-+		blk_mq_put_dispatch_budget(hctx->queue);
- 
- 	/*
- 	 * For non-shared tags, the RESTART check
-@@ -1298,9 +1304,11 @@ static void blk_mq_handle_partial_dispatch(struct blk_mq_hw_ctx *hctx,
- 
- /*
-  * Returns true if we did some work AND can potentially do more.
-+ *
-+ * @budgets is only valid iff @got_budget is true.
-  */
- bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
--			     bool got_budget)
-+			     bool got_budget, unsigned int budgets)
- {
- 	enum prep_dispatch prep;
- 	struct request *rq;
-@@ -1360,7 +1368,9 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 	 * that is where we will continue on next queue run.
- 	 */
- 	if (!list_empty(list)) {
--		blk_mq_handle_partial_dispatch(hctx, list, prep, ret, !!queued);
-+		blk_mq_handle_partial_dispatch(hctx, list, prep, ret,
-+				!!queued,
-+				got_budget ? budgets - queued : 0);
- 		blk_mq_update_dispatch_busy(hctx, true);
+@@ -1319,8 +1319,6 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	if (list_empty(list))
  		return false;
- 	} else
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9c0e93d4fe38..a37f8f673a19 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -40,7 +40,8 @@ struct blk_mq_ctx {
- void blk_mq_exit_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
--bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *, bool);
-+bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *,
-+		bool, unsigned int);
- void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
- 				bool kick_requeue_list);
- void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ 
+-	WARN_ON(!list_is_singular(list) && got_budget);
+-
+ 	/*
+ 	 * Now process all the entries, sending them to the driver.
+ 	 */
 -- 
 2.25.2
 
