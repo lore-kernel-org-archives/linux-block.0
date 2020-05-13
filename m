@@ -2,77 +2,113 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D82C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD87C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:29:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A99D22065D
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F02082065D
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 18:29:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589393953;
-	bh=SfJxDaSxm0hnHBUQQlW7klJYEBeSvPqH0A5X4yUESvo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=U/g+jZ4xuUMrk41N8k5BHeaWHbTLlSoehmKamzigcSXftqUM6E0zcyA5Ozk/296Pi
-	 BiyszCTLb0BaHsfU90buTOZlrPFnHd3Gt3Y9eI+m83EnMWO1uQwj5eEbHSVSTZqPrD
-	 PmEEJO0UjaStdEN+lJ6K4YCRYh7c4kJ7Cd+g8U30=
+	s=default; t=1589394573;
+	bh=QRSsQMrQ74camPjAugEMwP/lQqJBw3KN+yss8wjRYVo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=xoS2yW9GX45lGu0h6TWavmZtHAnKNMroEMKdNot16hlaCNC3nZmLFY/2ELRzOZ/To
+	 CXBEnekNmNfuAuR1UGW8zR0avwnLC8sYvCIGutXG/7Hmw/LBeWT5TbNqDDGvuzZ3O9
+	 XTj5EQtzguTuDcbvjZjoh3OQVimYxWq6JkXqGsFE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389983AbgEMSTM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 14:19:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35966 "EHLO mail.kernel.org"
+        id S2390161AbgEMS3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 14:29:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47032 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732845AbgEMSTM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 14:19:12 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1733310AbgEMS3b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 May 2020 14:29:31 -0400
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4805120659;
-        Wed, 13 May 2020 18:19:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64F53207D0;
+        Wed, 13 May 2020 18:29:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589393952;
-        bh=SfJxDaSxm0hnHBUQQlW7klJYEBeSvPqH0A5X4yUESvo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Kt83iOznWMDCO7CN/KhYA7OhhIp+dJ8qjppZYlYd2ZsvQlDtaSkePzBNQ0yXT9cgV
-         07AV6jluBY8Dd8bzEHcoaYXYWMU8a1QHqZ3QPQR/S4o5OUCUD8o717ISAFRdVYw9yE
-         DQeGKgRVoKhyPjUqErvy36jlZzCZ/Mg+LtCftVEc=
-Date:   Wed, 13 May 2020 11:19:10 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v12 08/12] scsi: ufs: Add inline encryption support to UFS
-Message-ID: <20200513181910.GH1243@sol.localdomain>
-References: <20200430115959.238073-1-satyat@google.com>
- <20200430115959.238073-9-satyat@google.com>
+        s=default; t=1589394571;
+        bh=QRSsQMrQ74camPjAugEMwP/lQqJBw3KN+yss8wjRYVo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=zuYgTbgg+vneAleokfO2ukKNs/dqZRWw5cokGloCn06DRltmLMyAH0XWH7ZXE6kme
+         ad+FAFkx841tWRfGJCwJuCCrF9NfvNSBS/VNkG+/4QSbaYBUc8DgdG1PYWFgMFsatw
+         bhT63We9c1wVG6MA7eSBOs4coDppYUwq6NJFs550=
+Received: by mail-lf1-f54.google.com with SMTP id h26so362013lfg.6;
+        Wed, 13 May 2020 11:29:30 -0700 (PDT)
+X-Gm-Message-State: AOAM533WL1j2HlmGsB4c17HR6omCcifybnCitPOHU0xJYEjH7Mp8fW3f
+        kyuY5C45juVn5EkVOlLpTUZPlFb0QIZYtQTyLA4=
+X-Google-Smtp-Source: ABdhPJzEel6P56V5AzdhnqpR97v3ZXYr3I1lEd0oqpxPoU0DCjvc+wX2TsHUs+/MUKk1AS+L8zGBfF+JTi024W0oARc=
+X-Received: by 2002:ac2:558e:: with SMTP id v14mr539886lfg.138.1589394568604;
+ Wed, 13 May 2020 11:29:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200430115959.238073-9-satyat@google.com>
+References: <20200508161517.252308-1-hch@lst.de> <20200508161517.252308-13-hch@lst.de>
+In-Reply-To: <20200508161517.252308-13-hch@lst.de>
+From:   Song Liu <song@kernel.org>
+Date:   Wed, 13 May 2020 11:29:17 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW6_Y53_XLFeVxhTDpTi_PKNLqqnrXLn+M2fJW268eE6_w@mail.gmail.com>
+Message-ID: <CAPhsuW6_Y53_XLFeVxhTDpTi_PKNLqqnrXLn+M2fJW268eE6_w@mail.gmail.com>
+Subject: Re: [PATCH 12/15] md: stop using ->queuedata
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        linux-m68k@lists.linux-m68k.org,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-xtensa@linux-xtensa.org, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-bcache@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-nvdimm@lists.01.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 11:59:55AM +0000, Satya Tangirala wrote:
-> @@ -8541,6 +8568,13 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
->  	/* Reset the attached device */
->  	ufshcd_vops_device_reset(hba);
->  
-> +	/* Init crypto */
-> +	err = ufshcd_hba_init_crypto(hba);
-> +	if (err) {
-> +		dev_err(hba->dev, "crypto setup failed\n");
-> +		goto out_remove_scsi_host;
-> +	}
-> +
+On Fri, May 8, 2020 at 9:17 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Due to changes in v5.6, this is jumping to the wrong error label.
-It should be 'free_tmf_queue'.
+Thanks for the cleanup. IIUC, you want this go through md tree?
 
-- Eric
+Otherwise,
+
+Acked-by: Song Liu <song@kernel.org>
+
+> ---
+>  drivers/md/md.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 271e8a5873549..c079ecf77c564 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -466,7 +466,7 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+>  {
+>         const int rw = bio_data_dir(bio);
+>         const int sgrp = op_stat_group(bio_op(bio));
+> -       struct mddev *mddev = q->queuedata;
+> +       struct mddev *mddev = bio->bi_disk->private_data;
+>         unsigned int sectors;
+>
+>         if (unlikely(test_bit(MD_BROKEN, &mddev->flags)) && (rw == WRITE)) {
+> @@ -5626,7 +5626,6 @@ static int md_alloc(dev_t dev, char *name)
+>         mddev->queue = blk_alloc_queue(md_make_request, NUMA_NO_NODE);
+>         if (!mddev->queue)
+>                 goto abort;
+> -       mddev->queue->queuedata = mddev;
+>
+>         blk_set_stacking_limits(&mddev->queue->limits);
+>
+> --
+> 2.26.2
+>
