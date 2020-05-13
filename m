@@ -2,157 +2,116 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBF2C2D0F6
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2DDC2D0F6
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4490206F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:42:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B248B20714
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:14:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=windriversystems.onmicrosoft.com header.i=@windriversystems.onmicrosoft.com header.b="hgVDjH4/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ppLa+IH+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726885AbgEMCmS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 22:42:18 -0400
-Received: from mail-co1nam11on2071.outbound.protection.outlook.com ([40.107.220.71]:6044
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725898AbgEMCmQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 22:42:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AAP4bKfM7c78178VLESafdZkP8rKKiuL7g+OooRGhAdoKRk01m1NhrqZJik6x9QyxCkfWHBnaQ79TOwHxbGW5+U5LOEDHZ/90KnCAvnEVdouCIgZlEOV1tmrhD04RUCkVlpZ/o5VwtM9kPkBuw1qPMkejg3fFc/f3rOOb8Ig7aDtJfjZA5dOJ8nFoUOL5K0rUOMOXn26zIGW5AxwLQFoptfXCcRwKHoqatt4oBcbPVUcmm4l7k1Dpo4kH8pKRSickoWNg+BZXDFgLlUdFq2sTmVvIPjjWN+x/WbgNKdF8XfIG4v8A1djnI2eqGe6sanKIKWvo3l7Tayl3IXm7z4V8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LKh6GJ4hX7qEOZAij/iGFCcbh4HlEgXnaObz5tB8Beo=;
- b=AGCntAP9gkORucdDdzoool0g0kJBG+TtC1RYkooCZJLKH85PqJ1dnLkFdB7VqnLwRO/aJSaKah2nME/zgoos5DqjMg+sjzR5WgjDNDsecQPaz6zhOx9vldSDfmATIxyU35FqQPlS6P81OWHMVepkRCUMNS1hRZIVB3ZDBP7/HsF2uZo4VUxVv10hCjFbjCuAibVwVgSgb1GhJ8rc8xNQhAb3ifyuuo2MxxVHMNvh+4/NN96VBLoCqqJHjneEWJQqP+cl0DPQVVxvWToEWSVuYK3sZvzxzgKizqhXflz2zC2xpadh/xIg5taLwZdybwrIaXyz5q4hYNlDzkeXgIMhmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+        id S1725982AbgEMDOr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 23:14:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725967AbgEMDOq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 May 2020 23:14:46 -0400
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BF3C061A0C
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 20:14:46 -0700 (PDT)
+Received: by mail-qt1-x843.google.com with SMTP id v4so12151516qte.3
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 20:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=windriversystems.onmicrosoft.com;
- s=selector2-windriversystems-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LKh6GJ4hX7qEOZAij/iGFCcbh4HlEgXnaObz5tB8Beo=;
- b=hgVDjH4/aGjwryEXjkUIKNGpLkHiNjPm7zvyAEcViYpgi5q2LuhkLlp0OZs73pB+2bYZjZe6BLagbLAauA7gUh2I0UCRo/Ovj2XoySQbAwGH3dlp4iYYNUZyf8SJEpxZkbKas5OFE4q0TuXEadr45867e3NLq0F1Aieudlrmhvo=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none
- header.from=windriver.com;
-Received: from BY5PR11MB4241.namprd11.prod.outlook.com (2603:10b6:a03:1ca::13)
- by BY5PR11MB3909.namprd11.prod.outlook.com (2603:10b6:a03:191::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Wed, 13 May
- 2020 02:42:14 +0000
-Received: from BY5PR11MB4241.namprd11.prod.outlook.com
- ([fe80::21d0:98fe:1248:b562]) by BY5PR11MB4241.namprd11.prod.outlook.com
- ([fe80::21d0:98fe:1248:b562%7]) with mapi id 15.20.3000.016; Wed, 13 May 2020
- 02:42:14 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
-From:   "Xu, Yanfei" <yanfei.xu@windriver.com>
-Subject: [loop]efcfec579: BUG:blk_update_request: I/O error, dev loop6, sector
- 49674 op 0x9:(WRITE_ZEROES)
-Message-ID: <3df7e30a-2495-544e-1ac2-3b0afd3e7324@windriver.com>
-Date:   Wed, 13 May 2020 10:42:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HK2PR02CA0208.apcprd02.prod.outlook.com
- (2603:1096:201:20::20) To BY5PR11MB4241.namprd11.prod.outlook.com
- (2603:10b6:a03:1ca::13)
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8Q6GGJktVYmihF1QRM2ZyJaorzh5uaXfYCfx3VREzUI=;
+        b=ppLa+IH+hd/26idHUGbO2DS+DcIBqIBmtTV8gVdyOdZ4UK7b60gnNx9/PWwZuOkWrC
+         tWDWf/fQiWqUqWCt08LkGMRsXRdAot8qRtQ4K/0mz98OBns9IkkNKnDcXkvaDlcofpRX
+         MftMYlRvDHYw1PvrnHf9rILSKFx05oZcFu26INUb6DW0UmjsblviXr3QnIqlAJNZapKW
+         oDKWdTFXvTPC6OhPIdVE/WH8sqNAWsyngcMywxXs4iwZN/8h9GbM+tnOX7QZ1L6NSMSC
+         TO3ogrZkrDE4CroOv7RNxhG8G1B9w8yqMspfQc5J/F8MCAY1pq1odeZOUdPbRYf9nbMB
+         qZXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8Q6GGJktVYmihF1QRM2ZyJaorzh5uaXfYCfx3VREzUI=;
+        b=qvriUHlbl0m07IX18jD7MUFXFfrhtRW/w49KuuKYAVxpDMHobnJ+V6fHydFcdt4Wny
+         UQrnWu+8yMdAYFVHXhRcTQsZ8OBNeM6xeLyxMGvUEOyFoPXjDGmsp76rrgwRr3t96PhH
+         ZdY6UUKhsVU6VQCgpc05O4iOhLRM6cte5Ny8Ur9c3PhEb6Gs9NpfzTvVIo2aefdqvo8U
+         wVz4SGof1qWmg4Ln9Pk2sk/x4sZR5VJLQX0HDZm16Ni4BMdRO7uTGhJPnyQc8yfbqrGB
+         Ua2JtMKisCFYPkJ8x0M0gTR1B24RTVmBIRw1Ju/hOxoH9TPETzBGWodq+oBzA1uzyPmM
+         vGIQ==
+X-Gm-Message-State: AGi0PuaE1inD6k/dRtKF2sFg/DDTEvXm0NOt9O+WCdn0bdzWinm7rdk2
+        3PxO51/V54ZiMdV+BdU1EMx+6YZf+323l9BeVUwPjg==
+X-Google-Smtp-Source: APiQypJqtkci7zcwIrlCXl4Wm5tDBS8nkeWfDl2iZ9cby+qnd56CTBBVB392d1joYsClYQDLo2wXzu84WRtfeqJuoPY=
+X-Received: by 2002:ac8:3879:: with SMTP id r54mr12266182qtb.106.1589339685770;
+ Tue, 12 May 2020 20:14:45 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [128.224.162.160] (60.247.85.82) by HK2PR02CA0208.apcprd02.prod.outlook.com (2603:1096:201:20::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20 via Frontend Transport; Wed, 13 May 2020 02:42:13 +0000
-X-Originating-IP: [60.247.85.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d5487637-59a0-4d73-6490-08d7f6e73e80
-X-MS-TrafficTypeDiagnostic: BY5PR11MB3909:
-X-Microsoft-Antispam-PRVS: <BY5PR11MB39099EED05D127064ACF2243E4BF0@BY5PR11MB3909.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
-X-Forefront-PRVS: 0402872DA1
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iHFI7AJ/R5WTaDexGIQs0qWOPhYk4/yffhg4FZG55xebQtumScy7PTHY1JSjiygL/7IhgYvknNrTRBOuRAc17iygGnYGxAkTCnkQvpsL3L1h3pCWoiMm32w8OJh3Fi4y2VauYLQZYKcwapGnFpbRhxm3oZrSO+bnDawwnQQLBtzPBHj36Apg3XYT4LsVK91ZKXOHWX2+Ch+PVK0oar867FoxAQKZkVataA/asGDSNHQOIZBfpWCQh/9aISPnPtJzvGqMVxQvt5kqqDIcwRKE00QV+/Mk3hLLvB2DZ+T4LVmRPSt0UXL+oP0QcPPWQzOgGH7W+kW2eNlPeofQ8G5MSgiNH6bFRBCSszDW2UlMmKLqaPmVcmYNnwvGkY4h8lOCnupv5Nyb/ssHqkD6Y+Rb+R9CRnQs0KHjJhwnFhuKN/32tgfkK4o1ZXuZEeXYyeleIT9CgWFUEvIuMv2y6pwNhue/zBP9p910hW9jMv5Z3irm2GKdhJ5fPGQrMI6g487mfncZDjKwo5BY95WKJAAJWqcojhgA+uZKSyvASpxF//anzYUiRbOWJtdRM3h7JzxHEUabeDuHJwsft3xMNh7CevLbVBRGVidX9oJRN+Y+0wFJSgBC3ZiTj1yUk2pyZI/v
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(366004)(346002)(136003)(396003)(376002)(39850400004)(33430700001)(956004)(16526019)(2906002)(8936002)(66556008)(2616005)(8676002)(31686004)(6706004)(66946007)(316002)(186003)(16576012)(26005)(66476007)(31696002)(478600001)(36756003)(6916009)(52116002)(86362001)(5660300002)(33440700001)(4326008)(6486002)(6666004)(78286006)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: uPpKKYaz5TMQ9uoxxYj1ev72HkasS/BuUDfvC8vgsiMO2RVNpeSWyyGCcLcOBdTRipD7xCAeo6l54CzWR+ctE9t5inZ1cVmfG9+xQXPI1G3YuQ/SagdSThNBehh2OXIhUSh+lFSx5fSQnKEl4UOTYlXqE4WCbxAnKXmMnN0KST4n+AXdYW5UelHLQAE/JcFNo29CFjJxInCf2nqgrhu6y4K6qIW7pAHlacF1jcXgQx7OtOeBDeLcUiO2vocInne4RzzKWUs0OWWycEZdmVJKFACTjg7gQm6TY73zaqu1nH5SVZNIAjxTMt9stUgPSnCX3jYLGPJ8NqiyrUGBSp4jNALYWdgH1+jKyAGkomPn4ku2kpIKl1FMb8jsfmBEAx7BUk34T2DnZug03Q9pSNHb9AhGXOUMePrUjOl183NGivrwN7JNdCmKXlV4aKBd+W3o0WFfn42M6DSN7CgS+TQY2zzqJn6q//1CBoFU0HBT970=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5487637-59a0-4d73-6490-08d7f6e73e80
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2020 02:42:14.3913
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /4VYmLc8/zWPHq0208Po+6DkiH7Xk+u9Qlcx/X8wBe+V4+XPBjk15vuXW+B6A2EMc18bDZXv70cDr22KV2sw7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR11MB3909
+References: <20200513004345.GA28465@192.168.3.9> <585b0389-aa83-59b8-a155-f23621155bcd@kernel.dk>
+In-Reply-To: <585b0389-aa83-59b8-a155-f23621155bcd@kernel.dk>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Wed, 13 May 2020 11:14:08 +0800
+Message-ID: <CAA70yB6SLv4g+Vihnf5M24J_ibTsEh5VLZzwoXJb0GZMhp+jZg@mail.gmail.com>
+Subject: Re: [PATCH] block: reset mapping if failed to update hardware queue count
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>, tom.leiming@gmail.com,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-After operating the /dev/loop which losetup with an image placed in tmpfs,
-
-I got the following ERROR messages:
-
-----------------[cut here]---------------------
-
-[  183.110770] blk_update_request: I/O error, dev loop6, sector 524160 
-op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.123949] blk_update_request: I/O error, dev loop6, sector 522 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.137123] blk_update_request: I/O error, dev loop6, sector 16906 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.150314] blk_update_request: I/O error, dev loop6, sector 32774 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.163551] blk_update_request: I/O error, dev loop6, sector 49674 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.176824] blk_update_request: I/O error, dev loop6, sector 65542 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.190029] blk_update_request: I/O error, dev loop6, sector 82442 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.203281] blk_update_request: I/O error, dev loop6, sector 98310 op 
-0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.216531] blk_update_request: I/O error, dev loop6, sector 115210 
-op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-[  183.229914] blk_update_request: I/O error, dev loop6, sector 131078 
-op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
-
-
-I have found the commit which introduce this issue by git bisect :
-
-     commit :efcfec57[loop: fix no-unmap write-zeroes request behavior]
-
-
-Kernrel version: Linux version 5.6.0
-
-Frequency: every time
-
-steps to reproduce:
-
-   1.git clone mainline kernel
-
-   2.compile kernel with ARCH=x86_64, and then boot the system with it
-
-     (seems other arch also can reproduce it )
-
-   3.make an image by "dd of=/tmp/image if=/dev/zero bs=1M count=256"
-
-   4.place the image in tmpfs directory
-
-   5.losetup /dev/loop6 /PATH/image
-
-   6.mkfs.ext2 /dev/loop6
-
-
-Any comments will be appreciated.
-
-
-Thanks,
-
-Yanfei
+On Wed, May 13, 2020 at 10:22 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 5/12/20 6:44 PM, Weiping Zhang wrote:
+> > When we increase hardware queue count, blk_mq_update_queue_map will
+> > reset the mapping between cpu and hardware queue base on the hardware
+> > queue count(set->nr_hw_queues). The mapping cannot be reset if it
+> > encounters error in blk_mq_realloc_hw_ctxs, but the fallback flow will
+> > continue using it, then blk_mq_map_swqueue will touch a invalid memory,
+> > because the mapping points to a wrong hctx.
+> >
+> > blktest block/030:
+> >
+> > null_blk: module loaded
+> > Increasing nr_hw_queues to 8 fails, fallback to 1
+> > ==================================================================
+> > BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x2f2/0x830
+> > Read of size 8 at addr 0000000000000128 by task nproc/8541
+> >
+> > CPU: 5 PID: 8541 Comm: nproc Not tainted 5.7.0-rc4-dbg+ #3
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> > rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
+> > Call Trace:
+> > dump_stack+0xa5/0xe6
+> > __kasan_report.cold+0x65/0xbb
+> > kasan_report+0x45/0x60
+> > check_memory_region+0x15e/0x1c0
+> > __kasan_check_read+0x15/0x20
+> > blk_mq_map_swqueue+0x2f2/0x830
+> > __blk_mq_update_nr_hw_queues+0x3df/0x690
+> > blk_mq_update_nr_hw_queues+0x32/0x50
+> > nullb_device_submit_queues_store+0xde/0x160 [null_blk]
+> > configfs_write_file+0x1c4/0x250 [configfs]
+> > __vfs_write+0x4c/0x90
+> > vfs_write+0x14b/0x2d0
+> > ksys_write+0xdd/0x180
+> > __x64_sys_write+0x47/0x50
+> > do_syscall_64+0x6f/0x310
+> > entry_SYSCALL_64_after_hwframe+0x49/0xb3
+>
+> Applied, thanks. Please do run blktests on your series in the future.
+>
+No problem, thanks a lot.
+> --
+> Jens Axboe
+>
