@@ -4,118 +4,142 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E13C2D0F6
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7634C2D0FB
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:22:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FF91207BC
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:21:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A843124927
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rDzBmDSO"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ODn9WEuN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728441AbgEMCVD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 22:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
+        id S1726885AbgEMCWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 22:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728228AbgEMCVC (ORCPT
+        with ESMTP id S1728608AbgEMCWM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 22:21:02 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14987C061A0C
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:21:02 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id q24so10300840pjd.1
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:21:02 -0700 (PDT)
+        Tue, 12 May 2020 22:22:12 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59328C061A0E
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:22:12 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id f23so6416428pgj.4
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=uQx7jsiEoL+4pTsFLx0JIAQjXn+Xi7pKRn+FFonx4D4=;
-        b=rDzBmDSOY6S6dcjX9uHeOo7f8BGfMNUwmLdQ8IJYvd2IusKnq1GIViVgisxpVParfE
-         XIrI4hle7lKVMH4iKQJd6wJ5zYLM2RITNk6mB3Wu1RDN6oZQnxaw2gNgIHLl9xEtvAE5
-         6qvu8bJUUL8bp/JyklkSkitcueAmLIhrPEY1OPhb4hWflrc4xwqwwO5M4jZrDUQXrhpH
-         clK6Brch18AKBiJ2BTgMUJrQXMcUumd96s7PZjybnzHxMEBnELRbfpJX/QCfaBPNCXrd
-         lEbxt3I9l6LAxj6yXZBu2TCW2D23TE80sIC8EXamMfi+u2pw4ShbHXF1z6Cy/1y1nu35
-         8tdg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=WL6LqGqep6zlwpLFE3J2WtwpQ1zPXw+qIg3YMMRroEc=;
+        b=ODn9WEuN3+VIjabru6hxefEEFpSjA/Z6TMKlCJQ8GFk0WbZMHU01ilMeVQ152xyzqB
+         /ksC/wI4GAaRQFkGM4O8JOaS/B0eqajte+SZj6KRKLnHLQ8BqUJms9eBz8gZVf8sT6gV
+         MoCCRNsdZpC+0NXfAmksqDDFCsvvztUei3BoG6I5rR0YbrFIBysb1pPrU1j9tKPVybkN
+         hU/iMaSGS8dfUMgTLlPIhNgX+Mj7E2r3jd4gIO+F+Kans8g9jnYAXmfI9bSUnWZWBHAn
+         VSI0wXCKKLevcpVOIqC0zrrM+vKsBtVAQN1CYpeHITQ6o1hMFVH/d7MNQadn5AZVVH74
+         9dhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=uQx7jsiEoL+4pTsFLx0JIAQjXn+Xi7pKRn+FFonx4D4=;
-        b=jH1Mnmyq2wjI7IL5EptnylpvKCRDVEuGcf47ZIJVta0M1RSvtyp1pqCxwy5sDH97xI
-         5uE/WC4yeffZisyJleefEm6S+asISu7Cw7G9jJKVcsWLfHoBh4FCH+8HK9O1q2ePLGOE
-         lrll303Bi38HJtivEp+ELmWuIWac+6ifS71tQOJ1pPqB6HtUEDTLgQjz3dJiqbGhJhZv
-         4h5cEmiUceC4GiUSKMXcgSpJf5XtRNl04GSBoFCevCfFeJWGhe5oRd1gWyUaeVi5H8UH
-         2mwWKph2yYg1lYLjlxQDHYnvMp7EZWydE+LARmWPrvxl61zERlBvI0CBK+BIt1iIfl24
-         AraA==
-X-Gm-Message-State: AGi0Pub8rvJjWxkioCKZe31xcwHojd2Qx07PsLkMo/6FHRoT528mHpZz
-        qTBpqr0ob+aSdXvhUANeSAjcyndpM5w=
-X-Google-Smtp-Source: APiQypJymAErgzRRhleZIsp6z5KEqf2zwrSpBCaveWCHD5WrV1R17sx7t8m7sIaXDa+MEF6wSw7iyA==
-X-Received: by 2002:a17:90b:80b:: with SMTP id bk11mr21995579pjb.204.1589336461086;
-        Tue, 12 May 2020 19:21:01 -0700 (PDT)
+        bh=WL6LqGqep6zlwpLFE3J2WtwpQ1zPXw+qIg3YMMRroEc=;
+        b=JwrGSOMK1RPfCLucavIv6NAfmyTiKaOA0zntAKLpVEQhsztPW9JdjiX7i87EEWWQo5
+         UOMDjyxJywiWjRdmEegOnEP5koO8l32DUGJ0N6ckiKicv4x3jAC+LrNJPJOUFhSd/Ot6
+         qUGSqjmCV01RCEgXBL1ThKc5xgmSRwMkRI2G9i7f/XcWdR9cCS2Wa12/BDyNzgfnItYE
+         ACGE4Y37vaVW/gOcWf4ZVuCK9aYakVIgkyKXtoeili/N2UHwnBahKSNA5NlNiMbkQXGr
+         qnMW1x73vT3xtWu2W1xr1WZdPDpGyDL8pMtex43cAMYkqJEOqpbH+/xdReatZw35xTBz
+         NzbQ==
+X-Gm-Message-State: AOAM530AL1o7h6cX5oJDGpBWYjoWLooQsbqgjDKWuP8AWU6M+VO3ncN7
+        BH2ucfEsAJLUZL4gVqRsHJI7pU+4OJM=
+X-Google-Smtp-Source: ABdhPJzBWEZaQALZkzwtMiPWjqkVlIGIbT1og0SaBl+rDkzzwKyMIYkI6jc8cPk19OESIVSdFHSnCA==
+X-Received: by 2002:a65:40c3:: with SMTP id u3mr9448390pgp.305.1589336531879;
+        Tue, 12 May 2020 19:22:11 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:1d8:eb9:1d84:211c? ([2605:e000:100e:8c61:1d8:eb9:1d84:211c])
-        by smtp.gmail.com with ESMTPSA id h9sm12912941pfo.129.2020.05.12.19.20.59
+        by smtp.gmail.com with ESMTPSA id k10sm13228551pfa.163.2020.05.12.19.22.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2020 19:21:00 -0700 (PDT)
-Subject: Re: [PATCH] block: reset mapping if failed to update hardware queue
- count
-To:     bvanassche@acm.org, tom.leiming@gmail.com,
-        linux-block@vger.kernel.org
-References: <20200513004345.GA28465@192.168.3.9>
+        Tue, 12 May 2020 19:22:10 -0700 (PDT)
+Subject: Re: BUG:loop:blk_update_request: I/O error, dev loop6, sector 49674
+ op 0x9:(WRITE_ZEROES)
+To:     "Xu, Yanfei" <yanfei.xu@windriver.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+        "Darrick J. Wong" <darrick.wong@oracle.com>
+References: <dac81506-0065-ee64-fcd1-c9f1d002b4fb@windriver.com>
+ <c51460e0-1abb-799d-9ee9-de9c39315eda@windriver.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <585b0389-aa83-59b8-a155-f23621155bcd@kernel.dk>
-Date:   Tue, 12 May 2020 20:20:58 -0600
+Message-ID: <8f3eeb22-2e85-aa3f-6287-b3c467d39a8e@kernel.dk>
+Date:   Tue, 12 May 2020 20:22:08 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200513004345.GA28465@192.168.3.9>
+In-Reply-To: <c51460e0-1abb-799d-9ee9-de9c39315eda@windriver.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/20 6:44 PM, Weiping Zhang wrote:
-> When we increase hardware queue count, blk_mq_update_queue_map will
-> reset the mapping between cpu and hardware queue base on the hardware
-> queue count(set->nr_hw_queues). The mapping cannot be reset if it
-> encounters error in blk_mq_realloc_hw_ctxs, but the fallback flow will
-> continue using it, then blk_mq_map_swqueue will touch a invalid memory,
-> because the mapping points to a wrong hctx.
+On 5/12/20 8:14 PM, Xu, Yanfei wrote:
+> Hi,
 > 
-> blktest block/030:
+> After operating the /dev/loop which losetup with an image placed in**tmpfs,
 > 
-> null_blk: module loaded
-> Increasing nr_hw_queues to 8 fails, fallback to 1
-> ==================================================================
-> BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x2f2/0x830
-> Read of size 8 at addr 0000000000000128 by task nproc/8541
+> I got the following ERROR messages:
 > 
-> CPU: 5 PID: 8541 Comm: nproc Not tainted 5.7.0-rc4-dbg+ #3
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
-> Call Trace:
-> dump_stack+0xa5/0xe6
-> __kasan_report.cold+0x65/0xbb
-> kasan_report+0x45/0x60
-> check_memory_region+0x15e/0x1c0
-> __kasan_check_read+0x15/0x20
-> blk_mq_map_swqueue+0x2f2/0x830
-> __blk_mq_update_nr_hw_queues+0x3df/0x690
-> blk_mq_update_nr_hw_queues+0x32/0x50
-> nullb_device_submit_queues_store+0xde/0x160 [null_blk]
-> configfs_write_file+0x1c4/0x250 [configfs]
-> __vfs_write+0x4c/0x90
-> vfs_write+0x14b/0x2d0
-> ksys_write+0xdd/0x180
-> __x64_sys_write+0x47/0x50
-> do_syscall_64+0x6f/0x310
-> entry_SYSCALL_64_after_hwframe+0x49/0xb3
+> ----------------[cut here]---------------------
+> 
+> [  183.110770] blk_update_request: I/O error, dev loop6, sector 524160 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.123949] blk_update_request: I/O error, dev loop6, sector 522 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.137123] blk_update_request: I/O error, dev loop6, sector 16906 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.150314] blk_update_request: I/O error, dev loop6, sector 32774 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.163551] blk_update_request: I/O error, dev loop6, sector 49674 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.176824] blk_update_request: I/O error, dev loop6, sector 65542 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.190029] blk_update_request: I/O error, dev loop6, sector 82442 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.203281] blk_update_request: I/O error, dev loop6, sector 98310 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.216531] blk_update_request: I/O error, dev loop6, sector 115210 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> [  183.229914] blk_update_request: I/O error, dev loop6, sector 131078 op 0x9:(WRITE_ZEROES) flags 0x1000800 phys_seg 0 prio class 0
+> 
+> 
+> I have found the commit which introduce this issue by git bisect :
+> 
+>     commit :efcfec57[loop: fix no-unmap write-zeroes request behavior]
 
-Applied, thanks. Please do run blktests on your series in the future.
+Please CC the author of that commit too. Leaving the rest quoted below.
+
+> Kernrel version: Linux version 5.6.0
+> 
+> Frequency: everytime
+> 
+> steps to reproduce:
+> 
+>   1.git clone mainline kernel
+> 
+>   2.compile kernel with ARCH=x86_64, and then boot the system with it
+> 
+>     (seems other arch also can reproduce it )
+> 
+>   3.make an image by "dd of=/tmp/image if=/dev/zero bs=1M count=256"
+> 
+>   *4.**place the image in tmpfs directory*
+> 
+>   5.losetup /dev/loop6 /PATH/TO/image
+> 
+>   6.mkfs.ext2 /dev/loop6
+> 
+> 
+> Any comments will be appreciated.
+> 
+> 
+> Thanks,
+> 
+> Yanfei
+> 
+> 
+> 
+> 
+> 
+
 
 -- 
 Jens Axboe
