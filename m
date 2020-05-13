@@ -2,88 +2,64 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEB7C2D0FD
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA24ACA90AF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:35:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 608E9204EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A690B22210
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:35:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8D3X2FE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b0sAJvuL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726001AbgEMN1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 09:27:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27076 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1733142AbgEMN1W (ORCPT
+        id S2387965AbgEMNfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 09:35:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56314 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388063AbgEMNfy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 09:27:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589376441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OH0J8d3K3U+hQmWR8NPajZuhzGmc4mTANodrmCJL8cs=;
-        b=W8D3X2FEvV90NYW1xXTRbHOUGvHFuOmM91+lFiFTWjxhYeX5vOwbIZ+IpivEhgcKaOYcuq
-        OvgH10YEGzNMMTDQ1/aSpXcNLeZ8IKOWwMHYOnxOEaTspHzwQLYICk7acYiKrV5wo73BaR
-        cALbHJSViNleJgksLeim5LhiE3p8uhs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-iyWGfh95OW-O_Gj4FkwCgg-1; Wed, 13 May 2020 09:27:19 -0400
-X-MC-Unique: iyWGfh95OW-O_Gj4FkwCgg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9855835B40;
-        Wed, 13 May 2020 13:27:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-59.rdu2.redhat.com [10.10.112.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 811E61C92D;
-        Wed, 13 May 2020 13:27:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20200513062649.2100053-7-hch@lst.de>
-References: <20200513062649.2100053-7-hch@lst.de> <20200513062649.2100053-1-hch@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dhowells@redhat.com, "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        drbd-dev@lists.linbit.com, linux-cifs@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
-        cluster-devel@redhat.com, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        netdev@vger.kernel.org, Vlad Yasevich <vyasevich@gmail.com>,
-        linux-kernel@vger.kernel.org, Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>, ocfs2-devel@oss.oracle.com
-Subject: Re: [PATCH 06/33] net: add sock_set_timestamps
+        Wed, 13 May 2020 09:35:54 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71D3C061A0E;
+        Wed, 13 May 2020 06:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=b0sAJvuLds/gvuq42NW7Pz3chO
+        OGLRXWYDUwsJ8GiI1GecWpIUFYndGm8pQtZ+KYvHIadI8gwuzmjuQh8g5ZPQSXwJSCE7VPmHIx8+o
+        kD/7z7IcZj7qHC900WRa4pQgbbtE4Vv2hy3scy9jjbDnDLMjXMu7rz11Z9ld7rtIjrb3p9CUfSzpm
+        lr/yKckNrkCgSbk/PS3X0pqumDwsVwbyUf1CLmaT1yUyrmLXb00gR8ZmO4+8xsgw9kEz/XNw7+zLD
+        K8oQdobkx8nGQzzraegImAk86LzuHNSs/rffe9EGgdJxrlY0lVNKoqA33vitrRX86ryXemxVuz9nK
+        a3cowTfQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jYrY9-00061W-GI; Wed, 13 May 2020 13:35:53 +0000
+Date:   Wed, 13 May 2020 06:35:53 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v12 02/12] block: Keyslot Manager for Inline Encryption
+Message-ID: <20200513133553.GA10793@infradead.org>
+References: <20200430115959.238073-1-satyat@google.com>
+ <20200430115959.238073-3-satyat@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3124743.1589376425.1@warthog.procyon.org.uk>
-Date:   Wed, 13 May 2020 14:27:05 +0100
-Message-ID: <3124744.1589376425@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200430115959.238073-3-satyat@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> wrote:
+Looks good,
 
-> Add a helper to directly set the SO_TIMESTAMP* sockopts from kernel space
-> without going through a fake uaccess.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Reviewed-by: David Howells <dhowells@redhat.com>
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
