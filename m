@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3645CA90AF
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 10:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BAEECA90AF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 10:49:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADCDC20675
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 10:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBA4A206B8
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 10:49:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q/hzZurT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bjl0ox4w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732686AbgEMKtn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 06:49:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58576 "EHLO
+        id S1732745AbgEMKtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 06:49:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732683AbgEMKtm (ORCPT
+        with ESMTP id S1726907AbgEMKtp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 06:49:42 -0400
+        Wed, 13 May 2020 06:49:45 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC654C061A0C
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 03:49:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686B4C061A0C
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 03:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=GMaCynBRlOHCgqnU9YRIKSqeuwPHeIiXFAnd3YV89Gw=; b=q/hzZurTwNvkuJZhBhul1fJ6sQ
-        GK3TFAhWPhJumHCaOng02b6cHWSXdnHZSkUdInRrwuDhs9ImL8KFziTdPZ9/ZfJpWF4bLMa+PKpzH
-        AwYKXWnwA2DUGJ5ovOFk8kxfEL0A8beAb1dffj41gILr55aETFLfoUsHY6wSdpZgL46jsTWOpGroZ
-        nxv++fB2cJZJSDL8u97bare9ryVA1Eqwfilfi6/JPR+V0iRDn9JgKac9b+GgDqT51xYGvcOz+dy5y
-        3r6rgkvWcAMd/SOtvsoXvYAXUfJ0H5QKDU1CDRJV4owNMg26vdB/zd5wp5jdyQWA3ReGFHFelyt2K
-        7IuzfNgQ==;
+        bh=CJm/YlJ6+YP4lPh+XX+4bVmk9tof6oBHlE7qlRl2THs=; b=bjl0ox4wHxQSRMaQzG45jU1XjY
+        kyZJKnU7XfOwdb2sZtPVkxluEidrk+JFBrmlo6l9OtDSDy5uNuwmG0v7oHqxuyR9iCwQZRHhAy/2+
+        hCHYHoOhYD7Uwe1adKZF/DnLwJdDx6kCepaMAYGcMgofGf1TQhQN6WEYq6T8kzVIBIx2iLvM+8bfl
+        G0gNZ638RZrgegNHSSWjumEjag9aNkB4330tsufyHhHfR8dNEcTC57Vhw0bd5Ajs1DGhqRviOO1be
+        nSQwLZjb1qbXiBEZNJNBZFEi6jiLzt4r/hwJkqcwz19ys4ljP0mWxRA7+ESu7I5FFvf29qlYGuSVg
+        DjRyN48g==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYoxK-0005bj-C7; Wed, 13 May 2020 10:49:42 +0000
+        id 1jYoxM-0005cR-Tr; Wed, 13 May 2020 10:49:45 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/4] block: move the blk-mq calls out of part_in_flight{,_rw}
-Date:   Wed, 13 May 2020 12:49:33 +0200
-Message-Id: <20200513104935.2338779-3-hch@lst.de>
+Subject: [PATCH 3/4] block: don't call part_{inc,dec}_in_flight for blk-mq devices
+Date:   Wed, 13 May 2020 12:49:34 +0200
+Message-Id: <20200513104935.2338779-4-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513104935.2338779-1-hch@lst.de>
 References: <20200513104935.2338779-1-hch@lst.de>
@@ -55,83 +55,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't bother to call part_in_flight / part_in_flight_rw on blk-mq
-devices, just call the blk-mq versions directly.
+part_inc_in_flight and part_dec_in_flight are no-ops for blk-mq queues,
+so remove the calls in purely blk-mq callers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ block/blk-core.c  | 21 +++++----------------
+ block/blk-merge.c |  2 --
+ 2 files changed, 5 insertions(+), 18 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index afdb2c3e5b22a..56e0560738c49 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -142,14 +142,9 @@ void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
- static unsigned int part_in_flight(struct request_queue *q,
- 		struct hd_struct *part)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fe73e816dae36..c22d3148a146e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1392,7 +1392,6 @@ void blk_account_io_done(struct request *req, u64 now)
+ 		update_io_ticks(part, jiffies, true);
+ 		part_stat_inc(part, ios[sgrp]);
+ 		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
+-		part_dec_in_flight(req->q, part, rq_data_dir(req));
+ 
+ 		hd_struct_put(part);
+ 		part_stat_unlock();
+@@ -1401,25 +1400,15 @@ void blk_account_io_done(struct request *req, u64 now)
+ 
+ void blk_account_io_start(struct request *rq, bool new_io)
  {
-+	unsigned int inflight = 0;
- 	int cpu;
--	unsigned int inflight;
+-	struct hd_struct *part;
+-	int rw = rq_data_dir(rq);
 -
--	if (queue_is_mq(q)) {
--		return blk_mq_in_flight(q, part);
--	}
+ 	if (!blk_do_io_stat(rq))
+ 		return;
  
--	inflight = 0;
- 	for_each_possible_cpu(cpu) {
- 		inflight += part_stat_local_read_cpu(part, in_flight[0], cpu) +
- 			    part_stat_local_read_cpu(part, in_flight[1], cpu);
-@@ -165,11 +160,6 @@ static void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- {
- 	int cpu;
- 
--	if (queue_is_mq(q)) {
--		blk_mq_in_flight_rw(q, part, inflight);
--		return;
+ 	part_stat_lock();
+-
+-	if (!new_io) {
+-		part = rq->part;
+-		part_stat_inc(part, merges[rw]);
+-	} else {
+-		part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
+-		part_inc_in_flight(rq->q, part, rw);
+-		rq->part = part;
 -	}
 -
- 	inflight[0] = 0;
- 	inflight[1] = 0;
- 	for_each_possible_cpu(cpu) {
-@@ -1307,7 +1297,10 @@ ssize_t part_stat_show(struct device *dev,
- 	unsigned int inflight;
- 
- 	part_stat_read_all(p, &stat);
--	inflight = part_in_flight(q, p);
-+	if (queue_is_mq(q))
-+		inflight = blk_mq_in_flight(q, p);
+-	update_io_ticks(part, jiffies, false);
+-
++	if (!new_io)
++		part_stat_inc(rq->part, merges[rq_data_dir(rq)]);
 +	else
-+		inflight = part_in_flight(q, p);
- 
- 	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
-@@ -1346,7 +1339,11 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
- 	struct request_queue *q = part_to_disk(p)->queue;
- 	unsigned int inflight[2];
- 
--	part_in_flight_rw(q, p, inflight);
-+	if (queue_is_mq(q))
-+		blk_mq_in_flight_rw(q, p, inflight);
-+	else
-+		part_in_flight_rw(q, p, inflight);
-+
- 	return sprintf(buf, "%8u %8u\n", inflight[0], inflight[1]);
++		rq->part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
++	update_io_ticks(rq->part, jiffies, false);
+ 	part_stat_unlock();
  }
  
-@@ -1601,7 +1598,10 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 	disk_part_iter_init(&piter, gp, DISK_PITER_INCL_EMPTY_PART0);
- 	while ((hd = disk_part_iter_next(&piter))) {
- 		part_stat_read_all(hd, &stat);
--		inflight = part_in_flight(gp->queue, hd);
-+		if (queue_is_mq(gp->queue))
-+			inflight = blk_mq_in_flight(gp->queue, hd);
-+		else
-+			inflight = part_in_flight(gp->queue, hd);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a04e991b5ded9..7588523106708 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -670,8 +670,6 @@ static void blk_account_io_merge(struct request *req)
+ 		part_stat_lock();
+ 		part = req->part;
  
- 		seq_printf(seqf, "%4d %7d %s "
- 			   "%lu %lu %lu %u "
+-		part_dec_in_flight(req->q, part, rq_data_dir(req));
+-
+ 		hd_struct_put(part);
+ 		part_stat_unlock();
+ 	}
 -- 
 2.26.2
 
