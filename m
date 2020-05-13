@@ -2,121 +2,131 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D003AC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 21:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9392DC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 21:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E92282054F
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 21:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CEC420727
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 21:36:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HcMxwpcQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726138AbgEMVAv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 17:00:51 -0400
-Received: from smtprelay0154.hostedemail.com ([216.40.44.154]:51208 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725977AbgEMVAu (ORCPT
+        id S1729379AbgEMVg2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 17:36:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47452 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729351AbgEMVg2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 17:00:50 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay08.hostedemail.com (Postfix) with ESMTP id CA6F0182CED34;
-        Wed, 13 May 2020 21:00:48 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: mist41_5dde648048f06
-X-Filterd-Recvd-Size: 3554
-Received: from XPS-9350.home (unknown [47.151.136.130])
-        (Authenticated sender: joe@perches.com)
-        by omf01.hostedemail.com (Postfix) with ESMTPA;
-        Wed, 13 May 2020 21:00:44 +0000 (UTC)
-Message-ID: <0ee5acfaca4cf32d4efad162046b858981a4dae3.camel@perches.com>
-Subject: Re: [PATCH 20/33] ipv4: add ip_sock_set_recverr
-From:   Joe Perches <joe@perches.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
-        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Date:   Wed, 13 May 2020 14:00:43 -0700
-In-Reply-To: <20200513062649.2100053-21-hch@lst.de>
-References: <20200513062649.2100053-1-hch@lst.de>
-         <20200513062649.2100053-21-hch@lst.de>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.1-2 
+        Wed, 13 May 2020 17:36:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589405787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z/s6vI/nmCH6b0CmF34V4hXpVkjbqBprb5r6kKm9AhU=;
+        b=HcMxwpcQLrWL9PQjH1OVbWU0AsL5zMp1B0USUdpER3q3tZ6P6KFVmecWCQk3XtKugtfCTt
+        KOFL4dWvRb3JQznu5B+Mpf7IPcWYZp/bgKgLM9YEpKp/sROZVQI8hd1ZsAR0OVWVWDQq88
+        2X+WsaYevFuEjI5XVUC68WfEdXMOaw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-rW6S6VcKOSuZkPVYP1uK2g-1; Wed, 13 May 2020 17:36:25 -0400
+X-MC-Unique: rW6S6VcKOSuZkPVYP1uK2g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 733D080572B;
+        Wed, 13 May 2020 21:36:24 +0000 (UTC)
+Received: from sulaco.redhat.com (unknown [10.3.128.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BBFE15D9E5;
+        Wed, 13 May 2020 21:36:23 +0000 (UTC)
+From:   Tony Asleson <tasleson@redhat.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [RFC PATCH v2 1/7] struct device: Add function callback durable_name
+Date:   Wed, 13 May 2020 16:36:15 -0500
+Message-Id: <20200513213621.470411-2-tasleson@redhat.com>
+In-Reply-To: <20200513213621.470411-1-tasleson@redhat.com>
+References: <20200513213621.470411-1-tasleson@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2020-05-13 at 08:26 +0200, Christoph Hellwig wrote:
-> Add a helper to directly set the IP_RECVERR sockopt from kernel space
-> without going through a fake uaccess.
+Function callback and function to be used to write a persistent
+durable name to the supplied character buffer.  This will be used to add
+structured key-value data to log messages for hardware related errors
+which allows end users to correlate message and specific hardware.
 
-This seems used only with true as the second arg.
-Is there reason to have that argument at all?
+Signed-off-by: Tony Asleson <tasleson@redhat.com>
+---
+ drivers/base/core.c    | 24 ++++++++++++++++++++++++
+ include/linux/device.h |  4 ++++
+ 2 files changed, 28 insertions(+)
 
-> diff --git a/include/net/ip.h b/include/net/ip.h
-[]
-> @@ -767,5 +767,6 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
->  
->  void ip_sock_set_tos(struct sock *sk, int val);
->  void ip_sock_set_freebind(struct sock *sk, bool val);
-> +void ip_sock_set_recverr(struct sock *sk, bool val);
->  
->  #endif	/* _IP_H */
-> diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-> index 0c40887a817f8..9abecc3195520 100644
-> --- a/net/ipv4/ip_sockglue.c
-> +++ b/net/ipv4/ip_sockglue.c
-> @@ -589,6 +589,16 @@ void ip_sock_set_freebind(struct sock *sk, bool val)
->  }
->  EXPORT_SYMBOL(ip_sock_set_freebind);
->  
-> +void ip_sock_set_recverr(struct sock *sk, bool val)
-> +{
-> +	lock_sock(sk);
-> +	inet_sk(sk)->recverr = val;
-> +	if (!val)
-> +		skb_queue_purge(&sk->sk_error_queue);
-> +	release_sock(sk);
-> +}
-> +EXPORT_SYMBOL(ip_sock_set_recverr);
-> +
->  /*
->   *	Socket option code for IP. This is the end of the line after any
->   *	TCP,UDP etc options on an IP socket.
-> diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-> index 562ea36c96b0f..1b87b8a9ff725 100644
-> --- a/net/rxrpc/local_object.c
-> +++ b/net/rxrpc/local_object.c
-> @@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
->  		/* Fall through */
->  	case AF_INET:
->  		/* we want to receive ICMP errors */
-> -		opt = 1;
-> -		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
-> -					(char *) &opt, sizeof(opt));
-> -		if (ret < 0) {
-> -			_debug("setsockopt failed");
-> -			goto error;
-> -		}
-> +		ip_sock_set_recverr(local->socket->sk, true);
->  
->  		/* we want to set the don't fragment bit */
->  		opt = IP_PMTUDISC_DO;
+diff --git a/drivers/base/core.c b/drivers/base/core.c
+index dbb0f9130f42..86ea3acb1e1f 100644
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -2281,6 +2281,30 @@ int dev_set_name(struct device *dev, const char *fmt, ...)
+ }
+ EXPORT_SYMBOL_GPL(dev_set_name);
+ 
++/**
++ * dev_durable_name - Write "DURABLE_NAME"=<durable name> in buffer
++ * @dev: device
++ * @buffer: character buffer to write results
++ * @len: length of buffer
++ * @return: Number of bytes written to buffer
++ */
++int dev_durable_name(const struct device *dev, char *buffer, size_t len)
++{
++	int tmp, dlen;
++
++	if (dev && dev->durable_name) {
++		tmp = snprintf(buffer, len, "DURABLE_NAME=");
++		if (tmp < len) {
++			dlen = dev->durable_name(dev, buffer + tmp,
++							len - tmp);
++			if (dlen > 0 && ((dlen + tmp) < len))
++				return dlen + tmp;
++		}
++	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(dev_durable_name);
++
+ /**
+  * device_to_dev_kobj - select a /sys/dev/ directory for the device
+  * @dev: device
+diff --git a/include/linux/device.h b/include/linux/device.h
+index fa04dfd22bbc..a9e5abbd2269 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -616,6 +616,8 @@ struct device {
+ 	struct iommu_fwspec	*iommu_fwspec;
+ 	struct iommu_param	*iommu_param;
+ 
++	int (*durable_name)(const struct device *dev, char *buff, size_t len);
++
+ 	bool			offline_disabled:1;
+ 	bool			offline:1;
+ 	bool			of_node_reused:1;
+@@ -657,6 +659,8 @@ static inline const char *dev_name(const struct device *dev)
+ extern __printf(2, 3)
+ int dev_set_name(struct device *dev, const char *name, ...);
+ 
++int dev_durable_name(const struct device *d, char *buffer, size_t len);
++
+ #ifdef CONFIG_NUMA
+ static inline int dev_to_node(struct device *dev)
+ {
+-- 
+2.25.4
 
