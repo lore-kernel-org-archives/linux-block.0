@@ -6,74 +6,76 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DA9C2D0F6
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D63C2D0F6
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:38:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EBEF2176D
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 116FB24927
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 02:38:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O+E+nmis"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C81jvOP5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726383AbgEMCdO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 22:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
+        id S1728498AbgEMCiC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 22:38:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbgEMCdO (ORCPT
+        with ESMTP id S1727885AbgEMCiB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 22:33:14 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3646BC061A0C
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:33:14 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id y9so3638273plk.10
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:33:14 -0700 (PDT)
+        Tue, 12 May 2020 22:38:01 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570F4C061A0E
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:38:01 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id x2so7336150pfx.7
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2020 19:38:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JBJSD5laxyspTTIoYkWCQTwgMbC24QNWN7qcdj5RGiM=;
-        b=O+E+nmis3jYIIkjVLoqcTo2+dOIB96GzN8uTWUFWBAZWN/wltupJZFpH/GXgdYZNPl
-         lE5B4Nna0P5e2rRJ3SFhZtoJKAYO7jHAxZsdpBkfY1gL3Mu0LM4ZZDbJRFhV7Q7xU8y2
-         8/pro4AEr1b0yJ+pfLELblzMMH1Xo9oivAbkziWF35QW6Rdk7OUU9KFgVQxGOf+6EHYb
-         9E30FRKLKo6P43BNDItuWKIgEkeWXJ+DSO5bQJpFgSR4TQn06c3OqeyAb+NExQ313YYo
-         ZdLHXEeqnv3eWPzE9VpWaDpIQ0medHmIs7KhYaTd5eDF2yA634wq18aYr6n7BoJTDyNQ
-         OPMw==
+        bh=WyehoVS5xyMsLCe9+kv0B9xp6ecEQYyhEXRq6FyyLdc=;
+        b=C81jvOP5IIpQSOmMCWgKmuxFjl4tmtvtegGVhvIv2onkYKGOq/ngfs15R0Jup3yyBt
+         BLb8nqLC/i0JhgUehRlszwt35PWjr82kiTS5uPwjiFPswK7F8WgRyxbBO9HB/AgmcaiK
+         nlas4o8GF8bnhZ+5Mn3gsgaFcoNjdJ2iUWeoyGR5unsHH1uBrttK/snvSm3RjVeFGomT
+         CNo8Pgsyjk5pol/9nRwPvzTXp7x+zOAw3wlryxhBG5/v2F3JAdYayCfJVrCLi45lAYYY
+         gMFfT9LbX2U9jBvAtyA6H6tnHykC6pO8D98NmDhRP/NRnU9PWb6dVEZL2gXdHOeWvmmN
+         XzeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=JBJSD5laxyspTTIoYkWCQTwgMbC24QNWN7qcdj5RGiM=;
-        b=acwj0iUe+3Sq5kMA2O66zPf5bhH+90HNbOtEhNVLp6VjXF9HYTBBQA0SynfIWozxmD
-         Nl+ZH56tMRXnOeecxkOVE6nxsb3NY0Gm92o1LMK8rje+6lL30PXRWQaPqMAAuMAV5vaL
-         e8ZTe9rBgfx+I7M+LhBRLozK052BEUzklbBTWBkS6aM8tHafWcZLPGfq3+M+3aWA3bBL
-         GWRqgEA5wMCJpMf54lVZk5j87M3PFlNJJqLrrqGGeup7OdjhgMwdrbvVRDLQMqb/OF8K
-         2Pld1slv96YBlPO9cyZqdgo1KJ0gjno13ffqi3E+gTmysVLjwqV5hoiCMws/UtrpbKC1
-         Jn0w==
-X-Gm-Message-State: AGi0PuZM0uhcKGkfqKbtA8OHNyAEyMAh+ZleldfFKrSEixUEm/gNtRW6
-        smk1rRL9iUvfgY6/NQC4upkPFQ==
-X-Google-Smtp-Source: APiQypLIc6CIlCz4OivRgh8tFxHQQVo+ZfhPzYUMjt2At9lId9Vo2V1smLcKILY6Bqk2P/hTKB7p4g==
-X-Received: by 2002:a17:902:70c6:: with SMTP id l6mr20949996plt.31.1589337193670;
-        Tue, 12 May 2020 19:33:13 -0700 (PDT)
+        bh=WyehoVS5xyMsLCe9+kv0B9xp6ecEQYyhEXRq6FyyLdc=;
+        b=UF4wMM6TtQgG4Gd6m+KMfJZ7rRc8ukkrPHujsCGsip+IsIiEOomptPTpLZSvl05dSY
+         Oc1Vmt73fjq06VijsSrFyeQG9eheHUSBCgDgXGA7I6KY+cSDSveZHevMoSMLyOjBGdE0
+         y+P/clqzuihLIc6+mtxbnphSHnH6HDEodu3ektHCPHz/TYvtzCwV1JL3ae6yCORKrVy1
+         kUkZ58Roc9stK0pJKUFBI1UvOye1u4pWBv/zWHC3Myo+a95xrYMmpK8rKpSvIq6UJwEk
+         QQQPbK+4u4Q3jitIa67EXlSRB2QxTXqgm//l88XBwSUATHp2t4il2L1E9UMatRz00ydc
+         D6Cg==
+X-Gm-Message-State: AOAM530XdAemHezI0PTYZPXVaL3DqtQfhxyO8SwxIFNcVRyXJn1WcNu9
+        LpCA0gCArYxHdo+1vQDjlNMV7Q==
+X-Google-Smtp-Source: ABdhPJzaaa08OSndxUzWVb1oUbS2rPRvAvnZOpuEVl6MGugQ7SyvMZIgJja84vb/FDIjuTHT2UoE3w==
+X-Received: by 2002:a62:6146:: with SMTP id v67mr5541865pfb.134.1589337480765;
+        Tue, 12 May 2020 19:38:00 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:1d8:eb9:1d84:211c? ([2605:e000:100e:8c61:1d8:eb9:1d84:211c])
-        by smtp.gmail.com with ESMTPSA id c14sm11702057pgi.54.2020.05.12.19.33.12
+        by smtp.gmail.com with ESMTPSA id b9sm12967542pfp.12.2020.05.12.19.37.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2020 19:33:13 -0700 (PDT)
-Subject: Re: [PATCH V2] block: add blk_io_schedule() for avoiding task hung in
- sync dio
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Salman Qazi <sqazi@google.com>,
-        Jesse Barnes <jsbarnes@google.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>
-References: <20200503015422.1123994-1-ming.lei@redhat.com>
+        Tue, 12 May 2020 19:38:00 -0700 (PDT)
+Subject: Re: [PATCH v11 00/10] Introduce Zone Append for writing to zoned
+ block devices
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi @ vger . kernel . org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel @ vger . kernel . org" <linux-fsdevel@vger.kernel.org>
+References: <20200512085554.26366-1-johannes.thumshirn@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <32f8355c-d18a-b962-1d7a-1ca87558cecc@kernel.dk>
-Date:   Tue, 12 May 2020 20:33:11 -0600
+Message-ID: <abd4b3d4-6261-c3a6-9b4c-9bf009a9820d@kernel.dk>
+Date:   Tue, 12 May 2020 20:37:57 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200503015422.1123994-1-ming.lei@redhat.com>
+In-Reply-To: <20200512085554.26366-1-johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,17 +84,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/2/20 7:54 PM, Ming Lei wrote:
-> Sync dio could be big, or may take long time in discard or in case of
-> IO failure.
+On 5/12/20 2:55 AM, Johannes Thumshirn wrote:
+> The upcoming NVMe ZNS Specification will define a new type of write
+> command for zoned block devices, zone append.
 > 
-> We have prevented task hung in submit_bio_wait() and blk_execute_rq(),
-> so apply the same trick for prevent task hung from happening in sync dio.
+> When when writing to a zoned block device using zone append, the start
+> sector of the write is pointing at the start LBA of the zone to write to.
+> Upon completion the block device will respond with the position the data
+> has been placed in the zone. This from a high level perspective can be
+> seen like a file system's block allocator, where the user writes to a
+> file and the file-system takes care of the data placement on the device.
 > 
-> Add helper of blk_io_schedule() and use io_schedule_timeout() to prevent
-> task hung warning.
+> In order to fully exploit the new zone append command in file-systems and
+> other interfaces above the block layer, we choose to emulate zone append
+> in SCSI and null_blk. This way we can have a single write path for both
+> file-systems and other interfaces above the block-layer, like io_uring on
+> zoned block devices, without having to care too much about the underlying
+> characteristics of the device itself.
+> 
+> The emulation works by providing a cache of each zone's write pointer, so
+> zone append issued to the disk can be translated to a write with a
+> starting LBA of the write pointer. This LBA is used as input zone number
+> for the write pointer lookup in the zone write pointer offset cache and
+> the cached offset is then added to the LBA to get the actual position to
+> write the data. In SCSI we then turn the REQ_OP_ZONE_APPEND request into a
+> WRITE(16) command. Upon successful completion of the WRITE(16), the cache
+> will be updated to the new write pointer location and the written sector
+> will be noted in the request. On error the cache entry will be marked as
+> invalid and on the next write an update of the write pointer will be
+> scheduled, before issuing the actual write.
+> 
+> In order to reduce memory consumption, the only cached item is the offset
+> of the write pointer from the start of the zone, everything else can be
+> calculated. On an example drive with 52156 zones, the additional memory
+> consumption of the cache is thus 52156 * 4 = 208624 Bytes or 51 4k Byte
+> pages. The performance impact is neglectable for a spinning drive.
+> 
+> For null_blk the emulation is way simpler, as null_blk's zoned block
+> device emulation support already caches the write pointer position, so we
+> only need to report the position back to the upper layers. Additional
+> caching is not needed here.
+> 
+> Furthermore we have converted zonefs to run use ZONE_APPEND for synchronous
+> direct I/Os. Asynchronous I/O still uses the normal path via iomap.
+> 
+> Performance testing with zonefs sync writes on a 14 TB SMR drive and nullblk
+> shows good results. On the SMR drive we're not regressing (the performance
+> improvement is within noise), on nullblk we could drastically improve specific
+> workloads:
+> 
+> * nullblk:
+> 
+> Single Thread Multiple Zones
+> 				kIOPS	MiB/s	MB/s	% delta
+> mq-deadline REQ_OP_WRITE	10.1	631	662
+> mq-deadline REQ_OP_ZONE_APPEND	13.2	828	868	+31.12
+> none REQ_OP_ZONE_APPEND		15.6	978	1026	+54.98
+> 
+> 
+> Multiple Threads Multiple Zones
+> 				kIOPS	MiB/s	MB/s	% delta
+> mq-deadline REQ_OP_WRITE	10.2	640	671
+> mq-deadline REQ_OP_ZONE_APPEND	10.4	650	681	+1.49
+> none REQ_OP_ZONE_APPEND		16.9	1058	1109	+65.28
+> 
+> * 14 TB SMR drive
+> 
+> Single Thread Multiple Zones
+> 				IOPS	MiB/s	MB/s	% delta
+> mq-deadline REQ_OP_WRITE	797	49.9	52.3
+> mq-deadline REQ_OP_ZONE_APPEND	806	50.4	52.9	+1.15
+> 
+> Multiple Threads Multiple Zones
+> 				kIOPS	MiB/s	MB/s	% delta
+> mq-deadline REQ_OP_WRITE	745	46.6	48.9
+> mq-deadline REQ_OP_ZONE_APPEND	768	48	50.3	+2.86
+> 
+> The %-delta is against the baseline of REQ_OP_WRITE using mq-deadline as I/O
+> scheduler.
+> 
+> The series is based on Jens' for-5.8/block branch with HEAD:
+> ae979182ebb3 ("bdi: fix up for "remove the name field in struct backing_dev_info"")
 
-Applied, thanks.
+Applied for 5.8, thanks.
 
 -- 
 Jens Axboe
