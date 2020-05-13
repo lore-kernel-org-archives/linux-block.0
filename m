@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9D7C2D0FC
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E927C2D0FA
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C7F4223E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5427822384
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 13:39:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="dszfHefJ"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="eGCVZxVH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387990AbgEMNi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 09:38:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56818 "EHLO
+        id S2387983AbgEMNjs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 09:39:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388265AbgEMNi5 (ORCPT
+        with ESMTP id S2388071AbgEMNi6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 09:38:57 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8931C061A0E
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 06:38:56 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id g12so28531040wmh.3
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 06:38:56 -0700 (PDT)
+        Wed, 13 May 2020 09:38:58 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2F4C061A0F
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 06:38:58 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id l18so20926589wrn.6
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 06:38:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=android.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eYHviJVahcwDhxjEt/fmtYPaGxNJX7zxM8/7Ab1/oKM=;
-        b=dszfHefJ/6wPpOkY6yHlMPpo9u0aofe27dyNCu9H6WbQusflK/2g2i5DPVgxFkOE99
-         3+xMxns/IcbHbuMCigFsUYpwDw3rX3sIp8ehscd/3v5p9G+BjI7C4VBeTK3gYMJk/KXW
-         3MZ0KCwEl0sTVTbSC8NB+XaxGsXkuXOlBrdOHdPpIAjGSj1zY7wVL4cX/hEVxnB32xRc
-         8c2r8d9oaMeZhUNRjTK9OSv2OHUim6+JSg+lVAnh5raV5l5cz3AKeJgWDhlb5gVq5gfR
-         Ergx+pbIVnchLIcwK340dlB/WGU1+K0U/KkNSKgRnzjYCPNfvu0mbnBgqI4KXL4R9I2r
-         95IA==
+        bh=DgaYzMr4at/dBaiZhwCRdQ4/MPv6wjkUvq/fU8vDFyU=;
+        b=eGCVZxVH41xtk/Hjf+/yYBJ2rL1w6wlC3Q0Ug4CbUk3ChWSrV8fzgQX9ykCvUT+WD9
+         k4TVZ93AvvFeUwiNHWIkVYVGAymD2Gk39up77TJ2y37bP9aBqIS3aqzRrhVmlB8WF7M0
+         WDt5iLjYWw76K76yNr9+BBY784ZgOP7+9caXVVhTMgrdZ8fkU8Kc4SaUf2qcJEufNd4V
+         rQECv2nuZtoI3PyLMqtZeRkyHn/P0sAzh3uUx1p2MjSKTFvAxy76bwFE0dIYoFBg5PmV
+         1RajsSLC34y31X7v/094xPxLGacJnioom8pXaoWEHCGPCdXDpj2tEwylNfKY8m3YkA20
+         uq7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eYHviJVahcwDhxjEt/fmtYPaGxNJX7zxM8/7Ab1/oKM=;
-        b=C/rq9NNZSD061EdsGvuh9pTkG9zY3FKE6pKbwQ5VHtA74OEE+Nh4Grlv0GCOvI2fDn
-         H7mYGc5Sb2XH9l/cdqfZM3JwYhZnI015KPgNx94Zz0g29NXo+COJ0VM8UrMEfKtSaNgw
-         E2capwA18pOuJUu1hc8NfxPLl+FxN6/vLRaWT+R1VL4vjtA0JXA4H0HG2W5zm6rdDk3O
-         L4GqZVp4R6susKAfdxvA+28aXV4FQOi/N6s5Z0verBeVOAxD4cBEJ1Dn3qrtOt/AFLMZ
-         i/6bs740yZZBBZ2sw5q6zkD0ut8X9eYupy1OADTGgHubYCv6SHht6RloEvdfhPhTdOvk
-         gVgA==
-X-Gm-Message-State: AOAM531XJTFCaxcZHv/kDDO8iw6WnYQogkPD36i9y5O6ESTv2oTNTGvh
-        jQlY7/RndB3pqamqXGiOwdjhCA==
-X-Google-Smtp-Source: ABdhPJwro6lOehGpNJwWlMkVkHMVfZV3Yl8YDIn16VxTnE16IUWiZ8ilQmJMXdZrKUOXcKp3g5E6+w==
-X-Received: by 2002:a1c:3187:: with SMTP id x129mr1800080wmx.27.1589377135614;
-        Wed, 13 May 2020 06:38:55 -0700 (PDT)
+        bh=DgaYzMr4at/dBaiZhwCRdQ4/MPv6wjkUvq/fU8vDFyU=;
+        b=C/cMOIVqNe5ywMFpUtYjkMDr0LfWoghoFLXt5Ji1tlAXs8niM31aE9WaUw9gxfUotT
+         OsrZ1pDonmfbglD4DfGkaP5Dh4QwJHesbe3u/oq6azCTepmTXBwqj5vbdncc1dK8RzIy
+         622YCx+QRR9WcgOIy8J1P7jifjtN7OhxD4X/LBKDEYuj5L4o2QUMOzToYrcZNYb87j+D
+         uN0MBIVnlctKiVkHEuPZGCPtqv7Ex77d8OK1UboY3mDQt858CtCW0yIG+pU8dJzoED4G
+         dyP9eUnmPLGmOFEucJgooOgtuLKi0xzvngMghnOUEGiBp5FpKc5Z4FcCM7s0VICR+Flx
+         WmcA==
+X-Gm-Message-State: AGi0PuZ5ibLFFdCxjgjCskxFPNlE+QWaTgEh2PQnnZqvyeu/ZsYF3vZD
+        EXnV/xQb4J8GpUo586bZVaAdAg==
+X-Google-Smtp-Source: APiQypLgfx0bZ/W+soTyjb30iFZoKYeCoiNB6MFptekC6Ez/iO7aZR3TZFMjzWE1yIp6pLSqi1qjsQ==
+X-Received: by 2002:a05:6000:1241:: with SMTP id j1mr30927974wrx.42.1589377136723;
+        Wed, 13 May 2020 06:38:56 -0700 (PDT)
 Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id m6sm26202653wrq.5.2020.05.13.06.38.54
+        by smtp.gmail.com with ESMTPSA id m6sm26202653wrq.5.2020.05.13.06.38.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 06:38:54 -0700 (PDT)
+        Wed, 13 May 2020 06:38:55 -0700 (PDT)
 From:   Martijn Coenen <maco@android.com>
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
 Cc:     narayan@google.com, zezeozue@google.com, maco@google.com,
@@ -65,9 +65,9 @@ Cc:     narayan@google.com, zezeozue@google.com, maco@google.com,
         Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Martijn Coenen <maco@android.com>
-Subject: [PATCH v5 05/11] loop: Refactor loop_set_status() size calculation
-Date:   Wed, 13 May 2020 15:38:39 +0200
-Message-Id: <20200513133845.244903-6-maco@android.com>
+Subject: [PATCH v5 06/11] loop: Remove figure_loop_size()
+Date:   Wed, 13 May 2020 15:38:40 +0200
+Message-Id: <20200513133845.244903-7-maco@android.com>
 X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
 In-Reply-To: <20200513133845.244903-1-maco@android.com>
 References: <20200513133845.244903-1-maco@android.com>
@@ -78,106 +78,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-figure_loop_size() calculates the loop size based on the passed in
-parameters, but at the same time it updates the offset and sizelimit
-parameters in the loop device configuration. That is a somewhat
-unexpected side effect of a function with this name, and it is only only
-needed by one of the two callers of this function - loop_set_status().
-
-Move the lo_offset and lo_sizelimit assignment back into loop_set_status(),
-and use the newly factored out functions to validate and apply the newly
-calculated size. This allows us to get rid of figure_loop_size() in a
-follow-up commit.
+This function was now only used by loop_set_capacity(). Just open code
+the remaining code in the caller instead.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Martijn Coenen <maco@android.com>
 ---
- drivers/block/loop.c | 37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ drivers/block/loop.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d9a756f8abd5..c134b3439483 100644
+index c134b3439483..e281a9f03d96 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -250,11 +250,6 @@ figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
- {
- 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
- 
--	if (lo->lo_offset != offset)
--		lo->lo_offset = offset;
--	if (lo->lo_sizelimit != sizelimit)
--		lo->lo_sizelimit = sizelimit;
--
- 	loop_set_size(lo, size);
+@@ -245,14 +245,6 @@ static void loop_set_size(struct loop_device *lo, loff_t size)
+ 	set_capacity_revalidate_and_notify(lo->lo_disk, size, false);
  }
  
-@@ -1272,6 +1267,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	kuid_t uid = current_uid();
- 	struct block_device *bdev;
- 	bool partscan = false;
-+	bool size_changed = false;
- 
- 	err = mutex_lock_killable(&loop_ctl_mutex);
- 	if (err)
-@@ -1293,6 +1289,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
-+		size_changed = true;
- 		sync_blockdev(lo->lo_device);
- 		kill_bdev(lo->lo_device);
- 	}
-@@ -1300,6 +1297,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	/* I/O need to be drained during transfer transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
-+	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
-+		/* If any pages were dirtied after kill_bdev(), try again */
-+		err = -EAGAIN;
-+		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-+			__func__, lo->lo_number, lo->lo_file_name,
-+			lo->lo_device->bd_inode->i_mapping->nrpages);
-+		goto out_unfreeze;
-+	}
-+
- 	err = loop_release_xfer(lo);
- 	if (err)
- 		goto out_unfreeze;
-@@ -1323,19 +1329,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (err)
- 		goto out_unfreeze;
- 
--	if (lo->lo_offset != info->lo_offset ||
--	    lo->lo_sizelimit != info->lo_sizelimit) {
--		/* kill_bdev should have truncated all the pages */
--		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
--			err = -EAGAIN;
--			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
--				__func__, lo->lo_number, lo->lo_file_name,
--				lo->lo_device->bd_inode->i_mapping->nrpages);
--			goto out_unfreeze;
--		}
--		figure_loop_size(lo, info->lo_offset, info->lo_sizelimit);
--	}
+-static void
+-figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
+-{
+-	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
 -
-+	lo->lo_offset = info->lo_offset;
-+	lo->lo_sizelimit = info->lo_sizelimit;
- 	memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
- 	memcpy(lo->lo_crypt_name, info->lo_crypt_name, LO_NAME_SIZE);
- 	lo->lo_file_name[LO_NAME_SIZE-1] = 0;
-@@ -1359,6 +1354,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		lo->lo_key_owner = uid;
- 	}
+-	loop_set_size(lo, size);
+-}
+-
+ static inline int
+ lo_do_transfer(struct loop_device *lo, int cmd,
+ 	       struct page *rpage, unsigned roffs,
+@@ -1534,10 +1526,13 @@ loop_get_status64(struct loop_device *lo, struct loop_info64 __user *arg) {
  
-+	if (size_changed) {
-+		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
-+					   lo->lo_backing_file);
-+		loop_set_size(lo, new_size);
-+	}
+ static int loop_set_capacity(struct loop_device *lo)
+ {
++	loff_t size;
 +
- 	loop_config_discard(lo);
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
  
- 	/* update dio if lo_offset or transfer is changed */
+-	figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit);
++	size = get_loop_size(lo, lo->lo_backing_file);
++	loop_set_size(lo, size);
+ 
+ 	return 0;
+ }
 -- 
 2.26.2.645.ge9eca65c58-goog
 
