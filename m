@@ -2,122 +2,107 @@ Return-Path: <SRS0=8+4U=63=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5ACC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 22:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6209C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 22:27:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 898CA20659
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 22:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1B752054F
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 22:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zsVEMSvo"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="qnuaqcZy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729829AbgEMWCc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 18:02:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51074 "EHLO
+        id S1731194AbgEMW07 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 18:26:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729775AbgEMWCc (ORCPT
+        by vger.kernel.org with ESMTP id S1731084AbgEMW07 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 18:02:32 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA153C061A0C
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 15:02:31 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id f134so15985700wmf.1
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 15:02:31 -0700 (PDT)
+        Wed, 13 May 2020 18:26:59 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC462C061A0E
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 15:26:58 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id x20so957317ejb.11
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 15:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NV0I+PQ/bP/GA960hSqWWInbdEsB8a3xj+0T2OplAI8=;
-        b=zsVEMSvo5zRFkbrslR/SdvibGufMZDtISasn8y9CWtnpLwCfNzl+dWWIAZlfDRuvaV
-         KSiXNBfONGMdbb/AXdKQZSrDQ1jE2S01iY3DcRHwn4etS+X6xW4Wpf39VwNuT7EuvqZO
-         jVXiiiNntcKfOOo0jry4K0jYp4Rpko9Fdee90BapxMOcX0c57DfdeCMDOyNzO2VgTQkQ
-         8UZ/6mkllgUWApck4F8HPz/03Ijyl5NixHXCfFZIa6w4tTAkmNGt5PLK/rcK50dTRNCw
-         RcLQ/O00CFgzIr8hBxSb+bEF7Z2gLkDSgbilQBmnmX6hBqIGKbJYPEFBa+eWtiMjvYZ6
-         UL7A==
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5gtvWq/MeF/6oEmnw1qXQmZlv3KNk4h6BjoEUKhO/AI=;
+        b=qnuaqcZyt8F/fu6JacXR348SsoSa3Tm7AzZNuvdyRoTov1keyBvQu8pXUwf75HxiOf
+         Kp75KOKoGDVG9AVOlHoBHnEOZ+aGnlYmnNxamZckzNM5gr/kauOLnvq8RbJVSj57g1cw
+         9NN4htlh7EN6fcqVbepwUivXJDqDlyuHYUdtHPY21wxmzjXy/ZgI5w7jQM2uM22NfFtA
+         q8lS8JkKuJziplyt33amkKJeLTRetS+ezNJTjHtj9SEkChz+0OHqn2TMVceqrJ2eD/4/
+         0tsEvnEt2hykkPAkDhJ48WHxBHzBhAZBdTwTt86tywE0BQeuxSyyhNQdkXE9MGPz7xQ5
+         Snkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NV0I+PQ/bP/GA960hSqWWInbdEsB8a3xj+0T2OplAI8=;
-        b=Ca5Bz4UbX3IsBbFz/AhEVoW/JgGTxmUQKvGVGKBaraFlzrF4cplu2dl5Q7eFKRMaBI
-         hwQ0GCKkFbtyRslb0vTfjzlJLp4V539SSpyeRPLV2gHCDqfz/O9Xi2ZNBvxgieLWTWSU
-         BW1TC/2cSGLrBml5hrQNKEbJLBCVDZ9OH8Bo8/s7x1XbGbBzN4AIDv+Rv6st+8TUYpdx
-         eMLdkpiaNx1riZnJVJBTR57xsHDxZNZq+UrCR9UgB0TlUu0ZBDnQdTihDLV+gYzAA0+1
-         rkZRUKZqHVHTY8j4c3CisyPN2SNzEVJt6KCoDKqldT3ks7Q6Sftp3KpvpWAc4YypaR0Y
-         fHZg==
-X-Gm-Message-State: AGi0PubTbjqHHOReejSM/UTNnVAIAUclyKx2srDTekUIlwo0GmoOzxB0
-        U7YmIY3tLvo4DSZ8+i0d8TEr5u6BlPI=
-X-Google-Smtp-Source: APiQypImDRFIw23OphRLSr2tLCe254h14d2kawUwf8XYH2kgtFJDmngnS+J14nygZmJuDqj2G3hy3A==
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr41899992wmb.166.1589407350423;
-        Wed, 13 May 2020 15:02:30 -0700 (PDT)
-Received: from [192.168.0.105] ([84.33.166.154])
-        by smtp.gmail.com with ESMTPSA id 128sm32340068wme.39.2020.05.13.15.02.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 May 2020 15:02:29 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] blktrace: Report pid with note messages
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20200513160223.7855-1-jack@suse.cz>
-Date:   Thu, 14 May 2020 00:04:12 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E45FC662-D4FB-4927-8DE3-22E22687B643@linaro.org>
-References: <20200513160223.7855-1-jack@suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5gtvWq/MeF/6oEmnw1qXQmZlv3KNk4h6BjoEUKhO/AI=;
+        b=jm0rt7o8Zwgymjm3/YieTL5DVW8YIZolcBh8OiuFGYmFNzaZ7xpKN63aMnU27mhl0M
+         lod9KPftM5TtQH9Y7dBB/HcHwPeLSQsmTnvCovR5U0qC+kRjoBrdh1SNFgzr/jLWCYi+
+         4savXk2mo9bEj6/lvp4ueUmnXeydpEYfNIER+VSK12vu6pSP72paC1EJGsvUZSXXNCzl
+         ra2J2Zia1UdatcIcCeNh4uWElGHpAArlOVKtBrQy5SqbCOCeBt3E2wJmQ7NrN7dD4L49
+         3duK0jidPRjft/JOgnll3YJDJ0oqWatFEJab09V5e/C9TPe4rDYZ2Cw/V+hbj6JaDv0s
+         xzXw==
+X-Gm-Message-State: AOAM530ZIO6Lr6D4UsvhgrYm2YHKojlCG3jDLL7UZ+89tL+6aq/uU/d6
+        dvV8o/dmug/kjy9UBpUX8yqi4isPufW5lJE29diOkA==
+X-Google-Smtp-Source: ABdhPJz1YkZyiu1OaSAVXpO2AAQnxlh/qNnka1A5+jaiVwuM2r/ADoB+8k1+qusteX+AGprilg7rK2SWSnm96LhSDK4=
+X-Received: by 2002:a17:906:1f8b:: with SMTP id t11mr1180169ejr.201.1589408817417;
+ Wed, 13 May 2020 15:26:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200508161517.252308-1-hch@lst.de> <CAPcyv4j3gVqrZWCCc2Q-6JizGAQXW0b+R1BcvWCZOvzaukGLQg@mail.gmail.com>
+ <20200509082352.GB21834@lst.de> <CAPcyv4ggb7_rwzGbhHNXSHd+jjSpZC=+DMEztY6Cu8Bc=ZNzag@mail.gmail.com>
+ <20200512080820.GA2336@lst.de>
+In-Reply-To: <20200512080820.GA2336@lst.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 13 May 2020 15:26:45 -0700
+Message-ID: <CAPcyv4iWB=ZMmpc1aWfpJabSbCdvB28dCeSp_xj7AZMfbF_rjg@mail.gmail.com>
+Subject: Re: remove a few uses of ->queuedata
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        linux-m68k@lists.linux-m68k.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-xtensa@linux-xtensa.org, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-bcache@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, May 12, 2020 at 1:08 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Sat, May 09, 2020 at 08:07:14AM -0700, Dan Williams wrote:
+> > > which are all used in the I/O submission path (generic_make_request /
+> > > generic_make_request_checks).  This is mostly a prep cleanup patch to
+> > > also remove the pointless queue argument from ->make_request - then
+> > > ->queue is an extra dereference and extra churn.
+> >
+> > Ah ok. If the changelogs had been filled in with something like "In
+> > preparation for removing @q from make_request_fn, stop using
+> > ->queuedata", I probably wouldn't have looked twice.
+> >
+> > For the nvdimm/ driver updates you can add:
+> >
+> >     Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> >
+> > ...or just let me know if you want me to pick those up through the nvdimm tree.
+>
+> I'd love you to pick them up through the nvdimm tree.  Do you want
+> to fix up the commit message yourself?
 
-
-> Il giorno 13 mag 2020, alle ore 18:02, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> Currently informational messages within block trace do not have PID
-> information of the process reporting the message included. With BFQ it
-> is sometimes useful to have the information and there's no good reason
-> to omit the information from the trace. So just fill in pid =
-information
-> when generating note message.
->=20
-
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-
-Thank you!
-Paolo
-
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
-> kernel/trace/blktrace.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index ca39dc3230cb..ea47f2084087 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -170,10 +170,10 @@ void __trace_note_message(struct blk_trace *bt, =
-struct blkcg *blkcg,
-> 	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-> 		blkcg =3D NULL;
-> #ifdef CONFIG_BLK_CGROUP
-> -	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-> +	trace_note(bt, current->pid, BLK_TN_MESSAGE, buf, n,
-> 		   blkcg ? cgroup_id(blkcg->css.cgroup) : 1);
-> #else
-> -	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, 0);
-> +	trace_note(bt, current->pid, BLK_TN_MESSAGE, buf, n, 0);
-> #endif
-> 	local_irq_restore(flags);
-> }
-> --=20
-> 2.16.4
->=20
-
+Will do, thanks.
