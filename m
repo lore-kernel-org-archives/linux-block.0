@@ -4,46 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDB4C2D0F8
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D99AC2D0F8
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2E62205ED
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3595E205ED
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 03:49:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXOa8vVF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bpn4YGSE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727790AbgEMDsy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 May 2020 23:48:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32763 "EHLO
+        id S1728461AbgEMDtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 May 2020 23:49:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35672 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727107AbgEMDsy (ORCPT
+        with ESMTP id S1727107AbgEMDtA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 May 2020 23:48:54 -0400
+        Tue, 12 May 2020 23:49:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589341731;
+        s=mimecast20190719; t=1589341739;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Xv5DqVnejg416O03SiKWNsVe+d+9iJXyGmze0RRSMnQ=;
-        b=hXOa8vVF8c+TaR9n4UhCPZ76Dd3khpFLjaYPhE1uWtY0nNo2srRawPfpGqWtYUEnRty1pR
-        M8m7tt9DJNxqicpMJEpwQGHCVupfuerbUZsJVA+P5JobWTfi8LEqeZ46W61LKaUDE5U1Uz
-        sA5Igwv4rMPi0neXqzW55RmHzXsKnsM=
+        bh=uLqS0yyxOJBQJd9pqTgMlI3LiIt9PX4rxkrzPTZC2A4=;
+        b=bpn4YGSEaLA/kff/pynVdRB8Jxmr/h6WOIEVrQI6XJ0c6+tadgQqWKhXroCh64nczXCKHo
+        GokQot/nMoIKDhvl7jsQauI6Z71KiiVvXB7Fm+Gz9SoXt7TOUSF4hXWz5YrtUz2ksI8F1p
+        WBKvN14pGJxptG/+aSO/5kvCX5sDULA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-xstxSs7APAq0kren1P2r9A-1; Tue, 12 May 2020 23:48:49 -0400
-X-MC-Unique: xstxSs7APAq0kren1P2r9A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-223-1_4_wLChPti8Q6EeLwDKng-1; Tue, 12 May 2020 23:48:55 -0400
+X-MC-Unique: 1_4_wLChPti8Q6EeLwDKng-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A3E61005510;
-        Wed, 13 May 2020 03:48:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13CA680183C;
+        Wed, 13 May 2020 03:48:54 +0000 (UTC)
 Received: from localhost (ovpn-12-166.pek2.redhat.com [10.72.12.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C91CF10013D9;
-        Wed, 13 May 2020 03:48:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E6265D9DD;
+        Wed, 13 May 2020 03:48:50 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -51,261 +51,125 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Hannes Reinecke <hare@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Thomas Gleixner <tglx@linutronix.de>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V11 04/12] blk-mq: assign rq->tag in blk_mq_get_driver_tag
-Date:   Wed, 13 May 2020 11:47:55 +0800
-Message-Id: <20200513034803.1844579-5-ming.lei@redhat.com>
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH V11 05/12] blk-mq: add blk_mq_all_tag_iter
+Date:   Wed, 13 May 2020 11:47:56 +0800
+Message-Id: <20200513034803.1844579-6-ming.lei@redhat.com>
 In-Reply-To: <20200513034803.1844579-1-ming.lei@redhat.com>
 References: <20200513034803.1844579-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Especially for none elevator, rq->tag is assigned after the request is
-allocated, so there isn't any way to figure out if one request is in
-being dispatched. Also the code path wrt. driver tag becomes a bit
-difference between none and io scheduler.
+Now request is thought as in-flight only when its state is updated as
+MQ_RQ_IN_FLIGHT, which is done by driver via blk_mq_start_request().
 
-When one hctx becomes inactive, we have to prevent any request from
-being dispatched to LLD. And get driver tag provides one perfect chance
-to do that. Meantime we can drain any such requests by checking if
-rq->tag is assigned.
+Actually from blk-mq's view, one rq can be thought as in-flight
+after its tag is >= 0.
 
-So only assign rq->tag until blk_mq_get_driver_tag() is called.
-
-This way also simplifies code of dealing with driver tag a lot.
+Add one new function of blk_mq_all_tag_iter so that we can iterate
+every in-flight request, and this way is more flexible since caller
+can decide to handle request according to rq's state.
 
 Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: John Garry <john.garry@huawei.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-flush.c | 18 ++----------
- block/blk-mq.c    | 75 ++++++++++++++++++++++++-----------------------
- block/blk-mq.h    | 21 +++++++------
- block/blk.h       |  5 ----
- 4 files changed, 51 insertions(+), 68 deletions(-)
+ block/blk-mq-tag.c | 33 +++++++++++++++++++++++++++++----
+ block/blk-mq-tag.h |  2 ++
+ 2 files changed, 31 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index c7f396e3d5e2..977edf95d711 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -236,13 +236,8 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		error = fq->rq_status;
- 
- 	hctx = flush_rq->mq_hctx;
--	if (!q->elevator) {
--		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
--		flush_rq->tag = -1;
--	} else {
--		blk_mq_put_driver_tag(flush_rq);
--		flush_rq->internal_tag = -1;
--	}
-+	flush_rq->internal_tag = -1;
-+	blk_mq_put_driver_tag(flush_rq);
- 
- 	running = &fq->flush_queue[fq->flush_running_idx];
- 	BUG_ON(fq->flush_pending_idx == fq->flush_running_idx);
-@@ -317,14 +312,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	flush_rq->mq_ctx = first_rq->mq_ctx;
- 	flush_rq->mq_hctx = first_rq->mq_hctx;
- 
--	if (!q->elevator) {
--		fq->orig_rq = first_rq;
--		flush_rq->tag = first_rq->tag;
--		blk_mq_tag_set_rq(flush_rq->mq_hctx, first_rq->tag, flush_rq);
--	} else {
--		flush_rq->internal_tag = first_rq->internal_tag;
--	}
--
-+	flush_rq->internal_tag = first_rq->internal_tag;
- 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
- 	flush_rq->cmd_flags |= (flags & REQ_DRV) | (flags & REQ_FAILFAST_MASK);
- 	flush_rq->rq_flags |= RQF_FLUSH_SEQ;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 53c6e7678c14..80d25e1d792a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -276,18 +276,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	struct request *rq = tags->static_rqs[tag];
- 	req_flags_t rq_flags = 0;
- 
--	if (data->flags & BLK_MQ_REQ_INTERNAL) {
--		rq->tag = -1;
--		rq->internal_tag = tag;
--	} else {
--		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
--			rq_flags = RQF_MQ_INFLIGHT;
--			atomic_inc(&data->hctx->nr_active);
--		}
--		rq->tag = tag;
--		rq->internal_tag = -1;
--		data->hctx->tags->rqs[rq->tag] = rq;
--	}
-+	rq->internal_tag = tag;
-+	rq->tag = -1;
- 
- 	/* csd/requeue_work/fifo_time is initialized before use */
- 	rq->q = data->q;
-@@ -471,14 +461,18 @@ static void __blk_mq_free_request(struct request *rq)
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
--	const int sched_tag = rq->internal_tag;
- 
- 	blk_pm_mark_last_busy(rq);
- 	rq->mq_hctx = NULL;
--	if (rq->tag != -1)
--		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
--	if (sched_tag != -1)
--		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
-+
-+	if (hctx->sched_tags) {
-+		if (rq->tag >= 0)
-+			blk_mq_put_tag(hctx->tags, ctx, rq->tag);
-+		blk_mq_put_tag(hctx->sched_tags, ctx, rq->internal_tag);
-+	} else {
-+		blk_mq_put_tag(hctx->tags, ctx, rq->internal_tag);
-+        }
-+
- 	blk_mq_sched_restart(hctx);
- 	blk_queue_exit(q);
- }
-@@ -526,7 +520,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- 		blk_stat_add(rq, now);
- 	}
- 
--	if (rq->internal_tag != -1)
-+	if (rq->q->elevator && rq->internal_tag != -1)
- 		blk_mq_sched_completed_request(rq, now);
- 
- 	blk_account_io_done(rq, now);
-@@ -1015,33 +1009,40 @@ static inline unsigned int queued_to_index(unsigned int queued)
- 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
- }
- 
--static bool blk_mq_get_driver_tag(struct request *rq)
-+static bool __blk_mq_get_driver_tag(struct request *rq)
- {
- 	struct blk_mq_alloc_data data = {
--		.q = rq->q,
--		.hctx = rq->mq_hctx,
--		.flags = BLK_MQ_REQ_NOWAIT,
--		.cmd_flags = rq->cmd_flags,
-+		.q		= rq->q,
-+		.hctx		= rq->mq_hctx,
-+		.flags		= BLK_MQ_REQ_NOWAIT,
-+		.cmd_flags	= rq->cmd_flags,
- 	};
--	bool shared;
- 
--	if (rq->tag != -1)
--		return true;
-+	if (data.hctx->sched_tags) {
-+		if (blk_mq_tag_is_reserved(data.hctx->sched_tags,
-+				rq->internal_tag))
-+			data.flags |= BLK_MQ_REQ_RESERVED;
-+		rq->tag = blk_mq_get_tag(&data);
-+	} else {
-+		rq->tag = rq->internal_tag;
-+	}
- 
--	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
--		data.flags |= BLK_MQ_REQ_RESERVED;
-+	if (rq->tag == -1)
-+		return false;
- 
--	shared = blk_mq_tag_busy(data.hctx);
--	rq->tag = blk_mq_get_tag(&data);
--	if (rq->tag >= 0) {
--		if (shared) {
--			rq->rq_flags |= RQF_MQ_INFLIGHT;
--			atomic_inc(&data.hctx->nr_active);
--		}
--		data.hctx->tags->rqs[rq->tag] = rq;
-+	if (blk_mq_tag_busy(data.hctx)) {
-+		rq->rq_flags |= RQF_MQ_INFLIGHT;
-+		atomic_inc(&data.hctx->nr_active);
- 	}
-+	data.hctx->tags->rqs[rq->tag] = rq;
-+	return true;
-+}
- 
--	return rq->tag != -1;
-+static bool blk_mq_get_driver_tag(struct request *rq)
-+{
-+	if (rq->tag != -1)
-+		return true;
-+	return __blk_mq_get_driver_tag(rq);
- }
- 
- static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e7d1da4b1f73..d0c72d7d07c8 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -196,26 +196,25 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
- 	return true;
- }
- 
--static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
--					   struct request *rq)
-+static inline void blk_mq_put_driver_tag(struct request *rq)
- {
--	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
-+	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-+	int tag = rq->tag;
-+
-+	if (tag < 0)
-+		return;
-+
- 	rq->tag = -1;
- 
-+	if (hctx->sched_tags)
-+		blk_mq_put_tag(hctx->tags, rq->mq_ctx, tag);
-+
- 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
- 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
- 		atomic_dec(&hctx->nr_active);
- 	}
- }
- 
--static inline void blk_mq_put_driver_tag(struct request *rq)
--{
--	if (rq->tag == -1 || rq->internal_tag == -1)
--		return;
--
--	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
--}
--
- static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
- {
- 	int cpu;
-diff --git a/block/blk.h b/block/blk.h
-index faf616cb0463..002104739465 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -26,11 +26,6 @@ struct blk_flush_queue {
- 	struct list_head	flush_data_in_flight;
- 	struct request		*flush_rq;
- 
--	/*
--	 * flush_rq shares tag with this rq, both can't be active
--	 * at the same time
--	 */
--	struct request		*orig_rq;
- 	struct lock_class_key	key;
- 	spinlock_t		mq_flush_lock;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 586c9d6e904a..c27c6dfc7d36 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -257,6 +257,7 @@ struct bt_tags_iter_data {
+ 	busy_tag_iter_fn *fn;
+ 	void *data;
+ 	bool reserved;
++	bool iterate_all;
  };
+ 
+ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+@@ -274,7 +275,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	 * test and set the bit before assining ->rqs[].
+ 	 */
+ 	rq = tags->rqs[bitnr];
+-	if (rq && blk_mq_request_started(rq))
++	if (rq && (iter_data->iterate_all || blk_mq_request_started(rq)))
+ 		return iter_data->fn(rq, iter_data->data, reserved);
+ 
+ 	return true;
+@@ -294,13 +295,15 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+  *		bitmap_tags member of struct blk_mq_tags.
+  */
+ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+-			     busy_tag_iter_fn *fn, void *data, bool reserved)
++			     busy_tag_iter_fn *fn, void *data, bool reserved,
++			     bool iterate_all)
+ {
+ 	struct bt_tags_iter_data iter_data = {
+ 		.tags = tags,
+ 		.fn = fn,
+ 		.data = data,
+ 		.reserved = reserved,
++		.iterate_all = iterate_all,
+ 	};
+ 
+ 	if (tags->rqs)
+@@ -321,8 +324,30 @@ static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
+ 	if (tags->nr_reserved_tags)
+-		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
+-	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
++		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true,
++				 false);
++	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false, false);
++}
++
++/**
++ * blk_mq_all_tag_iter - iterate over all requests in a tag map
++ * @tags:	Tag map to iterate over.
++ * @fn:		Pointer to the function that will be called for each
++ *		request. @fn will be called as follows: @fn(rq, @priv,
++ *		reserved) where rq is a pointer to a request. 'reserved'
++ *		indicates whether or not @rq is a reserved request. Return
++ *		true to continue iterating tags, false to stop.
++ * @priv:	Will be passed as second argument to @fn.
++ *
++ * It is the caller's responsibility to check rq's state in @fn.
++ */
++void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
++		void *priv)
++{
++	if (tags->nr_reserved_tags)
++		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true,
++				 true);
++	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false, true);
+ }
+ 
+ /**
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 2b8321efb682..d19546e8246b 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -34,6 +34,8 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv);
++void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
++		void *priv);
+ 
+ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ 						 struct blk_mq_hw_ctx *hctx)
 -- 
 2.25.2
 
