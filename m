@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85628C2D0F9
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF6FC2D0FE
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:28:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6177F2176D
-	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48BDC20718
+	for <linux-block@archiver.kernel.org>; Wed, 13 May 2020 06:28:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NiP22OnF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eiafrt7n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729728AbgEMG2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 May 2020 02:28:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46008 "EHLO
+        id S1729781AbgEMG2L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729679AbgEMG2I (ORCPT
+        with ESMTP id S1729679AbgEMG2L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 May 2020 02:28:08 -0400
+        Wed, 13 May 2020 02:28:11 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874F2C061A0C;
-        Tue, 12 May 2020 23:28:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF98C061A0E;
+        Tue, 12 May 2020 23:28:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=gMsO+mOWC0AxWgj5iPjiPJ81lg9fJ3e20NkoSKlWXl4=; b=NiP22OnFLtRhlIV98j3x7R65pm
-        Tuopik23/ANKB+k+q5wVYIUiGYhftnUTH3P8z23/kSkia4unoHBvll51eNnTcI7v1WUB7/XTBS4cl
-        UR5LjwYM9JEmlesGjj6I+I3urypCPSIM3NSv7EetW5GuuVmpNcVc1B1IEu/5n+RLsQUgMOsPUfagd
-        6bRL8SVwaeRf1fsxFl9JeTBAs4xmL5Kubmw/9DAaYASZTaB7cQKZjK0Fp0ZEryYGHCYKQfM3IFTU/
-        IokYGDr79vkQViV6wEOuQzO4vmHqIUvTC5DSSQZaL29/wA8faYMD600iV9TjJzv2j+E9QrEUjLQo1
-        GZhLgCGg==;
+        bh=8TT2PxSsEHipT+e5nSL6DhUaWirp80j0qmDh4nmGKY8=; b=eiafrt7nHqCNDveJ9gIe9E9pgO
+        QmFtEivvTMNAlSTpjQqGiinbccIYJpAjA983x/pBULlX0DWFGtN3Ue6Kc9mUgY54gWgOhle20hcvG
+        7Q/l8DlKedLblAfymab8XyOufMUKyts5b5yvP77ZC/rCin0PckQdwJWVhLWch3GSstZDgTm98DOpF
+        fCErxg2KksDxfRgQJn3oF+4/yUQk1b6vp899x1/0FRbNu8DjSUuUDC5F0CX2PZKpzmQv6hrjeuVi3
+        U8ob0+DxLHA7yij0KM2glbwmY2qM4h6gKGd6viPFEFRxjYk5SZWfg2NIK2Q5B9jMAOEW0oYtlOh0Q
+        2F2vwKTw==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYkr5-0003nY-Na; Wed, 13 May 2020 06:27:00 +0000
+        id 1jYkra-0004KK-Q3; Wed, 13 May 2020 06:27:31 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -56,9 +56,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 03/33] net: add sock_set_priority
-Date:   Wed, 13 May 2020 08:26:18 +0200
-Message-Id: <20200513062649.2100053-4-hch@lst.de>
+Subject: [PATCH 13/33] tcp: add tcp_sock_set_syncnt
+Date:   Wed, 13 May 2020 08:26:28 +0200
+Message-Id: <20200513062649.2100053-14-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -70,106 +70,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a helper to directly set the SO_PRIORITY sockopt from kernel space
+Add a helper to directly set the TCP_SYNCNT sockopt from kernel space
 without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/tcp.c   | 12 ++----------
- drivers/nvme/target/tcp.c | 18 ++++--------------
- include/net/sock.h        |  1 +
- net/core/sock.c           |  8 ++++++++
- 4 files changed, 15 insertions(+), 24 deletions(-)
+ drivers/nvme/host/tcp.c |  9 +--------
+ include/linux/tcp.h     |  1 +
+ net/ipv4/tcp.c          | 12 ++++++++++++
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 5cacb61c73229..cd6a8fc14a139 100644
+index a8070f93fd0a0..8417eeb83fcd2 100644
 --- a/drivers/nvme/host/tcp.c
 +++ b/drivers/nvme/host/tcp.c
-@@ -1362,16 +1362,8 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
- 	 */
- 	sock_set_linger(queue->sock->sk, true, 0);
- 
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret) {
--			dev_err(ctrl->ctrl.device,
--				"failed to set SO_PRIORITY sock opt, ret %d\n",
--				ret);
--			goto err_sock;
--		}
--	}
-+	if (so_priority > 0)
-+		sock_set_priority(queue->sock->sk, so_priority);
- 
- 	/* Set socket type of service */
- 	if (nctrl->opts->tos >= 0) {
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 87aba417189d2..778c1ce3137b7 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1448,12 +1448,8 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
- 	 */
- 	sock_set_linger(sock->sk, true, 0);
- 
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret)
--			return ret;
--	}
-+	if (so_priority > 0)
-+		sock_set_priority(sock->sk, so_priority);
- 
- 	/* Set socket type of service */
- 	if (inet->rcv_tos > 0) {
-@@ -1638,14 +1634,8 @@ static int nvmet_tcp_add_port(struct nvmet_port *nport)
- 		goto err_sock;
+@@ -1336,14 +1336,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
  	}
  
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(port->sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret) {
--			pr_err("failed to set SO_PRIORITY sock opt %d\n", ret);
--			goto err_sock;
--		}
+ 	/* Single syn retry */
+-	opt = 1;
+-	ret = kernel_setsockopt(queue->sock, IPPROTO_TCP, TCP_SYNCNT,
+-			(char *)&opt, sizeof(opt));
+-	if (ret) {
+-		dev_err(nctrl->device,
+-			"failed to set TCP_SYNCNT sock opt %d\n", ret);
+-		goto err_sock;
 -	}
-+	if (so_priority > 0)
-+		sock_set_priority(port->sock->sk, so_priority);
++	tcp_sock_set_syncnt(queue->sock->sk, 1);
  
- 	ret = kernel_bind(port->sock, (struct sockaddr *)&port->addr,
- 			sizeof(port->addr));
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60890fb47fbc0..cce11782dc295 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2689,5 +2689,6 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
- void sock_def_readable(struct sock *sk);
- void sock_set_reuseaddr(struct sock *sk, unsigned char reuse);
- void sock_set_linger(struct sock *sk, bool onoff, unsigned int linger);
-+void sock_set_priority(struct sock *sk, u32 priority);
+ 	/* Set TCP no delay */
+ 	tcp_sock_set_nodelay(queue->sock->sk, true);
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index e7ab6da5111b5..77b832acf3398 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -497,5 +497,6 @@ int tcp_skb_shift(struct sk_buff *to, struct sk_buff *from, int pcount,
+ void tcp_sock_set_cork(struct sock *sk, bool on);
+ void tcp_sock_set_nodelay(struct sock *sk, bool on);
+ void tcp_sock_set_quickack(struct sock *sk, int val);
++int tcp_sock_set_syncnt(struct sock *sk, int val);
  
- #endif	/* _SOCK_H */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index cbc5104ca3515..e9f1e2247b004 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -744,6 +744,14 @@ void sock_set_linger(struct sock *sk, bool onoff, unsigned int linger)
+ #endif	/* _LINUX_TCP_H */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index c681f43f0bb85..773b5cd366ab7 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2870,6 +2870,18 @@ void tcp_sock_set_quickack(struct sock *sk, int val)
  }
- EXPORT_SYMBOL(sock_set_linger);
+ EXPORT_SYMBOL(tcp_sock_set_quickack);
  
-+void sock_set_priority(struct sock *sk, u32 priority)
++int tcp_sock_set_syncnt(struct sock *sk, int val)
 +{
++	if (val < 1 || val > MAX_TCP_SYNCNT)
++		return -EINVAL;
++
 +	lock_sock(sk);
-+	sk->sk_priority = priority;
++	inet_csk(sk)->icsk_syn_retries = val;
 +	release_sock(sk);
++	return 0;
 +}
-+EXPORT_SYMBOL(sock_set_priority);
++EXPORT_SYMBOL(tcp_sock_set_syncnt);
 +
  /*
-  *	This is meant for all protocols to use and covers goings on
-  *	at the socket level. Everything here is generic.
+  *	Socket option code for TCP.
+  */
 -- 
 2.26.2
 
