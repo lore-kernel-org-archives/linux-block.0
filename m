@@ -2,150 +2,105 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7324FC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A77C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:35:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FEA020643
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA7902065C
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:35:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VKrUJVLC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728258AbgENT2W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 15:28:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
+        id S1727033AbgENTfh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 15:35:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725975AbgENT2V (ORCPT
+        by vger.kernel.org with ESMTP id S1726128AbgENTfh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 15:28:21 -0400
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E640EC061A0C
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 12:28:20 -0700 (PDT)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 49NM5Y60DmzlhGVS;
-        Thu, 14 May 2020 21:28:17 +0200 (CEST)
-Received: from ns3096276.ip-94-23-54.eu (unknown [94.23.54.103])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 49NM5X23j6zljVWn;
-        Thu, 14 May 2020 21:28:16 +0200 (CEST)
-Subject: Re: [RFC PATCH v3 00/12] Integrity Policy Enforcement LSM (IPE)
-To:     Deven Bowers <deven.desai@linux.microsoft.com>, agk@redhat.com,
-        axboe@kernel.dk, snitzer@redhat.com, jmorris@namei.org,
-        serge@hallyn.com, zohar@linux.ibm.com,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, jannh@google.com
-Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
-        sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
-        nramas@linux.microsoft.com, mdsakib@linux.microsoft.com,
-        linux-kernel@vger.kernel.org, corbet@lwn.net
-References: <20200415162550.2324-1-deven.desai@linux.microsoft.com>
- <b07ac7e1-7cf5-92c9-81d0-64174c3d5024@digikod.net>
- <0001755a-6b2a-b13b-960c-eb0b065c8e3c@linux.microsoft.com>
- <8ba7b15f-de91-40f7-fc95-115228345fce@linux.microsoft.com>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <44fb36ae-959d-4ff7-ed1f-ccfc2e292232@digikod.net>
-Date:   Thu, 14 May 2020 21:28:15 +0200
-User-Agent: 
+        Thu, 14 May 2020 15:35:37 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5A3C061A0C;
+        Thu, 14 May 2020 12:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2cAIpvlCjeek2UlOhaJLhP9ft/jEX+ktFmYjxRqXe+8=; b=VKrUJVLC1QZKeaeXa89WwIPrud
+        xWN6tLhwKrf0IpJKq477Gsgmnmh5IAspTgAHgDcohLeDdrarSFbeKBc4Rw2VutH7Wdqvp+u4GJ57w
+        S0xlexgFqHGVwvMQi6/gLdhHcd2BhEAtEJoKic/a9cMDbNfSZrkHXscgCV9WUJWrinXP0EAaolivK
+        hCE8IgM4uAPNE59ZVrZ32j3gM0r62sSoSbqGvAOLM1yqh1PJXDV7uEOvyuE6GKFQZHwxYJw4fajs3
+        Axa1m0R1dUG8mD1OUgFnasRlFQOsu7tu4NrpejMq4uvEZ+5h/r1+/qUH0gkhEmZ3YbfFR3xYXvB1l
+        kED1vgQw==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jZJdf-0003fM-JH; Thu, 14 May 2020 19:35:27 +0000
+Date:   Thu, 14 May 2020 12:35:27 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'Christoph Hellwig' <hch@lst.de>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        'Joe Perches' <joe@perches.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jon Maloy <jmaloy@redhat.com>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        Ying Xue <ying.xue@windriver.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>
+Subject: Re: [Ocfs2-devel] remove kernel_setsockopt and kernel_getsockopt
+Message-ID: <20200514193527.GB16070@bombadil.infradead.org>
+References: <20200513062649.2100053-1-hch@lst.de>
+ <ecc165c33962d964d518c80de605af632eee0474.camel@perches.com>
+ <756758e8f0e34e2e97db470609f5fbba@AcuMS.aculab.com>
+ <20200514101838.GA12548@lst.de>
+ <a76440f7305c4653877ff2abff499f4e@AcuMS.aculab.com>
+ <20200514103450.GA12901@lst.de>
+ <c2034daa0a23454abb5e5c5714807735@AcuMS.aculab.com>
 MIME-Version: 1.0
-In-Reply-To: <8ba7b15f-de91-40f7-fc95-115228345fce@linux.microsoft.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Antivirus: Dr.Web (R) for Unix mail servers drweb plugin ver.6.0.2.8
-X-Antivirus-Code: 0x100000
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2034daa0a23454abb5e5c5714807735@AcuMS.aculab.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, May 14, 2020 at 11:11:34AM +0000, David Laight wrote:
+> From: 'Christoph Hellwig'
+> > Sent: 14 May 2020 11:35
+> > On Thu, May 14, 2020 at 10:26:41AM +0000, David Laight wrote:
+> > > From: Christoph Hellwig
+> > > > Only for those were we have users, and all those are covered.
+> > >
+> > > What do we tell all our users when our kernel SCTP code
+> > > no longer works?
+> > 
+> > We only care about in-tree modules, just like for every other interface
+> > in the kernel.
+> 
+> Even if our management agreed to release the code and the code
+> layout matched the kernel guidelines you still wouldn't want
+> two large drivers that implement telephony functionality
+> for hardware that very few people actually have.
 
-On 12/05/2020 22:46, Deven Bowers wrote:
-> 
-> 
-> On 5/11/2020 11:03 AM, Deven Bowers wrote:
->>
->>
->> On 5/10/2020 2:28 AM, Mickaël Salaün wrote:
->>
->> [...snip]
->>
->>>>
->>>> Additionally, rules are evaluated top-to-bottom. As a result, any
->>>> revocation rules, or denies should be placed early in the file to
->>>> ensure
->>>> that these rules are evaluated before a rule with "action=ALLOW" is
->>>> hit.
->>>>
->>>> IPE policy is designed to be forward compatible and backwards
->>>> compatible,
->>>> thus any failure to parse a rule will result in the line being ignored,
->>>> and a warning being emitted. If backwards compatibility is not
->>>> required,
->>>> the kernel commandline parameter and sysctl, ipe.strict_parse can be
->>>> enabled, which will cause these warnings to be fatal.
->>>
->>> Ignoring unknown command may lead to inconsistent beaviors. To achieve
->>> forward compatibility, I think it would be better to never ignore
->>> unknown rule but to give a way to userspace to known what is the current
->>> kernel ABI. This could be done with a securityfs file listing the
->>> current policy grammar.
->>>
->>
->> That's a fair point. From a manual perspective, I think this is fine.
->> A human-user can interpret a grammar successfully on their own when new
->> syntax is introduced.
->>
->>  From a producing API perspective, I'd have to think about it a bit
->> more. Ideally, the grammar would be structured in such a way that the
->> userland
->> interpreter of this grammar would not have to be updated once new syntax
->> is introduced, avoiding the need to update the userland binary. To do so
->> generically ("op=%s") is easy, but doesn't necessarily convey sufficient
->> information (what happens when a new "op" token is introduced?). I think
->> this may come down to regular expression representations of valid values
->> for these tokens, which worries me as regular expressions are incredibly
->> error-prone[1].
->>
->> I'll see what I can come up with regarding this.
-> 
-> I have not found a way that I like to expose some kind of grammar
-> through securityfs that can be understood by usermode to parse the
-> policy. Here's what I propose as a compromise:
-> 
->     1. I remove the unknown command behavior. This address your
-> first point about inconsistent behaviors, and effectively removes the
-> strict_parse sysctl (as it is always enabled).
-> 
->     2. I introduce a versioning system for the properties
-> themselves. The valid set of properties and their versions
-> can be found in securityfs, under say, ipe/config in a key=value
-> format where `key` indicates the understood token, and `value`
-> indicates their current version. For example:
-> 
->     $ cat $SECURITYFS/ipe/config
->     op=1
->     action=1
->     policy_name=1
->     policy_version=1
->     dmverity_signature=1
->     dmverity_roothash=1
->     boot_verified=1
-
-The name ipe/config sounds like a file to configure IPE. Maybe something
-like ipe/config_abi or ipe/config_grammar?
-
-> 
-> if new syntax is introduced, the version number is increased.
-> 
->     3. The format of those versions are documented as part of
-> the admin-guide around IPE. If user-mode at that point wants to rip
-> the documentation formats and correlate with the versioning, then
-> it fulfills the same functionality as above, with out the complexity
-> around exposing a parsing grammar and interpreting it on-the-fly.
-> Many of these are unlikely to move past version 1, however.
-> 
-> Thoughts?
-> 
-
-That seems reasonable.
+Oh, good point, we'll change the policy for all modules and make every
+interface in the kernel stable from now on to cater to your special case.
