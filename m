@@ -2,71 +2,88 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D81BC433E1
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 05:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E68C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 05:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75B11206DC
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 05:12:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589433128;
-	bh=cdFrV7nh7pJqlqa0/pkPvBaYElxzoq3V+cr3ke1Ix5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ARvZiSEay2E0TXdWSI+9Nbz2DWm2tF9kZsDujatu5eYpOUtUPpgtIlHF89TVZHEQk
-	 bWm0/PuxjakM1zI03ISDAJSlGfFSpfFq6MY0X9qnIghgNQraGQWZiY8sn8kZEoqJUG
-	 CJa0UNT8N1/MLBjyQkcEqFQ3glkI87dKgjCna8EE=
+	by mail.kernel.org (Postfix) with ESMTP id 921A3205CB
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 05:50:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sRv6d+A9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725926AbgENFMH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 01:12:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49530 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725788AbgENFMH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 01:12:07 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D5DFF206D4;
-        Thu, 14 May 2020 05:12:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589433127;
-        bh=cdFrV7nh7pJqlqa0/pkPvBaYElxzoq3V+cr3ke1Ix5g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=k2VsDoJve1gy0nqVqVKZHvP2YadsKWdsfOk2d6wWgvoInglUMeVyOX0D6k15HOULg
-         hcQOk+F1+efu8V0RnZHR/Nwlcpp1qBS8gbxG5coCW4XjhFQ315KR+Vl4v6XHWurap+
-         yjR+HEitPXERvDZN0i8LtInW04GRKwswvZBdqjes=
-Date:   Wed, 13 May 2020 22:12:05 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Satya Tangirala <satyat@google.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v13 08/12] scsi: ufs: Add inline encryption support to UFS
-Message-ID: <20200514051205.GB14829@sol.localdomain>
-References: <20200514003727.69001-1-satyat@google.com>
- <20200514003727.69001-9-satyat@google.com>
+        id S1725818AbgENFuO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 01:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725794AbgENFuN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 May 2020 01:50:13 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71525C061A0C
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2020 22:50:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Sxo9Ep81jO2/p+U64anML+U88P1RPdL1LAXVqOHa30w=; b=sRv6d+A9+zWaL6nicSwQd7q4wY
+        NaY84/HfZWDJb+7x0Kt69dGXVqmwZRGftrCalFgNT3gqK0JSP8KtzTvXu8ly6YvRMtdvMh8RNACFM
+        EtNRX9eQvXCjUVV8aB4Z06snTXPqls4CxEuCyrJav1jtWTyd+oJ0QnM/pCjnSKM6WyveKIa59My7G
+        Jc9rwlw05XkH2UASJ7qHm2oW4LIPVr21O1wPXvxmIBticSe0UiIeA4oo2CvUL3rpQJsuUcD+zfUrN
+        JwMhgjTh70j4DICEKu/mHDhTnT7c+jYHYV311gQbNm85VEC2NvxALYq4rX1CRXY4DYgqqiaVjAgTl
+        6mVjN9qw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jZ6ks-0001MA-FR; Thu, 14 May 2020 05:50:02 +0000
+Date:   Wed, 13 May 2020 22:50:02 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>
+Subject: Re: [PATCH 3/9] blk-mq: don't predicate last flag in
+ blk_mq_dispatch_rq_list
+Message-ID: <20200514055002.GA22388@infradead.org>
+References: <20200513095443.2038859-1-ming.lei@redhat.com>
+ <20200513095443.2038859-4-ming.lei@redhat.com>
+ <20200513122753.GC23958@infradead.org>
+ <20200514005043.GE2073570@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200514003727.69001-9-satyat@google.com>
+In-Reply-To: <20200514005043.GE2073570@T590>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 14, 2020 at 12:37:23AM +0000, Satya Tangirala wrote:
-> Wire up ufshcd.c with the UFS Crypto API, the block layer inline
-> encryption additions and the keyslot manager.
+On Thu, May 14, 2020 at 08:50:43AM +0800, Ming Lei wrote:
+> On Wed, May 13, 2020 at 05:27:53AM -0700, Christoph Hellwig wrote:
+> > On Wed, May 13, 2020 at 05:54:37PM +0800, Ming Lei wrote:
+> > > .commit_rqs() is supposed to handle partial dispatch when driver may not
+> > > see .last of flag passed to .queue_rq().
+> > > 
+> > > We have added .commit_rqs() in case of partial dispatch and all consumers
+> > > of bd->last have implemented .commit_rqs() callback, so it is perfect to
+> > > pass real .last flag of the request list to .queue_rq() instead of faking
+> > > it by trying to allocate driver tag for next request in the batching list.
+> > 
+> > The current case still seems like a nice optimization to avoid an extra
+> > indirect function call.  So if you want to get rid of it I think it at
+> > least needs a better rationale.
 > 
-> Signed-off-by: Satya Tangirala <satyat@google.com>
+> You mean marking .last by trying to allocate for next request can
+> replace .commit_rqs()? No, it can't because .commit_rqs() can be
+> called no matter .last is set or not, both two are independent.
+> 
+> Removing it can avoid to pre-allocate one extra driver tag, and
+> improve driver tag's utilization.
 
-Looks good, you can add:
-
-    Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-- Eric
+What I said is that the current scheme works, and the new one will
+need an additional indirect function call in various scenarios.  The
+commit log doesn't really "sell" that change very well.  Your new
+explanation is much better, as would be saying it helps you with
+the hanges in this series.
