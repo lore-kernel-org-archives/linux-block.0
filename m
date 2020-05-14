@@ -2,144 +2,275 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CB5C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 18:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D2AC433E2
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:00:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 380B320671
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 18:03:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTYj/LIm"
+	by mail.kernel.org (Postfix) with ESMTP id B02E4206A5
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589482850;
+	bh=RyauCsxiWR6yHzEGhM4ClHB52t/cCsIR3Yac2foI/cg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=1OrL4WykGTA3LknCLHe4F/TDFeI3VHX1BfSbUDaCDroZHFhDxMgalzv/JwHDCrklI
+	 50a5cImPAArv4exw2ac9VswZmDFzarLcxTjL3uRxS89Vma2EB3nGsSag3vEC2hEoUf
+	 c4cP5xYBJiV6rggbUYaBOQuADlbUbfV7uYlacbqg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726132AbgENSD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 14:03:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45097 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726035AbgENSD2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 14:03:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589479406;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tE7zZsDmw/yZbrfqaJT36sACACFD7o4pfgXiX6CyaVE=;
-        b=cTYj/LIm7VfWPEsf/gcSaV7qV4nyZPNeWPHuBhbN/gXzo8ksliC2AGMbZ2WTFkYNnLz0p/
-        Ef4aZLtMlbekKeLXIrTnLL8azZAtXVFL9tRNx8aj1X6L1BfS14B1fpA7/hvU08XNxJ05Zq
-        G5AurfdfOkPqeGrs6uuaBjixmxBQRwU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-Hxoc4choN32rFwGvVK4wyA-1; Thu, 14 May 2020 14:03:22 -0400
-X-MC-Unique: Hxoc4choN32rFwGvVK4wyA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729399AbgENTAu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 15:00:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56266 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729435AbgENSzj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 May 2020 14:55:39 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14E96872FEB;
-        Thu, 14 May 2020 18:03:21 +0000 (UTC)
-Received: from [10.3.128.23] (unknown [10.3.128.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1741376E95;
-        Thu, 14 May 2020 18:03:19 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [RFC PATCH v2 5/7] ata_dev_printk: Use dev_printk
-To:     Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-References: <20200513213621.470411-1-tasleson@redhat.com>
- <20200513213621.470411-6-tasleson@redhat.com>
- <82257837-c5a8-6a38-ce13-0f1ce7e245ac@suse.de>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <e12aeb9e-fe5d-5b5e-d190-401997cecc34@redhat.com>
-Date:   Thu, 14 May 2020 13:03:18 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 78E402074A;
+        Thu, 14 May 2020 18:55:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589482538;
+        bh=RyauCsxiWR6yHzEGhM4ClHB52t/cCsIR3Yac2foI/cg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ObAZE+iKiu9Ais/PoDfHNIKHaIWGNuLEm9OeyWa4S7cohY8Z9fyiNa/6rUkLp/dvO
+         0VvjXa9PbvLc4nYPcrh92w7DazDCbz9kuLMOFzXvC0Y6mk9pCEm1qoI7z1JuJnyBE0
+         AUOHTjBtbWR6bSHVvbMAF4Zon4KjACWsAGtlKw8k=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Lance Digby <ldigby@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 31/39] virtio-blk: handle block_device_operations callbacks after hot unplug
+Date:   Thu, 14 May 2020 14:54:48 -0400
+Message-Id: <20200514185456.21060-31-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200514185456.21060-1-sashal@kernel.org>
+References: <20200514185456.21060-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <82257837-c5a8-6a38-ce13-0f1ce7e245ac@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/14/20 12:53 AM, Hannes Reinecke wrote:
-> On 5/13/20 11:36 PM, Tony Asleson wrote:
->> Utilize the dev_printk function which will add structured data
->> to the log message.
->>
->> Signed-off-by: Tony Asleson <tasleson@redhat.com>
->> ---
->>   drivers/ata/libata-core.c | 10 +++++++---
->>   1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
->> index 42c8728f6117..16978d615a17 100644
->> --- a/drivers/ata/libata-core.c
->> +++ b/drivers/ata/libata-core.c
->> @@ -7301,6 +7301,7 @@ EXPORT_SYMBOL(ata_link_printk);
->>   void ata_dev_printk(const struct ata_device *dev, const char *level,
->>               const char *fmt, ...)
->>   {
->> +    const struct device *gendev;
->>       struct va_format vaf;
->>       va_list args;
->>   @@ -7309,9 +7310,12 @@ void ata_dev_printk(const struct ata_device
->> *dev, const char *level,
->>       vaf.fmt = fmt;
->>       vaf.va = &args;
->>   -    printk("%sata%u.%02u: %pV",
->> -           level, dev->link->ap->print_id, dev->link->pmp + dev->devno,
->> -           &vaf);
->> +    gendev = (dev->sdev) ? &dev->sdev->sdev_gendev : &dev->tdev;
->> +
->> +    dev_printk(level, gendev, "ata%u.%02u: %pV",
->> +            dev->link->ap->print_id,
->> +            dev->link->pmp + dev->devno,
->> +            &vaf);
->>         va_end(args);
->>   }
->>
-> That is wrong.
-> dev_printk() will already prefix the logging message with the device
-> name, so we'll end up having the name printed twice.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-It certainly could be. Early in boot when &dev->sdev->sdev_gendev ==
-NULL and &dev->tdev is used we get
+[ Upstream commit 90b5feb8c4bebc76c27fcaf3e1a0e5ca2d319e9e ]
 
-dev1.0: ata1.00: configured for UDMA/100
+A userspace process holding a file descriptor to a virtio_blk device can
+still invoke block_device_operations after hot unplug.  This leads to a
+use-after-free accessing vblk->vdev in virtblk_getgeo() when
+ioctl(HDIO_GETGEO) is invoked:
 
-later when &dev->sdev->sdev_gendev != NULL we get
+  BUG: unable to handle kernel NULL pointer dereference at 0000000000000090
+  IP: [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
+  PGD 800000003a92f067 PUD 3a930067 PMD 0
+  Oops: 0000 [#1] SMP
+  CPU: 0 PID: 1310 Comm: hdio-getgeo Tainted: G           OE  ------------   3.10.0-1062.el7.x86_64 #1
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+  task: ffff9be5fbfb8000 ti: ffff9be5fa890000 task.ti: ffff9be5fa890000
+  RIP: 0010:[<ffffffffc00e5450>]  [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
+  RSP: 0018:ffff9be5fa893dc8  EFLAGS: 00010246
+  RAX: ffff9be5fc3f3400 RBX: ffff9be5fa893e30 RCX: 0000000000000000
+  RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff9be5fbc10b40
+  RBP: ffff9be5fa893dc8 R08: 0000000000000301 R09: 0000000000000301
+  R10: 0000000000000000 R11: 0000000000000000 R12: ffff9be5fdc24680
+  R13: ffff9be5fbc10b40 R14: ffff9be5fbc10480 R15: 0000000000000000
+  FS:  00007f1bfb968740(0000) GS:ffff9be5ffc00000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 0000000000000090 CR3: 000000003a894000 CR4: 0000000000360ff0
+  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+  Call Trace:
+   [<ffffffffc016ac37>] virtblk_getgeo+0x47/0x110 [virtio_blk]
+   [<ffffffff8d3f200d>] ? handle_mm_fault+0x39d/0x9b0
+   [<ffffffff8d561265>] blkdev_ioctl+0x1f5/0xa20
+   [<ffffffff8d488771>] block_ioctl+0x41/0x50
+   [<ffffffff8d45d9e0>] do_vfs_ioctl+0x3a0/0x5a0
+   [<ffffffff8d45dc81>] SyS_ioctl+0xa1/0xc0
 
-sd 1:0:0:0: [sdb] 209715200 512-byte logical blocks: (107 GB/100 GiB)
+A related problem is that virtblk_remove() leaks the vd_index_ida index
+when something still holds a reference to vblk->disk during hot unplug.
+This causes virtio-blk device names to be lost (vda, vdb, etc).
 
-to clarify, your point is dev1.0 is redundant as ata1.00 exists in the
-message?
+Fix these issues by protecting vblk->vdev with a mutex and reference
+counting vblk so the vd_index_ida index can be removed in all cases.
 
+Fixes: 48e4043d4529 ("virtio: add virtio disk geometry feature")
+Reported-by: Lance Digby <ldigby@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Link: https://lore.kernel.org/r/20200430140442.171016-1-stefanha@redhat.com
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/virtio_blk.c | 86 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 78 insertions(+), 8 deletions(-)
 
-In the block layer print_req_error we get:
-
-block sdb: blk_update_request: I/O error, dev sdb, sector 10000 op
-0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
-
-Which seems a bit more redundant.
-
-I've been trying to be careful to not change the human readable portion
-of the message, so not to disturb all the log scraping tools that exist
-mining errors.  Maybe this is the wrong approach?  In my original patch
-series I brought back printk_emit so that I could add the structured
-data without introducing changes in the message text output.  James
-Bottomley suggested using dev_printk which certainly made things
-cleaner, but it does add the prefix.
-
-
-Thanks,
-Tony
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 19d226ff15ef8..0e18eed62c575 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -31,6 +31,15 @@ struct virtio_blk_vq {
+ } ____cacheline_aligned_in_smp;
+ 
+ struct virtio_blk {
++	/*
++	 * This mutex must be held by anything that may run after
++	 * virtblk_remove() sets vblk->vdev to NULL.
++	 *
++	 * blk-mq, virtqueue processing, and sysfs attribute code paths are
++	 * shut down before vblk->vdev is set to NULL and therefore do not need
++	 * to hold this mutex.
++	 */
++	struct mutex vdev_mutex;
+ 	struct virtio_device *vdev;
+ 
+ 	/* The disk structure for the kernel. */
+@@ -42,6 +51,13 @@ struct virtio_blk {
+ 	/* Process context for config space updates */
+ 	struct work_struct config_work;
+ 
++	/*
++	 * Tracks references from block_device_operations open/release and
++	 * virtio_driver probe/remove so this object can be freed once no
++	 * longer in use.
++	 */
++	refcount_t refs;
++
+ 	/* What host tells us, plus 2 for header & tailer. */
+ 	unsigned int sg_elems;
+ 
+@@ -315,10 +331,55 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ 	return err;
+ }
+ 
++static void virtblk_get(struct virtio_blk *vblk)
++{
++	refcount_inc(&vblk->refs);
++}
++
++static void virtblk_put(struct virtio_blk *vblk)
++{
++	if (refcount_dec_and_test(&vblk->refs)) {
++		ida_simple_remove(&vd_index_ida, vblk->index);
++		mutex_destroy(&vblk->vdev_mutex);
++		kfree(vblk);
++	}
++}
++
++static int virtblk_open(struct block_device *bd, fmode_t mode)
++{
++	struct virtio_blk *vblk = bd->bd_disk->private_data;
++	int ret = 0;
++
++	mutex_lock(&vblk->vdev_mutex);
++
++	if (vblk->vdev)
++		virtblk_get(vblk);
++	else
++		ret = -ENXIO;
++
++	mutex_unlock(&vblk->vdev_mutex);
++	return ret;
++}
++
++static void virtblk_release(struct gendisk *disk, fmode_t mode)
++{
++	struct virtio_blk *vblk = disk->private_data;
++
++	virtblk_put(vblk);
++}
++
+ /* We provide getgeo only to please some old bootloader/partitioning tools */
+ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+ {
+ 	struct virtio_blk *vblk = bd->bd_disk->private_data;
++	int ret = 0;
++
++	mutex_lock(&vblk->vdev_mutex);
++
++	if (!vblk->vdev) {
++		ret = -ENXIO;
++		goto out;
++	}
+ 
+ 	/* see if the host passed in geometry config */
+ 	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
+@@ -334,12 +395,16 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+ 		geo->sectors = 1 << 5;
+ 		geo->cylinders = get_capacity(bd->bd_disk) >> 11;
+ 	}
+-	return 0;
++out:
++	mutex_unlock(&vblk->vdev_mutex);
++	return ret;
+ }
+ 
+ static const struct block_device_operations virtblk_fops = {
+ 	.ioctl  = virtblk_ioctl,
+ 	.owner  = THIS_MODULE,
++	.open = virtblk_open,
++	.release = virtblk_release,
+ 	.getgeo = virtblk_getgeo,
+ };
+ 
+@@ -659,6 +724,10 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 		goto out_free_index;
+ 	}
+ 
++	/* This reference is dropped in virtblk_remove(). */
++	refcount_set(&vblk->refs, 1);
++	mutex_init(&vblk->vdev_mutex);
++
+ 	vblk->vdev = vdev;
+ 	vblk->sg_elems = sg_elems;
+ 
+@@ -821,8 +890,6 @@ static int virtblk_probe(struct virtio_device *vdev)
+ static void virtblk_remove(struct virtio_device *vdev)
+ {
+ 	struct virtio_blk *vblk = vdev->priv;
+-	int index = vblk->index;
+-	int refc;
+ 
+ 	/* Make sure no work handler is accessing the device. */
+ 	flush_work(&vblk->config_work);
+@@ -832,18 +899,21 @@ static void virtblk_remove(struct virtio_device *vdev)
+ 
+ 	blk_mq_free_tag_set(&vblk->tag_set);
+ 
++	mutex_lock(&vblk->vdev_mutex);
++
+ 	/* Stop all the virtqueues. */
+ 	vdev->config->reset(vdev);
+ 
+-	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
++	/* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
++	vblk->vdev = NULL;
++
+ 	put_disk(vblk->disk);
+ 	vdev->config->del_vqs(vdev);
+ 	kfree(vblk->vqs);
+-	kfree(vblk);
+ 
+-	/* Only free device id if we don't have any users */
+-	if (refc == 1)
+-		ida_simple_remove(&vd_index_ida, index);
++	mutex_unlock(&vblk->vdev_mutex);
++
++	virtblk_put(vblk);
+ }
+ 
+ #ifdef CONFIG_PM_SLEEP
+-- 
+2.20.1
 
