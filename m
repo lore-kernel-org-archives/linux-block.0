@@ -2,76 +2,81 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19993C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 15:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00837C433E3
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 15:48:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF1ED20728
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 15:34:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDB8D2065D
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 15:48:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NKfqO3cB"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W7tvPmNX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727822AbgENPeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 11:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45574 "EHLO
+        id S1726239AbgENPsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 11:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727119AbgENPeU (ORCPT
+        with ESMTP id S1727801AbgENPso (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 11:34:20 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6FEC061A0E
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 08:34:20 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id u22so1284711plq.12
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 08:34:20 -0700 (PDT)
+        Thu, 14 May 2020 11:48:44 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9E7C05BD09
+        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 08:48:44 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id j21so1403613pgb.7
+        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 08:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pHBtRb+khIWZrefMw1X6pZevwAXg2al9wRn3xvVihy0=;
-        b=NKfqO3cBoDTJpRGDur9/vcfgahx0lBedFqcgsjMK5GrbeaiqjKRKo69vkHmriZS2YU
-         41ZEqi2d3AA/wTkGLGuHxDFYqqPbROqzoN6W3+cKiL295Y2PywCH80nC5qzvJooEBQzF
-         gfb59SXnKKXMNi24xbx5OWXcIGgMND1y38Y8Diz+rgTR2BZLBDczGNu2karytqb+DHyi
-         WgXg3n/PHRZikL+qMeQWro/Tmr34EPbgqMl7Lt6Xh9/w3LgSDcD8mQVCrgZ8VQF2TCwn
-         IofsrNrRQrSnR64lPkQf37JEaxZBwr6y6+yApHCSytNjb6sQLDNwGEp+dlYiDiIjqg1y
-         golw==
+        bh=QVPTIvQu1iziTRFJKhGerxR/iOcOw9CHIi8aErYZvwI=;
+        b=W7tvPmNXua7Zb4ois7BKrYv6djiJ340OMqd6V9VkYsjKKq02CeNU2MrB9sbFTpPv8t
+         HXBrK8UpJCZtqLYeXZk9Xaki/zKMdq5hz8B0bBMLc4DKGXSSIBl4eWI39VcmfGkAioR8
+         LwnIECtuAXxqRmLUjxX6kcgK+jnLBdwXFx9YQmg6Gv74BBwOSEwGjEakU7HKZKnaP0tg
+         5qRBWgUPFUeLMhS8uFN0QUXNU4mKbL//V8OjGV4Kd9GbWFD562HRbaPJwdrgWoSzuFdz
+         GWglB43zGMi5wJDrA07Snl31/95hIkh8b+PUxpAaWE2kAZZhuohnJ8QHPy+6HTqTrJQs
+         oXpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pHBtRb+khIWZrefMw1X6pZevwAXg2al9wRn3xvVihy0=;
-        b=oEykpaL/R0lpHJRwpr3PvhvY+5ymPaB7GieAVa8cKjw9iJSKtjYCHbmCQIuHoOzNpC
-         5FCDLnfoHnYRZhS7FOd1TgSHH562ry42CDv1JmdBVGfabgalNvqjgPndWI9Fo1BLoQ0G
-         xlilt3HUbxb6f0jWeqsgQLIWJjBCghXdURNj7h6XbFTc8iX34R8agVC64F8awAK8Vj1k
-         rGuteDCcVirFBcGT9L9BpHL3/GBgJjrwtWW0X43B9PGWejSwqNLtiBeIfdun7oqCfE9F
-         xJ6GP9cGfyf4sD0kwfjLbakHf8M1lXbomDMcwZ/vJZ9wuwfXWnQat3gE0QxecJnXhMCw
-         8jtg==
-X-Gm-Message-State: AOAM533LD8xN1KvGia2VKrgPkSQYNo+ImTPTRORg+5tmT0+Bn6GBlSPh
-        fq88k8wTcNeWAKR3wqjso1Kwug==
-X-Google-Smtp-Source: ABdhPJxQeND4OmYcB5YLpPsjAyico6RefXvZ40FYUlf8Ik8uL8AM1uknT2uGEy9hWNhk3iyew0TVrA==
-X-Received: by 2002:a17:90a:358c:: with SMTP id r12mr10677883pjb.161.1589470459745;
-        Thu, 14 May 2020 08:34:19 -0700 (PDT)
+        bh=QVPTIvQu1iziTRFJKhGerxR/iOcOw9CHIi8aErYZvwI=;
+        b=fquUCjHMC0XL4YHZsB2OgLp/w+yF5m+jrwRrZzBUmRvx9iPGAX0rkk/3FsgvGv58Cv
+         pZSEmYjDFUrS9yK57hjuVXUg3+E1CLWzJtZxJBvGBnH85Gjt9NoAxWG5B8ao7zJ/oGcP
+         2sy1L4ckNc2gntQIihsCIigMNzMrZsGBB5f9yHI+NLO+wRWh9KWDwn2N28kzXZ9lrwtK
+         PGibpT3GNmidzTcmzHNqbr0OezdsPg6Coq8ROtcbC0gtHSDF3g8t1LXIFnYOUEcfQjZq
+         0tbJVzaIQPMdk40LnMUgIgRZ+VvnUN6GM3ATEV6LW5CJheighAdpiIHagCBzy1BVRWeQ
+         Mjew==
+X-Gm-Message-State: AOAM530YxlMwgdbb/sO704giQK1xWZE0b/lr0RQqbEIYVGQtqCLKzt7f
+        Re6k4sEFrVg9pUHg6uBAo1HNzg==
+X-Google-Smtp-Source: ABdhPJxZsYPJZ4Q8VPYRGcHpXPqCXWdM4J7nk0x45q/cxf3ZKfN+0DFDU6LoyE+BI+dk41Ok9vLQTw==
+X-Received: by 2002:a63:1f43:: with SMTP id q3mr4715455pgm.386.1589471323757;
+        Thu, 14 May 2020 08:48:43 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:85e7:ddeb:bb07:3741? ([2605:e000:100e:8c61:85e7:ddeb:bb07:3741])
-        by smtp.gmail.com with ESMTPSA id k4sm2339675pgg.88.2020.05.14.08.34.18
+        by smtp.gmail.com with ESMTPSA id x62sm2636477pfc.46.2020.05.14.08.48.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2020 08:34:18 -0700 (PDT)
-Subject: Re: [PATCH block/for-linus] iocost: don't let vrate run wild while
- there's no saturation signal
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, newella@fb.com
-References: <20191015001811.GI18794@devbig004.ftw2.facebook.com>
- <20200514145114.GG16815@mtj.duckdns.org>
+        Thu, 14 May 2020 08:48:43 -0700 (PDT)
+Subject: Re: [PATCH v13 00/12] Inline Encryption Support
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+References: <20200514003727.69001-1-satyat@google.com>
+ <20200514051053.GA14829@sol.localdomain>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c3ea36e8-b888-4db0-0333-936523c98476@kernel.dk>
-Date:   Thu, 14 May 2020 09:34:17 -0600
+Message-ID: <8fa1aafe-1725-e586-ede3-a3273e674470@kernel.dk>
+Date:   Thu, 14 May 2020 09:48:40 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200514145114.GG16815@mtj.duckdns.org>
+In-Reply-To: <20200514051053.GA14829@sol.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,24 +85,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/14/20 8:51 AM, Tejun Heo wrote:
-> On Mon, Oct 14, 2019 at 05:18:11PM -0700, Tejun Heo wrote:
->> When the QoS targets are met and nothing is being throttled, there's
->> no way to tell how saturated the underlying device is - it could be
->> almost entirely idle, at the cusp of saturation or anywhere inbetween.
->> Given that there's no information, it's best to keep vrate as-is in
->> this state.  Before 7cd806a9a953 ("iocost: improve nr_lagging
->> handling"), this was the case - if the device isn't missing QoS
->> targets and nothing is being throttled, busy_level was reset to zero.
-> ...
->> Signed-off-by: Tejun Heo <tj@kernel.org>
->> Reported-by: Andy Newell <newella@fb.com>
->> Fixes: 7cd806a9a953 ("iocost: improve nr_lagging handling")
+On 5/13/20 11:10 PM, Eric Biggers wrote:
+> On Thu, May 14, 2020 at 12:37:15AM +0000, Satya Tangirala wrote:
+>> This patch series adds support for Inline Encryption to the block layer,
+>> UFS, fscrypt, f2fs and ext4. It has been rebased onto linux-block/for-next.
+>>
+>> Note that the patches in this series for the block layer (i.e. patches 1,
+>> 2, 3, 4 and 5) can be applied independently of the subsequent patches in
+>> this series.
 > 
-> Jens, this one fell through the cracks. It still applies with only a small
-> offset. Can you please apply?
+> Thanks, the (small) changes from v12 look good.  As usual, I made this available
+> in git at:
+> 
+>         Repo: https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git
+>         Tag: inline-encryption-v13
+> 
+> Jens, do you have any feedback on this patchset?  Is there any chance at taking
+> the block layer part (patches 1-5) for 5.8?  That part needs to go upstream
+> first, since patches 6-12 depend on them.  Then patches 6-12 can go upstream via
+> the SCSI and fscrypt trees in the following release.
 
-Looks like it did, queued up for 5.8 now.
+I have applied 1-5 for 5.8. Small tweak needed in patch 3 due to a header
+inclusion, but clean apart from that.
 
 -- 
 Jens Axboe
