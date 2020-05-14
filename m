@@ -2,274 +2,150 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 585E1C433E9
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7324FC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:28:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3400920675
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589483446;
-	bh=ZeaT1UWrh+ajkitvCxbSYqAIcX3Pf1/t8+3JjVNaooo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=vN1K4942veXBv1Ah4T77DtM4eFT3hQ8iHKAnukhhVRWzDLNBNsr4Qc9qBZBSG8rue
-	 NYAKDozHglamAsDqDG80B9Qcl7J1x6Nfrc7dd9UkfsRpmh1i60DjRtbNnCEUsn2jEo
-	 Brr+oET6cotfMYtcOLD/iGGZQtwIlUO7GaGhkMZs=
+	by mail.kernel.org (Postfix) with ESMTP id 5FEA020643
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 19:28:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728361AbgENSwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 14:52:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50752 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728332AbgENSwb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 14:52:31 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A506B20727;
-        Thu, 14 May 2020 18:52:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589482350;
-        bh=ZeaT1UWrh+ajkitvCxbSYqAIcX3Pf1/t8+3JjVNaooo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1nZEFq75p9yo4Yurv4HWpOxpCDzJm/WQeq8ZcnkewcpX0RJ1CyUbagIIS/JXXY2Xz
-         FCbgdEiUvGGFcjFWbiX4ywHKk8knpv7DABh2kUYz24plvq7fxRoY/2CjJTc83G+3k8
-         RkKsYPYrSFad4aje3pzs0k7oNQ7ssGkK+ooxLt78=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Lance Digby <ldigby@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Sasha Levin <sashal@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 32/62] virtio-blk: handle block_device_operations callbacks after hot unplug
-Date:   Thu, 14 May 2020 14:51:17 -0400
-Message-Id: <20200514185147.19716-32-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514185147.19716-1-sashal@kernel.org>
-References: <20200514185147.19716-1-sashal@kernel.org>
+        id S1728258AbgENT2W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 15:28:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725975AbgENT2V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 May 2020 15:28:21 -0400
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E640EC061A0C
+        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 12:28:20 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 49NM5Y60DmzlhGVS;
+        Thu, 14 May 2020 21:28:17 +0200 (CEST)
+Received: from ns3096276.ip-94-23-54.eu (unknown [94.23.54.103])
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 49NM5X23j6zljVWn;
+        Thu, 14 May 2020 21:28:16 +0200 (CEST)
+Subject: Re: [RFC PATCH v3 00/12] Integrity Policy Enforcement LSM (IPE)
+To:     Deven Bowers <deven.desai@linux.microsoft.com>, agk@redhat.com,
+        axboe@kernel.dk, snitzer@redhat.com, jmorris@namei.org,
+        serge@hallyn.com, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, jannh@google.com
+Cc:     tyhicks@linux.microsoft.com, pasha.tatashin@soleen.com,
+        sashal@kernel.org, jaskarankhurana@linux.microsoft.com,
+        nramas@linux.microsoft.com, mdsakib@linux.microsoft.com,
+        linux-kernel@vger.kernel.org, corbet@lwn.net
+References: <20200415162550.2324-1-deven.desai@linux.microsoft.com>
+ <b07ac7e1-7cf5-92c9-81d0-64174c3d5024@digikod.net>
+ <0001755a-6b2a-b13b-960c-eb0b065c8e3c@linux.microsoft.com>
+ <8ba7b15f-de91-40f7-fc95-115228345fce@linux.microsoft.com>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <44fb36ae-959d-4ff7-ed1f-ccfc2e292232@digikod.net>
+Date:   Thu, 14 May 2020 21:28:15 +0200
+User-Agent: 
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <8ba7b15f-de91-40f7-fc95-115228345fce@linux.microsoft.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Antivirus: Dr.Web (R) for Unix mail servers drweb plugin ver.6.0.2.8
+X-Antivirus-Code: 0x100000
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
 
-[ Upstream commit 90b5feb8c4bebc76c27fcaf3e1a0e5ca2d319e9e ]
+On 12/05/2020 22:46, Deven Bowers wrote:
+> 
+> 
+> On 5/11/2020 11:03 AM, Deven Bowers wrote:
+>>
+>>
+>> On 5/10/2020 2:28 AM, Mickaël Salaün wrote:
+>>
+>> [...snip]
+>>
+>>>>
+>>>> Additionally, rules are evaluated top-to-bottom. As a result, any
+>>>> revocation rules, or denies should be placed early in the file to
+>>>> ensure
+>>>> that these rules are evaluated before a rule with "action=ALLOW" is
+>>>> hit.
+>>>>
+>>>> IPE policy is designed to be forward compatible and backwards
+>>>> compatible,
+>>>> thus any failure to parse a rule will result in the line being ignored,
+>>>> and a warning being emitted. If backwards compatibility is not
+>>>> required,
+>>>> the kernel commandline parameter and sysctl, ipe.strict_parse can be
+>>>> enabled, which will cause these warnings to be fatal.
+>>>
+>>> Ignoring unknown command may lead to inconsistent beaviors. To achieve
+>>> forward compatibility, I think it would be better to never ignore
+>>> unknown rule but to give a way to userspace to known what is the current
+>>> kernel ABI. This could be done with a securityfs file listing the
+>>> current policy grammar.
+>>>
+>>
+>> That's a fair point. From a manual perspective, I think this is fine.
+>> A human-user can interpret a grammar successfully on their own when new
+>> syntax is introduced.
+>>
+>>  From a producing API perspective, I'd have to think about it a bit
+>> more. Ideally, the grammar would be structured in such a way that the
+>> userland
+>> interpreter of this grammar would not have to be updated once new syntax
+>> is introduced, avoiding the need to update the userland binary. To do so
+>> generically ("op=%s") is easy, but doesn't necessarily convey sufficient
+>> information (what happens when a new "op" token is introduced?). I think
+>> this may come down to regular expression representations of valid values
+>> for these tokens, which worries me as regular expressions are incredibly
+>> error-prone[1].
+>>
+>> I'll see what I can come up with regarding this.
+> 
+> I have not found a way that I like to expose some kind of grammar
+> through securityfs that can be understood by usermode to parse the
+> policy. Here's what I propose as a compromise:
+> 
+>     1. I remove the unknown command behavior. This address your
+> first point about inconsistent behaviors, and effectively removes the
+> strict_parse sysctl (as it is always enabled).
+> 
+>     2. I introduce a versioning system for the properties
+> themselves. The valid set of properties and their versions
+> can be found in securityfs, under say, ipe/config in a key=value
+> format where `key` indicates the understood token, and `value`
+> indicates their current version. For example:
+> 
+>     $ cat $SECURITYFS/ipe/config
+>     op=1
+>     action=1
+>     policy_name=1
+>     policy_version=1
+>     dmverity_signature=1
+>     dmverity_roothash=1
+>     boot_verified=1
 
-A userspace process holding a file descriptor to a virtio_blk device can
-still invoke block_device_operations after hot unplug.  This leads to a
-use-after-free accessing vblk->vdev in virtblk_getgeo() when
-ioctl(HDIO_GETGEO) is invoked:
+The name ipe/config sounds like a file to configure IPE. Maybe something
+like ipe/config_abi or ipe/config_grammar?
 
-  BUG: unable to handle kernel NULL pointer dereference at 0000000000000090
-  IP: [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
-  PGD 800000003a92f067 PUD 3a930067 PMD 0
-  Oops: 0000 [#1] SMP
-  CPU: 0 PID: 1310 Comm: hdio-getgeo Tainted: G           OE  ------------   3.10.0-1062.el7.x86_64 #1
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-  task: ffff9be5fbfb8000 ti: ffff9be5fa890000 task.ti: ffff9be5fa890000
-  RIP: 0010:[<ffffffffc00e5450>]  [<ffffffffc00e5450>] virtio_check_driver_offered_feature+0x10/0x90 [virtio]
-  RSP: 0018:ffff9be5fa893dc8  EFLAGS: 00010246
-  RAX: ffff9be5fc3f3400 RBX: ffff9be5fa893e30 RCX: 0000000000000000
-  RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff9be5fbc10b40
-  RBP: ffff9be5fa893dc8 R08: 0000000000000301 R09: 0000000000000301
-  R10: 0000000000000000 R11: 0000000000000000 R12: ffff9be5fdc24680
-  R13: ffff9be5fbc10b40 R14: ffff9be5fbc10480 R15: 0000000000000000
-  FS:  00007f1bfb968740(0000) GS:ffff9be5ffc00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000090 CR3: 000000003a894000 CR4: 0000000000360ff0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   [<ffffffffc016ac37>] virtblk_getgeo+0x47/0x110 [virtio_blk]
-   [<ffffffff8d3f200d>] ? handle_mm_fault+0x39d/0x9b0
-   [<ffffffff8d561265>] blkdev_ioctl+0x1f5/0xa20
-   [<ffffffff8d488771>] block_ioctl+0x41/0x50
-   [<ffffffff8d45d9e0>] do_vfs_ioctl+0x3a0/0x5a0
-   [<ffffffff8d45dc81>] SyS_ioctl+0xa1/0xc0
+> 
+> if new syntax is introduced, the version number is increased.
+> 
+>     3. The format of those versions are documented as part of
+> the admin-guide around IPE. If user-mode at that point wants to rip
+> the documentation formats and correlate with the versioning, then
+> it fulfills the same functionality as above, with out the complexity
+> around exposing a parsing grammar and interpreting it on-the-fly.
+> Many of these are unlikely to move past version 1, however.
+> 
+> Thoughts?
+> 
 
-A related problem is that virtblk_remove() leaks the vd_index_ida index
-when something still holds a reference to vblk->disk during hot unplug.
-This causes virtio-blk device names to be lost (vda, vdb, etc).
-
-Fix these issues by protecting vblk->vdev with a mutex and reference
-counting vblk so the vd_index_ida index can be removed in all cases.
-
-Fixes: 48e4043d4529 ("virtio: add virtio disk geometry feature")
-Reported-by: Lance Digby <ldigby@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Link: https://lore.kernel.org/r/20200430140442.171016-1-stefanha@redhat.com
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/virtio_blk.c | 86 ++++++++++++++++++++++++++++++++++----
- 1 file changed, 78 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 0736248999b0d..d52f33881ab6e 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -32,6 +32,15 @@ struct virtio_blk_vq {
- } ____cacheline_aligned_in_smp;
- 
- struct virtio_blk {
-+	/*
-+	 * This mutex must be held by anything that may run after
-+	 * virtblk_remove() sets vblk->vdev to NULL.
-+	 *
-+	 * blk-mq, virtqueue processing, and sysfs attribute code paths are
-+	 * shut down before vblk->vdev is set to NULL and therefore do not need
-+	 * to hold this mutex.
-+	 */
-+	struct mutex vdev_mutex;
- 	struct virtio_device *vdev;
- 
- 	/* The disk structure for the kernel. */
-@@ -43,6 +52,13 @@ struct virtio_blk {
- 	/* Process context for config space updates */
- 	struct work_struct config_work;
- 
-+	/*
-+	 * Tracks references from block_device_operations open/release and
-+	 * virtio_driver probe/remove so this object can be freed once no
-+	 * longer in use.
-+	 */
-+	refcount_t refs;
-+
- 	/* What host tells us, plus 2 for header & tailer. */
- 	unsigned int sg_elems;
- 
-@@ -294,10 +310,55 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 	return err;
- }
- 
-+static void virtblk_get(struct virtio_blk *vblk)
-+{
-+	refcount_inc(&vblk->refs);
-+}
-+
-+static void virtblk_put(struct virtio_blk *vblk)
-+{
-+	if (refcount_dec_and_test(&vblk->refs)) {
-+		ida_simple_remove(&vd_index_ida, vblk->index);
-+		mutex_destroy(&vblk->vdev_mutex);
-+		kfree(vblk);
-+	}
-+}
-+
-+static int virtblk_open(struct block_device *bd, fmode_t mode)
-+{
-+	struct virtio_blk *vblk = bd->bd_disk->private_data;
-+	int ret = 0;
-+
-+	mutex_lock(&vblk->vdev_mutex);
-+
-+	if (vblk->vdev)
-+		virtblk_get(vblk);
-+	else
-+		ret = -ENXIO;
-+
-+	mutex_unlock(&vblk->vdev_mutex);
-+	return ret;
-+}
-+
-+static void virtblk_release(struct gendisk *disk, fmode_t mode)
-+{
-+	struct virtio_blk *vblk = disk->private_data;
-+
-+	virtblk_put(vblk);
-+}
-+
- /* We provide getgeo only to please some old bootloader/partitioning tools */
- static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
- {
- 	struct virtio_blk *vblk = bd->bd_disk->private_data;
-+	int ret = 0;
-+
-+	mutex_lock(&vblk->vdev_mutex);
-+
-+	if (!vblk->vdev) {
-+		ret = -ENXIO;
-+		goto out;
-+	}
- 
- 	/* see if the host passed in geometry config */
- 	if (virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_GEOMETRY)) {
-@@ -313,11 +374,15 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
- 		geo->sectors = 1 << 5;
- 		geo->cylinders = get_capacity(bd->bd_disk) >> 11;
- 	}
--	return 0;
-+out:
-+	mutex_unlock(&vblk->vdev_mutex);
-+	return ret;
- }
- 
- static const struct block_device_operations virtblk_fops = {
- 	.owner  = THIS_MODULE,
-+	.open = virtblk_open,
-+	.release = virtblk_release,
- 	.getgeo = virtblk_getgeo,
- };
- 
-@@ -657,6 +722,10 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		goto out_free_index;
- 	}
- 
-+	/* This reference is dropped in virtblk_remove(). */
-+	refcount_set(&vblk->refs, 1);
-+	mutex_init(&vblk->vdev_mutex);
-+
- 	vblk->vdev = vdev;
- 	vblk->sg_elems = sg_elems;
- 
-@@ -822,8 +891,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- static void virtblk_remove(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk = vdev->priv;
--	int index = vblk->index;
--	int refc;
- 
- 	/* Make sure no work handler is accessing the device. */
- 	flush_work(&vblk->config_work);
-@@ -833,18 +900,21 @@ static void virtblk_remove(struct virtio_device *vdev)
- 
- 	blk_mq_free_tag_set(&vblk->tag_set);
- 
-+	mutex_lock(&vblk->vdev_mutex);
-+
- 	/* Stop all the virtqueues. */
- 	vdev->config->reset(vdev);
- 
--	refc = kref_read(&disk_to_dev(vblk->disk)->kobj.kref);
-+	/* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
-+	vblk->vdev = NULL;
-+
- 	put_disk(vblk->disk);
- 	vdev->config->del_vqs(vdev);
- 	kfree(vblk->vqs);
--	kfree(vblk);
- 
--	/* Only free device id if we don't have any users */
--	if (refc == 1)
--		ida_simple_remove(&vd_index_ida, index);
-+	mutex_unlock(&vblk->vdev_mutex);
-+
-+	virtblk_put(vblk);
- }
- 
- #ifdef CONFIG_PM_SLEEP
--- 
-2.20.1
-
+That seems reasonable.
