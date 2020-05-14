@@ -2,91 +2,104 @@ Return-Path: <SRS0=D5/G=64=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E74EC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 14:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B92C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 14:24:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 392AB2070A
-	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 14:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E4262070A
+	for <linux-block@archiver.kernel.org>; Thu, 14 May 2020 14:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RE+pWIEq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXJCh5GL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726191AbgENOGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 10:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726087AbgENOGl (ORCPT
+        id S1726492AbgENOYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 10:24:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43696 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726239AbgENOYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 10:06:41 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC13C061A0C
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 07:06:41 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id t16so1202746plo.7
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 07:06:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yhoL/6HO1ChA5Oa8fnvPVyKwLsbEO2mjs/X8Rtc1les=;
-        b=RE+pWIEqlIAWGLqoVVtMQ9kJeowfKM/bSS2m9ZpBDj/pGumqBP6hPo/A0ijuBmccha
-         w8ZIeZ4r3NucOognCUcjW3stjbA5S8gTCUwHI+g3wlZiupKwh1ac1oTiQiyEAtmrr31r
-         HavAg3R1Buc65CMqTluU0sB9vSciF1qJZGpcwXK8KPEaTWZ1vhy6sJtHxTUFLTj8tpo7
-         yNxdtq0x77BhrtYIA7EWbgQsJU4nW4hUES5dflXe6wvgoisaAXL+1BHm6mXhJjR81Guq
-         OR6Qy69kE0PeMbZsPrJoPrc/ycjEnzz//IrV8EQZNnH/AqZl6friQ5AhmPFO2TXesZEW
-         u7fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yhoL/6HO1ChA5Oa8fnvPVyKwLsbEO2mjs/X8Rtc1les=;
-        b=LIgJamr7QQinSdq7sxKQAN0Qirep+arKzEMwmMZE7i61DoXRLfS0Vxu9Z51PCihZny
-         ObhS1MmI1tcOPvinm5/QQLoGh6hMrn8kjLzbe0kG+niYlbD6ETm+anf5USORrEPKOdAG
-         2G/OVkr7W5ioccQ6mzAbBeEC6PdQXy1DDThlSHXfuzJikA6wZCO/lHLZ/7mLjV9by1kl
-         ZMA9ay3UiqvFK+nEsNdC3xURnyMyhPyQq2Y8Pvgo1Gji0Obbdw2qPUucAJamk3RMmUie
-         U6HpI7xgclrrkiLZ05Rbd+Vfuw16FHo9EsWGmQotV/HQF3ApL3A9Cq0LWNso8FrCE3CJ
-         s3Gg==
-X-Gm-Message-State: AGi0PuYf3jPKvVAeq+aNZLEQIQbGwoqfN5Yr+w/zWklgSNg5hU5/UOVE
-        9mOMSfNvC087Fp122HzICtpiZw==
-X-Google-Smtp-Source: APiQypKBpRCSK6gyqvCtXPNqRpnr55JxsneenMdSB7jkgSuxWBaLzKRXKbV34J308FxYw0nsfW/ycA==
-X-Received: by 2002:a17:90b:3444:: with SMTP id lj4mr39592335pjb.37.1589465200651;
-        Thu, 14 May 2020 07:06:40 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:a45a:373e:9b20:39ea? ([2605:e000:100e:8c61:a45a:373e:9b20:39ea])
-        by smtp.gmail.com with ESMTPSA id m8sm17824360pjz.27.2020.05.14.07.06.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2020 07:06:36 -0700 (PDT)
-Subject: Re: [PATCH] block: move blk_io_schedule() out of header file
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>
-References: <20200514084509.2117337-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b2a52355-f708-3b67-8210-ed614e81ba3a@kernel.dk>
-Date:   Thu, 14 May 2020 08:06:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Thu, 14 May 2020 10:24:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589466261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fGWHZrRoLExAS3mHwk8ufZ/s4MYBxFdJolCaEnLqA8M=;
+        b=OXJCh5GLUPv3k4SUBHt3EOoS6pcj0UXeOEj+luCmjZqmh9udrIAukKWN4wRIXhrk8SZgiq
+        3qezn7J2Rtb6PtKX5HRY5eYO4PDubZpacgbGxZhxmrzkcmCnLbqDe1mMnzi5ohEH16meoJ
+        HQgq42UtuWxXzvF1jYtaWz6pjKjh7EM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-gDkumX-iOmOMry4mSLa6sw-1; Thu, 14 May 2020 10:24:17 -0400
+X-MC-Unique: gDkumX-iOmOMry4mSLa6sw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B5F8800053;
+        Thu, 14 May 2020 14:24:13 +0000 (UTC)
+Received: from redhat.com (null.msp.redhat.com [10.15.80.136])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E42045D9CA;
+        Thu, 14 May 2020 14:24:04 +0000 (UTC)
+Date:   Thu, 14 May 2020 09:24:03 -0500
+From:   David Teigland <teigland@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
+        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+Subject: Re: is it ok to always pull in sctp for dlm, was: Re: [PATCH 27/33]
+ sctp: export sctp_setsockopt_bindx
+Message-ID: <20200514142403.GA1447@redhat.com>
+References: <20200513062649.2100053-1-hch@lst.de>
+ <20200513062649.2100053-28-hch@lst.de>
+ <20200513180058.GB2491@localhost.localdomain>
+ <20200514104040.GA12979@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200514084509.2117337-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200514104040.GA12979@lst.de>
+User-Agent: Mutt/1.8.3 (2017-05-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/14/20 2:45 AM, Ming Lei wrote:
-> blk_io_schedule() isn't called from performance sensitive code path, and
-> it is easier to maintain by exporting it as symbol.
+On Thu, May 14, 2020 at 12:40:40PM +0200, Christoph Hellwig wrote:
+> On Wed, May 13, 2020 at 03:00:58PM -0300, Marcelo Ricardo Leitner wrote:
+> > On Wed, May 13, 2020 at 08:26:42AM +0200, Christoph Hellwig wrote:
+> > > And call it directly from dlm instead of going through kernel_setsockopt.
+> > 
+> > The advantage on using kernel_setsockopt here is that sctp module will
+> > only be loaded if dlm actually creates a SCTP socket.  With this
+> > change, sctp will be loaded on setups that may not be actually using
+> > it. It's a quite big module and might expose the system.
+> > 
+> > I'm okay with the SCTP changes, but I'll defer to DLM folks to whether
+> > that's too bad or what for DLM.
 > 
-> Also blk_io_schedule() is only called by CONFIG_BLOCK code, so it is safe
-> to do this way. Meantime fixes build failure when CONFIG_BLOCK is off.
+> So for ipv6 I could just move the helpers inline as they were trivial
+> and avoid that issue.  But some of the sctp stuff really is way too
+> big for that, so the only other option would be to use symbol_get.
 
-Applied, thanks.
-
--- 
-Jens Axboe
+Let's try symbol_get, having the sctp module always loaded caused problems
+last time it happened (almost nobody uses dlm with it.)
+Dave 
 
