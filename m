@@ -2,116 +2,62 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAE8C433E3
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 17:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7B1C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 17:22:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBD3B2070A
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 17:01:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09CA02073E
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 17:22:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589562083;
-	bh=L//wP+MT78GfEJiCI4QlGMGDDzxZTlmk/idX3FTcIRY=;
+	s=default; t=1589563365;
+	bh=7WPQmTCPAvdVxUliB6KAZ3vpEVe0ZxmX97cunM2QPiY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=QlwDjbHtrnqw3gGFKNoRvSs2Lhgnt2lmDF+xtLua0EWe11NbV7/sFd+QsZ9lBl6sv
-	 ph4ZISaCE5Fperivx7lfFcihFuqFteFUkZt/39N1RXt5sLlmn/vXFuPyzRB+WPrqEK
-	 rFJVKgbBoiUSAL6X3R7KCkA680aagBP1TrU9+4p8=
+	b=l1V0PxY2FUeoGTg1DYNb/vgMhnttC/H/wWO5eeBvbD6OTqHgwG7T2qJxlPkVCtc78
+	 lI4KU/a2x4pMHweMeV+y7JXZ5U/2dMXafIpR02TsZfkon8Ps2RPJNsrGzBodIR1eeq
+	 ErBo5xJWsKhkpg+S9ZLjJnD0PmqAVIl+nuwdaRTk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgEORBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 13:01:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37894 "EHLO mail.kernel.org"
+        id S1726290AbgEORWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 13:22:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48932 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726144AbgEORBV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 13:01:21 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        id S1726170AbgEORWo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 13:22:44 -0400
+Received: from redsun51.ssa.fujisawa.hgst.com (unknown [199.255.47.7])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 50779206C0;
-        Fri, 15 May 2020 17:01:20 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2D95120727;
+        Fri, 15 May 2020 17:22:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589562080;
-        bh=L//wP+MT78GfEJiCI4QlGMGDDzxZTlmk/idX3FTcIRY=;
+        s=default; t=1589563363;
+        bh=7WPQmTCPAvdVxUliB6KAZ3vpEVe0ZxmX97cunM2QPiY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jddSpVkyXHBGXItg77bdv0TcwbfgMVMe7Q2SEgJSoRcLF+hg+keRPqsZMu/YO1rmZ
-         I8ELGSK3mDMWTnLtifx6EDg1r10Vo10Ir8EHH01XWJC8mm89kmSMuAIYFJHvh1sxPN
-         9EBOPbPYajXxJZoBC2mjpLyEbAzfjzQKOwDPVGe0=
-Date:   Fri, 15 May 2020 10:00:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Satya Tangirala <satyat@google.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v13 00/12] Inline Encryption Support
-Message-ID: <20200515170059.GA1009@sol.localdomain>
-References: <20200514003727.69001-1-satyat@google.com>
- <20200514051053.GA14829@sol.localdomain>
- <8fa1aafe-1725-e586-ede3-a3273e674470@kernel.dk>
- <20200515074127.GA13926@infradead.org>
- <20200515122540.GA143740@google.com>
- <20200515144224.GA12040@infradead.org>
+        b=kksoEX4n3gLOOzWunMvg8pxo8+42AgRdI/+k2Lf6tdsfJyRxz1BISiyBfFXJe0dy/
+         b4CaBYBjnLpEp0Z0dxgMbd+MtGWWKJES0Fyt46PqYK1oGFzhFrosjQ6+0QG0JAUyhv
+         zXpekmvDSVv9hmi+RjESnyfvQVokUZP4AjWN+RPU=
+Date:   Sat, 16 May 2020 02:22:35 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, damien.lemoal@wdc.com, hare@suse.com,
+        hch@lst.de, axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [RFC PATCH 2/4] block: block: change REQ_OP_ZONE_RESET from 8 to
+ 15
+Message-ID: <20200515172235.GA21682@redsun51.ssa.fujisawa.hgst.com>
+References: <20200515163157.72796-1-colyli@suse.de>
+ <20200515163157.72796-3-colyli@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200515144224.GA12040@infradead.org>
+In-Reply-To: <20200515163157.72796-3-colyli@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 15, 2020 at 07:42:24AM -0700, Christoph Hellwig wrote:
-> On Fri, May 15, 2020 at 12:25:40PM +0000, Satya Tangirala wrote:
-> > One of the nice things about the current design is that regardless of what
-> > request queue an FS sends an encrypted bio to, blk-crypto will be able to handle
-> > the encryption (whether by using hardware inline encryption, or using the
-> > blk-crypto-fallback). The FS itself does not need to worry about what the
-> > request queue is.
-> 
-> True.  Which just makes me despise that design with the pointless
-> fallback even more..
-
-The fallback is actually really useful.  First, for testing: it allows all the
-filesystem code that uses inline crypto to be tested using gce-xfstests and
-kvm-xfstests, so that it's covered by the usual ext4 and f2fs regression testing
-and it's much easier to develop patches for.  It also allowed us to enable the
-inlinecrypt mount option in Cuttlefish, which is the virtual Android device used
-to test the Android common kernels.  So, it gets the kernel test platform as
-similar to a real Android device as possible.
-
-Ideally we'd implement virtualized inline encryption as you suggested.  But
-these platforms use a mix of VMM's (QEMU, GCE, and crosvm) and storage types
-(virtio-blk, virtio-scsi, and maybe others; none of these even have an inline
-encryption standard defined yet).  So it's not currently feasible.
-
-Second, it creates a clean design where users can just use blk-crypto, and not
-have to implement a second encryption implementation.  For example, I'd
-eventually like to switch fscrypt over to just use blk-crypto.  That would
-remove the duplicate code that you're concerned about.  It would also make it
-much easier to implement direct I/O support in fscrypt which is something that
-people have been requesting for a long time.
-
-The reason the fscrypt conversion isn't yet part of the patchset is just that I
-consider it super important that we don't cause any regressions in fscrypt and
-that it doesn't use inline encryption hardware by default.  So it's not quite
-time to switch over for real yet, especially while the current patches are still
-pending upstream.  But I think it will come eventually, especially if we see
-that most Linux distros are enabling CONFIG_BLK_INLINE_ENCRYPTION anyway.  The
-inlinecrypt mount option will thten start controlling whether blk-crypto is
-allowed to to use real hardware or not, not whether blk-crypto is used or not.
-
-Also, in the coming months we're planning to implement filesystem metadata
-encryption that is properly integrated with the fscrypt key derivation so that
-file contents don't have to be encrypted twice (as would be the case with
-dm-crypt + fscrypt).  That's going to involve adding lots of encryption hooks to
-code in ext4, f2fs, and places like fs/buffer.c.  blk-crypto-fallback is super
-helpful for this, since it will allow us to simply call
-fscrypt_set_bio_crypt_ctx() everywhere, and not have to both do that *and*
-implement a second case where we do all the crypto work scheduling, bounce page
-allocation, crypto API calls, etc. at the filesystem level.
-
-- Eric
+The subject title for this patch should mention "REQ_OP_ZONE_RESET_ALL"
+instead of "REQ_OP_ZONE_RESET".
