@@ -2,116 +2,219 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1705C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5292AC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 16:10:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D430C207D0
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:53:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+zhmsKd"
+	by mail.kernel.org (Postfix) with ESMTP id 356CA2070A
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 16:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726624AbgEOPw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 11:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47576 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726250AbgEOPw5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 11:52:57 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B81C061A0C;
-        Fri, 15 May 2020 08:52:56 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id d22so2216335lfm.11;
-        Fri, 15 May 2020 08:52:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=l71weFdBgY/OPubK5TNcEV6JMPL70XXv0VPAI4BGmH8=;
-        b=h+zhmsKdPrBiA91DhveEfpS8srEtG6zUpM0LynXaeBAEpjymBb7cGgwHobsxSjveai
-         MczFjeQoUoR6hJ9K5WfBuDl6RUF3pIVcUH7a80+4OpUErSQVuHRoCukkkzKjzaC2mgjo
-         mjKXqx8t8tuPjiwOG5LF1XcrQz6VP+Z0Bk18SGdBx0GNTou6BwFy2NDR5le9ScpHhEqA
-         mYDelPDUPWjs3L6EPRXiDUmQ48Ni2B0+u1+p98HtmkYe4Bn57ASFvWY8W4/r1ZJzOOKK
-         5qCUawwktx2EmXiU3luK9jSBqVJJ/SHxbs9gvkyv1JoPU/81ttsidcCYJCD/KY40kdGA
-         e3EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l71weFdBgY/OPubK5TNcEV6JMPL70XXv0VPAI4BGmH8=;
-        b=M1n47HXBz/zH+lDK0suR2M5L53Pt1vdvNiDnaoCCH36lkWQp8MuX28hYUEh6uwd93Z
-         EWL3n59rwWn7i3S3ubIQ8ZuMcdBlyI2HQfNWqHUZxp+b2WXY+NqdYw3LieNd4WUBx73W
-         72sOZXx3Lq9ROZisqNe+b0thI7zDMTdb/HVjCARQql+yr6n2ZLnVbWj5/Ghl6d4edT9a
-         DVMkFsqCEaagQWOSAyQagkCIXwDeuvREEX84ue9LOBwBLdPOBWKK8Ajparlg3iqJAf3X
-         hiVcUfJ2SUUzFxcJxTbikNduBWRbr8gQ5B7sji3p/0968DvnobG8rlgcfGjuPjdve3RV
-         Q6tg==
-X-Gm-Message-State: AOAM532Rg6gPSN/W9GBeA6zcaVhmiUi+LrbBHGbsiPogvSsvQkk/A5aG
-        VUJquoagHKPofhWV3yc6kvy16Lva
-X-Google-Smtp-Source: ABdhPJxTNdXAf1FtSIiCyjYkNMI+hY5ajiYzUnof3HI0p3oY3hAgh9KXwjPIo2BOWmWGbMMBMBBZgg==
-X-Received: by 2002:a19:2258:: with SMTP id i85mr2905186lfi.86.1589557975112;
-        Fri, 15 May 2020 08:52:55 -0700 (PDT)
-Received: from [192.168.2.145] (ppp91-78-208-152.pppoe.mtu-net.ru. [91.78.208.152])
-        by smtp.googlemail.com with ESMTPSA id r3sm1529811lfm.52.2020.05.15.08.52.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2020 08:52:54 -0700 (PDT)
-Subject: Re: [PATCH v4 4/6] partitions/efi: Support GPT entry lookup at a
- non-standard location
-To:     Steve McIntyre <steve@einval.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-efi <linux-efi@vger.kernel.org>
-References: <20200515014143.12984-1-digetx@gmail.com>
- <20200515014143.12984-5-digetx@gmail.com>
- <20200515100320.GB30674@tack.einval.com>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <2633429b-f014-15ea-c08c-d2157b0177b1@gmail.com>
-Date:   Fri, 15 May 2020 18:52:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726183AbgEOQKN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 12:10:13 -0400
+Received: from verein.lst.de ([213.95.11.211]:57536 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726243AbgEOQKN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 12:10:13 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8A1B568C7B; Fri, 15 May 2020 18:10:07 +0200 (CEST)
+Date:   Fri, 15 May 2020 18:10:06 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH 5/6] blk-mq: disable preempt during allocating request
+ tag
+Message-ID: <20200515161006.GA32323@lst.de>
+References: <20200515014153.2403464-1-ming.lei@redhat.com> <20200515014153.2403464-6-ming.lei@redhat.com> <20200515153847.GB29610@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200515100320.GB30674@tack.einval.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200515153847.GB29610@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-15.05.2020 13:03, Steve McIntyre пишет:
-> On Fri, May 15, 2020 at 04:41:41AM +0300, Dmitry Osipenko wrote:
->> Most of consumer-grade NVIDIA Tegra devices use a proprietary bootloader
->> that can't be easily replaced because it's locked down using Secure Boot
->> cryptography singing and the crypto keys aren't given to a device owner.
->               ^^^^^^^ typo
->> These devices usually have eMMC storage that is partitioned using a custom
->> NVIDIA Tegra partition table format.  Of course bootloader and other
->> "special things" are stored on the eMMC storage, and thus, the partition
->> format can't be changed.
+On Fri, May 15, 2020 at 05:38:47PM +0200, Christoph Hellwig wrote:
+> On Fri, May 15, 2020 at 09:41:52AM +0800, Ming Lei wrote:
+> > Disable preempt for a little while during allocating request tag, so
+> > request's tag(internal tag) is always allocated on the cpu of data->ctx,
+> > prepare for improving to handle cpu hotplug during allocating request.
+> > 
+> > In the following patch, hctx->state will be checked to see if it becomes
+> > inactive which is always set on the last CPU of hctx->cpumask.
 > 
-> ...
-> 
+> I like the idea, but I hate the interface.  I really think we need
+> to moving assigning the ctx and hctx entirely into blk_mq_get_tag,
+> and then just unconditionally disable preemption in there.
 
-Thanks! I'll correct it in v5.
+Maybe something vaguely like this (on top of the previous patch):
+
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c8e34c1f547fe..f75be6c431ac6 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -111,7 +111,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	if (data->flags & BLK_MQ_REQ_RESERVED) {
+ 		if (unlikely(!tags->nr_reserved_tags)) {
+ 			WARN_ON_ONCE(1);
+-			return BLK_MQ_TAG_FAIL;
++			goto fail;
+ 		}
+ 		bt = &tags->breserved_tags;
+ 		tag_offset = 0;
+@@ -120,12 +120,22 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		tag_offset = tags->nr_reserved_tags;
+ 	}
+ 
++	if (!data->driver_tag) {
++		preempt_disable();
++		data->ctx = blk_mq_get_ctx(data->q);
++		data->hctx = blk_mq_map_queue(data->q, data->cmd_flags,
++				data->ctx);
++	}
++
++	if (!(data->flags & BLK_MQ_REQ_INTERNAL))
++		data->shared = blk_mq_tag_busy(data->hctx);
++
+ 	tag = __blk_mq_get_tag(data, bt);
+ 	if (tag != -1)
+ 		goto found_tag;
+ 
+ 	if (data->flags & BLK_MQ_REQ_NOWAIT)
+-		return BLK_MQ_TAG_FAIL;
++		goto fail;
+ 
+ 	ws = bt_wait_ptr(bt, data->hctx);
+ 	do {
+@@ -152,14 +162,14 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != -1)
+ 			break;
+ 
+-		if (data->preempt_disabled)
++		if (!data->driver_tag)
+ 			preempt_enable();
+ 		bt_prev = bt;
+ 		io_schedule();
+ 
+ 		sbitmap_finish_wait(bt, ws, &wait);
+ 
+-		if (data->preempt_disabled)
++		if (!data->driver_tag)
+ 			preempt_disable();
+ 		data->ctx = blk_mq_get_ctx(data->q);
+ 		data->hctx = blk_mq_map_queue(data->q, data->cmd_flags,
+@@ -184,17 +194,20 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	sbitmap_finish_wait(bt, ws, &wait);
+ 
+ found_tag:
+-	/*
+-	 * we are in request allocation, check if the current hctx is inactive.
+-	 * If yes, give up this allocation. We will retry on another new online
+-	 * CPU.
+-	 */
+-	if (data->preempt_disabled && unlikely(test_bit(BLK_MQ_S_INACTIVE,
+-					&data->hctx->state))) {
+-		blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
+-		return BLK_MQ_TAG_FAIL;
++	if (!data->driver_tag) {
++		/* fail allocations for inactive contexts. */
++		if (unlikely(!test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)))
++			goto fail_free_tag;
++		preempt_enable();
+ 	}
+ 	return tag + tag_offset;
++
++fail_free_tag:
++	blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
++fail:
++	data->ctx = NULL;
++	data->hctx = NULL;
++	return BLK_MQ_TAG_FAIL;
+ }
+ 
+ void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 52b8917ea7cb6..298557d00e081 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -347,10 +347,6 @@ static void __blk_mq_get_request(struct blk_mq_alloc_data *data)
+ 
+ 	WARN_ON_ONCE(data->ctx || data->hctx);
+ 
+-	preempt_disable();
+-	data->preempt_disabled = true;
+-	data->ctx = blk_mq_get_ctx(q);
+-	data->hctx = blk_mq_map_queue(q, data->cmd_flags, data->ctx);
+ 	if (data->cmd_flags & REQ_NOWAIT)
+ 		data->flags |= BLK_MQ_REQ_NOWAIT;
+ 
+@@ -366,15 +362,10 @@ static void __blk_mq_get_request(struct blk_mq_alloc_data *data)
+ 		    e->type->ops.limit_depth &&
+ 		    !(data->flags & BLK_MQ_REQ_RESERVED))
+ 			e->type->ops.limit_depth(data->cmd_flags, data);
+-	} else {
+-		blk_mq_tag_busy(data->hctx);
+ 	}
+ 
+ 	tag = blk_mq_get_tag(data);
+-	preempt_enable();
+ 	if (tag == BLK_MQ_TAG_FAIL) {
+-		data->ctx = NULL;
+-		data->hctx = NULL;
+ 		blk_queue_exit(q);
+ 		return;
+ 	}
+@@ -1042,8 +1033,8 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 		.hctx = rq->mq_hctx,
+ 		.flags = BLK_MQ_REQ_NOWAIT,
+ 		.cmd_flags = rq->cmd_flags,
++		.driver_tag = true,
+ 	};
+-	bool shared;
+ 
+ 	if (rq->tag != -1)
+ 		return true;
+@@ -1051,10 +1042,9 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
+ 		data.flags |= BLK_MQ_REQ_RESERVED;
+ 
+-	shared = blk_mq_tag_busy(data.hctx);
+ 	rq->tag = blk_mq_get_tag(&data);
+ 	if (rq->tag >= 0) {
+-		if (shared) {
++		if (data.shared) {
+ 			rq->rq_flags |= RQF_MQ_INFLIGHT;
+ 			atomic_inc(&data.hctx->nr_active);
+ 		}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e07be009831e9..563d096ea0cf4 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -153,14 +153,15 @@ struct blk_mq_alloc_data {
+ 	blk_mq_req_flags_t flags;
+ 	unsigned int shallow_depth;
+ 	unsigned int cmd_flags;
+-	bool preempt_disabled;
++	bool driver_tag;
+ 
+ 	/* input & output parameter */
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_hw_ctx *hctx;
+ 
+-	/* output parameter for __blk_mq_get_request */
++	/* output parameters */
+ 	struct request *rq;
++	bool shared;
+ };
+ 
+ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data *data)
