@@ -2,184 +2,108 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EE9C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 12:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7A1C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 13:53:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F23020657
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 12:25:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9EF520728
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 13:53:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mO9NPpo9"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qW8u9dwL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726139AbgEOMZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 08:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43240 "EHLO
+        id S1726223AbgEONxD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 09:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbgEOMZr (ORCPT
+        with ESMTP id S1726160AbgEONxC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 08:25:47 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2313C05BD0A
-        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 05:25:45 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id q16so840576plr.2
-        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 05:25:45 -0700 (PDT)
+        Fri, 15 May 2020 09:53:02 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAE6C061A0C
+        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 06:53:02 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id y25so981217pfn.5
+        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 06:53:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Bm1fAyG7yZavy9O90p1YkTKfmJanzeKvfx2jV+h6w2Q=;
-        b=mO9NPpo9BoTez+GQFpFt+Y3Cq/lG5g+yDRA4ftiV8ORIKSH8v5BAPa9DGSz1K6BrvB
-         OZIUrB91xEiaBbi9USZ/NlzeicZNr6N4UsDeRuVinZtLxKLjG9q6xxEkHuvnCmJ8QXDH
-         3gxFI9TH5fOpeWJ+WJtC87IszNA++1G54plFnlVbWpvCXCNhJ2Uo2+wle2cXiEkxulo6
-         fIqTVOJm6R92VPR5adK2c3B8rEL6s7NQRN0UDNpidt88M4dm51jnL4kuDaZHtdaiPjwk
-         OvRDms0Y/BlxHKP15cz6Vkm3sBqQWjOc2yIvtdz74eW5NoW6b+nrfDKW9ZeEKdzhP98W
-         IdmQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KLHDMMAfcXZ/sKsrs2509XkriszmE5YcTBkAUiw9NP0=;
+        b=qW8u9dwLX6Pw5v4y6WxHDJ6iEH9Y1g0kvElJUII+0IqDiBUpd5WnaxwRtnd6+sV1Iq
+         pMEzmb6dZr2tqxZwoX194wLFsO31RV+8UXj72w6QxPiFxsg21ScITE2skoazff5xzG1l
+         KI8eza5f1jYi1+XK98blCugSTl03hvxkCsQDGv1rqOk1A/zseVeXIRuNBN2QVDFs2Jn6
+         UEekGgx1LU1JBcu2cXQ76UwVsKOdbyDK7iQnjGbgFpNJRGpaMStxRwyUEoCZZnmo/mMJ
+         5w2tzpqOwpVadOE0z8BPv9PR7E2iAXRATTgE6haWbSp52yajsh4BB0A81ytnihrdxpKR
+         eQKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Bm1fAyG7yZavy9O90p1YkTKfmJanzeKvfx2jV+h6w2Q=;
-        b=R5268rLgIqn9+x0g61d8chVYKAGhL2H4eJtdG01NLDXRTEBUUksGfo7Wzxq2h9wX+w
-         Up5uMaf8Q7e1kTNm87uahvckfmfvSgZrBp60Q5Wz9EiFIfhj+ewQU8Ai5D0GAqe1SB+n
-         21jYVvugrs1C1XIlTd4n0LF22Mn/fOftRZY7FVZeCcePf3+T0j4Wdc7lCMHYN1gspC2O
-         BNBqm8dekx0IIn7vA4kXZabBjXkPOVkB3CnB4przx/07DOkiKp/gXS2k+fOgbFWa1kVX
-         JvBtLFieQOQ4T18uOHcq0kGz4FgJu/VFo/43JoqFBCZbPlPtjfdRJ+E5UNvye7a4/4QU
-         uOcQ==
-X-Gm-Message-State: AOAM530zUvmWVEaNd4xe/t7WZF4PH/u8hl+cv79DXaGushzUPSQG4nLt
-        L2YwFSv31nvZkad0v3oB7EY2Aw==
-X-Google-Smtp-Source: ABdhPJxodWiVpnp/bpk1spKFiU7lxS4aXxV09hAXu63vFlSE+V2nv5d8z4dCbHLg6VnBvKtknCleww==
-X-Received: by 2002:a17:90b:1104:: with SMTP id gi4mr2989366pjb.115.1589545544694;
-        Fri, 15 May 2020 05:25:44 -0700 (PDT)
-Received: from google.com (240.242.82.34.bc.googleusercontent.com. [34.82.242.240])
-        by smtp.gmail.com with ESMTPSA id k73sm1100151pje.55.2020.05.15.05.25.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 05:25:44 -0700 (PDT)
-Date:   Fri, 15 May 2020 12:25:40 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v13 00/12] Inline Encryption Support
-Message-ID: <20200515122540.GA143740@google.com>
-References: <20200514003727.69001-1-satyat@google.com>
- <20200514051053.GA14829@sol.localdomain>
- <8fa1aafe-1725-e586-ede3-a3273e674470@kernel.dk>
- <20200515074127.GA13926@infradead.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KLHDMMAfcXZ/sKsrs2509XkriszmE5YcTBkAUiw9NP0=;
+        b=Tr988vKJYHkkXSBTey3dbR7FgEqZoZXVOPH1fjgc4RRBjky5QFF06XuFQeLVfdgMG2
+         XhN/iPlGa4+5lsg5keAJdnRM8kLJO8ZAH/3jBWjfgo0ptBZIQH0C4RB9Dylmp6jn6i9d
+         4cBxHSuC6OtGLjjP//Ui7L2FSAhsbs2FNNCWPzaTNzcSy0xGX06OFCu9mz8ILaj3BIiN
+         AXewXs39S4OhXXxrk41gM70dNtF5aw2OK67OXsLNmieaW/OOQYQwpVSgNs+TRTdbswyq
+         eoh9wwirzhbS1BObUtv34YZI5tzUXMrJRZK/a7WowZ77ibsKtNCvNF/+o1Vq4v4004PR
+         vapA==
+X-Gm-Message-State: AOAM531ZfnX2aFN+KMo+lsRADyUzpX3X/7C4qGUpIE7d9vSFdhNWXO2i
+        9eONE4Vy77amGLyQ4ZivO/pXdw==
+X-Google-Smtp-Source: ABdhPJxgv7XbaHg/4AQxteRaeeW3ROhmjMu7FDQUH73FPz430Br2KwdmCoDucndGudp8IY6VCFIgDA==
+X-Received: by 2002:a63:5a5d:: with SMTP id k29mr3266957pgm.176.1589550782324;
+        Fri, 15 May 2020 06:53:02 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c085:21d6::1089? ([2620:10d:c090:400::5:7df0])
+        by smtp.gmail.com with ESMTPSA id u45sm1739435pjb.7.2020.05.15.06.53.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 May 2020 06:53:01 -0700 (PDT)
+Subject: Re: [PATCH v15 00/25] RTRS (former IBTRS) RDMA Transport Library and
+ RNBD (former IBNBD) RDMA Network Block Device
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>
+References: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
+ <CAHg0HuyYO913MmHt7qi12T6mVXo9nabUs6GJyqRAGfWAdfPjCQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e04fc798-ee25-53a5-fae0-5985306b55fd@kernel.dk>
+Date:   Fri, 15 May 2020 07:53:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200515074127.GA13926@infradead.org>
+In-Reply-To: <CAHg0HuyYO913MmHt7qi12T6mVXo9nabUs6GJyqRAGfWAdfPjCQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 15, 2020 at 12:41:27AM -0700, Christoph Hellwig wrote:
-> On Thu, May 14, 2020 at 09:48:40AM -0600, Jens Axboe wrote:
-> > I have applied 1-5 for 5.8. Small tweak needed in patch 3 due to a header
-> > inclusion, but clean apart from that.
+On 5/15/20 4:29 AM, Danil Kipnis wrote:
+> Hi Jens,
 > 
-> I looked at this a bit more as it clashed with my outstanding
-> q_usage_counter optimization, and I think we should move the
-> blk_crypto_bio_prep call into blk-mq, similar to what we do about
-> the integrity_prep call.  Comments?
-> 
-> ---
-> From b7a78be7de0f39ef972d6a2f97a3982a422bf3ab Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Fri, 15 May 2020 09:32:40 +0200
-> Subject: block: move blk_crypto_bio_prep into blk_mq_make_request
-> 
-> Currently blk_crypto_bio_prep is called for every block driver, including
-> stacking drivers, which is probably not the right thing to do.  Instead
-> move it to blk_mq_make_request, similar to how we handle integrity data.
-> If we ever grow a low-level make_request based driver that wants
-> encryption it will have to call blk_crypto_bio_prep manually, but I really
-> hope we don't grow more non-stacking make_request drivers to start with.
-One of the nice things about the current design is that regardless of what
-request queue an FS sends an encrypted bio to, blk-crypto will be able to handle
-the encryption (whether by using hardware inline encryption, or using the
-blk-crypto-fallback). The FS itself does not need to worry about what the
-request queue is.
+> we've fixed the kbuild cross-compile problem identified for our
+> patches for 5.7-rc4. The block part has been reviewed by Bart van
+> Assche (thanks a lot Bart), we also replaced idr by xarray there as
+> Jason suggested. You planned to queue us
+> for 5.7: https://www.spinics.net/lists/linux-rdma/msg88472.html. Could
+> you please give Jason an OK to take this through the rdma tree, see
+> https://www.spinics.net/lists/linux-rdma/msg91400.html?
 
-But if we move blk_crypto_bio_prep into blk_mq_make_request, the FS loses this
-ability to not care about the underlying request queue - it can no longer send a
-bio with an encryption context to queue such that q->make_request_fn !=
-blk_mq_make_request_fn. To restore that ability, we'll need to add calls to
-blk_crypto_bio_prep to every possible make_request_fn (although yes, if we do
-decide to add the call to blk_crypto_bio_prep in multiple places, I think it'll
-be fine to only add it to the non-stacking make_request_fns).
+My main worry isn't the current state of it, it's more how it's going
+to be handled going forward. If you're definitely going to maintain
+the upstream code in a suitable fashion, and not maintain an on-the-side
+version that you push to clients, then I'm fine with it going upstream
+and you can add my acked-by to the block part of the series.
 
-Also, I tried to look through the patch with the q_usage_counter optimization -
-is it this one?
+But maintaining the upstream version as the canonical version is key
+here.
 
-[PATCH 4/4] block: allow blk_mq_make_request to consume the q_usage_counter reference
+-- 
+Jens Axboe
 
-> 
-> This also means we only need to do the crypto preparation after splitting
-> and bouncing the bio, which means we don't bother allocating the fallback
-> context for a bio that might only be a dummy and gets split or bounced
-> later.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-core.c | 13 +++++--------
->  block/blk-mq.c   |  2 ++
->  2 files changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 1e97f99735232..ac59afaa26960 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1131,12 +1131,10 @@ blk_qc_t generic_make_request(struct bio *bio)
->  			/* Create a fresh bio_list for all subordinate requests */
->  			bio_list_on_stack[1] = bio_list_on_stack[0];
->  			bio_list_init(&bio_list_on_stack[0]);
-> -			if (blk_crypto_bio_prep(&bio)) {
-> -				if (q->make_request_fn)
-> -					ret = q->make_request_fn(q, bio);
-> -				else
-> -					ret = blk_mq_make_request(q, bio);
-> -			}
-> +			if (q->make_request_fn)
-> +				ret = q->make_request_fn(q, bio);
-> +			else
-> +				ret = blk_mq_make_request(q, bio);
->  
->  			blk_queue_exit(q);
->  
-> @@ -1185,8 +1183,7 @@ blk_qc_t direct_make_request(struct bio *bio)
->  		return BLK_QC_T_NONE;
->  	if (unlikely(bio_queue_enter(bio)))
->  		return BLK_QC_T_NONE;
-> -	if (blk_crypto_bio_prep(&bio))
-> -		ret = blk_mq_make_request(q, bio);
-> +	ret = blk_mq_make_request(q, bio);
->  	blk_queue_exit(q);
->  	return ret;
->  }
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d2962863e629f..0b5a0fa0d124b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2033,6 +2033,8 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
->  	blk_queue_bounce(q, &bio);
->  	__blk_queue_split(q, &bio, &nr_segs);
->  
-> +	if (!blk_crypto_bio_prep(&bio))
-> +		return BLK_QC_T_NONE;
->  	if (!bio_integrity_prep(bio))
->  		return BLK_QC_T_NONE;
->  
-> -- 
-> 2.26.2
-> 
