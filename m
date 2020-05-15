@@ -6,120 +6,116 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 585EEC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAC3C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 03:55:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 401AE20671
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EF552065F
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 03:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbgEOCFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 22:05:10 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4843 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726100AbgEOCFK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 22:05:10 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 88013B5C8678E9F93395;
-        Fri, 15 May 2020 10:05:05 +0800 (CST)
-Received: from [127.0.0.1] (10.166.215.55) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Fri, 15 May 2020
- 10:05:04 +0800
-Subject: Re: [PATCH v2 00/10] clean up SECTOR related macros and sectors/pages
- conversions
-To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        "Alasdair Kergon" <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-mm <linux-mm@kvack.org>, dm-devel <dm-devel@redhat.com>,
-        Song Liu <song@kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20200507075100.1779-1-thunder.leizhen@huawei.com>
-From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-Message-ID: <34fa4c00-9860-ca09-da4d-c5b20aad81b7@huawei.com>
-Date:   Fri, 15 May 2020 10:05:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727910AbgEODzj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 23:55:39 -0400
+Received: from mail-pl1-f176.google.com ([209.85.214.176]:34933 "EHLO
+        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726665AbgEODzj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 May 2020 23:55:39 -0400
+Received: by mail-pl1-f176.google.com with SMTP id q16so409253plr.2
+        for <linux-block@vger.kernel.org>; Thu, 14 May 2020 20:55:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=vb1WtJaUpKjPUeuSdPV1jFSQUyMjEpEylrC8Q1F61Uo=;
+        b=fglVlO1HuRYOnrfZk/LJlHnma1mjWERClhAsOoL5ooLBxAMLXARQCBs1ttwpIoPItv
+         NwliCvbK3qv0tpLRlBHeIqC81YAZKtxmoCBBB+j7SIAh8Y1Zddla+K1KjPb8HrSUKLdO
+         JRZ8y4Qk5yXK3bPpaFh0zdkNyStiCxerpZ1qYCDonvjmmVioGCUQR9bor2Ujer2EH0l5
+         GXxaHj7TfqS/faCslGPJRkGBaodzqHG6AryyT806LpfBKEKoMqCIpCfHyhaGAapi7Qq9
+         lTMCUft1lfp+1ssfIcGD/8JOWA9I+k6zahKlplFp4vAwlHbtt7GQ/4LCTR6phxYpR9U0
+         kk7A==
+X-Gm-Message-State: AOAM530Y+kOrpbkGca3LWZFh4FOSsEW2+RqUMS9/RQu5wnj2t/5GvOuC
+        o0LL+oWJ+h79AN2ke8MtGxSY+ZMj
+X-Google-Smtp-Source: ABdhPJxp/tIeHmN36sSyJ90da3FHtoIqWzS73jygdXgp2VbPQcOHEZ/elZkZEKPwEIH4J8EAWEjqIQ==
+X-Received: by 2002:a17:902:8c8f:: with SMTP id t15mr1720387plo.183.1589514936450;
+        Thu, 14 May 2020 20:55:36 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:3d24:1780:a4ad:9b1e? ([2601:647:4000:d7:3d24:1780:a4ad:9b1e])
+        by smtp.gmail.com with ESMTPSA id q7sm553688pgs.13.2020.05.14.20.55.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 May 2020 20:55:35 -0700 (PDT)
+Subject: Re: [PATCH 6/6] blk-mq: stop to allocate new requst and drain request
+ before hctx becomes inactive
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200515014153.2403464-1-ming.lei@redhat.com>
+ <20200515014153.2403464-7-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <f9af5f96-aa46-629d-0193-7ce69ac8781a@acm.org>
+Date:   Thu, 14 May 2020 20:55:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200507075100.1779-1-thunder.leizhen@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200515014153.2403464-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.166.215.55]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, all:
-   It seems no one take care about these patches. But I think patch 1 is need. And
-the main discussion points of others is whether we should add
-sectors_to_npage()/npage_to_sectors() or keep PAGE_SECTORS_SHIFT. And which marco
-name do we prefer: PAGE_SECTORS vs SECTORS_PER_PAGE, PAGE_SECTORS_SHIFT vs
-SECTORS_PER_PAGE_SHIFT.
+On 2020-05-14 18:41, Ming Lei wrote:
+> +	/* Prevent new request from being allocated on the current hctx/cpu */
+> +	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
 
-Hi, Jens Axboe, Coly Li, Kent Overstreet,Alasdair Kergon. Mike Snitzer:
-   Can you take a look at patch 1?
+What guarantees that this change has been observed by all CPUs before
+the blk_mq_tags_has_request() loop finishes?
 
-On 2020/5/7 15:50, Zhen Lei wrote:
-> v1 --> v2:
-> As Matthew Wilcox's suggestion, add sectors_to_npage()/npage_to_sectors()
-> helpers to eliminate SECTORS_PER_PAGE_SHIFT, because it's quite hard to read.
-> In further, I also eliminated PAGE_SECTORS_SHIFT.
-> 
-> I tried to eliminate all magic number "9" and "512", but it's too many, maybe
-> no one want to review it, so I gave up. In the process of searching, I found
-> the existing macro PAGE_SECTORS, it's equivalent to SECTORS_PER_PAGE. Because
-> PAGE_SECTORS was defined in include/linux/device-mapper.h, and SECTORS_PER_PAGE
-> was defined in drivers/block/zram/zram_drv.h, so I discarded SECTORS_PER_PAGE,
-> althrough I prefer it so much.
-> 
-> v1:
-> When I studied the code of mm/swap, I found "1 << (PAGE_SHIFT - 9)" appears
-> many times. So I try to clean up it.
-> 
-> 1. Replace "1 << (PAGE_SHIFT - 9)" or similar with SECTORS_PER_PAGE
-> 2. Replace "PAGE_SHIFT - 9" with SECTORS_PER_PAGE_SHIFT
-> 3. Replace "9" with SECTOR_SHIFT
-> 4. Replace "512" with SECTOR_SIZE
-> 
-> Zhen Lei (10):
->   block: move PAGE_SECTORS definition into <linux/blkdev.h>
->   zram: abolish macro SECTORS_PER_PAGE
->   block: add sectors_to_npage()/npage_to_sectors() helpers
->   zram: abolish macro SECTORS_PER_PAGE_SHIFT
->   block: abolish macro PAGE_SECTORS_SHIFT
->   mm/swap: use npage_to_sectors() and PAGE_SECTORS to clean up code
->   block: use sectors_to_npage() and PAGE_SECTORS to clean up code
->   md: use sectors_to_npage() and npage_to_sectors() to clean up code
->   md: use existing definition RESYNC_SECTORS
->   md: use PAGE_SECTORS to clean up code
-> 
->  block/blk-settings.c          |  6 +++---
->  block/partitions/core.c       |  5 ++---
->  drivers/block/brd.c           |  7 ++-----
->  drivers/block/null_blk_main.c | 10 ++++------
->  drivers/block/zram/zram_drv.c |  8 ++++----
->  drivers/block/zram/zram_drv.h |  2 --
->  drivers/md/bcache/util.h      |  2 --
->  drivers/md/dm-kcopyd.c        |  2 +-
->  drivers/md/dm-table.c         |  2 +-
->  drivers/md/md-bitmap.c        | 16 ++++++++--------
->  drivers/md/md.c               |  6 +++---
->  drivers/md/raid1.c            | 10 +++++-----
->  drivers/md/raid10.c           | 28 ++++++++++++++--------------
->  drivers/md/raid5-cache.c      | 11 +++++------
->  drivers/md/raid5.c            |  4 ++--
->  include/linux/blkdev.h        |  7 +++++--
->  include/linux/device-mapper.h |  1 -
->  mm/page_io.c                  |  4 ++--
->  mm/swapfile.c                 | 12 ++++++------
->  19 files changed, 67 insertions(+), 76 deletions(-)
-> 
+> +	/*
+> +	 * Grab one refcount for avoiding scheduler switch, and
+> +	 * return immediately if queue has been frozen.
+> +	 */
+> +	if (!percpu_ref_tryget(&q->q_usage_counter))
+> +		return 0;
 
+If percpu_ref_tryget(&q->q_usage_counter) fails that means either that
+request queue freezing is in progress or that a request queue has been
+frozen. I don't think that it is safe to return immediately if request
+queue freezing is still in progress.
+
+> +	/* wait until all requests in this hctx are gone */
+> +	while (blk_mq_tags_has_request(hctx))
+> +		msleep(5);
+> +
+> +	percpu_ref_put(&q->q_usage_counter);
+> +	return 0;
+> +}
+
+Thanks,
+
+Bart.
