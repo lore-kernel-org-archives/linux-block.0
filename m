@@ -2,99 +2,126 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E814C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 01:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C8EC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 01:42:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 767352065F
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 01:04:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 206CA2065F
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 01:42:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k13lKwLP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkaVUd/H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727836AbgEOBEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 21:04:36 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:59218 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727084AbgEOBEf (ORCPT
+        id S1726216AbgEOBmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 21:42:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35014 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726170AbgEOBmL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 21:04:35 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04F11PTl104648;
-        Fri, 15 May 2020 01:04:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=lTuyXb1zzAAFeltFSGKcd91dSqPhr8vBIQ5tAf2GO84=;
- b=k13lKwLP1ExxmJ0JwHGNgCI51Egbi6J5aoENT89TJbJnjhk4rhVPGruZVtelThL8GvtX
- AEMLMVUod0kS4YDTIn/WuoD58sRAoVRqL2vsgB9kbGVL+8j2ICIBXeBgaywmBGOEbWBl
- oF42PKxr1u+Ox1MdAT9+CI2IONDeXAl9vtMywAGiRuJLarm93Q0J+uPm40OWkLMIjAp4
- +ILwYrazH/4MRUKrRb/rrLaITa/LSea62BNNnPy9q6W2qko3yqctJ6q7ekXX+9YRqpqz
- oCnj5erPfQ2sYP5K/qVHD5qSKWNm0LO9+7rMpySAPQ6CoLjmcTeFY12VifV5eKT/3OPm Ew== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 3100xwpmhp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 15 May 2020 01:04:14 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04F12iZb138042;
-        Fri, 15 May 2020 01:04:14 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 310vjufqck-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 01:04:14 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04F14BZf004805;
-        Fri, 15 May 2020 01:04:12 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 14 May 2020 18:04:11 -0700
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Satya Tangirala <satyat@google.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v13 00/12] Inline Encryption Support
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20200514003727.69001-1-satyat@google.com>
-        <20200514051053.GA14829@sol.localdomain>
-Date:   Thu, 14 May 2020 21:04:08 -0400
-In-Reply-To: <20200514051053.GA14829@sol.localdomain> (Eric Biggers's message
-        of "Wed, 13 May 2020 22:10:53 -0700")
-Message-ID: <yq1tv0irotz.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.0.91 (gnu/linux)
+        Thu, 14 May 2020 21:42:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589506929;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qsnG25CPWDXMOE2a6UF+Jw5RGNZKv3s+x5lHPR9/oP8=;
+        b=AkaVUd/HKAZDEN2CR38mCT8LOW6ZYRq+g42jbgfreYG+kjJhMJpe1bZjCaG5/rjea4Wjkc
+        AxJbZSUVm1FFuwPZp0r2a0gnhC0ePpOl9uSStrlX9NRN9/9bM5VEu5m0hT0/HEhWAne7U6
+        SZByplWRZATU0mBBXAb1feKxtMFfo6Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-Pirfz8W2NVuqrC3tZ3gP6g-1; Thu, 14 May 2020 21:42:06 -0400
+X-MC-Unique: Pirfz8W2NVuqrC3tZ3gP6g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4C0A835B47;
+        Fri, 15 May 2020 01:42:04 +0000 (UTC)
+Received: from localhost (ovpn-12-94.pek2.redhat.com [10.72.12.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E3256E50D;
+        Fri, 15 May 2020 01:42:00 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 0/6] blk-mq: improvement CPU hotplug(simplified version)
+Date:   Fri, 15 May 2020 09:41:47 +0800
+Message-Id: <20200515014153.2403464-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9621 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
- spamscore=0 mlxlogscore=944 malwarescore=0 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005150007
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9621 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 lowpriorityscore=0
- suspectscore=0 mlxlogscore=972 clxscore=1011 cotscore=-2147483648
- mlxscore=0 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005150007
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-Eric,
+Thomas mentioned:
+    "
+     That was the constraint of managed interrupts from the very beginning:
+    
+      The driver/subsystem has to quiesce the interrupt line and the associated
+      queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+      until it's restarted by the core when the CPU is plugged in again.
+    "
 
-> Then patches 6-12 can go upstream via the SCSI and fscrypt trees in
-> the following release.
+But no drivers or blk-mq do that before one hctx becomes inactive(all
+CPUs for one hctx are offline), and even it is worse, blk-mq stills tries
+to run hw queue after hctx is dead, see blk_mq_hctx_notify_dead().
 
-I'd like our UFS folks to review the UFS patches. But otherwise no
-objection from me.
+This patchset tries to address the issue by the following approach:
 
+- before the last cpu in hctx->cpumask is going to offline, mark this
+hctx as inactive
+
+- disable preempt during allocating tag for request, and after tag
+is allocated, check if this hctx is inactive. If yes, give up this
+allocation and try remote allocation from online CPUs
+
+- before hctx becomes inactive, drain all allocated requests on this
+hctx
+
+Thanks John Garry for running lots of tests on arm64 with this previous
+version patches and co-working on investigating all kinds of issues.
+
+Thanks Christoph for review on old versions of this patches.
+
+https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-improve-cpu-hotplug
+
+Ming Lei (6):
+  blk-mq: allocate request on cpu in hctx->cpumask for
+    blk_mq_alloc_request_hctx
+  blk-mq: set data->ctx and data->hctx explicitly in blk_mq_get_request
+  blk-mq: add blk_mq_all_tag_iter
+  blk-mq: prepare for draining IO when hctx's all CPUs are offline
+  blk-mq: disable preempt during allocating request tag
+  blk-mq: stop to allocate new requst and drain request before hctx
+    becomes inactive
+
+ block/blk-mq-debugfs.c     |   2 +
+ block/blk-mq-tag.c         |  47 +++++++++-
+ block/blk-mq-tag.h         |   2 +
+ block/blk-mq.c             | 184 ++++++++++++++++++++++++++++++++-----
+ block/blk-mq.h             |   1 +
+ drivers/block/loop.c       |   2 +-
+ drivers/md/dm-rq.c         |   2 +-
+ include/linux/blk-mq.h     |  10 ++
+ include/linux/cpuhotplug.h |   1 +
+ 9 files changed, 221 insertions(+), 30 deletions(-)
+
+Cc: John Garry <john.garry@huawei.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.25.2
+
