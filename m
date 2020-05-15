@@ -2,124 +2,124 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73DAC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 585EEC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:05:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E2F8206A5
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:02:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6VnSZ3s"
+	by mail.kernel.org (Postfix) with ESMTP id 401AE20671
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 02:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgEOCCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 May 2020 22:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726122AbgEOCCo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 May 2020 22:02:44 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFDAC061A0C;
-        Thu, 14 May 2020 19:02:44 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id j3so494764ljg.8;
-        Thu, 14 May 2020 19:02:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9J3xZ+0hufAZY8Q946Gd5z6inR3BlFb/SIlC7L1t+/U=;
-        b=b6VnSZ3s0qXEVWpWflklrszaWqi+X8HiHVvHebezL/NDw6O4YIBSaA+q/JJpe5hJge
-         WJsK9j99q81170CK8u0FIZWL4Elck7U17wxih3SGCMROyyi4rB5jxtVhbp9GwBmLQ8TC
-         kkuM7oXK+h2Uuf4X6FFQr25xQlVBHtwPnORfeLkX0REbs4U4W3La+M3eWSHTcoodpi2C
-         k5RxXJOQzKYDn50H5erRSvBtoL889M1d6iy17JqBgzJo9awiQr6h9cCDe8Hv+tuiZgHS
-         zzT45O2rrcgYZ7hn7cag4r4arbnkzQGTh+pvwOQkax/GCtUWz7zINPX3DK/2RZtMibBb
-         EgMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9J3xZ+0hufAZY8Q946Gd5z6inR3BlFb/SIlC7L1t+/U=;
-        b=pNqhfP1lGGGgJYU2jIaDddzolkTrw2y2Y8Lx2iL3bCESD/Ciw7u6qUnm3ZeNkv6BSk
-         kqUjQnoGVq1K6v+LYDwyQIWhFxkwVcVh0lj7MitVFSqoq6YD/Upj7XXbPNRpry5zYfBM
-         sgL07Swfisf0n5yxRoFouw8b++bPt9oJQ5TBhUgIX33DSG0pz4IgrSrFbl1GrDFNucOY
-         FBpDRMrRRxhuejyOxfKUMyXN50h19H86Hlw6gohFbdciqp4G167uHFvCxhxa4Rlggu8V
-         Vl4zeg2sIRMk3y8XeXQyQkhVCk7RxZmkfFcGPR+/B1qyrJOFynZqaYnvN071DszThqgw
-         mUrg==
-X-Gm-Message-State: AOAM532K7rAyRmvKuhpmq6tKFd5YAhr9TKwrNuXY/cz3HIMGv8afW/qn
-        crTik2xaQBZ1Ip3vzzkaG2r6ka/Z
-X-Google-Smtp-Source: ABdhPJxrA7JYJ7efiuq7ExKigt85VerS+c/wP3Mq06cQYJVvJyK2fp5UJIRAD8VCub9PBoBE2qjyVQ==
-X-Received: by 2002:a2e:700b:: with SMTP id l11mr674278ljc.255.1589508162351;
-        Thu, 14 May 2020 19:02:42 -0700 (PDT)
-Received: from [192.168.2.145] (ppp91-78-208-152.pppoe.mtu-net.ru. [91.78.208.152])
-        by smtp.googlemail.com with ESMTPSA id z17sm382496ljc.81.2020.05.14.19.02.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2020 19:02:41 -0700 (PDT)
-Subject: Re: [PATCH v4 3/6] partitions: Introduce NVIDIA Tegra Partition Table
-To:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Davidlohr Bueso <dave@stgolabs.net>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-efi <linux-efi@vger.kernel.org>
-References: <20200515014143.12984-1-digetx@gmail.com>
- <20200515014143.12984-4-digetx@gmail.com>
- <055fc187-6181-6ccb-04a8-ab4324270ed7@infradead.org>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <821ae388-07b2-5883-95b8-c551ddc7bdea@gmail.com>
-Date:   Fri, 15 May 2020 05:02:40 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726907AbgEOCFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 May 2020 22:05:10 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4843 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726100AbgEOCFK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 May 2020 22:05:10 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 88013B5C8678E9F93395;
+        Fri, 15 May 2020 10:05:05 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.55) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Fri, 15 May 2020
+ 10:05:04 +0800
+Subject: Re: [PATCH v2 00/10] clean up SECTOR related macros and sectors/pages
+ conversions
+To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        "Alasdair Kergon" <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-mm <linux-mm@kvack.org>, dm-devel <dm-devel@redhat.com>,
+        Song Liu <song@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20200507075100.1779-1-thunder.leizhen@huawei.com>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <34fa4c00-9860-ca09-da4d-c5b20aad81b7@huawei.com>
+Date:   Fri, 15 May 2020 10:05:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <055fc187-6181-6ccb-04a8-ab4324270ed7@infradead.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200507075100.1779-1-thunder.leizhen@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.166.215.55]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-15.05.2020 04:58, Randy Dunlap пишет:
-> On 5/14/20 6:41 PM, Dmitry Osipenko wrote:
->> diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
->> index 702689a628f0..2c1408cba1a6 100644
->> --- a/block/partitions/Kconfig
->> +++ b/block/partitions/Kconfig
->> @@ -268,3 +268,11 @@ config CMDLINE_PARTITION
->>  	help
->>  	  Say Y here if you want to read the partition table from bootargs.
->>  	  The format for the command line is just like mtdparts.
->> +
->> +config TEGRA_PARTITION
->> +	bool "NVIDIA Tegra Partition support" if PARTITION_ADVANCED
->> +	default y if ARCH_TEGRA
->> +	depends on (ARCH_TEGRA && MMC_BLOCK) || COMPILE_TEST
-> 
-> That looks odd. Such depends are more often like:
-> 	depends on MMC_BLOCK && (ARCH_TEGRA || COMPILE_TEST)
-> 
-> but that's just my experience. If this works when ARCH_TEGRA and MMC_BLOCK
-> are not set and COMPILE_TEST is set, that's fine.
+Hi, all:
+   It seems no one take care about these patches. But I think patch 1 is need. And
+the main discussion points of others is whether we should add
+sectors_to_npage()/npage_to_sectors() or keep PAGE_SECTORS_SHIFT. And which marco
+name do we prefer: PAGE_SECTORS vs SECTORS_PER_PAGE, PAGE_SECTORS_SHIFT vs
+SECTORS_PER_PAGE_SHIFT.
 
-Ah, right! It shouldn't work since mmc_bdev_to_card() will be undefined
-if MMC_BLOCK=n. Good catch, thank you! :)
+Hi, Jens Axboe, Coly Li, Kent Overstreet,Alasdair Kergon. Mike Snitzer:
+   Can you take a look at patch 1?
+
+On 2020/5/7 15:50, Zhen Lei wrote:
+> v1 --> v2:
+> As Matthew Wilcox's suggestion, add sectors_to_npage()/npage_to_sectors()
+> helpers to eliminate SECTORS_PER_PAGE_SHIFT, because it's quite hard to read.
+> In further, I also eliminated PAGE_SECTORS_SHIFT.
+> 
+> I tried to eliminate all magic number "9" and "512", but it's too many, maybe
+> no one want to review it, so I gave up. In the process of searching, I found
+> the existing macro PAGE_SECTORS, it's equivalent to SECTORS_PER_PAGE. Because
+> PAGE_SECTORS was defined in include/linux/device-mapper.h, and SECTORS_PER_PAGE
+> was defined in drivers/block/zram/zram_drv.h, so I discarded SECTORS_PER_PAGE,
+> althrough I prefer it so much.
+> 
+> v1:
+> When I studied the code of mm/swap, I found "1 << (PAGE_SHIFT - 9)" appears
+> many times. So I try to clean up it.
+> 
+> 1. Replace "1 << (PAGE_SHIFT - 9)" or similar with SECTORS_PER_PAGE
+> 2. Replace "PAGE_SHIFT - 9" with SECTORS_PER_PAGE_SHIFT
+> 3. Replace "9" with SECTOR_SHIFT
+> 4. Replace "512" with SECTOR_SIZE
+> 
+> Zhen Lei (10):
+>   block: move PAGE_SECTORS definition into <linux/blkdev.h>
+>   zram: abolish macro SECTORS_PER_PAGE
+>   block: add sectors_to_npage()/npage_to_sectors() helpers
+>   zram: abolish macro SECTORS_PER_PAGE_SHIFT
+>   block: abolish macro PAGE_SECTORS_SHIFT
+>   mm/swap: use npage_to_sectors() and PAGE_SECTORS to clean up code
+>   block: use sectors_to_npage() and PAGE_SECTORS to clean up code
+>   md: use sectors_to_npage() and npage_to_sectors() to clean up code
+>   md: use existing definition RESYNC_SECTORS
+>   md: use PAGE_SECTORS to clean up code
+> 
+>  block/blk-settings.c          |  6 +++---
+>  block/partitions/core.c       |  5 ++---
+>  drivers/block/brd.c           |  7 ++-----
+>  drivers/block/null_blk_main.c | 10 ++++------
+>  drivers/block/zram/zram_drv.c |  8 ++++----
+>  drivers/block/zram/zram_drv.h |  2 --
+>  drivers/md/bcache/util.h      |  2 --
+>  drivers/md/dm-kcopyd.c        |  2 +-
+>  drivers/md/dm-table.c         |  2 +-
+>  drivers/md/md-bitmap.c        | 16 ++++++++--------
+>  drivers/md/md.c               |  6 +++---
+>  drivers/md/raid1.c            | 10 +++++-----
+>  drivers/md/raid10.c           | 28 ++++++++++++++--------------
+>  drivers/md/raid5-cache.c      | 11 +++++------
+>  drivers/md/raid5.c            |  4 ++--
+>  include/linux/blkdev.h        |  7 +++++--
+>  include/linux/device-mapper.h |  1 -
+>  mm/page_io.c                  |  4 ++--
+>  mm/swapfile.c                 | 12 ++++++------
+>  19 files changed, 67 insertions(+), 76 deletions(-)
+> 
+
