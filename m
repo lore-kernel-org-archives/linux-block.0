@@ -2,153 +2,90 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A61C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 05:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0DBC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 06:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E39C2065F
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 05:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE6AF20728
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 06:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbgEOFeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 01:34:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33728 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbgEOFeo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 01:34:44 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 7AF9DAEE7;
-        Fri, 15 May 2020 05:34:45 +0000 (UTC)
-Subject: Re: [PATCH] block: deny zone management ioctl on mounted fs
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block @ vger . kernel . org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20200514162643.11880-1-johannes.thumshirn@wdc.com>
- <BY5PR04MB69006DE86D1050620B5EDAA4E7BD0@BY5PR04MB6900.namprd04.prod.outlook.com>
- <8bc40310-6d2d-4b2f-ae56-17899fc29d22@suse.de>
- <BY5PR04MB6900E4FC84C094C4FD51C9CAE7BD0@BY5PR04MB6900.namprd04.prod.outlook.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
- qvZ2YWpidPjaIxHwu3u9tmLKqS+2vnP0k7PRHXBYbtZEMpy3kCzseNfdrNqwJ54A430BHf2S
- GMVRVENiScsnh4SnaYjFVvB8SrlhTsgVEXEBBma5Ktgq9YSoy5miatWmZvHLFTQgFMabCz/P
- j5/xzykrF6yHo0rHZtwzQzF8rriOplAFCECp/t05+OeHHxjSqSI0P/G79Ll+AJYLRRm9til/
- K6yz/1hX5xMToIkYrshDJDrUc8DjEpISQQPhG19PzaUf3vFpmnSVYprcWfJWsa2wZyyjRFkf
- J51S82WfclafNC6N7eRXedpRpG6udUAYOA1YdtlyQRZa84EJvMzW96iSL1Gf+ZGtRuM3k49H
- 1wiWOjlANiJYSIWyzJjxAd/7Xtiy/s3PRKL9u9y25ftMLFa1IljiDG+mdY7LyAGfvdtIkanr
- iBpX4gWXd7lNQFLDJMfShfu+CTMCdRzCAQ9hIHPmBeZDJxKq721CyBiGAhRxDN+TYiaG/UWT
- 7IB7LL4zJrIe/xQ8HhRO+2NvT89o0LxEFKBGg39yjTMIrjbl2ZxY488+56UV4FclubrG+t16
- r2KrandM7P5RjR+cuHhkKseim50Qsw0B+Eu33Hjry7YCihmGswARAQABtBhDb2x5IExpIDxj
- b2x5bGlAc3VzZS5kZT6JAlYEEwEIAEACGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgBYh
- BOo+RS/0+Uhgjej60Mc5B5Nrffj8BQJcR84dBQkY++fuAAoJEMc5B5Nrffj8ixcP/3KAKg1X
- EcoW4u/0z+Ton5rCyb/NpAww8MuRjNW82UBUac7yCi1y3OW7NtLjuBLw5SaVG5AArb7IF3U0
- qTOobqfl5XHsT0o5wFHZaKUrnHb6y7V3SplsJWfkP3JmOooJsQB3z3K96ZTkFelsNb0ZaBRu
- gV+LA4MomhQ+D3BCDR1it1OX/tpvm2uaDF6s/8uFtcDEM9eQeqATN/QAJ49nvU/I8zDSY9rc
- 0x9mP0x+gH4RccbnoPu/rUG6Fm1ZpLrbb6NpaYBBJ/V1BC4lIOjnd24bsoQrQmnJn9dSr60X
- 1MY60XDszIyzRw7vbJcUn6ZzPNFDxFFT9diIb+wBp+DD8ZlD/hnVpl4f921ZbvfOSsXAJrKB
- 1hGY17FPwelp1sPcK2mDT+pfHEMV+OQdZzD2OCKtza/5IYismJJm3oVUYMogb5vDNAw9X2aP
- XgwUuG+FDEFPamFMUwIfzYHcePfqf0mMsaeSgtA/xTxzx/0MLjUJHl46Bc0uKDhv7QUyGz0j
- Ywgr2mHTvG+NWQ/mDeHNGkcnsnp3IY7koDHnN2xMFXzY4bn9m8ctqKo2roqjCzoxD/njoAhf
- KBzdybLHATqJG/yiZSbCxDA1n/J4FzPyZ0rNHUAJ/QndmmVspE9syFpFCKigvvyrzm016+k+
- FJ59Q6RG4MSy/+J565Xj+DNY3/dCuQINBFYX6S8BEADZP+2cl4DRFaSaBms08W8/smc5T2CO
- YhAoygZn71rB7Djml2ZdvrLRjR8Qbn0Q/2L2gGUVc63pJnbrjlXSx2LfAFE0SlfYIJ11aFdF
- 9w7RvqWByQjDJor3Z0fWvPExplNgMvxpD0U0QrVT5dIGTx9hadejCl/ug09Lr6MPQn+a4+qs
- aRWwgCSHaIuDkH3zI1MJXiqXXFKUzJ/Fyx6R72rqiMPHH2nfwmMu6wOXAXb7+sXjZz5Po9GJ
- g2OcEc+rpUtKUJGyeQsnCDxUcqJXZDBi/GnhPCcraQuqiQ7EGWuJfjk51vaI/rW4bZkA9yEP
- B9rBYngbz7cQymUsfxuTT8OSlhxjP3l4ZIZFKIhDaQeZMj8pumBfEVUyiF6KVSfgfNQ/5PpM
- R4/pmGbRqrAAElhrRPbKQnCkGWDr8zG+AjN1KF6rHaFgAIO7TtZ+F28jq4reLkur0N5tQFww
- wFwxzROdeLHuZjL7eEtcnNnzSkXHczLkV4kQ3+vr/7Gm65mQfnVpg6JpwpVrbDYQeOFlxZ8+
- GERY5Dag4KgKa/4cSZX2x/5+KkQx9wHwackw5gDCvAdZ+Q81nm6tRxEYBBiVDQZYqO73stgT
- ZyrkxykUbQIy8PI+g7XMDCMnPiDncQqgf96KR3cvw4wN8QrgA6xRo8xOc2C3X7jTMQUytCz9
- 0MyV1QARAQABiQI8BBgBCAAmAhsMFiEE6j5FL/T5SGCN6PrQxzkHk2t9+PwFAlxHziAFCRj7
- 5/EACgkQxzkHk2t9+PxgfA//cH5R1DvpJPwraTAl24SUcG9EWe+NXyqveApe05nk15zEuxxd
- e4zFEjo+xYZilSveLqYHrm/amvQhsQ6JLU+8N60DZHVcXbw1Eb8CEjM5oXdbcJpXh1/1BEwl
- 4phsQMkxOTns51bGDhTQkv4lsZKvNByB9NiiMkT43EOx14rjkhHw3rnqoI7ogu8OO7XWfKcL
- CbchjJ8t3c2XK1MUe056yPpNAT2XPNF2EEBPG2Y2F4vLgEbPv1EtpGUS1+JvmK3APxjXUl5z
- 6xrxCQDWM5AAtGfM/IswVjbZYSJYyH4BQKrShzMb0rWUjkpXvvjsjt8rEXpZEYJgX9jvCoxt
- oqjCKiVLpwje9WkEe9O9VxljmPvxAhVqJjX62S+TGp93iD+mvpCoHo3+CcvyRcilz+Ko8lfO
- hS9tYT0HDUiDLvpUyH1AR2xW9RGDevGfwGTpF0K6cLouqyZNdhlmNciX48tFUGjakRFsxRmX
- K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
- 9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
- +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Message-ID: <7358208e-90ba-ccf6-6dad-fa65e17d80d7@suse.de>
-Date:   Fri, 15 May 2020 13:34:38 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        id S1726215AbgEOG27 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 02:28:59 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:38334 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726205AbgEOG26 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 02:28:58 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id D74529857C06E2477F6F;
+        Fri, 15 May 2020 14:28:56 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.55) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Fri, 15 May 2020
+ 14:28:54 +0800
+Subject: Re: [PATCH v2 06/10] mm/swap: use npage_to_sectors() and PAGE_SECTORS
+ to clean up code
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        linux-mm <linux-mm@kvack.org>, dm-devel <dm-devel@redhat.com>,
+        Song Liu <song@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20200507075100.1779-1-thunder.leizhen@huawei.com>
+ <20200507075100.1779-7-thunder.leizhen@huawei.com>
+ <20200515040647.GC16070@bombadil.infradead.org>
+From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <766da107-bc67-ff99-a8c8-87f8f98c7cf6@huawei.com>
+Date:   Fri, 15 May 2020 14:28:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <BY5PR04MB6900E4FC84C094C4FD51C9CAE7BD0@BY5PR04MB6900.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200515040647.GC16070@bombadil.infradead.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.166.215.55]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/15 13:25, Damien Le Moal wrote:
-> On 2020/05/15 14:09, Coly Li wrote:
->> On 2020/5/15 12:52, Damien Le Moal wrote:
->>> On 2020/05/15 1:26, Johannes Thumshirn wrote:
->>>> If a user submits a zone management ioctl from user-space, like a zone
->>>> reset and a file-system (like zonefs or f2fs) is mounted on the zoned
->>>> block device, the zone will get reset and the file-system's cached value
->>>> of the zone's write-pointer becomes invalid.
->>>>
->>>> Subsequent writes to this zone from the file-system will result in
->>>> unaligned writes and the drive will error out.
->>>>
->>>> Deny zone management ioctls when a super_block is found on the block
->>>> device.
->>>
->>> Zone management ioctls can only be executed by users that have SYS_CAP_ADMIN
->>> capabilities. If these start doing stupid things, the system is probably in for
->>> a lot of troubles beyond what this patch is trying to prevent.
->>>
->>> In addition, there are so many other ways that a mounted zoned block device can
->>> be corrupted beyond these ioctls that I am not sure this patch is very useful.
->>> E.g. any raw block device write in a zone would also cause the FS to see
->>> unaligned writes, and any other raw block device access is also possible for
->>> SYS_CAP_ADMIN users. Preventing only these ioctls does not really improve
->>> anything I think. That may even be harmful has that would prevent things like
->>> inline file system check utilities to run.
->>>
->>>
->>
->> The problem I encountered was, after I write 8KB data into seq/0 file, I
->> want to re-write from offset 0. At that moment I didn't know to use
->> 'truncate -s 0' to reset the write pointer of this zone file, so I use
->> 'blkzone reset' to reset the write pointer of seq zone 0, and I saw the
->> write pointer was reset to 0. But I still was not able to write data
->> into seq/0 file on offset 0. Then I decided to reset all the zones by
->> command 'blkzone reset -o 0 -c <zones number>', then the command hung
->> for 20+ minutes and not response. From the kernel message I saw quite a
->> log error message (an example is on pastbin: https://pastebin.com/ZFFNsaE0)
->>
->> In my mind, there are 2 methods to reset a zone, one is from blkzone,
->> one is from truncate on zonefs. I guess I am not the first/last one
->> which thinks the two method should work both, and has no idea when the
->> above error encountered.
-> 
-> Well yes, that is correct. These are methods to reset zones. But for a mounted
-> disk, any raw block device operation can corrupt the file system on it. That is
-> a principle that remains true for zoned block devices. Resenting a zone directly
-> on the device without the FS being aware of the operation will (and does)
-> corrupt the FS. Same for raw disk writes vs file writes on any mounted disk...
-> 
->>
->> Reject blkzone reset command when the zoned SMR drive is mounted by
->> zonefs, it is OK to me to avoid confusion and further mistake. IMHO,
->> This is a solution at least.
-> 
-> libblkid now includes patches supporting zonefs detection, so yes, we can patch
-> blkzone to reject zone management operations if the device is mounted. We need
-> the same for f2fs and dm-zoned too. Time to clean that up. Will do.
 
-Yes, this is a solution. Thanks.
 
-Coly Li
+On 2020/5/15 12:06, Matthew Wilcox wrote:
+> On Thu, May 07, 2020 at 03:50:56PM +0800, Zhen Lei wrote:
+>> @@ -266,7 +266,7 @@ int swap_writepage(struct page *page, struct writeback_control *wbc)
+>>  
+>>  static sector_t swap_page_sector(struct page *page)
+>>  {
+>> -	return (sector_t)__page_file_index(page) << (PAGE_SHIFT - 9);
+>> +	return npage_to_sectors((sector_t)__page_file_index(page));
+> 
+> If you make npage_to_sectors() a proper function instead of a macro,
+> you can do the casting inside the function instead of in the callers
+> (which is prone to bugs).
+
+Oh, yes. __page_file_index(page) maybe called many times in marco, althouth currently
+it is not. So that, not all are suitable for page_to_sector(). And for this example,
+still need to use "<< PAGE_SECTORS_SHIFT".
+
+> 
+> Also, this is a great example of why page_to_sector() was a better name
+> than npage_to_sectors().  This function doesn't return a count of sectors,
+> it returns a sector number within the swap device.
+OK, so I will change to page_to_sector()/sector_to_page().
+
+> 
+> 
+> .
+> 
+
