@@ -2,144 +2,168 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1234AC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C88C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:14:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E13E6207C4
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0559B207C4
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 15:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="ZXqvivJY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B8PkO8cL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbgEOPIy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 11:08:54 -0400
-Received: from mout.web.de ([212.227.17.11]:53791 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726234AbgEOPIx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 11:08:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1589555313;
-        bh=2Az8NnR7wJ9rN2x9fHizGYiaHCVrPmmewTwIZIfBU5s=;
-        h=X-UI-Sender-Class:To:Cc:Subject:From:Date;
-        b=ZXqvivJYAuG2fJlojZrSHhjwQJMqWniMoTMe+0INKTTnV58dM4Xixiq/5QBWDZMyb
-         UuWu3I3Hwznw0mN1iaJ/pKKdSzfPsgGXwiZOvQzrM7OyVnVACMjAFuS87gZditjEN+
-         qdVQ4/JD85kb8t11+KIeFoDLzVGDucar4JRBeb2A=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([78.49.164.161]) by smtp.web.de (mrweb103
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MOArg-1jU6AW37fY-005YVb; Fri, 15
- May 2020 17:08:32 +0200
-To:     Wu Bo <wubo40@huawei.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Feilong Lin <linfeilong@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: Re: [PATCH] blkcg: Fix memory leak in blkg_conf_prep()
-From:   Markus Elfring <Markus.Elfring@web.de>
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- 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 FEE=
-Message-ID: <4c670a6c-98c3-2b14-7438-09199506d92f@web.de>
-Date:   Fri, 15 May 2020 17:08:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1727076AbgEOPOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 11:14:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21167 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726227AbgEOPOV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 11:14:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589555657;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4jFShFTg902A0q2PIFAj13bBAo+TkoHxdtSFzmSJaQc=;
+        b=B8PkO8cLVVph/pN4dd3OZCiD6m3ovZaGaJOWfBZ+StZadTXIGXXz6Kc8OJqI4xXgRdbDLF
+        gpI19S0HgO2Wop0X+9LiGznCSklVw/JiTjRedmd7OXpuIr+1pQSS/84mQvJWYxZmtVbL5A
+        NMYg5s8AC5X1Mq9UFaQ7HCAfDCjKjCU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-LQVTQu0OPIyPDmXCi0pv9g-1; Fri, 15 May 2020 11:14:13 -0400
+X-MC-Unique: LQVTQu0OPIyPDmXCi0pv9g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03A5684B8A0;
+        Fri, 15 May 2020 15:14:10 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-95.rdu2.redhat.com [10.10.112.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D912F76E64;
+        Fri, 15 May 2020 15:13:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20200514102919.GA12680@lst.de>
+References: <20200514102919.GA12680@lst.de> <20200513062649.2100053-30-hch@lst.de> <20200513062649.2100053-1-hch@lst.de> <3123534.1589375587@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     dhowells@redhat.com, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        drbd-dev@lists.linbit.com, linux-cifs@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
+        cluster-devel@redhat.com, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        netdev@vger.kernel.org, Vlad Yasevich <vyasevich@gmail.com>,
+        linux-kernel@vger.kernel.org, Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, ocfs2-devel@oss.oracle.com
+Subject: Re: [PATCH 29/33] rxrpc_sock_set_min_security_level
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <128581.1589555639.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6zCR73WCJ+xsN9FSih8Z9jG+4rbMSSH93H8i/IOv2Je0OjMfyGL
- gMTBw3FdaTzbP0Bq0Zx6MC6lUmzzAzLij6ZyDsQu+HRUqVtXsLk94WRIYNNFngJZFzysEIx
- Y0czS7ob3NZ55bWZzX/jn9j2Uc0UG2nHPzZ2BgfaUWhjJm77ZZ1JVC6/KJoEIGnOC/w3wIV
- Ld0oBSoqKP7R/Za0EoyTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:V4nh84CWi3w=:PU/8sCh+p7VyTbyebDcCCU
- 9Ui/9Ggc12N8n5H/kSY8qHx6adZz0Zn8udibpHMPUVSMRxHT7g1ifarghHAhXx6G76++SMOxs
- 189VwvtJjgCvXN0G6YEO6rs6ri5zsKB3RQf8buVohG/ZjO3OTkZGv4TRNO4B10o9f6nuZ1G2V
- Htd5UEqgqr5GRnXJMhPduqQoEQ5SQZ2wlGWeOnil8rnBY01ILN8LHuMwNwhg3flfdW9ZIzt0h
- ff8S6GBitend6XoVUw1hPanP0dqMM7k2HsZlx++gadSSHg4h4KN0wxDKR+gnuXr3k+SM4Yu48
- AIG1k5+VqT0CtIvlQOKPMAyNxSFpx6zXQn9VDXv1Uqy36F8O3Tzb+/puEVTc+gOo78IQmdfCC
- VYc5NH6DOAJIrewP/bFIZ3gP0IY6IzmDVNGogGNBJeUpq25CyB1Aw3QsNLSP33LmrC/6hI6Sl
- o6lpYuxKRokkUaxu6WHLS45DI2IKVYEwQdCpmQssC0WVBe+Jm5BE+ZKbm3OyoeR0bC4uMF9mS
- wsbNoy+9rRrB3+pQmN2WdLFf4Zm0By5yBLXYvrpmRwad8A6m5/lomK2hkVVtpH3jCJSINL4Q1
- YMPrfUCzf23N8EwrTtBWEHmC7GrCmYvY3xt/rnx3VWfyU8D8SYb6Om+J1wtMEvYIGC3A0M9xl
- DzSqgQpZrB1ulo5Wxf00xchOcacAhee+V0fZlsxCqZq3BBxoG1F7sPpARuZ531DNMF+1rFYoC
- 5qcNBUK26tpkj0uOUCdpDVaK1dWxiSF+sXzXArnQcZymvo+eFOwGQArOHMNglGFJm1XPAHQZn
- sewfSOPSgZiHWo7WzPwB/AlymHm7i+6FJP8OvqEr5DCNVoxECqygYJN6uBGBaSXavtbQ2Fr/t
- M7cxx9F2aiOhScl+imSnnlQ0alXV4XTgcHTwbeRbN9tjEOuBxnsZ3jk0l9L2uwSG3f7ZeEmjq
- UZw+BLgF9JemuOJ9s08p4WV2vZ+150+2amWHQuJ1koZh2PdltPVock2TX8xSn8fbmMWE+XW4K
- JjbVFUjFKLiNMkjBk0VORIyty7Ixecm3+/t3kv+UcpghCyRyuoRmeqU4ZFwD6a1aAFB24lorl
- oacTKnNTDyKT6pBzsda4ZIJMUfWrvxEQg3RL5Mps2qUmVN0Cp0KvH3h0oQ/BjtUgjYGA6E/+k
- Q1LKyX1F07hymGx6sB7EYT2GexnRzm0UF8JcHQ0ev6IvQB3g1C7YGdLPfXPXsA43vnWcVUEy+
- NLj3TxcLTA8UsERUN
+Date:   Fri, 15 May 2020 16:13:59 +0100
+Message-ID: <128582.1589555639@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-=E2=80=A6
-> new_blkg =3D blkg_alloc(pos, q, GFP_KERNEL);
-=E2=80=A6
+Christoph Hellwig <hch@lst.de> wrote:
 
-I suggest to omit the source code quotation from the change description.
+> > Looks good - but you do need to add this to Documentation/networking/r=
+xrpc.txt
+> > also, thanks.
+> =
 
+> That file doesn't exist, instead we now have a
+> cumentation/networking/rxrpc.rst in weird markup.
 
-> if calling blkg_lookup_check() failed, at the IS_ERR block,
-> the new_blkg should be free before goto lable fail_unlock
-> in blkg_conf_prep() function.
+Yeah - that's only in net/next thus far.
 
-How do you think about a wording variant like the following?
+> Where do you want this to be added, and with what text?  Remember I don'=
+t
+> really know what this thing does, I just provide a shortcut.
 
-  If a call of the function =E2=80=9Cblkg_lookup_check=E2=80=9D failed,
-  release the previously allocated block group before jumping
-  to the target =E2=80=9Cfail_unlock=E2=80=9D in the implementation of
-  the function =E2=80=9Cblkg_conf_prep=E2=80=9D.
+The document itself describes what each rxrpc sockopt does.  Just look for
+RXRPC_MIN_SECURITY_LEVEL in there;-)
 
+Anyway, see the attached.  This also fixes a couple of errors in the doc t=
+hat
+I noticed.
 
-Would you like to add the tag =E2=80=9CFixes=E2=80=9D to the commit messag=
-e?
+David
+---
+diff --git a/Documentation/networking/rxrpc.rst b/Documentation/networking=
+/rxrpc.rst
+index 5ad35113d0f4..68552b92dc44 100644
+--- a/Documentation/networking/rxrpc.rst
++++ b/Documentation/networking/rxrpc.rst
+@@ -477,7 +477,7 @@ AF_RXRPC sockets support a few socket options at the S=
+OL_RXRPC level:
+ 	 Encrypted checksum plus packet padded and first eight bytes of packet
+ 	 encrypted - which includes the actual packet length.
+ =
 
-Regards,
-Markus
+-     (c) RXRPC_SECURITY_ENCRYPTED
++     (c) RXRPC_SECURITY_ENCRYPT
+ =
+
+ 	 Encrypted checksum plus entire packet padded and encrypted, including
+ 	 actual packet length.
+@@ -578,7 +578,7 @@ A client would issue an operation by:
+      This issues a request_key() to get the key representing the security
+      context.  The minimum security level can be set::
+ =
+
+-	unsigned int sec =3D RXRPC_SECURITY_ENCRYPTED;
++	unsigned int sec =3D RXRPC_SECURITY_ENCRYPT;
+ 	setsockopt(client, SOL_RXRPC, RXRPC_MIN_SECURITY_LEVEL,
+ 		   &sec, sizeof(sec));
+ =
+
+@@ -1090,6 +1090,15 @@ The kernel interface functions are as follows:
+      jiffies).  In the event of the timeout occurring, the call will be
+      aborted and -ETIME or -ETIMEDOUT will be returned.
+ =
+
++ (#) Apply the RXRPC_MIN_SECURITY_LEVEL sockopt to a socket from within i=
+n the
++     kernel::
++
++       int rxrpc_sock_set_min_security_level(struct sock *sk,
++					     unsigned int val);
++
++     This specifies the minimum security level required for calls on this
++     socket.
++
+ =
+
+ Configurable Parameters
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+index 7dfcbd58da85..e313dae01674 100644
+--- a/fs/afs/rxrpc.c
++++ b/fs/afs/rxrpc.c
+@@ -57,7 +57,7 @@ int afs_open_socket(struct afs_net *net)
+ 	srx.transport.sin6.sin6_port	=3D htons(AFS_CM_PORT);
+ =
+
+ 	ret =3D rxrpc_sock_set_min_security_level(socket->sk,
+-			RXRPC_SECURITY_ENCRYPT);
++						RXRPC_SECURITY_ENCRYPT);
+ 	if (ret < 0)
+ 		goto error_2;
+ =
+
