@@ -2,95 +2,75 @@ Return-Path: <SRS0=qX1g=65=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C892FC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 06:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B4EC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 07:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A93C8206F1
-	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 06:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 848E2206F4
+	for <linux-block@archiver.kernel.org>; Fri, 15 May 2020 07:37:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="mc53IrWV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbgEOGwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 02:52:38 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4846 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726371AbgEOGwh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 02:52:37 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 3E1FC151D066A462048B;
-        Fri, 15 May 2020 14:52:30 +0800 (CST)
-Received: from [127.0.0.1] (10.166.215.55) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Fri, 15 May 2020
- 14:52:28 +0800
-Subject: Re: [PATCH v2 07/10] block: use sectors_to_npage() and PAGE_SECTORS
- to clean up code
-To:     Matthew Wilcox <willy@infradead.org>
-CC:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        linux-mm <linux-mm@kvack.org>, dm-devel <dm-devel@redhat.com>,
-        Song Liu <song@kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20200507075100.1779-1-thunder.leizhen@huawei.com>
- <20200507075100.1779-8-thunder.leizhen@huawei.com>
- <20200515041916.GE16070@bombadil.infradead.org>
-From:   "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-Message-ID: <d3e9bebf-1fea-1497-6dd2-9354f9ca0d4b@huawei.com>
-Date:   Fri, 15 May 2020 14:52:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726622AbgEOHhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 03:37:19 -0400
+Received: from mailgw02.mediatek.com ([210.61.82.184]:7911 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726613AbgEOHhT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 03:37:19 -0400
+X-UUID: 592f197f268745128398747fa762b992-20200515
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=/DCO/zS7sesB2PVRfTMTsSwE8pj4v6mVVtmNsnUpisY=;
+        b=mc53IrWVbJ+QF+yITq9W+RJtiRzw/Im0K8UCmXksgoT20zYkNPfdBnBiDEemIfDnQnt2H3YNc7uARzMCvDYBH4p7wCZKMDWVvoe4trS35E7ICLkv+vNXWRV01seYMGFC8/GgBzTsI6rOkU4iv1+LT5PZ6vbeikuIROOKSCQZ6Vs=;
+X-UUID: 592f197f268745128398747fa762b992-20200515
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <stanley.chu@mediatek.com>)
+        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
+        with ESMTP id 1287260482; Fri, 15 May 2020 15:37:16 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs02n2.mediatek.inc (172.21.101.101) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Fri, 15 May 2020 15:37:06 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 15 May 2020 15:37:06 +0800
+Message-ID: <1589528228.3197.114.camel@mtkswgap22>
+Subject: Re: [PATCH v13 08/12] scsi: ufs: Add inline encryption support to
+ UFS
+From:   Stanley Chu <stanley.chu@mediatek.com>
+To:     Satya Tangirala <satyat@google.com>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-ext4@vger.kernel.org>,
+        "Barani Muthukumaran" <bmuthuku@qti.qualcomm.com>,
+        Kuohong Wang <kuohong.wang@mediatek.com>,
+        Kim Boojin <boojin.kim@samsung.com>
+Date:   Fri, 15 May 2020 15:37:08 +0800
+In-Reply-To: <20200514003727.69001-9-satyat@google.com>
+References: <20200514003727.69001-1-satyat@google.com>
+         <20200514003727.69001-9-satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
 MIME-Version: 1.0
-In-Reply-To: <20200515041916.GE16070@bombadil.infradead.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.166.215.55]
-X-CFilter-Loop: Reflected
+X-TM-SNTS-SMTP: 3162AC34A7748C1611374E99FEE9C8C991AB3926776566336456D27B7D911DA92000:8
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020/5/15 12:19, Matthew Wilcox wrote:
-> On Thu, May 07, 2020 at 03:50:57PM +0800, Zhen Lei wrote:
->> +++ b/block/blk-settings.c
->> @@ -150,7 +150,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
->>  	unsigned int max_sectors;
->>  
->>  	if ((max_hw_sectors << 9) < PAGE_SIZE) {
->> -		max_hw_sectors = 1 << (PAGE_SHIFT - 9);
->> +		max_hw_sectors = PAGE_SECTORS;
-> 
-> Surely this should be:
-> 
-> 	if (max_hw_sectors < PAGE_SECTORS) {
-> 		max_hw_sectors = PAGE_SECTORS;
-> 
-> ... no?
-
-I've noticed this place before. "(max_hw_sectors << 9) < PAGE_SIZE" can also make sure
-that max_hw_sectors is not too large, that means (max_hw_sectors << 9) may overflow.
-
-> 
->> -	page = read_mapping_page(mapping,
->> -			(pgoff_t)(n >> (PAGE_SHIFT - 9)), NULL);
->> +	page = read_mapping_page(mapping, (pgoff_t)sectors_to_npage(n), NULL);
-> 
-> ... again, get the type right, and you won't need the cast.
-OK, I'll consider it.
-
-> 
-> 
-> .
-> 
+SGkgU2F0eWEsDQoNCk9uIFRodSwgMjAyMC0wNS0xNCBhdCAwMDozNyArMDAwMCwgU2F0eWEgVGFu
+Z2lyYWxhIHdyb3RlOg0KPiBXaXJlIHVwIHVmc2hjZC5jIHdpdGggdGhlIFVGUyBDcnlwdG8gQVBJ
+LCB0aGUgYmxvY2sgbGF5ZXIgaW5saW5lDQo+IGVuY3J5cHRpb24gYWRkaXRpb25zIGFuZCB0aGUg
+a2V5c2xvdCBtYW5hZ2VyLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogU2F0eWEgVGFuZ2lyYWxhIDxz
+YXR5YXRAZ29vZ2xlLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFN0YW5sZXkgQ2h1IDxzdGFubGV5LmNo
+dUBtZWRpYXRlay5jb20+DQoNClRoYW5rcyBTYXR5YSBhbmQgRXJpYyBzbyBtdWNoIHRvIG1ha2Ug
+aW5saW5lIGVuY3J5cHRpb24gdXBzdHJlYW1lZC4NCg0KSSB3aWxsIHByb3ZpZGUgZXNzZW50aWFs
+IE1lZGlhVGVrIHZvcHMgcGF0Y2ggdG8gYWRvcHQgdGhpcyBmcmFtZXdvcmsNCnNvb24uDQoNClRo
+YW5rcywNClN0YW5sZXkgQ2h1DQoNCg0K
 
