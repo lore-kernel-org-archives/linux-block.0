@@ -2,80 +2,141 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D144DC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 14:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17534C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:11:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDA1020671
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 14:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC3B8207C3
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:11:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbgEPOKa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 10:10:30 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47116 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726266AbgEPOKa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 10:10:30 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 3CD3BACB1;
-        Sat, 16 May 2020 14:10:31 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 3/3] bcache-tools: convert writeback to writethrough mode for zoned backing device
-Date:   Sat, 16 May 2020 22:09:40 +0800
-Message-Id: <20200516140940.101190-4-colyli@suse.de>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200516140940.101190-1-colyli@suse.de>
-References: <20200516140940.101190-1-colyli@suse.de>
+        id S1726727AbgEPPLp convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 11:11:45 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:34984 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727111AbgEPPLp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 May 2020 11:11:45 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-182-psAgggZzN62zzCab8iGYhQ-1; Sat, 16 May 2020 16:11:41 +0100
+X-MC-Unique: psAgggZzN62zzCab8iGYhQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Sat, 16 May 2020 16:11:40 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Sat, 16 May 2020 16:11:40 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+CC:     Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>
+Subject: RE: [PATCH 27/33] sctp: export sctp_setsockopt_bindx
+Thread-Topic: [PATCH 27/33] sctp: export sctp_setsockopt_bindx
+Thread-Index: AQHWKsxNyiOODFVfBEqdWGEpseVc56iq0duQ
+Date:   Sat, 16 May 2020 15:11:40 +0000
+Message-ID: <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+References: <20200514062820.GC8564@lst.de>
+ <20200513062649.2100053-1-hch@lst.de> <20200513062649.2100053-28-hch@lst.de>
+ <20200513180058.GB2491@localhost.localdomain>
+ <129070.1589556002@warthog.procyon.org.uk>
+In-Reply-To: <129070.1589556002@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently bcache does not support writeback cache mode for zoned device
-as backing device.
+From: David Howells
+> Sent: 15 May 2020 16:20
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+> > > The advantage on using kernel_setsockopt here is that sctp module will
+> > > only be loaded if dlm actually creates a SCTP socket.  With this
+> > > change, sctp will be loaded on setups that may not be actually using
+> > > it. It's a quite big module and might expose the system.
+> >
+> > True.  Not that the intent is to kill kernel space callers of setsockopt,
+> > as I plan to remove the set_fs address space override used for it.
+> 
+> For getsockopt, does it make sense to have the core kernel load optval/optlen
+> into a buffer before calling the protocol driver?  Then the driver need not
+> see the userspace pointer at all.
+> 
+> Similar could be done for setsockopt - allocate a buffer of the size requested
+> by the user inside the kernel and pass it into the driver, then copy the data
+> back afterwards.
 
-If the backing device is zoned device, and cache mode is explicitly set
-to writeback mode, a information will be print to terminal,
-  "Zoned device <device name> detected: convert to writethrough mode."
-Then the cache mode will be automatically converted to writethrough,
-which is the default cache mode of bcache-tools.
+Yes, it also simplifies all the compat code.
+And there is a BPF test in setsockopt that also wants to
+pass on a kernel buffer.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- make.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+I'm willing to sit and write the patch.
+Quoting from a post I made later on Friday.
 
-diff --git a/make.c b/make.c
-index c1090a6..c5658ba 100644
---- a/make.c
-+++ b/make.c
-@@ -378,6 +378,19 @@ static void write_sb(char *dev, unsigned int block_size,
- 		SET_BDEV_CACHE_MODE(&sb, writeback ?
- 			CACHE_MODE_WRITEBACK : CACHE_MODE_WRITETHROUGH);
- 
-+		/*
-+		 * Currently bcache does not support writeback mode for
-+		 * zoned device as backing device. If the cache mode is
-+		 * explicitly set to writeback, automatically convert to
-+		 * writethough mode.
-+		 */
-+		if (is_zoned_device(dev) &&
-+		    BDEV_CACHE_MODE(&sb) == CACHE_MODE_WRITEBACK) {
-+			printf("Zoned device %s detected: convert to writethrough mode.\n",
-+				dev);
-+			SET_BDEV_CACHE_MODE(&sb, CACHE_MODE_WRITETHROUGH);
-+		}
-+
- 		if (data_offset != BDEV_DATA_START_DEFAULT) {
- 			sb.version = BCACHE_SB_VERSION_BDEV_WITH_OFFSET;
- 			sb.data_offset = data_offset;
--- 
-2.25.0
+Basically:
+
+This patch sequence (to be written) does the following:
+
+Patch 1: Change __sys_setsockopt() to allocate a kernel buffer,
+         copy the data into it then call set_fs(KERNEL_DS).
+         An on-stack buffer (say 64 bytes) will be used for
+         small transfers.
+
+Patch 2: The same for __sys_getsockopt().
+
+Patch 3: Compat setsockopt.
+
+Patch 4: Compat getsockopt.
+
+Patch 5: Remove the user copies from the global socket options code.
+
+Patches 6 to n-1; Remove the user copies from the per-protocol code.
+
+Patch n: Remove the set_fs(KERNEL_DS) from the entry points.
+
+This should be bisectable.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
