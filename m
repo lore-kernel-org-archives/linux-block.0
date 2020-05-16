@@ -2,138 +2,136 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB16C433E2
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A847EC433E3
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:37:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DE0620727
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:37:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84306207CB
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:37:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RnggIlJM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W5o9sYz6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727011AbgEPPhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 11:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
+        id S1727772AbgEPPhV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 11:37:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726695AbgEPPhB (ORCPT
+        with ESMTP id S1727082AbgEPPhT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 11:37:01 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E25CC061A0C;
-        Sat, 16 May 2020 08:37:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TG5YZgmRlXVS7HvhJz7DOFxKZzjqL5DT1HxTsi4ato4=; b=RnggIlJMvxkkVJkInT4pqpaVSA
-        SmN+fQmJr6rXEhoA27zDDtoVe3MfLbqyOGnjbFroFdUEa2bz7T8LXqJhdZ04Kn8zUaw7zqnqucvEE
-        jylJg+5o3OTrPcU/9WnNB5DHJG6s2r/4zP/X7rBAVxQdC6M19CKb7CjJPN7ckvsf+3VEUSWXTjPOs
-        h4KyUBqEslvU/z84GxRvc0uH9xKOs7/moDDDKZUR3/JC6le8XeM7SlwM6eCF1D2ew/AfzjZ81WeGR
-        TID2vSDI6gItLhZe+n8N/K+Igbx6wbsz1MCCu7X4o5NOmt5PKestOUG7qfbgkfaJZ9h4Kw4hb2rBr
-        xNF175SA==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jZyrs-000842-U1; Sat, 16 May 2020 15:36:52 +0000
-Date:   Sat, 16 May 2020 08:36:52 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     'David Howells' <dhowells@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>
-Subject: Re: [Ocfs2-devel] [PATCH 27/33] sctp: export sctp_setsockopt_bindx
-Message-ID: <20200516153652.GM16070@bombadil.infradead.org>
-References: <20200514062820.GC8564@lst.de>
- <20200513062649.2100053-1-hch@lst.de>
- <20200513062649.2100053-28-hch@lst.de>
- <20200513180058.GB2491@localhost.localdomain>
- <129070.1589556002@warthog.procyon.org.uk>
- <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+        Sat, 16 May 2020 11:37:19 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1CCC05BD09;
+        Sat, 16 May 2020 08:37:18 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id g1so5344888ljk.7;
+        Sat, 16 May 2020 08:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=hY+h+hQNft22sbR2GRHdulgy1g8os6lzLdmN2sCZ1lE=;
+        b=W5o9sYz66CM1jaHftKzu53qc4tndJdJyEpks307TEOIhx05twGZL58yXzc2rm/fmF3
+         gY+hiG81x5eadB2JrGXiyQ5Pq9PAXhWZofEox+oFkF/7Bn+lejFkpC4rLVPpJ+nPmh43
+         uaigifY9LwaZYHMqzEfUPVFF8mVByFQuvsQ2aPip/YUZh6H7pCeMxsI5Q9R1tco0uwrk
+         sy2C4dM/p6PSHVmiQt2LqUeXks8DkEoh8SBfwUKf5Hb/8Kjyd/cALFqIJw2s8rMOpfLq
+         HngheLBsMaWMVMEAYbcsaeT40D1K3bT/1pwCQDOaLHzmJmCDklXf+rfs+bUp0Hw7oCZT
+         GowA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=hY+h+hQNft22sbR2GRHdulgy1g8os6lzLdmN2sCZ1lE=;
+        b=lzV85Z9YK6LtsbMB3HhgxWxa4Jrp6oZw/r0Q6SGID2MixM+leUj4KHvrlxjbO9MG6y
+         OZIifyR9EdNc+Yje/6pLU05rK29ajelts7aPjdkzByIJGFnCQIdIc+8je4oIEbVojeCZ
+         obJMy/hiEG91mWEx1t2vmgGhff7RDKKDedC5UqIC1q4UQXRKrzTwKHx4hSBVljeyTczk
+         T2wDt3EWALfiVddY0kw+3YHfvbhMR5sThzgxlXYN+8KJWXGgtv1L5yfHxFjHL9pyaULi
+         T+aeOWR/b4IYu/6ulzQ1d7U7J4k8lYhLxCFVCv/uXWllAqQeCxqdeUnbYcNkYn5ng5Ou
+         7X7Q==
+X-Gm-Message-State: AOAM5313RNTLMFwAgkoCF6VeDxZ9l+H6BcbQHkuwUM8x5bLSPkI3hldO
+        ELoD2vBJq4CSyORUpCXzi0uTzHlJ
+X-Google-Smtp-Source: ABdhPJyf4prqs2e1qsAwyKo3RPBy4DbONUEjYYWDpAq4jeUWnpTlFo7a2DK8Y1jb12R6CVG+yCAcfg==
+X-Received: by 2002:a2e:8997:: with SMTP id c23mr845199lji.22.1589643437449;
+        Sat, 16 May 2020 08:37:17 -0700 (PDT)
+Received: from localhost.localdomain (ppp91-78-208-152.pppoe.mtu-net.ru. [91.78.208.152])
+        by smtp.gmail.com with ESMTPSA id a12sm2845356ljj.64.2020.05.16.08.37.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2020 08:37:16 -0700 (PDT)
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Stephen Warren <swarren@wwwdotorg.org>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>,
+        =?UTF-8?q?Nils=20=C3=96stlund?= <nils@naltan.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Steve McIntyre <steve@einval.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-efi <linux-efi@vger.kernel.org>
+Subject: [PATCH v5 1/6] mmc: core: Add raw_boot_mult field to mmc_ext_csd
+Date:   Sat, 16 May 2020 18:36:39 +0300
+Message-Id: <20200516153644.13748-2-digetx@gmail.com>
+X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200516153644.13748-1-digetx@gmail.com>
+References: <20200516153644.13748-1-digetx@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 16, 2020 at 03:11:40PM +0000, David Laight wrote:
-> From: David Howells
-> > Sent: 15 May 2020 16:20
-> > Christoph Hellwig <hch@lst.de> wrote:
-> > 
-> > > > The advantage on using kernel_setsockopt here is that sctp module will
-> > > > only be loaded if dlm actually creates a SCTP socket.  With this
-> > > > change, sctp will be loaded on setups that may not be actually using
-> > > > it. It's a quite big module and might expose the system.
-> > >
-> > > True.  Not that the intent is to kill kernel space callers of setsockopt,
-> > > as I plan to remove the set_fs address space override used for it.
-> > 
-> > For getsockopt, does it make sense to have the core kernel load optval/optlen
-> > into a buffer before calling the protocol driver?  Then the driver need not
-> > see the userspace pointer at all.
-> > 
-> > Similar could be done for setsockopt - allocate a buffer of the size requested
-> > by the user inside the kernel and pass it into the driver, then copy the data
-> > back afterwards.
-> 
-> Yes, it also simplifies all the compat code.
-> And there is a BPF test in setsockopt that also wants to
-> pass on a kernel buffer.
-> 
-> I'm willing to sit and write the patch.
-> Quoting from a post I made later on Friday.
-> 
-> Basically:
-> 
-> This patch sequence (to be written) does the following:
-> 
-> Patch 1: Change __sys_setsockopt() to allocate a kernel buffer,
->          copy the data into it then call set_fs(KERNEL_DS).
->          An on-stack buffer (say 64 bytes) will be used for
->          small transfers.
-> 
-> Patch 2: The same for __sys_getsockopt().
-> 
-> Patch 3: Compat setsockopt.
-> 
-> Patch 4: Compat getsockopt.
-> 
-> Patch 5: Remove the user copies from the global socket options code.
-> 
-> Patches 6 to n-1; Remove the user copies from the per-protocol code.
-> 
-> Patch n: Remove the set_fs(KERNEL_DS) from the entry points.
-> 
-> This should be bisectable.
+In order to support parsing of NVIDIA Tegra Partition Table format, we
+need to know the BOOT_SIZE_MULT value of the Extended CSD register because
+NVIDIA's bootloader linearizes the boot0/boot1/main partitions into a
+single virtual space, and thus, all partition addresses are shifted by
+the size of boot0 + boot1 partitions.
 
-I appreciate your dedication to not publishing the source code to
-your kernel module, but Christoph's patch series is actually better.
-It's typesafe rather than passing void pointers around.
+Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+---
+ drivers/mmc/core/mmc.c   | 2 ++
+ include/linux/mmc/card.h | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index 4203303f946a..112edfb1eb1d 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -417,6 +417,8 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
+ 		ext_csd[EXT_CSD_ERASE_TIMEOUT_MULT];
+ 	card->ext_csd.raw_hc_erase_grp_size =
+ 		ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE];
++	card->ext_csd.raw_boot_mult =
++		ext_csd[EXT_CSD_BOOT_MULT];
+ 	if (card->ext_csd.rev >= 3) {
+ 		u8 sa_shift = ext_csd[EXT_CSD_S_A_TIMEOUT];
+ 		card->ext_csd.part_config = ext_csd[EXT_CSD_PART_CONFIG];
+diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
+index 7d46411ffaa2..cd6b58b66010 100644
+--- a/include/linux/mmc/card.h
++++ b/include/linux/mmc/card.h
+@@ -109,6 +109,7 @@ struct mmc_ext_csd {
+ 	u8			raw_hc_erase_gap_size;	/* 221 */
+ 	u8			raw_erase_timeout_mult;	/* 223 */
+ 	u8			raw_hc_erase_grp_size;	/* 224 */
++	u8			raw_boot_mult;		/* 226 */
+ 	u8			raw_sec_trim_mult;	/* 229 */
+ 	u8			raw_sec_erase_mult;	/* 230 */
+ 	u8			raw_sec_feature_support;/* 231 */
+-- 
+2.26.0
+
