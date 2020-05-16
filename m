@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3C9C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D78C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C10B0206D8
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 977E8206D8
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgEPQYR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 12:24:17 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:46461 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726206AbgEPQYQ (ORCPT
+        id S1726237AbgEPQZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 12:25:19 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37220 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726206AbgEPQZT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 12:24:16 -0400
-Received: by mail-pl1-f179.google.com with SMTP id b12so2211822plz.13
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 09:24:16 -0700 (PDT)
+        Sat, 16 May 2020 12:25:19 -0400
+Received: by mail-pf1-f193.google.com with SMTP id y198so968743pfb.4
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 09:25:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=0DIUX5VNWSjEw0+UGqOxL8pM2LN76PJgsXLJf8Y5c/k=;
-        b=M4SEHChcnBont7l4wKsbgoeFkvHsbIqD+8emrCLrHR1YJyiCLT7ZGgqT8g154aRi8S
-         wx2MhsTAjkPzY2iH32MmribS1K/AOJXy1ndHb8oBHXMmkN13sFOTsf5dYZocmtbSnJAH
-         R0C47MHJSw/IAoGRetQrHY/JHeb95OhqMw5KZHOolQYPJoGAjp9mgL8KxsNGfUzvqOdS
-         iregFStOkmoIVDGB2IG83Jta0x2BhG+UreqGPrMDJLf3KPlOKP1rogpAORE+nx+deECZ
-         Z4aBgb8NdV/0whdxjT0y5L3EUcdprW0hZgjEYjO4RdpHF/nWEozfssFpUG70xjPYVXOJ
-         0Sqw==
-X-Gm-Message-State: AOAM531cbY3WT5o2XkS6pfEEHSlo/WvDqe+W2WZGwFEzCPMveMRZe4YI
-        lEcqfSf1GmDxhadJcK9Bz0lmZhYm
-X-Google-Smtp-Source: ABdhPJwymYnDt+nC9pNSClcSp5ILgBJLQKrcqDOUCGJ5FRScm4yk8TPI5EJEvdRZhjk60EQTPMW61w==
-X-Received: by 2002:a17:902:2:: with SMTP id 2mr8459952pla.311.1589646255258;
-        Sat, 16 May 2020 09:24:15 -0700 (PDT)
+        bh=HDCOMX++ziWprbuwcYpipOGg9IcpHZJkMIMnlxi6f30=;
+        b=VVNncRffQjGOHAtW4kV6dB574EAszdRWYmuIsHAyvD+YBQqU4vzIfpz8ba9gOcePUZ
+         /NiSrLkwHKwxQOsIVZZj9yn3bfxTbQuO/bz27kbmcnU9Us9yoVkS8roZh5nzjz1oWyRO
+         RXhG5j8dWzwktYEWSPy/SNspbkTkM0zYJgdCm31L+cbohLrRLd2QWL+RJ3vhfc94Ni5S
+         b/rC4RyLBtHkz5JJMBHfl9Nh5z79ULrW+zgTJa/KN36LJuaFcn3dLDI3ainZ9ZE1CJfJ
+         nwWzNfDIEokVnfokxqjmqB38/vD1rLx/ytqjZ3hX1e7wYQR1gqefWtbVUJ0Kq0UwCaGY
+         ZGaA==
+X-Gm-Message-State: AOAM533fTelzH9EL0Wy3O0VFXhB2ZPD8G/Nqmpxv6FEsTAiCmGrKzqZq
+        +F6YDFUsbrQogXrMTFEXCXw9/0P6
+X-Google-Smtp-Source: ABdhPJymEzqeG2OBywe2PgpfD9LtsOOaQlJFPdzxWdF7V0YTI8f4rLPDOib9ai8ipL8hvevtX3hPvQ==
+X-Received: by 2002:aa7:9e52:: with SMTP id z18mr9117840pfq.57.1589646318329;
+        Sat, 16 May 2020 09:25:18 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:97a:fd5b:e2c1:c090? ([2601:647:4000:d7:97a:fd5b:e2c1:c090])
-        by smtp.gmail.com with ESMTPSA id w2sm4255275pja.53.2020.05.16.09.24.13
+        by smtp.gmail.com with ESMTPSA id gq19sm462066pjb.55.2020.05.16.09.25.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 May 2020 09:24:14 -0700 (PDT)
-Subject: Re: [PATCH 1/4] blk-mq: move the call to blk_queue_enter_live out of
- blk_mq_get_request
+        Sat, 16 May 2020 09:25:17 -0700 (PDT)
+Subject: Re: [PATCH 2/4] blk-mq: remove a pointless queue enter pair in
+ blk_mq_alloc_request
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
 References: <20200516153430.294324-1-hch@lst.de>
- <20200516153430.294324-2-hch@lst.de>
+ <20200516153430.294324-3-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -72,12 +72,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <4a63a828-21e6-77f7-2988-ad85349eb2e2@acm.org>
-Date:   Sat, 16 May 2020 09:24:13 -0700
+Message-ID: <050f2ec1-5bbf-20a3-c76b-8aae1cb72db5@acm.org>
+Date:   Sat, 16 May 2020 09:25:16 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200516153430.294324-2-hch@lst.de>
+In-Reply-To: <20200516153430.294324-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,7 +87,6 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-16 08:34, Christoph Hellwig wrote:
-> Move the blk_queue_enter_live calls into the callers, where they can
-> successively be cleaned up.
+> No need for two queue references.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
