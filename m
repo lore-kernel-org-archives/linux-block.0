@@ -2,123 +2,90 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BD4C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 05:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A78CC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 07:40:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3572E206D4
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 05:50:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4DMnOfE"
+	by mail.kernel.org (Postfix) with ESMTP id DEE14206F4
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 07:40:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725934AbgEPFu1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 01:50:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21624 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725275AbgEPFu1 (ORCPT
+        id S1725934AbgEPHkq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 03:40:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:50341 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725867AbgEPHkp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 01:50:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589608225;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1U+2TT+KSyuB8+J8otdmfu38tcV5l3t0X/8rEiqc8FA=;
-        b=N4DMnOfE/PwqJhkG7G4QiguV92563AfcEYb+1sQRhSuAwSgudPYNbKpVt7BQnQI/WH2j7n
-        hbwwFEI5RBUOEU7VsuY1FIGhjgrjeLxYbTmgeXBsfIqhRSzPGrPRegXigylt+DEFcvv0ah
-        ILJXeOaU38km1jm8I2HIsOyrqV6C0HU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-O9lTJ3GLPui2cZwHYbKFlA-1; Sat, 16 May 2020 01:50:23 -0400
-X-MC-Unique: O9lTJ3GLPui2cZwHYbKFlA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FCCA805721;
-        Sat, 16 May 2020 05:50:22 +0000 (UTC)
-Received: from T590 (ovpn-12-95.pek2.redhat.com [10.72.12.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D48067053C;
-        Sat, 16 May 2020 05:50:16 +0000 (UTC)
-Date:   Sat, 16 May 2020 13:50:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org
-Subject: Re: [PATCH 4/5] block: Fix zero_fill_bio()
-Message-ID: <20200516055012.GA3393@T590>
-References: <20200516001914.17138-1-bvanassche@acm.org>
- <20200516001914.17138-5-bvanassche@acm.org>
+        Sat, 16 May 2020 03:40:45 -0400
+Received: from mail-qt1-f174.google.com ([209.85.160.174]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1N2Ujn-1j5IkW28WV-013zOi for <linux-block@vger.kernel.org>; Sat, 16 May
+ 2020 09:40:43 +0200
+Received: by mail-qt1-f174.google.com with SMTP id v4so4050870qte.3
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 00:40:43 -0700 (PDT)
+X-Gm-Message-State: AOAM5339O+QFLvC48ZNFH+McRFzpwxnB2ZWywz8U78/RbrbmfFa/tkuu
+        6mFwBHtkDLYDiFJvEw4F6gR1o5SzXlhmvh+2AYs=
+X-Google-Smtp-Source: ABdhPJxcEfJU96uHck57iuTGtaWAKQJ4BTxrNfthc1LMg0oXfgP7f3pwOD+atrD1szFtyWWYd5iHedeHHhTBMq0MRNc=
+X-Received: by 2002:ac8:6914:: with SMTP id e20mr7226813qtr.7.1589614842445;
+ Sat, 16 May 2020 00:40:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200516001914.17138-5-bvanassche@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20200516001914.17138-1-bvanassche@acm.org> <20200516001914.17138-2-bvanassche@acm.org>
+In-Reply-To: <20200516001914.17138-2-bvanassche@acm.org>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Sat, 16 May 2020 09:40:26 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a1FFgWp2P9tuaaBLtLy5KzxekuL1oVNsJuJQQY_Cism2A@mail.gmail.com>
+Message-ID: <CAK8P3a1FFgWp2P9tuaaBLtLy5KzxekuL1oVNsJuJQQY_Cism2A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] block: Fix type of first compat_put_{,u}long() argument
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:TbfH9GInwxIfTncVPR0YiJhphAPI8SFM/M3+ncORho/Wu+fBaQb
+ RXADQTPiRMQhd780rY52pQQSQgZ2rWmlm6Jf/g+lNowQOiYt4SbT1X/yvMHcdUwLkydDB/4
+ Ui14r8iZlST41Gf2ASj6BDFPrJn76F9xbAP8z3Ah2WDlg4lAA52B/1OHDTLRb+zTJd6rAI5
+ 6J4aSm9JKA0EfO+4xnZXg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QCnZWrxhXy4=:nLKgjzRpRseTrC2WcEQP3R
+ J9DdSoXs8tCIWlaTkrr5ziXswBSAesEohnA4Ttl2+usQ3B51cw0XQHwjQjDDP0tEBIQSXGWUv
+ AgLAV16ky/IB+tWg3JQAoG93dvoV8/12CYP1kMnTwzf386uNfgFBPP/JGlpLbEf6PGm6RB7xJ
+ MG4QWDKZ100o3nq/8DOgaZw5io1BcKOveIjpa/LZmNebhTbdNiCAKCLCSdqJEa/xycqfg8fd/
+ aG88CCfB54CLwJEFOvGe/dkrxPT0FMxDnR+eIxJ2yDWFwNTdfcK/eTZDbnioURKXcHZMu8ctP
+ 4iBhPGraK9K4ZLD7y1OGYdW3TJnPCpFDg3Ah9gtDo1OL3dsez1dIhhSckzKhwghAnbdocyB8Q
+ AmIRZiKiabeuTdiFxv1xd1nrp3XoyXvCdWREInyl+zp5X1mjo9z5lLufa9fCq96jZFWpy6PWr
+ TvhYYm3GT/oprlZ3lod6n/v2sgTJZvn/s6p0P27jcyUiyW9FeNwMoJ5HaAJhCXOji3KJqsqei
+ mRmyelbZB4IELypzaJlJoEu2mTAbqIxItjQ4zFwoZiUldokd5IJkfA/TMVNpQhgbXPCBuxd/h
+ QCzGdYJTtpba1PKCjLJMCpBvU/VCAnK2SMySEuop9IxRLQNxFCcnlqW6nrJgwvUtA22q2swR1
+ F8TM+QyXGFippvnFBdEed98RMIAdvWWHvl5KcpT6MWVn2gHEx7VOB8/ADWwggODMTjcAwnHSn
+ GaWz4ln0VJtKdC6RlmG99aey3wqY9VZj8OpjwY7ZS5S2Gt2/aRZ04bNbVegDClfF6GqkWxeeD
+ tH0iCqHV7eQTuQjTFvKiMKu75kJrrOA5YBYsvfhMYonPjVmkPI=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 15, 2020 at 05:19:13PM -0700, Bart Van Assche wrote:
-> Multiple block drivers use zero_fill_bio() to zero-initialize the data
-> buffer used for read operations. Make sure that all pages are zeroed
-> instead of only the first if one or more multi-page bvecs are used to
-> describe the data buffer.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: stable@vger.kernel.org
+On Sat, May 16, 2020 at 2:19 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> This patch fixes the following sparse warnings:
+>
+> block/ioctl.c:209:16: warning: incorrect type in argument 1 (different address spaces)
+> block/ioctl.c:209:16:    expected void const volatile [noderef] <asn:1> *
+> block/ioctl.c:209:16:    got signed int [usertype] *argp
+> block/ioctl.c:214:16: warning: incorrect type in argument 1 (different address spaces)
+> block/ioctl.c:214:16:    expected void const volatile [noderef] <asn:1> *
+> block/ioctl.c:214:16:    got unsigned int [usertype] *argp
+> block/ioctl.c:666:40: warning: incorrect type in argument 1 (different address spaces)
+> block/ioctl.c:666:40:    expected signed int [usertype] *argp
+> block/ioctl.c:666:40:    got void [noderef] <asn:1> *argp
+> block/ioctl.c:672:41: warning: incorrect type in argument 1 (different address spaces)
+> block/ioctl.c:672:41:    expected unsigned int [usertype] *argp
+> block/ioctl.c:672:41:    got void [noderef] <asn:1> *argp
+>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Fixes: 9b81648cb5e3 ("compat_ioctl: simplify up block/ioctl.c")
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/bio.c         | 27 ++++++++++++++++++++++-----
->  include/linux/bio.h |  1 +
->  2 files changed, 23 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 1594804fe8bc..48fcafbdae70 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -527,17 +527,34 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
->  }
->  EXPORT_SYMBOL(bio_alloc_bioset);
->  
-> +void zero_fill_bvec(const struct bio_vec *bvec)
-> +{
-> +	struct page *page = bvec->bv_page;
-> +	u32 offset = bvec->bv_offset;
-> +	u32 left = bvec->bv_len;
-> +
-> +	while (left) {
-> +		u32 len = min_t(u32, left, PAGE_SIZE - offset);
-> +		void *kaddr;
-> +
-> +		kaddr = kmap_atomic(page);
-> +		memset(kaddr + offset, 0, len);
-> +		flush_dcache_page(page);
-> +		kunmap_atomic(kaddr);
-> +		page++;
-> +		left -= len;
-> +		offset = 0;
-> +	}
-> +}
-> +EXPORT_SYMBOL(zero_fill_bvec);
-> +
->  void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
->  {
-> -	unsigned long flags;
->  	struct bio_vec bv;
->  	struct bvec_iter iter;
->  
->  	__bio_for_each_segment(bv, bio, iter, start) {
 
-The 'bv' from __bio_for_each_segment() is single page bvec, and so far
-only [__]bio_for_each_bvec iterates over multi-page bvec.
+Thanks for the fix!
 
-So nothing to be fixed and this patch isn't necessary.
-
-Thanks, 
-Ming
-
+Acked-by: Arnd Bergmann <arnd@arndb.de>
