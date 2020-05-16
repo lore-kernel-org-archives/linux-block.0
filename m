@@ -2,91 +2,68 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77A1C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 20:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51C4C433E2
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 20:30:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 836AF206D8
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 20:30:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WEGj/zLP"
+	by mail.kernel.org (Postfix) with ESMTP id 80E7E206D8
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 20:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589661011;
+	bh=K4kskH6ECBIit8dHw0hPLwLzRSuDES8NnC2gP8xYPnU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=gK2H/I5hpVDIEfFEJ1LrI5fQBs1jjOvxajkfPOgZ0Ij3o3ZoES5uKx9WND/9Yy68l
+	 KxK0HRc2sX3hztV+M10Yz3+rBGq5DPpRFNDyWFzmLmdyzg1ZY/PwpVY5LN0iPi5YYb
+	 7LNkQAZDU9oQEhF9ehSLCq6rDwkf4LPTzo4hcuKs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbgEPUaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 16:30:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34006 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726803AbgEPUaE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1726674AbgEPUaK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 16:30:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51840 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726422AbgEPUaE (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Sat, 16 May 2020 16:30:04 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC2FC061A0C
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 13:30:03 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id q24so2725730pjd.1
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 13:30:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Er5dBwlInT6MWrK0ZEK7+b/MKqa/cnSWtsupyCyxpas=;
-        b=WEGj/zLPzOmJWCTX9Zki1BwLdieUcpU3BIHc0fchh2Qiggio8QjSjDcelyHy53vTdD
-         RqDNQggmQsSq1Sfq4HQS2axWjfEBTtZ4cKAj5VR0OyxuVxFDvrmVl2WRuuplfaAY1cVe
-         WFGWDREe3RRFyrS3569xAs/zqtbtSykNCMGnCBpLIPXXYRCbgaDX84hiTiZ4XNGHm5VT
-         sTIZeP2yYoK0ldJXHQUME3csLhZ0pDeZOQ8wI7Gr3ovuTwz86uyT09Dy56xyj0lVSa/+
-         PLsqeoO4GzrGeW1LsSmt8HY/BzamyA5ZyLv90//BLLFeT6553u8yJpH0FQ02I0UiMb/Y
-         eD2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Er5dBwlInT6MWrK0ZEK7+b/MKqa/cnSWtsupyCyxpas=;
-        b=nxmrw34gfErkSm7jYE5lLq+5PKiW7NFwsn2bZOhGtqt7g7iu4W+96DRGepswLKghRw
-         ZU2cmEIwqhJndC7iQrsL7WwD31wnr0HZn0aW8NZI1yTWzzmfOQUFrGHK0pMLypNCMAWU
-         dSAoftBlD1kbXP7Qisa38KedPfP+T4MARhQbDlK06Z6QHwOcw6EgTGKxdyrfDEPsK5uD
-         DgzjlPOqDBJJHdDU1ak5WryMviZlo+6uGyE+IzmedF/qo7rG6qxoZcxVZEraIJ3O1ovl
-         6jdLjyphJ9XQXYJN3cQM3ZGKAXdItrfTqwJyn0SiDZybX4Mb4x97jpXkpW9N1c6+Qn7f
-         dcPQ==
-X-Gm-Message-State: AOAM530ftPa9ehouWiLKhnmebvzsvtTCQsKTMo/uhhI5OD1E+e5Vt2Ca
-        gf4+Ni5aj2DnGeSSQaUCUgsUdwk/GGU=
-X-Google-Smtp-Source: ABdhPJygwLUWbaIn5xagSeDj0HnLdX6VH8/3vxCCz/UU3JYJrcAsNqRnjH17Gat5ujr2sJhRlqJZqw==
-X-Received: by 2002:a17:90a:7486:: with SMTP id p6mr10426198pjk.62.1589661002985;
-        Sat, 16 May 2020 13:30:02 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:41fd:9201:9a30:5f75? ([2605:e000:100e:8c61:41fd:9201:9a30:5f75])
-        by smtp.gmail.com with ESMTPSA id m14sm4295837pgk.56.2020.05.16.13.30.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 May 2020 13:30:02 -0700 (PDT)
-Subject: Re: [PATCH] blktrace: Report pid with note messages
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <20200513160223.7855-1-jack@suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ffb07506-ffeb-111d-1969-bea3103c4953@kernel.dk>
-Date:   Sat, 16 May 2020 14:30:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200513160223.7855-1-jack@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Subject: Re: [GIT PULL] Block fixes for 5.7-rc6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589661003;
+        bh=K4kskH6ECBIit8dHw0hPLwLzRSuDES8NnC2gP8xYPnU=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=ToyPVpFZyZluLQdtTGem1DHz18WQ/Sfr+UXisTwPR7RZSG5hS0PDiGnqTfkFnk5R+
+         7WaiY7TY2EcnuHMIczbJiL71NGgUKeD5m5F11yRIuA+aftJbk9GwOmwgrWQuBrQNdN
+         slSTKKSmG3Ll0/e9WCFnPBSAlI7D0M94WN664Fwk=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <2e7f23d1-9c9f-81b2-067d-bc6762982701@kernel.dk>
+References: <2e7f23d1-9c9f-81b2-067d-bc6762982701@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2e7f23d1-9c9f-81b2-067d-bc6762982701@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.7-2020-05-16
+X-PR-Tracked-Commit-Id: 3948955397511ad5b68dc65fa11fad941d71d307
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3d1c1e5931ce45b3a3f309385bbc00c78e9951c6
+Message-Id: <158966100383.3231.377753862623389263.pr-tracker-bot@kernel.org>
+Date:   Sat, 16 May 2020 20:30:03 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/20 10:02 AM, Jan Kara wrote:
-> Currently informational messages within block trace do not have PID
-> information of the process reporting the message included. With BFQ it
-> is sometimes useful to have the information and there's no good reason
-> to omit the information from the trace. So just fill in pid information
-> when generating note message.
+The pull request you sent on Sat, 16 May 2020 14:22:17 -0600:
 
-Applied, thanks.
+> git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-16
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3d1c1e5931ce45b3a3f309385bbc00c78e9951c6
+
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
