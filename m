@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF02BC433E1
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 03:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9839BC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 03:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A70920657
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 03:20:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7489A20657
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 03:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589599231;
-	bh=M+ktMPS112XYqEPH32A6LyNk+vZmwg1qNOPTVnRFj08=;
+	s=default; t=1589599233;
+	bh=PHq+WZSrdEDTD/2glOikqgxPY0G8kXHOxpqxeBS4Wq8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uXiot3VVct74xe347OtBg4rnEM56lTsZB6o+yOyoKsuR7rig0rjmC7sOtfPGUqZfm
-	 lo3SGBiKKO39ncUAPacgpp2JkjjTBZvPwcLSVF9VNpLXtrF5loiwLgKQcK51eGZkZ1
-	 jqH2yMRgOoJhQLvYAZmcZqRmI0WNNtNps8INhx7k=
+	b=Bg49RhZ8nHKkIH8coxqMC+LGv8mN8QYKQ6EwWSasqd/uLg6CNlR/t8/PtGu6HFU6O
+	 3BLrFS3wpgWTKVzB8ZyNqPZ2nh5/sykXcOmFCGY3jMJbdBPTgNcYHzWTyS9ByfBbT1
+	 mfMMNGGrowyGH5qhZ7SH90Gmu0CPNBP8VEwhd+z8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728129AbgEPDUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 23:20:23 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45015 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728041AbgEPDUI (ORCPT
+        id S1728028AbgEPDUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 23:20:06 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:42301 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726290AbgEPDUE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 23:20:08 -0400
-Received: by mail-pl1-f193.google.com with SMTP id b8so1686318plm.11;
-        Fri, 15 May 2020 20:20:07 -0700 (PDT)
+        Fri, 15 May 2020 23:20:04 -0400
+Received: by mail-pl1-f195.google.com with SMTP id k19so1689852pll.9;
+        Fri, 15 May 2020 20:20:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WSjrRs+0uw9ZlSZjuW3x7w+Qi8+kmil3SD7+oVGrims=;
-        b=PXMBp90YZy9hdyqb7OsyGKERnhgpdRQoYUvE48W4O8IpBtwxGIpvUJL3qob1aOMsF8
-         o6d3SNnNuQn87JBdgxkkr1uuqY1XU9/p/MEUrzNhsOO+MaAjG5DF3shvrfNDdB2U+KYY
-         O/QQt5acOVM4k3Bq4b+ZHAcHqXjFyMmGhfExfzyhIv0iHtJ8bk6XWEHhG7e/ZkD/i1XM
-         BJryuh/VrtesvePhID/O0OfgrIKi37MToRxsnEgcuNIIl+Pj3SUi8aBVKS6NfW7kq1BD
-         ydHTbvf1zfN2PF3VJXE5VR7tZA8ar6uK2n45Y2DsTWiiNXjW5gftMq51N5BgFqpyTkyj
-         uMdw==
-X-Gm-Message-State: AOAM531BhGzdYnkcMMGrozQkUA5dULCDX9jXat6VariDsYBYOzWnzZhK
-        odnx1Jwzf3lsEJUY2ijwwPw=
-X-Google-Smtp-Source: ABdhPJzX3emfY2u5XlGWmWnMHz1FoWzaUTuwWxyn8o3ueiTdT13lL7oD1fI78RNo5dxjkInTLInT+A==
-X-Received: by 2002:a17:90a:1912:: with SMTP id 18mr6556766pjg.115.1589599207438;
-        Fri, 15 May 2020 20:20:07 -0700 (PDT)
+        bh=5R02k+n3cdjio+bit0SkkAOewNF+56MtF6LzxgE/Yc4=;
+        b=SxXw5Sz59WDOSmbDO38rqZBaI43VGqZibN5/OlZjwCIAKmtaNa5jktpkugtvgo8ZGo
+         Ux7t/crgJvXqMets4Y609k0U2+kghQVozOn5N9oULPRexmEMKiuDPO9phMqeNtvvnp2q
+         3jcFAwwcZO6bH1AyNwDWpvkBtEvkecPzlnYAv2T2QlhBAwNE0N+RZElpk21Y0I4EAQeJ
+         cfbwjqFxXy1dIWuEIoL8pCSaVzFbBwjOejz4g4Nl3jW2VlHZ1r7mKijH9TUBGlr60Kkz
+         UrB8EMknXBvBciDfgEbUo7G4qiO/noRdBolQWs87moS5QG/bWOqAM10oxjfBUePr/Jtk
+         Obxw==
+X-Gm-Message-State: AOAM533F5OULubmunh6bD9sNlbJZdfPhJ/RFrdOc/Kyi1OfndyS9d6NK
+        sGSw/nGj4cEW2y1xqXkbj8A=
+X-Google-Smtp-Source: ABdhPJxH1a/0+wYkeQjawqSViebcCCHDKk4gr7Y6Fd5IRIO2nQhXkOGRxo0KxGldWnfbVVdS506+0g==
+X-Received: by 2002:a17:902:7402:: with SMTP id g2mr6609838pll.241.1589599203778;
+        Fri, 15 May 2020 20:20:03 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id t22sm2578636pjs.1.2020.05.15.20.20.02
+        by smtp.gmail.com with ESMTPSA id e21sm2763562pga.71.2020.05.15.20.19.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 20:20:04 -0700 (PDT)
+        Fri, 15 May 2020 20:20:00 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id E0FF742309; Sat, 16 May 2020 03:19:59 +0000 (UTC)
+        id E676141D00; Sat, 16 May 2020 03:19:58 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -58,10 +58,11 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         akpm@linux-foundation.org
 Cc:     mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v5 7/7] loop: be paranoid on exit and prevent new additions / removals
-Date:   Sat, 16 May 2020 03:19:56 +0000
-Message-Id: <20200516031956.2605-8-mcgrof@kernel.org>
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v5 2/7] block: clarify context for gendisk / request_queue refcount increment helpers
+Date:   Sat, 16 May 2020 03:19:51 +0000
+Message-Id: <20200516031956.2605-3-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
 In-Reply-To: <20200516031956.2605-1-mcgrof@kernel.org>
 References: <20200516031956.2605-1-mcgrof@kernel.org>
@@ -72,37 +73,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Be pedantic on removal as well and hold the mutex.
-This should prevent uses of addition while we exit.
+Let us clarify the context under which the helpers to increment the
+refcount for the gendisk and request_queue can be called under. We
+make this explicit on the places where we may sleep with might_sleep().
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+We don't address the decrement context yet, as that needs some extra
+work and fixes, but will be addressed in the next patch.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/loop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/blk-core.c | 2 ++
+ block/genhd.c    | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 14372df0f354..54fbcbd930de 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2333,6 +2333,8 @@ static void __exit loop_exit(void)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e438c3b0815b..94216fa16a05 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -610,6 +610,8 @@ EXPORT_SYMBOL(blk_alloc_queue);
+  * @q: the request_queue structure to increment the refcount for
+  *
+  * Increment the refcount of the request_queue kobject.
++ *
++ * Context: Any context.
+  */
+ bool blk_get_queue(struct request_queue *q)
+ {
+diff --git a/block/genhd.c b/block/genhd.c
+index af910e6a0233..598bd32ad28c 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1017,11 +1017,15 @@ static ssize_t disk_badblocks_store(struct device *dev,
+  *
+  * This function gets the structure containing partitioning
+  * information for the given device @devt.
++ *
++ * Context: can sleep
+  */
+ struct gendisk *get_gendisk(dev_t devt, int *partno)
+ {
+ 	struct gendisk *disk = NULL;
  
- 	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
- 
-+	mutex_lock(&loop_ctl_mutex);
++	might_sleep();
 +
- 	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
- 	idr_destroy(&loop_index_idr);
+ 	if (MAJOR(devt) != BLOCK_EXT_MAJOR) {
+ 		struct kobject *kobj;
  
-@@ -2340,6 +2342,8 @@ static void __exit loop_exit(void)
- 	unregister_blkdev(LOOP_MAJOR, "loop");
- 
- 	misc_deregister(&loop_misc);
-+
-+	mutex_unlock(&loop_ctl_mutex);
- }
- 
- module_init(loop_init);
+@@ -1785,6 +1789,8 @@ EXPORT_SYMBOL(__alloc_disk_node);
+  *
+  * This increments the refcount for the struct gendisk, and the gendisk's
+  * fops module owner.
++ *
++ * Context: Any context.
+  */
+ struct kobject *get_disk_and_module(struct gendisk *disk)
+ {
 -- 
 2.26.2
 
