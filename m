@@ -2,233 +2,91 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303CCC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 18:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD58C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 18:44:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09D1E2065C
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 18:28:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lssXnj1x"
+	by mail.kernel.org (Postfix) with ESMTP id C6E0620727
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 18:44:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726527AbgEPS2O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 14:28:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43436 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726298AbgEPS2O (ORCPT
+        id S1726361AbgEPSo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 14:44:56 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34835 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbgEPSoz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 14:28:14 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3948EC061A0C
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 11:28:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oU6rRCh5x75ohhFZt98NCYSoL8c7BdnGMcbHyWF+3uo=; b=lssXnj1xRnJETNEMGjnSzE07Wp
-        ZI4iBARYLVF9EVfy1+MlbV7RDFScOJmZ2Aa0TXNXmDdoPYapUsAIUAntFZ6xzzcaL38Gm2LFZdSrV
-        By6sQ/U3kE7shI/KqVnXWIXmLPcsme2yzKEYuW8CLVYcvrih3xwqtfz+kWUb/lyabKBZIE4HWmFtR
-        r6z0IQk9oj1MqvhOXvETCks//GuhoM03uEdfVuMdc8qODcVR9Q+SNLDkFoogFJ47wkGXupJbZ5Nyn
-        6QXFvXDL4ERKz/PKCQJk4N2bDI4i+z4riBpITIOpEuDc9kFYxVJ/mzOzBKjivZKh2u6KJVbBpX/49
-        cz+eBEKw==;
-Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ja1Xh-0007oP-Oc; Sat, 16 May 2020 18:28:14 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
+        Sat, 16 May 2020 14:44:55 -0400
+Received: by mail-pl1-f195.google.com with SMTP id q16so2341595plr.2
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 11:44:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=NoKZ6VUrpD5EK3sJ37EC6wGUV101zPIE1/XPjm4Og+M=;
+        b=eOX9dMUDr7uDjJFa2Sn6jxzjZpIL/V7ilJnYmM7Db8BbRJ/poOLfN3cNIJ7hsgGR98
+         7X09FWM9WyWHSOnm3cDoDdbf7vnxs8z0PduTnAjXYFI8PYAGIxxGuSKaJgIzRT6SUB1h
+         7DjcJTaWuDpG/Sc62CligcgM8dlAFEW9cRGsqbOI/qU558WfqkqtljMtYWXJvoN33WHZ
+         LLwlorFhbvORne5Igc6lS02TS4DDvVcMCTXRsZABO/n1o4UarUytgFKwWIJMQl61Hroo
+         MpxpZlTxUx0n1UU8T3xt74eQ6B6NM5cP+i8jRjHhkmXnsXHKbNFKOc96zJGWWFkfcTEA
+         nhQA==
+X-Gm-Message-State: AOAM533YC2+mFktKek8vL0wrCK2vr61PLvSE3wy0XBocYtOBv3pyMOHE
+        mujK0Qxba9JPf0jILOXR+XnykzZi
+X-Google-Smtp-Source: ABdhPJyosQn3LL9q/ON8IM35lFTvulbpCd3WfSpHy0xU7lkc/S1DPOQeRhg6Vl8ZhoEVrQRhWpnVZw==
+X-Received: by 2002:a17:902:7b89:: with SMTP id w9mr8403628pll.252.1589654694306;
+        Sat, 16 May 2020 11:44:54 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:ac5d:e82f:151b:42d3? ([2601:647:4000:d7:ac5d:e82f:151b:42d3])
+        by smtp.gmail.com with ESMTPSA id c14sm4374478pgi.54.2020.05.16.11.44.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 May 2020 11:44:53 -0700 (PDT)
+Subject: Re: [PATCH 3/4] blk-mq: remove a pointless queue enter pair in
+ blk_mq_alloc_request_hctx
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 4/4] blk-mq: allow blk_mq_make_request to consume the q_usage_counter reference
-Date:   Sat, 16 May 2020 20:28:01 +0200
-Message-Id: <20200516182801.482930-5-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200516182801.482930-1-hch@lst.de>
 References: <20200516182801.482930-1-hch@lst.de>
+ <20200516182801.482930-4-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <7ca536f9-7e6d-b77a-ef13-41003cf4b159@acm.org>
+Date:   Sat, 16 May 2020 11:44:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200516182801.482930-4-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_make_request currently needs to grab an q_usage_counter
-reference when allocating a request.  This is because the block layer
-grabs one before calling blk_mq_make_request, but also releases it as
-soon as blk_mq_make_request returns.  Remove the blk_queue_exit call
-after blk_mq_make_request returns, and instead let it consume the
-reference.  This works perfectly fine for the block layer caller, just
-device mapper needs an extra reference as the old problem still
-persists there.  Open code blk_queue_enter_live in device mapper,
-as there should be no other callers and this allows better documenting
-why we do a non-try get.
+On 2020-05-16 11:28, Christoph Hellwig wrote:
+> No need for two queue references.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 33 ++++++++++++++++++++-------------
- block/blk-mq.c   | 13 +++++++------
- block/blk.h      | 11 -----------
- drivers/md/dm.c  | 11 ++++++++++-
- 4 files changed, 37 insertions(+), 31 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1e97f99735232..78683ea61c939 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1066,6 +1066,20 @@ generic_make_request_checks(struct bio *bio)
- 	return false;
- }
- 
-+static blk_qc_t do_make_request(struct bio *bio)
-+{
-+	struct request_queue *q = bio->bi_disk->queue;
-+	blk_qc_t ret = BLK_QC_T_NONE;
-+
-+	if (blk_crypto_bio_prep(&bio)) {
-+		if (!q->make_request_fn)
-+			return blk_mq_make_request(q, bio);
-+		ret = q->make_request_fn(q, bio);
-+	}
-+	blk_queue_exit(q);
-+	return ret;
-+}
-+
- /**
-  * generic_make_request - re-submit a bio to the block device layer for I/O
-  * @bio:  The bio describing the location in memory and on the device.
-@@ -1131,14 +1145,7 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			/* Create a fresh bio_list for all subordinate requests */
- 			bio_list_on_stack[1] = bio_list_on_stack[0];
- 			bio_list_init(&bio_list_on_stack[0]);
--			if (blk_crypto_bio_prep(&bio)) {
--				if (q->make_request_fn)
--					ret = q->make_request_fn(q, bio);
--				else
--					ret = blk_mq_make_request(q, bio);
--			}
--
--			blk_queue_exit(q);
-+			ret = do_make_request(bio);
- 
- 			/* sort new bios into those for a lower level
- 			 * and those for the same level
-@@ -1175,7 +1182,6 @@ EXPORT_SYMBOL(generic_make_request);
- blk_qc_t direct_make_request(struct bio *bio)
- {
- 	struct request_queue *q = bio->bi_disk->queue;
--	blk_qc_t ret = BLK_QC_T_NONE;
- 
- 	if (WARN_ON_ONCE(q->make_request_fn)) {
- 		bio_io_error(bio);
-@@ -1185,10 +1191,11 @@ blk_qc_t direct_make_request(struct bio *bio)
- 		return BLK_QC_T_NONE;
- 	if (unlikely(bio_queue_enter(bio)))
- 		return BLK_QC_T_NONE;
--	if (blk_crypto_bio_prep(&bio))
--		ret = blk_mq_make_request(q, bio);
--	blk_queue_exit(q);
--	return ret;
-+	if (!blk_crypto_bio_prep(&bio)) {
-+		blk_queue_exit(q);
-+		return BLK_QC_T_NONE;
-+	}
-+	return blk_mq_make_request(q, bio);
- }
- EXPORT_SYMBOL_GPL(direct_make_request);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b1c12de8926e3..cac11945f6023 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2028,26 +2028,24 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	__blk_queue_split(q, &bio, &nr_segs);
- 
- 	if (!bio_integrity_prep(bio))
--		return BLK_QC_T_NONE;
-+		goto queue_exit;
- 
- 	if (!is_flush_fua && !blk_queue_nomerges(q) &&
- 	    blk_attempt_plug_merge(q, bio, nr_segs, &same_queue_rq))
--		return BLK_QC_T_NONE;
-+		goto queue_exit;
- 
- 	if (blk_mq_sched_bio_merge(q, bio, nr_segs))
--		return BLK_QC_T_NONE;
-+		goto queue_exit;
- 
- 	rq_qos_throttle(q, bio);
- 
- 	data.cmd_flags = bio->bi_opf;
--	blk_queue_enter_live(q);
- 	rq = blk_mq_get_request(q, bio, &data);
- 	if (unlikely(!rq)) {
--		blk_queue_exit(q);
- 		rq_qos_cleanup(q, bio);
- 		if (bio->bi_opf & REQ_NOWAIT)
- 			bio_wouldblock_error(bio);
--		return BLK_QC_T_NONE;
-+		goto queue_exit;
- 	}
- 
- 	trace_block_getrq(q, bio, bio->bi_opf);
-@@ -2134,6 +2132,9 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	}
- 
- 	return cookie;
-+queue_exit:
-+	blk_queue_exit(q);
-+	return BLK_QC_T_NONE;
- }
- EXPORT_SYMBOL_GPL(blk_mq_make_request); /* only for request based dm */
- 
-diff --git a/block/blk.h b/block/blk.h
-index fc00537026a04..9e6ed5f118239 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -64,17 +64,6 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_freeze_queue(struct request_queue *q);
- 
--static inline void blk_queue_enter_live(struct request_queue *q)
--{
--	/*
--	 * Given that running in generic_make_request() context
--	 * guarantees that a live reference against q_usage_counter has
--	 * been established, further references under that same context
--	 * need not check that the queue has been frozen (marked dead).
--	 */
--	percpu_ref_get(&q->q_usage_counter);
--}
--
- static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 8921cd79422c6..f215b86664484 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1791,8 +1791,17 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
- 	int srcu_idx;
- 	struct dm_table *map;
- 
--	if (dm_get_md_type(md) == DM_TYPE_REQUEST_BASED)
-+	if (dm_get_md_type(md) == DM_TYPE_REQUEST_BASED) {
-+		/*
-+		 * We are called with a live reference on q_usage_counter, but
-+		 * that one will be released as soon as we return.  Grab an
-+		 * extra one as blk_mq_make_request expects to be able to
-+		 * consume a reference (which lives until the request is freed
-+		 * in case a request is allocated).
-+		 */
-+		percpu_ref_get(&q->q_usage_counter);
- 		return blk_mq_make_request(q, bio);
-+	}
- 
- 	map = dm_get_live_table(md, &srcu_idx);
- 
--- 
-2.26.2
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
