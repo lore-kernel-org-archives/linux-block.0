@@ -2,52 +2,52 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D78C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69674C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:28:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 977E8206D8
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E51A20756
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:28:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726237AbgEPQZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 12:25:19 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:37220 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726206AbgEPQZT (ORCPT
+        id S1726236AbgEPQ2Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 12:28:25 -0400
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:40306 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726212AbgEPQ2Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 12:25:19 -0400
-Received: by mail-pf1-f193.google.com with SMTP id y198so968743pfb.4
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 09:25:19 -0700 (PDT)
+        Sat, 16 May 2020 12:28:25 -0400
+Received: by mail-pj1-f68.google.com with SMTP id fu13so2483612pjb.5
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 09:28:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=HDCOMX++ziWprbuwcYpipOGg9IcpHZJkMIMnlxi6f30=;
-        b=VVNncRffQjGOHAtW4kV6dB574EAszdRWYmuIsHAyvD+YBQqU4vzIfpz8ba9gOcePUZ
-         /NiSrLkwHKwxQOsIVZZj9yn3bfxTbQuO/bz27kbmcnU9Us9yoVkS8roZh5nzjz1oWyRO
-         RXhG5j8dWzwktYEWSPy/SNspbkTkM0zYJgdCm31L+cbohLrRLd2QWL+RJ3vhfc94Ni5S
-         b/rC4RyLBtHkz5JJMBHfl9Nh5z79ULrW+zgTJa/KN36LJuaFcn3dLDI3ainZ9ZE1CJfJ
-         nwWzNfDIEokVnfokxqjmqB38/vD1rLx/ytqjZ3hX1e7wYQR1gqefWtbVUJ0Kq0UwCaGY
-         ZGaA==
-X-Gm-Message-State: AOAM533fTelzH9EL0Wy3O0VFXhB2ZPD8G/Nqmpxv6FEsTAiCmGrKzqZq
-        +F6YDFUsbrQogXrMTFEXCXw9/0P6
-X-Google-Smtp-Source: ABdhPJymEzqeG2OBywe2PgpfD9LtsOOaQlJFPdzxWdF7V0YTI8f4rLPDOib9ai8ipL8hvevtX3hPvQ==
-X-Received: by 2002:aa7:9e52:: with SMTP id z18mr9117840pfq.57.1589646318329;
-        Sat, 16 May 2020 09:25:18 -0700 (PDT)
+        bh=XlYdbbBSmg/+pgJpBBPai7MO3SDDy2viLmvzMkvuZF8=;
+        b=GYcB+7iYiElVoSammJL/Ey2kS85bjVZpdJu0642dlkWnftKg2WVnovNegJx2Ac9tBY
+         8DBQ0TZERWhXOdYfQ7jhJLspy5yF5tc8YsyBNOyzV8OnxLZRuA6quAaGy7HCmUKbcSkd
+         4D6gujyKCJMrtdG/SDAPzn158+szSbY3PDsM15gL5RKBfTLPBICZQafw3YyXg7HnCW5S
+         Ol0EOGqeHJIfpFWj2Vxx44hFC4tx33UJCST4slnfLcVLAKI4F4MG/pXlKzQXo3v/CepB
+         SPUSVGH9Am4Xoq3FBIPcu8gY1CNVBsr7BsRJ9BvHkbJ51N41JGzYaeMCu9OQO3ext9ZZ
+         EG6g==
+X-Gm-Message-State: AOAM531/hQxxswvEuVy0JQJJq7FEEFbDjkDZP49uhAlK2N38KTlT29c0
+        W75VJofB9JJIyJh3Et3RWi/NB694
+X-Google-Smtp-Source: ABdhPJyEaabLUVJaoscwBwCLcYTaIucbqgp2ZuU7+ouK4DL/L+dfN9s4rVuQFphju8ODg8WzLMeIvA==
+X-Received: by 2002:a17:90a:b10f:: with SMTP id z15mr9117329pjq.188.1589646503865;
+        Sat, 16 May 2020 09:28:23 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:97a:fd5b:e2c1:c090? ([2601:647:4000:d7:97a:fd5b:e2c1:c090])
-        by smtp.gmail.com with ESMTPSA id gq19sm462066pjb.55.2020.05.16.09.25.17
+        by smtp.gmail.com with ESMTPSA id 14sm4575165pfy.38.2020.05.16.09.28.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 May 2020 09:25:17 -0700 (PDT)
-Subject: Re: [PATCH 2/4] blk-mq: remove a pointless queue enter pair in
- blk_mq_alloc_request
+        Sat, 16 May 2020 09:28:23 -0700 (PDT)
+Subject: Re: [PATCH 3/4] blk-mq: remove a pointless queue enter pair in
+ blk_mq_alloc_request_hctx
 To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
 References: <20200516153430.294324-1-hch@lst.de>
- <20200516153430.294324-3-hch@lst.de>
+ <20200516153430.294324-4-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -72,12 +72,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <050f2ec1-5bbf-20a3-c76b-8aae1cb72db5@acm.org>
-Date:   Sat, 16 May 2020 09:25:16 -0700
+Message-ID: <87513e5c-270c-41cf-51d8-9106351449b5@acm.org>
+Date:   Sat, 16 May 2020 09:28:22 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200516153430.294324-3-hch@lst.de>
+In-Reply-To: <20200516153430.294324-4-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,6 +87,54 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-16 08:34, Christoph Hellwig wrote:
-> No need for two queue references.
+> No need for two queue references.  Also reduce the q_usage_counter
+> critical section to just the actual request allocation.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-mq.c | 14 ++++----------
+>  1 file changed, 4 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d96d3931f33e6..69e58cc4244c0 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -439,26 +439,20 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+>  	if (hctx_idx >= q->nr_hw_queues)
+>  		return ERR_PTR(-EIO);
+>  
+> -	ret = blk_queue_enter(q, flags);
+> -	if (ret)
+> -		return ERR_PTR(ret);
+> -
+>  	/*
+>  	 * Check if the hardware context is actually mapped to anything.
+>  	 * If not tell the caller that it should skip this queue.
+>  	 */
+>  	alloc_data.hctx = q->queue_hw_ctx[hctx_idx];
+> -	if (!blk_mq_hw_queue_mapped(alloc_data.hctx)) {
+> -		blk_queue_exit(q);
+> +	if (!blk_mq_hw_queue_mapped(alloc_data.hctx))
+>  		return ERR_PTR(-EXDEV);
+> -	}
+>  	cpu = cpumask_first_and(alloc_data.hctx->cpumask, cpu_online_mask);
+>  	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
+>  
+> -	blk_queue_enter_live(q);
+> +	ret = blk_queue_enter(q, flags);
+> +	if (ret)
+> +		return ERR_PTR(ret);
+>  	rq = blk_mq_get_request(q, NULL, &alloc_data);
+> -	blk_queue_exit(q);
+> -
+>  	if (!rq) {
+>  		blk_queue_exit(q);
+>  		return ERR_PTR(-EWOULDBLOCK);
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+This change looks wrong to me. blk_mq_update_nr_hw_queues() modifies
+q->queue_hw_ctx so q_usage_counter must be incremented before that
+pointer is dereferenced.
+
+Bart.
+
+
