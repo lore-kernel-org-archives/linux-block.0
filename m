@@ -4,52 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF74C433E1
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13908C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B266207DF
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3A5F2078B
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbgEPAT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 20:19:28 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:37289 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726550AbgEPAT2 (ORCPT
+        id S1726615AbgEPATb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 20:19:31 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:42054 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbgEPATb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 20:19:28 -0400
-Received: by mail-pj1-f68.google.com with SMTP id q9so1724423pjm.2;
-        Fri, 15 May 2020 17:19:28 -0700 (PDT)
+        Fri, 15 May 2020 20:19:31 -0400
+Received: by mail-pl1-f195.google.com with SMTP id k19so1565042pll.9
+        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 17:19:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=S3G2WbRhtzm3ssLwF+7XHKy6fZ2iPExuIOPfpVM4JAQ=;
-        b=nJ7jGyFcUyB/+6Ee2Q5ua7TB1+rD0OuaW9c4o5BvMrWCILeiIbfcPqO4Djkg9PkYKH
-         KDP7dZYG0c3NYpIsFuAdk163ENKS698IevrrLFCmd4bdJ/XjYOxSTFWUsXr53bC1k4d+
-         uk/9CeTxBnY4d7rwDi2lJmnivJe2qF+26k8WnPDSuZQgAZB3ji/IiMG9UnZKlYs41d9F
-         eM5O7vg5hpkZWB/lwb0lnlcA+lDzJ8mS8hQYta1nM2IgxCBZcWAwCSFh2MSwGHq0A+q6
-         GaoYRKi1PSW4F4rC48vPvgU7T5Lj7W3MCkQVQVaOpKji4mlNkYVRfW2QCMDW11OcP/ro
-         iVTQ==
-X-Gm-Message-State: AOAM533Yoc3Hd2/gW8DAI1ob6zi8Tg6vO5Y+LMwq6Hz76LMp9VeNlDzk
-        1GxmBEZkH1YwHQZDreeODAc=
-X-Google-Smtp-Source: ABdhPJz6k+47GUDiMGXO63ssCn+K7ItCEDmDzqJpfrHokKVVPveIRMAHsO0swQtse9BfIHPxnx5nJQ==
-X-Received: by 2002:a17:902:c489:: with SMTP id n9mr4130738plx.186.1589588367396;
-        Fri, 15 May 2020 17:19:27 -0700 (PDT)
+        bh=yRqbqIbIrUE7sSefoqXH9DxGNNQRoVSHhtLGsgwmH68=;
+        b=pu8Yi5+riIeIDcXfnU9/feEN23mrsHex/rkW9w7V4aSgjnSgNe8eBNmAAHawbwEUz5
+         CJtYR80707Bs5zVaUGRG8Bqc+SnPBp7Q/a0I/9hj9N20wT6iuak2s0lPLgFMGjP20xjP
+         tTYNcSKe93MkAEK6xLqWpexpdzZxecurEKSZHElrxy5d6LRYjGPl6UeZ7rFqNrK6aCoE
+         wUs9epdKI+fTAIjNspTPYg/7AFe93x3L7IDlQJJk8KkuChSnW1KsK1T601sIoMEGlKJR
+         lP9yc5vuvOcnZbNDDVhRuXf5bLyqJhKhPoLrmP3DuD4+99Z2SzdlAVp9ffLpJhV8lAz9
+         NMqw==
+X-Gm-Message-State: AOAM5317aA9hFeLP8poOXfXlwsV+6NE5JUrBOakQa1uugxYY97/zofNS
+        KRtNbf2KhMJuBgGhdoOFXPM=
+X-Google-Smtp-Source: ABdhPJzTR7eTdbcvZ5VUqNxbFQKgT80a66xa2dgQ8ujgCrbMEjXpSh8VzyUuGDv/8lSUUqbMuU1Dhw==
+X-Received: by 2002:a17:902:9697:: with SMTP id n23mr6050660plp.150.1589588368996;
+        Fri, 15 May 2020 17:19:28 -0700 (PDT)
 Received: from localhost.localdomain ([2601:647:4000:d7:f99a:ee92:9332:42a])
-        by smtp.gmail.com with ESMTPSA id 30sm2542383pgp.38.2020.05.15.17.19.25
+        by smtp.gmail.com with ESMTPSA id 30sm2542383pgp.38.2020.05.15.17.19.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 17:19:26 -0700 (PDT)
+        Fri, 15 May 2020 17:19:28 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>, stable@vger.kernel.org
-Subject: [PATCH 4/5] block: Fix zero_fill_bio()
-Date:   Fri, 15 May 2020 17:19:13 -0700
-Message-Id: <20200516001914.17138-5-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Alexander Potapenko <glider@google.com>
+Subject: [PATCH 5/5] null_blk: Zero-initialize read buffers in non-memory-backed mode
+Date:   Fri, 15 May 2020 17:19:14 -0700
+Message-Id: <20200516001914.17138-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200516001914.17138-1-bvanassche@acm.org>
 References: <20200516001914.17138-1-bvanassche@acm.org>
@@ -60,73 +62,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Multiple block drivers use zero_fill_bio() to zero-initialize the data
-buffer used for read operations. Make sure that all pages are zeroed
-instead of only the first if one or more multi-page bvecs are used to
-describe the data buffer.
+This patch suppresses an uninteresting KMSAN complaint without affecting
+performance of the null_blk driver if CONFIG_KMSAN is disabled.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
-Cc: stable@vger.kernel.org
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Alexander Potapenko <glider@google.com>
+Reported-by: Alexander Potapenko <glider@google.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/bio.c         | 27 ++++++++++++++++++++++-----
- include/linux/bio.h |  1 +
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ drivers/block/null_blk_main.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1594804fe8bc..48fcafbdae70 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -527,17 +527,34 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 06f5761fccb6..df1e144eeaa4 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1250,8 +1250,38 @@ static inline blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd,
+ 	return errno_to_blk_status(err);
  }
- EXPORT_SYMBOL(bio_alloc_bioset);
  
-+void zero_fill_bvec(const struct bio_vec *bvec)
++static void nullb_zero_rq_data_buffer(const struct request *rq)
 +{
-+	struct page *page = bvec->bv_page;
-+	u32 offset = bvec->bv_offset;
-+	u32 left = bvec->bv_len;
++	struct req_iterator iter;
++	struct bio_vec bvec;
 +
-+	while (left) {
-+		u32 len = min_t(u32, left, PAGE_SIZE - offset);
-+		void *kaddr;
-+
-+		kaddr = kmap_atomic(page);
-+		memset(kaddr + offset, 0, len);
-+		flush_dcache_page(page);
-+		kunmap_atomic(kaddr);
-+		page++;
-+		left -= len;
-+		offset = 0;
-+	}
++	rq_for_each_bvec(bvec, rq, iter)
++		zero_fill_bvec(&bvec);
 +}
-+EXPORT_SYMBOL(zero_fill_bvec);
 +
- void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
++static void nullb_zero_read_cmd_buffer(struct nullb_cmd *cmd)
++{
++	struct nullb_device *dev = cmd->nq->dev;
++
++	if (dev->queue_mode == NULL_Q_BIO && bio_op(cmd->bio) == REQ_OP_READ)
++		zero_fill_bio(cmd->bio);
++	else if (req_op(cmd->rq) == REQ_OP_READ)
++		nullb_zero_rq_data_buffer(cmd->rq);
++}
++
++/* Complete a request. Only called if dev->memory_backed == 0. */
+ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
  {
--	unsigned long flags;
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
- 
- 	__bio_for_each_segment(bv, bio, iter, start) {
--		char *data = bvec_kmap_irq(&bv, &flags);
--		memset(data, 0, bv.bv_len);
--		flush_dcache_page(bv.bv_page);
--		bvec_kunmap_irq(data, &flags);
-+		zero_fill_bvec(&bv);
- 	}
- }
- EXPORT_SYMBOL(zero_fill_bio_iter);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 58e6134b1c05..9438cbdfa19e 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -455,6 +455,7 @@ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
- extern void bio_copy_data(struct bio *dst, struct bio *src);
- extern void bio_list_copy_data(struct bio *dst, struct bio *src);
- extern void bio_free_pages(struct bio *bio);
-+void zero_fill_bvec(const struct bio_vec *bvec);
- void zero_fill_bio_iter(struct bio *bio, struct bvec_iter iter);
- void bio_truncate(struct bio *bio, unsigned new_size);
- void guard_bio_eod(struct bio *bio);
++	/*
++	 * Since root privileges are required to configure the null_blk
++	 * driver, it is fine that this driver does not initialize the
++	 * data buffers of read commands. Zero-initialize these buffers
++	 * anyway if KMSAN is enabled to prevent that KMSAN complains
++	 * about null_blk not initializing read data buffers.
++	 */
++	if (IS_ENABLED(CONFIG_KMSAN))
++		nullb_zero_read_cmd_buffer(cmd);
++
+ 	/* Complete IO by inline, softirq or timer */
+ 	switch (cmd->nq->dev->irqmode) {
+ 	case NULL_IRQ_SOFTIRQ:
