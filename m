@@ -2,120 +2,86 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13908C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A539C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 01:40:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3A5F2078B
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 00:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 506822076A
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 01:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589593208;
+	bh=CrQSqVcXyXcpUeO9jqEtUIojA+IlBVFSMmxcqh7aAeU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=KNIn1ObbVHb4/Qu9ndqjSZvCdfhAYQ/iWnLuk7Yj1wK4KQr3iVMHmVBjcQ4UjsEzZ
+	 6ks+84kY6jGxaNAm6L/7usp6cVYyHBm23xnwSLBPWooF1wt0rp/hh6p8xW5Ogk4Ut9
+	 6jaS1duUajW7ANPMeaIbKKYvU65Ea9u3Kyl1iFns=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726615AbgEPATb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 May 2020 20:19:31 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42054 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726550AbgEPATb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 May 2020 20:19:31 -0400
-Received: by mail-pl1-f195.google.com with SMTP id k19so1565042pll.9
-        for <linux-block@vger.kernel.org>; Fri, 15 May 2020 17:19:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yRqbqIbIrUE7sSefoqXH9DxGNNQRoVSHhtLGsgwmH68=;
-        b=pu8Yi5+riIeIDcXfnU9/feEN23mrsHex/rkW9w7V4aSgjnSgNe8eBNmAAHawbwEUz5
-         CJtYR80707Bs5zVaUGRG8Bqc+SnPBp7Q/a0I/9hj9N20wT6iuak2s0lPLgFMGjP20xjP
-         tTYNcSKe93MkAEK6xLqWpexpdzZxecurEKSZHElrxy5d6LRYjGPl6UeZ7rFqNrK6aCoE
-         wUs9epdKI+fTAIjNspTPYg/7AFe93x3L7IDlQJJk8KkuChSnW1KsK1T601sIoMEGlKJR
-         lP9yc5vuvOcnZbNDDVhRuXf5bLyqJhKhPoLrmP3DuD4+99Z2SzdlAVp9ffLpJhV8lAz9
-         NMqw==
-X-Gm-Message-State: AOAM5317aA9hFeLP8poOXfXlwsV+6NE5JUrBOakQa1uugxYY97/zofNS
-        KRtNbf2KhMJuBgGhdoOFXPM=
-X-Google-Smtp-Source: ABdhPJzTR7eTdbcvZ5VUqNxbFQKgT80a66xa2dgQ8ujgCrbMEjXpSh8VzyUuGDv/8lSUUqbMuU1Dhw==
-X-Received: by 2002:a17:902:9697:: with SMTP id n23mr6050660plp.150.1589588368996;
-        Fri, 15 May 2020 17:19:28 -0700 (PDT)
-Received: from localhost.localdomain ([2601:647:4000:d7:f99a:ee92:9332:42a])
-        by smtp.gmail.com with ESMTPSA id 30sm2542383pgp.38.2020.05.15.17.19.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 17:19:28 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Alexander Potapenko <glider@google.com>
-Subject: [PATCH 5/5] null_blk: Zero-initialize read buffers in non-memory-backed mode
-Date:   Fri, 15 May 2020 17:19:14 -0700
-Message-Id: <20200516001914.17138-6-bvanassche@acm.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200516001914.17138-1-bvanassche@acm.org>
-References: <20200516001914.17138-1-bvanassche@acm.org>
+        id S1726247AbgEPBkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 May 2020 21:40:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59406 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726204AbgEPBkH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 May 2020 21:40:07 -0400
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 86901207C4;
+        Sat, 16 May 2020 01:40:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589593206;
+        bh=CrQSqVcXyXcpUeO9jqEtUIojA+IlBVFSMmxcqh7aAeU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=cSlJChEPn9tokMbDKlEqAW4wizlqdgD60I2U+gwh8F1H4v0hqa40A2VCxiyroFduX
+         vIiNzPhX9XpQuo3Dnps88ojyTUqASpZUaZ9i0621+yQdD0k7jhksZQCkssn8l/KE5M
+         GXaZK7GC0nV2B0/x38EC954SB3oVy2KNMCCUxIfs=
+Received: by mail-vk1-f171.google.com with SMTP id p7so1085558vkf.5;
+        Fri, 15 May 2020 18:40:06 -0700 (PDT)
+X-Gm-Message-State: AOAM532S6QNuCXZJypsR6s09TSgWlQOg3OgFgMvp6zl80W0qB7gqSUZJ
+        BzyN8A8tEvfCu+MFvV0OMziyCRRcHjowvhgYL28=
+X-Google-Smtp-Source: ABdhPJy/TNRRchVgh7/X0CJvCfGZI0vrN5WLUnFbW6V2DhjJpoH3YEqbC2Z6LQXWvVKiVLin1pfQ2PwKRAH9VrOZ1x8=
+X-Received: by 2002:a1f:5fc5:: with SMTP id t188mr4836002vkb.34.1589593205572;
+ Fri, 15 May 2020 18:40:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200509031058.8239-1-mcgrof@kernel.org> <20200509031058.8239-5-mcgrof@kernel.org>
+ <e728acea-61c1-fcb5-489b-9be8cafe61ea@acm.org> <20200511133900.GL11244@42.do-not-panic.com>
+In-Reply-To: <20200511133900.GL11244@42.do-not-panic.com>
+From:   Luis Chamberlain <mcgrof@kernel.org>
+Date:   Fri, 15 May 2020 19:39:53 -0600
+X-Gmail-Original-Message-ID: <CAB=NE6X-RaP2Qbfi5J23EdsVDTUys6AuYT7g6QDtCt=d5-GZ9w@mail.gmail.com>
+Message-ID: <CAB=NE6X-RaP2Qbfi5J23EdsVDTUys6AuYT7g6QDtCt=d5-GZ9w@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] blktrace: break out of blktrace setup on
+ concurrent calls
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, Jan Kara <jack@suse.cz>,
+        Ming Lei <ming.lei@redhat.com>,
+        Nicolai Stange <nstange@suse.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>, yu kuai <yukuai3@huawei.com>,
+        linux-block@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch suppresses an uninteresting KMSAN complaint without affecting
-performance of the null_blk driver if CONFIG_KMSAN is disabled.
+On Mon, May 11, 2020 at 7:39 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> On Sat, May 09, 2020 at 06:09:38PM -0700, Bart Van Assche wrote:
+> > How about using the block device name instead of the partition name in
+> > the error message since the concurrency context is the block device and
+> > not the partition?
+>
+> blk device argument can be NULL here. sg-generic is one case.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Alexander Potapenko <glider@google.com>
-Reported-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/null_blk_main.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+I'm going to add a comment about this, as it is easily forgotten.
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 06f5761fccb6..df1e144eeaa4 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -1250,8 +1250,38 @@ static inline blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd,
- 	return errno_to_blk_status(err);
- }
- 
-+static void nullb_zero_rq_data_buffer(const struct request *rq)
-+{
-+	struct req_iterator iter;
-+	struct bio_vec bvec;
-+
-+	rq_for_each_bvec(bvec, rq, iter)
-+		zero_fill_bvec(&bvec);
-+}
-+
-+static void nullb_zero_read_cmd_buffer(struct nullb_cmd *cmd)
-+{
-+	struct nullb_device *dev = cmd->nq->dev;
-+
-+	if (dev->queue_mode == NULL_Q_BIO && bio_op(cmd->bio) == REQ_OP_READ)
-+		zero_fill_bio(cmd->bio);
-+	else if (req_op(cmd->rq) == REQ_OP_READ)
-+		nullb_zero_rq_data_buffer(cmd->rq);
-+}
-+
-+/* Complete a request. Only called if dev->memory_backed == 0. */
- static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
- {
-+	/*
-+	 * Since root privileges are required to configure the null_blk
-+	 * driver, it is fine that this driver does not initialize the
-+	 * data buffers of read commands. Zero-initialize these buffers
-+	 * anyway if KMSAN is enabled to prevent that KMSAN complains
-+	 * about null_blk not initializing read data buffers.
-+	 */
-+	if (IS_ENABLED(CONFIG_KMSAN))
-+		nullb_zero_read_cmd_buffer(cmd);
-+
- 	/* Complete IO by inline, softirq or timer */
- 	switch (cmd->nq->dev->irqmode) {
- 	case NULL_IRQ_SOFTIRQ:
+  Luis
