@@ -2,121 +2,74 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF33C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 13:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B384DC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 13:25:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAFEF20727
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 13:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 959D520657
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 13:25:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sa6Dpxcz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726219AbgEPNN6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 09:13:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35870 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726202AbgEPNN6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 09:13:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 750EDABB2;
-        Sat, 16 May 2020 13:13:58 +0000 (UTC)
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, damien.lemoal@wdc.com, hare@suse.com,
-        axboe@kernel.dk, linux-bcache@vger.kernel.org, kbusch@kernel.org
-References: <20200516035434.82809-1-colyli@suse.de>
- <20200516035434.82809-4-colyli@suse.de> <20200516124020.GC13448@lst.de>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Subject: Re: [RFC PATCH v2 3/4] block: remove queue_is_mq restriction from
- blk_revalidate_disk_zones()
-Message-ID: <d3fe49f1-d37b-689e-ae0e-078b1254d7e7@suse.de>
-Date:   Sat, 16 May 2020 21:13:50 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        id S1726584AbgEPNZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 09:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53118 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726302AbgEPNZk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 May 2020 09:25:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982B5C061A0C
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 06:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=cBvcrhcHFAjklTbDfnqUpat87EkDNZ+5qGzYA+vntis=; b=sa6Dpxcz15Gty74rOZd2NCOMv1
+        u59rrv/b+pLCNsGCfsD9GhJKPhkDJvfXDUshwIF25R9mQ9UOB3BgMRpXQWnATvGSAghNKjax1l7ok
+        GjzRdxPVkhkaX8h39eL3jKWU9Rqhq7J6P87xBKd2YajnhV2wDix8KuFiARY1LzZt2KPs6M/vUw2G2
+        WJY8yeVSI1FeSKYqkaeKNKQL9nPKxEoHaMBLAJS+TU5G3fqiG08N+6cjMCvWhW6asFslBjCc0+Q9t
+        MLTRPq+WMn9i2Ciw9wHnzjCzNMBX1a8O+nK9/eZ0SC08wluaxHDi+fR43R16t1T5eJzJtL6SrhNf/
+        CNk3o9fg==;
+Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jZwop-0003CY-IM; Sat, 16 May 2020 13:25:35 +0000
+Date:   Sat, 16 May 2020 15:25:32 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@fb.com>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fix for 5.7
+Message-ID: <20200516132532.GA244143@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200516124020.GC13448@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/16 20:40, Christoph Hellwig wrote:
-> On Sat, May 16, 2020 at 11:54:33AM +0800, Coly Li wrote:
->> The bcache driver is bio based and NOT request based multiqueued driver,
->> if a zoned SMR hard drive is used as backing device of a bcache device,
->> calling blk_revalidate_disk_zones() for the bcache device will fail due
->> to the following check in blk_revalidate_disk_zones(),
->> 478       if (WARN_ON_ONCE(!queue_is_mq(q)))
->> 479             return -EIO;
->>
->> Now bcache is able to export the zoned information from the underlying
->> zoned SMR drives and format zonefs on top of a bcache device, the
->> resitriction that a zoned device should be multiqueued is unnecessary
->> for now.
->>
->> Although in commit ae58954d8734c ("block: don't handle bio based drivers
->> in blk_revalidate_disk_zones") it is said that bio based drivers should
->> not call blk_revalidate_disk_zones() and just manually update their own
->> q->nr_zones, but this is inaccurate. The bio based drivers also need to
->> set their zone size and initialize bitmaps for cnv and seq zones, it is
->> necessary to call blk_revalidate_disk_zones() for bio based drivers.
-> 
-> Why would you need these bitmaps for bcache?  There is no reason to
-> serialize requests for stacking drivers, and you can already derive
-> if a zone is sequential or not from whatever internal information
-> you use.
-> 
-> So without a user that actually makes sense: NAK.
-> 
+The following changes since commit 59c7c3caaaf8750df4ec3255082f15eb4e371514:
 
-It is OK for me to set the zone_nr and zone size without calling
-blk_revalidate_disk_zones().
+  nvme: fix possible hang when ns scanning fails during error recovery (2020-05-09 16:07:58 -0600)
 
-Coly Li
+are available in the Git repository at:
+
+  git://git.infradead.org/nvme.git nvme-5.7
+
+for you to fetch changes up to b69e2ef24b7b4867f80f47e2781e95d0bacd15cb:
+
+  nvme-pci: dma read memory barrier for completions (2020-05-12 18:02:24 +0200)
+
+----------------------------------------------------------------
+Keith Busch (1):
+      nvme-pci: dma read memory barrier for completions
+
+ drivers/nvme/host/pci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
