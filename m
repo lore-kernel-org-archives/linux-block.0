@@ -2,57 +2,137 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8D3C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAC2C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:50:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B3EB206D8
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 292DA2065C
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:50:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcqE0ZP1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbgEPQnd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 12:43:33 -0400
-Received: from verein.lst.de ([213.95.11.211]:32823 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726226AbgEPQnd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 12:43:33 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 667C668B05; Sat, 16 May 2020 18:43:30 +0200 (CEST)
-Date:   Sat, 16 May 2020 18:43:30 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: remove the bio argument to ->prepare_request
-Message-ID: <20200516164330.GA18772@lst.de>
-References: <20200516154059.328211-1-hch@lst.de> <ffaa84e5-8878-84a9-5c52-a04fc3016cfe@acm.org> <20200516161346.GA17642@lst.de> <7d9889de-8078-0ea8-574a-586edf2c4e6b@cloud.ionos.com>
+        id S1726259AbgEPQub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 12:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726237AbgEPQua (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 May 2020 12:50:30 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FA4C061A0C;
+        Sat, 16 May 2020 09:50:29 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id a21so5461784ljj.11;
+        Sat, 16 May 2020 09:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=f99U+q5cMTjr+AScEQdDuV6vKmP7Ztj+erax4cbrEps=;
+        b=mcqE0ZP1L8fA9oZpjPLnHTQxj9DISlSkdUSjDS5MKMbk/j+03hUQLwd6z3B8B8MDVI
+         wRn1/6n3jL0HPIM4eaeTkrvvTUGSqbcAk/L2fOqZmYQVUokExZrC15lpCNnoH7IEgvAs
+         FyguYQs3v3ii5LK8OmRIpf8e3t3P8p6QuUeujYWdySBsdFwdmARutnbMCIFqIJuNW7hL
+         RKu+0D0hxIucdDXrYurm/1/Lkhpk7yqccI9NNjKbY+vbIxD33Tbumf5ronaI/MRabGYL
+         RqQiC0GdNh4HP942YsV0i0iVEhex68raCr/Du8jsmbBNvWi2DYljbPYjpyRKV2Z6+fPV
+         +jsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=f99U+q5cMTjr+AScEQdDuV6vKmP7Ztj+erax4cbrEps=;
+        b=KNHLNnMTR+PgCpJC1H94tIlZOusxpNkj+Kea7G7gv50m7VTfavOW8QMyOx93ng5J1a
+         AoL7SQZDV2RIKnOc+0W47KApeOlV47zyLcTQjAsetMWZD9n/ykYihrtFGJXkZtxpc9CF
+         J3p+l19t61rVDFAJ4uhDeOkWoovLlMxv/KbUPPsEWUjgas1z77rnw/LhPT6IPYfxgvd1
+         m9AiwO48hByRvQ1u+/lPEI0j75ux//EnYW+NjnEe/zkJjpJFUEVIgQlCZUa2XHT7dhNT
+         lDXC621vQ4/idMpUszYiReWtZRwmAkPy9d/ZJSWxMEDp/am2rDrA3n2R0SzT3XUtbvXg
+         MVVg==
+X-Gm-Message-State: AOAM530eGSWqGENItRcmVr2tWFQ97i5cdTNItRvr48IisxxJSx26yWzS
+        JZ/teaqQ1yQhw6rQTu5OKXbCfPqt
+X-Google-Smtp-Source: ABdhPJwIUIqwc5E8sr7K7W7qAuT9oG3a1T0Jbo8c/KLrXv9Oy6CPNoaLxRW7tfNYuUSYHEQnUic1Gw==
+X-Received: by 2002:a2e:b043:: with SMTP id d3mr5189656ljl.77.1589647826805;
+        Sat, 16 May 2020 09:50:26 -0700 (PDT)
+Received: from [192.168.2.145] (ppp91-78-208-152.pppoe.mtu-net.ru. [91.78.208.152])
+        by smtp.googlemail.com with ESMTPSA id f5sm3440127lfh.84.2020.05.16.09.50.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 May 2020 09:50:26 -0700 (PDT)
+Subject: Re: [PATCH v5 4/6] partitions/efi: Support GPT entry lookup at a
+ non-standard location
+To:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Stephen Warren <swarren@wwwdotorg.org>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>,
+        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Steve McIntyre <steve@einval.com>,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20200516153644.13748-1-digetx@gmail.com>
+ <20200516153644.13748-5-digetx@gmail.com>
+ <2ae298ca-016a-8867-52dd-86d99b9e0f3b@infradead.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <595392b8-d950-4be6-f6cf-e274b4760b94@gmail.com>
+Date:   Sat, 16 May 2020 19:50:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d9889de-8078-0ea8-574a-586edf2c4e6b@cloud.ionos.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <2ae298ca-016a-8867-52dd-86d99b9e0f3b@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 16, 2020 at 06:36:34PM +0200, Guoqing Jiang wrote:
-> Hi Christoph,
->
-> On 5/16/20 6:13 PM, Christoph Hellwig wrote:
->> On Sat, May 16, 2020 at 09:12:10AM -0700, Bart Van Assche wrote:
->>> On 2020-05-16 08:40, Christoph Hellwig wrote:
->>>> None of the I/O schedulers actually needs it.
->>> Is the next step perhaps to remove the bio argument from
->>> blk_mq_get_request()? Anyway:
->> Yes, but that is a bigger surgery :)
->
-> I had local changes for it which was compiled test, and seems no new caller 
-> of blk_mq_get_request.
+16.05.2020 18:51, Randy Dunlap пишет:
+> On 5/16/20 8:36 AM, Dmitry Osipenko wrote:
+>> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+>> index b64bfdd4326c..3af4660bc11f 100644
+>> --- a/block/partitions/efi.c
+>> +++ b/block/partitions/efi.c
+>> @@ -621,6 +621,14 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
+>>          if (!good_agpt && force_gpt)
+>>                  good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
+>>  
+>> +	/* The force_gpt_sector is used by NVIDIA Tegra partition parser in
+>> +	 * order to convey a non-standard location of the GPT entry for lookup.
+>> +	 * By default force_gpt_sector is set to 0 and has no effect.
+>> +	 */
+> 
+> Please fix the multi-line comment format as described in
+> Documentation/process/coding-style.rst.
+> 
+>> +	if (!good_agpt && force_gpt && state->force_gpt_sector)
+>> +		good_agpt = is_gpt_valid(state, state->force_gpt_sector,
+>> +					 &agpt, &aptes);
+>> +
+>>          /* The obviously unsuccessful case */
+>>          if (!good_pgpt && !good_agpt)
+>>                  goto fail;
+> 
+> thanks.
+> 
 
-Well, my plan was to sort out the calling conventions for real:
+Hello Randy,
 
-http://git.infradead.org/users/hch/block.git/commitdiff/bce839ff0799e398975c5a5c5a5123402ead6cc8
+I know that it's not a proper kernel-style formatting, but that's the
+style used by the whole efi.c source code and I wanted to maintain the
+same style, for consistency. Of course I can change to a proper style if
+it's more desirable than the consistency. Thank you for the comment!
