@@ -2,73 +2,80 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30F9C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222F0C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:12:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F57120767
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 15:52:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HTEtd/o1"
+	by mail.kernel.org (Postfix) with ESMTP id 05BE82065C
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726278AbgEPPwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 11:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726206AbgEPPwn (ORCPT
+        id S1726210AbgEPQMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 12:12:13 -0400
+Received: from mail-pl1-f173.google.com ([209.85.214.173]:40246 "EHLO
+        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726206AbgEPQMN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 11:52:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288EBC061A0C;
-        Sat, 16 May 2020 08:52:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=0jodEySlCm4LlCAkt1IFjMwE1bcEpTs7CKocuMqqKIs=; b=HTEtd/o1jYXt5tFWLMg3yw5VTB
-        jafi4+mq4NVtr2t5FgBZtbDN5gMvS7f18rO7CiXw8ksdpBEA8axSP53RxjuMuZ0/NDw2ZR7CkzPtp
-        YK0XLHljpcF6lJwsx9yEbuxo24GhKdEmqw01wYKDXYKAiIfAje7AAm4HHvoE7zIpCQd2D9TAHkCu9
-        JSiBMoi36/U1KFIzi3C3Kytzm4eDJwR8tg5VzNAzgbPLS1zvZTSIXRkMgRr/nb+5eIfd5WT0P01HW
-        nwpFLongpfCvr1fkn6kTAqa6WThkbifpl69GyOtJapkYKyNr40r/vYkndGY7lmYB+6q2LwMjdYeuV
-        8VglOWTw==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jZz7C-0001Dr-UZ; Sat, 16 May 2020 15:52:42 +0000
-Subject: Re: [PATCH v5 5/6] partitions/tegra: Support enforced GPT scanning
-To:     Dmitry Osipenko <digetx@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Davidlohr Bueso <dave@stgolabs.net>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Steve McIntyre <steve@einval.com>,
-        linux-efi <linux-efi@vger.kernel.org>
-References: <20200516153644.13748-1-digetx@gmail.com>
- <20200516153644.13748-6-digetx@gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <6d86e17f-6431-e9eb-6613-e8d6e889e079@infradead.org>
-Date:   Sat, 16 May 2020 08:52:41 -0700
+        Sat, 16 May 2020 12:12:13 -0400
+Received: by mail-pl1-f173.google.com with SMTP id t16so2217991plo.7
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 09:12:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=LoSTwUkwx9KS0M/T8JB3DsACoDND+sMS5idTAdwwMoI=;
+        b=NveLEOz0qLG6lloJtZ040iQ/lQ88uG32swoSg/YQwRib8JGZEgaHXZeYjVHMbJvtbl
+         f9QPLiTJle6mSBb00zcqOUjy47K1RYp0Fp3SalPvkWpUyWoTFLXJ7tnyClS99fHUdcFe
+         TwQ8c2O31GXjLwndBIOOujLOsImZQzfmAJ6/eC2+q7/L72+zOwtFLY3uoNbLAVszR8xN
+         eLcgp+jCpdsoBJ+0nFm0V8mE21D1oFldoSEKz73RNxEWkbpm9aYO0DIj3kyfEuEfMZql
+         P5eB3rWaxA9N06On6Vwjp68lKcRSIzB5dOEezulB6vcT2IOrvdgqRaRiD+Msw08Bpwd1
+         fYyg==
+X-Gm-Message-State: AOAM530h2h6Jjr8WRwmP5aqVr3BH4UkWmnWTq2ERmUfrunyqomeRV8IV
+        KGcK9ejrsMagilyyNQg3z3AK8OH2
+X-Google-Smtp-Source: ABdhPJwS+3Z1G/ehsEXfwyWczm5OmUz/O5Mo84ZDZSqG0Ft6T1/g8xt1//Z5mIiKFn34BdBBBXArAQ==
+X-Received: by 2002:a17:902:8a94:: with SMTP id p20mr8861545plo.57.1589645531727;
+        Sat, 16 May 2020 09:12:11 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:97a:fd5b:e2c1:c090? ([2601:647:4000:d7:97a:fd5b:e2c1:c090])
+        by smtp.gmail.com with ESMTPSA id 184sm4656543pfy.144.2020.05.16.09.12.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 May 2020 09:12:11 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: remove the bio argument to ->prepare_request
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+References: <20200516154059.328211-1-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <ffaa84e5-8878-84a9-5c52-a04fc3016cfe@acm.org>
+Date:   Sat, 16 May 2020 09:12:10 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200516153644.13748-6-digetx@gmail.com>
+In-Reply-To: <20200516154059.328211-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,29 +84,10 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/20 8:36 AM, Dmitry Osipenko wrote:
-> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-> index 3af4660bc11f..4eb4496fbb1b 100644
-> --- a/block/partitions/efi.c
-> +++ b/block/partitions/efi.c
-> @@ -98,6 +98,12 @@ static int force_gpt;
->  static int __init
->  force_gpt_fn(char *str)
->  {
-> +	/* This check allows to parse "gpt gpt_sector=" properly since
-> +	 * "gpt" overlaps with "gpt_sector", see tegra_gpt_sector_fn().
-> +	 */
+On 2020-05-16 08:40, Christoph Hellwig wrote:
+> None of the I/O schedulers actually needs it.
 
-same here.
+Is the next step perhaps to remove the bio argument from
+blk_mq_get_request()? Anyway:
 
-> +	if (force_gpt)
-> +		return 0;
-> +
->  	force_gpt = 1;
->  	return 1;
->  }
-
-
--- 
-~Randy
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
