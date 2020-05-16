@@ -2,125 +2,111 @@ Return-Path: <SRS0=73YH=66=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E291EC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8FFC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 17:10:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B346C2065C
-	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 16:58:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XWB8nVVv"
+	by mail.kernel.org (Postfix) with ESMTP id 05100206D8
+	for <linux-block@archiver.kernel.org>; Sat, 16 May 2020 17:10:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbgEPQ6e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 May 2020 12:58:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726237AbgEPQ6d (ORCPT
+        id S1726257AbgEPRKV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 May 2020 13:10:21 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:32778 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726251AbgEPRKV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 May 2020 12:58:33 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C456EC061A0C;
-        Sat, 16 May 2020 09:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=bbQ33WbtSFvsxRCkDIlragiDXl1OWmfa4TTs5FuIACg=; b=XWB8nVVv662/mphg0Jh2HbkVI+
-        +K5uoI5x7pxHZR76NkYSBI5gzEj2Zwa1IV/7ZkvRsnmauxN/dRNYpaJr40OFlQBhW61V1j3c8QMFK
-        zvc6etJpZg/M2ku2vVX58KgeKmuBHf6RVz7QZ2d0zk5RG5nvc60bkWFCpMut9jBBy32LqwzvTrcy3
-        m+bJBewURE5kzUIfnAv+oXPVDyGbd9UYJHpwHKvaPDQCcfttDazQZlkoMffKKMgi0oAbKgnsKwb6g
-        Sx0FD4KB8/LZ8CcJVOxjgeU0xP/mo+5gj7umJlBIWIJbmOlUp63EoySQb5DodLN6FREfTLW65BFSa
-        WzFHKO1Q==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ja08p-0000oq-An; Sat, 16 May 2020 16:58:27 +0000
-Subject: Re: [PATCH v5 4/6] partitions/efi: Support GPT entry lookup at a
- non-standard location
-To:     Dmitry Osipenko <digetx@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Heidelberg <david@ixit.cz>,
-        Peter Geis <pgwipeout@gmail.com>,
-        Stephen Warren <swarren@wwwdotorg.org>,
-        Nicolas Chauvet <kwizart@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Billy Laws <blaws05@gmail.com>,
-        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Davidlohr Bueso <dave@stgolabs.net>
-Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrey Danin <danindrey@mail.ru>,
-        Gilles Grandou <gilles@grandou.net>,
-        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Steve McIntyre <steve@einval.com>,
-        linux-efi <linux-efi@vger.kernel.org>
-References: <20200516153644.13748-1-digetx@gmail.com>
- <20200516153644.13748-5-digetx@gmail.com>
- <2ae298ca-016a-8867-52dd-86d99b9e0f3b@infradead.org>
- <595392b8-d950-4be6-f6cf-e274b4760b94@gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <4a0f6a9c-b652-598a-c8a0-580a3e98171b@infradead.org>
-Date:   Sat, 16 May 2020 09:58:25 -0700
+        Sat, 16 May 2020 13:10:21 -0400
+Received: by mail-pg1-f193.google.com with SMTP id s10so306012pgm.0
+        for <linux-block@vger.kernel.org>; Sat, 16 May 2020 10:10:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=VVXNsVoAh9AVxY4eEX48BnbzJN0o5NeVgTWX/fAupCU=;
+        b=M+JjH0LoyGyPfVa2K395UObib82ZIBDCy7p0Wkn6PIlhtwoOdebU3F6mBg7a/65vwD
+         KozqrTmBW5KWtH1qr5I+QmyPwXa87SdoZ5Mv5QbQhT9B7pZQ766Mprn4cjhodhEAc51S
+         YkTNQITp+82j4Ju3Qivg9gwqjPu5zCnsVPH8KwF/s08l96BG/T1vqDJVPtSsWZ7jHHDL
+         q36Y8zf1ul0CB3tJHmeN2bUSkKu+VqSK/gXCtPirXGlFSraOd9zyf7eYfyiFkVUQ0BdU
+         xfSQ8Yfets6QSKiv+l8t3XizIhjjUyuWHOYeCJlxk5YCH7AdsHHZOvGXGschliUHzQsY
+         tXyg==
+X-Gm-Message-State: AOAM530jqL6nX2iznpsS7oTwmIFWYLwZQLIcRY72lZ1jzyxb6RItIcV7
+        74Ajz1wzBtpSVmdnREfQAWw=
+X-Google-Smtp-Source: ABdhPJyPeSkzIUcYEfUo0xYqb3RGE0UFQjcd6QHPyeDZx2JjWibKpRr/AWNndhsabjzx8ECG4DKJHQ==
+X-Received: by 2002:a65:62d6:: with SMTP id m22mr8338629pgv.314.1589649020020;
+        Sat, 16 May 2020 10:10:20 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:97a:fd5b:e2c1:c090? ([2601:647:4000:d7:97a:fd5b:e2c1:c090])
+        by smtp.gmail.com with ESMTPSA id i184sm4363342pgc.36.2020.05.16.10.10.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 May 2020 10:10:18 -0700 (PDT)
+Subject: Re: [PATCH 2/5] bio.h: Declare the arguments of bio iteration
+ functions const
+To:     Alexander Potapenko <glider@google.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20200516001914.17138-1-bvanassche@acm.org>
+ <20200516001914.17138-3-bvanassche@acm.org>
+ <CAG_fn=WwtWxFhtx5esv_vqZ4=7Y1Ui0urLpVVvA4t3u-X=Oz1g@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <89399ce9-5738-fe58-da15-2b28f166740e@acm.org>
+Date:   Sat, 16 May 2020 10:10:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <595392b8-d950-4be6-f6cf-e274b4760b94@gmail.com>
+In-Reply-To: <CAG_fn=WwtWxFhtx5esv_vqZ4=7Y1Ui0urLpVVvA4t3u-X=Oz1g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/20 9:50 AM, Dmitry Osipenko wrote:
-> 16.05.2020 18:51, Randy Dunlap пишет:
->> On 5/16/20 8:36 AM, Dmitry Osipenko wrote:
->>> diff --git a/block/partitions/efi.c b/block/partitions/efi.c
->>> index b64bfdd4326c..3af4660bc11f 100644
->>> --- a/block/partitions/efi.c
->>> +++ b/block/partitions/efi.c
->>> @@ -621,6 +621,14 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
->>>          if (!good_agpt && force_gpt)
->>>                  good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
->>>  
->>> +	/* The force_gpt_sector is used by NVIDIA Tegra partition parser in
->>> +	 * order to convey a non-standard location of the GPT entry for lookup.
->>> +	 * By default force_gpt_sector is set to 0 and has no effect.
->>> +	 */
->>
->> Please fix the multi-line comment format as described in
->> Documentation/process/coding-style.rst.
->>
->>> +	if (!good_agpt && force_gpt && state->force_gpt_sector)
->>> +		good_agpt = is_gpt_valid(state, state->force_gpt_sector,
->>> +					 &agpt, &aptes);
->>> +
->>>          /* The obviously unsuccessful case */
->>>          if (!good_pgpt && !good_agpt)
->>>                  goto fail;
->>
->> thanks.
->>
-> 
-> Hello Randy,
-> 
-> I know that it's not a proper kernel-style formatting, but that's the
-> style used by the whole efi.c source code and I wanted to maintain the
-> same style, for consistency. Of course I can change to a proper style if
-> it's more desirable than the consistency. Thank you for the comment!
-> 
+On 2020-05-16 01:55, Alexander Potapenko wrote:
+> On Sat, May 16, 2020 at 2:19 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>> -static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+>> -                                   unsigned bytes)
+>> +static inline void bio_advance_iter(const struct bio *bio,
+>> +                                   struct bvec_iter *iter, unsigned bytes)
+>>  {
+>>         iter->bi_sector += bytes >> 9;
+>
+> On a related note, should this 9 be SECTOR_SHIFT?
 
-too bad. Sorry to hear that.
-It should have been "fixed" much earlier.
-It's probably too late now.
+Hi Alexander,
 
--- 
-~Randy
+I think a patch series is already under review for replacing "9" with
+SECTOR_SHIFT. See also
+https://lore.kernel.org/linux-block/20200507075100.1779-1-thunder.leizhen@huawei.com/.
 
+Thanks,
+
+Bart.
