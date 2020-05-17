@@ -2,112 +2,103 @@ Return-Path: <SRS0=r/dS=67=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8539C433DF
-	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 11:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FC0C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 22:17:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74802206F4
-	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 11:50:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D0372065F
+	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 22:17:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPK6UhYz"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="N++WCpXD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727893AbgEQLuJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 May 2020 07:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35182 "EHLO
+        id S1726550AbgEQWRi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 May 2020 18:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727833AbgEQLuJ (ORCPT
+        with ESMTP id S1726299AbgEQWRi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 May 2020 07:50:09 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 092BCC061A0C;
-        Sun, 17 May 2020 04:50:09 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id f15so2980279plr.3;
-        Sun, 17 May 2020 04:50:08 -0700 (PDT)
+        Sun, 17 May 2020 18:17:38 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5191C061A0C
+        for <linux-block@vger.kernel.org>; Sun, 17 May 2020 15:17:37 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id n22so4187188qtv.12
+        for <linux-block@vger.kernel.org>; Sun, 17 May 2020 15:17:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=RQqCyR4bauMcLEGGbKHO9FQ26y1JMcu6L0Mz2chabH4=;
-        b=TPK6UhYz1SmNZpLvbYJP2NFkB4VEnM1LAp3SFhb6dijjHxHPOVYj6mPJCuzeut/Ihd
-         CdfrZacKNWM2ik+Z1ra2/zwMjcP1as1cGPQMnZRqA8x4/3lwqQB5wdHepYJynSn+7u7e
-         bgDtKINcFBGn7wpsLvdT3iwn5VLR5hYjIx9BYTg2vD/4N2vCHWvR9vCL5qa0xXZELQ55
-         rFZayqMTXCSRoE87RGCc1v7hvQJ6QXSctqeApFtHISQH3Dir/ZfDOIKM/LnYMQiXHrd2
-         8CHb47vAyVcRcdImLO4QO2/ZX0JWuAF/ldMJSNAJpEUrxj1hNPXdvKrkWjvb7eGsn6mQ
-         0ubQ==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ZtCqJbSzSTr/mOw+zKYStT6YhJmMRVpkZgqWDpAi5Rc=;
+        b=N++WCpXD1D22zxXcHIsrPS8nLDn5EvvJtiwTQzSsRZEhwh0LHzSwsw8SQpsyXbGhhd
+         M512aYEuRlvzCm7a1lOxh4OMUKbVsKxCseVpwzyZRI5hZbqv0j0Id6CaSM3PH++VsjoE
+         jdYLYF+sk08HFfKpx18ViLDEXESDc+40y2cwdpAD1Nn5kwe0klahuoc75jRaPAt/zhXv
+         qgvE+yTHcSAVsqG/cdjoX/41y46ovWBTQiyZoXcsWV8AdENFfAJjxle09f4oit58sYkQ
+         bZe89i1yp0lB9ebCP/lLJwG2/ENX8RQLuM94b/GjrWkROJ77PzYbRwHF/HCxPCT8ELty
+         8EpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=RQqCyR4bauMcLEGGbKHO9FQ26y1JMcu6L0Mz2chabH4=;
-        b=IaMBK4ICpDekRQcZXNx5nf5shavli7haCf57aam/CZouuhYJFv24SqdP54u9nMziab
-         OSUw28wjxt9+/+UymL+2790Eo+3lXqxLVWR9dldQJLGzF1aI6pM9rryU0yVTHQWcZpTL
-         3tAbETJVeKU+SRVj1XJsQrBm5SzuowUmcd+Wm3WTJfJSCvtrvg+jN2OUaYVf1nrI4r1+
-         PVWkTW1lbVoOCDoCLudW7FEFoaS6BzX/Q0O0esMiXd9/batA0CV/D+FB+8J6P91uStY5
-         9Ud1obY+t5AEReEJv+OupKEXv6zrN1JN4h9zKj/fgHhepYnUCIga0OFJyrg8VNAY4vc+
-         Lc1g==
-X-Gm-Message-State: AOAM531vO/6ECR3skm9O99U1myRAyHglrYMDdHMsEXSdxaA+1tsWR3RR
-        10P+lcSdigC9uVNmC1SOiSg0oWIw
-X-Google-Smtp-Source: ABdhPJxbrMBUtFQL05TFgNGN60nbsF7yRGsKFZzFSbjieqrezfN5QeSD8vdp7GegJlpcQMlCWDposQ==
-X-Received: by 2002:a17:90a:2610:: with SMTP id l16mr13174341pje.219.1589716208483;
-        Sun, 17 May 2020 04:50:08 -0700 (PDT)
-Received: from localhost.localdomain ([45.135.186.16])
-        by smtp.gmail.com with ESMTPSA id cc8sm5842593pjb.11.2020.05.17.04.50.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2020 04:50:07 -0700 (PDT)
-From:   Baolin Wang <baolin.wang7@gmail.com>
-To:     axboe@kernel.dk
-Cc:     baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Remove unused flush_queue_delayed in struct blk_flush_queue
-Date:   Sun, 17 May 2020 19:49:41 +0800
-Message-Id: <d4104441539e9d8d2bc29a9c970713ba1ef2105d.1589715744.git.baolin.wang7@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ZtCqJbSzSTr/mOw+zKYStT6YhJmMRVpkZgqWDpAi5Rc=;
+        b=L90dKosfkQjFfDgTavTa2Tu+VDlGSM6hptq+qkyQNMoQQrvfk2wMSRov4nvnx2pXIZ
+         K+4FPpGjWcQdfCxfdmQZ63Rp9dPAhEBix5jlqITe5Bo6QGxnXEPa+FwqMPXQeWiZm6kH
+         0JhnezfxvvJq4X6IELTKu80KPEgOQPdFtjK7yRhrm/iCQ3e+HwEi6IzGj/eCqB0YAV3J
+         x/za/PufFwihEhpn00coKDZYnqZ4SZHU9NDY3kHuf9Q+5GWVgt41fsXfiUc3/zfuOYwk
+         JesJJ2EyYUESOmStifLtPl6srnOmdj74Jv3c2DPJ/GC/+BV1E2meiFOjS6nZpBLehA+a
+         laaw==
+X-Gm-Message-State: AOAM532w/71jM2+XH9YIELfSEWAmEGjNUAw8AiFPWFvfw+TD8xn4U++n
+        doelPcCaerWAB3A2d09a0rDiVA==
+X-Google-Smtp-Source: ABdhPJy0NyBiPigc2ASavOe6gEb8l61SV5QZ4f5YpPfRhBRGoN8rY6fPnU2/L/8G76IL3eariMSSjQ==
+X-Received: by 2002:aed:2fe2:: with SMTP id m89mr13895278qtd.124.1589753857029;
+        Sun, 17 May 2020 15:17:37 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id p2sm6807869qkm.41.2020.05.17.15.17.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 17 May 2020 15:17:36 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jaRbD-0003RG-LP; Sun, 17 May 2020 19:17:35 -0300
+Date:   Sun, 17 May 2020 19:17:35 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, leon@kernel.org, dledford@redhat.com,
+        jinpu.wang@cloud.ionos.com, pankaj.gupta@cloud.ionos.com
+Subject: Re: [PATCH v15 00/25] RTRS (former IBTRS) RDMA Transport Library and
+ RNBD (former IBNBD) RDMA Network Block Device
+Message-ID: <20200517221735.GA13057@ziepe.ca>
+References: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200511135131.27580-1-danil.kipnis@cloud.ionos.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The flush_queue_delayed was introdued to hold queue if flush is
-running for non-queueable flush drive by commit 3ac0cc450870
-("hold queue if flush is running for non-queueable flush drive"),
-but the non mq parts of the flush code had been removed by
-commit 7e992f847a08 ("block: remove non mq parts from the flush code"),
-as well as removing the usage of the flush_queue_delayed flag.
-Thus remove the unused flush_queue_delayed flag.
+On Mon, May 11, 2020 at 03:51:06PM +0200, Danil Kipnis wrote:
+> Hi all,
+>  
+> Here is v15 of the RTRS (former IBTRS) RDMA Transport Library and the
+> corresponding RNBD (former IBNBD) RDMA Network Block Device, which
+> fixes the issues in Makefile in V14 reported-by
+> the kbuild test robot (see changelog below). The patchset applies for
+> kernel v5.7-rc5.
 
-Signed-off-by: Baolin Wang <baolin.wang7@gmail.com>
----
- block/blk-flush.c | 1 -
- block/blk.h       | 1 -
- 2 files changed, 2 deletions(-)
+I don't particularly enjoy having another ULP for a single use case,
+but I think Ionos has shown commitment to use and maintain this, so
+lets go ahead.
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index c7f396e3d5e2..b733f7ac75c7 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -258,7 +258,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		blk_flush_complete_seq(rq, fq, seq, error);
- 	}
- 
--	fq->flush_queue_delayed = 0;
- 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- }
- 
-diff --git a/block/blk.h b/block/blk.h
-index fc00537026a0..6cab33a11f90 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -19,7 +19,6 @@ extern struct dentry *blk_debugfs_root;
- #endif
- 
- struct blk_flush_queue {
--	unsigned int		flush_queue_delayed:1;
- 	unsigned int		flush_pending_idx:1;
- 	unsigned int		flush_running_idx:1;
- 	blk_status_t 		rq_status;
--- 
-2.17.1
+Applied to for-next, with Jen's ack for the block part
 
+There will be probably be a stream of complaints from linux next in
+the next weeks or so. Remember the merge window is probably in 2
+weeks, so deal with them promptly please.
+
+Thanks,
+Jason
