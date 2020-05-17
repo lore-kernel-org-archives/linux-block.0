@@ -2,137 +2,191 @@ Return-Path: <SRS0=r/dS=67=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54422C433DF
-	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 22:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56132C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 23:55:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AED520735
-	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 22:46:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31A922081A
+	for <linux-block@archiver.kernel.org>; Sun, 17 May 2020 23:55:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JeYn2RCc";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="kuRXkjmP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIdNSeeb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726601AbgEQWqW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 May 2020 18:46:22 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:12019 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726591AbgEQWqV (ORCPT
+        id S1726797AbgEQXzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 May 2020 19:55:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34504 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726656AbgEQXzg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 May 2020 18:46:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1589755582; x=1621291582;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=Xvq/bOe8nFwKenjNRVb500LHn2LRgaf0af6BY34z96w=;
-  b=JeYn2RCcrkvhovpQwxazu4Uwp0TC8j8LUHKkMdq0T7u4RyHnL3NuNVKJ
-   rzKKirnG/qAFqWNSoWDrgrL9jAdQWQZfU81Pxzppzvos9XBJXH7zuPOSC
-   /hDpSyONFnr/txCcxt04vN8zwTYw3x60n3gSa0Tr1CVfxjRk637FPfgN5
-   K0qZLg1LLttATKavM8oNZ997A2E8K1uLEs7e/JzUpglJlWx5qQMeZg4Hm
-   5HgYI8ekwUlUb0eGLoj7q07KGU6dJOmuJA7ZB+KvWXN2DdLnnE0u2uBrH
-   gyFatteWsdcIczzWw8WfK/x+T4QHpFIeOaR+U7qEvpYxR8pgF1X2bh+7i
-   g==;
-IronPort-SDR: j6pe55RE4Z5BOKOvQ35X1Whj4xVAZ9aiBNEnYJpc0T/P8B7B+Nut3Qq5UxHldkQIDydnx4n0NT
- qd9Zyrz4zRRLo6YHwW+dqA/yXT5tklRn5oXmhMYhuqk7J8WKHkNmM9B8jYOUXGPlm9P1Z/y/nI
- iJg/7l7AVgYX5AizRO6o4QMk/8SleuRrd0VHpOVSUohr0Eoqdav2mko6EqB01vonhZ8VlJJKaZ
- 9B/fis/w9GFKhB4OyoZ7hP2BOeXVuRE19pOVlriplc7oiAmxrWypHFV1AQocgl1ofqaNh4iiuW
- Wmg=
-X-IronPort-AV: E=Sophos;i="5.73,405,1583164800"; 
-   d="scan'208";a="139331533"
-Received: from mail-bl2nam02lp2057.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.57])
-  by ob1.hgst.iphmx.com with ESMTP; 18 May 2020 06:46:21 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OUTL224sK6KTtr8B605Aibgk1SzmKWQaBarJmUQD6esUd3tgOr5G55vGA5/PJaa3/kxbYbDgXF7MHosz6HjLFg2y60id96kaIDui0Bt3hZGhxO643LBURnC0G2pSZimfcsQVzC6AHxuBDXuyKZN5sTmWVF7O681XTS7yi/g28ctV+54Bs9TzIgIZM8/7P7FzOio96yPXCR4I1G8/8lV4IDvTXM5mlTE5N5w5Uwq0A3r9gDa3yzrcYFNcZ5tIKBQnAE1ld/laPtsiZug96tl8qJFaG4KJj5sYM28ujRqIPXVY871Ld8e5PerdbgQN5axM/J2IvDzai6Zr5ES0nqDYrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xvq/bOe8nFwKenjNRVb500LHn2LRgaf0af6BY34z96w=;
- b=ZQt9cvGKGu55+TN0X2BHp/ukACslW/lJ3jFhM/9hCSU/5Io7U8HZHqTexq1gABLU6Xgon5cDzhj62JmbvvXkXFN+ZR6AfocpWgx+sjlJirXvIfJy6e64znR7/+t3fD6h/z/eGdjhRMukg5Q2ImoBu61D9AMJbSBnsPn0SPi0CWBRpunP1Zz80PfuueRlYwwTUtGwJ6LRtmtuYdyI4pKtxlbqSuMSZ5hSb92egJF9My33uHxP87RMa1stH25ChX9FIvtcsMobMIoZSyR6yhsH6ylC9xSwxHWl4E4WTs7VKxBBzQFPi5OYawSw5hwDhI5NrmcK+fF06XCHiuT8f2dZRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Sun, 17 May 2020 19:55:36 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82BB5C061A0C;
+        Sun, 17 May 2020 16:55:34 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id h4so7922034ljg.12;
+        Sun, 17 May 2020 16:55:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xvq/bOe8nFwKenjNRVb500LHn2LRgaf0af6BY34z96w=;
- b=kuRXkjmPmnbbnasCWQppxPkAEesaPF+sH0leATm8l9Lkzwng9tmn1H79ktencshTAkKsRsoGqIIgnz3hSM20BUPqqf/PwXTx3t3Z/pBwoDVW4iffstggKc0ZlWUshT6MKBdK0bznXZTKRPXeMIpMyTATzVS8W9DMFVRbDVK8cz0=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB6006.namprd04.prod.outlook.com (2603:10b6:a03:eb::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.27; Sun, 17 May
- 2020 22:46:17 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3000.033; Sun, 17 May 2020
- 22:46:17 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 2/5] bio.h: Declare the arguments of bio iteration
- functions const
-Thread-Topic: [PATCH 2/5] bio.h: Declare the arguments of bio iteration
- functions const
-Thread-Index: AQHWKxes/EceEZpND02aCQ2Fai2syg==
-Date:   Sun, 17 May 2020 22:46:16 +0000
-Message-ID: <BYAPR04MB4965F2C39CE5854A98F540A086BB0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200516001914.17138-1-bvanassche@acm.org>
- <20200516001914.17138-3-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: acm.org; dkim=none (message not signed)
- header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 94fab8b8-e22c-4173-ee26-08d7fab41c47
-x-ms-traffictypediagnostic: BYAPR04MB6006:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB60062AB5092E85F8FC84DB8186BB0@BYAPR04MB6006.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:635;
-x-forefront-prvs: 040655413E
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: I/xG7c8gfCJ5tX79VnEnqMqX+SSzJvUX0sj5NQKpH0eW8zKyNTDzjgIVLDpDOxQnAWfS3XP/CWdUSuOFMRlQoa0lZ2TWrDchb8LKCS4qbWk3DKGJ1lLDvQQ8eRMQHO8OkqvdVUulnmmBGqhIv87U7gwT6B2gLRrXLPLLigRq64AwdCq5WjZ1l2JfsFoBjjdCUNaCEV2aPbK/nKC+qWgbH7FYt8sZWArzfIB6JxS0ZLTjHW5PG5W/Cb5GC8Dhwd/Fk+eRIhYs47uZqdiBSxZCMMD96KRBoiA0Biy4/F4eaRwbo7fU6xiWUHXpEzxpRJxZUVvGIPVeJFBLPguDK72a09I4GQGuljgLo7aFRgBN7NjeomaSCdY8vgPPCP8Svqw6IHby+GWhAQhworsv9CZRK3a48QEqPgca0lOTt9qs6aI8pfk2u4FkSacTyCHSbV7A
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(366004)(136003)(376002)(396003)(346002)(52536014)(66446008)(316002)(110136005)(54906003)(86362001)(4744005)(8676002)(6506007)(53546011)(478600001)(4326008)(64756008)(9686003)(71200400001)(186003)(26005)(5660300002)(2906002)(76116006)(66556008)(66476007)(66946007)(33656002)(55016002)(8936002)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: z8casxuUnPng8sosroxceW4HL9XkjhluBejlUPYfyXLlHNfmONVFUpIojsQTS4j6RkkEO5Cd2p0NSGbUaUlhNf/fCpwkc6Ok3yt9Mur5jNLor07P3UHt4QYuW0q/K0q846QMI+ZZZIyOCd4MEuL5bJ7q1eLsFTMNa2GUHkUbaCphBMMHfXhGIK4n6ilE6PWqXQbZYG3on1bGOEKohO47JaeRSbo1ikdI/sz5RiT5rjpLSr1c9A02m9fU5Af9+2RMDk2m2WcpAYK/tBaI7Flb+Zz4vIqE5cIkJt8lZDwxnXVtwoOkvVOvc6R0XZUnbvShNSX6CEGcIzTIBwxYEd14qcAU+YZS8zOWZEZFj3YsLXy7tF0NcA7K40YfmWIyJN1ApK4inzBL0qSenFsrKDupCp80kXYhezJXjw2RTZJCNscip68Q/8Q33TcreRfXJudVkjILYovdOJuY00tespfzlXwoPNccWlmRvgYzouaxwCg=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=AE7rvJ9bQOe5Iv3TCs9QVJvHpNjvJT7jQx0yWIClvL8=;
+        b=bIdNSeebF0sOzpBjnRjJD7wq0z7acmE/98P4QdaWJBo1E1nMGwELD5ZPiegEdYlk90
+         c7eXWuy87PxtZBn9S+i6+BHscYbRVzIwqcl331bTCi9/a+0TbScIdCZdFXYdiltWnYac
+         jo5RxXaqI/t/ROyv6PK77QaXiMmfL4fYErE2qN4JmAcQS0zmFpV8poKeTKubuuY+Thpn
+         hjjJ+Dqaf7+HAI4Rwi3gGDHvWwoa/Eig6USQfW8MnqPc3rX1qogWdjqR6IFPOeTABT9S
+         Tn8XLR/G8JhhrTJX7/6gkH/0x7PMicj4+2/Dl/Ic7ZF7k2iN1RxJQyagyGYqqVvR7YfP
+         bp/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AE7rvJ9bQOe5Iv3TCs9QVJvHpNjvJT7jQx0yWIClvL8=;
+        b=KH1Os08IyXjVe9wPkhfFz64rGUZTCabTT/Fw4wznfSVxrBNajH6j3S5h0EPJfMqmoO
+         Pj4DJLqG2bFr1bReZ62hFMyvLv+tyoKTNAfox1tJKh0y4sigE72cMp3qscLmzBOmaDFr
+         VDG955cOAUzvSI3Z5jBIW7KrEwgVhQuoT0BuReZwdb3F038ju7VRIydgosTofQhJepb8
+         IgN/gD29xBqOTu+uQUT/gPREMl5nJYT+QtqINGmOHxTqKEBzl63dQlK9ufXPUbQ12zqr
+         tIrSwbHxc2BaA+CqWegyLwM7c0XPvxLWMes4jprJGPBLuQ89ZLspT8xkfECWLOHqsh9I
+         jWLw==
+X-Gm-Message-State: AOAM530KqlWysk1/Sb/swz0jYNPGlggaB6uprvpyzCxDh78m0WiOt37L
+        RIvm0Wi2Ov4rgmgVxpFYX0uNbRh3
+X-Google-Smtp-Source: ABdhPJzEUiiYd/oJCMEpxpgajyxxfj7zK6t4yrcBlOfnsdIxAxEU1ynFF1Hmj1VKlySMgrhvkT3ktg==
+X-Received: by 2002:a2e:9b0f:: with SMTP id u15mr8584980lji.272.1589759732688;
+        Sun, 17 May 2020 16:55:32 -0700 (PDT)
+Received: from [192.168.2.145] (ppp91-78-208-152.pppoe.mtu-net.ru. [91.78.208.152])
+        by smtp.googlemail.com with ESMTPSA id n18sm4791094lji.2.2020.05.17.16.55.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 May 2020 16:55:31 -0700 (PDT)
+Subject: Re: [PATCH v6 2/7] mmc: block: Add mmc_bdev_to_card() helper
+From:   Dmitry Osipenko <digetx@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Stephen Warren <swarren@wwwdotorg.org>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>,
+        =?UTF-8?Q?Nils_=c3=96stlund?= <nils@naltan.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Steve McIntyre <steve@einval.com>,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20200517021225.22890-1-digetx@gmail.com>
+ <20200517021225.22890-3-digetx@gmail.com>
+Message-ID: <7bddacf1-5fe0-5119-48ac-6a0cc65c5af0@gmail.com>
+Date:   Mon, 18 May 2020 02:55:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94fab8b8-e22c-4173-ee26-08d7fab41c47
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2020 22:46:17.0078
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8R1yFHMXE0GUxfgUfcFX2aibRU9a0vQoun3RbIrpP/klzUC23+Nty5a8lTnca7aH6zS/RGWuK/0t+vZP4YINko65qPw7mFWIUXOJSPBZJko=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6006
+In-Reply-To: <20200517021225.22890-3-digetx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/15/20 5:19 PM, Bart Van Assche wrote:=0A=
-> This change makes it possible to pass 'const struct bio *' arguments to=
-=0A=
-> these functions.=0A=
-> =0A=
-> Cc: Christoph Hellwig<hch@lst.de>=0A=
-> Cc: Ming Lei<ming.lei@redhat.com>=0A=
-> Cc: Damien Le Moal<damien.lemoal@wdc.com>=0A=
-> Cc: Chaitanya Kulkarni<chaitanya.kulkarni@wdc.com>=0A=
-> Cc: Alexander Potapenko<glider@google.com>=0A=
-> Signed-off-by: Bart Van Assche<bvanassche@acm.org>=0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+17.05.2020 05:12, Dmitry Osipenko пишет:
+> NVIDIA Tegra Partition Table takes into account MMC card's BOOT_SIZE_MULT
+> parameter, and thus, the partition parser needs to retrieve that EXT_CSD
+> value from the block device.  There are also some other parts of struct
+> mmc_card that are needed for the partition parser in order to calculate
+> the eMMC offset and verify different things.  This patch introduces new
+> helper which takes block device for the input argument and returns the
+> corresponding MMC card.
+> 
+> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+> ---
+>  drivers/mmc/core/block.c   | 15 +++++++++++++++
+>  include/linux/mmc/blkdev.h | 13 +++++++++++++
+>  2 files changed, 28 insertions(+)
+>  create mode 100644 include/linux/mmc/blkdev.h
+> 
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index c5367e2c8487..99298e888381 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -40,6 +40,7 @@
+>  #include <linux/debugfs.h>
+>  
+>  #include <linux/mmc/ioctl.h>
+> +#include <linux/mmc/blkdev.h>
+>  #include <linux/mmc/card.h>
+>  #include <linux/mmc/host.h>
+>  #include <linux/mmc/mmc.h>
+> @@ -305,6 +306,20 @@ static ssize_t force_ro_store(struct device *dev, struct device_attribute *attr,
+>  	return ret;
+>  }
+>  
+> +struct mmc_card *mmc_bdev_to_card(struct block_device *bdev)
+> +{
+> +	struct mmc_blk_data *md;
+> +
+> +	if (bdev->bd_disk->major != MMC_BLOCK_MAJOR)
+> +		return NULL;
+> +
+> +	md = mmc_blk_get(bdev->bd_disk);
+> +	if (!md)
+> +		return NULL;
+> +
+> +	return md->queue.card;
+> +}
+> +
+>  static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+>  {
+>  	struct mmc_blk_data *md = mmc_blk_get(bdev->bd_disk);
+> diff --git a/include/linux/mmc/blkdev.h b/include/linux/mmc/blkdev.h
+> new file mode 100644
+> index 000000000000..67608c58de70
+> --- /dev/null
+> +++ b/include/linux/mmc/blkdev.h
+> @@ -0,0 +1,13 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + *  linux/include/linux/mmc/blkdev.h
+> + */
+> +#ifndef LINUX_MMC_BLOCK_DEVICE_H
+> +#define LINUX_MMC_BLOCK_DEVICE_H
+> +
+> +struct block_device;
+> +struct mmc_card;
+> +
+> +struct mmc_card *mmc_bdev_to_card(struct block_device *bdev);
+> +
+> +#endif /* LINUX_MMC_BLOCK_DEVICE_H */
+> 
+
+Hello Ulf / Jens and everyone,
+
+Guys, what do you think about this change?
+
+Currently it's not allowed to compile MMC_BLOCK as a loadable kernel
+module if TEGRA_PARTITION is enabled because it depends on MMC_BLOCK
+presence. I'm curious if this situation could be improved by moving
+mmc_bdev_to_card() to linux/mmc/blkdev.h and then:
+
+1. Moving all private mmc/core/block.c structs to the public
+linux/mmc/blkdev.h.
+
+2. Or adding a "private opaque" pointer to a struct block_device and
+setting it to md->queue.card, for example.
+
+3. I see that struct block_device already has some bd_private field, but
+I'm not sure whether it could be used for what I'm trying to achieve.
+Actually I don't see where bd_private is used in kernel at all.
+
+I'd like get yours feedback, thanks in advance.
