@@ -2,84 +2,90 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC484C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 11:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B65FC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 11:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4F6B207E8
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 11:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D3E020758
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 11:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727006AbgERLej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 May 2020 07:34:39 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:51082 "EHLO huawei.com"
+        id S1726797AbgERLuM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 May 2020 07:50:12 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2219 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726526AbgERLej (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 May 2020 07:34:39 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D496DEC4CE1912E258A9;
-        Mon, 18 May 2020 19:34:34 +0800 (CST)
-Received: from [127.0.0.1] (10.166.215.100) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Mon, 18 May 2020
- 19:34:28 +0800
-Subject: Re: [PATCH] blkcg: Fix memory leak in blkg_conf_prep()
-To:     Markus Elfring <Markus.Elfring@web.de>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        "Feilong Lin" <linfeilong@huawei.com>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Zhiqiang Liu <liuzhiqiang26@huawei.com>
-References: <4c670a6c-98c3-2b14-7438-09199506d92f@web.de>
-From:   Wu Bo <wubo40@huawei.com>
-Message-ID: <5cfba9c1-675d-d4e8-65bf-746712ae32e5@huawei.com>
-Date:   Mon, 18 May 2020 19:34:27 +0800
+        id S1726585AbgERLuM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 May 2020 07:50:12 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 34342C964F80A3DCC410;
+        Mon, 18 May 2020 12:50:11 +0100 (IST)
+Received: from [127.0.0.1] (10.210.170.146) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 18 May
+ 2020 12:50:10 +0100
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v2
+To:     Christoph Hellwig <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200518063937.757218-1-hch@lst.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <6241656e-0bf7-b32d-493e-e3f870a4d031@huawei.com>
+Date:   Mon, 18 May 2020 12:49:14 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <4c670a6c-98c3-2b14-7438-09199506d92f@web.de>
+In-Reply-To: <20200518063937.757218-1-hch@lst.de>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.166.215.100]
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.170.146]
+X-ClientProxiedBy: lhreml719-chm.china.huawei.com (10.201.108.70) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/15 23:08, Markus Elfring wrote:
-> …
->> new_blkg = blkg_alloc(pos, q, GFP_KERNEL);
-> …
+On 18/05/2020 07:39, Christoph Hellwig wrote:
+> Hi all,
 > 
-> I suggest to omit the source code quotation from the change description.
+> this series ensures I/O is quiesced before a cpu and thus the managed
+> interrupt handler is shut down.
 > 
+> This patchset tries to address the issue by the following approach:
 > 
->> if calling blkg_lookup_check() failed, at the IS_ERR block,
->> the new_blkg should be free before goto lable fail_unlock
->> in blkg_conf_prep() function.
+>   - before the last cpu in hctx->cpumask is going to offline, mark this
+>     hctx as inactive
 > 
-> How do you think about a wording variant like the following?
+>   - disable preempt during allocating tag for request, and after tag is
+>     allocated, check if this hctx is inactive. If yes, give up the
+>     allocation and try remote allocation from online CPUs
 > 
->    If a call of the function “blkg_lookup_check” failed,
->    release the previously allocated block group before jumping
->    to the target “fail_unlock” in the implementation of
->    the function “blkg_conf_prep”.
+>   - before hctx becomes inactive, drain all allocated requests on this
+>     hctx
+> 
+> The guts of the changes are from Ming Lei, I just did a bunch of prep
+> cleanups so that they can fit in more nicely.  The series also depends
+> on my "avoid a few q_usage_counter roundtrips v3" series.
+> 
+> Thanks John Garry for running lots of tests on arm64 with this previous
+> version patches and co-working on investigating all kinds of issues.
+> 
+> A git tree is available here:
+> 
+>      git://git.infradead.org/users/hch/block.git blk-mq-hotplug
+> 
+> Gitweb:
+> 
+>      http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-mq-hotplug
+> .
 > 
 
-Thanks for your suggestion. omit the source code quotation from the 
-description is more friendly. I will modify the description in V2 patch.
+FWIW, I tested this series for cpu hotplug and it looked ok.
 
-Thanks,
-Wu Bo
-
-> 
-> Would you like to add the tag “Fixes” to the commit message?
-> 
-> Regards,
-> Markus
-> 
-
-
+john
