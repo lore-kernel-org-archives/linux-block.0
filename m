@@ -6,86 +6,85 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F20DC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 02:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFED5C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 02:56:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69838207BB
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 02:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFBB020787
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 02:56:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbgERCc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 May 2020 22:32:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55212 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726639AbgERCc1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 May 2020 22:32:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 62A6AAE96;
-        Mon, 18 May 2020 02:32:26 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 4/4] block: set bi_size to REQ_OP_ZONE_RESET bio
+        id S1726680AbgERC4l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 May 2020 22:56:41 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:51990 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726639AbgERC4k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 17 May 2020 22:56:40 -0400
+Received: by mail-pj1-f65.google.com with SMTP id cx22so1011595pjb.1
+        for <linux-block@vger.kernel.org>; Sun, 17 May 2020 19:56:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=SAflGMcdaG131rPEvbIiw1qcwEBGT6u1s6p80KNja8c=;
+        b=aS3Xm26P4m5p1aK3SvmAJGfQqHJuOfXn6YPXmB/KM4Gcd4VY/G/d33v3d/DnXsoAFE
+         oUnKrErgkYl2Hibadn1E+02X2vNlsj+CwajJKee3DzPU3s4cs9p6oCvd6RruM+sQ5xr9
+         jeeMFp4NfE8EsdzoVC1WLEiPnETT1poGAsaN5f85XyL7Hf7EwjV55fY2pSv6laWDpf/K
+         TdiqxwUoTdWjIKWwLTsrxSE2P4T9YeJnKN7Pvf1pP9ZjTqRB89vEyD5iCUqlcGDDdBa0
+         dJtxXbX7v834Mxz7chMeB12PF6Zwbdawj19fvOwNjZellAUZ/bchpbyApwqE9EVNoqgy
+         m9wQ==
+X-Gm-Message-State: AOAM53211C4fMfTbIQly/VtyuqrZsWYHVw+NEy4o+27YbRoLRy5gXa1y
+        snpTS13E2+1++FFlDa7U0/Q=
+X-Google-Smtp-Source: ABdhPJyEhQD1VH27yL+HhgB3HD2yLkaRDJrnJ52aK1q5RcS/uhbaE609c9ayZyyP+LauI09DW5j0yg==
+X-Received: by 2002:a17:90a:2685:: with SMTP id m5mr13943472pje.197.1589770600018;
+        Sun, 17 May 2020 19:56:40 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:1c3f:56a2:fad2:fca1? ([2601:647:4000:d7:1c3f:56a2:fad2:fca1])
+        by smtp.gmail.com with ESMTPSA id m2sm3873086pjl.45.2020.05.17.19.56.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 May 2020 19:56:39 -0700 (PDT)
+Subject: Re: [PATCH 5/5] null_blk: Zero-initialize read buffers in
+ non-memory-backed mode
 To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-References: <20200516035434.82809-1-colyli@suse.de>
- <20200516035434.82809-5-colyli@suse.de>
- <BY5PR04MB6900FDE1CD0D754084FCCA38E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <4248690d-1be2-3da4-3dec-9d9f3216526e@suse.de>
-Date:   Mon, 18 May 2020 10:32:17 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        Alexander Potapenko <glider@google.com>
+References: <20200516001914.17138-1-bvanassche@acm.org>
+ <20200516001914.17138-6-bvanassche@acm.org>
+ <BY5PR04MB69008A16B82CD028FC01D0A6E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
+ <440743f4-1053-32f3-2edf-3eb0fdd057ef@acm.org>
+ <BY5PR04MB690032A546EF80F2B823C984E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <45f9df39-a62e-4721-5bc8-ac9fa87b02ea@acm.org>
+Date:   Sun, 17 May 2020 19:56:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <BY5PR04MB6900FDE1CD0D754084FCCA38E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
+In-Reply-To: <BY5PR04MB690032A546EF80F2B823C984E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -94,88 +93,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/18 08:59, Damien Le Moal wrote:
-> On 2020/05/16 12:55, Coly Li wrote:
->> Now for zoned device, zone management ioctl commands are converted into
->> zone management bios and handled by blkdev_zone_mgmt(). There are 4 zone
->> management bios are handled, their op code is,
->> - REQ_OP_ZONE_RESET
->>   Reset the zone's writer pointer and empty all previously stored data.
->> - REQ_OP_ZONE_OPEN
->>   Open the zones in the specified sector range, no influence on data.
->> - REQ_OP_ZONE_CLOSE
->>   Close the zones in the specified sector range, no influence on data.
->> - REQ_OP_ZONE_FINISH
->>   Mark the zone as full, no influence on data.
->> All the zone management bios has 0 byte size, a.k.a their bi_size is 0.
+On 2020-05-17 19:10, Damien Le Moal wrote:
+> On 2020/05/18 10:32, Bart Van Assche wrote:
+>> On 2020-05-17 18:12, Damien Le Moal wrote:
+>>> On 2020/05/16 9:19, Bart Van Assche wrote:
+>>>> +static void nullb_zero_rq_data_buffer(const struct request *rq)
+>>>> +{
+>>>> +	struct req_iterator iter;
+>>>> +	struct bio_vec bvec;
+>>>> +
+>>>> +	rq_for_each_bvec(bvec, rq, iter)
+>>>> +		zero_fill_bvec(&bvec);
+>>>> +}
+>>>> +
+>>>> +static void nullb_zero_read_cmd_buffer(struct nullb_cmd *cmd)
+>>>> +{
+>>>> +	struct nullb_device *dev = cmd->nq->dev;
+>>>> +
+>>>> +	if (dev->queue_mode == NULL_Q_BIO && bio_op(cmd->bio) == REQ_OP_READ)
+>>>> +		zero_fill_bio(cmd->bio);
+>>>> +	else if (req_op(cmd->rq) == REQ_OP_READ)
+>>>> +		nullb_zero_rq_data_buffer(cmd->rq);
+>>>> +}
+>>>
+>>> Shouldn't the definition of these two functions be under a "#ifdef CONFIG_KMSAN" ?
 >>
->> Exept for REQ_OP_ZONE_RESET request, zero length bio works fine for
->> other zone management bio, before the zoned device e.g. host managed SMR
->> hard drive can be created as a bcache device.
->>
->> When a bcache device (virtual block device to forward bios like md raid
->> drivers) can be created on top of the zoned device, and a fast SSD is
->> attached as a cache device, bcache driver may cache the frequent random
->> READ requests on fast SSD to accelerate hot data READ performance.
->>
->> When bcache driver receives a zone management bio for REQ_OP_ZONE_RESET
->> op, while forwarding the request to underlying zoned device e.g. host
->> managed SMR hard drive, it should also invalidate all cached data from
->> SSD for the resetting zone. Otherwise bcache will continue provide the
->> outdated cached data to READ request and cause potential data storage
->> inconsistency and corruption.
->>
->> In order to invalidate outdated data from SSD for the reset zone, bcache
->> needs to know not only the start LBA but also the range length of the
->> resetting zone. Otherwise, bcache won't be able to accurately invalidate
->> the outdated cached data.
->>
->> Is it possible to simply set the bi_size inside bcache driver? The
->> answer is NO. Although every REQ_OP_ZONE_RESET bio has exact length as
->> zone size or q->limits.chunk_sectors, it is possible that some other
->> layer stacking block driver (in the future) exists between bcache driver
->> and blkdev_zone_mgmt() where the zone management bio is made.
+>> It is on purpose that I used IS_ENABLED(CONFIG_KMSAN) below instead of
+>> #ifdef CONFIG_KMSAN. CONFIG_KMSAN is not yet upstream and I want to
+>> expose the above code to the build robot.
 > 
-> But bcache "knows" what underlying devices it is using, right ? So getting the
-> SMR drive zone size using blk_queue_zone_sectors(), bdev_zone_sectors() or by
-> directly accessing q->limits->chunk_sectors should not be a problem at all, no ?
-> 
->>
->> The best location to set bi_size is where the zone management bio is
->> composed in blkdev_zone_mgmt(), then no matter how this bio is split
->> before bcache driver receives it, bcache driver can always correctly
->> invalidate the resetting range.
->>
->> This patch sets the bi_size of REQ_OP_ZONE_RESET bio for each resetting
->> zone. Here REQ_OP_ZONE_RESET_ALL is special whose bi_size should be set
->> as capacity of whole drive size, then bcache can invalidate all cached
->> data from SSD for the zoned backing device.
-> 
-> NACK. The problem here is that struct bio_vec bv_len field and struct bvec_iter
-> bi_size field are both "unsigned int". So they can describe at most 4G x 512B =
-> 2TB ranges. For REQ_OP_ZONE_RESET_ALL, that is simply way too small (we already
-> are at 20TB capacity for SMR). One cannot issue a BIO with a length that is the
-> entire disk capacity.
-> 
-> I really think that bcache should handle the zone management ops as a special
-> case. I understand the goal of trying to minimize that by integrating them as
-> much as possible into the regular bcache IO path, but that really seems
-> dangerous to me. Since these operations will need remapping in bcache anyway
-> (for handling the first hidden zone containing the super block), all special
-> processing can be done under a single "if" which should not impact too much
-> performance of regular read/write commands in the hot path.
-> 
-> Device mapper has such code: see __split_and_process_bio() and its use of
-> op_is_zone_mgmt() function to handle zone management requests slightly
-> differently than other BIOs. That remove the need for relying on op_is_write()
-> direction (patch 1 and 2 in this series) for reset zones too, which in the end
-> will I think make your bcache code a lot more solid.
-> 
+> But then you will get a "defined but unused" build warning, no ?
 
-Copied. I understand and agree with you and Christoph now. Let me
-reconstruct the bcache code and maybe the depended change of generic
-block layer code can be avoided.
+Not when using IS_ENABLED(...).
 
-Damien and Christoph, thank you all for the comments.
-
-Coly Li
+Bart.
