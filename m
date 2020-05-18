@@ -2,77 +2,64 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29289C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 12:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F61C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 13:16:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12F8E206D4
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 12:22:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E17D220671
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 13:16:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgERMWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 May 2020 08:22:44 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4812 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726585AbgERMWo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 May 2020 08:22:44 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id C07DBD3A8A3B99E9CC35;
-        Mon, 18 May 2020 20:22:41 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Mon, 18 May 2020
- 20:22:33 +0800
-From:   Wu Bo <wubo40@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <Markus.Elfring@web.de>, <linux-kernel@vger.kernel.org>,
-        <liuzhiqiang26@huawei.com>, <linfeilong@huawei.com>,
-        <wubo40@huawei.com>
-Subject: [PATCH] blkcg:Fix memory leaks in blkg_conf_prep()
-Date:   Mon, 18 May 2020 20:36:06 +0800
-Message-ID: <1589805366-328489-1-git-send-email-wubo40@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726918AbgERNQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 May 2020 09:16:39 -0400
+Received: from verein.lst.de ([213.95.11.211]:38470 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726726AbgERNQj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 May 2020 09:16:39 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 555F968B02; Mon, 18 May 2020 15:16:35 +0200 (CEST)
+Date:   Mon, 18 May 2020 15:16:34 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 5/9] blk-mq: don't set data->ctx and data->hctx in
+ blk_mq_alloc_request_hctx
+Message-ID: <20200518131634.GA645@lst.de>
+References: <20200518093155.GB35380@T590> <87imgty15d.fsf@nanos.tec.linutronix.de> <20200518115454.GA46364@T590>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.27]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200518115454.GA46364@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Wu Bo <wubo40@huawei.com>
+On Mon, May 18, 2020 at 07:54:54PM +0800, Ming Lei wrote:
+> 
+> I guess I misunderstood your point, sorry for that.
+> 
+> The requirement is just that the request needs to be allocated on one online
+> CPU after INACTIVE is set, and we can use a workqueue to do that.
 
-If a call of the function blkg_lookup_check() failed,
-we should be release the previously allocated block group 
-before jumping to the lable 'fail_unlock' in the implementation of 
-the function blkg_conf_prep().
+I've looked over the code again, and I'm really not sure why we need that.
+Presumable the CPU hotplug code ensures tasks don't get schedule on the
+CPU running the shutdown state machine, so if we just do a retry of the
+tag allocation we can assume we are on a different CPU now (Thomas,
+correct me if that assumption is wrong).  So I think we can do entirely
+with the preempt_disable and the smp calls.  Something like this branch,
+which has only survived basic testing (the last patch is the pimary
+interesting one, plus maybe the last 3 before that):
 
-Suggested-by: Markus Elfring <Markus.Elfring@web.de>
-Signed-off-by: Wu Bo <wubo40@huawei.com>
+    git://git.infradead.org/users/hch/block.git blk-mq-hotplug.2
 
----
-V2: omit the source code quotation from 
-    the change description
+Gitweb:
 
----
- block/blk-cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 930212c..afeb769 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -682,6 +682,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		blkg = blkg_lookup_check(pos, pol, q);
- 		if (IS_ERR(blkg)) {
- 			ret = PTR_ERR(blkg);
-+			blkg_free(new_blkg);
- 			goto fail_unlock;
- 		}
- 
--- 
-1.8.3.1
-
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-mq-hotplug.2
