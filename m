@@ -2,218 +2,203 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43402C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 06:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E44DC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 07:25:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22271207F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 06:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DECA20657
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 07:25:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Z5qrYZlz";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="e3qlhuXQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="soiaT+Il"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726489AbgERG4k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 May 2020 02:56:40 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26324 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726127AbgERG4j (ORCPT
+        id S1726940AbgERHZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 May 2020 03:25:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726958AbgERHZU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 May 2020 02:56:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1589784999; x=1621320999;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=qrILgPvcViNNX8QECg5QCcAXIwLK/mZaof1IMas/FVw=;
-  b=Z5qrYZlzhAMooDa0ACQlo9O8io82TpyJykv/LVBDFSN1c5QbvxDm/Hi0
-   sxrrolaCGeBP/JtkF2O7UPXCZARsq44KrWdVfu350ipH0AXokBL4sm1Ib
-   /VdP1KeibfD6FwH2/UI+1deSSdzpo+fPevfdrTupWxr7UsEKx42P5Rkj/
-   wPPLlvDpTVvDAmdLwKrC2r6aFB7f49fDrYzzm5u12wge1hYWV/xO/xHAr
-   jDknif2DbMZTr2+Do8HucSRTsPNaboPDPiC98IAYkYgu+tYy/w02kH8Uo
-   DynKPrytHFHBrODYNn/eTQgXHUp0ZDXvMqLvDAsgjZte6N1Tcz5Vt0DpL
-   g==;
-IronPort-SDR: M6IrnpCBbOsvGKXn+PDLj/8WVeHsJTSUxjUTj8s2vO6Dcqv1nhrvphlFM/Z3NLr9iz1twWgrd2
- Yv48pT2x7EaSJq8vNFdiebp/rxJWuDVJAN14JKoOINViyIuAIc+5VeG0xK5cdrjl9Uyzei8sN6
- afm3QJtYZQWYeWxD8L7LBzWZEN51EmjbaJq81QnpEbbKLglx1mVCxXpN27F6imzkArOf0ddpQk
- rBZTAwwGtjd5N0YrP4lE1i2kYi+pdKB6JD5C/VrKIMGnoAaq/wCVeztxvCZHd3o7G/0dpPFlz9
- teY=
-X-IronPort-AV: E=Sophos;i="5.73,406,1583164800"; 
-   d="scan'208";a="246907201"
-Received: from mail-bn7nam10lp2108.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.108])
-  by ob1.hgst.iphmx.com with ESMTP; 18 May 2020 14:56:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pbo1qlrrTYzHaRV7qxETfVrzl6jxve1Lq5VTntwKU47iqTUEUbGZ/4siTZ376Zhg1Y+GjU7PTbtGMKhrAXnUqwOyydOUJ+E+/EzZQkyaoo9V/Ns19ti15REztE/6rBcJab5f50x1xZIjFv6y/K+0ZUYu+TQ32VsSNlDg3K2uxq/Da0gV2GKDHmeMJnVUtnsoop37xT/vn/cvxTkXbm5NBHzy0/D4clOlF0wa+kyIKlcmv04+q0zMYAW1Gn/mHYR2L2D8icFikpRgTYBBtbsoA0lo+Ndw0Yhq1sIOn5g3kb39m0+DiEW0BXwKMptnfMyGe2YsSdC80l48sgL0qNB/FA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4PZQ95CWQtGDbMFy92cPICr4e6rXtV0rqTz3k1D0DGc=;
- b=hOLMcWtrSHfsY3zCzV7FH6BpceP04Mx44s7GLCwrkiFq1t0MqD2gw7kmAadd5kRjK9Caw9+fLukKDihO+sYAhZcFzB4eVQIzFVHHqNugz95FSUmy9++6ccjjk8eXgAq9zy9iZypT1vuaZKMFJ8/1Sc6iZc/qNHBA/mzcXs3xsEBXbF3PjOVLZ/chesztv2JZV7Tu296L028CgSD3fpLIcBDUszd3Y02VMV4LngWaKgA4SAiOyLdkd3cXJ+qOI0Qfkbll4ugSp9aK3LhOTI2zKGfhRSC+w9HQSp6/HVDnCGnTuiRGoSAo1l+awy0L+QZI1q32sGDjTNm+fafFRtdVYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Mon, 18 May 2020 03:25:20 -0400
+Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85040C05BD0C
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2020 00:25:19 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id s5so3105159uad.4
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2020 00:25:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4PZQ95CWQtGDbMFy92cPICr4e6rXtV0rqTz3k1D0DGc=;
- b=e3qlhuXQRXB9SyMbrBKO9eud1eFu5jbuZ8z7U+M149bzH70lpVkN7QPk+XhRTAa+DzrC90M4ifM8pd53HQgGUUnUPKqsVKetDh5OUQww/uGoERBTMd3NfWSg0jtw60ikdGvqaho05fXiFsaFNpZ6aq2fy0Hh1jEAjoeJcxiYvAs=
-Received: from BY5PR04MB6900.namprd04.prod.outlook.com (2603:10b6:a03:229::20)
- by BY5PR04MB6721.namprd04.prod.outlook.com (2603:10b6:a03:22a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Mon, 18 May
- 2020 06:56:36 +0000
-Received: from BY5PR04MB6900.namprd04.prod.outlook.com
- ([fe80::b574:3071:da2f:7606]) by BY5PR04MB6900.namprd04.prod.outlook.com
- ([fe80::b574:3071:da2f:7606%6]) with mapi id 15.20.3000.034; Mon, 18 May 2020
- 06:56:36 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Hannes Reinecke <hare@suse.de>, Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hare@suse.com" <hare@suse.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: Re: [RFC PATCH v2 1/4] block: change REQ_OP_ZONE_RESET from 6 to 13
-Thread-Topic: [RFC PATCH v2 1/4] block: change REQ_OP_ZONE_RESET from 6 to 13
-Thread-Index: AQHWKzXNZ12ghqAt20GTR1GjD4GRxw==
-Date:   Mon, 18 May 2020 06:56:36 +0000
-Message-ID: <BY5PR04MB6900419B7FBB5913904B3AF1E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
-References: <20200516035434.82809-1-colyli@suse.de>
- <20200516035434.82809-2-colyli@suse.de> <20200516123801.GB13448@lst.de>
- <fc0fd3c9-ea46-7c62-2a57-abd64e79cd08@suse.de>
- <20200516125027.GA13730@lst.de>
- <f57da1e7-1563-db1e-8730-8daca219cbe7@suse.de>
- <20200516153649.GB16693@lst.de>
- <c50be737-da25-1e48-3e26-aa15df175110@suse.de>
- <19eea726-590c-bf55-2dbf-35b71c9d1600@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: suse.de; dkim=none (message not signed)
- header.d=none;suse.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 14a8d2d4-f9dc-41ed-07c7-08d7faf89b73
-x-ms-traffictypediagnostic: BY5PR04MB6721:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR04MB672199B042F8C101D90010B4E7B80@BY5PR04MB6721.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 04073E895A
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: IW96HI7kEHCdeTpPd/5qGYhDJCIPRuuhriEC+PvtYZklDvnVWsidJDE71mx3snGFdqm249psXf20C+SN8Egduidz7qkwCwowv7clh7jo/4HL7LjHNRQkVGsw/jLTCjhtgnhV71auBvAqx5CpkWDC4pzDSPLKUk3rqFVFqEC2cCvcU/kUIK8UM04GsBtvuW5OJj6pQ2yHxW9caXNrJlvI9716dYil77mIH/Ur8g2MIx7bFzZx0/qdtYpUfWai28Bl8SqRUQVp/eTN+WnaiGpao2kjQ4w6eIXrWMHWAjPK1HTq7r5KuvFHfO/Jm9PEKB9Vzv+roNOiV2saO155MxqaxDKfja+ZRTGsaCtXk22AIDysdxz2UBKcRIIqkObQHZeTmrptm1vwu+q5UY79+F6yo1wZUCzo/If7xcE9ysGdQ2Uv565LcifxllMMiDmIcYZg
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR04MB6900.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(26005)(9686003)(52536014)(55016002)(186003)(33656002)(8936002)(66946007)(53546011)(76116006)(66556008)(66476007)(6506007)(8676002)(64756008)(66446008)(316002)(110136005)(7696005)(71200400001)(54906003)(4326008)(478600001)(86362001)(2906002)(7416002)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: K3YB3zLEHFe8Bi40fy4kszw9/1WIZ28d/V3W45WpbdwJaak4Xo5LmQ9mGtyjkBlToJFDJmQmLTA8jAMSWVmZliTZlNwPuqG3ShND5e6F2Uno3NhvB2pcHY3E/qxy3+Vnw8T5xvNvzF29Q72nfsnW1xtw8oIeW+JBsmbRBvvbxTktwgPtQKBhK+8qAOxRtElSJSfyyKLThdyowjFftt1BdX5iTLGKPr6rbIrK1IXpTOk7BRMfEAjRqOfn3zi/9RvmZIdJ5mryd+9lZqi90POxB8rOiSyBdTaXnxYuV/UOCI0TtLaUaRKNezQnNwGBLy2jLmaPXKxvFE3jHvd5OpYnFZRfWRow3niWDTMXhj82EajvaC/O8RylQBdzSivYuAvhi+rD888JEkCIe/TjLla5xriH6NwsgtdtVhUFRh3fw95UjAJgQgPvEHEZg5Nhpz5CsFOBsxRVovzakeQz8/1Ndd+bCRvAShUM+6zzE+iCpqurS7NVhU+tAWOIf0ivpLLw
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=aM+aPj0zOelCyynTrSmLMMQxc/+9X5BzxNpmeNMaiC4=;
+        b=soiaT+IlxtbU5bq6IqH0Hfp0oTnXcMaNQXTj3b/oA7odKHdqeOpIAT4AP18YPTa+tJ
+         QU+brKC5T+uT06O5yb35yJ0a3o3PlIIZz8uHd+abKZTErLQtIVRSkBI0TrxMcKvrRsL5
+         J4TabbAwz7055GNTUqrcH54OifcE0MnnFcqdGxogoh7Usu5JYo8dWW1GBaXD2W0WSIdG
+         Z68VroVjJTmK5QKbN6MiZO9D7wbg52jJ5t6Op/fPqvV/yZnUBo2A9L8ivWHhYSpxHF/D
+         07OiDBSE6PXT+sCN09hHYEF1OUnsTwra2pOdio3nsRu1520JgxorFIMMdbJK8v2wHRS8
+         rGSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=aM+aPj0zOelCyynTrSmLMMQxc/+9X5BzxNpmeNMaiC4=;
+        b=OZDUj5e1sX3Yo8nhBQfBAGq4UYY9NIn7XwmUqlNG/+DkDt6gmUdc47d47zz6BFSwBp
+         hSKhr5gAwfdLCD7DIT6D1kTxtcLLD1J6WAitEef08kLELNbM/8qIcQuYOc/3UM/8usfd
+         q6IxjXoB4F/0Ps+gGrvC5e90nyiZTfoUL8apFOAuqLVGRcRGI1GzKzFOIl9w4XHJt8LH
+         FZGPbDjJow7xLYf7YERKx2Ceio0VEjYMOHYF6Ec1damyIc5jo2M4mBX/VB9I7nGQ8vd4
+         9c32yrXjnEWPAtuAtKPsWEyNo/vIY/2hR1gx1CMbGSb+mOUjjC2tzsEX37ch1v7ghNYi
+         tpqg==
+X-Gm-Message-State: AOAM530AH+rreYB3nr0CRcOksunawDT/7+Yme1neTNS+gh/E/CD4DOA8
+        O7Znh0m0e+/3uolYWm3w48d9fgOz7yR5mw3hNYPHQA==
+X-Google-Smtp-Source: ABdhPJweGliNvIcLeCDU05CO+CaxX92MJZt0aMcqXXyqQIkHu9/Nlxtk64UFlOyWaAs4a7SkMmnbVVYmQTm7wnBffrY=
+X-Received: by 2002:ab0:544a:: with SMTP id o10mr10183460uaa.15.1589786718366;
+ Mon, 18 May 2020 00:25:18 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14a8d2d4-f9dc-41ed-07c7-08d7faf89b73
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 May 2020 06:56:36.0944
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tI3ZPczK/4gGLhRFfdbVz9bDi64UCQAxEuV7YO/WTsUtJrIKRIZOvDOTp/u0C2KrrkelhczpUcx4KE27Xr2AnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6721
+References: <20200517021225.22890-1-digetx@gmail.com> <20200517021225.22890-3-digetx@gmail.com>
+ <7bddacf1-5fe0-5119-48ac-6a0cc65c5af0@gmail.com>
+In-Reply-To: <7bddacf1-5fe0-5119-48ac-6a0cc65c5af0@gmail.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 18 May 2020 09:24:42 +0200
+Message-ID: <CAPDyKFrGbKSx=afZCNBN_r_6iNm_TX0tZVRLK05ZUTDBGvAuyA@mail.gmail.com>
+Subject: Re: [PATCH v6 2/7] mmc: block: Add mmc_bdev_to_card() helper
+To:     Dmitry Osipenko <digetx@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Stephen Warren <swarren@wwwdotorg.org>,
+        Nicolas Chauvet <kwizart@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Billy Laws <blaws05@gmail.com>,
+        =?UTF-8?Q?Nils_=C3=96stlund?= <nils@naltan.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrey Danin <danindrey@mail.ru>,
+        Gilles Grandou <gilles@grandou.net>,
+        Ryan Grachek <ryan@edited.us>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Steve McIntyre <steve@einval.com>,
+        linux-efi <linux-efi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/05/18 15:53, Hannes Reinecke wrote:=0A=
-> On 5/17/20 7:30 AM, Coly Li wrote:=0A=
->> On 2020/5/16 23:36, Christoph Hellwig wrote:=0A=
->>> On Sat, May 16, 2020 at 09:05:39PM +0800, Coly Li wrote:=0A=
->>>> On 2020/5/16 20:50, Christoph Hellwig wrote:=0A=
->>>>> On Sat, May 16, 2020 at 08:44:45PM +0800, Coly Li wrote:=0A=
->>>>>> Yes you are right, just like REQ_OP_DISCARD which does not transfer =
-any=0A=
->>>>>> data but changes the data on device. If the request changes the stor=
-ed=0A=
->>>>>> data, it does transfer data.=0A=
->>>>>=0A=
->>>>> REQ_OP_DISCARD is a special case, because most implementation end up=
-=0A=
->>>>> transferring data, it just gets attached in the low-level driver.=0A=
->>>>>=0A=
->>>>=0A=
->>>> Yes, REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL are quite similar to=
-=0A=
->>>> REQ_OP_DISCARD. Data read from the LBA range of reset zone is not=0A=
->>>> suggested and the content is undefined.=0A=
->>>>=0A=
->>>> For bcache, similar to REQ_OP_DISCARD, REQ_OP_ZONE_RESET and=0A=
->>>> REQ_OP_ZONE_RESET_ALL are handled in same way: If the backing device=
-=0A=
->>>> supports discard/zone_reset, and the operation successes, then cached=
-=0A=
->>>> data on SSD covered by the LBA range should be invalid, otherwise user=
-s=0A=
->>>> will read outdated and garbage data.=0A=
->>>>=0A=
->>>> We should treat REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL being in=
-=0A=
->>>> WRITE direction.=0A=
->>>=0A=
->>> No, the difference is that the underlying SCSI/ATA/NVMe command tend to=
-=0A=
->>> usually actually transfer data.  Take a look at the special_vec field=
-=0A=
->>> in struct request and the RQF_SPECIAL_PAYLOAD flag.=0A=
->>>=0A=
->>=0A=
->> Then bio_data_dir() will be problematic, as it is defined,=0A=
->>   52 /*=0A=
->>   53  * Return the data direction, READ or WRITE.=0A=
->>   54  */=0A=
->>   55 #define bio_data_dir(bio) \=0A=
->>   56         (op_is_write(bio_op(bio)) ? WRITE : READ)=0A=
->>=0A=
->> For the REQ_OP_ZONE_RESET bio, bio_data_dir() will report it as READ.=0A=
->>=0A=
->> Since the author is you, how to fix this ?=0A=
->>=0A=
-> =0A=
-> Well, but I do think that Coly is right in that bio_data_dir() is very =
-=0A=
-> unconvincing, or at least improperly documented.=0A=
-> =0A=
-> I can't quite follow Christoph's argument in that bio_data_dir() =0A=
-> reflects whether data is _actually_ transferred (if so, why would =0A=
-> REQ_OP_ZONE_CLOSE() be marked as WRITE?)=0A=
-> However, in most cases bio_data_dir() will only come into effect if =0A=
-> there are attached bvecs.=0A=
-> =0A=
-> So the _correct_ usage for bio_data_dir() would be to check if there is =
-=0A=
-> data attached to the bio (eg by using bio_has_data()), and only call =0A=
-> bio_data_dir() if that returns true. For false you'd need to add a =0A=
-> switch evaluating the individual commands.=0A=
-> =0A=
-> And, btw, bio_has_data() needs updating, too; all the zone commands are =
-=0A=
-> missing from there, too.=0A=
-=0A=
-Not really. They all have 0 size, so bio_has_data() always return false for=
- zone=0A=
-management ops. It will return true only for report zones.=0A=
-=0A=
-> =0A=
-> Cheers,=0A=
-> =0A=
-> Hannes=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On Mon, 18 May 2020 at 01:55, Dmitry Osipenko <digetx@gmail.com> wrote:
+>
+> 17.05.2020 05:12, Dmitry Osipenko =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > NVIDIA Tegra Partition Table takes into account MMC card's BOOT_SIZE_MU=
+LT
+> > parameter, and thus, the partition parser needs to retrieve that EXT_CS=
+D
+> > value from the block device.  There are also some other parts of struct
+> > mmc_card that are needed for the partition parser in order to calculate
+> > the eMMC offset and verify different things.  This patch introduces new
+> > helper which takes block device for the input argument and returns the
+> > corresponding MMC card.
+> >
+> > Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+> > ---
+> >  drivers/mmc/core/block.c   | 15 +++++++++++++++
+> >  include/linux/mmc/blkdev.h | 13 +++++++++++++
+> >  2 files changed, 28 insertions(+)
+> >  create mode 100644 include/linux/mmc/blkdev.h
+> >
+> > diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> > index c5367e2c8487..99298e888381 100644
+> > --- a/drivers/mmc/core/block.c
+> > +++ b/drivers/mmc/core/block.c
+> > @@ -40,6 +40,7 @@
+> >  #include <linux/debugfs.h>
+> >
+> >  #include <linux/mmc/ioctl.h>
+> > +#include <linux/mmc/blkdev.h>
+> >  #include <linux/mmc/card.h>
+> >  #include <linux/mmc/host.h>
+> >  #include <linux/mmc/mmc.h>
+> > @@ -305,6 +306,20 @@ static ssize_t force_ro_store(struct device *dev, =
+struct device_attribute *attr,
+> >       return ret;
+> >  }
+> >
+> > +struct mmc_card *mmc_bdev_to_card(struct block_device *bdev)
+> > +{
+> > +     struct mmc_blk_data *md;
+> > +
+> > +     if (bdev->bd_disk->major !=3D MMC_BLOCK_MAJOR)
+> > +             return NULL;
+> > +
+> > +     md =3D mmc_blk_get(bdev->bd_disk);
+> > +     if (!md)
+> > +             return NULL;
+> > +
+> > +     return md->queue.card;
+> > +}
+> > +
+> >  static int mmc_blk_open(struct block_device *bdev, fmode_t mode)
+> >  {
+> >       struct mmc_blk_data *md =3D mmc_blk_get(bdev->bd_disk);
+> > diff --git a/include/linux/mmc/blkdev.h b/include/linux/mmc/blkdev.h
+> > new file mode 100644
+> > index 000000000000..67608c58de70
+> > --- /dev/null
+> > +++ b/include/linux/mmc/blkdev.h
+> > @@ -0,0 +1,13 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + *  linux/include/linux/mmc/blkdev.h
+> > + */
+> > +#ifndef LINUX_MMC_BLOCK_DEVICE_H
+> > +#define LINUX_MMC_BLOCK_DEVICE_H
+> > +
+> > +struct block_device;
+> > +struct mmc_card;
+> > +
+> > +struct mmc_card *mmc_bdev_to_card(struct block_device *bdev);
+> > +
+> > +#endif /* LINUX_MMC_BLOCK_DEVICE_H */
+> >
+>
+> Hello Ulf / Jens and everyone,
+
+Hi Dmitry,
+
+>
+> Guys, what do you think about this change?
+
+As I stated in an earlier reply, I am deferring the review from mmc
+point of view, until I see some confirmation from Jens that he is okay
+with adding a new partition format.
+
+Otherwise I may just waste my time on reviews. I hope you understand.
+
+Kind regards
+Uffe
+
+>
+> Currently it's not allowed to compile MMC_BLOCK as a loadable kernel
+> module if TEGRA_PARTITION is enabled because it depends on MMC_BLOCK
+> presence. I'm curious if this situation could be improved by moving
+> mmc_bdev_to_card() to linux/mmc/blkdev.h and then:
+>
+> 1. Moving all private mmc/core/block.c structs to the public
+> linux/mmc/blkdev.h.
+>
+> 2. Or adding a "private opaque" pointer to a struct block_device and
+> setting it to md->queue.card, for example.
+>
+> 3. I see that struct block_device already has some bd_private field, but
+> I'm not sure whether it could be used for what I'm trying to achieve.
+> Actually I don't see where bd_private is used in kernel at all.
+>
+> I'd like get yours feedback, thanks in advance.
