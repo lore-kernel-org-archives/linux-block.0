@@ -2,259 +2,138 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A71A1C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 04:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F52C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 05:09:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73CD720787
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 04:30:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95195207C4
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 05:09:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FBNqnGSM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lqqAhFfR";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="wTxbp9Uc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbgEREa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 May 2020 00:30:27 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:50326 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725280AbgEREa1 (ORCPT
+        id S1726180AbgERFJ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 May 2020 01:09:28 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:10617 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726040AbgERFJ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 May 2020 00:30:27 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04I4Tid9067122;
-        Mon, 18 May 2020 04:30:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=mime-version :
- message-id : date : from : to : cc : subject : content-type :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=OveuMVbR4YSqctD5sYckSyi6w/OFAe1tz9kxqthg9V4=;
- b=FBNqnGSMo7kbvPIHzDKvOxMmy8ibusjHMAV402KF5b7EuEiR1Bzkf0Dn1Z2kx7cd0iGf
- hs2NhSj6byK8AWE7YNL+gWsRc0KuO2RtMsd0KTUUfIfdcG6YcV/GQdZwumd+MxK5PKcP
- qCgwvCbhAbTrMTEYq3ORtwmvhJT9wrem/jEZNfgJr4lvqtqZKz7qsKeFiM3YFR0QoSkC
- R17MIqs0Uw8NVGLc+XC2CjsXXY8HLBsKY8Z9eiSISr6mq5Juj0TJVkNQFFzHQS21Jsf9
- 5vE0ctH6WD0ebdrzZ3oAEfx5XBExa+gCs6ccGXXo5RG0SgA6Z/sbXS5BX6/m52lPP9Db cA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 31284kmf08-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 18 May 2020 04:30:15 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04I4T1Xw106569;
-        Mon, 18 May 2020 04:30:15 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 312sxpjr2m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 May 2020 04:30:14 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04I4UALL028495;
-        Mon, 18 May 2020 04:30:11 GMT
-MIME-Version: 1.0
-Message-ID: <c77b0998-5112-4d6b-b51c-41d2b901009d@default>
-Date:   Sun, 17 May 2020 21:30:10 -0700 (PDT)
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     <linux-nvme@lists.infradead.org>
-Cc:     <linux-block@vger.kernel.org>
-Subject: nvme double __blk_mq_complete_request() bugs
-X-Mailer: Zimbra on Oracle Beehive
-Content-Type: text/plain; charset=UTF-8
+        Mon, 18 May 2020 01:09:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1589778567; x=1621314567;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=jniKQ7KenpPaVIeWxR/nKeX6MjkX1glXIyhjq8SKq64=;
+  b=lqqAhFfR24IvXYoGD0FN6CeEZJemykbHu2K4tpkhZkJg8hObYlVAUrPW
+   yY3sejXOWb4s5Y6GKRkXZOtdjUIxkxS4ESMNvlxJweXSY+OKxx2Nb8OY4
+   dcCKpgW6G8rK4OEtn52O6unUocev47CPGcsi4oC9lPxq2+J5oxDKXdvhl
+   gJpqkMsPPmq+k8Gc6i3LsZdIr649qn680q+oQ9uRERAbu0i6mpMghRmxg
+   VxGLVWGBJ+02qpXQi7ukcuuijWMerBAxR60pNDbJfl8yNnxp64sU4JUCv
+   OX+6TI3ONxRxvlWdJloKLH0kIqmYSXOXgWKtAssKAQ3IRNOLm/s4j3k0d
+   Q==;
+IronPort-SDR: yfbcf31rCBtUzj7GGbxnmtzsIH/otDigbUypAtrtanmXOBhP2Cl33f8XkFkT2g936ydD8F3zXg
+ VOXtFfCHcIzEmtlGtXk6QSlJKPTQYwucrgS3/dh5wcil5VK7gQQUpyCtdOb0TlVRBLYDXNFQYv
+ 3ohvLRUbsjQdIO7MEUJaffzUWoTFICnF04tNvG147MgIFAvFknoAegLpeJ3aULQWQsSCw1xME7
+ 5y2nXCBPpcXyOuLQuMVrgriaLqzj+yR2Om3+ulms++CgJVJj/+sOK5LE6pIeU3pIXGqevUMsR0
+ LL4=
+X-IronPort-AV: E=Sophos;i="5.73,406,1583164800"; 
+   d="scan'208";a="138249946"
+Received: from mail-bn7nam10lp2107.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.107])
+  by ob1.hgst.iphmx.com with ESMTP; 18 May 2020 13:09:25 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VGa0Vv+xtN1FGSYD4fMySfBKUJJGk6FOp1nkTGsAWCN6ZYNgXv4ia1slCFAufwltNmng+sH2tM/RgU88GnbXMcO5kmy3zRrpTd9qciG0QXCRtHcPh6PjPBHwJ+6NJeLWMRQYA2jdrO/97ZjB9DkWm5C7FWLjpj4gP8NCXUJvJN2E7zU4BTADElMfcO6EqpSLcWRfbGrajGw+TYGkIILN/ViqtawY2ae+iD0PFrnixcnK44pn4iXRfM+ZthQmQ2/zE2YFJ0o/QvRPcBXUYpVPtO6aokLVKSCcrZd04j89+bQAOrPZpGsDEBzDRZRNQ/vUY3UFAzkZ2XUohbHVEHQTvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jniKQ7KenpPaVIeWxR/nKeX6MjkX1glXIyhjq8SKq64=;
+ b=RhZhFi5QDFp4jtcQBDeZ3bCqTBxTrRXLOWqKpNYsMZjWbu/8uSNvN+AcHZBuSeDnpPh6mm6p2Cr5iEztU/VyIwgm7gLvproBdnpBlC3QTu7SCcQ/gAQ1s06nNJ6lDuA8RvkYJir37sK9GgGgEGTrV8oLhpH24Nq1X4wJj8JjKbRiH5b5i3+iPY7gVz4DETufr3fau9gD5GJcUjWGYPnuyDUiy3Ql5IOuafOMlK9FoL0/m0w7YBCs/wr6M0y8VXxCZQ7jlWCl2Q3UthcAcasFVRGc/vh7KcJVVUWhJmFHLOxHvs5OPMKlkxH42DJ45jXBdlfszLfpfyA4Ko7ztrif/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jniKQ7KenpPaVIeWxR/nKeX6MjkX1glXIyhjq8SKq64=;
+ b=wTxbp9UcLD6blaUzAbuZ3GzAwGtIQroyzI/D/Vy+Ry9dkK8V623luDqNKKBnLNK/odlJebdl6Mx5dDhqqG4CjqOH/iuaXFrpa03WFf5ziXNbxDtl+mudLbBiQGSWiDgwEJSkTaweKqZz7A0RX3qiMQaX/7CoaDxbFjj+vZup2yw=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB4549.namprd04.prod.outlook.com (2603:10b6:a03:5e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Mon, 18 May
+ 2020 05:09:23 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3000.033; Mon, 18 May 2020
+ 05:09:23 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>, Coly Li <colyli@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>, "hch@lst.de" <hch@lst.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: Re: [RFC PATCH v2 1/4] block: change REQ_OP_ZONE_RESET from 6 to 13
+Thread-Topic: [RFC PATCH v2 1/4] block: change REQ_OP_ZONE_RESET from 6 to 13
+Thread-Index: AQHWKzXNx0htYVAnNEmE+sJXY3ZbhA==
+Date:   Mon, 18 May 2020 05:09:23 +0000
+Message-ID: <BYAPR04MB4965F50C13415E486F519DC986B80@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20200516035434.82809-1-colyli@suse.de>
+ <20200516035434.82809-2-colyli@suse.de>
+ <BY5PR04MB69005621AE920061F7FD383CE7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: aa6ae7c5-30df-4dfc-90c3-08d7fae9a11e
+x-ms-traffictypediagnostic: BYAPR04MB4549:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB45499AC5AC21F0EBD44F140B86B80@BYAPR04MB4549.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 04073E895A
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ij8NsrbIpegiuBm0b/1vORHnewLWFzUM6TOnvx5JP5IVlqZ+nxIzv1VsUIWXhmzCDo0eI7yXwi1RPGiprSimpHHSC1JGXEfku+SS5EL4BbmXd+MHCVZbp4IALZdPzR6LcKzZ0R2g+E/zd0BWq3ep2YWi8kvuFm689VVFP0LEkcnQoTxLStG7aXd+JGv4EGr0naO6tUN0llhB4sX7+U/37B1JVQf6ng+zAwSM5qqcWv44JizYw9N+qXhzfQpAS+uo2IkiKcRneFVddlB+hy7UzyA1Cmdd7xrgLzxyjB92yi1kjneh0bDLYPrtMWpXeeR//hEAdOJAJxd5IDrG97AyyJ2DsCMV11xycdQzxtzrqjRvj5Ev0BwmCe9xoEjZBwLYVsjY6GDMLmBf/m8cOQBqCTC7d5Fh9waNqDQJ6q20whNqyida3Csi0LLNEbSjmVrM
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(136003)(366004)(346002)(376002)(396003)(4744005)(110136005)(7696005)(478600001)(53546011)(6506007)(316002)(4326008)(26005)(33656002)(54906003)(7416002)(52536014)(186003)(2906002)(5660300002)(8936002)(71200400001)(8676002)(66446008)(55016002)(9686003)(66946007)(86362001)(76116006)(66476007)(66556008)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: UIACVAM5V4WM/WZvVJSze/YVxb/fCyoYe65eOwZcLcmTCfMw+5x8tYE71CK/NKlfkglXXSBiKf/vol4C3pFIQuvOyjyelmnmhoYxeCKHIAlX3oMRdqX///dmXzy+/wjVaC5sBonFWREfdRiAfG/xpx+GukXqumrsfWFwJZoiCYFVEdS5kpVhhknB4giMdZe2B/Bscjbuj0y7kpzSz/d6/AcU2Z4fHIKxFI8X4aoDzwj69yNfozWgvWbbd9HXn1SgA/modQRo1WqgDT6F+YHCtSADXalcTd1RwZpoxmeB9oBxIxMyv+qnQNm3Xmug9nr3LvKzP2cclN++VTMJhuHNTICz/W+1Shhw3/cYlYhTTRLV6HOG2ILoD720192wTpC7T6pDPqYksdLZ5mLmDj0r16KTws12PzqZXPoTgxbAk6hh89zRV1MdZ2FZyUWoa/FQ45bkooVqjUM/8MWrMvY8Ey8qaO1mYQ9254JftI9k6NA=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9624 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 malwarescore=0
- mlxlogscore=779 bulkscore=0 mlxscore=0 suspectscore=4 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005180040
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9624 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=4 mlxscore=0
- cotscore=-2147483648 impostorscore=0 malwarescore=0 mlxlogscore=792
- lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005180040
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa6ae7c5-30df-4dfc-90c3-08d7fae9a11e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 May 2020 05:09:23.2074
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4PQSe6saTyFbYJ4gK/l+/MfiETBM+H3yrH9HK4yl+oyA15RAWqMG5k6cQ6fTb8XUy6971ZE6ASnNPHjsLFTveWxEzcVbO1tywUMLSiSjNBE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4549
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-This is to report the below page fault issue for nvme-loop.
-
-[  235.223975] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[  235.224878] BUG: KASAN: null-ptr-deref in blk_mq_free_request+0x363/0x51=
-0
-[  235.225674] Write of size 4 at addr 0000000000000198 by task swapper/3/0
-[  235.226456]=20
-[  235.226772] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[  235.227633] BUG: kernel NULL pointer dereference, address: 0000000000000=
-198
-[  235.228447] #PF: supervisor write access in kernel mode
-[  235.229062] #PF: error_code(0x0002) - not-present page
-[  235.229667] PGD 0 P4D 0=20
-[  235.229976] Oops: 0002 [#1] SMP KASAN PTI
-[  235.230451] CPU: 3 PID: 0 Comm: swapper/3 Tainted: G    B             5.=
-7.0-rc5+ #1
-[  235.231347] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-[  235.232692] RIP: 0010:blk_mq_free_request+0x367/0x510
-[  235.233286] Code: 89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 a2 dc ff ff 48 =
-8d ba 98 01 00 00 be 04 00 00 00 48 89 14 24 e8 fd 69 9a ff 48 8b 14 24 <f0=
-> ff 8a 98 01 00 00 e9 e2 fe ff ff 48 83 c4 08 48 89 ef be 03 00
-[  235.235503] RSP: 0018:ffff8881f7389be0 EFLAGS: 00010046
-[  235.236114] RAX: 0000000000000000 RBX: ffff8881f21b9680 RCX: ffffffff816=
-e05b1
-[  235.236941] RDX: 0000000000000000 RSI: 0000000000000046 RDI: 00000000000=
-00046
-[  235.237770] RBP: 0000000000000001 R08: fffffbfff0af5869 R09: fffffbfff0a=
-f5869
-[  235.238598] R10: ffffffff857ac347 R11: fffffbfff0af5868 R12: ffff8881f21=
-b969c
-[  235.239424] R13: ffff8881f0f62738 R14: ffffe8ffffd884c0 R15: ffff8881f21=
-b9698
-[  235.240255] FS:  0000000000000000(0000) GS:ffff8881f7380000(0000) knlGS:=
-0000000000000000
-[  235.241192] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  235.241863] CR2: 0000000000000198 CR3: 00000001eb886004 CR4: 00000000003=
-60ee0
-[  235.242695] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
-00000
-[  235.243523] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
-00400
-[  235.244349] Call Trace:
-[  235.244645]  <IRQ>
-[  235.244890]  blk_mq_complete_request+0x266/0x460
-[  235.245432]  nvmet_req_complete+0xd/0xb0
-[  235.245898]  iomap_dio_bio_end_io+0x336/0x480
-[  235.246409]  blk_update_request+0x320/0x960
-[  235.246904]  blk_mq_end_request+0x4e/0x4d0
-[  235.247391]  blk_mq_complete_request+0x266/0x460
-[  235.247937]  virtblk_done+0x164/0x300
-[  235.248372]  ? loop_queue_work.cold.44+0x5e/0x5e
-[  235.248915]  ? rcu_accelerate_cbs+0x5d/0x1a70
-[  235.249429]  ? virtqueue_get_used_addr+0x140/0x140
-[  235.249990]  vring_interrupt+0x16d/0x280
-[  235.250454]  __handle_irq_event_percpu+0xdd/0x470
-[  235.251010]  handle_irq_event_percpu+0x6e/0x130
-[  235.251544]  ? rcu_accelerate_cbs_unlocked+0x110/0x110
-[  235.252145]  ? __handle_irq_event_percpu+0x470/0x470
-[  235.252729]  ? _raw_spin_lock+0x75/0xd0
-[  235.253181]  ? _raw_write_lock+0xd0/0xd0
-[  235.253645]  handle_irq_event+0xc2/0x158
-[  235.254107]  handle_edge_irq+0x1e9/0x7a0
-[  235.254572]  do_IRQ+0x94/0x1e0
-[  235.254936]  common_interrupt+0xf/0xf
-[  235.255368]  </IRQ>
-[  235.255629] RIP: 0010:native_safe_halt+0xe/0x10
-[  235.256162] Code: e9 f2 fe ff ff 48 89 df e8 2f dc f8 fd eb a4 cc cc cc =
-cc cc cc cc cc cc cc cc cc cc e9 07 00 00 00 0f 00 2d a4 7d 4a 00 fb f4 <c3=
-> 90 e9 07 00 00 00 0f 00 2d 94 7d 4a 00 f4 c3 cc cc 41 56 41 55
-[  235.258314] RSP: 0018:ffff8881f61ffdd8 EFLAGS: 00000246 ORIG_RAX: ffffff=
-ffffffffde
-[  235.259194] RAX: ffffffff83bc59f0 RBX: dffffc0000000000 RCX: ffffffff83b=
-c6639
-[  235.260022] RDX: 1ffff1103ec398e8 RSI: 0000000000000008 RDI: ffff8881f61=
-cc740
-[  235.260850] RBP: 0000000000000003 R08: ffffed103ec398e9 R09: ffffed103ec=
-398e9
-[  235.261681] R10: ffff8881f61cc747 R11: ffffed103ec398e8 R12: ffffffff84e=
-5c4c0
-[  235.262508] R13: 0000000000000003 R14: 1ffff1103ec3ffc4 R15: 00000000000=
-00000
-[  235.263338]  ? __cpuidle_text_start+0x8/0x8
-[  235.263832]  ? default_idle_call+0x29/0x60
-[  235.264315]  ? tsc_verify_tsc_adjust+0x68/0x1f0
-[  235.264849]  default_idle+0x1a/0x2b0
-[  235.265273]  do_idle+0x2fd/0x3b0
-[  235.265658]  ? arch_cpu_idle_exit+0x40/0x40
-[  235.266151]  ? schedule_idle+0x56/0x90
-[  235.266595]  cpu_startup_entry+0x14/0x20
-[  235.267057]  start_secondary+0x2a6/0x340
-[  235.267522]  ? set_cpu_sibling_map+0x1fb0/0x1fb0
-[  235.268066]  secondary_startup_64+0xb6/0xc0
-[  235.268561] Modules linked in:
-[  235.268929] CR2: 0000000000000198
-[  235.269330] ---[ end trace f8fa823705a3dbe7 ]---
-[  235.269875] RIP: 0010:blk_mq_free_request+0x367/0x510
-[  235.270466] Code: 89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 a2 dc ff ff 48 =
-8d ba 98 01 00 00 be 04 00 00 00 48 89 14 24 e8 fd 69 9a ff 48 8b 14 24 <f0=
-> ff 8a 98 01 00 00 e9 e2 fe ff ff 48 83 c4 08 48 89 ef be 03 00
-[  235.272622] RSP: 0018:ffff8881f7389be0 EFLAGS: 00010046
-[  235.273230] RAX: 0000000000000000 RBX: ffff8881f21b9680 RCX: ffffffff816=
-e05b1
-[  235.274063] RDX: 0000000000000000 RSI: 0000000000000046 RDI: 00000000000=
-00046
-[  235.274890] RBP: 0000000000000001 R08: fffffbfff0af5869 R09: fffffbfff0a=
-f5869
-[  235.275717] R10: ffffffff857ac347 R11: fffffbfff0af5868 R12: ffff8881f21=
-b969c
-[  235.276545] R13: ffff8881f0f62738 R14: ffffe8ffffd884c0 R15: ffff8881f21=
-b9698
-[  235.277371] FS:  0000000000000000(0000) GS:ffff8881f7380000(0000) knlGS:=
-0000000000000000
-[  235.278307] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  235.278977] CR2: 0000000000000198 CR3: 00000001eb886004 CR4: 00000000003=
-60ee0
-[  235.279805] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
-00000
-[  235.280632] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
-00400
-[  235.281459] Kernel panic - not syncing: Fatal exception in interrupt
-[  235.282474] Kernel Offset: 0x400000 from 0xffffffff81000000 (relocation =
-range: 0xffffffff80000000-0xffffffffbfffffff)
-[  235.283695] ---[ end Kernel panic - not syncing: Fatal exception in inte=
-rrupt ]---
-
-
-This is because of double __blk_mq_complete_request() when resetting nvme-l=
-oop.
-
-# echo 1 > /sys/block/nvme1n1/device/nvme1/reset_controller
-
-
-                                                nvme_loop_queue_response()
-                                                -> nvme_end_request()
-                                                   -> blk_mq_complete_reque=
-st()
-nvme_loop_reset_ctrl_work()
--> nvme_stop_queues(&ctrl->ctrl)
-   -> blk_mq_tagset_busy_iter(&ctrl->tag_set,
-            nvme_cancel_request, &ctrl->ctrl);
-      -> nvme_cancel_request(): state is not MQ_RQ_COMPLETE()
-         -> blk_mq_complete_request()
-            -> WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-                                                      -> __blk_mq_complete_=
-request()
-                                                         -> WRITE_ONCE(rq->=
-state, MQ_RQ_COMPLETE);
-
-
-
-After code analysis, I think this is for nvme-pci as well.
-
-                                       nvme_process_cq()
-                                       -> nvme_handle_cqe()
-                                          -> nvme_end_request()
-                                             -> blk_mq_complete_request()
-nvme_reset_work()
--> nvme_dev_disable()
-   -> nvme_reap_pending_cqes()
-      -> nvme_process_cq()
-         -> nvme_handle_cqe()
-            -> nvme_end_request()
-               -> blk_mq_complete_request()
-                  -> __blk_mq_complete_request()
-                                                -> __blk_mq_complete_reques=
-t()
-
-
-I did not check if nvme-tcp/nvme-fc/nvme-rdma would have the similar issue.=
- Was
-there already any fix or discussion for above issue? That is, when resettin=
-g
-the device, a blk_mq_complete_request() is already in progress.
-
-Thank you very much!
-
-Dongli Zhang
+On 5/17/20 5:33 PM, Damien Le Moal wrote:=0A=
+> As Chaitanya pointed out, this is already used. Please rebase on Jens=0A=
+> block/for-5.8/block branch.=0A=
+> =0A=
+> I do not see any problem with this change, but as Christoph commented, si=
+nce=0A=
+> zone reset does not transfer any data, I do not really see the necessity =
+for=0A=
+> this. Zone reset is indeed data-destructive, but it is not a "write" comm=
+and.=0A=
+> But following DISCARD and having the op number as an odd number is OK I t=
+hink.=0A=
+Let's keep reset consistent with discard and write-zeroes.=0A=
