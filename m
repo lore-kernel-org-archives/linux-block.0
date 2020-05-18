@@ -2,92 +2,84 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31034C433E4
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 16:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EF4C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 16:56:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11F9D20674
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 16:50:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="j3ozo5YH"
+	by mail.kernel.org (Postfix) with ESMTP id 42FAB20758
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 16:56:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728420AbgERQuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 May 2020 12:50:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51780 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726958AbgERQup (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 May 2020 12:50:45 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7874C061A0C;
-        Mon, 18 May 2020 09:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kZ1kt/vvSWLV22qkWN7aKlxZz7wcX+WgFj2oUslFSoQ=; b=j3ozo5YHhZD8k6To6Kx6JYBtFf
-        3ro7WFhgIcFxk9sM8YyXJMP1ljUysW3CEYKqKWLP2qaP1VCDz6hG1+RO2o48RMHX57B2pgMWsTRHm
-        6qBznsPTqj9W41MCa36Vj34K2scnpByyAH9hk4n4QgEXgqPsfPMqKctkdvqZ7CGVT9Kiu7m2eG0Xg
-        Z2S552l1JSMN6/ihF5mjDfESDw9j42b5Dk/ljZbE4GQkDocvWkFANRe792+jf+a62b7+a2MOwkY6h
-        9rT/3ag8Svxuei5DS+/8LTm1jF4aabP4NRraZDwyB4/0lNAIu6kjG/Hr6ujWcERiWB5IZCd5yGJ4J
-        yiJHceqg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jaiyS-0000NI-EH; Mon, 18 May 2020 16:50:44 +0000
-Date:   Mon, 18 May 2020 09:50:44 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Satya Tangirala <satyat@google.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Kuohong Wang <kuohong.wang@mediatek.com>,
-        Kim Boojin <boojin.kim@samsung.com>
-Subject: Re: [PATCH v13 00/12] Inline Encryption Support
-Message-ID: <20200518165044.GA23230@infradead.org>
-References: <20200514003727.69001-1-satyat@google.com>
- <20200514051053.GA14829@sol.localdomain>
- <8fa1aafe-1725-e586-ede3-a3273e674470@kernel.dk>
- <20200515074127.GA13926@infradead.org>
- <20200515122540.GA143740@google.com>
- <20200515144224.GA12040@infradead.org>
- <20200515170059.GA1009@sol.localdomain>
+        id S1727040AbgERQ4W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 May 2020 12:56:22 -0400
+Received: from verein.lst.de ([213.95.11.211]:39387 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727020AbgERQ4W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 May 2020 12:56:22 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7299268B02; Mon, 18 May 2020 18:56:19 +0200 (CEST)
+Date:   Mon, 18 May 2020 18:56:19 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 5/9] blk-mq: don't set data->ctx and data->hctx in
+ blk_mq_alloc_request_hctx
+Message-ID: <20200518165619.GA17465@lst.de>
+References: <20200518093155.GB35380@T590> <87imgty15d.fsf@nanos.tec.linutronix.de> <20200518115454.GA46364@T590> <20200518131634.GA645@lst.de> <20200518141107.GA50374@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200515170059.GA1009@sol.localdomain>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200518141107.GA50374@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 15, 2020 at 10:00:59AM -0700, Eric Biggers wrote:
-> The fallback is actually really useful.  First, for testing: it allows all the
-> filesystem code that uses inline crypto to be tested using gce-xfstests and
-> kvm-xfstests, so that it's covered by the usual ext4 and f2fs regression testing
-> and it's much easier to develop patches for.  It also allowed us to enable the
-> inlinecrypt mount option in Cuttlefish, which is the virtual Android device used
-> to test the Android common kernels.  So, it gets the kernel test platform as
-> similar to a real Android device as possible.
+On Mon, May 18, 2020 at 10:11:07PM +0800, Ming Lei wrote:
+> On Mon, May 18, 2020 at 03:16:34PM +0200, Christoph Hellwig wrote:
+> > On Mon, May 18, 2020 at 07:54:54PM +0800, Ming Lei wrote:
+> > > 
+> > > I guess I misunderstood your point, sorry for that.
+> > > 
+> > > The requirement is just that the request needs to be allocated on one online
+> > > CPU after INACTIVE is set, and we can use a workqueue to do that.
+> > 
+> > I've looked over the code again, and I'm really not sure why we need that.
+> > Presumable the CPU hotplug code ensures tasks don't get schedule on the
+> > CPU running the shutdown state machine, so if we just do a retry of the
 > 
-> Ideally we'd implement virtualized inline encryption as you suggested.  But
-> these platforms use a mix of VMM's (QEMU, GCE, and crosvm) and storage types
-> (virtio-blk, virtio-scsi, and maybe others; none of these even have an inline
-> encryption standard defined yet).  So it's not currently feasible.
+> percpu kthread still can be scheduled on the cpu to be online, see
+> is_cpu_allowed(). And bound wq has been used widely in fs code.
 
-Not that you don't need to implement it in the hypervisor.  You can
-also trivially wire up for things like null_blk.
+s/to be online/to be offlined/ I guess.
 
-> Second, it creates a clean design where users can just use blk-crypto, and not
-> have to implement a second encryption implementation.
+Shouldn't all the per-cpu kthreads also stop as part of the offlining?
+If they don't quiesce before the new blk-mq stop state I think we need
+to make sure they do.  It is rather pointless to quiesce the requests
+if a thread that can submit I/O is still live.
 
-And I very much disagree about that being a clean implementation.  It is
-fine if the user doesn't care, but you should catch this before hitting
-the block stack and do the encryption there without hardware blk-crypt
-support.
+> > 
+> >     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-mq-hotplug.2
+> > 
+> 
+> After preempt_disable() is removed, the INACTIVE bit is set in the CPU
+> to be offline, and the bit can be read on all other CPUs, so other CPUs
+> may not get synced with the INACTIVE bit.
+
+INACTIVE is set to the hctx, and it is set by the last CPU to be
+offlined that is mapped to the hctx.  once the bit is set the barrier
+ensured it is seen everywhere before we start waiting for the requests
+to finish.  What is missing?:
+
+> 
+> 
+> Thanks,
+> Ming
+---end quoted text---
