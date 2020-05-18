@@ -2,124 +2,88 @@ Return-Path: <SRS0=EWmM=7A=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC3BC433DF
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 01:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BEDC433DF
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 01:48:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D041207BB
-	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 01:32:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50EF820758
+	for <linux-block@archiver.kernel.org>; Mon, 18 May 2020 01:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbgERBcv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 May 2020 21:32:51 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:33184 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726720AbgERBcv (ORCPT
+        id S1726675AbgERBsR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 May 2020 21:48:17 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:50417 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726670AbgERBsR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 May 2020 21:32:51 -0400
-Received: by mail-pf1-f195.google.com with SMTP id n15so972875pfd.0
-        for <linux-block@vger.kernel.org>; Sun, 17 May 2020 18:32:51 -0700 (PDT)
+        Sun, 17 May 2020 21:48:17 -0400
+Received: by mail-pj1-f66.google.com with SMTP id nu7so1826585pjb.0
+        for <linux-block@vger.kernel.org>; Sun, 17 May 2020 18:48:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=rl5v7KEPLNTXOFE4Tvo4dd16Bbg0rr2ige6nTcwpcSU=;
-        b=p/+PyRfJzChh1f+wLKQ4RJ26vbyypaD6yXoanAHVXKkC6K4EWILY/+tLjflcDOrWFo
-         IHV9qUo8RGL76Mza+KIi0OK3lcT9DUzrBPIjzAxzkkc6HCYZ1GMkN8tqlY1EYSvsHMJN
-         kg/nEaSc2eHmMo2zwkquzNgxWWl/avfC3PMC7HAPaOE1loMvzDpfTE710NL8OiPBCf58
-         w6aZTm4CXTsMTAiMmAa3Q5Pox+pIFQOCOwUANOB+yb3QkTJXzQqx8LRIKg6rM+UOw8b2
-         UbPhdpNOc/BxhZu+0S3cmxRhKwkWYbcQvQQQtti2G33YTC9kHUCPYPgJVciCJqevoQL4
-         6/ww==
-X-Gm-Message-State: AOAM530ElTWylWA/fZhBgpJr90uhrhoWxw4zSn1ne7jIjcVJ75R7XesY
-        SyfMh9hpXNef1zAfmFV2cpRXurc9
-X-Google-Smtp-Source: ABdhPJwWyQX9Lc1YDssZrttAMJY/ML4KusENaMQleTC9INcf1h3aQijM2rl57nhjXtgKSSDj8N0scQ==
-X-Received: by 2002:a65:5302:: with SMTP id m2mr12548067pgq.135.1589765570654;
-        Sun, 17 May 2020 18:32:50 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:1c3f:56a2:fad2:fca1? ([2601:647:4000:d7:1c3f:56a2:fad2:fca1])
-        by smtp.gmail.com with ESMTPSA id s136sm7190524pfc.29.2020.05.17.18.32.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 May 2020 18:32:49 -0700 (PDT)
-Subject: Re: [PATCH 5/5] null_blk: Zero-initialize read buffers in
- non-memory-backed mode
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Alexander Potapenko <glider@google.com>
-References: <20200516001914.17138-1-bvanassche@acm.org>
- <20200516001914.17138-6-bvanassche@acm.org>
- <BY5PR04MB69008A16B82CD028FC01D0A6E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=x+zg3IZlDk49LKTIYto5My49MTn9w4kMWDWNdNzyDno=;
+        b=rDjOaNv/k4ZUtkLQZqeC4JtsrQWSpss9pFV3EjnLnSm6DEw4th6eo+V96uAyRTqstG
+         Ko/krF+6nu0IAmEKUS7wOBOPYVR89ABdJ5OA7V8TKNcaaZc/9zgmISUSHkyv8+zYuiLA
+         yN77fgzd1/1p3kavBc15gUItLSlffbNzswgTC2/2EXTfjxVWXmUTaA9VtlsE8uhR5rnv
+         huIFQTPsyfN1hLZWKO3hLfR8U+Keyg8BgkNoXCrnglysL3eDj4z1Py1irX+xkYQR80GY
+         fb5VudiFvHgxux9MkOBh8ndvW8e1v0U/JtVQsRfH/ROI24S8MiSYoeqrrE6IxFjHrlnL
+         Obaw==
+X-Gm-Message-State: AOAM5322koM3p7z2CoRR+WG2dXOC22xNcJfFkdVM5sP9I0VYc9/t9tCQ
+        iUgXWsgWAJ0nXcogholNkiU=
+X-Google-Smtp-Source: ABdhPJz4RHbCsHv2r8sCfZn24VJFfKczHr/jZW7CTvDsOhrG+qM5cZS3gLcRPiLvAxpbSAlySDJpLg==
+X-Received: by 2002:a17:90a:2610:: with SMTP id l16mr16169324pje.219.1589766496331;
+        Sun, 17 May 2020 18:48:16 -0700 (PDT)
+Received: from localhost.localdomain ([2601:647:4000:d7:1c3f:56a2:fad2:fca1])
+        by smtp.gmail.com with ESMTPSA id m2sm3778353pjl.45.2020.05.17.18.48.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2020 18:48:15 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <440743f4-1053-32f3-2edf-3eb0fdd057ef@acm.org>
-Date:   Sun, 17 May 2020 18:32:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v2 0/4] Block layer patches for kernel v5.8
+Date:   Sun, 17 May 2020 18:48:03 -0700
+Message-Id: <20200518014807.7749-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <BY5PR04MB69008A16B82CD028FC01D0A6E7B80@BY5PR04MB6900.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-17 18:12, Damien Le Moal wrote:
-> On 2020/05/16 9:19, Bart Van Assche wrote:
->> +static void nullb_zero_rq_data_buffer(const struct request *rq)
->> +{
->> +	struct req_iterator iter;
->> +	struct bio_vec bvec;
->> +
->> +	rq_for_each_bvec(bvec, rq, iter)
->> +		zero_fill_bvec(&bvec);
->> +}
->> +
->> +static void nullb_zero_read_cmd_buffer(struct nullb_cmd *cmd)
->> +{
->> +	struct nullb_device *dev = cmd->nq->dev;
->> +
->> +	if (dev->queue_mode == NULL_Q_BIO && bio_op(cmd->bio) == REQ_OP_READ)
->> +		zero_fill_bio(cmd->bio);
->> +	else if (req_op(cmd->rq) == REQ_OP_READ)
->> +		nullb_zero_rq_data_buffer(cmd->rq);
->> +}
-> 
-> Shouldn't the definition of these two functions be under a "#ifdef CONFIG_KMSAN" ?
+Hi Jens,
 
-Hi Damien,
-
-It is on purpose that I used IS_ENABLED(CONFIG_KMSAN) below instead of
-#ifdef CONFIG_KMSAN. CONFIG_KMSAN is not yet upstream and I want to
-expose the above code to the build robot.
+The patches in this series are what I came up with as the result of
+analyzing Alexander Potapenko's report about reading from null_blk.
+Please consider these patches for kernel v5.8.
 
 Thanks,
 
 Bart.
+
+Changes compared to v1:
+- Adjusted the comments added by patch "Document the bio_vec properties" as
+  requested by Christoph.
+- Left out the patch "Fix zero_fill_bio()" since it is not necessary.
+- Moved zero_fill_bvec() from patch "Fix zero_fill_bio()" into patch
+  "null_blk: Zero-initialize read buffers in non-memory-backed mode".
+
+Bart Van Assche (4):
+  block: Fix type of first compat_put_{,u}long() argument
+  bio.h: Declare the arguments of the bio iteration functions const
+  block: Document the bio_vec properties
+  null_blk: Zero-initialize read buffers in non-memory-backed mode
+
+ block/ioctl.c                 |  4 +--
+ drivers/block/null_blk_main.c | 50 +++++++++++++++++++++++++++++++++++
+ include/linux/bio.h           |  6 ++---
+ include/linux/bvec.h          | 13 +++++++--
+ 4 files changed, 66 insertions(+), 7 deletions(-)
+
