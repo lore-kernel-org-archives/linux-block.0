@@ -2,92 +2,109 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59211C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FDDC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:42:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23B3D20657
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:40:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pWd5K2r2"
+	by mail.kernel.org (Postfix) with ESMTP id F2E3C207D8
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:42:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589902937;
+	bh=SAUtnHbhRUvNQHA6UXyEPH+tMYYQxg6u5DOJzEquLKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=epcc1CbwcwvH23gpzI4yPhcMHdptuxEdIam5JjPt3XZMgRn8ddqKonT8BMD9TYQn+
+	 6FHrOGTegleaMJH0JkjoBsYHrNyNaInPB+DqpCUaoMyooIBmoTBw03J+yIPyKqdQG5
+	 R06xhn1/4Uu2dUKr228HXY5T2WNymfFXom8YNEB4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728647AbgESPkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 11:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728633AbgESPkn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 11:40:43 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF56C08C5C0
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:40:42 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id t7so42722plr.0
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RGO/bU976Rbw41xP6zn2pcfHAVM+aVs3q5u5hArX4dg=;
-        b=pWd5K2r26WSj0olmybcxO2axnHp0KEVS68KcbkerqBNEiv/YZ1ESgS3KjJZgQNcJpc
-         4PMxlRcpZuP5XZUqWLnTROCEMpELDP9unZg7ICTieNj9wtrHN03BYVrhTDvZiyWCoz2s
-         mz4OTbkD4vNrgIohvjC0w0LvVeL8tsne4KIWJNwvyrCPI9pLBR+DPL8fQckMMThvvZBb
-         BSXdUhaPx4aN6LkNp6Y6f5aK1lTkezR3kBsAVEmw/iClnHh0Q0VMMEOERkK5BWGcCsIX
-         PGBa8Iqj6VmSGOgFkGKyw7W990Hs5HMr/1CNv5fExfSHn4K++4XFNBBPGNds0jIWIv4r
-         biOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RGO/bU976Rbw41xP6zn2pcfHAVM+aVs3q5u5hArX4dg=;
-        b=hFdFPt/6KuopYc/ZZwU549sLKAoUUO8nKj/a4aOKT7em3B752eUqyFM8ImpXbHfaCD
-         p0NCfi47+6cZa5PgiMkdjlj9ZLkg49qZuKgd31v1lFZJ6QyG00SeDxTUEnAYx9GqM9wa
-         tfqfCvFlYQ2rB7LqluP3eJgYiI34qIyLyMk2C4QgeXBI3q8CfcgmCqvxJga5G0g3WD6q
-         Gr/PKpx1Rog+5AluTflME1Fy8PYbBkMD06950/SoZmTkMDY9aKgfZQXQytL6ngA+XRE8
-         Hcp1n8fzWGqlcFO/n4+jdydTOglBRhqu228VnSpyVXnhVsP7yqNVuS7ilLtFiMB41wSx
-         hyDw==
-X-Gm-Message-State: AOAM531FoC0NDlhp0qBzyHFIa1FF/I73C4/cnEk/HQbVI81jMOe911Pz
-        vqETc5Ni/gz/ELhGpJU3Cfc0hQ==
-X-Google-Smtp-Source: ABdhPJyyWtD4wFwiCxYZejO84CrBXVEEuQFsjDkzcu+kuViFcLhlNdvU4jojPr4mvR43VG/l2DNxgw==
-X-Received: by 2002:a17:90a:840e:: with SMTP id j14mr138230pjn.85.1589902841607;
-        Tue, 19 May 2020 08:40:41 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:14f4:acbd:a5d0:25ca? ([2605:e000:100e:8c61:14f4:acbd:a5d0:25ca])
-        by smtp.gmail.com with ESMTPSA id p24sm11615083pff.92.2020.05.19.08.40.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2020 08:40:41 -0700 (PDT)
-Subject: Re: [PATCH v3 0/4] Block layer patches for kernel v5.8
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Alexander Potapenko <glider@google.com>
-References: <20200519040737.4531-1-bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <13a6142f-d0b6-507f-70d8-3ca3ba83c4e6@kernel.dk>
-Date:   Tue, 19 May 2020 09:40:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728778AbgESPmQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 11:42:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47536 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728633AbgESPmQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 May 2020 11:42:16 -0400
+Received: from localhost (unknown [213.57.247.131])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CC70720657;
+        Tue, 19 May 2020 15:42:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589902935;
+        bh=SAUtnHbhRUvNQHA6UXyEPH+tMYYQxg6u5DOJzEquLKI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gYhLcLMwyQL8Olf6gN9Egx1f9rCvTAa3We8KZNbNicrG7ysAiKgk56HhizrOtc6SD
+         HBHDxlAb7et8c9pTj0C+b+JXRNUZ9iFyFdG/Kdn6NhKUBs5W2kfo19l6BtILfuD7eU
+         MvT7vBCzYLzY1AFuO27CyZGKCYgRWDyi0P2t8brg=
+Date:   Tue, 19 May 2020 18:42:11 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH 1/1] rnbd/rtrs: pass max segment size from blk user to
+ the rdma library
+Message-ID: <20200519154211.GS188135@unreal>
+References: <e132ee19-ff55-c017-732c-284a3b20daf7@infradead.org>
+ <20200519080136.885628-1-danil.kipnis@cloud.ionos.com>
+ <20200519080136.885628-2-danil.kipnis@cloud.ionos.com>
+ <20200519084812.GP188135@unreal>
+ <CAHg0Huw9HiNz1jYcypiirbB6encMcBOuGMLDE+9m0wGp0B6VfA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200519040737.4531-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHg0Huw9HiNz1jYcypiirbB6encMcBOuGMLDE+9m0wGp0B6VfA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/20 10:07 PM, Bart Van Assche wrote:
-> Hi Jens,
-> 
-> The patches in this series are what I came up with as the result of
-> analyzing Alexander Potapenko's report about reading from null_blk.
-> Please consider these patches for kernel v5.8.
+On Tue, May 19, 2020 at 11:14:26AM +0200, Danil Kipnis wrote:
+> Hi Leon
+>
+> On Tue, May 19, 2020 at 10:48 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Tue, May 19, 2020 at 10:01:36AM +0200, Danil Kipnis wrote:
+> > > When Block Device Layer is disabled, BLK_MAX_SEGMENT_SIZE is undefined.
+> > > The rtrs is a transport library and should compile independently of the
+> > > block layer. The desired max segment size should be passed down by the
+> > > user.
+> > >
+> > > Introduce max_segment_size parameter for the rtrs_clt_open() call.
+> > >
+> > > Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> > > Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> > > ---
+> >
+> > Please, add fixes line.
+> I'm new to this for-next fix up procedure. What tree the commit I
+> should reference with the fixes line should come from? Should I split
+> this commit so that I can reference the commits which add separate
+> files in the original patchset here
+> https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=for-next
+> ? And also if I have to fix yet another issue - how do I then
+> reference the commit this patch creates if applied?
+> Thank you!
 
-Applied, thanks.
+NP,
 
--- 
-Jens Axboe
+You need to configure your email client to properly honor replies,
+e.g. add extra blank line between your reply and the email body.
+It will make your replies more clear.
 
+Regarding fixes:
+1. There should not blank line between Fixes line and SOBs.
+2. You can use one Fixes line (use latest).
+3. Patches are usually divided for logical units.
+
+Thanks
+
+>
+> >
+> > Thanks
