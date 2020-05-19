@@ -2,125 +2,96 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E40E6C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 22:16:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED70C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 23:34:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5A4420823
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 22:16:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AB79207C4
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 23:34:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="defEXQ49"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PkphyJ7h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726352AbgESWQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 18:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45528 "EHLO
+        id S1726348AbgESXeZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 19:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725998AbgESWQt (ORCPT
+        with ESMTP id S1726178AbgESXeY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 18:16:49 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5427AC061A0F
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 15:16:48 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id w19so441583ply.11
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 15:16:48 -0700 (PDT)
+        Tue, 19 May 2020 19:34:24 -0400
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506D6C061A0E
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 16:34:24 -0700 (PDT)
+Received: by mail-qt1-x841.google.com with SMTP id l1so1166635qtp.6
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 16:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:references:to:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=GRjxYibzlS4o3avg6p2vVkLA1+T3i5/MjrM9DLMxH+Q=;
-        b=defEXQ49DqQO/7rYBm1mDgtJKGAlVzIFgD+4JsjyVSBd+pA46CbrTVkQNIJvkc7ysH
-         w9buPS6isXFvPOa7FEWFO+yJBZbqmUPDBrLMVkmafSdoAhjvfn59RbRdRyKGV/kOoRjG
-         d2TeH/4uGgplUMCIKDnoUmxW5fVrdi1k0fxViQyZT++xDMFvkdMugzvsQibsFYii407Y
-         8E2Yt51ZtKw1sfnfpQVWrHj1H9305cATQ9rPcWCS//XzVfNRWXaCWP+aPbSbHiEeEOR7
-         EVOu6cFAqwjF3LJWzJM4ju4be1CSpB0uJCUAEnhQJAFbspZtRqJ1kJeL3a3sK8XZIgBs
-         zQTw==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=83We/Mr70MD4EiPjp3ORsT3cMcT/fqJs14tN4jNeALQ=;
+        b=PkphyJ7hrxzRIXZc1vTx3ePPg+qMN0P9FJW23j3vkeG6cR/IEDJ/PwVVPr6rCKgWR0
+         uxvwEXp4zKZdEVYxUY69qlwGe5ZyVTaJGaaT1bzFTVKt1vgr7pxDlsnYxf8Y0d1Ovgwn
+         OzKAq6f/cur7NV34ENpzm4F/vlOOfNELAQKKSPDLo9i97t3S/vYUWxDYZL3Q2xnNSNfd
+         MqzNBNj2mMHsZWOpwpsmZ2GcyYXih8I1LBb+TP9g4008Yky3ReTsA98JRP0oJX+Bop8+
+         5cIa+4xSluFY0CXJ/PN+E3BAs/d+atY3iqCAmZ4R+Fg60LjUmaWFJsv2N3+6RZCpwYRa
+         FPhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:references:to:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GRjxYibzlS4o3avg6p2vVkLA1+T3i5/MjrM9DLMxH+Q=;
-        b=G+JPc+QSdX2jzXEWialXYnt2NQ26fdov/F8s3dKOcKWwHUOYBb7sC/QcdcuygA7Gou
-         vEpml0D/qZn2sA+66CC5VReiQmVFf9Q/7p43fsKjf5DLaU0j1q9BnRpqlRjf/sACRNR0
-         A0y2ndPE1+OjGSc2oOc//vBITx8Ppu0wa0xtw7qNzYzd0KhWH1UMD0lccMXnG67a10Sp
-         Q2NCaiSUUkFtkHykjGqjjdUZQnUmoTkl4RGNN0myh10c5q99fFnbouhTPQLVa9lQlNuj
-         I7tnfYbaYgtwF4fly/LG+mxmJl3AAabJXKBvgYIwpr65WQsOwbwCuUs6owkuqoyS/nZu
-         6hRw==
-X-Gm-Message-State: AOAM533dCPnny+p59U855mTbsx1fZun82V7STABoQsRHKnOENKGas750
-        7vXxEOI0dL065ziHEUmldFS895lBXLU=
-X-Google-Smtp-Source: ABdhPJxivJPwG+4s/YAmp27bWpjl0r+6h5JqOzFIEAgbsP6S4C3ZHaLnLhH5Rub6QYZlS/4dGiOHxg==
-X-Received: by 2002:a17:902:c213:: with SMTP id 19mr1543735pll.190.1589926607367;
-        Tue, 19 May 2020 15:16:47 -0700 (PDT)
-Received: from ?IPv6:2605:e000:100e:8c61:14f4:acbd:a5d0:25ca? ([2605:e000:100e:8c61:14f4:acbd:a5d0:25ca])
-        by smtp.gmail.com with ESMTPSA id v75sm412112pjb.35.2020.05.19.15.16.46
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2020 15:16:46 -0700 (PDT)
-Subject: Fwd: [RFC 2/2] io_uring: mark REQ_NOWAIT for a non-mq queue as
- unspported
-References: <1589925170-48687-3-git-send-email-bijan.mottahedeh@oracle.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-X-Forwarded-Message-Id: <1589925170-48687-3-git-send-email-bijan.mottahedeh@oracle.com>
-Message-ID: <3503f837-0958-0a55-ab7b-d4f1c7131179@kernel.dk>
-Date:   Tue, 19 May 2020 16:16:45 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=83We/Mr70MD4EiPjp3ORsT3cMcT/fqJs14tN4jNeALQ=;
+        b=siIUKKyyuzP9wUvhsXqW8SykETHueJMLEuD2UQT/A2yYb9nK4sTUoqI7puFXV5e8JU
+         eToxLP4y0N4VCAy/eAZFP+nxyQPaT2HIdP3pUNq02y5jhY54rGWb7UbZVnFWKJappl0h
+         Rd4AjfVbLCBu96b+mjiMlYWMFstZwqe1Xve9omRUj2LJxcm3ZypqsipT4zmb3UbTKqBt
+         ge7CeOca6HpiqdYy8DcvJFz0M7/VI0m7Jw1HuIVQq5r+RO8ZxGpfpPdD9ITgffOHG6ly
+         b4eln2JLUOzDadukvZqiPqQ45eKj40o1h9NZt31wPoRSfwEdSj2kIIqA4eTi9RZvae1x
+         zyOw==
+X-Gm-Message-State: AOAM5337vtwf3Jp+4VXRn7KJ4LfhwQ1IVhHfHthIvZSd+vnodU7JZ1gF
+        QeP5/f2q6rHbQ3bjWV5R7LiQwQ==
+X-Google-Smtp-Source: ABdhPJygMA9fyOWgOnUo1Gb9cez3ltp5DMCbIVcY0rTqNsUnj53c07XtG+LOljH5lXbHjeZzzd6pXA==
+X-Received: by 2002:aed:2b67:: with SMTP id p94mr2555408qtd.255.1589931263151;
+        Tue, 19 May 2020 16:34:23 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id z25sm1069973qtj.75.2020.05.19.16.34.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 19 May 2020 16:34:22 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jbBkc-0003Tj-1A; Tue, 19 May 2020 20:34:22 -0300
+Date:   Tue, 19 May 2020 20:34:22 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Cc:     linux-rdma@vger.kernel.org, linux-next@vger.kernel.org,
+        jinpu.wang@cloud.ionos.com, dledford@redhat.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, bvanassche@acm.org,
+        rdunlap@infradead.org, leon@kernel.org
+Subject: Re: [PATCH 0/1] Fix RTRS compilation with block layer disabled
+Message-ID: <20200519233422.GB12656@ziepe.ca>
+References: <e132ee19-ff55-c017-732c-284a3b20daf7@infradead.org>
+ <20200519080136.885628-1-danil.kipnis@cloud.ionos.com>
 MIME-Version: 1.0
-In-Reply-To: <1589925170-48687-3-git-send-email-bijan.mottahedeh@oracle.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200519080136.885628-1-danil.kipnis@cloud.ionos.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, May 19, 2020 at 10:01:35AM +0200, Danil Kipnis wrote:
+> Hi Jason, Hi All,
+> 
+> this fixes the compilation problem reported by Randy Dunlap for RTRS on
+> rdma for-next.
+> 
+> Jason, am I even doing the right thing sending the fixes for the issues
+> reported for the for-next for RTRS/RNBD to here?
 
+Yes, I will take them.
 
+Do not send cover letters for single patches please
 
--------- Forwarded Message --------
-Subject: [RFC 2/2] io_uring: mark REQ_NOWAIT for a non-mq queue as unspported
-Date: Tue, 19 May 2020 14:52:50 -0700
-From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-To: axboe@kernel.dk
-CC: io-uring@vger.kernel.org
-
-Mark a REQ_NOWAIT request for a non-mq queue as unspported instead of
-retryable since otherwise the io_uring layer will keep resubmitting
-the request.
-
-Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
----
- block/blk-core.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5847993..3807140 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -962,14 +962,10 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
- 	}
- 
- 	/*
--	 * Non-mq queues do not honor REQ_NOWAIT, so complete a bio
--	 * with BLK_STS_AGAIN status in order to catch -EAGAIN and
--	 * to give a chance to the caller to repeat request gracefully.
-+	 * Non-mq queues do not honor REQ_NOWAIT, return -EOPNOTSUPP.
- 	 */
--	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q)) {
--		status = BLK_STS_AGAIN;
--		goto end_io;
--	}
-+	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
-+		goto not_supported;
- 
- 	if (should_fail_bio(bio))
- 		goto end_io;
--- 
-1.8.3.1
-
+Jason
