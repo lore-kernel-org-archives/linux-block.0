@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40231C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCB2C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D6B520809
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 614A420657
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ySydS5S7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vppHI2i2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728832AbgESPnC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 11:43:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39934 "EHLO
+        id S1729279AbgESPnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 11:43:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728633AbgESPnC (ORCPT
+        with ESMTP id S1728647AbgESPnK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 11:43:02 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C0AC08C5C0
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:01 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id x13so63415pfn.11
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:01 -0700 (PDT)
+        Tue, 19 May 2020 11:43:10 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91349C08C5C0
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:09 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id k22so26587pls.10
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nDCjU7k2XMPXVzp/hHLiozXK2Q7t2yiQQnE2aeBeopA=;
-        b=ySydS5S7NCcxW2sO7kS+ESFm9nQcmN/vQ1Ctcc2Rq1jGiYT7ZWbKXfY72i8et7nX5n
-         LfGZysbkrQHm7rcDOyJ3Y4qiMNCm4NwoW8MCWbcUuh1v7ZOsguXwMwQ8azkHXUMoPnXt
-         towh7OUR/rQbM440RD8pH1hzeLTe+XUpe+eUsHdYKHIrKU4vp/W2LVMouqFMxFIOJBCZ
-         H+5ALyj3F6b8YRvBv7FGISsB4hKfLfn2oU6Yk7zOdl32d803oWftxco18RPOfCrX1OpD
-         nMkw1sjMd4Ydu3NYoftN1uhAs9iDcaiVbpRbqraSykeGXnVnHj/sVeQ3hW730HQQShtc
-         bmoA==
+        bh=nTb00k1/dYvI4ehiN9PDOKgU2zbif57VigXWm2jH9AA=;
+        b=vppHI2i27NdgOWWLq2UDBrm/mCYt7NDDwesYS0rru2gKS4ak/42IG5kLc6YqbaYgGp
+         PI+ZKuO0J0sWjTtfd4JSbt7PspOd2P7NQMPnzpdRCQiWePp8X15/Epd+YqyMYqkU11Vf
+         cGcN0sIFstOkBsUPEOkHfWptJJUlPfUjLSeKM8ri1cmtjtP2wU3P3U/S1BIukqe4JQIJ
+         LoT2Ok/roJRTFOl8ZSFHtTTWVF0taiuEb31BBVFL1TreIFmTJGUqrcGO/4SKSAqR8d4D
+         XNzNPk9wb/48xRtwq2NnXC8dGMYfCnqH7O+0sk7oPVCBOf2+xqLAV8hRiCMtbOU555Uy
+         3DDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=nDCjU7k2XMPXVzp/hHLiozXK2Q7t2yiQQnE2aeBeopA=;
-        b=Ho3PTdLtz0W6vOJllsduxCqKOD/VZ/bz/syy123CMbZT3mfwxxEzLkOCxf1WX9nlPd
-         0wW7W/0hiZPuwx1qLG/lt0sWBAqwso4VZSCgeUtbVxUXWFHQW/vcUa5cK0snardpPcjJ
-         mrLldjXk8qHX/1Jo4UgBH7/MJU+py7rxrmhU1Goq7LKLJnsY70zBHUgJ7J3JWFr8jg/H
-         vHXuYqizis0OZ3wiZg89hm2S8ts8i1pnpxHYQi61sFjYTzMY/PsFXM9wkqXXvC1MAHZG
-         DyUwpzfrHYCJua8w3b31eM5aVTdAJ/EXNdf0TZcpVXoaNn/UNHJ0SrNljgRinajZmu+m
-         Huyw==
-X-Gm-Message-State: AOAM533QzdNkBhsZmjtUHixTpS3/Ujx4Wxm2t8GA3M2Oz26W1FdCD+To
-        frJpKRxCa/fRUxcXxwFI1gVPUY0w640=
-X-Google-Smtp-Source: ABdhPJwTeViFpRe8oPY+FVS1lEyfrccIDBCPotb4uA6K/7gsrYzywZ8Vs+MxlhratyhUQ38VLXp/uQ==
-X-Received: by 2002:a63:b0f:: with SMTP id 15mr6801029pgl.6.1589902980570;
-        Tue, 19 May 2020 08:43:00 -0700 (PDT)
+        bh=nTb00k1/dYvI4ehiN9PDOKgU2zbif57VigXWm2jH9AA=;
+        b=ZYArSJ5yzVW3LZPNKVvgKmmd48TidNdpCUqVJbvG9uAt42+XYJxHTRshofR2Gq34jX
+         7ia5aTSgSU84vS2H9fWYEsA+nbBpKBCNdDspYNwTkXVCgreLqVoB+RkTb1KI4WSXxTbd
+         HuXFhF0dN/BOLrib+j1RBxB+2GpYWmrLh+CkeB9sXrEjWSsk/g1INeWK7vWqqhfGLpcv
+         +1QVW/geYV9q65aGymG8EQvnTGaf1sqPWKlYIWngzUH8olqb8/pUN7SjW8lOjbvCd55I
+         tCqMolq5o+jGWIXghAYNwY/6JHWdljZ5rZqDO/IOlF9BH+nbxKtRMKEX2tZ4/gy+PSMW
+         1QMg==
+X-Gm-Message-State: AOAM530HLAjjMoZ1CiKjxmk2b5j8uEu8B3EBqOxE9Eou93bFGRrfC0mI
+        q+waNsHhOGGtvWsAZwBIl3mhvUXNOB8=
+X-Google-Smtp-Source: ABdhPJyWOI3g0LJSG1KSr6cdneey6cTyOCfVNtGaVT6Bf3cfmpFWygdmlXDPvqRgOLW/2SDRg32FPg==
+X-Received: by 2002:a17:90a:a484:: with SMTP id z4mr162864pjp.214.1589902988805;
+        Tue, 19 May 2020 08:43:08 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:14f4:acbd:a5d0:25ca? ([2605:e000:100e:8c61:14f4:acbd:a5d0:25ca])
-        by smtp.gmail.com with ESMTPSA id p30sm980275pgn.58.2020.05.19.08.42.59
+        by smtp.gmail.com with ESMTPSA id g9sm10396957pgj.89.2020.05.19.08.43.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2020 08:42:59 -0700 (PDT)
-Subject: Re: [PATCH] block: Remove unused flush_queue_delayed in struct
- blk_flush_queue
-To:     Baolin Wang <baolin.wang7@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <d4104441539e9d8d2bc29a9c970713ba1ef2105d.1589715744.git.baolin.wang7@gmail.com>
+        Tue, 19 May 2020 08:43:08 -0700 (PDT)
+Subject: Re: avoid a few q_usage_counter roundtrips v3
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20200516182801.482930-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ec068795-5fd9-9d90-19bc-c145456fa5c5@kernel.dk>
-Date:   Tue, 19 May 2020 09:42:58 -0600
+Message-ID: <aa30fd0d-e107-f99d-3979-f6e0199f6a61@kernel.dk>
+Date:   Tue, 19 May 2020 09:43:07 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <d4104441539e9d8d2bc29a9c970713ba1ef2105d.1589715744.git.baolin.wang7@gmail.com>
+In-Reply-To: <20200516182801.482930-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,14 +77,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/20 5:49 AM, Baolin Wang wrote:
-> The flush_queue_delayed was introdued to hold queue if flush is
-> running for non-queueable flush drive by commit 3ac0cc450870
-> ("hold queue if flush is running for non-queueable flush drive"),
-> but the non mq parts of the flush code had been removed by
-> commit 7e992f847a08 ("block: remove non mq parts from the flush code"),
-> as well as removing the usage of the flush_queue_delayed flag.
-> Thus remove the unused flush_queue_delayed flag.
+On 5/16/20 12:27 PM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> the way we track reference on q_usage_counter is a little weird at the
+> moment, in that we often have to grab another reference in addition to
+> the current one.  This small series reshuffles that to avoid the extra
+> references in the normal I/O path.
+> 
+> Changes since v2:
+>  - increase the q_usage_counter critical section a bit in
+>    blk_mq_alloc_request_hctx
+> 
+> Changes since v1:
+>  - rebased to the lastest for-5.8/block tree with the blk-crypt addition
 
 Applied, thanks.
 
