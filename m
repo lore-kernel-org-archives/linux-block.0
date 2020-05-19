@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCB2C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC502C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 614A420657
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3A0D20657
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:43:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vppHI2i2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Uh2jpQ4m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729279AbgESPnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 11:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39964 "EHLO
+        id S1729283AbgESPnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 11:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728647AbgESPnK (ORCPT
+        with ESMTP id S1728647AbgESPnO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 11:43:10 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91349C08C5C0
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:09 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id k22so26587pls.10
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:09 -0700 (PDT)
+        Tue, 19 May 2020 11:43:14 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0147CC08C5C0
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:13 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id t16so32895plo.7
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nTb00k1/dYvI4ehiN9PDOKgU2zbif57VigXWm2jH9AA=;
-        b=vppHI2i27NdgOWWLq2UDBrm/mCYt7NDDwesYS0rru2gKS4ak/42IG5kLc6YqbaYgGp
-         PI+ZKuO0J0sWjTtfd4JSbt7PspOd2P7NQMPnzpdRCQiWePp8X15/Epd+YqyMYqkU11Vf
-         cGcN0sIFstOkBsUPEOkHfWptJJUlPfUjLSeKM8ri1cmtjtP2wU3P3U/S1BIukqe4JQIJ
-         LoT2Ok/roJRTFOl8ZSFHtTTWVF0taiuEb31BBVFL1TreIFmTJGUqrcGO/4SKSAqR8d4D
-         XNzNPk9wb/48xRtwq2NnXC8dGMYfCnqH7O+0sk7oPVCBOf2+xqLAV8hRiCMtbOU555Uy
-         3DDQ==
+        bh=Y//gBEyuh9LEoDa5NvkTsMGmsc68PNObmT5REgcCMtU=;
+        b=Uh2jpQ4mxnIxmh6Us2RQV6PzYd237rZwV2CIaAedCSAQJb+uxTsC2A+4XN57BZsIWM
+         AYYmw8k+T34NYSuKauIwK8xBnU3pTLsRqWwlmOh965+Y5O/VGDMDo9ANl/Axl7T15/zc
+         +OewLJnWDs9jo1Euu1nZmzJm6DxOmrSHVORAFFbeAs1rplzCkF8vzaTyJ+yhtsA+6iQf
+         9aNLqo16TvcCnuq7K6WswyOLrcBnmyXDqIqsaDdYQ5yoGaqlJlVukVzudWdDD/+wcor2
+         KErtyOG1wqO4TQMkpHW/kDohLSwRpEVp5ZyLpSolnUyv3pCnd2bzD3h6koEUtNRDyv2s
+         baGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=nTb00k1/dYvI4ehiN9PDOKgU2zbif57VigXWm2jH9AA=;
-        b=ZYArSJ5yzVW3LZPNKVvgKmmd48TidNdpCUqVJbvG9uAt42+XYJxHTRshofR2Gq34jX
-         7ia5aTSgSU84vS2H9fWYEsA+nbBpKBCNdDspYNwTkXVCgreLqVoB+RkTb1KI4WSXxTbd
-         HuXFhF0dN/BOLrib+j1RBxB+2GpYWmrLh+CkeB9sXrEjWSsk/g1INeWK7vWqqhfGLpcv
-         +1QVW/geYV9q65aGymG8EQvnTGaf1sqPWKlYIWngzUH8olqb8/pUN7SjW8lOjbvCd55I
-         tCqMolq5o+jGWIXghAYNwY/6JHWdljZ5rZqDO/IOlF9BH+nbxKtRMKEX2tZ4/gy+PSMW
-         1QMg==
-X-Gm-Message-State: AOAM530HLAjjMoZ1CiKjxmk2b5j8uEu8B3EBqOxE9Eou93bFGRrfC0mI
-        q+waNsHhOGGtvWsAZwBIl3mhvUXNOB8=
-X-Google-Smtp-Source: ABdhPJyWOI3g0LJSG1KSr6cdneey6cTyOCfVNtGaVT6Bf3cfmpFWygdmlXDPvqRgOLW/2SDRg32FPg==
-X-Received: by 2002:a17:90a:a484:: with SMTP id z4mr162864pjp.214.1589902988805;
-        Tue, 19 May 2020 08:43:08 -0700 (PDT)
+        bh=Y//gBEyuh9LEoDa5NvkTsMGmsc68PNObmT5REgcCMtU=;
+        b=kIFCTVQmFVQqGewryAu6eSHJfvKex2Whi/G7AmHTo1ggkpAq6GNPwqZ+kQ3hG5ike/
+         sfVUgkD+ZcFWhrmFtAmEBTlqGXRqtFEHib4QZ7LjuhChAwQCu/KFENLxzETXRb5u3Rth
+         svHLkwlQ4BeNen4UTPE4xG+370gw4tK+VHms8vzGDUvaWR3Trvbbj4gtFd+45nynx+p5
+         FK/aRl5Ua4vlHrC6Uv08LKiqmpAwIRr2t2CQb/E0nl0zh9+bKdXwsTCycdIAZVbjS9Ui
+         fiapPCSvcOnVfPPoeGALT3k8mx3mBlfeUwVGG+6dbCwpEVLqUDv4lyuC4bS8JHXZzlne
+         uWWA==
+X-Gm-Message-State: AOAM533M0FCtvMs0Z/ByKgmhc5KeoUc1gx1DEBW1ZbvF8mEfVGlbU2RX
+        YPF5n8rKXwOe8lITytkXWbYNNddBfdE=
+X-Google-Smtp-Source: ABdhPJz5OE9IiXHIQaBGNuH5Ln22yWw3q+n1ikHFg9cB549RcWZJAGJcIIGC0YhuGnA0PLnRhVA1pw==
+X-Received: by 2002:a17:90a:268f:: with SMTP id m15mr182185pje.190.1589902992181;
+        Tue, 19 May 2020 08:43:12 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:14f4:acbd:a5d0:25ca? ([2605:e000:100e:8c61:14f4:acbd:a5d0:25ca])
-        by smtp.gmail.com with ESMTPSA id g9sm10396957pgj.89.2020.05.19.08.43.07
+        by smtp.gmail.com with ESMTPSA id x185sm11606326pfx.155.2020.05.19.08.43.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 May 2020 08:43:08 -0700 (PDT)
-Subject: Re: avoid a few q_usage_counter roundtrips v3
+        Tue, 19 May 2020 08:43:11 -0700 (PDT)
+Subject: Re: small block accounting cleanups
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org
-References: <20200516182801.482930-1-hch@lst.de>
+References: <20200513104935.2338779-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <aa30fd0d-e107-f99d-3979-f6e0199f6a61@kernel.dk>
-Date:   Tue, 19 May 2020 09:43:07 -0600
+Message-ID: <22d85028-4b1d-1211-a08e-b735d265f2ef@kernel.dk>
+Date:   Tue, 19 May 2020 09:43:10 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200516182801.482930-1-hch@lst.de>
+In-Reply-To: <20200513104935.2338779-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,20 +77,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/20 12:27 PM, Christoph Hellwig wrote:
+On 5/13/20 4:49 AM, Christoph Hellwig wrote:
 > Hi Jens,
 > 
-> the way we track reference on q_usage_counter is a little weird at the
-> moment, in that we often have to grab another reference in addition to
-> the current one.  This small series reshuffles that to avoid the extra
-> references in the normal I/O path.
-> 
-> Changes since v2:
->  - increase the q_usage_counter critical section a bit in
->    blk_mq_alloc_request_hctx
-> 
-> Changes since v1:
->  - rebased to the lastest for-5.8/block tree with the blk-crypt addition
+> find a few small accounting cleanups attached, mostly cleaning up
+> the somewhat ad-hoc blk-mq vs bio split.
 
 Applied, thanks.
 
