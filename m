@@ -2,104 +2,231 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9122BC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 09:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684E8C433E2
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 11:15:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63A54207D3
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 09:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C83620708
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 11:15:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="IEF7FAI6"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="OCX1l0/w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgESJh2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 05:37:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
+        id S1726605AbgESLPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 07:15:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726494AbgESJh2 (ORCPT
+        with ESMTP id S1726505AbgESLPb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 05:37:28 -0400
+        Tue, 19 May 2020 07:15:31 -0400
 Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A4EC061A0C
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 02:37:28 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id l17so15103018wrr.4
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 02:37:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E211AC05BD0A
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 04:15:29 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id l17so15451752wrr.4
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 04:15:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=l5m5JovpW4KqrVfnLRe5gitpajPe9wGwEXNUrXvNPEs=;
-        b=IEF7FAI6x1I3Lf7An67lAfZUK20DO9GSTzsH62JauPTM8I6kmBTDUXYz54dRkY8UHh
-         f97QULm66kPRjIwzh5pyDNSWClz1/1sZHBrwQJie5L+camhGSiZ4w3IZDOmPCdgmmCV5
-         hZQyuRQ7ZhiOfftaTPLfwrieP/EOSDpM4MrMcCU/V0SuK2rMyFNQ+QC30Z7yZqGfH336
-         uHNljLNThGwUeXSokRyyK2LV8bG3NfJ1njhQ4WQQVhF9k7QmobkhLcMo6wcDSOCovLq0
-         Jn22LbPem5fxoegbZxNxlk0D5c2WnnMcCPxk8H/xgDv+WrbFBwjuIGNZYTmZDu16nT+a
-         QdCg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=pW+kzW15PGpcVZl9bvylaiuLX6HBC4BMUpt01iLWbg8=;
+        b=OCX1l0/w+oipbAIJkYvZpnb0IY6T/iw40cWz/mUpc5ipI6nkf5eVKW/xDPBDedSjuq
+         WRo+H3z06R83TfSwoYzE2+/SPPU971baQ42ghi4kCvr1nLapTbBY1PNeyV3Pp0hzZ3qR
+         jtRQ4ypsyJij8D8oNNw3i4kHSRtIj4AzCroQIQAn86+BNtSp0gBLO3wHdOhNPjo6uvsZ
+         2Ww2Rx0whieONSf32doO3hz9QYNEM3RPAZ3snOdKzWu8RzGsU+wrrchmcKudFj2LH9DZ
+         6QKUd3QoqLx8qwFz03GQ7NsGBlgValxDofm4qk+uLw7DYnjPhwbvOC0oT4UCVp0Gkq/n
+         QmVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=l5m5JovpW4KqrVfnLRe5gitpajPe9wGwEXNUrXvNPEs=;
-        b=tcRmK2YQvagS+P7dkLXrcN+TtS1mbN3Xg5Pk96Zz5ntTmR8Gqkd/5YjdSBKpgbr5jv
-         Yy2Rn06X1qkW4YHGKCEq8Gv7Nbpz8yZJSNDMROwSVBv2wL+R6wBCnlVLm6QT6h4zKEF5
-         gcCp7Q2ts44MM2o+ooE0bFnxgGWMYPAJEXB1o8Cn82N+I2C4xN4XorvCufMSZ/N5B9z/
-         Zk0eUNhZZmr58oOktQkyb4fuTW9T+kuV/vwEocTJYnhmcN1y103Pf6PrVqf0yX0Yvwdi
-         cVIu821VymX4N77Nb9DyRJaYROFnpj4GnZlDZ5/PzqYgpVWTw181FuS33Qe8F6aPiBlY
-         UhCw==
-X-Gm-Message-State: AOAM531Q8Z7p1dU0XvSE1hwxefIWpHNwPqek1/1Jjs1AV2jpAqiQ0Zw4
-        PvLA3E+rDwgRhVQ9iT8kXb4v3jHpBz2ydplr9sUo
-X-Google-Smtp-Source: ABdhPJyH2+DPmDhPeyW8f0tviX0MVkoaEzS87+oz2jYAkQdvB9/HgdGl9oCjG+bniDmpmB4wQoHITcxjzMtQhJjLrIo=
-X-Received: by 2002:adf:cc81:: with SMTP id p1mr23625980wrj.192.1589881047033;
- Tue, 19 May 2020 02:37:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200519091924.134494-1-weiyongjun1@huawei.com>
-In-Reply-To: <20200519091924.134494-1-weiyongjun1@huawei.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=pW+kzW15PGpcVZl9bvylaiuLX6HBC4BMUpt01iLWbg8=;
+        b=Z42IsFY0SFO29VNdPT2uU1vwWF/8/oWvXvPN5xW23MKMPrKQhyx05gCU+/6zYVKpEl
+         N/TUBn03Kb0JzGDvH5dQRdGJZ7mHggPk9PCvqcJ6hHwUfncTfKyTaVkXflUYwujpinPS
+         gILHwGZWWL9ME9M0YZ0djKnG7OM1FX8P1cJLSCP+uKVekgIt5Uu9vMZuq1uZ5RmIgrpU
+         nVYaqGD0a/G9pMTzuvMRKmCevB5/1zzBQFcxFbvyHFMHiFdE1yY+yBnlbJJCuOf0YKWf
+         M9K/n86wcfjcRBeu9f/m1piq0vQYCdU8uDFbl0r6rNpAlwmVt7HVF+xbzqjTYK6ohwQ8
+         vCAg==
+X-Gm-Message-State: AOAM533e6tdPpNes/PVGVxyVvwa5JRF0ympik1AEqk7pEnD3npfBhIap
+        6cgNWyZ8NGHS9aWWYr+0fJd8UTwhfQ9cXQ4=
+X-Google-Smtp-Source: ABdhPJwv1K7qCs+9eTltTGz2wzBJo4gjAQUG8TlOwOSqdOfJjjHWwHLoI9blPbZpSER2l1s9Ik1eVA==
+X-Received: by 2002:adf:fb0f:: with SMTP id c15mr26665427wrr.410.1589886928247;
+        Tue, 19 May 2020 04:15:28 -0700 (PDT)
+Received: from dkxps.fkb.profitbricks.net (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
+        by smtp.gmail.com with ESMTPSA id g24sm21516746wrb.35.2020.05.19.04.15.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2020 04:15:27 -0700 (PDT)
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Tue, 19 May 2020 11:37:16 +0200
-Message-ID: <CAHg0Huwq6yRX7x8-A8uZ_NqCib03wZ1fGwaAN2q=6e-tR=sozA@mail.gmail.com>
-Subject: Re: [PATCH -next] block/rnbd: server: fix error return code in rnbd_srv_create_dev_sysfs()
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-next@vger.kernel.org, axboe@kernel.dk, dledford@redhat.com,
+        jgg@ziepe.ca
+Cc:     bvanassche@acm.org, leon@kernel.org, danil.kipnis@cloud.ionos.com,
+        jinpu.wang@cloud.ionos.com, rdunlap@infradead.org
+Subject: [PATCH v2] rnbd/rtrs: pass max segment size from blk user to the rdma library
+Date:   Tue, 19 May 2020 13:14:19 +0200
+Message-Id: <20200519111419.924170-1-danil.kipnis@cloud.ionos.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200519084812.GP188135@unreal>
+References: <20200519084812.GP188135@unreal>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 19, 2020 at 11:16 AM Wei Yongjun <weiyongjun1@huawei.com> wrote:
->
-> Fix to return negative error code -ENOMEM from the error handling
-> case instead of 0, as done elsewhere in this function.
->
-> Fixes: 8cee532f469b ("block/rnbd: server: sysfs interface functions")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->  drivers/block/rnbd/rnbd-srv-sysfs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
-> index 106775c074d1..5ba1a31ad626 100644
-> --- a/drivers/block/rnbd/rnbd-srv-sysfs.c
-> +++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-> @@ -52,8 +52,10 @@ int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
->
->         dev->dev_sessions_kobj = kobject_create_and_add("sessions",
->                                                         &dev->dev_kobj);
-> -       if (!dev->dev_sessions_kobj)
-> +       if (!dev->dev_sessions_kobj) {
-> +               ret = -ENOMEM;
->                 goto put_dev_kobj;
-> +       }
->
->         bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
->         ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
->
+When Block Device Layer is disabled, BLK_MAX_SEGMENT_SIZE is undefined.
+The rtrs is a transport library and should compile independently of the
+block layer. The desired max segment size should be passed down by the
+user.
 
-Right, thanks you.
-Reviewed-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Introduce max_segment_size parameter for the rtrs_clt_open() call.
+
+Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
+Fixes: 6a98d71daea1 ("RDMA/rtrs: client: main functionality")
+Fixes: cb80329c9434 ("RDMA/rtrs: client: private header with client structs and functions")
+Fixes: b5c27cdb094e ("RDMA/rtrs: public interface header to establish RDMA connections")
+
+Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+---
+v1->v2 Add Fixes lines.
+
+ drivers/block/rnbd/rnbd-clt.c          |  1 +
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c | 17 +++++++++++------
+ drivers/infiniband/ulp/rtrs/rtrs-clt.h |  1 +
+ drivers/infiniband/ulp/rtrs/rtrs.h     |  1 +
+ 4 files changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 55bff3b1be71..450a571e6a1e 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1216,6 +1216,7 @@ find_and_get_or_create_sess(const char *sessname,
+ 				   paths, path_cnt, port_nr,
+ 				   sizeof(struct rnbd_iu),
+ 				   RECONNECT_DELAY, BMAX_SEGMENTS,
++				   BLK_MAX_SEGMENT_SIZE,
+ 				   MAX_RECONNECTS);
+ 	if (IS_ERR(sess->rtrs)) {
+ 		err = PTR_ERR(sess->rtrs);
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+index 468fdd0d8713..b2e465ad4423 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+@@ -12,7 +12,6 @@
+ 
+ #include <linux/module.h>
+ #include <linux/rculist.h>
+-#include <linux/blkdev.h> /* for BLK_MAX_SEGMENT_SIZE */
+ 
+ #include "rtrs-clt.h"
+ #include "rtrs-log.h"
+@@ -1407,7 +1406,8 @@ static void rtrs_clt_close_work(struct work_struct *work);
+ 
+ static struct rtrs_clt_sess *alloc_sess(struct rtrs_clt *clt,
+ 					 const struct rtrs_addr *path,
+-					 size_t con_num, u16 max_segments)
++					 size_t con_num, u16 max_segments,
++					 size_t max_segment_size)
+ {
+ 	struct rtrs_clt_sess *sess;
+ 	int err = -ENOMEM;
+@@ -1444,7 +1444,7 @@ static struct rtrs_clt_sess *alloc_sess(struct rtrs_clt *clt,
+ 	strlcpy(sess->s.sessname, clt->sessname, sizeof(sess->s.sessname));
+ 	sess->s.con_num = con_num;
+ 	sess->clt = clt;
+-	sess->max_pages_per_mr = max_segments * BLK_MAX_SEGMENT_SIZE >> 12;
++	sess->max_pages_per_mr = max_segments * max_segment_size >> 12;
+ 	init_waitqueue_head(&sess->state_wq);
+ 	sess->state = RTRS_CLT_CONNECTING;
+ 	atomic_set(&sess->connected_cnt, 0);
+@@ -2530,6 +2530,7 @@ static struct rtrs_clt *alloc_clt(const char *sessname, size_t paths_num,
+ 				  void	(*link_ev)(void *priv,
+ 						   enum rtrs_clt_link_ev ev),
+ 				  unsigned int max_segments,
++				  size_t max_segment_size,
+ 				  unsigned int reconnect_delay_sec,
+ 				  unsigned int max_reconnect_attempts)
+ {
+@@ -2559,6 +2560,7 @@ static struct rtrs_clt *alloc_clt(const char *sessname, size_t paths_num,
+ 	clt->port = port;
+ 	clt->pdu_sz = pdu_sz;
+ 	clt->max_segments = max_segments;
++	clt->max_segment_size = max_segment_size;
+ 	clt->reconnect_delay_sec = reconnect_delay_sec;
+ 	clt->max_reconnect_attempts = max_reconnect_attempts;
+ 	clt->priv = priv;
+@@ -2640,6 +2642,7 @@ static void free_clt(struct rtrs_clt *clt)
+  * @pdu_sz: Size of extra payload which can be accessed after permit allocation.
+  * @reconnect_delay_sec: time between reconnect tries
+  * @max_segments: Max. number of segments per IO request
++ * @max_segment_size: Max. size of one segment
+  * @max_reconnect_attempts: Number of times to reconnect on error before giving
+  *			    up, 0 for * disabled, -1 for forever
+  *
+@@ -2654,6 +2657,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+ 				 size_t paths_num, u16 port,
+ 				 size_t pdu_sz, u8 reconnect_delay_sec,
+ 				 u16 max_segments,
++				 size_t max_segment_size,
+ 				 s16 max_reconnect_attempts)
+ {
+ 	struct rtrs_clt_sess *sess, *tmp;
+@@ -2662,7 +2666,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+ 
+ 	clt = alloc_clt(sessname, paths_num, port, pdu_sz, ops->priv,
+ 			ops->link_ev,
+-			max_segments, reconnect_delay_sec,
++			max_segments, max_segment_size, reconnect_delay_sec,
+ 			max_reconnect_attempts);
+ 	if (IS_ERR(clt)) {
+ 		err = PTR_ERR(clt);
+@@ -2672,7 +2676,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+ 		struct rtrs_clt_sess *sess;
+ 
+ 		sess = alloc_sess(clt, &paths[i], nr_cpu_ids,
+-				  max_segments);
++				  max_segments, max_segment_size);
+ 		if (IS_ERR(sess)) {
+ 			err = PTR_ERR(sess);
+ 			goto close_all_sess;
+@@ -2921,7 +2925,8 @@ int rtrs_clt_create_path_from_sysfs(struct rtrs_clt *clt,
+ 	struct rtrs_clt_sess *sess;
+ 	int err;
+ 
+-	sess = alloc_sess(clt, addr, nr_cpu_ids, clt->max_segments);
++	sess = alloc_sess(clt, addr, nr_cpu_ids, clt->max_segments,
++			  clt->max_segment_size);
+ 	if (IS_ERR(sess))
+ 		return PTR_ERR(sess);
+ 
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.h b/drivers/infiniband/ulp/rtrs/rtrs-clt.h
+index 039a2ebba2f9..167acd3c90fc 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs-clt.h
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.h
+@@ -164,6 +164,7 @@ struct rtrs_clt {
+ 	unsigned int		max_reconnect_attempts;
+ 	unsigned int		reconnect_delay_sec;
+ 	unsigned int		max_segments;
++	size_t			max_segment_size;
+ 	void			*permits;
+ 	unsigned long		*permits_map;
+ 	size_t			queue_depth;
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs.h b/drivers/infiniband/ulp/rtrs/rtrs.h
+index 9879d40467b6..9af750f4d783 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs.h
++++ b/drivers/infiniband/ulp/rtrs/rtrs.h
+@@ -58,6 +58,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+ 				 size_t path_cnt, u16 port,
+ 				 size_t pdu_sz, u8 reconnect_delay_sec,
+ 				 u16 max_segments,
++				 size_t max_segment_size,
+ 				 s16 max_reconnect_attempts);
+ 
+ void rtrs_clt_close(struct rtrs_clt *sess);
+-- 
+2.25.1
+
