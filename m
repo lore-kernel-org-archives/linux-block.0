@@ -2,73 +2,92 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E31C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59211C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:40:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1BD8C2081A
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:37:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23B3D20657
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TLmLKoJb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pWd5K2r2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729000AbgESPhb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 11:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
+        id S1728647AbgESPkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 11:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728994AbgESPhb (ORCPT
+        with ESMTP id S1728633AbgESPkn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 11:37:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60289C08C5C0;
-        Tue, 19 May 2020 08:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6xgTObkLhE+yJInjtnnn6HwlNCqVGeDL4BjvcKIYvZE=; b=TLmLKoJb6jq2HLOx5oAajDP2K+
-        8mel6/LpLiE/q57PrNwkTft1dEmthHiT/iILTuIZguzJmM597hhDdDrfSfNSRy6sXrPCjzJr389Xp
-        lUbZGuJvFQ16X9+RVlohxSMywkEQVIqbmaMkJCt48dnXJ1Di9Wg2duy2ZLl2EbWOluxINnW61ZoCI
-        KHXH3Gg1j4eztu4lTADqb40N8Pt6/FYgw57tuvMJFsb5QNgT8iak+OrU3AeHwUj788V30pxjPiZGg
-        HKwewgmdEhBusHmwMqvjV9FMaeD1cuW0Y7tbVHntpbqrewpuHa55f7SNHNenkT1J+2AU24JECFNGe
-        pcpiT8zg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jb4Iu-0000e1-M9; Tue, 19 May 2020 15:37:16 +0000
-Date:   Tue, 19 May 2020 08:37:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 6/7] blktrace: break out of blktrace setup on
- concurrent calls
-Message-ID: <20200519153716.GC21875@infradead.org>
-References: <20200516031956.2605-1-mcgrof@kernel.org>
- <20200516031956.2605-7-mcgrof@kernel.org>
+        Tue, 19 May 2020 11:40:43 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF56C08C5C0
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:40:42 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id t7so42722plr.0
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 08:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=RGO/bU976Rbw41xP6zn2pcfHAVM+aVs3q5u5hArX4dg=;
+        b=pWd5K2r26WSj0olmybcxO2axnHp0KEVS68KcbkerqBNEiv/YZ1ESgS3KjJZgQNcJpc
+         4PMxlRcpZuP5XZUqWLnTROCEMpELDP9unZg7ICTieNj9wtrHN03BYVrhTDvZiyWCoz2s
+         mz4OTbkD4vNrgIohvjC0w0LvVeL8tsne4KIWJNwvyrCPI9pLBR+DPL8fQckMMThvvZBb
+         BSXdUhaPx4aN6LkNp6Y6f5aK1lTkezR3kBsAVEmw/iClnHh0Q0VMMEOERkK5BWGcCsIX
+         PGBa8Iqj6VmSGOgFkGKyw7W990Hs5HMr/1CNv5fExfSHn4K++4XFNBBPGNds0jIWIv4r
+         biOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RGO/bU976Rbw41xP6zn2pcfHAVM+aVs3q5u5hArX4dg=;
+        b=hFdFPt/6KuopYc/ZZwU549sLKAoUUO8nKj/a4aOKT7em3B752eUqyFM8ImpXbHfaCD
+         p0NCfi47+6cZa5PgiMkdjlj9ZLkg49qZuKgd31v1lFZJ6QyG00SeDxTUEnAYx9GqM9wa
+         tfqfCvFlYQ2rB7LqluP3eJgYiI34qIyLyMk2C4QgeXBI3q8CfcgmCqvxJga5G0g3WD6q
+         Gr/PKpx1Rog+5AluTflME1Fy8PYbBkMD06950/SoZmTkMDY9aKgfZQXQytL6ngA+XRE8
+         Hcp1n8fzWGqlcFO/n4+jdydTOglBRhqu228VnSpyVXnhVsP7yqNVuS7ilLtFiMB41wSx
+         hyDw==
+X-Gm-Message-State: AOAM531FoC0NDlhp0qBzyHFIa1FF/I73C4/cnEk/HQbVI81jMOe911Pz
+        vqETc5Ni/gz/ELhGpJU3Cfc0hQ==
+X-Google-Smtp-Source: ABdhPJyyWtD4wFwiCxYZejO84CrBXVEEuQFsjDkzcu+kuViFcLhlNdvU4jojPr4mvR43VG/l2DNxgw==
+X-Received: by 2002:a17:90a:840e:: with SMTP id j14mr138230pjn.85.1589902841607;
+        Tue, 19 May 2020 08:40:41 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:14f4:acbd:a5d0:25ca? ([2605:e000:100e:8c61:14f4:acbd:a5d0:25ca])
+        by smtp.gmail.com with ESMTPSA id p24sm11615083pff.92.2020.05.19.08.40.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 May 2020 08:40:41 -0700 (PDT)
+Subject: Re: [PATCH v3 0/4] Block layer patches for kernel v5.8
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alexander Potapenko <glider@google.com>
+References: <20200519040737.4531-1-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <13a6142f-d0b6-507f-70d8-3ca3ba83c4e6@kernel.dk>
+Date:   Tue, 19 May 2020 09:40:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200516031956.2605-7-mcgrof@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200519040737.4531-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 16, 2020 at 03:19:55AM +0000, Luis Chamberlain wrote:
-> We use one blktrace per request_queue, that means one per the entire
-> disk.  So we cannot run one blktrace on say /dev/vda and then /dev/vda1,
-> or just two calls on /dev/vda.
+On 5/18/20 10:07 PM, Bart Van Assche wrote:
+> Hi Jens,
 > 
-> We check for concurrent setup only at the very end of the blktrace setup though.
+> The patches in this series are what I came up with as the result of
+> analyzing Alexander Potapenko's report about reading from null_blk.
+> Please consider these patches for kernel v5.8.
 
-Too long line in the changelog.
+Applied, thanks.
 
-Otherwise this looks good:
+-- 
+Jens Axboe
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
