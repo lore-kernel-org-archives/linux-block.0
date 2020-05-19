@@ -2,93 +2,115 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 924AAC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 04:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F21B2C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 07:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65AB6207D8
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 04:24:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HFazT0xw"
+	by mail.kernel.org (Postfix) with ESMTP id CDE5F207D8
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 07:52:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589874745;
+	bh=8oFtGVvPtwvLeXVT+tYrnzpgE338OIeGbsSr9YBrZYA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=1Qjpr33TEkO9nXhgPS8DVUn8czj0qKVhGDFFOhhiaMxik+ByKkrfcHjlBWWgC/TaM
+	 9KxWJdn2pWoRKSugOYwg9udGpnEQElCQLIyd9wk8CsP1vPbhC2KIL6fEHjuKbKuaXN
+	 wA+tO8z7yzYb8DBBHExu8rhYH8rgaemVN4o3gYO4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726045AbgESEYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 00:24:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57849 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725791AbgESEYm (ORCPT
+        id S1728621AbgESHwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 03:52:20 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39573 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728629AbgESHwT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 00:24:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589862280;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
-        bh=zqC0iTOS7MsS7ORK14skLYI/HrQoGHgioBg7h+sh8dE=;
-        b=HFazT0xwWBZmnJoBKRXYXw+r9+Sby77JZkYldTgrek/l+cdARBmkDl6VyW3HPpT3z5TUqz
-        WeysiRTSssOiwxgbYsipYcESYt91oKvgWWYZgeDpWLSVzscO2N4R4Ovxq7Aj4Hnw2vdFQC
-        tIUVwTo8lenzGAtVCD0hnQU+NHN57vw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-1PwBp9zNPnKtqmalt1V_0w-1; Tue, 19 May 2020 00:24:35 -0400
-X-MC-Unique: 1PwBp9zNPnKtqmalt1V_0w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8EB11800D42;
-        Tue, 19 May 2020 04:24:33 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E19C25D9DC;
-        Tue, 19 May 2020 04:24:33 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id AD58A4EA70;
-        Tue, 19 May 2020 04:24:33 +0000 (UTC)
-Date:   Tue, 19 May 2020 00:24:33 -0400 (EDT)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     linux-block <linux-block@vger.kernel.org>
-Cc:     hch@lst.de, mkoutny@suse.com, xuyang2018.jy@cn.fujitsu.com
-Message-ID: <788249564.27423058.1589862273371.JavaMail.zimbra@redhat.com>
-In-Reply-To: <191340985.27421983.1589858341899.JavaMail.zimbra@redhat.com>
-Subject: blktests block/013 failed from commit "block: remove the bd_openers
- checks in blk_drop_partitions"
+        Tue, 19 May 2020 03:52:19 -0400
+Received: by mail-wm1-f66.google.com with SMTP id w64so2277900wmg.4;
+        Tue, 19 May 2020 00:52:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q9ehllzv4GXD6PHjLq8rxZ0NEvwuAG+BryL3jyLoW3I=;
+        b=chvmaXWeCwO9URC7bdzrRLP5/Vu52UyX28eW8PAQ8pbRq1UGeAotyEqrbEJ5HKJluP
+         JQbPbdGkf7gj+aNSJb89lfoo4XXHAdWXYTvNUSuNatsg+BIEF50WECDfNHY6xDQXv5H1
+         ieS1Zf/uYr+pcYxnf6d9Np+y6t5sLVxZo+xs9rJkZ1k4ehaBCjotIfBeyU0os1J4I9Ku
+         fAorVWvtyMLjsFaE0QB3OkKkL0yWjBPA1Gy1BPO11yMi1vAH7Y9F3DyQ1EedO7+9Jzme
+         ixvhXBvAD+Ofj1QHAGhI6dHtPmbcnuhpvQdsVdJcHLldBX1jvjAOKDyc2MYjVmYp5Zkz
+         clWQ==
+X-Gm-Message-State: AOAM532PkB5sFKSGodo0LPZuB6od53JDXNPlJYpj8Ss22JzSvlyD+tvL
+        3nZQOhYgiIu2A0YpThE8mHY=
+X-Google-Smtp-Source: ABdhPJzhMPJJ+bOTnb0XzxprTwcOOTMoZpRkuCsUFILfWTJFhfoKhfdBOE3Io5xf2x700pgQq1fN2w==
+X-Received: by 2002:a1c:1902:: with SMTP id 2mr3881648wmz.178.1589874736792;
+        Tue, 19 May 2020 00:52:16 -0700 (PDT)
+Received: from localhost (ip-37-188-176-234.eurotel.cz. [37.188.176.234])
+        by smtp.gmail.com with ESMTPSA id q2sm19274851wrx.60.2020.05.19.00.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2020 00:52:15 -0700 (PDT)
+Date:   Tue, 19 May 2020 09:52:13 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     linux-f2fs-devel@lists.sourceforge.net,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+Message-ID: <20200519075213.GF32497@dhcp22.suse.cz>
+References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
+ <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
+ <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.68.5.41, 10.4.195.9]
-Thread-Topic: blktests block/013 failed from commit "block: remove the bd_openers checks in blk_drop_partitions"
-Thread-Index: /sWw4UcHbh385HTdRhZbZf5p+gbONg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
-With commit[1], blktests block/013[2] will be failed and it doesn't report "Device or resource busy", could anyone help check it?
+On Mon 18-05-20 19:40:55, Naresh Kamboju wrote:
+> Thanks for looking into this problem.
+> 
+> On Sat, 2 May 2020 at 02:28, Andrew Morton <akpm@linux-foundation.org> wrote:
+> >
+> > On Fri, 1 May 2020 18:08:28 +0530 Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> >
+> > > mkfs -t ext4 invoked oom-killer on i386 kernel running on x86_64 device
+> > > and started happening on linux -next master branch kernel tag next-20200430
+> > > and next-20200501. We did not bisect this problem.
+[...]
+> Creating journal (131072 blocks): [   31.251333] mkfs.ext4 invoked
+> oom-killer: gfp_mask=0x101cc0(GFP_USER|__GFP_WRITE), order=0,
+> oom_score_adj=0
+[...]
+> [   31.500943] DMA free:187396kB min:22528kB low:28160kB high:33792kB
+> reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
+> active_file:4736kB inactive_file:431688kB unevictable:0kB
+> writepending:62020kB present:783360kB managed:668264kB mlocked:0kB
+> kernel_stack:888kB pagetables:0kB bounce:0kB free_pcp:880kB
+> local_pcp:216kB free_cma:163840kB
 
-[1]
-commit 10c70d95c0f2f9a6f52d0e33243d2877370cef51
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue Apr 28 10:52:03 2020 +0200
+This is really unexpected. You are saying this is a regular i386 and DMA
+should be bottom 16MB while yours is 780MB and the rest of the low mem
+is in the Normal zone which is completely missing here. How have you got
+to that configuration? I have to say I haven't seen anything like that
+on i386.
 
-    block: remove the bd_openers checks in blk_drop_partitions
+The failing request is GFP_USER so highmem is not really allowed but
+free pages are way above watermarks so the allocation should have just
+succeeded.
 
-
-[2]
-[root@storageqe-62 blktests]# ./check block/013
-block/013 => sdd (try BLKRRPART on a mounted device)         [failed]
-    runtime  19.026s  ...  18.543s
-    --- tests/block/013.out	2020-05-18 04:38:47.872418459 -0400
-    +++ /mnt/tests/kernel/storage/SSD/nvme_blktest/blktests/results/sdd/block/013.out.bad	2020-05-18 23:58:56.875256644 -0400
-    @@ -1,3 +1,3 @@
-     Running block/013
-    -Device or resource busy
-    +
-     Test complete
-[root@storageqe-62 blktests]# uname -r
-5.7.0-rc4
-
-
+-- 
+Michal Hocko
+SUSE Labs
