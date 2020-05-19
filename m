@@ -2,129 +2,114 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A136C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 11:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6784C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 12:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEF13207E8
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 11:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CD8C207D8
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 12:04:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="BV69TgNy"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="a3vCr1Qs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgESL34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 07:29:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56880 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728612AbgESL34 (ORCPT
+        id S1728612AbgESMEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 08:04:04 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57192 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726949AbgESMED (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 07:29:56 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A1DC08C5C2
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 04:29:55 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id z72so3118877wmc.2
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 04:29:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8ZfvggmvQu85nIN1LaIoXlz/9OYnyPQMzR24y6/lbLM=;
-        b=BV69TgNyfOp7ZqcP3ZFgX7XYRnKuJ9Knrsxt/70a/rYvAEOk+6azknhcDduyBWI2S6
-         ei4vVgeFGDZu+xWYHnWH1XUYyfWaWg3HrCQFIl5fkNZG4AajgK1A8zg2PxqH0mcK5QkN
-         X/4EywONFwdSKjJHn/kFoYLQadtMn9lMkFWVJjB5uQBnqzwPb8PDaTcQ3CO+HyAZZTxO
-         dRvHc1504ytvTJ9dfow4zsCZC/VHn0NhqXYAphDZNy8Wa8KU0q8Tc0ccU+igZy4HeDxB
-         E786v+RcjUiQf1sbxoYE0QA2iHo3TsSZUv7auczVjxtsC0YrDCPDk+/prANiOniKV3fE
-         F7dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8ZfvggmvQu85nIN1LaIoXlz/9OYnyPQMzR24y6/lbLM=;
-        b=NgiFPJRLD8sXv2K94GijeXNQbOOTu+wrAoUpYuq0NVICQ+4BQX7ktDmsjaErdZKmUR
-         5vSiZ5vp12as/WYxqrerRt/CZG3orLpoaAkeN8zLt+T5pCv+PSTVGNReKqW7iDL+okEa
-         XQyV0K6j3LqKSo9ILeKHdmZD0VtgXje0rJpBZMDRyD3vVNQHmJu9U0Z8V4NPUQXiZXLN
-         tLSOi7jScoaYvWgPWAI85xZrkq9gTPODaQWtXK9f3eLYc64sIu0A/Mot+DxNJlIF8goG
-         LUsn2xEN5C8Ngu8CxCtAgFFDhNUrm+FCAoh2vngUnsGx5I8LQjnsqbM7KjASIi3UGLqk
-         qYaw==
-X-Gm-Message-State: AOAM530w3eMRRxtyLr6BS0xrdlYtNwkz6EOaPuhnXKv+IZwt6/kd9OM9
-        62bnHK4rVrI4wyQuj9h5u5TtTYdISpPE74M=
-X-Google-Smtp-Source: ABdhPJx3xt6DGqbiQhh4L3B/c7SN2vEUehC//YMkBQU1F6d2WujaUpm9Vypwu+ikpf2Z4dDrczaXvw==
-X-Received: by 2002:a1c:c309:: with SMTP id t9mr4813047wmf.113.1589887794181;
-        Tue, 19 May 2020 04:29:54 -0700 (PDT)
-Received: from dkxps.fkb.profitbricks.net (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
-        by smtp.gmail.com with ESMTPSA id n9sm3635898wmj.5.2020.05.19.04.29.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2020 04:29:53 -0700 (PDT)
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-next@vger.kernel.org, axboe@kernel.dk, dledford@redhat.com,
-        jgg@ziepe.ca
-Cc:     bvanassche@acm.org, leon@kernel.org, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com, kbuild test robot <lkp@intel.com>
-Subject: [PATCH v2] rtrs-clt: silence kbuild test inconsistent intenting smatch warning
-Date:   Tue, 19 May 2020 13:29:36 +0200
-Message-Id: <20200519112936.928185-1-danil.kipnis@cloud.ionos.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 19 May 2020 08:04:03 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04JC1lWV037335;
+        Tue, 19 May 2020 12:03:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=5Dh6Kmbkk88WlGxBnrORL6ipiVsjzGGG0ld8Cmr/oEo=;
+ b=a3vCr1Qssr/Fsd8D+n7WkYPUngrf5ETstMC+iQqlmXSoTGiwYDMf8ZgBPRG9OBQhVAD4
+ 1uExhBaIvTiCoGVx35LUSfcVLEc8F6cEgJMrQrEx3ooMFns9WfxjWfe2Zu/a8CodXpkv
+ BN0wKfQGdw69PBIW3doicKCBwvfD30EJ9/MR3IsUOTU1xa2mmROQKhAXDMZfuMdWJjBd
+ +60flxBPivF+IMbeWQ/GWeVdnwxA16AaP/hdUbMVnXTV3keb0m5ZXzh7QS4qsXtYPi0R
+ cIv4Z185OevARFYzHwPLuGW+MQKyrBrEK+67ANbHYuFU6O2ZH0t+iZ1z1NFCNB61orRk JQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 31284kvwgj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 19 May 2020 12:03:58 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04JC32cL065970;
+        Tue, 19 May 2020 12:03:58 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 312t343b34-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 May 2020 12:03:58 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04JC3sGQ018978;
+        Tue, 19 May 2020 12:03:55 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 May 2020 05:03:54 -0700
+Date:   Tue, 19 May 2020 15:03:47 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] block/rnbd: Fix an IS_ERR() vs NULL check in
+ find_or_create_sess()
+Message-ID: <20200519120347.GD42765@mwanda>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9625 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005190109
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9625 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
+ cotscore=-2147483648 impostorscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005190109
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kbuild test robot reports a smatch warning:
-drivers/infiniband/ulp/rtrs/rtrs-clt.c:1196 rtrs_clt_failover_req() warn: inconsistent indenting
-drivers/infiniband/ulp/rtrs/rtrs-clt.c:2890 rtrs_clt_request() warn: inconsistent indenting
+The alloc_sess() function returns error pointers, it never returns NULL.
 
-To get rid of the warning, move the while_each_path() macro to a newline.
-Rename the macro to end_each_path() to avoid the "while should follow close
-brace '}'" checkpatch error.
-
-Fixes: 6a98d71daea1 ("RDMA/rtrs: client: main functionality")
-
-Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Reported-by: kbuild test robot <lkp@intel.com>
+Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- v1->v2 Add fixes line
- drivers/infiniband/ulp/rtrs/rtrs-clt.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-index 468fdd0d8713..0fa3a229d90e 100644
---- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-+++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-@@ -734,7 +734,7 @@ struct path_it {
- 			  (it)->i < (it)->clt->paths_num;		\
- 	     (it)->i++)
- 
--#define while_each_path(it)						\
-+#define end_each_path(it)						\
- 	path_it_deinit(it);						\
- 	rcu_read_unlock();						\
- 	}
-@@ -1193,7 +1193,8 @@ static int rtrs_clt_failover_req(struct rtrs_clt *clt,
- 		/* Success path */
- 		rtrs_clt_inc_failover_cnt(alive_sess->stats);
- 		break;
--	} while_each_path(&it);
-+	}
-+	end_each_path(&it);
- 
- 	return err;
- }
-@@ -2887,7 +2888,8 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 55bff3b1be71..a033247281da 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -923,13 +923,12 @@ rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
+ 	sess = __find_and_get_sess(sessname);
+ 	if (!sess) {
+ 		sess = alloc_sess(sessname);
+-		if (sess) {
+-			list_add(&sess->list, &sess_list);
+-			*first = true;
+-		} else {
++		if (IS_ERR(sess)) {
+ 			mutex_unlock(&sess_lock);
+-			return ERR_PTR(-ENOMEM);
++			return sess;
  		}
- 		/* Success path */
- 		break;
--	} while_each_path(&it);
-+	}
-+	end_each_path(&it);
- 
- 	return err;
- }
++		list_add(&sess->list, &sess_list);
++		*first = true;
+ 	} else
+ 		*first = false;
+ 	mutex_unlock(&sess_lock);
 -- 
-2.25.1
+2.26.2
 
