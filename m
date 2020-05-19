@@ -2,152 +2,124 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FBFC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 08:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B848DC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 08:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D6A5207D8
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 08:11:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A15C207C4
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 08:34:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nfYah+u2";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="XcsaoBw4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726504AbgESILt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 04:11:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:32807 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726318AbgESILs (ORCPT
+        id S1726150AbgESIe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 04:34:56 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:26242 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbgESIez (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 04:11:48 -0400
-Received: from mail-qk1-f180.google.com ([209.85.222.180]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MMG6Y-1jJyQo3ZBe-00JIG7; Tue, 19 May 2020 10:11:45 +0200
-Received: by mail-qk1-f180.google.com with SMTP id g185so13774114qke.7;
-        Tue, 19 May 2020 01:11:44 -0700 (PDT)
-X-Gm-Message-State: AOAM530DaOx6VGD4hAtL1MtDchRPiAqc8ofyewQS4diTO0MnWW+lLrUg
-        4oN4bcjyKAHfcf+Wz1vur9k4+YZZBgETN85Y6iQ=
-X-Google-Smtp-Source: ABdhPJx6XgbSzoT+qvNjdY9pWlEyJs3vEhdbk/bed0qIGoM1ay/d49G6y8ZoK1QmCZ9OPzgrrkMiO8yQSdyKoKqOetU=
-X-Received: by 2002:a37:aa82:: with SMTP id t124mr18447360qke.3.1589875903344;
- Tue, 19 May 2020 01:11:43 -0700 (PDT)
+        Tue, 19 May 2020 04:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1589877311; x=1621413311;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=nfYah+u2Jc5on8oI98kgk5k8tqtEWQZbMvRJWwXyiY1IkN3mAaqURKgP
+   RRXMBGWjFk0cub4jI2sr953y+MfLstx9mkvqq+0XozWaOQCMUeRuKJvc8
+   j4IO7wx2upQW9ydaGAx9iKckFD+DpDrmHVs49RHKhDWs5UYEeNPCyio88
+   d5V2CROPPRVBHGNayq7JcTqfS6dry6qGgdR+qY2beOyx6OxFqExJlAsc4
+   FLSDQhHE6d1LLocc0cTeogZo4HXzaahPwYo1JrctgCn7ftxHspS3I0ugU
+   BpwdW6X33aI6Es8BDzf5npIsYPbQDDk93GluH+bPUCPr6gOQX3T0Wso9T
+   A==;
+IronPort-SDR: 6Zkzsr4pf8yp6hXqr89ZlyVfxtEPh2hRJfSpr7r3ik9Bi1c2rZn3aSaGjQW2eIBGx2b6cOBUD4
+ ZEAN/QnRWeD6r9oiAZuONssv3HfXsN0ZmPkfr2JrHHghZTLoZJQ1vexl+anCN/CKcfNrRgxsyD
+ ab1SUSUBBby/n/beJ3ahT8XCgjg9dvC6R0OGyXj5uYARoMVVg9nPJNWSODU2XFeF7f9FJa0Zct
+ oePHOzU25bLjELnu3IM9QMaHxRUiR33O9AGGiTWZDzkpnZWe6lvrmdwJaDlJu5oowEbTHoJ3KH
+ l7k=
+X-IronPort-AV: E=Sophos;i="5.73,409,1583164800"; 
+   d="scan'208";a="240758875"
+Received: from mail-dm6nam11lp2177.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.177])
+  by ob1.hgst.iphmx.com with ESMTP; 19 May 2020 16:35:09 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N9zNPHcjscz+LeGhCe2ie+SUTAhy1jqWHyV4aZ1B3V8uLHDFXJEAUGWV2TZOBZMsE+6kMsQKu/zirtn/V0x/SIYlenb+rsRb3sVhYP2TKEULj4PEX2u76flVIrn0kxImq7ECBJEan3t7VBG3NGe2m2frIg7y1ZWC14zYLuYGEfGmylHtVQ1DxlUOc8kUohfb9LE6HGhE1XPw81rtIYwTDv21oRp4BHt319WQDBjslozLgDrtU9AKrVVcqN+XlVK8Iuiwc1K/S0PsaCOdkBg/lp01ZoyLGoHZj5u8dBO1hW4Bm/dkg/sN8v4JCNozhLr4y8xZVq92jyTXODwUdzPYig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=UQHFC86kZZlvbZdkQchAj5WD5euSxJzvAj797HVwat8zybyvuQG2xq8j5d1EhsXTsc1OL9GFg1fUcDhnEgsRW5+hUDZhWx+/+Z9HY0VR3CeaaxXm90mc4J4hiZIzNlF3DHoGFKMtshXk368rBB8WmEi5cub5fSeVqcvUbivAWbyapBItOaJhW+0H4rWZIa+IaTLDiyKBrmY7fAi02gVekx/YBpQJcn4o0VUUq8IYatocExtSK9k++SiUf80ngj9ZLlxPWcQ5gIInNs3egWfD/Rco7cDk0TImKHoL8JgxdBZXxxFrI237HgV6Oblbp2MZVhzyE5Vj8w15RVBHDi2cqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=XcsaoBw4HkbZb8ccuuEEylUQ5rvSvkdDOTAeqvH33NRFC7gTXfNSOxXWyS8aGc0pB/atAQXEkkjiGuwzaOKfZ1dWq576PZ6/esWSLlomqzy61K6NVkKIC/pb0VMbr3VHu/uXRp/bmNd5rGOVCU0233NzhDLkf6F6h5tZFkHxBbg=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN4PR0401MB3567.namprd04.prod.outlook.com
+ (2603:10b6:803:4b::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.27; Tue, 19 May
+ 2020 08:34:52 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::9854:2bc6:1ad2:f655%4]) with mapi id 15.20.3000.034; Tue, 19 May 2020
+ 08:34:52 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v3 1/4] block: Fix type of first compat_put_{,u}long()
+ argument
+Thread-Topic: [PATCH v3 1/4] block: Fix type of first compat_put_{,u}long()
+ argument
+Thread-Index: AQHWLZMRbaLjnJLAhkaQxgopTt5Kqg==
+Date:   Tue, 19 May 2020 08:34:52 +0000
+Message-ID: <SN4PR0401MB3598D504EFA3D3B05E27FDDD9BB90@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20200519040737.4531-1-bvanassche@acm.org>
+ <20200519040737.4531-2-bvanassche@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: acm.org; dkim=none (message not signed)
+ header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: c396a918-17a3-4772-2bb0-08d7fbcf806b
+x-ms-traffictypediagnostic: SN4PR0401MB3567:
+x-microsoft-antispam-prvs: <SN4PR0401MB35670CE5CF9766E778F61C559BB90@SN4PR0401MB3567.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-forefront-prvs: 040866B734
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ci8qkMae7io5SR6U2tOAwh+FHNBOZ11DK3fumZs7BiOXbmjAIQVgLaEERV5kfKkj13Wjbjeok1lRrHpT8Si5AwMWOEsiKaNAwTgJXVMpyLBPktqkm9dr05UnHGGm7fEanhvPrrvWkdx9dbkv+N+FyAVa7tL8dZWqZYinWdz8FK7q4SNzr85c1JoqK1XM5inFGk1P9IyYCeJU2MK+3c96lIx1lsYqHkldFoVy/XA/jFjyPwBEQ8vyAPKV4+ybm/zbPoSQFcdGEmkfUrnphjXNXCx9WzHRMgSvQbhSLkqhQm5TBuWWKyrxrOGekAa/jzWy6cIDGfewyZL1+NiKFTmmgZRM8WOng/Kg87rrI16XkyjUiosEzUM1QHjPYweAo4KrRKr/pAgk2p1/bsf76tBZ4H7fXYfIheo6r3bhhpEyb2P+cAz4Fj20jBG0VB6jf/kv
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(396003)(376002)(136003)(366004)(33656002)(478600001)(2906002)(52536014)(86362001)(4270600006)(55016002)(66476007)(66946007)(9686003)(66446008)(64756008)(66556008)(4326008)(91956017)(76116006)(19618925003)(71200400001)(26005)(8676002)(316002)(8936002)(186003)(5660300002)(54906003)(7696005)(110136005)(558084003)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: BgoF6LOiiXR7BkIC+ZtPBtrrx7XAJjazdCzxrtoRCxG8KA3flWa+aRmLlripOSLTm38PbsPkuQTGH5dcuFru95yX2esqEcHYpBsmsYaxud0SzsdzictTICY1Wi8wZE+hM5MQ4X/khmZwcWzJ2pshwkgzBQ4P84a2fDUAqU2GZzXD3DA2hIHIb7OAOsDtYvX0QAn+uglNAyIuHtN4omaM5J4TAl9aV+X4YK+MZW2w/morvtMqLu5RuojtRoYaVPmv/YS3HDbWIcgp2t4IkyX+WHN9ErrGTQQHykXDB2mSZdZ0m2N53Knvijhfr8o1SnP1pgeZF4OE35wsmxEs2jxfaadgpwbdqz676M+KA7RNicpfszV+fs4MIZ+OaHwpOue6J8bQP6uwbR0MM2Y4/Xr9NAYMpF7Vt89y0MCs/7BUkmcabYqmmsrd7XxXELVVXF59tbjbYmJ7zOCa2cXkmGaRXZq1lCuHAXtQht7ItXA7xk8GiYCgL5lSV9fmfpnMGKks
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
- <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
- <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com> <20200519075213.GF32497@dhcp22.suse.cz>
-In-Reply-To: <20200519075213.GF32497@dhcp22.suse.cz>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Tue, 19 May 2020 10:11:25 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
-Message-ID: <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:2/mAmEdLTn1HGgMYfMHYI+jtPMkkNSk61dkTTHTMQH78jKNjHU0
- /MgCf92uJ27qRjxKmEqcmyBuW+bQhtuYlH4oo+3kZVwSbR9mwCoXoDGR9yg5IiFN02jdIf+
- MW7go5jPQhVxGK34JppEJKAwvA3tJhq55I3YPzfRPY9AHeVt1GJel0JEkN/uBcFXRtHvEco
- ab9CQEc7l/7/7HkRM9OWA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6KykcjFhjmQ=:LLXV0qw1dXrPKBJyO7uXLI
- S7ohXmM68ZCBLiT1sDMs0CPPwQRzxCCPtR8DzAJizCdb/qwlOFkjz6GUN74SObx0g6xGgmM+a
- x3xjIMoAAs9Ec8LvidgLlDzvronTa/nKK9TKZDCcVYnbIJrKd1NORcRfG0BLKfFb1hJMnykH1
- a+ilOJpLl99n7nH3klZJL3NppTKLUJJAvEc+sO+BzRxe3pIpIkzrfGZFT8kGUhO6SMwRB9TIH
- miiuWcNCBUwJ7nsoL7IhQzrZrVoEipUHOsGpNGx8UzMaZkM1Xnbhq4iPazBu0hBuy09i8VogG
- Jc04uj9CcVfJJqRJ1N+bCV8xuZo9M6thWI8hl1NPE+EU71PsNCdkqEXhFNZDv1UXqU9Vrfry5
- O8tWru8gdILfzQBi7OdHEOrFeUeQEIfZ2lI6vczGDRNbgmCXKJ4+UH5zJcheDuWoRqRuiP4J1
- M6bI7uqJiZbsLk71SpW2XJFtKqh9P3kmZcwUZq6YxQBxxPm2fq9xKAu4PYI60SsdLUiNp82ea
- yhWlGasyUUTAO7k1Jb73KuoL0Aumoj75/mxfrkO6fFEA30+oSNEDB7c5ZGnW4iogqi8/1vlt9
- XwIjSBExYqCIj7PqUj2ue6SDJbfjUwrUQclmDfomglAJ0j8JeowbDbhLKuAxPP6pyl7oLUZUq
- UCdaxwDKOGx6EZIb8Fu2vw13sgG/Rsjs5m44IqCCBsxvLjQUYo/FfIjAHPE4plVh41VHpFJpT
- GAhWuw+qNbtM4q6w/rlx3DsWI7oospXsSTkOsASShFRdsG0SiNBv1ueb29mn4UKwunXUpwQD0
- HMhCgPFcf3IaVVGWzRM8lee5MUz1ThcGaCRjrCdOZ3RAgjx+U4=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c396a918-17a3-4772-2bb0-08d7fbcf806b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 May 2020 08:34:52.6614
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QGMt3RO5Us0VgeGcS+4uTNnbgffiV7ACeau8LUXrzjjykyZQDcUiRU8zUB59bWQR1YTZWU9DscxXgR9+V85aGf438S873UHKE9/odOKAdvM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3567
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 19, 2020 at 9:52 AM Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Mon 18-05-20 19:40:55, Naresh Kamboju wrote:
-> > Thanks for looking into this problem.
-> >
-> > On Sat, 2 May 2020 at 02:28, Andrew Morton <akpm@linux-foundation.org> wrote:
-> > >
-> > > On Fri, 1 May 2020 18:08:28 +0530 Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> > >
-> > > > mkfs -t ext4 invoked oom-killer on i386 kernel running on x86_64 device
-> > > > and started happening on linux -next master branch kernel tag next-20200430
-> > > > and next-20200501. We did not bisect this problem.
-> [...]
-> > Creating journal (131072 blocks): [   31.251333] mkfs.ext4 invoked
-> > oom-killer: gfp_mask=0x101cc0(GFP_USER|__GFP_WRITE), order=0,
-> > oom_score_adj=0
-> [...]
-> > [   31.500943] DMA free:187396kB min:22528kB low:28160kB high:33792kB
-> > reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
-> > active_file:4736kB inactive_file:431688kB unevictable:0kB
-> > writepending:62020kB present:783360kB managed:668264kB mlocked:0kB
-> > kernel_stack:888kB pagetables:0kB bounce:0kB free_pcp:880kB
-> > local_pcp:216kB free_cma:163840kB
->
-> This is really unexpected. You are saying this is a regular i386 and DMA
-> should be bottom 16MB while yours is 780MB and the rest of the low mem
-> is in the Normal zone which is completely missing here. How have you got
-> to that configuration? I have to say I haven't seen anything like that
-> on i386.
-
-I think that line comes from an ARM32 beaglebone-X15 machine showing
-the same symptom. The i386 line from the log file that Naresh linked to at
-https://lkft.validation.linaro.org/scheduler/job/1406110#L1223  is less
-unusual:
-
-[   34.931663] Node 0 active_anon:21464kB inactive_anon:8688kB
-active_file:16604kB inactive_file:849976kB unevictable:0kB
-isolated(anon):0kB isolated(file):0kB mapped:25284kB dirty:58952kB
-writeback:27772kB shmem:8944kB writeback_tmp:0kB unstable:0kB
-all_unreclaimable? yes
-[   34.955523] DMA free:3356kB min:68kB low:84kB high:100kB
-reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
-active_file:0kB inactive_file:11964kB unevictable:0kB
-writepending:11980kB present:15964kB managed:15876kB mlocked:0kB
-kernel_stack:0kB pagetables:0kB bounce:0kB free_pcp:0kB local_pcp:0kB
-free_cma:0kB
-[   34.983385] lowmem_reserve[]: 0 825 1947 825
-[   34.987678] Normal free:3948kB min:7732kB low:8640kB high:9548kB
-reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
-active_file:1096kB inactive_file:786400kB unevictable:0kB
-writepending:65432kB present:884728kB managed:845576kB mlocked:0kB
-kernel_stack:1112kB pagetables:0kB bounce:0kB free_pcp:2908kB
-local_pcp:500kB free_cma:0kB
-[   35.017427] lowmem_reserve[]: 0 0 8980 0
-[   35.021362] HighMem free:1049496kB min:512kB low:1748kB high:2984kB
-reserved_highatomic:0KB active_anon:21464kB inactive_anon:8688kB
-active_file:15508kB inactive_file:51612kB unevictable:0kB
-writepending:0kB present:1149540kB managed:1149540kB mlocked:0kB
-kernel_stack:0kB pagetables:712kB bounce:0kB free_pcp:1524kB
-local_pcp:292kB free_cma:0kB
-[   35.051717] lowmem_reserve[]: 0 0 0 0
-[   35.055374] DMA: 8*4kB (UE) 1*8kB (E) 1*16kB (E) 0*32kB 0*64kB
-0*128kB 1*256kB (E) 0*512kB 1*1024kB (E) 1*2048kB (E) 0*4096kB =
-3384kB
-[   35.067446] Normal: 27*4kB (U) 23*8kB (U) 12*16kB (UE) 12*32kB (U)
-4*64kB (UE) 2*128kB (U) 2*256kB (UE) 1*512kB (E) 0*1024kB 1*2048kB (U)
-0*4096kB = 4452kB
-[   35.081347] HighMem: 2*4kB (UM) 0*8kB 1*16kB (M) 2*32kB (UM) 1*64kB
-(U) 0*128kB 1*256kB (M) 1*512kB (M) 0*1024kB 0*2048kB 256*4096kB (M) =
-1049496kB
-
-        Arnd
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
