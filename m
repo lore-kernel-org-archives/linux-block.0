@@ -2,95 +2,48 @@ Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3592FC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1776EC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AEBE207D8
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:04:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XYll6qzf"
+	by mail.kernel.org (Postfix) with ESMTP id F01FE20809
+	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 15:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728925AbgESPEO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 11:04:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727910AbgESPEN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 11:04:13 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED8EC08C5C0;
-        Tue, 19 May 2020 08:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=klHY5uJiJ1ZMv4sROnMdMEUYgzDxI9wNLeNXBZIY+rI=; b=XYll6qzfRprQhwNNyOqxJpYMmg
-        6Xqg/zQ6PlnvA3j7E1UEd4IHqyrnczfpL//+QAouvCoGhmyR83pOg5HIfhZBIMMu2uNr4gPtGDsGE
-        HKeFcEhZ9Kezr3XXxJqQYuryKOj9+1psnJRSKo2bUoeCHlC41Z+E+Ju+yliydg8KvHXrhRg/70vTf
-        ugZIP/pubXS54CzX0CEWbUgmfnPBjW0TFqf0kuJzpsDT+kMz1R7i7SHYClRcW3RhLHawGd9cXYLTK
-        o0din+R8ceLHoursAwJjpHrNx6MLYvspuI/c3JC9h3zK+PRtUov/aAuozsFFQ+1dYxp/WmlbrY243
-        gNjlsVBA==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jb3mp-00020X-GT; Tue, 19 May 2020 15:04:07 +0000
-Subject: Re: [PATCH v2] rnbd/rtrs: pass max segment size from blk user to the
- rdma library
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-next@vger.kernel.org, axboe@kernel.dk, dledford@redhat.com,
-        jgg@ziepe.ca
-Cc:     bvanassche@acm.org, leon@kernel.org, jinpu.wang@cloud.ionos.com
-References: <20200519084812.GP188135@unreal>
- <20200519111419.924170-1-danil.kipnis@cloud.ionos.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <63d61bce-afe4-5af7-d181-7380db9a701d@infradead.org>
-Date:   Tue, 19 May 2020 08:04:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728925AbgESPV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 11:21:29 -0400
+Received: from verein.lst.de ([213.95.11.211]:44553 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728847AbgESPV3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 May 2020 11:21:29 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B3A9768B02; Tue, 19 May 2020 17:21:26 +0200 (CEST)
+Date:   Tue, 19 May 2020 17:21:26 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Alexander Potapenko <glider@google.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 3/4] block: Document the bio_vec properties
+Message-ID: <20200519152126.GA22286@lst.de>
+References: <20200519040737.4531-1-bvanassche@acm.org> <20200519040737.4531-4-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20200519111419.924170-1-danil.kipnis@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200519040737.4531-4-bvanassche@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/20 4:14 AM, Danil Kipnis wrote:
-> When Block Device Layer is disabled, BLK_MAX_SEGMENT_SIZE is undefined.
-> The rtrs is a transport library and should compile independently of the
-> block layer. The desired max segment size should be passed down by the
-> user.
-> 
-> Introduce max_segment_size parameter for the rtrs_clt_open() call.
-> 
-> Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
-> Fixes: 6a98d71daea1 ("RDMA/rtrs: client: main functionality")
-> Fixes: cb80329c9434 ("RDMA/rtrs: client: private header with client structs and functions")
-> Fixes: b5c27cdb094e ("RDMA/rtrs: public interface header to establish RDMA connections")
-> 
-> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+On Mon, May 18, 2020 at 09:07:36PM -0700, Bart Van Assche wrote:
+> Since it is nontrivial that nth_page() does not have to be used for a
+> bio_vec, document this.
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+Looks good,
 
-Thanks.
-
-> ---
-> v1->v2 Add Fixes lines.
-> 
->  drivers/block/rnbd/rnbd-clt.c          |  1 +
->  drivers/infiniband/ulp/rtrs/rtrs-clt.c | 17 +++++++++++------
->  drivers/infiniband/ulp/rtrs/rtrs-clt.h |  1 +
->  drivers/infiniband/ulp/rtrs/rtrs.h     |  1 +
->  4 files changed, 14 insertions(+), 6 deletions(-)
-
-
--- 
-~Randy
+Reviewed-by: Christoph Hellwig <hch@lst.de>
