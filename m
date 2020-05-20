@@ -6,97 +6,173 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77071C433E3
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E21BC433E2
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 11:56:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56489207D3
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E10F206BE
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 11:56:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GcyRcfEj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qlgXHVmE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726789AbgETKMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 06:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
+        id S1726957AbgETL4e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 07:56:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726224AbgETKMV (ORCPT
+        with ESMTP id S1726435AbgETL4c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 06:12:21 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87817C061A0F
-        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:12:19 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id s8so2513762wrt.9
-        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:12:19 -0700 (PDT)
+        Wed, 20 May 2020 07:56:32 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C24FC05BD43
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 04:56:31 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id u16so353780lfl.8
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 04:56:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=iBcqQ8zxIDDNjlNpFLw9XT6VQWod6ur15qrla/UFJIM=;
-        b=GcyRcfEjdfbUfF8SYp6YXFCUiSmHxZEnby3pNjehHWcDBnLM95xiIR946clqhMIo8v
-         q+v5u3uDiDhe8BwtjxlihKWI+8U1pWzeM5cAq/iINiMV6zxZz02aD80JLlLBqtdpOr6i
-         wADkaP6IfmQ9s+UGfWXE0NcUcb45UtiO5o1CH2/VfQs3ReRWTB16/pQ8rSpnVwBHlAHS
-         u7oV2A5AJ6a62eVFO4EYeZjkfGG4F2rfUpPXPh7KKl/I8GnbAZyKp3mlRc5DePAyoJ6s
-         uGDQT5aedJV3pbX0QlcaREnlFnSIG4Dm0ONnZ4ppugikoVr/9w451geilvvnMm3tREOk
-         0PPw==
+        bh=c8qp29x57Bnw83ildG5bfYkgdHVhrczJ6/NyvfJLqdw=;
+        b=qlgXHVmEwhlw8sQKewHDsuWMSreqtLqu7J0G2FobOqDX6oBRZuV/ovWE3ANMJBrQ/R
+         VHSrnEzZvSTDxoGM3/zD4+VTvhNG0yaVzAa7lwGqABFXOzXetvh0ERA4i6G5tYAoy+YR
+         Qr6jPv+xDkynFLCazHC8VGxm8nKlCbFmrG5Kj91mWASiJARiWqfoR7ILN0Zk3nndZglm
+         xfojJ2HA3S+ljjrJhP5FQNxiCPqhXs7R18c5zKgCMh12Zewow13rinQNy8sr0PEtMvmD
+         gPqjH0dG3srB+Q4snOOPhnSigEJYiArkGSq8les+OJeIhHLgVWpVkJPP+TTaSgnYuQhJ
+         AIGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=iBcqQ8zxIDDNjlNpFLw9XT6VQWod6ur15qrla/UFJIM=;
-        b=HzrZ0D4NrW+RP0AYnarsbThG7pB2MugbhQOx9zXgxdlEjdznBOOCjUholXvdFeV3FX
-         g4RJVjSsqqMYtf4N5RL//Y6MBQEYBkYWN53/SjPeJ+0hoRAld1fyPELZDTKPyvNK4J9d
-         bMwOZZIm0VIL5UPz0wpfcNzXDQcoswkJ/yulClLVUnWQ5yCvyOXIKI/s15oDmWovkNZ1
-         3tlinWGp5GbrkyXlxtVnvQb1sWK8bZueu6EQ1iJKT/dhRJumfuw7nsnnIY0/sX6yPSOt
-         NQFUrHWeCHiWq/+nzKh9d4KPGg+MVlFNWxXvutf/uzP1GTknSomPo4GanNEVc9vkFDvi
-         VSCQ==
-X-Gm-Message-State: AOAM533BDGQBe6svWxwfDX46SrqOh1UKxonIsAQVKdUw6rHjm0q1DOFE
-        3uM82ro3wkvKY+USwwaiXZt9Av5w2M0GcvpT0AY4
-X-Google-Smtp-Source: ABdhPJypgX0CYZ1BPyRbnRWRWfBgtSJZTe/P5PsSECo15WsGXB6uu7WRt6MROF7Juxl784icOyfURtWML4iF6b7GMoM=
-X-Received: by 2002:adf:cc81:: with SMTP id p1mr3338025wrj.192.1589969538224;
- Wed, 20 May 2020 03:12:18 -0700 (PDT)
+        bh=c8qp29x57Bnw83ildG5bfYkgdHVhrczJ6/NyvfJLqdw=;
+        b=smyH7wUrK4aOPUxvPRmac9xnSZR1em/OLEEcI/JuKEv4NuWIEnOm5rmSq34uYylvOU
+         rRU9/IgcqE9rhxcryl4Th6BgY8Dw1NKEHf/9PeVmcsErxZFNzJsbpfcGG6uMRTvrLooy
+         Rc9CzMZrlyUrAHNEnocAm0fbesN07q8X8TeQ6HH7Troid8MJ1wkn+gCEXpj/DqQiKB6D
+         UZuoDMcpzbhBj3Bb/6jugiTfOYwQQ+OSZEKY/cct+WRaG1mCds3mbBxvKHMRUBC0G2P8
+         ec21prjm4zv2AQw7UCJVE7k49YCyM5mbxUp5a+IeqdBRHzjiplx4I/gNJs+RbFcjIDyQ
+         XTrg==
+X-Gm-Message-State: AOAM531JwLOgLWDHPNTBuoJroEg+HIsdxiR1kDZGWNsCDce4IQ9cyvBW
+        JwurlgWBYO3y8lUvSsY5NKdj2vX9sIZhdXU9oHXvlw==
+X-Google-Smtp-Source: ABdhPJwm4d8MeeXVBkReCSgeKef0/TrHxDY6JMkbe05871VEuSEJIfm5/eJuCpE32/mb9LC8RnbJH+gDczs7BL2boVk=
+X-Received: by 2002:a19:8453:: with SMTP id g80mr2422388lfd.167.1589975789287;
+ Wed, 20 May 2020 04:56:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200520040354.3e619918@canb.auug.org.au> <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
-In-Reply-To: <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Wed, 20 May 2020 12:12:07 +0200
-Message-ID: <CAHg0Huww=oyj0DSuLSKOrJp5vtG_2xLLqM27MAHWNJdLWNeB3A@mail.gmail.com>
-Subject: Re: linux-next: Tree for May 19 (block/rnbd/)
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
+References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
+ <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
+ <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
+ <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
+ <20200519084535.GG32497@dhcp22.suse.cz>
+In-Reply-To: <20200519084535.GG32497@dhcp22.suse.cz>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Wed, 20 May 2020 17:26:17 +0530
+Message-ID: <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Randy,
+FYI,
 
-On Tue, May 19, 2020 at 8:59 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+This issue is specific on 32-bit architectures i386 and arm on linux-next tree.
+As per the test results history this problem started happening from
+Bad : next-20200430
+Good : next-20200429
+
+steps to reproduce:
+dd if=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190504A00573
+of=/dev/null bs=1M count=2048
+or
+mkfs -t ext4 /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190804A00BE5
+
+
+Problem:
+[   38.802375] dd invoked oom-killer: gfp_mask=0x100cc0(GFP_USER),
+order=0, oom_score_adj=0
+
+i386 crash log:  https://pastebin.com/Hb8U89vU
+arm crash log: https://pastebin.com/BD9t3JTm
+
+On Tue, 19 May 2020 at 14:15, Michal Hocko <mhocko@kernel.org> wrote:
 >
-> On 5/19/20 11:03 AM, Stephen Rothwell wrote:
-> > Hi all,
+> On Tue 19-05-20 10:11:25, Arnd Bergmann wrote:
+> > On Tue, May 19, 2020 at 9:52 AM Michal Hocko <mhocko@kernel.org> wrote:
+> > >
+> > > On Mon 18-05-20 19:40:55, Naresh Kamboju wrote:
+> > > > Thanks for looking into this problem.
+> > > >
+> > > > On Sat, 2 May 2020 at 02:28, Andrew Morton <akpm@linux-foundation.org> wrote:
+> > > > >
+> > > > > On Fri, 1 May 2020 18:08:28 +0530 Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> > > > >
+> > > > > > mkfs -t ext4 invoked oom-killer on i386 kernel running on x86_64 device
+> > > > > > and started happening on linux -next master branch kernel tag next-20200430
+> > > > > > and next-20200501. We did not bisect this problem.
+> > > [...]
+> > > > Creating journal (131072 blocks): [   31.251333] mkfs.ext4 invoked
+> > > > oom-killer: gfp_mask=0x101cc0(GFP_USER|__GFP_WRITE), order=0,
+> > > > oom_score_adj=0
+> > > [...]
+> > > > [   31.500943] DMA free:187396kB min:22528kB low:28160kB high:33792kB
+> > > > reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
+> > > > active_file:4736kB inactive_file:431688kB unevictable:0kB
+> > > > writepending:62020kB present:783360kB managed:668264kB mlocked:0kB
+> > > > kernel_stack:888kB pagetables:0kB bounce:0kB free_pcp:880kB
+> > > > local_pcp:216kB free_cma:163840kB
+> > >
+> > > This is really unexpected. You are saying this is a regular i386 and DMA
+> > > should be bottom 16MB while yours is 780MB and the rest of the low mem
+> > > is in the Normal zone which is completely missing here. How have you got
+> > > to that configuration? I have to say I haven't seen anything like that
+> > > on i386.
 > >
-> > News: there will be no linux-next release tomorrow.
-> >
-> > Changes since 20200518:
-> >
+> > I think that line comes from an ARM32 beaglebone-X15 machine showing
+> > the same symptom. The i386 line from the log file that Naresh linked to at
+> > https://lkft.validation.linaro.org/scheduler/job/1406110#L1223  is less
+> > unusual:
 >
-> seen on i386:
+> OK, that makes more sense! At least for the memory layout.
 >
-> when CONFIG_MODULES is not set/enabled:
+> > [   34.931663] Node 0 active_anon:21464kB inactive_anon:8688kB
+> > active_file:16604kB inactive_file:849976kB unevictable:0kB
+> > isolated(anon):0kB isolated(file):0kB mapped:25284kB dirty:58952kB
+> > writeback:27772kB shmem:8944kB writeback_tmp:0kB unstable:0kB
+> > all_unreclaimable? yes
+> > [   34.955523] DMA free:3356kB min:68kB low:84kB high:100kB
+> > reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
+> > active_file:0kB inactive_file:11964kB unevictable:0kB
+> > writepending:11980kB present:15964kB managed:15876kB mlocked:0kB
+> > kernel_stack:0kB pagetables:0kB bounce:0kB free_pcp:0kB local_pcp:0kB
+> > free_cma:0kB
+> > [   34.983385] lowmem_reserve[]: 0 825 1947 825
+> > [   34.987678] Normal free:3948kB min:7732kB low:8640kB high:9548kB
+> > reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB
+> > active_file:1096kB inactive_file:786400kB unevictable:0kB
+> > writepending:65432kB present:884728kB managed:845576kB mlocked:0kB
+> > kernel_stack:1112kB pagetables:0kB bounce:0kB free_pcp:2908kB
+> > local_pcp:500kB free_cma:0kB
 >
-> ../drivers/block/rnbd/rnbd-clt-sysfs.c: In function 'rnbd_clt_remove_dev_symlink':
-> ../drivers/block/rnbd/rnbd-clt-sysfs.c:435:39: error: implicit declaration of function 'module_is_live'; did you mean 'module_driver'? [-Werror=implicit-function-declaration]
->   if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
->                                        ^~~~~~~~~~~~~~
->                                        module_driver
->
->
+> The lowmem is really low (way below the min watermark so even memory
+> reserves for high priority and atomic requests are depleted. There is
+> still 786MB of inactive page cache to be reclaimed. It doesn't seem to
+> be dirty or under the writeback but it still might be pinned by the
+> filesystem. I would suggest watching vmscan reclaim tracepoints and
+> check why the reclaim fails to reclaim anything.
 > --
-> ~Randy
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-
-Looking into this, thank you
+> Michal Hocko
+> SUSE Labs
