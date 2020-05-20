@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CDAC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 23:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE5AC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 23:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD5C120873
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 23:02:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DB0F20873
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 23:02:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aUOolwmg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AhWiHxdV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728690AbgETXCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 19:02:02 -0400
+        id S1728692AbgETXCG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 19:02:06 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7017 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728648AbgETXCB (ORCPT
+        with ESMTP id S1728648AbgETXCG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 19:02:01 -0400
+        Wed, 20 May 2020 19:02:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1590015722; x=1621551722;
+  t=1590015727; x=1621551727;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bWMZiFoqSUL/3acCdJU4JlzT00LV/k5w2vpIEvv48ug=;
-  b=aUOolwmgoE0V7rc6LNGzSM5W0Je6hpjvpXTGCFOtiOfWWuWZuuFzg6qU
-   dQTe6QuqdnXDNMcLh1th7+0moiEps7oGwhw1/u5L3UovcyF8/sGPAbSQT
-   G22RVVALQs2/+PM3HrTkQtPEeDZeYP5uI3NWijU1+IRXGWDH+gVgEKa87
-   h2TdgHPH3QIJzHC9VGsqgrV4Y45tEp3cOzZ4duRqpbi72MQnFuNMcM8li
-   p5uXqS33939pWIs6aE4MC24UXxWGp5Hq4D2+fDmWDed/Lz+5gKUXpuur9
-   vqd7PSefWbB7yqzOtUEhcTDJ8aT4bIs9fxRSyuDtMEzHFyt2Ek0giDRBO
-   g==;
-IronPort-SDR: AhoI9/ycKpW4vnDlFfagplDPfEzEc7zDB32MbLzu2MZ63dTpRwxmOv5yUDRzh97fwmxHlx6z+v
- 7aAM8iVXrOr5spM+iz7ULh96qvNXstNL1EJcg+DS5Ta8FGkR9hCSE1r18arxRkrrrMaW3CNGIM
- UNRY3CvNVjXcyy83ks/XzLwXVTQMXF39gaZ69cRe4TdGP7ID6LlCwUm5ysOyNAqcTyiNFgmMd1
- DELs6ymruGBZI8+QL7G+Bqn1ZT9vOZYYWdh5BODGCkhOGXNLUzkz1IDEpQaosBP8AvA0CbUEIZ
- 1mE=
+  bh=hsKjT73X9xJTLvvur1ylGmlHAREjIduh/gg6/OUtCww=;
+  b=AhWiHxdVjsdhanONf15Tp/6akb0Ai2vP+DkIybFQ+zBn4rjnACiQ8139
+   2ckQ1Firt2jxmIG3S8IKyWvyWcacHh5AZV5joDL3vL0vP2J8xgcHHdbxx
+   b264OfHKOn70xspnhMUDTY/GhlBmXQqPhDQEbnGFtPKe4xfGFqiHXdmDI
+   aeClssPSvN7u203ux5VAyKwhAlNxZlzNhGo/LxjPmnAAg5WR31MNdIeyu
+   LM0XgHlI23K5tdfQM8TH0ICVgDnLazSNyCot3jTCRTcnxO3TqYzNoS3so
+   C1u95vUxbUQ2EzkljZZGdZBYUm2y1eGWuBRvcizUFUIJn5cjzBE5JErKz
+   A==;
+IronPort-SDR: 0jJfxl+amzAHLOdCZW4FsdPP1LrdxC4bQWQ+NACgiIaq7e10OelU7pyV01QOUPAFEfGslqpti8
+ 5N0+8LSkJfOAZkdb1bhijmw6tiUFByVWYWTGbif7x2Lx90M8asHKrZwwqiSHpyFn/Qp0TDxetS
+ EL1RzIs6ELCjirF2KKm1EhXJ8JDKVKJymLtlHksA4Z661uDLgewSEDn9O8y1cNg3MHxAnGhuP6
+ qM7ibRK18kgX2J9iMr7LW8lwOJi/FOsmmIEOvHjcF/op9f8DQXnZDe84y0V9KjvRhy+XO8YJJB
+ 5ws=
 X-IronPort-AV: E=Sophos;i="5.73,415,1583164800"; 
-   d="scan'208";a="142501782"
+   d="scan'208";a="142501785"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 May 2020 07:02:02 +0800
-IronPort-SDR: jnFY+/w9Qwg2Shfm5lbaDMIHheOEtXfyAoWU2+o+t5lwQdRWQUJEIliIknTgz8jNZzZ85JQkZi
- yDEr1v3U2bikMOEDVlme4AyZ4BHxrVv5o=
+  by ob1.hgst.iphmx.com with ESMTP; 21 May 2020 07:02:07 +0800
+IronPort-SDR: 1S57mlKJrZWeVcuQWFx5Ww5Uyp+tGLaWTQVbPPMIPAOaATK3KxGTpgaIb6rImhCrWcpu45H8JN
+ nUaq8F12Di3g0X5R1j5jF5HNVTz1WuBZA=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2020 15:51:30 -0700
-IronPort-SDR: SEE2uupmrcZbQopvI+kjFc/eujRT2nmhF72H62hHzIv4JHfJdJVFRcCxqxOmprLUGRKi94xNoT
- /6Vc/miTcppg==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2020 15:51:34 -0700
+IronPort-SDR: ZF7p+m+ln/kC5g4cC7LhRsIqOT1KEWwYKr0MNyb2yxPg3Pm06ZGd/DJLIvvpanv8Stu+1hqO8m
+ 1TIx/6V8H9cg==
 WDCIronportException: Internal
 Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
-  by uls-op-cesaip01.wdc.com with ESMTP; 20 May 2020 16:02:01 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 20 May 2020 16:02:06 -0700
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 1/2] null_blk: return error for invalid zone size
-Date:   Wed, 20 May 2020 16:01:51 -0700
-Message-Id: <20200520230152.36120-2-chaitanya.kulkarni@wdc.com>
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 2/2] null_blk: don't allow discard for zoned mode
+Date:   Wed, 20 May 2020 16:01:52 -0700
+Message-Id: <20200520230152.36120-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20200520230152.36120-1-chaitanya.kulkarni@wdc.com>
 References: <20200520230152.36120-1-chaitanya.kulkarni@wdc.com>
@@ -70,57 +71,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In null_init_zone_dev() check if the zone size is larger than device
-capacity, return error if needed.
+Zoned block device specification do not define the behavior of
+discard/trim command as this command is generally replaced by the reset
+write pointer (zone reset) command. Emulate this in null_blk by making
+zoned and discard options mutually exclusive.
 
-This also fixes the following oops :-
-
-null_blk: changed the number of conventional zones to 4294967295
-BUG: kernel NULL pointer dereference, address: 0000000000000010
-PGD 7d76c5067 P4D 7d76c5067 PUD 7d240c067 PMD 0
-Oops: 0002 [#1] SMP NOPTI
-CPU: 4 PID: 5508 Comm: nullbtests.sh Tainted: G OE 5.7.0-rc4lblk-fnext0
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e4
-RIP: 0010:null_init_zoned_dev+0x17a/0x27f [null_blk]
-RSP: 0018:ffffc90007007e00 EFLAGS: 00010246
-RAX: 0000000000000020 RBX: ffff8887fb3f3c00 RCX: 0000000000000007
-RDX: 0000000000000000 RSI: ffff8887ca09d688 RDI: ffff888810fea510
-RBP: 0000000000000010 R08: ffff8887ca09d688 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff8887c26e8000
-R13: ffffffffa05e9390 R14: 0000000000000000 R15: 0000000000000001
-FS:  00007fcb5256f740(0000) GS:ffff888810e00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000010 CR3: 000000081e8fe000 CR4: 00000000003406e0
-Call Trace:
- null_add_dev+0x534/0x71b [null_blk]
- nullb_device_power_store.cold.41+0x8/0x2e [null_blk]
- configfs_write_file+0xe6/0x150
- vfs_write+0xba/0x1e0
- ksys_write+0x5f/0xe0
- do_syscall_64+0x60/0x250
- entry_SYSCALL_64_after_hwframe+0x49/0xb3
-RIP: 0033:0x7fcb51c71840
-
+Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/block/null_blk_zoned.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/block/null_blk_main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk_zoned.c
-index 9c19f747f394..cc47606d8ffe 100644
---- a/drivers/block/null_blk_zoned.c
-+++ b/drivers/block/null_blk_zoned.c
-@@ -23,6 +23,10 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 		pr_err("zone_size must be power-of-two\n");
- 		return -EINVAL;
- 	}
-+	if (dev->zone_size > dev->size) {
-+		pr_err("Zone size larger than device capacity\n");
-+		return -EINVAL;
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 4f37b9fb28bb..6126f771ae99 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1561,6 +1561,13 @@ static void null_config_discard(struct nullb *nullb)
+ {
+ 	if (nullb->dev->discard == false)
+ 		return;
++
++	if (nullb->dev->zoned) {
++		nullb->dev->discard = false;
++		pr_info("discard option is ignored in zoned mode\n");
++		return;
 +	}
- 
- 	dev->zone_size_sects = dev->zone_size << ZONE_SIZE_SHIFT;
- 	dev->nr_zones = dev_size >>
++
+ 	nullb->q->limits.discard_granularity = nullb->dev->blocksize;
+ 	nullb->q->limits.discard_alignment = nullb->dev->blocksize;
+ 	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
 -- 
 2.22.1
 
