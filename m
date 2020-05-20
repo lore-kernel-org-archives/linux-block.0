@@ -1,107 +1,128 @@
-Return-Path: <SRS0=keWk=7B=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=ALdW=7C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D09C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 23:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B47FC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 01:18:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5FBB20809
-	for <linux-block@archiver.kernel.org>; Tue, 19 May 2020 23:44:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C978B2075F
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 01:18:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iFlqm/M9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsemTWtS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725998AbgESXoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 May 2020 19:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726318AbgESXop (ORCPT
+        id S1726348AbgETBSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 May 2020 21:18:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27616 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726318AbgETBSj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 May 2020 19:44:45 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60613C061A0E
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 16:44:45 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id m11so1863536qka.4
-        for <linux-block@vger.kernel.org>; Tue, 19 May 2020 16:44:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=l2sL1SuOB0Bwoh3rp7+GqKpOELWuc6ZuQ7vSlzcsMBE=;
-        b=iFlqm/M9J3nwY7cxchj42OacLXK5ohOEesABtw0fSf/vL6HReI8WyMrmSPTL0oy8ym
-         kFk7GBJbKToh6jrpED9mgjFNQmjPzETw3m4OErn2Bt6xBOrN+BT/ffVcXM/RnT4tRPkS
-         0/R0svtdCM/PkwDcxBLVz3D/nY89Tda4pdHmbZscMfN0dJrhblTVlSfn/jHQsvT/Uri4
-         ozuyF8ejM+2gyKgnoHToo5W57H3LdY85+LBEtGmuGSgWqf8KpOm9hdLjG/5bMXhxWlZb
-         Ltsc9NYiw/gtoWktRxBUOwMAiBypmXMO7/Iw7YUYu4ULAqHMS/I0ELNnrL9BFkFPX1W/
-         O+vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=l2sL1SuOB0Bwoh3rp7+GqKpOELWuc6ZuQ7vSlzcsMBE=;
-        b=NIPb/dfu8xHrhFJ850cLYOA8kWFinsdMjTQAJaxYVGy3c3doq+z18ALKSwQyzPJxtD
-         IaSimljzxandcIzLnMvv4va/e/Cs8VBySJ7H/dZyvQYOcjey+8uFfr9wOyKXI77T1YSD
-         UIdJyDFueoK+ugbjMlJ3n5JGxgZca5knV6GXE1Cx+t8MrDk1PlaGHPVykW4cKogRdxPs
-         jWo0lepma3ZHIP3pkDyNoSO1Q6oSWiP3ozcehSRdjz6Ekn/pmADm3kqZ57mH02Lmvj7C
-         drwEq5eYxtXOUQFJJBq2SNZARKQqJ+KRDgIIpdsSZSD0tKirtAO2TccY255P4cls2+og
-         UYbg==
-X-Gm-Message-State: AOAM533Y9UXuTgaWhWhuSoj2oKSpeiEyUvBCfDQYAkLeNhNTDKO0pEcW
-        EBEAkBa5MMLZikbW9yKcVGEjIQ==
-X-Google-Smtp-Source: ABdhPJyqzRlLG6w3O2K4GgGWlPTq0J5WCXLjnydkSlHtNZdebPL9AT7MR4Vtxwwj1z4lp/8Kd5h4kw==
-X-Received: by 2002:a37:506:: with SMTP id 6mr1965568qkf.159.1589931884672;
-        Tue, 19 May 2020 16:44:44 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id n206sm914132qke.20.2020.05.19.16.44.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 19 May 2020 16:44:44 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jbBud-0007yh-PW; Tue, 19 May 2020 20:44:43 -0300
-Date:   Tue, 19 May 2020 20:44:43 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-next@vger.kernel.org, axboe@kernel.dk, dledford@redhat.com,
-        bvanassche@acm.org, leon@kernel.org, jinpu.wang@cloud.ionos.com,
-        rdunlap@infradead.org
-Subject: Re: [PATCH v2] rnbd/rtrs: pass max segment size from blk user to the
- rdma library
-Message-ID: <20200519234443.GB30609@ziepe.ca>
-References: <20200519084812.GP188135@unreal>
- <20200519111419.924170-1-danil.kipnis@cloud.ionos.com>
+        Tue, 19 May 2020 21:18:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589937517;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7yYBRNQiyHNP5lLD1Its0j+AibWc7irAqGuGhp7bBL4=;
+        b=TsemTWtSc3RCyzTGpMEsH7nzTU9iAvg3tXJON9hjjqtTokfjshJ6asJeiTuSrAPyzI8YGS
+        Zst3EndkTLtCbaeCGe2WzB5HcL+7h84/xL8bjRV2DWyPRFRF8UR9MlQ2sUKiLvRSLAXhH1
+        OQSNRHy8SBb4NMm5B9qmetNUAugSQq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-JGQmxt61OLSAhAeA6PWB1A-1; Tue, 19 May 2020 21:18:36 -0400
+X-MC-Unique: JGQmxt61OLSAhAeA6PWB1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDF2F464;
+        Wed, 20 May 2020 01:18:34 +0000 (UTC)
+Received: from T590 (ovpn-12-217.pek2.redhat.com [10.72.12.217])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B4E0060BE1;
+        Wed, 20 May 2020 01:18:27 +0000 (UTC)
+Date:   Wed, 20 May 2020 09:18:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 5/9] blk-mq: don't set data->ctx and data->hctx in
+ blk_mq_alloc_request_hctx
+Message-ID: <20200520011823.GA415158@T590>
+References: <20200518093155.GB35380@T590>
+ <87imgty15d.fsf@nanos.tec.linutronix.de>
+ <20200518115454.GA46364@T590>
+ <20200518131634.GA645@lst.de>
+ <20200518141107.GA50374@T590>
+ <20200518165619.GA17465@lst.de>
+ <20200519015420.GA70957@T590>
+ <20200519153000.GB22286@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200519111419.924170-1-danil.kipnis@cloud.ionos.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200519153000.GB22286@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 19, 2020 at 01:14:19PM +0200, Danil Kipnis wrote:
-> When Block Device Layer is disabled, BLK_MAX_SEGMENT_SIZE is undefined.
-> The rtrs is a transport library and should compile independently of the
-> block layer. The desired max segment size should be passed down by the
-> user.
+On Tue, May 19, 2020 at 05:30:00PM +0200, Christoph Hellwig wrote:
+> On Tue, May 19, 2020 at 09:54:20AM +0800, Ming Lei wrote:
+> > As Thomas clarified, workqueue hasn't such issue any more, and only other
+> > per CPU kthreads can run until the CPU clears the online bit.
+> > 
+> > So the question is if IO can be submitted from such kernel context?
 > 
-> Introduce max_segment_size parameter for the rtrs_clt_open() call.
-> 
-> Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
-> Fixes: 6a98d71daea1 ("RDMA/rtrs: client: main functionality")
-> Fixes: cb80329c9434 ("RDMA/rtrs: client: private header with client structs and functions")
-> Fixes: b5c27cdb094e ("RDMA/rtrs: public interface header to establish RDMA connections")
-> 
-> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-> ---
-> v1->v2 Add Fixes lines.
+> What other per-CPU kthreads even exist?
 
-Applied to for-next, thanks
+I don't know, so expose to wider audiences.
 
-Jason
+> 
+> > > INACTIVE is set to the hctx, and it is set by the last CPU to be
+> > > offlined that is mapped to the hctx.  once the bit is set the barrier
+> > > ensured it is seen everywhere before we start waiting for the requests
+> > > to finish.  What is missing?:
+> > 
+> > memory barrier should always be used as pair, and you should have mentioned
+> > that the implied barrier in test_and_set_bit_lock pair from sbitmap_get()
+> > is pair of smp_mb__after_atomic() in blk_mq_hctx_notify_offline().
+> 
+> Documentation/core-api/atomic_ops.rst makes it pretty clear that the
+> special smp_mb__before_atomic and smp_mb__after_atomic barriers are only
+> used around the set_bit/clear_bit/change_bit operations, and not on the
+> test_bit side.  That is also how they are used in all the callsites I
+> checked.
+
+I didn't care if the barrier is smp_mb__after_atomic or smp_mb() because it
+is added in slow path.
+
+What I tried to express is that every SMP memory barrier use should be commented
+clearly, especially about the pairing usage, see "SMP BARRIER PAIRING" section of
+Documentation/memory-barriers.txt.
+
+So please add comments around the new added smp_mb__after_atomic(),
+something like:
+
+/*
+ * The pair of the following smp_mb__after_atomic() is smp_mb() implied in
+ * test_and_set_bit_lock pair from sbitmap_get(), so that setting tag bit and
+ * checking INACTIVE in blk_mq_get_tag() can be ordered, same with setting
+ * INACTIVE and checking tag bit in blk_mq_hctx_notify_offline().
+ */
+
+> 
+> > Then setting tag bit and checking INACTIVE in blk_mq_get_tag() can be ordered,
+> > same with setting INACTIVE and checking tag bit in blk_mq_hctx_notify_offline().
+> 
+> Buy yes, even if not that would take care of it.
+
+The OPs have been ordered in this way, that is exactly purpose of the added memory
+barrier.
+
+thanks,
+Ming
+
