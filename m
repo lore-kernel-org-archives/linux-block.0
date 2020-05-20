@@ -2,105 +2,101 @@ Return-Path: <SRS0=ALdW=7C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A48D5C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77071C433E3
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:12:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 832CB2075F
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56489207D3
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 10:12:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hsxRs5C5"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="GcyRcfEj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbgETKEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 06:04:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42934 "EHLO
+        id S1726789AbgETKMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 06:12:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbgETKEk (ORCPT
+        with ESMTP id S1726224AbgETKMV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 06:04:40 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D11C061A0E
-        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:04:40 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id i15so2476715wrx.10
-        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:04:40 -0700 (PDT)
+        Wed, 20 May 2020 06:12:21 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87817C061A0F
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:12:19 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id s8so2513762wrt.9
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 03:12:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=inIn2ONjibCnSjCghxYnKq2rJ8+ESmy4DRNsddh+5yQ=;
-        b=hsxRs5C5YKYa0yGhhIMT8XTt4BoSeJuvqv1ep1IHg83tnHnWPY4qC0Ary05LJN/ytf
-         MK+6DkmMTO9O0cs/6rjB0kxORhU0VilWrccz3QYeTs8o6uBYGgvisL5HVrzJNsF0M0Cm
-         khtyZ8qYv/5VG54vdTkCJbphGw5c5EMeKbH8Ro+648vM+QF8RiY0AgPDyr7AgfxuCYYJ
-         iNFQpZnN2WnqBrOWTtdai6yvUPzCjS+38ty6JN2Nw/wWgvgVcVxN43DCqKbos6f6w2Un
-         EHqpC/elSDJHwrCkFAHHxsWWXCKf/owGUskeqyzFrGaTxyYkV1bHxnKz/elmGJiVfDEj
-         DjfQ==
+        bh=iBcqQ8zxIDDNjlNpFLw9XT6VQWod6ur15qrla/UFJIM=;
+        b=GcyRcfEjdfbUfF8SYp6YXFCUiSmHxZEnby3pNjehHWcDBnLM95xiIR946clqhMIo8v
+         q+v5u3uDiDhe8BwtjxlihKWI+8U1pWzeM5cAq/iINiMV6zxZz02aD80JLlLBqtdpOr6i
+         wADkaP6IfmQ9s+UGfWXE0NcUcb45UtiO5o1CH2/VfQs3ReRWTB16/pQ8rSpnVwBHlAHS
+         u7oV2A5AJ6a62eVFO4EYeZjkfGG4F2rfUpPXPh7KKl/I8GnbAZyKp3mlRc5DePAyoJ6s
+         uGDQT5aedJV3pbX0QlcaREnlFnSIG4Dm0ONnZ4ppugikoVr/9w451geilvvnMm3tREOk
+         0PPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=inIn2ONjibCnSjCghxYnKq2rJ8+ESmy4DRNsddh+5yQ=;
-        b=NK5rPsjX68p73bKQKlUtEjx7WMS7fmNHBzUJ3UdsnOyQ8XDlGl/FyELKdGwasn4rls
-         HANRXGgpsgahaONttoNRJFwIfsSnwhx7OigEkbXyoQD7AdOIaCj0Mrf7tGF+4dX3v2TQ
-         MJ8zqo3S6U4oMGVilY+M1/4G5kHCGY9sEkIi+F18a1Jt/wUaFUhnu/HASffneN/mQqeM
-         SfAB4yd9G23zrwAI7IvDPCcnEKnCxGtcw0+nPEtZ0NvCasvtrkWliLpGkM+x/zdTs3Dr
-         o3HykrlVirMundVETQf3yGYSGA+5D73cusg800YabHs3/hNR9TGCvpYhTqXKM0j8fVM/
-         k1Tw==
-X-Gm-Message-State: AOAM532ARLWHKmmlJaNwWGP7UnGc4xshrqYJ1gsfnmNlbF3+2SZsqYIb
-        Xcgj7cVYkajp7Fv7xRLZVdOOHyu5tCmljikvtAJT
-X-Google-Smtp-Source: ABdhPJwVhiOqJ6pZXZNbYxT2v3Gmlpbge7+a6xMaVWYDFGQk3afXhXJbIz+s1l5P0HUngJK5K88CcaSWqMTubKH3ZVc=
-X-Received: by 2002:a5d:6705:: with SMTP id o5mr3608109wru.426.1589969078863;
- Wed, 20 May 2020 03:04:38 -0700 (PDT)
+        bh=iBcqQ8zxIDDNjlNpFLw9XT6VQWod6ur15qrla/UFJIM=;
+        b=HzrZ0D4NrW+RP0AYnarsbThG7pB2MugbhQOx9zXgxdlEjdznBOOCjUholXvdFeV3FX
+         g4RJVjSsqqMYtf4N5RL//Y6MBQEYBkYWN53/SjPeJ+0hoRAld1fyPELZDTKPyvNK4J9d
+         bMwOZZIm0VIL5UPz0wpfcNzXDQcoswkJ/yulClLVUnWQ5yCvyOXIKI/s15oDmWovkNZ1
+         3tlinWGp5GbrkyXlxtVnvQb1sWK8bZueu6EQ1iJKT/dhRJumfuw7nsnnIY0/sX6yPSOt
+         NQFUrHWeCHiWq/+nzKh9d4KPGg+MVlFNWxXvutf/uzP1GTknSomPo4GanNEVc9vkFDvi
+         VSCQ==
+X-Gm-Message-State: AOAM533BDGQBe6svWxwfDX46SrqOh1UKxonIsAQVKdUw6rHjm0q1DOFE
+        3uM82ro3wkvKY+USwwaiXZt9Av5w2M0GcvpT0AY4
+X-Google-Smtp-Source: ABdhPJypgX0CYZ1BPyRbnRWRWfBgtSJZTe/P5PsSECo15WsGXB6uu7WRt6MROF7Juxl784icOyfURtWML4iF6b7GMoM=
+X-Received: by 2002:adf:cc81:: with SMTP id p1mr3338025wrj.192.1589969538224;
+ Wed, 20 May 2020 03:12:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200519112936.928185-1-danil.kipnis@cloud.ionos.com>
- <76b6b987-4f63-2487-7fbe-a1d9c2f06b76@acm.org> <20200519233847.GC12656@ziepe.ca>
-In-Reply-To: <20200519233847.GC12656@ziepe.ca>
+References: <20200520040354.3e619918@canb.auug.org.au> <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
+In-Reply-To: <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
 From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Wed, 20 May 2020 12:04:28 +0200
-Message-ID: <CAHg0Huy3JmK=iFSrEFhbv==KFJusNr6Z+=H7Xwf+fHEZU2pYmQ@mail.gmail.com>
-Subject: Re: [PATCH v2] rtrs-clt: silence kbuild test inconsistent intenting
- smatch warning
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org,
+Date:   Wed, 20 May 2020 12:12:07 +0200
+Message-ID: <CAHg0Huww=oyj0DSuLSKOrJp5vtG_2xLLqM27MAHWNJdLWNeB3A@mail.gmail.com>
+Subject: Re: linux-next: Tree for May 19 (block/rnbd/)
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Doug Ledford <dledford@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        kbuild test robot <lkp@intel.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 20, 2020 at 1:38 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Tue, May 19, 2020 at 07:29:15AM -0700, Bart Van Assche wrote:
-> > diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > index 468fdd0d8713..8dfa56dc32bc 100644
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > @@ -727,18 +727,13 @@ struct path_it {
-> >       struct rtrs_clt_sess *(*next_path)(struct path_it *it);
-> >  };
-> >
-> > -#define do_each_path(path, clt, it) {                                        \
-> > -     path_it_init(it, clt);                                          \
-> > -     rcu_read_lock();                                                \
-> > -     for ((it)->i = 0; ((path) = ((it)->next_path)(it)) &&           \
-> > -                       (it)->i < (it)->clt->paths_num;               \
-> > +#define for_each_path(path, clt, it)                                 \
-> > +     for (path_it_init((it), (clt)), rcu_read_lock(), (it)->i = 0;   \
-> > +          (((path) = ((it)->next_path)(it)) &&                       \
-> > +           (it)->i < (it)->clt->paths_num) ||                        \
-> > +                  (path_it_deinit(it), rcu_read_unlock(), 0);        \
-> >            (it)->i++)
->
-> That is nicer, even better to write it with some inlines..
+Hi Randy,
 
-You mean pass a callback to an inline function that would iterate?
+On Tue, May 19, 2020 at 8:59 PM Randy Dunlap <rdunlap@infradead.org> wrote:
 >
-> Jason
+> On 5/19/20 11:03 AM, Stephen Rothwell wrote:
+> > Hi all,
+> >
+> > News: there will be no linux-next release tomorrow.
+> >
+> > Changes since 20200518:
+> >
+>
+> seen on i386:
+>
+> when CONFIG_MODULES is not set/enabled:
+>
+> ../drivers/block/rnbd/rnbd-clt-sysfs.c: In function 'rnbd_clt_remove_dev_symlink':
+> ../drivers/block/rnbd/rnbd-clt-sysfs.c:435:39: error: implicit declaration of function 'module_is_live'; did you mean 'module_driver'? [-Werror=implicit-function-declaration]
+>   if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
+>                                        ^~~~~~~~~~~~~~
+>                                        module_driver
+>
+>
+> --
+> ~Randy
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+
+Looking into this, thank you
