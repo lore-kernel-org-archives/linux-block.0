@@ -2,54 +2,87 @@ Return-Path: <SRS0=ALdW=7C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B88C433E3
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 15:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169B5C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 16:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8EBB206F1
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 15:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAF602065F
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 16:52:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726436AbgETPb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 11:31:27 -0400
-Received: from verein.lst.de ([213.95.11.211]:50373 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726596AbgETPb0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 11:31:26 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 69DAB68BEB; Wed, 20 May 2020 17:31:23 +0200 (CEST)
-Date:   Wed, 20 May 2020 17:31:23 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org
-Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set
- data->ctx and data->hctx in blk_mq_alloc_request_hctx
-Message-ID: <20200520153123.GA2340@lst.de>
-References: <20200518131634.GA645@lst.de> <20200518141107.GA50374@T590> <20200518165619.GA17465@lst.de> <20200519015420.GA70957@T590> <20200519153000.GB22286@lst.de> <20200520011823.GA415158@T590> <20200520030424.GI416136@T590> <20200520080357.GA4197@lst.de> <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk> <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk>
+        id S1726691AbgETQwt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 12:52:49 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40313 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbgETQwt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 May 2020 12:52:49 -0400
+Received: by mail-pf1-f195.google.com with SMTP id x2so1833444pfx.7
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2020 09:52:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mHy6dzJShAsBSfKMCNdl4v0+6ff2utTjPCI7FIyPRMo=;
+        b=hxUDAylDobBGUjhI71zf1SJpqQCIMX9XsAXlbdw2GXIx+piz2PdleQFjpQ0wlMwb+w
+         2IFO+AIYMsqq6WHDJ/wB2equPVegdzguRcATv8goIq3ITXhWqenf3pXMOnOLiRgfHf6n
+         G86U0ouEOiSbTz7PvkcxYbtSUYPrKoWlNDG+RgprcJSWfGu96BhJMGrSdakCN9Z3LbZc
+         g05YeQp/xwFrkmqJ64z2yMkN0kzhUUu1VfoHH4WP+5XLPEnW6CXU5lyTsq0ifusukISX
+         K1cX/eZzx6F2cKQOsgtbS3t7+aKqSBac8ptsM1WqOGUqpFgTgz9ibkCo3IebixbHZlm6
+         9BRw==
+X-Gm-Message-State: AOAM531Ek0Jmt2GRLVZXexBSEZOU12pWUdK3JxtPzGOg+Mc6PwJ/hoF+
+        HOFtTzEeHuNbHP0IyxGM/3Y=
+X-Google-Smtp-Source: ABdhPJxuCgEiF8HNagLjtK2xau+9+AR1f4KMZeh9d4wSMZhcOT+16DqEnPCcU48FhsHMcah4gKZ6aQ==
+X-Received: by 2002:a05:6a00:1494:: with SMTP id v20mr5293792pfu.150.1589993567717;
+        Wed, 20 May 2020 09:52:47 -0700 (PDT)
+Received: from localhost.localdomain ([2601:647:4000:d7:c031:e55:f9a8:4282])
+        by smtp.gmail.com with ESMTPSA id w199sm2563885pfc.68.2020.05.20.09.52.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2020 09:52:47 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests] Restore support for running tests without prior test results
+Date:   Wed, 20 May 2020 09:52:41 -0700
+Message-Id: <20200520165241.24798-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 20, 2020 at 09:20:50AM -0600, Jens Axboe wrote:
-> Just checked, and it works fine for me. If I create an SQPOLL ring with
-> SQ_AFF set and bound to CPU 3, if CPU 3 goes offline, then the kthread
-> just appears unbound but runs just fine. When CPU 3 comes online again,
-> the mask appears correct.
-> 
-> So don't think there's anything wrong on that side. The affinity is a
-> performance optimization, not a correctness issue. Really not much we
-> can do if the chosen CPU is offlined, apart from continue to chug along.
+This patch fixes the following runtime error:
 
-Ok, that sounds pretty sensible.
+./check: line 245: LAST_TEST_RUN: unbound variable
+
+Fixes: 203b5723a28e ("Show last run for skipped tests")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ check | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/check b/check
+index 0a4e539a5cd9..5151d01995ac 100755
+--- a/check
++++ b/check
+@@ -240,9 +240,15 @@ _output_last_test_run() {
+ }
+ 
+ _output_test_run() {
++	local param_count
+ 	if [[ -t 1 ]]; then
+ 		# Move the cursor back up to the status.
+-		tput cuu $((${#LAST_TEST_RUN[@]} + 1))
++		if [ -n "${LAST_TEST_RUN+set}" ]; then
++			param_count=${#LAST_TEST_RUN[@]}
++		else
++			param_count=0
++		fi
++		tput cuu $((param_count + 1))
+ 	fi
+ 
+ 	local status=${TEST_RUN["status"]}
