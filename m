@@ -2,65 +2,77 @@ Return-Path: <SRS0=ALdW=7C=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6C7C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 14:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B45C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 14:36:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75442207F9
-	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 14:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47CCE207C4
+	for <linux-block@archiver.kernel.org>; Wed, 20 May 2020 14:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbgETOSf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 10:18:35 -0400
-Received: from verein.lst.de ([213.95.11.211]:50062 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726436AbgETOSf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 10:18:35 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9508368C4E; Wed, 20 May 2020 16:18:30 +0200 (CEST)
-Date:   Wed, 20 May 2020 16:18:30 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Joe Perches <joe@perches.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
-        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH 20/33] ipv4: add ip_sock_set_recverr
-Message-ID: <20200520141830.GA28867@lst.de>
-References: <20200513062649.2100053-1-hch@lst.de> <20200513062649.2100053-21-hch@lst.de> <0ee5acfaca4cf32d4efad162046b858981a4dae3.camel@perches.com> <20200514103025.GB12680@lst.de> <9992a1fe768a0b1e9bb9470d2728ba25dbe042db.camel@perches.com>
+        id S1726775AbgETOgp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 10:36:45 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2235 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726443AbgETOgp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 May 2020 10:36:45 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 792C887BBEDE40A15C6B;
+        Wed, 20 May 2020 15:36:43 +0100 (IST)
+Received: from [127.0.0.1] (10.210.167.247) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 20 May
+ 2020 15:36:42 +0100
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v2
+To:     Christoph Hellwig <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20200518063937.757218-1-hch@lst.de>
+ <6241656e-0bf7-b32d-493e-e3f870a4d031@huawei.com>
+ <20200519153034.GC22286@lst.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <28e4b835-14d8-a82c-24e8-a895b645484a@huawei.com>
+Date:   Wed, 20 May 2020 15:35:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9992a1fe768a0b1e9bb9470d2728ba25dbe042db.camel@perches.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200519153034.GC22286@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.167.247]
+X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 14, 2020 at 04:51:26AM -0700, Joe Perches wrote:
-> > Mostly to keep it symmetric with the sockopt.  I could probably remove
-> > a few arguments in the series if we want to be strict.
+On 19/05/2020 16:30, Christoph Hellwig wrote:
+> On Mon, May 18, 2020 at 12:49:14PM +0100, John Garry wrote:
+>>> A git tree is available here:
+>>>
+>>>       git://git.infradead.org/users/hch/block.git blk-mq-hotplug
+>>>
+>>> Gitweb:
+>>>
+>>>       http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-mq-hotplug
+>>> .
+>>>
+>>
+>> FWIW, I tested this series for cpu hotplug and it looked ok.
 > 
-> My preference would use strict and add
-> arguments only when necessary.
+> Can you also test the blk-mq-hotplug.2 branch?
+> .
+> 
 
-In a few cases that would create confusion as the arguments are rather
-overloaded.  But for a lot of the cases where it doesn't and there isn't
-really much use for other arguments I've done that now.
+Yeah, it looks ok. No timeouts for CPU hotplug.
+
+Cheers,
+John
