@@ -2,125 +2,138 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD25C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C59C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A43A20759
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73D6E20759
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:00:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="i+fI4Gqf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EV5SVn70"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729969AbgEUS75 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 14:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40948 "EHLO
+        id S1729845AbgEUTA1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 15:00:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729555AbgEUS75 (ORCPT
+        with ESMTP id S1729555AbgEUTA1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 14:59:57 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F7AC061A0F
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 11:59:57 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id h16so7422926eds.5
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 11:59:56 -0700 (PDT)
+        Thu, 21 May 2020 15:00:27 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B021C061A0F
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:00:27 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id v16so9633659ljc.8
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:00:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=4Ywk6LfudhfW/QxS6TT/2iEiv5VyTiN0xpyOE7piVw4=;
-        b=i+fI4Gqf/Ohk+Vqa/qZmFeMmfSE5I8dtvu8vlQu9S59kga/51dcu3IcmgWYwKrOh44
-         997Kt2i7SYbF9JqEpHwzP1AIiobUzugYQVSJ7q+NiobOlM689uT3//6sdxkGqJyVeG1P
-         KBCsvIXDKeB0opXU5JA/ybuZ7Uc/+DS3UpzqFhKcz126TYpME8bPq+o8z+6wNL4Rm0ZC
-         J2iaAbQTBVWes6M6Kjg+tSLsn9Va9D8kLTHtjKi+8RAvzHCs1zMUvKktuMI5eno5wDNR
-         XEXvK1wt5ANk0SUlYXisqMnBXotOFNkdNP6cDk7RzBcyxtlEsUxgR42gUhk2VeMmPZFT
-         rPHQ==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AXqOJl5SmNS23EUn7DmXTUU6aYLgyfPvo+AUamH08Ps=;
+        b=EV5SVn70MuPiXaA+/GpI4b2qrg0jB93InY/vaKKkvXw3rt6V19F3iaEfufdWjb2vSa
+         LFgwuEMLZ0kF+u4vLem/Ho+YYOlDTSymGzxy0FWxZiHOsB3Pb3GSFPQ6THq8MehoMw81
+         61D12qPxoVMXCVN5YnrMpoSh0ZCOqjVhvK2/icCRVt/PPsd4BcWFGL0kAP/7zDq1hN3x
+         a1rzoPThWH5HcKX0GiUC4cxi3kkuCMXpV76kYKiXipe6YgwkiIKVt/YehTDSxdT8FKMQ
+         CKv5YcXmrRHEWyhnCcxlLCZV3yGZBNkQfBJxwnNbBjgGPVYWSZIk3apxM0beTrE2kQJt
+         vtEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4Ywk6LfudhfW/QxS6TT/2iEiv5VyTiN0xpyOE7piVw4=;
-        b=GqzTP17vvW3o4FfDAR7DLeE0paQlldrVO6Nqy+dlNHn81oTsyFHa+yg1PFSTSvbX/0
-         +1EE4mksbUNxy0M5KTSnjASBW2g/7ssn3F8mQVcRQ7yd0rBc9AKYZNV6ddZVI6s/3GKJ
-         hMRgAI+BpN6c3p5+/DH9o1RogW3zBIcVB5kpHY1TB3106MycrUn6L9VrVjGWwwdZiCn+
-         Od+PVYIV5/SwlVj8T+fNIIVHIIRllKD3953FX3/R0ie95l1XDaSMUo+n9ezxsuM6qE2y
-         REsVG26MaWB25GdxBWxWhKFLOhN0/1pQSA3viVgN+nBJ6bFbZa1R9vtOC/Z6ItLNSMif
-         /CWw==
-X-Gm-Message-State: AOAM531O9oWaaDqHhygqUKgo1OUawOYpq+ZLy3A3hD3pSUYuclXAks+U
-        48cGF7XwFhTjFVRGtuYws32LYA1qCA==
-X-Google-Smtp-Source: ABdhPJx0d62NTCDUeOOm12GdNsFYQXlCIgeKz6/a2uCAOb9qssFSyy8B9j2Yq7mpSTZtypm9+6TF8g==
-X-Received: by 2002:a50:9f02:: with SMTP id b2mr102475edf.29.1590087595328;
-        Thu, 21 May 2020 11:59:55 -0700 (PDT)
-Received: from dkxps.local (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
-        by smtp.gmail.com with ESMTPSA id e9sm5493836edl.25.2020.05.21.11.59.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 11:59:54 -0700 (PDT)
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        dledford@redhat.com, jgg@ziepe.ca, rdunlap@infradead.org
-Cc:     axboe@kernel.dk, bvanassche@acm.org, leon@kernel.org,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        guoqing.jiang@cloud.ionos.com
-Subject: [PATCH] rnbd: fix compilation error when CONFIG_MODULES is disabled
-Date:   Thu, 21 May 2020 20:59:09 +0200
-Message-Id: <20200521185909.457245-1-danil.kipnis@cloud.ionos.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <ca0729a1-2e4d-670d-2519-a175b3035b28@infradead.org>
-References: <ca0729a1-2e4d-670d-2519-a175b3035b28@infradead.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AXqOJl5SmNS23EUn7DmXTUU6aYLgyfPvo+AUamH08Ps=;
+        b=kgPCLpLLPxeqA2WF9kx18/m8OygRsEVv62LPmAVkxGto9vILqQ0gwiF5GqiwzzvlSG
+         0AQDT6OREUFWHGD/qcmX9xJw6KaXsOoFtT/8aSnJj0WQ7yUzizFL+hHzsbAvQrE7v4YW
+         aXl4LyX1kkqDj+dP2X0EUhijL+W2kTgjj5ddZs6/YMK42NPdJ4cWRd9Ke4dTK4zuRH32
+         QuGxKntC9zb+QYQpYXx90ZGtmkNAgw2kwHx7Gfm0lWqRtSMbHUUavHbPRP047CcDAHFR
+         POcwGGUwkZj93+b5d/Y3lrMb0MxP3S1KNvXo2BVMSxmViWMZSwVz4Zz7dPthuWlmmzvj
+         PY6w==
+X-Gm-Message-State: AOAM5317ay0AhkvQwOY14mtmSlg6b9MYeIokrfkcBJjHvz9EDK+lNhOc
+        IrT07SIGIiW8oa8YAHqmuF815llQEwMMZEgsLza5lA==
+X-Google-Smtp-Source: ABdhPJztzAYrR/hpe1uRAGQjKmg0ls00XHM6k9/5+3Vj5L9HrQE3V1E3er3ujQPjsfP8Tn3nR1o1fnGVTi8pnw7kWuo=
+X-Received: by 2002:a2e:6c0c:: with SMTP id h12mr5664520ljc.266.1590087625478;
+ Thu, 21 May 2020 12:00:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
+ <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
+ <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
+ <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
+ <20200519084535.GG32497@dhcp22.suse.cz> <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
+ <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
+ <20200520190906.GA558281@chrisdown.name> <20200521095515.GK6462@dhcp22.suse.cz>
+ <20200521163450.GV6462@dhcp22.suse.cz>
+In-Reply-To: <20200521163450.GV6462@dhcp22.suse.cz>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Fri, 22 May 2020 00:30:13 +0530
+Message-ID: <CA+G9fYuDWGZx50UpD+WcsDeHX9vi3hpksvBAWbMgRZadb0Pkww@mail.gmail.com>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-module_is_live function is only defined when CONFIG_MODULES is enabled.
-Use try_module_get instead to check whether the module is being removed.
+On Thu, 21 May 2020 at 22:04, Michal Hocko <mhocko@kernel.org> wrote:
+>
+> On Thu 21-05-20 11:55:16, Michal Hocko wrote:
+> > On Wed 20-05-20 20:09:06, Chris Down wrote:
+> > > Hi Naresh,
+> > >
+> > > Naresh Kamboju writes:
+> > > > As a part of investigation on this issue LKFT teammate Anders Roxell
+> > > > git bisected the problem and found bad commit(s) which caused this problem.
+> > > >
+> > > > The following two patches have been reverted on next-20200519 and retested the
+> > > > reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
+> > > > ( invoked oom-killer is gone now)
+> > > >
+> > > > Revert "mm, memcg: avoid stale protection values when cgroup is above
+> > > > protection"
+> > > >    This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
+> > > >
+> > > > Revert "mm, memcg: decouple e{low,min} state mutations from protection
+> > > > checks"
+> > > >    This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
+> > >
+> > > Thanks Anders and Naresh for tracking this down and reverting.
+> > >
+> > > I'll take a look tomorrow. I don't see anything immediately obviously wrong
+> > > in either of those commits from a (very) cursory glance, but they should
+> > > only be taking effect if protections are set.
+> >
+> > Agreed. If memory.{low,min} is not used then the patch should be
+> > effectively a nop.
+>
+> I was staring into the code and did not see anything.  Could you give the
+> following debugging patch a try and see whether it triggers?
 
-When module unload and manuall unmapping is happening in parallel, we can
-try removing the symlink twice: rnbd_client_exit vs. rnbd_clt_unmap_dev_store.
+These code paths did not touch it seems. but still see the reported problem.
+Please find a detailed test log output [1]
 
-This is probably not the best way to deal with this race in general, but for
-now this fixes the compilation issue when CONFIG_MODULES is disabled and has
-no functional impact. Regression tests passed.
+And
+One more test log with cgroup_disable=memory [2]
 
-Fixes: 1eb54f8f5dd8 ("block/rnbd: client: sysfs interface functions")
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Suggested-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
----
-v1->v2 Fix format of the "Fixes:" line
-       Add Acked-by Randy Runlap <rdunlap@infradead.org>
- drivers/block/rnbd/rnbd-clt-sysfs.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index a4508fcc7ffe..73d7cb40abb3 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -428,12 +428,14 @@ static struct attribute *rnbd_dev_attrs[] = {
- void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
- {
- 	/*
--	 * The module_is_live() check is crucial and helps to avoid annoying
--	 * sysfs warning raised in sysfs_remove_link(), when the whole sysfs
--	 * path was just removed, see rnbd_close_sessions().
-+	 * The module unload rnbd_client_exit path is racing with unmapping of the
-+	 * last single device from the sysfs manually i.e. rnbd_clt_unmap_dev_store()
-+	 * leading to a sysfs warning because of sysfs link already was removed already.
- 	 */
--	if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
-+	if (strlen(dev->blk_symlink_name) && try_module_get(THIS_MODULE)) {
- 		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
-+		module_put(THIS_MODULE);
-+	}
- }
- 
- static struct kobj_type rnbd_dev_ktype = {
--- 
-2.25.1
-
+Test log link,
+[1] https://pastebin.com/XJU7We1g
+[2] https://pastebin.com/BZ0BMUVt
