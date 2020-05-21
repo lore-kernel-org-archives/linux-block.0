@@ -2,200 +2,100 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F754C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 12:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AF0C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:21:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9AD2070A
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 12:44:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590065091;
-	bh=3F5dC6wyEp8L1T30G/MM+VlTT7Frh8v3T33HyZdYRuQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CS4QaEFlOGxtF+TVhZHFTrz9MiXpABEOPA8Vdl+GnELCBOwqyJamo3kIdAuizfGv2
-	 ReSNtrwWRwB0FnphGKw/+LOqMFottCouNtBEt0FVNIvilEW9hjXzYz3e7iKlvubBiX
-	 Ke03xwnOqrzb+waI8PdTz4IIW/tNIcLYrGFELSC8=
+	by mail.kernel.org (Postfix) with ESMTP id 47B5920748
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:21:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IubiXOXx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbgEUMou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 08:44:50 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41032 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728133AbgEUMou (ORCPT
+        id S1728077AbgEUOVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 10:21:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727985AbgEUOVH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 08:44:50 -0400
-Received: by mail-ed1-f66.google.com with SMTP id g9so6553206edr.8;
-        Thu, 21 May 2020 05:44:47 -0700 (PDT)
+        Thu, 21 May 2020 10:21:07 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 071E5C061A0E
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:21:05 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id s69so3134012pjb.4
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:21:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tqWT/aJMqjQS/LwwIzDw5vVtbTuX7+bbQKCciE383sc=;
+        b=IubiXOXxF2nL7YfH5AF2oZumoIioFJkh2cyMRIZp0jsTtdJTU6sm5tTkN3HB9KSqpr
+         BtfBrkxRHj9emgX0ItTzLqrFslEgmDV5pO1oagyiFOJUdNGqmgdWCpF92vGx8KmQIdr8
+         FTDpUs3OaOO5TVWe6ABfw+7ANd0xGdrP5T9kYTlX81C50wZB5HxY+ZNlwgC4QnTvB4YM
+         i1IqzwpR0hiihyC8n83UH2C42t418sA/KbyBT2urJw8cwaWySpd+n+xOxbR6Lzi9J9IL
+         K8VxDTfFDp42DN/+XuQKeLell9ggOV648PoVukEpAqYDM5Peiu2huxXaw3PifSu6hRYg
+         TaIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7B+zSNVUKDMX+EtrLfhKx/b5Dlg1GLXsdTK5UK1C/wA=;
-        b=LBqqAvMYl75xgaIVDJECJkKkNuhp+yAPLz3GbT3cvKtdR9yxaOWFx7+NwQ1V7lIu89
-         IhoQ5Qqx3afyoOV2S6tJVVXJz2R/hb9YPGWNAsVO79/r4E+5KUbj01GfU2ztwZ2UCoRU
-         3Sxq6Z+gzllNB1O6eACV25UiyqiKLLEi69xBJQuOpTo6Q8Ji/NzT/YWV183rP3bI0vvm
-         tCd8FfYdn6oo0hWmVpiHnVJnKuqrf0yu9H5t/6keNS0wpXSMiuxrbpIE+NhUrzyvr9+D
-         krL+f62PI9u6T17I6MTw08G3ow587zerfVgtAZ5Z0NH8ldkugTDU2x4AbkyOyioSJqYF
-         wYaA==
-X-Gm-Message-State: AOAM530aGm4cCbKdujFEm/18iwXiee6fDQrYZmAOpmDHKIg+3K9J1Kh4
-        cPD5ZY83nvJQgTEs2P/Nfno=
-X-Google-Smtp-Source: ABdhPJyFmwAVPZkzShA2BCWpmRd1w2Y3qvQQ3fG96wsb/P2EJuekC35u1D4g78CqUn7CegdanQGqrg==
-X-Received: by 2002:a05:6402:203a:: with SMTP id ay26mr7259622edb.205.1590065086406;
-        Thu, 21 May 2020 05:44:46 -0700 (PDT)
-Received: from localhost (ip-37-188-180-112.eurotel.cz. [37.188.180.112])
-        by smtp.gmail.com with ESMTPSA id rn17sm4757851ejb.115.2020.05.21.05.44.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 05:44:45 -0700 (PDT)
-Date:   Thu, 21 May 2020 14:44:44 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200521124444.GP6462@dhcp22.suse.cz>
-References: <20200519075213.GF32497@dhcp22.suse.cz>
- <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz>
- <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name>
- <20200521095515.GK6462@dhcp22.suse.cz>
- <CA+G9fYvAB9F+Xo0vUsSveKnExkv3cV9-oOG9gBqGEcXsO95m0w@mail.gmail.com>
- <20200521105801.GL6462@dhcp22.suse.cz>
- <alpine.LSU.2.11.2005210504110.1185@eggly.anvils>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tqWT/aJMqjQS/LwwIzDw5vVtbTuX7+bbQKCciE383sc=;
+        b=iqyAAkinSX5UNUwdkK8Mp7SDiQgGMfnn6QT5c5rCSxQGb5W+gc2vFvu1wyzR5lGAEH
+         Cej6pIERsXwmA8EbEN7Du4Oi5x2WTSrLfM91H3d9/sAXgqCeyxtQGtN0c7D1X50c4mIc
+         ROMHOOv6iyRSBu9ThdPk4xQJFszTW7kG5SRz6aQ1BhxawzmCQWMMUrAx0jsDk/CshuBL
+         21Zys9ptOQgJAlF6yja8nDJTo6XqAlOyEQ3CBormB+06DiuU1kf1WQXoa4kXv1w2zG5X
+         7MjDSbJFgDRqIvsMujgLHgauRPq5oQFwULPkETkFGdim7uNDXAP3cdQX/zduQcgHTxID
+         HCdg==
+X-Gm-Message-State: AOAM532I860qldVV3SpWIZye7QpOOmvzagW2V+SkleG3BRLmhoCYrqWp
+        fSmbY4EFM68GmZ33Mxy/SV9lMA==
+X-Google-Smtp-Source: ABdhPJwJWiF05G52IFW9R5Nmw5veE7Mlw/Rui0UPeykYh3HiKu3fnjOBS9uNDK1RBAVTK+i14VNZqg==
+X-Received: by 2002:a17:902:7047:: with SMTP id h7mr10219648plt.9.1590070864321;
+        Thu, 21 May 2020 07:21:04 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:c00a:8fd2:4246:efbe? ([2605:e000:100e:8c61:c00a:8fd2:4246:efbe])
+        by smtp.gmail.com with ESMTPSA id k65sm4703876pfd.156.2020.05.21.07.21.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2020 07:21:03 -0700 (PDT)
+Subject: Re: [PATCH v5 00/11] Add a new LOOP_CONFIGURE ioctl
+To:     Martijn Coenen <maco@android.com>, hch@lst.de, ming.lei@redhat.com
+Cc:     narayan@google.com, zezeozue@google.com, maco@google.com,
+        kernel-team@android.com, bvanassche@acm.org,
+        Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200513133845.244903-1-maco@android.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <fe0b7bf9-07b1-9025-f9d6-7ace03c89a1f@kernel.dk>
+Date:   Thu, 21 May 2020 08:21:01 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.11.2005210504110.1185@eggly.anvils>
+In-Reply-To: <20200513133845.244903-1-maco@android.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 21-05-20 05:24:27, Hugh Dickins wrote:
-> On Thu, 21 May 2020, Michal Hocko wrote:
-> > On Thu 21-05-20 16:11:11, Naresh Kamboju wrote:
-> > > On Thu, 21 May 2020 at 15:25, Michal Hocko <mhocko@kernel.org> wrote:
-> > > >
-> > > > On Wed 20-05-20 20:09:06, Chris Down wrote:
-> > > > > Hi Naresh,
-> > > > >
-> > > > > Naresh Kamboju writes:
-> > > > > > As a part of investigation on this issue LKFT teammate Anders Roxell
-> > > > > > git bisected the problem and found bad commit(s) which caused this problem.
-> > > > > >
-> > > > > > The following two patches have been reverted on next-20200519 and retested the
-> > > > > > reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
-> > > > > > ( invoked oom-killer is gone now)
-> > > > > >
-> > > > > > Revert "mm, memcg: avoid stale protection values when cgroup is above
-> > > > > > protection"
-> > > > > >    This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
-> > > > > >
-> > > > > > Revert "mm, memcg: decouple e{low,min} state mutations from protection
-> > > > > > checks"
-> > > > > >    This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
-> > > > >
-> > > > > Thanks Anders and Naresh for tracking this down and reverting.
-> > > > >
-> > > > > I'll take a look tomorrow. I don't see anything immediately obviously wrong
-> > > > > in either of those commits from a (very) cursory glance, but they should
-> > > > > only be taking effect if protections are set.
-> > > >
-> > > > Agreed. If memory.{low,min} is not used then the patch should be
-> > > > effectively a nop. Btw. do you see the problem when booting with
-> > > > cgroup_disable=memory kernel command line parameter?
-> > > 
-> > > With extra kernel command line parameters, cgroup_disable=memory
-> > > I have noticed a differ problem now.
-> > > 
-> > > + mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8NRK0BPF6XF
-> > > mke2fs 1.43.8 (1-Jan-2018)
-> > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
-> > > Filesystem UUID: 3bb1a285-2cb4-44b4-b6e8-62548f3ac620
-> > > Superblock backups stored on blocks:
-> > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-> > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-> > > 102400000, 214990848
-> > > Allocating group tables:    0/7453                           done
-> > > Writing inode tables:    0/7453                           done
-> > > Creating journal (262144 blocks): [   35.502102] BUG: kernel NULL
-> > > pointer dereference, address: 000000c8
-> > > [   35.508372] #PF: supervisor read access in kernel mode
-> > > [   35.513506] #PF: error_code(0x0000) - not-present page
-> > > [   35.518638] *pde = 00000000
-> > > [   35.521514] Oops: 0000 [#1] SMP
-> > > [   35.524652] CPU: 0 PID: 145 Comm: kswapd0 Not tainted
-> > > 5.7.0-rc6-next-20200519+ #1
-> > > [   35.532121] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
-> > > 2.2 05/23/2018
-> > > [   35.539507] EIP: mem_cgroup_get_nr_swap_pages+0x28/0x60
-> > 
-> > Could you get faddr2line for this offset?
+On 5/13/20 7:38 AM, Martijn Coenen wrote:
+> This series introduces a new ioctl that makes it possible to atomically
+> configure a loop device. Previously, if you wanted to set parameters
+> such as the offset on a loop device, this required calling LOOP_SET_FD
+> to set the backing file, and then LOOP_SET_STATUS to set the offset.
+> However, in between these two calls, the loop device is available and
+> would accept requests, which is generally not desirable. Similar issues
+> exist around setting the block size (LOOP_SET_BLOCK_SIZE) and requesting
+> direct I/O mode (LOOP_SET_DIRECT_IO).
 > 
-> No need for that, I can help with the "cgroup_disabled=memory" crash:
-> I've been happily running with the fixup below, but haven't got to
-> send it in yet (and wouldn't normally be reading mail at this time!)
-> because of busy chasing a couple of other bugs (not necessarily mm);
-> and maybe the fix would be better with explicit mem_cgroup_disabled()
-> test, or maybe that should be where cgroup_memory_noswap is decided -
-> up to Johannes.
+> There are also performance benefits with combining these ioctls into
+> one, which are described in more detail in the last change in the
+> series.
 
-Thanks Hugh. I can see what is the problem now. I was looking at the
-Linus' tree and we have a different code there
-
-	long nr_swap_pages = get_nr_swap_pages();
-
-        if (!do_swap_account || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
-                return nr_swap_pages;
-
-which would be impossible to crash so I was really wondering what is
-going on here. But there are other changes in the mmotm which I haven't
-reviewed yet. Looking at the next tree now it is a fallout from "mm:
-memcontrol: prepare swap controller setup for integration".
-
-!memcg check slightly more cryptic than an explicit mem_cgroup_disabled
-but I would just leave it to Johannes as well.
-
-> 
-> ---
-> 
->  mm/memcontrol.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> --- 5.7-rc6-mm1/mm/memcontrol.c	2020-05-20 12:21:56.109693740 -0700
-> +++ linux/mm/memcontrol.c	2020-05-20 12:26:15.500478753 -0700
-> @@ -6954,7 +6954,8 @@ long mem_cgroup_get_nr_swap_pages(struct
->  {
->  	long nr_swap_pages = get_nr_swap_pages();
->  
-> -	if (cgroup_memory_noswap || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
-> +	if (!memcg || cgroup_memory_noswap ||
-> +            !cgroup_subsys_on_dfl(memory_cgrp_subsys))
->  		return nr_swap_pages;
->  	for (; memcg != root_mem_cgroup; memcg = parent_mem_cgroup(memcg))
->  		nr_swap_pages = min_t(long, nr_swap_pages,
+Thanks, applied for 5.8.
 
 -- 
-Michal Hocko
-SUSE Labs
+Jens Axboe
+
