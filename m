@@ -2,132 +2,123 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A92C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F9AC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:39:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7677A20738
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:39:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CE4E207D3
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 18:39:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IWFKsoJv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729294AbgEUSjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 14:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37768 "EHLO
+        id S1729626AbgEUSjz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 14:39:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728240AbgEUSjg (ORCPT
+        with ESMTP id S1728240AbgEUSjz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 14:39:36 -0400
-Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DDB0C061A0E;
-        Thu, 21 May 2020 11:39:36 -0700 (PDT)
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jbq6A-0006og-PX; Thu, 21 May 2020 20:39:19 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id E386A100C2D; Thu, 21 May 2020 20:39:16 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set data->ctx and data->hctx in blk_mq_alloc_request_hctx
-In-Reply-To: <20200521092340.GA751297@T590>
-References: <20200520011823.GA415158@T590> <20200520030424.GI416136@T590> <20200520080357.GA4197@lst.de> <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk> <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk> <87tv0av1gu.fsf@nanos.tec.linutronix.de> <2a12a7aa-c339-1e51-de0d-9bc6ced14c64@kernel.dk> <87eereuudh.fsf@nanos.tec.linutronix.de> <20200521022746.GA730422@T590> <87367tvh6g.fsf@nanos.tec.linutronix.de> <20200521092340.GA751297@T590>
-Date:   Thu, 21 May 2020 20:39:16 +0200
-Message-ID: <87pnaxt9nv.fsf@nanos.tec.linutronix.de>
+        Thu, 21 May 2020 14:39:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75606C061A0E;
+        Thu, 21 May 2020 11:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=En08B0VmVu+Rrpznv1PvjxQP21WWZNWy251YyWEC4UQ=; b=IWFKsoJvv9I8S0HThzn5lAoAed
+        hc/JvIYv7b7AY3Xb0j87M9MQSmks+gmMUyeFdv5bbc2kRH6sxq3b7WqzHHJVoPiKn9D3h9815ZQHH
+        npTQ3OwfNK70crTrvFtcsZsVyHevTFCfkq+ipN3SxlmnkC+awYcX4xrRPaEj2r0u6TQ8IYaJulFIS
+        TZXYqpaPgaD85Vpsxe2u0T4QsalbzEsGLi67aVsG5Xa4Vm1Zh2efb6J2GeCnR+bonNkBUBQsF74uv
+        FdizJqxbq0tfjcg9kV7dC+axTe337TINH6ijGR5TAF6kXtSxVgGtCtXqLhEeaFCNIL6PLTq5vKZ07
+        HmJCIyOw==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jbq6g-0002Um-Pe; Thu, 21 May 2020 18:39:50 +0000
+Subject: Re: [PATCH] rnbd: fix compilation error when CONFIG_MODULES is
+ disabled
+To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        dledford@redhat.com, jgg@ziepe.ca
+Cc:     axboe@kernel.dk, bvanassche@acm.org, leon@kernel.org,
+        jinpu.wang@cloud.ionos.com, guoqing.jiang@cloud.ionos.com
+References: <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
+ <20200521175001.445208-1-danil.kipnis@cloud.ionos.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <ca0729a1-2e4d-670d-2519-a175b3035b28@infradead.org>
+Date:   Thu, 21 May 2020 11:39:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <20200521175001.445208-1-danil.kipnis@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming,
+On 5/21/20 10:50 AM, Danil Kipnis wrote:
+> module_is_live function is only defined when CONFIG_MODULES is enabled.
+> Use try_module_get instead to check whether the module is being removed.
+> 
+> When module unload and manuall unmapping is happening in parallel, we can
+> try removing the symlink twice: rnbd_client_exit vs. rnbd_clt_unmap_dev_store.
+> 
+> This is probably not the best way to deal with this race in general, but for
+> now this fixes the compilation issue when CONFIG_MODULES is disabled and has
+> no functional impact. Regression tests passed.
+> 
+> Fixes: 1eb54f8f5dd8 block/rnbd: client: sysfs interface functions
 
-Ming Lei <ming.lei@redhat.com> writes:
-> On Thu, May 21, 2020 at 10:13:59AM +0200, Thomas Gleixner wrote:
->> Ming Lei <ming.lei@redhat.com> writes:
->> > On Thu, May 21, 2020 at 12:14:18AM +0200, Thomas Gleixner wrote:
->> > - otherwise, the kthread just retries and retries to allocate & release,
->> > and sooner or later, its time slice is consumed, and migrated out, and the
->> > cpu hotplug handler will get chance to run and move on, then the cpu is
->> > shutdown.
->> 
->> 1) This is based on the assumption that the kthread is in the SCHED_OTHER
->>    scheduling class. Is that really a valid assumption?
->
-> Given it is unlikely path, we can add msleep() before retrying when INACTIVE bit
-> is observed by current thread, and this way can avoid spinning and should work
-> for other schedulers.
+The Fixes: line has a specific expected format. It should be like this:
 
-That should work, but pretty is something else
+Fixes: 1eb54f8f5dd8 ("block/rnbd: client: sysfs interface functions")
 
->> 
->> 2) What happens in the following scenario:
->> 
->>    unplug
->> 
->>      mq_offline
->>        set_ctx_inactive()
->>        drain_io()
->>        
->>    io_kthread()
->>        try_queue()
->>        wait_on_ctx()
->> 
->>    Can this happen and if so what will wake up that thread?
->
-> drain_io() releases all tag of this hctx, then wait_on_ctx() will be waken up
-> after any tag is released.
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Suggested-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+> Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 
-drain_io() is already done ...
+Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
 
-So looking at that thread function:
 
-static int io_sq_thread(void *data)
-{
-	struct io_ring_ctx *ctx = data;
+Thanks.
 
-        while (...) {
-              ....
-	      to_submit = io_sqring_entries(ctx);
+> ---
+>  drivers/block/rnbd/rnbd-clt-sysfs.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+> index a4508fcc7ffe..73d7cb40abb3 100644
+> --- a/drivers/block/rnbd/rnbd-clt-sysfs.c
+> +++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+> @@ -428,12 +428,14 @@ static struct attribute *rnbd_dev_attrs[] = {
+>  void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
+>  {
+>  	/*
+> -	 * The module_is_live() check is crucial and helps to avoid annoying
+> -	 * sysfs warning raised in sysfs_remove_link(), when the whole sysfs
+> -	 * path was just removed, see rnbd_close_sessions().
+> +	 * The module unload rnbd_client_exit path is racing with unmapping of the
+> +	 * last single device from the sysfs manually i.e. rnbd_clt_unmap_dev_store()
+> +	 * leading to a sysfs warning because of sysfs link already was removed already.
+>  	 */
+> -	if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
+> +	if (strlen(dev->blk_symlink_name) && try_module_get(THIS_MODULE)) {
+>  		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
+> +		module_put(THIS_MODULE);
+> +	}
+>  }
+>  
+>  static struct kobj_type rnbd_dev_ktype = {
+> 
+> base-commit: f11e0ec55f0c80ff47693af2150bad5db0e20387
+> 
 
---> preemption
 
-hotplug runs
-   mq_offline()
-      set_ctx_inactive();
-      drain_io();
-      finished();
-
---> thread runs again
-
-      mutex_lock(&ctx->uring_lock);
-      ret = io_submit_sqes(ctx, to_submit, NULL, -1, true);
-      mutex_unlock(&ctx->uring_lock);
-
-      ....
-
-      if (!to_submit || ret == -EBUSY)
-          ...
-      	  wait_on_ctx();
-
-Can this happen or did drain_io() already take care of the 'to_submit'
-items and the call to io_submit_sqes() turns into a zero action ?
-
-If the above happens then nothing will wake it up because the context
-draining is done and finished.
-
-Thanks,
-
-        tglx
+-- 
+~Randy
