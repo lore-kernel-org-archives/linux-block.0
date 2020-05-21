@@ -2,129 +2,113 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8F4C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 09:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77ACAC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 09:36:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C75182072C
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 09:24:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AlNLna3X"
+	by mail.kernel.org (Postfix) with ESMTP id 600FB20721
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 09:36:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728686AbgEUJYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 05:24:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52095 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728750AbgEUJYA (ORCPT
+        id S1728981AbgEUJgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 05:36:09 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:47701 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728720AbgEUJgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 05:24:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590053039;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oXqIwCuxexwEMT6sWq3yw4kZ4MgmT2D4JiPVuLqvuPk=;
-        b=AlNLna3X782FM7V8rh+845nfAK57YCBK2stKXVUPMJT9qD+IwvVnC1Jyf3Ng4w8bhaucrU
-        VQ91VjiAwiSQ7rAgB1kwLrnPTpbcMRmzcWQ+94AMSBr9rMcltzIvLOdDl/jabh/BZzY+Ot
-        tnL4ptt+smlwjoLnEQN2pX6nrNY49KM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-p2H3ENIzNh-rGh7Us0gPdA-1; Thu, 21 May 2020 05:23:55 -0400
-X-MC-Unique: p2H3ENIzNh-rGh7Us0gPdA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04B4D107BEF5;
-        Thu, 21 May 2020 09:23:53 +0000 (UTC)
-Received: from T590 (ovpn-13-123.pek2.redhat.com [10.72.13.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 191865EE0E;
-        Thu, 21 May 2020 09:23:44 +0000 (UTC)
-Date:   Thu, 21 May 2020 17:23:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set
- data->ctx and data->hctx in blk_mq_alloc_request_hctx
-Message-ID: <20200521092340.GA751297@T590>
-References: <20200520011823.GA415158@T590>
- <20200520030424.GI416136@T590>
- <20200520080357.GA4197@lst.de>
- <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk>
- <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk>
- <87tv0av1gu.fsf@nanos.tec.linutronix.de>
- <2a12a7aa-c339-1e51-de0d-9bc6ced14c64@kernel.dk>
- <87eereuudh.fsf@nanos.tec.linutronix.de>
- <20200521022746.GA730422@T590>
- <87367tvh6g.fsf@nanos.tec.linutronix.de>
+        Thu, 21 May 2020 05:36:09 -0400
+Received: from mail-qk1-f173.google.com ([209.85.222.173]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1MV6G6-1jRDmr065O-00S4aI; Thu, 21 May 2020 11:36:07 +0200
+Received: by mail-qk1-f173.google.com with SMTP id i5so6503277qkl.12;
+        Thu, 21 May 2020 02:36:06 -0700 (PDT)
+X-Gm-Message-State: AOAM532tdMBB+TVbWUDVaovW3ZoNwPPp2cTaOQb2mN7sPzfXEmx4BiXR
+        GgjYShL6CoZQ5QinJKjs1vpCXMpI5JDoMeLVM2g=
+X-Google-Smtp-Source: ABdhPJws3KKBV0w5Mhpfv6LZKBqE10KcRtqFB/QC1e+qfkRLL99VkSqd9yoBmueLGwUSMY9q0aWGCr2HfWe2EBzpd8M=
+X-Received: by 2002:a37:4c48:: with SMTP id z69mr8052116qka.138.1590053765528;
+ Thu, 21 May 2020 02:36:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87367tvh6g.fsf@nanos.tec.linutronix.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
+ <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
+ <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
+ <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
+ <20200519084535.GG32497@dhcp22.suse.cz> <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
+ <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
+ <20200520190906.GA558281@chrisdown.name> <CA+G9fYt1qvGQTAdUZ4WgitY18cydgnNzqu_fyoTtSm3W8JhF3w@mail.gmail.com>
+In-Reply-To: <CA+G9fYt1qvGQTAdUZ4WgitY18cydgnNzqu_fyoTtSm3W8JhF3w@mail.gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 21 May 2020 11:35:49 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2Yna-BD+M6-+Y2Go_Y0ZXx8_7KMud7JxSfPbG8+-Q7Wg@mail.gmail.com>
+Message-ID: <CAK8P3a2Yna-BD+M6-+Y2Go_Y0ZXx8_7KMud7JxSfPbG8+-Q7Wg@mail.gmail.com>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:tE3t4TPrND4BHXRl6VrQxpilryG1scFRiFa8boVDA7y+3W+2ulA
+ m2PT/hqzBoz12kmiz7J4oY82+0aCSbQNFLtsRcYQZB+iqmF6pSeD8QWhVY+RBR16+NPuPFf
+ ZRRyL1B8qNZPMS305xGjd83w6fkA1IE3/u5IkvUuBOFpfmor7KQd2JnqxSSd5JjnyoIBk9U
+ zMLRHViqkSxwTi7mJGC+w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8dbZaZ6lhT0=:b/ekQTZHioS9KkLCYnPh5N
+ uvR3WiOuz3VGP99yC0Nf+Vk3FYp9XjDuwgshHynI+bM1U52lhJOfUi1EY0AwQSZFSZCe/P/Vw
+ 3syZlZY6O5XFZtaOId7tPJvDeJYZQ6EHN/1nMuCiqPbh5smnbEIua9Wfo6xT2FlJkn7FiQNIl
+ 5dr8yKWy0FvagBahaGvPmKpB6vgWq0jGru2pnjXlnRz0ShozTmFE592aHfUjqDbqcfTdOwRGL
+ 5i6uYo4pQRdZNV/E7gjv1y1Rqo86XS71NncoYSBP2AzkqgIoCzEYGnNBS6kkgc79QwfPvmscv
+ pfR7KPTay4Asb7A6lyrvugMb8BC1B6EsSal+lCN//cA0tfJG4KoJL0esSEobTji0BzI44XNhm
+ 3fcUrSfGI5tE/reO9Pb5dSEkAmxykMv1iAlcuu0qNvWjPG7lRpWvlyzq2pt0zs5RYggG2Wax/
+ QSoSc0UZxC6bBC2GPl2W8rbqaoQBcuxD6tzZMVvXcNYBSybvu32id6xKegatZr05f+u9doJY0
+ pUgJobQc5Kd6cZQT4bde5HIJOxBQ7zWH3AxTiLlop8MA0io31hYqMLZuTx1w5AA32qtnBl+0C
+ Kd8drNOv+NP8vio1rz8hUt3uJU/TOMSrPvm2ON3X7rnmlNh3KavnimntNPFuazcTbcgfltREQ
+ BypiaNyCEz6GY7PY/zdx4wfAorTrFmB8ShtpdX37hW0KK2hkZzhNVt3B5FUVCqDOrKradH8mq
+ atkX9MDemwiNjDUeGvxESYEoSV3e3v8rmM8DP1wHcRHApcaSdFgeOQAZQPjesbTKQa7cMd684
+ os953vEyKqhkGO9869LJzt/v427XuK0Q7w6Wh0cWxB1hgQdjoo=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Thomas,
+On Thu, May 21, 2020 at 11:22 AM Naresh Kamboju
+<naresh.kamboju@linaro.org> wrote:
+> On Thu, 21 May 2020 at 00:39, Chris Down <chris@chrisdown.name> wrote:
+> > Since you have i386 hardware available, and I don't, could you please apply
+> > only "avoid stale protection" again and check if it only happens with that
+> > commit, or requires both? That would help narrow down the suspects.
 
-On Thu, May 21, 2020 at 10:13:59AM +0200, Thomas Gleixner wrote:
-> Ming Lei <ming.lei@redhat.com> writes:
-> > On Thu, May 21, 2020 at 12:14:18AM +0200, Thomas Gleixner wrote:
-> >> When the CPU is finally offlined, i.e. the CPU cleared the online bit in
-> >> the online mask is definitely too late simply because it still runs on
-> >> that outgoing CPU _after_ the hardware queue is shut down and drained.
-> >
-> > IMO, the patch in Christoph's blk-mq-hotplug.2 still works for percpu
-> > kthread.
-> >
-> > It is just not optimal in the retrying, but it should be fine. When the
-> > percpu kthread is scheduled on the CPU to be offlined:
-> >
-> > - if the kthread doesn't observe the INACTIVE flag, the allocated request
-> > will be drained.
-> >
-> > - otherwise, the kthread just retries and retries to allocate & release,
-> > and sooner or later, its time slice is consumed, and migrated out, and the
-> > cpu hotplug handler will get chance to run and move on, then the cpu is
-> > shutdown.
-> 
-> 1) This is based on the assumption that the kthread is in the SCHED_OTHER
->    scheduling class. Is that really a valid assumption?
+Note that Naresh is running an i386 kernel on regular 64-bit hardware that
+most people have access to.
 
-Given it is unlikely path, we can add msleep() before retrying when INACTIVE bit
-is observed by current thread, and this way can avoid spinning and should work
-for other schedulers.
+> kernel config link,
+> https://builds.tuxbuild.com/8lg6WQibcwtQRRtIa0bcFA/kernel.config
 
-> 
-> 2) What happens in the following scenario:
-> 
->    unplug
-> 
->      mq_offline
->        set_ctx_inactive()
->        drain_io()
->        
->    io_kthread()
->        try_queue()
->        wait_on_ctx()
-> 
->    Can this happen and if so what will wake up that thread?
+Do you know if the same bug shows up running a kernel with that
+configuration in qemu? I would expect it to, and that would make
+it much easier to reproduce.
 
-drain_io() releases all tag of this hctx, then wait_on_ctx() will be waken up
-after any tag is released.
+I would also not be surprised if it happens on all architectures but only
+shows up on the 32-bit arm and x86 machines first because they have
+a rather limited amount of lowmem. Maybe booting a 64-bit kernel
+with "mem=512M" and then running "dd if=/dev/sda of=/dev/null bs=1M"
+will also trigger it. I did not attempt to run this myself.
 
-If wait_on_ctx() waits for other generic resource, it will be waken up
-after this resource is available.
-
-thanks,
-Ming
-
+       Arnd
