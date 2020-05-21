@@ -2,141 +2,91 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF53C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFDCC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:28:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DCF72078B
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:28:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hwpQzUaz"
+	by mail.kernel.org (Postfix) with ESMTP id 4D0202075F
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:28:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590028112;
+	bh=j/Om0BT7uCN//ljCy9QOiKpXlEEQpdCYJ69i2h4VBpg=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=01veVeN/zew3tW688LMSXqiW2gGmzPu0mABQMuQPlPsQNt3dyRZpSFNpus5ahekxK
+	 +pjk27iMYYKyjYaw3v6LFbOhSRYikXd7KjXBnYH8xXd9wh6/+xwPV3G6zn18oTP7fs
+	 V4j/zY/rpEueIW/SN6W4F/vRYznP195ukQQpI1xU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbgEUC2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 22:28:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23181 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726840AbgEUC2G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 22:28:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590028084;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HiJAaDRSg5DnM9NEbapqZa54OkdMt62Nfi59/wxsSTk=;
-        b=hwpQzUazhe24rfDk9LqbVJ1q5DQqcyKOgp080qZhlLv4wNSagQG7go5xh8ipDiqqhoUSqy
-        4tf7LiuaRcCJ+qLuQQtyECtQ4CM6hZd6UGu6JwSSm7EqFeaAXVWT0nN4nrfgy//y50YV5c
-        fvTtwg+bSyx4nmiwMipmjpi/uZRxj+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-FDsArPCQMPSgD6E4nTNMkg-1; Wed, 20 May 2020 22:28:00 -0400
-X-MC-Unique: FDsArPCQMPSgD6E4nTNMkg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727926AbgEUC2b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 22:28:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52038 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726871AbgEUC2b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 May 2020 22:28:31 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D12F800688;
-        Thu, 21 May 2020 02:27:59 +0000 (UTC)
-Received: from T590 (ovpn-13-123.pek2.redhat.com [10.72.13.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5350382A24;
-        Thu, 21 May 2020 02:27:50 +0000 (UTC)
-Date:   Thu, 21 May 2020 10:27:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set
- data->ctx and data->hctx in blk_mq_alloc_request_hctx
-Message-ID: <20200521022746.GA730422@T590>
-References: <20200519015420.GA70957@T590>
- <20200519153000.GB22286@lst.de>
- <20200520011823.GA415158@T590>
- <20200520030424.GI416136@T590>
- <20200520080357.GA4197@lst.de>
- <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk>
- <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk>
- <87tv0av1gu.fsf@nanos.tec.linutronix.de>
- <2a12a7aa-c339-1e51-de0d-9bc6ced14c64@kernel.dk>
- <87eereuudh.fsf@nanos.tec.linutronix.de>
+        by mail.kernel.org (Postfix) with ESMTPSA id 8DBD820748;
+        Thu, 21 May 2020 02:28:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590028110;
+        bh=j/Om0BT7uCN//ljCy9QOiKpXlEEQpdCYJ69i2h4VBpg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=OniVzvBfiUdT7nNNv8Ww5AMKYMyqYQr7peEAa2yETGT5BWH/6MV+cDY0lo5ZMptZb
+         VCP7EheUqlomagf6OIYzZN5+RZLwbSVzzzBRtu4bgpxLEC3TVwvsqTLeHFD7dNCL+s
+         wAfcNFyWcVUUsc/oqwzE9c1W1u6kqJJHdLeJz+98=
+From:   Keith Busch <kbusch@kernel.org>
+To:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] iov_iter: fix gap alignment check
+Date:   Wed, 20 May 2020 19:28:26 -0700
+Message-Id: <20200521022826.3268432-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87eereuudh.fsf@nanos.tec.linutronix.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 21, 2020 at 12:14:18AM +0200, Thomas Gleixner wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
-> > On 5/20/20 1:41 PM, Thomas Gleixner wrote:
-> >> Jens Axboe <axboe@kernel.dk> writes:
-> >>> On 5/20/20 8:45 AM, Jens Axboe wrote:
-> >>>> It just uses kthread_create_on_cpu(), nothing home grown. Pretty sure
-> >>>> they just break affinity if that CPU goes offline.
-> >>>
-> >>> Just checked, and it works fine for me. If I create an SQPOLL ring with
-> >>> SQ_AFF set and bound to CPU 3, if CPU 3 goes offline, then the kthread
-> >>> just appears unbound but runs just fine. When CPU 3 comes online again,
-> >>> the mask appears correct.
-> >> 
-> >> When exactly during the unplug operation is it unbound?
-> >
-> > When the CPU has been fully offlined. I check the affinity mask, it
-> > reports 0. But it's still being scheduled, and it's processing work.
-> > Here's an example, PID 420 is the thread in question:
-> >
-> > [root@archlinux cpu3]# taskset -p 420
-> > pid 420's current affinity mask: 8
-> > [root@archlinux cpu3]# echo 0 > online 
-> > [root@archlinux cpu3]# taskset -p 420
-> > pid 420's current affinity mask: 0
-> > [root@archlinux cpu3]# echo 1 > online 
-> > [root@archlinux cpu3]# taskset -p 420
-> > pid 420's current affinity mask: 8
-> >
-> > So as far as I can tell, it's working fine for me with the goals
-> > I have for that kthread.
-> 
-> Works for me is not really useful information and does not answer my
-> question:
-> 
-> >> When exactly during the unplug operation is it unbound?
-> 
-> The problem Ming and Christoph are trying to solve requires that the
-> thread is migrated _before_ the hardware queue is shut down and
-> drained. That's why I asked for the exact point where this happens.
-> 
-> When the CPU is finally offlined, i.e. the CPU cleared the online bit in
-> the online mask is definitely too late simply because it still runs on
-> that outgoing CPU _after_ the hardware queue is shut down and drained.
+The block layer uses the queue's virt_boundary to enforce alignment between
+vectors, but iov_iter_gap_alignment() returned the starting address or'ed
+with all but the last the length. Fix it to return alignment for each
+vector's starting address except the first, and each vector's ending
+address except the last.
 
-IMO, the patch in Christoph's blk-mq-hotplug.2 still works for percpu
-kthread.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ lib/iov_iter.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-It is just not optimal in the retrying, but it should be fine. When the
-percpu kthread is scheduled on the CPU to be offlined:
-
-- if the kthread doesn't observe the INACTIVE flag, the allocated request
-will be drained.
-
-- otherwise, the kthread just retries and retries to allocate & release,
-and sooner or later, its time slice is consumed, and migrated out, and the
-cpu hotplug handler will get chance to run and move on, then the cpu is
-shutdown.
-
-- After the cpu is shutdown, the percpu kthread becomes unbound, and
-the allocation from new online cpu will succeed.
-
-Thanks,
-Ming
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 51595bf3af85..9cfaf2fd5cfd 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1252,12 +1252,12 @@ unsigned long iov_iter_gap_alignment(const struct iov_iter *i)
+ 	}
+ 
+ 	iterate_all_kinds(i, size, v,
+-		(res |= (!res ? 0 : (unsigned long)v.iov_base) |
+-			(size != v.iov_len ? size : 0), 0),
+-		(res |= (!res ? 0 : (unsigned long)v.bv_offset) |
+-			(size != v.bv_len ? size : 0)),
+-		(res |= (!res ? 0 : (unsigned long)v.iov_base) |
+-			(size != v.iov_len ? size : 0))
++		(res |= (size == i->count ? 0 : (unsigned long)v.iov_base) |
++			(size == v.iov_len ? 0 : (unsigned long)v.iov_base + v.iov_len), 0),
++		res |= (size == i->count ? 0 : v.bv_offset) |
++		       (size == v.bv_len ? 0 : v.bv_offset + v.bv_len),
++		res |= (size == i->count ? 0 : (unsigned long)v.iov_base) |
++		       (size == v.iov_len ? 0 : (unsigned long)v.iov_base + v.iov_len)
+ 		);
+ 	return res;
+ }
+-- 
+2.24.1
 
