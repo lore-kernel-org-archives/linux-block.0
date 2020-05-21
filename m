@@ -6,72 +6,69 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AF0C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1ACC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:35:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47B5920748
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:21:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 552A5206F6
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 14:35:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IubiXOXx"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Uv1D67Rb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728077AbgEUOVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 10:21:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
+        id S1728243AbgEUOfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 10:35:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727985AbgEUOVH (ORCPT
+        with ESMTP id S1729716AbgEUOfL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 10:21:07 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 071E5C061A0E
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:21:05 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id s69so3134012pjb.4
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:21:05 -0700 (PDT)
+        Thu, 21 May 2020 10:35:11 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208E5C061A0F
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:35:11 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id q9so3147399pjm.2
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 07:35:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tqWT/aJMqjQS/LwwIzDw5vVtbTuX7+bbQKCciE383sc=;
-        b=IubiXOXxF2nL7YfH5AF2oZumoIioFJkh2cyMRIZp0jsTtdJTU6sm5tTkN3HB9KSqpr
-         BtfBrkxRHj9emgX0ItTzLqrFslEgmDV5pO1oagyiFOJUdNGqmgdWCpF92vGx8KmQIdr8
-         FTDpUs3OaOO5TVWe6ABfw+7ANd0xGdrP5T9kYTlX81C50wZB5HxY+ZNlwgC4QnTvB4YM
-         i1IqzwpR0hiihyC8n83UH2C42t418sA/KbyBT2urJw8cwaWySpd+n+xOxbR6Lzi9J9IL
-         K8VxDTfFDp42DN/+XuQKeLell9ggOV648PoVukEpAqYDM5Peiu2huxXaw3PifSu6hRYg
-         TaIg==
+        bh=J51At+hbotKe/uyCWwztTgcU/DKyC1up14t8RJPYJKs=;
+        b=Uv1D67Rbj3w+JIfTeS0RoEMnLi28XeDKRpNgO6o1c4n8FDQcTZSsUz09B1X8ugGsbA
+         Pgkw3JTRFMvmGaZtFwGFJV+IuFVjI8wGqvxxcciM8e7LBQ6hP6N3xx5CCtfPjlFOP1h5
+         XDqyiErYrA8ZHFn5DItUl2oIdDyGLKCbHc1LyK11kRZ1KaZZLDWfRXec+TGA5/6GhKAg
+         ceSQJbMPtVF5ByuClk9Y+mb8WYBueHtKp3Kk6dZdl6Se3SgTfETB43iw+jkueRx8I/hZ
+         u81yEnt6XEXTi0bktUTlTbF2Y3525FraxUIc5iNJykWW0qKyEbssi+C1Uthh6+09QGzj
+         UT/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=tqWT/aJMqjQS/LwwIzDw5vVtbTuX7+bbQKCciE383sc=;
-        b=iqyAAkinSX5UNUwdkK8Mp7SDiQgGMfnn6QT5c5rCSxQGb5W+gc2vFvu1wyzR5lGAEH
-         Cej6pIERsXwmA8EbEN7Du4Oi5x2WTSrLfM91H3d9/sAXgqCeyxtQGtN0c7D1X50c4mIc
-         ROMHOOv6iyRSBu9ThdPk4xQJFszTW7kG5SRz6aQ1BhxawzmCQWMMUrAx0jsDk/CshuBL
-         21Zys9ptOQgJAlF6yja8nDJTo6XqAlOyEQ3CBormB+06DiuU1kf1WQXoa4kXv1w2zG5X
-         7MjDSbJFgDRqIvsMujgLHgauRPq5oQFwULPkETkFGdim7uNDXAP3cdQX/zduQcgHTxID
-         HCdg==
-X-Gm-Message-State: AOAM532I860qldVV3SpWIZye7QpOOmvzagW2V+SkleG3BRLmhoCYrqWp
-        fSmbY4EFM68GmZ33Mxy/SV9lMA==
-X-Google-Smtp-Source: ABdhPJwJWiF05G52IFW9R5Nmw5veE7Mlw/Rui0UPeykYh3HiKu3fnjOBS9uNDK1RBAVTK+i14VNZqg==
-X-Received: by 2002:a17:902:7047:: with SMTP id h7mr10219648plt.9.1590070864321;
-        Thu, 21 May 2020 07:21:04 -0700 (PDT)
+        bh=J51At+hbotKe/uyCWwztTgcU/DKyC1up14t8RJPYJKs=;
+        b=VApbtEsKHnftDgjsBRIZGc0Mxr6Yr5BqcLcx40dlvuEbXm//jca5URBEWENga3WlZ0
+         xVMkLHEYp/u6DEmw6vK6FkuFn4MW/d+B0HL3eKzu5PL43GpRtuVjFRnTZ3xl7QPJDM57
+         9Ao9qBzOMlD4tNUTeB1NV8A/wIi2vPg7rIRhwjfYpYWJLsoHAmhRM8T8DAMZucHza1Tt
+         qsnwyRkAxn5kMoZr3yi7LrrRJ7RZ7uiwRPk/k59rrj94638SSYF7oocleJSYN3uzb8N/
+         SlXxptJVcgEYLTMiFxQUsb9KyH3b1+ADUUYryHJwl1Fk8oTKCs7cgeYxWDqecGycuy/L
+         fEWA==
+X-Gm-Message-State: AOAM531MXMqDYG7aueY5HD+sVhtdGBlrWi/IBs3u+pSwD+WMXLTdKFND
+        6/XUQ6UBV1mIi3AWiWW2TH0ZxguySi8=
+X-Google-Smtp-Source: ABdhPJzslJOtTY+QZx6oTAX3n0Ux5CKV15SysD/PgQzEqKZIALlHgXxia3Q8MwRo8M1fcjOL8hhQgA==
+X-Received: by 2002:a17:902:b18b:: with SMTP id s11mr9668569plr.160.1590071710297;
+        Thu, 21 May 2020 07:35:10 -0700 (PDT)
 Received: from ?IPv6:2605:e000:100e:8c61:c00a:8fd2:4246:efbe? ([2605:e000:100e:8c61:c00a:8fd2:4246:efbe])
-        by smtp.gmail.com with ESMTPSA id k65sm4703876pfd.156.2020.05.21.07.21.02
+        by smtp.gmail.com with ESMTPSA id p12sm4251968pgj.22.2020.05.21.07.35.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 07:21:03 -0700 (PDT)
-Subject: Re: [PATCH v5 00/11] Add a new LOOP_CONFIGURE ioctl
-To:     Martijn Coenen <maco@android.com>, hch@lst.de, ming.lei@redhat.com
-Cc:     narayan@google.com, zezeozue@google.com, maco@google.com,
-        kernel-team@android.com, bvanassche@acm.org,
-        Chaitanya.Kulkarni@wdc.com, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200513133845.244903-1-maco@android.com>
+        Thu, 21 May 2020 07:35:09 -0700 (PDT)
+Subject: Re: small blkdev_issue_flush cleanups
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20200513123601.2465370-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fe0b7bf9-07b1-9025-f9d6-7ace03c89a1f@kernel.dk>
-Date:   Thu, 21 May 2020 08:21:01 -0600
+Message-ID: <1b115def-6506-7bcb-3703-961d1b3d1412@kernel.dk>
+Date:   Thu, 21 May 2020 08:35:08 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200513133845.244903-1-maco@android.com>
+In-Reply-To: <20200513123601.2465370-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,21 +77,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/20 7:38 AM, Martijn Coenen wrote:
-> This series introduces a new ioctl that makes it possible to atomically
-> configure a loop device. Previously, if you wanted to set parameters
-> such as the offset on a loop device, this required calling LOOP_SET_FD
-> to set the backing file, and then LOOP_SET_STATUS to set the offset.
-> However, in between these two calls, the loop device is available and
-> would accept requests, which is generally not desirable. Similar issues
-> exist around setting the block size (LOOP_SET_BLOCK_SIZE) and requesting
-> direct I/O mode (LOOP_SET_DIRECT_IO).
+On 5/13/20 6:35 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> There are also performance benefits with combining these ioctls into
-> one, which are described in more detail in the last change in the
-> series.
+> two small cleanups for blkdev_issue_flush below.
 
-Thanks, applied for 5.8.
+Looks fine to me, but I hate patches that touch so wide in the tree,
+often ends up being a hassle for me. This one looks pretty low risk
+in that regard, hopefully it will be. Added for 5.8.
 
 -- 
 Jens Axboe
