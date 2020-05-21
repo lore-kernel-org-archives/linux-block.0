@@ -2,138 +2,113 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C59C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B328C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:15:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73D6E20759
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:00:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EV5SVn70"
+	by mail.kernel.org (Postfix) with ESMTP id 3A8CD20738
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729845AbgEUTA1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 15:00:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729555AbgEUTA1 (ORCPT
+        id S1730073AbgEUTP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 15:15:56 -0400
+Received: from mail-pf1-f169.google.com ([209.85.210.169]:34159 "EHLO
+        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729475AbgEUTP4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 15:00:27 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B021C061A0F
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:00:27 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id v16so9633659ljc.8
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AXqOJl5SmNS23EUn7DmXTUU6aYLgyfPvo+AUamH08Ps=;
-        b=EV5SVn70MuPiXaA+/GpI4b2qrg0jB93InY/vaKKkvXw3rt6V19F3iaEfufdWjb2vSa
-         LFgwuEMLZ0kF+u4vLem/Ho+YYOlDTSymGzxy0FWxZiHOsB3Pb3GSFPQ6THq8MehoMw81
-         61D12qPxoVMXCVN5YnrMpoSh0ZCOqjVhvK2/icCRVt/PPsd4BcWFGL0kAP/7zDq1hN3x
-         a1rzoPThWH5HcKX0GiUC4cxi3kkuCMXpV76kYKiXipe6YgwkiIKVt/YehTDSxdT8FKMQ
-         CKv5YcXmrRHEWyhnCcxlLCZV3yGZBNkQfBJxwnNbBjgGPVYWSZIk3apxM0beTrE2kQJt
-         vtEg==
+        Thu, 21 May 2020 15:15:56 -0400
+Received: by mail-pf1-f169.google.com with SMTP id x15so3839323pfa.1
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:15:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AXqOJl5SmNS23EUn7DmXTUU6aYLgyfPvo+AUamH08Ps=;
-        b=kgPCLpLLPxeqA2WF9kx18/m8OygRsEVv62LPmAVkxGto9vILqQ0gwiF5GqiwzzvlSG
-         0AQDT6OREUFWHGD/qcmX9xJw6KaXsOoFtT/8aSnJj0WQ7yUzizFL+hHzsbAvQrE7v4YW
-         aXl4LyX1kkqDj+dP2X0EUhijL+W2kTgjj5ddZs6/YMK42NPdJ4cWRd9Ke4dTK4zuRH32
-         QuGxKntC9zb+QYQpYXx90ZGtmkNAgw2kwHx7Gfm0lWqRtSMbHUUavHbPRP047CcDAHFR
-         POcwGGUwkZj93+b5d/Y3lrMb0MxP3S1KNvXo2BVMSxmViWMZSwVz4Zz7dPthuWlmmzvj
-         PY6w==
-X-Gm-Message-State: AOAM5317ay0AhkvQwOY14mtmSlg6b9MYeIokrfkcBJjHvz9EDK+lNhOc
-        IrT07SIGIiW8oa8YAHqmuF815llQEwMMZEgsLza5lA==
-X-Google-Smtp-Source: ABdhPJztzAYrR/hpe1uRAGQjKmg0ls00XHM6k9/5+3Vj5L9HrQE3V1E3er3ujQPjsfP8Tn3nR1o1fnGVTi8pnw7kWuo=
-X-Received: by 2002:a2e:6c0c:: with SMTP id h12mr5664520ljc.266.1590087625478;
- Thu, 21 May 2020 12:00:25 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=me8k5kO6gJhEHivRx7ZHWKWt03O6RaXrFJvlIQxegbw=;
+        b=WYlzF6lgcRGHl7HpHyMxE0haO45UAbKsCf1XMXf3IlgIDw7MzGoWhCc0NewCwWDZ5q
+         UqQudS4ajveggEqBR3jM88Qhv54nzShz6ylbmNxX3FVtqOYG/w1HMxwoL3N41F64D7/r
+         rT3/JUr14I7zZkMjZ5Mcu6JfCJcrfVu7djN5Y1yTcHPeE4Tnbnnh0bZW0znFyJNsVhEn
+         Nl50iM4+dZmDmWpRgUBhqYz+oOwvNilWj33Gk/98NIy+6H0Scx+9e88/U0UyqBOvbcOO
+         pc+4WDPi0dmPb+ezc73jiNja0e+7+BvR5hZtqjLtmVT3DdiQQJofISTpzeEAyB0fqT2L
+         pCGQ==
+X-Gm-Message-State: AOAM530+nPFbrsawYNEeJCuThfnDNUhVPNPzxHV+iwidnv/hT2IjvZ5j
+        k8BrPUQXQKMSw9FgpTSa8AE=
+X-Google-Smtp-Source: ABdhPJz/uXy2paEqFPJPCvkWYo8ns60pQcOxyZuCvECwiGX+6uSJ/SHf9oz1AIxGZ7wsl6+8hrA4uQ==
+X-Received: by 2002:a63:d516:: with SMTP id c22mr10504293pgg.123.1590088555242;
+        Thu, 21 May 2020 12:15:55 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:50cc:4329:ba49:7ab1? ([2601:647:4000:d7:50cc:4329:ba49:7ab1])
+        by smtp.gmail.com with ESMTPSA id f64sm5273180pjd.5.2020.05.21.12.15.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2020 12:15:54 -0700 (PDT)
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v3
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200520170635.2094101-1-hch@lst.de>
+ <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org> <20200521025744.GC735749@T590>
+ <9249e1cc-b6f2-010e-78d2-ead5a1b93464@acm.org> <20200521043305.GA741019@T590>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <7accb5b2-6c7d-0e0d-56df-d06e8d9ac5af@acm.org>
+Date:   Thu, 21 May 2020 12:15:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
- <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
- <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
- <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz> <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name> <20200521095515.GK6462@dhcp22.suse.cz>
- <20200521163450.GV6462@dhcp22.suse.cz>
-In-Reply-To: <20200521163450.GV6462@dhcp22.suse.cz>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 22 May 2020 00:30:13 +0530
-Message-ID: <CA+G9fYuDWGZx50UpD+WcsDeHX9vi3hpksvBAWbMgRZadb0Pkww@mail.gmail.com>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200521043305.GA741019@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 21 May 2020 at 22:04, Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Thu 21-05-20 11:55:16, Michal Hocko wrote:
-> > On Wed 20-05-20 20:09:06, Chris Down wrote:
-> > > Hi Naresh,
-> > >
-> > > Naresh Kamboju writes:
-> > > > As a part of investigation on this issue LKFT teammate Anders Roxell
-> > > > git bisected the problem and found bad commit(s) which caused this problem.
-> > > >
-> > > > The following two patches have been reverted on next-20200519 and retested the
-> > > > reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
-> > > > ( invoked oom-killer is gone now)
-> > > >
-> > > > Revert "mm, memcg: avoid stale protection values when cgroup is above
-> > > > protection"
-> > > >    This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
-> > > >
-> > > > Revert "mm, memcg: decouple e{low,min} state mutations from protection
-> > > > checks"
-> > > >    This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
-> > >
-> > > Thanks Anders and Naresh for tracking this down and reverting.
-> > >
-> > > I'll take a look tomorrow. I don't see anything immediately obviously wrong
-> > > in either of those commits from a (very) cursory glance, but they should
-> > > only be taking effect if protections are set.
-> >
-> > Agreed. If memory.{low,min} is not used then the patch should be
-> > effectively a nop.
->
-> I was staring into the code and did not see anything.  Could you give the
-> following debugging patch a try and see whether it triggers?
+On 2020-05-20 21:33, Ming Lei wrote:
+> No.
+> 
+> If vector 3 is for covering hw queue 12 ~ 15, the vector shouldn't be
+> shutdown when cpu 14 is offline.
+>> Also I am pretty sure that we don't do this way with managed IRQ. And
+> non-managed IRQ will be migrated to other online cpus during cpu offline,
+> so not an issue at all. See migrate_one_irq().
 
-These code paths did not touch it seems. but still see the reported problem.
-Please find a detailed test log output [1]
+Thanks for the pointer to migrate_one_irq().
 
-And
-One more test log with cgroup_disable=memory [2]
+However, I'm not convinced the above statement is correct. My
+understanding is that the block driver knows which interrupt vector has
+been associated with which hardware queue but the blk-mq core not. It
+seems to me that patch 6/6 of this series is based on the following
+assumptions:
+(a) That the interrupt that is associated with a hardware queue is
+    processed by one of the CPU's in hctx->cpumask.
+(b) That hardware queues do not share interrupt vectors.
 
-Test log link,
-[1] https://pastebin.com/XJU7We1g
-[2] https://pastebin.com/BZ0BMUVt
+I don't think that either assumption is correct.
+
+Bart.
