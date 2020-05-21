@@ -2,235 +2,140 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55945C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2F8C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28CB120758
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA3D6206F6
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 02:58:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIZNHQnm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQwp7h6f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbgEUCkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 May 2020 22:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727798AbgEUCkD (ORCPT
+        id S1726954AbgEUC6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 May 2020 22:58:01 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44407 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726861AbgEUC6B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 May 2020 22:40:03 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27CCBC061A0E;
-        Wed, 20 May 2020 19:40:02 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id y17so3336509ilg.0;
-        Wed, 20 May 2020 19:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/RCzazjPJQ1zcfvr5ivU8gZ2oW1vvouNHyaX2fPjs5o=;
-        b=JIZNHQnmERaJeRhfnEjjac0W+vknvOwLXY/d6ercTVMilrrz524WChiYGwFGcaHgFJ
-         K8JZk1i5INW6EyIXuYOyX2v32bfw6qRfgzQTQHHULRWMhQsYMBm89glhPbVBx2I6bwxs
-         j20/Yum6NRQKLWYNIxFRjPx0QViHZTbPlmI1fZzO6exUlTKfLwEVLiDwpVb7Qfp6TgJ/
-         snhs+KlBeHyRitCTHyRBIFjZ454fFCb9qrYuro47/SQk4QgBQgus3sRPgPYvG8W/Vui1
-         AknW2UXV00QW+opr5rDKKkCPY+BNrd0MlLO7V3cFfkCwusagGNkXGNtRMJgA5pK9QeWA
-         IAFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/RCzazjPJQ1zcfvr5ivU8gZ2oW1vvouNHyaX2fPjs5o=;
-        b=TWTHK1Mul5Ro/PhNgWzqWNYPt0nJuLsbNFOVNMtrDHKeUNy5e3Wh4KgXabrwfejQa4
-         feGQUIrWta/+x1iWMMKkF95BTmX22rdt+eaMHB2HnUkoBYGSK/Hu9KHbjv+BmPIoH6+n
-         MxAmTa8gLVNgzNGUEm32kaHaJYGHO8DYUO4jiB7cEoJwQyVAuC8rLYdbpC6arSWPo3K6
-         Bgqcm/kcW5i+XRLJd6gjF3FiPga6q49LJs2Mgj6IFDBPg7QaPPNEhs8PSWHouj3hSFKC
-         IVcPeYPuZJwkrw4dqoILxGW0DGCfBC0jvyl98CnOG3p+/AhoxnPTh8l9IaZhrNuYJihJ
-         r98g==
-X-Gm-Message-State: AOAM53084UvGaeHRrgPwSB/V1GuYkpGv69xr+89HIfFpfscv5Ue+oW+Z
-        KgqQtQd3+FqBTBWZX8nQAlxvdPiSsKFL7f9z2FM=
-X-Google-Smtp-Source: ABdhPJyv/UYZjPy/DPwJRsYbSaKbImcwHJUxF5BT675dGaD56oiGCZioxLSjEnZKhN7916a+tUgfDxQbE7d+nnFanoQ=
-X-Received: by 2002:a92:9e11:: with SMTP id q17mr6952459ili.137.1590028801270;
- Wed, 20 May 2020 19:40:01 -0700 (PDT)
+        Wed, 20 May 2020 22:58:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590029879;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wYk1kQY9+pTZpuFHmtiHZ9rb+tj5wA0baIA0oghllHc=;
+        b=gQwp7h6fnGPyvoFhlsGp26uy7lbs2MmoexMHbVYSE07VaBoUKWz8R+GEGyNDpypY4BgEri
+        0L1y73D7e/3Y6Kr879upK6immKQmeRY7OTTVjYfonR5aszuJ3YaUowQKOK2rljBrAG238W
+        8+r4wMAnytwmho/hMF57L/OOECHELJg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-W55voAKfNHSSWVnAKsZLnA-1; Wed, 20 May 2020 22:57:57 -0400
+X-MC-Unique: W55voAKfNHSSWVnAKsZLnA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 467FE800688;
+        Thu, 21 May 2020 02:57:56 +0000 (UTC)
+Received: from T590 (ovpn-13-123.pek2.redhat.com [10.72.13.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6287C79597;
+        Thu, 21 May 2020 02:57:49 +0000 (UTC)
+Date:   Thu, 21 May 2020 10:57:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v3
+Message-ID: <20200521025744.GC735749@T590>
+References: <20200520170635.2094101-1-hch@lst.de>
+ <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org>
 MIME-Version: 1.0
-References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
- <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
- <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
- <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz> <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
-In-Reply-To: <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
-From:   Yafang Shao <laoar.shao@gmail.com>
-Date:   Thu, 21 May 2020 10:39:25 +0800
-Message-ID: <CALOAHbDMrHkNHTxeBWP22iTjJd+HfqfFhAfmC_m0jsVkhu5vEA@mail.gmail.com>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Chris Down <chris@chrisdown.name>,
-        Michal Hocko <mhocko@kernel.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 21, 2020 at 2:00 AM Naresh Kamboju
-<naresh.kamboju@linaro.org> wrote:
->
-> On Wed, 20 May 2020 at 17:26, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> >
-> >
-> > This issue is specific on 32-bit architectures i386 and arm on linux-next tree.
-> > As per the test results history this problem started happening from
-> > Bad : next-20200430
-> > Good : next-20200429
-> >
-> > steps to reproduce:
-> > dd if=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190504A00573
-> > of=/dev/null bs=1M count=2048
-> > or
-> > mkfs -t ext4 /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190804A00BE5
-> >
-> >
-> > Problem:
-> > [   38.802375] dd invoked oom-killer: gfp_mask=0x100cc0(GFP_USER),
-> > order=0, oom_score_adj=0
->
-> As a part of investigation on this issue LKFT teammate Anders Roxell
-> git bisected the problem and found bad commit(s) which caused this problem.
->
-> The following two patches have been reverted on next-20200519 and retested the
-> reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
-> ( invoked oom-killer is gone now)
->
-> Revert "mm, memcg: avoid stale protection values when cgroup is above
-> protection"
->     This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
->
-> Revert "mm, memcg: decouple e{low,min} state mutations from protection
-> checks"
->     This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
->
+On Wed, May 20, 2020 at 02:46:52PM -0700, Bart Van Assche wrote:
+> On 2020-05-20 10:06, Christoph Hellwig wrote:
+> > this series ensures I/O is quiesced before a cpu and thus the managed
+> > interrupt handler is shut down.
+> > 
+> > This patchset tries to address the issue by the following approach:
+> > 
+> >  - before the last cpu in hctx->cpumask is going to offline, mark this
+> >    hctx as inactive
+> > 
+> >  - disable preempt during allocating tag for request, and after tag is
+> >    allocated, check if this hctx is inactive. If yes, give up the
+> >    allocation and try remote allocation from online CPUs
+> > 
+> >  - before hctx becomes inactive, drain all allocated requests on this
+> >    hctx
+> 
+> What is not clear to me is which assumptions about the relationship
+> between interrupts and hardware queues this patch series is based on.
+> Does this patch series perhaps only support a 1:1 mapping between
+> interrupts and hardware queues?
 
-My guess is that we made the same mistake in commit "mm, memcg:
-decouple e{low,min} state mutations from protection
-checks" that it read a stale memcg protection in
-mem_cgroup_below_low() and mem_cgroup_below_min().
+No, it supports any mapping, but the issue won't be triggered on 1:N
+mapping, since this kind of hctx never becomes inactive.
 
-Bellow is a possble fix,
+> What if there are more hardware queues
+> than interrupts? An example of a block driver that allocates multiple
 
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 7a2c56fc..6591b71 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -391,20 +391,28 @@ static inline unsigned long
-mem_cgroup_protection(struct mem_cgroup *root,
- void mem_cgroup_calculate_protection(struct mem_cgroup *root,
-                                     struct mem_cgroup *memcg);
+It doesn't matter, see blew comment.
 
--static inline bool mem_cgroup_below_low(struct mem_cgroup *memcg)
-+static inline bool mem_cgroup_below_low(struct mem_cgroup *root,
-+                                       struct mem_cgroup *memcg)
- {
-        if (mem_cgroup_disabled())
-                return false;
+> hardware queues is the NVMeOF initiator driver. From the NVMeOF
+> initiator driver function nvme_rdma_alloc_tagset() and for the code that
+> refers to I/O queues:
+> 
+> 	set->nr_hw_queues = nctrl->queue_count - 1;
+> 
+> From nvme_rdma_alloc_io_queues():
+> 
+> 	nr_read_queues = min_t(unsigned int, ibdev->num_comp_vectors,
+> 				min(opts->nr_io_queues,
+> 				    num_online_cpus()));
+> 	nr_default_queues =  min_t(unsigned int,
+> 	 			ibdev->num_comp_vectors,
+> 				min(opts->nr_write_queues,
+> 					 num_online_cpus()));
+> 	nr_poll_queues = min(opts->nr_poll_queues, num_online_cpus());
+> 	nr_io_queues = nr_read_queues + nr_default_queues +
+> 			 nr_poll_queues;
+> 	[ ... ]
+> 	ctrl->ctrl.queue_count = nr_io_queues + 1;
+> 
+> From nvmf_parse_options():
+> 
+> 	/* Set defaults */
+> 	opts->nr_io_queues = num_online_cpus();
+> 
+> Can this e.g. result in 16 hardware queues being allocated for I/O even
+> if the underlying RDMA adapter only supports four interrupt vectors?
+> Does that mean that four hardware queues will be associated with each
+> interrupt vector?
 
-+       if (root == memcg)
-+               return false;
-+
-        return READ_ONCE(memcg->memory.elow) >=
-                page_counter_read(&memcg->memory);
- }
+The patchset actually doesn't bind to interrupt vector, and that said we
+don't care actuall interrupt allocation.
 
--static inline bool mem_cgroup_below_min(struct mem_cgroup *memcg)
-+static inline bool mem_cgroup_below_min(struct mem_cgroup *root,
-+                                       struct mem_cgroup *memcg)
- {
-        if (mem_cgroup_disabled())
-                return false;
+> If the CPU to which one of these interrupt vectors has
+> been assigned is hotplugged, does that mean that four hardware queues
+> have to be quiesced instead of only one as is done in patch 6/6?
 
-+       if (root == memcg)
-+               return false;
-+
-        return READ_ONCE(memcg->memory.emin) >=
-                page_counter_read(&memcg->memory);
- }
-@@ -896,12 +904,14 @@ static inline void
-mem_cgroup_calculate_protection(struct mem_cgroup *root,
- {
- }
-
--static inline bool mem_cgroup_below_low(struct mem_cgroup *memcg)
-+static inline bool mem_cgroup_below_low(struct mem_cgroup *root,
-+                                       struct mem_cgroup *memcg)
- {
-        return false;
- }
-
--static inline bool mem_cgroup_below_min(struct mem_cgroup *memcg)
-+static inline bool mem_cgroup_below_min(struct mem_cgroup *root,
-+                                       struct mem_cgroup *memcg)
- {
-        return false;
- }
-diff --git a/mm/vmscan.c b/mm/vmscan.c
-index c71660e..fdcdd88 100644
---- a/mm/vmscan.c
-+++ b/mm/vmscan.c
-@@ -2637,13 +2637,13 @@ static void shrink_node_memcgs(pg_data_t
-*pgdat, struct scan_control *sc)
-
-                mem_cgroup_calculate_protection(target_memcg, memcg);
-
--               if (mem_cgroup_below_min(memcg)) {
-+               if (mem_cgroup_below_min(target_memcg, memcg)) {
-                        /*
-                         * Hard protection.
-                         * If there is no reclaimable memory, OOM.
-                         */
-                        continue;
--               } else if (mem_cgroup_below_low(memcg)) {
-+               } else if (mem_cgroup_below_low(target_memcg, memcg)) {
-                        /*
-                         * Soft protection.
-                         * Respect the protection only as long as
+No, one hctx only becomes inactive after each CPU in hctx->cpumask is offline.
+No matter how interrupt vector is assigned to hctx, requests shouldn't
+be dispatched to that hctx any more.
 
 
+Thanks,
+Ming
 
-
-
-> i386 test log shows mkfs -t ext4 pass
-> https://lkft.validation.linaro.org/scheduler/job/1443405#L1200
->
-> ref:
-> https://lore.kernel.org/linux-mm/cover.1588092152.git.chris@chrisdown.name/
-> https://lore.kernel.org/linux-mm/CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com/T/#t
->
-> --
-> Linaro LKFT
-> https://lkft.linaro.org
-
-
-
---
-Thanks
-Yafang
