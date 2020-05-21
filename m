@@ -2,157 +2,124 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54916C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 16:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8BEDC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 17:50:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34E0320759
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 16:34:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590078899;
-	bh=GdctWZTFeFe+RmglMdU4Kju3R4Pre2MpynzU74CY4o4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=rc//ha2xUwEOfdtnt1EkuqD+nj78hPFqC9VKGTBnRq+XEwIj3MXW6OQo8aZTowQsR
-	 UKI85P923ZfhSYDchYtWmocLUeuJMvvv634VaQMBbB/G0JntEdX4bRzfgJTajHPVis
-	 dg5eRA1c8FRks62yaf80ngW3vKmcSjccgpVqU4xs=
+	by mail.kernel.org (Postfix) with ESMTP id B9A5A207D3
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 17:50:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="XZTMa4cm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729787AbgEUQe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 12:34:56 -0400
-Received: from mail-ej1-f65.google.com ([209.85.218.65]:46610 "EHLO
-        mail-ej1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726938AbgEUQez (ORCPT
+        id S1730002AbgEURu7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 13:50:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729820AbgEURu6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 12:34:55 -0400
-Received: by mail-ej1-f65.google.com with SMTP id e2so9520077eje.13;
-        Thu, 21 May 2020 09:34:53 -0700 (PDT)
+        Thu, 21 May 2020 13:50:58 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25191C061A0F
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 10:50:58 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id g9so7241865edw.10
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 10:50:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=c5hk+YvDF+HNcyf9r7puwjNVcCKeuusQ28Ivdswl/wY=;
+        b=XZTMa4cmZBy3IafYJoqtED2R8GeVsYhpNul9KMyfu2JfcqXxrLTDs763L54yDeTfbe
+         yn9XviBnQKTkOJ6MkE/nQTcMS85uqcodkyiO25PfrTS9f4OpkviuvvJyXid346P7svS2
+         Zkcnwtqhq4x63LsWI5tw5dnfetHLKgr8k7c6Ut8rRMC94Sbv2x04eV9c32s89AGBLmoY
+         BjhXrZJJhY6Onlf6a2hHKYSxGY2urxrhmFELm5td093zmXU1k6+8ADP1mX6rM4uF3pVg
+         hy+1PVDHbwEInAKVpKPUde1VJlQBW6OoJ1FfJ2CmDNpEZqTBNMZDmI40TkA13sZM59Cv
+         7cWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xPFD7IFPtAwroNkfi9MemR+cpIhDyy+Gat6jBDCzwmc=;
-        b=I+zFEekaSGNtUvOBaQWHj6RVKBBQMWG7kcw59nWP4UEq62aw8PzkCFsFxhdCeLUvOF
-         uvUgqFtNQRGimz80rErbFSQHYD8Eipwj94F6p1arDkhfw81w5/EZG489FiZrdUBA6Tfc
-         aaOyjjcZXHaZyPOw4aqEsK0kOJRvskGJFz0N2ablGt8tM1zI6Im0TT7heeWpJurk4i6S
-         7yNpIilJeEOe1qs7WN/XRZ4NWWoqEV0TpLCfxZROanRtx+r0aOwXFD6eM2yKMDPz9mam
-         WXK89Bq0PWkePDyepB4ysrudm9LfvdoP2xaP8Fjca8pEjl+SzWayfxb00dpPyChLXhOn
-         48Hg==
-X-Gm-Message-State: AOAM531Obo4tukQe9e0V2brWkUq0agXLcajodfW2Cxf0Rfi6OXa0TPL4
-        DaLqKLt7Fcdx/WRA7D0uGa4=
-X-Google-Smtp-Source: ABdhPJwXVn3GpddymYyJuCnFqK41AXqqaHjxUQiP8VzaDxPtzIQQTqMUciYSPeaIDYFRbF092GX9fQ==
-X-Received: by 2002:a17:906:3607:: with SMTP id q7mr4218185ejb.81.1590078892997;
-        Thu, 21 May 2020 09:34:52 -0700 (PDT)
-Received: from localhost (ip-37-188-180-112.eurotel.cz. [37.188.180.112])
-        by smtp.gmail.com with ESMTPSA id m27sm5175644eja.83.2020.05.21.09.34.50
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=c5hk+YvDF+HNcyf9r7puwjNVcCKeuusQ28Ivdswl/wY=;
+        b=pHkRD9I+wFkspde2lWsP07VcvLszq6g3M2KdfvODpW/hBSmp9oC7xyHVZIhXg3UAQ0
+         wsLr8tBpnNIT7swbjknsi137bPEvJqbnwH0hdAV61uJIlUUhn+OnUSseKINqctIq4pfh
+         oGjp8NZXorR7Mtnrq8DFajewf4/Epjh57lejrK46hXXdUTAquWnh06nQhbru5V4Ix7/3
+         cQWhPnc8cBPr8bLw9CQCqlthMZbKEn/wHvCPx+dWANEXQQNGWqeh1nEIRVgawpeaSTw4
+         xTh0xGxdtw8Ho05adYi9/iKL9LKSqagJJC3/EcH4l/I0rTgGj7pEpHYqbyc+VhsKnJYH
+         H5WA==
+X-Gm-Message-State: AOAM533LQDFUsaEfGGMTMha6YIuj7Eh0YvAvP7p8Qs6VjZ2avlK1kC1c
+        tRao32mgpBGJl3O2d4Fan9enVx6rzQ==
+X-Google-Smtp-Source: ABdhPJzToo8f9DVO/kSz/quWW8eMz/WF+e6ERpzOVZ6UV+MrK6+EGUGO1015b1B48Aw27ecTnKSrpg==
+X-Received: by 2002:a05:6402:c2:: with SMTP id i2mr8768644edu.224.1590083456687;
+        Thu, 21 May 2020 10:50:56 -0700 (PDT)
+Received: from dkxps.fkb.profitbricks.net (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
+        by smtp.gmail.com with ESMTPSA id z12sm5358700edk.78.2020.05.21.10.50.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 09:34:51 -0700 (PDT)
-Date:   Thu, 21 May 2020 18:34:50 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Chris Down <chris@chrisdown.name>
-Cc:     Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, cgroups@vger.kernel.org
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200521163450.GV6462@dhcp22.suse.cz>
-References: <CA+G9fYu2ruH-8uxBHE0pdE6RgRTSx4QuQPAN=Nv3BCdRd2ouYA@mail.gmail.com>
- <20200501135806.4eebf0b92f84ab60bba3e1e7@linux-foundation.org>
- <CA+G9fYsiZ81pmawUY62K30B6ue+RXYod854RS91R2+F8ZO7Xvw@mail.gmail.com>
- <20200519075213.GF32497@dhcp22.suse.cz>
- <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz>
- <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name>
- <20200521095515.GK6462@dhcp22.suse.cz>
+        Thu, 21 May 2020 10:50:55 -0700 (PDT)
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        dledford@redhat.com, jgg@ziepe.ca
+Cc:     axboe@kernel.dk, bvanassche@acm.org, leon@kernel.org,
+        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
+        guoqing.jiang@cloud.ionos.com, Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] rnbd: fix compilation error when CONFIG_MODULES is disabled
+Date:   Thu, 21 May 2020 19:50:01 +0200
+Message-Id: <20200521175001.445208-1-danil.kipnis@cloud.ionos.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
+References: <86962843-e786-4a3f-0b85-1e06fbdbd76a@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200521095515.GK6462@dhcp22.suse.cz>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 21-05-20 11:55:16, Michal Hocko wrote:
-> On Wed 20-05-20 20:09:06, Chris Down wrote:
-> > Hi Naresh,
-> > 
-> > Naresh Kamboju writes:
-> > > As a part of investigation on this issue LKFT teammate Anders Roxell
-> > > git bisected the problem and found bad commit(s) which caused this problem.
-> > > 
-> > > The following two patches have been reverted on next-20200519 and retested the
-> > > reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
-> > > ( invoked oom-killer is gone now)
-> > > 
-> > > Revert "mm, memcg: avoid stale protection values when cgroup is above
-> > > protection"
-> > >    This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
-> > > 
-> > > Revert "mm, memcg: decouple e{low,min} state mutations from protection
-> > > checks"
-> > >    This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
-> > 
-> > Thanks Anders and Naresh for tracking this down and reverting.
-> > 
-> > I'll take a look tomorrow. I don't see anything immediately obviously wrong
-> > in either of those commits from a (very) cursory glance, but they should
-> > only be taking effect if protections are set.
-> 
-> Agreed. If memory.{low,min} is not used then the patch should be
-> effectively a nop.
+module_is_live function is only defined when CONFIG_MODULES is enabled.
+Use try_module_get instead to check whether the module is being removed.
 
-I was staring into the code and do not see anything.  Could you give the
-following debugging patch a try and see whether it triggers?
+When module unload and manuall unmapping is happening in parallel, we can
+try removing the symlink twice: rnbd_client_exit vs. rnbd_clt_unmap_dev_store.
 
-diff --git a/mm/vmscan.c b/mm/vmscan.c
-index cc555903a332..df2e8df0eb71 100644
---- a/mm/vmscan.c
-+++ b/mm/vmscan.c
-@@ -2404,6 +2404,8 @@ static void get_scan_count(struct lruvec *lruvec, struct scan_control *sc,
- 			 * sc->priority further than desirable.
- 			 */
- 			scan = max(scan, SWAP_CLUSTER_MAX);
-+
-+			trace_printk("scan:%lu protection:%lu\n", scan, protection);
- 		} else {
- 			scan = lruvec_size;
- 		}
-@@ -2648,6 +2650,7 @@ static void shrink_node_memcgs(pg_data_t *pgdat, struct scan_control *sc)
- 		mem_cgroup_calculate_protection(target_memcg, memcg);
+This is probably not the best way to deal with this race in general, but for
+now this fixes the compilation issue when CONFIG_MODULES is disabled and has
+no functional impact. Regression tests passed.
+
+Fixes: 1eb54f8f5dd8 block/rnbd: client: sysfs interface functions
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Suggested-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+---
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index a4508fcc7ffe..73d7cb40abb3 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -428,12 +428,14 @@ static struct attribute *rnbd_dev_attrs[] = {
+ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
+ {
+ 	/*
+-	 * The module_is_live() check is crucial and helps to avoid annoying
+-	 * sysfs warning raised in sysfs_remove_link(), when the whole sysfs
+-	 * path was just removed, see rnbd_close_sessions().
++	 * The module unload rnbd_client_exit path is racing with unmapping of the
++	 * last single device from the sysfs manually i.e. rnbd_clt_unmap_dev_store()
++	 * leading to a sysfs warning because of sysfs link already was removed already.
+ 	 */
+-	if (strlen(dev->blk_symlink_name) && module_is_live(THIS_MODULE))
++	if (strlen(dev->blk_symlink_name) && try_module_get(THIS_MODULE)) {
+ 		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
++		module_put(THIS_MODULE);
++	}
+ }
  
- 		if (mem_cgroup_below_min(memcg)) {
-+			trace_printk("under min:%lu emin:%lu\n", memcg->memory.min, memcg->memory.emin);
- 			/*
- 			 * Hard protection.
- 			 * If there is no reclaimable memory, OOM.
-@@ -2660,6 +2663,7 @@ static void shrink_node_memcgs(pg_data_t *pgdat, struct scan_control *sc)
- 			 * there is an unprotected supply
- 			 * of reclaimable memory from other cgroups.
- 			 */
-+			trace_printk("under low:%lu elow:%lu\n", memcg->memory.low, memcg->memory.elow);
- 			if (!sc->memcg_low_reclaim) {
- 				sc->memcg_low_skipped = 1;
- 				continue;
+ static struct kobj_type rnbd_dev_ktype = {
+
+base-commit: f11e0ec55f0c80ff47693af2150bad5db0e20387
 -- 
-Michal Hocko
-SUSE Labs
+2.25.1
+
