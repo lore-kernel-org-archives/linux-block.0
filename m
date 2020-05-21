@@ -2,101 +2,96 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7236FC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 04:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8482BC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 08:14:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 376CD207F9
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 04:33:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1392m1/"
+	by mail.kernel.org (Postfix) with ESMTP id 6242520759
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 08:14:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726394AbgEUEdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 00:33:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41186 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726282AbgEUEdV (ORCPT
+        id S1728436AbgEUIOV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 04:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727122AbgEUIOV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 00:33:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590035600;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FDyGUh7s/5L2muUx6wj15QhxW1gKn4WuKlPuioZ7Nm8=;
-        b=J1392m1/67pAb5Cb4HuQ68UnxrtwZTRh1c9hRXrf1ivXDl5VdjUwRES+844UxAo2wVS+KJ
-        eNtSGHCkxAKKSOWAcnGW3t78gId+L95GeHHeoBOG4i/IfFCR3ZcmZjXjdZRLzv9TS2YpAj
-        mcqReM7wjCXCI67mYq36YbRx3Bydf40=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-Qjl8T8oUP8OCf2wndYx5UA-1; Thu, 21 May 2020 00:33:18 -0400
-X-MC-Unique: Qjl8T8oUP8OCf2wndYx5UA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF351835B41;
-        Thu, 21 May 2020 04:33:16 +0000 (UTC)
-Received: from T590 (ovpn-13-123.pek2.redhat.com [10.72.13.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 82E4219C4F;
-        Thu, 21 May 2020 04:33:10 +0000 (UTC)
-Date:   Thu, 21 May 2020 12:33:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Thu, 21 May 2020 04:14:21 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65600C061A0E;
+        Thu, 21 May 2020 01:14:21 -0700 (PDT)
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jbgL2-0004jF-Gl; Thu, 21 May 2020 10:14:00 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id B6DB5100C2D; Thu, 21 May 2020 10:13:59 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v3
-Message-ID: <20200521043305.GA741019@T590>
-References: <20200520170635.2094101-1-hch@lst.de>
- <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org>
- <20200521025744.GC735749@T590>
- <9249e1cc-b6f2-010e-78d2-ead5a1b93464@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set data->ctx and data->hctx in blk_mq_alloc_request_hctx
+In-Reply-To: <20200521022746.GA730422@T590>
+References: <20200519015420.GA70957@T590> <20200519153000.GB22286@lst.de> <20200520011823.GA415158@T590> <20200520030424.GI416136@T590> <20200520080357.GA4197@lst.de> <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk> <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk> <87tv0av1gu.fsf@nanos.tec.linutronix.de> <2a12a7aa-c339-1e51-de0d-9bc6ced14c64@kernel.dk> <87eereuudh.fsf@nanos.tec.linutronix.de> <20200521022746.GA730422@T590>
+Date:   Thu, 21 May 2020 10:13:59 +0200
+Message-ID: <87367tvh6g.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9249e1cc-b6f2-010e-78d2-ead5a1b93464@acm.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 20, 2020 at 08:50:56PM -0700, Bart Van Assche wrote:
-> On 2020-05-20 19:57, Ming Lei wrote:
-> > On Wed, May 20, 2020 at 02:46:52PM -0700, Bart Van Assche wrote:
-> >> If the CPU to which one of these interrupt vectors has
-> >> been assigned is hotplugged, does that mean that four hardware queues
-> >> have to be quiesced instead of only one as is done in patch 6/6?
-> > 
-> > No, one hctx only becomes inactive after each CPU in hctx->cpumask is offline.
-> > No matter how interrupt vector is assigned to hctx, requests shouldn't
-> > be dispatched to that hctx any more.
-> 
-> Since I haven't found an answer to my question in your reply I will
-> rephrase my question. Suppose that there are 16 CPU cores, 16 hardware
-> queues and that hctx->cpumask of each hardware queue i only contains CPU
-> i. Suppose that four interrupt vectors (0, 1, 2 and 3) are used to
-> report the completions for these hardware queues. Suppose that interrupt
-> vector 3 is associated with hardware queues 12, 13, 14 and 15, and also
-> that interrupt vector 3 is mapped to CPU core 14. My interpretation of
-> patch 6/6 is that it will only quiesce hardware queue 14 but none of the
-> other hardware queues associated with the same interrupt vector
-> (hardware queues 12, 13 and 15). Isn't that a bug?
+Ming Lei <ming.lei@redhat.com> writes:
+> On Thu, May 21, 2020 at 12:14:18AM +0200, Thomas Gleixner wrote:
+>> When the CPU is finally offlined, i.e. the CPU cleared the online bit in
+>> the online mask is definitely too late simply because it still runs on
+>> that outgoing CPU _after_ the hardware queue is shut down and drained.
+>
+> IMO, the patch in Christoph's blk-mq-hotplug.2 still works for percpu
+> kthread.
+>
+> It is just not optimal in the retrying, but it should be fine. When the
+> percpu kthread is scheduled on the CPU to be offlined:
+>
+> - if the kthread doesn't observe the INACTIVE flag, the allocated request
+> will be drained.
+>
+> - otherwise, the kthread just retries and retries to allocate & release,
+> and sooner or later, its time slice is consumed, and migrated out, and the
+> cpu hotplug handler will get chance to run and move on, then the cpu is
+> shutdown.
 
-No.
+1) This is based on the assumption that the kthread is in the SCHED_OTHER
+   scheduling class. Is that really a valid assumption?
 
-If vector 3 is for covering hw queue 12 ~ 15, the vector shouldn't be
-shutdown when cpu 14 is offline.
+2) What happens in the following scenario:
 
-Also I am pretty sure that we don't do this way with managed IRQ. And
-non-managed IRQ will be migrated to other online cpus during cpu offline,
-so not an issue at all. See migrate_one_irq().
+   unplug
 
+     mq_offline
+       set_ctx_inactive()
+       drain_io()
+       
+   io_kthread()
+       try_queue()
+       wait_on_ctx()
+
+   Can this happen and if so what will wake up that thread?
+
+I'm not familiar enough with that code to answer #2, but this really
+wants to be properly described and documented.
 
 Thanks,
-Ming
 
+        tglx
