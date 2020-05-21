@@ -2,113 +2,342 @@ Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B328C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC6BC433E3
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A8CD20738
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BFFA20738
+	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 19:18:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="IZHHDCMO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730073AbgEUTP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 15:15:56 -0400
-Received: from mail-pf1-f169.google.com ([209.85.210.169]:34159 "EHLO
-        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729475AbgEUTP4 (ORCPT
+        id S1730514AbgEUTS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 15:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43820 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730341AbgEUTSL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 15:15:56 -0400
-Received: by mail-pf1-f169.google.com with SMTP id x15so3839323pfa.1
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:15:55 -0700 (PDT)
+        Thu, 21 May 2020 15:18:11 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732F6C08C5C1
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:18:11 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id p12so6389796qtn.13
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 12:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3saNR5c+6VNupgYjih4e3CSZVXxO/Uu/tqHqOuV8bQg=;
+        b=IZHHDCMOyktHFom60CWiiTZknilhOZz2yQd0nUXDZoj4AWiZZoLpX54YbH1BHJEwAr
+         ISqrRSXko4V4gmriEkRFbmWgaTiJhYeOIhuVFGVBsr6kIs7FuL9BVTwQYgvv+cUQcCvI
+         cwPKnifZ6trujNffSOBlfNAYuzfnTyCo6H0wEwK6htR8qWlsCT6Thi3pVTHSSd8Q3dmO
+         vB2eX0uQX772TtB9QLPUkTOvgnp78QZH5zqVyMRVI3OCix8duRSLLcl+31RlEbr9l7r1
+         /8hPAk5zNBB3jfH2nGYdBaa2EKHPtHMy7KVXRqQpSf3UYQs1mKQaWvJRJTz7wNJ7NIuX
+         0EFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=me8k5kO6gJhEHivRx7ZHWKWt03O6RaXrFJvlIQxegbw=;
-        b=WYlzF6lgcRGHl7HpHyMxE0haO45UAbKsCf1XMXf3IlgIDw7MzGoWhCc0NewCwWDZ5q
-         UqQudS4ajveggEqBR3jM88Qhv54nzShz6ylbmNxX3FVtqOYG/w1HMxwoL3N41F64D7/r
-         rT3/JUr14I7zZkMjZ5Mcu6JfCJcrfVu7djN5Y1yTcHPeE4Tnbnnh0bZW0znFyJNsVhEn
-         Nl50iM4+dZmDmWpRgUBhqYz+oOwvNilWj33Gk/98NIy+6H0Scx+9e88/U0UyqBOvbcOO
-         pc+4WDPi0dmPb+ezc73jiNja0e+7+BvR5hZtqjLtmVT3DdiQQJofISTpzeEAyB0fqT2L
-         pCGQ==
-X-Gm-Message-State: AOAM530+nPFbrsawYNEeJCuThfnDNUhVPNPzxHV+iwidnv/hT2IjvZ5j
-        k8BrPUQXQKMSw9FgpTSa8AE=
-X-Google-Smtp-Source: ABdhPJz/uXy2paEqFPJPCvkWYo8ns60pQcOxyZuCvECwiGX+6uSJ/SHf9oz1AIxGZ7wsl6+8hrA4uQ==
-X-Received: by 2002:a63:d516:: with SMTP id c22mr10504293pgg.123.1590088555242;
-        Thu, 21 May 2020 12:15:55 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:50cc:4329:ba49:7ab1? ([2601:647:4000:d7:50cc:4329:ba49:7ab1])
-        by smtp.gmail.com with ESMTPSA id f64sm5273180pjd.5.2020.05.21.12.15.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 12:15:54 -0700 (PDT)
-Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v3
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-References: <20200520170635.2094101-1-hch@lst.de>
- <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org> <20200521025744.GC735749@T590>
- <9249e1cc-b6f2-010e-78d2-ead5a1b93464@acm.org> <20200521043305.GA741019@T590>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <7accb5b2-6c7d-0e0d-56df-d06e8d9ac5af@acm.org>
-Date:   Thu, 21 May 2020 12:15:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3saNR5c+6VNupgYjih4e3CSZVXxO/Uu/tqHqOuV8bQg=;
+        b=jLgTI41xwz+y0a4yHTN6vZSgKpMDoUW/9+F/Yz2BwT+acUNCqAbI8nYvVhmTanYXkT
+         tviQxaLXzyCny7ezyLeYKYS68+35Ci7//Z468VGDpmTv8iCWDpQ7Te1P7LHexSnLPXPc
+         q6sH5lEFB7XD8a/VqXyBVfT6VqVDtjIj8+zWEMvXfBOCvl1yjDNkfpT7gYJtc/MpneKI
+         VKycTOg3H9iJozQoVtjf8ed1PiviLOA6DZl1OxyZfIwBquXo/zkS0asT1lyt2pUoCCfN
+         tMQlhEUxamuYFG5v16lARHKeUeWVTgFzErSt8SwlxuuWu8IEtC3IQIavZRRRtx4fQN3D
+         w2yg==
+X-Gm-Message-State: AOAM533C/Y1+UrjYYRZl4fb9QA8KBG37R7nSkdJkFQdDUVnO1DLEHqsL
+        vBzO//krJ1CzBGR2Ax+F6gVCWw==
+X-Google-Smtp-Source: ABdhPJzVWP1hA7wiiSGD2yjVWj4mcyrIqhfmshAaGG5iJui8AOs5vLOi37iHWy6Hm3r3/Z1bDOTdTg==
+X-Received: by 2002:ac8:17f0:: with SMTP id r45mr12186357qtk.114.1590088690329;
+        Thu, 21 May 2020 12:18:10 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:4708])
+        by smtp.gmail.com with ESMTPSA id j3sm5380605qkf.9.2020.05.21.12.18.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2020 12:18:09 -0700 (PDT)
+Date:   Thu, 21 May 2020 15:17:46 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     Hugh Dickins <hughd@google.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+Message-ID: <20200521191746.GB815980@cmpxchg.org>
+References: <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
+ <20200519084535.GG32497@dhcp22.suse.cz>
+ <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
+ <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
+ <20200520190906.GA558281@chrisdown.name>
+ <20200521095515.GK6462@dhcp22.suse.cz>
+ <CA+G9fYvAB9F+Xo0vUsSveKnExkv3cV9-oOG9gBqGEcXsO95m0w@mail.gmail.com>
+ <20200521105801.GL6462@dhcp22.suse.cz>
+ <alpine.LSU.2.11.2005210504110.1185@eggly.anvils>
+ <20200521124444.GP6462@dhcp22.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20200521043305.GA741019@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200521124444.GP6462@dhcp22.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-20 21:33, Ming Lei wrote:
-> No.
+On Thu, May 21, 2020 at 02:44:44PM +0200, Michal Hocko wrote:
+> On Thu 21-05-20 05:24:27, Hugh Dickins wrote:
+> > On Thu, 21 May 2020, Michal Hocko wrote:
+> > > On Thu 21-05-20 16:11:11, Naresh Kamboju wrote:
+> > > > On Thu, 21 May 2020 at 15:25, Michal Hocko <mhocko@kernel.org> wrote:
+> > > > >
+> > > > > On Wed 20-05-20 20:09:06, Chris Down wrote:
+> > > > > > Hi Naresh,
+> > > > > >
+> > > > > > Naresh Kamboju writes:
+> > > > > > > As a part of investigation on this issue LKFT teammate Anders Roxell
+> > > > > > > git bisected the problem and found bad commit(s) which caused this problem.
+> > > > > > >
+> > > > > > > The following two patches have been reverted on next-20200519 and retested the
+> > > > > > > reproducible steps and confirmed the test case mkfs -t ext4 got PASS.
+> > > > > > > ( invoked oom-killer is gone now)
+> > > > > > >
+> > > > > > > Revert "mm, memcg: avoid stale protection values when cgroup is above
+> > > > > > > protection"
+> > > > > > >    This reverts commit 23a53e1c02006120f89383270d46cbd040a70bc6.
+> > > > > > >
+> > > > > > > Revert "mm, memcg: decouple e{low,min} state mutations from protection
+> > > > > > > checks"
+> > > > > > >    This reverts commit 7b88906ab7399b58bb088c28befe50bcce076d82.
+> > > > > >
+> > > > > > Thanks Anders and Naresh for tracking this down and reverting.
+> > > > > >
+> > > > > > I'll take a look tomorrow. I don't see anything immediately obviously wrong
+> > > > > > in either of those commits from a (very) cursory glance, but they should
+> > > > > > only be taking effect if protections are set.
+> > > > >
+> > > > > Agreed. If memory.{low,min} is not used then the patch should be
+> > > > > effectively a nop. Btw. do you see the problem when booting with
+> > > > > cgroup_disable=memory kernel command line parameter?
+> > > > 
+> > > > With extra kernel command line parameters, cgroup_disable=memory
+> > > > I have noticed a differ problem now.
+> > > > 
+> > > > + mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8NRK0BPF6XF
+> > > > mke2fs 1.43.8 (1-Jan-2018)
+> > > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
+> > > > Filesystem UUID: 3bb1a285-2cb4-44b4-b6e8-62548f3ac620
+> > > > Superblock backups stored on blocks:
+> > > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+> > > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+> > > > 102400000, 214990848
+> > > > Allocating group tables:    0/7453                           done
+> > > > Writing inode tables:    0/7453                           done
+> > > > Creating journal (262144 blocks): [   35.502102] BUG: kernel NULL
+> > > > pointer dereference, address: 000000c8
+> > > > [   35.508372] #PF: supervisor read access in kernel mode
+> > > > [   35.513506] #PF: error_code(0x0000) - not-present page
+> > > > [   35.518638] *pde = 00000000
+> > > > [   35.521514] Oops: 0000 [#1] SMP
+> > > > [   35.524652] CPU: 0 PID: 145 Comm: kswapd0 Not tainted
+> > > > 5.7.0-rc6-next-20200519+ #1
+> > > > [   35.532121] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+> > > > 2.2 05/23/2018
+> > > > [   35.539507] EIP: mem_cgroup_get_nr_swap_pages+0x28/0x60
+> > > 
+> > > Could you get faddr2line for this offset?
+> > 
+> > No need for that, I can help with the "cgroup_disabled=memory" crash:
+> > I've been happily running with the fixup below, but haven't got to
+> > send it in yet (and wouldn't normally be reading mail at this time!)
+> > because of busy chasing a couple of other bugs (not necessarily mm);
+> > and maybe the fix would be better with explicit mem_cgroup_disabled()
+> > test, or maybe that should be where cgroup_memory_noswap is decided -
+> > up to Johannes.
 > 
-> If vector 3 is for covering hw queue 12 ~ 15, the vector shouldn't be
-> shutdown when cpu 14 is offline.
->> Also I am pretty sure that we don't do this way with managed IRQ. And
-> non-managed IRQ will be migrated to other online cpus during cpu offline,
-> so not an issue at all. See migrate_one_irq().
+> Thanks Hugh. I can see what is the problem now. I was looking at the
+> Linus' tree and we have a different code there
+> 
+> 	long nr_swap_pages = get_nr_swap_pages();
+> 
+>         if (!do_swap_account || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
+>                 return nr_swap_pages;
+> 
+> which would be impossible to crash so I was really wondering what is
+> going on here. But there are other changes in the mmotm which I haven't
+> reviewed yet. Looking at the next tree now it is a fallout from "mm:
+> memcontrol: prepare swap controller setup for integration".
+> 
+> !memcg check slightly more cryptic than an explicit mem_cgroup_disabled
+> but I would just leave it to Johannes as well.
 
-Thanks for the pointer to migrate_one_irq().
+Very much appreciate you guys tracking it down so quickly. Sorry about
+the breakage.
 
-However, I'm not convinced the above statement is correct. My
-understanding is that the block driver knows which interrupt vector has
-been associated with which hardware queue but the blk-mq core not. It
-seems to me that patch 6/6 of this series is based on the following
-assumptions:
-(a) That the interrupt that is associated with a hardware queue is
-    processed by one of the CPU's in hctx->cpumask.
-(b) That hardware queues do not share interrupt vectors.
+I think mem_cgroup_disabled() checks are pretty good markers of public
+entry points to the memcg API, so I'd prefer that even if a bit more
+verbose. What do you think?
 
-I don't think that either assumption is correct.
+---
+From cd373ec232942a9bc43ee5e7d2171352019a58fb Mon Sep 17 00:00:00 2001
+From: Hugh Dickins <hughd@google.com>
+Date: Thu, 21 May 2020 14:58:36 -0400
+Subject: [PATCH] mm: memcontrol: prepare swap controller setup for integration
+ fix
 
-Bart.
+Fix crash with cgroup_disable=memory:
+
+> > > > + mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8NRK0BPF6XF
+> > > > mke2fs 1.43.8 (1-Jan-2018)
+> > > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
+> > > > Filesystem UUID: 3bb1a285-2cb4-44b4-b6e8-62548f3ac620
+> > > > Superblock backups stored on blocks:
+> > > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+> > > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+> > > > 102400000, 214990848
+> > > > Allocating group tables:    0/7453                           done
+> > > > Writing inode tables:    0/7453                           done
+> > > > Creating journal (262144 blocks): [   35.502102] BUG: kernel NULL
+> > > > pointer dereference, address: 000000c8
+> > > > [   35.508372] #PF: supervisor read access in kernel mode
+> > > > [   35.513506] #PF: error_code(0x0000) - not-present page
+> > > > [   35.518638] *pde = 00000000
+> > > > [   35.521514] Oops: 0000 [#1] SMP
+> > > > [   35.524652] CPU: 0 PID: 145 Comm: kswapd0 Not tainted
+> > > > 5.7.0-rc6-next-20200519+ #1
+> > > > [   35.532121] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+> > > > 2.2 05/23/2018
+> > > > [   35.539507] EIP: mem_cgroup_get_nr_swap_pages+0x28/0x60
+
+do_memsw_account() used to be automatically false when the cgroup
+controller was disabled. Now that it's replaced by
+cgroup_memory_noswap, for which this isn't true, make the
+mem_cgroup_disabled() checks explicit in the swap control API.
+
+[hannes@cmpxchg.org: use mem_cgroup_disabled() in all API functions]
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Debugged-by: Hugh Dickins <hughd@google.com>
+Debugged-by: Michal Hocko <mhocko@kernel.org>
+Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
+---
+ mm/memcontrol.c | 47 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
+
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 3e000a316b59..850bca380562 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -6811,6 +6811,9 @@ void mem_cgroup_swapout(struct page *page, swp_entry_t entry)
+ 	VM_BUG_ON_PAGE(PageLRU(page), page);
+ 	VM_BUG_ON_PAGE(page_count(page), page);
+ 
++	if (mem_cgroup_disabled())
++		return;
++
+ 	if (cgroup_subsys_on_dfl(memory_cgrp_subsys))
+ 		return;
+ 
+@@ -6876,6 +6879,10 @@ int mem_cgroup_try_charge_swap(struct page *page, swp_entry_t entry)
+ 	struct mem_cgroup *memcg;
+ 	unsigned short oldid;
+ 
++	if (mem_cgroup_disabled())
++		return 0;
++
++	/* Only cgroup2 has swap.max */
+ 	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
+ 		return 0;
+ 
+@@ -6920,6 +6927,9 @@ void mem_cgroup_uncharge_swap(swp_entry_t entry, unsigned int nr_pages)
+ 	struct mem_cgroup *memcg;
+ 	unsigned short id;
+ 
++	if (mem_cgroup_disabled())
++		return;
++
+ 	id = swap_cgroup_record(entry, 0, nr_pages);
+ 	rcu_read_lock();
+ 	memcg = mem_cgroup_from_id(id);
+@@ -6940,12 +6950,25 @@ long mem_cgroup_get_nr_swap_pages(struct mem_cgroup *memcg)
+ {
+ 	long nr_swap_pages = get_nr_swap_pages();
+ 
+-	if (cgroup_memory_noswap || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
+-		return nr_swap_pages;
++	if (mem_cgroup_disabled())
++		goto out;
++
++	/* Swap control disabled */
++	if (cgroup_memory_noswap)
++		goto out;
++
++	/*
++	 * Only cgroup2 has swap.max, cgroup1 does mem+sw accounting,
++	 * which does not place restrictions specifically on swap.
++	 */
++	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
++		goto out;
++
+ 	for (; memcg != root_mem_cgroup; memcg = parent_mem_cgroup(memcg))
+ 		nr_swap_pages = min_t(long, nr_swap_pages,
+ 				      READ_ONCE(memcg->swap.max) -
+ 				      page_counter_read(&memcg->swap));
++out:
+ 	return nr_swap_pages;
+ }
+ 
+@@ -6957,18 +6980,30 @@ bool mem_cgroup_swap_full(struct page *page)
+ 
+ 	if (vm_swap_full())
+ 		return true;
+-	if (cgroup_memory_noswap || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
+-		return false;
++
++	if (mem_cgroup_disabled())
++		goto out;
++
++	/* Swap control disabled */
++	if (cgroup_memory_noswap)
++		goto out;
++
++	/*
++	 * Only cgroup2 has swap.max, cgroup1 does mem+sw accounting,
++	 * which does not place restrictions specifically on swap.
++	 */
++	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
++		goto out;
+ 
+ 	memcg = page->mem_cgroup;
+ 	if (!memcg)
+-		return false;
++		goto out;
+ 
+ 	for (; memcg != root_mem_cgroup; memcg = parent_mem_cgroup(memcg))
+ 		if (page_counter_read(&memcg->swap) * 2 >=
+ 		    READ_ONCE(memcg->swap.max))
+ 			return true;
+-
++out:
+ 	return false;
+ }
+ 
+-- 
+2.26.2
+
