@@ -2,117 +2,98 @@ Return-Path: <SRS0=5dBz=7E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAF3C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 16:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF2FC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 17:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36B762065F
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 16:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D08FD206D5
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 17:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DElrh53n"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NUfqHVsF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730364AbgEVQlT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 May 2020 12:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
+        id S1730709AbgEVRIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 May 2020 13:08:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730534AbgEVQlT (ORCPT
+        with ESMTP id S1730306AbgEVRIi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 May 2020 12:41:19 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22971C05BD43
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 09:41:19 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id ee19so4988958qvb.11
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 09:41:19 -0700 (PDT)
+        Fri, 22 May 2020 13:08:38 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6CC3C061A0E
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 10:08:38 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id x11so3634611plv.9
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 10:08:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Gic/1R/3waf7AEbQmqRilav4LMcZDIm9OqkrPl/dkdw=;
-        b=DElrh53nseZZ1yD/ZQp65i6zsVsBBVHY12bldCdkwCt4iRHoIjs3Ih3IocvxPI7Be+
-         T13Wj28LaLIE/ghO6OxYczOIO5PG7hDaPXclu9BTjpDQgQPDu8Bb+IMDpwkuQ9RFXPWl
-         1DVGbvTNqX5BBzHwFqP2XdGX5ZXCUpxAVQuZNsWscvW/gqYFdE2q9J2iVT0uqfoqTuNr
-         y/onfJxz+1nGbbNLO/oh5GBoYj6f0XKphOV6GzxhZrOvbi1jKZsi5OD3UPyUZsfSD5/t
-         CTz7+RRHcmxa49u5/+SofSW0aSwudQKnUBjgtIXJ1rL1AWgOy6yTQ1hQtYnqwQZ4Qqb+
-         ZETw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=0gGbPjVIKb0ppLj5bKrwqYuuVIDYRhq+f0+5o5BY50g=;
+        b=NUfqHVsFFC94VLFoj/kJI1r6yJRWEbPlAMqsjCNuKgz4se3GsIods9MzV/wNli43QR
+         ak8U/q0Gqnx+7+NuRxIVdx76P9jKEtfXoc8neD9LQVNnxcPE1FhvyLFx1zae2qTkKzR4
+         eU9Yk5CGgKOauUX7jLZd8kNKEF6mXUv6jdM2FlYRG7AgpKKlkdZW1RmqjnZndD40AAGS
+         /plnD1F3DfaGvcoa5ruPv3S7eqXGG7FVtqaT1oXlELK6LvyNEROpiJk6T3V+4d3AWkzs
+         lpAj7HyDaax9ySmQCsVEUbcrv+UwTNl0Bn6EfJJLLPftrEBZX674bmeyomWXUDZjPK8y
+         juAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Gic/1R/3waf7AEbQmqRilav4LMcZDIm9OqkrPl/dkdw=;
-        b=CDMHT+FGoUlsGCbUlPy1Wmlm8AMQeuurBA2TXmMJYyhL6Ai1MFmqx7QjiFzSw8QcAM
-         BoyKvGc6/rtNDQZHELk+PFP77APmFfGhodF3tJt2EGYzW9MhJd8+aPfB6D85CVoQGJka
-         GF8pHsjfxjRcrs5ho320GCbQ8Sgetd1KFbEnT4KU/wdALo7Ku5RNCKFjZpN9DB3iZltO
-         1bxpFqPcP1/tcGbPSAR9XTxHVNCvNar4lj9Hi3mAZaL71SPgSr0fBHqjCjZ7PzkE4lCM
-         umWIXiM547pdK1YAsrEsaYE6XH+JXUFSjG1ZShGlWXZtIqkajJmZI/5qhKiN9nCX+IhF
-         +9yg==
-X-Gm-Message-State: AOAM530tQq2+Y01aXUgrp315/Cc5ZU5kfdxc1OJK4qniqoLgJpt8ThRy
-        2pPV/0PIO5EU4z4hRmr3FxJtKA==
-X-Google-Smtp-Source: ABdhPJzfZmjxB95p6UPPpZEUJqs6F8nDa2qW9dBg6llK23fiXXCME4T1/ceTY4MQppy88PcB99Terw==
-X-Received: by 2002:a05:6214:104a:: with SMTP id l10mr4584181qvr.98.1590165678134;
-        Fri, 22 May 2020 09:41:18 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id d6sm7573800qkj.72.2020.05.22.09.41.17
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 22 May 2020 09:41:17 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jcAjV-0006cz-75; Fri, 22 May 2020 13:41:17 -0300
-Date:   Fri, 22 May 2020 13:41:17 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] block/rnbd: Fix an IS_ERR() vs NULL check in
- find_or_create_sess()
-Message-ID: <20200522164117.GJ17583@ziepe.ca>
-References: <20200519120347.GD42765@mwanda>
- <CAMGffEnuk2WfWmwjKy_Sqcuf_xKwzrPpE_o8j3nHM30ADr8HVw@mail.gmail.com>
- <CAMGffEmC215iOmtT_iZizey=jnbgWneE5f5zapYvdJi5WYDM1w@mail.gmail.com>
- <20200522144831.GH17583@ziepe.ca>
- <20200522154403.GN30374@kadam>
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=0gGbPjVIKb0ppLj5bKrwqYuuVIDYRhq+f0+5o5BY50g=;
+        b=MrRW6WrT/vtlHegY312HvjxeJ4PC+ki70PoxqO0Lkgq3w0pIHBKxlfWCrsngzShcHI
+         9Kpi0CNYnLFMDXlFeNSAWgJ/stJ6IDlQO2U8paTmzrLNQIchu1nuzq9mMq1aQbsc4WCM
+         dNAtPbSl+B7Hz7qdOnSqrOIUAFHMHPSVSiWDEgck6eEexRZ7jNfoNaor2j6Ns5cd+x/2
+         dUw2RIXdw8DAOEFuQ/a7ooSx73XoJG7rv2+apqaSB6ijo4gqHi8m1Je3A57lW9BCtYfb
+         9EymjwTbuFnCtIUhzkaCxwD7W0QXU4o6ZplSY2/kXsvy67e2mauScgT/TDkufCEI8yPK
+         v3mQ==
+X-Gm-Message-State: AOAM530m5sQl6x//trIS4zRImuPfeHRB/dqtdR4x3ak9MLrFZXvfTBYf
+        t7XqdSzpo7oeVwtw5tKeZ5nBA27q7NI=
+X-Google-Smtp-Source: ABdhPJzBrlEMsjINYtfL8igkMwLqyoUN2oNb6SAIwAx597gqoEZgA7TbaDCwrkNgdTSN4m35EjTy8Q==
+X-Received: by 2002:a17:902:7b89:: with SMTP id w9mr14436393pll.252.1590167317908;
+        Fri, 22 May 2020 10:08:37 -0700 (PDT)
+Received: from ?IPv6:2605:e000:100e:8c61:892a:d4e5:be12:19f? ([2605:e000:100e:8c61:892a:d4e5:be12:19f])
+        by smtp.gmail.com with ESMTPSA id v9sm3104099pgj.54.2020.05.22.10.08.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 May 2020 10:08:37 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.7-rc
+Message-ID: <6efa4314-0dc4-8d77-0b28-bf53287cf6d0@kernel.dk>
+Date:   Fri, 22 May 2020 11:08:36 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200522154403.GN30374@kadam>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 22, 2020 at 06:44:03PM +0300, Dan Carpenter wrote:
-> On Fri, May 22, 2020 at 11:48:31AM -0300, Jason Gunthorpe wrote:
-> > On Fri, May 22, 2020 at 07:13:08AM +0200, Jinpu Wang wrote:
-> > > On Tue, May 19, 2020 at 2:52 PM Jinpu Wang <jinpu.wang@cloud.ionos.com> wrote:
-> > > >
-> > > > On Tue, May 19, 2020 at 2:04 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> > > > >
-> > > > > The alloc_sess() function returns error pointers, it never returns NULL.
-> > > > >
-> > > > > Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
-> > > > > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > > > Thanks Dan,
-> > > > Reviewed-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-> > > 
-> > > Hi Jason,
-> > > 
-> > > Could you also queue this fix for for-next?
-> > 
-> > Uhh.. Yes OK, but if it doesn't get cc'd to linux-rdma I won't see it..
-> > 
-> 
-> I suspect that we should update MAINTAINERS so that
-> ./scripts/get_maintainer.pl gives the right lists.  Proabably all
-> drivers/block/rnbd/ patches are supposed to go through you?
+Hi Linus,
 
-I think Jens will take then once everything is merged, it is just for
-the next few weeks
+Two fixes for null_blk, for zone mode.
 
-Jason
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/block-5.7-2020-05-22
+
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (2):
+      null_blk: return error for invalid zone size
+      null_blk: don't allow discard for zoned mode
+
+ drivers/block/null_blk_main.c  | 7 +++++++
+ drivers/block/null_blk_zoned.c | 4 ++++
+ 2 files changed, 11 insertions(+)
+
+-- 
+Jens Axboe
+
