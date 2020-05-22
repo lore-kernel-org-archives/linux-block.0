@@ -2,90 +2,169 @@ Return-Path: <SRS0=5dBz=7E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CC7C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 05:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A20C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 05:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E737A20757
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 05:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D486720759
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 05:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Lr2U5tw3"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="aYQyOOGY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728192AbgEVFNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 May 2020 01:13:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
+        id S1725894AbgEVFjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 May 2020 01:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728189AbgEVFNW (ORCPT
+        with ESMTP id S1727924AbgEVFjl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 May 2020 01:13:22 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1054FC061A0E
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 22:13:21 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id e2so11470276eje.13
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 22:13:20 -0700 (PDT)
+        Fri, 22 May 2020 01:39:41 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5472DC08C5C0
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 22:39:41 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id s21so11623352ejd.2
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 22:39:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MWHQvFpaWXA6nLt3wiLhFrrphRE3s7yxYwyGrpAyCCM=;
-        b=Lr2U5tw3AowCbUkTYoqFdKDRVE1y5tShPYT2nKRYPcQSFbe7yLJBuUDAhTM+megEwA
-         aivo5+nWC+g53adSl4NUU0zFcsrVFR7lPcz/Cy0K406aPEMkZOC9zcT8D4rcFJIRASpa
-         JmP0U6C0zTVigc+48r7GpI20gLcm4zgApshrNPruaAS9utb7qEjrxXq9FiJMqzU4oSxK
-         NiTidua7XbaVUmo+hoMpgJMOV8KzYuBT7tAU9KJfFZ3RLcvg7l7i04NK6TNQ4FQLTtea
-         lblwWAlyOOwFH/D/8wAked+Wt6Iv1wS0sY9FscTihu3339ZpKG1Vhx32cG4vK8byv3MK
-         NTXg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=CqYPjIYXrmaZh1pcb7Hru9zoJQGqnxH9Aw5pMpXidZM=;
+        b=aYQyOOGYpTK506neKROafbVlLAM6zZWflTaTxbOTlno9UdTylN2QDKgpzPOPDyFfTF
+         CmoRZ3VWFKuQDI3sZpQxxvEu5MwUfJJBUICT+V+2wdAdlKF3lc7d24impuPgDdfpG629
+         9FJ66bkZBb1gIsL+gwnVw2mxksHPRgd8DMOPM4qJL+6Gvg+DuZvIViNVocpSWoAVgEUW
+         fYoUahjTtCl23DzT7h4Dp66pnB1b+WNdClhsLoi6ADDMhqoZ/nbAdRq+eYAEkAn7vWLe
+         VeROqDTviZ/nzpcySbHjbAaHzDSW+oDsOjK3CL0RAPtnplFbF67tvK0iOQtGxuYgB9/P
+         T1VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MWHQvFpaWXA6nLt3wiLhFrrphRE3s7yxYwyGrpAyCCM=;
-        b=iZQ9Dv+6vfAA93uzR1Zv5XOorBR0rvnsSEZ0nxQvTiuQ1UBOSrEHEYrqKYAL1oVbYd
-         T207FPcZvURai2A14jLeYOnYXB9j2wU+H2x6XeZ+3CNFBQEm1N/k3bVmZekhoNrNvY5Z
-         qUkJf0hLP/SfdrJZDUhwASC97LavY4uM6Pe4nmrndPmt0CdUcSNHoEptzlI8F/uY4e19
-         cuYdsip4h1YjV+MNd/MvpirS4Xfhlt66vsoCw9E0QQESjA7cDQHdLqEU33V6OlCCi3Rx
-         hX2Seq2T4wQFZTlpwBlLwkJ2fk9MhZ54mz6VmM1EdpivR9m4wsrtdO2ktuSEkSNae5vs
-         PThw==
-X-Gm-Message-State: AOAM531mRUyu2tzDeg5wpuZAoyMGJHpGVKO+ad/XDC2EyGVT9b6MXFYu
-        3ZUetXHj58UmB345ZI5bbrO69603F7tczTdkzGzNrg==
-X-Google-Smtp-Source: ABdhPJzZxiF70JkXGmjOELNN0LmRH4kyPtlEx4e9CMFAS4mjQopoe0fUhygSewFtJRDauvv9xcgvb103OXHkbfqDMAQ=
-X-Received: by 2002:a17:907:36d:: with SMTP id rs13mr6765653ejb.478.1590124399660;
- Thu, 21 May 2020 22:13:19 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=CqYPjIYXrmaZh1pcb7Hru9zoJQGqnxH9Aw5pMpXidZM=;
+        b=OILS5kGR6UOxXadgh+QIIF+b8aNgnPUjb97zE9B0h1BQWxSadqWWas5Wj8FakmxPdA
+         dI6y6U12ajTHYyhkxHboeoiwL3DRerj9xl1kcW97tkjwgRqLfnhOljoHZZoX2hGjh/vN
+         +oPvSZpAmhBlMWUU+Bb2BWFCu8dQfwTUsrEZ9nywur50Ro+FNUgpSnxbN45hRTf45SWb
+         GA3sbQZw/7Ft4HgtSxM7T53UgAqJk2KjcqFh/AQVh3hiu6C1dZTpUx+a8d5ePBpEGqk8
+         F4fnpMhK/vEBjy0rCn76dQDbfWK1z1ASP1tRXt9wrm1wuiiQ19puosWX3WT1hUxb0pdA
+         W1Bw==
+X-Gm-Message-State: AOAM5336cF31H/KElRxGe2WtDuhakt7ndlaPuyvBnnDg/SHfvkpSp3mB
+        Rx6tr2aDLV8qtAawGzfYg5LVR+uNq6E7
+X-Google-Smtp-Source: ABdhPJy9uq8m2rKxx7uq0I34Kzy/WwnDjRO8dUM+LKlxkdxUSne7RB9jAb8jIaXI2nuz36i0IY94QQ==
+X-Received: by 2002:a17:906:e2d2:: with SMTP id gr18mr6423821ejb.312.1590125979781;
+        Thu, 21 May 2020 22:39:39 -0700 (PDT)
+Received: from dkxps.local (dslb-002-204-227-207.002.204.pools.vodafone-ip.de. [2.204.227.207])
+        by smtp.gmail.com with ESMTPSA id c12sm6845358ejm.36.2020.05.21.22.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2020 22:39:39 -0700 (PDT)
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-next@vger.kernel.org, bvanassche@acm.org,
+        dledford@redhat.com, jgg@ziepe.ca
+Cc:     axboe@kernel.dk, danil.kipnis@cloud.ionos.com, lkp@intel.com,
+        jinpu.wang@cloud.ionos.com
+Subject: [PATCH] RDMA/rtrs: get rid of the do_next_path while_next_path macros
+Date:   Fri, 22 May 2020 07:39:24 +0200
+Message-Id: <20200522053924.528980-1-danil.kipnis@cloud.ionos.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200520191105.GK31189@ziepe.ca>
+References: <20200520191105.GK31189@ziepe.ca>
 MIME-Version: 1.0
-References: <20200519120347.GD42765@mwanda> <CAMGffEnuk2WfWmwjKy_Sqcuf_xKwzrPpE_o8j3nHM30ADr8HVw@mail.gmail.com>
-In-Reply-To: <CAMGffEnuk2WfWmwjKy_Sqcuf_xKwzrPpE_o8j3nHM30ADr8HVw@mail.gmail.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 22 May 2020 07:13:08 +0200
-Message-ID: <CAMGffEmC215iOmtT_iZizey=jnbgWneE5f5zapYvdJi5WYDM1w@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd: Fix an IS_ERR() vs NULL check in find_or_create_sess()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 19, 2020 at 2:52 PM Jinpu Wang <jinpu.wang@cloud.ionos.com> wrote:
->
-> On Tue, May 19, 2020 at 2:04 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> >
-> > The alloc_sess() function returns error pointers, it never returns NULL.
-> >
-> > Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Thanks Dan,
-> Reviewed-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+The macros do_each_path/while_each_path lead to a smatch warning:
+drivers/infiniband/ulp/rtrs/rtrs-clt.c:1196 rtrs_clt_failover_req() warn: inconsistent indenting
+drivers/infiniband/ulp/rtrs/rtrs-clt.c:2890 rtrs_clt_request() warn: inconsistent indenting
 
-Hi Jason,
+Also checkpatch complains:
+ERROR: Macros with multiple statements should be enclosed in a do - while loop
 
-Could you also queue this fix for for-next?
+The macros are used only in two places: for a normal IO path and for the
+failover path triggered after errors.
 
-Thanks
+Get rid of the macros and just use a for loop iterating over the list
+of paths in both places. It is easier to read and also less lines of code.
+
+Fixes: 6a98d71daea1 ("RDMA/rtrs: client: main functionality")
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+---
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c | 29 ++++++++++++--------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+index 468fdd0d8713..45ea5aa5f406 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+@@ -727,18 +727,6 @@ struct path_it {
+ 	struct rtrs_clt_sess *(*next_path)(struct path_it *it);
+ };
+ 
+-#define do_each_path(path, clt, it) {					\
+-	path_it_init(it, clt);						\
+-	rcu_read_lock();						\
+-	for ((it)->i = 0; ((path) = ((it)->next_path)(it)) &&		\
+-			  (it)->i < (it)->clt->paths_num;		\
+-	     (it)->i++)
+-
+-#define while_each_path(it)						\
+-	path_it_deinit(it);						\
+-	rcu_read_unlock();						\
+-	}
+-
+ /**
+  * list_next_or_null_rr_rcu - get next list element in round-robin fashion.
+  * @head:	the head for the list.
+@@ -1177,7 +1165,10 @@ static int rtrs_clt_failover_req(struct rtrs_clt *clt,
+ 	int err = -ECONNABORTED;
+ 	struct path_it it;
+ 
+-	do_each_path(alive_sess, clt, &it) {
++	rcu_read_lock();
++	for (path_it_init(&it, clt);
++	     (alive_sess = it.next_path(&it)) && it.i < it.clt->paths_num;
++	     it.i++) {
+ 		if (unlikely(READ_ONCE(alive_sess->state) !=
+ 			     RTRS_CLT_CONNECTED))
+ 			continue;
+@@ -1193,7 +1184,9 @@ static int rtrs_clt_failover_req(struct rtrs_clt *clt,
+ 		/* Success path */
+ 		rtrs_clt_inc_failover_cnt(alive_sess->stats);
+ 		break;
+-	} while_each_path(&it);
++	}
++	path_it_deinit(&it);
++	rcu_read_unlock();
+ 
+ 	return err;
+ }
+@@ -2862,7 +2855,9 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
+ 		dma_dir = DMA_TO_DEVICE;
+ 	}
+ 
+-	do_each_path(sess, clt, &it) {
++	rcu_read_lock();
++	for (path_it_init(&it, clt);
++	     (sess = it.next_path(&it)) && it.i < it.clt->paths_num; it.i++) {
+ 		if (unlikely(READ_ONCE(sess->state) != RTRS_CLT_CONNECTED))
+ 			continue;
+ 
+@@ -2887,7 +2882,9 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
+ 		}
+ 		/* Success path */
+ 		break;
+-	} while_each_path(&it);
++	}
++	path_it_deinit(&it);
++	rcu_read_unlock();
+ 
+ 	return err;
+ }
+-- 
+2.25.1
+
