@@ -2,114 +2,116 @@ Return-Path: <SRS0=5dBz=7E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A8DC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 10:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1FDC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 12:18:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4371B20757
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 10:01:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="HnPluOJF"
+	by mail.kernel.org (Postfix) with ESMTP id 99189207F7
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 12:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728396AbgEVKBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 May 2020 06:01:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40258 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728267AbgEVKBX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 May 2020 06:01:23 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221E4C061A0E
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 03:01:22 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id u188so9253668wmu.1
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2020 03:01:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RyxHtd8t+Tnym6Rgfk/b1z6/xAgAd1SgDqjswJTBPeQ=;
-        b=HnPluOJFuyWZ2ZmEnp7WE34nWh83fzfZaugdRb/RgIp3B3UhhAIdNPCeePTwTkn32y
-         OTCuEppurSdXNLugm1Y+bu9BGs8PW/AhkWHQ1NBM4ECKgFTUA+KHgpqd8xXXRGCZw5J4
-         khAyW9C9LXtu9y7EvPqTpxXsYzMVmFPWcSWJa9OzGwG3wcyw0wN6qzA8pah3yWvZwEgS
-         YfefvBkrxQrAHM++e+EgghWkvd5/DaKlvevQYJU6vjcSnFAV+kd9P4vRBr+Q7nU/oGHy
-         KG4/MQJxpGMH9TajPB4/r+GGj0tiG+Xyrfn/BnwHykkZvfS3hrmUt2dpR7pzf5vCW7Ql
-         S4Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RyxHtd8t+Tnym6Rgfk/b1z6/xAgAd1SgDqjswJTBPeQ=;
-        b=B6778rsg1lLNPKiOJ1ZZJ8E5juAZbVY0MMqLKj1PmoJfZTvJPqGtR9hZP2pPa6kgs2
-         V5Yp+F/zNgyq34wXX1BgE/8Bzb6gHSnlFwJ9BASZDZBfoEM1J4ajd41jDosht+x5oGNu
-         uz4jom6LMjjgok6XMwJgU4jKhJYaJW9Yw5IbtIanYwwvbbcCE4ss2Yc46QS/P1aUdzAY
-         /qbNTrjSIintZAuFzcsoTRM96Pa3zKw+tgo3NhIc+OV03qmI/Ax/u6opmP1MPLm6jyye
-         HpVWiRngn1MYT+DGXLT4ZUF4Lc1g+VPegiZhCqPX3ZPnt88FLW2KjFG4akWLGj6B8B/S
-         Wt7g==
-X-Gm-Message-State: AOAM5331/PVivP0qt0u10fHv8ini4K/yGuRnS0bNAYYVzaz1uDNIyxOK
-        iPj33KG5jGPehxeGLcHKQ3QZkQVU4AvEt84iWyF6sVydUw==
-X-Google-Smtp-Source: ABdhPJyCVsG6wWaF1VxfaUETpoayuVhLjiFIiH8pDZdtkv+vqCyWpNVJcDDNCjYoo2AfDxsELPltZ6BD8lCKZrMMIM4=
-X-Received: by 2002:a1c:c242:: with SMTP id s63mr12990862wmf.180.1590141680757;
- Fri, 22 May 2020 03:01:20 -0700 (PDT)
+        id S1729406AbgEVMSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 May 2020 08:18:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52318 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729016AbgEVMSs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 May 2020 08:18:48 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id C3B4CAF73;
+        Fri, 22 May 2020 12:18:48 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [RFC PATCH v4 0/3] bcache: support zoned device as bcache backing device
+Date:   Fri, 22 May 2020 20:18:34 +0800
+Message-Id: <20200522121837.109651-1-colyli@suse.de>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
-References: <20200522082833.1480551-1-haris.phnx@gmail.com>
-In-Reply-To: <20200522082833.1480551-1-haris.phnx@gmail.com>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Fri, 22 May 2020 12:01:10 +0200
-Message-ID: <CAHg0HuwK3FepXP06o-S_y6hukYmF3sMRgU+RweB6EMWdF3y9TQ@mail.gmail.com>
-Subject: Re: [PATCH] RDMA/rtrs: server: use already dereferenced rtrs_sess structure
-To:     haris iqbal <haris.phnx@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 22, 2020 at 10:28 AM <haris.phnx@gmail.com> wrote:
->
-> From: Md Haris Iqbal <haris.phnx@gmail.com>
->
-> The rtrs_sess structure has already been extracted above from the
-> rtrs_srv_sess structure. Use that to avoid redundant dereferencing.
->
-> Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
-> Signed-off-by: Md Haris Iqbal <haris.phnx@gmail.com>
-> ---
->  drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> index 1fc6ece036ff..5ef8988ee75b 100644
-> --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> @@ -1822,13 +1822,13 @@ static int rtrs_rdma_connect(struct rdma_cm_id *cm_id,
->                 /*
->                  * Sanity checks
->                  */
-> -               if (con_num != sess->s.con_num || cid >= sess->s.con_num) {
-> +               if (con_num != s->con_num || cid >= s->con_num) {
->                         rtrs_err(s, "Incorrect request: %d, %d\n",
->                                   cid, con_num);
->                         mutex_unlock(&srv->paths_mutex);
->                         goto reject_w_econnreset;
->                 }
-> -               if (sess->s.con[cid]) {
-> +               if (s->con[cid]) {
->                         rtrs_err(s, "Connection already exists: %d\n",
->                                   cid);
->                         mutex_unlock(&srv->paths_mutex);
-> --
-> 2.25.1
->
+Hi folks,
 
-Acked-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+This is series, now bcache can support zoned device (e.g. host managed
+SMR hard drive) as the backing deice. Currently writeback mode is not
+support yet, which is on the to-do list (requires on-disk super block
+format change).
 
-Thanks Haris.
+The first patch makes bcache to export the zoned information to upper
+layer code, for example formatting zonefs on top of the bcache device.
+By default, zone 0 of the zoned device is fully reserved for bcache
+super block, therefore the reported zones number is 1 less than the
+exact zones number of the physical SMR hard drive.
+
+The second patch handles zone management command for bcache. Indeed
+these zone management commands are wrappered as zone management bios.
+For REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL zone management bios,
+before forwarding the bio to backing device, all cached data covered
+by the resetting zone(s) must be invalidated to keep data consistency.
+For rested zone management bios just minus the bi_sector by data_offset
+and simply forward to the zoned backing device.
+
+The third patch is to make sure after bcache device starts, the cache
+mode cannot be changed to writeback via sysfs interface. Bcache-tools
+is modified to notice users and convert to writeback mode to the default
+writethrough mode when making a bcache device.
+
+There is one thing not addressed by this series, that is re-write the
+bcache super block after REQ_OP_ZONE_RESET_ALL command. There will be
+quite soon that all seq zones device may appear, but it is OK to make
+bcache support such all seq-zones device a bit later.
+
+Now a bcache device created with a zoned SMR drive can pass these test
+cases,
+- read /sys/block/bcache0/queue/zoned, content is 'host-managed'
+- read /sys/block/bcache0/queue/nr_zones, content is number of zones
+  excluding zone 0 of the backing device (reserved for bcache super
+  block).
+- read /sys/block/bcache0/queue/chunk_sectors, content is zone size
+  in sectors.
+- run 'blkzone report /dev/bcache0', all zones information displayed.
+- run 'blkzone reset -o <zone LBA> -c <zones number> /dev/bcache0',
+  conventional zones will reject the command, seqential zones covered
+  by the command range will reset its write pointer to start LBA of
+  their zones. If <zone LBA> is 0 and <zones number> covers all zones,
+  REQ_OP_ZONE_RESET_ALL command will be received and handled by bcache
+  device properly.
+- zonefs can be created on top of the bcache device, with/without cache
+  device attached. All sequential direct write and random read work well
+  and zone reset by 'truncate -s 0 <zone file>' works too.
+- Writeback cache mode does not support yet.
+
+Now all prevous code review comments are addressed by this RFC version.
+Please don't hesitate to offer your opinion on this version.
+
+Thanks in advance for your help.
+
+Coly Li
+---
+Changelog:
+v4: another improved version without any other generic block change.
+v3: an improved version depends on other generic block layer changes.
+v2: the first RFC version for comments and review.
+v1: the initial version posted just for information.
+
+
+Coly Li (3):
+  bcache: export bcache zone information for zoned backing device
+  bcache: handle zone management bios for bcache device
+  bcache: reject writeback cache mode for zoned backing device
+
+ drivers/md/bcache/bcache.h  |  10 +++
+ drivers/md/bcache/request.c | 168 +++++++++++++++++++++++++++++++++++-
+ drivers/md/bcache/super.c   |  98 ++++++++++++++++++++-
+ drivers/md/bcache/sysfs.c   |   5 ++
+ 4 files changed, 279 insertions(+), 2 deletions(-)
+
+-- 
+2.25.0
+
