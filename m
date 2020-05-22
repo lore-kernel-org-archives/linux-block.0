@@ -2,110 +2,68 @@ Return-Path: <SRS0=5dBz=7E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DD9C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 08:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC026C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 09:11:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F2D7207FB
-	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 08:28:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jR5px4X0"
+	by mail.kernel.org (Postfix) with ESMTP id D6B47206B6
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 09:11:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728898AbgEVI2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 May 2020 04:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728814AbgEVI2i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 May 2020 04:28:38 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 210AFC061A0E;
-        Fri, 22 May 2020 01:28:38 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id l17so9325095wrr.4;
-        Fri, 22 May 2020 01:28:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=abcoJk2Ej1/pByjWlWCcArJRiMosXUxELnPioeN+4oM=;
-        b=jR5px4X0Q+1gkBgRMzjiRTeKOkOpX5IYrFjr2mNCwO5SiVYDITah9dUP1ArvhbrpUX
-         OKkjdF+/JnG5ufaYvyKaYY1u8nBGSch6n0z9pFJuAOWSNmY+A2PQbvok8fWc2ffqTnsH
-         tvpBGdVee9FssYsJYBtmPj64znIln9WaQuPQ16ZyEVI2eJ36XMqii4h/EX+ZtckqGYb0
-         VVlV9dxQSB5ZW8D3OeJF8MMasNMYAmkPhJ0kaHcss4kMSBnFspL74638n8EKX9dHE7OJ
-         LKcAC7iUFjgQXNXBstV/iQBaF0IvvnyMUIqS/v8JOzIG6CDETeJIFC6PtqgnGEDyqLM9
-         dLGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=abcoJk2Ej1/pByjWlWCcArJRiMosXUxELnPioeN+4oM=;
-        b=VP87lU6cbM7Tlfc/N3yJlOCU+jL6bjeVxicFraZOmXB83L0H8ZvHK9s1CPcEiRumuW
-         JrVWBoQugnMBUIG6/K6geCJZqeqUJbC+ISjNhLCE3ew1Lrb3ZQcir3nVNGSV6PtA5vSo
-         1iszbB3wRLC5IaJ5dBdfNl4zyyn5WPMEREvtyaU1NfE+tjsdm1cCncEo++ni9fTLoxqe
-         DgNMnKk9N4ZWndW23W+1Rb59LS5ZoxmHzeIZnvy6T5NgvsVkSeRkAyIo1gbESoFL4/6y
-         qLvCLsdMbNu0OrFCrdpZDZoXEqan0+v23gmg1h01PhstOeXbVIs9o61P00CEjHQAcrC+
-         b7AA==
-X-Gm-Message-State: AOAM532OP+HhrVslm9rF3Odcylit9YV8gzhogHfO1Eb2xpDpTelGfV7i
-        IEuMlSOZfqk+UlnXb2iNji3jFt5l0xC2mA==
-X-Google-Smtp-Source: ABdhPJwJVMWClOn9DCvaY7m6jfEebfsMfY/AKU2SXjN5VEzla1Pbllpe9lCEWzHyycXCMEe4VaYDzQ==
-X-Received: by 2002:a5d:5682:: with SMTP id f2mr2339637wrv.382.1590136116592;
-        Fri, 22 May 2020 01:28:36 -0700 (PDT)
-Received: from localhost.localdomain (ip217-160-210-68.pbiaas.com. [217.160.210.68])
-        by smtp.gmail.com with ESMTPSA id t22sm8768630wmj.37.2020.05.22.01.28.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 May 2020 01:28:35 -0700 (PDT)
-From:   haris.phnx@gmail.com
-To:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com
-Cc:     axboe@kernel.dk, dledford@redhat.com, jgg@ziepe.ca,
-        Md Haris Iqbal <haris.phnx@gmail.com>
-Subject: [PATCH] RDMA/rtrs: server: use already dereferenced rtrs_sess structure
-Date:   Fri, 22 May 2020 08:28:33 +0000
-Message-Id: <20200522082833.1480551-1-haris.phnx@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        id S1729582AbgEVJLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 May 2020 05:11:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46386 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728068AbgEVJLw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 May 2020 05:11:52 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 453D9B1FFE;
+        Fri, 22 May 2020 09:11:53 +0000 (UTC)
+Subject: Re: [PATCH 1/6] blk-mq: remove the bio argument to ->prepare_request
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200520170635.2094101-1-hch@lst.de>
+ <20200520170635.2094101-2-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <2351df60-fd7a-4eba-3b05-97ae7f5beb9d@suse.de>
+Date:   Fri, 22 May 2020 11:11:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <20200520170635.2094101-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Md Haris Iqbal <haris.phnx@gmail.com>
+On 5/20/20 7:06 PM, Christoph Hellwig wrote:
+> None of the I/O schedulers actually needs it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/bfq-iosched.c      | 2 +-
+>   block/blk-mq.c           | 2 +-
+>   block/kyber-iosched.c    | 2 +-
+>   block/mq-deadline.c      | 2 +-
+>   include/linux/elevator.h | 2 +-
+>   5 files changed, 5 insertions(+), 5 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-The rtrs_sess structure has already been extracted above from the
-rtrs_srv_sess structure. Use that to avoid redundant dereferencing.
+Cheers,
 
-Fixes: 9cb837480424 ("RDMA/rtrs: server: main functionality")
-Signed-off-by: Md Haris Iqbal <haris.phnx@gmail.com>
----
- drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-index 1fc6ece036ff..5ef8988ee75b 100644
---- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-+++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-@@ -1822,13 +1822,13 @@ static int rtrs_rdma_connect(struct rdma_cm_id *cm_id,
- 		/*
- 		 * Sanity checks
- 		 */
--		if (con_num != sess->s.con_num || cid >= sess->s.con_num) {
-+		if (con_num != s->con_num || cid >= s->con_num) {
- 			rtrs_err(s, "Incorrect request: %d, %d\n",
- 				  cid, con_num);
- 			mutex_unlock(&srv->paths_mutex);
- 			goto reject_w_econnreset;
- 		}
--		if (sess->s.con[cid]) {
-+		if (s->con[cid]) {
- 			rtrs_err(s, "Connection already exists: %d\n",
- 				  cid);
- 			mutex_unlock(&srv->paths_mutex);
+Hannes
 -- 
-2.25.1
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
