@@ -1,234 +1,164 @@
-Return-Path: <SRS0=t9QE=7D=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=5dBz=7E=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D88EC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 23:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D91BDC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 01:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAC0920823
-	for <linux-block@archiver.kernel.org>; Thu, 21 May 2020 23:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8A61207F7
+	for <linux-block@archiver.kernel.org>; Fri, 22 May 2020 01:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rUoh0EqL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jq1hVcNF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729318AbgEUXgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 May 2020 19:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56028 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728537AbgEUXgA (ORCPT
+        id S1726335AbgEVB5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 May 2020 21:57:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29825 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726860AbgEVB5j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 May 2020 19:36:00 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A325DC061A0E
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 16:36:00 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id d7so6913644ote.6
-        for <linux-block@vger.kernel.org>; Thu, 21 May 2020 16:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=kuLdeOsDjtq4btndvocDjcU9xa/QKpm/ZAFygkLZQD0=;
-        b=rUoh0EqLHveWp3JmAv8austkXIK10h/ZbmP/iO2jGai2j9kfjNn19FlOu1A+s7cUi9
-         WKX4MQfU1iBAXfYYg33aC5VonsRXKpCAEqIynepaFwo9iSQjpBKZMlz4YDXmr801D3Cw
-         vyKrq7OhTWEPJUUu0gHafme14RPu6t2Cg7dhm2fldoChmvPt2iqzahr+o2f2vIsCYXWU
-         7D16d20kDrhdyMA/altx7HLHOJ5YBOa6oOvNBQ6C4DMYVNuW3+WsAnBqnvLeXajBggif
-         +vBJKox3zID8l9wuDMyr6f/2s3P38a+CAl6iZNwFPER1EaXyOjOWR0caKiFzOSEBoLpX
-         xJsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=kuLdeOsDjtq4btndvocDjcU9xa/QKpm/ZAFygkLZQD0=;
-        b=YtH4DhxhVz0wrcYr6WWXo0buBGd+okSU+dorxIEAtAaJKmcTQwcZ2DCKLtaWmLhw2e
-         hsqg1mcBY5sdhWK2RpPCBM3LBHNb76/ps4hXLufWBQXF2uTvAWBUCtrXNz7FGVLAedds
-         9RQUJCf3r0nlIU0oy08mQiwD/Rmzo1a1HDtlDIldSHFBjwepgrLmG6t0O0/BhdWc6HLy
-         e/PV0OjEbc2+j04HAL1mtMXVQKBUlY6KNLuH8oS0SJG8ASX+RWQaSQ/R9ldB5I2NKt5z
-         hJG5jjZwFsTzXberi5zEheoGAfri1+xi23lRzjnc/uumYHCZn99uUbAISBDaMXX9pPRx
-         CQVw==
-X-Gm-Message-State: AOAM531mk7PMOxsbouYiJifHs2UheE5a2dG5F7EEr+25KAHFiJzXj/4E
-        xuK/3xDq4+fgSthaS1uUc2Uvcg==
-X-Google-Smtp-Source: ABdhPJxq9NYSUNqGk3KZgFuE6+bBS3i85hFHEJHqR05vwv+zm2qIzHoixf/P7AvUsZ/S1HLdwY2rYA==
-X-Received: by 2002:a9d:4902:: with SMTP id e2mr8835571otf.86.1590104159617;
-        Thu, 21 May 2020 16:35:59 -0700 (PDT)
-Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id l26sm2077279oos.43.2020.05.21.16.35.56
-        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
-        Thu, 21 May 2020 16:35:58 -0700 (PDT)
-Date:   Thu, 21 May 2020 16:35:42 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@eggly.anvils
-To:     Johannes Weiner <hannes@cmpxchg.org>
-cc:     Hugh Dickins <hughd@google.com>, Michal Hocko <mhocko@kernel.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-In-Reply-To: <20200521215855.GB815153@cmpxchg.org>
-Message-ID: <alpine.LSU.2.11.2005211614320.1102@eggly.anvils>
-References: <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com> <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com> <20200520190906.GA558281@chrisdown.name> <20200521095515.GK6462@dhcp22.suse.cz>
- <CA+G9fYvAB9F+Xo0vUsSveKnExkv3cV9-oOG9gBqGEcXsO95m0w@mail.gmail.com> <20200521105801.GL6462@dhcp22.suse.cz> <alpine.LSU.2.11.2005210504110.1185@eggly.anvils> <20200521124444.GP6462@dhcp22.suse.cz> <20200521191746.GB815980@cmpxchg.org>
- <alpine.LSU.2.11.2005211250130.1158@eggly.anvils> <20200521215855.GB815153@cmpxchg.org>
-User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
+        Thu, 21 May 2020 21:57:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590112658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+wDdNyvkCFMdN0Oe8Nl6A+nCz6R/E6o7nQrNSLAaN6Y=;
+        b=Jq1hVcNFqC/jps1reMom+hgCSSEMytcEfBMEx8YjL45JwhfCm9oel2bSxYRVW5MteL4/Xv
+        jY8n5SpRfXcH9FR1DYbrZEsQ/U5Fd8cjNyOwPF+4o4B6brr5y0mRNyqgUHq5fA7DL9qh/u
+        39I96B6dgqwlIcKVY8MfbgQZYE8MhR8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-93omiG20O--1Yrc9dX2vLA-1; Thu, 21 May 2020 21:57:34 -0400
+X-MC-Unique: 93omiG20O--1Yrc9dX2vLA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A36C41005510;
+        Fri, 22 May 2020 01:57:32 +0000 (UTC)
+Received: from T590 (ovpn-13-78.pek2.redhat.com [10.72.13.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BBDD795A9;
+        Fri, 22 May 2020 01:57:23 +0000 (UTC)
+Date:   Fri, 22 May 2020 09:57:19 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>, io-uring@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: io_uring vs CPU hotplug, was Re: [PATCH 5/9] blk-mq: don't set
+ data->ctx and data->hctx in blk_mq_alloc_request_hctx
+Message-ID: <20200522015719.GB755458@T590>
+References: <20200520080357.GA4197@lst.de>
+ <8f893bb8-66a9-d311-ebd8-d5ccd8302a0d@kernel.dk>
+ <448d3660-0d83-889b-001f-a09ea53fa117@kernel.dk>
+ <87tv0av1gu.fsf@nanos.tec.linutronix.de>
+ <2a12a7aa-c339-1e51-de0d-9bc6ced14c64@kernel.dk>
+ <87eereuudh.fsf@nanos.tec.linutronix.de>
+ <20200521022746.GA730422@T590>
+ <87367tvh6g.fsf@nanos.tec.linutronix.de>
+ <20200521092340.GA751297@T590>
+ <87pnaxt9nv.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87pnaxt9nv.fsf@nanos.tec.linutronix.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 21 May 2020, Johannes Weiner wrote:
-> On Thu, May 21, 2020 at 01:06:28PM -0700, Hugh Dickins wrote:
-> > On Thu, 21 May 2020, Johannes Weiner wrote:
-> > > do_memsw_account() used to be automatically false when the cgroup
-> > > controller was disabled. Now that it's replaced by
-> > > cgroup_memory_noswap, for which this isn't true, make the
-> > > mem_cgroup_disabled() checks explicit in the swap control API.
-> > > 
-> > > [hannes@cmpxchg.org: use mem_cgroup_disabled() in all API functions]
-> > > Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> > > Debugged-by: Hugh Dickins <hughd@google.com>
-> > > Debugged-by: Michal Hocko <mhocko@kernel.org>
-> > > Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
-> > > ---
-> > >  mm/memcontrol.c | 47 +++++++++++++++++++++++++++++++++++++++++------
-> > >  1 file changed, 41 insertions(+), 6 deletions(-)
-> > 
-> > I'm certainly not against a mem_cgroup_disabled() check in the only
-> > place that's been observed to need it, as a fixup to merge into your
-> > original patch; but this seems rather an over-reaction - and I'm a
-> > little surprised that setting mem_cgroup_disabled() doesn't just
-> > force cgroup_memory_noswap, saving repetitious checks elsewhere
-> > (perhaps there's a difficulty in that, I haven't looked).
+On Thu, May 21, 2020 at 08:39:16PM +0200, Thomas Gleixner wrote:
+> Ming,
 > 
-> Fair enough, I changed it to set the flag at initialization time if
-> mem_cgroup_disabled(). I was never a fan of the old flags, where it
-> was never clear what was commandline, and what was internal runtime
-> state - do_swap_account? really_do_swap_account? But I think it's
-> straight-forward in this case now.
+> Ming Lei <ming.lei@redhat.com> writes:
+> > On Thu, May 21, 2020 at 10:13:59AM +0200, Thomas Gleixner wrote:
+> >> Ming Lei <ming.lei@redhat.com> writes:
+> >> > On Thu, May 21, 2020 at 12:14:18AM +0200, Thomas Gleixner wrote:
+> >> > - otherwise, the kthread just retries and retries to allocate & release,
+> >> > and sooner or later, its time slice is consumed, and migrated out, and the
+> >> > cpu hotplug handler will get chance to run and move on, then the cpu is
+> >> > shutdown.
+> >> 
+> >> 1) This is based on the assumption that the kthread is in the SCHED_OTHER
+> >>    scheduling class. Is that really a valid assumption?
+> >
+> > Given it is unlikely path, we can add msleep() before retrying when INACTIVE bit
+> > is observed by current thread, and this way can avoid spinning and should work
+> > for other schedulers.
 > 
-> > Historically, I think we've added mem_cgroup_disabled() checks
-> > (accessing a cacheline we'd rather avoid) where they're necessary,
-> > rather than at every "interface".
+> That should work, but pretty is something else
 > 
-> To me that always seemed like bugs waiting to happen. Like this one!
+> >> 
+> >> 2) What happens in the following scenario:
+> >> 
+> >>    unplug
+> >> 
+> >>      mq_offline
+> >>        set_ctx_inactive()
+> >>        drain_io()
+> >>        
+> >>    io_kthread()
+> >>        try_queue()
+> >>        wait_on_ctx()
+> >> 
+> >>    Can this happen and if so what will wake up that thread?
+> >
+> > drain_io() releases all tag of this hctx, then wait_on_ctx() will be waken up
+> > after any tag is released.
 > 
-> It's a jump label nowadays, so I've been liberal with these to avoid
-> subtle bugs.
+> drain_io() is already done ...
 > 
-> > And you seem to be in a very "goto out" mood today - we all have
-> > our "goto out" days, alternating with our "return 0" days :)
+> So looking at that thread function:
 > 
-> :-)
+> static int io_sq_thread(void *data)
+> {
+> 	struct io_ring_ctx *ctx = data;
 > 
-> But I agree, best to keep this fixup self-contained and defer anything
-> else to separate cleanup patches.
+>         while (...) {
+>               ....
+> 	      to_submit = io_sqring_entries(ctx);
 > 
-> How about the below? It survives a swaptest with cgroup_disable=memory
-> for me.
+> --> preemption
+> 
+> hotplug runs
+>    mq_offline()
+>       set_ctx_inactive();
+>       drain_io();
+>       finished();
+> 
+> --> thread runs again
+> 
+>       mutex_lock(&ctx->uring_lock);
+>       ret = io_submit_sqes(ctx, to_submit, NULL, -1, true);
+>       mutex_unlock(&ctx->uring_lock);
+> 
+>       ....
+> 
+>       if (!to_submit || ret == -EBUSY)
+>           ...
+>       	  wait_on_ctx();
+> 
+> Can this happen or did drain_io() already take care of the 'to_submit'
+> items and the call to io_submit_sqes() turns into a zero action ?
+> 
+> If the above happens then nothing will wake it up because the context
+> draining is done and finished.
 
-I like this version *a lot*, thank you. I got worried for a bit by
-the "#define cgroup_memory_noswap 1" when #ifndef CONFIG_MEMCG_SWAP,
-but now realize that fits perfectly.
+As Jens replied, you mixed the ctx from io uring and blk-mq, both are in
+two worlds.
 
-> 
-> Hugh, I started with your patch, which is why I kept you as the
-> author, but as the patch now (and arguably the previous one) is
-> sufficiently different, I dropped that now. I hope that's okay.
+Any wait in this percpu kthread should just wait for generic resource,
+not directly related with blk-mq's inactive hctx. Once this thread is
+migrated to other online cpu, it will move on.
 
-Absolutely okay, these are yours: I was a little uncomfortable to
-see me on the From line before, but it also seemed just too petty
-to insist that my name be removed.
 
-(By the way, off-topic for this particular issue, but advance warning
-that I hope to post a couple of patches to __read_swap_cache_async()
-before the end of the day, first being fixup to some of your mods -
-I suspect you got it working well enough, and intended to come back
-to check a few details later, but never quite got around to that.)
+Thanks,
+Ming
 
-> 
-> ---
-> From d9e7ed15d1c9248a3fd99e35e82437549154dac7 Mon Sep 17 00:00:00 2001
-> From: Johannes Weiner <hannes@cmpxchg.org>
-> Date: Thu, 21 May 2020 17:44:25 -0400
-> Subject: [PATCH] mm: memcontrol: prepare swap controller setup for integration
->  fix
-> 
-> Fix crash with cgroup_disable=memory:
-> 
-> > > > > + mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8NRK0BPF6XF
-> > > > > mke2fs 1.43.8 (1-Jan-2018)
-> > > > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
-> > > > > Filesystem UUID: 3bb1a285-2cb4-44b4-b6e8-62548f3ac620
-> > > > > Superblock backups stored on blocks:
-> > > > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-> > > > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-> > > > > 102400000, 214990848
-> > > > > Allocating group tables:    0/7453                           done
-> > > > > Writing inode tables:    0/7453                           done
-> > > > > Creating journal (262144 blocks): [   35.502102] BUG: kernel NULL
-> > > > > pointer dereference, address: 000000c8
-> > > > > [   35.508372] #PF: supervisor read access in kernel mode
-> > > > > [   35.513506] #PF: error_code(0x0000) - not-present page
-> > > > > [   35.518638] *pde = 00000000
-> > > > > [   35.521514] Oops: 0000 [#1] SMP
-> > > > > [   35.524652] CPU: 0 PID: 145 Comm: kswapd0 Not tainted
-> > > > > 5.7.0-rc6-next-20200519+ #1
-> > > > > [   35.532121] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
-> > > > > 2.2 05/23/2018
-> > > > > [   35.539507] EIP: mem_cgroup_get_nr_swap_pages+0x28/0x60
-> 
-> Swap accounting used to be implied-disabled when the cgroup controller
-> was disabled. Restore that for the new cgroup_memory_noswap, so that
-> we bail out of this function instead of dereferencing a NULL memcg.
-> 
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Debugged-by: Hugh Dickins <hughd@google.com>
-> Debugged-by: Michal Hocko <mhocko@kernel.org>
-> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
-
-Acked-by: Hugh Dickins <hughd@google.com>
-
-> ---
->  mm/memcontrol.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index 3e000a316b59..e3b785d6e771 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -7075,7 +7075,11 @@ static struct cftype memsw_files[] = {
->  
->  static int __init mem_cgroup_swap_init(void)
->  {
-> -	if (mem_cgroup_disabled() || cgroup_memory_noswap)
-> +	/* No memory control -> no swap control */
-> +	if (mem_cgroup_disabled())
-> +		cgroup_memory_noswap = true;
-> +
-> +	if (cgroup_memory_noswap)
->  		return 0;
->  
->  	WARN_ON(cgroup_add_dfl_cftypes(&memory_cgrp_subsys, swap_files));
-> -- 
-> 2.26.2
