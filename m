@@ -2,147 +2,109 @@ Return-Path: <SRS0=SpOq=7F=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6E2C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 23 May 2020 07:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A08AC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 23 May 2020 15:20:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2B4A2073B
-	for <linux-block@archiver.kernel.org>; Sat, 23 May 2020 07:46:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L14BLNKI"
+	by mail.kernel.org (Postfix) with ESMTP id 74F0120787
+	for <linux-block@archiver.kernel.org>; Sat, 23 May 2020 15:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725535AbgEWHqY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 May 2020 03:46:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725294AbgEWHqX (ORCPT
+        id S2387863AbgEWPUE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 May 2020 11:20:04 -0400
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:37963 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387815AbgEWPUD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 May 2020 03:46:23 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D65C6C061A0E
-        for <linux-block@vger.kernel.org>; Sat, 23 May 2020 00:46:22 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id x22so7818299lfd.4
-        for <linux-block@vger.kernel.org>; Sat, 23 May 2020 00:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TrivRHaV0EYW9yCB4SkPi2X/Wga8CUn0A9+dhuceNIY=;
-        b=L14BLNKIpakDUIX3xE/egAKjU0I12UkuqxAoGoR35CSCKrkfugNy+AHdwYoIAGpfKj
-         RUqVtaGqeBAdwadS9f7/zW8PS6czYvCSt/k9qAkhxtmVK08W2Rsm/DO3SCxaUr9tvUiD
-         kwzdEH8ZVl4TlMUZ5hirdUOoJrvXpTtDrT3JkVVwTD2k+3Bk5lPkva7+CkHlz9WSbq3Z
-         rbpUqFBt4Mo6NxQJ7vOrZQOvNrnLjqevHXbun9Gay0h1WWsvXUKTnK5Yd7uQ0b7/IvI9
-         12lVx8/bOLqM98XgkGkeo1ZSlp5TWPW2IlnAyHe8W2dEn0o867QuJOmIUBkTxOtRRZEp
-         qyIA==
+        Sat, 23 May 2020 11:20:03 -0400
+Received: by mail-pj1-f43.google.com with SMTP id t8so4219934pju.3
+        for <linux-block@vger.kernel.org>; Sat, 23 May 2020 08:20:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TrivRHaV0EYW9yCB4SkPi2X/Wga8CUn0A9+dhuceNIY=;
-        b=njup5+8z3w90l5TtmYhrkj7W03woz+Ogg5NdzVXy6UyY+9MtfQ45e4/WKWiETpVDjZ
-         Wn6jh5jeKB2CHEPSu6uByYnwJbJalhTLnJXgbtj3ZelonBavmJJAQkUgrVQpyRWYVOMb
-         3W4UnzUnOr5nb+WxuqNxH4iMny+k3XdK0yrHHRyXxlF1eYm6d4bcepUKNm/kRNkJvQfR
-         Fi0KHv+MvZM2GMYOQIVKQ/SNbXc2JXomN5DzTCXYBAiIOaffiW8qWZ4161CKWVX7Sdyg
-         sJWGkAziHrW4wDMhvxKP5iFjz+e9HGtjoeDKCicBbfrBdTRZ1k2mz/wN8mC3NyOn1yz0
-         Iurw==
-X-Gm-Message-State: AOAM531NOoJH/Tn8gP9EhBg2i3O/A5PqvRI6icmRzNhU/7lPG3v2M8ey
-        jBrBqxhrVlgMmqBFcSmgnZh/oQTGuGXFZx3O7VOxs6DK
-X-Google-Smtp-Source: ABdhPJzmxPg2qFVR9zsNqWI9D0KnTDQHcHX2xd0tOEdsa5CTLFAVIi4y8esScXNtLtQJ+YeJ9rYMxQAt8nBXn52DeAQ=
-X-Received: by 2002:a19:6a10:: with SMTP id u16mr9421774lfu.105.1590219981201;
- Sat, 23 May 2020 00:46:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200513095443.2038859-1-ming.lei@redhat.com>
-In-Reply-To: <20200513095443.2038859-1-ming.lei@redhat.com>
-From:   Baolin Wang <baolin.wang7@gmail.com>
-Date:   Sat, 23 May 2020 15:45:55 +0800
-Message-ID: <CADBw62o9eTQDJ9RvNgEqSpXmg6Xcq=2TxH0Hfxhp29uF2W=TXA@mail.gmail.com>
-Subject: Re: [PATCH 0/9] blk-mq: support batching dispatch from scheduler
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=apssdwq+tyl1tas2Q698AKqtFc7kUObUQOlIuUV3CxE=;
+        b=I8Ylch2vScXuldCJGxP1NmPyat5gpF5gBeTqg1tZqL0R3kAmjJNtnQHd7fRx8cb0in
+         nTxwQ1RxFWKQAhc993ZR01XTXjlFS8thsXSG7WdTx36sC5+ilqN1ssMQwbXs0s/wrd37
+         StHXeX38TYOTFMlpgALtrJgZvWcUP63msnrToC4/kz0dbGLsaGYpRe0TZHnXaNFYUTpw
+         yzyJTEWwEtX3eAQanKJCFO+MuCkiNd9USUVeh28JWdeMSw2m+1mwuyRkyIOasNaoo1Fb
+         FhdbvuuU7pNbPFsKV1Yi+NiSMuW54NDZbwaMzOrhQ6/XRFda1bflH2J7JGw9D8STfV19
+         nOWg==
+X-Gm-Message-State: AOAM533KfFV9TB0vRVhaXvayZMNs70r0qrDRj8sc3USM0c8QVYGIkfum
+        sENcUc704BveiRcykGTjEH3V85IY
+X-Google-Smtp-Source: ABdhPJwS6ypcfvNJZ+NVY/GiTkl0ebD6qR5lYHnsLzfRkgVs7hhaaoRK3CSZVp80UiJgQZGXNblrRA==
+X-Received: by 2002:a17:90a:d56:: with SMTP id 22mr10286253pju.187.1590247201397;
+        Sat, 23 May 2020 08:20:01 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:e001:10c:9a49:9da9? ([2601:647:4000:d7:e001:10c:9a49:9da9])
+        by smtp.gmail.com with ESMTPSA id f3sm9130627pfd.30.2020.05.23.08.19.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 23 May 2020 08:20:00 -0700 (PDT)
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v3
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200520170635.2094101-1-hch@lst.de>
+ <0cbc37cf-5439-c68c-3581-b3c436932388@acm.org> <20200521025744.GC735749@T590>
+ <9249e1cc-b6f2-010e-78d2-ead5a1b93464@acm.org> <20200521043305.GA741019@T590>
+ <7accb5b2-6c7d-0e0d-56df-d06e8d9ac5af@acm.org> <20200522023923.GC755458@T590>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <26169cd9-49b8-b949-aaa3-9745e821c86c@acm.org>
+Date:   Sat, 23 May 2020 08:19:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200522023923.GC755458@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On 2020-05-21 19:39, Ming Lei wrote:
+> You may argue that two hw queue may share single managed interrupt, that
+> is possible if driver plays the trick. But if driver plays the trick in
+> this way, it is driver's responsibility to guarantee that the managed
+> irq won't be shutdown if either of the two hctxs are active, such as,
+> making sure that hctx->cpumask + hctx->cpumask <= this managed interrupt's affinity.
+> It is definitely one strange enough case, and this patch doesn't
+> suppose to cover this strange case. But, this patch won't break this
+> case. Also just be curious, do you have such in-tree case? and are you
+> sure the driver uses managed interrupt?
 
-On Wed, May 13, 2020 at 5:55 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Hi Guys,
->
-> More and more drivers want to get batching requests queued from
-> block layer, such as mmc[1], and tcp based storage drivers[2]. Also
-> current in-tree users have virtio-scsi, virtio-blk and nvme.
->
-> For none, we already support batching dispatch.
->
-> But for io scheduler, every time we just take one request from scheduler
-> and pass the single request to blk_mq_dispatch_rq_list(). This way makes
-> batching dispatch not possible when io scheduler is applied. One reason
-> is that we don't want to hurt sequential IO performance, becasue IO
-> merge chance is reduced if more requests are dequeued from scheduler
-> queue.
->
-> Tries to start the support by dequeuing more requests from scheduler
-> if budget is enough and device isn't busy.
->
-> Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
->
-> Patches can be found from the following tree too:
->
->         https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-batching-submission
->
-> Patch 1 ~ 7 are improvement and cleanup, which can't applied without
-> supporting batching dispatch.
->
-> Patch 8 ~ 9 starts to support batching dispatch from scheduler.
+I'm concerned about the block drivers that use RDMA (NVMeOF, SRP, iSER,
+...). The functions that accept an interrupt vector argument
+(comp_vector), namely ib_alloc_cq() and ib_create_cq(), can be used in
+such a way that completion interrupts are handled on another CPU than
+those in hctx->cpumask.
 
-Sorry for late reply. I've tested your patch set and got some better
-performance. Thanks.
-Tested-by: Baolin Wang <baolin.wang7@gmail.com>
-
-> Please review and comment!
->
->
-> [1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
-> [2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
->
->
-> Ming Lei (9):
->   blk-mq: pass request queue into get/put budget callback
->   blk-mq: pass hctx to blk_mq_dispatch_rq_list
->   blk-mq: don't predicate last flag in blk_mq_dispatch_rq_list
->   blk-mq: move getting driver tag and bugget into one helper
->   blk-mq: move .queue_rq code into one helper
->   blk-mq: move code for handling partial dispatch into one helper
->   blk-mq: remove dead check from blk_mq_dispatch_rq_list
->   blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
->   blk-mq: support batching dispatch in case of io scheduler
->
->  block/blk-mq-sched.c    |  96 ++++++++++++++--
->  block/blk-mq.c          | 248 +++++++++++++++++++++-------------------
->  block/blk-mq.h          |  15 +--
->  drivers/scsi/scsi_lib.c |   8 +-
->  include/linux/blk-mq.h  |   4 +-
->  5 files changed, 226 insertions(+), 145 deletions(-)
->
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Baolin Wang <baolin.wang7@gmail.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
->
-> --
-> 2.25.2
->
-
-
--- 
-Baolin Wang
+Bart.
