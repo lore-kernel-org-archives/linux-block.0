@@ -2,178 +2,255 @@ Return-Path: <SRS0=kLuB=7H=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54B8C433DF
-	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 08:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4465CC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 09:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC45A20776
-	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 08:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D1922071A
+	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 09:21:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqqQJeS1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731238AbgEYIOc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 May 2020 04:14:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54498 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730769AbgEYIOV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 May 2020 04:14:21 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id E9109AC4A;
-        Mon, 25 May 2020 08:14:21 +0000 (UTC)
-Subject: Re: [RFC PATCH v4 0/3] bcache: support zoned device as bcache backing
- device
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20200522121837.109651-1-colyli@suse.de>
- <CY4PR04MB3751BEA457F5B95A4D6EFB01E7B30@CY4PR04MB3751.namprd04.prod.outlook.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- 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
-Message-ID: <f9b8d7a4-2cdb-9c65-81a7-a1fbabb47159@suse.de>
-Date:   Mon, 25 May 2020 16:14:15 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        id S2389339AbgEYJVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 May 2020 05:21:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39801 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389352AbgEYJVN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 May 2020 05:21:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590398470;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bHwc3ISLSs9+E/DWUI7MgmeV4rADM3VzcEPWbpT0roA=;
+        b=EqqQJeS1lBnOf0GM0q26UDo4A5AG30oYVs0tNjj7+OfzC5EWXavlEtElCz0BkyPDGsui4g
+        Z98TnTpG12itJAxjII6W/zt1XQidN6oXZ/ZBqTtftJTBPGQGnF+D+t4P8WsMr8tz4N1RsV
+        KSqn34sFinTxeo44cQwKXCP6elEQthM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-n4gfDXT5MU2MZbN9N8qF0g-1; Mon, 25 May 2020 05:21:05 -0400
+X-MC-Unique: n4gfDXT5MU2MZbN9N8qF0g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E8D4107ACCA;
+        Mon, 25 May 2020 09:21:03 +0000 (UTC)
+Received: from T590 (ovpn-12-137.pek2.redhat.com [10.72.12.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 248AD19D61;
+        Mon, 25 May 2020 09:20:54 +0000 (UTC)
+Date:   Mon, 25 May 2020 17:20:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH 6/6] blk-mq: drain I/O when all CPUs in a hctx are offline
+Message-ID: <20200525092050.GA802845@T590>
+References: <20200520170635.2094101-1-hch@lst.de>
+ <20200520170635.2094101-7-hch@lst.de>
+ <98028672-be06-fb18-8cb3-b4ae1422caf9@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <CY4PR04MB3751BEA457F5B95A4D6EFB01E7B30@CY4PR04MB3751.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98028672-be06-fb18-8cb3-b4ae1422caf9@suse.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/25 13:25, Damien Le Moal wrote:
-> On 2020/05/22 21:19, Coly Li wrote:
->> Hi folks,
->>
->> This is series, now bcache can support zoned device (e.g. host managed
->> SMR hard drive) as the backing deice. Currently writeback mode is not
->> support yet, which is on the to-do list (requires on-disk super block
->> format change).
->>
->> The first patch makes bcache to export the zoned information to upper
->> layer code, for example formatting zonefs on top of the bcache device.
->> By default, zone 0 of the zoned device is fully reserved for bcache
->> super block, therefore the reported zones number is 1 less than the
->> exact zones number of the physical SMR hard drive.
->>
->> The second patch handles zone management command for bcache. Indeed
->> these zone management commands are wrappered as zone management bios.
->> For REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL zone management bios,
->> before forwarding the bio to backing device, all cached data covered
->> by the resetting zone(s) must be invalidated to keep data consistency.
->> For rested zone management bios just minus the bi_sector by data_offset
->> and simply forward to the zoned backing device.
->>
->> The third patch is to make sure after bcache device starts, the cache
->> mode cannot be changed to writeback via sysfs interface. Bcache-tools
->> is modified to notice users and convert to writeback mode to the default
->> writethrough mode when making a bcache device.
->>
->> There is one thing not addressed by this series, that is re-write the
->> bcache super block after REQ_OP_ZONE_RESET_ALL command. There will be
->> quite soon that all seq zones device may appear, but it is OK to make
->> bcache support such all seq-zones device a bit later.
->>
->> Now a bcache device created with a zoned SMR drive can pass these test
->> cases,
->> - read /sys/block/bcache0/queue/zoned, content is 'host-managed'
->> - read /sys/block/bcache0/queue/nr_zones, content is number of zones
->>   excluding zone 0 of the backing device (reserved for bcache super
->>   block).
->> - read /sys/block/bcache0/queue/chunk_sectors, content is zone size
->>   in sectors.
->> - run 'blkzone report /dev/bcache0', all zones information displayed.
->> - run 'blkzone reset -o <zone LBA> -c <zones number> /dev/bcache0',
->>   conventional zones will reject the command, seqential zones covered
->>   by the command range will reset its write pointer to start LBA of
->>   their zones. If <zone LBA> is 0 and <zones number> covers all zones,
->>   REQ_OP_ZONE_RESET_ALL command will be received and handled by bcache
->>   device properly.
->> - zonefs can be created on top of the bcache device, with/without cache
->>   device attached. All sequential direct write and random read work well
->>   and zone reset by 'truncate -s 0 <zone file>' works too.
->> - Writeback cache mode does not support yet.
->>
->> Now all prevous code review comments are addressed by this RFC version.
->> Please don't hesitate to offer your opinion on this version.
->>
->> Thanks in advance for your help.
+On Fri, May 22, 2020 at 11:25:42AM +0200, Hannes Reinecke wrote:
+> On 5/20/20 7:06 PM, Christoph Hellwig wrote:
+> > From: Ming Lei <ming.lei@redhat.com>
+> > 
+> > Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
+> > up queue mapping. Thomas mentioned the following point[1]:
+> > 
+> > "That was the constraint of managed interrupts from the very beginning:
+> > 
+> >   The driver/subsystem has to quiesce the interrupt line and the associated
+> >   queue _before_ it gets shutdown in CPU unplug and not fiddle with it
+> >   until it's restarted by the core when the CPU is plugged in again."
+> > 
+> > However, current blk-mq implementation doesn't quiesce hw queue before
+> > the last CPU in the hctx is shutdown.  Even worse, CPUHP_BLK_MQ_DEAD is a
+> > cpuhp state handled after the CPU is down, so there isn't any chance to
+> > quiesce the hctx before shutting down the CPU.
+> > 
+> > Add new CPUHP_AP_BLK_MQ_ONLINE state to stop allocating from blk-mq hctxs
+> > where the last CPU goes away, and wait for completion of in-flight
+> > requests.  This guarantees that there is no inflight I/O before shutting
+> > down the managed IRQ.
+> > 
+> > Add a BLK_MQ_F_STACKING and set it for dm-rq and loop, so we don't need
+> > to wait for completion of in-flight requests from these drivers to avoid
+> > a potential dead-lock. It is safe to do this for stacking drivers as those
+> > do not use interrupts at all and their I/O completions are triggered by
+> > underlying devices I/O completion.
+> > 
+> > [1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > [hch: different retry mechanism, merged two patches, minor cleanups]
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >   block/blk-mq-debugfs.c     |   2 +
+> >   block/blk-mq-tag.c         |   8 +++
+> >   block/blk-mq.c             | 114 ++++++++++++++++++++++++++++++++++++-
+> >   drivers/block/loop.c       |   2 +-
+> >   drivers/md/dm-rq.c         |   2 +-
+> >   include/linux/blk-mq.h     |  10 ++++
+> >   include/linux/cpuhotplug.h |   1 +
+> >   7 files changed, 135 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> > index 96b7a35c898a7..15df3a36e9fa4 100644
+> > --- a/block/blk-mq-debugfs.c
+> > +++ b/block/blk-mq-debugfs.c
+> > @@ -213,6 +213,7 @@ static const char *const hctx_state_name[] = {
+> >   	HCTX_STATE_NAME(STOPPED),
+> >   	HCTX_STATE_NAME(TAG_ACTIVE),
+> >   	HCTX_STATE_NAME(SCHED_RESTART),
+> > +	HCTX_STATE_NAME(INACTIVE),
+> >   };
+> >   #undef HCTX_STATE_NAME
+> > @@ -239,6 +240,7 @@ static const char *const hctx_flag_name[] = {
+> >   	HCTX_FLAG_NAME(TAG_SHARED),
+> >   	HCTX_FLAG_NAME(BLOCKING),
+> >   	HCTX_FLAG_NAME(NO_SCHED),
+> > +	HCTX_FLAG_NAME(STACKING),
+> >   };
+> >   #undef HCTX_FLAG_NAME
+> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > index c27c6dfc7d36e..3925d1e55bc8f 100644
+> > --- a/block/blk-mq-tag.c
+> > +++ b/block/blk-mq-tag.c
+> > @@ -180,6 +180,14 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+> >   	sbitmap_finish_wait(bt, ws, &wait);
+> >   found_tag:
+> > +	/*
+> > +	 * Give up this allocation if the hctx is inactive.  The caller will
+> > +	 * retry on an active hctx.
+> > +	 */
+> > +	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state))) {
+> > +		blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
+> > +		return -1;
+> > +	}
+> >   	return tag + tag_offset;
+> >   }
+> I really wish we could have a dedicated NO_TAG value; returning
+> -1 for an unsigned int always feels dodgy.
+> And we could kill all the various internal definitions in drivers/scsi ...
 > 
-> Coly,
-> 
-> One more thing: your patch series lacks support for REQ_OP_ZONE_APPEND. It would
-> be great to add that. As is, since you do not set the max_zone_append_sectors
-> queue limit for the bcache device, that command will not be issued by the block
-> layer. But zonefs (and btrfs) will use zone append in (support for zonefs is
-> queued already in 5.8, btrfs will come later).
+> Hmm?
 
-Hi Damien,
-
-Thank you for the suggestion, I will work on it now and post in next
-version.
+Good catch.
 
 > 
-> If bcache writethrough policy results in a data write to be issued to both the
-> backend device and the cache device, then some special code will be needed:
-> these 2 BIOs will need to be serialized since the actual write location of a
-> zone append command is known only on completion of the command. That is, the
-> zone append BIO needs to be issued to the backend device first, then to the
-> cache SSD device as a regular write once the zone append completes and its write
-> location is known.
-> 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 42aee2978464b..672c7e3f61243 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -375,14 +375,32 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+> >   			e->type->ops.limit_depth(data->cmd_flags, data);
+> >   	}
+> > +retry:
+> >   	data->ctx = blk_mq_get_ctx(q);
+> >   	data->hctx = blk_mq_map_queue(q, data->cmd_flags, data->ctx);
+> >   	if (!(data->flags & BLK_MQ_REQ_INTERNAL))
+> >   		blk_mq_tag_busy(data->hctx);
+> > +	/*
+> > +	 * Waiting allocations only fail because of an inactive hctx.  In that
+> > +	 * case just retry the hctx assignment and tag allocation as CPU hotplug
+> > +	 * should have migrated us to an online CPU by now.
+> > +	 */
+> >   	tag = blk_mq_get_tag(data);
+> > -	if (tag == BLK_MQ_TAG_FAIL)
+> > -		return NULL;
+> > +	if (tag == BLK_MQ_TAG_FAIL) {
+> > +		if (data->flags & BLK_MQ_REQ_NOWAIT)
+> > +			return NULL;
+> > +
+> > +		/*
+> > +		 * All kthreads that can perform I/O should have been moved off
+> > +		 * this CPU by the time the the CPU hotplug statemachine has
+> > +		 * shut down a hctx.  But better be sure with an extra sanity
+> > +		 * check.
+> > +		 */
+> > +		if (WARN_ON_ONCE(current->flags & PF_KTHREAD))
+> > +			return NULL;
+> > +		goto retry;
+> > +	}
+> >   	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+> >   }
+> > @@ -2324,6 +2342,86 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+> >   	return -ENOMEM;
+> >   }
+> > +struct rq_iter_data {
+> > +	struct blk_mq_hw_ctx *hctx;
+> > +	bool has_rq;
+> > +};
+> > +
+> > +static bool blk_mq_has_request(struct request *rq, void *data, bool reserved)
+> > +{
+> > +	struct rq_iter_data *iter_data = data;
+> > +
+> > +	if (rq->mq_hctx != iter_data->hctx)
+> > +		return true;
+> > +	iter_data->has_rq = true;
+> > +	return false;
+> > +}
+> > +
+> > +static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
+> > +{
+> > +	struct blk_mq_tags *tags = hctx->sched_tags ?
+> > +			hctx->sched_tags : hctx->tags;
+> > +	struct rq_iter_data data = {
+> > +		.hctx	= hctx,
+> > +	};
+> > +
+> > +	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
+> > +	return data.has_rq;
+> > +}
+> > +
+> To my reading this would only work reliably if we run the iteration on one
+> of the cpus in the corresponding mask for the hctx.
+> Yet I fail to see any provision for this neither here nor in the previous
+> patch
+> How do you guarantee that?
+> Or is there some implicit mechanism which I've missed?
 
-Copied. It should be OK for bcache. For writethrough mode the data will
-be inserted into SSD only after bio to the backing storage accomplished.
+Yeah, it is guaranteed by memory barrier.
 
-Thank you for all your comments, I start to work on your comments on the
-series and reply your comments (maybe with more questions) latter.
+[1] tag allocation path
 
-Coly Li
+sbitmap_get()	/* smp_mb() is implied */
+test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)
 
+[2] cpu is going to offline
+
+set_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)
+smp_mb__after_atomic();
+blk_mq_hctx_has_requests()
+	blk_mq_all_tag_iter
+		bt_tags_for_each
+			sbitmap_for_each_set
+
+So setting tag bit and reading BLK_MQ_S_INACTIVE is ordered, and
+setting BLK_MQ_S_INACTIVE and readding tag bit is ordered too.
+
+Then either one request is re-tried to be allocated on another online CPU,
+or the request is allocated & drained before the cpu is going to
+offline.
+
+
+Thanks,
+Ming
 
