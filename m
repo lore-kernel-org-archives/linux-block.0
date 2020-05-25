@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76112C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 11:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E787C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 11:30:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 555A3207FB
-	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 11:30:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5707720723
+	for <linux-block@archiver.kernel.org>; Mon, 25 May 2020 11:30:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cVeRwyZx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hlyzKgUq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390171AbgEYLaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 May 2020 07:30:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
+        id S2390226AbgEYLaf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 May 2020 07:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388136AbgEYLaY (ORCPT
+        with ESMTP id S2390223AbgEYLae (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 May 2020 07:30:24 -0400
+        Mon, 25 May 2020 07:30:34 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD3CC061A0E;
-        Mon, 25 May 2020 04:30:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86F82C061A0E;
+        Mon, 25 May 2020 04:30:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Qq+ysHCZAJr0PvG5gfgqqhpu5RG6xW5L1GPGYv1gJ58=; b=cVeRwyZx3qs12+4yP+KFnmEkSG
-        0YiUHPJL9TZ7gnDcdyd6bDcciUc/cQpB3zbhRBE8CSaKRzHpKPl4/o+i2gOrcs9hLZM8/HmwQtR9l
-        L2RJ4eS9uw4NHF3UQmgBaT05Nv5Z7b1PQAUad+lCHhn29pb7VT4xuFhbOFoY2LTEN+Zpn+0BNvq4I
-        lcxBQh6pZk9GDuGwx/nSObjwTVMyq8w8uhab0tV/LgOSLFmxR59GTzr5ln3QyyjeVi7pAcl101KGQ
-        zy6XcJUqvBVMNq8vK+6CtnHSfzxxrpKTF/8llZRtqco83nwMsUeoTYvtbvcH54OnGdlVuMhRoW8P1
-        +aCTN/8A==;
+        bh=Kem+Md/o9biQbHpho+JPveOv/KJgvNSOsgvRyoxBLPU=; b=hlyzKgUqDe1/rLenQn+uC206Ho
+        /J6TShCG77UAdZcVIY7FfB+NtnL427bJlsQYe9uxJIXV2SIz40hPLqjho+RnpL7dM0XFZDlxoMEuT
+        UNUB8p69Xy+cFD19VHQN3q9PCyJss6xkizSNa4nDz3EctwokrVP07bSimwhL68Ks3/Q4vGD6oVDEE
+        aM44+6Y7S7abnK5al5vSKSV3lB/RAEuhARAUwRq7RUPrie4/YnzvHyRVGW6pCE5GcM57LZ0eKKbGb
+        NoA5c2aBaPxAuC7Dny41hYm/dVAwzuOBYph7qRXldqc4XqvgKajczFOUHJhzk3ycuoiGMRAlaa5DK
+        HpOgujPg==;
 Received: from [2001:4bb8:18c:5da7:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jdBJE-0002N7-4N; Mon, 25 May 2020 11:30:20 +0000
+        id 1jdBJJ-0002Nh-W9; Mon, 25 May 2020 11:30:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
@@ -46,9 +46,9 @@ Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
         linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
         linux-bcache@vger.kernel.org, linux-nvdimm@lists.01.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 01/16] block: add disk/bio-based accounting helpers
-Date:   Mon, 25 May 2020 13:29:59 +0200
-Message-Id: <20200525113014.345997-2-hch@lst.de>
+Subject: [PATCH 03/16] rsxx: use bio_{start,end}_io_acct
+Date:   Mon, 25 May 2020 13:30:01 +0200
+Message-Id: <20200525113014.345997-4-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200525113014.345997-1-hch@lst.de>
 References: <20200525113014.345997-1-hch@lst.de>
@@ -60,104 +60,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add two new helpers to simplify I/O accounting for bio based drivers.
-Currently these drivers use the generic_start_io_acct and
-generic_end_io_acct helpers which have very cumbersome calling
-conventions, don't actually return the time they started accounting,
-and try to deal with accounting for partitions, which can't happen
-for bio based drivers.  The new helpers will be used to subsequently
-replace uses of the old helpers.
-
-The main function is the bio based wrappes in blkdev.h, but for zram
-which wants to account rw_page based I/O lower level routines are
-provided as well.
+Switch rsxx to use the nicer bio accounting helpers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h | 26 ++++++++++++++++++++++++++
- 2 files changed, 60 insertions(+)
+ drivers/block/rsxx/dev.c | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 77e57c2e8d602..8973104f88d90 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1432,6 +1432,40 @@ void blk_account_io_start(struct request *rq, bool new_io)
- 	part_stat_unlock();
- }
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index 8ffa8260dcafe..3ba07ab30c84f 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -96,20 +96,6 @@ static const struct block_device_operations rsxx_fops = {
+ 	.ioctl		= rsxx_blkdev_ioctl,
+ };
  
-+unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
-+		unsigned int op)
-+{
-+	struct hd_struct *part = &disk->part0;
-+	const int sgrp = op_stat_group(op);
-+	unsigned long now = READ_ONCE(jiffies);
-+
-+	part_stat_lock();
-+	update_io_ticks(part, now, false);
-+	part_stat_inc(part, ios[sgrp]);
-+	part_stat_add(part, sectors[sgrp], sectors);
-+	part_stat_local_inc(part, in_flight[op_is_write(op)]);
-+	part_stat_unlock();
-+
-+	return now;
-+}
-+EXPORT_SYMBOL(disk_start_io_acct);
-+
-+void disk_end_io_acct(struct gendisk *disk, unsigned int op,
-+		unsigned long start_time)
-+{
-+	struct hd_struct *part = &disk->part0;
-+	const int sgrp = op_stat_group(op);
-+	unsigned long now = READ_ONCE(jiffies);
-+	unsigned long duration = now - start_time;
-+
-+	part_stat_lock();
-+	update_io_ticks(part, now, true);
-+	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
-+	part_stat_local_dec(part, in_flight[op_is_write(op)]);
-+	part_stat_unlock();
-+}
-+EXPORT_SYMBOL(disk_end_io_acct);
-+
- /*
-  * Steal bios from a request and add them to a bio list.
-  * The request must not have been partially completed before.
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7d10f4e632325..76d01a8a13b80 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1892,4 +1892,30 @@ static inline void blk_wake_io_task(struct task_struct *waiter)
- 		wake_up_process(waiter);
- }
+-static void disk_stats_start(struct rsxx_cardinfo *card, struct bio *bio)
+-{
+-	generic_start_io_acct(card->queue, bio_op(bio), bio_sectors(bio),
+-			     &card->gendisk->part0);
+-}
+-
+-static void disk_stats_complete(struct rsxx_cardinfo *card,
+-				struct bio *bio,
+-				unsigned long start_time)
+-{
+-	generic_end_io_acct(card->queue, bio_op(bio),
+-			    &card->gendisk->part0, start_time);
+-}
+-
+ static void bio_dma_done_cb(struct rsxx_cardinfo *card,
+ 			    void *cb_data,
+ 			    unsigned int error)
+@@ -121,7 +107,7 @@ static void bio_dma_done_cb(struct rsxx_cardinfo *card,
  
-+unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
-+		unsigned int op);
-+void disk_end_io_acct(struct gendisk *disk, unsigned int op,
-+		unsigned long start_time);
-+
-+/**
-+ * bio_start_io_acct - start I/O accounting for bio based drivers
-+ * @bio:	bio to start account for
-+ *
-+ * Returns the start time that should be passed back to bio_end_io_acct().
-+ */
-+static inline unsigned long bio_start_io_acct(struct bio *bio)
-+{
-+	return disk_start_io_acct(bio->bi_disk, bio_sectors(bio), bio_op(bio));
-+}
-+
-+/**
-+ * bio_end_io_acct - end I/O accounting for bio based drivers
-+ * @bio:	bio to end account for
-+ * @start:	start time returned by bio_start_io_acct()
-+ */
-+static inline void bio_end_io_acct(struct bio *bio, unsigned long start_time)
-+{
-+	return disk_end_io_acct(bio->bi_disk, bio_op(bio), start_time);
-+}
-+
- #endif
+ 	if (atomic_dec_and_test(&meta->pending_dmas)) {
+ 		if (!card->eeh_state && card->gendisk)
+-			disk_stats_complete(card, meta->bio, meta->start_time);
++			bio_end_io_acct(meta->bio, meta->start_time);
+ 
+ 		if (atomic_read(&meta->error))
+ 			bio_io_error(meta->bio);
+@@ -167,10 +153,9 @@ static blk_qc_t rsxx_make_request(struct request_queue *q, struct bio *bio)
+ 	bio_meta->bio = bio;
+ 	atomic_set(&bio_meta->error, 0);
+ 	atomic_set(&bio_meta->pending_dmas, 0);
+-	bio_meta->start_time = jiffies;
+ 
+ 	if (!unlikely(card->halt))
+-		disk_stats_start(card, bio);
++		bio_meta->start_time = bio_start_io_acct(bio);
+ 
+ 	dev_dbg(CARD_TO_DEV(card), "BIO[%c]: meta: %p addr8: x%llx size: %d\n",
+ 		 bio_data_dir(bio) ? 'W' : 'R', bio_meta,
 -- 
 2.26.2
 
