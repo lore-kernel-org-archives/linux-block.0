@@ -2,165 +2,120 @@ Return-Path: <SRS0=PnPs=7I=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8B3C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 May 2020 07:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3FDBC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 26 May 2020 09:49:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3EDC2053B
-	for <linux-block@archiver.kernel.org>; Tue, 26 May 2020 07:13:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JO3vhnYw"
+	by mail.kernel.org (Postfix) with ESMTP id 78F00207CB
+	for <linux-block@archiver.kernel.org>; Tue, 26 May 2020 09:49:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590486562;
+	bh=YbEsQYed/xK56VlugO9eBl8EtQ7JhieFcgQki+VOcDM=;
+	h=Date:From:To:cc:Subject:List-ID:From;
+	b=xVfHdw4+E10SkzgpFrPf3KJpWAyx/AjUnGvmeyp9R2zqecDokCyCjYyv32/RHjPNl
+	 n30r+5TErB9VtG0w8xLOuudwdFtevF2rSYawcit2c7Cb67lTQMBZX3CWMGK5SjZ3gY
+	 pBr75HU5wVyy3G2UzHzmdd8MXzoi9Qcvceja+rLE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727062AbgEZHNH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 May 2020 03:13:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41761 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727037AbgEZHNH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 May 2020 03:13:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590477185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WN2N/BApCYukmkn4MbWXrd3uuV84H0MyGafZbyYspsU=;
-        b=JO3vhnYwOgg9JZ5JQL8N9oAuk+mTOco6vY143m5wTCLf8+rmNcuPg6imi1t/4jxUtCUiv0
-        t4FfcY9Ecn3DZxvagwUQof+v3YTxo58zUtN1UKOCWu3AOMHeV9J5GkS84K2P7KCI0Eg5HH
-        ht+xxgBLm+N+4Ecr5e3bbXZUGvk3Bco=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-0MO6C4EJPqafACJvQy18mg-1; Tue, 26 May 2020 03:13:04 -0400
-X-MC-Unique: 0MO6C4EJPqafACJvQy18mg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728813AbgEZJtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 May 2020 05:49:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40252 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728765AbgEZJtV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 May 2020 05:49:21 -0400
+Received: from pobox.suse.cz (nat1.prg.suse.com [195.250.132.148])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B36EA18FE860;
-        Tue, 26 May 2020 07:13:01 +0000 (UTC)
-Received: from T590 (ovpn-12-134.pek2.redhat.com [10.72.12.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9839719D7C;
-        Tue, 26 May 2020 07:12:53 +0000 (UTC)
-Date:   Tue, 26 May 2020 15:12:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Alan Adamson <alan.adamson@oracle.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Max Gurtovoy <maxg@mellanox.com>
-Subject: Re: [PATCH 3/3] nvme-pci: make nvme reset more reliable
-Message-ID: <20200526071249.GA874504@T590>
-References: <20200520115655.729705-1-ming.lei@redhat.com>
- <20200520115655.729705-4-ming.lei@redhat.com>
- <9c5ac1e0-b5ca-0f54-5ee3-fd630dbdb8d4@oracle.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 11CE02070A;
+        Tue, 26 May 2020 09:49:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590486561;
+        bh=YbEsQYed/xK56VlugO9eBl8EtQ7JhieFcgQki+VOcDM=;
+        h=Date:From:To:cc:Subject:From;
+        b=MTJWAYIrrw+c/y2vzHTDiVO7J7vRbIlHsZwxg/XHY/CJoktE7bIEk4wwD9qPoS7vw
+         jwsVIBGHnwWJ40YE6rcJ2u/q0QRNSixOikQZJDpVlSmCXaHOgd3UIstrtcQvbyd5NV
+         nFRzSsr1CbqCmnl9fwTBdE03qVFTrbxqS5A6pRGQ=
+Date:   Tue, 26 May 2020 11:49:18 +0200 (CEST)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
+cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Libor Pechacek <lpechacek@suse.cz>
+Subject: [PATCH] block/floppy: fix contended case in floppy_queue_rq()
+Message-ID: <nycvar.YFH.7.76.2005261146420.25812@cbobk.fhfr.pm>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c5ac1e0-b5ca-0f54-5ee3-fd630dbdb8d4@oracle.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 25, 2020 at 10:01:18PM -0700, Dongli Zhang wrote:
-> 
-> 
-> On 5/20/20 4:56 AM, Ming Lei wrote:
-> > During waiting for in-flight IO completion in reset handler, timeout
-> 
-> Does this indicate the window since nvme_start_queues() in nvme_reset_work(),
-> that is, just after the queues are unquiesced again?
+From: Jiri Kosina <jkosina@suse.cz>
 
-Right, nvme_start_queues() starts to dispatch requests again, and
-nvme_wait_freeze() waits completion of all these in-flight IOs.
+Since the switch of floppy driver to blk-mq, the contended (fdc_busy) case 
+in floppy_queue_rq() is not handled correctly.
 
-> 
-> If v2 is required in the future, how about to mention the specific function to
-> that it would be much more easier to track the issue.
+In case we reach floppy_queue_rq() with fdc_busy set (i.e. with the floppy 
+locked due to another request still being in-flight), we put the request 
+on the list of requests and return BLK_STS_OK to the block core, without 
+actually scheduling delayed work / doing further processing of the 
+request. This means that processing of this request is postponed until 
+another request comes and passess uncontended.
 
-Not sure it is needed, cause it is quite straightforward.
+Which in some cases might actually never happen and we keep waiting 
+indefinitely. The simple testcase is
 
-> 
-> > or controller failure still may happen, then the controller is deleted
-> > and all inflight IOs are failed. This way is too violent.
-> > 
-> > Improve the reset handling by replacing nvme_wait_freeze with query
-> > & check controller. If all ns queues are frozen, the controller is reset
-> > successfully, otherwise check and see if the controller has been disabled.
-> > If yes, break from the current recovery and schedule a fresh new reset.
-> > 
-> > This way avoids to failing IO & removing controller unnecessarily.
-> > 
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Sagi Grimberg <sagi@grimberg.me>
-> > Cc: Keith Busch <kbusch@kernel.org>
-> > Cc: Max Gurtovoy <maxg@mellanox.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/nvme/host/pci.c | 37 ++++++++++++++++++++++++++++++-------
-> >  1 file changed, 30 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> > index ce0d1e79467a..b5aeed33a634 100644
-> > --- a/drivers/nvme/host/pci.c
-> > +++ b/drivers/nvme/host/pci.c
-> > @@ -24,6 +24,7 @@
-> >  #include <linux/io-64-nonatomic-lo-hi.h>
-> >  #include <linux/sed-opal.h>
-> >  #include <linux/pci-p2pdma.h>
-> > +#include <linux/delay.h>
-> >  
-> >  #include "trace.h"
-> >  #include "nvme.h"
-> > @@ -1235,9 +1236,6 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
-> >  	 * shutdown, so we return BLK_EH_DONE.
-> >  	 */
-> >  	switch (dev->ctrl.state) {
-> > -	case NVME_CTRL_CONNECTING:
-> > -		nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DELETING);
-> > -		/* fall through */
-> >  	case NVME_CTRL_DELETING:
-> >  		dev_warn_ratelimited(dev->ctrl.device,
-> >  			 "I/O %d QID %d timeout, disable controller\n",
-> > @@ -2393,7 +2391,8 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
-> >  		u32 csts = readl(dev->bar + NVME_REG_CSTS);
-> >  
-> >  		if (dev->ctrl.state == NVME_CTRL_LIVE ||
-> > -		    dev->ctrl.state == NVME_CTRL_RESETTING) {
-> > +		    dev->ctrl.state == NVME_CTRL_RESETTING ||
-> > +		    dev->ctrl.state == NVME_CTRL_CONNECTING) {
-> >  			freeze = true;
-> >  			nvme_start_freeze(&dev->ctrl);
-> >  		}
-> > @@ -2504,12 +2503,29 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev)
-> >  		nvme_put_ctrl(&dev->ctrl);
-> >  }
-> >  
-> > +static bool nvme_wait_freeze_and_check(struct nvme_dev *dev)
-> > +{
-> > +	bool frozen;
-> > +
-> > +	while (true) {
-> > +		frozen = nvme_frozen(&dev->ctrl);
-> > +		if (frozen)
-> > +			break;
-> 
-> ... and how about to comment that the below is because of nvme timeout handler
-> as explained in another email (if v2 would be sent) so that it is not required
-> to query for "online_queues" with cscope :)
-> 
-> > +		if (!dev->online_queues)
-> > +			break;
-> > +		msleep(5);
+	for i in `seq 1 2000`; do echo -en $i '\r'; blkid --info /dev/fd0 2> /dev/null; done
 
-Fine.
+run in quemu. That reliably causes blkid eventually indefinitely hanging 
+in __floppy_read_block_0() waiting for completion, as the BIO callback 
+never happens, and no further IO is ever submitted on the (non-existent) 
+floppy device. This was observed reliably on qemu-emulated device.
 
+Fix that by not queuing the request in the contended case, and return 
+BLK_STS_RESOURCE instead, so that blk core handles the request 
+rescheduling and let it pass properly non-contended later.
 
-Thanks,
-Ming
+Fixes: a9f38e1dec107a ("floppy: convert to blk-mq")
+Cc: stable@vger.kernel.org
+Tested-by: Libor Pechacek <lpechacek@suse.cz>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ drivers/block/floppy.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index c3daa64cb52c..975cd0a6baa1 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2938,17 +2938,17 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		 (unsigned long long) current_req->cmd_flags))
+ 		return BLK_STS_IOERR;
+ 
+-	spin_lock_irq(&floppy_lock);
+-	list_add_tail(&bd->rq->queuelist, &floppy_reqs);
+-	spin_unlock_irq(&floppy_lock);
+-
+ 	if (test_and_set_bit(0, &fdc_busy)) {
+ 		/* fdc busy, this new request will be treated when the
+ 		   current one is done */
+ 		is_alive(__func__, "old request running");
+-		return BLK_STS_OK;
++		return BLK_STS_RESOURCE;
+ 	}
+ 
++	spin_lock_irq(&floppy_lock);
++	list_add_tail(&bd->rq->queuelist, &floppy_reqs);
++	spin_unlock_irq(&floppy_lock);
++
+ 	command_status = FD_COMMAND_NONE;
+ 	__reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	set_fdc(0);
+
+-- 
+Jiri Kosina
+SUSE Labs
 
