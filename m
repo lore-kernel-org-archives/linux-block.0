@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDBAC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87F1C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6D6F207D8
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 974072073B
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725601AbgE0Wie (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 18:38:34 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44309 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbgE0Wic (ORCPT
+        id S1725801AbgE0Win (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 18:38:43 -0400
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:44899 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbgE0Wim (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 18:38:32 -0400
-Received: by mail-pg1-f193.google.com with SMTP id p30so12464997pgl.11
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 15:38:32 -0700 (PDT)
+        Wed, 27 May 2020 18:38:42 -0400
+Received: by mail-pl1-f172.google.com with SMTP id bh7so3807901plb.11
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 15:38:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=sqbeX3iFiAT0lCUEnFUdqw19DYBrLFvvgGzpjRzIvGw=;
-        b=deL+xPn6xCpM/TKRR+j4Pc/heymwcTnhtJC915ARqScwcXZ1Sq6ca6kN8qVtxrYYjR
-         kAxu3FHJ+0V7wLGLCbA+OFw0kvw12yXsI08A3hbvzfKh5dEWQTntPw4h5psXCayd8lFm
-         4L0lOGAAJouxTY7ceCx0fWFBIK3eE1B2swdsGHWimGWailhJYdZtml+dyelstUYIX//Z
-         pwD5I5a4mvKjIGPT0/9IFcBe/mTrJ7dmIFfyO+SoHlPdYbMu7w9JHO4jTcpMZJgPJa91
-         GzIrDKWPTzwIOJEKD78et9RiBGwXZzf914MGJRC9wVF6taSb9B8HZqD4gZPnwgxawbHt
-         xImA==
-X-Gm-Message-State: AOAM531i0FerQc0LHtNMhyX5K6eP3U3u0WalqJN4rld0CfAzxFpbLSST
-        ve+GM1WKMolHllEGv04v9pI=
-X-Google-Smtp-Source: ABdhPJzfypEyX8yRfHYJkZLNLyPKO0+Tjg8xRZCRFnw1UotmGFr5OCSiud/VUeHvKDnh94rxxmAuTQ==
-X-Received: by 2002:a63:9d81:: with SMTP id i123mr19893pgd.176.1590619111701;
-        Wed, 27 May 2020 15:38:31 -0700 (PDT)
+        bh=hb0p2j2SpK8fOzgHF/XBDn0D5KhAcZooNVr1Cw0THVA=;
+        b=q1vCxAgr3JQ+Lpwca3N4o6/cVdeKFf3SpeJ39W2J6XUHpSAkZX659o1VnAoQblyqC+
+         1khx2Vn2yuIC/yiae9biCFA6w+hOmPeU/sJCqZWO/tgkP6vOJOep/OscJjSWYSPVeeHR
+         ++vtHGZ4pCuJ2VNfYno4s6EMfhSm3DTRM63WDDPvYXXxJ56uuBLRmyHcZtDSXDpkUHK5
+         VG/x83gY0TLbl47k4rgR4sbnvfMqnSCQNxjGLomVbtTNtIe9dEpL84/2Ey4VyWyyf4MR
+         aI08sHyfJ5IT9vr3rIf9Nejt1uezBSq4FRs0TTc5CM2yI20y6jQVN6bdcYMc9guZljfD
+         IO/Q==
+X-Gm-Message-State: AOAM531uWc7cOClsYNCETZrVpjg4E5EyxEs+yakHrbricvcIkyXyj28n
+        smflS9To5EovxCozsNJeqwDP/SOy
+X-Google-Smtp-Source: ABdhPJxWDRcr8/nKMVEaNoAC455lFWi8IttrgL1qrTNJyv8tfQHFNyySUr9/Qh0Js4ClWhM1hwaAqw==
+X-Received: by 2002:a17:90a:1c81:: with SMTP id t1mr598091pjt.177.1590619121860;
+        Wed, 27 May 2020 15:38:41 -0700 (PDT)
 Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id p4sm2830224pff.159.2020.05.27.15.38.30
+        by smtp.gmail.com with ESMTPSA id mu17sm3478573pjb.53.2020.05.27.15.38.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 15:38:30 -0700 (PDT)
-Subject: Re: [PATCH 4/8] blk-mq: rename BLK_MQ_TAG_FAIL to BLK_MQ_NO_TAG
+        Wed, 27 May 2020 15:38:41 -0700 (PDT)
+Subject: Re: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
         Thomas Gleixner <tglx@linutronix.de>
 References: <20200527180644.514302-1-hch@lst.de>
- <20200527180644.514302-5-hch@lst.de>
+ <20200527180644.514302-6-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +73,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <afa931dc-d382-500b-c95a-3f2cc22d207e@acm.org>
-Date:   Wed, 27 May 2020 15:38:29 -0700
+Message-ID: <5060b300-ef50-f993-0387-ef2da1244f43@acm.org>
+Date:   Wed, 27 May 2020 15:38:39 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200527180644.514302-5-hch@lst.de>
+In-Reply-To: <20200527180644.514302-6-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,7 +88,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-27 11:06, Christoph Hellwig wrote:
-> To prepare for wider use of this constant give it a more applicable name.
+> Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
