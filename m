@@ -2,97 +2,145 @@ Return-Path: <SRS0=4GtC=7J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342B7C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9294C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 20:07:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14CBF2073B
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:52:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590605579;
-	bh=IzmIC3jCbsY7O2IfmPtRly6W+l04C4nWbvVFB0I2evI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=l7YzR3U0UoA4u0JV31M5DSjdmyDSvXVB7bGjOeZOclbyiHLN3r+ly7Wh7OkDxrhZJ
-	 F1k7IZOhmosmwiaCUVLCDQTnTArZWQ5qJMF7JXujrlb/z3rRcI2aqu8vKmjMQ6B2SW
-	 O8OIoylkLgFWMc0gS8L8gTcZQrD/L9uRy2CecA8s=
+	by mail.kernel.org (Postfix) with ESMTP id C12A52089D
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 20:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbgE0Sww (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:52:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39496 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727076AbgE0Swv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:52:51 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E298B2075A;
-        Wed, 27 May 2020 18:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590605571;
-        bh=IzmIC3jCbsY7O2IfmPtRly6W+l04C4nWbvVFB0I2evI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hkq12V8jNl27N+ZiNuzBv9aCKbVOrDpnJ8Rva+5sPH/Ygob2MClJIEsPMyuqweUxe
-         bPt7JjpLTdgd8jGVTPTPVSKB6UGKPilKnnzh1ahSVmwS2bZmFpHLsvHcZK/nhaL01n
-         UmglV77JpW5i8iewow5OeCAvebQ1v4VMO3LoF/XY=
-Date:   Wed, 27 May 2020 11:52:49 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Alan Adamson <alan.adamson@oracle.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 0/3] blk-mq/nvme: improve nvme-pci reset handler
-Message-ID: <20200527185249.GA3442470@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200520115655.729705-1-ming.lei@redhat.com>
- <22083f76-43f5-38a1-0e2d-84b626a6fd50@oracle.com>
+        id S1726887AbgE0UHT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 16:07:19 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:45055 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbgE0UHS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 May 2020 16:07:18 -0400
+Received: by mail-pg1-f195.google.com with SMTP id p30so12314309pgl.11
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 13:07:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=+WbfliVtnDKxE0Rh+9gNyTM41PrwRT7phDMTYki/75s=;
+        b=aVBFvd4mHlJ7onnmJTLx75KvEjGkVOLwPwKAkJgimM6DlrEjKYrdBBI8r6vg8XGWxA
+         M3mF86avOo0f62T343JLKg8qFKchllgLSYIr4r/2OwagD/7siL+NEELy0ClLPHsKP9+W
+         DJio4ae46B+GNA38ESHrmGYB8+BI8e2MndRKuUG8+/F0Hm41KCFWu0LqsSp5JapMk21K
+         hRp+nrj+qA4stUtZ37ewZsQuVWNRsfg0yzKxIk2+aZvHBJ7ex7K3dixbbJFt+j/eZMfI
+         ddbnzuitla8H7W5jHpVvIE6JZBrwDuECdDu2qnyFoRAV1XTlNOT/68yw5lEPnZNolLY1
+         mylA==
+X-Gm-Message-State: AOAM532jhp8/ZDm2U/UXXoAUUrjxaMKW6+9cE7/hSc/G4MZRWN50Jzu2
+        ozLa2qdWEtqeRdlzNqRcJ9w=
+X-Google-Smtp-Source: ABdhPJwZjV2Y4ThUWTz4yVyZJVbMqrn7MrgIaGmrp0FEsmifVjPvcerm1/LKTBKoAasfOWXWQAWWwA==
+X-Received: by 2002:a62:7e0e:: with SMTP id z14mr5664671pfc.58.1590610037684;
+        Wed, 27 May 2020 13:07:17 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id d2sm2777490pfc.7.2020.05.27.13.07.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2020 13:07:16 -0700 (PDT)
+Subject: Re: blk-mq: improvement CPU hotplug (simplified version) v4
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20200527180644.514302-1-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <e70a1d79-4bc4-53a4-d8ad-b5d61225f736@acm.org>
+Date:   Wed, 27 May 2020 13:07:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <22083f76-43f5-38a1-0e2d-84b626a6fd50@oracle.com>
+In-Reply-To: <20200527180644.514302-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 27, 2020 at 11:09:53AM -0700, Alan Adamson wrote:
-> [  139.895265] CPU: 5 PID: 2470 Comm: kworker/5:1H Not tainted 5.7.0-rc7+ #1
-> [  139.895266] Hardware name: Oracle Corporation ORACLE SERVER
-> X6-2/ASM,MOTHERBOARD,1U, BIOS 38050100 08/30/2016
-> [  139.895271] Workqueue: kblockd blk_mq_timeout_work
-> [  139.895272] Call Trace:
-> [  139.895279]  dump_stack+0x6d/0x9a
-> [  139.895281]  should_fail.cold.5+0x32/0x42
-> [  139.895282]  blk_should_fake_timeout+0x26/0x30
-> [  139.895283]  blk_mq_complete_request+0x1b/0x120
-> [  139.895292]  nvme_cancel_request+0x33/0x80 [nvme_core]
-> [  139.895296]  bt_tags_iter+0x48/0x50
-> [  139.895297]  blk_mq_tagset_busy_iter+0x1eb/0x270
-> [  139.895299]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
-> [  139.895301]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
-> [  139.895305]  nvme_dev_disable+0x2be/0x460 [nvme]
-> [  139.895307]  nvme_timeout.cold.80+0x9c/0x182 [nvme]
-> [  139.895311]  ? sched_clock+0x9/0x10
-> [  139.895315]  ? sched_clock_cpu+0x11/0xc0
-> [  139.895320]  ? __switch_to_asm+0x40/0x70
-> [  139.895321]  blk_mq_check_expired+0x192/0x1b0
-> [  139.895322]  bt_iter+0x52/0x60
-> [  139.895323]  blk_mq_queue_tag_busy_iter+0x1a0/0x2e0
-> [  139.895325]  ? __switch_to_asm+0x40/0x70
-> [  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
-> [  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
-> [  139.895329]  ? compat_start_thread+0x20/0x40
-> [  139.895330]  blk_mq_timeout_work+0x5a/0x130
-> [  139.895333]  process_one_work+0x1ab/0x380
-> [  139.895334]  worker_thread+0x37/0x3b0
-> [  139.895335]  kthread+0x120/0x140
-> [  139.895337]  ? create_worker+0x1b0/0x1b0
-> [  139.895337]  ? kthread_park+0x90/0x90
-> [  139.895339]  ret_from_fork+0x35/0x40
+On 2020-05-27 11:06, Christoph Hellwig wrote:
+> this series ensures I/O is quiesced before a cpu and thus the managed
+> interrupt handler is shut down.
+> 
+> This patchset tries to address the issue by the following approach:
+> 
+>  - before the last cpu in hctx->cpumask is going to offline, mark this
+>    hctx as inactive
+> 
+>  - disable preempt during allocating tag for request, and after tag is
+>    allocated, check if this hctx is inactive. If yes, give up the
+>    allocation and try remote allocation from online CPUs
+> 
+>  - before hctx becomes inactive, drain all allocated requests on this
+>    hctx
+> 
+> The guts of the changes are from Ming Lei, I just did a bunch of prep
+> cleanups so that they can fit in more nicely.  The series also depends
+> on my "avoid a few q_usage_counter roundtrips v3" series.
+> 
+> Thanks John Garry for running lots of tests on arm64 with this previous
+> version patches and co-working on investigating all kinds of issues.
 
-The driver reclaimed all outstanding tags and returned them to the block
-layer. This isn't faking a timeout anymore. The driver has done its
-part to reclaim lost commands. This is faking a broken block layer
-instead.
+Hi Christoph,
+
+Thanks for having prepared and posted this new patch series. After v3
+was posted and before v4 was posted I had a closer look at the IRQ core.
+My conclusions (which may be incorrect) are as follows:
+* The only function that sets the 'is_managed' member of struct
+  irq_affinity_desc to 1 is irq_create_affinity_masks().
+* There are two ways to cause that function to be called: setting the
+  PCI_IRQ_AFFINITY flag when calling pci_alloc_irq_vectors_affinity() or
+  passing the 'affd' argument. pci_alloc_irq_vectors() calls
+  pci_alloc_irq_vectors_affinity().
+* The following drivers pass an affinity domain argument when allocating
+  interrupts: virtio_blk, nvme, be2iscsi, csiostor, hisi_sas, megaraid,
+  mpt3sas, qla2xxx, virtio_scsi.
+* The following drivers set the PCI_IRQ_AFFINITY flag but do not pass an
+  affinity domain: aacraid, hpsa, lpfc, smartqpi, virtio_pci_common.
+
+What is not clear to me is why managed interrupts are shut down if the
+last CPU in their affinity mask is shut down? Has it been considered to
+modify the IRQ core such that managed PCIe interrupts are assigned to
+another CPU if the last CPU in their affinity mask is shut down? Would
+that make it unnecessary to drain hardware queues during CPU
+hotplugging? Or is there perhaps something in the PCI or PCIe
+specifications or in one of the architectures supported by Linux that
+prevents doing this?
+
+Is this the commit that introduced shutdown of managed interrupts:
+c5cb83bb337c ("genirq/cpuhotplug: Handle managed IRQs on CPU hotplug")?
+
+Some of my knowledge about non-managed and managed interrupts comes from
+https://lore.kernel.org/lkml/alpine.DEB.2.20.1710162106400.2037@nanos/
+
+Thanks,
+
+Bart.
