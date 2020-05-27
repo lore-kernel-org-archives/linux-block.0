@@ -7,46 +7,45 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A51C433E2
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B03C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 618352075A
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12F892084C
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eDUWFqBb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o5ula6HI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389001AbgE0SGz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50320 "EHLO
+        id S2389124AbgE0SHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 14:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388952AbgE0SGz (ORCPT
+        with ESMTP id S2388952AbgE0SHA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:06:55 -0400
+        Wed, 27 May 2020 14:07:00 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD4BC03E97D
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:06:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47DEEC03E97D
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:07:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=pK2iNjr38Ma0vdcmJbx2jzT0j5QZb+bdcUG7kz3OAHo=; b=eDUWFqBbohKaV3WBZ2lquE0KA0
-        MSjHlOE4cM9/Zk2NLNAK4b+4gNeW7xH4gp5ShoiAhixlEnOwRWjm3CdLxwdJ2hYBsb/Vkj3my5gQe
-        lP1mxLjLfLlbsB2ViM24uIfhPWd7aBgn0d3YPoLoU1+hrw3JHF9FKvtpfujDoltGf4yWwjkBU5zI4
-        lwhYFWMhEkmIENeAwukSSx+UPBaxosReYWqtiboaQmn54xcF5yQxBoG6j3SF6xos0zxESydfMciKZ
-        T3IlqXOH+hBkRLOj18lICrc0flKHxprZ+RcttPfiZaO3TUbmnwjTEnbBITW45hvm7njy1QELUIToJ
-        5pfqA1vg==;
+        bh=UzEzEYXNdRdDbJ5uFS+DTXsQmTTRtclxcsjkl2MiQkU=; b=o5ula6HI5yBPNqbCkRU2PlOSpf
+        LmpxXVVmePtQMuBQsBvqs4subHuC5Xozh77XARkmNpn1Xs1hhfSfM3Ily7IzK8yZF0iLjBObkoPsz
+        ljWJ3vpezU1QRUxW8i+l12BnRNiPej0mxK6VWB+JHPF0OGgmgBt9wIel6eOrU8AtdAOiOAxseVNgO
+        iFKaEGloiurpNLYwnhr8pKXgBn95ZYFkKceij0gS+YK38Ncy84m89rs58Aod6vsh3/z8VWId7Z+iL
+        Rb7qFJTjnOcOYKmmEd/5EiwVAfoqMmsj4Jf14UVKWC2PEHH+63r4r328k+LTwrFJiudPj8+rMhsXz
+        cPyFzfDQ==;
 Received: from p4fdb0aaa.dip0.t-ipconnect.de ([79.219.10.170] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1je0S7-00050e-0j; Wed, 27 May 2020 18:06:55 +0000
+        id 1je0SB-000515-QG; Wed, 27 May 2020 18:07:00 +0000
 From:   Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ming Lei <ming.lei@redhat.com>, Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH 3/8] blk-mq: move more request initialization to blk_mq_rq_ctx_init
-Date:   Wed, 27 May 2020 20:06:39 +0200
-Message-Id: <20200527180644.514302-4-hch@lst.de>
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
+Date:   Wed, 27 May 2020 20:06:41 +0200
+Message-Id: <20200527180644.514302-6-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527180644.514302-1-hch@lst.de>
 References: <20200527180644.514302-1-hch@lst.de>
@@ -59,94 +58,136 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't split request initialization between __blk_mq_alloc_request and
-blk_mq_rq_ctx_init.  Also remove the op argument as it can be derived
-from the blk_mq_alloc_data structure.
+Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/blk-mq.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+ block/blk-mq-tag.c |  8 ++++----
+ block/blk-mq.c     | 14 +++++++-------
+ block/blk-mq.h     |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2250e6397559b..1ffbc5d9e7cfe 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -271,7 +271,7 @@ static inline bool blk_mq_need_time_stamp(struct request *rq)
- }
- 
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
--		unsigned int tag, unsigned int op, u64 alloc_time_ns)
-+		unsigned int tag, u64 alloc_time_ns)
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c76ba4f90fa09..597ff9c27cf63 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -92,7 +92,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
  {
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct request *rq = tags->static_rqs[tag];
-@@ -295,7 +295,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->mq_ctx = data->ctx;
- 	rq->mq_hctx = data->hctx;
- 	rq->rq_flags = rq_flags;
--	rq->cmd_flags = op;
-+	rq->cmd_flags = data->cmd_flags;
- 	if (data->flags & BLK_MQ_REQ_PREEMPT)
- 		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
-@@ -327,8 +327,23 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->end_io = NULL;
- 	rq->end_io_data = NULL;
- 
--	data->ctx->rq_dispatched[op_is_sync(op)]++;
-+	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
- 	refcount_set(&rq->ref, 1);
-+
-+	if (!op_is_flush(data->cmd_flags)) {
-+		struct elevator_queue *e = data->q->elevator;
-+
-+		rq->elv.icq = NULL;
-+		if (e && e->type->ops.prepare_request) {
-+			if (e->type->icq_cache)
-+				blk_mq_sched_assign_ioc(rq);
-+
-+			e->type->ops.prepare_request(rq);
-+			rq->rq_flags |= RQF_ELVPRIV;
-+		}
-+	}
-+
-+	data->hctx->queued++;
- 	return rq;
- }
- 
-@@ -336,7 +351,6 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- {
- 	struct request_queue *q = data->q;
- 	struct elevator_queue *e = q->elevator;
--	struct request *rq;
- 	unsigned int tag;
- 	bool clear_ctx_on_error = false;
- 	u64 alloc_time_ns = 0;
-@@ -378,19 +392,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 		return NULL;
+ 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+ 	    !hctx_may_queue(data->hctx, bt))
+-		return -1;
++		return BLK_MQ_NO_TAG;
+ 	if (data->shallow_depth)
+ 		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
+@@ -121,7 +121,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
  	}
  
--	rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags, alloc_time_ns);
--	if (!op_is_flush(data->cmd_flags)) {
--		rq->elv.icq = NULL;
--		if (e && e->type->ops.prepare_request) {
--			if (e->type->icq_cache)
--				blk_mq_sched_assign_ioc(rq);
--
--			e->type->ops.prepare_request(rq);
--			rq->rq_flags |= RQF_ELVPRIV;
--		}
--	}
--	data->hctx->queued++;
--	return rq;
-+	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+ 	tag = __blk_mq_get_tag(data, bt);
+-	if (tag != -1)
++	if (tag != BLK_MQ_NO_TAG)
+ 		goto found_tag;
+ 
+ 	if (data->flags & BLK_MQ_REQ_NOWAIT)
+@@ -143,13 +143,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		 * as running the queue may also have found completions.
+ 		 */
+ 		tag = __blk_mq_get_tag(data, bt);
+-		if (tag != -1)
++		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+ 
+ 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
+ 
+ 		tag = __blk_mq_get_tag(data, bt);
+-		if (tag != -1)
++		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+ 
+ 		bt_prev = bt;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 826ff8f97489c..cde2aec558ac5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -278,7 +278,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	req_flags_t rq_flags = 0;
+ 
+ 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
+-		rq->tag = -1;
++		rq->tag = BLK_MQ_NO_TAG;
+ 		rq->internal_tag = tag;
+ 	} else {
+ 		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
+@@ -286,7 +286,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 			atomic_inc(&data->hctx->nr_active);
+ 		}
+ 		rq->tag = tag;
+-		rq->internal_tag = -1;
++		rq->internal_tag = BLK_MQ_NO_TAG;
+ 		data->hctx->tags->rqs[rq->tag] = rq;
+ 	}
+ 
+@@ -483,9 +483,9 @@ static void __blk_mq_free_request(struct request *rq)
+ 	blk_crypto_free_request(rq);
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx = NULL;
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+-	if (sched_tag != -1)
++	if (sched_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
+ 	blk_queue_exit(q);
+@@ -534,7 +534,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ 		blk_stat_add(rq, now);
+ 	}
+ 
+-	if (rq->internal_tag != -1)
++	if (rq->internal_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_sched_completed_request(rq, now);
+ 
+ 	blk_account_io_done(rq, now);
+@@ -1033,7 +1033,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	};
+ 	bool shared;
+ 
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		return true;
+ 
+ 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
+@@ -1049,7 +1049,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 		data.hctx->tags->rqs[rq->tag] = rq;
+ 	}
+ 
+-	return rq->tag != -1;
++	return rq->tag != BLK_MQ_NO_TAG;
  }
  
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 10bfdfb494faf..a139b06318174 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -201,7 +201,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+ 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+-	rq->tag = -1;
++	rq->tag = BLK_MQ_NO_TAG;
+ 
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+ 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+@@ -211,7 +211,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 
+ static inline void blk_mq_put_driver_tag(struct request *rq)
+ {
+-	if (rq->tag == -1 || rq->internal_tag == -1)
++	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
+ 		return;
+ 
+ 	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
 -- 
 2.26.2
 
