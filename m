@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F26C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 05:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3339C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 05:25:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AADA920776
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 05:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B240520776
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 05:25:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="au7HokE0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="i0G7rCar"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728977AbgE0FYg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 01:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44622 "EHLO
+        id S1729018AbgE0FZn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 01:25:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728975AbgE0FYd (ORCPT
+        with ESMTP id S1729009AbgE0FYs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 01:24:33 -0400
+        Wed, 27 May 2020 01:24:48 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B728CC061A0F;
-        Tue, 26 May 2020 22:24:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EF4C061A0F;
+        Tue, 26 May 2020 22:24:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=BoE9LPw2oUO3NHvNjCZuG9y6ne8/lIjQVC7yN88KH00=; b=au7HokE0bZOtEUIYi9XKtdmXJh
-        iILFYm6nSw4YwEgYmqWTci3irvj6mGEu0DIOyoOLaZBJyQYGhxSVuuKNsaWqlWe0RIKauXSfrRBqE
-        IvNdBZ5NNmeuUaIMQvVMRdzITUPU9BltNAHbol/EHeS1+TUcfMNOnvcHBpK1UspVIum+bX8Oqnv8O
-        HrovPzyj17VacYYIiWjIJmULkhYr6pOri2dEv837UAOnlQAcOPbfIF5YlFuuhCFf9GiNj0B2FTBss
-        cVNMAZoff+zoSDx1GMWkM+iNBbm0jZnHF9MWPOhXzlZf21SnmYJ6THHJVZpm7FTr5Ks3pOKtiCp+X
-        q0iuPy3A==;
+        bh=guMNtkQLFS+Af7Jv6Zf+xm7qUVgM/uq3RWfopHGYO30=; b=i0G7rCar+EI/zuVSrOdLgUCeNZ
+        ne3hIFUC0D2jmNCM17C1KKsdDtbG4deN9Um0xYyZC1IK8VW79NkAViUEmMzZzOpcBd4HbNETXIWPW
+        soDzc/XuJhvJnoTeYHDWpjaIX/VnYCB3m+cUMKTxWp+EBTyvAEOqJJmbbxp4PKIPgD4GsjjzMuFI5
+        GsgWTiYhmEaCtCCC/CVfO4Cx7+qCVHBji7tHFv6MCOySws0wIUF2PEPHvghPDN5fshok1+PgLIOJN
+        GKK8NCmg+4TbUgsdxyMn5hFFbiAsrYdY2DJaGyT/FeITQwP3OUNnPxy21wObSPi/QewTDJCmAgqUQ
+        JHXlosww==;
 Received: from [2001:4bb8:18c:5da7:8164:affc:3c20:853d] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jdoYI-0000nL-5P; Wed, 27 May 2020 05:24:30 +0000
+        id 1jdoYT-0000pk-Is; Wed, 27 May 2020 05:24:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
@@ -46,9 +46,9 @@ Cc:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
         linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
         linux-bcache@vger.kernel.org, linux-nvdimm@lists.01.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 03/16] rsxx: use bio_{start,end}_io_acct
-Date:   Wed, 27 May 2020 07:24:06 +0200
-Message-Id: <20200527052419.403583-4-hch@lst.de>
+Subject: [PATCH 07/16] nvdimm: use bio_{start,end}_io_acct
+Date:   Wed, 27 May 2020 07:24:10 +0200
+Message-Id: <20200527052419.403583-8-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527052419.403583-1-hch@lst.de>
 References: <20200527052419.403583-1-hch@lst.de>
@@ -60,60 +60,119 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Switch rsxx to use the nicer bio accounting helpers.
+Switch dm to use the nicer bio accounting helpers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 ---
- drivers/block/rsxx/dev.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ drivers/nvdimm/blk.c  |  6 ++++--
+ drivers/nvdimm/btt.c  |  6 ++++--
+ drivers/nvdimm/nd.h   | 19 -------------------
+ drivers/nvdimm/pmem.c |  6 ++++--
+ 4 files changed, 12 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
-index 8ffa8260dcafe..3ba07ab30c84f 100644
---- a/drivers/block/rsxx/dev.c
-+++ b/drivers/block/rsxx/dev.c
-@@ -96,20 +96,6 @@ static const struct block_device_operations rsxx_fops = {
- 	.ioctl		= rsxx_blkdev_ioctl,
- };
+diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
+index 43751fab9d36a..036e23aef9b04 100644
+--- a/drivers/nvdimm/blk.c
++++ b/drivers/nvdimm/blk.c
+@@ -178,7 +178,9 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
+ 	bip = bio_integrity(bio);
+ 	nsblk = q->queuedata;
+ 	rw = bio_data_dir(bio);
+-	do_acct = nd_iostat_start(bio, &start);
++	do_acct = blk_queue_io_stat(bio->bi_disk->queue);
++	if (do_acct)
++		start = bio_start_io_acct(bio);
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		unsigned int len = bvec.bv_len;
  
--static void disk_stats_start(struct rsxx_cardinfo *card, struct bio *bio)
+@@ -195,7 +197,7 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
+ 		}
+ 	}
+ 	if (do_acct)
+-		nd_iostat_end(bio, start);
++		bio_end_io_acct(bio, start);
+ 
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 3b09419218d6f..90c0c4bbe77b9 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1452,7 +1452,9 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
+ 	if (!bio_integrity_prep(bio))
+ 		return BLK_QC_T_NONE;
+ 
+-	do_acct = nd_iostat_start(bio, &start);
++	do_acct = blk_queue_io_stat(bio->bi_disk->queue);
++	if (do_acct)
++		start = bio_start_io_acct(bio);
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		unsigned int len = bvec.bv_len;
+ 
+@@ -1477,7 +1479,7 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
+ 		}
+ 	}
+ 	if (do_acct)
+-		nd_iostat_end(bio, start);
++		bio_end_io_acct(bio, start);
+ 
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
+index 85dbb2a322b9b..85c1ae813ea31 100644
+--- a/drivers/nvdimm/nd.h
++++ b/drivers/nvdimm/nd.h
+@@ -396,25 +396,6 @@ static inline int nvdimm_setup_pfn(struct nd_pfn *nd_pfn,
+ #endif
+ int nd_blk_region_init(struct nd_region *nd_region);
+ int nd_region_activate(struct nd_region *nd_region);
+-void __nd_iostat_start(struct bio *bio, unsigned long *start);
+-static inline bool nd_iostat_start(struct bio *bio, unsigned long *start)
 -{
--	generic_start_io_acct(card->queue, bio_op(bio), bio_sectors(bio),
--			     &card->gendisk->part0);
--}
+-	struct gendisk *disk = bio->bi_disk;
 -
--static void disk_stats_complete(struct rsxx_cardinfo *card,
--				struct bio *bio,
--				unsigned long start_time)
+-	if (!blk_queue_io_stat(disk->queue))
+-		return false;
+-
+-	*start = jiffies;
+-	generic_start_io_acct(disk->queue, bio_op(bio), bio_sectors(bio),
+-			      &disk->part0);
+-	return true;
+-}
+-static inline void nd_iostat_end(struct bio *bio, unsigned long start)
 -{
--	generic_end_io_acct(card->queue, bio_op(bio),
--			    &card->gendisk->part0, start_time);
--}
+-	struct gendisk *disk = bio->bi_disk;
 -
- static void bio_dma_done_cb(struct rsxx_cardinfo *card,
- 			    void *cb_data,
- 			    unsigned int error)
-@@ -121,7 +107,7 @@ static void bio_dma_done_cb(struct rsxx_cardinfo *card,
+-	generic_end_io_acct(disk->queue, bio_op(bio), &disk->part0, start);
+-}
+ static inline bool is_bad_pmem(struct badblocks *bb, sector_t sector,
+ 		unsigned int len)
+ {
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 2df6994acf836..97f948f8f4e62 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -202,7 +202,9 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 	if (bio->bi_opf & REQ_PREFLUSH)
+ 		ret = nvdimm_flush(nd_region, bio);
  
- 	if (atomic_dec_and_test(&meta->pending_dmas)) {
- 		if (!card->eeh_state && card->gendisk)
--			disk_stats_complete(card, meta->bio, meta->start_time);
-+			bio_end_io_acct(meta->bio, meta->start_time);
+-	do_acct = nd_iostat_start(bio, &start);
++	do_acct = blk_queue_io_stat(bio->bi_disk->queue);
++	if (do_acct)
++		start = bio_start_io_acct(bio);
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		if (op_is_write(bio_op(bio)))
+ 			rc = pmem_do_write(pmem, bvec.bv_page, bvec.bv_offset,
+@@ -216,7 +218,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 		}
+ 	}
+ 	if (do_acct)
+-		nd_iostat_end(bio, start);
++		bio_end_io_acct(bio, start);
  
- 		if (atomic_read(&meta->error))
- 			bio_io_error(meta->bio);
-@@ -167,10 +153,9 @@ static blk_qc_t rsxx_make_request(struct request_queue *q, struct bio *bio)
- 	bio_meta->bio = bio;
- 	atomic_set(&bio_meta->error, 0);
- 	atomic_set(&bio_meta->pending_dmas, 0);
--	bio_meta->start_time = jiffies;
- 
- 	if (!unlikely(card->halt))
--		disk_stats_start(card, bio);
-+		bio_meta->start_time = bio_start_io_acct(bio);
- 
- 	dev_dbg(CARD_TO_DEV(card), "BIO[%c]: meta: %p addr8: x%llx size: %d\n",
- 		 bio_data_dir(bio) ? 'W' : 'R', bio_meta,
+ 	if (bio->bi_opf & REQ_FUA)
+ 		ret = nvdimm_flush(nd_region, bio);
 -- 
 2.26.2
 
