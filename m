@@ -7,47 +7,45 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4BFC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9697C433E3
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B84A2075A
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C718F2084C
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WfNh2tiz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WsmsmBgh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388996AbgE0SGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:06:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50310 "EHLO
+        id S2389091AbgE0SG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 14:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388138AbgE0SGy (ORCPT
+        with ESMTP id S2388952AbgE0SG5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:06:54 -0400
+        Wed, 27 May 2020 14:06:57 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31FACC03E97D
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:06:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93FAC03E97D
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:06:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=GZHK7ojbE9JEQt7G0TTJxEDV3ZWIqb3+Cw6lVNqm5Ro=; b=WfNh2tizpfcpxBq9LZd/G8POHY
-        wD+Uu5p780612RowFUJ/0oVQ5OQ31u4bVncPtegCqY06IzuvKwmhBH+pl9L2LQzwvo5vOfR/PwN3/
-        6BFwynrVautQ/T8bcMZWkVlOCcc16PmErpLKBBpfl4ksse/v2XNTS2tCUW3AYdJW/Hq2oRbnmWuUw
-        NV6UjX1cDKwPXTzIQBtLmZlASiyO5aKBiKDa2xWTRctn6PMay33qi0Nb6qfOsCUcJNBaYhDFNF+0/
-        CCxZO4pJqMBiv9xk0qUywe5p+z/FR+u9C8hJAsbgKTUMQ5hTcnO/dZDSaz2nI30jKCSHSz7MF1y1I
-        xcbFk0lg==;
+        bh=RmFXUDABrtnvbESD6brVVX5e4mRXVISKjd3BoEdyD88=; b=WsmsmBghJbRJmes6YYM2dZGMk3
+        wv4AGZiUWggygBHTvKLVO9Sd8QhWorE5MZL1/2XfI1ISDDjEY/FDRGVtAwzLbrfbi0KEjxO1mFYfI
+        R5ONTMGBZXGmXdXVwi2B0Fv/940VENH9JB3DcF4t4XftGbMH2E/aU6j883MUtTxrgcgFT1noGlg8K
+        i6KsLHDSo8fGfo9u2494udrW8ABhj/zf49g4lBx8nBuJZLUhB0J55F9qpIoDwJG+lZYQths8tEbNY
+        fy5IgathCJW0/5/8CjtXY5BcyH1zliTC0if8bheH86+oteNoKrwOt5/J78r1bt0ciTcdtI9V7CbKc
+        XFkgCvmQ==;
 Received: from p4fdb0aaa.dip0.t-ipconnect.de ([79.219.10.170] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1je0S2-00050K-70; Wed, 27 May 2020 18:06:50 +0000
+        id 1je0S9-00050n-DC; Wed, 27 May 2020 18:06:57 +0000
 From:   Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH 1/8] blk-mq: remove the bio argument to ->prepare_request
-Date:   Wed, 27 May 2020 20:06:37 +0200
-Message-Id: <20200527180644.514302-2-hch@lst.de>
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 4/8] blk-mq: rename BLK_MQ_TAG_FAIL to BLK_MQ_NO_TAG
+Date:   Wed, 27 May 2020 20:06:40 +0200
+Message-Id: <20200527180644.514302-5-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527180644.514302-1-hch@lst.de>
 References: <20200527180644.514302-1-hch@lst.de>
@@ -60,86 +58,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-None of the I/O schedulers actually needs it.
+To prepare for wider use of this constant give it a more applicable name.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/bfq-iosched.c      | 2 +-
- block/blk-mq.c           | 2 +-
- block/kyber-iosched.c    | 2 +-
- block/mq-deadline.c      | 2 +-
- include/linux/elevator.h | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq-tag.c | 4 ++--
+ block/blk-mq-tag.h | 4 ++--
+ block/blk-mq.c     | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 3d411716d7ee4..50c8f034c01c5 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6073,7 +6073,7 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
-  * comments on bfq_init_rq for the reason behind this delayed
-  * preparation.
-  */
--static void bfq_prepare_request(struct request *rq, struct bio *bio)
-+static void bfq_prepare_request(struct request *rq)
- {
- 	/*
- 	 * Regardless of whether we have an icq attached, we have to
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 586c9d6e904ab..c76ba4f90fa09 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -111,7 +111,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	if (data->flags & BLK_MQ_REQ_RESERVED) {
+ 		if (unlikely(!tags->nr_reserved_tags)) {
+ 			WARN_ON_ONCE(1);
+-			return BLK_MQ_TAG_FAIL;
++			return BLK_MQ_NO_TAG;
+ 		}
+ 		bt = &tags->breserved_tags;
+ 		tag_offset = 0;
+@@ -125,7 +125,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		goto found_tag;
+ 
+ 	if (data->flags & BLK_MQ_REQ_NOWAIT)
+-		return BLK_MQ_TAG_FAIL;
++		return BLK_MQ_NO_TAG;
+ 
+ 	ws = bt_wait_ptr(bt, data->hctx);
+ 	do {
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 2b8321efb6820..8a741752af8b9 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -44,9 +44,9 @@ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+ }
+ 
+ enum {
+-	BLK_MQ_TAG_FAIL		= -1U,
++	BLK_MQ_NO_TAG		= -1U,
+ 	BLK_MQ_TAG_MIN		= 1,
+-	BLK_MQ_TAG_MAX		= BLK_MQ_TAG_FAIL - 1,
++	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
+ };
+ 
+ extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cac11945f6023..850e3642efc40 100644
+index 1ffbc5d9e7cfe..826ff8f97489c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -387,7 +387,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 			if (e->type->icq_cache)
- 				blk_mq_sched_assign_ioc(rq);
- 
--			e->type->ops.prepare_request(rq, bio);
-+			e->type->ops.prepare_request(rq);
- 			rq->rq_flags |= RQF_ELVPRIV;
- 		}
+@@ -386,7 +386,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
  	}
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 34dcea0ef6377..a38c5ab103d12 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -579,7 +579,7 @@ static bool kyber_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio,
- 	return merged;
- }
  
--static void kyber_prepare_request(struct request *rq, struct bio *bio)
-+static void kyber_prepare_request(struct request *rq)
- {
- 	rq_set_domain_token(rq, -1);
- }
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b490f47fd553c..b57470e154c8f 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -541,7 +541,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
-  * Nothing to do here. This is defined only to ensure that .finish_request
-  * method is called upon request completion.
-  */
--static void dd_prepare_request(struct request *rq, struct bio *bio)
-+static void dd_prepare_request(struct request *rq)
- {
- }
- 
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 901bda352dcb7..bacc40a0bdf39 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -39,7 +39,7 @@ struct elevator_mq_ops {
- 	void (*request_merged)(struct request_queue *, struct request *, enum elv_merge);
- 	void (*requests_merged)(struct request_queue *, struct request *, struct request *);
- 	void (*limit_depth)(unsigned int, struct blk_mq_alloc_data *);
--	void (*prepare_request)(struct request *, struct bio *bio);
-+	void (*prepare_request)(struct request *);
- 	void (*finish_request)(struct request *);
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
+ 	tag = blk_mq_get_tag(data);
+-	if (tag == BLK_MQ_TAG_FAIL) {
++	if (tag == BLK_MQ_NO_TAG) {
+ 		if (clear_ctx_on_error)
+ 			data->ctx = NULL;
+ 		return NULL;
 -- 
 2.26.2
 
