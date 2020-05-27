@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B87F1C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA017C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:52:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 974072073B
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A4812084C
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 22:52:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725801AbgE0Win (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 18:38:43 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:44899 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbgE0Wim (ORCPT
+        id S1725385AbgE0Wws (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 18:52:48 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42885 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbgE0Wws (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 18:38:42 -0400
-Received: by mail-pl1-f172.google.com with SMTP id bh7so3807901plb.11
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 15:38:42 -0700 (PDT)
+        Wed, 27 May 2020 18:52:48 -0400
+Received: by mail-pl1-f196.google.com with SMTP id x11so9742988plv.9
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 15:52:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=hb0p2j2SpK8fOzgHF/XBDn0D5KhAcZooNVr1Cw0THVA=;
-        b=q1vCxAgr3JQ+Lpwca3N4o6/cVdeKFf3SpeJ39W2J6XUHpSAkZX659o1VnAoQblyqC+
-         1khx2Vn2yuIC/yiae9biCFA6w+hOmPeU/sJCqZWO/tgkP6vOJOep/OscJjSWYSPVeeHR
-         ++vtHGZ4pCuJ2VNfYno4s6EMfhSm3DTRM63WDDPvYXXxJ56uuBLRmyHcZtDSXDpkUHK5
-         VG/x83gY0TLbl47k4rgR4sbnvfMqnSCQNxjGLomVbtTNtIe9dEpL84/2Ey4VyWyyf4MR
-         aI08sHyfJ5IT9vr3rIf9Nejt1uezBSq4FRs0TTc5CM2yI20y6jQVN6bdcYMc9guZljfD
-         IO/Q==
-X-Gm-Message-State: AOAM531uWc7cOClsYNCETZrVpjg4E5EyxEs+yakHrbricvcIkyXyj28n
-        smflS9To5EovxCozsNJeqwDP/SOy
-X-Google-Smtp-Source: ABdhPJxWDRcr8/nKMVEaNoAC455lFWi8IttrgL1qrTNJyv8tfQHFNyySUr9/Qh0Js4ClWhM1hwaAqw==
-X-Received: by 2002:a17:90a:1c81:: with SMTP id t1mr598091pjt.177.1590619121860;
-        Wed, 27 May 2020 15:38:41 -0700 (PDT)
+        bh=/EgT6JLYV4/szy3xpKpygU2i1QsH8y8xW5bMYvlmouc=;
+        b=Bk4vjxwph6UDg3+tQoNfKh4FXx3ZoMUBqEzDZ/K4P3qJ02i2wqaW4CL/WAs71JOon1
+         zjPvI4Fw4f7KSfiqtNdnuLW+rALER2gbt8yyR3trSw1f0Q5HKDNQLNrc45VS/vpzXnyE
+         3YUzRWRyZpBw8S0tuk7u98z1Wm/X7C2kp/uH41FLHYQyv5wsMdMJ/4pgdEjab4G68Wn9
+         NvU6EFutUEC/ucOzcb2mRyb2It06QA37YPtitGKIaY3IhNRIh+c9dWMux545tw+t5EAq
+         mZfm+WlzcyizMDcfzewo5hvffQl2Aw0ztd8lOFUij7zUqCBWn6XEjfUlS7KRxR7eAPbE
+         aM0g==
+X-Gm-Message-State: AOAM531oW9/HY5dE5tqdAYWru6W0YSy+QWVp9i2X09RdTVKzPQbLWjG2
+        7G0EWlk3YNRBHO5VgMmZctE=
+X-Google-Smtp-Source: ABdhPJzg3ltNUDaCNxvd63S0HGwdewVZFYic+rQMYRnMoJ9uxGHpNnDh6AEU2KWZzQqHsbBM7vFFUw==
+X-Received: by 2002:a17:902:9342:: with SMTP id g2mr639631plp.326.1590619967459;
+        Wed, 27 May 2020 15:52:47 -0700 (PDT)
 Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id mu17sm3478573pjb.53.2020.05.27.15.38.40
+        by smtp.gmail.com with ESMTPSA id w190sm2845598pfw.35.2020.05.27.15.52.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 15:38:41 -0700 (PDT)
-Subject: Re: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
+        Wed, 27 May 2020 15:52:46 -0700 (PDT)
+Subject: Re: [PATCH 7/8] blk-mq: add blk_mq_all_tag_iter
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>
 References: <20200527180644.514302-1-hch@lst.de>
- <20200527180644.514302-6-hch@lst.de>
+ <20200527180644.514302-8-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -73,12 +74,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <5060b300-ef50-f993-0387-ef2da1244f43@acm.org>
-Date:   Wed, 27 May 2020 15:38:39 -0700
+Message-ID: <413f73b7-436b-9319-b589-e6fef370fb39@acm.org>
+Date:   Wed, 27 May 2020 15:52:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200527180644.514302-6-hch@lst.de>
+In-Reply-To: <20200527180644.514302-8-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,7 +89,48 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2020-05-27 11:06, Christoph Hellwig wrote:
-> Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
+> @@ -308,21 +312,28 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+>  }
+>  
+>  /**
+> - * blk_mq_all_tag_busy_iter - iterate over all started requests in a tag map
+> + * blk_mq_all_tag_iter - iterate over all requests in a tag map
+>   * @tags:	Tag map to iterate over.
+> - * @fn:		Pointer to the function that will be called for each started
+> + * @fn:		Pointer to the function that will be called for each
+>   *		request. @fn will be called as follows: @fn(rq, @priv,
+>   *		reserved) where rq is a pointer to a request. 'reserved'
+>   *		indicates whether or not @rq is a reserved request. Return
+>   *		true to continue iterating tags, false to stop.
+>   * @priv:	Will be passed as second argument to @fn.
+>   */
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Please document the new 'flags' argument in the kernel-doc header.
 
+> -static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
+> -		busy_tag_iter_fn *fn, void *priv)
+> +static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
+> +		busy_tag_iter_fn *fn, void *priv, unsigned int flags)
+>  {
+>  	if (tags->nr_reserved_tags)
+> -		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
+> -	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
+> +		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv,
+> +				 flags | BT_TAG_ITER_RESERVED);
+> +	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, flags);
+> +}
+
+The meaning of the 'reserved' argument passed to bt_for_each() and also
+to busy_iter_fn is 'the request argument is a reserved request'. If
+BT_TAG_ITER_RESERVED would be set in the 'flags' argument then the wrong
+value will be passed for the 'reserved' argument in the second
+bt_tags_for_each() call. So I think we need something like the following
+at the start of __blk_mq_all_tag_iter():
+
+	WARN_ON_ONCE(flags & BT_TAG_ITER_RESERVED)
+
+Otherwise this patch looks good to me.
+
+Thanks,
+
+Bart.
