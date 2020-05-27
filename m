@@ -2,390 +2,223 @@ Return-Path: <SRS0=4GtC=7J=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913C6C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C34C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D02720899
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A4D42084C
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:07:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pHP6ZNu1"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UDLPzB3n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389131AbgE0SHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387696AbgE0SHH (ORCPT
+        id S2389175AbgE0SHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 14:07:18 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52710 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387696AbgE0SHS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:07:07 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764F3C03E97D
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=1wUqFNamx0eA9fmN336gxhmu4X7NKBIxx+AIv/+9Jy0=; b=pHP6ZNu1JJp5Hw9SpGvvTt5ZqL
-        enM+FcdErLf5TKzduCTRGVfnKWc2NPWDyRFH37ofM/cm94Vn8k7sx3I/elvNNwBTy1ywOWKQ4bx7u
-        mY6qIYbP+CaKQvHiE6GaH5khsv8lDbyjDOIzkalfEnrr1+UjOOuTKwQzVxWygU+MlljQASSgjaEJX
-        4X07/WsZ4ehoAPgUQKXM4NjkeB6OFCrDjemn8mWB0YudTSfeEYU00EJi8dQrUM5g5WwpQQcOlsxKF
-        8AYZerDuI+JTWUSI9u/2y12yj64TslECW2FDSSmr/UbyZ+/Z14pgve4Rd0PMLYX20YGVdjH4tpquo
-        v9XQ3zPA==;
-Received: from p4fdb0aaa.dip0.t-ipconnect.de ([79.219.10.170] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1je0SI-000524-VR; Wed, 27 May 2020 18:07:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 8/8] blk-mq: drain I/O when all CPUs in a hctx are offline
-Date:   Wed, 27 May 2020 20:06:44 +0200
-Message-Id: <20200527180644.514302-9-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200527180644.514302-1-hch@lst.de>
-References: <20200527180644.514302-1-hch@lst.de>
+        Wed, 27 May 2020 14:07:18 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RI28Lb120155;
+        Wed, 27 May 2020 18:07:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=+h/gGcyWHKhcDMgy1dZJ30IPaBXOLlyVVZC9lm/roic=;
+ b=UDLPzB3nXuSobGjgTr+BHjwz619MBmLwPHTthZ4nF1kKAzf9jKtuPiUkhOfh0s56hR2W
+ dgNJi42vitdXgqHmhVE+3FrszPO0IQ7ylV9PI6xv1JyhlnHrrZS6vsdcC7vB3uM2DlQV
+ f679+fDixQgCl9PJaboj5TW/e8r7+bZ38HZDmWo2gKaM7nRgm48Q4Ohe/tNAuT9fZuTn
+ 1obDRnQH/6STxQRIj8stypxIGDglDDXJ1gTppBpgX3fH3/wsIfX/wHjezqDD7DK2nKOX
+ uArLXsLGpNWptMeZ+XuMyIfze/2NYUJQkYoiSnKefVsemF+KXfukjMKq9oAMJXAd5g3g Cg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 318xe1gytx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 27 May 2020 18:07:06 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RI357h150070;
+        Wed, 27 May 2020 18:07:06 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 317ddr7xe3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 May 2020 18:07:06 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04RI75JA025708;
+        Wed, 27 May 2020 18:07:05 GMT
+Received: from dhcp-10-76-241-128.usdhcp.oraclecorp.com (/10.76.241.128)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 27 May 2020 11:07:05 -0700
+Subject: Re: [PATCH 0/3] blk-mq/nvme: improve nvme-pci reset handler
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20200520115655.729705-1-ming.lei@redhat.com>
+From:   Alan Adamson <alan.adamson@oracle.com>
+Message-ID: <22083f76-43f5-38a1-0e2d-84b626a6fd50@oracle.com>
+Date:   Wed, 27 May 2020 11:09:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <20200520115655.729705-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-To:     unlisted-recipients:; (no To-header on input)
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ phishscore=0 adultscore=0 suspectscore=4 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005270141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ adultscore=0 cotscore=-2147483648 mlxscore=0 bulkscore=0
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 impostorscore=0 suspectscore=4 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005270141
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+I tested this patch against a timeout test I've been working with and 
+I'm getting a hang.
 
-Most of blk-mq drivers depend on managed IRQ's auto-affinity to setup
-up queue mapping. Thomas mentioned the following point[1]:
+# cat block-err.sh
+set -x
+echo 100 > /sys/kernel/debug/fail_io_timeout/probability
+echo 1000 > /sys/kernel/debug/fail_io_timeout/times
+echo 1 > /sys/block/nvme0n1/io-timeout-fail
+dd if=/dev/nvme0n1 of=/dev/null bs=512 count=1
 
-"That was the constraint of managed interrupts from the very beginning:
 
- The driver/subsystem has to quiesce the interrupt line and the associated
- queue _before_ it gets shutdown in CPU unplug and not fiddle with it
- until it's restarted by the core when the CPU is plugged in again."
+# sh  block-err.sh
++ echo 100
++ echo 1000
++ echo 1
++ dd if=/dev/nvme0n1 of=/dev/null bs=512 count=1
 
-However, current blk-mq implementation doesn't quiesce hw queue before
-the last CPU in the hctx is shutdown.  Even worse, CPUHP_BLK_MQ_DEAD is a
-cpuhp state handled after the CPU is down, so there isn't any chance to
-quiesce the hctx before shutting down the CPU.
+**** Hang ****
 
-Add new CPUHP_AP_BLK_MQ_ONLINE state to stop allocating from blk-mq hctxs
-where the last CPU goes away, and wait for completion of in-flight
-requests.  This guarantees that there is no inflight I/O before shutting
-down the managed IRQ.
+# dmesg
+.
+.
+.
+[   79.403253] FAULT_INJECTION: forcing a failure.
+                name fail_io_timeout, interval 1, probability 100, space 
+0, times 1000
+[   79.403255] CPU: 5 PID: 0 Comm: swapper/5 Not tainted 5.7.0-rc7+ #1
+[   79.403256] Hardware name: Oracle Corporation ORACLE SERVER 
+X6-2/ASM,MOTHERBOARD,1U, BIOS 38050100 08/30/2016
+[   79.403257] Call Trace:
+[   79.403259]  <IRQ>
+[   79.403267]  dump_stack+0x6d/0x9a
+[   79.403270]  should_fail.cold.5+0x32/0x42
+[   79.403273]  blk_should_fake_timeout+0x26/0x30
+[   79.403275]  blk_mq_complete_request+0x1b/0x120
+[   79.403280]  nvme_irq+0xd9/0x1f0 [nvme]
+[   79.403287]  __handle_irq_event_percpu+0x44/0x190
+[   79.403288]  handle_irq_event_percpu+0x32/0x80
+[   79.403290]  handle_irq_event+0x3b/0x5a
+[   79.403291]  handle_edge_irq+0x87/0x190
+[   79.403296]  do_IRQ+0x54/0xe0
+[   79.403299]  common_interrupt+0xf/0xf
+[   79.403300]  </IRQ>
+[   79.403305] RIP: 0010:cpuidle_enter_state+0xc1/0x400
+[   79.403307] Code: ff e8 e3 41 93 ff 80 7d c7 00 74 17 9c 58 0f 1f 44 
+00 00 f6 c4 02 0f 85 d2 02 00 00 31 ff e8 16 c3 99 ff fb 66 0f 1f 44 00 
+00 <45> 85 e4 0f 88 3d 02 00 00 49 63 c4 48 8d 14 40 48 8d 0c c5 00 00
+[   79.403308] RSP: 0018:ffffb97e8c54be40 EFLAGS: 00000246 ORIG_RAX: 
+ffffffffffffffdd
+[   79.403309] RAX: ffff9781bf76cc40 RBX: ffffd95e7f743200 RCX: 
+000000000000001f
+[   79.403310] RDX: 000000127ccd6e6c RSI: 0000000031573862 RDI: 
+0000000000000000
+[   79.403310] RBP: ffffb97e8c54be80 R08: 0000000000000002 R09: 
+000000000002c4c0
+[   79.403311] R10: 011b921e580bc454 R11: ffff9781bf76bb44 R12: 
+0000000000000002
+[   79.403311] R13: ffffffffbd14c120 R14: ffffffffbd14c208 R15: 
+ffffffffbd14c1f0
+[   79.403314]  cpuidle_enter+0x2e/0x40
+[   79.403318]  call_cpuidle+0x23/0x40
+[   79.403319]  do_idle+0x230/0x270
+[   79.403320]  cpu_startup_entry+0x1d/0x20
+[   79.403325]  start_secondary+0x170/0x1c0
+[   79.403329]  secondary_startup_64+0xb6/0xc0
+[  109.674334] nvme nvme0: I/O 754 QID 34 timeout, aborting
+[  109.674395] nvme nvme0: Abort status: 0x0
+[  139.879453] nvme nvme0: I/O 754 QID 34 timeout, reset controller
+[  139.895263] FAULT_INJECTION: forcing a failure.
+                name fail_io_timeout, interval 1, probability 100, space 
+0, times 999
+[  139.895265] CPU: 5 PID: 2470 Comm: kworker/5:1H Not tainted 5.7.0-rc7+ #1
+[  139.895266] Hardware name: Oracle Corporation ORACLE SERVER 
+X6-2/ASM,MOTHERBOARD,1U, BIOS 38050100 08/30/2016
+[  139.895271] Workqueue: kblockd blk_mq_timeout_work
+[  139.895272] Call Trace:
+[  139.895279]  dump_stack+0x6d/0x9a
+[  139.895281]  should_fail.cold.5+0x32/0x42
+[  139.895282]  blk_should_fake_timeout+0x26/0x30
+[  139.895283]  blk_mq_complete_request+0x1b/0x120
+[  139.895292]  nvme_cancel_request+0x33/0x80 [nvme_core]
+[  139.895296]  bt_tags_iter+0x48/0x50
+[  139.895297]  blk_mq_tagset_busy_iter+0x1eb/0x270
+[  139.895299]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
+[  139.895301]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
+[  139.895305]  nvme_dev_disable+0x2be/0x460 [nvme]
+[  139.895307]  nvme_timeout.cold.80+0x9c/0x182 [nvme]
+[  139.895311]  ? sched_clock+0x9/0x10
+[  139.895315]  ? sched_clock_cpu+0x11/0xc0
+[  139.895320]  ? __switch_to_asm+0x40/0x70
+[  139.895321]  blk_mq_check_expired+0x192/0x1b0
+[  139.895322]  bt_iter+0x52/0x60
+[  139.895323]  blk_mq_queue_tag_busy_iter+0x1a0/0x2e0
+[  139.895325]  ? __switch_to_asm+0x40/0x70
+[  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
+[  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
+[  139.895329]  ? compat_start_thread+0x20/0x40
+[  139.895330]  blk_mq_timeout_work+0x5a/0x130
+[  139.895333]  process_one_work+0x1ab/0x380
+[  139.895334]  worker_thread+0x37/0x3b0
+[  139.895335]  kthread+0x120/0x140
+[  139.895337]  ? create_worker+0x1b0/0x1b0
+[  139.895337]  ? kthread_park+0x90/0x90
+[  139.895339]  ret_from_fork+0x35/0x40
+[  139.897859] nvme nvme0: Shutdown timeout set to 10 seconds
+[  139.901186] nvme nvme0: 56/0/0 default/read/poll queues
 
-Add a BLK_MQ_F_STACKING and set it for dm-rq and loop, so we don't need
-to wait for completion of in-flight requests from these drivers to avoid
-a potential dead-lock. It is safe to do this for stacking drivers as those
-do not use interrupts at all and their I/O completions are triggered by
-underlying devices I/O completion.
-
-[1] https://lore.kernel.org/linux-block/alpine.DEB.2.21.1904051331270.1802@nanos.tec.linutronix.de/
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[hch: different retry mechanism, merged two patches, minor cleanups]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-debugfs.c     |   2 +
- block/blk-mq-tag.c         |   8 +++
- block/blk-mq.c             | 121 ++++++++++++++++++++++++++++++++++++-
- drivers/block/loop.c       |   2 +-
- drivers/md/dm-rq.c         |   2 +-
- include/linux/blk-mq.h     |  10 +++
- include/linux/cpuhotplug.h |   1 +
- 7 files changed, 142 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 96b7a35c898a7..15df3a36e9fa4 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -213,6 +213,7 @@ static const char *const hctx_state_name[] = {
- 	HCTX_STATE_NAME(STOPPED),
- 	HCTX_STATE_NAME(TAG_ACTIVE),
- 	HCTX_STATE_NAME(SCHED_RESTART),
-+	HCTX_STATE_NAME(INACTIVE),
- };
- #undef HCTX_STATE_NAME
- 
-@@ -239,6 +240,7 @@ static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(TAG_SHARED),
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
-+	HCTX_FLAG_NAME(STACKING),
- };
- #undef HCTX_FLAG_NAME
- 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9f74064768423..1c548d9f67ee7 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -180,6 +180,14 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	sbitmap_finish_wait(bt, ws, &wait);
- 
- found_tag:
-+	/*
-+	 * Give up this allocation if the hctx is inactive.  The caller will
-+	 * retry on an active hctx.
-+	 */
-+	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state))) {
-+		blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
-+		return -1;
-+	}
- 	return tag + tag_offset;
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 898400452b1cf..e4580cd6c6f49 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -375,14 +375,39 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 			e->type->ops.limit_depth(data->cmd_flags, data);
- 	}
- 
-+retry:
- 	data->ctx = blk_mq_get_ctx(q);
- 	data->hctx = blk_mq_map_queue(q, data->cmd_flags, data->ctx);
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL))
- 		blk_mq_tag_busy(data->hctx);
- 
-+	/*
-+	 * Waiting allocations only fail because of an inactive hctx.  In that
-+	 * case just retry the hctx assignment and tag allocation as CPU hotplug
-+	 * should have migrated us to an online CPU by now.
-+	 */
- 	tag = blk_mq_get_tag(data);
--	if (tag == BLK_MQ_NO_TAG)
--		return NULL;
-+	if (tag == BLK_MQ_NO_TAG) {
-+		if (data->flags & BLK_MQ_REQ_NOWAIT)
-+			return NULL;
-+
-+		/*
-+		 * All kthreads that can perform I/O should have been moved off
-+		 * this CPU by the time the the CPU hotplug statemachine has
-+		 * shut down a hctx.  But better be sure with an extra sanity
-+		 * check.
-+		 */
-+		if (WARN_ON_ONCE(current->flags & PF_KTHREAD))
-+			return NULL;
-+
-+		/*
-+		 * Give up the CPU and sleep for a random short time to ensure
-+		 * that thread using a realtime scheduling class are migrated
-+		 * off the the CPU.
-+		 */
-+		msleep(3);
-+		goto retry;
-+	}
- 	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
- }
- 
-@@ -2324,6 +2349,86 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	return -ENOMEM;
- }
- 
-+struct rq_iter_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	bool has_rq;
-+};
-+
-+static bool blk_mq_has_request(struct request *rq, void *data, bool reserved)
-+{
-+	struct rq_iter_data *iter_data = data;
-+
-+	if (rq->mq_hctx != iter_data->hctx)
-+		return true;
-+	iter_data->has_rq = true;
-+	return false;
-+}
-+
-+static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct blk_mq_tags *tags = hctx->sched_tags ?
-+			hctx->sched_tags : hctx->tags;
-+	struct rq_iter_data data = {
-+		.hctx	= hctx,
-+	};
-+
-+	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
-+	return data.has_rq;
-+}
-+
-+static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
-+		struct blk_mq_hw_ctx *hctx)
-+{
-+	if (cpumask_next_and(-1, hctx->cpumask, cpu_online_mask) != cpu)
-+		return false;
-+	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
-+		return false;
-+	return true;
-+}
-+
-+static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
-+{
-+	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_online);
-+
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
-+	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
-+		return 0;
-+
-+	/*
-+	 * Prevent new request from being allocated on the current hctx.
-+	 *
-+	 * The smp_mb__after_atomic() Pairs with the implied barrier in
-+	 * test_and_set_bit_lock in sbitmap_get().  Ensures the inactive flag is
-+	 * seen once we return from the tag allocator.
-+	 */
-+	set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-+	smp_mb__after_atomic();
-+
-+	/*
-+	 * Try to grab a reference to the queue and wait for any outstanding
-+	 * requests.  If we could not grab a reference the queue has been
-+	 * frozen and there are no requests.
-+	 */
-+	if (percpu_ref_tryget(&hctx->queue->q_usage_counter)) {
-+		while (blk_mq_hctx_has_requests(hctx))
-+			msleep(5);
-+		percpu_ref_put(&hctx->queue->q_usage_counter);
-+	}
-+
-+	return 0;
-+}
-+
-+static int blk_mq_hctx_notify_online(unsigned int cpu, struct hlist_node *node)
-+{
-+	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
-+			struct blk_mq_hw_ctx, cpuhp_online);
-+
-+	if (cpumask_test_cpu(cpu, hctx->cpumask))
-+		clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-+	return 0;
-+}
-+
- /*
-  * 'cpu' is going away. splice any existing rq_list entries from this
-  * software queue to the hw queue dispatch list, and ensure that it
-@@ -2337,6 +2442,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	enum hctx_type type;
- 
- 	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-+		return 0;
-+
- 	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
- 	type = hctx->type;
- 
-@@ -2360,6 +2468,9 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 
- static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
- {
-+	if (!(hctx->flags & BLK_MQ_F_STACKING))
-+		cpuhp_state_remove_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-+						    &hctx->cpuhp_online);
- 	cpuhp_state_remove_instance_nocalls(CPUHP_BLK_MQ_DEAD,
- 					    &hctx->cpuhp_dead);
- }
-@@ -2419,6 +2530,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
- {
- 	hctx->queue_num = hctx_idx;
- 
-+	if (!(hctx->flags & BLK_MQ_F_STACKING))
-+		cpuhp_state_add_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-+				&hctx->cpuhp_online);
- 	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
- 
- 	hctx->tags = set->tags[hctx_idx];
-@@ -3673,6 +3787,9 @@ static int __init blk_mq_init(void)
- {
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
-+	cpuhp_setup_state_multi(CPUHP_AP_BLK_MQ_ONLINE, "block/mq:online",
-+				blk_mq_hctx_notify_online,
-+				blk_mq_hctx_notify_offline);
- 	return 0;
- }
- subsys_initcall(blk_mq_init);
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index da693e6a834e5..d7904b4d8d126 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2037,7 +2037,7 @@ static int loop_add(struct loop_device **l, int i)
- 	lo->tag_set.queue_depth = 128;
- 	lo->tag_set.numa_node = NUMA_NO_NODE;
- 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
--	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING;
- 	lo->tag_set.driver_data = lo;
- 
- 	err = blk_mq_alloc_tag_set(&lo->tag_set);
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 3f8577e2c13be..f60c025121215 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -547,7 +547,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
- 	md->tag_set->ops = &dm_mq_ops;
- 	md->tag_set->queue_depth = dm_get_blk_mq_queue_depth();
- 	md->tag_set->numa_node = md->numa_node_id;
--	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
-+	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING;
- 	md->tag_set->nr_hw_queues = dm_get_blk_mq_nr_hw_queues();
- 	md->tag_set->driver_data = md;
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d7307795439a4..a20f8c241d665 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -140,6 +140,8 @@ struct blk_mq_hw_ctx {
- 	 */
- 	atomic_t		nr_active;
- 
-+	/** @cpuhp_online: List to store request if CPU is going to die */
-+	struct hlist_node	cpuhp_online;
- 	/** @cpuhp_dead: List to store request if some CPU die. */
- 	struct hlist_node	cpuhp_dead;
- 	/** @kobj: Kernel object for sysfs. */
-@@ -391,6 +393,11 @@ struct blk_mq_ops {
- enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
-+	/*
-+	 * Set when this device requires underlying blk-mq device for
-+	 * completing IO:
-+	 */
-+	BLK_MQ_F_STACKING	= 1 << 2,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
-@@ -400,6 +407,9 @@ enum {
- 	BLK_MQ_S_TAG_ACTIVE	= 1,
- 	BLK_MQ_S_SCHED_RESTART	= 2,
- 
-+	/* hw queue is inactive after all its CPUs become offline */
-+	BLK_MQ_S_INACTIVE	= 3,
-+
- 	BLK_MQ_MAX_DEPTH	= 10240,
- 
- 	BLK_MQ_CPU_WORK_BATCH	= 8,
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 77d70b6335318..24b3a77810b6d 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -152,6 +152,7 @@ enum cpuhp_state {
- 	CPUHP_AP_SMPBOOT_THREADS,
- 	CPUHP_AP_X86_VDSO_VMA_ONLINE,
- 	CPUHP_AP_IRQ_AFFINITY_ONLINE,
-+	CPUHP_AP_BLK_MQ_ONLINE,
- 	CPUHP_AP_ARM_MVEBU_SYNC_CLOCKS,
- 	CPUHP_AP_X86_INTEL_EPB_ONLINE,
- 	CPUHP_AP_PERF_ONLINE,
--- 
-2.26.2
-
+On 5/20/20 4:56 AM, Ming Lei wrote:
+> Hi,
+>
+> For nvme-pci, after controller is recovered, in-flight IOs are waited
+> before updating nr hw queues. If new controller error happens during
+> this period, nvme-pci driver deletes the controller and fails in-flight
+> IO. This way is too violent, and not friendly from user viewpoint.
+>
+> Add APIs for checking if queue is frozen, and replace nvme_wait_freeze
+> in nvme-pci reset handler with checking if all ns queues are frozen &
+> controller disabled. Then a fresh new reset can be scheduled for
+> handling new controller error during waiting for in-flight IO completion.
+>
+> So deleting controller & failing IOs can be avoided in this situation.
+>
+> Without this patches, when fail io timeout injection is run, the
+> controller can be removed very quickly. With this patch, no controller
+> removing can be observed, and controller can recover to normal state
+> after stopping to inject io timeout failure.
+>
+> Ming Lei (3):
+>    blk-mq: add API of blk_mq_queue_frozen
+>    nvme: add nvme_frozen
+>    nvme-pci: make nvme reset more reliable
+>
+>   block/blk-mq.c           |  6 ++++++
+>   drivers/nvme/host/core.c | 14 ++++++++++++++
+>   drivers/nvme/host/nvme.h |  1 +
+>   drivers/nvme/host/pci.c  | 37 ++++++++++++++++++++++++++++++-------
+>   include/linux/blk-mq.h   |  1 +
+>   5 files changed, 52 insertions(+), 7 deletions(-)
+>
