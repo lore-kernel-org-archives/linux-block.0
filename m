@@ -6,37 +6,38 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F0DC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95EAC433DF
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:21:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BBE12075A
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2CE12084C
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:21:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391928AbgE0SSQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:18:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45136 "EHLO mx2.suse.de"
+        id S2391950AbgE0SVt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 14:21:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46428 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391927AbgE0SSQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:18:16 -0400
+        id S2391948AbgE0SVs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 May 2020 14:21:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 524EDAEB9;
-        Wed, 27 May 2020 18:18:18 +0000 (UTC)
-Subject: Re: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
+        by mx2.suse.de (Postfix) with ESMTP id 7691EAEB9;
+        Wed, 27 May 2020 18:21:50 +0000 (UTC)
+Subject: Re: [PATCH 7/8] blk-mq: add blk_mq_all_tag_iter
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>
 References: <20200527180644.514302-1-hch@lst.de>
- <20200527180644.514302-6-hch@lst.de>
+ <20200527180644.514302-8-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <c41925f1-26ac-1ecc-bf07-970624dcfd82@suse.de>
-Date:   Wed, 27 May 2020 20:18:14 +0200
+Message-ID: <8374b3ea-560a-117b-421e-a2f84401bbdb@suse.de>
+Date:   Wed, 27 May 2020 20:21:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200527180644.514302-6-hch@lst.de>
+In-Reply-To: <20200527180644.514302-8-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -46,14 +47,25 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/27/20 8:06 PM, Christoph Hellwig wrote:
-> Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
+> From: Ming Lei <ming.lei@redhat.com>
 > 
+> Add a new blk_mq_all_tag_iter function to iterate over all allocated
+> scheduler tags and driver tags.  This is more flexible than the existing
+> blk_mq_all_tag_busy_iter function as it allows the callers to do whatever
+> they want on allocated request instead of being limited to started
+> requests.
+> 
+> It will be used to implement draining allocated requests on specified
+> hctx in this patchset.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> [hch: switch from the two booleans to a more readable flags field and
+>   consolidate the tags iter functions]
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   block/blk-mq-tag.c |  8 ++++----
->   block/blk-mq.c     | 14 +++++++-------
->   block/blk-mq.h     |  4 ++--
->   3 files changed, 13 insertions(+), 13 deletions(-)
+>   block/blk-mq-tag.c | 46 +++++++++++++++++++++++++++++-----------------
+>   block/blk-mq-tag.h |  2 ++
+>   2 files changed, 31 insertions(+), 17 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
