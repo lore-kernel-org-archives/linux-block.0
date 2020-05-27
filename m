@@ -7,45 +7,47 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9697C433E3
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAF7C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C718F2084C
-	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FCB720C56
+	for <linux-block@archiver.kernel.org>; Wed, 27 May 2020 18:06:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WsmsmBgh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WwLi4Do2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389091AbgE0SG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 14:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50328 "EHLO
+        id S2388737AbgE0SGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 14:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388952AbgE0SG5 (ORCPT
+        with ESMTP id S2388952AbgE0SGy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 14:06:57 -0400
+        Wed, 27 May 2020 14:06:54 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93FAC03E97D
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:06:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EA2C08C5C2
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 11:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=RmFXUDABrtnvbESD6brVVX5e4mRXVISKjd3BoEdyD88=; b=WsmsmBghJbRJmes6YYM2dZGMk3
-        wv4AGZiUWggygBHTvKLVO9Sd8QhWorE5MZL1/2XfI1ISDDjEY/FDRGVtAwzLbrfbi0KEjxO1mFYfI
-        R5ONTMGBZXGmXdXVwi2B0Fv/940VENH9JB3DcF4t4XftGbMH2E/aU6j883MUtTxrgcgFT1noGlg8K
-        i6KsLHDSo8fGfo9u2494udrW8ABhj/zf49g4lBx8nBuJZLUhB0J55F9qpIoDwJG+lZYQths8tEbNY
-        fy5IgathCJW0/5/8CjtXY5BcyH1zliTC0if8bheH86+oteNoKrwOt5/J78r1bt0ciTcdtI9V7CbKc
-        XFkgCvmQ==;
+        bh=hVLoK50S7Z+zdYaGyGPKyOFSm/U4jWBdrmqXM6awnh8=; b=WwLi4Do21UprXFU/M6ZneNiU6l
+        vxPKpGyWrleYSTuM0i8BWH4oDbYPjpNJ5I8eF7rFAf0IOlfbB2SsLoM5seretEiB8or4mpBs/zfue
+        4T6Jup5E/1/HOt1Xx+L0OJ70lsIfOu/AtlNA7IIgcPpdp1e8wbUDHDj9Ub7mPm2GEszV+W7OaxLQ9
+        5gwDaxDVpSN4bcmOplJP4oFvVMuzotG5ItFWILNS7sl2xTM8b5Ef6cr+3PlMyJcgEhLphYCLOb0yX
+        qT3eYfKCve/uNxuYQTf0xisxDr8ZPBDODcds09vj8k8gkVtDHalCzFALAhuIStWxnG94PKB7esxFI
+        9G3WtEFA==;
 Received: from p4fdb0aaa.dip0.t-ipconnect.de ([79.219.10.170] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1je0S9-00050n-DC; Wed, 27 May 2020 18:06:57 +0000
+        id 1je0S4-00050Y-Je; Wed, 27 May 2020 18:06:52 +0000
 From:   Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH 4/8] blk-mq: rename BLK_MQ_TAG_FAIL to BLK_MQ_NO_TAG
-Date:   Wed, 27 May 2020 20:06:40 +0200
-Message-Id: <20200527180644.514302-5-hch@lst.de>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH 2/8] blk-mq: simplify the blk_mq_get_request calling convention
+Date:   Wed, 27 May 2020 20:06:38 +0200
+Message-Id: <20200527180644.514302-3-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527180644.514302-1-hch@lst.de>
 References: <20200527180644.514302-1-hch@lst.de>
@@ -58,66 +60,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To prepare for wider use of this constant give it a more applicable name.
+The bio argument is entirely unused, and the request_queue can be passed
+through the alloc_data, given that it needs to be filled out for the
+low-level tag allocation anyway.  Also rename the function to
+__blk_mq_alloc_request as the switch between get and alloc in the call
+chains is rather confusing.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/blk-mq-tag.c | 4 ++--
- block/blk-mq-tag.h | 4 ++--
- block/blk-mq.c     | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 586c9d6e904ab..c76ba4f90fa09 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -111,7 +111,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	if (data->flags & BLK_MQ_REQ_RESERVED) {
- 		if (unlikely(!tags->nr_reserved_tags)) {
- 			WARN_ON_ONCE(1);
--			return BLK_MQ_TAG_FAIL;
-+			return BLK_MQ_NO_TAG;
- 		}
- 		bt = &tags->breserved_tags;
- 		tag_offset = 0;
-@@ -125,7 +125,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 		goto found_tag;
- 
- 	if (data->flags & BLK_MQ_REQ_NOWAIT)
--		return BLK_MQ_TAG_FAIL;
-+		return BLK_MQ_NO_TAG;
- 
- 	ws = bt_wait_ptr(bt, data->hctx);
- 	do {
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 2b8321efb6820..8a741752af8b9 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -44,9 +44,9 @@ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
- }
- 
- enum {
--	BLK_MQ_TAG_FAIL		= -1U,
-+	BLK_MQ_NO_TAG		= -1U,
- 	BLK_MQ_TAG_MIN		= 1,
--	BLK_MQ_TAG_MAX		= BLK_MQ_TAG_FAIL - 1,
-+	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
- };
- 
- extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1ffbc5d9e7cfe..826ff8f97489c 100644
+index 850e3642efc40..2250e6397559b 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -386,7 +386,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 	}
+@@ -332,10 +332,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	return rq;
+ }
  
- 	tag = blk_mq_get_tag(data);
--	if (tag == BLK_MQ_TAG_FAIL) {
-+	if (tag == BLK_MQ_NO_TAG) {
- 		if (clear_ctx_on_error)
- 			data->ctx = NULL;
- 		return NULL;
+-static struct request *blk_mq_get_request(struct request_queue *q,
+-					  struct bio *bio,
+-					  struct blk_mq_alloc_data *data)
++static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ {
++	struct request_queue *q = data->q;
+ 	struct elevator_queue *e = q->elevator;
+ 	struct request *rq;
+ 	unsigned int tag;
+@@ -346,7 +345,6 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+ 	if (blk_queue_rq_alloc_time(q))
+ 		alloc_time_ns = ktime_get_ns();
+ 
+-	data->q = q;
+ 	if (likely(!data->ctx)) {
+ 		data->ctx = blk_mq_get_ctx(q);
+ 		clear_ctx_on_error = true;
+@@ -398,7 +396,11 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		blk_mq_req_flags_t flags)
+ {
+-	struct blk_mq_alloc_data alloc_data = { .flags = flags, .cmd_flags = op };
++	struct blk_mq_alloc_data data = {
++		.q		= q,
++		.flags		= flags,
++		.cmd_flags	= op,
++	};
+ 	struct request *rq;
+ 	int ret;
+ 
+@@ -406,7 +408,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+-	rq = blk_mq_get_request(q, NULL, &alloc_data);
++	rq = __blk_mq_alloc_request(&data);
+ 	if (!rq)
+ 		goto out_queue_exit;
+ 	rq->__data_len = 0;
+@@ -422,7 +424,11 @@ EXPORT_SYMBOL(blk_mq_alloc_request);
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	unsigned int op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+ {
+-	struct blk_mq_alloc_data alloc_data = { .flags = flags, .cmd_flags = op };
++	struct blk_mq_alloc_data data = {
++		.q		= q,
++		.flags		= flags,
++		.cmd_flags	= op,
++	};
+ 	struct request *rq;
+ 	unsigned int cpu;
+ 	int ret;
+@@ -448,14 +454,14 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	 * If not tell the caller that it should skip this queue.
+ 	 */
+ 	ret = -EXDEV;
+-	alloc_data.hctx = q->queue_hw_ctx[hctx_idx];
+-	if (!blk_mq_hw_queue_mapped(alloc_data.hctx))
++	data.hctx = q->queue_hw_ctx[hctx_idx];
++	if (!blk_mq_hw_queue_mapped(data.hctx))
+ 		goto out_queue_exit;
+-	cpu = cpumask_first_and(alloc_data.hctx->cpumask, cpu_online_mask);
+-	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
++	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
++	data.ctx = __blk_mq_get_ctx(q, cpu);
+ 
+ 	ret = -EWOULDBLOCK;
+-	rq = blk_mq_get_request(q, NULL, &alloc_data);
++	rq = __blk_mq_alloc_request(&data);
+ 	if (!rq)
+ 		goto out_queue_exit;
+ 	return rq;
+@@ -2016,7 +2022,9 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+ 	const int is_flush_fua = op_is_flush(bio->bi_opf);
+-	struct blk_mq_alloc_data data = { .flags = 0};
++	struct blk_mq_alloc_data data = {
++		.q		= q,
++	};
+ 	struct request *rq;
+ 	struct blk_plug *plug;
+ 	struct request *same_queue_rq = NULL;
+@@ -2040,7 +2048,7 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	rq_qos_throttle(q, bio);
+ 
+ 	data.cmd_flags = bio->bi_opf;
+-	rq = blk_mq_get_request(q, bio, &data);
++	rq = __blk_mq_alloc_request(&data);
+ 	if (unlikely(!rq)) {
+ 		rq_qos_cleanup(q, bio);
+ 		if (bio->bi_opf & REQ_NOWAIT)
 -- 
 2.26.2
 
