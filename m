@@ -2,95 +2,168 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C63CC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 14:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE02C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:00:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D03B206A1
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 14:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACDFE2084C
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590677744;
-	bh=aeWCbJC1lVpG7XBaulzFleC3fVFsQ3XErVC65IO43tE=;
+	s=default; t=1590678010;
+	bh=J1DAx+/EWKJPSnHywJKuL6WicgijqDLo74oZUX3zsjg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OAJo9WALUPIU+yvy0btrOUIk3o68ROFO7ApTsB2H+De+noJaEU1QiKDxbvhd3ysrY
-	 b/kg8RtuErdikTYnpxc2oQ/kSIZNoxACVX8OUTikRnXXEZLIxxbPNfSWzHNWrsyg8O
-	 ELgkZ16obENLBmcZTl61v1mShqQ1tuBn8PH4YWKo=
+	b=wx2LTo6vdUHkNLcBy7QokkEvEg72Ox9xOGmmO2LCp+uR7zt5XevUT1yEORVyl/6W7
+	 ChLzsX25Ub2CUfJorvGrwD2d7ZT7yWCEGW/n0qCmogxhb1EEjPQrvtoRnspnnIwjac
+	 hibw2ZQlgMJzXnrUGZOKhnD2mfFGn/HmcI1avSG8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391314AbgE1Ozn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 10:55:43 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:39553 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391280AbgE1Ozm (ORCPT
+        id S2404005AbgE1O7y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 May 2020 10:59:54 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:54785 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403956AbgE1O7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 10:55:42 -0400
-Received: by mail-pj1-f65.google.com with SMTP id n15so3205474pjt.4
-        for <linux-block@vger.kernel.org>; Thu, 28 May 2020 07:55:41 -0700 (PDT)
+        Thu, 28 May 2020 10:59:47 -0400
+Received: by mail-wm1-f66.google.com with SMTP id h4so3474221wmb.4;
+        Thu, 28 May 2020 07:59:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Uu4KWUW4u3Cn+gGQE+G+FxqVnArkbnVy0FGqOMUP4vo=;
-        b=VZyVQdu6KhyxQJgn7LiDYgp/rJCvUWbo0Dua9pL1bqtLKHipSJClUX+44c0eZaIWwq
-         vU+i7zf8uCHzrNogZLtvv4wpDXPY1oYo6Had1G0VGDQn3/mWq4YZlkoJ+/uQLnS1qnFs
-         gCnYXtIh6rx8LyXyGxTvq+NupX4j+jjUtFq+MKM4F8RourHFgcrCAkhHChRUPd79HrJb
-         duAy9iacZ600ruP/ljIkFa71P8eisBCaSNW3bFH1vZj0SnkRbtTkSqOYeI4bbbLT2ymo
-         UjM2OsmbhafOHdtOk8gDnC664p0dPBHtptJ4xkgCLJYcv3ugh+EOMHUshutQzdKQtSGt
-         jszQ==
-X-Gm-Message-State: AOAM530GY2wi5gA6XczZ8cjQksgzN63yHCXEVFHjRYrOtKfd5caLKQiY
-        qbqf5Zokxr7ADAy0ZKADme8=
-X-Google-Smtp-Source: ABdhPJxMCymVowtp3x/oJmCd3ytOqschsRATBYwwnN2+YbAtzfOJe1CNQlK5f5b8+pngrdoHaMRTww==
-X-Received: by 2002:a17:90a:4fc6:: with SMTP id q64mr4269352pjh.34.1590677741628;
-        Thu, 28 May 2020 07:55:41 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id y6sm5141812pjn.37.2020.05.28.07.55.40
+         :mime-version:content-disposition:in-reply-to;
+        bh=HvdKpHF042iTNApEGGudMnbcuPPZ+JOhqsO7H3d0iMc=;
+        b=sBhEmuSUd/GFOy3np6mV8rstzGSKw+c/3N7A5idKPh6bSBRzSjT8zi2hGTXx0IQ058
+         3vgOx1IIU/u5a1ArZyovHhM/CuTwqOBUcZURZfyXkNl4unIuv3y65nUSuXutlRnQHKhy
+         hQXzBCA9ZY0vsz9gnD2qPuPnFcnIZKILRhMntigT8Wr+Rp6oytstrmuYreQsBqdfthN7
+         uy0pTvGAt+a61/QhVOjGQUG9KwdaVD6/6aZ0frMa0VjBvrskGW6Z04tq12L5JUIWUeYw
+         tZTuwIwJu5uUcK3n0uw+DyJPgjqa2scQxwXvmGabrp8CHjr6+mPQsCCyZSWEzbD7DPcb
+         QkwA==
+X-Gm-Message-State: AOAM5312Xv+4y5d8EKInL1tAq3ohf4MDrhdGv0td1MspagaaNnXDPlD1
+        JIVE+9LSrJlwkWcdjCpmmks=
+X-Google-Smtp-Source: ABdhPJwLdJXj9IDbExOvEPWylXBWigVlYHMkRhO6O5dzYmOl704Ju6Ewl0cUi5F1r49EwVynvlA5Tw==
+X-Received: by 2002:a1c:230a:: with SMTP id j10mr3748329wmj.124.1590677985101;
+        Thu, 28 May 2020 07:59:45 -0700 (PDT)
+Received: from localhost (ip-37-188-185-40.eurotel.cz. [37.188.185.40])
+        by smtp.gmail.com with ESMTPSA id t129sm2060873wmf.41.2020.05.28.07.59.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2020 07:55:40 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id D19F340605; Thu, 28 May 2020 14:55:39 +0000 (UTC)
-Date:   Thu, 28 May 2020 14:55:39 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] blktrace: Avoid sparse warnings when assigning
- q->blk_trace
-Message-ID: <20200528145539.GS11244@42.do-not-panic.com>
-References: <20200528092910.11118-1-jack@suse.cz>
- <298af02a-3b58-932a-8769-72dcc52750ad@acm.org>
+        Thu, 28 May 2020 07:59:44 -0700 (PDT)
+Date:   Thu, 28 May 2020 16:59:42 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Hugh Dickins <hughd@google.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+Message-ID: <20200528145942.GF27484@dhcp22.suse.cz>
+References: <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
+ <20200520190906.GA558281@chrisdown.name>
+ <20200521095515.GK6462@dhcp22.suse.cz>
+ <CA+G9fYvAB9F+Xo0vUsSveKnExkv3cV9-oOG9gBqGEcXsO95m0w@mail.gmail.com>
+ <20200521105801.GL6462@dhcp22.suse.cz>
+ <alpine.LSU.2.11.2005210504110.1185@eggly.anvils>
+ <20200521124444.GP6462@dhcp22.suse.cz>
+ <20200521191746.GB815980@cmpxchg.org>
+ <alpine.LSU.2.11.2005211250130.1158@eggly.anvils>
+ <20200521215855.GB815153@cmpxchg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <298af02a-3b58-932a-8769-72dcc52750ad@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200521215855.GB815153@cmpxchg.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 28, 2020 at 07:44:38AM -0700, Bart Van Assche wrote:
-> > @@ -1669,10 +1672,7 @@ static int blk_trace_setup_queue(struct request_queue *q,
-> >  
-> >  	blk_trace_setup_lba(bt, bdev);
-> >  
-> > -	ret = -EBUSY;
-> > -	if (cmpxchg(&q->blk_trace, NULL, bt))
-> > -		goto free_bt;
-> > -
-> > +	rcu_assign_pointer(q->blk_trace, bt);
-> >  	get_probe_ref();
-> >  	return 0;
+[Sorry for a late reply - was offline for few days]
+
+On Thu 21-05-20 17:58:55, Johannes Weiner wrote:
+> On Thu, May 21, 2020 at 01:06:28PM -0700, Hugh Dickins wrote:
+[...]
+> >From d9e7ed15d1c9248a3fd99e35e82437549154dac7 Mon Sep 17 00:00:00 2001
+> From: Johannes Weiner <hannes@cmpxchg.org>
+> Date: Thu, 21 May 2020 17:44:25 -0400
+> Subject: [PATCH] mm: memcontrol: prepare swap controller setup for integration
+>  fix
 > 
-> Shouldn't q->blk_trace only be assigned if
-> q->blk_trace == NULL?
+> Fix crash with cgroup_disable=memory:
+> 
+> > > > > + mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8NRK0BPF6XF
+> > > > > mke2fs 1.43.8 (1-Jan-2018)
+> > > > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
+> > > > > Filesystem UUID: 3bb1a285-2cb4-44b4-b6e8-62548f3ac620
+> > > > > Superblock backups stored on blocks:
+> > > > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+> > > > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+> > > > > 102400000, 214990848
+> > > > > Allocating group tables:    0/7453                           done
+> > > > > Writing inode tables:    0/7453                           done
+> > > > > Creating journal (262144 blocks): [   35.502102] BUG: kernel NULL
+> > > > > pointer dereference, address: 000000c8
+> > > > > [   35.508372] #PF: supervisor read access in kernel mode
+> > > > > [   35.513506] #PF: error_code(0x0000) - not-present page
+> > > > > [   35.518638] *pde = 00000000
+> > > > > [   35.521514] Oops: 0000 [#1] SMP
+> > > > > [   35.524652] CPU: 0 PID: 145 Comm: kswapd0 Not tainted
+> > > > > 5.7.0-rc6-next-20200519+ #1
+> > > > > [   35.532121] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+> > > > > 2.2 05/23/2018
+> > > > > [   35.539507] EIP: mem_cgroup_get_nr_swap_pages+0x28/0x60
+> 
+> Swap accounting used to be implied-disabled when the cgroup controller
+> was disabled. Restore that for the new cgroup_memory_noswap, so that
+> we bail out of this function instead of dereferencing a NULL memcg.
+> 
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Debugged-by: Hugh Dickins <hughd@google.com>
+> Debugged-by: Michal Hocko <mhocko@kernel.org>
+> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
 
-Yes but the old call checked for that and left it as NULL if
-it was not NULL.
+Yes this looks better. I hope to get to your series soon to have the
+full picture finally.
 
-I have a patch in my series which checks for q->blkt_trace *early*
-prior to continuing to avoid concurrent calls proactively, otherwise
-this will fail only at the very end.
+> ---
+>  mm/memcontrol.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 3e000a316b59..e3b785d6e771 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -7075,7 +7075,11 @@ static struct cftype memsw_files[] = {
+>  
+>  static int __init mem_cgroup_swap_init(void)
+>  {
+> -	if (mem_cgroup_disabled() || cgroup_memory_noswap)
+> +	/* No memory control -> no swap control */
+> +	if (mem_cgroup_disabled())
+> +		cgroup_memory_noswap = true;
+> +
+> +	if (cgroup_memory_noswap)
+>  		return 0;
+>  
+>  	WARN_ON(cgroup_add_dfl_cftypes(&memory_cgrp_subsys, swap_files));
+> -- 
+> 2.26.2
 
-  Luis
+-- 
+Michal Hocko
+SUSE Labs
