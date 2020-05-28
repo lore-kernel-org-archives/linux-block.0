@@ -2,115 +2,98 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC8EC433E1
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A23C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:19:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBCFB2075F
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EC3D2075F
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 15:19:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590678200;
-	bh=yCrRflPa+owv3moiIgb+n52ywNy7D1ovIWfQG7sa6Jc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0uh4wah08jKakoJOqrwNsM6uwQiiDPfzKp+bUEh3DS7+qQMmJ14WIgcf9oUin60MA
-	 Ij+PKka+7JcwK41/2AzouTfQDhhQ7vVYwa/zY8VFRSdzmPk9PXX/2+BXKvWcd2wr8A
-	 6KG0R7JVl/qVZyPdFGzGOPmrBTCEKlbRjYMUKJVY=
+	s=default; t=1590679177;
+	bh=wuS2VVINMsYAL+5tn4419QsY/qdGxbg8TopCXFS0HKg=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=wmRDMJi3mZ7oSFnM9fz4dETZ88vr2eXgb3hxqOu5tsaR4RQaUxaIHPldEi+Z5Xb3Q
+	 Jtd/c97NRXHd6ZLIZw3QLEyAX5ZsvIiBsASQBaBLDXeSnYq8fzRzo7+PoYFe4wwYpv
+	 HKoSBWL9UtoYvEBX/RMlQ0ZQxbTLWdyBwiDFZS2I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404156AbgE1PDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 11:03:18 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35115 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403912AbgE1PDQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 11:03:16 -0400
-Received: by mail-wm1-f66.google.com with SMTP id n5so3561883wmd.0;
-        Thu, 28 May 2020 08:03:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=evz1lutsdd2Eqt9o4+KgC57g/gR26qB8cQ2KV6NODWs=;
-        b=VJx/HwbXl5o/d18rL9jXFWIru48CRcbu6zMa/nbL8uHL5RkpLFzluxqMPSHkiUACnq
-         8fpdo/KWej952ZGVeM52GUKte5NExvG3LpYfxGglSAuy0TBPmQxlIIK82X7RgOLgJmXB
-         +pjpUIOL/bVQorU96JoWT/ysuQZBRxRchyXcPh4B01yzJEnbYuNZSzg4Di2PgdvnQw22
-         ksF9CdT4clBfpm1g7Phqf34d9bI09L/NOjel519iuryPdW9UVpqHeITg1pNWQgwAcNU0
-         V4UJuQwu9Zb4g6+2NLS3L5y+wF758rtkI/+FjSh/df4TUBaKBHx9YBdCX2ufGjpBOo78
-         eMbg==
-X-Gm-Message-State: AOAM5335KeIBGypNdrt0JATwyrPXP/uVxG66RygJwBLuKrIswRUKlp8s
-        U+85bywfUrHGjRi+1zXV9K4=
-X-Google-Smtp-Source: ABdhPJzniI6Aw1b/FqGaEPNB/a6M/vRt8hKQ5Zx5UYlLdgljMoGjhh+KSxCloB6yCJzH8NHlfHrceg==
-X-Received: by 2002:a1c:b0c8:: with SMTP id z191mr3947280wme.165.1590678193035;
-        Thu, 28 May 2020 08:03:13 -0700 (PDT)
-Received: from localhost (ip-37-188-185-40.eurotel.cz. [37.188.185.40])
-        by smtp.gmail.com with ESMTPSA id k14sm6163539wrq.97.2020.05.28.08.03.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2020 08:03:11 -0700 (PDT)
-Date:   Thu, 28 May 2020 17:03:10 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Yafang Shao <laoar.shao@gmail.com>,
-        Chris Down <chris@chrisdown.name>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200528150310.GG27484@dhcp22.suse.cz>
-References: <20200519075213.GF32497@dhcp22.suse.cz>
- <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz>
- <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name>
- <20200521095515.GK6462@dhcp22.suse.cz>
- <20200521163450.GV6462@dhcp22.suse.cz>
- <CA+G9fYuDWGZx50UpD+WcsDeHX9vi3hpksvBAWbMgRZadb0Pkww@mail.gmail.com>
- <CA+G9fYs2jg-j_5fdb0OW0G-JzDjN7b8d9qnX7uuk9p4c7mVSig@mail.gmail.com>
+        id S2404310AbgE1PTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 May 2020 11:19:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55946 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404171AbgE1PTe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 May 2020 11:19:34 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5247F2075F;
+        Thu, 28 May 2020 15:19:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590679173;
+        bh=wuS2VVINMsYAL+5tn4419QsY/qdGxbg8TopCXFS0HKg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=zAxMWUg+J8SNsTcfK1rK6GrTaJXLWQDL1EjZuyKhxK7cmIgoFjWoWwMiMA9ZxWwrj
+         WQ0O3d2WB9KHiN0NzA0sQFIjsWpGiZOzjk344HtFAEGXuX3MyIQNpXuXdnnKn/GZxy
+         RVsh7P3om0jbKCRlfHd4BSUFqekeM8AI2LuzlzuY=
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-nvme@lists.infradead.org, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 1/2] blk-mq: export __blk_mq_complete_request
+Date:   Thu, 28 May 2020 08:19:30 -0700
+Message-Id: <20200528151931.3501506-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYs2jg-j_5fdb0OW0G-JzDjN7b8d9qnX7uuk9p4c7mVSig@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 22-05-20 02:23:09, Naresh Kamboju wrote:
-> My apology !
-> As per the test results history this problem started happening from
-> Bad : next-20200430 (still reproducible on next-20200519)
-> Good : next-20200429
-> 
-> The git tree / tag used for testing is from linux next-20200430 tag and reverted
-> following three patches and oom-killer problem fixed.
-> 
-> Revert "mm, memcg: avoid stale protection values when cgroup is above
-> protection"
-> Revert "mm, memcg: decouple e{low,min} state mutations from protectinn checks"
-> Revert "mm-memcg-decouple-elowmin-state-mutations-from-protection-checks-fix"
+For when drivers have a need to bypass error injection.
 
-The discussion has fragmented and I got lost TBH.
-In http://lkml.kernel.org/r/CA+G9fYuDWGZx50UpD+WcsDeHX9vi3hpksvBAWbMgRZadb0Pkww@mail.gmail.com
-you have said that none of the added tracing output has triggered. Does
-this still hold? Because I still have a hard time to understand how
-those three patches could have the observed effects.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-mq.c         | 3 ++-
+ include/linux/blk-mq.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cac11945f602..3c61faf63e15 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -556,7 +556,7 @@ static void __blk_mq_complete_request_remote(void *data)
+ 	q->mq_ops->complete(rq);
+ }
+ 
+-static void __blk_mq_complete_request(struct request *rq)
++void __blk_mq_complete_request(struct request *rq)
+ {
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	struct request_queue *q = rq->q;
+@@ -602,6 +602,7 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	}
+ 	put_cpu();
+ }
++EXPORT_SYMBOL(__blk_mq_complete_request);
+ 
+ static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+ 	__releases(hctx->srcu)
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index d7307795439a..cfe7eac3764e 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -494,6 +494,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list);
+ void blk_mq_kick_requeue_list(struct request_queue *q);
+ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+ bool blk_mq_complete_request(struct request *rq);
++void __blk_mq_complete_request(struct request *rq);
+ bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
+ 			   struct bio *bio, unsigned int nr_segs);
+ bool blk_mq_queue_stopped(struct request_queue *q);
 -- 
-Michal Hocko
-SUSE Labs
+2.24.1
+
