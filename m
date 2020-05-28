@@ -2,60 +2,91 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA67AC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 18:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E87C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 18:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B94EB2078C
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 18:18:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590689894;
-	bh=AI6mftzqfL5PqUmgUmNnymIfEoSbNgy5qQglt19o9yk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=L9nBecObmvJAVJZl0JKbjbVdLUMnJUcT3wKJQ4TzY23LVHXlqEGRt6R00LaTlcdt4
-	 IirmhvHf4eLxj2BvNqOiUXkX88b7AsevUhbfWcdPGL5DlnDi4Qh50KHgWBcjt7HidT
-	 h4v3QlzPaKk1sMR/HWoVNPm/X8DhiFtUAgXZ5plg=
+	by mail.kernel.org (Postfix) with ESMTP id 2A6F8206A1
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 18:31:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405769AbgE1SSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 14:18:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54324 "EHLO mail.kernel.org"
+        id S2405798AbgE1Sby (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 May 2020 14:31:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52988 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405735AbgE1SSK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 14:18:10 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 830372073B;
-        Thu, 28 May 2020 18:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590689890;
-        bh=AI6mftzqfL5PqUmgUmNnymIfEoSbNgy5qQglt19o9yk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vdJgTUdMWvo0k/8NfoBN38tUzqyyhsugmhAR4HGCIcVmcuqc4A5Difa48syV37mh8
-         dv63NaSZ0H51K05wj0Zd8jRXL6rGQO0gTRkCHK9tCZVglOS5wiNC3VipyzgnBpB4kN
-         rf7/2AuEtGfXiD4p/Wi1qZ/AkE3WnhXu8dJtagpE=
-Date:   Thu, 28 May 2020 11:18:07 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCHv2 1/2] blk-mq: export __blk_mq_complete_request
-Message-ID: <20200528181807.GA3504306@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200528151931.3501506-1-kbusch@kernel.org>
- <20200528164256.GA25651@lst.de>
+        id S2405775AbgE1Sbx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 May 2020 14:31:53 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 2F24AAD1A;
+        Thu, 28 May 2020 18:31:52 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 66B781E1289; Thu, 28 May 2020 20:31:52 +0200 (CEST)
+Date:   Thu, 28 May 2020 20:31:52 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH] blktrace: Avoid sparse warnings when assigning
+ q->blk_trace
+Message-ID: <20200528183152.GH14550@quack2.suse.cz>
+References: <20200528092910.11118-1-jack@suse.cz>
+ <298af02a-3b58-932a-8769-72dcc52750ad@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200528164256.GA25651@lst.de>
+In-Reply-To: <298af02a-3b58-932a-8769-72dcc52750ad@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 28, 2020 at 06:42:56PM +0200, Christoph Hellwig wrote:
-> I think this needs a better name.
+On Thu 28-05-20 07:44:38, Bart Van Assche wrote:
+> (+Luis)
+> 
+> On 2020-05-28 02:29, Jan Kara wrote:
+> > Mostly for historical reasons, q->blk_trace is assigned through xchg()
+> > and cmpxchg() atomic operations. Although this is correct, sparse
+> > complains about this because it violates rcu annotations. Furthermore
+> > there's no real need for atomic operations anymore since all changes to
+> > q->blk_trace happen under q->blk_trace_mutex. So let's just replace
+> > xchg() with rcu_replace_pointer() and cmpxchg() with explicit check and
+> > rcu_assign_pointer(). This makes the code more efficient and sparse
+> > happy.
+> > 
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> 
+> How about adding a reference to commit c780e86dd48e ("blktrace: Protect
+> q->blk_trace with RCU") in the description of this patch?
 
-blk_mq_do_complete_req()?
+Yes, that's probably a good idea.
+
+> > @@ -1669,10 +1672,7 @@ static int blk_trace_setup_queue(struct request_queue *q,
+> >  
+> >  	blk_trace_setup_lba(bt, bdev);
+> >  
+> > -	ret = -EBUSY;
+> > -	if (cmpxchg(&q->blk_trace, NULL, bt))
+> > -		goto free_bt;
+> > -
+> > +	rcu_assign_pointer(q->blk_trace, bt);
+> >  	get_probe_ref();
+> >  	return 0;
+> 
+> This changes a conditional assignment of q->blk_trace into an
+> unconditional assignment. Shouldn't q->blk_trace only be assigned if
+> q->blk_trace == NULL?
+
+Yes but both callers of blk_trace_setup_queue() actually check that
+q->blk_trace is NULL before calling blk_trace_setup_queue() and since we
+hold blk_trace_mutex all the time, the value of q->blk_trace cannot change.
+So the conditional assignment was just bogus.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
