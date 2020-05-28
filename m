@@ -2,114 +2,126 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4D3C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 06:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE98C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 08:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B39EA2073B
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 06:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6CA020B80
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 08:01:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="AvzTFCIH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7pxlj7E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725681AbgE1G2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 02:28:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725294AbgE1G2g (ORCPT
+        id S1725839AbgE1IBQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 May 2020 04:01:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55987 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725901AbgE1IBP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 02:28:36 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48179C05BD1E
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 23:28:36 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id s19so22196746edt.12
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 23:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=5MkFrDgF5VspAmYHCjE3L+lmTwqFXhsdmwItUzmmYmQ=;
-        b=AvzTFCIHVx3qfAhRrsnAgFy2dWlhXhf4W3nNrKWTSpdP/0vWamueZnjT+6Qs8JAro3
-         5rjN8JXoaG2c4HdCxOcNy99MI2yU/5vz6+7j+ClH+CytbQYkhcPSeCHTkZI4spzSxCBJ
-         juz7Wh3eEzYXfttxG4mP3rNmCJwrNae088M3lSqsJeV7jlbM/q+hsoPw6+rYpyyc/mjJ
-         CcZKDi//5Xi7MHxG3GKhC+ywBJQTD1NFoA3h5VyuvCpKSriDvVQ3j6y+ncf8aZJzPq/O
-         2tv1dd9+pgN8blm5WB6UwrsZ9dYHkDSJf5TJl2bph0yxJKyybUKP9grgfWjJEwX7zc9z
-         0FQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=5MkFrDgF5VspAmYHCjE3L+lmTwqFXhsdmwItUzmmYmQ=;
-        b=k3tSMgzmbhPGYxyAVzpxyjCr6Fknog3qdRrjtjYDLsu31etAXQ/iudnsRweCddq5PD
-         IiXiSxNuCiDS0Of9enttpadv9NzRGjyDWrPnuh8VI193TcnIK12+MKUYU8h8nqiupdzU
-         pQGz9CnvAnrqj7uDcMcU+i5AxvM5dhzRsTLD6lyPo+DtUGNSy3Hbha1RDTcx45vkCbKf
-         k8Vv/3jxSiN1vfa//hlSqD+fugb41sPa3K0smbxEFvBfjQBHgAlyaYLzVxX0zrEtysXY
-         O5stuyBNUeHDRCwQXjJdKk63C0olAqdOT7QBf3uMejfJWY7nQmgoidihodVi9P1ksvzs
-         bv5Q==
-X-Gm-Message-State: AOAM533EXoP4fSUJLOwZ1TvCCri0XsFyyrHe4NoqQSO5hcf6Qzau3GyX
-        GQN8eezQg4OZL+sHZNrHn33bmg==
-X-Google-Smtp-Source: ABdhPJyc8HLOjeL5rh9/6pD/emZOr32Ehyiz+rzW7XmdKPV7S2MgDdVX043h26V6pipPZ4iBM1fI5A==
-X-Received: by 2002:a50:ace4:: with SMTP id x91mr1503734edc.361.1590647314911;
-        Wed, 27 May 2020 23:28:34 -0700 (PDT)
-Received: from localhost (ip-5-186-121-52.cgn.fibianet.dk. [5.186.121.52])
-        by smtp.gmail.com with ESMTPSA id b21sm3999199edt.15.2020.05.27.23.28.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 23:28:33 -0700 (PDT)
-Date:   Thu, 28 May 2020 08:28:33 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     wu000273@umn.edu
-Cc:     kjlu@umn.edu, Matias Bjorling <mb@lightnvm.io>,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias@cnexlabs.com>,
-        Jens Axboe <axboe@fb.com>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <jg@lightnvm.io>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lightnvm: pblk: Fix reference count leak in
- pblk_sysfs_init.
-Message-ID: <20200528062833.clbghpoqizjvl7g4@mpHalley.localdomain>
-References: <20200527210628.9477-1-wu000273@umn.edu>
+        Thu, 28 May 2020 04:01:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590652874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PbJoT2F2lFRbK3iDIBBxpGnGYKEW9Z+Ntt/XK5EwBqs=;
+        b=L7pxlj7EZBOpPQRvZZyd31mH1qpvfQSxLhvc71c5v6bKfb4MLHZLaT6aTDAZ16r7Vcda38
+        nCn4n4seO1uBJpJiBkjQEs6Yo5+vtoKkGcZDiA3FL5UgtPMprU+AEa2osfjA20wzucr79/
+        AIwiypz3Wjjpyc4A0N1d8zyiSe4ohJE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-ioCAz0LJPCef8TEk8gJ8Rg-1; Thu, 28 May 2020 04:01:08 -0400
+X-MC-Unique: ioCAz0LJPCef8TEk8gJ8Rg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1261580183C;
+        Thu, 28 May 2020 08:01:07 +0000 (UTC)
+Received: from localhost (ovpn-12-189.pek2.redhat.com [10.72.12.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 72F90D01E0;
+        Thu, 28 May 2020 08:01:03 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH V3 0/6] blk-mq: support batching dispatch from scheduler
+Date:   Thu, 28 May 2020 16:00:47 +0800
+Message-Id: <20200528080053.1062653-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200527210628.9477-1-wu000273@umn.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27.05.2020 16:06, wu000273@umn.edu wrote:
->From: Qiushi Wu <wu000273@umn.edu>
->
->kobject_init_and_add() takes reference even when it fails.
->Thus, when kobject_init_and_add() returns an error,
->kobject_put() must be called to properly clean up the kobject.
->
->Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
->Signed-off-by: Qiushi Wu <wu000273@umn.edu>
->---
-> drivers/lightnvm/pblk-sysfs.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
->index 6387302b03f2..90f1433b19a2 100644
->--- a/drivers/lightnvm/pblk-sysfs.c
->+++ b/drivers/lightnvm/pblk-sysfs.c
->@@ -711,6 +711,7 @@ int pblk_sysfs_init(struct gendisk *tdisk)
-> 					"%s", "pblk");
-> 	if (ret) {
-> 		pblk_err(pblk, "could not register\n");
->+		kobject_put(&pblk->kobj);
-> 		return ret;
-> 	}
->
->-- 
->2.17.1
->
+Hi Jens,
 
-Looks good to me.
+More and more drivers want to get batching requests queued from
+block layer, such as mmc[1], and tcp based storage drivers[2]. Also
+current in-tree users have virtio-scsi, virtio-blk and nvme.
 
-Reviewed-by: Javier González <javier@javigon.com>
+For none, we already support batching dispatch.
+
+But for io scheduler, every time we just take one request from scheduler
+and pass the single request to blk_mq_dispatch_rq_list(). This way makes
+batching dispatch not possible when io scheduler is applied. One reason
+is that we don't want to hurt sequential IO performance, becasue IO
+merge chance is reduced if more requests are dequeued from scheduler
+queue.
+
+Tries to start the support by dequeuing more requests from scheduler
+if budget is enough and device isn't busy.
+
+Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
+
+Baolin has tested V1 and found performance on MMC can be improved.
+
+Patches can be found from the following tree too:
+
+	https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-batching-submission
+
+Patch 1 ~ 4 are improvement and cleanup, which can't applied without
+supporting batching dispatch.
+
+Patch 5 ~ 6 starts to support batching dispatch from scheduler.
+
+
+[1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
+[2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
+
+V3:
+	- add reviewed-by tag
+	- fix one typo
+	- fix one budget leak issue in case that .queue_rq returned *_RESOURCE in 5/6
+
+V2:
+	- remove 'got_budget' from blk_mq_dispatch_rq_list
+	- drop patch for getting driver tag & handling partial dispatch
+
+Ming Lei (6):
+  blk-mq: pass request queue into get/put budget callback
+  blk-mq: pass hctx to blk_mq_dispatch_rq_list
+  blk-mq: move getting driver tag and budget into one helper
+  blk-mq: remove dead check from blk_mq_dispatch_rq_list
+  blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
+  blk-mq: support batching dispatch in case of io scheduler
+
+ block/blk-mq-sched.c    |  95 ++++++++++++++++++++++++++++-----
+ block/blk-mq.c          | 115 ++++++++++++++++++++++++++--------------
+ block/blk-mq.h          |  15 +++---
+ drivers/scsi/scsi_lib.c |   8 ++-
+ include/linux/blk-mq.h  |   4 +-
+ 5 files changed, 168 insertions(+), 69 deletions(-)
+
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Baolin Wang <baolin.wang7@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+-- 
+2.25.2
+
