@@ -2,172 +2,114 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EC4C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 05:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4D3C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 06:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C0AA21475
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 05:19:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B39EA2073B
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 06:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLBH3UJU"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="AvzTFCIH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbgE1FTw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 01:19:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25253 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725308AbgE1FTw (ORCPT
+        id S1725681AbgE1G2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 May 2020 02:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725294AbgE1G2g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 01:19:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590643190;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=P3Y/gDbakCJK9wXnR6lxW0ZGicPSiuYSicce1VScLbk=;
-        b=VLBH3UJU7OwCDfTvbNE2BwR1rkQqd5MPrJGjY8SPhorpcHlqH5xgJKmHvkG1iHH+6eZcVG
-        acvWZ59QJNVQ2suxiAiKBBewphkucF+HSTjEMHTf4Me8ROzt5QLPfA3CtoFiNTPVMilU9W
-        BftomcaCPvzMf4UYqJRtGb8PyCQwQ3k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-P3sOQXgBMZWUT-of1TbBtA-1; Thu, 28 May 2020 01:19:46 -0400
-X-MC-Unique: P3sOQXgBMZWUT-of1TbBtA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4854C80B700;
-        Thu, 28 May 2020 05:19:45 +0000 (UTC)
-Received: from T590 (ovpn-12-189.pek2.redhat.com [10.72.12.189])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A88145C1B0;
-        Thu, 28 May 2020 05:19:37 +0000 (UTC)
-Date:   Thu, 28 May 2020 13:19:32 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/8] blk-mq: drain I/O when all CPUs in a hctx are offline
-Message-ID: <20200528051932.GA1008129@T590>
-References: <20200527180644.514302-1-hch@lst.de>
- <20200527180644.514302-9-hch@lst.de>
- <7acc7ab5-02f9-e6ee-e95f-175bc0df9cbc@acm.org>
- <20200528014601.GC933147@T590>
- <1ec7922c-f2b0-08ec-5849-f4eb7f71e9e7@acm.org>
+        Thu, 28 May 2020 02:28:36 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48179C05BD1E
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 23:28:36 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id s19so22196746edt.12
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2020 23:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=5MkFrDgF5VspAmYHCjE3L+lmTwqFXhsdmwItUzmmYmQ=;
+        b=AvzTFCIHVx3qfAhRrsnAgFy2dWlhXhf4W3nNrKWTSpdP/0vWamueZnjT+6Qs8JAro3
+         5rjN8JXoaG2c4HdCxOcNy99MI2yU/5vz6+7j+ClH+CytbQYkhcPSeCHTkZI4spzSxCBJ
+         juz7Wh3eEzYXfttxG4mP3rNmCJwrNae088M3lSqsJeV7jlbM/q+hsoPw6+rYpyyc/mjJ
+         CcZKDi//5Xi7MHxG3GKhC+ywBJQTD1NFoA3h5VyuvCpKSriDvVQ3j6y+ncf8aZJzPq/O
+         2tv1dd9+pgN8blm5WB6UwrsZ9dYHkDSJf5TJl2bph0yxJKyybUKP9grgfWjJEwX7zc9z
+         0FQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5MkFrDgF5VspAmYHCjE3L+lmTwqFXhsdmwItUzmmYmQ=;
+        b=k3tSMgzmbhPGYxyAVzpxyjCr6Fknog3qdRrjtjYDLsu31etAXQ/iudnsRweCddq5PD
+         IiXiSxNuCiDS0Of9enttpadv9NzRGjyDWrPnuh8VI193TcnIK12+MKUYU8h8nqiupdzU
+         pQGz9CnvAnrqj7uDcMcU+i5AxvM5dhzRsTLD6lyPo+DtUGNSy3Hbha1RDTcx45vkCbKf
+         k8Vv/3jxSiN1vfa//hlSqD+fugb41sPa3K0smbxEFvBfjQBHgAlyaYLzVxX0zrEtysXY
+         O5stuyBNUeHDRCwQXjJdKk63C0olAqdOT7QBf3uMejfJWY7nQmgoidihodVi9P1ksvzs
+         bv5Q==
+X-Gm-Message-State: AOAM533EXoP4fSUJLOwZ1TvCCri0XsFyyrHe4NoqQSO5hcf6Qzau3GyX
+        GQN8eezQg4OZL+sHZNrHn33bmg==
+X-Google-Smtp-Source: ABdhPJyc8HLOjeL5rh9/6pD/emZOr32Ehyiz+rzW7XmdKPV7S2MgDdVX043h26V6pipPZ4iBM1fI5A==
+X-Received: by 2002:a50:ace4:: with SMTP id x91mr1503734edc.361.1590647314911;
+        Wed, 27 May 2020 23:28:34 -0700 (PDT)
+Received: from localhost (ip-5-186-121-52.cgn.fibianet.dk. [5.186.121.52])
+        by smtp.gmail.com with ESMTPSA id b21sm3999199edt.15.2020.05.27.23.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2020 23:28:33 -0700 (PDT)
+Date:   Thu, 28 May 2020 08:28:33 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     wu000273@umn.edu
+Cc:     kjlu@umn.edu, Matias Bjorling <mb@lightnvm.io>,
+        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias@cnexlabs.com>,
+        Jens Axboe <axboe@fb.com>,
+        Javier =?utf-8?B?R29uesOhbGV6?= <jg@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lightnvm: pblk: Fix reference count leak in
+ pblk_sysfs_init.
+Message-ID: <20200528062833.clbghpoqizjvl7g4@mpHalley.localdomain>
+References: <20200527210628.9477-1-wu000273@umn.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <1ec7922c-f2b0-08ec-5849-f4eb7f71e9e7@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200527210628.9477-1-wu000273@umn.edu>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 27, 2020 at 08:33:48PM -0700, Bart Van Assche wrote:
-> On 2020-05-27 18:46, Ming Lei wrote:
-> > On Wed, May 27, 2020 at 04:09:19PM -0700, Bart Van Assche wrote:
-> >> On 2020-05-27 11:06, Christoph Hellwig wrote:
-> >>> --- a/block/blk-mq-tag.c
-> >>> +++ b/block/blk-mq-tag.c
-> >>> @@ -180,6 +180,14 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-> >>>  	sbitmap_finish_wait(bt, ws, &wait);
-> >>>  
-> >>>  found_tag:
-> >>> +	/*
-> >>> +	 * Give up this allocation if the hctx is inactive.  The caller will
-> >>> +	 * retry on an active hctx.
-> >>> +	 */
-> >>> +	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state))) {
-> >>> +		blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
-> >>> +		return -1;
-> >>> +	}
-> >>>  	return tag + tag_offset;
-> >>>  }
-> >>
-> >> The code that has been added in blk_mq_hctx_notify_offline() will only
-> >> work correctly if blk_mq_get_tag() tests BLK_MQ_S_INACTIVE after the
-> >> store instructions involved in the tag allocation happened. Does this
-> >> mean that a memory barrier should be added in the above function before
-> >> the test_bit() call?
-> > 
-> > Please see comment in blk_mq_hctx_notify_offline():
-> > 
-> > +       /*
-> > +        * Prevent new request from being allocated on the current hctx.
-> > +        *
-> > +        * The smp_mb__after_atomic() Pairs with the implied barrier in
-> > +        * test_and_set_bit_lock in sbitmap_get().  Ensures the inactive flag is
-> > +        * seen once we return from the tag allocator.
-> > +        */
-> > +       set_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-> 
-> From Documentation/atomic_bitops.txt: "Except for a successful
-> test_and_set_bit_lock() which has ACQUIRE semantics and
-> clear_bit_unlock() which has RELEASE semantics."
+On 27.05.2020 16:06, wu000273@umn.edu wrote:
+>From: Qiushi Wu <wu000273@umn.edu>
+>
+>kobject_init_and_add() takes reference even when it fails.
+>Thus, when kobject_init_and_add() returns an error,
+>kobject_put() must be called to properly clean up the kobject.
+>
+>Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
+>Signed-off-by: Qiushi Wu <wu000273@umn.edu>
+>---
+> drivers/lightnvm/pblk-sysfs.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+>index 6387302b03f2..90f1433b19a2 100644
+>--- a/drivers/lightnvm/pblk-sysfs.c
+>+++ b/drivers/lightnvm/pblk-sysfs.c
+>@@ -711,6 +711,7 @@ int pblk_sysfs_init(struct gendisk *tdisk)
+> 					"%s", "pblk");
+> 	if (ret) {
+> 		pblk_err(pblk, "could not register\n");
+>+		kobject_put(&pblk->kobj);
+> 		return ret;
+> 	}
+>
+>-- 
+>2.17.1
+>
 
-test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state) is called exactly after
-one tag is allocated, that means test_and_set_bit_lock is successful before
-the test_bit(). The ACQUIRE semantics guarantees that test_bit(BLK_MQ_S_INACTIVE)
-is always done after successful test_and_set_bit_lock(), so tag bit is
-always set before testing BLK_MQ_S_INACTIVE.
- 
-See Documentation/memory-barriers.txt:
- (5) ACQUIRE operations.
+Looks good to me.
 
-     This acts as a one-way permeable barrier.  It guarantees that all memory
-     operations after the ACQUIRE operation will appear to happen after the
-     ACQUIRE operation with respect to the other components of the system.
-     ACQUIRE operations include LOCK operations and both smp_load_acquire()
-     and smp_cond_load_acquire() operations.
-
-> 
-> My understanding is that operations that have acquire semantics pair
-> with operations that have release semantics. I haven't been able to find
-> any documentation that shows that smp_mb__after_atomic() has release
-> semantics. So I looked up its definition. This is what I found:
-> 
-> $ git grep -nH 'define __smp_mb__after_atomic'
-> arch/ia64/include/asm/barrier.h:49:#define __smp_mb__after_atomic()
-> barrier()
-> arch/mips/include/asm/barrier.h:133:#define __smp_mb__after_atomic()
-> smp_llsc_mb()
-> arch/s390/include/asm/barrier.h:50:#define __smp_mb__after_atomic()
-> barrier()
-> arch/sparc/include/asm/barrier_64.h:57:#define __smp_mb__after_atomic()
-> barrier()
-> arch/x86/include/asm/barrier.h:83:#define __smp_mb__after_atomic()	do {
-> } while (0)
-> arch/xtensa/include/asm/barrier.h:20:#define __smp_mb__after_atomic()	
-> barrier()
-> include/asm-generic/barrier.h:116:#define __smp_mb__after_atomic()
-> __smp_mb()
-> 
-> My interpretation of the above is that not all smp_mb__after_atomic()
-> implementations have release semantics. Do you agree with this conclusion?
-
-I understand smp_mb__after_atomic() orders set_bit(BLK_MQ_S_INACTIVE)
-and reading the tag bit which is done in blk_mq_all_tag_iter().
-
-So the two pair of OPs are ordered:
-
-1) if one request(tag bit) is allocated before setting BLK_MQ_S_INACTIVE,
-the tag bit will be observed in blk_mq_all_tag_iter() from blk_mq_hctx_has_requests(),
-so the request will be drained.
-
-OR
-
-2) if one request(tag bit) is allocated after setting BLK_MQ_S_INACTIVE,
-the request(tag bit) will be released and retried on another CPU
-finally, see __blk_mq_alloc_request().
-
-Cc Paul and linux-kernel list.
-
-
-Thanks,
-Ming
-
+Reviewed-by: Javier González <javier@javigon.com>
