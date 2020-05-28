@@ -2,162 +2,236 @@ Return-Path: <SRS0=lWBJ=7K=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDF4C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 01:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9143EC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 01:36:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29A252100A
-	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 01:15:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64E062084C
+	for <linux-block@archiver.kernel.org>; Thu, 28 May 2020 01:36:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqerqJMd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725795AbgE1BPQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 May 2020 21:15:16 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38196 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725768AbgE1BPP (ORCPT
+        id S1726063AbgE1Bge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 May 2020 21:36:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29416 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725896AbgE1Bge (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 May 2020 21:15:15 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q8so12670456pfu.5;
-        Wed, 27 May 2020 18:15:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=zEJC/keMYsw/lXDxPakt60ru3sfh7fcbE4KUupGoOkQ=;
-        b=HCQsNBJSbczI7dNVQIO+QyS3nCwB1T9CPXzoMf1L+x1JO3yH297IkTisg6lOkE9bpM
-         jXbCxHNzsVUglWLtEur5EJt+x4h+4qsegCvlb1JrGxMw4zL7sx2g69vZ/71KgBr8n1kP
-         8b2wlr5GBwyPxfTBsrshDNc/vNGbugfwaDqjKkL7J2np78xV8DbnrxWzJxgfoizeHGAr
-         GEpt46YXqwQXTsSoCLYP1LmEFbOlp1lLkONvz0lLOSQVIPxLrPYSfc+GmtefCPDVn0Vs
-         arOJhogbtEZhEa2uGaX3sVX+6JcIXKNiwisE/jd3/cXReSMwe/JX4KPTJWlpAvx3/0iA
-         uJ7w==
-X-Gm-Message-State: AOAM5334n7Vqxd1j2dGf4WLAHdsv7CFmGiNqUp0Jq+wlzmuowMZXe6a8
-        SAyYrMF+CSoqlf66uWF0vRs=
-X-Google-Smtp-Source: ABdhPJyqPA/THaMvlBvffYtpFjaHUygj7US/vRrk78f1KaFUQY7e03pJm6bTtPjhVfjiDP3EQ1a2FA==
-X-Received: by 2002:a62:1b87:: with SMTP id b129mr520581pfb.162.1590628513969;
-        Wed, 27 May 2020 18:15:13 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id s102sm3295368pjb.57.2020.05.27.18.15.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 18:15:13 -0700 (PDT)
-Subject: Re: [PATCH v5 5/7] blktrace: fix debugfs use after free
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-References: <20200516031956.2605-1-mcgrof@kernel.org>
- <20200516031956.2605-6-mcgrof@kernel.org>
- <20200519163713.GA29944@infradead.org>
- <20200527031202.GT11244@42.do-not-panic.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <3e5e75d4-56ad-19c6-fbc3-b8c78283ec54@acm.org>
-Date:   Wed, 27 May 2020 18:15:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Wed, 27 May 2020 21:36:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590629792;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CrRDMSyUueCP0CeAxgEqbi+UPByZat1mVSXlLI0YYgI=;
+        b=TqerqJMdImM2Z3mXrFNEL+Z+6ycmSBdE8g17FjTY7AJFnQFB46F7oSjvw7DzX8S6CwzQ9q
+        llDQZMA7jACkKHKxt4hXBaf3MAdsmK6/dw3cYKM1rgTSDHLyFnr1OJjOckKhCQOceW0obK
+        61ADobNFtIAz4B0QGxn53fjXV/0LT5U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-UaYLpAKAOOeHoG6UjxjQXA-1; Wed, 27 May 2020 21:36:23 -0400
+X-MC-Unique: UaYLpAKAOOeHoG6UjxjQXA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCE7F835B46;
+        Thu, 28 May 2020 01:36:21 +0000 (UTC)
+Received: from T590 (ovpn-12-189.pek2.redhat.com [10.72.12.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 62F245C1B0;
+        Thu, 28 May 2020 01:36:15 +0000 (UTC)
+Date:   Thu, 28 May 2020 09:36:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Alan Adamson <alan.adamson@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 0/3] blk-mq/nvme: improve nvme-pci reset handler
+Message-ID: <20200528013611.GA933147@T590>
+References: <20200520115655.729705-1-ming.lei@redhat.com>
+ <22083f76-43f5-38a1-0e2d-84b626a6fd50@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200527031202.GT11244@42.do-not-panic.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <22083f76-43f5-38a1-0e2d-84b626a6fd50@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-26 20:12, Luis Chamberlain wrote:
-> +	/*
-> +	 * Blktrace needs a debugsfs name even for queues that don't register
-> +	 * a gendisk, so it lazily registers the debugfs directory.  But that
-> +	 * can get us into a situation where a SCSI device is found, with no
-> +	 * driver for it (yet).  Then blktrace is used on the device, creating
-> +	 * the debugfs directory, and only after that a drivers is loaded. In
-                                                        ^^^^^^^
-                                                        driver?
+Hi Alan,
 
-> @@ -494,6 +490,38 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->  	 */
->  	strreplace(buts->name, '/', '_');
->  
-> +	/*
-> +	 * We also have to use a partition directory if a partition is
-> +	 * being worked on, even though the same request_queue is shared.
-> +	 */
-> +	if (bdev && bdev != bdev->bd_contains)
-> +		dir = bdev->bd_part->debugfs_dir;
+On Wed, May 27, 2020 at 11:09:53AM -0700, Alan Adamson wrote:
+> I tested this patch against a timeout test I've been working with and I'm
+> getting a hang.
+> 
+> # cat block-err.sh
+> set -x
+> echo 100 > /sys/kernel/debug/fail_io_timeout/probability
+> echo 1000 > /sys/kernel/debug/fail_io_timeout/times
+> echo 1 > /sys/block/nvme0n1/io-timeout-fail
+> dd if=/dev/nvme0n1 of=/dev/null bs=512 count=1
+> 
+> 
+> # sh  block-err.sh
+> + echo 100
+> + echo 1000
+> + echo 1
+> + dd if=/dev/nvme0n1 of=/dev/null bs=512 count=1
+> 
+> **** Hang ****
+> 
+> # dmesg
+> .
+> .
+> .
+> [   79.403253] FAULT_INJECTION: forcing a failure.
+>                name fail_io_timeout, interval 1, probability 100, space 0,
+> times 1000
+> [   79.403255] CPU: 5 PID: 0 Comm: swapper/5 Not tainted 5.7.0-rc7+ #1
+> [   79.403256] Hardware name: Oracle Corporation ORACLE SERVER
+> X6-2/ASM,MOTHERBOARD,1U, BIOS 38050100 08/30/2016
+> [   79.403257] Call Trace:
+> [   79.403259]  <IRQ>
+> [   79.403267]  dump_stack+0x6d/0x9a
+> [   79.403270]  should_fail.cold.5+0x32/0x42
+> [   79.403273]  blk_should_fake_timeout+0x26/0x30
+> [   79.403275]  blk_mq_complete_request+0x1b/0x120
+> [   79.403280]  nvme_irq+0xd9/0x1f0 [nvme]
+> [   79.403287]  __handle_irq_event_percpu+0x44/0x190
+> [   79.403288]  handle_irq_event_percpu+0x32/0x80
+> [   79.403290]  handle_irq_event+0x3b/0x5a
+> [   79.403291]  handle_edge_irq+0x87/0x190
+> [   79.403296]  do_IRQ+0x54/0xe0
+> [   79.403299]  common_interrupt+0xf/0xf
+> [   79.403300]  </IRQ>
+> [   79.403305] RIP: 0010:cpuidle_enter_state+0xc1/0x400
+> [   79.403307] Code: ff e8 e3 41 93 ff 80 7d c7 00 74 17 9c 58 0f 1f 44 00
+> 00 f6 c4 02 0f 85 d2 02 00 00 31 ff e8 16 c3 99 ff fb 66 0f 1f 44 00 00 <45>
+> 85 e4 0f 88 3d 02 00 00 49 63 c4 48 8d 14 40 48 8d 0c c5 00 00
+> [   79.403308] RSP: 0018:ffffb97e8c54be40 EFLAGS: 00000246 ORIG_RAX:
+> ffffffffffffffdd
+> [   79.403309] RAX: ffff9781bf76cc40 RBX: ffffd95e7f743200 RCX:
+> 000000000000001f
+> [   79.403310] RDX: 000000127ccd6e6c RSI: 0000000031573862 RDI:
+> 0000000000000000
+> [   79.403310] RBP: ffffb97e8c54be80 R08: 0000000000000002 R09:
+> 000000000002c4c0
+> [   79.403311] R10: 011b921e580bc454 R11: ffff9781bf76bb44 R12:
+> 0000000000000002
+> [   79.403311] R13: ffffffffbd14c120 R14: ffffffffbd14c208 R15:
+> ffffffffbd14c1f0
+> [   79.403314]  cpuidle_enter+0x2e/0x40
+> [   79.403318]  call_cpuidle+0x23/0x40
+> [   79.403319]  do_idle+0x230/0x270
+> [   79.403320]  cpu_startup_entry+0x1d/0x20
+> [   79.403325]  start_secondary+0x170/0x1c0
+> [   79.403329]  secondary_startup_64+0xb6/0xc0
+> [  109.674334] nvme nvme0: I/O 754 QID 34 timeout, aborting
+> [  109.674395] nvme nvme0: Abort status: 0x0
+> [  139.879453] nvme nvme0: I/O 754 QID 34 timeout, reset controller
+> [  139.895263] FAULT_INJECTION: forcing a failure.
+>                name fail_io_timeout, interval 1, probability 100, space 0,
+> times 999
+> [  139.895265] CPU: 5 PID: 2470 Comm: kworker/5:1H Not tainted 5.7.0-rc7+ #1
+> [  139.895266] Hardware name: Oracle Corporation ORACLE SERVER
+> X6-2/ASM,MOTHERBOARD,1U, BIOS 38050100 08/30/2016
+> [  139.895271] Workqueue: kblockd blk_mq_timeout_work
+> [  139.895272] Call Trace:
+> [  139.895279]  dump_stack+0x6d/0x9a
+> [  139.895281]  should_fail.cold.5+0x32/0x42
+> [  139.895282]  blk_should_fake_timeout+0x26/0x30
+> [  139.895283]  blk_mq_complete_request+0x1b/0x120
+> [  139.895292]  nvme_cancel_request+0x33/0x80 [nvme_core]
+> [  139.895296]  bt_tags_iter+0x48/0x50
+> [  139.895297]  blk_mq_tagset_busy_iter+0x1eb/0x270
+> [  139.895299]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
+> [  139.895301]  ? nvme_try_sched_reset+0x40/0x40 [nvme_core]
+> [  139.895305]  nvme_dev_disable+0x2be/0x460 [nvme]
+> [  139.895307]  nvme_timeout.cold.80+0x9c/0x182 [nvme]
+> [  139.895311]  ? sched_clock+0x9/0x10
+> [  139.895315]  ? sched_clock_cpu+0x11/0xc0
+> [  139.895320]  ? __switch_to_asm+0x40/0x70
+> [  139.895321]  blk_mq_check_expired+0x192/0x1b0
+> [  139.895322]  bt_iter+0x52/0x60
+> [  139.895323]  blk_mq_queue_tag_busy_iter+0x1a0/0x2e0
+> [  139.895325]  ? __switch_to_asm+0x40/0x70
+> [  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
+> [  139.895326]  ? __blk_mq_requeue_request+0xf0/0xf0
+> [  139.895329]  ? compat_start_thread+0x20/0x40
+> [  139.895330]  blk_mq_timeout_work+0x5a/0x130
+> [  139.895333]  process_one_work+0x1ab/0x380
+> [  139.895334]  worker_thread+0x37/0x3b0
+> [  139.895335]  kthread+0x120/0x140
+> [  139.895337]  ? create_worker+0x1b0/0x1b0
+> [  139.895337]  ? kthread_park+0x90/0x90
+> [  139.895339]  ret_from_fork+0x35/0x40
+> [  139.897859] nvme nvme0: Shutdown timeout set to 10 seconds
+> [  139.901186] nvme nvme0: 56/0/0 default/read/poll queues
 
-Please balance braces in if-statements as required by the kernel coding style.
+The above just shows the stack trace which fakes the timeout failure.
+Not see any hang stack trace.
 
-> +	else {
-> +		/*
-> +		 * For queues that do not have a gendisk attached to them, the
-> +		 * debugfs directory will not have been created at setup time.
-> +		 * Create it here lazily, it will only be removed when the
-> +		 * queue is torn down.
-> +		 */
+The reason is that you set 100% failure, then no any request can move
+on. And each request is tried 100 times, which may take too long
+to complete given the default timeout is 30sec.
 
-Is the above comment perhaps a reference to blk_register_queue()? If so, please
-mention the name of that function explicitly.
+ echo 100 > /sys/kernel/debug/fail_io_timeout/probability
+ echo 1000 > /sys/kernel/debug/fail_io_timeout/times
 
-> +		if (!q->debugfs_dir) {
-> +			q->debugfs_dir =
-> +				debugfs_create_dir(buts->name,
-> +						   blk_debugfs_root);
-> +		}
-> +		dir = q->debugfs_dir;
-> +	}
-> +
-> +	/*
-> +	 * As blktrace relies on debugfs for its interface the debugfs directory
-> +	 * is required, contrary to the usual mantra of not checking for debugfs
-> +	 * files or directories.
-> +	 */
-> +	if (IS_ERR_OR_NULL(q->debugfs_dir)) {
-> +		pr_warn("debugfs_dir not present for %s so skipping\n",
-> +			buts->name);
-> +		return -ENOENT;
-> +	}
+If you stop the injection via below command after some time, such as 5min
+since starting the script, you will see the test done with this patchset.
 
-How are do_blk_trace_setup() calls serialized against the debugfs directory
-creation code in blk_register_queue()? Perhaps via q->blk_trace_mutex? Are
-mutex lock and unlock calls for that mutex perhaps missing from
-compat_blk_trace_setup()?
+	echo 0 > /sys/block/nvme0n1/io-timeout-fail
 
-How about adding a lockdep_assert_held(&q->blk_trace_mutex) statement in
-do_blk_trace_setup()?
+Without this patches, the controller can be removed very soon.
 
 Thanks,
+Ming
 
-Bart.
+> 
+> On 5/20/20 4:56 AM, Ming Lei wrote:
+> > Hi,
+> > 
+> > For nvme-pci, after controller is recovered, in-flight IOs are waited
+> > before updating nr hw queues. If new controller error happens during
+> > this period, nvme-pci driver deletes the controller and fails in-flight
+> > IO. This way is too violent, and not friendly from user viewpoint.
+> > 
+> > Add APIs for checking if queue is frozen, and replace nvme_wait_freeze
+> > in nvme-pci reset handler with checking if all ns queues are frozen &
+> > controller disabled. Then a fresh new reset can be scheduled for
+> > handling new controller error during waiting for in-flight IO completion.
+> > 
+> > So deleting controller & failing IOs can be avoided in this situation.
+> > 
+> > Without this patches, when fail io timeout injection is run, the
+> > controller can be removed very quickly. With this patch, no controller
+> > removing can be observed, and controller can recover to normal state
+> > after stopping to inject io timeout failure.
+> > 
+> > Ming Lei (3):
+> >    blk-mq: add API of blk_mq_queue_frozen
+> >    nvme: add nvme_frozen
+> >    nvme-pci: make nvme reset more reliable
+> > 
+> >   block/blk-mq.c           |  6 ++++++
+> >   drivers/nvme/host/core.c | 14 ++++++++++++++
+> >   drivers/nvme/host/nvme.h |  1 +
+> >   drivers/nvme/host/pci.c  | 37 ++++++++++++++++++++++++++++++-------
+> >   include/linux/blk-mq.h   |  1 +
+> >   5 files changed, 52 insertions(+), 7 deletions(-)
+> > 
+> 
+> _______________________________________________
+> linux-nvme mailing list
+> linux-nvme@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-nvme
+
+-- 
+Ming
+
