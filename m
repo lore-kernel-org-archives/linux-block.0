@@ -2,102 +2,121 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD2FC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB55BC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 22:23:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6A3E20707
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C25AB20810
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 22:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WZeC7eO7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgr42ZBk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727947AbgE2Vzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 17:55:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53758 "EHLO
+        id S1727964AbgE2WXW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 18:23:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726975AbgE2Vzh (ORCPT
+        with ESMTP id S1727112AbgE2WXU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 17:55:37 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B0BC08C5C9
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:55:37 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id f185so5626530wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:55:37 -0700 (PDT)
+        Fri, 29 May 2020 18:23:20 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB36C03E969
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 15:23:20 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id x14so5732905wrp.2
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 15:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=y+7fPyOVJN5kEZ9dPieR6MlsnghgeDslNqLeQyzk6T0=;
-        b=WZeC7eO7/F1ZaHD2HPukUdjFIz2gU316B+8AUCkZ3RKsm7iLEROxDs+nbuAmSb/M1D
-         oto7q3ImBObrsf7Z8ZjIa2xJvNFfpmhYKUXEMNdbGPul2Odv8xHsR0jxFRbs75pFsx8s
-         tEBmiGdLzbVZNYQ5xTX0vEWNkGPpXNroUaoy77ja1l5tGYab04onKEOIRN3Mi46GrMtQ
-         SetD/TtpId/Ilf7VGL1u8VPwxrB29EEl3tywWnAl0i+PVtPjDP3lxNZ07IpbuOUE4a55
-         fiblyxy3HtslcCuCq66nOo+R7FDVhxyx46HZvQ+KZjC/3rkGtvP+LfVqOmpJFfg5Znu7
-         Qzgg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WhUWUhv2t93m8FZWyi4PhqbyZ2LKivXiPEzLODLgNE4=;
+        b=cgr42ZBkgMxXl6FziWMPoLfX+f3yDnZNqqrNP+zSsEOr80755Zu3tUe+x7JQTsig67
+         lKte5BfjXrgkquAyRGC5pALpkBNZJNYmJoq6E80j8g1YjsU+wLVytC9Rt2yqTTYwbqNq
+         Yl2tFy/qU00FJIHywAbt43zHEXm92nPDQ8q3NX3JuTmPfUaeMVRgUKehx7/x+NmZZxu5
+         8gQfg/GZaK5FX6lfmjvcAHXRNuqjZ3u548omN8R0cu+XZQh8saAycKu1lcTw7Kx36RUz
+         TIueIq21Er0KG8JD2C6iEzZXtnHeYvh29/ZYZWA8KwxyoatBY9NnCeyfKlMxoXxYuDkk
+         fRWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=y+7fPyOVJN5kEZ9dPieR6MlsnghgeDslNqLeQyzk6T0=;
-        b=tBa6qGjI3Qj9aMxzYZG9GVXZfyiLfzXlaikRDxwgXN9gMXhnkP2yYKjtSjz9ITWycY
-         6NaVdUP+RucK/GPw94/HL5SdMYlHOmcf/7MYVhzn34C2U7AHZRXgzDJ+3kYuBljPn94v
-         wjQ/1SBMnVxaJxKD+mvfFA/AyvgAhaOBGOFkD8VT+ggEirOtQiR7l+yCRsmE37/7DSuD
-         Sujx/T0cVCXNen4m1k90cNTbkA/Qlnv4BMDnvccxHn1BKxg6zzGgwyDVAVg4G4rnp7xR
-         Q5UckJncSDMttKICka5qthVS4Va3AbvDpoFm0xB3IrxJGlcaGEr0jzgaGhvrKCFWwCpl
-         x8Cw==
-X-Gm-Message-State: AOAM530n29gytn3hXpVBQtwhoDwzwxVKfXsm6lHHwx73iUIO7RB+RE6d
-        wNwGTlCZ7VUiELTrwrU24S0x/kQevSefSw==
-X-Google-Smtp-Source: ABdhPJwebDU0toeDqVExcoUsOjyNPjev/ummN9l/P8IRsg1/RBgPJu0TE/gEy3JksZSZdsnGz7qe6A==
-X-Received: by 2002:a05:600c:3cf:: with SMTP id z15mr10058213wmd.24.1590789335789;
-        Fri, 29 May 2020 14:55:35 -0700 (PDT)
-Received: from ?IPv6:2001:16b8:4826:7300:a436:5e5d:3e25:d8b3? ([2001:16b8:4826:7300:a436:5e5d:3e25:d8b3])
-        by smtp.gmail.com with ESMTPSA id t14sm5080616wri.7.2020.05.29.14.55.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 14:55:35 -0700 (PDT)
-Subject: Re: [PATCH 0/4] cleanup for blk-wbt and blk-throttle
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org
-References: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <f308bc7f-083a-d0f3-aad2-b353c241dbde@cloud.ionos.com>
-Date:   Fri, 29 May 2020 23:55:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WhUWUhv2t93m8FZWyi4PhqbyZ2LKivXiPEzLODLgNE4=;
+        b=lVHz2hDMXXxicq7XQviXvEeDPwdMJVHtj80NWWe91eTJPZ3thgxqm540pCri03+tH0
+         MI75K4gJy8g2Eqf+VyEbg3+PsnFw4EwjKpr3KZUvBM2Ay3Q8hK0EfBa9lvkONtM0hFAX
+         5SwWgU10nT30Q82q1i/pI926QcS6OmIiIrmN5vuKD4biGzQRoOJ7s3HBm1ewj7rda31H
+         xEV8fzjG5+4RCrW5/K+WcsJloURpJ5vDXrX+ckyWIYLtUyXwimuy+02HMqw30Qsc14Gu
+         H9KMhXdEMy705XPiWCTM7cUFznxDFNh4otO/sZzXpdFgplVPTRQ4DtsoYeSjLk0/vxdo
+         VTbQ==
+X-Gm-Message-State: AOAM531BccQSMkhMf3xMFvkrLsF97WmzQCsZzSk9Rsh+YEJemmoUIJ3r
+        iqAOhD0V4TbSDgTfHtNZWwFvFuOnjGsl1viF71w=
+X-Google-Smtp-Source: ABdhPJxkGAbNH3w9I9hsRjgXZ2CBJoNRXCrsOtreFOCMf2Y8sbICZzHSYFGdh4X7H+3E8mg5/jDgDzHBZUXXQ5V0d7c=
+X-Received: by 2002:a5d:4745:: with SMTP id o5mr10092817wrs.87.1590790999382;
+ Fri, 29 May 2020 15:23:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20200528153441.3501777-1-kbusch@kernel.org> <20200528153441.3501777-2-kbusch@kernel.org>
+ <68629453-d776-59e5-cdc9-8681eb2bab37@oracle.com> <20200528191118.GB3504306@dhcp-10-100-145-180.wdl.wdc.com>
+ <20200528191443.GA3504350@dhcp-10-100-145-180.wdl.wdc.com>
+ <f9cbedc9-88b2-acc8-5b95-f1c247ab1525@oracle.com> <CACVXFVOTQ7HLV5DCP1XezPqha13LfUrj-fZE8++_BAoTvtPWMA@mail.gmail.com>
+ <20200529132217.GB3506625@dhcp-10-100-145-180.wdl.wdc.com>
+In-Reply-To: <20200529132217.GB3506625@dhcp-10-100-145-180.wdl.wdc.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Sat, 30 May 2020 06:23:08 +0800
+Message-ID: <CACVXFVMithaukPF45qFzTgzqQ2g2mhLbUD+-AyaNwVwZo7+CyA@mail.gmail.com>
+Subject: Re: [PATCHv3 2/2] nvme: cancel requests for real
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Alan Adamson <alan.adamson@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        linux-nvme <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Gently ping.
+On Fri, May 29, 2020 at 9:22 PM Keith Busch <kbusch@kernel.org> wrote:
+>
+> On Fri, May 29, 2020 at 11:39:46AM +0800, Ming Lei wrote:
+> > On Fri, May 29, 2020 at 4:19 AM Alan Adamson <alan.adamson@oracle.com> wrote:
+> > That said NVMe's
+> > error handling becomes better after applying the patchs of '[PATCH
+> > 0/3] blk-mq/nvme: improve
+> > nvme-pci reset handler'.
+>
+> I think that's a bit debatable. Alan is synthesizing a truly broken
+> controller. The current code will abandon this controller after about 30
 
-On 5/9/20 12:00 AM, Guoqing Jiang wrote:
-> Hi,
->
-> Find some functions can be removed since there is no caller of them when
-> read the code.
->
-> Thanks,
-> Guoqing
->
-> Guoqing Jiang (4):
->    blk-throttle: remove blk_throtl_drain
->    blk-throttle: remove tg_drain_bios
->    blk-wbt: remove wbt_update_limits
->    blk-wbt: rename __wbt_update_limits to wbt_update_limits
->
->   block/blk-throttle.c | 63 --------------------------------------------
->   block/blk-wbt.c      | 16 +++--------
->   block/blk-wbt.h      |  4 ---
->   block/blk.h          |  2 --
->   4 files changed, 4 insertions(+), 81 deletions(-)
->
+Not sure it can be thought as a truly broken controller. When waiting
+on nvme_wait_freeze()
+during reset, the controller has been in normal state.  There is still chance to
+trigger timeout by any occasional event, just like any other timeout,
+which isn't
+special enough for us to have to kill the controller.
 
+> seconds. Your series will reset that broken controller indefinitely.
+> Which of those options is better?
+
+Removing controller is very horrible, because it becomes a brick
+basically, together
+with data loss. And we should retry enough before killing the controller.
+
+Mys series doesn't reset indefinitely since every request is just
+retried limited
+times(default is 5), at least chance should be provided to retry
+claimed times for IO
+requests.
+
+>
+> I think degrading to an admin-only mode at some point would be preferable.
+
+If the timeout event is occasional, this way gives up too early and
+doesn't retry
+claimed times, then peopele may complain for data loss.
+
+
+Thanks,
+Ming Lei
