@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BEDC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95450C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07995206A1
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71507206A1
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bw6Al2Vo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DFYWiKfo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbgE2Nxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 09:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
+        id S1725901AbgE2Nxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 09:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbgE2Nxd (ORCPT
+        with ESMTP id S1726849AbgE2Nxf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 09:53:33 -0400
+        Fri, 29 May 2020 09:53:35 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1BCC03E969
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942A4C03E969
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=1r5IEc02VUb3EztNfiI4r3PGboatTSx3DytUYbpgYu0=; b=bw6Al2Vo8Om8JmGv3LA2+uZx9G
-        PLCKaodgxGKwHVXTlHzYQDAOgCeq9hVGRDFgI6EBnsaLL8hVygWB0ur0tz5JaOMj03XFD6c5N73GW
-        5O14dGBD1kyD73JvkPy2q/xjf1Bk9/aT4D65sExWjNzu6jA2uc6qy0nqTz/NnuUKHil6fz+WEitLl
-        +w5+lCdFCKhyW8GLIezhw/CZFzOEghQcPjytop7jsKqR9SBkg+hIos6xrGXFq5nq3Q9HiuF9DBc3F
-        uGpV6pJ1Elsw7J1eZufwWNXuIn5F/kx37CHbdtnozhHKWAUqgJvtoOTmqPfP7xQXXkDfxCwXyHzWG
-        Pc3GWsWw==;
+        bh=HxvxgA19pkd+Givz+iqH/9Lq41iOhVxepIPT/LRhjCE=; b=DFYWiKfoSARaZI5fbFjlm4VaVx
+        MzbTDfd228r4B5LFOZ21z9380UD8BkSzDMLq/K601dQp8820vvXnW0AYDiMbfQk+IwKzP8yxYhdzH
+        fzC4g93y+cIAS2GZ/OyW6CyRK1tpZqjzMlbr/ND2KXSAQuCZXZAi69TKYKhX2oW4qWnx14sbNgZXP
+        sWC0JQYlUpeMSvj5fJBG2P6Sm60m6bMO6V2d1fp6xR8Prhyvo/Rpol+zaaVeMJULIlAA8ncSQMiI2
+        tR4mJmF9FfTK6oMos60ZYtCFLTyMFBdQgeVWgUg0bSw8iMfpz3NkAUj0G96RUDkxrJx62WRfrJZ+k
+        0zeZxEqA==;
 Received: from p4fdb1ad2.dip0.t-ipconnect.de ([79.219.26.210] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jefRz-0000pa-7c; Fri, 29 May 2020 13:53:31 +0000
+        id 1jefS1-0000q4-P4; Fri, 29 May 2020 13:53:34 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Hannes Reinecke <hare@suse.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
-Date:   Fri, 29 May 2020 15:53:12 +0200
-Message-Id: <20200529135315.199230-6-hch@lst.de>
+Subject: [PATCH 6/8] blk-mq: open code __blk_mq_alloc_request in blk_mq_alloc_request_hctx
+Date:   Fri, 29 May 2020 15:53:13 +0200
+Message-Id: <20200529135315.199230-7-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529135315.199230-1-hch@lst.de>
 References: <20200529135315.199230-1-hch@lst.de>
@@ -61,140 +59,115 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
+blk_mq_alloc_request_hctx is only used for NVMeoF connect commands, so
+tailor it to the specific requirements, and don't bother the general
+fast path code with its special twinkles.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de
 Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/blk-mq-tag.c |  8 ++++----
- block/blk-mq.c     | 14 +++++++-------
- block/blk-mq.h     |  4 ++--
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ block/blk-mq.c | 44 +++++++++++++++++++++++---------------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index c76ba4f90fa09..597ff9c27cf63 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -92,7 +92,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- {
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
- 	    !hctx_may_queue(data->hctx, bt))
--		return -1;
-+		return BLK_MQ_NO_TAG;
- 	if (data->shallow_depth)
- 		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
- 	else
-@@ -121,7 +121,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	}
- 
- 	tag = __blk_mq_get_tag(data, bt);
--	if (tag != -1)
-+	if (tag != BLK_MQ_NO_TAG)
- 		goto found_tag;
- 
- 	if (data->flags & BLK_MQ_REQ_NOWAIT)
-@@ -143,13 +143,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 		 * as running the queue may also have found completions.
- 		 */
- 		tag = __blk_mq_get_tag(data, bt);
--		if (tag != -1)
-+		if (tag != BLK_MQ_NO_TAG)
- 			break;
- 
- 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
- 
- 		tag = __blk_mq_get_tag(data, bt);
--		if (tag != -1)
-+		if (tag != BLK_MQ_NO_TAG)
- 			break;
- 
- 		bt_prev = bt;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3fbc08d879452..696202e6e304f 100644
+index 696202e6e304f..d8c17ab0c7c22 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -278,7 +278,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	req_flags_t rq_flags = 0;
+@@ -351,21 +351,13 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+ 	struct elevator_queue *e = q->elevator;
+-	unsigned int tag;
+-	bool clear_ctx_on_error = false;
+ 	u64 alloc_time_ns = 0;
++	unsigned int tag;
  
- 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
--		rq->tag = -1;
-+		rq->tag = BLK_MQ_NO_TAG;
- 		rq->internal_tag = tag;
- 	} else {
- 		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
-@@ -286,7 +286,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 			atomic_inc(&data->hctx->nr_active);
- 		}
- 		rq->tag = tag;
--		rq->internal_tag = -1;
-+		rq->internal_tag = BLK_MQ_NO_TAG;
- 		data->hctx->tags->rqs[rq->tag] = rq;
+ 	/* alloc_time includes depth and tag waits */
+ 	if (blk_queue_rq_alloc_time(q))
+ 		alloc_time_ns = ktime_get_ns();
+ 
+-	if (likely(!data->ctx)) {
+-		data->ctx = blk_mq_get_ctx(q);
+-		clear_ctx_on_error = true;
+-	}
+-	if (likely(!data->hctx))
+-		data->hctx = blk_mq_map_queue(q, data->cmd_flags,
+-						data->ctx);
+ 	if (data->cmd_flags & REQ_NOWAIT)
+ 		data->flags |= BLK_MQ_REQ_NOWAIT;
+ 
+@@ -381,17 +373,16 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ 		    e->type->ops.limit_depth &&
+ 		    !(data->flags & BLK_MQ_REQ_RESERVED))
+ 			e->type->ops.limit_depth(data->cmd_flags, data);
+-	} else {
+-		blk_mq_tag_busy(data->hctx);
  	}
  
-@@ -483,9 +483,9 @@ static void __blk_mq_free_request(struct request *rq)
- 	blk_crypto_free_request(rq);
- 	blk_pm_mark_last_busy(rq);
- 	rq->mq_hctx = NULL;
--	if (rq->tag != -1)
-+	if (rq->tag != BLK_MQ_NO_TAG)
- 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
--	if (sched_tag != -1)
-+	if (sched_tag != BLK_MQ_NO_TAG)
- 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
- 	blk_mq_sched_restart(hctx);
- 	blk_queue_exit(q);
-@@ -534,7 +534,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- 		blk_stat_add(rq, now);
- 	}
- 
--	if (rq->internal_tag != -1)
-+	if (rq->internal_tag != BLK_MQ_NO_TAG)
- 		blk_mq_sched_completed_request(rq, now);
- 
- 	blk_account_io_done(rq, now);
-@@ -1033,7 +1033,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
- 	};
- 	bool shared;
- 
--	if (rq->tag != -1)
-+	if (rq->tag != BLK_MQ_NO_TAG)
- 		return true;
- 
- 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
-@@ -1049,7 +1049,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
- 		data.hctx->tags->rqs[rq->tag] = rq;
- 	}
- 
--	return rq->tag != -1;
-+	return rq->tag != BLK_MQ_NO_TAG;
++	data->ctx = blk_mq_get_ctx(q);
++	data->hctx = blk_mq_map_queue(q, data->cmd_flags, data->ctx);
++	if (!(data->flags & BLK_MQ_REQ_INTERNAL))
++		blk_mq_tag_busy(data->hctx);
++
+ 	tag = blk_mq_get_tag(data);
+-	if (tag == BLK_MQ_NO_TAG) {
+-		if (clear_ctx_on_error)
+-			data->ctx = NULL;
++	if (tag == BLK_MQ_NO_TAG)
+ 		return NULL;
+-	}
+-
+ 	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
  }
  
- static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 10bfdfb494faf..a139b06318174 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -201,7 +201,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
- 					   struct request *rq)
- {
- 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
--	rq->tag = -1;
-+	rq->tag = BLK_MQ_NO_TAG;
+@@ -431,17 +422,22 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
+ 	};
+-	struct request *rq;
++	u64 alloc_time_ns = 0;
+ 	unsigned int cpu;
++	unsigned int tag;
+ 	int ret;
  
- 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
- 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-@@ -211,7 +211,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
++	/* alloc_time includes depth and tag waits */
++	if (blk_queue_rq_alloc_time(q))
++		alloc_time_ns = ktime_get_ns();
++
+ 	/*
+ 	 * If the tag allocator sleeps we could get an allocation for a
+ 	 * different hardware context.  No need to complicate the low level
+ 	 * allocator for this for the rare use case of a command tied to
+ 	 * a specific queue.
+ 	 */
+-	if (WARN_ON_ONCE(!(flags & BLK_MQ_REQ_NOWAIT)))
++	if (WARN_ON_ONCE(!(flags & (BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_RESERVED))))
+ 		return ERR_PTR(-EINVAL);
  
- static inline void blk_mq_put_driver_tag(struct request *rq)
- {
--	if (rq->tag == -1 || rq->internal_tag == -1)
-+	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
- 		return;
+ 	if (hctx_idx >= q->nr_hw_queues)
+@@ -462,11 +458,17 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
+ 	data.ctx = __blk_mq_get_ctx(q, cpu);
  
- 	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
++	if (q->elevator)
++		data.flags |= BLK_MQ_REQ_INTERNAL;
++	else
++		blk_mq_tag_busy(data.hctx);
++
+ 	ret = -EWOULDBLOCK;
+-	rq = __blk_mq_alloc_request(&data);
+-	if (!rq)
++	tag = blk_mq_get_tag(&data);
++	if (tag == BLK_MQ_NO_TAG)
+ 		goto out_queue_exit;
+-	return rq;
++	return blk_mq_rq_ctx_init(&data, tag, alloc_time_ns);
++
+ out_queue_exit:
+ 	blk_queue_exit(q);
+ 	return ERR_PTR(ret);
 -- 
 2.26.2
 
