@@ -2,168 +2,194 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C7CC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAACC433E1
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:25:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBF29208B8
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:12:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590786766;
-	bh=O6cQO5tlO36gsHjj1jLNoFC04gY2apWmhvaGhlMaXd0=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
-	 From;
-	b=Bek+HMGJRjAe6lufy/jKEvs7EWVuZhxT5oYLZ5s5PnCoO0r3i8aBV5GmrsZy5FuE8
-	 V6R4hj0IekRsZJQmj/UAz/LMdzUgMXvA6gMr1gsSlmJQMIBZ9xcd0cxLAHlwXP66zp
-	 zCpb6ClD63gLjUzgu78aGPMQcg+Y9P+8B7QbH7QU=
+	by mail.kernel.org (Postfix) with ESMTP id A58AD20776
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:25:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sShWQ8ck"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728242AbgE2VMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 17:12:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34984 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728040AbgE2VMp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 17:12:45 -0400
-Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 16E24206A4;
-        Fri, 29 May 2020 21:12:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590786764;
-        bh=O6cQO5tlO36gsHjj1jLNoFC04gY2apWmhvaGhlMaXd0=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=ZvcT9Y/WNAMnfrUmU/Kfg1oTNlvf0Rqu77+5g4B273ssf0F3fhvJtgaOEtltpsTeh
-         hLLMCGr7Xp1XRKwpIv759+2c2h0pttmmfYAeW7K7T9St/ZSBV9gBHUM22X7djMmfV+
-         zTGnxTujmn+ivQQFpbdziNO9CvhpawKBZPKf3y5M=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id 00AFC3522A6E; Fri, 29 May 2020 14:12:43 -0700 (PDT)
-Date:   Fri, 29 May 2020 14:12:43 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/8] blk-mq: drain I/O when all CPUs in a hctx are offline
-Message-ID: <20200529211243.GG2869@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200528014601.GC933147@T590>
- <1ec7922c-f2b0-08ec-5849-f4eb7f71e9e7@acm.org>
- <20200528051932.GA1008129@T590>
- <4fb6f0cf-a356-833e-25ab-47f9131c729b@acm.org>
- <20200528172121.GN2869@paulmck-ThinkPad-P72>
- <20200529015304.GC1075489@T590>
- <20200529030728.GW2869@paulmck-ThinkPad-P72>
- <20200529035315.GD1075489@T590>
- <20200529181352.GF2869@paulmck-ThinkPad-P72>
- <00b74229-f943-fb4b-ade4-3f4511c33146@acm.org>
+        id S1727879AbgE2VZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 17:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727964AbgE2VZt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 May 2020 17:25:49 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26BFC03E969
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:25:49 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id g18so3153293qtu.13
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:25:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0NVhJpZVOHuuQ+bSCwQVo2cpvSDBbOMGIQW9zICcowo=;
+        b=sShWQ8ck7UwdQzbNXfEGDqaVlJTJYDI2Eg5NaAacCL4Urm6bYmuWp5OHNJCYp2k/yf
+         hBMbF6to5RL2zs0hv42KuYGzDlH37+UHm3jJmNRBuqbU9itQf3FXs2HIRTDN0llyIZaR
+         hA+CdLEOVGRmpJaLSKfAdaa+zOxvN8NFcBrTR9/dK7xWY52ywdQoCP3tXIUf9XXrqgRx
+         8LruET2uArxZb6p4dY9C9f5LSp/ATie2Pk1AABu3YhsIiFSgGoUP2G0rY9q5Ra3fc46H
+         dW/l/W3GAnHYOo4YkSjHGd6+4wpV0pfgJjsn/wXfneipvYoJMF7SjlRIHHGTEfNU7PIk
+         ZlNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0NVhJpZVOHuuQ+bSCwQVo2cpvSDBbOMGIQW9zICcowo=;
+        b=kplN3Ak5F5WhkEC2Ga+kqyqfSQ+EC1yAAdEdKWgJ+z3WQJigd7uCfIxBi64JQYr2+5
+         5MGH6+VnUj2AaOL9zfQWENi87u6IiXvopPvL07p+lAhSJAYz7OJMFjLwrAL4cTvjcDgB
+         8HDKhmC6qR+ysmQDraUjL0Kl2L/yViSsN4quPBpaeaiuBEEyp6f1ssUMh52IKmYJAlps
+         LDHj1b5VBa69uN7LP48XN0B50HkAH0nY+ATeXT0jQwE8gdyt5CAnGOxxmYRm3JosZUbg
+         zRRUghdtd/zD/XiKL8rpbzM5HpINObFqY/YdkNMpkrq/3kVMPKda7VyycB25rGMeWa6l
+         X12w==
+X-Gm-Message-State: AOAM5315eMZaw1XYma77enFR7lqJp9FILqlWMOj6uPQMuzY7LJa6yObh
+        Xjs8fGbG9JVz0sqRae0+1sd8VA==
+X-Google-Smtp-Source: ABdhPJzCWnh+qgUZ+gmRtXuj/lng/ZiY1JuE9JmrdKcfdhJJzfBAi5DgZbwsyKKm2WIb0OohXni2qQ==
+X-Received: by 2002:ac8:6ec2:: with SMTP id f2mr10845034qtv.309.1590787548822;
+        Fri, 29 May 2020 14:25:48 -0700 (PDT)
+Received: from [192.168.1.92] (pool-71-255-246-27.washdc.fios.verizon.net. [71.255.246.27])
+        by smtp.gmail.com with ESMTPSA id e57sm8023438qta.12.2020.05.29.14.25.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2020 14:25:48 -0700 (PDT)
+Subject: Re: [RFC PATCH v4 4/4] scsi: ufs-qcom: add Inline Crypto Engine
+ support
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Andy Gross <agross@kernel.org>,
+        Avri Altman <avri.altman@wdc.com>,
+        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Can Guo <cang@codeaurora.org>,
+        Elliot Berman <eberman@codeaurora.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Satya Tangirala <satyat@google.com>
+References: <20200501045111.665881-1-ebiggers@kernel.org>
+ <20200501045111.665881-5-ebiggers@kernel.org>
+ <31fa95e5-7757-96ae-2e86-1f54959e3a6c@linaro.org>
+ <20200507180435.GB236103@gmail.com> <20200507180838.GC236103@gmail.com>
+ <40600d42-dfa9-b60c-6ce8-0eda6bdf7ddf@linaro.org>
+ <20200529171326.GA82398@gmail.com>
+From:   Thara Gopinath <thara.gopinath@linaro.org>
+Message-ID: <676394c6-4250-8998-d959-68cd218991e5@linaro.org>
+Date:   Fri, 29 May 2020 17:25:47 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00b74229-f943-fb4b-ade4-3f4511c33146@acm.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200529171326.GA82398@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 29, 2020 at 12:55:43PM -0700, Bart Van Assche wrote:
-> On 2020-05-29 11:13, Paul E. McKenney wrote:
-> > On Fri, May 29, 2020 at 11:53:15AM +0800, Ming Lei wrote:
-> >> Another pair is in blk_mq_get_tag(), and we expect the following two
-> >> memory OPs are ordered:
-> >>
-> >> 1) set bit in successful test_and_set_bit_lock(), which is called
-> >> from sbitmap_get()
-> >>
-> >> 2) test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)
-> >>
-> >> Do you think that the above two OPs are ordered?
-> > 
-> > Given that he has been through the code, I would like to hear Bart's
-> > thoughts, actually.
+
+
+On 5/29/20 1:13 PM, Eric Biggers wrote:
+> On Fri, May 29, 2020 at 11:54:18AM -0400, Thara Gopinath wrote:
+>> On 5/7/20 2:08 PM, Eric Biggers wrote:
+>>> On Thu, May 07, 2020 at 11:04:35AM -0700, Eric Biggers wrote:
+>>>> Hi Thara,
+>>>>
+>>>> On Thu, May 07, 2020 at 08:36:58AM -0400, Thara Gopinath wrote:
+>>>>>
+>>>>>
+>>>>> On 5/1/20 12:51 AM, Eric Biggers wrote:
+>>>>>> From: Eric Biggers <ebiggers@google.com>
+>>>>>>
+>>>>>> Add support for Qualcomm Inline Crypto Engine (ICE) to ufs-qcom.
+>>>>>>
+>>>>>> The standards-compliant parts, such as querying the crypto capabilities
+>>>>>> and enabling crypto for individual UFS requests, are already handled by
+>>>>>> ufshcd-crypto.c, which itself is wired into the blk-crypto framework.
+>>>>>> However, ICE requires vendor-specific init, enable, and resume logic,
+>>>>>> and it requires that keys be programmed and evicted by vendor-specific
+>>>>>> SMC calls.  Make the ufs-qcom driver handle these details.
+>>>>>>
+>>>>>> I tested this on Dragonboard 845c, which is a publicly available
+>>>>>> development board that uses the Snapdragon 845 SoC and runs the upstream
+>>>>>> Linux kernel.  This is the same SoC used in the Pixel 3 and Pixel 3 XL
+>>>>>> phones.  This testing included (among other things) verifying that the
+>>>>>> expected ciphertext was produced, both manually using ext4 encryption
+>>>>>> and automatically using a block layer self-test I've written.
+>>>>> Hello Eric,
+>>>>>
+>>>>> I am interested in testing out this series on 845, 855 and if possile on 865
+>>>>> platforms. Can you give me some more details about your testing please.
+>>>>>
+>>>>
+>>>> Great!  You can test this with fscrypt, a.k.a. ext4 or f2fs encryption.
+>>>>
+>>>> A basic manual test would be:
+>>>>
+>>>> 1. Build a kernel with:
+>>>>
+>>>> 	CONFIG_BLK_INLINE_ENCRYPTION=y
+>>>> 	CONFIG_FS_ENCRYPTION=y
+>>>> 	CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y
+>>>
+>>> Sorry, I forgot: 'CONFIG_SCSI_UFS_CRYPTO=y' is needed too.
+>>
+>> Hi Eric,
+>>
+>> I tested this manually on db845c, sm8150-mtp and sm8250-mtp.(I added the dts
+>> file entries for 8150 and 8250).
+>>
+>> I also ran OsBench test case createfiles[1] on the above platforms.
+>> Following are the results on a non encrypted and encrypted directory on the
+>> same file system(lower the number better)
+>>
+>> 			8250-MTP	8150-MTP	DB845
+>>
+>> nonencrypt_dir(us) 	55.3108954	26.8323124    69.5709552
+>> encrypt_dir(us) 	70.0214426	37.5411254    92.3818296
+>>
+>>
+>>
+>> 1. https://github.com/mbitsnbites/osbench/blob/master/README.md
+>>
 > 
-> Hi Paul,
+> Great, thanks for testing.
 > 
-> My understanding of the involved instructions is as follows (see also
-> https://lore.kernel.org/linux-block/b98f055f-6f38-a47c-965d-b6bcf4f5563f@huawei.com/T/#t
-> for the entire e-mail thread):
-> * blk_mq_hctx_notify_offline() sets the BLK_MQ_S_INACTIVE bit in
-> hctx->state, calls smp_mb__after_atomic() and waits in a loop until all
-> tags have been freed. Each tag is an integer number that has a 1:1
-> correspondence with a block layer request structure. The code that
-> iterates over block layer request tags relies on
-> __sbitmap_for_each_set(). That function examines both the 'word' and
-> 'cleared' members of struct sbitmap_word.
-> * What blk_mq_hctx_notify_offline() waits for is freeing of tags by
-> blk_mq_put_tag(). blk_mq_put_tag() frees a tag by setting a bit in
-> sbitmap_word.cleared (see also sbitmap_deferred_clear_bit()).
-> * Tag allocation by blk_mq_get_tag() relies on test_and_set_bit_lock().
-> The actual allocation happens by sbitmap_get() that sets a bit in
-> sbitmap_word.word. blk_mg_get_tag() tests the BLK_MQ_S_INACTIVE bit
-> after tag allocation succeeded.
+> Note that the benchmark you ran (creating many small files, then deleting them)
+> mostly tests the performance of filenames encryption and directory operations,
+> not file contents encryption.  Inline encryption is only used for file contents.
 > 
-> What confuses me is that blk_mq_hctx_notify_offline() uses
-> smp_mb__after_atomic() to enforce the order of memory accesses while
-> blk_mq_get_tag() relies on the acquire semantics of
-> test_and_set_bit_lock(). Usually ordering is enforced by combining two
-> smp_mb() calls or by combining a store-release with a load-acquire.
+> In fact, since that benchmark doesn't sync the files before deleting them, there
+> is no guarantee that any file contents are actually written to disk, and hence
+> no guarantee that inline encryption got used at all.
+
+Hi Eric,
+
+The results are particularly interesting if you think a sync is not 
+happening. There should not be any performance regression in this case 
+between the two directories. I can try some reading/writing performance 
+tests rather than creating files testing.
+
 > 
-> Does the Linux memory model provide the expected ordering guarantees
-> when combining load-acquire with smp_mb__after_atomic() as used in patch
-> 8/8 of this series?
+> It would be more relevant to test the performance of reading/writing file data.
+> 
+> Also, did you try doing any correctness tests?  (See what I suggested earlier.)
 
-Strictly speaking, smp_mb__after_atomic() works only in combination
-with a non-value-returning atomic operation. Let's look at a (silly)
-example where smp_mb__after_atomic() would not help in conjunction
-with smp_store_release():
+I did correctness test as part of manual tests by diffing the content of 
+the copied files and verifying them. I did not run any other tests you 
+mentioned. Feel free to add my Tested-by in the next version you send out.
 
-void thread1(void)
-{
-	smp_store_release(&x, 1);
-	smp_mb__after_atomic();
-	r1 = READ_ONCE(y);
-}
+> 
+> - Eric
+> 
 
-void thread2(void)
-{
-	smp_store_release(&y, 1);
-	smp_mb__after_atomic();
-	r2 = READ_ONCE(x);
-}
-
-Even on x86 (or perhaps especially on x86) it is quite possible that
-execution could end with r1 == r2 == 0 because on x86 there is no
-ordering whatsoever from smp_mb__after_atomic().  In this case,
-the CPU is well within its rights to reorder each thread's store
-with its later load.  Yes, even x86.
-
-On the other hand, suppose that the stores are non-value-returning
-atomics:
-
-void thread1(void)
-{
-	atomic_inc(&x);
-	smp_mb__after_atomic();
-	r1 = READ_ONCE(y);
-}
-
-void thread2(void)
-{
-	atomic_inc(&y);
-	smp_mb__after_atomic();
-	r2 = READ_ONCE(x);
-}
-
-In this case, for all architectures, there would be the equivalent
-of an smp_mb() full barrier associated with either the atomic_inc()
-or the smp_mb__after_atomic(), which would rule out the case where
-execution ends with r1 == r2 == 0.
-
-Does that help?
-
-							Thanx, Paul
+-- 
+Warm Regards
+Thara
