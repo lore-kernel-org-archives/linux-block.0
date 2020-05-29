@@ -2,240 +2,115 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED24C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 03:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A45C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 06:49:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60DFC2078C
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 03:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 609B32072D
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 06:49:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfHgC2P3"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="G3Q6Iq9g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728588AbgE2Dxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 May 2020 23:53:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53529 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728578AbgE2Dxf (ORCPT
+        id S1725768AbgE2Gtb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 02:49:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725562AbgE2Gta (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 May 2020 23:53:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590724413;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tLVztUdG71N2GEyZAgALhdDmfmTPgewakQAC+BFs32s=;
-        b=EfHgC2P3XFMlW1FKelPdMwqnWyU3xstrRJ2ibe9xD18dkMJjET04UDNg5Ju1GMsXQNBeoZ
-        rsvcZzEGpjtNQkRP0fSw5MiToLSKYhsSQW4MEwpxd5v/Pt/uLcO74s3VwnoAMSX7FPcGK/
-        tGEgQrNK5QMI8tNtQM3wxh2RqX8AjIg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-6sBSXuhCMjGg9s7jYzPvVg-1; Thu, 28 May 2020 23:53:30 -0400
-X-MC-Unique: 6sBSXuhCMjGg9s7jYzPvVg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B6EC18A0760;
-        Fri, 29 May 2020 03:53:28 +0000 (UTC)
-Received: from T590 (ovpn-12-157.pek2.redhat.com [10.72.12.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 08B0560C81;
-        Fri, 29 May 2020 03:53:19 +0000 (UTC)
-Date:   Fri, 29 May 2020 11:53:15 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Fri, 29 May 2020 02:49:30 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59664C03E969
+        for <linux-block@vger.kernel.org>; Thu, 28 May 2020 23:49:29 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id k11so973476ejr.9
+        for <linux-block@vger.kernel.org>; Thu, 28 May 2020 23:49:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=3MdeqVyB7qqljYQy1e+2+zaRWsAJCR017mMr9VXzZ4Y=;
+        b=G3Q6Iq9gGZmpk3gidKEg293iTpRBe03usgIvHj/o9dYqlqSG2a2o4i/vuUH7o39HZz
+         JbdjNQE1oDQp48dIw7wnU50wo0HT0NKGFSt0TGg/8B5IveZL9DPStnl0r+Xdog7qU9jR
+         JDEWI+nf7Yn3KBqZY9jPM26baohAPXo3S9ofUNsFYpzEbHwdN3GymLvNCrYtj0dJWPwq
+         BYAJzAhNsORPoyCBEt9U8tnLJRSD5UzHVbY7ts/3vbWk/ae6W1DaCCmOu366sQewdSP+
+         erERilRbZYTrjNCWlFek0u/X/9WCByrGA2NVsC8+5UCd4aJF0pMx+dBM4FMLfpFeWcYN
+         qZyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=3MdeqVyB7qqljYQy1e+2+zaRWsAJCR017mMr9VXzZ4Y=;
+        b=hJ7LJd23Q9cU1UaVuhywhzLIOEWTnW7WD8iIpnZZA4jMWpjYjNtHFSw9bZmRknbqoq
+         DBkr440oAZqLO3WEqv+1Vx2l9lXbEZU2oiIyDmcx+N3DMLFAETqnbnooIVnnl83F0n/h
+         Zxj14vOg4N6SX6PDCfPTMQ2sOEvCy/4yIwE6S3h9wdUO5MZhlXmJKrmSc67rQfJO2Jdx
+         DH3PIdcrb6r++mLxOxDKcUToC2TulKE8WXuK9FHxJbSPqLz7OAVX0+CVW3OBQ29Hoe4r
+         w+T60OIIf/tezGtyy6E35crlLkBqSgeg2HElS2BL8Lrk87QxUUQyT9TP9LMgVhpVnDGV
+         jgDw==
+X-Gm-Message-State: AOAM532+/6N0VzDgipnESBWXMf6SKsD98Ax/aVot9fXuVavYozWRLN2Q
+        frB96+jsCcGG6TI2jDrrbrV5iatkiFk=
+X-Google-Smtp-Source: ABdhPJwZLmIufYpWK0ymII3E3TftzSSzUlARdwH313AxcjBpnKCEsE/uvlbDTxzNnEsQNgLkfnPhqQ==
+X-Received: by 2002:a17:906:7f84:: with SMTP id f4mr6117632ejr.482.1590734968104;
+        Thu, 28 May 2020 23:49:28 -0700 (PDT)
+Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
+        by smtp.gmail.com with ESMTPSA id bd10sm5966118edb.10.2020.05.28.23.49.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 May 2020 23:49:27 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: pblk: Fix reference count leak in
+ pblk_sysfs_init.
+To:     wu000273@umn.edu, kjlu@umn.edu
+Cc:     Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/8] blk-mq: drain I/O when all CPUs in a hctx are offline
-Message-ID: <20200529035315.GD1075489@T590>
-References: <20200527180644.514302-1-hch@lst.de>
- <20200527180644.514302-9-hch@lst.de>
- <7acc7ab5-02f9-e6ee-e95f-175bc0df9cbc@acm.org>
- <20200528014601.GC933147@T590>
- <1ec7922c-f2b0-08ec-5849-f4eb7f71e9e7@acm.org>
- <20200528051932.GA1008129@T590>
- <4fb6f0cf-a356-833e-25ab-47f9131c729b@acm.org>
- <20200528172121.GN2869@paulmck-ThinkPad-P72>
- <20200529015304.GC1075489@T590>
- <20200529030728.GW2869@paulmck-ThinkPad-P72>
+References: <20200527210628.9477-1-wu000273@umn.edu>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <c67132e2-e684-74b8-2809-98e80fc944e6@lightnvm.io>
+Date:   Fri, 29 May 2020 08:49:26 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529030728.GW2869@paulmck-ThinkPad-P72>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200527210628.9477-1-wu000273@umn.edu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Paul,
+On 27/05/2020 23.06, wu000273@umn.edu wrote:
+> From: Qiushi Wu <wu000273@umn.edu>
+>
+> kobject_init_and_add() takes reference even when it fails.
+> Thus, when kobject_init_and_add() returns an error,
+> kobject_put() must be called to properly clean up the kobject.
+>
+> Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
+> Signed-off-by: Qiushi Wu <wu000273@umn.edu>
+> ---
+>   drivers/lightnvm/pblk-sysfs.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+> index 6387302b03f2..90f1433b19a2 100644
+> --- a/drivers/lightnvm/pblk-sysfs.c
+> +++ b/drivers/lightnvm/pblk-sysfs.c
+> @@ -711,6 +711,7 @@ int pblk_sysfs_init(struct gendisk *tdisk)
+>   					"%s", "pblk");
+>   	if (ret) {
+>   		pblk_err(pblk, "could not register\n");
+> +		kobject_put(&pblk->kobj);
+>   		return ret;
+>   	}
+>   
 
-On Thu, May 28, 2020 at 08:07:28PM -0700, Paul E. McKenney wrote:
-> On Fri, May 29, 2020 at 09:53:04AM +0800, Ming Lei wrote:
-> > Hi Paul,
-> > 
-> > Thanks for your response!
-> > 
-> > On Thu, May 28, 2020 at 10:21:21AM -0700, Paul E. McKenney wrote:
-> > > On Thu, May 28, 2020 at 06:37:47AM -0700, Bart Van Assche wrote:
-> > > > On 2020-05-27 22:19, Ming Lei wrote:
-> > > > > On Wed, May 27, 2020 at 08:33:48PM -0700, Bart Van Assche wrote:
-> > > > >> My understanding is that operations that have acquire semantics pair
-> > > > >> with operations that have release semantics. I haven't been able to find
-> > > > >> any documentation that shows that smp_mb__after_atomic() has release
-> > > > >> semantics. So I looked up its definition. This is what I found:
-> > > > >>
-> > > > >> $ git grep -nH 'define __smp_mb__after_atomic'
-> > > > >> arch/ia64/include/asm/barrier.h:49:#define __smp_mb__after_atomic()
-> > > > >> barrier()
-> > > > >> arch/mips/include/asm/barrier.h:133:#define __smp_mb__after_atomic()
-> > > > >> smp_llsc_mb()
-> > > > >> arch/s390/include/asm/barrier.h:50:#define __smp_mb__after_atomic()
-> > > > >> barrier()
-> > > > >> arch/sparc/include/asm/barrier_64.h:57:#define __smp_mb__after_atomic()
-> > > > >> barrier()
-> > > > >> arch/x86/include/asm/barrier.h:83:#define __smp_mb__after_atomic()	do {
-> > > > >> } while (0)
-> > > > >> arch/xtensa/include/asm/barrier.h:20:#define __smp_mb__after_atomic()	
-> > > > >> barrier()
-> > > > >> include/asm-generic/barrier.h:116:#define __smp_mb__after_atomic()
-> > > > >> __smp_mb()
-> > > > >>
-> > > > >> My interpretation of the above is that not all smp_mb__after_atomic()
-> > > > >> implementations have release semantics. Do you agree with this conclusion?
-> > > > > 
-> > > > > I understand smp_mb__after_atomic() orders set_bit(BLK_MQ_S_INACTIVE)
-> > > > > and reading the tag bit which is done in blk_mq_all_tag_iter().
-> > > > > 
-> > > > > So the two pair of OPs are ordered:
-> > > > > 
-> > > > > 1) if one request(tag bit) is allocated before setting BLK_MQ_S_INACTIVE,
-> > > > > the tag bit will be observed in blk_mq_all_tag_iter() from blk_mq_hctx_has_requests(),
-> > > > > so the request will be drained.
-> > > > > 
-> > > > > OR
-> > > > > 
-> > > > > 2) if one request(tag bit) is allocated after setting BLK_MQ_S_INACTIVE,
-> > > > > the request(tag bit) will be released and retried on another CPU
-> > > > > finally, see __blk_mq_alloc_request().
-> > > > > 
-> > > > > Cc Paul and linux-kernel list.
-> > > > 
-> > > > I do not agree with the above conclusion. My understanding of
-> > > > acquire/release labels is that if the following holds:
-> > > > (1) A store operation that stores the value V into memory location M has
-> > > > a release label.
-> > > > (2) A load operation that reads memory location M has an acquire label.
-> > > > (3) The load operation (2) retrieves the value V that was stored by (1).
-> > > > 
-> > > > that the following ordering property holds: all load and store
-> > > > instructions that happened before the store instruction (1) in program
-> > > > order are guaranteed to happen before the load and store instructions
-> > > > that follow (2) in program order.
-> > > > 
-> > > > In the ARM manual these semantics have been described as follows: "A
-> > > > Store-Release instruction is multicopy atomic when observed with a
-> > > > Load-Acquire instruction".
-> > > > 
-> > > > In this case the load-acquire operation is the
-> > > > "test_and_set_bit_lock(nr, word)" statement from the sbitmap code. That
-> > > > code is executed indirectly by blk_mq_get_tag(). Since there is no
-> > > > matching store-release instruction in __blk_mq_alloc_request() for
-> > > > 'word', ordering of the &data->hctx->state and 'tag' memory locations is
-> > > > not guaranteed by the acquire property of the "test_and_set_bit_lock(nr,
-> > > > word)" statement from the sbitmap code.
-> > > 
-> > > I feel like I just parachuted into the middle of the conversation,
-> > > so let me start by giving a (silly) example illustrating the limits of
-> > > smp_mb__{before,after}_atomic() that might be tangling things up.
-> > > 
-> > > But please please please avoid doing this in real code unless you have
-> > > an extremely good reason included in a comment.
-> > > 
-> > > void t1(void)
-> > > {
-> > > 	WRITE_ONCE(a, 1);
-> > > 	smp_mb__before_atomic();
-> > > 	WRITE_ONCE(b, 1);  // Just Say No to code here!!!
-> > > 	atomic_inc(&c);
-> > > 	WRITE_ONCE(d, 1);  // Just Say No to code here!!!
-> > > 	smp_mb__after_atomic();
-> > > 	WRITE_ONCE(e, 1);
-> > > }
-> > > 
-> > > void t2(void)
-> > > {
-> > > 	r1 = READ_ONCE(e);
-> > > 	smp_mb();
-> > > 	r2 = READ_ONCE(d);
-> > > 	smp_mb();
-> > > 	r3 = READ_ONCE(c);
-> > > 	smp_mb();
-> > > 	r4 = READ_ONCE(b);
-> > > 	smp_mb();
-> > > 	r5 = READ_ONCE(a);
-> > > }
-> > > 
-> > > Each platform must provide strong ordering for either atomic_inc()
-> > > on the one hand (as ia64 does) or for smp_mb__{before,after}_atomic()
-> > > on the other (as powerpc does).  Note that both ia64 and powerpc are
-> > > weakly ordered.
-> > > 
-> > > So ia64 could see (r1 == 1 && r2 == 0) on the one hand as well as (r4 ==
-> > > 1 && r5 == 0).  So clearly smp_mb_{before,after}_atomic() need not have
-> > > any ordering properties whatsoever.
-> > > 
-> > > Similarly, powerpc could see (r3 == 1 && r4 == 0) on the one hand as well
-> > > as (r2 == 1 && r3 == 0) on the other.  Or even both at the same time.
-> > > So clearly atomic_inc() need not have any ordering properties whatsoever.
-> > > 
-> > > But the combination of smp_mb__before_atomic() and the later atomic_inc()
-> > > does provide full ordering, so that no architecture can see (r3 == 1 &&
-> > > r5 == 0), and either of r1 or r2 can be substituted for r3.
-> > > 
-> > > Similarly, atomic_inc() and the late4r smp_mb__after_atomic() also
-> > > provide full ordering, so that no architecture can see (r1 == 1 && r3 ==
-> > > 0), and either r4 or r5 can be substituted for r3.
-> > > 
-> > > 
-> > > So a call to set_bit() followed by a call to smp_mb__after_atomic() will
-> > > provide a full memory barrier (implying release semantics) for any write
-> > > access after the smp_mb__after_atomic() with respect to the set_bit() or
-> > > any access preceding it.  But the set_bit() by itself won't have release
-> > > semantics, nor will the smp_mb__after_atomic(), only their combination
-> > > further combined with some write following the smp_mb__after_atomic().
-> > > 
-> > > More generally, there will be the equivalent of smp_mb() somewhere between
-> > > the set_bit() and every access following the smp_mb__after_atomic().
-> > > 
-> > > Does that help, or am I missing the point?
-> > 
-> > Yeah, it does help.
-> > 
-> > BTW, can we replace the smp_mb__after_atomic() with smp_mb() for
-> > ordering set_bit() and the memory OP following the smp_mb()?
-> 
-> Placing an smp_mb() between set_bit() and a later access will indeed
-> order set_bit() with that later access.
-> 
-> That said, I don't know this code well enough to say whether or not
-> that ordering is sufficient.
+Thanks, Quishi.
 
-Another pair is in blk_mq_get_tag(), and we expect the following two
-memory OPs are ordered:
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 
-1) set bit in successful test_and_set_bit_lock(), which is called
-from sbitmap_get()
+Jens, would you kindly pick up the patch?
 
-2) test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)
-
-Do you think that the above two OPs are ordered?
-
-Thanks,
-Ming
+Thank you, Matias
 
