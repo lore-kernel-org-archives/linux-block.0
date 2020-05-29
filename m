@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DA8C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA072C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 612CC206A1
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9652206A1
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uQhEkcbc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T9yx7gJV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbgE2Nx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 09:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34834 "EHLO
+        id S1726629AbgE2Nx2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 09:53:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbgE2Nx0 (ORCPT
+        with ESMTP id S1725901AbgE2Nx1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 09:53:26 -0400
+        Fri, 29 May 2020 09:53:27 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B237C03E969
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8AAC03E969
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=FGk5ZphODZauHfo1ssOtq/svyM9+WQ7WHq0Jutm28Jo=; b=uQhEkcbc0LKcqwZihRW2/E5tUz
-        2HhVOjQwTO8hOQ0Jn5Acv/4EmYKUMLIoSQWSWq/08gEclDZdw9W2YzOGb2DVBAvNndq0xgl7cWuqn
-        iHl3zN0OMzHSE7M3+0fRFUQbmJNztfR1fZY2BcL7Jjr96SQYxmLMcxih57FCTFO1pbVXmGPMCgpaR
-        oy2UWlhtW6REelRWg2AhyakxpNXD7rrCD1yZyLVwSlxlaDMf8XJRdcwgeEqIF4l9IhH/6aNHkDMDm
-        CC0YerQrciNRBiZPfJuFiVL1GBatd7jdFfh84us+eiSUR2sxj1+j8P2f8SnStRT9SqGFYe9NC2U6X
-        gWIXXiAg==;
+        bh=VvLKWA71OANoo922Wht7iHAQfAI5iri7SHordecipUI=; b=T9yx7gJVJwhG788PXJ640u22xt
+        +OfaIo5I2+WensjwD4MktWYvmyxI9h+msGrbY97ujgV8n8vv9dRm4OsUpzDnl+ztAPaPpWb0bnMMA
+        4kpMcU/k4K2c8ZIL0GmSjq+/OxW3Ss9DF8YNceicbR/Xs7cND7HaAt2hqg+p9CxhK1WMHjv1PtUZH
+        z59c+ZYZItWlHSsIZekPTsKcGxO+IP7BuAeU6fRHyKMMwtJZ0FG3I1Ybt27Zr9nh0ioU2WKT9JJTZ
+        CU1Y4+5OeSPtmvySVPdZ8plTzWcFZBy4SlCbCPZtZEgBZOsXaMB2eI6wdZzTuqojbDDE4ueAJrcwM
+        NhDN/47w==;
 Received: from p4fdb1ad2.dip0.t-ipconnect.de ([79.219.26.210] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jefRo-0000nZ-F0; Fri, 29 May 2020 13:53:20 +0000
+        id 1jefRu-0000oK-0o; Fri, 29 May 2020 13:53:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
@@ -47,9 +47,9 @@ Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH 1/8] blk-mq: remove the bio argument to ->prepare_request
-Date:   Fri, 29 May 2020 15:53:08 +0200
-Message-Id: <20200529135315.199230-2-hch@lst.de>
+Subject: [PATCH 3/8] blk-mq: move more request initialization to blk_mq_rq_ctx_init
+Date:   Fri, 29 May 2020 15:53:10 +0200
+Message-Id: <20200529135315.199230-4-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529135315.199230-1-hch@lst.de>
 References: <20200529135315.199230-1-hch@lst.de>
@@ -61,7 +61,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-None of the I/O schedulers actually needs it.
+Don't split request initialization between __blk_mq_alloc_request and
+blk_mq_rq_ctx_init.  Also remove the op argument as it can be derived
+from the blk_mq_alloc_data structure.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
@@ -70,78 +72,85 @@ Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/bfq-iosched.c      | 2 +-
- block/blk-mq.c           | 2 +-
- block/kyber-iosched.c    | 2 +-
- block/mq-deadline.c      | 2 +-
- include/linux/elevator.h | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 36 +++++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 3d411716d7ee4..50c8f034c01c5 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6073,7 +6073,7 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
-  * comments on bfq_init_rq for the reason behind this delayed
-  * preparation.
-  */
--static void bfq_prepare_request(struct request *rq, struct bio *bio)
-+static void bfq_prepare_request(struct request *rq)
- {
- 	/*
- 	 * Regardless of whether we have an icq attached, we have to
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c606c74463ccd..c697017588c12 100644
+index c1e66c014be1d..89c6223c1b603 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -387,7 +387,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 			if (e->type->icq_cache)
- 				blk_mq_sched_assign_ioc(rq);
+@@ -271,7 +271,7 @@ static inline bool blk_mq_need_time_stamp(struct request *rq)
+ }
  
--			e->type->ops.prepare_request(rq, bio);
+ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+-		unsigned int tag, unsigned int op, u64 alloc_time_ns)
++		unsigned int tag, u64 alloc_time_ns)
+ {
+ 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+ 	struct request *rq = tags->static_rqs[tag];
+@@ -295,7 +295,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->mq_ctx = data->ctx;
+ 	rq->mq_hctx = data->hctx;
+ 	rq->rq_flags = rq_flags;
+-	rq->cmd_flags = op;
++	rq->cmd_flags = data->cmd_flags;
+ 	if (data->flags & BLK_MQ_REQ_PREEMPT)
+ 		rq->rq_flags |= RQF_PREEMPT;
+ 	if (blk_queue_io_stat(data->q))
+@@ -327,8 +327,23 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->end_io = NULL;
+ 	rq->end_io_data = NULL;
+ 
+-	data->ctx->rq_dispatched[op_is_sync(op)]++;
++	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
+ 	refcount_set(&rq->ref, 1);
++
++	if (!op_is_flush(data->cmd_flags)) {
++		struct elevator_queue *e = data->q->elevator;
++
++		rq->elv.icq = NULL;
++		if (e && e->type->ops.prepare_request) {
++			if (e->type->icq_cache)
++				blk_mq_sched_assign_ioc(rq);
++
 +			e->type->ops.prepare_request(rq);
- 			rq->rq_flags |= RQF_ELVPRIV;
- 		}
++			rq->rq_flags |= RQF_ELVPRIV;
++		}
++	}
++
++	data->hctx->queued++;
+ 	return rq;
+ }
+ 
+@@ -336,7 +351,6 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+ 	struct elevator_queue *e = q->elevator;
+-	struct request *rq;
+ 	unsigned int tag;
+ 	bool clear_ctx_on_error = false;
+ 	u64 alloc_time_ns = 0;
+@@ -378,19 +392,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ 		return NULL;
  	}
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 34dcea0ef6377..a38c5ab103d12 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -579,7 +579,7 @@ static bool kyber_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio,
- 	return merged;
+ 
+-	rq = blk_mq_rq_ctx_init(data, tag, data->cmd_flags, alloc_time_ns);
+-	if (!op_is_flush(data->cmd_flags)) {
+-		rq->elv.icq = NULL;
+-		if (e && e->type->ops.prepare_request) {
+-			if (e->type->icq_cache)
+-				blk_mq_sched_assign_ioc(rq);
+-
+-			e->type->ops.prepare_request(rq);
+-			rq->rq_flags |= RQF_ELVPRIV;
+-		}
+-	}
+-	data->hctx->queued++;
+-	return rq;
++	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
  }
  
--static void kyber_prepare_request(struct request *rq, struct bio *bio)
-+static void kyber_prepare_request(struct request *rq)
- {
- 	rq_set_domain_token(rq, -1);
- }
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b490f47fd553c..b57470e154c8f 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -541,7 +541,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
-  * Nothing to do here. This is defined only to ensure that .finish_request
-  * method is called upon request completion.
-  */
--static void dd_prepare_request(struct request *rq, struct bio *bio)
-+static void dd_prepare_request(struct request *rq)
- {
- }
- 
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 901bda352dcb7..bacc40a0bdf39 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -39,7 +39,7 @@ struct elevator_mq_ops {
- 	void (*request_merged)(struct request_queue *, struct request *, enum elv_merge);
- 	void (*requests_merged)(struct request_queue *, struct request *, struct request *);
- 	void (*limit_depth)(unsigned int, struct blk_mq_alloc_data *);
--	void (*prepare_request)(struct request *, struct bio *bio);
-+	void (*prepare_request)(struct request *);
- 	void (*finish_request)(struct request *);
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
 -- 
 2.26.2
 
