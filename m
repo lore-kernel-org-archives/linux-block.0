@@ -2,148 +2,111 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F430C433E2
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68067C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:38:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EF952075A
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:13:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590772410;
-	bh=BbBe82lF+6Tr+noUC4bXnOHTzzVUPB37RrcOhBm7fTU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RiH+piTlfnmK+MU4KESguO5iU9qtmKQW/iT2kTn6GAutjLAslPmCHBgYBpGcR7ByE
-	 cdyAMJwxdKS0hNDKvHkojPDWX9b6EDQ0mFWquqMNk63pxji8pW5Mos0U2HoYfHXHf4
-	 9gQ02rUdgz6B9p8XFKty3YRz1953HP8J4Q54MHwM=
+	by mail.kernel.org (Postfix) with ESMTP id 45422208B8
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:38:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gqQCxF4K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726849AbgE2RN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 13:13:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33576 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbgE2RN2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 13:13:28 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 82A6D20723;
-        Fri, 29 May 2020 17:13:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590772408;
-        bh=BbBe82lF+6Tr+noUC4bXnOHTzzVUPB37RrcOhBm7fTU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=O/M+2wKz/pSqjaCIRdl+JuWbLWuiMrolQuDUxLdIuEg059L8ejThnasSmQryOv0Un
-         OVrrBnQkygJAOOWBAGzd6GlsV556VZBuQeArM7S3GtKsF2OBAoHFFZ1GfyBmOZ0psj
-         IjCk52zdCHQk2+i0RFgK79raNAq9Cyj0xRFbx7+E=
-Date:   Fri, 29 May 2020 10:13:26 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Thara Gopinath <thara.gopinath@linaro.org>
-Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [RFC PATCH v4 4/4] scsi: ufs-qcom: add Inline Crypto Engine
- support
-Message-ID: <20200529171326.GA82398@gmail.com>
-References: <20200501045111.665881-1-ebiggers@kernel.org>
- <20200501045111.665881-5-ebiggers@kernel.org>
- <31fa95e5-7757-96ae-2e86-1f54959e3a6c@linaro.org>
- <20200507180435.GB236103@gmail.com>
- <20200507180838.GC236103@gmail.com>
- <40600d42-dfa9-b60c-6ce8-0eda6bdf7ddf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40600d42-dfa9-b60c-6ce8-0eda6bdf7ddf@linaro.org>
+        id S1725914AbgE2Rir (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 13:38:47 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:54352 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgE2Rir (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 May 2020 13:38:47 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THS2iw166071;
+        Fri, 29 May 2020 17:38:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=/RW+mkPDwSW00rWCQ1Qu/i8lGlTHo7jS5iJOYu2SJAg=;
+ b=gqQCxF4Kh/ueAi+o0LfQggTdkrFPNMOAcWXw8fSEeV+74bqQ3PKXxIiXh1S1INQ4Y0te
+ QHuurAoqGCtqpCT7vex8jSNEZb6oNCS0uzzGMfJjSIjRLxXFOoLNS+3tpXeqk20ZIcYp
+ 8P4PC+jtsDdeziSort9gUr2Rm57dePw45le7gU0uE/OXywA1CpiqnDwRsuaFu24oqrJ0
+ 72hJBwjjp8CuL5XQSgscbzhej6BK8klrgShRihuqzO1qrinCPIz7DFugjuSAIjl7ts5I
+ bT4GgT4Lbz/o/IiOKIFx0ecF9shxmTx3Pntv6k505g98bisk9FQhtc17y3JVRDTACk1H bA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 316u8rbn4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 29 May 2020 17:38:45 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THRisL077787;
+        Fri, 29 May 2020 17:38:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 31a9kuhym6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 May 2020 17:38:44 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04THcfH6027323;
+        Fri, 29 May 2020 17:38:43 GMT
+Received: from localhost.localdomain (/10.211.9.80)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 29 May 2020 10:38:41 -0700
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org
+Subject: [PATCH for-next 1/1] null_blk: force complete for timeout request
+Date:   Fri, 29 May 2020 10:31:08 -0700
+Message-Id: <20200529173108.25198-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.17.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxscore=0 adultscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005290133
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 cotscore=-2147483648 suspectscore=1
+ phishscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 adultscore=0
+ lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005290133
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 29, 2020 at 11:54:18AM -0400, Thara Gopinath wrote:
-> On 5/7/20 2:08 PM, Eric Biggers wrote:
-> > On Thu, May 07, 2020 at 11:04:35AM -0700, Eric Biggers wrote:
-> > > Hi Thara,
-> > > 
-> > > On Thu, May 07, 2020 at 08:36:58AM -0400, Thara Gopinath wrote:
-> > > > 
-> > > > 
-> > > > On 5/1/20 12:51 AM, Eric Biggers wrote:
-> > > > > From: Eric Biggers <ebiggers@google.com>
-> > > > > 
-> > > > > Add support for Qualcomm Inline Crypto Engine (ICE) to ufs-qcom.
-> > > > > 
-> > > > > The standards-compliant parts, such as querying the crypto capabilities
-> > > > > and enabling crypto for individual UFS requests, are already handled by
-> > > > > ufshcd-crypto.c, which itself is wired into the blk-crypto framework.
-> > > > > However, ICE requires vendor-specific init, enable, and resume logic,
-> > > > > and it requires that keys be programmed and evicted by vendor-specific
-> > > > > SMC calls.  Make the ufs-qcom driver handle these details.
-> > > > > 
-> > > > > I tested this on Dragonboard 845c, which is a publicly available
-> > > > > development board that uses the Snapdragon 845 SoC and runs the upstream
-> > > > > Linux kernel.  This is the same SoC used in the Pixel 3 and Pixel 3 XL
-> > > > > phones.  This testing included (among other things) verifying that the
-> > > > > expected ciphertext was produced, both manually using ext4 encryption
-> > > > > and automatically using a block layer self-test I've written.
-> > > > Hello Eric,
-> > > > 
-> > > > I am interested in testing out this series on 845, 855 and if possile on 865
-> > > > platforms. Can you give me some more details about your testing please.
-> > > > 
-> > > 
-> > > Great!  You can test this with fscrypt, a.k.a. ext4 or f2fs encryption.
-> > > 
-> > > A basic manual test would be:
-> > > 
-> > > 1. Build a kernel with:
-> > > 
-> > > 	CONFIG_BLK_INLINE_ENCRYPTION=y
-> > > 	CONFIG_FS_ENCRYPTION=y
-> > > 	CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y
-> > 
-> > Sorry, I forgot: 'CONFIG_SCSI_UFS_CRYPTO=y' is needed too.
-> 
-> Hi Eric,
-> 
-> I tested this manually on db845c, sm8150-mtp and sm8250-mtp.(I added the dts
-> file entries for 8150 and 8250).
-> 
-> I also ran OsBench test case createfiles[1] on the above platforms.
-> Following are the results on a non encrypted and encrypted directory on the
-> same file system(lower the number better)
-> 
-> 			8250-MTP	8150-MTP	DB845
-> 
-> nonencrypt_dir(us) 	55.3108954	26.8323124    69.5709552
-> encrypt_dir(us) 	70.0214426	37.5411254    92.3818296
-> 
-> 
-> 
-> 1. https://github.com/mbitsnbites/osbench/blob/master/README.md
-> 
+The commit 7b11eab041da ("blk-mq: blk-mq: provide forced completion
+method") exports new API to force a request to complete without error
+injection.
 
-Great, thanks for testing.
+There should be no error injection when completing a request by timeout
+handler.
 
-Note that the benchmark you ran (creating many small files, then deleting them)
-mostly tests the performance of filenames encryption and directory operations,
-not file contents encryption.  Inline encryption is only used for file contents.
+Otherwise, the below would hang because timeout handler is failed.
 
-In fact, since that benchmark doesn't sync the files before deleting them, there
-is no guarantee that any file contents are actually written to disk, and hence
-no guarantee that inline encryption got used at all.
+echo 100 > /sys/kernel/debug/fail_io_timeout/probability
+echo 1000 > /sys/kernel/debug/fail_io_timeout/times
+echo 1 > /sys/block/nullb0/io-timeout-fail
+dd if=/dev/zero of=/dev/nullb0 bs=512 count=1 oflag=direct
 
-It would be more relevant to test the performance of reading/writing file data.
+With this patch, the timeout handler is able to complete the IO.
 
-Also, did you try doing any correctness tests?  (See what I suggested earlier.)
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ drivers/block/null_blk_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Eric
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 6126f771ae99..87b31f9ca362 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1423,7 +1423,7 @@ static bool should_requeue_request(struct request *rq)
+ static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
+ {
+ 	pr_info("rq %p timed out\n", rq);
+-	blk_mq_complete_request(rq);
++	blk_mq_force_complete_rq(rq);
+ 	return BLK_EH_DONE;
+ }
+ 
+-- 
+2.17.1
+
