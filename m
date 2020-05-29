@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBDCC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BEDC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A4AA206A1
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07995206A1
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 13:53:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tGoajMSZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bw6Al2Vo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbgE2Nxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 09:53:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34850 "EHLO
+        id S1726829AbgE2Nxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 09:53:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbgE2Nxa (ORCPT
+        with ESMTP id S1725901AbgE2Nxd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 09:53:30 -0400
+        Fri, 29 May 2020 09:53:33 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79861C03E969
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1BCC03E969
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 06:53:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=I45p2Wet8791NWuwPRDCFzYLZJDKan8qsLasc056SqE=; b=tGoajMSZIkXxXFUEMXZ8sezSyc
-        nFu9h81CXj3iMfMFwhpaiNyzrgZfzayYmFSWNEKUYmQAKaIo7cDxDGGK2//hS3SjLoWNs5z9EWqrf
-        16r26jyGf8oyo/84E97uT0A6XM5FdSlbu6AGemONGaTjS8I0u++D1PtnE4/iFCBeGdDWycMXXeW2D
-        pUCtG0FlJj7LOQq0YDOO319aL94SHt0KsLGjR3ZMCJ4DH/9/ELLblQ4yuRTB9IKNAh2bjPZuzorAB
-        G3B2O+ynum6fPNWLnKssWTDSslHgKn68WES3ntf1GlAn0RofYJ8wvoY+PwFJU2Iiz5IH/WSInA9Hg
-        rfzG16JA==;
+        bh=1r5IEc02VUb3EztNfiI4r3PGboatTSx3DytUYbpgYu0=; b=bw6Al2Vo8Om8JmGv3LA2+uZx9G
+        PLCKaodgxGKwHVXTlHzYQDAOgCeq9hVGRDFgI6EBnsaLL8hVygWB0ur0tz5JaOMj03XFD6c5N73GW
+        5O14dGBD1kyD73JvkPy2q/xjf1Bk9/aT4D65sExWjNzu6jA2uc6qy0nqTz/NnuUKHil6fz+WEitLl
+        +w5+lCdFCKhyW8GLIezhw/CZFzOEghQcPjytop7jsKqR9SBkg+hIos6xrGXFq5nq3Q9HiuF9DBc3F
+        uGpV6pJ1Elsw7J1eZufwWNXuIn5F/kx37CHbdtnozhHKWAUqgJvtoOTmqPfP7xQXXkDfxCwXyHzWG
+        Pc3GWsWw==;
 Received: from p4fdb1ad2.dip0.t-ipconnect.de ([79.219.26.210] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jefRw-0000ol-Km; Fri, 29 May 2020 13:53:29 +0000
+        id 1jefRz-0000pa-7c; Fri, 29 May 2020 13:53:31 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
 Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
@@ -47,9 +47,9 @@ Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
         Hannes Reinecke <hare@suse.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH 4/8] blk-mq: rename BLK_MQ_TAG_FAIL to BLK_MQ_NO_TAG
-Date:   Fri, 29 May 2020 15:53:11 +0200
-Message-Id: <20200529135315.199230-5-hch@lst.de>
+Subject: [PATCH 5/8] blk-mq: use BLK_MQ_NO_TAG in more places
+Date:   Fri, 29 May 2020 15:53:12 +0200
+Message-Id: <20200529135315.199230-6-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529135315.199230-1-hch@lst.de>
 References: <20200529135315.199230-1-hch@lst.de>
@@ -61,7 +61,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To prepare for wider use of this constant give it a more applicable name.
+Replace various magic -1 constants for tags with BLK_MQ_NO_TAG.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
@@ -69,62 +69,132 @@ Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- block/blk-mq-tag.c | 4 ++--
- block/blk-mq-tag.h | 4 ++--
- block/blk-mq.c     | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq-tag.c |  8 ++++----
+ block/blk-mq.c     | 14 +++++++-------
+ block/blk-mq.h     |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 586c9d6e904ab..c76ba4f90fa09 100644
+index c76ba4f90fa09..597ff9c27cf63 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
-@@ -111,7 +111,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	if (data->flags & BLK_MQ_REQ_RESERVED) {
- 		if (unlikely(!tags->nr_reserved_tags)) {
- 			WARN_ON_ONCE(1);
--			return BLK_MQ_TAG_FAIL;
-+			return BLK_MQ_NO_TAG;
- 		}
- 		bt = &tags->breserved_tags;
- 		tag_offset = 0;
-@@ -125,7 +125,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+@@ -92,7 +92,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ {
+ 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+ 	    !hctx_may_queue(data->hctx, bt))
+-		return -1;
++		return BLK_MQ_NO_TAG;
+ 	if (data->shallow_depth)
+ 		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
+@@ -121,7 +121,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	}
+ 
+ 	tag = __blk_mq_get_tag(data, bt);
+-	if (tag != -1)
++	if (tag != BLK_MQ_NO_TAG)
  		goto found_tag;
  
  	if (data->flags & BLK_MQ_REQ_NOWAIT)
--		return BLK_MQ_TAG_FAIL;
-+		return BLK_MQ_NO_TAG;
+@@ -143,13 +143,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		 * as running the queue may also have found completions.
+ 		 */
+ 		tag = __blk_mq_get_tag(data, bt);
+-		if (tag != -1)
++		if (tag != BLK_MQ_NO_TAG)
+ 			break;
  
- 	ws = bt_wait_ptr(bt, data->hctx);
- 	do {
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 2b8321efb6820..8a741752af8b9 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -44,9 +44,9 @@ static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
- }
+ 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
  
- enum {
--	BLK_MQ_TAG_FAIL		= -1U,
-+	BLK_MQ_NO_TAG		= -1U,
- 	BLK_MQ_TAG_MIN		= 1,
--	BLK_MQ_TAG_MAX		= BLK_MQ_TAG_FAIL - 1,
-+	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
- };
+ 		tag = __blk_mq_get_tag(data, bt);
+-		if (tag != -1)
++		if (tag != BLK_MQ_NO_TAG)
+ 			break;
  
- extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+ 		bt_prev = bt;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 89c6223c1b603..3fbc08d879452 100644
+index 3fbc08d879452..696202e6e304f 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -386,7 +386,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+@@ -278,7 +278,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	req_flags_t rq_flags = 0;
+ 
+ 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
+-		rq->tag = -1;
++		rq->tag = BLK_MQ_NO_TAG;
+ 		rq->internal_tag = tag;
+ 	} else {
+ 		if (data->hctx->flags & BLK_MQ_F_TAG_SHARED) {
+@@ -286,7 +286,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 			atomic_inc(&data->hctx->nr_active);
+ 		}
+ 		rq->tag = tag;
+-		rq->internal_tag = -1;
++		rq->internal_tag = BLK_MQ_NO_TAG;
+ 		data->hctx->tags->rqs[rq->tag] = rq;
  	}
  
- 	tag = blk_mq_get_tag(data);
--	if (tag == BLK_MQ_TAG_FAIL) {
-+	if (tag == BLK_MQ_NO_TAG) {
- 		if (clear_ctx_on_error)
- 			data->ctx = NULL;
- 		return NULL;
+@@ -483,9 +483,9 @@ static void __blk_mq_free_request(struct request *rq)
+ 	blk_crypto_free_request(rq);
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx = NULL;
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+-	if (sched_tag != -1)
++	if (sched_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
+ 	blk_queue_exit(q);
+@@ -534,7 +534,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ 		blk_stat_add(rq, now);
+ 	}
+ 
+-	if (rq->internal_tag != -1)
++	if (rq->internal_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_sched_completed_request(rq, now);
+ 
+ 	blk_account_io_done(rq, now);
+@@ -1033,7 +1033,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	};
+ 	bool shared;
+ 
+-	if (rq->tag != -1)
++	if (rq->tag != BLK_MQ_NO_TAG)
+ 		return true;
+ 
+ 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
+@@ -1049,7 +1049,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 		data.hctx->tags->rqs[rq->tag] = rq;
+ 	}
+ 
+-	return rq->tag != -1;
++	return rq->tag != BLK_MQ_NO_TAG;
+ }
+ 
+ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 10bfdfb494faf..a139b06318174 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -201,7 +201,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+ 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+-	rq->tag = -1;
++	rq->tag = BLK_MQ_NO_TAG;
+ 
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+ 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+@@ -211,7 +211,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 
+ static inline void blk_mq_put_driver_tag(struct request *rq)
+ {
+-	if (rq->tag == -1 || rq->internal_tag == -1)
++	if (rq->tag == BLK_MQ_NO_TAG || rq->internal_tag == BLK_MQ_NO_TAG)
+ 		return;
+ 
+ 	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
 -- 
 2.26.2
 
