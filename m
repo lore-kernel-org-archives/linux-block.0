@@ -2,273 +2,381 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60D4C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 22:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1BEC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 23:20:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AAF05205CB
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 22:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26DA9207BC
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 23:20:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bfb0eWTR"
+	dkim=pass (2048-bit key) header.d=bur.io header.i=@bur.io header.b="utzddtwM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s99X2CW9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727112AbgE2Wz1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 18:55:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47466 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726943AbgE2Wz1 (ORCPT
+        id S1728040AbgE2XUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 19:20:25 -0400
+Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:53565 "EHLO
+        wnew2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726898AbgE2XUZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 18:55:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590792924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kf+XvZIvjuSJOGFqDMEBZEf7hBNba7bfR0wZd1cpvMY=;
-        b=Bfb0eWTR8OWJWBBpM4AJPOse6T4EVfhAHxbaFUi35PPPyaXo9ozcozoSOxUPUREafj0gRM
-        0yzSOrZiwx0FuYv2tmYXo1tTsFJd6V18JDJA7JAD9JOtDocQxhsEioEmL8V7Ae5vgav86g
-        FoAlW3lBBIhBSrZvvN312pnD2f7O5ho=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-AWYe3YXTPYqNZKiIxipY8g-1; Fri, 29 May 2020 18:55:19 -0400
-X-MC-Unique: AWYe3YXTPYqNZKiIxipY8g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11950461;
-        Fri, 29 May 2020 22:55:18 +0000 (UTC)
-Received: from T590 (ovpn-12-23.pek2.redhat.com [10.72.12.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 291B17A1ED;
-        Fri, 29 May 2020 22:55:09 +0000 (UTC)
-Date:   Sat, 30 May 2020 06:55:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org,
-        Acshai Manoj <acshai.manoj@microfocus.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Enzo Matsumiya <ematsumiya@suse.com>,
-        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Xiao Ni <xni@redhat.com>
-Subject: Re: [PATCH v2] block: improve discard bio alignment in
- __blkdev_issue_discard()
-Message-ID: <20200529225505.GA1121169@T590>
-References: <20200529163418.101606-1-colyli@suse.de>
+        Fri, 29 May 2020 19:20:25 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id 79802160A;
+        Fri, 29 May 2020 19:20:22 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Fri, 29 May 2020 19:20:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bur.io; h=from
+        :to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm1; bh=NiQG/tD5+WSs469fNdGE5PUeS3
+        WKVuh9TA8wXZO+ago=; b=utzddtwMWe13cmAR+D7ZTBr8IOno67gUwV6CBLTXlG
+        URzcc1ilvsoh8qbXCwUrUk5Fpta74wSSkc7Wnm5Gc7MXbw9nyV+jvtLptUwPfJrb
+        o/XhMXBwRi9Ltuqr+OtYMtZTRqG2o18jE/2Zzb/RhOj3L/let+1fi12Z9lGvqe5Q
+        SNqfbEkdY0+UwoWKKQ3cfz5Wb/bMnSABHjfkjgsylfuJT18FBhEZKQVnDPYcrPUm
+        4loan7Cr26fDjpZy4Ag2gVI1XFp58xLCCnwvAjTfFpTNobFz7Vr9Z98ERG6UMQrm
+        +jVt0WJasuzOcAfP1vyFr7/h84DP3N7c5m8PxLZ2WtfA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=NiQG/tD5+WSs469fN
+        dGE5PUeS3WKVuh9TA8wXZO+ago=; b=s99X2CW9+yulkGMa8h6E47le2k96P7mTU
+        BmdO3tZe8PjspdHq4RobNVdoT4ZqDFpgjbgroW1u5M+BbOP1TwEm4/qiPhVrdpri
+        4LMFy8LfXw8IaUKK8GdefOhTGGHF4VX6MXzMfF4sEcfgczd5lP1IV0tVWNk93/IY
+        nB1Kscl7wROKEFy/uuCmEs1IfCnE+d0PHHD3GOj3ab/xEMUWAdvlRB2QKPy+J9YD
+        DMyDTVjFE8owP2jgiM307sqbJZIeURKC5/xQFSsE/oUY03L3wKN0byeNX6RZTeAu
+        7s/+Lt1G0NZ0DM0YuHl2Wt2FDya0G6wJJOv2fMv8B1NTY0oR50lyA==
+X-ME-Sender: <xms:tJjRXudo9M_1IZrbmlFaDqBUO7OUuIJ0RZAauhfR521zejb1LotvJQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddvledgudelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeuohhrihhsuceu
+    uhhrkhhovhcuoegsohhrihhssegsuhhrrdhioheqnecuggftrfgrthhtvghrnhepudeitd
+    elueeijeefleffveelieefgfejjeeigeekudduteefkefffeethfdvjeevnecukfhppedu
+    ieefrdduudegrddufedvrdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepsghorhhishessghurhdrihho
+X-ME-Proxy: <xmx:tJjRXoNQOnC9McvcvQ4crkctqf9Xcq0nfEFoAIBWMW2BJ_ApilhUQQ>
+    <xmx:tJjRXvhRTve9ZWzuVygtQg5zFg_4OHcGr40qwIo0G4Fr5495bzAjyg>
+    <xmx:tJjRXr8igY8fIwytzZPi3EPXhsET6GdHoxUQrDibEuiHuKo_u98pdw>
+    <xmx:tZjRXuJkoBf2ybY2oa4EfGmnnJwYPPf-WW9_hRH0htuIwgYJTTAV1Chm0qzxbyYd>
+Received: from localhost (unknown [163.114.132.3])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 677273280060;
+        Fri, 29 May 2020 19:20:20 -0400 (EDT)
+From:   Boris Burkov <boris@bur.io>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Boris Burkov <boris@bur.io>
+Subject: [PATCH blk-cgroup/for-5.8] blk-cgroup: show global disk stats in root cgroup io.stat
+Date:   Fri, 29 May 2020 16:20:17 -0700
+Message-Id: <20200529232017.1795920-1-boris@bur.io>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529163418.101606-1-colyli@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 30, 2020 at 12:34:18AM +0800, Coly Li wrote:
-> This patch improves discard bio split for address and size alignment in
-> __blkdev_issue_discard(). The aligned discard bio may help underlying
-> device controller to perform better discard and internal garbage
-> collection, and avoid unnecessary internal fragment.
-> 
-> Current discard bio split algorithm in __blkdev_issue_discard() may have
-> non-discarded fregment on device even the discard bio LBA and size are
-> both aligned to device's discard granularity size.
-> 
-> Here is the example steps on how to reproduce the above problem.
-> - On a VMWare ESXi 6.5 update3 installation, create a 51GB virtual disk
->   with thin mode and give it to a Linux virtual machine.
-> - Inside the Linux virtual machine, if the 50GB virtual disk shows up as
->   /dev/sdb, fill data into the first 50GB by,
-> 	# dd if=/dev/zero of=/dev/sdb bs=4096 count=13107200
-> - Discard the 50GB range from offset 0 on /dev/sdb,
-> 	# blkdiscard /dev/sdb -o 0 -l 53687091200
-> - Observe the underlying mapping status of the device
-> 	# sg_get_lba_status /dev/sdb -m 1048 --lba=0
->   descriptor LBA: 0x0000000000000000  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000000000800  blocks: 16773120  deallocated
->   descriptor LBA: 0x0000000000fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000001000000  blocks: 8386560  deallocated
->   descriptor LBA: 0x00000000017ff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000001800000  blocks: 8386560  deallocated
->   descriptor LBA: 0x0000000001fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000002000000  blocks: 8386560  deallocated
->   descriptor LBA: 0x00000000027ff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000002800000  blocks: 8386560  deallocated
->   descriptor LBA: 0x0000000002fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000003000000  blocks: 8386560  deallocated
->   descriptor LBA: 0x00000000037ff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000003800000  blocks: 8386560  deallocated
->   descriptor LBA: 0x0000000003fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000004000000  blocks: 8386560  deallocated
->   descriptor LBA: 0x00000000047ff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000004800000  blocks: 8386560  deallocated
->   descriptor LBA: 0x0000000004fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000005000000  blocks: 8386560  deallocated
->   descriptor LBA: 0x00000000057ff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000005800000  blocks: 8386560  deallocated
->   descriptor LBA: 0x0000000005fff800  blocks: 2048  mapped (or unknown)
->   descriptor LBA: 0x0000000006000000  blocks: 6291456  deallocated
->   descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
-> 
-> Although the discard bio starts at LBA 0 and has 50<<30 bytes size which
-> are perfect aligned to the discard granularity, from the above list
-> these are many 1MB (2048 sectors) internal fragments exist unexpectedly.
-> 
-> The problem is in __blkdev_issue_discard(), an improper algorithm causes
-> an improper bio size which is not aligned.
-> 
->  25 int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  26                 sector_t nr_sects, gfp_t gfp_mask, int flags,
->  27                 struct bio **biop)
->  28 {
->  29         struct request_queue *q = bdev_get_queue(bdev);
->    [snipped]
->  56
->  57         while (nr_sects) {
->  58                 sector_t req_sects = min_t(sector_t, nr_sects,
->  59                                 bio_allowed_max_sectors(q));
->  60
->  61                 WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
->  62
->  63                 bio = blk_next_bio(bio, 0, gfp_mask);
->  64                 bio->bi_iter.bi_sector = sector;
->  65                 bio_set_dev(bio, bdev);
->  66                 bio_set_op_attrs(bio, op, 0);
->  67
->  68                 bio->bi_iter.bi_size = req_sects << 9;
->  69                 sector += req_sects;
->  70                 nr_sects -= req_sects;
->    [snipped]
->  79         }
->  80
->  81         *biop = bio;
->  82         return 0;
->  83 }
->  84 EXPORT_SYMBOL(__blkdev_issue_discard);
-> 
-> At line 58-59, to discard a 50GB range, req_sets is set as return value
-> of bio_allowed_max_sectors(q), which is 8388607 sectors. In the above
-> case, the discard granularity is 2048 sectors, although the start LBA
-> and discard length are aligned to discard granularity, seq_sets never
-> has chance to be aligned to discard granularity. This is why there are
-> some still-mapped 2048 sectors segment in every 4 or 8 GB range.
-> 
-> Because queue's max_discard_sectors is aligned to discard granularity,
-> if req_sects at line 58 is set to a value closest to UINT_MAX and
-> aligned to q->limits.max_discard_sectors, then all consequent split bios
-> inside device driver are (almostly) aligned to discard_granularity of
-> the device queue.
-> 
-> This patch introduces bio_aligned_discard_max_sectors() to return the
-> closet to UINT_MAX and aligned to q->limits.discard_granularity value,
-> and replace bio_allowed_max_sectors() with this new inline routine to
-> decide the split bio length.
-> 
-> But we still need to handle the situation when discard start LBA is not
-> aligned to q->limits.discard_granularity, otherwise even the length is
-> aligned, current code may still leave 2048 segment around every 4BG
-> range. Thereforeto calculate req_sects, firstly the start LBA of discard
-> request command is checked, if it is not aligned to discard granularity,
-> the first split location should make sure following bio has bi_sector
-> aligned to discard granularity. Then there won't be still-mapped segment
-> in the middle of the discard range.
-> 
-> The above is how this patch improves discard bio alignment in
-> __blkdev_issue_discard(). Now with this patch, after discard with same
-> command line mentiond previously, sg_get_lba_status returns,
-> descriptor LBA: 0x0000000000000000  blocks: 106954752  deallocated
-> descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
-> 
-> We an see there is no 2048 sectors segment anymore, everything is clean.
-> 
-> Reported-by: Acshai Manoj <acshai.manoj@microfocus.com>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Enzo Matsumiya <ematsumiya@suse.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Xiao Ni <xni@redhat.com>
-> ---
-> Changelog:
-> v2: replace 9 with SECTOR_SHIFT as suggested by Bart Van Assche.
-> v1: initial version.
-> 
->  block/blk-lib.c | 25 +++++++++++++++++++++++--
->  block/blk.h     | 15 +++++++++++++++
->  2 files changed, 38 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index 5f2c429d4378..2fc0e3cc1ed8 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -55,8 +55,29 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  		return -EINVAL;
->  
->  	while (nr_sects) {
-> -		sector_t req_sects = min_t(sector_t, nr_sects,
-> -				bio_allowed_max_sectors(q));
-> +		sector_t granularity_aligned_lba;
-> +		sector_t req_sects;
-> +
-> +		granularity_aligned_lba =
-> +			round_up(sector, q->limits.discard_granularity);
-> +
-> +		/*
-> +		 * Check whether the discard bio starts at a discard_granularity
-> +		 * aligned LBA,
-> +		 * - If no: set (granularity_aligned_lba - sector) to bi_size of
-> +		 *   the first split bio, then the second bio will start at a
-> +		 *   discard_granularity aligned LBA.
-> +		 * - If yes: use bio_aligned_discard_max_sectors() as the max
-> +		 *   possible bi_size of th first split bio. Then when this bio
-> +		 *   is split in device drive, the split ones are always easier
-> +		 *   to be aligned to max_discard_sectors of the device's queue.
-> +		 */
-> +		if (granularity_aligned_lba == sector)
-> +			req_sects = min_t(sector_t, nr_sects,
-> +					  bio_aligned_discard_max_sectors(q));
-> +		else
-> +			req_sects = min_t(sector_t, nr_sects,
-> +					  granularity_aligned_lba - sector);
+In order to improve consistency and usability in cgroup stat accounting,
+we would like to support the root cgroup's io.stat.
 
-min_non_zero() may be cleaner.
+Since the root cgroup has processes doing io even if the system has no
+explicitly created cgroups, we need to be careful to avoid overhead in
+that case.  For that reason, the rstat algorithms don't handle the root
+cgroup, so just turning the file on wouldn't give correct statistics.
 
->  
->  		WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index 0a94ec68af32..dc5369e7e1fb 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -292,6 +292,21 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
->  	return round_down(UINT_MAX, queue_logical_block_size(q)) >> 9;
->  }
->  
-> +/*
-> + * The max bio size which is aligned to q->limits.max_discard_sectors. This
-> + * is a hint to split large discard bio in generic block layer, then if device
-> + * driver needs to split the discard bio into smaller ones, their bi_size can
-> + * be very probably and easily ligned to max_discard_sectors of the device's
-> + * queue.
-> + */
-> +static inline unsigned int bio_aligned_discard_max_sectors(
-> +					struct request_queue *q)
-> +{
-> +	return round_down(UINT_MAX,
-> +			 (q->limits.max_discard_sectors << SECTOR_SHIFT))
-> +			>> SECTOR_SHIFT;
-> +}
+To get around this, we simulate flushing the iostat struct by filling it
+out directly from global disk stats. The result is a root cgroup io.stat
+file consistent with both /proc/diskstats and io.stat.
 
-The above may not be correct, what if q->limits.max_discard_sectors is
-less enough? raid10 may use default 512k max discard bytes. Then
-bio_aligned_discard_max_sectors() can return bigger value than
-q->limits.max_discard_sectors, and breaks this discard limit.
+Signed-off-by: Boris Burkov <boris@bur.io>
+Suggested-by: Tejun Heo <tj@kernel.org>
+---
+ Documentation/admin-guide/cgroup-v2.rst |   3 +-
+ block/blk-cgroup.c                      | 199 +++++++++++++++---------
+ block/genhd.c                           |   4 +-
+ include/linux/genhd.h                   |   1 +
+ 4 files changed, 129 insertions(+), 78 deletions(-)
 
-thanks,
-Ming
+diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+index fed4e1d2a343..1eaea1ddaeb9 100644
+--- a/Documentation/admin-guide/cgroup-v2.rst
++++ b/Documentation/admin-guide/cgroup-v2.rst
+@@ -1465,8 +1465,7 @@ IO Interface Files
+ ~~~~~~~~~~~~~~~~~~
+ 
+   io.stat
+-	A read-only nested-keyed file which exists on non-root
+-	cgroups.
++	A read-only nested-keyed file.
+ 
+ 	Lines are keyed by $MAJ:$MIN device numbers and not ordered.
+ 	The following nested keys are defined.
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0ecc897b225c..a285572c2436 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -739,12 +739,137 @@ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
+ }
+ EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
++static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
++{
++	int i;
++
++	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
++		dst->bytes[i] = src->bytes[i];
++		dst->ios[i] = src->ios[i];
++	}
++}
++
++static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
++{
++	int i;
++
++	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
++		dst->bytes[i] += src->bytes[i];
++		dst->ios[i] += src->ios[i];
++	}
++}
++
++static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
++{
++	int i;
++
++	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
++		dst->bytes[i] -= src->bytes[i];
++		dst->ios[i] -= src->ios[i];
++	}
++}
++
++static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
++{
++	struct blkcg *blkcg = css_to_blkcg(css);
++	struct blkcg_gq *blkg;
++
++	rcu_read_lock();
++
++	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
++		struct blkcg_gq *parent = blkg->parent;
++		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
++		struct blkg_iostat cur, delta;
++		unsigned int seq;
++
++		/* fetch the current per-cpu values */
++		do {
++			seq = u64_stats_fetch_begin(&bisc->sync);
++			blkg_iostat_set(&cur, &bisc->cur);
++		} while (u64_stats_fetch_retry(&bisc->sync, seq));
++
++		/* propagate percpu delta to global */
++		u64_stats_update_begin(&blkg->iostat.sync);
++		blkg_iostat_set(&delta, &cur);
++		blkg_iostat_sub(&delta, &bisc->last);
++		blkg_iostat_add(&blkg->iostat.cur, &delta);
++		blkg_iostat_add(&bisc->last, &delta);
++		u64_stats_update_end(&blkg->iostat.sync);
++
++		/* propagate global delta to parent */
++		if (parent) {
++			u64_stats_update_begin(&parent->iostat.sync);
++			blkg_iostat_set(&delta, &blkg->iostat.cur);
++			blkg_iostat_sub(&delta, &blkg->iostat.last);
++			blkg_iostat_add(&parent->iostat.cur, &delta);
++			blkg_iostat_add(&blkg->iostat.last, &delta);
++			u64_stats_update_end(&parent->iostat.sync);
++		}
++	}
++
++	rcu_read_unlock();
++}
++
++/*
++ * The rstat algorithms intentionally don't handle the root cgroup to avoid
++ * incurring overhead when no cgroups are defined. For that reason,
++ * cgroup_rstat_flush in blkcg_print_stat does not actually fill out the
++ * iostat in the root cgroup's blkcg_gq.
++ *
++ * However, we would like to re-use the printing code between the root and
++ * non-root cgroups to the extent possible. For that reason, we simulate
++ * flushing the root cgroup's stats by explicitly filling in the iostat
++ * with disk level statistics.
++ */
++static void blkcg_fill_root_iostats(void)
++{
++	struct class_dev_iter iter;
++	struct device *dev;
++
++	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
++	while ((dev = class_dev_iter_next(&iter))) {
++		struct gendisk *disk = dev_to_disk(dev);
++		struct hd_struct *part = disk_get_part(disk, 0);
++		struct blkcg_gq *blkg = blk_queue_root_blkg(disk->queue);
++		struct blkg_iostat tmp;
++		int cpu;
++
++		memset(&tmp, 0, sizeof(tmp));
++		for_each_possible_cpu(cpu) {
++			struct disk_stats *cpu_dkstats;
++
++			cpu_dkstats = per_cpu_ptr(part->dkstats, cpu);
++			tmp.ios[BLKG_IOSTAT_READ] +=
++				cpu_dkstats->ios[STAT_READ];
++			tmp.ios[BLKG_IOSTAT_WRITE] +=
++				cpu_dkstats->ios[STAT_WRITE];
++			tmp.ios[BLKG_IOSTAT_DISCARD] +=
++				cpu_dkstats->ios[STAT_DISCARD];
++			// convert sectors to bytes
++			tmp.bytes[BLKG_IOSTAT_READ] +=
++				cpu_dkstats->sectors[STAT_READ] << 9;
++			tmp.bytes[BLKG_IOSTAT_WRITE] +=
++				cpu_dkstats->sectors[STAT_WRITE] << 9;
++			tmp.bytes[BLKG_IOSTAT_DISCARD] +=
++				cpu_dkstats->sectors[STAT_DISCARD] << 9;
++
++			u64_stats_update_begin(&blkg->iostat.sync);
++			blkg_iostat_set(&blkg->iostat.cur, &tmp);
++			u64_stats_update_end(&blkg->iostat.sync);
++		}
++	}
++}
++
+ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+ 	struct blkcg_gq *blkg;
+ 
+-	cgroup_rstat_flush(blkcg->css.cgroup);
++	if (!seq_css(sf)->parent)
++		blkcg_fill_root_iostats();
++	else
++		cgroup_rstat_flush(blkcg->css.cgroup);
++
+ 	rcu_read_lock();
+ 
+ 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
+@@ -833,7 +958,6 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ static struct cftype blkcg_files[] = {
+ 	{
+ 		.name = "stat",
+-		.flags = CFTYPE_NOT_ON_ROOT,
+ 		.seq_show = blkcg_print_stat,
+ 	},
+ 	{ }	/* terminate */
+@@ -1114,77 +1238,6 @@ static int blkcg_can_attach(struct cgroup_taskset *tset)
+ 	return ret;
+ }
+ 
+-static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
+-{
+-	int i;
+-
+-	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+-		dst->bytes[i] = src->bytes[i];
+-		dst->ios[i] = src->ios[i];
+-	}
+-}
+-
+-static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
+-{
+-	int i;
+-
+-	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+-		dst->bytes[i] += src->bytes[i];
+-		dst->ios[i] += src->ios[i];
+-	}
+-}
+-
+-static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
+-{
+-	int i;
+-
+-	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
+-		dst->bytes[i] -= src->bytes[i];
+-		dst->ios[i] -= src->ios[i];
+-	}
+-}
+-
+-static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+-{
+-	struct blkcg *blkcg = css_to_blkcg(css);
+-	struct blkcg_gq *blkg;
+-
+-	rcu_read_lock();
+-
+-	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
+-		struct blkcg_gq *parent = blkg->parent;
+-		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
+-		struct blkg_iostat cur, delta;
+-		unsigned seq;
+-
+-		/* fetch the current per-cpu values */
+-		do {
+-			seq = u64_stats_fetch_begin(&bisc->sync);
+-			blkg_iostat_set(&cur, &bisc->cur);
+-		} while (u64_stats_fetch_retry(&bisc->sync, seq));
+-
+-		/* propagate percpu delta to global */
+-		u64_stats_update_begin(&blkg->iostat.sync);
+-		blkg_iostat_set(&delta, &cur);
+-		blkg_iostat_sub(&delta, &bisc->last);
+-		blkg_iostat_add(&blkg->iostat.cur, &delta);
+-		blkg_iostat_add(&bisc->last, &delta);
+-		u64_stats_update_end(&blkg->iostat.sync);
+-
+-		/* propagate global delta to parent */
+-		if (parent) {
+-			u64_stats_update_begin(&parent->iostat.sync);
+-			blkg_iostat_set(&delta, &blkg->iostat.cur);
+-			blkg_iostat_sub(&delta, &blkg->iostat.last);
+-			blkg_iostat_add(&parent->iostat.cur, &delta);
+-			blkg_iostat_add(&blkg->iostat.last, &delta);
+-			u64_stats_update_end(&parent->iostat.sync);
+-		}
+-	}
+-
+-	rcu_read_unlock();
+-}
+-
+ static void blkcg_bind(struct cgroup_subsys_state *root_css)
+ {
+ 	int i;
+diff --git a/block/genhd.c b/block/genhd.c
+index afdb2c3e5b22..4f5f4590517c 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -38,8 +38,6 @@ static struct kobject *block_depr;
+ static DEFINE_SPINLOCK(ext_devt_lock);
+ static DEFINE_IDR(ext_devt_idr);
+ 
+-static const struct device_type disk_type;
+-
+ static void disk_check_events(struct disk_events *ev,
+ 			      unsigned int *clearing_ptr);
+ static void disk_alloc_events(struct gendisk *disk);
+@@ -1566,7 +1564,7 @@ static char *block_devnode(struct device *dev, umode_t *mode,
+ 	return NULL;
+ }
+ 
+-static const struct device_type disk_type = {
++const struct device_type disk_type = {
+ 	.name		= "disk",
+ 	.groups		= disk_attr_groups,
+ 	.release	= disk_release,
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index a9384449465a..ea38bc36bc6d 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -26,6 +26,7 @@
+ #define disk_to_dev(disk)	(&(disk)->part0.__dev)
+ #define part_to_dev(part)	(&((part)->__dev))
+ 
++extern const struct device_type disk_type;
+ extern struct device_type part_type;
+ extern struct class block_class;
+ 
+-- 
+2.24.1
 
