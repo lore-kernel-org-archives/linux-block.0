@@ -2,151 +2,241 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C219DC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 047BCC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 18:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A45DD2075A
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 17:59:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Sh7ESs4h"
+	by mail.kernel.org (Postfix) with ESMTP id CADB12077D
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 18:13:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590776034;
+	bh=Z9aulBk0GSj0k2iTvgXVaJOOMA50ErLt1DpAvZgy2Tc=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
+	 From;
+	b=vJkyWRvAKQacnzMdXyfCT43a7JhTdU9Gnpf1iQeG+nezAOttuoBmR0cS8ldxV8bLm
+	 Hei2X3ohOfjrvi65XZoK2y/f//1ucEzh1veu73lRf6OzwDrIfx0PFkVy82v86PlF/M
+	 86VDW3JCTCr0l8596nv/p9VFTcHvF/vjI74ksyqs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbgE2R77 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 13:59:59 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:40934 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbgE2R76 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 13:59:58 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THvi85021525;
-        Fri, 29 May 2020 17:59:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=ke1Tb2lZ6TNxiMEsMMfWeYd0ze4tzPMfe1UIQngC7+s=;
- b=Sh7ESs4h9DY3Tu5OY8XFWCjwpo7qKRx5F4suhiBaJepLGaJ7CyeAoZ690DaTkzKWIWjw
- nTOGXHUMWFcj9ad/gBiFXx9/k0CDioZZFkIVG22cXrzljPngpJw8PKKXN4nIicqOKYbc
- qOBhypLVu9Z9SRkS0vNWMK+lfCiqrpEJRxUsLflrmSEuht9Mw9xYSS70xBNbTtCWard2
- +16M6ziakSwtY3u69Eqd97Ky2QWRG5uz0nug8hl9Bk5kYvgZJZWET8GqrW1jIlCWz/e7
- xfJ0X5SfHFhpTl64ig8lEFXDc1QoLyBDRS6LCliL9RA16VDAFor7t7A8nzPBrCTlT9IE 9w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 316u8rbr10-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 29 May 2020 17:59:50 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THrgmK031430;
-        Fri, 29 May 2020 17:59:49 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 317j6024pj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 May 2020 17:59:49 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04THxlaI014216;
-        Fri, 29 May 2020 17:59:47 GMT
-Received: from dhcp-10-76-241-128.usdhcp.oraclecorp.com (/10.76.241.128)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 29 May 2020 10:59:47 -0700
-Subject: Re: [PATCHv4 1/2] blk-mq: blk-mq: provide forced completion method
-To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
-        hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-References: <20200529145200.3545747-1-kbusch@kernel.org>
-From:   Alan Adamson <alan.adamson@oracle.com>
-Message-ID: <30209979-9b8b-d558-09e1-4d2da227e10d@oracle.com>
-Date:   Fri, 29 May 2020 11:02:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1727024AbgE2SNy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 14:13:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53614 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725839AbgE2SNx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 May 2020 14:13:53 -0400
+Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D01E620776;
+        Fri, 29 May 2020 18:13:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590776032;
+        bh=Z9aulBk0GSj0k2iTvgXVaJOOMA50ErLt1DpAvZgy2Tc=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=BFpnbTyZeTzb2pHDC5RrF4PY9+4zmxQhtR2THTeEkygPG/rvAC+/NYLebkcRqfvdZ
+         V393ZCjflCBw8ry6GaMEoB6Q8NpR5Z9/tNIdnWniwhl+mxdKgDrRNDIXIkRD+TYjbd
+         92kmwohxuTJxgaWa8ZvyrzX6Usvg8LvkeubzrS6o=
+Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
+        id A68F73522A6E; Fri, 29 May 2020 11:13:52 -0700 (PDT)
+Date:   Fri, 29 May 2020 11:13:52 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 8/8] blk-mq: drain I/O when all CPUs in a hctx are offline
+Message-ID: <20200529181352.GF2869@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200527180644.514302-9-hch@lst.de>
+ <7acc7ab5-02f9-e6ee-e95f-175bc0df9cbc@acm.org>
+ <20200528014601.GC933147@T590>
+ <1ec7922c-f2b0-08ec-5849-f4eb7f71e9e7@acm.org>
+ <20200528051932.GA1008129@T590>
+ <4fb6f0cf-a356-833e-25ab-47f9131c729b@acm.org>
+ <20200528172121.GN2869@paulmck-ThinkPad-P72>
+ <20200529015304.GC1075489@T590>
+ <20200529030728.GW2869@paulmck-ThinkPad-P72>
+ <20200529035315.GD1075489@T590>
 MIME-Version: 1.0
-In-Reply-To: <20200529145200.3545747-1-kbusch@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=3
- mlxlogscore=999 mlxscore=0 adultscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005290135
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
- priorityscore=1501 spamscore=0 cotscore=-2147483648 suspectscore=3
- phishscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005290135
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200529035315.GD1075489@T590>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Passes my tests, thanks.
+On Fri, May 29, 2020 at 11:53:15AM +0800, Ming Lei wrote:
+> Hi Paul,
+> 
+> On Thu, May 28, 2020 at 08:07:28PM -0700, Paul E. McKenney wrote:
+> > On Fri, May 29, 2020 at 09:53:04AM +0800, Ming Lei wrote:
+> > > Hi Paul,
+> > > 
+> > > Thanks for your response!
+> > > 
+> > > On Thu, May 28, 2020 at 10:21:21AM -0700, Paul E. McKenney wrote:
+> > > > On Thu, May 28, 2020 at 06:37:47AM -0700, Bart Van Assche wrote:
+> > > > > On 2020-05-27 22:19, Ming Lei wrote:
+> > > > > > On Wed, May 27, 2020 at 08:33:48PM -0700, Bart Van Assche wrote:
+> > > > > >> My understanding is that operations that have acquire semantics pair
+> > > > > >> with operations that have release semantics. I haven't been able to find
+> > > > > >> any documentation that shows that smp_mb__after_atomic() has release
+> > > > > >> semantics. So I looked up its definition. This is what I found:
+> > > > > >>
+> > > > > >> $ git grep -nH 'define __smp_mb__after_atomic'
+> > > > > >> arch/ia64/include/asm/barrier.h:49:#define __smp_mb__after_atomic()
+> > > > > >> barrier()
+> > > > > >> arch/mips/include/asm/barrier.h:133:#define __smp_mb__after_atomic()
+> > > > > >> smp_llsc_mb()
+> > > > > >> arch/s390/include/asm/barrier.h:50:#define __smp_mb__after_atomic()
+> > > > > >> barrier()
+> > > > > >> arch/sparc/include/asm/barrier_64.h:57:#define __smp_mb__after_atomic()
+> > > > > >> barrier()
+> > > > > >> arch/x86/include/asm/barrier.h:83:#define __smp_mb__after_atomic()	do {
+> > > > > >> } while (0)
+> > > > > >> arch/xtensa/include/asm/barrier.h:20:#define __smp_mb__after_atomic()	
+> > > > > >> barrier()
+> > > > > >> include/asm-generic/barrier.h:116:#define __smp_mb__after_atomic()
+> > > > > >> __smp_mb()
+> > > > > >>
+> > > > > >> My interpretation of the above is that not all smp_mb__after_atomic()
+> > > > > >> implementations have release semantics. Do you agree with this conclusion?
+> > > > > > 
+> > > > > > I understand smp_mb__after_atomic() orders set_bit(BLK_MQ_S_INACTIVE)
+> > > > > > and reading the tag bit which is done in blk_mq_all_tag_iter().
+> > > > > > 
+> > > > > > So the two pair of OPs are ordered:
+> > > > > > 
+> > > > > > 1) if one request(tag bit) is allocated before setting BLK_MQ_S_INACTIVE,
+> > > > > > the tag bit will be observed in blk_mq_all_tag_iter() from blk_mq_hctx_has_requests(),
+> > > > > > so the request will be drained.
+> > > > > > 
+> > > > > > OR
+> > > > > > 
+> > > > > > 2) if one request(tag bit) is allocated after setting BLK_MQ_S_INACTIVE,
+> > > > > > the request(tag bit) will be released and retried on another CPU
+> > > > > > finally, see __blk_mq_alloc_request().
+> > > > > > 
+> > > > > > Cc Paul and linux-kernel list.
+> > > > > 
+> > > > > I do not agree with the above conclusion. My understanding of
+> > > > > acquire/release labels is that if the following holds:
+> > > > > (1) A store operation that stores the value V into memory location M has
+> > > > > a release label.
+> > > > > (2) A load operation that reads memory location M has an acquire label.
+> > > > > (3) The load operation (2) retrieves the value V that was stored by (1).
+> > > > > 
+> > > > > that the following ordering property holds: all load and store
+> > > > > instructions that happened before the store instruction (1) in program
+> > > > > order are guaranteed to happen before the load and store instructions
+> > > > > that follow (2) in program order.
+> > > > > 
+> > > > > In the ARM manual these semantics have been described as follows: "A
+> > > > > Store-Release instruction is multicopy atomic when observed with a
+> > > > > Load-Acquire instruction".
+> > > > > 
+> > > > > In this case the load-acquire operation is the
+> > > > > "test_and_set_bit_lock(nr, word)" statement from the sbitmap code. That
+> > > > > code is executed indirectly by blk_mq_get_tag(). Since there is no
+> > > > > matching store-release instruction in __blk_mq_alloc_request() for
+> > > > > 'word', ordering of the &data->hctx->state and 'tag' memory locations is
+> > > > > not guaranteed by the acquire property of the "test_and_set_bit_lock(nr,
+> > > > > word)" statement from the sbitmap code.
+> > > > 
+> > > > I feel like I just parachuted into the middle of the conversation,
+> > > > so let me start by giving a (silly) example illustrating the limits of
+> > > > smp_mb__{before,after}_atomic() that might be tangling things up.
+> > > > 
+> > > > But please please please avoid doing this in real code unless you have
+> > > > an extremely good reason included in a comment.
+> > > > 
+> > > > void t1(void)
+> > > > {
+> > > > 	WRITE_ONCE(a, 1);
+> > > > 	smp_mb__before_atomic();
+> > > > 	WRITE_ONCE(b, 1);  // Just Say No to code here!!!
+> > > > 	atomic_inc(&c);
+> > > > 	WRITE_ONCE(d, 1);  // Just Say No to code here!!!
+> > > > 	smp_mb__after_atomic();
+> > > > 	WRITE_ONCE(e, 1);
+> > > > }
+> > > > 
+> > > > void t2(void)
+> > > > {
+> > > > 	r1 = READ_ONCE(e);
+> > > > 	smp_mb();
+> > > > 	r2 = READ_ONCE(d);
+> > > > 	smp_mb();
+> > > > 	r3 = READ_ONCE(c);
+> > > > 	smp_mb();
+> > > > 	r4 = READ_ONCE(b);
+> > > > 	smp_mb();
+> > > > 	r5 = READ_ONCE(a);
+> > > > }
+> > > > 
+> > > > Each platform must provide strong ordering for either atomic_inc()
+> > > > on the one hand (as ia64 does) or for smp_mb__{before,after}_atomic()
+> > > > on the other (as powerpc does).  Note that both ia64 and powerpc are
+> > > > weakly ordered.
+> > > > 
+> > > > So ia64 could see (r1 == 1 && r2 == 0) on the one hand as well as (r4 ==
+> > > > 1 && r5 == 0).  So clearly smp_mb_{before,after}_atomic() need not have
+> > > > any ordering properties whatsoever.
+> > > > 
+> > > > Similarly, powerpc could see (r3 == 1 && r4 == 0) on the one hand as well
+> > > > as (r2 == 1 && r3 == 0) on the other.  Or even both at the same time.
+> > > > So clearly atomic_inc() need not have any ordering properties whatsoever.
+> > > > 
+> > > > But the combination of smp_mb__before_atomic() and the later atomic_inc()
+> > > > does provide full ordering, so that no architecture can see (r3 == 1 &&
+> > > > r5 == 0), and either of r1 or r2 can be substituted for r3.
+> > > > 
+> > > > Similarly, atomic_inc() and the late4r smp_mb__after_atomic() also
+> > > > provide full ordering, so that no architecture can see (r1 == 1 && r3 ==
+> > > > 0), and either r4 or r5 can be substituted for r3.
+> > > > 
+> > > > 
+> > > > So a call to set_bit() followed by a call to smp_mb__after_atomic() will
+> > > > provide a full memory barrier (implying release semantics) for any write
+> > > > access after the smp_mb__after_atomic() with respect to the set_bit() or
+> > > > any access preceding it.  But the set_bit() by itself won't have release
+> > > > semantics, nor will the smp_mb__after_atomic(), only their combination
+> > > > further combined with some write following the smp_mb__after_atomic().
+> > > > 
+> > > > More generally, there will be the equivalent of smp_mb() somewhere between
+> > > > the set_bit() and every access following the smp_mb__after_atomic().
+> > > > 
+> > > > Does that help, or am I missing the point?
+> > > 
+> > > Yeah, it does help.
+> > > 
+> > > BTW, can we replace the smp_mb__after_atomic() with smp_mb() for
+> > > ordering set_bit() and the memory OP following the smp_mb()?
+> > 
+> > Placing an smp_mb() between set_bit() and a later access will indeed
+> > order set_bit() with that later access.
+> > 
+> > That said, I don't know this code well enough to say whether or not
+> > that ordering is sufficient.
+> 
+> Another pair is in blk_mq_get_tag(), and we expect the following two
+> memory OPs are ordered:
+> 
+> 1) set bit in successful test_and_set_bit_lock(), which is called
+> from sbitmap_get()
+> 
+> 2) test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state)
+> 
+> Do you think that the above two OPs are ordered?
 
-Reviewed-by: Alan Adamson <alan.adamson@oracle.com>
+Given that he has been through the code, I would like to hear Bart's
+thoughts, actually.
 
-On 5/29/20 7:51 AM, Keith Busch wrote:
-> Drivers may need to bypass error injection for error recovery. Rename
-> __blk_mq_complete_request() to blk_mq_force_complete_rq() and export
-> that function so drivers may skip potential fake timeouts after they've
-> reclaimed lost requests.
->
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   block/blk-mq.c         | 15 +++++++++++++--
->   include/linux/blk-mq.h |  1 +
->   2 files changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index cac11945f602..560a114a82f8 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -556,7 +556,17 @@ static void __blk_mq_complete_request_remote(void *data)
->   	q->mq_ops->complete(rq);
->   }
->   
-> -static void __blk_mq_complete_request(struct request *rq)
-> +/**
-> + * blk_mq_force_complete_rq() - Force complete the request, bypassing any error
-> + * 				injection that could drop the completion.
-> + * @rq: Request to be force completed
-> + *
-> + * Drivers should use blk_mq_complete_request() to complete requests in their
-> + * normal IO path. For timeout error recovery, drivers may call this forced
-> + * completion routine after they've reclaimed timed out requests to bypass
-> + * potentially subsequent fake timeouts.
-> + */
-> +void blk_mq_force_complete_rq(struct request *rq)
->   {
->   	struct blk_mq_ctx *ctx = rq->mq_ctx;
->   	struct request_queue *q = rq->q;
-> @@ -602,6 +612,7 @@ static void __blk_mq_complete_request(struct request *rq)
->   	}
->   	put_cpu();
->   }
-> +EXPORT_SYMBOL_GPL(blk_mq_force_complete_rq);
->   
->   static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
->   	__releases(hctx->srcu)
-> @@ -635,7 +646,7 @@ bool blk_mq_complete_request(struct request *rq)
->   {
->   	if (unlikely(blk_should_fake_timeout(rq->q)))
->   		return false;
-> -	__blk_mq_complete_request(rq);
-> +	blk_mq_force_complete_rq(rq);
->   	return true;
->   }
->   EXPORT_SYMBOL(blk_mq_complete_request);
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index d7307795439a..856bb10993cf 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -494,6 +494,7 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list);
->   void blk_mq_kick_requeue_list(struct request_queue *q);
->   void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
->   bool blk_mq_complete_request(struct request *rq);
-> +void blk_mq_force_complete_rq(struct request *rq);
->   bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
->   			   struct bio *bio, unsigned int nr_segs);
->   bool blk_mq_queue_stopped(struct request_queue *q);
+							Thanx, Paul
