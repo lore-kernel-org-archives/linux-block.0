@@ -3,54 +3,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6249DC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 16:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 431B9C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 16:17:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48AD720897
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 16:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B2E72077D
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 16:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725795AbgE2QOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 12:14:22 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:39919 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbgE2QOV (ORCPT
+        id S1727035AbgE2QR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 12:17:58 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:34460 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725681AbgE2QR6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 12:14:21 -0400
-Received: by mail-pl1-f195.google.com with SMTP id x18so1328228pll.6
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 09:14:20 -0700 (PDT)
+        Fri, 29 May 2020 12:17:58 -0400
+Received: by mail-pf1-f193.google.com with SMTP id z64so1576296pfb.1
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 09:17:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=tWTqNNryCv8ab8Epl8V4G4MlmVY90wjsVFAKoFIN+fw=;
-        b=eiAh7IzDWlrXASCGi8vBthlOnOXZmqx7fam4tWxwR49zcrJsQhT2e7IQP1Vp+zOE5u
-         nCr+X9V+dwp6aiO+s5qwABVMNBd2aB84CzZD9DY3Gy2/jE15Bv2masuLGAisnuGrq7wL
-         73ugSf1E7ndIAtGklyRx78jBqkreN+26DIoWo5zJITxZETiuwKt3ubQ8xzJgna3NEXK1
-         KBWucBnm2J2qCVK2+PJSjrhoYdHlpEerI4AWYWWqkPjxnnrN+Nmdk/c/Vd4EpsMf2ust
-         x3t0YkPsGI0vI8260scSvQkrSpruh6e99JG+mp7rH5ZpWWMsUS8g6X9vfVI75xsBKVwm
-         CC0w==
-X-Gm-Message-State: AOAM530VL2+NNlrDu5RBk9CIbMZtj1mQNXTxyidWoH42j0TTBS9v1yIQ
-        3BJnywYWWB9LVG70aD3hvjM=
-X-Google-Smtp-Source: ABdhPJyY+HqqFns0b956CsrBED2qzrwHQHiOL9p/hDgArV7OidYXljkEcdWEDiUyM5s3ReMGw9OBsg==
-X-Received: by 2002:a17:90b:2391:: with SMTP id mr17mr3851792pjb.220.1590768860323;
-        Fri, 29 May 2020 09:14:20 -0700 (PDT)
+        bh=4iA4fLluUKM2wBC2KZq3FDrTT8K1VIFSPGTSfVomd6g=;
+        b=LUNVfCoHzqHe85VbrbAv4kM6Flcys1JROxMnTemcAVrsQzqklA1E32K7K46Q6yE3Hs
+         7TbKGzwpW7W+ZtlOmfMkpXNNObl/bPkGnhxT7bGbLPUYTfMh8PAdY6qD8b/MMvu23i7m
+         vVV5xQtIQyDr2cMBV5euj8J39LKe0u0nHJg9AKKmHMNZz0matEHjwAC1FcH8mB+h7l8p
+         ftH1jdVaIzo/hWrrITkrHHvr0TTm9l2ZpYAhd4zMIW/Xl/BGgf1HYYjDdaIEWtb3FpiN
+         nBSxQutkAO4wBCoiGU8G9hBKe26zQ5Lkbin7o4weakeRQjWOWa+PtCYEZ5BSZjen4QkO
+         FlZA==
+X-Gm-Message-State: AOAM532p8ZmgEjKW5mWNITOa1bTMGfRk3Rb/r2iew/v6G7cSiJNC4uY/
+        2CtiyG6ObhiO8FZ4Ce+vQEY=
+X-Google-Smtp-Source: ABdhPJxwQydfBiFICgA7vh5wGfewiNlAbsg51PbUNZUjJmjXsACMxXRQ8glpjWATnt31jEiNKNMCww==
+X-Received: by 2002:a63:f103:: with SMTP id f3mr9096130pgi.30.1590769077288;
+        Fri, 29 May 2020 09:17:57 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:9d55:11e:7174:3ec6? ([2601:647:4000:d7:9d55:11e:7174:3ec6])
-        by smtp.gmail.com with ESMTPSA id l23sm7551371pff.80.2020.05.29.09.14.18
+        by smtp.gmail.com with ESMTPSA id a2sm7746895pfg.98.2020.05.29.09.17.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 09:14:19 -0700 (PDT)
-Subject: Re: [PATCH 7/8] blk-mq: add blk_mq_all_tag_iter
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-References: <20200529135315.199230-1-hch@lst.de>
- <20200529135315.199230-8-hch@lst.de>
+        Fri, 29 May 2020 09:17:56 -0700 (PDT)
+Subject: Re: [PATCH] block: improve discard bio alignment in
+ __blkdev_issue_discard()
+To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
+Cc:     Acshai Manoj <acshai.manoj@microfocus.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Xiao Ni <xni@redhat.com>
+References: <20200529160350.99710-1-colyli@suse.de>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -75,12 +75,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <ca2b66d0-c1cd-b683-5955-410c0cd6229d@acm.org>
-Date:   Fri, 29 May 2020 09:14:17 -0700
+Message-ID: <d5d8af86-659f-d2cb-06e7-876c9481f73d@acm.org>
+Date:   Fri, 29 May 2020 09:17:54 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200529135315.199230-8-hch@lst.de>
+In-Reply-To: <20200529160350.99710-1-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,14 +89,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-29 06:53, Christoph Hellwig wrote:
-> Add a new blk_mq_all_tag_iter function to iterate over all allocated
-> scheduler tags and driver tags.  This is more flexible than the existing
-> blk_mq_all_tag_busy_iter function as it allows the callers to do whatever
-> they want on allocated request instead of being limited to started
-> requests.
-> 
-> It will be used to implement draining allocated requests on specified
-> hctx in this patchset.
+On 2020-05-29 09:03, Coly Li wrote:
+> +static inline unsigned int bio_aligned_discard_max_sectors(
+> +					struct request_queue *q)
+> +{
+> +	return round_down(UINT_MAX, (q->limits.max_discard_sectors << 9)) >> 9;
+> +}
 
-Reviewed-by: Bart van Assche <bvanassche@acm.org>
+How about changing '9' into 'SECTOR_SHIFT'?
+
+Thanks,
+
+Bart.
+
