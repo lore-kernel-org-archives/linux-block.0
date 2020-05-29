@@ -2,133 +2,102 @@ Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A819EC433E2
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD2FC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:55:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8284C20B80
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590788327;
-	bh=tE0uiE2+3bBMtWRXqfGfV9qTFRy4O0X4c3cZONdz6Us=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0nY/doEW9CqbByMaLf+F1MFnihBrE2dN0qIOvy8eN6zUfk1ccv+TMh99Kyo+shHOD
-	 FcGFKgFsPYj8wCOH9ulqxoVdCzHb6VYb6suhkG/UAGTz+GJYEO5Ybl3i6PUq8LZF5u
-	 EhKFDujQGN/KpUs4yOJA0LCjc7CjzE0RLMxivejM=
+	by mail.kernel.org (Postfix) with ESMTP id E6A3E20707
+	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 21:55:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="WZeC7eO7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbgE2Viq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 17:38:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42456 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727879AbgE2Viq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 17:38:46 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3C9BF2071A;
-        Fri, 29 May 2020 21:38:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590788325;
-        bh=tE0uiE2+3bBMtWRXqfGfV9qTFRy4O0X4c3cZONdz6Us=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FR/X5uWt/SX5VwwetokdckrjO3xYCshTrKr7FGh3UbMFBpEQa4jLs3EafgCrS/Rhy
-         aLn78Ria2TAChv7kxOnS6r1map6x8egSewewnSWfcqQgePocwMktB6KGRHrmfWSTR2
-         ANlAFA60lT5tcnw/JRDDZuX2x4WChEzBW7OjrJAw=
-Date:   Fri, 29 May 2020 14:38:43 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Thara Gopinath <thara.gopinath@linaro.org>
-Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [RFC PATCH v4 4/4] scsi: ufs-qcom: add Inline Crypto Engine
- support
-Message-ID: <20200529213843.GA220669@gmail.com>
-References: <20200501045111.665881-1-ebiggers@kernel.org>
- <20200501045111.665881-5-ebiggers@kernel.org>
- <31fa95e5-7757-96ae-2e86-1f54959e3a6c@linaro.org>
- <20200507180435.GB236103@gmail.com>
- <20200507180838.GC236103@gmail.com>
- <40600d42-dfa9-b60c-6ce8-0eda6bdf7ddf@linaro.org>
- <20200529171326.GA82398@gmail.com>
- <676394c6-4250-8998-d959-68cd218991e5@linaro.org>
+        id S1727947AbgE2Vzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 17:55:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53758 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726975AbgE2Vzh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 May 2020 17:55:37 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B0BC08C5C9
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:55:37 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id f185so5626530wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 14:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=y+7fPyOVJN5kEZ9dPieR6MlsnghgeDslNqLeQyzk6T0=;
+        b=WZeC7eO7/F1ZaHD2HPukUdjFIz2gU316B+8AUCkZ3RKsm7iLEROxDs+nbuAmSb/M1D
+         oto7q3ImBObrsf7Z8ZjIa2xJvNFfpmhYKUXEMNdbGPul2Odv8xHsR0jxFRbs75pFsx8s
+         tEBmiGdLzbVZNYQ5xTX0vEWNkGPpXNroUaoy77ja1l5tGYab04onKEOIRN3Mi46GrMtQ
+         SetD/TtpId/Ilf7VGL1u8VPwxrB29EEl3tywWnAl0i+PVtPjDP3lxNZ07IpbuOUE4a55
+         fiblyxy3HtslcCuCq66nOo+R7FDVhxyx46HZvQ+KZjC/3rkGtvP+LfVqOmpJFfg5Znu7
+         Qzgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=y+7fPyOVJN5kEZ9dPieR6MlsnghgeDslNqLeQyzk6T0=;
+        b=tBa6qGjI3Qj9aMxzYZG9GVXZfyiLfzXlaikRDxwgXN9gMXhnkP2yYKjtSjz9ITWycY
+         6NaVdUP+RucK/GPw94/HL5SdMYlHOmcf/7MYVhzn34C2U7AHZRXgzDJ+3kYuBljPn94v
+         wjQ/1SBMnVxaJxKD+mvfFA/AyvgAhaOBGOFkD8VT+ggEirOtQiR7l+yCRsmE37/7DSuD
+         Sujx/T0cVCXNen4m1k90cNTbkA/Qlnv4BMDnvccxHn1BKxg6zzGgwyDVAVg4G4rnp7xR
+         Q5UckJncSDMttKICka5qthVS4Va3AbvDpoFm0xB3IrxJGlcaGEr0jzgaGhvrKCFWwCpl
+         x8Cw==
+X-Gm-Message-State: AOAM530n29gytn3hXpVBQtwhoDwzwxVKfXsm6lHHwx73iUIO7RB+RE6d
+        wNwGTlCZ7VUiELTrwrU24S0x/kQevSefSw==
+X-Google-Smtp-Source: ABdhPJwebDU0toeDqVExcoUsOjyNPjev/ummN9l/P8IRsg1/RBgPJu0TE/gEy3JksZSZdsnGz7qe6A==
+X-Received: by 2002:a05:600c:3cf:: with SMTP id z15mr10058213wmd.24.1590789335789;
+        Fri, 29 May 2020 14:55:35 -0700 (PDT)
+Received: from ?IPv6:2001:16b8:4826:7300:a436:5e5d:3e25:d8b3? ([2001:16b8:4826:7300:a436:5e5d:3e25:d8b3])
+        by smtp.gmail.com with ESMTPSA id t14sm5080616wri.7.2020.05.29.14.55.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2020 14:55:35 -0700 (PDT)
+Subject: Re: [PATCH 0/4] cleanup for blk-wbt and blk-throttle
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <f308bc7f-083a-d0f3-aad2-b353c241dbde@cloud.ionos.com>
+Date:   Fri, 29 May 2020 23:55:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <676394c6-4250-8998-d959-68cd218991e5@linaro.org>
+In-Reply-To: <20200508220015.11528-1-guoqing.jiang@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 29, 2020 at 05:25:47PM -0400, Thara Gopinath wrote:
-> > > Hi Eric,
-> > > 
-> > > I tested this manually on db845c, sm8150-mtp and sm8250-mtp.(I added the dts
-> > > file entries for 8150 and 8250).
-> > > 
-> > > I also ran OsBench test case createfiles[1] on the above platforms.
-> > > Following are the results on a non encrypted and encrypted directory on the
-> > > same file system(lower the number better)
-> > > 
-> > > 			8250-MTP	8150-MTP	DB845
-> > > 
-> > > nonencrypt_dir(us) 	55.3108954	26.8323124    69.5709552
-> > > encrypt_dir(us) 	70.0214426	37.5411254    92.3818296
-> > > 
-> > > 
-> > > 
-> > > 1. https://github.com/mbitsnbites/osbench/blob/master/README.md
-> > > 
-> > 
-> > Great, thanks for testing.
-> > 
-> > Note that the benchmark you ran (creating many small files, then deleting them)
-> > mostly tests the performance of filenames encryption and directory operations,
-> > not file contents encryption.  Inline encryption is only used for file contents.
-> > 
-> > In fact, since that benchmark doesn't sync the files before deleting them, there
-> > is no guarantee that any file contents are actually written to disk, and hence
-> > no guarantee that inline encryption got used at all.
-> 
-> Hi Eric,
-> 
-> The results are particularly interesting if you think a sync is not
-> happening. 
+Gently ping.
 
-You can check the source code
-(https://github.com/mbitsnbites/osbench/blob/master/src/create_files.c).
-There's no sync.
+On 5/9/20 12:00 AM, Guoqing Jiang wrote:
+> Hi,
+>
+> Find some functions can be removed since there is no caller of them when
+> read the code.
+>
+> Thanks,
+> Guoqing
+>
+> Guoqing Jiang (4):
+>    blk-throttle: remove blk_throtl_drain
+>    blk-throttle: remove tg_drain_bios
+>    blk-wbt: remove wbt_update_limits
+>    blk-wbt: rename __wbt_update_limits to wbt_update_limits
+>
+>   block/blk-throttle.c | 63 --------------------------------------------
+>   block/blk-wbt.c      | 16 +++--------
+>   block/blk-wbt.h      |  4 ---
+>   block/blk.h          |  2 --
+>   4 files changed, 4 insertions(+), 81 deletions(-)
+>
 
-> There should not be any performance regression in this case
-> between the two directories. 
-
-That's not true; the filenames still need to be encrypted.  Filenames encryption
-happens right away, not later when the pages are written to disk.  Contents
-encryption works differently.
-
-> I can try some reading/writing performance tests rather than creating files
-> testing.
-> > 
-> > It would be more relevant to test the performance of reading/writing file data.
-> > 
-> > Also, did you try doing any correctness tests?  (See what I suggested earlier.)
-> 
-> I did correctness test as part of manual tests by diffing the content of the
-> copied files and verifying them. I did not run any other tests you
-> mentioned. Feel free to add my Tested-by in the next version you send out.
-> 
-
-Okay, thanks!
-
-- Eric
