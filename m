@@ -2,243 +2,241 @@ Return-Path: <SRS0=VeZL=7M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A42C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 13:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7730CC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 13:55:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0985020715
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 13:52:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTpvQu7l"
+	by mail.kernel.org (Postfix) with ESMTP id 58CA120715
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 13:55:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728941AbgE3Nw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 May 2020 09:52:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43959 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727851AbgE3Nw6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 May 2020 09:52:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590846775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TNnr3qLTdHB28Ad+/AEnpk05q0jlMEs2ygmx4qV3lRM=;
-        b=QTpvQu7lyC6EykeGX28985pYx/fC9ZwTMis3uk2LxwQvn86LuFc3iJq8EDb7FJp7c5g6Da
-        e3QVUdloKbpLZhpgxCn8wvqhsCDVFco9jm2uDTw7VFtcamMgLq//UxNeD7gqxRKPCSW/4S
-        xghV++RC/9ZZK4cZkVBh591AJvyxlXE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-lLoCN4SXMfKt5oYqy0ODtA-1; Sat, 30 May 2020 09:52:50 -0400
-X-MC-Unique: lLoCN4SXMfKt5oYqy0ODtA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EDFB18FE860;
-        Sat, 30 May 2020 13:52:49 +0000 (UTC)
-Received: from localhost (ovpn-12-60.pek2.redhat.com [10.72.12.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B04046ACF8;
-        Sat, 30 May 2020 13:52:45 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
-Cc:     Alan Adamson <alan.adamson@oracle.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH V2 3/3] nvme-pci: make nvme reset more reliable
-Date:   Sat, 30 May 2020 21:52:21 +0800
-Message-Id: <20200530135221.1152749-4-ming.lei@redhat.com>
-In-Reply-To: <20200530135221.1152749-1-ming.lei@redhat.com>
-References: <20200530135221.1152749-1-ming.lei@redhat.com>
+        id S1728848AbgE3NzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 May 2020 09:55:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53506 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728769AbgE3NzJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 May 2020 09:55:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 1CE54AC22;
+        Sat, 30 May 2020 13:55:07 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org
+Cc:     linux-bcache@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Acshai Manoj <acshai.manoj@microfocus.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Xiao Ni <xni@redhat.com>
+Subject: [PATCH v3] block: improve discard bio alignment in __blkdev_issue_discard()
+Date:   Sat, 30 May 2020 21:52:31 +0800
+Message-Id: <20200530135231.122389-1-colyli@suse.de>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-During waiting for in-flight IO completion in reset handler, timeout
-or controller failure still may happen, then the controller is deleted
-and all inflight IOs are failed. This way is too violent: 1) the timeout
-may be triggered exactly during nvme_wait_freeze() after controller is
-recovered by one occasional event; 2) the claimed retry times isn't
-respected.
+This patch improves discard bio split for address and size alignment in
+__blkdev_issue_discard(). The aligned discard bio may help underlying
+device controller to perform better discard and internal garbage
+collection, and avoid unnecessary internal fragment.
 
-Improve the reset handling by replacing nvme_wait_freeze with query
-& check controller. If all ns queues are frozen, the controller is reset
-successfully, otherwise check and see if the controller has been disabled.
-If yes, break from the current recovery and schedule a fresh new reset.
+Current discard bio split algorithm in __blkdev_issue_discard() may have
+non-discarded fregment on device even the discard bio LBA and size are
+both aligned to device's discard granularity size.
 
-This way avoids to failing IO & removing controller unnecessarily.
+Here is the example steps on how to reproduce the above problem.
+- On a VMWare ESXi 6.5 update3 installation, create a 51GB virtual disk
+  with thin mode and give it to a Linux virtual machine.
+- Inside the Linux virtual machine, if the 50GB virtual disk shows up as
+  /dev/sdb, fill data into the first 50GB by,
+        # dd if=/dev/zero of=/dev/sdb bs=4096 count=13107200
+- Discard the 50GB range from offset 0 on /dev/sdb,
+        # blkdiscard /dev/sdb -o 0 -l 53687091200
+- Observe the underlying mapping status of the device
+        # sg_get_lba_status /dev/sdb -m 1048 --lba=0
+  descriptor LBA: 0x0000000000000000  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000000000800  blocks: 16773120  deallocated
+  descriptor LBA: 0x0000000000fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000001000000  blocks: 8386560  deallocated
+  descriptor LBA: 0x00000000017ff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000001800000  blocks: 8386560  deallocated
+  descriptor LBA: 0x0000000001fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000002000000  blocks: 8386560  deallocated
+  descriptor LBA: 0x00000000027ff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000002800000  blocks: 8386560  deallocated
+  descriptor LBA: 0x0000000002fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000003000000  blocks: 8386560  deallocated
+  descriptor LBA: 0x00000000037ff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000003800000  blocks: 8386560  deallocated
+  descriptor LBA: 0x0000000003fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000004000000  blocks: 8386560  deallocated
+  descriptor LBA: 0x00000000047ff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000004800000  blocks: 8386560  deallocated
+  descriptor LBA: 0x0000000004fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000005000000  blocks: 8386560  deallocated
+  descriptor LBA: 0x00000000057ff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000005800000  blocks: 8386560  deallocated
+  descriptor LBA: 0x0000000005fff800  blocks: 2048  mapped (or unknown)
+  descriptor LBA: 0x0000000006000000  blocks: 6291456  deallocated
+  descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
 
+Although the discard bio starts at LBA 0 and has 50<<30 bytes size which
+are perfect aligned to the discard granularity, from the above list
+these are many 1MB (2048 sectors) internal fragments exist unexpectedly.
+
+The problem is in __blkdev_issue_discard(), an improper algorithm causes
+an improper bio size which is not aligned.
+
+ 25 int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 26                 sector_t nr_sects, gfp_t gfp_mask, int flags,
+ 27                 struct bio **biop)
+ 28 {
+ 29         struct request_queue *q = bdev_get_queue(bdev);
+   [snipped]
+ 56
+ 57         while (nr_sects) {
+ 58                 sector_t req_sects = min_t(sector_t, nr_sects,
+ 59                                 bio_allowed_max_sectors(q));
+ 60
+ 61                 WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
+ 62
+ 63                 bio = blk_next_bio(bio, 0, gfp_mask);
+ 64                 bio->bi_iter.bi_sector = sector;
+ 65                 bio_set_dev(bio, bdev);
+ 66                 bio_set_op_attrs(bio, op, 0);
+ 67
+ 68                 bio->bi_iter.bi_size = req_sects << 9;
+ 69                 sector += req_sects;
+ 70                 nr_sects -= req_sects;
+   [snipped]
+ 79         }
+ 80
+ 81         *biop = bio;
+ 82         return 0;
+ 83 }
+ 84 EXPORT_SYMBOL(__blkdev_issue_discard);
+
+At line 58-59, to discard a 50GB range, req_sects is set as return value
+of bio_allowed_max_sectors(q), which is 8388607 sectors. In the above
+case, the discard granularity is 2048 sectors, although the start LBA
+and discard length are aligned to discard granularity, req_sects never
+has chance to be aligned to discard granularity. This is why there are
+some still-mapped 2048 sectors fragment in every 4 or 8 GB range.
+
+If req_sects at line 58 is set to a value aligned to discard_granularity
+and close to UNIT_MAX, then all consequent split bios inside device
+driver are (almostly) aligned to discard_granularity of the device
+queue. The 2048 sectors still-mapped fragment will disappear.
+
+This patch introduces bio_aligned_discard_max_sectors() to return the
+the value which is aligned to q->limits.discard_granularity and closest
+to UINT_MAX. Then this patch replaces bio_allowed_max_sectors() with
+this new routine to decide a more proper split bio length.
+
+But we still need to handle the situation when discard start LBA is not
+aligned to q->limits.discard_granularity, otherwise even the length is
+aligned, current code may still leave 2048 fragment around every 4GB
+range. Therefore, to calculate req_sects, firstly the start LBA of
+discard range is checked, if it is not aligned to discard granularity,
+the first split location should make sure following bio has bi_sector
+aligned to discard granularity. Then there won't be still-mapped
+fragment in the middle of the discard range.
+
+The above is how this patch improves discard bio alignment in
+__blkdev_issue_discard(). Now with this patch, after discard with same
+command line mentiond previously, sg_get_lba_status returns,
+descriptor LBA: 0x0000000000000000  blocks: 106954752  deallocated
+descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
+
+We an see there is no 2048 sectors segment anymore, everything is clean.
+
+Reported-by: Acshai Manoj <acshai.manoj@microfocus.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Bart Van Assche <bvanassche@acm.org>
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Enzo Matsumiya <ematsumiya@suse.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Xiao Ni <xni@redhat.com>
 ---
- drivers/nvme/host/core.c |  3 ++-
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/pci.c  | 50 +++++++++++++++++++++++++++++++++-------
- 3 files changed, 46 insertions(+), 9 deletions(-)
+Changelog:
+v2, the improved version with inspire from review comments by Bart,
+    Ming and Xiao.
+v1, the initial version.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 469010607383..f4a00a85a47e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -45,9 +45,10 @@ static unsigned char shutdown_timeout = 5;
- module_param(shutdown_timeout, byte, 0644);
- MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
+ block/blk-lib.c | 25 +++++++++++++++++++++++--
+ block/blk.h     | 14 ++++++++++++++
+ 2 files changed, 37 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 5f2c429d4378..7bffdee63a20 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -55,8 +55,29 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		return -EINVAL;
  
--static u8 nvme_max_retries = 5;
-+u8 nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, byte, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
-+EXPORT_SYMBOL_GPL(nvme_max_retries);
- 
- static unsigned long default_ps_max_latency_us = 100000;
- module_param(default_ps_max_latency_us, ulong, 0644);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 459e5952ff5f..ba4c84f16a0b 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -25,6 +25,8 @@ extern unsigned int nvme_io_timeout;
- extern unsigned int admin_timeout;
- #define ADMIN_TIMEOUT	(admin_timeout * HZ)
- 
-+extern u8 nvme_max_retries;
+ 	while (nr_sects) {
+-		sector_t req_sects = min_t(sector_t, nr_sects,
+-				bio_allowed_max_sectors(q));
++		sector_t granularity_aligned_lba;
++		sector_t req_sects;
 +
- #define NVME_DEFAULT_KATO	5
- #define NVME_KATO_GRACE		10
- 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e13c370de830..9b75f1d855f9 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -24,6 +24,7 @@
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/sed-opal.h>
- #include <linux/pci-p2pdma.h>
-+#include <linux/delay.h>
- 
- #include "trace.h"
- #include "nvme.h"
-@@ -106,6 +107,7 @@ struct nvme_dev {
- 	unsigned long bar_mapped_size;
- 	struct work_struct remove_work;
- 	struct mutex shutdown_lock;
-+	int successive_shutdown;
- 	bool subsystem;
- 	u64 cmb_size;
- 	bool cmb_use_sqes;
-@@ -1243,9 +1245,6 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 	 * shutdown, so we return BLK_EH_DONE.
- 	 */
- 	switch (dev->ctrl.state) {
--	case NVME_CTRL_CONNECTING:
--		nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DELETING);
--		/* fall through */
- 	case NVME_CTRL_DELETING:
- 		dev_warn_ratelimited(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, disable controller\n",
-@@ -2383,11 +2382,13 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 
- 	mutex_lock(&dev->shutdown_lock);
-+	dev->successive_shutdown++;
- 	if (pci_is_enabled(pdev)) {
- 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
- 
- 		if (dev->ctrl.state == NVME_CTRL_LIVE ||
--		    dev->ctrl.state == NVME_CTRL_RESETTING) {
-+		    dev->ctrl.state == NVME_CTRL_RESETTING ||
-+		    dev->ctrl.state == NVME_CTRL_CONNECTING) {
- 			freeze = true;
- 			nvme_start_freeze(&dev->ctrl);
- 		}
-@@ -2498,12 +2499,34 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev)
- 		nvme_put_ctrl(&dev->ctrl);
- }
- 
-+static bool nvme_wait_freeze_and_check(struct nvme_dev *dev)
-+{
-+	bool frozen;
-+
-+	while (true) {
-+		frozen = nvme_frozen(&dev->ctrl);
-+		if (frozen)
-+			break;
++		granularity_aligned_lba = round_up(sector,
++				q->limits.discard_granularity >> SECTOR_SHIFT);
 +
 +		/*
-+		 * controller may has been shutdown because of new timeout, so
-+		 * break from the loop and report the event to reset handler.
++		 * Check whether the discard bio starts at a discard_granularity
++		 * aligned LBA,
++		 * - If no: set (granularity_aligned_lba - sector) to bi_size of
++		 *   the first split bio, then the second bio will start at a
++		 *   discard_granularity aligned LBA.
++		 * - If yes: use bio_aligned_discard_max_sectors() as the max
++		 *   possible bi_size of the first split bio. Then when this bio
++		 *   is split in device drive, the split ones are very probably
++		 *   to be aligned to discard_granularity of the device's queue.
 +		 */
-+		if (!dev->online_queues)
-+			break;
-+		msleep(3);
-+	}
-+
-+	return frozen;
++		if (granularity_aligned_lba == sector)
++			req_sects = min_t(sector_t, nr_sects,
++					  bio_aligned_discard_max_sectors(q));
++		else
++			req_sects = min_t(sector_t, nr_sects,
++					  granularity_aligned_lba - sector);
+ 
+ 		WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 0a94ec68af32..589007ac564e 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -292,6 +292,20 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
+ 	return round_down(UINT_MAX, queue_logical_block_size(q)) >> 9;
+ }
+ 
++/*
++ * The max bio size which is aligned to q->limits.discard_granularity. This
++ * is a hint to split large discard bio in generic block layer, then if device
++ * driver needs to split the discard bio into smaller ones, their bi_size can
++ * be very probably and easily aligned to discard_granularity of the device's
++ * queue.
++ */
++static inline unsigned int bio_aligned_discard_max_sectors(
++					struct request_queue *q)
++{
++	return round_down(UINT_MAX, q->limits.discard_granularity) >>
++			SECTOR_SHIFT;
 +}
 +
- static void nvme_reset_work(struct work_struct *work)
- {
- 	struct nvme_dev *dev =
- 		container_of(work, struct nvme_dev, ctrl.reset_work);
- 	bool was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	int result;
-+	bool reset_done = true;
- 
- 	if (WARN_ON(dev->ctrl.state != NVME_CTRL_RESETTING)) {
- 		result = -ENODEV;
-@@ -2600,23 +2623,34 @@ static void nvme_reset_work(struct work_struct *work)
- 		nvme_free_tagset(dev);
- 	} else {
- 		nvme_start_queues(&dev->ctrl);
--		nvme_wait_freeze(&dev->ctrl);
--		nvme_dev_add(dev);
-+		reset_done = nvme_wait_freeze_and_check(dev);
-+		if (reset_done)
-+			nvme_dev_add(dev);
- 		nvme_unfreeze(&dev->ctrl);
- 	}
- 
- 	/*
- 	 * If only admin queue live, keep it to do further investigation or
- 	 * recovery.
-+	 *
-+	 * Or we can't move on after retrying enough times.
- 	 */
--	if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_LIVE)) {
-+	if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_LIVE) ||
-+	    (!reset_done && dev->successive_shutdown >= nvme_max_retries)) {
- 		dev_warn(dev->ctrl.device,
- 			"failed to mark controller live state\n");
- 		result = -ENODEV;
- 		goto out;
- 	}
- 
--	nvme_start_ctrl(&dev->ctrl);
-+	/* New error happens during reset, so schedule a new reset */
-+	if (!reset_done) {
-+		dev_warn(dev->ctrl.device, "new error during reset\n");
-+		nvme_reset_ctrl(&dev->ctrl);
-+	} else {
-+		dev->successive_shutdown = 0;
-+		nvme_start_ctrl(&dev->ctrl);
-+	}
- 	return;
- 
-  out_unlock:
+ /*
+  * Internal io_context interface
+  */
 -- 
-2.25.2
+2.25.0
 
