@@ -1,382 +1,106 @@
-Return-Path: <SRS0=yryn=7L=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=VeZL=7M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1BEC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 23:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBA7C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 01:27:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26DA9207BC
-	for <linux-block@archiver.kernel.org>; Fri, 29 May 2020 23:20:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bur.io header.i=@bur.io header.b="utzddtwM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s99X2CW9"
+	by mail.kernel.org (Postfix) with ESMTP id 83C8120810
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 01:27:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728040AbgE2XUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 May 2020 19:20:25 -0400
-Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:53565 "EHLO
-        wnew2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726898AbgE2XUZ (ORCPT
+        id S1728297AbgE3B1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 May 2020 21:27:50 -0400
+Received: from mail-pl1-f182.google.com ([209.85.214.182]:44930 "EHLO
+        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727876AbgE3B1u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 May 2020 19:20:25 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id 79802160A;
-        Fri, 29 May 2020 19:20:22 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Fri, 29 May 2020 19:20:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bur.io; h=from
-        :to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm1; bh=NiQG/tD5+WSs469fNdGE5PUeS3
-        WKVuh9TA8wXZO+ago=; b=utzddtwMWe13cmAR+D7ZTBr8IOno67gUwV6CBLTXlG
-        URzcc1ilvsoh8qbXCwUrUk5Fpta74wSSkc7Wnm5Gc7MXbw9nyV+jvtLptUwPfJrb
-        o/XhMXBwRi9Ltuqr+OtYMtZTRqG2o18jE/2Zzb/RhOj3L/let+1fi12Z9lGvqe5Q
-        SNqfbEkdY0+UwoWKKQ3cfz5Wb/bMnSABHjfkjgsylfuJT18FBhEZKQVnDPYcrPUm
-        4loan7Cr26fDjpZy4Ag2gVI1XFp58xLCCnwvAjTfFpTNobFz7Vr9Z98ERG6UMQrm
-        +jVt0WJasuzOcAfP1vyFr7/h84DP3N7c5m8PxLZ2WtfA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=NiQG/tD5+WSs469fN
-        dGE5PUeS3WKVuh9TA8wXZO+ago=; b=s99X2CW9+yulkGMa8h6E47le2k96P7mTU
-        BmdO3tZe8PjspdHq4RobNVdoT4ZqDFpgjbgroW1u5M+BbOP1TwEm4/qiPhVrdpri
-        4LMFy8LfXw8IaUKK8GdefOhTGGHF4VX6MXzMfF4sEcfgczd5lP1IV0tVWNk93/IY
-        nB1Kscl7wROKEFy/uuCmEs1IfCnE+d0PHHD3GOj3ab/xEMUWAdvlRB2QKPy+J9YD
-        DMyDTVjFE8owP2jgiM307sqbJZIeURKC5/xQFSsE/oUY03L3wKN0byeNX6RZTeAu
-        7s/+Lt1G0NZ0DM0YuHl2Wt2FDya0G6wJJOv2fMv8B1NTY0oR50lyA==
-X-ME-Sender: <xms:tJjRXudo9M_1IZrbmlFaDqBUO7OUuIJ0RZAauhfR521zejb1LotvJQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddvledgudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeuohhrihhsuceu
-    uhhrkhhovhcuoegsohhrihhssegsuhhrrdhioheqnecuggftrfgrthhtvghrnhepudeitd
-    elueeijeefleffveelieefgfejjeeigeekudduteefkefffeethfdvjeevnecukfhppedu
-    ieefrdduudegrddufedvrdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepsghorhhishessghurhdrihho
-X-ME-Proxy: <xmx:tJjRXoNQOnC9McvcvQ4crkctqf9Xcq0nfEFoAIBWMW2BJ_ApilhUQQ>
-    <xmx:tJjRXvhRTve9ZWzuVygtQg5zFg_4OHcGr40qwIo0G4Fr5495bzAjyg>
-    <xmx:tJjRXr8igY8fIwytzZPi3EPXhsET6GdHoxUQrDibEuiHuKo_u98pdw>
-    <xmx:tZjRXuJkoBf2ybY2oa4EfGmnnJwYPPf-WW9_hRH0htuIwgYJTTAV1Chm0qzxbyYd>
-Received: from localhost (unknown [163.114.132.3])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 677273280060;
-        Fri, 29 May 2020 19:20:20 -0400 (EDT)
-From:   Boris Burkov <boris@bur.io>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com,
-        Boris Burkov <boris@bur.io>
-Subject: [PATCH blk-cgroup/for-5.8] blk-cgroup: show global disk stats in root cgroup io.stat
-Date:   Fri, 29 May 2020 16:20:17 -0700
-Message-Id: <20200529232017.1795920-1-boris@bur.io>
-X-Mailer: git-send-email 2.24.1
+        Fri, 29 May 2020 21:27:50 -0400
+Received: by mail-pl1-f182.google.com with SMTP id bh7so1893287plb.11
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2020 18:27:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=XDWfZVKTmoJWjJPnYLsSwVWmfKMK3J9Vaq5J+PDFQYY=;
+        b=Wxgv1rTKUfp9LSGweLNGRuk7mbjWTKdbzyFp/uHu4D85Lm4w9VdSbWYR5qUWdiKltw
+         NkLCeZRsKxP2jy81yPd9gSKY5cTBR4YRmFlS+uKaMzFd7459xJ+p7BAdWGr3nZIIjZmW
+         pzCth3UvfL+I4hgjcILeQh5z/oELkd2jQ/uxaVWaZBtbqcVuCfAqLrF5LmRM+tN6sQo2
+         iEBdfHYKVD/R3Wm15EW110YLKPVQVIaBzMIBUIUWwJ/a5H7+Ydl6qFRBQnGBIw1gZrhF
+         QOId4fb6obIKvhrIWNLeqpVeiQTjRpksddiaNfBxSHfDUp8v9jmsKpgZe3gHYcLSbTe8
+         IMrA==
+X-Gm-Message-State: AOAM533Z34HY0dPKfWxzEb5fvo3E7Ar34ISrgy22siwjzGKsRHDuKlg1
+        H5n7qeti37UziCiHlFAiD4Q=
+X-Google-Smtp-Source: ABdhPJzlA44qy6sLNfmNl8+aMWIi0v33GlJafrNNnvvayBnypDZX8J6j3m8QU5DA6N4DKKAZ8/4Rxg==
+X-Received: by 2002:a17:90a:2e8a:: with SMTP id r10mr11916008pjd.33.1590802068258;
+        Fri, 29 May 2020 18:27:48 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:7462:f68a:6e38:5c40? ([2601:647:4000:d7:7462:f68a:6e38:5c40])
+        by smtp.gmail.com with ESMTPSA id 25sm559039pjk.50.2020.05.29.18.27.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2020 18:27:47 -0700 (PDT)
+Subject: Re: [PATCH v2] block: improve discard bio alignment in
+ __blkdev_issue_discard()
+To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
+Cc:     Acshai Manoj <acshai.manoj@microfocus.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Xiao Ni <xni@redhat.com>
+References: <20200529163418.101606-1-colyli@suse.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <a7d1b0d0-8823-2fa4-89ce-782be6f52016@acm.org>
+Date:   Fri, 29 May 2020 18:27:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200529163418.101606-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to improve consistency and usability in cgroup stat accounting,
-we would like to support the root cgroup's io.stat.
+On 2020-05-29 09:34, Coly Li wrote:
+> +static inline unsigned int bio_aligned_discard_max_sectors(
+> +					struct request_queue *q)
+> +{
+> +	return round_down(UINT_MAX,
+> +			 (q->limits.max_discard_sectors << SECTOR_SHIFT))
+> +			>> SECTOR_SHIFT;
+> +}
 
-Since the root cgroup has processes doing io even if the system has no
-explicitly created cgroups, we need to be careful to avoid overhead in
-that case.  For that reason, the rstat algorithms don't handle the root
-cgroup, so just turning the file on wouldn't give correct statistics.
+max_discard_sectors has been declared as an unsigned int. Can the shift
+left operation overflow?
 
-To get around this, we simulate flushing the iostat struct by filling it
-out directly from global disk stats. The result is a root cgroup io.stat
-file consistent with both /proc/diskstats and io.stat.
+Thanks,
 
-Signed-off-by: Boris Burkov <boris@bur.io>
-Suggested-by: Tejun Heo <tj@kernel.org>
----
- Documentation/admin-guide/cgroup-v2.rst |   3 +-
- block/blk-cgroup.c                      | 199 +++++++++++++++---------
- block/genhd.c                           |   4 +-
- include/linux/genhd.h                   |   1 +
- 4 files changed, 129 insertions(+), 78 deletions(-)
-
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index fed4e1d2a343..1eaea1ddaeb9 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -1465,8 +1465,7 @@ IO Interface Files
- ~~~~~~~~~~~~~~~~~~
- 
-   io.stat
--	A read-only nested-keyed file which exists on non-root
--	cgroups.
-+	A read-only nested-keyed file.
- 
- 	Lines are keyed by $MAJ:$MIN device numbers and not ordered.
- 	The following nested keys are defined.
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0ecc897b225c..a285572c2436 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -739,12 +739,137 @@ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
- }
- EXPORT_SYMBOL_GPL(blkg_conf_finish);
- 
-+static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
-+{
-+	int i;
-+
-+	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
-+		dst->bytes[i] = src->bytes[i];
-+		dst->ios[i] = src->ios[i];
-+	}
-+}
-+
-+static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
-+{
-+	int i;
-+
-+	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
-+		dst->bytes[i] += src->bytes[i];
-+		dst->ios[i] += src->ios[i];
-+	}
-+}
-+
-+static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
-+{
-+	int i;
-+
-+	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
-+		dst->bytes[i] -= src->bytes[i];
-+		dst->ios[i] -= src->ios[i];
-+	}
-+}
-+
-+static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(css);
-+	struct blkcg_gq *blkg;
-+
-+	rcu_read_lock();
-+
-+	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-+		struct blkcg_gq *parent = blkg->parent;
-+		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
-+		struct blkg_iostat cur, delta;
-+		unsigned int seq;
-+
-+		/* fetch the current per-cpu values */
-+		do {
-+			seq = u64_stats_fetch_begin(&bisc->sync);
-+			blkg_iostat_set(&cur, &bisc->cur);
-+		} while (u64_stats_fetch_retry(&bisc->sync, seq));
-+
-+		/* propagate percpu delta to global */
-+		u64_stats_update_begin(&blkg->iostat.sync);
-+		blkg_iostat_set(&delta, &cur);
-+		blkg_iostat_sub(&delta, &bisc->last);
-+		blkg_iostat_add(&blkg->iostat.cur, &delta);
-+		blkg_iostat_add(&bisc->last, &delta);
-+		u64_stats_update_end(&blkg->iostat.sync);
-+
-+		/* propagate global delta to parent */
-+		if (parent) {
-+			u64_stats_update_begin(&parent->iostat.sync);
-+			blkg_iostat_set(&delta, &blkg->iostat.cur);
-+			blkg_iostat_sub(&delta, &blkg->iostat.last);
-+			blkg_iostat_add(&parent->iostat.cur, &delta);
-+			blkg_iostat_add(&blkg->iostat.last, &delta);
-+			u64_stats_update_end(&parent->iostat.sync);
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+}
-+
-+/*
-+ * The rstat algorithms intentionally don't handle the root cgroup to avoid
-+ * incurring overhead when no cgroups are defined. For that reason,
-+ * cgroup_rstat_flush in blkcg_print_stat does not actually fill out the
-+ * iostat in the root cgroup's blkcg_gq.
-+ *
-+ * However, we would like to re-use the printing code between the root and
-+ * non-root cgroups to the extent possible. For that reason, we simulate
-+ * flushing the root cgroup's stats by explicitly filling in the iostat
-+ * with disk level statistics.
-+ */
-+static void blkcg_fill_root_iostats(void)
-+{
-+	struct class_dev_iter iter;
-+	struct device *dev;
-+
-+	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
-+	while ((dev = class_dev_iter_next(&iter))) {
-+		struct gendisk *disk = dev_to_disk(dev);
-+		struct hd_struct *part = disk_get_part(disk, 0);
-+		struct blkcg_gq *blkg = blk_queue_root_blkg(disk->queue);
-+		struct blkg_iostat tmp;
-+		int cpu;
-+
-+		memset(&tmp, 0, sizeof(tmp));
-+		for_each_possible_cpu(cpu) {
-+			struct disk_stats *cpu_dkstats;
-+
-+			cpu_dkstats = per_cpu_ptr(part->dkstats, cpu);
-+			tmp.ios[BLKG_IOSTAT_READ] +=
-+				cpu_dkstats->ios[STAT_READ];
-+			tmp.ios[BLKG_IOSTAT_WRITE] +=
-+				cpu_dkstats->ios[STAT_WRITE];
-+			tmp.ios[BLKG_IOSTAT_DISCARD] +=
-+				cpu_dkstats->ios[STAT_DISCARD];
-+			// convert sectors to bytes
-+			tmp.bytes[BLKG_IOSTAT_READ] +=
-+				cpu_dkstats->sectors[STAT_READ] << 9;
-+			tmp.bytes[BLKG_IOSTAT_WRITE] +=
-+				cpu_dkstats->sectors[STAT_WRITE] << 9;
-+			tmp.bytes[BLKG_IOSTAT_DISCARD] +=
-+				cpu_dkstats->sectors[STAT_DISCARD] << 9;
-+
-+			u64_stats_update_begin(&blkg->iostat.sync);
-+			blkg_iostat_set(&blkg->iostat.cur, &tmp);
-+			u64_stats_update_end(&blkg->iostat.sync);
-+		}
-+	}
-+}
-+
- static int blkcg_print_stat(struct seq_file *sf, void *v)
- {
- 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
- 	struct blkcg_gq *blkg;
- 
--	cgroup_rstat_flush(blkcg->css.cgroup);
-+	if (!seq_css(sf)->parent)
-+		blkcg_fill_root_iostats();
-+	else
-+		cgroup_rstat_flush(blkcg->css.cgroup);
-+
- 	rcu_read_lock();
- 
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-@@ -833,7 +958,6 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- static struct cftype blkcg_files[] = {
- 	{
- 		.name = "stat",
--		.flags = CFTYPE_NOT_ON_ROOT,
- 		.seq_show = blkcg_print_stat,
- 	},
- 	{ }	/* terminate */
-@@ -1114,77 +1238,6 @@ static int blkcg_can_attach(struct cgroup_taskset *tset)
- 	return ret;
- }
- 
--static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
--{
--	int i;
--
--	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
--		dst->bytes[i] = src->bytes[i];
--		dst->ios[i] = src->ios[i];
--	}
--}
--
--static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
--{
--	int i;
--
--	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
--		dst->bytes[i] += src->bytes[i];
--		dst->ios[i] += src->ios[i];
--	}
--}
--
--static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
--{
--	int i;
--
--	for (i = 0; i < BLKG_IOSTAT_NR; i++) {
--		dst->bytes[i] -= src->bytes[i];
--		dst->ios[i] -= src->ios[i];
--	}
--}
--
--static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
--{
--	struct blkcg *blkcg = css_to_blkcg(css);
--	struct blkcg_gq *blkg;
--
--	rcu_read_lock();
--
--	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
--		struct blkcg_gq *parent = blkg->parent;
--		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
--		struct blkg_iostat cur, delta;
--		unsigned seq;
--
--		/* fetch the current per-cpu values */
--		do {
--			seq = u64_stats_fetch_begin(&bisc->sync);
--			blkg_iostat_set(&cur, &bisc->cur);
--		} while (u64_stats_fetch_retry(&bisc->sync, seq));
--
--		/* propagate percpu delta to global */
--		u64_stats_update_begin(&blkg->iostat.sync);
--		blkg_iostat_set(&delta, &cur);
--		blkg_iostat_sub(&delta, &bisc->last);
--		blkg_iostat_add(&blkg->iostat.cur, &delta);
--		blkg_iostat_add(&bisc->last, &delta);
--		u64_stats_update_end(&blkg->iostat.sync);
--
--		/* propagate global delta to parent */
--		if (parent) {
--			u64_stats_update_begin(&parent->iostat.sync);
--			blkg_iostat_set(&delta, &blkg->iostat.cur);
--			blkg_iostat_sub(&delta, &blkg->iostat.last);
--			blkg_iostat_add(&parent->iostat.cur, &delta);
--			blkg_iostat_add(&blkg->iostat.last, &delta);
--			u64_stats_update_end(&parent->iostat.sync);
--		}
--	}
--
--	rcu_read_unlock();
--}
--
- static void blkcg_bind(struct cgroup_subsys_state *root_css)
- {
- 	int i;
-diff --git a/block/genhd.c b/block/genhd.c
-index afdb2c3e5b22..4f5f4590517c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -38,8 +38,6 @@ static struct kobject *block_depr;
- static DEFINE_SPINLOCK(ext_devt_lock);
- static DEFINE_IDR(ext_devt_idr);
- 
--static const struct device_type disk_type;
--
- static void disk_check_events(struct disk_events *ev,
- 			      unsigned int *clearing_ptr);
- static void disk_alloc_events(struct gendisk *disk);
-@@ -1566,7 +1564,7 @@ static char *block_devnode(struct device *dev, umode_t *mode,
- 	return NULL;
- }
- 
--static const struct device_type disk_type = {
-+const struct device_type disk_type = {
- 	.name		= "disk",
- 	.groups		= disk_attr_groups,
- 	.release	= disk_release,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index a9384449465a..ea38bc36bc6d 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -26,6 +26,7 @@
- #define disk_to_dev(disk)	(&(disk)->part0.__dev)
- #define part_to_dev(part)	(&((part)->__dev))
- 
-+extern const struct device_type disk_type;
- extern struct device_type part_type;
- extern struct class block_class;
- 
--- 
-2.24.1
-
+Bart.
