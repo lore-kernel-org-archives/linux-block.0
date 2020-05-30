@@ -2,124 +2,194 @@ Return-Path: <SRS0=VeZL=7M=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F69C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 14:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 510D2C433E1
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 16:45:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FA1A206C3
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 14:04:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 385A02077D
+	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 16:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728949AbgE3OEx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 May 2020 10:04:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54830 "EHLO mx2.suse.de"
+        id S1729029AbgE3Qps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 May 2020 12:45:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37568 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727851AbgE3OEx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 May 2020 10:04:53 -0400
+        id S1728998AbgE3Qps (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 May 2020 12:45:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 56949AC6D;
-        Sat, 30 May 2020 14:04:50 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org
-Cc:     Coly Li <colyli@suse.de>, Damien Le Moal <damien.lemoal@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Jens Axboe <axboe@fb.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v2] block: change REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL to be odd numbers
-Date:   Sat, 30 May 2020 22:02:25 +0800
-Message-Id: <20200530140225.122537-1-colyli@suse.de>
-X-Mailer: git-send-email 2.25.0
+        by mx2.suse.de (Postfix) with ESMTP id 044BEAB64;
+        Sat, 30 May 2020 16:45:44 +0000 (UTC)
+Subject: Re: [PATCH v3] block: improve discard bio alignment in
+ __blkdev_issue_discard()
+To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
+Cc:     linux-bcache@vger.kernel.org,
+        Acshai Manoj <acshai.manoj@microfocus.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Enzo Matsumiya <ematsumiya@suse.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Xiao Ni <xni@redhat.com>
+References: <20200530135231.122389-1-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <8c8045cf-1f1a-25ff-a93f-003b1ed5ae00@suse.de>
+Date:   Sat, 30 May 2020 18:45:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <20200530135231.122389-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL are defined as
-even numbers 6 and 8, such zone reset bios are treated as READ bios by
-bio_data_dir(), which is obviously misleading.
+On 5/30/20 3:52 PM, Coly Li wrote:
+> This patch improves discard bio split for address and size alignment in
+> __blkdev_issue_discard(). The aligned discard bio may help underlying
+> device controller to perform better discard and internal garbage
+> collection, and avoid unnecessary internal fragment.
+> 
+> Current discard bio split algorithm in __blkdev_issue_discard() may have
+> non-discarded fregment on device even the discard bio LBA and size are
+> both aligned to device's discard granularity size.
+> 
+> Here is the example steps on how to reproduce the above problem.
+> - On a VMWare ESXi 6.5 update3 installation, create a 51GB virtual disk
+>    with thin mode and give it to a Linux virtual machine.
+> - Inside the Linux virtual machine, if the 50GB virtual disk shows up as
+>    /dev/sdb, fill data into the first 50GB by,
+>          # dd if=/dev/zero of=/dev/sdb bs=4096 count=13107200
+> - Discard the 50GB range from offset 0 on /dev/sdb,
+>          # blkdiscard /dev/sdb -o 0 -l 53687091200
+> - Observe the underlying mapping status of the device
+>          # sg_get_lba_status /dev/sdb -m 1048 --lba=0
+>    descriptor LBA: 0x0000000000000000  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000000000800  blocks: 16773120  deallocated
+>    descriptor LBA: 0x0000000000fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000001000000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x00000000017ff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000001800000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x0000000001fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000002000000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x00000000027ff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000002800000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x0000000002fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000003000000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x00000000037ff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000003800000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x0000000003fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000004000000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x00000000047ff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000004800000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x0000000004fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000005000000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x00000000057ff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000005800000  blocks: 8386560  deallocated
+>    descriptor LBA: 0x0000000005fff800  blocks: 2048  mapped (or unknown)
+>    descriptor LBA: 0x0000000006000000  blocks: 6291456  deallocated
+>    descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
+> 
+> Although the discard bio starts at LBA 0 and has 50<<30 bytes size which
+> are perfect aligned to the discard granularity, from the above list
+> these are many 1MB (2048 sectors) internal fragments exist unexpectedly.
+> 
+> The problem is in __blkdev_issue_discard(), an improper algorithm causes
+> an improper bio size which is not aligned.
+> 
+>   25 int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>   26                 sector_t nr_sects, gfp_t gfp_mask, int flags,
+>   27                 struct bio **biop)
+>   28 {
+>   29         struct request_queue *q = bdev_get_queue(bdev);
+>     [snipped]
+>   56
+>   57         while (nr_sects) {
+>   58                 sector_t req_sects = min_t(sector_t, nr_sects,
+>   59                                 bio_allowed_max_sectors(q));
+>   60
+>   61                 WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
+>   62
+>   63                 bio = blk_next_bio(bio, 0, gfp_mask);
+>   64                 bio->bi_iter.bi_sector = sector;
+>   65                 bio_set_dev(bio, bdev);
+>   66                 bio_set_op_attrs(bio, op, 0);
+>   67
+>   68                 bio->bi_iter.bi_size = req_sects << 9;
+>   69                 sector += req_sects;
+>   70                 nr_sects -= req_sects;
+>     [snipped]
+>   79         }
+>   80
+>   81         *biop = bio;
+>   82         return 0;
+>   83 }
+>   84 EXPORT_SYMBOL(__blkdev_issue_discard);
+> 
+> At line 58-59, to discard a 50GB range, req_sects is set as return value
+> of bio_allowed_max_sectors(q), which is 8388607 sectors. In the above
+> case, the discard granularity is 2048 sectors, although the start LBA
+> and discard length are aligned to discard granularity, req_sects never
+> has chance to be aligned to discard granularity. This is why there are
+> some still-mapped 2048 sectors fragment in every 4 or 8 GB range.
+> 
+> If req_sects at line 58 is set to a value aligned to discard_granularity
+> and close to UNIT_MAX, then all consequent split bios inside device
+> driver are (almostly) aligned to discard_granularity of the device
+> queue. The 2048 sectors still-mapped fragment will disappear.
+> 
+> This patch introduces bio_aligned_discard_max_sectors() to return the
+> the value which is aligned to q->limits.discard_granularity and closest
+> to UINT_MAX. Then this patch replaces bio_allowed_max_sectors() with
+> this new routine to decide a more proper split bio length.
+> 
+> But we still need to handle the situation when discard start LBA is not
+> aligned to q->limits.discard_granularity, otherwise even the length is
+> aligned, current code may still leave 2048 fragment around every 4GB
+> range. Therefore, to calculate req_sects, firstly the start LBA of
+> discard range is checked, if it is not aligned to discard granularity,
+> the first split location should make sure following bio has bi_sector
+> aligned to discard granularity. Then there won't be still-mapped
+> fragment in the middle of the discard range.
+> 
+> The above is how this patch improves discard bio alignment in
+> __blkdev_issue_discard(). Now with this patch, after discard with same
+> command line mentiond previously, sg_get_lba_status returns,
+> descriptor LBA: 0x0000000000000000  blocks: 106954752  deallocated
+> descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
+> 
+> We an see there is no 2048 sectors segment anymore, everything is clean.
+> 
+> Reported-by: Acshai Manoj <acshai.manoj@microfocus.com>
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Enzo Matsumiya <ematsumiya@suse.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Xiao Ni <xni@redhat.com>
+> ---
+> Changelog:
+> v2, the improved version with inspire from review comments by Bart,
+>      Ming and Xiao.
+> v1, the initial version.
+> 
+>   block/blk-lib.c | 25 +++++++++++++++++++++++--
+>   block/blk.h     | 14 ++++++++++++++
+>   2 files changed, 37 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-The macro bio_data_dir() is defined in include/linux/bio.h as,
- 55 #define bio_data_dir(bio) \
- 56         (op_is_write(bio_op(bio)) ? WRITE : READ)
+Cheers,
 
-And op_is_write() is defined in include/linux/blk_types.h as,
-397 static inline bool op_is_write(unsigned int op)
-398 {
-399         return (op & 1);
-400 }
-
-The convention of op_is_write() is when there is data transfer then the
-op code should be odd number, and treat as a write op. bio_data_dir()
-treats all bio direction as READ if op_is_write() reports false, and
-WRITE if op_is_write() reports true.
-
-Because REQ_OP_ZONE_RESET and REQ_OP_ZONE_RESET_ALL are even numbers,
-although they don't transfer data but reporting them as READ bio by
-bio_data_dir() is misleading and might be wrong. Because these two
-commands will reset the writer pointers of the resetting zones, and all
-content after the reset write pointer will be invalid and unaccessible,
-obviously they are not READ bios in any means.
-
-This patch changes REQ_OP_ZONE_RESET from 6 to 15, and changes
-REQ_OP_ZONE_RESET_ALL from 8 to 17. Now bios with these two op code
-can be treated as WRITE by bio_data_dir(). Although they don't transfer
-data, now we keep them consistent with REQ_OP_DISCARD and
-REQ_OP_WRITE_ZEROES with the ituition that they change on-media content
-and should be WRITE request.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Shaun Tancheff <shaun.tancheff@seagate.com>
----
-Changelog:
-v2: add Reviewed-by tag for Damien and Chaitanya.
-v1: initial version.
-
- include/linux/blk_types.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index ccb895f911b1..447b46a0accf 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -300,12 +300,8 @@ enum req_opf {
- 	REQ_OP_DISCARD		= 3,
- 	/* securely erase sectors */
- 	REQ_OP_SECURE_ERASE	= 5,
--	/* reset a zone write pointer */
--	REQ_OP_ZONE_RESET	= 6,
- 	/* write the same sector many times */
- 	REQ_OP_WRITE_SAME	= 7,
--	/* reset all the zone present on the device */
--	REQ_OP_ZONE_RESET_ALL	= 8,
- 	/* write the zero filled sector many times */
- 	REQ_OP_WRITE_ZEROES	= 9,
- 	/* Open a zone */
-@@ -316,6 +312,10 @@ enum req_opf {
- 	REQ_OP_ZONE_FINISH	= 12,
- 	/* write data at the current zone write pointer */
- 	REQ_OP_ZONE_APPEND	= 13,
-+	/* reset a zone write pointer */
-+	REQ_OP_ZONE_RESET	= 15,
-+	/* reset all the zone present on the device */
-+	REQ_OP_ZONE_RESET_ALL	= 17,
- 
- 	/* SCSI passthrough using struct scsi_request */
- 	REQ_OP_SCSI_IN		= 32,
+Hannes
 -- 
-2.25.0
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
