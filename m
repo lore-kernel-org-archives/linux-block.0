@@ -1,195 +1,145 @@
-Return-Path: <SRS0=VeZL=7M=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=tY2F=7N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 510D2C433E1
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 16:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 900E4C433E0
+	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 04:09:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 385A02077D
-	for <linux-block@archiver.kernel.org>; Sat, 30 May 2020 16:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C2FB206B6
+	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 04:09:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kew9nIK8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729029AbgE3Qps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 May 2020 12:45:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37568 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728998AbgE3Qps (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 May 2020 12:45:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 044BEAB64;
-        Sat, 30 May 2020 16:45:44 +0000 (UTC)
-Subject: Re: [PATCH v3] block: improve discard bio alignment in
- __blkdev_issue_discard()
-To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
-Cc:     linux-bcache@vger.kernel.org,
-        Acshai Manoj <acshai.manoj@microfocus.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Enzo Matsumiya <ematsumiya@suse.com>,
-        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, Xiao Ni <xni@redhat.com>
-References: <20200530135231.122389-1-colyli@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <8c8045cf-1f1a-25ff-a93f-003b1ed5ae00@suse.de>
-Date:   Sat, 30 May 2020 18:45:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1725860AbgEaEJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 May 2020 00:09:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbgEaEJu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 31 May 2020 00:09:50 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7CDCC05BD43
+        for <linux-block@vger.kernel.org>; Sat, 30 May 2020 21:09:48 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id b6so4066371ljj.1
+        for <linux-block@vger.kernel.org>; Sat, 30 May 2020 21:09:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1Dvo7g92Ll82Uwjs4Po60oTTNqHm0eVJCPATokIzRtE=;
+        b=Kew9nIK8jMwvnQFN3/WT+s6X1nSGW74i+CPNbTuxLkNIb1l8PVVzOh6TCMRb3GvpcU
+         otSiiUf1VXO7NseOAy1QITT1tN6pX9bxsgWyVJVmb+r+nTJnHhGQsNpbCmHabFj5xsM1
+         NBTEUMVAZ1EcMQLvbVHJQrKku1VFiXDfnCVwcGfZH/jVRdQYCeuWaVb1cL1iBFl91dlq
+         T/Apv2f2YM9rbF+ELniIrlIokuIxP/Z9lIyG3fSDPGNSnikUNqYQiTvJWVZh5s79KXbF
+         gnz20JhHejFBq+VuE/BpISSs86XKwQWZfIclyunGCQG5ebq5LDcczI5SfVV90uyVe8Ey
+         1RQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1Dvo7g92Ll82Uwjs4Po60oTTNqHm0eVJCPATokIzRtE=;
+        b=Ytctbgi7Rp4kI3A0xEQrsat+8Qi3Gz2+5WfDvMi+U+GVEs8SaR5Fd4hW5y7fzZM84H
+         P72vkXalSHEpgwpcJQEcKW2fYqDPwnkXSePV126hOkARhBtLZDf7cCflWk7DMeOFjCeH
+         WDXprK3KyKMW4iTeih5LoVZp/Fsr6r7ulUkTgNV1WCyoePNzEq6/lv+F8bl/Holtz72h
+         eytLifv4XJxN4Ihv1AXO9Hg9ZA9lkZ/8w4dBEjxnjDpfJ2wg2EGaQyTlDBj3SD751nVI
+         FFIgb/6SCw9U1zj8zVerZB2ADuWjhLu0WcW3ObZ+nf/8iJtwQb12zUJtmn9jXSP9uQuO
+         YMDg==
+X-Gm-Message-State: AOAM533ILwOTFNXTx5kLkyA4EY/31yhTVhhiH/5nOGquWTxMK42GT8To
+        wWW/1rEBeUAYZ1ar8ET48sJfcn+DfQAXQxQLe1pWsdbH
+X-Google-Smtp-Source: ABdhPJwftcyrtC1T5n4w1bQli9cvXY4xYpZdvDO+MtB0Cw1NAHytlYYABZNBjictSFGWzllSX2r7MfRfNRaGnDzPZGE=
+X-Received: by 2002:a2e:3202:: with SMTP id y2mr7991061ljy.155.1590898186951;
+ Sat, 30 May 2020 21:09:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200530135231.122389-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200528080053.1062653-1-ming.lei@redhat.com>
+In-Reply-To: <20200528080053.1062653-1-ming.lei@redhat.com>
+From:   Baolin Wang <baolin.wang7@gmail.com>
+Date:   Sun, 31 May 2020 12:09:07 +0800
+Message-ID: <CADBw62rjYzTF=yZrZ3HHjd1J0qRm0hV5yFgxCLqyhaQfWFs+0w@mail.gmail.com>
+Subject: Re: [PATCH V3 0/6] blk-mq: support batching dispatch from scheduler
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/30/20 3:52 PM, Coly Li wrote:
-> This patch improves discard bio split for address and size alignment in
-> __blkdev_issue_discard(). The aligned discard bio may help underlying
-> device controller to perform better discard and internal garbage
-> collection, and avoid unnecessary internal fragment.
-> 
-> Current discard bio split algorithm in __blkdev_issue_discard() may have
-> non-discarded fregment on device even the discard bio LBA and size are
-> both aligned to device's discard granularity size.
-> 
-> Here is the example steps on how to reproduce the above problem.
-> - On a VMWare ESXi 6.5 update3 installation, create a 51GB virtual disk
->    with thin mode and give it to a Linux virtual machine.
-> - Inside the Linux virtual machine, if the 50GB virtual disk shows up as
->    /dev/sdb, fill data into the first 50GB by,
->          # dd if=/dev/zero of=/dev/sdb bs=4096 count=13107200
-> - Discard the 50GB range from offset 0 on /dev/sdb,
->          # blkdiscard /dev/sdb -o 0 -l 53687091200
-> - Observe the underlying mapping status of the device
->          # sg_get_lba_status /dev/sdb -m 1048 --lba=0
->    descriptor LBA: 0x0000000000000000  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000000000800  blocks: 16773120  deallocated
->    descriptor LBA: 0x0000000000fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000001000000  blocks: 8386560  deallocated
->    descriptor LBA: 0x00000000017ff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000001800000  blocks: 8386560  deallocated
->    descriptor LBA: 0x0000000001fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000002000000  blocks: 8386560  deallocated
->    descriptor LBA: 0x00000000027ff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000002800000  blocks: 8386560  deallocated
->    descriptor LBA: 0x0000000002fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000003000000  blocks: 8386560  deallocated
->    descriptor LBA: 0x00000000037ff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000003800000  blocks: 8386560  deallocated
->    descriptor LBA: 0x0000000003fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000004000000  blocks: 8386560  deallocated
->    descriptor LBA: 0x00000000047ff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000004800000  blocks: 8386560  deallocated
->    descriptor LBA: 0x0000000004fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000005000000  blocks: 8386560  deallocated
->    descriptor LBA: 0x00000000057ff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000005800000  blocks: 8386560  deallocated
->    descriptor LBA: 0x0000000005fff800  blocks: 2048  mapped (or unknown)
->    descriptor LBA: 0x0000000006000000  blocks: 6291456  deallocated
->    descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
-> 
-> Although the discard bio starts at LBA 0 and has 50<<30 bytes size which
-> are perfect aligned to the discard granularity, from the above list
-> these are many 1MB (2048 sectors) internal fragments exist unexpectedly.
-> 
-> The problem is in __blkdev_issue_discard(), an improper algorithm causes
-> an improper bio size which is not aligned.
-> 
->   25 int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->   26                 sector_t nr_sects, gfp_t gfp_mask, int flags,
->   27                 struct bio **biop)
->   28 {
->   29         struct request_queue *q = bdev_get_queue(bdev);
->     [snipped]
->   56
->   57         while (nr_sects) {
->   58                 sector_t req_sects = min_t(sector_t, nr_sects,
->   59                                 bio_allowed_max_sectors(q));
->   60
->   61                 WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
->   62
->   63                 bio = blk_next_bio(bio, 0, gfp_mask);
->   64                 bio->bi_iter.bi_sector = sector;
->   65                 bio_set_dev(bio, bdev);
->   66                 bio_set_op_attrs(bio, op, 0);
->   67
->   68                 bio->bi_iter.bi_size = req_sects << 9;
->   69                 sector += req_sects;
->   70                 nr_sects -= req_sects;
->     [snipped]
->   79         }
->   80
->   81         *biop = bio;
->   82         return 0;
->   83 }
->   84 EXPORT_SYMBOL(__blkdev_issue_discard);
-> 
-> At line 58-59, to discard a 50GB range, req_sects is set as return value
-> of bio_allowed_max_sectors(q), which is 8388607 sectors. In the above
-> case, the discard granularity is 2048 sectors, although the start LBA
-> and discard length are aligned to discard granularity, req_sects never
-> has chance to be aligned to discard granularity. This is why there are
-> some still-mapped 2048 sectors fragment in every 4 or 8 GB range.
-> 
-> If req_sects at line 58 is set to a value aligned to discard_granularity
-> and close to UNIT_MAX, then all consequent split bios inside device
-> driver are (almostly) aligned to discard_granularity of the device
-> queue. The 2048 sectors still-mapped fragment will disappear.
-> 
-> This patch introduces bio_aligned_discard_max_sectors() to return the
-> the value which is aligned to q->limits.discard_granularity and closest
-> to UINT_MAX. Then this patch replaces bio_allowed_max_sectors() with
-> this new routine to decide a more proper split bio length.
-> 
-> But we still need to handle the situation when discard start LBA is not
-> aligned to q->limits.discard_granularity, otherwise even the length is
-> aligned, current code may still leave 2048 fragment around every 4GB
-> range. Therefore, to calculate req_sects, firstly the start LBA of
-> discard range is checked, if it is not aligned to discard granularity,
-> the first split location should make sure following bio has bi_sector
-> aligned to discard granularity. Then there won't be still-mapped
-> fragment in the middle of the discard range.
-> 
-> The above is how this patch improves discard bio alignment in
-> __blkdev_issue_discard(). Now with this patch, after discard with same
-> command line mentiond previously, sg_get_lba_status returns,
-> descriptor LBA: 0x0000000000000000  blocks: 106954752  deallocated
-> descriptor LBA: 0x0000000006600000  blocks: 0  deallocated
-> 
-> We an see there is no 2048 sectors segment anymore, everything is clean.
-> 
-> Reported-by: Acshai Manoj <acshai.manoj@microfocus.com>
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Enzo Matsumiya <ematsumiya@suse.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Xiao Ni <xni@redhat.com>
-> ---
-> Changelog:
-> v2, the improved version with inspire from review comments by Bart,
->      Ming and Xiao.
-> v1, the initial version.
-> 
->   block/blk-lib.c | 25 +++++++++++++++++++++++--
->   block/blk.h     | 14 ++++++++++++++
->   2 files changed, 37 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Thu, May 28, 2020 at 4:01 PM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Hi Jens,
+>
+> More and more drivers want to get batching requests queued from
+> block layer, such as mmc[1], and tcp based storage drivers[2]. Also
+> current in-tree users have virtio-scsi, virtio-blk and nvme.
+>
+> For none, we already support batching dispatch.
+>
+> But for io scheduler, every time we just take one request from scheduler
+> and pass the single request to blk_mq_dispatch_rq_list(). This way makes
+> batching dispatch not possible when io scheduler is applied. One reason
+> is that we don't want to hurt sequential IO performance, becasue IO
+> merge chance is reduced if more requests are dequeued from scheduler
+> queue.
+>
+> Tries to start the support by dequeuing more requests from scheduler
+> if budget is enough and device isn't busy.
+>
+> Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
+>
+> Baolin has tested V1 and found performance on MMC can be improved.
+>
+> Patches can be found from the following tree too:
+>
+>         https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-batching-submission
+>
+> Patch 1 ~ 4 are improvement and cleanup, which can't applied without
+> supporting batching dispatch.
+>
+> Patch 5 ~ 6 starts to support batching dispatch from scheduler.
+>
+>
+> [1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
+> [2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
+>
+> V3:
+>         - add reviewed-by tag
+>         - fix one typo
+>         - fix one budget leak issue in case that .queue_rq returned *_RESOURCE in 5/6
+>
+> V2:
+>         - remove 'got_budget' from blk_mq_dispatch_rq_list
+>         - drop patch for getting driver tag & handling partial dispatch
+>
+> Ming Lei (6):
+>   blk-mq: pass request queue into get/put budget callback
+>   blk-mq: pass hctx to blk_mq_dispatch_rq_list
+>   blk-mq: move getting driver tag and budget into one helper
+>   blk-mq: remove dead check from blk_mq_dispatch_rq_list
+>   blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
+>   blk-mq: support batching dispatch in case of io scheduler
+>
+>  block/blk-mq-sched.c    |  95 ++++++++++++++++++++++++++++-----
+>  block/blk-mq.c          | 115 ++++++++++++++++++++++++++--------------
+>  block/blk-mq.h          |  15 +++---
+>  drivers/scsi/scsi_lib.c |   8 ++-
+>  include/linux/blk-mq.h  |   4 +-
+>  5 files changed, 168 insertions(+), 69 deletions(-)
+>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Baolin Wang <baolin.wang7@gmail.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
 
-Cheers,
+Works well for me again. So for the whole patch set:
+Tested-by: Baolin Wang <baolin.wang7@gmail.com>
 
-Hannes
 -- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Baolin Wang
