@@ -2,144 +2,105 @@ Return-Path: <SRS0=tY2F=7N=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900E4C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 04:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B365DC433E0
+	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 16:33:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C2FB206B6
-	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 04:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B9EC2074B
+	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 16:33:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kew9nIK8"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="X15XYZ63"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725860AbgEaEJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 May 2020 00:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        id S1726008AbgEaQdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 May 2020 12:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725837AbgEaEJu (ORCPT
+        with ESMTP id S1725912AbgEaQdU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 May 2020 00:09:50 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7CDCC05BD43
-        for <linux-block@vger.kernel.org>; Sat, 30 May 2020 21:09:48 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id b6so4066371ljj.1
-        for <linux-block@vger.kernel.org>; Sat, 30 May 2020 21:09:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1Dvo7g92Ll82Uwjs4Po60oTTNqHm0eVJCPATokIzRtE=;
-        b=Kew9nIK8jMwvnQFN3/WT+s6X1nSGW74i+CPNbTuxLkNIb1l8PVVzOh6TCMRb3GvpcU
-         otSiiUf1VXO7NseOAy1QITT1tN6pX9bxsgWyVJVmb+r+nTJnHhGQsNpbCmHabFj5xsM1
-         NBTEUMVAZ1EcMQLvbVHJQrKku1VFiXDfnCVwcGfZH/jVRdQYCeuWaVb1cL1iBFl91dlq
-         T/Apv2f2YM9rbF+ELniIrlIokuIxP/Z9lIyG3fSDPGNSnikUNqYQiTvJWVZh5s79KXbF
-         gnz20JhHejFBq+VuE/BpISSs86XKwQWZfIclyunGCQG5ebq5LDcczI5SfVV90uyVe8Ey
-         1RQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1Dvo7g92Ll82Uwjs4Po60oTTNqHm0eVJCPATokIzRtE=;
-        b=Ytctbgi7Rp4kI3A0xEQrsat+8Qi3Gz2+5WfDvMi+U+GVEs8SaR5Fd4hW5y7fzZM84H
-         P72vkXalSHEpgwpcJQEcKW2fYqDPwnkXSePV126hOkARhBtLZDf7cCflWk7DMeOFjCeH
-         WDXprK3KyKMW4iTeih5LoVZp/Fsr6r7ulUkTgNV1WCyoePNzEq6/lv+F8bl/Holtz72h
-         eytLifv4XJxN4Ihv1AXO9Hg9ZA9lkZ/8w4dBEjxnjDpfJ2wg2EGaQyTlDBj3SD751nVI
-         FFIgb/6SCw9U1zj8zVerZB2ADuWjhLu0WcW3ObZ+nf/8iJtwQb12zUJtmn9jXSP9uQuO
-         YMDg==
-X-Gm-Message-State: AOAM533ILwOTFNXTx5kLkyA4EY/31yhTVhhiH/5nOGquWTxMK42GT8To
-        wWW/1rEBeUAYZ1ar8ET48sJfcn+DfQAXQxQLe1pWsdbH
-X-Google-Smtp-Source: ABdhPJwftcyrtC1T5n4w1bQli9cvXY4xYpZdvDO+MtB0Cw1NAHytlYYABZNBjictSFGWzllSX2r7MfRfNRaGnDzPZGE=
-X-Received: by 2002:a2e:3202:: with SMTP id y2mr7991061ljy.155.1590898186951;
- Sat, 30 May 2020 21:09:46 -0700 (PDT)
+        Sun, 31 May 2020 12:33:20 -0400
+Received: from forwardcorp1p.mail.yandex.net (forwardcorp1p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b6:217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E283C061A0E;
+        Sun, 31 May 2020 09:33:19 -0700 (PDT)
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
+        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 5A5D82E0A0D;
+        Sun, 31 May 2020 19:33:15 +0300 (MSK)
+Received: from vla1-81430ab5870b.qloud-c.yandex.net (vla1-81430ab5870b.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:8143:ab5])
+        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id FnnZx2bYyP-XCI8SNsx;
+        Sun, 31 May 2020 19:33:15 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1590942795; bh=iJVjU4rwDPnmE8hHnwj5S3ufe8dG+OTautxuIMN4pfY=;
+        h=Message-ID:Date:To:From:Subject;
+        b=X15XYZ63AITIZ7pnvj1HKf/JZsztiQh9EAlfGOcch49UUXYAxmaXZxknYju4wYMkt
+         xnGcODda08swEUQ6nXThRJWyYWFttqF93aZCFW/44pGsfBgFUu8uvyBvxoATiEcOb9
+         Uv4qtRfeGb40hd1ETfRstIY7K9FCnuxVozvFiF9Q=
+Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b081:111::1:4])
+        by vla1-81430ab5870b.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id vxZdZDgham-XCW8Jfs6;
+        Sun, 31 May 2020 19:33:12 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: [PATCH] block: really remove REQ_NOWAIT_INLINE
+From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Date:   Sun, 31 May 2020 19:33:12 +0300
+Message-ID: <159094279217.155550.11478547618029899022.stgit@buzz>
+User-Agent: StGit/0.22-39-gd257
 MIME-Version: 1.0
-References: <20200528080053.1062653-1-ming.lei@redhat.com>
-In-Reply-To: <20200528080053.1062653-1-ming.lei@redhat.com>
-From:   Baolin Wang <baolin.wang7@gmail.com>
-Date:   Sun, 31 May 2020 12:09:07 +0800
-Message-ID: <CADBw62rjYzTF=yZrZ3HHjd1J0qRm0hV5yFgxCLqyhaQfWFs+0w@mail.gmail.com>
-Subject: Re: [PATCH V3 0/6] blk-mq: support batching dispatch from scheduler
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 28, 2020 at 4:01 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Hi Jens,
->
-> More and more drivers want to get batching requests queued from
-> block layer, such as mmc[1], and tcp based storage drivers[2]. Also
-> current in-tree users have virtio-scsi, virtio-blk and nvme.
->
-> For none, we already support batching dispatch.
->
-> But for io scheduler, every time we just take one request from scheduler
-> and pass the single request to blk_mq_dispatch_rq_list(). This way makes
-> batching dispatch not possible when io scheduler is applied. One reason
-> is that we don't want to hurt sequential IO performance, becasue IO
-> merge chance is reduced if more requests are dequeued from scheduler
-> queue.
->
-> Tries to start the support by dequeuing more requests from scheduler
-> if budget is enough and device isn't busy.
->
-> Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
->
-> Baolin has tested V1 and found performance on MMC can be improved.
->
-> Patches can be found from the following tree too:
->
->         https://github.com/ming1/linux/commits/v5.7-rc-blk-mq-batching-submission
->
-> Patch 1 ~ 4 are improvement and cleanup, which can't applied without
-> supporting batching dispatch.
->
-> Patch 5 ~ 6 starts to support batching dispatch from scheduler.
->
->
-> [1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
-> [2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
->
-> V3:
->         - add reviewed-by tag
->         - fix one typo
->         - fix one budget leak issue in case that .queue_rq returned *_RESOURCE in 5/6
->
-> V2:
->         - remove 'got_budget' from blk_mq_dispatch_rq_list
->         - drop patch for getting driver tag & handling partial dispatch
->
-> Ming Lei (6):
->   blk-mq: pass request queue into get/put budget callback
->   blk-mq: pass hctx to blk_mq_dispatch_rq_list
->   blk-mq: move getting driver tag and budget into one helper
->   blk-mq: remove dead check from blk_mq_dispatch_rq_list
->   blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
->   blk-mq: support batching dispatch in case of io scheduler
->
->  block/blk-mq-sched.c    |  95 ++++++++++++++++++++++++++++-----
->  block/blk-mq.c          | 115 ++++++++++++++++++++++++++--------------
->  block/blk-mq.h          |  15 +++---
->  drivers/scsi/scsi_lib.c |   8 ++-
->  include/linux/blk-mq.h  |   4 +-
->  5 files changed, 168 insertions(+), 69 deletions(-)
->
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Baolin Wang <baolin.wang7@gmail.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
+Commit 7b6620d7db56 ("block: remove REQ_NOWAIT_INLINE") removed it,
+but some pieces left. Probably something went wrong with git merge.
 
-Works well for me again. So for the whole patch set:
-Tested-by: Baolin Wang <baolin.wang7@gmail.com>
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+---
+ include/linux/blk_types.h |    7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
--- 
-Baolin Wang
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 31eb92876be7..59b2e9bd9bd8 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,8 +322,7 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
+-	__REQ_NOWAIT,           /* Don't wait if request will block */
+-	__REQ_NOWAIT_INLINE,	/* Return would-block error inline */
++	__REQ_NOWAIT,		/* Don't wait if request will block */
+ 	/*
+ 	 * When a shared kthread needs to issue a bio for a cgroup, doing
+ 	 * so synchronously can lead to priority inversions as the kthread
+@@ -358,7 +357,6 @@ enum req_flag_bits {
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+-#define REQ_NOWAIT_INLINE	(1ULL << __REQ_NOWAIT_INLINE)
+ #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+@@ -452,13 +450,12 @@ static inline int op_stat_group(unsigned int op)
+ 
+ typedef unsigned int blk_qc_t;
+ #define BLK_QC_T_NONE		-1U
+-#define BLK_QC_T_EAGAIN		-2U
+ #define BLK_QC_T_SHIFT		16
+ #define BLK_QC_T_INTERNAL	(1U << 31)
+ 
+ static inline bool blk_qc_t_valid(blk_qc_t cookie)
+ {
+-	return cookie != BLK_QC_T_NONE && cookie != BLK_QC_T_EAGAIN;
++	return cookie != BLK_QC_T_NONE;
+ }
+ 
+ static inline unsigned int blk_qc_t_to_queue_num(blk_qc_t cookie)
+
