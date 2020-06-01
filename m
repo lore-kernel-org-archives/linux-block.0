@@ -7,47 +7,50 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC51C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 12:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB48C433DF
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 12:37:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0743F206C3
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 12:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 281BB20679
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 12:37:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="diASRVyf"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="bud8UMHh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727769AbgFAMhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jun 2020 08:37:15 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:34160 "EHLO
-        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725974AbgFAMhO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Jun 2020 08:37:14 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net [IPv6:2a02:6b8:0:1619::119])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 63A412E146A;
-        Mon,  1 Jun 2020 15:37:11 +0300 (MSK)
+        id S1727124AbgFAMhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jun 2020 08:37:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727890AbgFAMhT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jun 2020 08:37:19 -0400
+Received: from forwardcorp1p.mail.yandex.net (forwardcorp1p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b6:217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24BD2C061A0E;
+        Mon,  1 Jun 2020 05:37:19 -0700 (PDT)
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net [IPv6:2a02:6b8:0:1402::301])
+        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id B906A2E150E;
+        Mon,  1 Jun 2020 15:37:17 +0300 (MSK)
 Received: from myt4-18a966dbd9be.qloud-c.yandex.net (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
-        by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 2BvFuUgSOx-b9fuaNjU;
-        Mon, 01 Jun 2020 15:37:11 +0300
+        by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id ai6aEALE3J-bGICEg7u;
+        Mon, 01 Jun 2020 15:37:17 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1591015031; bh=TQETKRhtCiB37qEhqMf6OVjO3wUc34huMloLIRNEzig=;
+        t=1591015037; bh=4hRg9MCRpNZccDrLqlIWiCiQ6475nINTgczAmQWqMOs=;
         h=In-Reply-To:Message-ID:References:Date:To:From:Subject:Cc;
-        b=diASRVyfaLvmacOpxcs2ovMQxQZUkZLgWuhkDOxnAR8SThK5rf4OLsGKSyggA/4Vf
-         nSPGDwHLrZMXlH8HF67BO+B26G2Cs66akUZAEpTRsA7YbQfcneJDl5IAIYdPP2KZ9n
-         iRtrHGY87HhZEtbgBwx7Xzcr8UpADkmvQoPQJFMY=
-Authentication-Results: mxbackcorp2j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+        b=bud8UMHhYef3bRfb9uNwEFOltll5+Dvg3jOm9Z3wH09FN14zy3bnVUx+H45M1cz5i
+         /oE5ny7AHRo8QeTrKkL19r0gR7ttOSCGxQSGU+6kWQABFZoO/P+CEPDlkdne/3YR5e
+         xz9oJ8oG6fzCU/SjZZE8JAUhtIcTcFY2LJux/gyw=
+Authentication-Results: mxbackcorp1g.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b080:6420::1:8])
-        by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 1wSpJbGMQA-b9Wux0gM;
-        Mon, 01 Jun 2020 15:37:09 +0300
+        by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id ugeF6tCqFx-bGWetb0e;
+        Mon, 01 Jun 2020 15:37:16 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
-Subject: [PATCH RFC 1/3] block: add flag 'nowait_requests' into queue limits
+Subject: [PATCH RFC 3/3] dm: add support for REQ_NOWAIT and enable for target
+ dm-linear
 From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, linux-raid@vger.kernel.org,
         Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>
-Date:   Mon, 01 Jun 2020 15:37:09 +0300
-Message-ID: <159101502963.180989.6228080995222059011.stgit@buzz>
+Date:   Mon, 01 Jun 2020 15:37:16 +0300
+Message-ID: <159101503621.180989.6036577504611218020.stgit@buzz>
 In-Reply-To: <159101473169.180989.12175693728191972447.stgit@buzz>
 References: <159101473169.180989.12175693728191972447.stgit@buzz>
 User-Agent: StGit/0.22-39-gd257
@@ -59,81 +62,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add flag for marking bio-based queues which support REQ_NOWAIT.
-Set for all request based (mq) devices.
+Add dm target feature flag DM_TARGET_NOWAIT which tells that target
+has no problem with REQ_NOWAIT.
 
-Stacking device should set it after blk_set_stacking_limits() if method
-make_request() itself doesn't delay requests or handles REQ_NOWAIT.
+Set limits.nowait_requests if all targets and backends handle REQ_NOWAIT.
 
 Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 ---
- block/blk-core.c       |    4 ++--
- block/blk-mq.c         |    3 +++
- block/blk-settings.c   |    3 +++
- include/linux/blkdev.h |    1 +
- 4 files changed, 9 insertions(+), 2 deletions(-)
+ drivers/md/dm-linear.c        |    5 +++--
+ drivers/md/dm-table.c         |    3 +++
+ drivers/md/dm.c               |    4 +++-
+ include/linux/device-mapper.h |    6 ++++++
+ 4 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c4b015004796..9139a316e6d4 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -892,9 +892,9 @@ generic_make_request_checks(struct bio *bio)
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index e1db43446327..00774b5d7668 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -228,10 +228,11 @@ static struct target_type linear_target = {
+ 	.name   = "linear",
+ 	.version = {1, 4, 0},
+ #ifdef CONFIG_BLK_DEV_ZONED
+-	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_ZONED_HM,
++	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT |
++		    DM_TARGET_ZONED_HM,
+ 	.report_zones = linear_report_zones,
+ #else
+-	.features = DM_TARGET_PASSES_INTEGRITY,
++	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT,
+ #endif
+ 	.module = THIS_MODULE,
+ 	.ctr    = linear_ctr,
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 0a2cc197f62b..f4610f79ebd6 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1500,12 +1500,15 @@ int dm_calculate_queue_limits(struct dm_table *table,
+ 	unsigned int zone_sectors = 0;
  
- 	/*
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
--	 * if queue is not a request based queue.
-+	 * if queue does not support this flag.
- 	 */
--	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_mq(q))
-+	if ((bio->bi_opf & REQ_NOWAIT) && !q->limits.nowait_requests)
- 		goto not_supported;
+ 	blk_set_stacking_limits(limits);
++	limits->nowait_requests = 1;
  
- 	if (should_fail_bio(bio))
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a7785df2c944..0c3daa0cda87 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2952,6 +2952,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	 */
- 	q->poll_nsec = BLK_MQ_POLL_CLASSIC;
+ 	for (i = 0; i < dm_table_get_num_targets(table); i++) {
+ 		blk_set_stacking_limits(&ti_limits);
  
-+	/* Request based queue always supports REQ_NOWAIT */
-+	q->limits.nowait_requests = 1;
+ 		ti = dm_table_get_target(table, i);
+ 
++		ti_limits.nowait_requests = dm_target_supports_nowait(ti->type);
 +
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_add_queue_tag_set(set, q);
- 	blk_mq_map_swqueue(q);
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 14397b4c4b53..8f96c7324497 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -59,6 +59,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->io_opt = 0;
- 	lim->misaligned = 0;
- 	lim->zoned = BLK_ZONED_NONE;
-+	lim->nowait_requests = 0;
- }
- EXPORT_SYMBOL(blk_set_default_limits);
+ 		if (!ti->type->iterate_devices)
+ 			goto combine_limits;
  
-@@ -486,6 +487,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 	t->max_segment_size = min_not_zero(t->max_segment_size,
- 					   b->max_segment_size);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index db9e46114653..767cd4d70341 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1794,7 +1794,9 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
+ 		dm_put_live_table(md, srcu_idx);
  
-+	t->nowait_requests &= b->nowait_requests;
+-		if (!(bio->bi_opf & REQ_RAHEAD))
++		if (bio->bi_opf & REQ_NOWAIT)
++			bio_wouldblock_error(bio);
++		else if (!(bio->bi_opf & REQ_RAHEAD))
+ 			queue_io(md, bio);
+ 		else
+ 			bio_io_error(bio);
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index af48d9da3916..4d4af1eeeba4 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -252,6 +252,12 @@ struct target_type {
+ #define DM_TARGET_ZONED_HM		0x00000040
+ #define dm_target_supports_zoned_hm(type) ((type)->features & DM_TARGET_ZONED_HM)
+ 
++/*
++ * A target handles REQ_NOWAIT
++ */
++#define DM_TARGET_NOWAIT		0x00000080
++#define dm_target_supports_nowait(type) (!!((type)->features & DM_TARGET_NOWAIT))
 +
- 	t->misaligned |= b->misaligned;
- 
- 	alignment = queue_limit_alignment_offset(b, start);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 32868fbedc9e..5f612dda34c2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -346,6 +346,7 @@ struct queue_limits {
- 	unsigned char		misaligned;
- 	unsigned char		discard_misaligned;
- 	unsigned char		raid_partial_stripes_expensive;
-+	unsigned char		nowait_requests;
- 	enum blk_zoned_model	zoned;
- };
- 
+ struct dm_target {
+ 	struct dm_table *table;
+ 	struct target_type *type;
 
