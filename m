@@ -2,141 +2,200 @@ Return-Path: <SRS0=rAsZ=7O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE43BC433E0
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 16:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B19FEC433DF
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 17:05:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7965206C3
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 16:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88D1C2073B
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 17:05:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591031104;
+	bh=PxIYJ56iKvvrQ4kKSH18qpmNyl0CfsPBmvcZFV5XyeQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=DZO/lFcYJ0kogmcbb85shof2VA3XknC5Ti3e1o4MTSF5h3ChpvJDBODdAHI/P8rst
+	 vN7kAEFN+sloZBYjybC4AXXhL6+UiYUcK8CVe/l2EL1QwJ6qFrGLVMf9yHyFy2YAAk
+	 l6jaSbnaL9FJ0Jip+OxX+tU7QcgS6hdpqusKeZgg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726176AbgFAQJe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jun 2020 12:09:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44504 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726075AbgFAQJd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Jun 2020 12:09:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 4FFD2ABCE;
-        Mon,  1 Jun 2020 16:09:33 +0000 (UTC)
-Subject: Re: [RFC PATCH v4 3/3] bcache: reject writeback cache mode for zoned
- backing device
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        id S1726017AbgFARFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jun 2020 13:05:04 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39609 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726067AbgFARFD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jun 2020 13:05:03 -0400
+Received: by mail-pf1-f193.google.com with SMTP id d66so3770635pfd.6;
+        Mon, 01 Jun 2020 10:05:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SqGvEuB0dFlcyyOSkJr50JgBdhkSQyFc3GUwrr5SVgo=;
+        b=a4EHHrJBATDdyjGwKrNre1MUeVtBXz6ysCqST6eBGYsS9djGuOe577cwMuU8COwAvN
+         62QqlMN1xcE7rIKixVyHXEYR7sahHah39Fx243GdGMM92UugozriD2pJYIHqzanIP62i
+         TczoTa/puq5bz4XOL+hNBV6pZlm5R9D3gEMSYbV3WhgkXlC8gOnWoeUTm1PJb5ojviJ4
+         CZiqyOB8j1kfLmX29Gw3jugwBN17gdvBGZUJzlTnFvpswCOSiHmGGgffFUZNIVgJ6g/F
+         ovt7S8DgHOp21fJHo3+WrDxqhFFk6JCtNXzNI+qs9pTdImwYnM8yBrPh9KthaAxwq2qU
+         UUjQ==
+X-Gm-Message-State: AOAM530eahe8l4zDvgUdY01jd/AMN3xwv6ZQA3Jothd6RmJgQrTydMpt
+        VYcGCMIJDVhUnB7ZkyQKAsU=
+X-Google-Smtp-Source: ABdhPJz0ib7h9telSiaQOJsAqtZNR0bvb+tdnQXKTIJD1pbCWADiC0oB625tI++TmThx78YyDXczZQ==
+X-Received: by 2002:a63:205d:: with SMTP id r29mr11424078pgm.367.1591031102551;
+        Mon, 01 Jun 2020 10:05:02 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id c123sm8680pfb.102.2020.06.01.10.05.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2020 10:05:01 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 39CD640251; Mon,  1 Jun 2020 17:05:00 +0000 (UTC)
+Date:   Mon, 1 Jun 2020 17:05:00 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
         Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-References: <20200522121837.109651-1-colyli@suse.de>
- <20200522121837.109651-4-colyli@suse.de>
- <CY4PR04MB3751EF222D4DFFB9C05AB38EE7B30@CY4PR04MB3751.namprd04.prod.outlook.com>
-From:   Coly Li <colyli@suse.de>
-Autocrypt: addr=colyli@suse.de; keydata=
- mQINBFYX6S8BEAC9VSamb2aiMTQREFXK4K/W7nGnAinca7MRuFUD4JqWMJ9FakNRd/E0v30F
- qvZ2YWpidPjaIxHwu3u9tmLKqS+2vnP0k7PRHXBYbtZEMpy3kCzseNfdrNqwJ54A430BHf2S
- GMVRVENiScsnh4SnaYjFVvB8SrlhTsgVEXEBBma5Ktgq9YSoy5miatWmZvHLFTQgFMabCz/P
- j5/xzykrF6yHo0rHZtwzQzF8rriOplAFCECp/t05+OeHHxjSqSI0P/G79Ll+AJYLRRm9til/
- K6yz/1hX5xMToIkYrshDJDrUc8DjEpISQQPhG19PzaUf3vFpmnSVYprcWfJWsa2wZyyjRFkf
- J51S82WfclafNC6N7eRXedpRpG6udUAYOA1YdtlyQRZa84EJvMzW96iSL1Gf+ZGtRuM3k49H
- 1wiWOjlANiJYSIWyzJjxAd/7Xtiy/s3PRKL9u9y25ftMLFa1IljiDG+mdY7LyAGfvdtIkanr
- iBpX4gWXd7lNQFLDJMfShfu+CTMCdRzCAQ9hIHPmBeZDJxKq721CyBiGAhRxDN+TYiaG/UWT
- 7IB7LL4zJrIe/xQ8HhRO+2NvT89o0LxEFKBGg39yjTMIrjbl2ZxY488+56UV4FclubrG+t16
- r2KrandM7P5RjR+cuHhkKseim50Qsw0B+Eu33Hjry7YCihmGswARAQABtBhDb2x5IExpIDxj
- b2x5bGlAc3VzZS5kZT6JAlYEEwEIAEACGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgBYh
- BOo+RS/0+Uhgjej60Mc5B5Nrffj8BQJcR84dBQkY++fuAAoJEMc5B5Nrffj8ixcP/3KAKg1X
- EcoW4u/0z+Ton5rCyb/NpAww8MuRjNW82UBUac7yCi1y3OW7NtLjuBLw5SaVG5AArb7IF3U0
- qTOobqfl5XHsT0o5wFHZaKUrnHb6y7V3SplsJWfkP3JmOooJsQB3z3K96ZTkFelsNb0ZaBRu
- gV+LA4MomhQ+D3BCDR1it1OX/tpvm2uaDF6s/8uFtcDEM9eQeqATN/QAJ49nvU/I8zDSY9rc
- 0x9mP0x+gH4RccbnoPu/rUG6Fm1ZpLrbb6NpaYBBJ/V1BC4lIOjnd24bsoQrQmnJn9dSr60X
- 1MY60XDszIyzRw7vbJcUn6ZzPNFDxFFT9diIb+wBp+DD8ZlD/hnVpl4f921ZbvfOSsXAJrKB
- 1hGY17FPwelp1sPcK2mDT+pfHEMV+OQdZzD2OCKtza/5IYismJJm3oVUYMogb5vDNAw9X2aP
- XgwUuG+FDEFPamFMUwIfzYHcePfqf0mMsaeSgtA/xTxzx/0MLjUJHl46Bc0uKDhv7QUyGz0j
- Ywgr2mHTvG+NWQ/mDeHNGkcnsnp3IY7koDHnN2xMFXzY4bn9m8ctqKo2roqjCzoxD/njoAhf
- KBzdybLHATqJG/yiZSbCxDA1n/J4FzPyZ0rNHUAJ/QndmmVspE9syFpFCKigvvyrzm016+k+
- FJ59Q6RG4MSy/+J565Xj+DNY3/dCuQINBFYX6S8BEADZP+2cl4DRFaSaBms08W8/smc5T2CO
- YhAoygZn71rB7Djml2ZdvrLRjR8Qbn0Q/2L2gGUVc63pJnbrjlXSx2LfAFE0SlfYIJ11aFdF
- 9w7RvqWByQjDJor3Z0fWvPExplNgMvxpD0U0QrVT5dIGTx9hadejCl/ug09Lr6MPQn+a4+qs
- aRWwgCSHaIuDkH3zI1MJXiqXXFKUzJ/Fyx6R72rqiMPHH2nfwmMu6wOXAXb7+sXjZz5Po9GJ
- g2OcEc+rpUtKUJGyeQsnCDxUcqJXZDBi/GnhPCcraQuqiQ7EGWuJfjk51vaI/rW4bZkA9yEP
- B9rBYngbz7cQymUsfxuTT8OSlhxjP3l4ZIZFKIhDaQeZMj8pumBfEVUyiF6KVSfgfNQ/5PpM
- R4/pmGbRqrAAElhrRPbKQnCkGWDr8zG+AjN1KF6rHaFgAIO7TtZ+F28jq4reLkur0N5tQFww
- wFwxzROdeLHuZjL7eEtcnNnzSkXHczLkV4kQ3+vr/7Gm65mQfnVpg6JpwpVrbDYQeOFlxZ8+
- GERY5Dag4KgKa/4cSZX2x/5+KkQx9wHwackw5gDCvAdZ+Q81nm6tRxEYBBiVDQZYqO73stgT
- ZyrkxykUbQIy8PI+g7XMDCMnPiDncQqgf96KR3cvw4wN8QrgA6xRo8xOc2C3X7jTMQUytCz9
- 0MyV1QARAQABiQI8BBgBCAAmAhsMFiEE6j5FL/T5SGCN6PrQxzkHk2t9+PwFAlxHziAFCRj7
- 5/EACgkQxzkHk2t9+PxgfA//cH5R1DvpJPwraTAl24SUcG9EWe+NXyqveApe05nk15zEuxxd
- e4zFEjo+xYZilSveLqYHrm/amvQhsQ6JLU+8N60DZHVcXbw1Eb8CEjM5oXdbcJpXh1/1BEwl
- 4phsQMkxOTns51bGDhTQkv4lsZKvNByB9NiiMkT43EOx14rjkhHw3rnqoI7ogu8OO7XWfKcL
- CbchjJ8t3c2XK1MUe056yPpNAT2XPNF2EEBPG2Y2F4vLgEbPv1EtpGUS1+JvmK3APxjXUl5z
- 6xrxCQDWM5AAtGfM/IswVjbZYSJYyH4BQKrShzMb0rWUjkpXvvjsjt8rEXpZEYJgX9jvCoxt
- oqjCKiVLpwje9WkEe9O9VxljmPvxAhVqJjX62S+TGp93iD+mvpCoHo3+CcvyRcilz+Ko8lfO
- hS9tYT0HDUiDLvpUyH1AR2xW9RGDevGfwGTpF0K6cLouqyZNdhlmNciX48tFUGjakRFsxRmX
- K0Jx4CEZubakJe+894sX6pvNFiI7qUUdB882i5GR3v9ijVPhaMr8oGuJ3kvwBIA8lvRBGVGn
- 9xvzkQ8Prpbqh30I4NMp8MjFdkwCN6znBKPHdjNTwE5PRZH0S9J0o67IEIvHfH0eAWAsgpTz
- +jwc7VKH7vkvgscUhq/v1/PEWCAqh9UHy7R/jiUxwzw/288OpgO+i+2l11Y=
-Message-ID: <72c84579-d4be-acb4-7fcb-d773ab847fd5@suse.de>
-Date:   Tue, 2 Jun 2020 00:09:27 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v5 5/7] blktrace: fix debugfs use after free
+Message-ID: <20200601170500.GF13911@42.do-not-panic.com>
+References: <20200516031956.2605-1-mcgrof@kernel.org>
+ <20200516031956.2605-6-mcgrof@kernel.org>
+ <20200519163713.GA29944@infradead.org>
+ <20200527031202.GT11244@42.do-not-panic.com>
 MIME-Version: 1.0
-In-Reply-To: <CY4PR04MB3751EF222D4DFFB9C05AB38EE7B30@CY4PR04MB3751.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200527031202.GT11244@42.do-not-panic.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/5/25 09:26, Damien Le Moal wrote:
-> On 2020/05/22 21:19, Coly Li wrote:
->> Currently we don't support writeback mode for zoned device as backing
->> device. So reject it by sysfs interface.
->>
->> This rejection will be removed after the writeback cache mode support
->> for zoned device gets done.
->>
->> Signed-off-by: Coly Li <colyli@suse.de>
->> Cc: Damien Le Moal <damien.lemoal@wdc.com>
->> Cc: Hannes Reinecke <hare@suse.com>
->> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->> ---
->>  drivers/md/bcache/sysfs.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
->> index 323276994aab..41bdbc42a17d 100644
->> --- a/drivers/md/bcache/sysfs.c
->> +++ b/drivers/md/bcache/sysfs.c
->> @@ -359,6 +359,11 @@ STORE(__cached_dev)
->>  		if (v < 0)
->>  			return v;
->>  
->> +		if ((unsigned int) v == CACHE_MODE_WRITEBACK) {
->> +			pr_err("writeback mode is not supported for zoned backing device.\n");
->> +			return -ENOTSUPP;
->> +		}
->> +
->>  		if ((unsigned int) v != BDEV_CACHE_MODE(&dc->sb)) {
->>  			SET_BDEV_CACHE_MODE(&dc->sb, v);
->>  			bch_write_bdev_super(dc, NULL);
->>
-> 
-> Do you have a similar check in bcache user tools at format time ? Or is the
-> cache mode specified only when the bcache device is started ?
+On Wed, May 27, 2020 at 03:12:02AM +0000, Luis Chamberlain wrote:
+> You forgot to deal with partitions. Putting similar lipstick on the pig,
+> this is what I end up with, let me know if this seems agreeable:
 
-Yes I do the cache mode check in bcache-tools, and if user sets
-writeback mode, bcache-tools will inform user and switch it to
-writethrough mode explicitly.
+So even with the partition stuff in place, this approach still don't
+allow multiple uses of blktrace against a scsi-generic device and its
+backend real block device, say TYPE_DISK. A simple example is a scsi
+drive hooked up used to allow users to do blktrace /dev/sda *and*
+blktrace /dev/sg0, but with the proposed change /dev/sg0 no longer
+works beacuse the dentry pertains to the '/dev/sda' name, not
+'/dev/sg0'.
 
-> 
-> Looks good.
-> 
-> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
-> 
+We can shoehorn in a solution following the style proposed as follows.
+We can keep this only slightly cleaner if we don't care about the
+extra dentry even if a user disables CONFIG_CHR_DEV_SG. The cost
+would just be an extra dentry on the request_queue.
 
-Thank you for the review!
+I'll run this through 0-day and then post a new hopefully final series,
+but if you don't think this or would prefer something lease please let
+me know.
 
-Coly Li
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 86c107de2836..f46bdc7f6509 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -920,6 +920,9 @@ static void blk_release_queue(struct kobject *kobj)
+ 	blk_trace_shutdown(q);
+ 
+ 	debugfs_remove_recursive(q->debugfs_dir);
++#if defined(CONFIG_CHR_DEV_SG) || defined(CONFIG_CHR_DEV_SG_MODULE)
++	debugfs_remove_recursive(q->sg_debugfs_dir);
++#endif
+ 	if (queue_is_mq(q))
+ 		blk_mq_debugfs_unregister(q);
+ 
+@@ -939,6 +942,21 @@ struct kobj_type blk_queue_ktype = {
+ 	.release	= blk_release_queue,
+ };
+ 
++#if defined(CONFIG_CHR_DEV_SG) || defined(CONFIG_CHR_DEV_SG_MODULE)
++/**
++ * blk_sg_debugfs_init - initialize debugs for scsi-generic
++ * @q: the associated queue
++ * @name: name of the scsi-generic device
++ *
++ * To be used by scsi-generic for allowing it to use blktrace.
++ */
++void blk_sg_debugfs_init(struct request_queue *q, const char *name)
++{
++	q->sg_debugfs_dir = debugfs_create_dir(name, blk_debugfs_root);
++}
++EXPORT_SYMBOL_GPL(blk_sg_debugfs_init);
++#endif
++
+ /**
+  * blk_register_queue - register a block layer queue with sysfs
+  * @disk: Disk of which the request queue should be registered with sysfs.
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index 20472aaaf630..c87fe1923f3d 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -1519,6 +1519,7 @@ static int
+ sg_add_device(struct device *cl_dev, struct class_interface *cl_intf)
+ {
+ 	struct scsi_device *scsidp = to_scsi_device(cl_dev->parent);
++	struct request_queue *q = scsidp->request_queue;
+ 	struct gendisk *disk;
+ 	Sg_device *sdp = NULL;
+ 	struct cdev * cdev = NULL;
+@@ -1573,6 +1574,7 @@ sg_add_device(struct device *cl_dev, struct class_interface *cl_intf)
+ 	} else
+ 		pr_warn("%s: sg_sys Invalid\n", __func__);
+ 
++	blk_sg_debugfs_init(q, disk->disk_name);
+ 	sdev_printk(KERN_NOTICE, scsidp, "Attached scsi generic sg%d "
+ 		    "type %d\n", sdp->index, scsidp->type);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5877b03b8117..be5a40d59f60 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -575,6 +575,9 @@ struct request_queue {
+ 	struct bio_set		bio_split;
+ 
+ 	struct dentry		*debugfs_dir;
++#if defined(CONFIG_CHR_DEV_SG) || defined(CONFIG_CHR_DEV_SG_MODULE)
++	struct dentry		*sg_debugfs_dir;
++#endif
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 	struct dentry		*sched_debugfs_dir;
+ 	struct dentry		*rqos_debugfs_dir;
+@@ -858,6 +861,14 @@ static inline void rq_flush_dcache_pages(struct request *rq)
+ 
+ extern int blk_register_queue(struct gendisk *disk);
+ extern void blk_unregister_queue(struct gendisk *disk);
++#if defined(CONFIG_CHR_DEV_SG) || defined(CONFIG_CHR_DEV_SG_MODULE)
++extern void blk_sg_debugfs_init(struct request_queue *q, const char *name);
++#else
++static inline void blk_sg_debugfs_init(struct request_queue *q,
++				       const char *name)
++{
++}
++#endif
+ extern blk_qc_t generic_make_request(struct bio *bio);
+ extern blk_qc_t direct_make_request(struct bio *bio);
+ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index a55cbfd060f5..5b0310f38e11 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -511,6 +511,11 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	 */
+ 	if (bdev && bdev != bdev->bd_contains) {
+ 		dir = bdev->bd_part->debugfs_dir;
++	} else if (q->sg_debugfs_dir &&
++		   strlen(buts->name) == strlen(q->sg_debugfs_dir->d_name.name)
++		   && strcmp(buts->name, q->sg_debugfs_dir->d_name.name) == 0) {
++		/* scsi-generic requires use of its own directory */
++		dir = q->sg_debugfs_dir;
+ 	} else {
+ 		/*
+ 		 * For queues that do not have a gendisk attached to them, that
