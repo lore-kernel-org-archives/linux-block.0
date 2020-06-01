@@ -2,101 +2,159 @@ Return-Path: <SRS0=rAsZ=7O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ADE5C433E2
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 11:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3730C433E0
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 11:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71958207DF
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 11:37:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mFkTPyu0"
+	by mail.kernel.org (Postfix) with ESMTP id 843A320738
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 11:41:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbgFALhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Jun 2020 07:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725838AbgFALhJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Jun 2020 07:37:09 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3A82C03E97C
-        for <linux-block@vger.kernel.org>; Mon,  1 Jun 2020 04:37:07 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id b6so7731191ljj.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2020 04:37:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uQTt+MIIpyDA4belDkYAgM2iFZj3fYj7DkPTdahh8pc=;
-        b=mFkTPyu0DgEndR/rPSLh+6SZhzSM1qBKDd8PBw9+8FvGjQLyi0X4GhIxr44O0HNY9S
-         B0O6ex76hLxTjxqQ49jCMJRn0P5+NwecUxkmaO+2TZvf9guPUE23aZWwKzSV1NJUHrcB
-         XWTjHPSBLmNyW5MpuJeasWOkKZDwWVMWV09Kuyua48ogCAyegiD3cR/TT1fDiwk8TBVe
-         y4rDFfND0mqTQzB7qrGexH6onIGb5aDrS1KF78f7S5UesCrxYaMWTUjSc4eMyNToKq9P
-         irMvgdInEjpirCLJqjXh2FRQc1HtYKpAsHox8q+6ds+nU4NbLZHd1w9jc1+L/R2rJGAo
-         PjRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uQTt+MIIpyDA4belDkYAgM2iFZj3fYj7DkPTdahh8pc=;
-        b=OwL8lbGSZ1WMnLtEYsFOF8RekEjRBJyB73VUnN/3xG6/hzVjnMs4+UxeulYZr/uDIA
-         begu20tRHSb+Id9nvz4JWuWTq16qyP+wjAsNPa77NjPMCxNa2stbcCp5/aIq6UVjVTUA
-         3tzPFG9Cj7UbvGGa890KhvjCGMcmoM9yQF3VIr5EFnVTLHKZesg+lkxMaClxEdk2YYo1
-         sKS/mKZilaADHOnSwBcSs9q4PzW0G9O2S+LMqbsJyvocbaK/AqwjyL/l1gHXv0DTN+E9
-         oo/I6p/hzgx2G7lOBrcgkQedbWA+bTb/+ZvfQZKPZqxrbz6pcn5AtDNh38ntXpXqtYzs
-         rcdQ==
-X-Gm-Message-State: AOAM531BkTV4eV2lUsmfEnn+yOt8pqMlgMaxxORySTiDnnNqs7tfwB1+
-        ss/YL6YgUdIt3kjqE2NP3CGmj5ql1XGSWbDEnBr+cw==
-X-Google-Smtp-Source: ABdhPJw+PTS+SxItJ484C0YqddclYX1X+Em1nuXbhwpxd5uIYFTeFzaNLSV1mhgdPe0vjmuzIUkSf9IuyYYdVc5kqow=
-X-Received: by 2002:a2e:92d7:: with SMTP id k23mr1854314ljh.100.1591011425955;
- Mon, 01 Jun 2020 04:37:05 -0700 (PDT)
+        id S1725886AbgFALlZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Jun 2020 07:41:25 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:40122 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726075AbgFALlZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Jun 2020 07:41:25 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id DBA51F7082F7FAC56BB6;
+        Mon,  1 Jun 2020 19:41:22 +0800 (CST)
+Received: from [127.0.0.1] (10.166.215.221) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Mon, 1 Jun 2020
+ 19:41:19 +0800
+Subject: Re: [v3] nbd: fix potential NULL pointer fault in nbd_genl_disconnect
+From:   Sun Ke <sunke32@huawei.com>
+To:     Mike Christie <mchristi@redhat.com>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20200210073241.41813-1-sunke32@huawei.com>
+ <5E418D62.8090102@redhat.com>
+ <c3531fc5-73b3-6ef4-816e-97f491f45c18@huawei.com> <5E42D8B1.406@redhat.com>
+ <1b1110b2-1db6-9781-89cf-82b1403b1641@huawei.com>
+Message-ID: <1123bbfe-bcf5-99a7-6ee5-5cc12b693377@huawei.com>
+Date:   Mon, 1 Jun 2020 19:41:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200528081003.238804-1-linus.walleij@linaro.org> <20200601074957.GE1181806@T590>
-In-Reply-To: <20200601074957.GE1181806@T590>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Mon, 1 Jun 2020 13:36:54 +0200
-Message-ID: <CACRpkdYL4-Z=kaS+RfniVr=Sn-yOf+=CKMJDsn=eTK3atmGohg@mail.gmail.com>
-Subject: Re: [PATCH] block: Flag elevators suitable for single queue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-mtd@lists.infradead.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1b1110b2-1db6-9781-89cf-82b1403b1641@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.166.215.221]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 1, 2020 at 9:50 AM Ming Lei <ming.lei@redhat.com> wrote:
-> On Thu, May 28, 2020 at 10:10:03AM +0200, Linus Walleij wrote:
-> > The Kyber block scheduler is not suitable for single hardware
-> > queue devices, so add a new flag for single hardware queue
-> > devices and add that to the deadline and BFQ schedulers
-> > so the Kyber scheduler will not be selected for single queue
-> > devices.
->
-> The above may not be true for some single hw queue high performance HBA(
-> such as megasas), which can get better performance from none, so it is
-> reasonable to get better performance from kyber, see 6ce3dd6eec11 ("blk-mq:
-> issue directly if hw queue isn't busy in case of 'none'"), and the
-> following link:
->
-> https://lore.kernel.org/linux-block/20180710010331.27479-1-ming.lei@redhat.com/
 
-I see, but isn't the case rather that none is preferred and kyber gives
-the same characteristics because it's not standing in the way
-as much?
 
-It looks like if we should add a special flag for these devices with
-very fast single queues so they can say "I prefer none", do you
-agree?
+在 2020/2/12 10:00, sunke (E) 写道:
+> 
+> 
+> 在 2020/2/12 0:39, Mike Christie 写道:
+>> On 02/10/2020 10:12 PM, sunke (E) wrote:
+>>>
+>>>
+>>> 在 2020/2/11 1:05, Mike Christie 写道:
+>>>> On 02/10/2020 01:32 AM, Sun Ke wrote:
+>>>>> Open /dev/nbdX first, the config_refs will be 1 and
+>>>>> the pointers in nbd_device are still null. Disconnect
+>>>>> /dev/nbdX, then reference a null recv_workq. The
+>>>>> protection by config_refs in nbd_genl_disconnect is useless.
+>>>>>
+>>>>> To fix it, just add a check for a non null task_recv in
+>>>>> nbd_genl_disconnect.
+>>>>>
+>>>>> Signed-off-by: Sun Ke <sunke32@huawei.com>
+>>>>> ---
+>>>>> v1 -> v2:
+>>>>> Add an omitted mutex_unlock.
+>>>>>
+>>>>> v2 -> v3:
+>>>>> Add nbd->config_lock, suggested by Josef.
+>>>>> ---
+>>>>>    drivers/block/nbd.c | 8 ++++++++
+>>>>>    1 file changed, 8 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>>> index b4607dd96185..870b3fd0c101 100644
+>>>>> --- a/drivers/block/nbd.c
+>>>>> +++ b/drivers/block/nbd.c
+>>>>> @@ -2008,12 +2008,20 @@ static int nbd_genl_disconnect(struct sk_buff
+>>>>> *skb, struct genl_info *info)
+>>>>>                   index);
+>>>>>            return -EINVAL;
+>>>>>        }
+>>>>> +    mutex_lock(&nbd->config_lock);
+>>>>>        if (!refcount_inc_not_zero(&nbd->refs)) {
+>>>>> +        mutex_unlock(&nbd->config_lock);
+>>>>>            mutex_unlock(&nbd_index_mutex);
+>>>>>            printk(KERN_ERR "nbd: device at index %d is going down\n",
+>>>>>                   index);
+>>>>>            return -EINVAL;
+>>>>>        }
+>>>>> +    if (!nbd->recv_workq) {
+>>>>> +        mutex_unlock(&nbd->config_lock);
+>>>>> +        mutex_unlock(&nbd_index_mutex);
+>>>>> +        return -EINVAL;
+>>>>> +    }
+>>>>> +    mutex_unlock(&nbd->config_lock);
+>>>>>        mutex_unlock(&nbd_index_mutex);
+>>>>>        if (!refcount_inc_not_zero(&nbd->config_refs)) {
+>>>>>            nbd_put(nbd);
+>>>>>
+>>>>
+>>>> With my other patch then we will not need this right? It handles your
+>>>> case by just being integrated with the existing checks in:
+>>>>
+>>>> nbd_disconnect_and_put->nbd_clear_sock->sock_shutdown
+>>>>
+>>>> ...
+>>>>
+>>>> static void sock_shutdown(struct nbd_device *nbd)
+>>>> {
+>>>>
+>>>> ....
+>>>>
+>>>>           if (config->num_connections == 0)
+>>>>                   return;
+>>>>
+>>>>
+>>>> num_connections is zero for your case since we never did a
+>>>> nbd_genl_disconnect so we would return here.
+>>>>
+>>>>
+>>>> .
+>>>>
+>>> Hi Mike
+>>>
+>>> Your point is not right totally.
+>>>
+>>> Yes, config->num_connections is 0 and will return in sock_shutdown. Then
+>>> it will back to nbd_disconnect_and_put and do flush_workqueue
+>>> (nbd->recv_workq).
+>>>
+>>> nbd_disconnect_and_put
+>>>      ->nbd_clear_sock
+>>>          ->sock_shutdown
+>>>      ->flush_workqueue
+>>>
+>>
+>> My patch removed that extra flush_workqueue in nbd_disconnect_and_put.
+>>
+>> The idea of the patch was to move the flush calls to when we do
+>> sock_shutdown in the config (connect, disconnect, clear sock) code
+>> paths, because that is the time we know we will need to kill the recv
+>> workers and wait for them to complete so we know they are not still
+>> running when userspace does a new config operation.
+>>
+> Yes, I see.
+> 
 
-Yours,
-Linus Walleij
+Hi Mike
+
+Have you sent your patch?
+
