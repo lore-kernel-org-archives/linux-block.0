@@ -2,182 +2,118 @@ Return-Path: <SRS0=rAsZ=7O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7866C433DF
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 00:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 497EEC433E1
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 01:25:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81FD72067B
-	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 00:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 218FF207F7
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 01:25:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cLUts0ES"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728422AbgFAAz3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 May 2020 20:55:29 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:53275 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgFAAz2 (ORCPT
+        id S1727802AbgFABZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 May 2020 21:25:02 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:54766 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726555AbgFABZB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 May 2020 20:55:28 -0400
-Received: from mail-qt1-f197.google.com ([209.85.160.197])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <mfo@canonical.com>)
-        id 1jfYje-00049Q-I9
-        for linux-block@vger.kernel.org; Mon, 01 Jun 2020 00:55:26 +0000
-Received: by mail-qt1-f197.google.com with SMTP id e8so8521136qtq.22
-        for <linux-block@vger.kernel.org>; Sun, 31 May 2020 17:55:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3Pzz5zxhVl7hYkJ54F01MWFYXZMMN0HGsDMY/3v7yz4=;
-        b=PVTFIkqONP1MMwGzslnGv+M4EKRKpuJJ543g364BwNpsLo5vVpI/4xhdOGcbeQQ4R8
-         f4Bu+DMb1hXiWpEY1SkvF7Mt/H+2chRaRnpVCRJQSp+4++VtZH4yoGpqFSy7l/j1mtR0
-         mxJibDSTbDOBUuUiyOPtg9wx0gG7uI1LO3ngqeeeCgUa5ebmVhzZJ52HlxHokksK65si
-         qIgwjcK7xxqkqUTQj0YV6SCeKIOdDmTcJe8E7XG7po9F6+1dGSe+BOpGwv9dFQQx9Dlu
-         eO3zQz95BmyWkV+jYu8U8RfOKv4nNeG+Da/JwznzhvC5gM6zvNJQpIGG6LYPout/Grng
-         4oWw==
-X-Gm-Message-State: AOAM533yswhXeXR7P58XBiUY7rvb5DWudQCEkHZZvREqqnw20ddAkgPv
-        fZ5LIIDnguLkm5VpeUjmBWyLaYA6xBDJpzRUzEh78FEXqX8ve8+XCVrRVUIcJU6m5FUX+uu300m
-        1PiPKM5tcsrwpgjW+bpvwmUVOvGgtH1t+KHxve42T
-X-Received: by 2002:a0c:ca08:: with SMTP id c8mr18288768qvk.237.1590972925515;
-        Sun, 31 May 2020 17:55:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxehgu4MjbasPDk0C3AB7KLo5n4bdBhfyAznHKwfTlN3EhO8pUBi0QwtPCb68SjNQVn8nakfQ==
-X-Received: by 2002:a0c:ca08:: with SMTP id c8mr18288756qvk.237.1590972925206;
-        Sun, 31 May 2020 17:55:25 -0700 (PDT)
-Received: from localhost.localdomain ([179.159.56.229])
-        by smtp.gmail.com with ESMTPSA id h77sm13680767qke.37.2020.05.31.17.55.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2020 17:55:24 -0700 (PDT)
-From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH] block: check for page size in queue_logical_block_size()
-Date:   Sun, 31 May 2020 21:55:20 -0300
-Message-Id: <20200601005520.420719-1-mfo@canonical.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sun, 31 May 2020 21:25:01 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0511GinO029800;
+        Mon, 1 Jun 2020 01:24:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=soZUl3/aG71B/k1/PkbJ+p5RT1UVgYuZaKnNxUhQBZQ=;
+ b=cLUts0ESlycTaC43qJFEbYb8aatoCeqGpMO5URaI1Pj0xj2YblgyKW2pyn2M/npwP5Z8
+ i2ctIYHGlfBzcTrCVKqFuA7d8E9uOA+FnRUI9icQwAGIAWedi1o188gUAz8pJR6YflRR
+ ytCwN5cfFLfD8p7bllUq9mftkuROx2JXlb4/Bs901p4buqd/L8NMrOfbxiRVU4Uuvz2H
+ PuG1cae4Guh56jxJhNZje2EviJ1ga5kQZ2AScRYy65ZaiKJd2SlQlIaPQRzKvF0WMk3y
+ WkdZKqn5ugZ3dKsWgYCu3TCf7WcyNGg89QkzkQRTXjdPo06VTjfcWyBRHsb/yce8d1Ta jg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 31bfekv95q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 01 Jun 2020 01:24:00 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0511HwGX053015;
+        Mon, 1 Jun 2020 01:23:59 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 31c25h5dmr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 01 Jun 2020 01:23:59 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0511NuSp001716;
+        Mon, 1 Jun 2020 01:23:58 GMT
+Received: from localhost.localdomain (/10.211.9.80)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 31 May 2020 18:23:56 -0700
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     nbd@other.debian.org, linux-block@vger.kernel.org
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] nbd: append module param and description following corresponding variables
+Date:   Sun, 31 May 2020 18:16:01 -0700
+Message-Id: <20200601011602.29381-2-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200601011602.29381-1-dongli.zhang@oracle.com>
+References: <20200601011602.29381-1-dongli.zhang@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9638 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=8 spamscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006010008
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9638 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=8
+ mlxlogscore=999 priorityscore=1501 bulkscore=0 phishscore=0 clxscore=1011
+ impostorscore=0 adultscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006010008
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's possible for a block driver to set logical block size to
-a value greater than page size incorrectly; e.g. bcache takes
-the value from the superblock, set by the user w/ make-bcache.
+A lot of drivers append the module parameter and its description following
+the corresponding variables (e.g., 'g_submit_queues' in null or
+'admin_timeout' in nvme).
 
-This causes a BUG/NULL pointer dereference in the path:
+This patch would do the same for 'nbds_max' and 'max_part' in nbd driver.
+This makes it much more friendly to cscope when reading the code.
 
-  __blkdev_get()
-  -> set_init_blocksize() // set i_blkbits based on ...
-     -> bdev_logical_block_size()
-        -> queue_logical_block_size() // ... this value
-  -> bdev_disk_changed()
-     ...
-     -> blkdev_readpage()
-        -> block_read_full_page()
-           -> create_page_buffers() // size = 1 << i_blkbits
-              -> create_empty_buffers() // give size/take pointer
-                 -> alloc_page_buffers() // return NULL
-                 .. BUG!
-
-Because alloc_page_buffers() is called with size > PAGE_SIZE,
-thus it initializes head = NULL, skips the loop, return head;
-then create_empty_buffers() gets (and uses) the NULL pointer.
-
-This has been around longer than commit ad6bf88a6c19 ("block:
-fix an integer overflow in logical block size"); however, it
-increased the range of values that can trigger the issue.
-
-Previously only 8k/16k/32k (on x86/4k page size) would do it,
-as greater values overflow unsigned short to zero, and queue_
-logical_block_size() would then use the default of 512.
-
-Now the range with unsigned int is much larger, and one user
-with an (incorrect) 512k value, which happened to be zero'ed
-previously and work fine, hits the issue -- the zero is gone,
-and queue_logical_block_size() does return 512k (> PAGE_SIZE)
-
-Fix this for the general case in queue_logical_block_size(),
-regardless of the driver-side fault/fix, to prevent current
-and future issues, while drivers adjust to the right values.
-
-Test-case:
-
-    # IMG=/root/disk.img
-    # dd if=/dev/zero of=$IMG bs=1 count=0 seek=1G
-    # DEV=$(losetup --find --show $IMG)
-    # make-bcache --bdev $DEV --block 8k
-      < see dmesg >
-
-Before:
-
-    # uname -rv
-    5.7.0-rc7
-
-    [   55.944046] BUG: kernel NULL pointer dereference, address: 0000000000000000
-    ...
-    [   55.949742] CPU: 3 PID: 610 Comm: bcache-register Not tainted 5.7.0-rc7 #4
-    ...
-    [   55.952281] RIP: 0010:create_empty_buffers+0x1a/0x100
-    ...
-    [   55.966434] Call Trace:
-    [   55.967021]  create_page_buffers+0x48/0x50
-    [   55.967834]  block_read_full_page+0x49/0x380
-    [   55.972181]  do_read_cache_page+0x494/0x610
-    [   55.974780]  read_part_sector+0x2d/0xaa
-    [   55.975558]  read_lba+0x10e/0x1e0
-    [   55.977904]  efi_partition+0x120/0x5a6
-    [   55.980227]  blk_add_partitions+0x161/0x390
-    [   55.982177]  bdev_disk_changed+0x61/0xd0
-    [   55.982961]  __blkdev_get+0x350/0x490
-    [   55.983715]  __device_add_disk+0x318/0x480
-    [   55.984539]  bch_cached_dev_run+0xc5/0x270
-    [   55.986010]  register_bcache.cold+0x122/0x179
-    [   55.987628]  kernfs_fop_write+0xbc/0x1a0
-    [   55.988416]  vfs_write+0xb1/0x1a0
-    [   55.989134]  ksys_write+0x5a/0xd0
-    [   55.989825]  do_syscall_64+0x43/0x140
-    [   55.990563]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-    [   55.991519] RIP: 0033:0x7f7d60ba3154
-    ...
-
-After:
-
-    # uname -rv
-    5.7.0-rc7.chkpgsz1
-
-    [   46.313306] bcache: register_bdev() registered backing device loop0
-
-    # grep ^ /sys/block/bcache0/queue/*_block_size
-    /sys/block/bcache0/queue/logical_block_size:512
-    /sys/block/bcache0/queue/physical_block_size:8192
-
-Reported-by: Ryan Finnie <ryan@finnie.org>
-Reported-by: Sebastian Marsching <sebastian@marsching.com>
-Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 ---
- include/linux/blkdev.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/nbd.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 32868fbedc9e..fb9dfc8c7e68 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1297,7 +1297,8 @@ static inline unsigned queue_logical_block_size(const struct request_queue *q)
- {
- 	int retval = 512;
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 43cff01a5a67..74c1363702f5 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -146,7 +146,13 @@ static struct dentry *nbd_dbg_dir;
+ #define NBD_DEF_BLKSIZE 1024
  
--	if (q && q->limits.logical_block_size)
-+	if (q && q->limits.logical_block_size &&
-+		 q->limits.logical_block_size <= PAGE_SIZE)
- 		retval = q->limits.logical_block_size;
+ static unsigned int nbds_max = 16;
++module_param(nbds_max, int, 0444);
++MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
++
+ static int max_part = 16;
++module_param(max_part, int, 0444);
++MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
++
+ static int part_shift;
  
- 	return retval;
+ static int nbd_dev_dbg_init(struct nbd_device *nbd);
+@@ -2444,8 +2450,3 @@ module_exit(nbd_cleanup);
+ 
+ MODULE_DESCRIPTION("Network Block Device");
+ MODULE_LICENSE("GPL");
+-
+-module_param(nbds_max, int, 0444);
+-MODULE_PARM_DESC(nbds_max, "number of network block devices to initialize (default: 16)");
+-module_param(max_part, int, 0444);
+-MODULE_PARM_DESC(max_part, "number of partitions per device (default: 16)");
 -- 
 2.17.1
 
