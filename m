@@ -1,113 +1,183 @@
-Return-Path: <SRS0=tY2F=7N=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=rAsZ=7O=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DB8C433DF
-	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 16:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7866C433DF
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 00:55:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CCEB207BB
-	for <linux-block@archiver.kernel.org>; Sun, 31 May 2020 16:39:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Oc6sUMwE"
+	by mail.kernel.org (Postfix) with ESMTP id 81FD72067B
+	for <linux-block@archiver.kernel.org>; Mon,  1 Jun 2020 00:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728193AbgEaQjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 May 2020 12:39:44 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:39780 "EHLO
-        forwardcorp1o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728322AbgEaQjn (ORCPT
+        id S1728422AbgFAAz3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 May 2020 20:55:29 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:53275 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726081AbgFAAz2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 May 2020 12:39:43 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::301])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 20C632E1478;
-        Sun, 31 May 2020 19:39:38 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
-        by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 0aHlEyV4lD-dbx0ACCx;
-        Sun, 31 May 2020 19:39:38 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1590943178; bh=2mtCU2U0KE0xx8atMhzxY/9rjdmX95+6IA+naCASAYw=;
-        h=In-Reply-To:References:Date:Message-ID:To:From:Subject;
-        b=Oc6sUMwEwwNe84QZd0++bNQB5xjfiOTB63EsWwgcbByWiVRHSyFN7s9YnOzv18X30
-         QWJLUFxLrWhRoFKDGG0P//67FHR5CKEK4S+FMsGXRv+EsDpUigcH36P1Me6hSH5kY8
-         1GS8uF9sTF2g1cg8aDcjK99zYvSeJesAWfRQlGtw=
-Authentication-Results: mxbackcorp1o.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b081:111::1:4])
-        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id W4zK4d67ix-daWGj9q3;
-        Sun, 31 May 2020 19:39:36 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH] block: really remove REQ_NOWAIT_INLINE
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-References: <159094279217.155550.11478547618029899022.stgit@buzz>
-Message-ID: <7274c2c7-5348-babb-4bbf-6a0e7b95559b@yandex-team.ru>
-Date:   Sun, 31 May 2020 19:39:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Sun, 31 May 2020 20:55:28 -0400
+Received: from mail-qt1-f197.google.com ([209.85.160.197])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mfo@canonical.com>)
+        id 1jfYje-00049Q-I9
+        for linux-block@vger.kernel.org; Mon, 01 Jun 2020 00:55:26 +0000
+Received: by mail-qt1-f197.google.com with SMTP id e8so8521136qtq.22
+        for <linux-block@vger.kernel.org>; Sun, 31 May 2020 17:55:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3Pzz5zxhVl7hYkJ54F01MWFYXZMMN0HGsDMY/3v7yz4=;
+        b=PVTFIkqONP1MMwGzslnGv+M4EKRKpuJJ543g364BwNpsLo5vVpI/4xhdOGcbeQQ4R8
+         f4Bu+DMb1hXiWpEY1SkvF7Mt/H+2chRaRnpVCRJQSp+4++VtZH4yoGpqFSy7l/j1mtR0
+         mxJibDSTbDOBUuUiyOPtg9wx0gG7uI1LO3ngqeeeCgUa5ebmVhzZJ52HlxHokksK65si
+         qIgwjcK7xxqkqUTQj0YV6SCeKIOdDmTcJe8E7XG7po9F6+1dGSe+BOpGwv9dFQQx9Dlu
+         eO3zQz95BmyWkV+jYu8U8RfOKv4nNeG+Da/JwznzhvC5gM6zvNJQpIGG6LYPout/Grng
+         4oWw==
+X-Gm-Message-State: AOAM533yswhXeXR7P58XBiUY7rvb5DWudQCEkHZZvREqqnw20ddAkgPv
+        fZ5LIIDnguLkm5VpeUjmBWyLaYA6xBDJpzRUzEh78FEXqX8ve8+XCVrRVUIcJU6m5FUX+uu300m
+        1PiPKM5tcsrwpgjW+bpvwmUVOvGgtH1t+KHxve42T
+X-Received: by 2002:a0c:ca08:: with SMTP id c8mr18288768qvk.237.1590972925515;
+        Sun, 31 May 2020 17:55:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxehgu4MjbasPDk0C3AB7KLo5n4bdBhfyAznHKwfTlN3EhO8pUBi0QwtPCb68SjNQVn8nakfQ==
+X-Received: by 2002:a0c:ca08:: with SMTP id c8mr18288756qvk.237.1590972925206;
+        Sun, 31 May 2020 17:55:25 -0700 (PDT)
+Received: from localhost.localdomain ([179.159.56.229])
+        by smtp.gmail.com with ESMTPSA id h77sm13680767qke.37.2020.05.31.17.55.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2020 17:55:24 -0700 (PDT)
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH] block: check for page size in queue_logical_block_size()
+Date:   Sun, 31 May 2020 21:55:20 -0300
+Message-Id: <20200601005520.420719-1-mfo@canonical.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <159094279217.155550.11478547618029899022.stgit@buzz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31/05/2020 19.33, Konstantin Khlebnikov wrote:
-> Commit 7b6620d7db56 ("block: remove REQ_NOWAIT_INLINE") removed it,
-> but some pieces left. Probably something went wrong with git merge.
+It's possible for a block driver to set logical block size to
+a value greater than page size incorrectly; e.g. bcache takes
+the value from the superblock, set by the user w/ make-bcache.
 
-Nevermind. As I see in block/for-next, Christoph have removed REQ_NOWAIT_INLINE.
+This causes a BUG/NULL pointer dereference in the path:
 
-But BLK_QC_T_EAGAIN is still here though.
+  __blkdev_get()
+  -> set_init_blocksize() // set i_blkbits based on ...
+     -> bdev_logical_block_size()
+        -> queue_logical_block_size() // ... this value
+  -> bdev_disk_changed()
+     ...
+     -> blkdev_readpage()
+        -> block_read_full_page()
+           -> create_page_buffers() // size = 1 << i_blkbits
+              -> create_empty_buffers() // give size/take pointer
+                 -> alloc_page_buffers() // return NULL
+                 .. BUG!
 
-> 
-> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-> ---
->   include/linux/blk_types.h |    7 ++-----
->   1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 31eb92876be7..59b2e9bd9bd8 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -322,8 +322,7 @@ enum req_flag_bits {
->   	__REQ_PREFLUSH,		/* request for cache flush */
->   	__REQ_RAHEAD,		/* read ahead, can fail anytime */
->   	__REQ_BACKGROUND,	/* background IO */
-> -	__REQ_NOWAIT,           /* Don't wait if request will block */
-> -	__REQ_NOWAIT_INLINE,	/* Return would-block error inline */
-> +	__REQ_NOWAIT,		/* Don't wait if request will block */
->   	/*
->   	 * When a shared kthread needs to issue a bio for a cgroup, doing
->   	 * so synchronously can lead to priority inversions as the kthread
-> @@ -358,7 +357,6 @@ enum req_flag_bits {
->   #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
->   #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
->   #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
-> -#define REQ_NOWAIT_INLINE	(1ULL << __REQ_NOWAIT_INLINE)
->   #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
->   
->   #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
-> @@ -452,13 +450,12 @@ static inline int op_stat_group(unsigned int op)
->   
->   typedef unsigned int blk_qc_t;
->   #define BLK_QC_T_NONE		-1U
-> -#define BLK_QC_T_EAGAIN		-2U
->   #define BLK_QC_T_SHIFT		16
->   #define BLK_QC_T_INTERNAL	(1U << 31)
->   
->   static inline bool blk_qc_t_valid(blk_qc_t cookie)
->   {
-> -	return cookie != BLK_QC_T_NONE && cookie != BLK_QC_T_EAGAIN;
-> +	return cookie != BLK_QC_T_NONE;
->   }
->   
->   static inline unsigned int blk_qc_t_to_queue_num(blk_qc_t cookie)
-> 
+Because alloc_page_buffers() is called with size > PAGE_SIZE,
+thus it initializes head = NULL, skips the loop, return head;
+then create_empty_buffers() gets (and uses) the NULL pointer.
+
+This has been around longer than commit ad6bf88a6c19 ("block:
+fix an integer overflow in logical block size"); however, it
+increased the range of values that can trigger the issue.
+
+Previously only 8k/16k/32k (on x86/4k page size) would do it,
+as greater values overflow unsigned short to zero, and queue_
+logical_block_size() would then use the default of 512.
+
+Now the range with unsigned int is much larger, and one user
+with an (incorrect) 512k value, which happened to be zero'ed
+previously and work fine, hits the issue -- the zero is gone,
+and queue_logical_block_size() does return 512k (> PAGE_SIZE)
+
+Fix this for the general case in queue_logical_block_size(),
+regardless of the driver-side fault/fix, to prevent current
+and future issues, while drivers adjust to the right values.
+
+Test-case:
+
+    # IMG=/root/disk.img
+    # dd if=/dev/zero of=$IMG bs=1 count=0 seek=1G
+    # DEV=$(losetup --find --show $IMG)
+    # make-bcache --bdev $DEV --block 8k
+      < see dmesg >
+
+Before:
+
+    # uname -rv
+    5.7.0-rc7
+
+    [   55.944046] BUG: kernel NULL pointer dereference, address: 0000000000000000
+    ...
+    [   55.949742] CPU: 3 PID: 610 Comm: bcache-register Not tainted 5.7.0-rc7 #4
+    ...
+    [   55.952281] RIP: 0010:create_empty_buffers+0x1a/0x100
+    ...
+    [   55.966434] Call Trace:
+    [   55.967021]  create_page_buffers+0x48/0x50
+    [   55.967834]  block_read_full_page+0x49/0x380
+    [   55.972181]  do_read_cache_page+0x494/0x610
+    [   55.974780]  read_part_sector+0x2d/0xaa
+    [   55.975558]  read_lba+0x10e/0x1e0
+    [   55.977904]  efi_partition+0x120/0x5a6
+    [   55.980227]  blk_add_partitions+0x161/0x390
+    [   55.982177]  bdev_disk_changed+0x61/0xd0
+    [   55.982961]  __blkdev_get+0x350/0x490
+    [   55.983715]  __device_add_disk+0x318/0x480
+    [   55.984539]  bch_cached_dev_run+0xc5/0x270
+    [   55.986010]  register_bcache.cold+0x122/0x179
+    [   55.987628]  kernfs_fop_write+0xbc/0x1a0
+    [   55.988416]  vfs_write+0xb1/0x1a0
+    [   55.989134]  ksys_write+0x5a/0xd0
+    [   55.989825]  do_syscall_64+0x43/0x140
+    [   55.990563]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+    [   55.991519] RIP: 0033:0x7f7d60ba3154
+    ...
+
+After:
+
+    # uname -rv
+    5.7.0-rc7.chkpgsz1
+
+    [   46.313306] bcache: register_bdev() registered backing device loop0
+
+    # grep ^ /sys/block/bcache0/queue/*_block_size
+    /sys/block/bcache0/queue/logical_block_size:512
+    /sys/block/bcache0/queue/physical_block_size:8192
+
+Reported-by: Ryan Finnie <ryan@finnie.org>
+Reported-by: Sebastian Marsching <sebastian@marsching.com>
+Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+---
+ include/linux/blkdev.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 32868fbedc9e..fb9dfc8c7e68 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1297,7 +1297,8 @@ static inline unsigned queue_logical_block_size(const struct request_queue *q)
+ {
+ 	int retval = 512;
+ 
+-	if (q && q->limits.logical_block_size)
++	if (q && q->limits.logical_block_size &&
++		 q->limits.logical_block_size <= PAGE_SIZE)
+ 		retval = q->limits.logical_block_size;
+ 
+ 	return retval;
+-- 
+2.17.1
+
