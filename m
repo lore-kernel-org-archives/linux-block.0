@@ -2,87 +2,112 @@ Return-Path: <SRS0=F1yh=7P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EF5C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 21:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA247C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:35:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 662E620897
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 21:39:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591133964;
-	bh=CZ3tWKdReHovy4+PiN8qETj3xN00roFN4Fdq69Iju3k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OF4k8qpWz0nNstINA7ELGnyphuso9rglvmGyGagHB68bzGIzf8bDqPiyMu0yr7SQ6
-	 vf5rRSl2MMSRLBSic/dzZd9fSml+Rb0LAD3pSJVL8SMZy8KYdX2tNzKRXzDoLRN2En
-	 1KIeD/+/jViiAIpX6WkaUJu/4OxhpCYZhJfg2htw=
+	by mail.kernel.org (Postfix) with ESMTP id 7B2172072F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:35:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TCn3525h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728337AbgFBVjX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jun 2020 17:39:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727784AbgFBVjX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jun 2020 17:39:23 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3AF5720870;
-        Tue,  2 Jun 2020 21:39:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591133963;
-        bh=CZ3tWKdReHovy4+PiN8qETj3xN00roFN4Fdq69Iju3k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZlWCmV02nKvoT3ayPGLRXh16q6wUlhjyRD885mMnBhe6GBBBCsCQJ8lRbQS8WU3HH
-         O8yemse4UWKf6pVRr6hh0+rgj8THe/+bWjhGNQTWj2KTQzA9Uh7H1xaW21WS1hbuXI
-         75zavsDEFZAXXYTRYkFUnA6HJiWkNo2ohUMH5ZVo=
-Date:   Tue, 2 Jun 2020 14:39:21 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, Mike Snitzer <msnitzer@redhat.com>
-Subject: Re: [PATCH] block: fix an integer overflow in logical block size
-Message-ID: <20200602213921.GA229073@gmail.com>
-References: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
+        id S1728273AbgFBWf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jun 2020 18:35:27 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:59522 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726373AbgFBWf1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jun 2020 18:35:27 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052MW68P016387;
+        Tue, 2 Jun 2020 22:35:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=bD3UacLBwx+YKEs4eG5RaYbAiUcQOKlKnfWL01xaU9A=;
+ b=TCn3525h7WGw7GfyJPHuKzNJtBY7z9gkmJh4JZ7YshPYlLhL/IaPlZaAb8F1Hl071+y3
+ EMN3SZAqEotAzVU+85Pgtzgj0BKp/2acNXwhUmVUc3hVtSxR0B7oW2LRUTvGKBSUzqm9
+ 4yLJab0oVaETP351Tli+0ENjMWmuYiihsncTC1Z+B6yCyKAMJ9XV2eIBjdFLEHhI/CuA
+ RNfDleoMB6dGD+isZ6ytm0FrKOUKS6JSYATv2/qKhyxEXTxqmDjN5nIkCHHiik7ynuwz
+ ocGHmgj/WJXtR11P8rHADuGEkdFeE0TxchrBiFQ+qDETkI1I5wpyvEd6jmvOT/Zj64aH rQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 31bewqxe6t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 02 Jun 2020 22:35:16 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052MXwGD050538;
+        Tue, 2 Jun 2020 22:35:15 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 31c25q76gq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 02 Jun 2020 22:35:15 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 052MZCUo024602;
+        Tue, 2 Jun 2020 22:35:14 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 02 Jun 2020 15:35:12 -0700
+To:     yu kuai <yukuai3@huawei.com>
+Cc:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <martin.petersen@oracle.com>, <wenwen@cs.uga.edu>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+Subject: Re: [PATCH] block/bio-integrity: don't free 'buf' if
+ bio_integrity_add_page() failed
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1tuzt9k6w.fsf@ca-mkp.ca.oracle.com>
+References: <20200601123856.3895734-1-yukuai3@huawei.com>
+Date:   Tue, 02 Jun 2020 18:35:10 -0400
+In-Reply-To: <20200601123856.3895734-1-yukuai3@huawei.com> (yu kuai's message
+        of "Mon, 1 Jun 2020 20:38:56 +0800")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=5 spamscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006020157
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
+ phishscore=0 suspectscore=5 impostorscore=0 cotscore=-2147483648
+ lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006020157
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 15, 2020 at 08:35:25AM -0500, Mikulas Patocka wrote:
-> Logical block size has type unsigned short. That means that it can be at
-> most 32768. However, there are architectures that can run with 64k pages
-> (for example arm64) and on these architectures, it may be possible to
-> create block devices with 64k block size.
-> 
-> For exmaple (run this on an architecture with 64k pages):
-> # modprobe brd rd_size=1048576
-> # dmsetup create cache --table "0 `blockdev --getsize /dev/ram0` writecache s /dev/ram0 /dev/ram1 65536 0"
-> # mkfs.ext4 -b 65536 /dev/mapper/cache
-> # mount -t ext4 /dev/mapper/cache /mnt/test
-> 
-> Mount will fail with this error because it tries to read the superblock using 2-sector
-> access:
->   device-mapper: writecache: I/O is not aligned, sector 2, size 1024, block size 65536
->   EXT4-fs (dm-0): unable to read superblock
-> 
-> This patch changes the logical block size from unsigned short to unsigned
-> int to avoid the overflow.
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
-Mikulas, a question about this patch.  In crypt_io_hints() in
-drivers/md/dm-crypt.c there is:
+Hi Yu!
 
-       limits->logical_block_size =
-                max_t(unsigned short, limits->logical_block_size, cc->sector_size);
+I suggest a few minor wording tweaks to the commit message:
 
-Shouldn't that have been changed to 'unsigned int', now that
-limits->logical_block_size is 'unsigned int' rather than 'unsigned short'?
+> commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug") add
 
-- Eric
+s/add/added/
+
+> a kree() for 'buf' if bio_integrity_add_page() return '0'. However,
+> the
+
+s/kree/kfree/
+s/return/returns/
+
+> object will be freed in bio_integrity_free() since 'bio->bi_opf' and
+> 'bio->bi_integrity' was set previousy in bio_integrity_alloc().
+
+s/was/were/
+
+Otherwise OK.
+
+And like Ming pointed out, you may want to add a comment about the
+assertion that the first vec is valid.
+
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
