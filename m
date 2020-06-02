@@ -2,112 +2,91 @@ Return-Path: <SRS0=F1yh=7P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA247C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB84C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B2172072F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23473205CB
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 22:45:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TCn3525h"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="l7BGAYSJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728273AbgFBWf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jun 2020 18:35:27 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59522 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726373AbgFBWf1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jun 2020 18:35:27 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052MW68P016387;
-        Tue, 2 Jun 2020 22:35:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=bD3UacLBwx+YKEs4eG5RaYbAiUcQOKlKnfWL01xaU9A=;
- b=TCn3525h7WGw7GfyJPHuKzNJtBY7z9gkmJh4JZ7YshPYlLhL/IaPlZaAb8F1Hl071+y3
- EMN3SZAqEotAzVU+85Pgtzgj0BKp/2acNXwhUmVUc3hVtSxR0B7oW2LRUTvGKBSUzqm9
- 4yLJab0oVaETP351Tli+0ENjMWmuYiihsncTC1Z+B6yCyKAMJ9XV2eIBjdFLEHhI/CuA
- RNfDleoMB6dGD+isZ6ytm0FrKOUKS6JSYATv2/qKhyxEXTxqmDjN5nIkCHHiik7ynuwz
- ocGHmgj/WJXtR11P8rHADuGEkdFeE0TxchrBiFQ+qDETkI1I5wpyvEd6jmvOT/Zj64aH rQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 31bewqxe6t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 02 Jun 2020 22:35:16 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052MXwGD050538;
-        Tue, 2 Jun 2020 22:35:15 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 31c25q76gq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Jun 2020 22:35:15 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 052MZCUo024602;
-        Tue, 2 Jun 2020 22:35:14 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Jun 2020 15:35:12 -0700
-To:     yu kuai <yukuai3@huawei.com>
-Cc:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <martin.petersen@oracle.com>, <wenwen@cs.uga.edu>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
+        id S1728370AbgFBWpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jun 2020 18:45:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728294AbgFBWpA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jun 2020 18:45:00 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18599C08C5C1
+        for <linux-block@vger.kernel.org>; Tue,  2 Jun 2020 15:45:00 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id j1so14316pfe.4
+        for <linux-block@vger.kernel.org>; Tue, 02 Jun 2020 15:45:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=gw+oir9vsdQyfz85spkA2bDQZBuoJ7KvGUAxwG5MV1Q=;
+        b=l7BGAYSJdX8YnJAUsyKvom/jK+gebydLglTtY8cwmxlrejMoj4I1tpnmqh6WcCU1xt
+         HNBDo6kbhIyp+W15ltqWMxZd/jBTxnrh0LXWX/M7xmcoL1v6vf3Z2GYQsqrivpGUK/SQ
+         nHZcLQPLVFvCLuxOM+gNssMB3hTo/lb3xgnruvwKDMKK5G+bjWkr5ms1E60KnBn4BB6V
+         hbo1Z8w4+amp5YVwfAFpFWHcAtVyMv4MlL57rtgwT3BqFQpRBJVygid2ZxemFRG8dubu
+         jw7saUiaNO9zayf2b8IJKzofGqI7pG/rtJl6kbclBcuthMXwFVNg3cOjKUiA4JUt7rfd
+         EjoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gw+oir9vsdQyfz85spkA2bDQZBuoJ7KvGUAxwG5MV1Q=;
+        b=fQFkpyJ9BFJOGH21xstaRxb+KZQ4BpePIu/PvQEVQU083wwxlqTjOx00y06hlTqnKy
+         qYb3XLtXZT2w7VPs3fFRu0hODFaoPTLOI/g22HBaWxba0EsNAM1matMYo1PbWgXorJFm
+         r4jGYrLFZ5Sd4SqmVO3PRYI2xPKd2rlJqaozk36hq0/fK9qaNcFLrDtrvekBh2yVFmH4
+         0fmIZkz5GlROJvfL20WcrtVwz/9kWKVPQt4N6s2WysvEq8F4pefLJ3ONpazCuiHCbsY4
+         S0p9k3aOD97HjfTaQOopaowjQqPTCLKsYk3vvgl6s3F0wI+RikjQ0I+nhASVT5Dwugil
+         2JEQ==
+X-Gm-Message-State: AOAM531PKflZUOXNd3QPKEyWnjEb0+QspyHA4RkrcTIaOSbA4C+KgiI7
+        LKzFC8Fxm8PC5dN2r7YLKp1RPw==
+X-Google-Smtp-Source: ABdhPJyvpNttiPHEgxjCiHmykrhKYBCz7667Uw1QR6Vzecz0wrAlKr6MtSY5sFvsOut+/A4a4Ay5Ww==
+X-Received: by 2002:aa7:9e4e:: with SMTP id z14mr26404407pfq.227.1591137899395;
+        Tue, 02 Jun 2020 15:44:59 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h35sm81928pje.29.2020.06.02.15.44.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jun 2020 15:44:58 -0700 (PDT)
 Subject: Re: [PATCH] block/bio-integrity: don't free 'buf' if
  bio_integrity_add_page() failed
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1tuzt9k6w.fsf@ca-mkp.ca.oracle.com>
+To:     yu kuai <yukuai3@huawei.com>, ming.lei@redhat.com,
+        martin.petersen@oracle.com, wenwen@cs.uga.edu
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
 References: <20200601123856.3895734-1-yukuai3@huawei.com>
-Date:   Tue, 02 Jun 2020 18:35:10 -0400
-In-Reply-To: <20200601123856.3895734-1-yukuai3@huawei.com> (yu kuai's message
-        of "Mon, 1 Jun 2020 20:38:56 +0800")
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <9a4eb4b7-76f2-0b1c-c760-a09a76ee325a@kernel.dk>
+Date:   Tue, 2 Jun 2020 16:44:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=5 spamscore=0
- malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006020157
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
- phishscore=0 suspectscore=5 impostorscore=0 cotscore=-2147483648
- lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
- malwarescore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006020157
+In-Reply-To: <20200601123856.3895734-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-Hi Yu!
-
-I suggest a few minor wording tweaks to the commit message:
-
-> commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug") add
-
-s/add/added/
-
-> a kree() for 'buf' if bio_integrity_add_page() return '0'. However,
-> the
-
-s/kree/kfree/
-s/return/returns/
-
+On 6/1/20 6:38 AM, yu kuai wrote:
+> commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug") add a
+> kree() for 'buf' if bio_integrity_add_page() return '0'. However, the
 > object will be freed in bio_integrity_free() since 'bio->bi_opf' and
 > 'bio->bi_integrity' was set previousy in bio_integrity_alloc().
 
-s/was/were/
-
-Otherwise OK.
-
-And like Ming pointed out, you may want to add a comment about the
-assertion that the first vec is valid.
-
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+Applied, thanks.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
+
