@@ -2,87 +2,112 @@ Return-Path: <SRS0=F1yh=7P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D779C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AACC433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 08:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11532206A2
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A61E8206A2
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 08:01:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="yP+4LxNp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725835AbgFBHv2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jun 2020 03:51:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52438 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725819AbgFBHv2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jun 2020 03:51:28 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id B4E5BAB64;
-        Tue,  2 Jun 2020 07:51:28 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 09:51:24 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hare@suse.de,
-        ming.lei@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] blk-mq: get ctx in order to handle BLK_MQ_S_INACTIVE
- in blk_mq_get_tag()
-Message-ID: <20200602075124.3igsbsgbzf3varib@beryllium.lan>
-References: <20200602061749.32029-1-dongli.zhang@oracle.com>
+        id S1726184AbgFBIBe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jun 2020 04:01:34 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:60000 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725811AbgFBIBd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jun 2020 04:01:33 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0527uY1u088522;
+        Tue, 2 Jun 2020 08:01:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hxfcsqFFJfllZ2M4bcJmu85MukQ2QTy19xfU8ihmlac=;
+ b=yP+4LxNp9BykBqQNCtQkgojOF47zsIzMDQ+taKumcqlXNS21E46lD5cnaMh5J2Og0QCG
+ Aozuu6QuAh8Azen2R2FWmgwtqSG3ZoS49eodK+ErixVOikZgM9J9gcYpaYMG516mkxdT
+ 4fRDsgjElCvL26PVHzOYaYDI/nEuxn+1LgMxXbQoW84S5Ji2kqO9azmGQpoe9yKLrR7k
+ fwhfw3LW+fLpdbTN0PJ3nF50SgGrIXdgEryHYhbXJgquPC9SdAZFGAytpx+c0KUhxQ8m
+ nP+vNedgA40oYrqivZ7z8fdIYEikx9aH6PMjTkO1bT35IEEtE3akcQ/X2yQHTFvHD6BE xA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 31bfem2hdb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 02 Jun 2020 08:01:23 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0527vtAJ126069;
+        Tue, 2 Jun 2020 08:01:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 31c25n4ygb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 02 Jun 2020 08:01:23 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05281MLN028195;
+        Tue, 2 Jun 2020 08:01:22 GMT
+Received: from [192.168.0.110] (/183.246.144.78)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 02 Jun 2020 01:01:22 -0700
+Subject: Re: [PATCH] block/bio-integrity: don't free 'buf' if
+ bio_integrity_add_page() failed
+To:     yu kuai <yukuai3@huawei.com>, axboe@kernel.dk, ming.lei@redhat.com,
+        martin.petersen@oracle.com, wenwen@cs.uga.edu
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20200601123856.3895734-1-yukuai3@huawei.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <28b53354-7012-4559-943e-21526864dd10@oracle.com>
+Date:   Tue, 2 Jun 2020 16:01:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200602061749.32029-1-dongli.zhang@oracle.com>
+In-Reply-To: <20200601123856.3895734-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9639 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=2 spamscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006020051
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9639 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=2
+ mlxlogscore=999 priorityscore=1501 bulkscore=0 phishscore=0 clxscore=1011
+ impostorscore=0 adultscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006020051
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 01, 2020 at 11:17:49PM -0700, Dongli Zhang wrote:
-> When scheduler is set, we hit below page fault when we offline cpu.
+On 6/1/20 8:38 PM, yu kuai wrote:
+> commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug") add a
+> kree() for 'buf' if bio_integrity_add_page() return '0'. However, the
+> object will be freed in bio_integrity_free() since 'bio->bi_opf' and
+> 'bio->bi_integrity' was set previousy in bio_integrity_alloc().
 > 
-> [ 1061.007725] BUG: kernel NULL pointer dereference, address: 0000000000000040
-> [ 1061.008710] #PF: supervisor read access in kernel mode
-> [ 1061.009492] #PF: error_code(0x0000) - not-present page
-> [ 1061.010241] PGD 0 P4D 0
-> [ 1061.010614] Oops: 0000 [#1] SMP PTI
-> [ 1061.011130] CPU: 0 PID: 122 Comm: kworker/0:1H Not tainted 5.7.0-rc7+ #2'
-> ... ...
-> [ 1061.013760] Workqueue: kblockd blk_mq_run_work_fn
-> [ 1061.014446] RIP: 0010:blk_mq_put_tag+0xf/0x30
-> ... ...
-> [ 1061.017726] RSP: 0018:ffffa5c18037fc70 EFLAGS: 00010287
-> [ 1061.018475] RAX: 0000000000000000 RBX: ffffa5c18037fcf0 RCX: 0000000000000004
-> [ 1061.019507] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff911535dc1180
-> ... ...
-> [ 1061.028454] Call Trace:
-> [ 1061.029307]  blk_mq_get_tag+0x26e/0x280
-> [ 1061.029866]  ? wait_woken+0x80/0x80
-> [ 1061.030378]  blk_mq_get_driver_tag+0x99/0x110
-> [ 1061.031009]  blk_mq_dispatch_rq_list+0x107/0x5e0
-> [ 1061.031672]  ? elv_rb_del+0x1a/0x30
-> [ 1061.032178]  blk_mq_do_dispatch_sched+0xe2/0x130
-> [ 1061.032844]  __blk_mq_sched_dispatch_requests+0xcc/0x150
-> [ 1061.033638]  blk_mq_sched_dispatch_requests+0x2b/0x50
-> [ 1061.034239]  __blk_mq_run_hw_queue+0x75/0x110
-> [ 1061.034867]  process_one_work+0x15c/0x370
-> [ 1061.035450]  worker_thread+0x44/0x3d0
-> [ 1061.035980]  kthread+0xf3/0x130
-> [ 1061.036440]  ? max_active_store+0x80/0x80
-> [ 1061.037018]  ? kthread_bind+0x10/0x10
-> [ 1061.037554]  ret_from_fork+0x35/0x40
-> [ 1061.038073] Modules linked in:
-> [ 1061.038543] CR2: 0000000000000040
-> [ 1061.038962] ---[ end trace d20e1df7d028e69f ]---
+> Fixes: commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug")
+> Signed-off-by: yu kuai <yukuai3@huawei.com>> ---
+>  block/bio-integrity.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> This is because blk_mq_get_driver_tag() would be used to allocate tag once
-> scheduler (e.g., mq-deadline) is set. However, in order to handle
-> BLK_MQ_S_INACTIVE in blk_mq_get_tag(), we need to set data->ctx for
-> blk_mq_put_tag().
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index bf62c25cde8f..ae07dd78e951 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -278,7 +278,6 @@ bool bio_integrity_prep(struct bio *bio)
+>  
+>  		if (ret == 0) {
+>  			printk(KERN_ERR "could not attach integrity payload\n");
+> -			kfree(buf);
+>  			status = BLK_STS_RESOURCE;
+>  			goto err_end_io;
+>  		}
 > 
-> Fixes: bf0beec0607db3c6 ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+Looks good to me.
+Reviewed-by: Bob Liu <bob.liu@oracle.com>
+
