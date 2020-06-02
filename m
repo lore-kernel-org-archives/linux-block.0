@@ -4,104 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B6D8C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 15:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EF5C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 21:39:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBFD3206C3
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 15:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 662E620897
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 21:39:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591110638;
-	bh=Pgmebh21MiHoPm58nXFPJEqeFSbhIvnL8TyWXJx2Gq0=;
+	s=default; t=1591133964;
+	bh=CZ3tWKdReHovy4+PiN8qETj3xN00roFN4Fdq69Iju3k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=iOoxLZeNn8jldOpV8tSvMpA4Z5tIGAvqeUgqJL1qGxLLSg/9UtBMry1t1UKprLCsj
-	 /Uu88MEf3XWIxGLzGw6N9QOpATNd6RaTK+7FZCJUWQugt09CwlwRHy44JKhYRtOEkC
-	 O+qT+iblz64ZwoawqIzCecYvRMvelCxGpjDa18gg=
+	b=OF4k8qpWz0nNstINA7ELGnyphuso9rglvmGyGagHB68bzGIzf8bDqPiyMu0yr7SQ6
+	 vf5rRSl2MMSRLBSic/dzZd9fSml+Rb0LAD3pSJVL8SMZy8KYdX2tNzKRXzDoLRN2En
+	 1KIeD/+/jViiAIpX6WkaUJu/4OxhpCYZhJfg2htw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726000AbgFBPKi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jun 2020 11:10:38 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46609 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbgFBPKi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jun 2020 11:10:38 -0400
-Received: by mail-pl1-f194.google.com with SMTP id n2so1438348pld.13
-        for <linux-block@vger.kernel.org>; Tue, 02 Jun 2020 08:10:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pwv2Ql0InxKCmqySkl1LrmXVCQiGrBQdZLsznXTptg8=;
-        b=rvVYCilSLA4uM7fcPD5Qw+K+5gKaQjF8r8g6+/8EwwdUTsKqLpcLvXhv9Seyd7i5Hw
-         B2Z8KruBH3csC6A9OU/ReiYilp2BB0zig42WOh1CLDPzupjiC7grHjd2wOegoSOESiUK
-         V3VTG2/NAEQ39n9nw9U/gLo234dgxLnnEUYv4cE5zLwdf5c+fBUATU5DpaofrN0zhqrb
-         bHIuKctcZdaQPYDE52kLUpkZDv/qYDIZ1giTALX06aJYdQRSUv//ZxDMYv6+0vOO/v4N
-         kIZfkJjD6YCSIf47xJTaIRMsshEzZUYklR2o8cA5r1FFhnPK3bNfGqwOskT3tle9EP+s
-         xdVg==
-X-Gm-Message-State: AOAM531wWdFxpHgSDJ8tzaFP1GsRypeoDZ8UXWih+ujtOSxJPQELp6Yv
-        68NMaIYl6HtQFF4+tUwNGsY=
-X-Google-Smtp-Source: ABdhPJxeZoYUTjt7xdk1YWtavIISIKvOUrvAe6/Jmsf1W5G7dOij0e4x6DRTt4GQEihwdakASnc5lQ==
-X-Received: by 2002:a17:90a:7446:: with SMTP id o6mr1356903pjk.217.1591110636983;
-        Tue, 02 Jun 2020 08:10:36 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id a2sm2478889pgh.81.2020.06.02.08.10.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2020 08:10:34 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 6034040256; Tue,  2 Jun 2020 15:10:33 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 15:10:33 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, bvanassche@acm.org,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH] blktrace: Avoid sparse warnings when assigning
- q->blk_trace
-Message-ID: <20200602151033.GG13911@42.do-not-panic.com>
-References: <20200602071205.22057-1-jack@suse.cz>
- <20200602141734.GL11244@42.do-not-panic.com>
+        id S1728337AbgFBVjX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jun 2020 17:39:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53610 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727784AbgFBVjX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Jun 2020 17:39:23 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3AF5720870;
+        Tue,  2 Jun 2020 21:39:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591133963;
+        bh=CZ3tWKdReHovy4+PiN8qETj3xN00roFN4Fdq69Iju3k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZlWCmV02nKvoT3ayPGLRXh16q6wUlhjyRD885mMnBhe6GBBBCsCQJ8lRbQS8WU3HH
+         O8yemse4UWKf6pVRr6hh0+rgj8THe/+bWjhGNQTWj2KTQzA9Uh7H1xaW21WS1hbuXI
+         75zavsDEFZAXXYTRYkFUnA6HJiWkNo2ohUMH5ZVo=
+Date:   Tue, 2 Jun 2020 14:39:21 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, Mike Snitzer <msnitzer@redhat.com>
+Subject: Re: [PATCH] block: fix an integer overflow in logical block size
+Message-ID: <20200602213921.GA229073@gmail.com>
+References: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200602141734.GL11244@42.do-not-panic.com>
+In-Reply-To: <alpine.LRH.2.02.2001150833180.31494@file01.intranet.prod.int.rdu2.redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 02, 2020 at 02:17:34PM +0000, Luis Chamberlain wrote:
-> On Tue, Jun 02, 2020 at 09:12:05AM +0200, Jan Kara wrote:
-> > Here is version of my patch rebased on top of Luis' blktrace fixes. Luis, if
-> > the patch looks fine, can you perhaps include it in your series since it seems
-> > you'll do another revision of your series due to discussion over patch 5/7?
-> > Thanks!
+On Wed, Jan 15, 2020 at 08:35:25AM -0500, Mikulas Patocka wrote:
+> Logical block size has type unsigned short. That means that it can be at
+> most 32768. However, there are architectures that can run with 64k pages
+> (for example arm64) and on these architectures, it may be possible to
+> create block devices with 64k block size.
 > 
-> Sure thing, will throw in the pile.
+> For exmaple (run this on an architecture with 64k pages):
+> # modprobe brd rd_size=1048576
+> # dmsetup create cache --table "0 `blockdev --getsize /dev/ram0` writecache s /dev/ram0 /dev/ram1 65536 0"
+> # mkfs.ext4 -b 65536 /dev/mapper/cache
+> # mount -t ext4 /dev/mapper/cache /mnt/test
+> 
+> Mount will fail with this error because it tries to read the superblock using 2-sector
+> access:
+>   device-mapper: writecache: I/O is not aligned, sector 2, size 1024, block size 65536
+>   EXT4-fs (dm-0): unable to read superblock
+> 
+> This patch changes the logical block size from unsigned short to unsigned
+> int to avoid the overflow.
+> 
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
-I've updated the commit log as follows as well, as I think its important
-to annotate that the check for processing of the blktrace only makes
-sense if it was not set. Let me know if this is fine. The commit log
-is below.
+Mikulas, a question about this patch.  In crypt_io_hints() in
+drivers/md/dm-crypt.c there is:
 
-From: Jan Kara <jack@suse.cz>
-Date: Tue, 2 Jun 2020 09:12:05 +0200
-Subject: [PATCH 1/8] blktrace: Avoid sparse warnings when assigning
- q->blk_trace
+       limits->logical_block_size =
+                max_t(unsigned short, limits->logical_block_size, cc->sector_size);
 
-Mostly for historical reasons, q->blk_trace is assigned through xchg()
-and cmpxchg() atomic operations. Although this is correct, sparse
-complains about this because it violates rcu annotations since commit
-c780e86dd48e ("blktrace: Protect q->blk_trace with RCU") which started
-to use rcu for accessing q->blk_trace. Furthermore there's no real need
-for atomic operations anymore since all changes to q->blk_trace happen
-under q->blk_trace_mutex *and* since it also makes more sense to check
-if q->blk_trace is set with the mutex held *earlier* and this is now
-done through the patch titled "blktrace: break out on concurrent calls"
-and was already before on blk_trace_setup_queue().
+Shouldn't that have been changed to 'unsigned int', now that
+limits->logical_block_size is 'unsigned int' rather than 'unsigned short'?
 
-So let's just replace xchg() with rcu_replace_pointer() and cmpxchg()
-with explicit check and rcu_assign_pointer(). This makes the code more
-efficient and sparse happy.
-
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+- Eric
