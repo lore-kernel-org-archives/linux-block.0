@@ -2,98 +2,87 @@ Return-Path: <SRS0=F1yh=7P=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A1FC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D779C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 534A62077D
-	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:38:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYJ73ovo"
+	by mail.kernel.org (Postfix) with ESMTP id 11532206A2
+	for <linux-block@archiver.kernel.org>; Tue,  2 Jun 2020 07:51:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725907AbgFBHiL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Jun 2020 03:38:11 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22440 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726179AbgFBHiL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jun 2020 03:38:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591083490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HSlpXWkdenCoS8Vggi65kLvpKKRyegY2MHdYGB2V1Mg=;
-        b=fYJ73ovovLe82zJvMkvY5FH2k3RZUXzVMdCnAOqgR40bYzT0pWUNP7Cg5PwXUEaEgUxlJx
-        Wnm29Swad1zUogYDfIpH+alAO9H8XN0DuH2QAOmLi9iVdChXTxQDPrj7WSjkkLn+2AHrmU
-        tA3kYL+sJlJy+8+TM11aQ7i7h607OKg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-1miAQknoOuiCWtiUVJoR4A-1; Tue, 02 Jun 2020 03:38:04 -0400
-X-MC-Unique: 1miAQknoOuiCWtiUVJoR4A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D127107ACCA;
-        Tue,  2 Jun 2020 07:38:03 +0000 (UTC)
-Received: from T590 (ovpn-12-167.pek2.redhat.com [10.72.12.167])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE35478EF4;
-        Tue,  2 Jun 2020 07:37:56 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 15:37:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     yu kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com, wenwen@cs.uga.edu,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH] block/bio-integrity: don't free 'buf' if
- bio_integrity_add_page() failed
-Message-ID: <20200602073752.GB1384911@T590>
-References: <20200601123856.3895734-1-yukuai3@huawei.com>
+        id S1725835AbgFBHv2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Jun 2020 03:51:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52438 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725819AbgFBHv2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Jun 2020 03:51:28 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id B4E5BAB64;
+        Tue,  2 Jun 2020 07:51:28 +0000 (UTC)
+Date:   Tue, 2 Jun 2020 09:51:24 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hare@suse.de,
+        ming.lei@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] blk-mq: get ctx in order to handle BLK_MQ_S_INACTIVE
+ in blk_mq_get_tag()
+Message-ID: <20200602075124.3igsbsgbzf3varib@beryllium.lan>
+References: <20200602061749.32029-1-dongli.zhang@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200601123856.3895734-1-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200602061749.32029-1-dongli.zhang@oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 01, 2020 at 08:38:56PM +0800, yu kuai wrote:
-> commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug") add a
-> kree() for 'buf' if bio_integrity_add_page() return '0'. However, the
-> object will be freed in bio_integrity_free() since 'bio->bi_opf' and
-> 'bio->bi_integrity' was set previousy in bio_integrity_alloc().
+On Mon, Jun 01, 2020 at 11:17:49PM -0700, Dongli Zhang wrote:
+> When scheduler is set, we hit below page fault when we offline cpu.
 > 
-> Fixes: commit e7bf90e5afe3 ("block/bio-integrity: fix a memory leak bug")
-> Signed-off-by: yu kuai <yukuai3@huawei.com>
-> ---
->  block/bio-integrity.c | 1 -
->  1 file changed, 1 deletion(-)
+> [ 1061.007725] BUG: kernel NULL pointer dereference, address: 0000000000000040
+> [ 1061.008710] #PF: supervisor read access in kernel mode
+> [ 1061.009492] #PF: error_code(0x0000) - not-present page
+> [ 1061.010241] PGD 0 P4D 0
+> [ 1061.010614] Oops: 0000 [#1] SMP PTI
+> [ 1061.011130] CPU: 0 PID: 122 Comm: kworker/0:1H Not tainted 5.7.0-rc7+ #2'
+> ... ...
+> [ 1061.013760] Workqueue: kblockd blk_mq_run_work_fn
+> [ 1061.014446] RIP: 0010:blk_mq_put_tag+0xf/0x30
+> ... ...
+> [ 1061.017726] RSP: 0018:ffffa5c18037fc70 EFLAGS: 00010287
+> [ 1061.018475] RAX: 0000000000000000 RBX: ffffa5c18037fcf0 RCX: 0000000000000004
+> [ 1061.019507] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff911535dc1180
+> ... ...
+> [ 1061.028454] Call Trace:
+> [ 1061.029307]  blk_mq_get_tag+0x26e/0x280
+> [ 1061.029866]  ? wait_woken+0x80/0x80
+> [ 1061.030378]  blk_mq_get_driver_tag+0x99/0x110
+> [ 1061.031009]  blk_mq_dispatch_rq_list+0x107/0x5e0
+> [ 1061.031672]  ? elv_rb_del+0x1a/0x30
+> [ 1061.032178]  blk_mq_do_dispatch_sched+0xe2/0x130
+> [ 1061.032844]  __blk_mq_sched_dispatch_requests+0xcc/0x150
+> [ 1061.033638]  blk_mq_sched_dispatch_requests+0x2b/0x50
+> [ 1061.034239]  __blk_mq_run_hw_queue+0x75/0x110
+> [ 1061.034867]  process_one_work+0x15c/0x370
+> [ 1061.035450]  worker_thread+0x44/0x3d0
+> [ 1061.035980]  kthread+0xf3/0x130
+> [ 1061.036440]  ? max_active_store+0x80/0x80
+> [ 1061.037018]  ? kthread_bind+0x10/0x10
+> [ 1061.037554]  ret_from_fork+0x35/0x40
+> [ 1061.038073] Modules linked in:
+> [ 1061.038543] CR2: 0000000000000040
+> [ 1061.038962] ---[ end trace d20e1df7d028e69f ]---
 > 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index bf62c25cde8f..ae07dd78e951 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -278,7 +278,6 @@ bool bio_integrity_prep(struct bio *bio)
->  
->  		if (ret == 0) {
->  			printk(KERN_ERR "could not attach integrity payload\n");
-> -			kfree(buf);
->  			status = BLK_STS_RESOURCE;
->  			goto err_end_io;
->  		}
+> This is because blk_mq_get_driver_tag() would be used to allocate tag once
+> scheduler (e.g., mq-deadline) is set. However, in order to handle
+> BLK_MQ_S_INACTIVE in blk_mq_get_tag(), we need to set data->ctx for
+> blk_mq_put_tag().
+> 
+> Fixes: bf0beec0607db3c6 ("blk-mq: drain I/O when all CPUs in a hctx are offline")
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 
-Looks correct, and it relies on the fact the 1st 'page' is always added
-successfully, so 'buf' is always attached to the bip since then:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-
-thanks, 
-Ming
-
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
