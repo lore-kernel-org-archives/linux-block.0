@@ -4,189 +4,132 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB9FC433DF
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 11:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EF1C433DF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 12:00:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60D9C20772
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 11:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0C9C20738
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 12:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725926AbgFCLxu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 07:53:50 -0400
-Received: from verein.lst.de ([213.95.11.211]:50422 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725855AbgFCLxu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jun 2020 07:53:50 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A250A68B05; Wed,  3 Jun 2020 13:53:47 +0200 (CEST)
-Date:   Wed, 3 Jun 2020 13:53:47 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        John Garry <john.garry@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
- inactive hctx
-Message-ID: <20200603115347.GA8653@lst.de>
-References: <20200603105128.2147139-1-ming.lei@redhat.com>
+        id S1725884AbgFCMAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 08:00:42 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2270 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725833AbgFCMAl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jun 2020 08:00:41 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
+        by Forcepoint Email with ESMTP id 8ED93C327E73F3D3C7B3;
+        Wed,  3 Jun 2020 13:00:40 +0100 (IST)
+Received: from [127.0.0.1] (10.47.0.59) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Wed, 3 Jun 2020
+ 13:00:39 +0100
+Subject: Re: [PATCH 1/1] blk-mq: get ctx in order to handle BLK_MQ_S_INACTIVE
+ in blk_mq_get_tag()
+To:     Dongli Zhang <dongli.zhang@oracle.com>,
+        <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <hare@suse.de>, <dwagner@suse.de>,
+        <ming.lei@redhat.com>, <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20200602061749.32029-1-dongli.zhang@oracle.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <2114e1a8-253b-9ad7-0991-afc15df365bd@huawei.com>
+Date:   Wed, 3 Jun 2020 12:59:28 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200603105128.2147139-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200602061749.32029-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.0.59]
+X-ClientProxiedBy: lhreml735-chm.china.huawei.com (10.201.108.86) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 06:51:27PM +0800, Ming Lei wrote:
-> Commit bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-> prevents new request from being allocated on hctx which is going to be inactive,
-> meantime drains all in-queue requests.
+On 02/06/2020 07:17, Dongli Zhang wrote:
+> When scheduler is set, we hit below page fault when we offline cpu.
 > 
-> We needn't to prevent driver tag from being allocated during cpu hotplug, more
-> importantly we have to provide driver tag for requests, so that the cpu hotplug
-> handling can move on. blk_mq_get_tag() is shared for allocating both internal
-> tag and drive tag, so driver tag allocation may fail because the hctx is
-> marked as inactive.
+> [ 1061.007725] BUG: kernel NULL pointer dereference, address: 0000000000000040
+> [ 1061.008710] #PF: supervisor read access in kernel mode
+> [ 1061.009492] #PF: error_code(0x0000) - not-present page
+> [ 1061.010241] PGD 0 P4D 0
+> [ 1061.010614] Oops: 0000 [#1] SMP PTI
+> [ 1061.011130] CPU: 0 PID: 122 Comm: kworker/0:1H Not tainted 5.7.0-rc7+ #2'
+> ... ...
+> [ 1061.013760] Workqueue: kblockd blk_mq_run_work_fn
+> [ 1061.014446] RIP: 0010:blk_mq_put_tag+0xf/0x30
+> ... ...
+> [ 1061.017726] RSP: 0018:ffffa5c18037fc70 EFLAGS: 00010287
+> [ 1061.018475] RAX: 0000000000000000 RBX: ffffa5c18037fcf0 RCX: 0000000000000004
+> [ 1061.019507] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff911535dc1180
+> ... ...
+> [ 1061.028454] Call Trace:
+> [ 1061.029307]  blk_mq_get_tag+0x26e/0x280
+> [ 1061.029866]  ? wait_woken+0x80/0x80
+> [ 1061.030378]  blk_mq_get_driver_tag+0x99/0x110
+> [ 1061.031009]  blk_mq_dispatch_rq_list+0x107/0x5e0
+> [ 1061.031672]  ? elv_rb_del+0x1a/0x30
+> [ 1061.032178]  blk_mq_do_dispatch_sched+0xe2/0x130
+> [ 1061.032844]  __blk_mq_sched_dispatch_requests+0xcc/0x150
+> [ 1061.033638]  blk_mq_sched_dispatch_requests+0x2b/0x50
+> [ 1061.034239]  __blk_mq_run_hw_queue+0x75/0x110
+> [ 1061.034867]  process_one_work+0x15c/0x370
+> [ 1061.035450]  worker_thread+0x44/0x3d0
+> [ 1061.035980]  kthread+0xf3/0x130
+> [ 1061.036440]  ? max_active_store+0x80/0x80
+> [ 1061.037018]  ? kthread_bind+0x10/0x10
+> [ 1061.037554]  ret_from_fork+0x35/0x40
+> [ 1061.038073] Modules linked in:
+> [ 1061.038543] CR2: 0000000000000040
+> [ 1061.038962] ---[ end trace d20e1df7d028e69f ]---
 > 
-> Fix the issue by moving BLK_MQ_S_INACTIVE check to __blk_mq_alloc_request().
+> This is because blk_mq_get_driver_tag() would be used to allocate tag once
+> scheduler (e.g., mq-deadline) is set. 
 
-This looks correct, but a little ugly.  How about we resurrect my
-patch to split off blk_mq_get_driver_tag entirely?  Quick untested rebase
-below, still needs a better changelog and fixes tg:
+I tried mq-deadline and I did not see this. Anyway else special or 
+specific about your test?
 
----
-From e432011e2eb5ac7bd1046bbf936645e9f7b74e64 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Sat, 16 May 2020 08:03:48 +0200
-Subject: blk-mq: split out a __blk_mq_get_driver_tag helper
+However, I see other issues for that (setting the scheduler), that being 
+scsi timeouts when I start running IO and hotplugging CPUs. I should 
+have tested the scheduler != none previously for "blk-mq: improvement 
+CPU hotplug (simplified version) " series ...
 
-Allocation of the driver tag in the case of using a scheduler shares very
-little code with the "normal" tag allocation.  Split out a new helper to
-streamline this path, and untangle it from the complex normal tag
-allocation.
+I'll check Ming's patch "[PATCH] blk-mq: don't fail driver tag 
+allocation because of inactive hctx" for that.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-tag.c | 27 +++++++++++++++++++++++++++
- block/blk-mq-tag.h |  8 ++++++++
- block/blk-mq.c     | 29 -----------------------------
- block/blk-mq.h     |  1 -
- 4 files changed, 35 insertions(+), 30 deletions(-)
+Thanks,
+John
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 96a39d0724a29..cded7fdcad8ef 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -191,6 +191,33 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	return tag + tag_offset;
- }
- 
-+bool __blk_mq_get_driver_tag(struct request *rq)
-+{
-+	struct sbitmap_queue *bt = &rq->mq_hctx->tags->bitmap_tags;
-+	unsigned int tag_offset = rq->mq_hctx->tags->nr_reserved_tags;
-+	bool shared = blk_mq_tag_busy(rq->mq_hctx);
-+	int tag;
-+
-+	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
-+		bt = &rq->mq_hctx->tags->breserved_tags;
-+		tag_offset = 0;
-+	}
-+
-+	if (!hctx_may_queue(rq->mq_hctx, bt))
-+		return false;
-+	tag = __sbitmap_queue_get(bt);
-+	if (tag == BLK_MQ_NO_TAG)
-+		return false;
-+
-+	rq->tag = tag + tag_offset;
-+	if (shared) {
-+		rq->rq_flags |= RQF_MQ_INFLIGHT;
-+		atomic_inc(&rq->mq_hctx->nr_active);
-+	}
-+	rq->mq_hctx->tags->rqs[rq->tag] = rq;
-+	return true;
-+}
-+
- void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
- 		    unsigned int tag)
- {
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index d38e48f2a0a4a..2e4ef51cdb32a 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -51,6 +51,14 @@ enum {
- 	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
- };
- 
-+bool __blk_mq_get_driver_tag(struct request *rq);
-+static inline bool blk_mq_get_driver_tag(struct request *rq)
-+{
-+	if (rq->tag != BLK_MQ_NO_TAG)
-+		return true;
-+	return __blk_mq_get_driver_tag(rq);
-+}
-+
- extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
- extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9a36ac1c1fa1d..4f57d27bfa737 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1052,35 +1052,6 @@ static inline unsigned int queued_to_index(unsigned int queued)
- 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
- }
- 
--bool blk_mq_get_driver_tag(struct request *rq)
--{
--	struct blk_mq_alloc_data data = {
--		.q = rq->q,
--		.hctx = rq->mq_hctx,
--		.flags = BLK_MQ_REQ_NOWAIT,
--		.cmd_flags = rq->cmd_flags,
--	};
--	bool shared;
--
--	if (rq->tag != BLK_MQ_NO_TAG)
--		return true;
--
--	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
--		data.flags |= BLK_MQ_REQ_RESERVED;
--
--	shared = blk_mq_tag_busy(data.hctx);
--	rq->tag = blk_mq_get_tag(&data);
--	if (rq->tag >= 0) {
--		if (shared) {
--			rq->rq_flags |= RQF_MQ_INFLIGHT;
--			atomic_inc(&data.hctx->nr_active);
--		}
--		data.hctx->tags->rqs[rq->tag] = rq;
--	}
--
--	return rq->tag != BLK_MQ_NO_TAG;
--}
--
- static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 				int flags, void *key)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a139b06318174..b3ce0f3a2ad2a 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -44,7 +44,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
- void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
- 				bool kick_requeue_list);
- void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
--bool blk_mq_get_driver_tag(struct request *rq);
- struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_ctx *start);
- 
--- 
-2.26.2
+However, in order to handle
+> BLK_MQ_S_INACTIVE in blk_mq_get_tag(), we need to set data->ctx for
+> blk_mq_put_tag().
+> 
+> Fixes: bf0beec0607db3c6 ("blk-mq: drain I/O when all CPUs in a hctx are offline")
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+> This is based on for-next because currently the pull request for v5.8 is
+> not picked by mainline.
+> 
+>   block/blk-mq.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 9a36ac1c1fa1..8bf6c06a86c1 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1056,6 +1056,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+>   {
+>   	struct blk_mq_alloc_data data = {
+>   		.q = rq->q,
+> +		.ctx = rq->mq_ctx,
+>   		.hctx = rq->mq_hctx,
+>   		.flags = BLK_MQ_REQ_NOWAIT,
+>   		.cmd_flags = rq->cmd_flags,
+> 
 
