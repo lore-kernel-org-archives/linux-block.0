@@ -2,92 +2,134 @@ Return-Path: <SRS0=EWxa=7Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67812C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 08:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415EBC433E1
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 09:43:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43648206C3
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 08:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2305920734
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 09:43:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d2yCiQDs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725866AbgFCIfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 04:35:30 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46926 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbgFCIfa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jun 2020 04:35:30 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id C231AAC37;
-        Wed,  3 Jun 2020 08:35:31 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 040DB1E1281; Wed,  3 Jun 2020 10:35:28 +0200 (CEST)
-Date:   Wed, 3 Jun 2020 10:35:27 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        bvanassche@acm.org, Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH] blktrace: Avoid sparse warnings when assigning
- q->blk_trace
-Message-ID: <20200603083527.GF19165@quack2.suse.cz>
-References: <20200602071205.22057-1-jack@suse.cz>
- <20200602141734.GL11244@42.do-not-panic.com>
- <20200602151033.GG13911@42.do-not-panic.com>
+        id S1725877AbgFCJn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 05:43:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33287 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725854AbgFCJn4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jun 2020 05:43:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591177434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0ejvKMzUq+xku9IeAAQ+zuZnJBb22HYVMp9wWRBsj9o=;
+        b=d2yCiQDs7mab8R/tyBf9veci4mvDw1E+b5sQK896/UGP3BzRQbS5IFUl7Olbuf409T8Rhu
+        wg2fgdQTdt6lYgb2qkJPOQAZZwrftCw4TxCPSrDY82FKhO0wosDrhloFYkxS5KSpugrH+w
+        NGJZwodKu5QdM1VLiP1O/I2ysmB27fc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-lvq0zLflP2Gy_xxu-cNN6Q-1; Wed, 03 Jun 2020 05:43:52 -0400
+X-MC-Unique: lvq0zLflP2Gy_xxu-cNN6Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42AAD879513;
+        Wed,  3 Jun 2020 09:43:51 +0000 (UTC)
+Received: from localhost (ovpn-12-230.pek2.redhat.com [10.72.12.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C8B3711A9F6;
+        Wed,  3 Jun 2020 09:43:47 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH V5 0/6] blk-mq: support batching dispatch from scheduler
+Date:   Wed,  3 Jun 2020 17:43:31 +0800
+Message-Id: <20200603094337.2064181-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200602151033.GG13911@42.do-not-panic.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 02-06-20 15:10:33, Luis Chamberlain wrote:
-> On Tue, Jun 02, 2020 at 02:17:34PM +0000, Luis Chamberlain wrote:
-> > On Tue, Jun 02, 2020 at 09:12:05AM +0200, Jan Kara wrote:
-> > > Here is version of my patch rebased on top of Luis' blktrace fixes. Luis, if
-> > > the patch looks fine, can you perhaps include it in your series since it seems
-> > > you'll do another revision of your series due to discussion over patch 5/7?
-> > > Thanks!
-> > 
-> > Sure thing, will throw in the pile.
-> 
-> I've updated the commit log as follows as well, as I think its important
-> to annotate that the check for processing of the blktrace only makes
-> sense if it was not set. Let me know if this is fine. The commit log
-> is below.
+Hi Jens,
 
-Thanks! The changelog looks good to me.
+More and more drivers want to get batching requests queued from
+block layer, such as mmc[1], and tcp based storage drivers[2]. Also
+current in-tree users have virtio-scsi, virtio-blk and nvme.
 
-								Honza
+For none, we already support batching dispatch.
 
-> 
-> From: Jan Kara <jack@suse.cz>
-> Date: Tue, 2 Jun 2020 09:12:05 +0200
-> Subject: [PATCH 1/8] blktrace: Avoid sparse warnings when assigning
->  q->blk_trace
-> 
-> Mostly for historical reasons, q->blk_trace is assigned through xchg()
-> and cmpxchg() atomic operations. Although this is correct, sparse
-> complains about this because it violates rcu annotations since commit
-> c780e86dd48e ("blktrace: Protect q->blk_trace with RCU") which started
-> to use rcu for accessing q->blk_trace. Furthermore there's no real need
-> for atomic operations anymore since all changes to q->blk_trace happen
-> under q->blk_trace_mutex *and* since it also makes more sense to check
-> if q->blk_trace is set with the mutex held *earlier* and this is now
-> done through the patch titled "blktrace: break out on concurrent calls"
-> and was already before on blk_trace_setup_queue().
-> 
-> So let's just replace xchg() with rcu_replace_pointer() and cmpxchg()
-> with explicit check and rcu_assign_pointer(). This makes the code more
-> efficient and sparse happy.
-> 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+But for io scheduler, every time we just take one request from scheduler
+and pass the single request to blk_mq_dispatch_rq_list(). This way makes
+batching dispatch not possible when io scheduler is applied. One reason
+is that we don't want to hurt sequential IO performance, becasue IO
+merge chance is reduced if more requests are dequeued from scheduler
+queue.
+
+Tries to start the support by dequeuing more requests from scheduler
+if budget is enough and device isn't busy.
+
+Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
+
+Baolin has tested previous versions and found performance on MMC can be improved.
+
+Patch 1 ~ 4 are improvement and cleanup, which can't applied without
+supporting batching dispatch.
+
+Patch 5 ~ 6 starts to support batching dispatch from scheduler.
+
+
+
+[1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
+[2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
+
+V5:
+	- code style changes suggested by Damien
+
+V4:
+	- fix releasing budgets and avoids IO hang(5/6)
+	- dispatch more batches if the device can accept more(6/6)
+	- verified by running more tests
+
+V3:
+	- add reviewed-by tag
+	- fix one typo
+	- fix one budget leak issue in case that .queue_rq returned *_RESOURCE in 5/6
+
+V2:
+	- remove 'got_budget' from blk_mq_dispatch_rq_list
+	- drop patch for getting driver tag & handling partial dispatch
+
+
+Ming Lei (6):
+  blk-mq: pass request queue into get/put budget callback
+  blk-mq: pass hctx to blk_mq_dispatch_rq_list
+  blk-mq: move getting driver tag and budget into one helper
+  blk-mq: remove dead check from blk_mq_dispatch_rq_list
+  blk-mq: pass obtained budget count to blk_mq_dispatch_rq_list
+  blk-mq: support batching dispatch in case of io scheduler
+
+ block/blk-mq-sched.c    | 116 +++++++++++++++++++++++++++++++++++-----
+ block/blk-mq.c          | 110 +++++++++++++++++++++++--------------
+ block/blk-mq.h          |  15 +++---
+ drivers/scsi/scsi_lib.c |   8 ++-
+ include/linux/blk-mq.h  |   4 +-
+ 5 files changed, 182 insertions(+), 71 deletions(-)
+
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Baolin Wang <baolin.wang7@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.25.2
+
