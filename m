@@ -2,160 +2,148 @@ Return-Path: <SRS0=EWxa=7Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0E2C433DF
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 10:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6009DC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 11:33:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B20D2067B
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 10:51:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+psHK4M"
+	by mail.kernel.org (Postfix) with ESMTP id 3FE3A20679
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 11:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbgFCKvq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 06:51:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37990 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725828AbgFCKvq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jun 2020 06:51:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591181505;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ldgonZ2DlV7LRQByUlde8lyBCswR/fyiQiwPLedQAWc=;
-        b=e+psHK4MhFCHq0KFzwGjGueFbdYztCO0LHxLxlCYbZsvzdhj9SUOTLHiCuA4JnI6iy4Xk0
-        UcySb3/GpVz30hVXeCUrYsMkaggEsS60hC1w4IBR3hArHV6oqUoCAw7NLbtZ+V+IYLHqo3
-        eZWf6gs02x+3F1HNNuaVxd3l+1NoPXQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-9lD8V9pzOKyMTLiHQqEjRA-1; Wed, 03 Jun 2020 06:51:43 -0400
-X-MC-Unique: 9lD8V9pzOKyMTLiHQqEjRA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3CC2872FE4;
-        Wed,  3 Jun 2020 10:51:41 +0000 (UTC)
-Received: from localhost (ovpn-12-230.pek2.redhat.com [10.72.12.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 456FD5D9CD;
-        Wed,  3 Jun 2020 10:51:36 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        John Garry <john.garry@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH] blk-mq: don't fail driver tag allocation because of inactive hctx
-Date:   Wed,  3 Jun 2020 18:51:27 +0800
-Message-Id: <20200603105128.2147139-1-ming.lei@redhat.com>
+        id S1725882AbgFCLd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 07:33:29 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:47150 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725859AbgFCLd2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 07:33:28 -0400
+Received: from mail-ua1-f70.google.com ([209.85.222.70])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mauricio.oliveira@canonical.com>)
+        id 1jgReA-00026l-BH
+        for linux-block@vger.kernel.org; Wed, 03 Jun 2020 11:33:26 +0000
+Received: by mail-ua1-f70.google.com with SMTP id b6so995085uap.5
+        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 04:33:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=viWYkVa597+lkhfe/lqw69DI7OYxv7dleAG5yZlXtxg=;
+        b=VJFHG5qnEDTlEa4J/DgiGt+STXSuOV0dMHc8g6Yslyr47Cv7ZZsAQirsfI41d7M9Ku
+         kLPXcID/J82Q+XsJU0ELaLbt9HW9Oh87QWaM2D1chZNE2nMGPjt+nwCkOREc1IC7wqyO
+         J0qHk34KgWdpLuuUETHDUK8ldlWKZL+n7nk3eC5tW7m3b2lfbRpH6ulliBV4eSNjKKV2
+         v9qhZUu4td+A0ybotpi2lI+mMwNVIfs+z4QKnaWjfdyNWAA1+y2e6Ap87wq2dX8hCGDn
+         Q/8vvm/AMJ+C2cJAd/m5TgjKdzM4k3c/KuSrpSoaOLoW1FtIRbT3UkYSjmrhvOne4qH7
+         +9WQ==
+X-Gm-Message-State: AOAM530M0u40MWDACW3KEnEXYXyN1UsysFX4OuSmbd0XbBawykJ943C+
+        oHa+UrYyPI8SskYSlN2DGL7f7aB0OamdT4wYRzDSJYctIT6Y/yka3uv6QHq7wQ5wXZP1rjFbYMv
+        uwK3Qfxdk4eG+RbQZqIKOVYA/Pj08nRLoB5DMoC5NmXccU/zdQ3J3W5St
+X-Received: by 2002:a67:f982:: with SMTP id b2mr5105646vsq.202.1591184005346;
+        Wed, 03 Jun 2020 04:33:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2L95Hcwr+KERSxUoaVamz4ousfBtZICWCrSqLfm4qD2f/+vD8L2dRRmdvxOiqAxm7Nk0Gl2262x1kbsdsTv8=
+X-Received: by 2002:a67:f982:: with SMTP id b2mr5105631vsq.202.1591184005085;
+ Wed, 03 Jun 2020 04:33:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200601005520.420719-1-mfo@canonical.com> <20200601073440.GD1181806@T590>
+ <CAO9xwp0mibE5_cpq4qaGtJBMBbouUf+jmJEQv7jF5DiL71CCjg@mail.gmail.com>
+In-Reply-To: <CAO9xwp0mibE5_cpq4qaGtJBMBbouUf+jmJEQv7jF5DiL71CCjg@mail.gmail.com>
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+Date:   Wed, 3 Jun 2020 08:33:14 -0300
+Message-ID: <CAO9xwp07aQ_hDCS-MKwqy8h0w3ZyHwbeku2w6OussWO6wxKVhw@mail.gmail.com>
+Subject: Re: [PATCH] block: check for page size in queue_logical_block_size()
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-prevents new request from being allocated on hctx which is going to be inactive,
-meantime drains all in-queue requests.
+On Mon, Jun 1, 2020 at 10:47 AM Mauricio Faria de Oliveira
+<mfo@canonical.com> wrote:
+>
+> Hi Ming,
+>
+> (sorry, re-sending in plain text; previous reply had HTML by mistake,
+> and bounced in linux-block.)
+>
+> On Mon, Jun 1, 2020 at 4:34 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Sun, May 31, 2020 at 09:55:20PM -0300, Mauricio Faria de Oliveira wrote:
+> > > It's possible for a block driver to set logical block size to
+> > > a value greater than page size incorrectly; e.g. bcache takes
+> > > the value from the superblock, set by the user w/ make-bcache.
+> > >
+> > > This causes a BUG/NULL pointer dereference in the path:
+> > >
+> > >   __blkdev_get()
+> > >   -> set_init_blocksize() // set i_blkbits based on ...
+> > >      -> bdev_logical_block_size()
+> > >         -> queue_logical_block_size() // ... this value
+> > >   -> bdev_disk_changed()
+> > >      ...
+> > >      -> blkdev_readpage()
+> > >         -> block_read_full_page()
+> > >            -> create_page_buffers() // size = 1 << i_blkbits
+> > >               -> create_empty_buffers() // give size/take pointer
+> > >                  -> alloc_page_buffers() // return NULL
+> > >                  .. BUG!
+> > >
+> > > Because alloc_page_buffers() is called with size > PAGE_SIZE,
+> > > thus it initializes head = NULL, skips the loop, return head;
+> > > then create_empty_buffers() gets (and uses) the NULL pointer.
+> > >
+> > > This has been around longer than commit ad6bf88a6c19 ("block:
+> > > fix an integer overflow in logical block size"); however, it
+> > > increased the range of values that can trigger the issue.
+> > >
+> > > Previously only 8k/16k/32k (on x86/4k page size) would do it,
+> > > as greater values overflow unsigned short to zero, and queue_
+> > > logical_block_size() would then use the default of 512.
+> > >
+> > > Now the range with unsigned int is much larger, and one user
+> > > with an (incorrect) 512k value, which happened to be zero'ed
+> > > previously and work fine, hits the issue -- the zero is gone,
+> > > and queue_logical_block_size() does return 512k (> PAGE_SIZE)
+> >
+> > There is only very limited such potential users(loop, virtio-blk,
+> > xen-blkfront), so could you fix the user instead of working around
+> > queue_logical_block_size()?
+> >
+>
+> Thanks for reviewing.
+>
+> I can take a look at that, sure, but think the current approach may
+> still be useful? as it prevents the current, and future potential
+> users too.
+>
 
-We needn't to prevent driver tag from being allocated during cpu hotplug, more
-importantly we have to provide driver tag for requests, so that the cpu hotplug
-handling can move on. blk_mq_get_tag() is shared for allocating both internal
-tag and drive tag, so driver tag allocation may fail because the hctx is
-marked as inactive.
+Please disregard this patch.
 
-Fix the issue by moving BLK_MQ_S_INACTIVE check to __blk_mq_alloc_request().
+Giving this more thought, it's not a good idea to "prevent" any issues
+here -- that would actually mask them.
+It's probably better to let current issues break, to identify and fix
+them (e.g., this), and especially future issues, to hit/fix before
+landing.
 
-Cc: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Daniel Wagner <dwagner@suse.de>
-Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-tag.c |  8 --------
- block/blk-mq.c     | 27 ++++++++++++++++++++-------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+Thanks,
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 96a39d0724a2..762198b62088 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -180,14 +180,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	sbitmap_finish_wait(bt, ws, &wait);
- 
- found_tag:
--	/*
--	 * Give up this allocation if the hctx is inactive.  The caller will
--	 * retry on an active hctx.
--	 */
--	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state))) {
--		blk_mq_put_tag(tags, data->ctx, tag + tag_offset);
--		return BLK_MQ_NO_TAG;
--	}
- 	return tag + tag_offset;
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a98a19353461..c5acf4858abf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -347,6 +347,24 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	return rq;
- }
- 
-+static inline unsigned int blk_mq_get_request_tag(
-+		struct blk_mq_alloc_data *data)
-+{
-+	/*
-+	 * Waiting allocations only fail because of an inactive hctx.  In that
-+	 * case just retry the hctx assignment and tag allocation as CPU hotplug
-+	 * should have migrated us to an online CPU by now.
-+	 */
-+	int tag = blk_mq_get_tag(data);
-+	if (unlikely(test_bit(BLK_MQ_S_INACTIVE, &data->hctx->state) &&
-+				tag != BLK_MQ_NO_TAG)) {
-+		blk_mq_put_tag(blk_mq_tags_from_data(data), data->ctx, tag);
-+		tag = BLK_MQ_NO_TAG;
-+	}
-+
-+	return tag;
-+}
-+
- static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- {
- 	struct request_queue *q = data->q;
-@@ -381,12 +399,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL))
- 		blk_mq_tag_busy(data->hctx);
- 
--	/*
--	 * Waiting allocations only fail because of an inactive hctx.  In that
--	 * case just retry the hctx assignment and tag allocation as CPU hotplug
--	 * should have migrated us to an online CPU by now.
--	 */
--	tag = blk_mq_get_tag(data);
-+	tag = blk_mq_get_request_tag(data);
- 	if (tag == BLK_MQ_NO_TAG) {
- 		if (data->flags & BLK_MQ_REQ_NOWAIT)
- 			return NULL;
-@@ -480,7 +493,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 		blk_mq_tag_busy(data.hctx);
- 
- 	ret = -EWOULDBLOCK;
--	tag = blk_mq_get_tag(&data);
-+	tag = blk_mq_get_request_tag(&data);
- 	if (tag == BLK_MQ_NO_TAG)
- 		goto out_queue_exit;
- 	return blk_mq_rq_ctx_init(&data, tag, alloc_time_ns);
+> Cheers,
+>
+> > thanks,
+> > Ming
+> >
+>
+>
+> --
+> Mauricio Faria de Oliveira
+
+
+
 -- 
-2.25.2
-
+Mauricio Faria de Oliveira
