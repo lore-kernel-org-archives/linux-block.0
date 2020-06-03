@@ -6,61 +6,60 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6AFC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 18:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5018C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 21:32:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6F6B207F5
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 18:12:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BCAA2077D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 21:32:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726103AbgFCSMH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 14:12:07 -0400
-Received: from verein.lst.de ([213.95.11.211]:51702 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725821AbgFCSMH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jun 2020 14:12:07 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C2B3F68B05; Wed,  3 Jun 2020 20:12:03 +0200 (CEST)
-Date:   Wed, 3 Jun 2020 20:12:03 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
- inactive hctx
-Message-ID: <20200603181203.GA2032@lst.de>
-References: <20200603105128.2147139-1-ming.lei@redhat.com> <20200603115347.GA8653@lst.de> <20200603133608.GA2149752@T590>
+        id S1726034AbgFCVc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 17:32:27 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37896 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725961AbgFCVc0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 17:32:26 -0400
+Received: by mail-pl1-f193.google.com with SMTP id m7so1277832plt.5
+        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 14:32:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=VWd149gQHGAxsdrW+OPOlQzJKW8AB/B4FCCE/4vPSZYJZ5taFwsWT4OuTKJuxu+qhA
+         QYgn9+DwjKz+cV0wnCu3sXihZlxtYTv3SsgSQ6Xil4QPCAgmvEPmNHEQx6IL67XozYtW
+         qg0QRD6tJqN6hplkcJpEo9VI43gCWIjblbLS8bhbJOY7GpG8MrARNHzu+Rr6WN1jnCyw
+         r8HlBgceu0/t2MuqHXW9YTM0fuffYwBr/BRHFQUGsjF8j42F1dVH1uDqpoRGe2Op1MDS
+         HiRzLYRIblIJXRsbPr0M1FT9JrK0NraWlKGvxQ30sEb07va7vtFcoG/LjwkA2d66bLaj
+         697Q==
+X-Gm-Message-State: AOAM5303FSGDAyntzxxHWxd/Z5a8ZEuvp08m131v45Qduy3lSNIKPBqQ
+        Y1I+nHIQAU2ZBb8NVcABOe4=
+X-Google-Smtp-Source: ABdhPJwhW+uLI2cBK17pJ8rxtIn1WDpscu7FB5VWYfr5eEJwjpzwhKz920dbxZlwaLwIsgIOuubwZQ==
+X-Received: by 2002:a17:90a:f0d4:: with SMTP id fa20mr2149642pjb.160.1591219946281;
+        Wed, 03 Jun 2020 14:32:26 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:5409:1488:6d95:bdff? ([2601:647:4802:9070:5409:1488:6d95:bdff])
+        by smtp.gmail.com with ESMTPSA id f6sm2773150pfe.174.2020.06.03.14.32.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2020 14:32:25 -0700 (PDT)
+Subject: Re: [PATCH] block: remove the error argument to the
+ block_bio_complete tracepoint
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, hare@suse.com,
+        linux-nvme@lists.infradead.org
+References: <20200603051443.579748-1-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <a46c6fb4-1b0f-154c-4158-a05bb5891edd@grimberg.me>
+Date:   Wed, 3 Jun 2020 14:32:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200603133608.GA2149752@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200603051443.579748-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 09:36:08PM +0800, Ming Lei wrote:
-> > +bool __blk_mq_get_driver_tag(struct request *rq)
-> > +{
-> > +	struct sbitmap_queue *bt = &rq->mq_hctx->tags->bitmap_tags;
-> > +	unsigned int tag_offset = rq->mq_hctx->tags->nr_reserved_tags;
-> > +	bool shared = blk_mq_tag_busy(rq->mq_hctx);
-> 
-> Not necessary to add 'shared' which is just used once.
-
-blk_mq_tag_busy also increments active_queues, and the existing code
-does that before various early returns.  To keep the behavior as-is
-the call to blk_mq_tag_busy can't be moved around.
-
-> > +	int tag;
-> > +
-> > +	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
-> > +		bt = &rq->mq_hctx->tags->breserved_tags;
-> 
-> Too many rq->mq_hctx->tags, you can add one local variable to store it.
-
-Really just three of them.  And with a local variable confusing it with
-rq->mq_hctx->sched_tags becomes much easier.
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
