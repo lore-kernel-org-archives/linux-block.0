@@ -2,64 +2,123 @@ Return-Path: <SRS0=EWxa=7Q=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5018C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 21:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A211BC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:32:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BCAA2077D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 21:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EA7C207DA
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:32:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VUpMlsS8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726034AbgFCVc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 17:32:27 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:37896 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725961AbgFCVc0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 17:32:26 -0400
-Received: by mail-pl1-f193.google.com with SMTP id m7so1277832plt.5
-        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 14:32:26 -0700 (PDT)
+        id S1726039AbgFCXcP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 19:32:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbgFCXcO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 19:32:14 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B55C08C5C3
+        for <linux-block@vger.kernel.org>; Wed,  3 Jun 2020 16:32:14 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id b5so2479281pfp.9
+        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 16:32:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=mP7HDY2ZN5ivM9lomEi6uc16BWfE9HMAWk/tyOctczk=;
+        b=VUpMlsS8luWYC3XyHHaZc+nRVPBUhMgVRgY7r6ereTmxJ2CV63CmoY9G8LrGOkuSTQ
+         K47uNjixFZ1fYU9L0oHIXbtPGyL3X2bOpWgIhpXRvnlBLqW0qd3WjT492H4d1foUpJxP
+         H25ReL/ps5emEFx5QusYD9+rH0F1unUcjPs5k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=VWd149gQHGAxsdrW+OPOlQzJKW8AB/B4FCCE/4vPSZYJZ5taFwsWT4OuTKJuxu+qhA
-         QYgn9+DwjKz+cV0wnCu3sXihZlxtYTv3SsgSQ6Xil4QPCAgmvEPmNHEQx6IL67XozYtW
-         qg0QRD6tJqN6hplkcJpEo9VI43gCWIjblbLS8bhbJOY7GpG8MrARNHzu+Rr6WN1jnCyw
-         r8HlBgceu0/t2MuqHXW9YTM0fuffYwBr/BRHFQUGsjF8j42F1dVH1uDqpoRGe2Op1MDS
-         HiRzLYRIblIJXRsbPr0M1FT9JrK0NraWlKGvxQ30sEb07va7vtFcoG/LjwkA2d66bLaj
-         697Q==
-X-Gm-Message-State: AOAM5303FSGDAyntzxxHWxd/Z5a8ZEuvp08m131v45Qduy3lSNIKPBqQ
-        Y1I+nHIQAU2ZBb8NVcABOe4=
-X-Google-Smtp-Source: ABdhPJwhW+uLI2cBK17pJ8rxtIn1WDpscu7FB5VWYfr5eEJwjpzwhKz920dbxZlwaLwIsgIOuubwZQ==
-X-Received: by 2002:a17:90a:f0d4:: with SMTP id fa20mr2149642pjb.160.1591219946281;
-        Wed, 03 Jun 2020 14:32:26 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:5409:1488:6d95:bdff? ([2601:647:4802:9070:5409:1488:6d95:bdff])
-        by smtp.gmail.com with ESMTPSA id f6sm2773150pfe.174.2020.06.03.14.32.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2020 14:32:25 -0700 (PDT)
-Subject: Re: [PATCH] block: remove the error argument to the
- block_bio_complete tracepoint
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, hare@suse.com,
-        linux-nvme@lists.infradead.org
-References: <20200603051443.579748-1-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <a46c6fb4-1b0f-154c-4158-a05bb5891edd@grimberg.me>
-Date:   Wed, 3 Jun 2020 14:32:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=mP7HDY2ZN5ivM9lomEi6uc16BWfE9HMAWk/tyOctczk=;
+        b=n1TF/JA2zuxvYgdBR0FqarhrLZ7Acst5N9/jslYcRgfgRi1dlqEyngZDgSb3Ui3we0
+         RYMUCKhGMDyuJJzkgSpX8xMBELijuKcBHxPa3vuGDt/KjaeS/7n3ZuK6QZC+RmQCuON6
+         wSyqFkRRhK8DpcopQ6a2WT/Y0JPCfXyxZTAvGhcGTDIu3pKIQ1x2EJqRHSvDTT6SyrIB
+         YKc+S0tX8VKcweLSGuhk9ieRpUwUNM64vk4AR+ytB/RvRjMlg+GNK7ujf47ZihltfrTF
+         G3/V7r0ekd2zJ2v1PitCJ/w0jIqUU03YBs65Wflyu4UWEt3BzD5nhb7iRPsPz33rJN0L
+         6WgA==
+X-Gm-Message-State: AOAM532xAeFT8ydgmg38aHHHGTcTAWsSG1hYsJx6HYlHyCfV6KaWi30y
+        3z8qTIPZ9W5HIoL3yakN/p2x6g==
+X-Google-Smtp-Source: ABdhPJx7JrP50eeA2KfLnLeonR3ATTZL4fgn8xfVLKyPbfOSa9aQRBoHTRs7znIl54UHsuA1YKgyUQ==
+X-Received: by 2002:a63:6541:: with SMTP id z62mr1735576pgb.320.1591227133920;
+        Wed, 03 Jun 2020 16:32:13 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id x77sm2799667pfc.4.2020.06.03.16.32.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jun 2020 16:32:12 -0700 (PDT)
+From:   Kees Cook <keescook@chromium.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Joe Perches <joe@perches.com>,
+        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-mm@kvack.org, clang-built-linux@googlegroups.com
+Subject: [PATCH 04/10] rtlwifi: rtl8192cu: Remove uninitialized_var() usage
+Date:   Wed,  3 Jun 2020 16:31:57 -0700
+Message-Id: <20200603233203.1695403-5-keescook@chromium.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200603233203.1695403-1-keescook@chromium.org>
+References: <20200603233203.1695403-1-keescook@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <20200603051443.579748-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Using uninitialized_var() is dangerous as it papers over real bugs[1]
+(or can in the future), and suppresses unrelated compiler warnings (e.g.
+"unused variable"). If the compiler thinks it is uninitialized, either
+simply initialize the variable or make compiler changes. As a precursor
+to removing[2] this[3] macro[4], just initialize this variable to NULL,
+and avoid sending garbage by returning.
+
+[1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+[2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+[3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+[4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
+index f070f25bb735..5b071b70bc08 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
+@@ -592,7 +592,7 @@ static void _rtl92cu_init_chipn_one_out_ep_priority(struct ieee80211_hw *hw,
+ 						    bool wmm_enable,
+ 						    u8 queue_sel)
+ {
+-	u16 uninitialized_var(value);
++	u16 value;
+ 
+ 	switch (queue_sel) {
+ 	case TX_SELE_HQ:
+@@ -606,7 +606,7 @@ static void _rtl92cu_init_chipn_one_out_ep_priority(struct ieee80211_hw *hw,
+ 		break;
+ 	default:
+ 		WARN_ON(1); /* Shall not reach here! */
+-		break;
++		return;
+ 	}
+ 	_rtl92c_init_chipn_reg_priority(hw, value, value, value, value,
+ 					value, value);
+-- 
+2.25.1
+
