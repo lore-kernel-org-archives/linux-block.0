@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7978CC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3911C433EA
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:33:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 533682077D
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C062207DA
+	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YTEneSOL"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TU9flWAg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgFCXdO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 19:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55632 "EHLO
+        id S1726119AbgFCXd2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 19:33:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726189AbgFCXcV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 19:32:21 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD65FC0085C2
+        with ESMTP id S1726380AbgFCXcS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 19:32:18 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30767C00863D
         for <linux-block@vger.kernel.org>; Wed,  3 Jun 2020 16:32:18 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id m1so2703817pgk.1
+Received: by mail-pl1-x641.google.com with SMTP id bh7so1364577plb.11
         for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 16:32:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=3Hqe0fSnXDR9BQhToHGwDvWeXmOn6wXlTM1ZNtQBNo0=;
-        b=YTEneSOLG0G03VL7npO7bUdyovAOz/rWIhWyhFR63irmezy8TdYcAkK240HUiwVQWE
-         l1+wS3Zsf9sMrntm2h4pD25VpYQ6IwLesvsppd1RMdvcr3jcMToX3FgASNyJIcm+17M+
-         RgKR5xqROZSaXLSFW/JQA7YcOaR/t1jFVii4U=
+        bh=vlsGh/2A3yd9dyMlCDYBd0p4l1T5Oo7IaL6NTs2MBUk=;
+        b=TU9flWAg9FMH+Npku3SFev/YYK6vvYYCp6jsnIW2uRPdSGDM2UMjhH0to/RSt2mcu+
+         +tEJTAZqQ0UV4spAC//nbMEU4YZmc6CW1cgHcGYV50zllOcjZjx+9n/jCEKcVaB/68HX
+         WckrYbpJZIVMmdggrVZUzoJLKS1NezuTTfatg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3Hqe0fSnXDR9BQhToHGwDvWeXmOn6wXlTM1ZNtQBNo0=;
-        b=D97JOOA3vYLsgemAQnuit3yyO+ycmoRjmBFiSkoMHPhdvaUT5pCb6zCKtTrEIer70t
-         OUHn83hvTXSuF9O0BJ53EILv+AYv7pxQGnI+s7lLCxbNRRolF+tUfGrcbg0I04+87nT4
-         xe2M0qkl7oLeMdpDuY76HQgKOazTa3M2rBp20F+epB1fijtG6Jq8LTXgpGlWumxFZ8qa
-         qbJ63FNBIEXpv+aZH9NqutEmCvx9kA/pHb95jGzuFC5xA6ryC/6NGoMY7lq0ALohf+qK
-         7mcrBoljv6r4yXklzKB4e27KbU3FgJ0nsqUTTiQwZMA3pwQ0LbeFQeHJMKWg4x1Y0+Yc
-         riCg==
-X-Gm-Message-State: AOAM533EyGCT1Wvoxjejfso6IRB5ZMX1p+m6wOgd3LkZMELzroG5Phtd
-        /1V357nCHIjGKksXJ1mPrucNZw==
-X-Google-Smtp-Source: ABdhPJyfJH3U7PUxTmeWYwI+KnsyVJ3CXtEz238mctrUyUOZNrrAJx63byFxfj5FXVnOwJj3WTFGgg==
-X-Received: by 2002:a65:41c8:: with SMTP id b8mr1632114pgq.265.1591227138290;
-        Wed, 03 Jun 2020 16:32:18 -0700 (PDT)
+        bh=vlsGh/2A3yd9dyMlCDYBd0p4l1T5Oo7IaL6NTs2MBUk=;
+        b=BVhbyqDIQXzrAOUzb/0eO9DspVH2MiBjiZ9tuBYP7VAEoCaLV8JMSfQfMnXSteVcMA
+         EHU3dFlpzXw+zc4q83sq/NaWcH3s6xKqBtcl9cDAPomh9AHMPvKWO5qVK+ZImpDy3hrG
+         IYainfBTlOfyI2ubKdZsyOX/wVmsk3p/pzEaQitvKWh0vf6zuljxC9sG3zWxZk55iOz4
+         EpVzZD3b/bKbybGyYaw4FBwnfd2wQ4qOtxZbhdJkayqLl5SLj4emRshVDitPDESNo+as
+         Y1txiwSYYjwZT3g/IcMEqUZWGVYD/igesUuUEVUtF3xN5iP2mQYFBoEnaLxeG/e6TmgC
+         y4Wg==
+X-Gm-Message-State: AOAM530w2ZXIFoSFa68H8U2wnjdpm6GP6cRWYMcVBZhL/fRZ6eKeRfu6
+        5U8JSlvlya+e1jD1QI/cJiGPsg==
+X-Google-Smtp-Source: ABdhPJyBu+lQtrGYhp3WZ7ZyvY1X8s9WoOeJvHWXF5Ulh61p00d2PYdWCaVGKn3LkWqTOEtrYGlBGw==
+X-Received: by 2002:a17:902:aa0c:: with SMTP id be12mr2119692plb.241.1591227137753;
+        Wed, 03 Jun 2020 16:32:17 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l3sm3402369pju.43.2020.06.03.16.32.14
+        by smtp.gmail.com with ESMTPSA id b1sm3836817pjc.33.2020.06.03.16.32.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 03 Jun 2020 16:32:16 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -67,13 +67,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
         linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 05/10] ide: Remove uninitialized_var() usage
-Date:   Wed,  3 Jun 2020 16:31:58 -0700
-Message-Id: <20200603233203.1695403-6-keescook@chromium.org>
+Subject: [PATCH 06/10] clk: st: Remove uninitialized_var() usage
+Date:   Wed,  3 Jun 2020 16:31:59 -0700
+Message-Id: <20200603233203.1695403-7-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200603233203.1695403-1-keescook@chromium.org>
 References: <20200603233203.1695403-1-keescook@chromium.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -87,9 +88,10 @@ simply initialize the variable or make compiler changes. As a precursor
 to removing[2] this[3] macro[4], just remove this variable since it was
 actually unused:
 
-drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-variable]
-        unsigned long uninitialized_var(flags);
-                                        ^
+drivers/clk/st/clkgen-fsyn.c: In function ‘quadfs_set_rate’:
+drivers/clk/st/clkgen-fsyn.c:793:6: warning: unused variable ‘i’ [-Wunused-variable]
+  793 |  int i;
+      |      ^
 
 [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
 [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
@@ -98,21 +100,21 @@ drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-va
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/ide/ide-taskfile.c | 1 -
+ drivers/clk/st/clkgen-fsyn.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/drivers/ide/ide-taskfile.c b/drivers/ide/ide-taskfile.c
-index aab6a10435b6..a26f85ab58a9 100644
---- a/drivers/ide/ide-taskfile.c
-+++ b/drivers/ide/ide-taskfile.c
-@@ -229,7 +229,6 @@ void ide_pio_bytes(ide_drive_t *drive, struct ide_cmd *cmd,
- 	ide_hwif_t *hwif = drive->hwif;
- 	struct scatterlist *sg = hwif->sg_table;
- 	struct scatterlist *cursg = cmd->cursg;
--	unsigned long uninitialized_var(flags);
- 	struct page *page;
- 	unsigned int offset;
- 	u8 *buf;
+diff --git a/drivers/clk/st/clkgen-fsyn.c b/drivers/clk/st/clkgen-fsyn.c
+index a156bd0c6af7..f1adc858b590 100644
+--- a/drivers/clk/st/clkgen-fsyn.c
++++ b/drivers/clk/st/clkgen-fsyn.c
+@@ -790,7 +790,6 @@ static int quadfs_set_rate(struct clk_hw *hw, unsigned long rate,
+ 	struct st_clk_quadfs_fsynth *fs = to_quadfs_fsynth(hw);
+ 	struct stm_fs params;
+ 	long hwrate;
+-	int uninitialized_var(i);
+ 
+ 	if (!rate || !parent_rate)
+ 		return -EINVAL;
 -- 
 2.25.1
 
