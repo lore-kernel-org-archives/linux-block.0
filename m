@@ -2,121 +2,173 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E699C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C7AC433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F2272067B
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E12B9207D0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="evhiSuNK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eTUIYqIr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729763AbgFDUZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 16:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
+        id S1728717AbgFDUZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 16:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729782AbgFDUZ3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:25:29 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D733C08C5C5
+        with ESMTP id S1729797AbgFDUZa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:25:30 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EB8C08C5C7
         for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 13:25:29 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id k11so7513258ejr.9
+Received: by mail-pj1-x1041.google.com with SMTP id q24so1721803pjd.1
         for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 13:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wp1xYo6k4Ed0Q77xnwXh8flp1gyMGXgNyJfMwsgW+Kg=;
-        b=evhiSuNKpPTp+xlYhHPUN38Ox9A/NzzEV4h1KCTaNexej2sn7dmxexT5wPV6QE9RGz
-         8s+clTM3p1CcSW8UaFOs+qvckgUkMZCWKQTkyDHU6S/fz724e8Vq0r4vnPsuXTIqOTMo
-         ImpLlbekhGKaz1aCRFpAKp2RoYziWLrVBv+kPju1pOuBuubQ+yvuGmBZxTi0FgAL/xGs
-         bstbfB866bgWjvF5BP1/Gb+lQVOxGlNCNdLiVkaiEjXFC1758lqtSdf2UsrBgT3xnK84
-         kIqKVoUgb2UoS9fHTo26sqjDx8ivjPSW9RvxOOS99pfOPNahG8izNyr51/w+pRl6e4bJ
-         3R5Q==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TblIMkzhKEVNZyPa1dQf8kFQ+MgYlpgsesY6pOK1xME=;
+        b=eTUIYqIrq5sxbgWQO/3JauOnTYpVr1lxYINDt5nKOAMkJOKF9ufyGFqb5XSmsRi3m+
+         Uksx9+kJJ0xBVvvMTZtWdGvFYckH9URWghdJ/VSzZBwwBmizmaE949JntUM6qTfFIrip
+         3zzyVfVtH7B2Lzj4WQ8kAWj65+Txwm/2hs5XFlhCKdRU1uedTRsD04P49ZgSRY5QBLTc
+         CQBCbVHZuVCB29pP2Co0mZAOf0TgkJUljtb0VB8CHI8VhuigYp30PE+r/D7MHanlVYxK
+         BKS8ooZdHaU0PWi8nTHb08bOMRG7dMr/qLVaTlH87DKKqIpufZxi7ZRUHWNmW4PpK4km
+         2vlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wp1xYo6k4Ed0Q77xnwXh8flp1gyMGXgNyJfMwsgW+Kg=;
-        b=DqEsGcQVUuRaQ0TSZ/3bkLTkqjZOBs3vJAxQ86549TvTDUkEBHEY+5G6exEMNpg077
-         tfzuP3u7GUC4BFGA3zuKj0Y1Ys6qxXtUSgl5yozpdH46St+r7PkHQxO7mVHzWSBg2RqE
-         8mEGlZZoAeSSBxDDHvAfxt3OHXXA5lk7LVlqT449wp2O97mjgr6bicV2pnMnLtjpep3N
-         p+xDdUFzXnIWQ0uNrNsPU9nCc+I442o9BQEfWQY+Wn5zw26CE+Dl2CuFcRe56vBdaGbQ
-         /CxU7UaukIcQNKxh3j0uWD3e/kFkh7PpcmMD5XgfnPR/7+nUAKOn0vCeo3rrXm9iHObb
-         V9oQ==
-X-Gm-Message-State: AOAM531hwccVHPPt9KgU0dAoVFX0Zb31cnGsbPgiBmGqAH55wju3z6PS
-        XB20ffqKIzxOAcFenJkCIVNuzQ==
-X-Google-Smtp-Source: ABdhPJy0rnfMZ1ArAXpFdTF1Mqx8GK4Oc26nrumSGoUgDRR2u9udOp68JVQC+ShGFy3J/lNOJiw52w==
-X-Received: by 2002:a17:906:3844:: with SMTP id w4mr5771829ejc.313.1591302327676;
-        Thu, 04 Jun 2020 13:25:27 -0700 (PDT)
-Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
-        by smtp.gmail.com with ESMTPSA id gx8sm2792246ejb.86.2020.06.04.13.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 13:25:26 -0700 (PDT)
-From:   Martijn Coenen <maco@android.com>
-To:     axboe@kernel.dk, hch@lst.de, naresh.kamboju@linaro.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Martijn Coenen <maco@android.com>
-Subject: [PATCH] loop: Fix wrong masking of status flags
-Date:   Thu,  4 Jun 2020 22:25:20 +0200
-Message-Id: <20200604202520.66459-1-maco@android.com>
-X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TblIMkzhKEVNZyPa1dQf8kFQ+MgYlpgsesY6pOK1xME=;
+        b=Jp5sEXe/byEmCP+R9QMnIehTa1PtQS7ep/C8ZLjYkXga2nxGgyWOJcljaLOLrgph+x
+         RHrgU6+/VGEsKx1iSLRPu2aovSoFRC+xKNsH5hM3hpsNa1F+APv9O14ZwLaMDroFjBIw
+         IdzwnQBFHHHt+2eDTl263E5pHd9LHfsnpHag71+E7rXkzzTRVGScDsXbj5d6P8dQrFlF
+         mPbfkbws6CCR5ViOV9MwR1VmFsjO5gMGveBxhi6JnwaIdm7lPssy58534tB26pVqURC4
+         XGt1DtuVA7detLxaga/MTZN2uEyY2224cFrEEQx0RlDu2MmNDHGvukb0fbdrbI+v4sgr
+         39cA==
+X-Gm-Message-State: AOAM5306HvxD8bo1/lpqj6Zj9w2aZq/vtZDcENYAJUf7liwYpz+4YAH8
+        csBciMK3EALlOcgo5zMhs0QtBrpZPuQyEuJf4E+nwg==
+X-Google-Smtp-Source: ABdhPJzjhN/4pCp12TIV+9JXZmAnmqzfEHd9/r8jgURCikDTNzP/FuiRKg13zAi0ZiROLKM3I1SNYAlTdBzPgSsKmW0=
+X-Received: by 2002:a17:902:341:: with SMTP id 59mr6129425pld.119.1591302328252;
+ Thu, 04 Jun 2020 13:25:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200603233203.1695403-1-keescook@chromium.org>
+ <20200603233203.1695403-4-keescook@chromium.org> <CAKwvOdnNuFySqAMk7s_cXqFM=dPX4JfvqNVLCuj90Gn4tzciAw@mail.gmail.com>
+ <202006041316.A15D952@keescook>
+In-Reply-To: <202006041316.A15D952@keescook>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 4 Jun 2020 13:25:16 -0700
+Message-ID: <CAKwvOdk9e19MqJNhGYV5mJisLOcjK+ba2sYzLgf7cvNerqNuwA@mail.gmail.com>
+Subject: Re: [PATCH 03/10] b43: Remove uninitialized_var() usage
+To:     Kees Cook <keescook@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Joe Perches <joe@perches.com>,
+        Andy Whitcroft <apw@canonical.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        b43-dev@lists.infradead.org,
+        Network Development <netdev@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-spi@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In faf1d25440d6, loop_set_status() now assigns lo_status directly from
-the passed in lo_flags, but then fixes it up by masking out flags that
-can't be set by LOOP_SET_STATUS; unfortunately the mask was negated.
+On Thu, Jun 4, 2020 at 1:18 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Thu, Jun 04, 2020 at 01:08:44PM -0700, Nick Desaulniers wrote:
+> > On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
+> > >
+> > > Using uninitialized_var() is dangerous as it papers over real bugs[1]
+> > > (or can in the future), and suppresses unrelated compiler warnings (e.g.
+> > > "unused variable"). If the compiler thinks it is uninitialized, either
+> > > simply initialize the variable or make compiler changes. As a precursor
+> > > to removing[2] this[3] macro[4], just initialize this variable to NULL,
+> > > and make the (unreachable!) code do a conditional test.
+> > >
+> > > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+> > > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+> > > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+> > > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+> > >
+> > > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > > ---
+> > >  drivers/net/wireless/broadcom/b43/phy_n.c | 10 +++++++---
+> > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
+> > > index d3c001fa8eb4..88cdcea10d61 100644
+> > > --- a/drivers/net/wireless/broadcom/b43/phy_n.c
+> > > +++ b/drivers/net/wireless/broadcom/b43/phy_n.c
+> > > @@ -4222,7 +4222,7 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
+> >
+> > The TODOs and `#if 0` in this function are concerning.  It looks like
+> > `rf_pwr_offset_table` is only used when `phy->rev` is >=7 && < 19.
+> >
+> > Further, the loop has a case for `phy->rev >= 19` but we would have
+> > returned earlier if that was the case.
 
-Re-ran all ltp ioctl_loop tests, and they all passed.
+oh, and there's an early return for `phy->rev < 3` I just noticed.
 
-Pass run of the previously failing one:
+>
+> Yeah, that's why I put the "(unreachable!)" note in the commit log. ;)
 
-tst_test.c:1247: INFO: Timeout per run is 0h 05m 00s
-tst_device.c:88: INFO: Found free device 0 '/dev/loop0'
-ioctl_loop01.c:49: PASS: /sys/block/loop0/loop/partscan = 0
-ioctl_loop01.c:50: PASS: /sys/block/loop0/loop/autoclear = 0
-ioctl_loop01.c:51: PASS: /sys/block/loop0/loop/backing_file =
-'/tmp/ZRJ6H4/test.img'
-ioctl_loop01.c:65: PASS: get expected lo_flag 12
-ioctl_loop01.c:67: PASS: /sys/block/loop0/loop/partscan = 1
-ioctl_loop01.c:68: PASS: /sys/block/loop0/loop/autoclear = 1
-ioctl_loop01.c:77: PASS: access /dev/loop0p1 succeeds
-ioctl_loop01.c:83: PASS: access /sys/block/loop0/loop0p1 succeeds
+I don't think that note is correct.
 
-Summary:
-passed   8
-failed   0
-skipped  0
-warnings 0
+>
+> >
+> > >         u32 rfpwr_offset;
+> > >         u8 pga_gain, pad_gain;
+> > >         int i;
+> > > -       const s16 *uninitialized_var(rf_pwr_offset_table);
+> > > +       const s16 *rf_pwr_offset_table = NULL;
+> > >
+> > >         table = b43_nphy_get_tx_gain_table(dev);
+> > >         if (!table)
+> > > @@ -4256,9 +4256,13 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
+> > >                         pga_gain = (table[i] >> 24) & 0xf;
+> > >                         pad_gain = (table[i] >> 19) & 0x1f;
+> > >                         if (b43_current_band(dev->wl) == NL80211_BAND_2GHZ)
+> > > -                               rfpwr_offset = rf_pwr_offset_table[pad_gain];
+> > > +                               rfpwr_offset = rf_pwr_offset_table
+> > > +                                               ? rf_pwr_offset_table[pad_gain]
+> > > +                                               : 0;
+> > >                         else
+> > > -                               rfpwr_offset = rf_pwr_offset_table[pga_gain];
+> > > +                               rfpwr_offset = rf_pwr_offset_table
+> > > +                                               ? rf_pwr_offset_table[pga_gain]
+> > > +                                               : 0;
+> >
+> >
+> > The code is trying to check `phy->rev >= 7 && phy->rev < 19` once
+> > before the loop, then set `rf_pwr_offset_table`, so having another
+> > conditional on `rf_pwr_offset_table` in the loop is unnecessary. I'm
+> > ok with initializing it to `NULL`, but I'm not sure the conditional
+> > check is necessary.  Do you get a compiler warning otherwise?
+>
+> I mean, sort of the best thing to do is just remove nearly everything
+> here since it's actually unreachable. But it is commented as "when
 
-Fixes: faf1d25440d6 ("loop: Clean up LOOP_SET_STATUS lo_flags handling")
-Signed-off-by: Martijn Coenen <maco@android.com>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This code is reachable. Consider `phy->rev >= 7 && phy->rev < 19`.  If
+`rf_pwr_offset_table` was NULL, it would have returned early on L4246,
+so the checks added in this patch are unnecessary.  Forgive me if
+there's some other control flow I'm not considering.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 4212288ab157..ad63e4247868 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1390,7 +1390,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		goto out_unfreeze;
- 
- 	/* Mask out flags that can't be set using LOOP_SET_STATUS. */
--	lo->lo_flags &= ~LOOP_SET_STATUS_SETTABLE_FLAGS;
-+	lo->lo_flags &= LOOP_SET_STATUS_SETTABLE_FLAGS;
- 	/* For those flags, use the previous values instead */
- 	lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_SETTABLE_FLAGS;
- 	/* For flags that can't be cleared, use previous values too */
+> supported ..." etc, so I figured I'd leave it. As part of that I didn't
+> want to leave any chance of a NULL deref, so I added the explicit tests
+> just for robustness.
+>
+> *shrug*
 -- 
-2.27.0.278.ge193c7cf3a9-goog
-
+Thanks,
+~Nick Desaulniers
