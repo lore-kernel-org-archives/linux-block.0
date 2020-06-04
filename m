@@ -2,125 +2,84 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EE9C433E2
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 17:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFF9C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:04:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 855E4207D8
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 17:58:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dp1MW0oL"
+	by mail.kernel.org (Postfix) with ESMTP id 24D522077D
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:04:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591297446;
+	bh=eulf8YWx/Madi2SxQ2AuCbVjnYllknbaJpYGNL3tLwM=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=MINAcb1ZECZDUWsxLgglOQkJjWv7/OIhT20n+o00X0B6pY7+LQejpxapgzQVRCGsM
+	 BDaoo1PPUd6+w7xe9ffWYNqmUd4PZsajFmwMaq0oR1PDRrF6CIhdSMVYgMivymUDl/
+	 1DM7y9MGHBfZNfXgPkyYFQuxpctf2wyyTipsb8Nw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730382AbgFDR6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 13:58:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57556 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730326AbgFDR6B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 13:58:01 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D124C08C5C3
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 10:58:01 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id g28so7030643qkl.0
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 10:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ylFM7xcrRPttXnSFsxxMsniM496bjo9TahOp0BQ4KWQ=;
-        b=dp1MW0oLsIVpf8P1GqlJ7ywKbTALgi380UyzwJhLZxxjLZbExXSS3+DNraBRJx+RxA
-         2YNRIqPWKCJwUAt2Ionyk91M424aXFCth771TTbwhKuAi/5z09C6/Wr39Wytw6IFYat4
-         ROGMU+gTfjKOfKx/KnMfK4lHl61/+H90NG+NU9ft1Ad329Ugd8oNWQRmnDyTDrH84VcG
-         NHqJ/pa7Z8WtA7tv5ssR9OBolcmhh/Z0Chu/DqhjQRZD68jbMjVitMLn9/18eeVfDBtl
-         W6iFo32dBc0/Xz9TBC1xS9lWFSwriSPTsiMKkjJI2/Fy1v0kJA0h8NiDLZa3m0zxOiRF
-         iMLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ylFM7xcrRPttXnSFsxxMsniM496bjo9TahOp0BQ4KWQ=;
-        b=b8M0DsIaQb3ncLyTIHPZsPrwxtWgQsDbuG9JtSdCcfweOz5kvrAPdtc+oiURxSyUlb
-         VEIdSnwWEgrcBcQsePDcV8MSmpm63AgumwZwJcJkBlLAwkQox5d6pPcvtXcuVVe7HQom
-         crnJn66UxYYJQblVWjHqqy6MaD/Z37yNizDyZdUN8uZs9/meEfhsKjXMqj8tZDIrsc8h
-         Xe7vxNWAt963+UW5xd8iIzZPS3g3oJKWHWK9MSmBVMfk3f+NgMH5B5IMRNdXgQBVin11
-         p8/o8Gv2QJY6pAlhUpgnCrZ7O+rhoNOrnih/koRbZ42+3ZxnSxxdLfDcuSjZkWiJV/Hz
-         YPkw==
-X-Gm-Message-State: AOAM533qY2FdghfrjUjB6OjVMTXMwwEER+Xr3duTS2JO8bp8sr6HRxOH
-        gqaYOHPshTiOU9TAovohAy8Z/Q==
-X-Google-Smtp-Source: ABdhPJzYt2lslt13YiEsonKEZ+jBx4HFt1d65mCYXH6vxqHPQIS81ppOdKBUfUx77lLK8R8poNgzug==
-X-Received: by 2002:ae9:ebd2:: with SMTP id b201mr5788109qkg.409.1591293480332;
-        Thu, 04 Jun 2020 10:58:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id t43sm5788444qtj.85.2020.06.04.10.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 10:57:59 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.93)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jgu7r-001H95-GE; Thu, 04 Jun 2020 14:57:59 -0300
-Date:   Thu, 4 Jun 2020 14:57:59 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 09/10] treewide: Remove uninitialized_var() usage
-Message-ID: <20200604175759.GQ6578@ziepe.ca>
-References: <20200603233203.1695403-1-keescook@chromium.org>
- <20200603233203.1695403-10-keescook@chromium.org>
- <20200604132306.GO6578@ziepe.ca>
- <202006040757.0DFC3F28E@keescook>
+        id S1729284AbgFDTEF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 15:04:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33676 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728967AbgFDTEE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Jun 2020 15:04:04 -0400
+Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BBF17206C3;
+        Thu,  4 Jun 2020 19:04:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591297443;
+        bh=eulf8YWx/Madi2SxQ2AuCbVjnYllknbaJpYGNL3tLwM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=h/RVHQI4PXglXk0M2xhL6qwhLDoqz7/50ASkfljg46CDbi0KUi9z27WnbcxAXvdxr
+         yyrwgBKw9IkjJu3OoMnnLx1SyjsGcnXTpD/LhPejIGS0WtiUxSX6/mz3UXrvEBUXEi
+         Dp2lH0Ism1XCs6Kbhg+szqPDx4YVqHBDqFd8vtAY=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] dm crypt: avoid truncating the logical block size
+Date:   Thu,  4 Jun 2020 12:01:26 -0700
+Message-Id: <20200604190126.15735-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202006040757.0DFC3F28E@keescook>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 07:59:40AM -0700, Kees Cook wrote:
-> On Thu, Jun 04, 2020 at 10:23:06AM -0300, Jason Gunthorpe wrote:
-> > On Wed, Jun 03, 2020 at 04:32:02PM -0700, Kees Cook wrote:
-> > > Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> > > (or can in the future), and suppresses unrelated compiler warnings
-> > > (e.g. "unused variable"). If the compiler thinks it is uninitialized,
-> > > either simply initialize the variable or make compiler changes.
-> > > 
-> > > I preparation for removing[2] the[3] macro[4], remove all remaining
-> > > needless uses with the following script:
-> > > 
-> > > git grep '\buninitialized_var\b' | cut -d: -f1 | sort -u | \
-> > > 	xargs perl -pi -e \
-> > > 		's/\buninitialized_var\(([^\)]+)\)/\1/g;
-> > > 		 s:\s*/\* (GCC be quiet|to make compiler happy) \*/$::g;'
-> > > 
-> > > drivers/video/fbdev/riva/riva_hw.c was manually tweaked to avoid
-> > > pathological white-space.
-> > > 
-> > > No outstanding warnings were found building allmodconfig with GCC 9.3.0
-> > > for x86_64, i386, arm64, arm, powerpc, powerpc64le, s390x, mips, sparc64,
-> > > alpha, and m68k.
-> > 
-> > At least in the infiniband part I'm confident that old gcc versions
-> > will print warnings after this patch.
-> > 
-> > As the warnings are wrong, do we care? Should old gcc maybe just -Wno-
-> > the warning?
-> 
-> I *think* a lot of those are from -Wmaybe-uninitialized, but Linus just
-> turned that off unconditionally in v5.7:
-> 78a5255ffb6a ("Stop the ad-hoc games with -Wno-maybe-initialized")
+From: Eric Biggers <ebiggers@google.com>
 
-Yah, that alone is justification enough to do this purge.
+queue_limits::logical_block_size got changed from unsigned short to
+unsigned int, but it was forgotten to update crypt_io_hints() to use the
+new type.  Fix it.
 
-Jason
+Fixes: ad6bf88a6c19 ("block: fix an integer overflow in logical block size")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/md/dm-crypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 3df90daba89e..a1dcb8675484 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -3274,7 +3274,7 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
+ 	limits->max_segment_size = PAGE_SIZE;
+ 
+ 	limits->logical_block_size =
+-		max_t(unsigned short, limits->logical_block_size, cc->sector_size);
++		max_t(unsigned, limits->logical_block_size, cc->sector_size);
+ 	limits->physical_block_size =
+ 		max_t(unsigned, limits->physical_block_size, cc->sector_size);
+ 	limits->io_min = max_t(unsigned, limits->io_min, cc->sector_size);
+-- 
+2.27.0.278.ge193c7cf3a9-goog
+
