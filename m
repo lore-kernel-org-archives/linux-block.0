@@ -2,124 +2,121 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F454C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E699C433E1
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C34F206E6
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:20:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F2272067B
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jAmWlkIQ"
+	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="evhiSuNK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgFDUUD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 16:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51372 "EHLO
+        id S1729763AbgFDUZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 16:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726774AbgFDUUC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:20:02 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509EBC08C5C2
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 13:20:02 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id a45so2495943pje.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 13:20:02 -0700 (PDT)
+        with ESMTP id S1729782AbgFDUZ3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:25:29 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D733C08C5C5
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 13:25:29 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id k11so7513258ejr.9
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 13:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gz66RqxXF5KGuRHQ0GYBuygtpEJiPzNI0sTLh4Vu69Y=;
-        b=jAmWlkIQJZzKdLIy24SnHWINuzTVOS3/wjvm2cU2AFi5wGPpwqQkjWfOwBraDHgs8k
-         bMHElbdbRxBbtC27xZm6mEe99uDc96pKouYmbV/dc0+e2MIiE2jcwrdVq98w16mgeguV
-         2DhLtfyu1wmL1bs6o/3S7BQ/OXA9/tFItMGTU=
+        d=android.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wp1xYo6k4Ed0Q77xnwXh8flp1gyMGXgNyJfMwsgW+Kg=;
+        b=evhiSuNKpPTp+xlYhHPUN38Ox9A/NzzEV4h1KCTaNexej2sn7dmxexT5wPV6QE9RGz
+         8s+clTM3p1CcSW8UaFOs+qvckgUkMZCWKQTkyDHU6S/fz724e8Vq0r4vnPsuXTIqOTMo
+         ImpLlbekhGKaz1aCRFpAKp2RoYziWLrVBv+kPju1pOuBuubQ+yvuGmBZxTi0FgAL/xGs
+         bstbfB866bgWjvF5BP1/Gb+lQVOxGlNCNdLiVkaiEjXFC1758lqtSdf2UsrBgT3xnK84
+         kIqKVoUgb2UoS9fHTo26sqjDx8ivjPSW9RvxOOS99pfOPNahG8izNyr51/w+pRl6e4bJ
+         3R5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gz66RqxXF5KGuRHQ0GYBuygtpEJiPzNI0sTLh4Vu69Y=;
-        b=XBuBp8JP3G1AsNQruW62Jb+KzC+OheHXwo/dD0PrfvqYJu3D+C7xYhKSlqZh7eUSkI
-         qToNPnJuSBERz3zT8E2dvm6UJO3AOdoVolaTXvp3erznYpGehUZARgqee6Y/yDbjr8Ar
-         O0qQcUygF2KJ97sZwMTkadoCZBiQLhWqJieCYGTmbs8KRxeGyWW/x3CHeASxeyIbSwyJ
-         rVC3EOtOp4oIujaiJPzvWQlGPzeUkNHDUvHYhznD6zyaL7Ntz+gf86+T7PfajB0SsBg8
-         sAlJNNfUQGfzvblUbwIuTb8meDDCzTSAL9vjRjMAj3cURq7wvUVN1FN3yF2vHl2qiGnb
-         Yn5w==
-X-Gm-Message-State: AOAM531Sb+F7mL3i8SMEMUDpk0C5pzyM6Ld61lWUksLVfmHFUtFg+Sl0
-        ffTsj77jJuqSf+/yf9C3CzabXA==
-X-Google-Smtp-Source: ABdhPJxkV30NNQPml+L5dx48JHt30SosyvH9CeJOsvPeKMxl1Di1uyDaJOg4t+7npffgj0Ki2XTH3Q==
-X-Received: by 2002:a17:90a:7043:: with SMTP id f61mr7838452pjk.140.1591302001916;
-        Thu, 04 Jun 2020 13:20:01 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id g17sm1432553pju.11.2020.06.04.13.20.00
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wp1xYo6k4Ed0Q77xnwXh8flp1gyMGXgNyJfMwsgW+Kg=;
+        b=DqEsGcQVUuRaQ0TSZ/3bkLTkqjZOBs3vJAxQ86549TvTDUkEBHEY+5G6exEMNpg077
+         tfzuP3u7GUC4BFGA3zuKj0Y1Ys6qxXtUSgl5yozpdH46St+r7PkHQxO7mVHzWSBg2RqE
+         8mEGlZZoAeSSBxDDHvAfxt3OHXXA5lk7LVlqT449wp2O97mjgr6bicV2pnMnLtjpep3N
+         p+xDdUFzXnIWQ0uNrNsPU9nCc+I442o9BQEfWQY+Wn5zw26CE+Dl2CuFcRe56vBdaGbQ
+         /CxU7UaukIcQNKxh3j0uWD3e/kFkh7PpcmMD5XgfnPR/7+nUAKOn0vCeo3rrXm9iHObb
+         V9oQ==
+X-Gm-Message-State: AOAM531hwccVHPPt9KgU0dAoVFX0Zb31cnGsbPgiBmGqAH55wju3z6PS
+        XB20ffqKIzxOAcFenJkCIVNuzQ==
+X-Google-Smtp-Source: ABdhPJy0rnfMZ1ArAXpFdTF1Mqx8GK4Oc26nrumSGoUgDRR2u9udOp68JVQC+ShGFy3J/lNOJiw52w==
+X-Received: by 2002:a17:906:3844:: with SMTP id w4mr5771829ejc.313.1591302327676;
+        Thu, 04 Jun 2020 13:25:27 -0700 (PDT)
+Received: from maco2.ams.corp.google.com (a83-162-234-235.adsl.xs4all.nl. [83.162.234.235])
+        by smtp.gmail.com with ESMTPSA id gx8sm2792246ejb.86.2020.06.04.13.25.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 13:20:01 -0700 (PDT)
-Date:   Thu, 4 Jun 2020 13:20:00 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org,
-        Network Development <netdev@vger.kernel.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-spi@vger.kernel.org,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH 05/10] ide: Remove uninitialized_var() usage
-Message-ID: <202006041318.B0EA9059C7@keescook>
-References: <20200603233203.1695403-1-keescook@chromium.org>
- <20200603233203.1695403-6-keescook@chromium.org>
- <CAKwvOdm5zDide5RuppY_jG=r46=UMdVJBrkBqD5x=dOMTG9cZg@mail.gmail.com>
+        Thu, 04 Jun 2020 13:25:26 -0700 (PDT)
+From:   Martijn Coenen <maco@android.com>
+To:     axboe@kernel.dk, hch@lst.de, naresh.kamboju@linaro.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Martijn Coenen <maco@android.com>
+Subject: [PATCH] loop: Fix wrong masking of status flags
+Date:   Thu,  4 Jun 2020 22:25:20 +0200
+Message-Id: <20200604202520.66459-1-maco@android.com>
+X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdm5zDide5RuppY_jG=r46=UMdVJBrkBqD5x=dOMTG9cZg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 12:29:17PM -0700, Nick Desaulniers wrote:
-> On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> > (or can in the future), and suppresses unrelated compiler warnings (e.g.
-> > "unused variable"). If the compiler thinks it is uninitialized, either
-> > simply initialize the variable or make compiler changes. As a precursor
-> > to removing[2] this[3] macro[4], just remove this variable since it was
-> > actually unused:
-> >
-> > drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-variable]
-> >         unsigned long uninitialized_var(flags);
-> >                                         ^
-> >
-> > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
-> >
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> 
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+In faf1d25440d6, loop_set_status() now assigns lo_status directly from
+the passed in lo_flags, but then fixes it up by masking out flags that
+can't be set by LOOP_SET_STATUS; unfortunately the mask was negated.
 
-Thanks for the reviews!
+Re-ran all ltp ioctl_loop tests, and they all passed.
 
-> Fixes ce1e518190ea ("ide: don't disable interrupts during kmap_atomic()")
+Pass run of the previously failing one:
 
-I originally avoided adding Fixes tags because I didn't want these
-changes backported into a -stable without -Wmaybe-uninitialized
-disabled, but in these cases (variable removal), that actually does make
-sense. Thanks!
+tst_test.c:1247: INFO: Timeout per run is 0h 05m 00s
+tst_device.c:88: INFO: Found free device 0 '/dev/loop0'
+ioctl_loop01.c:49: PASS: /sys/block/loop0/loop/partscan = 0
+ioctl_loop01.c:50: PASS: /sys/block/loop0/loop/autoclear = 0
+ioctl_loop01.c:51: PASS: /sys/block/loop0/loop/backing_file =
+'/tmp/ZRJ6H4/test.img'
+ioctl_loop01.c:65: PASS: get expected lo_flag 12
+ioctl_loop01.c:67: PASS: /sys/block/loop0/loop/partscan = 1
+ioctl_loop01.c:68: PASS: /sys/block/loop0/loop/autoclear = 1
+ioctl_loop01.c:77: PASS: access /dev/loop0p1 succeeds
+ioctl_loop01.c:83: PASS: access /sys/block/loop0/loop0p1 succeeds
 
--Kees
+Summary:
+passed   8
+failed   0
+skipped  0
+warnings 0
 
+Fixes: faf1d25440d6 ("loop: Clean up LOOP_SET_STATUS lo_flags handling")
+Signed-off-by: Martijn Coenen <maco@android.com>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 4212288ab157..ad63e4247868 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1390,7 +1390,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		goto out_unfreeze;
+ 
+ 	/* Mask out flags that can't be set using LOOP_SET_STATUS. */
+-	lo->lo_flags &= ~LOOP_SET_STATUS_SETTABLE_FLAGS;
++	lo->lo_flags &= LOOP_SET_STATUS_SETTABLE_FLAGS;
+ 	/* For those flags, use the previous values instead */
+ 	lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_SETTABLE_FLAGS;
+ 	/* For flags that can't be cleared, use previous values too */
 -- 
-Kees Cook
+2.27.0.278.ge193c7cf3a9-goog
+
