@@ -2,281 +2,259 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E97C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 10:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1C9C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 11:26:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 488D820829
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 10:45:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591267555;
-	bh=7HIqpsm0tm+2XExfq0AzdkL8CefjTuY4JD+t1WaHJ4Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OQ2IHmOz+31fEBzxzz9R3vobhSAqqYpJO3Y54RoxF6aJ7ju64umjQFImqnS5i15VN
-	 zsM2tKWEvt3YpLbkZX598HU2+8a6uxAjNbOIhdSn2LJJEQe3kJQeYrwO02DMBNYi82
-	 vJgVHMjmGQtTEOEWbj5x9LKCCUXilVStXfJMqj1k=
+	by mail.kernel.org (Postfix) with ESMTP id 6CE63206E6
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 11:26:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWEnyTiJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725881AbgFDKpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 06:45:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45386 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725854AbgFDKpx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Jun 2020 06:45:53 -0400
-Received: from localhost (unknown [213.57.247.131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726061AbgFDL0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 07:26:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55456 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbgFDL0e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 07:26:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591269991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZPWS+UtP47C4ALN3uPjM5A67Vzk2WPgiT6vScl99CKc=;
+        b=GWEnyTiJem1zkOf4txe57yetPyOTV4z8XOSblRh5WOzlKNU7Fif+yqRN8nEvXqyKRtxqdE
+        nvHkcyMA/Qzia528CjhK8cRHa7use9GgqF8sYfAwtBqLEpPyeoEoVx2Vxf0HlD398mB9VT
+        gLbyRRxfRdsQXLZp1GK4eSI/fiMQSZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-MrknvYw3MJWZkvbBkSIg2w-1; Thu, 04 Jun 2020 07:26:28 -0400
+X-MC-Unique: MrknvYw3MJWZkvbBkSIg2w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0ADEF206A2;
-        Thu,  4 Jun 2020 10:45:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591267552;
-        bh=7HIqpsm0tm+2XExfq0AzdkL8CefjTuY4JD+t1WaHJ4Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nXIxctdaDUfVJdM+aVx4FqqdFME3BCC7lIl7cnNWHBv+Ri7byDCS4FFYYUN6Ee9x6
-         Z1bV+VEf2rZESvfw5OOW4VO+j4l7ZmhyfBLlgMR7rWLCtPVrCC1bEr6rIYpehp+eNL
-         h2ZQ25FifK80ZDfBN33Btek9OiE549FI31YqnKcA=
-Date:   Thu, 4 Jun 2020 13:45:49 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 09/10] treewide: Remove uninitialized_var() usage
-Message-ID: <20200604104549.GC8834@unreal>
-References: <20200603233203.1695403-1-keescook@chromium.org>
- <20200603233203.1695403-10-keescook@chromium.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ECBC1883600;
+        Thu,  4 Jun 2020 11:26:27 +0000 (UTC)
+Received: from T590 (ovpn-12-27.pek2.redhat.com [10.72.12.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3C187CCC4;
+        Thu,  4 Jun 2020 11:26:20 +0000 (UTC)
+Date:   Thu, 4 Jun 2020 19:26:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
+ inactive hctx
+Message-ID: <20200604112615.GA2336493@T590>
+References: <20200603105128.2147139-1-ming.lei@redhat.com>
+ <20200603115347.GA8653@lst.de>
+ <20200603133608.GA2149752@T590>
+ <6b58e473-16a4-4ce2-a4ac-50b952d364d7@huawei.com>
+ <6fbd3669-4358-6d9f-5c94-e1bc7acecb86@oracle.com>
+ <b37b1f30-722b-4767-0627-103b94c7421c@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200603233203.1695403-10-keescook@chromium.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b37b1f30-722b-4767-0627-103b94c7421c@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 04:32:02PM -0700, Kees Cook wrote:
-> Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> (or can in the future), and suppresses unrelated compiler warnings
-> (e.g. "unused variable"). If the compiler thinks it is uninitialized,
-> either simply initialize the variable or make compiler changes.
->
-> I preparation for removing[2] the[3] macro[4], remove all remaining
-> needless uses with the following script:
->
-> git grep '\buninitialized_var\b' | cut -d: -f1 | sort -u | \
-> 	xargs perl -pi -e \
-> 		's/\buninitialized_var\(([^\)]+)\)/\1/g;
-> 		 s:\s*/\* (GCC be quiet|to make compiler happy) \*/$::g;'
->
-> drivers/video/fbdev/riva/riva_hw.c was manually tweaked to avoid
-> pathological white-space.
->
-> No outstanding warnings were found building allmodconfig with GCC 9.3.0
-> for x86_64, i386, arm64, arm, powerpc, powerpc64le, s390x, mips, sparc64,
-> alpha, and m68k.
->
-> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  arch/arm/mach-sa1100/assabet.c                   |  2 +-
->  arch/arm/mm/alignment.c                          |  2 +-
->  arch/ia64/kernel/process.c                       |  2 +-
->  arch/ia64/mm/discontig.c                         |  2 +-
->  arch/ia64/mm/tlb.c                               |  2 +-
->  arch/mips/lib/dump_tlb.c                         |  2 +-
->  arch/mips/mm/init.c                              |  2 +-
->  arch/mips/mm/tlb-r4k.c                           |  6 +++---
->  arch/powerpc/kvm/book3s_64_mmu_radix.c           |  2 +-
->  arch/powerpc/kvm/book3s_pr.c                     |  2 +-
->  arch/powerpc/kvm/powerpc.c                       |  2 +-
->  arch/powerpc/platforms/52xx/mpc52xx_pic.c        |  2 +-
->  arch/s390/kernel/smp.c                           |  2 +-
->  arch/x86/kernel/quirks.c                         | 10 +++++-----
->  arch/x86/kvm/mmu/mmu.c                           |  2 +-
->  arch/x86/kvm/mmu/paging_tmpl.h                   |  2 +-
->  arch/x86/kvm/x86.c                               |  2 +-
->  block/blk-merge.c                                |  2 +-
->  drivers/acpi/acpi_pad.c                          |  2 +-
->  drivers/ata/libata-scsi.c                        |  2 +-
->  drivers/atm/zatm.c                               |  2 +-
->  drivers/block/drbd/drbd_nl.c                     |  6 +++---
->  drivers/block/rbd.c                              |  2 +-
->  drivers/clk/clk-gate.c                           |  2 +-
->  drivers/clk/spear/clk-vco-pll.c                  |  2 +-
->  drivers/crypto/nx/nx-842-powernv.c               |  2 +-
->  drivers/firewire/ohci.c                          | 14 +++++++-------
->  drivers/gpu/drm/bridge/sil-sii8620.c             |  2 +-
->  drivers/gpu/drm/drm_edid.c                       |  2 +-
->  drivers/gpu/drm/exynos/exynos_drm_dsi.c          |  6 +++---
->  drivers/gpu/drm/i915/display/intel_fbc.c         |  2 +-
->  drivers/gpu/drm/i915/gt/intel_lrc.c              |  2 +-
->  drivers/gpu/drm/i915/intel_uncore.c              |  2 +-
->  drivers/gpu/drm/rockchip/dw-mipi-dsi-rockchip.c  |  4 ++--
->  drivers/i2c/busses/i2c-rk3x.c                    |  2 +-
->  drivers/ide/ide-acpi.c                           |  2 +-
->  drivers/ide/ide-atapi.c                          |  2 +-
->  drivers/ide/ide-io-std.c                         |  4 ++--
->  drivers/ide/ide-io.c                             |  8 ++++----
->  drivers/ide/ide-sysfs.c                          |  2 +-
->  drivers/ide/umc8672.c                            |  2 +-
->  drivers/idle/intel_idle.c                        |  2 +-
->  drivers/infiniband/core/uverbs_cmd.c             |  4 ++--
->  drivers/infiniband/hw/cxgb4/cm.c                 |  2 +-
->  drivers/infiniband/hw/cxgb4/cq.c                 |  2 +-
->  drivers/infiniband/hw/mlx4/qp.c                  |  6 +++---
->  drivers/infiniband/hw/mlx5/cq.c                  |  6 +++---
->  drivers/infiniband/hw/mlx5/devx.c                |  2 +-
->  drivers/infiniband/hw/mlx5/qp.c                  |  2 +-
->  drivers/infiniband/hw/mthca/mthca_qp.c           | 10 +++++-----
->  drivers/infiniband/sw/siw/siw_qp_rx.c            |  2 +-
->  drivers/input/serio/serio_raw.c                  |  2 +-
->  drivers/input/touchscreen/sur40.c                |  2 +-
->  drivers/iommu/intel-iommu.c                      |  2 +-
->  drivers/md/dm-io.c                               |  2 +-
->  drivers/md/dm-ioctl.c                            |  2 +-
->  drivers/md/dm-snap-persistent.c                  |  2 +-
->  drivers/md/dm-table.c                            |  2 +-
->  drivers/md/dm-writecache.c                       |  2 +-
->  drivers/md/raid5.c                               |  2 +-
->  drivers/media/dvb-frontends/rtl2832.c            |  2 +-
->  drivers/media/tuners/qt1010.c                    |  4 ++--
->  drivers/media/usb/gspca/vicam.c                  |  2 +-
->  drivers/media/usb/uvc/uvc_video.c                |  8 ++++----
->  drivers/memstick/host/jmb38x_ms.c                |  2 +-
->  drivers/memstick/host/tifm_ms.c                  |  2 +-
->  drivers/mmc/host/sdhci.c                         |  2 +-
->  drivers/mtd/nand/raw/nand_ecc.c                  |  2 +-
->  drivers/mtd/nand/raw/s3c2410.c                   |  2 +-
->  drivers/mtd/parsers/afs.c                        |  4 ++--
->  drivers/mtd/ubi/eba.c                            |  2 +-
->  drivers/net/can/janz-ican3.c                     |  2 +-
->  drivers/net/ethernet/broadcom/bnx2.c             |  4 ++--
->  .../net/ethernet/mellanox/mlx5/core/pagealloc.c  |  4 ++--
->  drivers/net/ethernet/neterion/s2io.c             |  2 +-
->  drivers/net/ethernet/qlogic/qla3xxx.c            |  2 +-
->  drivers/net/ethernet/sun/cassini.c               |  2 +-
->  drivers/net/ethernet/sun/niu.c                   |  6 +++---
->  drivers/net/wan/z85230.c                         |  2 +-
->  drivers/net/wireless/ath/ath10k/core.c           |  2 +-
->  drivers/net/wireless/ath/ath6kl/init.c           |  2 +-
->  drivers/net/wireless/ath/ath9k/init.c            |  2 +-
->  drivers/net/wireless/broadcom/b43/debugfs.c      |  2 +-
->  drivers/net/wireless/broadcom/b43/dma.c          |  2 +-
->  drivers/net/wireless/broadcom/b43/lo.c           |  2 +-
->  drivers/net/wireless/broadcom/b43/phy_n.c        |  2 +-
->  drivers/net/wireless/broadcom/b43/xmit.c         | 12 ++++++------
->  .../net/wireless/broadcom/b43legacy/debugfs.c    |  2 +-
->  drivers/net/wireless/broadcom/b43legacy/main.c   |  2 +-
->  drivers/net/wireless/intel/iwlegacy/3945.c       |  2 +-
->  drivers/net/wireless/intel/iwlegacy/4965-mac.c   |  2 +-
->  .../net/wireless/realtek/rtlwifi/rtl8192cu/hw.c  |  4 ++--
->  drivers/pci/pcie/aer.c                           |  2 +-
->  drivers/platform/x86/hdaps.c                     |  4 ++--
->  drivers/scsi/dc395x.c                            |  2 +-
->  drivers/scsi/pm8001/pm8001_hwi.c                 |  2 +-
->  drivers/scsi/pm8001/pm80xx_hwi.c                 |  2 +-
->  drivers/ssb/driver_chipcommon.c                  |  4 ++--
->  drivers/tty/cyclades.c                           |  2 +-
->  drivers/tty/isicom.c                             |  2 +-
->  drivers/usb/musb/cppi_dma.c                      |  2 +-
->  drivers/usb/storage/sddr55.c                     |  4 ++--
->  drivers/vhost/net.c                              |  6 +++---
->  drivers/video/fbdev/matrox/matroxfb_maven.c      |  6 +++---
->  drivers/video/fbdev/pm3fb.c                      |  6 +++---
->  drivers/video/fbdev/riva/riva_hw.c               |  3 +--
->  drivers/virtio/virtio_ring.c                     |  6 +++---
->  fs/afs/dir.c                                     |  2 +-
->  fs/afs/security.c                                |  2 +-
->  fs/dlm/netlink.c                                 |  2 +-
->  fs/erofs/data.c                                  |  4 ++--
->  fs/erofs/zdata.c                                 |  2 +-
->  fs/f2fs/data.c                                   |  2 +-
->  fs/fat/dir.c                                     |  2 +-
->  fs/fuse/control.c                                |  4 ++--
->  fs/fuse/cuse.c                                   |  2 +-
->  fs/fuse/file.c                                   |  2 +-
->  fs/gfs2/aops.c                                   |  2 +-
->  fs/gfs2/bmap.c                                   |  2 +-
->  fs/gfs2/lops.c                                   |  2 +-
->  fs/hfsplus/unicode.c                             |  2 +-
->  fs/isofs/namei.c                                 |  4 ++--
->  fs/jffs2/erase.c                                 |  2 +-
->  fs/nfsd/nfsctl.c                                 |  2 +-
->  fs/ocfs2/alloc.c                                 |  4 ++--
->  fs/ocfs2/dir.c                                   | 14 +++++++-------
->  fs/ocfs2/extent_map.c                            |  4 ++--
->  fs/ocfs2/namei.c                                 |  2 +-
->  fs/ocfs2/refcounttree.c                          |  2 +-
->  fs/ocfs2/xattr.c                                 |  2 +-
->  fs/omfs/file.c                                   |  2 +-
->  fs/overlayfs/copy_up.c                           |  4 ++--
->  fs/ubifs/commit.c                                |  6 +++---
->  fs/ubifs/dir.c                                   |  2 +-
->  fs/ubifs/file.c                                  |  4 ++--
->  fs/ubifs/journal.c                               |  4 ++--
->  fs/ubifs/lpt.c                                   |  2 +-
->  fs/ubifs/tnc.c                                   |  6 +++---
->  fs/ubifs/tnc_misc.c                              |  4 ++--
->  fs/udf/balloc.c                                  |  2 +-
->  fs/xfs/xfs_bmap_util.c                           |  2 +-
->  include/net/flow_offload.h                       |  2 +-
->  kernel/async.c                                   |  4 ++--
->  kernel/audit.c                                   |  2 +-
->  kernel/debug/kdb/kdb_io.c                        |  2 +-
->  kernel/dma/debug.c                               |  2 +-
->  kernel/events/core.c                             |  2 +-
->  kernel/events/uprobes.c                          |  2 +-
->  kernel/exit.c                                    |  2 +-
->  kernel/futex.c                                   | 14 +++++++-------
->  kernel/locking/lockdep.c                         | 16 ++++++++--------
->  kernel/trace/ring_buffer.c                       |  2 +-
->  lib/radix-tree.c                                 |  2 +-
->  lib/test_lockup.c                                |  2 +-
->  mm/frontswap.c                                   |  2 +-
->  mm/ksm.c                                         |  2 +-
->  mm/memcontrol.c                                  |  2 +-
->  mm/memory.c                                      |  2 +-
->  mm/mempolicy.c                                   |  4 ++--
->  mm/page_alloc.c                                  |  2 +-
->  mm/percpu.c                                      |  2 +-
->  mm/slub.c                                        |  4 ++--
->  mm/swap.c                                        |  4 ++--
->  net/dccp/options.c                               |  2 +-
->  net/ipv4/netfilter/nf_socket_ipv4.c              |  6 +++---
->  net/ipv6/ip6_flowlabel.c                         |  2 +-
->  net/ipv6/netfilter/nf_socket_ipv6.c              |  2 +-
->  net/netfilter/nf_conntrack_ftp.c                 |  2 +-
->  net/netfilter/nfnetlink_log.c                    |  2 +-
->  net/netfilter/nfnetlink_queue.c                  |  4 ++--
->  net/sched/cls_flow.c                             |  2 +-
->  net/sched/sch_cake.c                             |  2 +-
->  net/sched/sch_cbq.c                              |  2 +-
->  net/sched/sch_fq_codel.c                         |  2 +-
->  net/sched/sch_fq_pie.c                           |  2 +-
->  net/sched/sch_hfsc.c                             |  2 +-
->  net/sched/sch_htb.c                              |  2 +-
->  net/sched/sch_sfq.c                              |  2 +-
->  net/sunrpc/svcsock.c                             |  4 ++--
->  net/sunrpc/xprtsock.c                            | 10 +++++-----
->  net/tls/tls_sw.c                                 |  2 +-
->  sound/core/control_compat.c                      |  2 +-
->  sound/isa/sb/sb16_csp.c                          |  2 +-
->  sound/usb/endpoint.c                             |  2 +-
->  184 files changed, 284 insertions(+), 285 deletions(-)
+On Thu, Jun 04, 2020 at 11:24:29AM +0100, John Garry wrote:
+> > > > > 
+> > > > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > > > > index 96a39d0724a29..cded7fdcad8ef 100644
+> > > > > --- a/block/blk-mq-tag.c
+> > > > > +++ b/block/blk-mq-tag.c
+> > > > > @@ -191,6 +191,33 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+> > > > >        return tag + tag_offset;
+> > > > >    }
+> > > > >    +bool __blk_mq_get_driver_tag(struct request *rq)
+> > > > > +{
+> > > > > +    struct sbitmap_queue *bt = &rq->mq_hctx->tags->bitmap_tags;
+> > > > > +    unsigned int tag_offset = rq->mq_hctx->tags->nr_reserved_tags;
+> > > > > +    bool shared = blk_mq_tag_busy(rq->mq_hctx);
+> > > > 
+> > > > Not necessary to add 'shared' which is just used once.
+> > > > 
+> > > > > +    int tag;
+> > > > > +
+> > > > > +    if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
+> > > > > +        bt = &rq->mq_hctx->tags->breserved_tags;
+> > > > 
+> > > > Too many rq->mq_hctx->tags, you can add one local variable to store it.
+> > > > 
+> > > > Otherwise, looks fine:
+> > > > 
+> > > > Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Unfortunately this looks to still have problems. So, for a start, this
+> stackframe is pumped out a lot (which I removed, for below):
+> 
+> [  697.464058] Workqueue: kblockd blk_mq_run_work_fn
+> [  697.468749] Call trace:
+> [  697.471184]  dump_backtrace+0x0/0x1c0
+> [  697.474833]  show_stack+0x18/0x28
+> [  697.478136]  dump_stack+0xc8/0x114
+> [  697.481524]  __blk_mq_run_hw_queue+0x124/0x130
+> [  697.485954]  blk_mq_run_work_fn+0x20/0x30
+> [  697.489951]  process_one_work+0x1e8/0x360
+> [  697.493947]  worker_thread+0x238/0x478
+> [  697.497683]  kthread+0x150/0x158
+> [  697.500898]  ret_from_fork+0x10/0x1c
+> [  697.504480] run queue from wrong CPU 32, hctx active
+> [  697.509444] CPU: 32 PID: 1477 Comm: kworker/21:2H Not tainted 5.7.0-
+> 
+> And then other time I get SCSI timeouts:
+> 
+> [95.170616] psci: CPU21 killed (polled 0 ms)
+> [95.419832] CPU22: shutdown
+> [95.422630] psci: CPU22 killed (polled 0 ms)
+> [95.683772] irq_shutdown irq1384MiB/s,w=0KiB/s][r=380k,w=0 IOPS][eta
+> 00m:50s]
+> [95.687013] CPU23: shutdown
+> [95.689829] psci: CPU23 killed (polled 0 ms)
+> [96.379817] CPU24: shutdown
+> [96.382617] psci: CPU24 killed (polled 0 ms)
+> [96.703823] CPU25: shutdown=1902MiB/s,w=0KiB/s][r=487k,w=0 IOPS][eta
+> 00m:49s]
+> [96.706667] psci: CPU25 killed (polled 0 ms)
+> [97.299845] CPU26: shutdown
+> [97.302647] psci: CPU26 killed (polled 0 ms)
+> [97.331737] irq_shutdown irq139
+> [97.334969] CPU27: shutdown
+> [97.337774] psci: CPU27 killed (polled 0 ms)
+> [  102.308329] CPU28: shutdown=1954MiB/s,w=0KiB/s][r=500k,w=0 IOPS][eta
+> 00m:44s]
+> [  102.311137] psci: CPU28 killed (polled 0 ms)
+> [  102.663877] CPU29: shutdown=1755MiB/s,w=0KiB/s][r=449k,w=0 IOPS][eta
+> 00m:43s]
+> [  102.666679] psci: CPU29 killed (polled 0 ms)
+> [  104.459867] CPU30: shutdown=1552MiB/s,w=0KiB/s][r=397k,w=0 IOPS][eta
+> 00m:42s]
+> [  104.462668] psci: CPU30 killed (polled 0 ms)
+> [  106.259909] IRQ 43: no longer affine to CPU31s][r=414k,w=0 IOPS][eta
+> 00m:40s]
+> [  106.264273] IRQ 114: no longer affine to CPU31
+> [  106.268707] IRQ 118: no longer affine to CPU31
+> [  106.273141] IRQ 123: no longer affine to CPU31
+> [  106.277579] irq_shutdown irq140
+> [  106.280757] IRQ 332: no longer affine to CPU31
+> [  106.285190] IRQ 336: no longer affine to CPU31
+> [  106.289623] IRQ 338: no longer affine to CPU31
+> [  106.294056] IRQ 340: no longer affine to CPU31
+> [  106.298489] IRQ 344: no longer affine to CPU31
+> [  106.302922] IRQ 348: no longer affine to CPU31
+> [  106.307450] CPU31: shutdown
+> [  106.310251] psci: CPU31 killed (polled 0 ms)
+> [  108.367884] CPU32: shutdown=1693MiB/s,w=0KiB/s][r=434k,w=0 IOPS][eta
+> 00m:38s]
+> [  108.370683] psci: CPU32 killed (polled 0 ms)
+> [  110.808471] CPU33: shutdown=1747MiB/s,w=0KiB/s][r=447k,w=0 IOPS][eta
+> 00m:35s]
+> [  110.811269] psci: CPU33 killed (polled 0 ms)
+> [  110.871804] CPU34: shutdown
+> [  110.874598] psci: CPU34 killed (polled 0 ms)
+> [  111.767879] irq_shutdown irq1412MiB/s,w=0KiB/s][r=418k,w=0 IOPS][eta
+> 00m:34s]
+> [  111.771171] CPU35: shutdown
+> [  111.773975] psci: CPU35 killed (polled 0 ms)
+> [  113.167866] CPU36: shutdown=1680MiB/s,w=0KiB/s][r=430k,w=0 IOPS][eta
+> 00m:33s]
+> [  113.170673] psci: CPU36 killed (polled 0 ms)
+> [  115.783879] CPU37: shutdown=1839MiB/s,w=0KiB/s][r=471k,w=0 IOPS][eta
+> 00m:30s]
+> [  115.786675] psci: CPU37 killed (polled 0 ms)
+> [  117.111877] CPU38: shutdown=2032MiB/s,w=0KiB/s][r=520k,w=0 IOPS][eta
+> 00m:29s]
+> [  117.114670] psci: CPU38 killed (polled 0 ms)
+> [  121.263701] irq_shutdown irq1423MiB/s,w=0KiB/s][r=428k,w=0 IOPS][eta
+> 00m:25s]
+> [  121.266996] CPU39: shutdown
+> [  121.269797] psci: CPU39 killed (polled 0 ms)
+> [  121.364122] CPU40: shutdown
+> [  121.366918] psci: CPU40 killed (polled 0 ms)
+> [  121.448256] CPU41: shutdown
+> [  121.451058] psci: CPU41 killed (polled 0 ms)
+> [  121.515785] CPU42: shutdown=1711MiB/s,w=0KiB/s][r=438k,w=0 IOPS][eta
+> 00m:24s]
+> [  121.518586] psci: CPU42 killed (polled 0 ms)
+> [  121.563659] irq_shutdown irq143
+> [  121.566922] CPU43: shutdown
+> [  121.569732] psci: CPU43 killed (polled 0 ms)
+> [  122.619423] scsi_times_out req=0xffff001faf906900=371k,w=0 IOPS][eta
+> 00m:23s]
+> [  122.624131] scsi_times_out req=0xffff001faf90ed00
+> [  122.628842] scsi_times_out req=0xffff001faf90fc00
+> [  122.633547] scsi_times_out req=0xffff001faf906000
+> [  122.638259] scsi_times_out req=0xffff001faf906300
+> [  122.642969] scsi_times_out req=0xffff001faf906600
+> [  122.647676] scsi_times_out req=0xffff001faf906c00
+> [  122.652381] scsi_times_out req=0xffff001faf906f00
+> [  122.657086] scsi_times_out req=0xffff001faf907200
+> [  122.661791] scsi_times_out req=0xffff001faf907500
+> [  122.666498] scsi_times_out req=0xffff001faf907800
+> [  122.671203] scsi_times_out req=0xffff001faf907b00
+> [  122.675909] scsi_times_out req=0xffff001faf907e00
+> [  122.680615] scsi_times_out req=0xffff001faf908100
+> [  122.685319] scsi_times_out req=0xffff001faf908400
+> [  122.690025] scsi_times_out req=0xffff001faf908700
+> [  122.694731] scsi_times_out req=0xffff001faf908a00
+> [  122.699439] scsi_times_out req=0xffff001faf908d00
+> [  122.704145] scsi_times_out req=0xffff001faf909000
+> [  122.708849] scsi_times_out req=0xffff001faf909300
+> 
+> 
+> And another:
+> 
+> 51.336698] CPU53: shutdown
+> [  251.336737] run queue from wrong CPU 0, hctx active
+> [  251.339545] run queue from wrong CPU 0, hctx active
+> [  251.344695] psci: CPU53 killed (polled 0 ms)
+> [  251.349302] run queue from wrong CPU 0, hctx active
+> [  251.358447] run queue from wrong CPU 0, hctx active
+> [  251.363336] run queue from wrong CPU 0, hctx active
+> [  251.368222] run queue from wrong CPU 0, hctx active
+> [  251.373108] run queue from wrong CPU 0, hctx active
+> [  252.488831] CPU54: shutdown=1094MiB/s,w=0KiB/s][r=280k,w=0 IOPS][eta
+> 00m:04s]
+> [  252.491629] psci: CPU54 killed (polled 0 ms)
+> [  252.536533] irq_shutdown irq146
+> [  252.540007] CPU55: shutdown
+> [  252.543273] psci: CPU55 killed (polled 0 ms)
+> [  252.656656] CPU56: shutdown
+> [  252.659446] psci: CPU56 killed (polled 0 ms)
+> [  252.704576] CPU57: shutdown=947MiB/s,w=0KiB/s][r=242k,w=0 IOPS][eta
+> 00m:02s]
+> [  252.707369] psci: CPU57 killed (polled 0 ms)
+> [  254.352646] CPU58: shutdown=677MiB/s,w=0KiB/s][r=173k,w=0 IOPS][eta
+> 00m:02s]
+> [  254.355442] psci: CPU58 killed (polled 0 ms)
+> long sleep 1
+> [  279.288227] scsi_times_out req=0xffff041fa10b6600[r=0,w=0 IOPS][eta
+> 04m:37s]
+> [  279.320281] sas: Enter sas_scsi_recover_host busy: 1 failed: 1
+> [  279.326144] sas: trying to find task 0x00000000e8dca422
+> [  279.331379] sas: sas_scsi_find_task: aborting task 0x00000000e8dca422
+> 
+> none scheduler seems ok.
+
+Can you reproduce it by just applying the patch of 'blk-mq: don't fail driver tag
+allocation because of inactive hctx'?
+
+If yes, can you collect debugfs log after the timeout is triggered?
+
 
 Thanks,
-Reviewed-by: Leon Romanovsky <leonro@mellanox.com> # drivers/infiniband and mlx4/mlx5
+Ming
+
