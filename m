@@ -2,119 +2,134 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FF4C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 13:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C23C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 13:29:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2417C20823
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 13:23:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3DB220772
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 13:29:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Z1SifWi8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lOBHkax2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728577AbgFDNXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 09:23:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43074 "EHLO
+        id S1728376AbgFDN3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 09:29:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728474AbgFDNXK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 09:23:10 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1102DC08C5C3
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 06:23:09 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id w9so5155722qtv.3
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 06:23:09 -0700 (PDT)
+        with ESMTP id S1728337AbgFDN3D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 09:29:03 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D044C08C5C0
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 06:29:03 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id x14so6123251wrp.2
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 06:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Zd56CSP9N2M4FrfN9ySWd7Nzjr+sOLOVU8sX9ZsvxYk=;
-        b=Z1SifWi8Glj9s1ZlViEQIoOzrtW4kQqhJPAuBmH8BuAfTlSORzOP5/aBkVIpDCF065
-         4tet6nf/xexKbX9HERYTEiH7bvvMa7jEzJZJ+Y9NbTVNdXZMe5cuQGHU5U8XYpc6rEpA
-         0M5eGOL/GQzV1R+AsSeBTDbzXk+YExg+XOlZLmxAbhKhBOAjkHQZ06AbVHRZdzvZiU7w
-         cHe+L3V8vNXxybekuzSoIvOp1xxWvK8SbdjJVplyLz5vYnbOtUIAIDcZULCyq5qUdBWf
-         hegDa8ghfSlITKfZUXou8d2OJHz3pI/kZh5/E9mjrrfnPUc08cS9ulbxQPmbEBYY1pID
-         +u9g==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9XT1vLZYetGvuzk+KWrknQXupj0yTVynPBDswGPzGyA=;
+        b=lOBHkax2QXNA01TVkwCpjfALj5k9W/3VgUUcIffr3Xtk+r8sTqCc7yqMifZjnAy3lp
+         WLMua1FShdt4DH+reovg7xbM9A8n2uI4t/6xnR1hTFo9xnQ2igaddWr+JY1ew0+35V6u
+         SlzGce2KGDBM3BIKZMgHqPSx6jvd87uLsMCaWCbstpukMt/y5pwajp7PqCB+ZYPqo9Ih
+         LS+LFg09golYEdbJm1EkgtNmBG1x7qf6CaVBlqD2YIFIr4iRmeBft7G1zA4dDnR4Lj23
+         wpDsJCaZUAiefesWqvVzohtaM1L4wvb3kmKLsy+Uq+WeTT0XLj6T4oBRWPY4WW5/GLLj
+         e4Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Zd56CSP9N2M4FrfN9ySWd7Nzjr+sOLOVU8sX9ZsvxYk=;
-        b=VW8MZu7FmDLYgY0rzO1+Uv8tljppiimDjPdgiaRNkAHH2Gr9RDe19eNXQhvI3reFUE
-         Rh6T3JfSHKv3toARLL2GKtUYil23Gb5SIjhCKS8NI9BhREcTbazf9OqB+dcR03jncTEL
-         mO1bGuKKD4HuCasoogTFZZzMPq+uppVi2AMQ01bAG7Ieb4R65EJqlUxxNdu/7o+KDmjO
-         9VxZc4w6TR9fEcgSdiZvQUJ0/ZrH1VmV66CVEaJG+Mqikb8mF1/uDBS8y/spKP0FC2IJ
-         cs4cHRNfyz43fAoUvdzK8iw0SKXPoHUvS0GOshWXxA8jGlVS9sLWrZthbufFsWEpq1kD
-         I4xQ==
-X-Gm-Message-State: AOAM533WKMO6awyYBS0Yfd6xiPQs2fOxTDdRq35mSdf+MWmuBFcvUkod
-        cW27bhpqeRPIz3H1Ym5vTKFnxg==
-X-Google-Smtp-Source: ABdhPJxRZn/pXIUEkZhANETiTogTGf06kqn6Gs1x5NZFGFUPmFe5McyxpBqwN0tWHmbj+GOZ4kP/eQ==
-X-Received: by 2002:aed:3fa5:: with SMTP id s34mr4444014qth.343.1591276988114;
-        Thu, 04 Jun 2020 06:23:08 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id 126sm4330150qkj.89.2020.06.04.06.23.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 06:23:07 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.93)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jgppq-001CIj-Sr; Thu, 04 Jun 2020 10:23:06 -0300
-Date:   Thu, 4 Jun 2020 10:23:06 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 09/10] treewide: Remove uninitialized_var() usage
-Message-ID: <20200604132306.GO6578@ziepe.ca>
-References: <20200603233203.1695403-1-keescook@chromium.org>
- <20200603233203.1695403-10-keescook@chromium.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9XT1vLZYetGvuzk+KWrknQXupj0yTVynPBDswGPzGyA=;
+        b=MYho2TzZ+1EkPZPq/5nxYgKXvpJtIu8sZFj+j6jesyO2QWmiSQ7ys15IsfEh49Ol4o
+         7AFvic2z5VpLU+78J5fAehxKTba2Ip+Eb/mR1HB5eAtngpQL7ddNygyMDmSRAdG8AkRx
+         +FNmg6iF+3n53AKwzxyqY5yyHIM6L/eibRg7RX0x0bphQkrImb47zy0ecpjgnZS/uRF3
+         YcXVg7aYAkWSuV/WOeyZ327eEvnas7mGSVMqp7bmXFy8lLQ4D5u5UGZmuoMHHAxdABOT
+         B3Uo8Ydpj6EtrSMMVLwD/qGWtZtV4wkavXnxVo2LIoaSg5rfpyMh62C7WnBGupyt8kT3
+         AJVQ==
+X-Gm-Message-State: AOAM533PJmHUJk7TH1kTxNAau4UJ+Wh0QE9isEn+fwyIy12e58hZBbzQ
+        msnPGnUmLxWflCAx/RoO26ovEnCfhKNKGb7+K6U=
+X-Google-Smtp-Source: ABdhPJwFy+SnEGO9CauBSyZwmxpZ50TtMRcgWl8a1Et8EmYPTQnCrk7gjIpgrLULP2UkdpYcF3PWeWe3kbbrSrn+yys=
+X-Received: by 2002:adf:e544:: with SMTP id z4mr4493207wrm.317.1591277342373;
+ Thu, 04 Jun 2020 06:29:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200603233203.1695403-10-keescook@chromium.org>
+References: <20200603105128.2147139-1-ming.lei@redhat.com> <20200603115347.GA8653@lst.de>
+ <20200603133608.GA2149752@T590> <6b58e473-16a4-4ce2-a4ac-50b952d364d7@huawei.com>
+ <6fbd3669-4358-6d9f-5c94-e1bc7acecb86@oracle.com> <b37b1f30-722b-4767-0627-103b94c7421c@huawei.com>
+ <20200604112615.GA2336493@T590> <7291fd02-3c2c-f3f9-f3eb-725cd85d5523@huawei.com>
+ <20200604120747.GB2336493@T590> <38b4c7a3-057f-c52c-993b-523660085e3c@huawei.com>
+In-Reply-To: <38b4c7a3-057f-c52c-993b-523660085e3c@huawei.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Thu, 4 Jun 2020 21:28:50 +0800
+Message-ID: <CACVXFVPb7eF_kWdE5HJ9y54-zOaTeK7QjSsebaZKF2CKwwwipA@mail.gmail.com>
+Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
+ inactive hctx
+To:     John Garry <john.garry@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 04:32:02PM -0700, Kees Cook wrote:
-> Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> (or can in the future), and suppresses unrelated compiler warnings
-> (e.g. "unused variable"). If the compiler thinks it is uninitialized,
-> either simply initialize the variable or make compiler changes.
-> 
-> I preparation for removing[2] the[3] macro[4], remove all remaining
-> needless uses with the following script:
-> 
-> git grep '\buninitialized_var\b' | cut -d: -f1 | sort -u | \
-> 	xargs perl -pi -e \
-> 		's/\buninitialized_var\(([^\)]+)\)/\1/g;
-> 		 s:\s*/\* (GCC be quiet|to make compiler happy) \*/$::g;'
-> 
-> drivers/video/fbdev/riva/riva_hw.c was manually tweaked to avoid
-> pathological white-space.
-> 
-> No outstanding warnings were found building allmodconfig with GCC 9.3.0
-> for x86_64, i386, arm64, arm, powerpc, powerpc64le, s390x, mips, sparc64,
-> alpha, and m68k.
+On Thu, Jun 4, 2020 at 8:50 PM John Garry <john.garry@huawei.com> wrote:
+>
+>
+> >> That's your patch - ok, I can try.
+> >>
+>
+> I still get timeouts and sometimes the same driver tag message occurs:
+>
+>   1014.232417] run queue from wrong CPU 0, hctx active
+> [ 1014.237692] run queue from wrong CPU 0, hctx active
+> [ 1014.243014] run queue from wrong CPU 0, hctx active
+> [ 1014.248370] run queue from wrong CPU 0, hctx active
+> [ 1014.253725] run queue from wrong CPU 0, hctx active
+> [ 1014.259252] run queue from wrong CPU 0, hctx active
+> [ 1014.264492] run queue from wrong CPU 0, hctx active
+> [ 1014.269453] irq_shutdown irq146
+> [ 1014.272752] CPU55: shutdown
+> [ 1014.275552] psci: CPU55 killed (polled 0 ms)
+> [ 1015.151530] CPU56: shutdownr=1621MiB/s,w=0KiB/s][r=415k,w=0 IOPS][eta
+> 00m:00s]
+> [ 1015.154322] psci: CPU56 killed (polled 0 ms)
+> [ 1015.184345] CPU57: shutdown
+> [ 1015.187143] psci: CPU57 killed (polled 0 ms)
+> [ 1015.223388] CPU58: shutdown
+> [ 1015.226174] psci: CPU58 killed (polled 0 ms)
+> long sleep 8
+> [ 1045.234781] scsi_times_out req=0xffff041fa13e6300[r=0,w=0 IOPS][eta
+> 04m:30s]
+>
+> [...]
+>
+> >>
+> >> I thought that if all the sched tags are put, then we should have no driver
+> >> tag for that same hctx, right? That seems to coincide with the timeout (30
+> >> seconds later)
+> >
+> > That is weird, if there is driver tag found, that means the request is
+> > in-flight and can't be completed by HW.
+>
+> In blk_mq_hctx_has_requests(), we iterate the sched tags (when
+> hctx->sched_tags is set). So can some requests not have a sched tag
+> (even for scheduler set for the queue)?
+>
+>   I assume you have integrated
+> > global host tags patch in your test,
+>
+> No, but the LLDD does not use request->tag - it generates its own.
 
-At least in the infiniband part I'm confident that old gcc versions
-will print warnings after this patch.
+Except for wrong queue mapping,  another reason is that the generated
+tag may not
+be unique. Either of two may cause such timeout issue when the managed
+interrupt is
+active.
 
-As the warnings are wrong, do we care? Should old gcc maybe just -Wno-
-the warning?
-
-Otherwise the IB bits look ok to me
-
-Acked-by: Jason Gunthorpe <jgg@mellanox.com>
-
-Jason
+Thanks,
+Ming
