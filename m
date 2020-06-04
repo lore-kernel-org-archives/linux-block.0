@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6E1C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 663CFC433E3
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:40:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A13F2207F9
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:29:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A702075B
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:40:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qNWdjuwt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="khjHaUxx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728696AbgFDT3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 15:29:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43462 "EHLO
+        id S1729146AbgFDTkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 15:40:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728785AbgFDT3a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 15:29:30 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1625C08C5C4
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 12:29:29 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id bg4so2622698plb.3
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 12:29:29 -0700 (PDT)
+        with ESMTP id S1727950AbgFDTkW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 15:40:22 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA95C08C5C0
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 12:40:22 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id p30so3954579pgl.11
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 12:40:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BN0NA5oXxaJmgloA0bV1VuRl7DweslwGb9BXC5tlSZI=;
-        b=qNWdjuwtEh3SepeFF9fNagsbBVKMOdC+i2KqVDopsH6dlehq61YjmGsjU3zQ6/6Sm+
-         RI59y6nTt3iJaugOaLxusXHriKBWVNJCrzHeENeqAGVpHLkPMQooCck+j2xRNg4QVbq2
-         U7Aga0bTxqeYSMNSshjefDdYD9kzqlGJMlmXX3yAeOrKcPi394fVJzn+N+UEYVrgLikW
-         PJ80Ob/zePEkwKogqqleJVCwqC4lBAXZfyFsOJ1Q71OHbRbc0fyAs9RyF+VvGzxb6jyN
-         PR+j0XjbkYKBjIdoJN78dsQ95HeKy3QSGz7aES9jpi6oH42fz2hvJ1Opql+7AsV4VMb8
-         cVyA==
+         :cc:content-transfer-encoding;
+        bh=kJllNW+A+qSZYDyNUy0KaOA5QFyWsX/L5wjqGF/eTNE=;
+        b=khjHaUxxHWq27mRVrCP90N/AIWBHw0Raqt4MSawehwogpV8OkvENICvoOfJVZkx0HE
+         hNogTV16/NwZXxCOSGv2dPerVjZRRpPeRIGxaNDeieFVvkNGOsQPbUA4jVsw+RGMJM/1
+         DZ4Ka7WSW9usbnCAubZ33uZYz1CuVXU1e5wwsVkAh0ownQvTfrX26uwpcMSg4c4FVlB9
+         J0MlT9xW0GEK1fvgfb3wjQTvPWdI4UdS6GZdlbET89acNH1Dsv7O3JvR2loOOenQdzRS
+         7VBqB+LvcFYGppvlPdjlWc/cGF5adEw1HB5y4y0ezzkfiCva7K4+HnNEtlnj/NWpd7fY
+         2hVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BN0NA5oXxaJmgloA0bV1VuRl7DweslwGb9BXC5tlSZI=;
-        b=mGc1ELmnNhpaIo2FY1weAUSQTo5lCZDBQtU/F8t2HDkVmqI2wme3dchK4ctlMcARn4
-         QDy6Tgq78s7TEjiePR8K69PiH+8ciRks2bfwduPfel1rCsbo1m5rn6t6rt4KXgLF4Z/B
-         1CGoae4VjZShE3KzbYck0svEtf8nl2U6/cxt1jsSwAA0awmOs7yglGaE4mGuQF/zMOE2
-         j3P444h4z0oh7aRlFOO6GyqEJE/q7c4jIu9MVT39Rx8z4b3kJw74c4LNcrLh+nRZtw0w
-         Bp28OcuSmuOuNwX9qxyboLGc/zjlZQhghft/2u3MrAUGW7CcPs6QBEKRjNyJDYYU0dSp
-         GdTw==
-X-Gm-Message-State: AOAM5339yzy8HIgDFoHkE6oW1rqxBU19OG7Jft5ySWAEn4zIQ++zilqL
-        Ad/lQMajr/4HPA2niErqkwBXRr+3QuykkS2mY23sOg==
-X-Google-Smtp-Source: ABdhPJzSzKsiHc4z7LwcmpkgMu0NbAbDQYhYcnmTB/97B33m/EUjE6lKfBun6ZCLEkmHQ8gJwyD1p9mb5gkpJj8C3R0=
-X-Received: by 2002:a17:902:724a:: with SMTP id c10mr6119344pll.223.1591298968901;
- Thu, 04 Jun 2020 12:29:28 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=kJllNW+A+qSZYDyNUy0KaOA5QFyWsX/L5wjqGF/eTNE=;
+        b=ZxizFSHtYDMokwFyBK2Sl7746FqE4a+LPJHXJeMlza4Lb+JSbhibw10ReSOA+y0IeY
+         uoW5FzSVUS2Y8fB8QssFhpeqY1LQLOUIcoeLQ0Nz3v79HLknyMms7LNGdGdv/ICbqMIw
+         CLuf0zxZHl5Wm+Kb4XsOE8wmwou6iwAULmsgupoCWXcSQd1atZA1uziGydlNko2UKYOv
+         kg3p7bKZ0xJJVimg838npsQ3n6RfwRdCmeb71F8WufKOUA+2ugbDxZUqG63EyyQ8lRkA
+         o9HwDyJlzud5yQYVeyONkfXhtd1Bn198tdXP1xvSEIiCNnlTIjhpft3WeiEbTNxAihc0
+         DWqg==
+X-Gm-Message-State: AOAM531gghu2onrI9O7Ndr3qizC04MYCpUVjehBGSqEgb0z+geU0Aogr
+        zvpiebLkJTDJgHKVVxGfCJdhJyfvRcxr2Ak6qhYVDw==
+X-Google-Smtp-Source: ABdhPJyYElZ0dKBuAEJ4uM9aYg7zNwG3YltGgh77s2eCEowEEsdqVj0Qq+w+v4Ujopd3NJrASj7ulK+YFsUqdUSAiYg=
+X-Received: by 2002:a63:5644:: with SMTP id g4mr5715275pgm.381.1591299621501;
+ Thu, 04 Jun 2020 12:40:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200603233203.1695403-1-keescook@chromium.org> <20200603233203.1695403-6-keescook@chromium.org>
-In-Reply-To: <20200603233203.1695403-6-keescook@chromium.org>
+References: <20200603233203.1695403-1-keescook@chromium.org> <20200603233203.1695403-8-keescook@chromium.org>
+In-Reply-To: <20200603233203.1695403-8-keescook@chromium.org>
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 4 Jun 2020 12:29:17 -0700
-Message-ID: <CAKwvOdm5zDide5RuppY_jG=r46=UMdVJBrkBqD5x=dOMTG9cZg@mail.gmail.com>
-Subject: Re: [PATCH 05/10] ide: Remove uninitialized_var() usage
+Date:   Thu, 4 Jun 2020 12:40:09 -0700
+Message-ID: <CAKwvOdnQCCV7SHq+nbRd0O0A+P035kU4t5vPDs8T=BhNQ2cbdA@mail.gmail.com>
+Subject: Re: [PATCH 07/10] spi: davinci: Remove uninitialized_var() usage
 To:     Kees Cook <keescook@chromium.org>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -76,8 +76,9 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         linux-spi@vger.kernel.org,
         Linux Memory Management List <linux-mm@kvack.org>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        mporter@ti.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -92,46 +93,57 @@ On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
 > to removing[2] this[3] macro[4], just remove this variable since it was
 > actually unused:
 >
-> drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-variable]
->         unsigned long uninitialized_var(flags);
->                                         ^
+> drivers/spi/spi-davinci.c: In function =E2=80=98davinci_spi_bufs=E2=80=99=
+:
+> drivers/spi/spi-davinci.c:579:11: warning: unused variable =E2=80=98rx_bu=
+f_count=E2=80=99 [-Wunused-variable]
+>   579 |  unsigned rx_buf_count;
+>       |           ^~~~~~~~~~~~
 >
-> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.co=
+m/
+> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=3D1TGqCR5vQkCzWJ0QxK6Cern=
+OU6eedsudAixw@mail.gmail.com/
+> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz=
+9knmPuXhOeg@mail.gmail.com/
+> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=3DyVJu65TpLg=
+N_ybYNv0VEOKA@mail.gmail.com/
 >
 > Signed-off-by: Kees Cook <keescook@chromium.org>
 
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Fixes ce1e518190ea ("ide: don't disable interrupts during kmap_atomic()")
+Fixes 048177ce3b39 ("spi: spi-davinci: convert to DMA engine API")
 
 > ---
->  drivers/ide/ide-taskfile.c | 1 -
+>  drivers/spi/spi-davinci.c | 1 -
 >  1 file changed, 1 deletion(-)
 >
-> diff --git a/drivers/ide/ide-taskfile.c b/drivers/ide/ide-taskfile.c
-> index aab6a10435b6..a26f85ab58a9 100644
-> --- a/drivers/ide/ide-taskfile.c
-> +++ b/drivers/ide/ide-taskfile.c
-> @@ -229,7 +229,6 @@ void ide_pio_bytes(ide_drive_t *drive, struct ide_cmd *cmd,
->         ide_hwif_t *hwif = drive->hwif;
->         struct scatterlist *sg = hwif->sg_table;
->         struct scatterlist *cursg = cmd->cursg;
-> -       unsigned long uninitialized_var(flags);
->         struct page *page;
->         unsigned int offset;
->         u8 *buf;
+> diff --git a/drivers/spi/spi-davinci.c b/drivers/spi/spi-davinci.c
+> index f71c497393a6..f50c0c79cbdf 100644
+> --- a/drivers/spi/spi-davinci.c
+> +++ b/drivers/spi/spi-davinci.c
+> @@ -576,7 +576,6 @@ static int davinci_spi_bufs(struct spi_device *spi, s=
+truct spi_transfer *t)
+>         u32 errors =3D 0;
+>         struct davinci_spi_config *spicfg;
+>         struct davinci_spi_platform_data *pdata;
+> -       unsigned uninitialized_var(rx_buf_count);
+>
+>         dspi =3D spi_master_get_devdata(spi->master);
+>         pdata =3D &dspi->pdata;
 > --
 > 2.25.1
 >
 > --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200603233203.1695403-6-keescook%40chromium.org.
+> You received this message because you are subscribed to the Google Groups=
+ "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgi=
+d/clang-built-linux/20200603233203.1695403-8-keescook%40chromium.org.
 
 
 
--- 
+--=20
 Thanks,
 ~Nick Desaulniers
