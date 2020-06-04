@@ -2,107 +2,136 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4A1C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6E1C433E1
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:29:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10886206C3
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:14:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A13F2207F9
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 19:29:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drXSah+U"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qNWdjuwt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726456AbgFDTOR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 15:14:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47240 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726480AbgFDTOR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 15:14:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591298056;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+P5s6QFAet4IgovHLPL8H2pSUM47EY9OL/ITWccuoIw=;
-        b=drXSah+U8RKH2DtOEDk3Zm84pa3MM+LxIaAhsQCqtqniZ02SfsO+RPp0obKD1LgeSiGiAO
-        cPCBtQCcSjNNq5QSS5XwXVG9VuzospxIIvTlYa+SBUeB2znP1hhDQKbnGpX8ugYAJTZOjf
-        o59myH6iPKvr69ekh+4AQzEDz6iyrVE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-4LOqTJZ5P32dR1PTB1DGwQ-1; Thu, 04 Jun 2020 15:14:12 -0400
-X-MC-Unique: 4LOqTJZ5P32dR1PTB1DGwQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14A9F18B638C;
-        Thu,  4 Jun 2020 19:14:11 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B66555C1B0;
-        Thu,  4 Jun 2020 19:14:02 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 054JE2vE003437;
-        Thu, 4 Jun 2020 15:14:02 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 054JE2As003433;
-        Thu, 4 Jun 2020 15:14:02 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Thu, 4 Jun 2020 15:14:02 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Eric Biggers <ebiggers@kernel.org>
-cc:     dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] dm crypt: avoid truncating the logical block size
-In-Reply-To: <20200604190126.15735-1-ebiggers@kernel.org>
-Message-ID: <alpine.LRH.2.02.2006041512500.3360@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20200604190126.15735-1-ebiggers@kernel.org>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S1728696AbgFDT3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 15:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43462 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728785AbgFDT3a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 15:29:30 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1625C08C5C4
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 12:29:29 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id bg4so2622698plb.3
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 12:29:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BN0NA5oXxaJmgloA0bV1VuRl7DweslwGb9BXC5tlSZI=;
+        b=qNWdjuwtEh3SepeFF9fNagsbBVKMOdC+i2KqVDopsH6dlehq61YjmGsjU3zQ6/6Sm+
+         RI59y6nTt3iJaugOaLxusXHriKBWVNJCrzHeENeqAGVpHLkPMQooCck+j2xRNg4QVbq2
+         U7Aga0bTxqeYSMNSshjefDdYD9kzqlGJMlmXX3yAeOrKcPi394fVJzn+N+UEYVrgLikW
+         PJ80Ob/zePEkwKogqqleJVCwqC4lBAXZfyFsOJ1Q71OHbRbc0fyAs9RyF+VvGzxb6jyN
+         PR+j0XjbkYKBjIdoJN78dsQ95HeKy3QSGz7aES9jpi6oH42fz2hvJ1Opql+7AsV4VMb8
+         cVyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BN0NA5oXxaJmgloA0bV1VuRl7DweslwGb9BXC5tlSZI=;
+        b=mGc1ELmnNhpaIo2FY1weAUSQTo5lCZDBQtU/F8t2HDkVmqI2wme3dchK4ctlMcARn4
+         QDy6Tgq78s7TEjiePR8K69PiH+8ciRks2bfwduPfel1rCsbo1m5rn6t6rt4KXgLF4Z/B
+         1CGoae4VjZShE3KzbYck0svEtf8nl2U6/cxt1jsSwAA0awmOs7yglGaE4mGuQF/zMOE2
+         j3P444h4z0oh7aRlFOO6GyqEJE/q7c4jIu9MVT39Rx8z4b3kJw74c4LNcrLh+nRZtw0w
+         Bp28OcuSmuOuNwX9qxyboLGc/zjlZQhghft/2u3MrAUGW7CcPs6QBEKRjNyJDYYU0dSp
+         GdTw==
+X-Gm-Message-State: AOAM5339yzy8HIgDFoHkE6oW1rqxBU19OG7Jft5ySWAEn4zIQ++zilqL
+        Ad/lQMajr/4HPA2niErqkwBXRr+3QuykkS2mY23sOg==
+X-Google-Smtp-Source: ABdhPJzSzKsiHc4z7LwcmpkgMu0NbAbDQYhYcnmTB/97B33m/EUjE6lKfBun6ZCLEkmHQ8gJwyD1p9mb5gkpJj8C3R0=
+X-Received: by 2002:a17:902:724a:: with SMTP id c10mr6119344pll.223.1591298968901;
+ Thu, 04 Jun 2020 12:29:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200603233203.1695403-1-keescook@chromium.org> <20200603233203.1695403-6-keescook@chromium.org>
+In-Reply-To: <20200603233203.1695403-6-keescook@chromium.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 4 Jun 2020 12:29:17 -0700
+Message-ID: <CAKwvOdm5zDide5RuppY_jG=r46=UMdVJBrkBqD5x=dOMTG9cZg@mail.gmail.com>
+Subject: Re: [PATCH 05/10] ide: Remove uninitialized_var() usage
+To:     Kees Cook <keescook@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Joe Perches <joe@perches.com>,
+        Andy Whitcroft <apw@canonical.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        b43-dev@lists.infradead.org,
+        Network Development <netdev@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-spi@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> Using uninitialized_var() is dangerous as it papers over real bugs[1]
+> (or can in the future), and suppresses unrelated compiler warnings (e.g.
+> "unused variable"). If the compiler thinks it is uninitialized, either
+> simply initialize the variable or make compiler changes. As a precursor
+> to removing[2] this[3] macro[4], just remove this variable since it was
+> actually unused:
+>
+> drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-variable]
+>         unsigned long uninitialized_var(flags);
+>                                         ^
+>
+> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-
-On Thu, 4 Jun 2020, Eric Biggers wrote:
-
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> queue_limits::logical_block_size got changed from unsigned short to
-> unsigned int, but it was forgotten to update crypt_io_hints() to use the
-> new type.  Fix it.
-> 
-> Fixes: ad6bf88a6c19 ("block: fix an integer overflow in logical block size")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-
-Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Fixes ce1e518190ea ("ide: don't disable interrupts during kmap_atomic()")
 
 > ---
->  drivers/md/dm-crypt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 3df90daba89e..a1dcb8675484 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -3274,7 +3274,7 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  	limits->max_segment_size = PAGE_SIZE;
->  
->  	limits->logical_block_size =
-> -		max_t(unsigned short, limits->logical_block_size, cc->sector_size);
-> +		max_t(unsigned, limits->logical_block_size, cc->sector_size);
->  	limits->physical_block_size =
->  		max_t(unsigned, limits->physical_block_size, cc->sector_size);
->  	limits->io_min = max_t(unsigned, limits->io_min, cc->sector_size);
-> -- 
-> 2.27.0.278.ge193c7cf3a9-goog
-> 
+>  drivers/ide/ide-taskfile.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/drivers/ide/ide-taskfile.c b/drivers/ide/ide-taskfile.c
+> index aab6a10435b6..a26f85ab58a9 100644
+> --- a/drivers/ide/ide-taskfile.c
+> +++ b/drivers/ide/ide-taskfile.c
+> @@ -229,7 +229,6 @@ void ide_pio_bytes(ide_drive_t *drive, struct ide_cmd *cmd,
+>         ide_hwif_t *hwif = drive->hwif;
+>         struct scatterlist *sg = hwif->sg_table;
+>         struct scatterlist *cursg = cmd->cursg;
+> -       unsigned long uninitialized_var(flags);
+>         struct page *page;
+>         unsigned int offset;
+>         u8 *buf;
+> --
+> 2.25.1
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200603233203.1695403-6-keescook%40chromium.org.
 
+
+
+-- 
+Thanks,
+~Nick Desaulniers
