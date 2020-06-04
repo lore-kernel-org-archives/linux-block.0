@@ -1,63 +1,49 @@
-Return-Path: <SRS0=EWxa=7Q=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1E2C433EA
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B48D6C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 00:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AC8F207ED
-	for <linux-block@archiver.kernel.org>; Wed,  3 Jun 2020 23:34:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NPDoMZL+"
+	by mail.kernel.org (Postfix) with ESMTP id 9979620679
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 00:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727065AbgFCXeH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Jun 2020 19:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbgFCXcP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 19:32:15 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABA3C08C5C8
-        for <linux-block@vger.kernel.org>; Wed,  3 Jun 2020 16:32:14 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id g12so1367817pll.10
-        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2020 16:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=hMUFWqcrC1VZxvWDwrZSg4KS9BvtvLd2CEEYtAT+tik=;
-        b=NPDoMZL+zfsatoKLllUEr8wu4PDByFvpOx0tUIG0zh+F9kNU3lZAIs4/72VWZHO62B
-         wJNDmXTEzDkwVDFm5ZmRQQz2JzgS9VFCuCWR/c1ERdo1M9u6NFUkJjq4MdvlAxFdWiuA
-         qZfnse2pv1GkiYqRcfQiacr45rwEs75PqerkU=
+        id S1726003AbgFDAAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Jun 2020 20:00:37 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36418 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725937AbgFDAAg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jun 2020 20:00:36 -0400
+Received: by mail-pl1-f196.google.com with SMTP id bg4so1404547plb.3;
+        Wed, 03 Jun 2020 17:00:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=hMUFWqcrC1VZxvWDwrZSg4KS9BvtvLd2CEEYtAT+tik=;
-        b=mL5B258cIptsexc43AaH8LMCMCn/2lFldfvN4Ed72D/v+7IGmXWaEMDJaI39g99IJ4
-         oV0GrTV8tcglpCJHNJXKIPvA3LwDEo7tjPSqbynB5rj8GH4Q+EFeI0jNmJ1bg9QPn9Ld
-         i7SFDmoaQWNwq5Qzm5og7a5QrO3VysFBQptBIbP378YVFMvGPaEkhDonKnJyJ1u7NvCU
-         BTjO9DV5qIsqihxBLS8arbBt+2DoIKf5Be5nscRuLcoZGe1FnC43HvEs5kitQ2/Dyydc
-         BznVfss/s+XcbU5nrBKPsKWJQeaHsz99l4qdNIGJcv8N4LDmmxpxWWKhnKWEZRz4yFwT
-         Mx0w==
-X-Gm-Message-State: AOAM53046cSYamNPgWC8uOU/nyX0uuuhWjZ7/3reADGS8DpXqMmkPjMr
-        sa7UBGt+HWYymT1MqXJ641wePQ==
-X-Google-Smtp-Source: ABdhPJwEforJlQ6Hw2sLXD7jNMrxzqXBv5BlsWVfup5BJSe8mp612gIHwefIBt6eEGH3vm6zOlawSw==
-X-Received: by 2002:a17:90b:3448:: with SMTP id lj8mr2505301pjb.163.1591227134470;
-        Wed, 03 Jun 2020 16:32:14 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id b1sm3836777pjc.33.2020.06.03.16.32.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2020 16:32:12 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=hqnXIJZaSToxwE4bsbIxKQdnZSaxn/cLMp66RTiJkEo=;
+        b=QtmfPKHb1de9eqnOjTAaek7DA3jPQBQJBw01QehIc+ht/jlY6ZNYMy5rGdJOZwxDNM
+         jUlyxFp7y0ApdBsyAzq7CgDZ0lMkxvI/1ERPZU4cHTbId0/xk8xu86JnbC9bQLXOL+WY
+         KmGJ+k0iG4iePZc/acsXZPusb9tccWAxFqeMBPC35HXSYwbLYceGX/Ix2J/7ff+tK3Uj
+         wa443ovMpRcXx9Go6IX8EkQ3tCQA3kgXq4SzD2EZeLhVGJd1QP6r2Df4fjDbgJnW+6em
+         mqy70Ue1wNLGL4pcTfUPpzogCnrclWPM3vG9uJQ82oFKZcbCq+28wc5pE1m8QXqUdeCG
+         JBEA==
+X-Gm-Message-State: AOAM533gLvx5HsLJC+Bj1l+QIS/nMP1lsoPqeP241cYBfVjCPO8zGD2I
+        2a/MIfgzzhGSjS8zAo4U+JBm51hI
+X-Google-Smtp-Source: ABdhPJxdv1OUJungAAnQJYQOYNOB9vqFI8KXBhLqIskIXOR/nZN6yrPTlTHOI+Lv1CJsgyn+BRHNiA==
+X-Received: by 2002:a17:90b:605:: with SMTP id gb5mr2422811pjb.167.1591228835561;
+        Wed, 03 Jun 2020 17:00:35 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id 98sm3970139pjo.12.2020.06.03.17.00.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2020 17:00:34 -0700 (PDT)
+Subject: Re: [PATCH 10/10] compiler: Remove uninitialized_var() macro
+To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Alexander Potapenko <glider@google.com>,
         Joe Perches <joe@perches.com>,
@@ -67,91 +53,52 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
         linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 01/10] x86/mm/numa: Remove uninitialized_var() usage
-Date:   Wed,  3 Jun 2020 16:31:54 -0700
-Message-Id: <20200603233203.1695403-2-keescook@chromium.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200603233203.1695403-1-keescook@chromium.org>
 References: <20200603233203.1695403-1-keescook@chromium.org>
+ <20200603233203.1695403-11-keescook@chromium.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <8882ca16-5192-a519-d5a8-02371fbb28cb@acm.org>
+Date:   Wed, 3 Jun 2020 17:00:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200603233203.1695403-11-keescook@chromium.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Using uninitialized_var() is dangerous as it papers over real bugs[1]
-(or can in the future), and suppresses unrelated compiler warnings (e.g.
-"unused variable"). If the compiler thinks it is uninitialized, either
-simply initialize the variable or make compiler changes. As a precursor
-to removing[2] this[3] macro[4], refactor code to avoid its need.
+On 2020-06-03 16:32, Kees Cook wrote:
+> Using uninitialized_var() is dangerous as it papers over real bugs[1]
+> (or can in the future), and suppresses unrelated compiler warnings
+> (e.g. "unused variable"). If the compiler thinks it is uninitialized,
+> either simply initialize the variable or make compiler changes.
 
-The original reason for its use here was to work around the #ifdef
-being the only place the variable was used. This is better expressed
-using IS_ENABLED() and a new code block where the variable can be used
-unconditionally.
+Thank you for having done this work!
 
-[1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-[2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-[3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-[4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- arch/x86/mm/numa.c                | 18 +++++++++---------
- include/linux/page-flags-layout.h |  2 +-
- 2 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/mm/numa.c b/arch/x86/mm/numa.c
-index 59ba008504dc..38eeb15f3b07 100644
---- a/arch/x86/mm/numa.c
-+++ b/arch/x86/mm/numa.c
-@@ -541,7 +541,6 @@ static void __init numa_clear_kernel_node_hotplug(void)
- 
- static int __init numa_register_memblks(struct numa_meminfo *mi)
- {
--	unsigned long uninitialized_var(pfn_align);
- 	int i, nid;
- 
- 	/* Account for nodes with cpus and no memory */
-@@ -569,15 +568,16 @@ static int __init numa_register_memblks(struct numa_meminfo *mi)
- 	 * If sections array is gonna be used for pfn -> nid mapping, check
- 	 * whether its granularity is fine enough.
- 	 */
--#ifdef NODE_NOT_IN_PAGE_FLAGS
--	pfn_align = node_map_pfn_alignment();
--	if (pfn_align && pfn_align < PAGES_PER_SECTION) {
--		printk(KERN_WARNING "Node alignment %LuMB < min %LuMB, rejecting NUMA config\n",
--		       PFN_PHYS(pfn_align) >> 20,
--		       PFN_PHYS(PAGES_PER_SECTION) >> 20);
--		return -EINVAL;
-+	if (IS_ENABLED(NODE_NOT_IN_PAGE_FLAGS)) {
-+		unsigned long pfn_align = node_map_pfn_alignment();
-+
-+		if (pfn_align && pfn_align < PAGES_PER_SECTION) {
-+			pr_warn("Node alignment %LuMB < min %LuMB, rejecting NUMA config\n",
-+				PFN_PHYS(pfn_align) >> 20,
-+				PFN_PHYS(PAGES_PER_SECTION) >> 20);
-+			return -EINVAL;
-+		}
- 	}
--#endif
- 	if (!numa_meminfo_cover_memory(mi))
- 		return -EINVAL;
- 
-diff --git a/include/linux/page-flags-layout.h b/include/linux/page-flags-layout.h
-index 71283739ffd2..1a4cdec2bd29 100644
---- a/include/linux/page-flags-layout.h
-+++ b/include/linux/page-flags-layout.h
-@@ -100,7 +100,7 @@
-  * there.  This includes the case where there is no node, so it is implicit.
-  */
- #if !(NODES_WIDTH > 0 || NODES_SHIFT == 0)
--#define NODE_NOT_IN_PAGE_FLAGS
-+#define NODE_NOT_IN_PAGE_FLAGS 1
- #endif
- 
- #if defined(CONFIG_NUMA_BALANCING) && LAST_CPUPID_WIDTH == 0
--- 
-2.25.1
-
+Reviewed-by: Bart van Assche <bvanassche@acm.org>
