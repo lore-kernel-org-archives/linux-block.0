@@ -2,65 +2,61 @@ Return-Path: <SRS0=q4M6=7R=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4014C433E1
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257B9C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3329206E6
-	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3D3D207ED
+	for <linux-block@archiver.kernel.org>; Thu,  4 Jun 2020 20:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ul9IqQ41"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iwsRqxQE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729536AbgFDUQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 16:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
+        id S1729058AbgFDUSf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 16:18:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbgFDUQV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:16:21 -0400
+        with ESMTP id S1728116AbgFDUSe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 16:18:34 -0400
 Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA822C08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 13:16:20 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id t7so4037929pgt.3
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 13:16:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62005C08C5C0
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 13:18:34 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id e9so3997720pgo.9
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 13:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pCXmYsl76J0CAlxoPdk8mPZO/WOJwZ5J1IK/xTYSvtY=;
-        b=Ul9IqQ41ZiXh1TA37NXxQoP1MYWZkk1ImeHfZoGz6a6IPTQKCTgkI4vMbYvxIt8wpE
-         ElHA9RWwTvFCaySEtclTRP/dyePJtOWdEk29ahiOH2gLk0aIx7jxMqS8sHpI0dAD9/eD
-         v2pQeh6hmu6BRKkCyhh5mYDGk/czBtEllytZVgQeNFhavoEfrbFwLLVfzZ/2XW9eqAuC
-         T6PPxSNZdkIUyyCpj3L+bHh3A58HE+YTCCyomOaAjuPFYAu7WNLA0VPJGgc8Oy3KvimW
-         enSRBgfNysV+6XPIzSx1E3hPpfiQZPkCEErtaeB8Ewgc+PLJOHksAeBzo6J1PIYEAlTL
-         B91g==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KSgduwKhAGu1Me5hdrsNlT/LSTVts5IMrrdQbnnmgtM=;
+        b=iwsRqxQEY+LpPM+s+DR5Kt1prnKy4GHGxqj/QUqqkkqSMBCDJe1CHdT/yKZJkiBDXL
+         Y6szw+en5NZ6khTYpwS0FGviJsYX/r26zXRpTi2oURHUxJskaDdTNYF20YKqgU+50wUG
+         aJZ2WjX85SJKBXLpicthf/oXnlRh2W1BmzGAE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pCXmYsl76J0CAlxoPdk8mPZO/WOJwZ5J1IK/xTYSvtY=;
-        b=q/tV2/ydMr2yN380OJ3KU4ptgMMK55N7BqOuwdYORl3V2VKcQkjbPpHv+rQkjTbxSu
-         /6tssSRKL6Q5IXl7wXGB1jOwApdxUWmb56tLo5v1TQTPSddHvWgyILAg2TgUTdeh6s9s
-         VvXsi9/IyI97l0s+5/0JwQjWrMymmTt539xDXazfRBI2YEy0i4rTT3/QvD5R+1RXARx1
-         EW4EeoTul1Mqu14OTNmJyC4sArKQf08xcs4urhXYDk9yYT+OiGMtPtKxwWTBuOGv9I9p
-         B7BAOXxJrJi/koD0Xi/6UYDNOLBButCQ4YirHwnaBiBVscNYuuh7L2RA5rXzADRFU82L
-         pLbw==
-X-Gm-Message-State: AOAM532yozS9+YQijRDkDGYXMdeSCX5L0Dccf7cl3YXYQuTfhIidogJL
-        7IBYYOhzZAnlUcXGmDiwrIkYJI7TBYb+yrZ3AzvCBw==
-X-Google-Smtp-Source: ABdhPJye6FZH70P5vXHcitY46EI4rxFnZqJif4KZJI8zWDppq3cq3MmDJfiH17IwjHHvUarffuS8hk7FOMV62ymzGuM=
-X-Received: by 2002:a63:4f09:: with SMTP id d9mr5970154pgb.10.1591301780211;
- Thu, 04 Jun 2020 13:16:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200603233203.1695403-1-keescook@chromium.org> <20200603233203.1695403-5-keescook@chromium.org>
-In-Reply-To: <20200603233203.1695403-5-keescook@chromium.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 4 Jun 2020 13:16:08 -0700
-Message-ID: <CAKwvOdnd30bcqoNXF1ugadU=KbW3aXu07+T-891amO2_b7kQdg@mail.gmail.com>
-Subject: Re: [PATCH 04/10] rtlwifi: rtl8192cu: Remove uninitialized_var() usage
-To:     Kees Cook <keescook@chromium.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KSgduwKhAGu1Me5hdrsNlT/LSTVts5IMrrdQbnnmgtM=;
+        b=J3EgfbRmY+kv64VCNtypz174I+pkTuPVivvcCJClrm/V4YjN37l9Tq/ZdoK0xch1kk
+         F6EvTHqJ4xKyOWchdNq+HDveylTKdp/xT3ft6VLXmpKJT3iDL7CXN3BMj0NBHAf329ah
+         Ngnm0iHW7H4mRTMY96Bdo4U9o1o6f0DZ1VEZ+umO5u2u+stw6qUdIZChBVAQpwNnJ+NX
+         CcemNJV/B9G1bex1gNLSMXUFRYy/YnziolP28fV2cM5UVLlAOOmCa4eW7sZ/bNm9SwF7
+         bdjG9sy0oCbZ0W1EJUPbv95pVa9Q+RGdFYWPtSltKyLgRncZ0l6cTP0j0SzJwNnsmLmV
+         GQng==
+X-Gm-Message-State: AOAM530NUWPrD8OeoXRwKZfAReRgmZyroK/5BLtInBy3rK3dAECBn7ma
+        K47CJ6frfrTETPEAW3DusKufLg==
+X-Google-Smtp-Source: ABdhPJy6jmo6NLjATFT9PEAZE69aJp2ake2/5E+UKA7LNV6vmFPBoWj+KBik/aUM7ISRTcCYuBBaWw==
+X-Received: by 2002:a63:c58:: with SMTP id 24mr6232804pgm.246.1591301913875;
+        Thu, 04 Jun 2020 13:18:33 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id r5sm5581320pji.20.2020.06.04.13.18.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2020 13:18:33 -0700 (PDT)
+Date:   Thu, 4 Jun 2020 13:18:31 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
@@ -76,61 +72,93 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         linux-spi@vger.kernel.org,
         Linux Memory Management List <linux-mm@kvack.org>,
         clang-built-linux <clang-built-linux@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 03/10] b43: Remove uninitialized_var() usage
+Message-ID: <202006041316.A15D952@keescook>
+References: <20200603233203.1695403-1-keescook@chromium.org>
+ <20200603233203.1695403-4-keescook@chromium.org>
+ <CAKwvOdnNuFySqAMk7s_cXqFM=dPX4JfvqNVLCuj90Gn4tzciAw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdnNuFySqAMk7s_cXqFM=dPX4JfvqNVLCuj90Gn4tzciAw@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
->
-> Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> (or can in the future), and suppresses unrelated compiler warnings (e.g.
-> "unused variable"). If the compiler thinks it is uninitialized, either
-> simply initialize the variable or make compiler changes. As a precursor
-> to removing[2] this[3] macro[4], just initialize this variable to NULL,
-> and avoid sending garbage by returning.
->
-> [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+On Thu, Jun 04, 2020 at 01:08:44PM -0700, Nick Desaulniers wrote:
+> On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > Using uninitialized_var() is dangerous as it papers over real bugs[1]
+> > (or can in the future), and suppresses unrelated compiler warnings (e.g.
+> > "unused variable"). If the compiler thinks it is uninitialized, either
+> > simply initialize the variable or make compiler changes. As a precursor
+> > to removing[2] this[3] macro[4], just initialize this variable to NULL,
+> > and make the (unreachable!) code do a conditional test.
+> >
+> > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+> > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+> > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+> > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+> >
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  drivers/net/wireless/broadcom/b43/phy_n.c | 10 +++++++---
+> >  1 file changed, 7 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
+> > index d3c001fa8eb4..88cdcea10d61 100644
+> > --- a/drivers/net/wireless/broadcom/b43/phy_n.c
+> > +++ b/drivers/net/wireless/broadcom/b43/phy_n.c
+> > @@ -4222,7 +4222,7 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
+> 
+> The TODOs and `#if 0` in this function are concerning.  It looks like
+> `rf_pwr_offset_table` is only used when `phy->rev` is >=7 && < 19.
+> 
+> Further, the loop has a case for `phy->rev >= 19` but we would have
+> returned earlier if that was the case.
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Fixes: dc0313f46664 ("rtlwifi: rtl8192cu: Add routine hw")
+Yeah, that's why I put the "(unreachable!)" note in the commit log. ;)
 
-> ---
->  drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
-> index f070f25bb735..5b071b70bc08 100644
-> --- a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
-> +++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
-> @@ -592,7 +592,7 @@ static void _rtl92cu_init_chipn_one_out_ep_priority(struct ieee80211_hw *hw,
->                                                     bool wmm_enable,
->                                                     u8 queue_sel)
->  {
-> -       u16 uninitialized_var(value);
-> +       u16 value;
->
->         switch (queue_sel) {
->         case TX_SELE_HQ:
-> @@ -606,7 +606,7 @@ static void _rtl92cu_init_chipn_one_out_ep_priority(struct ieee80211_hw *hw,
->                 break;
->         default:
->                 WARN_ON(1); /* Shall not reach here! */
-> -               break;
-> +               return;
->         }
->         _rtl92c_init_chipn_reg_priority(hw, value, value, value, value,
->                                         value, value);
+> 
+> >         u32 rfpwr_offset;
+> >         u8 pga_gain, pad_gain;
+> >         int i;
+> > -       const s16 *uninitialized_var(rf_pwr_offset_table);
+> > +       const s16 *rf_pwr_offset_table = NULL;
+> >
+> >         table = b43_nphy_get_tx_gain_table(dev);
+> >         if (!table)
+> > @@ -4256,9 +4256,13 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
+> >                         pga_gain = (table[i] >> 24) & 0xf;
+> >                         pad_gain = (table[i] >> 19) & 0x1f;
+> >                         if (b43_current_band(dev->wl) == NL80211_BAND_2GHZ)
+> > -                               rfpwr_offset = rf_pwr_offset_table[pad_gain];
+> > +                               rfpwr_offset = rf_pwr_offset_table
+> > +                                               ? rf_pwr_offset_table[pad_gain]
+> > +                                               : 0;
+> >                         else
+> > -                               rfpwr_offset = rf_pwr_offset_table[pga_gain];
+> > +                               rfpwr_offset = rf_pwr_offset_table
+> > +                                               ? rf_pwr_offset_table[pga_gain]
+> > +                                               : 0;
+> 
+> 
+> The code is trying to check `phy->rev >= 7 && phy->rev < 19` once
+> before the loop, then set `rf_pwr_offset_table`, so having another
+> conditional on `rf_pwr_offset_table` in the loop is unnecessary. I'm
+> ok with initializing it to `NULL`, but I'm not sure the conditional
+> check is necessary.  Do you get a compiler warning otherwise?
 
-Whew! Nothing like passing the same value 6 times! (Other callers do
-use distinct values though, just curious seeing this instance.)
+I mean, sort of the best thing to do is just remove nearly everything
+here since it's actually unreachable. But it is commented as "when
+supported ..." etc, so I figured I'd leave it. As part of that I didn't
+want to leave any chance of a NULL deref, so I added the explicit tests
+just for robustness.
+
+*shrug*
+
+-Kees
 
 -- 
-Thanks,
-~Nick Desaulniers
+Kees Cook
