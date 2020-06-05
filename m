@@ -2,120 +2,232 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D500C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 07:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DA4C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 08:21:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3D53206DC
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 07:31:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5A5YFDm"
+	by mail.kernel.org (Postfix) with ESMTP id 3D5452074B
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 08:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725986AbgFEHbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 03:31:46 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25337 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725280AbgFEHbp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 03:31:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591342304;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hGfj0xACvt+aD8msBaBYURuw6XsINDRLgRfsY+KyXP8=;
-        b=D5A5YFDmVdZtkVqmkmfH4PLw+f2IEJiw14/AY5uQt3gF4yVkqZaf8SYs9ivRJ2vqOxuRQr
-        2R1OdOUwBJQFuj6EHUL8LyXQBZ1fHEAak5TJAfslrbqZe6kCOpAcDH4OfENjc2eW3/wPZV
-        zIWLqXyH2Yk3AaxOx5MWnZJb0XMceAs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-FL5RJ0lIMNKHGKdyTdEC2A-1; Fri, 05 Jun 2020 03:31:40 -0400
-X-MC-Unique: FL5RJ0lIMNKHGKdyTdEC2A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9BD8800688;
-        Fri,  5 Jun 2020 07:31:38 +0000 (UTC)
-Received: from T590 (ovpn-12-164.pek2.redhat.com [10.72.12.164])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58B176292E;
-        Fri,  5 Jun 2020 07:31:31 +0000 (UTC)
-Date:   Fri, 5 Jun 2020 15:31:27 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
- inactive hctx
-Message-ID: <20200605073127.GA2378708@T590>
-References: <6fbd3669-4358-6d9f-5c94-e1bc7acecb86@oracle.com>
- <b37b1f30-722b-4767-0627-103b94c7421c@huawei.com>
- <20200604112615.GA2336493@T590>
- <7291fd02-3c2c-f3f9-f3eb-725cd85d5523@huawei.com>
- <20200604120747.GB2336493@T590>
- <38b4c7a3-057f-c52c-993b-523660085e3c@huawei.com>
- <20200604130058.GC2336493@T590>
- <83c37a8f-abfa-c1d1-e9d6-ccfdd344edb3@huawei.com>
- <20200605005915.GA2368173@T590>
- <e7d97cfa-c0c3-180c-cfbd-976d90592ac1@huawei.com>
+        id S1726062AbgFEIVr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 04:21:47 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:13131 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725986AbgFEIVr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 04:21:47 -0400
+X-IronPort-AV: E=Sophos;i="5.73,475,1583164800"; 
+   d="scan'208";a="93895131"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+  by heian.cn.fujitsu.com with ESMTP; 05 Jun 2020 16:21:39 +0800
+Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
+        by cn.fujitsu.com (Postfix) with ESMTP id 65CB250A996F;
+        Fri,  5 Jun 2020 16:21:35 +0800 (CST)
+Received: from [10.167.220.84] (10.167.220.84) by
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.2; Fri, 5 Jun 2020 16:21:35 +0800
+Subject: Re: LTP: syscalls: regression on mainline - ioctl_loop01 mknod07
+ setns01
+To:     Martijn Coenen <maco@android.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>
+CC:     LTP List <ltp@lists.linux.it>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        chrubis <chrubis@suse.cz>, Arnd Bergmann <arnd@arndb.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Jan Stancek <jstancek@redhat.com>,
+        Xiao Yang <yangx.jy@cn.fujitsu.com>,
+        Richard Palethorpe <rpalethorpe@suse.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        <lkft-triage@lists.linaro.org>
+References: <CA+G9fYuGwcE3zyMFQPpfA0CyW=4WOg9V=kCfKhS7b8930jQofA@mail.gmail.com>
+ <CA+G9fYuUvjDeLXVm2ax_5UF=OJeH7fog0U7GG2vEUXg-HXWRqg@mail.gmail.com>
+ <CAB0TPYGo5ePYrah3Wgv_M1fx91+niRe12YaBBXGfs5b87Fjtrg@mail.gmail.com>
+ <CAB0TPYEx4Z8do3qL1KVpnGGnorTLGqKtrwi1uQgxQ6Xw3JqiYw@mail.gmail.com>
+From:   Yang Xu <xuyang2018.jy@cn.fujitsu.com>
+Message-ID: <ca8a4087-8c8b-6105-3f2c-1e2deee5f987@cn.fujitsu.com>
+Date:   Fri, 5 Jun 2020 16:21:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e7d97cfa-c0c3-180c-cfbd-976d90592ac1@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAB0TPYEx4Z8do3qL1KVpnGGnorTLGqKtrwi1uQgxQ6Xw3JqiYw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.167.220.84]
+X-ClientProxiedBy: G08CNEXCHPEKD04.g08.fujitsu.local (10.167.33.200) To
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201)
+X-yoursite-MailScanner-ID: 65CB250A996F.AF3EE
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: xuyang2018.jy@cn.fujitsu.com
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 08:24:50AM +0100, John Garry wrote:
-> On 05/06/2020 01:59, Ming Lei wrote:
-> > > 	hctx5: default 36 37 38 39
-> > > 	hctx6: default 40 41 42 43
-> > > 	hctx7: default 44 45 46 47
-> > > 	hctx8: default 48 49 50 51
-> > > 	hctx9: default 52 53 54 55
-> > > 	hctx10: default 56 57 58 59
-> > > 	hctx11: default 60 61 62 63
-> > > 	hctx12: default 0 1 2 3
-> > > 	hctx13: default 4 5 6 7
-> > > 	hctx14: default 8 9 10 11
-> > > 	hctx15: default 12 13 14 15
-> > OK, the queue mapping is correct.
-> > 
-> > As I mentioned in another thread, the real hw tag may be set as wrong.
-> > 
-> 
-> I doubt this.
-> 
-> And I think that you should also be able to add the same debug to
-> blk_mq_hctx_notify_offline() to see that there may be still driver tags
-> allocated to when all the scheduler tags are free'd for any test in your
-> env.
+Hi Martijn
 
-No, that isn't possible, scheduler tag lifetime covers the whole request's
-lifetime.
-
+> Hi Naresh,
 > 
-> > You have to double check your cooked tag allocation algorithm and see if it
-> > can work well when more requests than real hw queue depth are queued to hisi_sas,
-> > and the correct way is to return SCSI_MLQUEUE_HOST_BUSY from .queuecommand().
+> I just sent a patch and cc'd you. I verified all the loop tests pass
+> again with that patch.
+I think you want to say "without".  I verified the ioctl_loop01 fails 
+with faf1d25440 ("loop: Clean up LOOP_SET_STATUS lo_flags handling").
+
+This kernel commit breaks old behaviour(if old flag all 0, new flag is 
+always 0 regradless your flag setting).
+
+I think we should modify code as below:
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 13518ba191f5..c6ba8cf486ce 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1364,11 +1364,9 @@ loop_set_status(struct loop_device *lo, const 
+struct loop_info64 *info)
+         if (err)
+                 goto out_unfreeze;
+
+-       /* Mask out flags that can't be set using LOOP_SET_STATUS. */
+-       lo->lo_flags &= ~LOOP_SET_STATUS_SETTABLE_FLAGS;
+-       /* For those flags, use the previous values instead */
+-       lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_SETTABLE_FLAGS;
+-       /* For flags that can't be cleared, use previous values too */
++       /* Mask out flags that can be set using LOOP_SET_STATUS. */
++       lo->lo_flags &= LOOP_SET_STATUS_SETTABLE_FLAGS;
++       /* For flags that can't be cleared, use previous values. */
+         lo->lo_flags |= prev_lo_flags &~LOOP_SET_STATUS_CLEARABLE_FLAGS;
+
+Best Regards
+Yang Xu
 > 
-> Yeah, the LLDD would just reject requests in that scenario and we would know
-> about it from logs etc.
+> Thanks,
+> Martijn
 > 
-> Anyway, I'll continue to check.
+> 
+> On Thu, Jun 4, 2020 at 9:10 PM Martijn Coenen <maco@android.com> wrote:
+>>
+>> Hi Naresh,
+>>
+>> I suspect the loop failures are due to
+>> faf1d25440d6ad06d509dada4b6fe62fea844370 ("loop: Clean up
+>> LOOP_SET_STATUS lo_flags handling"), I will investigate and get back
+>> to you.
+>>
+>> Thanks,
+>> Martijn
+>>
+>> On Thu, Jun 4, 2020 at 7:19 PM Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>>
+>>> + linux-block@vger.kernel.org
+>>>
+>>> On Thu, 4 Jun 2020 at 22:47, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>>>
+>>>> Following three test cases reported as regression on Linux mainline kernel
+>>>> on x86_64, arm64, arm and i386
+>>>>
+>>>>    ltp-syscalls-tests:
+>>>>      * ioctl_loop01
+>>>>      * mknod07
+>>>>      * setns01
+>>>>
+>>>> git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>>>> git branch: master
+>>>> GOOD:
+>>>>    git commit: b23c4771ff62de8ca9b5e4a2d64491b2fb6f8f69
+>>>>    git describe: v5.7-1230-gb23c4771ff62
+>>>> BAD:
+>>>>    git commit: 1ee08de1e234d95b5b4f866878b72fceb5372904
+>>>>    git describe: v5.7-3523-g1ee08de1e234
+>>>>
+>>>> kernel-config: https://builds.tuxbuild.com/U3bU0dMA62OVHb4DvZIVuw/kernel.config
+>>>>
+>>>> We are investigating these failures.
+>>>>
+>>>> tst_test.c:906: CONF: btrfs driver not available
+>>>> tst_test.c:1246: INFO: Timeout per run is 0h 15m 00s
+>>>> tst_device.c:88: INFO: Found free device 1 '/dev/loop1'
+>>>> ioctl_loop01.c:49: PASS: /sys/block/loop1/loop/partscan = 0
+>>>> [ 1073.639677] loop_set_status: loop1 () has still dirty pages (nrpages=1)
+>>>> ioctl_loop01.c:50: PASS: /sys/block/loop1/loop/autoclear = 0
+>>>> ioctl_loop01.c:51: PASS: /sys/block/loop1/loop/backing_file =
+>>>> '/scratch/ltp-mnIdulzriQ/9cPtLQ/test.img'
+>>>> ioctl_loop01.c:63: FAIL: expect 12 but got 17
+>>>> ioctl_loop01.c:67: FAIL: /sys/block/loop1/loop/partscan != 1 got 0
+>>>> ioctl_loop01.c:68: FAIL: /sys/block/loop1/loop/autoclear != 1 got 0
+>>>> ioctl_loop01.c:79: FAIL: access /dev/loop1p1 fails
+>>>> [ 1073.679678] loop_set_status: loop1 () has still dirty pages (nrpages=1)
+>>>> ioctl_loop01.c:85: FAIL: access /sys/block/loop1/loop1p1 fails
+>>>>
+>>>> HINT: You _MAY_ be missing kernel fixes, see:
+>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=10c70d95c0f2
+>>>>
+>>>> mke2fs 1.43.8 (1-Jan-2018)
+>>>> [ 1264.711379] EXT4-fs (loop0): mounting ext2 file system using the
+>>>> ext4 subsystem
+>>>> [ 1264.716642] EXT4-fs (loop0): mounted filesystem without journal. Opts: (null)
+>>>> mknod07     0  TINFO  :  Using test device LTP_DEV='/dev/loop0'
+>>>> mknod07     0  TINFO  :  Formatting /dev/loop0 with ext2 opts='' extra opts=''
+>>>> mknod07     1  TPASS  :  mknod failed as expected:
+>>>> TEST_ERRNO=EACCES(13): Permission denied
+>>>> mknod07     2  TPASS  :  mknod failed as expected:
+>>>> TEST_ERRNO=EACCES(13): Permission denied
+>>>> mknod07     3  TFAIL  :  mknod07.c:155: mknod succeeded unexpectedly
+>>>> mknod07     4  TPASS  :  mknod failed as expected:
+>>>> TEST_ERRNO=EPERM(1): Operation not permitted
+>>>> mknod07     5  TPASS  :  mknod failed as expected:
+>>>> TEST_ERRNO=EROFS(30): Read-only file system
+>>>> mknod07     6  TPASS  :  mknod failed as expected:
+>>>> TEST_ERRNO=ELOOP(40): Too many levels of symbolic links
+>>>>
+>>>>
+>>>> setns01     0  TINFO  :  ns_name=ipc, ns_fds[0]=6, ns_types[0]=0x8000000
+>>>> setns01     0  TINFO  :  ns_name=mnt, ns_fds[1]=7, ns_types[1]=0x20000
+>>>> setns01     0  TINFO  :  ns_name=net, ns_fds[2]=8, ns_types[2]=0x40000000
+>>>> setns01     0  TINFO  :  ns_name=pid, ns_fds[3]=9, ns_types[3]=0x20000000
+>>>> setns01     0  TINFO  :  ns_name=uts, ns_fds[4]=10, ns_types[4]=0x4000000
+>>>> setns01     0  TINFO  :  setns(-1, 0x8000000)
+>>>> setns01     1  TPASS  :  invalid fd exp_errno=9
+>>>> setns01     0  TINFO  :  setns(-1, 0x20000)
+>>>> setns01     2  TPASS  :  invalid fd exp_errno=9
+>>>> setns01     0  TINFO  :  setns(-1, 0x40000000)
+>>>> setns01     3  TPASS  :  invalid fd exp_errno=9
+>>>> setns01     0  TINFO  :  setns(-1, 0x20000000)
+>>>> setns01     4  TPASS  :  invalid fd exp_errno=9
+>>>> setns01     0  TINFO  :  setns(-1, 0x4000000)
+>>>> setns01     5  TPASS  :  invalid fd exp_errno=9
+>>>> setns01     0  TINFO  :  setns(11, 0x8000000)
+>>>> setns01     6  TFAIL  :  setns01.c:176: regular file fd exp_errno=22:
+>>>> errno=EBADF(9): Bad file descriptor
+>>>> setns01     0  TINFO  :  setns(11, 0x20000)
+>>>> setns01     7  TFAIL  :  setns01.c:176: regular file fd exp_errno=22:
+>>>> errno=EBADF(9): Bad file descriptor
+>>>> setns01     0  TINFO  :  setns(11, 0x40000000)
+>>>> setns01     8  TFAIL  :  setns01.c:176: regular file fd exp_errno=22:
+>>>> errno=EBADF(9): Bad file descriptor
+>>>> setns01     0  TINFO  :  setns(11, 0x20000000)
+>>>> setns01     9  TFAIL  :  setns01.c:176: regular file fd exp_errno=22:
+>>>> errno=EBADF(9): Bad file descriptor
+>>>> setns01     0  TINFO  :  setns(11, 0x4000000)
+>>>> setns01    10  TFAIL  :  setns01.c:176: regular file fd exp_errno=22:
+>>>> errno=EBADF(9): Bad file descriptor
+>>>>
+>>>> Full test log link,
+>>>> https://lkft.validation.linaro.org/scheduler/job/1467931#L8047
+>>>>
+>>>> test results comparison shows this test case started failing from June-2-2020
+>>>> https://qa-reports.linaro.org/lkft/linux-mainline-oe/build/v5.7-4092-g38696e33e2bd/testrun/2779586/suite/ltp-syscalls-tests/test/ioctl_loop01/history/
+>>>>
+>>>> https://qa-reports.linaro.org/lkft/linux-mainline-oe/build/v5.7-4092-g38696e33e2bd/testrun/2779586/suite/ltp-syscalls-tests/test/setns01/history/
+>>>>
+>>>> https://qa-reports.linaro.org/lkft/linux-mainline-oe/build/v5.7-4092-g38696e33e2bd/testrun/2779586/suite/ltp-syscalls-tests/test/mknod07/history/
+>>>>
+>>>>
+>>>> --
+>>>> Linaro LKFT
+>>>> https://lkft.linaro.org
+> 
+> 
 
-The merged patch is much simpler than before, new request is prevented from being
-allocated on the inactive hctx, then drain all in-flight requests on this hctx.
-
-You need to check if the request is queued to hw correctly.
-
-Thanks,
-Ming
 
