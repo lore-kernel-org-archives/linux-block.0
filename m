@@ -6,77 +6,68 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC186C433DF
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 03:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D799C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 03:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85E23207D3
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 03:23:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BE3F207D3
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 03:24:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oApTUVbv"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bPH7uHE5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726109AbgFEDW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Jun 2020 23:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59996 "EHLO
+        id S1725968AbgFEDYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Jun 2020 23:24:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725954AbgFEDW6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 23:22:58 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3274EC08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 20:22:57 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id n2so3048126pld.13
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 20:22:57 -0700 (PDT)
+        with ESMTP id S1725954AbgFEDYe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jun 2020 23:24:34 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BCDC08C5C0
+        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 20:24:32 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id ga6so2007583pjb.1
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 20:24:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QyQw+sLIla93dlac0TERwcz4aWSKJuqSco16Wn/VCK0=;
-        b=oApTUVbvRfwUXQkyK9U+0EK+y9ZjZdvqoGei9Z2c+lWyA4V9WeC6RwySmnttTG6h6R
-         J5FKeKiU9vufOnBhhFWruh7l2jnbuXC8HWckjX0IWbOhN+hgkr19jyYnvyUKtb9GTheu
-         evTg8bf8NZZU26vKyLPUwu2n9wMheLWcgtUV6877z7H0Zr5+wAxY7sqTsokSArUmkoJa
-         77CgaSzTGld6I7+o8tUozYfgSTrnAM0/BRZqTO7g6feV+eKBM4odUNA3qXqctA8zH9JB
-         ScsFF9jE/IDuxxV3ZgUfLedbHUBWt3W81bm87m3jv5JSAc39E9TYoGsaPR5oEcTt461g
-         XBSA==
+        bh=EVmfztVzXoVu0QduA/l+tCorSJU4f9rapwi7f1MC1DE=;
+        b=bPH7uHE55KjmKw8Ga2YC/pgn5FtH9iw/zcnLJWjmBSvWAdNxIKg+f3Ag229MSZSfw+
+         iHb1Ba8j29qZExbXfSoTk+TcmXkA6pjrvMiMxRCD2mxh6dP0uhR1JdA/+kWX6jhv94M/
+         bRwqlyo0VQ43nuF4hdkKUNWZP1PmLaRRljlwmPHRJWPUi5ffWZuPgzMpSX0Rg3eiaMvo
+         90/tpWloKf4fO6nOlwE+Q1BZP8NfjZbFGsm2XtgEwzkx2Z5Shq6skApV7O545zAd/Ikr
+         XlDupzGz1lLNtDp1aJ07jEKwJDtdDGTXW+r4uldKMAtCKCzwL57NN5xz+cPDG2jlRTTd
+         MGkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QyQw+sLIla93dlac0TERwcz4aWSKJuqSco16Wn/VCK0=;
-        b=G0by8bh909Iyl4RerGLARBxIBxVaiIlFjpDNJQWHX2A2FuIfDcDVyB0N0h+Xdbt85r
-         RJ8IdgwtXxv7l7A/OKn7AqNXic7lpMZ8TRHeI0whCNhETrkYt40SqOeCHALxqhrHTmYf
-         ORGIscIJ5CF0WKDXLrhCQBNXzt59pyq6rsTMcDrWf13wWENH+kz4HQEbYX31w/Da1xEI
-         XyYJL+WHqsYflM6lkKQvffuLYNHfUFOhYopmSao3YH16SrRwyO1+xCXWZ+xcJ9whE15g
-         WlaV3qnfH3Hy3L12wuojx6X1KyrMgsTIjrK58kG7KMcaBLj/A994qUrYQxXgmjZnhKRu
-         nyOw==
-X-Gm-Message-State: AOAM531OZ/HGeanDbcQZd/Ocs4rGxEn9CnnQliwf274TyEYMqqwfVZ7l
-        ivnwwaxrmNmJIjGRKnUYI/UqIOe6CYmDrw==
-X-Google-Smtp-Source: ABdhPJwxXh8FFNGBgBksKWyrxn6L7WMe3Dlu7Qjsdz92aLKnsM1nGvuXZeAExnd99VH2EfqwFr5bhg==
-X-Received: by 2002:a17:90a:2222:: with SMTP id c31mr570134pje.200.1591327376490;
-        Thu, 04 Jun 2020 20:22:56 -0700 (PDT)
+        bh=EVmfztVzXoVu0QduA/l+tCorSJU4f9rapwi7f1MC1DE=;
+        b=ZhcQcTgY/xGqh9U2NXn89fNhljWaepQhAv1pMnnMmRbe7IXwKY1R2exJrsjKYX68hA
+         3XwpXEdjTuhx4cft2nMb9s/dcLxPniEOxpUBys6x0FTX93wpqk07LM03LR0lpWSQTfY/
+         7S6Rk6dfNaif4n1ckfmysHRJB2/RHUKm+AVDingoU1U3cM+c4qve90WDob65wSSpJijX
+         HFNITLQNwJcn+QSIXrGblii6rHUlzIOIxQlcYxER5FvgkBHlZzCCCmUSIqdV+9z4jT2o
+         0h70e0G3rAxdvVcn9xFAywOL7UaMFpviO+qZoJQVcJiMTKpiCCiIANFEp1xyUqnL/2XI
+         ltUQ==
+X-Gm-Message-State: AOAM5304xf+cAqan3x8lLjS5gycNB8dpUBrn83y4qT6j7i/xQ1vBS+AG
+        1JBQtnebH80VP/nhOEAtD5qDeg==
+X-Google-Smtp-Source: ABdhPJwPB0YeLS6h72HAGY40ENvyBUBjh+y3ewrGePyr7TuLyFkWR6v78LKP5O/tyKq1BmQr6zYjYg==
+X-Received: by 2002:a17:90a:8c4:: with SMTP id 4mr666271pjn.64.1591327472043;
+        Thu, 04 Jun 2020 20:24:32 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id a14sm5520589pfc.133.2020.06.04.20.22.54
+        by smtp.gmail.com with ESMTPSA id u25sm5683740pfm.115.2020.06.04.20.24.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 20:22:55 -0700 (PDT)
-Subject: Re: [PATCH v2 5/6] block: nr_sects_write(): Disable preemption on
- seqcount write
-To:     "Ahmed S. Darwish" <a.darwish@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Sebastian A. Siewior" <bigeasy@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vivek Goyal <vgoyal@redhat.com>, linux-block@vger.kernel.org
-References: <20200603144949.1122421-1-a.darwish@linutronix.de>
- <20200603144949.1122421-6-a.darwish@linutronix.de>
+        Thu, 04 Jun 2020 20:24:31 -0700 (PDT)
+Subject: Re: [PATCH V2 0/4] blktrace: fix sparse warnings
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+References: <20200604071330.5086-1-chaitanya.kulkarni@wdc.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b8440471-e78d-8112-2ab3-c2a948095fa8@kernel.dk>
-Date:   Thu, 4 Jun 2020 21:22:53 -0600
+Message-ID: <46bee113-ee17-15a9-f383-ef0bc8b404b8@kernel.dk>
+Date:   Thu, 4 Jun 2020 21:24:30 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200603144949.1122421-6-a.darwish@linutronix.de>
+In-Reply-To: <20200604071330.5086-1-chaitanya.kulkarni@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,18 +76,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/3/20 8:49 AM, Ahmed S. Darwish wrote:
-> For optimized block readers not holding a mutex, the "number of sectors"
-> 64-bit value is protected from tearing on 32-bit architectures by a
-> sequence counter.
+On 6/4/20 1:13 AM, Chaitanya Kulkarni wrote:
+> Hi,
 > 
-> Disable preemption before entering that sequence counter's write side
-> critical section. Otherwise, the read side can preempt the write side
-> section and spin for the entire scheduler tick. If the reader belongs to
-> a real-time scheduling class, it can spin forever and the kernel will
-> livelock.
+> This is a small patch-series which fixes various sparse warnings.
+> 
+> Regards,
+> Chaitanya
+> 
+> * Changes from V1:-
+> 
+> 1. Get rid of the first patch since Jan already posted similar
+>    patch.
 
-Applied, thanks.
+Applied 1-3 (there seems to be no number 4 anymore, regardless of subject
+in this cover letter).
+
+Jan, are you re-sending the final one?
 
 -- 
 Jens Axboe
