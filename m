@@ -2,283 +2,120 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD4AC433DF
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 19:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E450CC433E1
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 22:33:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3DC0207D3
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 19:16:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C520E207D0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 22:33:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591384585;
-	bh=M5ZF83eDYXJp9bPXYVp6Z703Dey5FxKazfxrBHpw0Yk=;
+	s=default; t=1591396407;
+	bh=AmNtOqTpIwcyG2l7iLaR+nlkCZiWlE75noVn2Qww3bA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=pMvhZ81M5+2bEkFXmC1XAFfia+UgO9toVS9ZmFChlpWlj/QVZszpKExXMA0rpuGnb
-	 PSHdS/UQo603NPiG61pTn0RHyDnw3ieFFTatk/E7ToG9PrCRtyTJMKnCWFzWtvKfyB
-	 X5WKIlOCzZknqsom12LjNEP/oyniWitCBUd2UXII=
+	b=wH/HV4zU9MMby+V/fAYL/klgVVYsGw/IWPFteRA/mb6XTbwxZBBJ9B0TEHqOMDBTX
+	 r0kGgEBiEdUOVPQmyMmMSJjUBTExcscLtUd1iX7ZGNsAz/wvpBDvSyl0Jl2Sfp7eRS
+	 d7bMS8nbsX+oFYBw6zf7M6iZ6+RzaG8LHXiSf0xs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgFETQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 15:16:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36882 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727027AbgFETQY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 15:16:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591384581;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cVn8ZozkDMO7PwjA1gitngNH38sPd9THTGfoZG+oEV4=;
-        b=N2MosAVYtXEuuINwfA1udwH6BMS9khyBTjKV+KjhtkEtfEnM2FErpDt6QMlIFHEFyGSz1w
-        Gau2lXIidXgCTrQCTQLxO/4aXpvLNgqTlJuPhqgZAGM2ewGfZC6tihgSpAZr4L5OSrxw63
-        1Jqq/vlmqTznrjDfv59M105WXVH1Luk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-fGIRHfkHNUCeKYjCno5zXw-1; Fri, 05 Jun 2020 15:16:19 -0400
-X-MC-Unique: fGIRHfkHNUCeKYjCno5zXw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D63E4800688;
-        Fri,  5 Jun 2020 19:16:17 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D6F49CA0;
-        Fri,  5 Jun 2020 19:16:14 +0000 (UTC)
-Date:   Fri, 5 Jun 2020 15:16:13 -0400
-From:   Mike Snitzer <gustavoars@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Dmitry Baryshkov <dmitry_baryshkov@mentor.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        Khazhismel Kumykov <khazhy@google.com>,
-        Martin Wilck <mwilck@suse.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Subject: [git pull v2] device mapper changes for 5.8
-Message-ID: <20200605191613.GA621@redhat.com>
-References: <20200605145124.GA31972@redhat.com>
+        id S1728157AbgFEWdX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 18:33:23 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:53539 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725878AbgFEWdX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 18:33:23 -0400
+Received: by mail-pj1-f65.google.com with SMTP id i12so3226555pju.3;
+        Fri, 05 Jun 2020 15:33:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vS5y2cwTZmplrWxSMeAOvchEwRxJxoFyQaaO7U/jQTc=;
+        b=APz7A3hHruHCdS2eSmB7nHEP33bYuNEdzA2Pq4h5F+mg3JmaGPtq7zeIrlHLlRyG8y
+         kpLL/JnHAvmJHKfG8c1/QbdtPIgzGczSGXS3DdnyggiXEm0jYK9S4tMUrJZaT7AQJo6t
+         u8LxagURiCOPMX2Lny8pNf5g23fgssAhQdxtyJGtKVa+K2YMtG+6YGwklgoBNL0pN9cA
+         Ah9qLakvGGRbwpbDg3LspkIxaScYnJ164GzRYLMA6zOcxYHRhD0m8qRnIui3vIOqlxJe
+         IGy+GrJrkmQdbTQCUXkl3SMn6BINMHSUhyPZ5NBhqFD9slkwImclp8yvi4tLcphJ5PqC
+         YAPg==
+X-Gm-Message-State: AOAM530u/tclCEXyv5tPzOHow2UVqV+zNalHmEwdVHsPBM3GkoawTeT8
+        E4Yq5HnaZB6iU4A39/G1NXo=
+X-Google-Smtp-Source: ABdhPJyajZB2ekSKunHZEPzroRX0GQ5Qx0oFeO/rItogtY+TqeixJGMKJYPif86T+TAP5R3klqe8dA==
+X-Received: by 2002:a17:90a:6f04:: with SMTP id d4mr4924167pjk.134.1591396402606;
+        Fri, 05 Jun 2020 15:33:22 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id c1sm539415pfo.197.2020.06.05.15.33.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2020 15:33:21 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 8E4B8403AB; Fri,  5 Jun 2020 22:33:20 +0000 (UTC)
+Date:   Fri, 5 Jun 2020 22:33:20 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v5 5/7] blktrace: fix debugfs use after free
+Message-ID: <20200605223320.GN11244@42.do-not-panic.com>
+References: <20200516031956.2605-1-mcgrof@kernel.org>
+ <20200516031956.2605-6-mcgrof@kernel.org>
+ <20200519163713.GA29944@infradead.org>
+ <20200527031202.GT11244@42.do-not-panic.com>
+ <20200601170500.GF13911@42.do-not-panic.com>
+ <d4ef5da1-7d11-657c-f864-8b2ca6ea082c@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200605145124.GA31972@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <d4ef5da1-7d11-657c-f864-8b2ca6ea082c@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Thu, Jun 04, 2020 at 09:48:43PM -0700, Bart Van Assche wrote:
+> On 2020-06-01 10:05, Luis Chamberlain wrote:
+> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > index a55cbfd060f5..5b0310f38e11 100644
+> > --- a/kernel/trace/blktrace.c
+> > +++ b/kernel/trace/blktrace.c
+> > @@ -511,6 +511,11 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+> >  	 */
+> >  	if (bdev && bdev != bdev->bd_contains) {
+> >  		dir = bdev->bd_part->debugfs_dir;
+> > +	} else if (q->sg_debugfs_dir &&
+> > +		   strlen(buts->name) == strlen(q->sg_debugfs_dir->d_name.name)
+> > +		   && strcmp(buts->name, q->sg_debugfs_dir->d_name.name) == 0) {
+> > +		/* scsi-generic requires use of its own directory */
+> > +		dir = q->sg_debugfs_dir;
+> >  	} else {
+> >  		/*
+> >  		 * For queues that do not have a gendisk attached to them, that
+> > 
+> 
+> Please Cc Martin Petersen for patches that modify SCSI code.
 
-I had some miscommunication with Mikulas on his -ENOMEM sleep and retry
-changes for dm-crypt and dm-integrity, he no longer thinks them
-appropriate: https://www.redhat.com/archives/dm-devel/2020-June/msg00061.html
-So I dropped them via rebase and updated the tag (to avoid any
-potential for linux-stable churn due to them having cc'd
-linux-stable).  Hope that was the correct way forward...
+Sure thing.
+> The string comparison check looks fragile to me. Is the purpose of that
 
-For the following changes there is one dm-zoned-metadata.c conflict that
-linux-next has been carrying for a while.  See commit d77e96f277 ("Merge
-remote-tracking branch 'device-mapper/for-next'") from next-20200605.
-It resolves conflict from linux-block's commit 9398554fb3 ("block:
-remove the_error_sector argument to blkdev_issue_flush").
+> check perhaps to verify whether tracing is being activated through the
+> SCSI generic interface?
 
-The following changes since commit 2ef96a5bb12be62ef75b5828c0aab838ebb29cb8:
+Yes.
 
-  Linux 5.7-rc5 (2020-05-10 15:16:58 -0700)
+> If so, how about changing that test into
+> something like the following?
+> 
+> 	MAJOR(dev) == SCSI_GENERIC_MAJOR
 
-are available in the Git repository at:
+Sure.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.8/dm-changes
-
-for you to fetch changes up to 64611a15ca9da91ff532982429c44686f4593b5f:
-
-  dm crypt: avoid truncating the logical block size (2020-06-05 14:59:59 -0400)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Largest change for this cycle is the DM zoned target's metadata
-  version 2 feature that adds support for pairing regular block
-  devices with a zoned device to ease performance impact associated
-  with finite random zones of zoned device.  Changes came in 3
-  batches: first prepared for and then added the ability to pair a
-  single regular block device, second was a batch of fixes to improve
-  zoned's reclaim heuristic, third removed the limitation of only
-  adding a single additional regular block device to allow many
-  devices.  Testing has shown linear scaling as more devices are
-  added.
-
-- Add new emulated block size (ebs) target that emulates a smaller
-  logical_block_size than a block device supports.  Primary use-case
-  is to emulate "512e" devices that have 512 byte logical_block_size
-  and 4KB physical_block_size.  This is useful to some legacy
-  applications otherwise wouldn't be ablee to be used on 4K devices
-  because they depend on issuing IO in 512 byte granularity.
-
-- Add discard interfaces to DM bufio.  First consumer of the interface
-  is the dm-ebs target that makes heavy use of dm-bufio.
-
-- Fix DM crypt's block queue_limits stacking to not truncate
-  logic_block_size.
-
-- Add Documentation for DM integrity's status line.
-
-- Switch DMDEBUG from a compile time config option to instead use
-  dynamic debug via pr_debug.
-
-- Fix DM multipath target's hueristic for how it manages
-  "queue_if_no_path" state internally.  DM multipath now avoids
-  disabling "queue_if_no_path" unless it is actually needed (e.g. in
-  response to configure timeout or explicit "fail_if_no_path"
-  message).  This fixes reports of spurious -EIO being reported back
-  to userspace application during fault tolerance testing with an NVMe
-  backend.  Added various dynamic DMDEBUG messages to assist with
-  debugging queue_if_no_path in the future.
-
-- Add a new DM multipath "Historical Service Time" Path Selector.
-
-- Fix DM multipath's dm_blk_ioctl() to switch paths on IO error.
-
-- Improve DM writecache target performance by using explicit
-  cache flushing for target's single-threaded usecase and a small
-  cleanup to remove unnecessary test in persistent_memory_claim.
-
-- Other small cleanups in DM core, dm-persistent-data, and DM integrity.
-
-----------------------------------------------------------------
-Dmitry Baryshkov (1):
-      dm crypt: support using encrypted keys
-
-Eric Biggers (1):
-      dm crypt: avoid truncating the logical block size
-
-Gabriel Krisman Bertazi (1):
-      dm mpath: pass IO start time to path selector
-
-Gustavo A. R. Silva (1):
-      dm: replace zero-length array with flexible-array
-
-Hannes Reinecke (38):
-      dm zoned: add 'status' callback
-      dm zoned: add 'message' callback
-      dm zoned: store zone id within the zone structure and kill dmz_id()
-      dm zoned: use array for superblock zones
-      dm zoned: store device in struct dmz_sb
-      dm zoned: move fields from struct dmz_dev to dmz_metadata
-      dm zoned: introduce dmz_metadata_label() to format device name
-      dm zoned: Introduce dmz_dev_is_dying() and dmz_check_dev()
-      dm zoned: remove 'dev' argument from reclaim
-      dm zoned: replace 'target' pointer in the bio context
-      dm zoned: use dmz_zone_to_dev() when handling metadata I/O
-      dm zoned: add metadata logging functions
-      dm zoned: Reduce logging output on startup
-      dm zoned: ignore metadata zone in dmz_alloc_zone()
-      dm zoned: metadata version 2
-      dm: use dynamic debug instead of compile-time config option
-      dm zoned: remove spurious newlines from debugging messages
-      dm zoned: return NULL if dmz_get_zone_for_reclaim() fails to find a zone
-      dm zoned: separate random and cache zones
-      dm zoned: reclaim random zones when idle
-      dm zoned: start reclaim with sequential zones
-      dm zoned: terminate reclaim on congestion
-      dm zoned: remove leftover hunk for switching to sequential zones
-      dm zoned: add debugging message for reading superblocks
-      dm zoned: avoid unnecessary device recalulation for secondary superblock
-      dm zoned: improve logging messages for reclaim
-      dm zoned: add a 'reserved' zone flag
-      dm zoned: convert to xarray
-      dm zoned: allocate temporary superblock for tertiary devices
-      dm zoned: add device pointer to struct dm_zone
-      dm zoned: add metadata pointer to struct dmz_dev
-      dm zoned: per-device reclaim
-      dm zoned: move random and sequential zones into struct dmz_dev
-      dm zoned: support arbitrary number of devices
-      dm zoned: allocate zone by device index
-      dm zoned: select reclaim zone based on device index
-      dm zoned: prefer full zones for reclaim
-      dm zoned: check superblock location
-
-Heinz Mauelshagen (2):
-      dm: add emulated block size target
-      dm ebs: pass discards down to underlying device
-
-Khazhismel Kumykov (1):
-      dm mpath: add Historical Service Time Path Selector
-
-Martin Wilck (1):
-      dm mpath: switch paths in dm_blk_ioctl() code path
-
-Mike Snitzer (5):
-      dm: use DMDEBUG macros now that they use pr_debug variants
-      dm mpath: simplify __must_push_back
-      dm mpath: restrict queue_if_no_path state machine
-      dm mpath: enhance queue_if_no_path debugging
-      dm mpath: add DM device name to Failing/Reinstating path log messages
-
-Mikulas Patocka (8):
-      dm bufio: implement discard
-      dm writecache: remove superfluous test in persistent_memory_claim
-      dm writecache: improve performance on DDR persistent memory (Optane)
-      dm bufio: delete unused and inefficient dm_bufio_discard_buffers
-      dm integrity: add status line documentation
-      dm bufio: clean up rbtree block ordering
-      dm bufio: introduce forget_buffer_locked
-      dm ebs: use dm_bufio_forget_buffers
-
-Nathan Chancellor (1):
-      dm zoned: Avoid 64-bit division error in dmz_fixup_devices
-
-YueHaibing (1):
-      dm integrity: remove set but not used variables
-
-Zhiqiang Liu (1):
-      dm persistent data: switch exit_ro_spine to return void
-
- Documentation/admin-guide/device-mapper/dm-ebs.rst |   51 +
- .../admin-guide/device-mapper/dm-integrity.rst     |    8 +
- .../admin-guide/device-mapper/dm-zoned.rst         |   62 +-
- drivers/md/Kconfig                                 |   20 +
- drivers/md/Makefile                                |    3 +
- drivers/md/dm-bufio.c                              |  109 +-
- drivers/md/dm-crypt.c                              |   80 +-
- drivers/md/dm-ebs-target.c                         |  471 +++++++++
- drivers/md/dm-historical-service-time.c            |  561 +++++++++++
- drivers/md/dm-integrity.c                          |    6 +-
- drivers/md/dm-log-writes.c                         |    2 +-
- drivers/md/dm-mpath.c                              |  123 ++-
- drivers/md/dm-path-selector.h                      |    2 +-
- drivers/md/dm-queue-length.c                       |    2 +-
- drivers/md/dm-raid.c                               |    2 +-
- drivers/md/dm-raid1.c                              |    2 +-
- drivers/md/dm-service-time.c                       |    2 +-
- drivers/md/dm-stats.c                              |    2 +-
- drivers/md/dm-stripe.c                             |    2 +-
- drivers/md/dm-switch.c                             |    2 +-
- drivers/md/dm-writecache.c                         |   42 +-
- drivers/md/dm-zoned-metadata.c                     | 1046 +++++++++++++++-----
- drivers/md/dm-zoned-reclaim.c                      |  210 ++--
- drivers/md/dm-zoned-target.c                       |  463 ++++++---
- drivers/md/dm-zoned.h                              |  113 ++-
- drivers/md/dm.c                                    |   11 +-
- drivers/md/persistent-data/dm-btree-internal.h     |    4 +-
- drivers/md/persistent-data/dm-btree-spine.c        |    6 +-
- include/linux/device-mapper.h                      |    9 +-
- include/linux/dm-bufio.h                           |   12 +
- 30 files changed, 2779 insertions(+), 649 deletions(-)
- create mode 100644 Documentation/admin-guide/device-mapper/dm-ebs.rst
- create mode 100644 drivers/md/dm-ebs-target.c
- create mode 100644 drivers/md/dm-historical-service-time.c
-
+  Luis
