@@ -2,153 +2,114 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C41C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 13:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3553BC433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 13:05:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F4112075B
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 13:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FA0A206E6
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 13:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="dZrynhEH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bkqNLpnP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726993AbgFENCR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 09:02:17 -0400
-Received: from mout.web.de ([212.227.15.3]:50583 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726744AbgFENCO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 09:02:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1591362105;
-        bh=O+67Zqc7BNPiu0Riju17L/rB8Wen0+rCWIN/C3IARsI=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=dZrynhEH/Nx8o5dHlZU66Fg33ZPH4WJPbG3SxalHBlbIZM6ivHis49E1N5x/2dS8g
-         JKyQOPzzIbYihRtMBc/cclsJOQTMxP3/nxk+8KGbBYJNTZqZbnHMLTSeRFwZ2j481M
-         84Oo1la85K/2q9s+Vu5Kku+W7Maypf6IDKJeSUlo=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.131.102.114]) by smtp.web.de (mrweb002
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MIvFp-1jfHEW2cQr-002Xm8; Fri, 05
- Jun 2020 15:01:45 +0200
+        id S1726711AbgFENFB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 09:05:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37086 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726668AbgFENFB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 09:05:01 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CAC2C08C5C5
+        for <linux-block@vger.kernel.org>; Fri,  5 Jun 2020 06:05:01 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id k2so2568989pjs.2
+        for <linux-block@vger.kernel.org>; Fri, 05 Jun 2020 06:05:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qMmRPUhgtpuS6TTG/GuqLkNjYHA8c+3dVy8v0SMwjMk=;
+        b=bkqNLpnPAhUUJPYxLvISfFtr4FvME2B0TRGC5RqPoNt2xKQMu5TPyH7bQDFNomaW2y
+         cdr68bxUbRNBYT56MpvLzMeWjqQKNeF6hCrfo/lQoE1/Op2UPzMm4h+6k3GRrK+xoyhJ
+         jDJ79wGBXsMM6klm3WxyJ3PrEmmtbfPDKp/odfEuUPRyo2qdgY5Pwu2UggruUrqkZVLd
+         V1/7DbEG/cyRRKhiiR4HVe0XetnFxxfYwe30V9ywHzffwSLPzwQY9QyB5LQxjExieX/Q
+         d7ANk0zYFIrS0TD4DN9WEE5hJGkIeF348d8XPrtZsFZjaG7jaCjZPQJNKfsvsF0L/y78
+         4+Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qMmRPUhgtpuS6TTG/GuqLkNjYHA8c+3dVy8v0SMwjMk=;
+        b=TFFOhM41o3FbY/YMC13BRikmnzOZfWthX8TDdG5A8cl4X1kwUU/hNFTRM1UZBJaabz
+         o188LPjUeL1HfbYVGI00UozqBuCBZ//CE16EfTFfRuUYk0MtVsiw9yQec041TpAIw4O8
+         kzRpOlQyrCGmkxCrcMpzHXlUcWBMB+o/ThwgSZN8bQQJKQrjmubCMA7cRd8Hc4dRjIsu
+         s4pHtrp6X7izYHZkOsV9BiashHkekNm/g9HFwcHjK3qVFXIH+AM7n+AHfnSBJPgNltSM
+         it1cDvtwYDVijCqUBgOjI8NYERETt27rKE8gH4rT3UfSxk21iK8kOJVDuO+aGDAqAPql
+         6x5A==
+X-Gm-Message-State: AOAM533xlWWEbvqL85bYisa5KWik98a6HSSyWo3TiCT4iKacsK8RxMi/
+        XlABoJnUvMH+0hH0G4o5FCj26g==
+X-Google-Smtp-Source: ABdhPJztl3sgTYmes9QTZ50W/VL5LHmidIjsSGXV5BWpaw3tcv1f91aOZKJu3/pXlLzzR6iDp493gQ==
+X-Received: by 2002:a17:902:41:: with SMTP id 59mr9814427pla.104.1591362299795;
+        Fri, 05 Jun 2020 06:04:59 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id 136sm7448369pfa.152.2020.06.05.06.04.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2020 06:04:58 -0700 (PDT)
 Subject: Re: block: Fix use-after-free in blkdev_get()
-To:     Matthew Wilcox <willy@infradead.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
+To:     Markus Elfring <Markus.Elfring@web.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
         Jason Yan <yanaijie@huawei.com>, hulkci@huawei.com,
         kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
         Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>
 References: <88676ff2-cb7e-70ec-4421-ecf8318990b1@web.de>
  <5fa658bf-3028-9b5c-30cc-dbdef6bf8f7a@huawei.com>
  <20200605094353.GS30374@kadam> <2ee6f2f7-eaec-e748-bead-0ad59f4c378b@web.de>
  <20200605111049.GA19604@bombadil.infradead.org>
  <b6c8ebd7-ccd3-2a94-05b2-7b92a30ec8a9@web.de>
  <20200605115158.GD19604@bombadil.infradead.org>
-From:   Markus Elfring <Markus.Elfring@web.de>
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
- +v43YoGpDNyhgA0w9CEhuwfZrE91GocMtjLO67TAc2i2nxMc/FJRDI0OemO4VJ9RwID6ltwt
- mpVJgXGKkNJ1ey+QOXouzlErVvE2fRh+KXXN1Q7fSmTJlAW9XJYHS3BDHb0uRpymRSX3O+E2
- lA87C7R8qAigPDZi6Z7UmwIA83ZMKXQ5stA0lhPyYgQcM7fh7V4ZYhnR0I5/qkUoxKpqaYLp
- YHBczVP+Zx/zHOM0KQphOMbU7X3c1pmMruoe6ti9uZzqZSLsF+NKXFEPBS665tQr66HJvZvY
- GMDlntZFAZ6xQvCC1r3MGoxEC1tuEa24vPCC9RZ9wk2sY5Csbva0WwYv3WKRZZBv8eIhGMxs
- rcpeGShRFyZ/0BYO53wZAPV1pEhGLLxd8eLN/nEWjJE0ejakPC1H/mt5F+yQBJAzz9JzbToU
- 5jKLu0SugNI18MspJut8AiA1M44CIWrNHXvWsQ+nnBKHDHHYZu7MoXlOmB32ndsfPthR3GSv
- jN7YD4Ad724H8fhRijmC1+RpuSce7w2JLj5cYj4MlccmNb8YUxsE8brY2WkXQYS8Ivse39MX
- BE66MQN0r5DQ6oqgoJ4gHIVBUv/ZwgcmUNS5gQkNCFA0dWXznQARAQABtCZNYXJrdXMgRWxm
- cmluZyA8TWFya3VzLkVsZnJpbmdAd2ViLmRlPokCVAQTAQgAPhYhBHDP0hzibeXjwQ/ITuU9
- Figxg9azBQJYNvsQAhsjBQkJZgGABQsJCAcCBhUICQoLAgQWAgMBAh4BAheAAAoJEOU9Figx
- g9azcyMP/iVihZkZ4VyH3/wlV3nRiXvSreqg+pGPI3c8J6DjP9zvz7QHN35zWM++1yNek7Ar
- OVXwuKBo18ASlYzZPTFJZwQQdkZSV+atwIzG3US50ZZ4p7VyUuDuQQVVqFlaf6qZOkwHSnk+
- CeGxlDz1POSHY17VbJG2CzPuqMfgBtqIU1dODFLpFq4oIAwEOG6fxRa59qbsTLXxyw+PzRaR
- LIjVOit28raM83Efk07JKow8URb4u1n7k9RGAcnsM5/WMLRbDYjWTx0lJ2WO9zYwPgRykhn2
- sOyJVXk9xVESGTwEPbTtfHM+4x0n0gC6GzfTMvwvZ9G6xoM0S4/+lgbaaa9t5tT/PrsvJiob
- kfqDrPbmSwr2G5mHnSM9M7B+w8odjmQFOwAjfcxoVIHxC4Cl/GAAKsX3KNKTspCHR0Yag78w
- i8duH/eEd4tB8twcqCi3aCgWoIrhjNS0myusmuA89kAWFFW5z26qNCOefovCx8drdMXQfMYv
- g5lRk821ZCNBosfRUvcMXoY6lTwHLIDrEfkJQtjxfdTlWQdwr0mM5ye7vd83AManSQwutgpI
- q+wE8CNY2VN9xAlE7OhcmWXlnAw3MJLW863SXdGlnkA3N+U4BoKQSIToGuXARQ14IMNvfeKX
- NphLPpUUnUNdfxAHu/S3tPTc/E/oePbHo794dnEm57LuuQINBFg2+xABEADZg/T+4o5qj4cw
- nd0G5pFy7ACxk28mSrLuva9tyzqPgRZ2bdPiwNXJUvBg1es2u81urekeUvGvnERB/TKekp25
- 4wU3I2lEhIXj5NVdLc6eU5czZQs4YEZbu1U5iqhhZmKhlLrhLlZv2whLOXRlLwi4jAzXIZAu
- 76mT813jbczl2dwxFxcT8XRzk9+dwzNTdOg75683uinMgskiiul+dzd6sumdOhRZR7YBT+xC
- wzfykOgBKnzfFscMwKR0iuHNB+VdEnZw80XGZi4N1ku81DHxmo2HG3icg7CwO1ih2jx8ik0r
- riIyMhJrTXgR1hF6kQnX7p2mXe6K0s8tQFK0ZZmYpZuGYYsV05OvU8yqrRVL/GYvy4Xgplm3
- DuMuC7/A9/BfmxZVEPAS1gW6QQ8vSO4zf60zREKoSNYeiv+tURM2KOEj8tCMZN3k3sNASfoG
- fMvTvOjT0yzMbJsI1jwLwy5uA2JVdSLoWzBD8awZ2X/eCU9YDZeGuWmxzIHvkuMj8FfX8cK/
- 2m437UA877eqmcgiEy/3B7XeHUipOL83gjfq4ETzVmxVswkVvZvR6j2blQVr+MhCZPq83Ota
- xNB7QptPxJuNRZ49gtT6uQkyGI+2daXqkj/Mot5tKxNKtM1Vbr/3b+AEMA7qLz7QjhgGJcie
- qp4b0gELjY1Oe9dBAXMiDwARAQABiQI8BBgBCAAmFiEEcM/SHOJt5ePBD8hO5T0WKDGD1rMF
- Alg2+xACGwwFCQlmAYAACgkQ5T0WKDGD1rOYSw/+P6fYSZjTJDAl9XNfXRjRRyJSfaw6N1pA
- Ahuu0MIa3djFRuFCrAHUaaFZf5V2iW5xhGnrhDwE1Ksf7tlstSne/G0a+Ef7vhUyeTn6U/0m
- +/BrsCsBUXhqeNuraGUtaleatQijXfuemUwgB+mE3B0SobE601XLo6MYIhPh8MG32MKO5kOY
- hB5jzyor7WoN3ETVNQoGgMzPVWIRElwpcXr+yGoTLAOpG7nkAUBBj9n9TPpSdt/npfok9ZfL
- /Q+ranrxb2Cy4tvOPxeVfR58XveX85ICrW9VHPVq9sJf/a24bMm6+qEg1V/G7u/AM3fM8U2m
- tdrTqOrfxklZ7beppGKzC1/WLrcr072vrdiN0icyOHQlfWmaPv0pUnW3AwtiMYngT96BevfA
- qlwaymjPTvH+cTXScnbydfOQW8220JQwykUe+sHRZfAF5TS2YCkQvsyf7vIpSqo/ttDk4+xc
- Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
- x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
- pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <453060f2-80af-86a4-7e33-78d4cc87503f@web.de>
-Date:   Fri, 5 Jun 2020 15:01:44 +0200
+ <453060f2-80af-86a4-7e33-78d4cc87503f@web.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1d95e2f6-7cf8-f0d3-bf8a-54d0a99c9ba1@kernel.dk>
+Date:   Fri, 5 Jun 2020 07:04:56 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200605115158.GD19604@bombadil.infradead.org>
+In-Reply-To: <453060f2-80af-86a4-7e33-78d4cc87503f@web.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:YKXlcLZKgmIulc8SYpt1u3oN8t78sRzUmxkIXEg6d2D2vNd+W0N
- 0b9nLwnyqZuUp5eqjiJJvj8MuIE5SdZjuDQcG3DIB9cZBqQGXvqIW+dHIWry3R68CklJ78E
- sokHRR4KkSba98h78cnA+/FT3kdEkjWNrad15TbU6XXXUCSyyiYtXT+c40sAAAzR4Lmx6tG
- aqPmnLG+tHmHGUN1wKQhw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wxN1oTDv5mw=:BTcJBkwLg9kmS63/COWQcV
- YUiqjujxYt+urC1wylQFbiOD7byvROkQSh8PAlMdzfc8iByBJ91E2cQ9NWCndkMtjlqJc2hcn
- 7W4knYbq4LBvD88CgNeELY9o3ViM/QFZw2nh/R05ik8G5j+ommZiuw+CM/sHO9GG02oxWixcj
- zQlLiveauyqbRtjvZ9VtKgddWbuLh7hxvO4ds4gQleo7CTZOgFqdgmLnwxHkQzASjUYdnr9FP
- StgRsvxVNDRWo1bKhRwGqzBPlCJAapPsK0XwKs1QCeDsAY0UzVos8+JrNW3iVEEZO41brnWWV
- UjBBB4406xIyo6ME4Gczd3rVP4cv2hsYnzxRwGIfJjkZDKjJ5HZRntdabIPpx/s6iqr0Fx15c
- c5m3NUjEZF7ZnCAP1f0pWiXqGT/WowQVVJXDInUA6bCqj3pCucgyKvBKKYJNJ1UyzzmdFUCTG
- qFXathf9WSZKedx1V3klT1bRgTBsARIj94WsBPSJSDXilhL7RuP54ns3MiIPb0m+Jux353TaE
- 2PveNrZe7Xh51Dp5D/dCNu/6OT/AcR5GT1W4PCA/3wppSR1BJxmdTPql+hTsgAnJisiVx7fQH
- 2TFeupyUyGMJ+GJrrdQV2J358AfkRtshh2RoFAysMyQhivXkqsRjklKX+pVRhtbSjeQ4O/Ewd
- 3l8SLRnPB1kGFIR6M9mNAJSgCQwGIFPDbCz2iskTVhNzNr43deU8orJFvT4bwXuX+FnEC06cX
- IDlYdLSpEL2+ytgshcKh7RQS9/QBoJ93SZVewpGkWkmrYbV5oSdkRr7EXpYyqEt7pfr4JuYe5
- M6cmrrjmjKarITwhKbbyUveAuF7AyLM6j9qLwOyfXtCLKMcMfhR+Ana/JfeAa5wmDrZfhEZem
- RXEtoRPcA4HDbCDLCukjQB0lb58hvB3Wd/bPwn0gF/aB8Cxx4c3xSMi1ZudSTN0e2xKv7PFFS
- lYlJwsUDulJdzydK84bobLvGsWvLJijAr7bbErJcDqts4oL7mPmvBVb4RAJkQtXQtX45zUjsv
- 2J3SBKQlewi0YV3FQp9w+TyvnELmdinZJle+HPNSzEAD/hLzfCUWFbP/62mw9f5VPK4FBg0l6
- y6nSBt3FYGzo3n9JVsfTZu1upfil8iOsAfkkRlFRtDEvg/MLTl8k0skTz7iYhtenBdwQBHNRa
- GqFvic70rD7XDgJcAgxrwwOHqVHgg53btm3CXTKa/rC/BWUvdpx4ZM/Eile+cdITWa7436WkI
- ikWQ7efkfIYC7OOz8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> The details can vary also for my suggestions.
->> Would you point any more disagreements out on concrete items?
->
-> That's exactly the problem with many of your comments.
-> They're vague to the point of unintelligibility.
-
-Was is so vague about possibilities which I point out for patch reviews
-(for example)?
-* Spelling corrections
-* Additional wording alternatives
-
-
->>> But refcount -> reference count is not particularly interesting.
+On 6/5/20 7:01 AM, Markus Elfring wrote:
+>>> The details can vary also for my suggestions.
+>>> Would you point any more disagreements out on concrete items?
 >>
->> Can a wording clarification become helpful also for this issue?
->
-> This is a great example.  I have no idea what this sentence means.
+>> That's exactly the problem with many of your comments.
+>> They're vague to the point of unintelligibility.
+> 
+> Was is so vague about possibilities which I point out for patch reviews
+> (for example)?
+> * Spelling corrections
+> * Additional wording alternatives
 
-Some developers usually prefer to use abbreviations at specific places
-while I dare to propose the usage of another well-known term
-for commit messages.
+I'll make this very simple - don't reply making suggestions to commit
+messages, ever. The "improvements" aren't usually improvements, and it
+causes more confusion for the submitter.
 
-Regards,
-Markus
+Maintainers generally do change commit messages to improve them, if
+needed.
+
+No reply is needed to this e-mail.
+
+-- 
+Jens Axboe
+
