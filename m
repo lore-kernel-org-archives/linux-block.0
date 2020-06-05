@@ -2,149 +2,215 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D52C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 05:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAFBC433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 06:16:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31B5B207D3
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 05:02:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4t9D42d"
+	by mail.kernel.org (Postfix) with ESMTP id 33961207ED
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 06:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgFEFCe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 01:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725280AbgFEFCe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 01:02:34 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BDCBC08C5C1
-        for <linux-block@vger.kernel.org>; Thu,  4 Jun 2020 22:02:33 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id c194so7205242oig.5
-        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2020 22:02:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PLhG8vT3mFcuJfNnH7fIedUGeLesNM4v59nD7h+56nw=;
-        b=W4t9D42dX/56NXPsywgadSq1thAD+GBBNZ2NskdtxGtqGfB6W7bJc91zMjQaW8u9K+
-         PqZjoIuBP+98duTt+Ut1YmhyPoK0drKLNOMtvNld7YWVlgPyKmlLu4bnaln1gwu/VaHT
-         2vbUMflI5BgaYHDLrMyFc84JQ/Dq0wml3E0PgmdWlEKMLgRBUfR3OtUr5bUP3MAdqIIL
-         icH74YMBAM7dT2TA1X4czgSHNIuOps1FNtX9fuIXIM29XNVFSwriA8mH6DaZLO6NRehm
-         jEuWHBLG6DRdj1SiFEGDj7av12mi0DG90mt2Aq5qCOd9tcbg1VsMAII93br1w2QoQIxa
-         ebQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PLhG8vT3mFcuJfNnH7fIedUGeLesNM4v59nD7h+56nw=;
-        b=P60bvu3mXVlPQWigJj6lUCb2fP3TDukQoAU7y5dHCbYzqCElSEKedka+zHe2n3xXC2
-         20pNpNfPOHlpbtdusQioHCvQzFHbGd1Iys7379hJ82Vytuwi2ifxyIdD5UZBSjh75qjD
-         PqpAVrRqi4tNZhLZWlSiWcPpoB40wM3G1JKLh460FEXeFJtaNr9UrMW0XYnMTytqHUna
-         hJOQ+LSnADgwLiguwrwVCuOeRVNYVMAIsRllhsFPCx9fjlfLNXMwI7t/BZ3TO799E9nR
-         9tuSXRRQE9eOXEi1auUVJEUR6n2RK+CTrD0lNTvmc1KgDMMl/FP6OuqTRnBFoqqIh6RT
-         sXYg==
-X-Gm-Message-State: AOAM532dM16SynqGh56V0EvTnKrHrlv+dXC8qzZsoqNuJs4yF0Mmn5yy
-        ro9TinkbtT2RL4IgyJU85E52d/pQM5CGoW2mk0I=
-X-Google-Smtp-Source: ABdhPJzfADqkcFrvslW1/AbrDQJe88vAdJaupnE9QInvSjXNnmSTgwA97U2phX1XMxD1ZNmvOkN8t2ZEzFwWG+ET7eE=
-X-Received: by 2002:aca:cf43:: with SMTP id f64mr801134oig.141.1591333352465;
- Thu, 04 Jun 2020 22:02:32 -0700 (PDT)
+        id S1726040AbgFEGQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 02:16:07 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35754 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725280AbgFEGQH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Jun 2020 02:16:07 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 28EC161D4D7855C450F5;
+        Fri,  5 Jun 2020 14:16:00 +0800 (CST)
+Received: from huawei.com (10.175.124.28) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Fri, 5 Jun 2020
+ 14:15:52 +0800
+From:   Jason Yan <yanaijie@huawei.com>
+To:     <viro@zeniv.linux.org.uk>, <axboe@kernel.dk>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>
+CC:     Jason Yan <yanaijie@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
+        Hulk Robot <hulkci@huawei.com>
+Subject: [PATCH v2] block: Fix use-after-free in blkdev_get()
+Date:   Fri, 5 Jun 2020 14:43:24 +0800
+Message-ID: <20200605064324.44188-1-yanaijie@huawei.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200604054434.216698-1-harshadshirwadkar@gmail.com> <49a4c410-6d42-46b3-adde-1d0a8fc6b594@acm.org>
-In-Reply-To: <49a4c410-6d42-46b3-adde-1d0a8fc6b594@acm.org>
-From:   harshad shirwadkar <harshadshirwadkar@gmail.com>
-Date:   Thu, 4 Jun 2020 22:02:21 -0700
-Message-ID: <CAD+ocbzdh0eq+wBQ-DqUUw_Gvwc0xv-FbBUNS0aZfpn+eToUEg@mail.gmail.com>
-Subject: Re: [PATCH] blktrace: put bounds on BLKTRACESETUP buf_size and buf_nr
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
+In blkdev_get() we call __blkdev_get() to do some internal jobs and if
+there is some errors in __blkdev_get(), the bdput() is called which
+means we have released the refcount of the bdev (actually the refcount of
+the bdev inode). This means we cannot access bdev after that point. But
+accually bdev is still accessed in blkdev_get() after calling
+__blkdev_get(). This may leads to use-after-free if the refcount is the
+last one we released in __blkdev_get(). Let's take a look at the
+following scenerio:
 
-On Thu, Jun 4, 2020 at 9:31 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-06-03 22:44, Harshad Shirwadkar wrote:
-> > Make sure that user requested memory via BLKTRACESETUP is within
-> > bounds. This can be easily exploited by setting really large values
-> > for buf_size and buf_nr in BLKTRACESETUP ioctl.
-> >
-> > blktrace program has following hardcoded values for bufsize and bufnr:
-> > BUF_SIZE=(512 * 1024)
-> > BUF_NR=(4)
->
-> Where is the code that imposes these limits? I haven't found it. Did I
-> perhaps overlook something?
+  CPU0            CPU1                    CPU2
+blkdev_open     blkdev_open           Remove disk
+                  bd_acquire
+		  blkdev_get
+		    __blkdev_get      del_gendisk
+					bdev_unhash_inode
+  bd_acquire          bdev_get_gendisk
+    bd_forget           failed because of unhashed
+	  bdput
+	              bdput (the last one)
+		        bdev_evict_inode
 
-From what I understand, these are not limits. These are hardcoded
-values used by blktrace userspace when it calls BLKTRACESETUP ioctl.
-Inside the kernel, before this patch there is no checking in the linux
-kernel.
+	  	    access bdev => use after free
 
->
-> > diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
-> > index 690621b610e5..4d9dc44a83f9 100644
-> > --- a/include/uapi/linux/blktrace_api.h
-> > +++ b/include/uapi/linux/blktrace_api.h
-> > @@ -129,6 +129,9 @@ enum {
-> >  };
-> >
-> >  #define BLKTRACE_BDEV_SIZE   32
-> > +#define BLKTRACE_MAX_BUFSIZ  (1024 * 1024)
-> > +#define BLKTRACE_MAX_BUFNR   16
-> > +#define BLKTRACE_MAX_ALLOC   ((BLKTRACE_MAX_BUFNR) * (BLKTRACE_MAX_BUFNR))
->
-> Adding these constants to the user space API is a very inflexible
-> approach. There must be better approaches to export constants like these
-> to user space, e.g. through sysfs attributes.
->
-> It probably will be easier to get a patch like this one upstream if the
-> uapi headers are not modified.
+[  459.350216] BUG: KASAN: use-after-free in __lock_acquire+0x24c1/0x31b0
+[  459.351190] Read of size 8 at addr ffff88806c815a80 by task syz-executor.0/20132
+[  459.352347]
+[  459.352594] CPU: 0 PID: 20132 Comm: syz-executor.0 Not tainted 4.19.90 #2
+[  459.353628] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+[  459.354947] Call Trace:
+[  459.355337]  dump_stack+0x111/0x19e
+[  459.355879]  ? __lock_acquire+0x24c1/0x31b0
+[  459.356523]  print_address_description+0x60/0x223
+[  459.357248]  ? __lock_acquire+0x24c1/0x31b0
+[  459.357887]  kasan_report.cold+0xae/0x2d8
+[  459.358503]  __lock_acquire+0x24c1/0x31b0
+[  459.359120]  ? _raw_spin_unlock_irq+0x24/0x40
+[  459.359784]  ? lockdep_hardirqs_on+0x37b/0x580
+[  459.360465]  ? _raw_spin_unlock_irq+0x24/0x40
+[  459.361123]  ? finish_task_switch+0x125/0x600
+[  459.361812]  ? finish_task_switch+0xee/0x600
+[  459.362471]  ? mark_held_locks+0xf0/0xf0
+[  459.363108]  ? __schedule+0x96f/0x21d0
+[  459.363716]  lock_acquire+0x111/0x320
+[  459.364285]  ? blkdev_get+0xce/0xbe0
+[  459.364846]  ? blkdev_get+0xce/0xbe0
+[  459.365390]  __mutex_lock+0xf9/0x12a0
+[  459.365948]  ? blkdev_get+0xce/0xbe0
+[  459.366493]  ? bdev_evict_inode+0x1f0/0x1f0
+[  459.367130]  ? blkdev_get+0xce/0xbe0
+[  459.367678]  ? destroy_inode+0xbc/0x110
+[  459.368261]  ? mutex_trylock+0x1a0/0x1a0
+[  459.368867]  ? __blkdev_get+0x3e6/0x1280
+[  459.369463]  ? bdev_disk_changed+0x1d0/0x1d0
+[  459.370114]  ? blkdev_get+0xce/0xbe0
+[  459.370656]  blkdev_get+0xce/0xbe0
+[  459.371178]  ? find_held_lock+0x2c/0x110
+[  459.371774]  ? __blkdev_get+0x1280/0x1280
+[  459.372383]  ? lock_downgrade+0x680/0x680
+[  459.373002]  ? lock_acquire+0x111/0x320
+[  459.373587]  ? bd_acquire+0x21/0x2c0
+[  459.374134]  ? do_raw_spin_unlock+0x4f/0x250
+[  459.374780]  blkdev_open+0x202/0x290
+[  459.375325]  do_dentry_open+0x49e/0x1050
+[  459.375924]  ? blkdev_get_by_dev+0x70/0x70
+[  459.376543]  ? __x64_sys_fchdir+0x1f0/0x1f0
+[  459.377192]  ? inode_permission+0xbe/0x3a0
+[  459.377818]  path_openat+0x148c/0x3f50
+[  459.378392]  ? kmem_cache_alloc+0xd5/0x280
+[  459.379016]  ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.379802]  ? path_lookupat.isra.0+0x900/0x900
+[  459.380489]  ? __lock_is_held+0xad/0x140
+[  459.381093]  do_filp_open+0x1a1/0x280
+[  459.381654]  ? may_open_dev+0xf0/0xf0
+[  459.382214]  ? find_held_lock+0x2c/0x110
+[  459.382816]  ? lock_downgrade+0x680/0x680
+[  459.383425]  ? __lock_is_held+0xad/0x140
+[  459.384024]  ? do_raw_spin_unlock+0x4f/0x250
+[  459.384668]  ? _raw_spin_unlock+0x1f/0x30
+[  459.385280]  ? __alloc_fd+0x448/0x560
+[  459.385841]  do_sys_open+0x3c3/0x500
+[  459.386386]  ? filp_open+0x70/0x70
+[  459.386911]  ? trace_hardirqs_on_thunk+0x1a/0x1c
+[  459.387610]  ? trace_hardirqs_off_caller+0x55/0x1c0
+[  459.388342]  ? do_syscall_64+0x1a/0x520
+[  459.388930]  do_syscall_64+0xc3/0x520
+[  459.389490]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.390248] RIP: 0033:0x416211
+[  459.390720] Code: 75 14 b8 02 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83
+04 19 00 00 c3 48 83 ec 08 e8 0a fa ff ff 48 89 04 24 b8 02 00 00 00 0f
+   05 <48> 8b 3c 24 48 89 c2 e8 53 fa ff ff 48 89 d0 48 83 c4 08 48 3d
+      01
+[  459.393483] RSP: 002b:00007fe45dfe9a60 EFLAGS: 00000293 ORIG_RAX: 0000000000000002
+[  459.394610] RAX: ffffffffffffffda RBX: 00007fe45dfea6d4 RCX: 0000000000416211
+[  459.395678] RDX: 00007fe45dfe9b0a RSI: 0000000000000002 RDI: 00007fe45dfe9b00
+[  459.396758] RBP: 000000000076bf20 R08: 0000000000000000 R09: 000000000000000a
+[  459.397930] R10: 0000000000000075 R11: 0000000000000293 R12: 00000000ffffffff
+[  459.399022] R13: 0000000000000bd9 R14: 00000000004cdb80 R15: 000000000076bf2c
+[  459.400168]
+[  459.400430] Allocated by task 20132:
+[  459.401038]  kasan_kmalloc+0xbf/0xe0
+[  459.401652]  kmem_cache_alloc+0xd5/0x280
+[  459.402330]  bdev_alloc_inode+0x18/0x40
+[  459.402970]  alloc_inode+0x5f/0x180
+[  459.403510]  iget5_locked+0x57/0xd0
+[  459.404095]  bdget+0x94/0x4e0
+[  459.404607]  bd_acquire+0xfa/0x2c0
+[  459.405113]  blkdev_open+0x110/0x290
+[  459.405702]  do_dentry_open+0x49e/0x1050
+[  459.406340]  path_openat+0x148c/0x3f50
+[  459.406926]  do_filp_open+0x1a1/0x280
+[  459.407471]  do_sys_open+0x3c3/0x500
+[  459.408010]  do_syscall_64+0xc3/0x520
+[  459.408572]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.409415]
+[  459.409679] Freed by task 1262:
+[  459.410212]  __kasan_slab_free+0x129/0x170
+[  459.410919]  kmem_cache_free+0xb2/0x2a0
+[  459.411564]  rcu_process_callbacks+0xbb2/0x2320
+[  459.412318]  __do_softirq+0x225/0x8ac
 
-Thanks, makes sense. I'll do this in the V2. If we do that, we still
-need to define the default values for these limits. Do the values
-chosen for MAX_BUFSIZE and MAX_ALLOC look reasonable?
+Fix this by delaying bdput() to the end of blkdev_get() which means we
+have finished accessing bdev.
 
->
-> >  /*
-> >   * User setup structure passed with BLKTRACESETUP
-> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> > index ea47f2084087..b3b0a8164c05 100644
-> > --- a/kernel/trace/blktrace.c
-> > +++ b/kernel/trace/blktrace.c
-> > @@ -482,6 +482,9 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-> >       if (!buts->buf_size || !buts->buf_nr)
-> >               return -EINVAL;
-> >
-> > +     if (buts->buf_size * buts->buf_nr > BLKTRACE_MAX_ALLOC)
-> > +             return -E2BIG;
-> > +
-> >       if (!blk_debugfs_root)
-> >               return -ENOENT;
->
-> Where do the overflow(s) happen if buts->buf_size and buts->buf_nr are
-> large? Is the following code from relay_open() the only code that can
-> overflow?
->
->         chan->alloc_size = PAGE_ALIGN(subbuf_size * n_subbufs);
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Jason Yan <yanaijie@huawei.com>
+---
+ v2: Add Reported-by tag and cc linux-block mailing list
 
-Good catch, I'm not sure if the overflows are checked for, but I maybe
-wrong. Given the possibility of overflows, perhaps we should be
-checking for individual upper bounds instead of the product?
+ fs/block_dev.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-Harshad
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 47860e589388..8faec9fb47b6 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1566,7 +1566,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	if (!for_part) {
+ 		ret = devcgroup_inode_permission(bdev->bd_inode, perm);
+ 		if (ret != 0) {
+-			bdput(bdev);
+ 			return ret;
+ 		}
+ 	}
+@@ -1688,7 +1687,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	disk_unblock_events(disk);
+ 	put_disk_and_module(disk);
+  out:
+-	bdput(bdev);
+ 
+ 	return ret;
+ }
+@@ -1755,6 +1753,9 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+ 		bdput(whole);
+ 	}
+ 
++	if (res)
++		bdput(bdev);
++
+ 	return res;
+ }
+ EXPORT_SYMBOL(blkdev_get);
+-- 
+2.21.3
 
->
-> Thanks,
->
-> Bart.
->
