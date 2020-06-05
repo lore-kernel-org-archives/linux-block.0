@@ -2,93 +2,81 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8323C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F04CC433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B44312077D
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA1BD2063A
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:52:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AmUizXlh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726324AbgFELu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 07:50:26 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2286 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726314AbgFELuZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 07:50:25 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 2BB1D280F92576B9D221;
-        Fri,  5 Jun 2020 12:50:24 +0100 (IST)
-Received: from [127.0.0.1] (10.210.169.114) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 5 Jun 2020
- 12:50:23 +0100
-Subject: Re: [PATCH 0/2] blk-mq: fix handling cpu hotplug
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>
-References: <20200605114410.2416726-1-ming.lei@redhat.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e99f7770-f7b1-291b-d8bb-0ad30d774078@huawei.com>
-Date:   Fri, 5 Jun 2020 12:49:10 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726365AbgFELv6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 07:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726324AbgFELv6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 07:51:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B34C08C5C2;
+        Fri,  5 Jun 2020 04:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=XMIUr7QQnBAMG/5n56k4P+c+DXhD2JhaWi3/bfA8kU0=; b=AmUizXlhfS4T140zZqpI0Yfzmp
+        JH+u5PKoAX0bZNDzeRNaDmdLeSyuWIqPb6JcttVdRebusPaSMCGXAO3ToV7RPVg/HZ8MP/kS67eqo
+        kYB3rPYKUEZGEIDuf8DiKRK1a5VccmhsJ8F/zzVr2cHJpIt7HBBhhJMzyd1dLNSWULfDA9bHUwuqt
+        8g6OVELcIR54uJXNNcBVbTGkB5bXn3EeBDAN2yJ/uNH5nnJ54pqYaKUycRvbPtgDjc/wEKzv7Z8it
+        xlTdbDJ0TpH+VIUp1fuZSWUSMhatsHuMk5QF2Q/ztmb8Az/2zu2rLnFN2AyMP+JelN/eCnY2hOc7N
+        l2/Njn6A==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jhAtC-0001E0-BT; Fri, 05 Jun 2020 11:51:58 +0000
+Date:   Fri, 5 Jun 2020 04:51:58 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Jason Yan <yanaijie@huawei.com>, hulkci@huawei.com,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: block: Fix use-after-free in blkdev_get()
+Message-ID: <20200605115158.GD19604@bombadil.infradead.org>
+References: <88676ff2-cb7e-70ec-4421-ecf8318990b1@web.de>
+ <5fa658bf-3028-9b5c-30cc-dbdef6bf8f7a@huawei.com>
+ <20200605094353.GS30374@kadam>
+ <2ee6f2f7-eaec-e748-bead-0ad59f4c378b@web.de>
+ <20200605111049.GA19604@bombadil.infradead.org>
+ <b6c8ebd7-ccd3-2a94-05b2-7b92a30ec8a9@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20200605114410.2416726-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.169.114]
-X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6c8ebd7-ccd3-2a94-05b2-7b92a30ec8a9@web.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/06/2020 12:44, Ming Lei wrote:
-> Hi Jens,
+On Fri, Jun 05, 2020 at 01:48:43PM +0200, Markus Elfring wrote:
+> >> I am trying to contribute a bit of patch review as usual.
+> >
+> > Please stop criticising people's commit messages.  Your suggestions
+> > are usually not improvements.
 > 
-> The 1st patch avoids to fail driver tag allocation because of inactive
-> hctx, so hang risk can be killed during cpu hotplug.
-> 
-> The 2nd patch fixes blk_mq_all_tag_iter so that we can drain all
-> requests before one hctx becomes inactive.
-> 
-> Both fixes bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are
-> offline").
-> 
-> John has verified that the two can fix his request timeout issue during
-> cpu hotplug.
+> The details can vary also for my suggestions.
+> Would you point any more disagreemnents out on concrete items?
 
-But let me test it again my afternoon. My test branch earlier had some
-debug stuff.
+That's exactly the problem with many of your comments.  They're
+vague to the point of unintelligibility.
 
-Cheers
+> > But refcount -> reference count is not particularly interesting.
+> 
+> Can a wording clarification become helpful also for this issue?
 
-> 
-> Christoph Hellwig (1):
->    blk-mq: split out a __blk_mq_get_driver_tag helper
-> 
-> Ming Lei (1):
->    blk-mq: fix blk_mq_all_tag_iter
-> 
->   block/blk-mq-tag.c | 39 ++++++++++++++++++++++++++++++++++++---
->   block/blk-mq-tag.h |  8 ++++++++
->   block/blk-mq.c     | 29 -----------------------------
->   block/blk-mq.h     |  1 -
->   4 files changed, 44 insertions(+), 33 deletions(-)
-> 
-> Cc: Dongli Zhang <dongli.zhang@oracle.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Daniel Wagner <dwagner@suse.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: John Garry <john.garry@huawei.com>
-> 
-> 
-
+This is a great example.  I have no idea what this sentence means.
+I speak some German; how would you say this in German?
