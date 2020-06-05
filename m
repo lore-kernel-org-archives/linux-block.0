@@ -2,120 +2,80 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E450CC433E1
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 22:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AB4C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 23:15:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C520E207D0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 22:33:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B1422074B
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 23:15:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591396407;
-	bh=AmNtOqTpIwcyG2l7iLaR+nlkCZiWlE75noVn2Qww3bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=wH/HV4zU9MMby+V/fAYL/klgVVYsGw/IWPFteRA/mb6XTbwxZBBJ9B0TEHqOMDBTX
-	 r0kGgEBiEdUOVPQmyMmMSJjUBTExcscLtUd1iX7ZGNsAz/wvpBDvSyl0Jl2Sfp7eRS
-	 d7bMS8nbsX+oFYBw6zf7M6iZ6+RzaG8LHXiSf0xs=
+	s=default; t=1591398920;
+	bh=Hx9Lqe52dmWcYZwruCnYgyjNrNw+D+fuPK+l/lRXEl0=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=aOGIJ5+sqqPx+FDmzI9zGtNfEpWc2icsYe0XcrPnLu3P9QEAyyI1B63/1+eq2qufd
+	 P81iy8+/fqfa1fz7tnMq5E78RdwfCjFu62roTfBqG9OhawlJR6DuSlx2vP7qB6Y0UU
+	 PvvMezUkz6nwWVgx+JQ5OfZq/w0zVc2/6qF5IDdA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728157AbgFEWdX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 18:33:23 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:53539 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbgFEWdX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 18:33:23 -0400
-Received: by mail-pj1-f65.google.com with SMTP id i12so3226555pju.3;
-        Fri, 05 Jun 2020 15:33:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vS5y2cwTZmplrWxSMeAOvchEwRxJxoFyQaaO7U/jQTc=;
-        b=APz7A3hHruHCdS2eSmB7nHEP33bYuNEdzA2Pq4h5F+mg3JmaGPtq7zeIrlHLlRyG8y
-         kpLL/JnHAvmJHKfG8c1/QbdtPIgzGczSGXS3DdnyggiXEm0jYK9S4tMUrJZaT7AQJo6t
-         u8LxagURiCOPMX2Lny8pNf5g23fgssAhQdxtyJGtKVa+K2YMtG+6YGwklgoBNL0pN9cA
-         Ah9qLakvGGRbwpbDg3LspkIxaScYnJ164GzRYLMA6zOcxYHRhD0m8qRnIui3vIOqlxJe
-         IGy+GrJrkmQdbTQCUXkl3SMn6BINMHSUhyPZ5NBhqFD9slkwImclp8yvi4tLcphJ5PqC
-         YAPg==
-X-Gm-Message-State: AOAM530u/tclCEXyv5tPzOHow2UVqV+zNalHmEwdVHsPBM3GkoawTeT8
-        E4Yq5HnaZB6iU4A39/G1NXo=
-X-Google-Smtp-Source: ABdhPJyajZB2ekSKunHZEPzroRX0GQ5Qx0oFeO/rItogtY+TqeixJGMKJYPif86T+TAP5R3klqe8dA==
-X-Received: by 2002:a17:90a:6f04:: with SMTP id d4mr4924167pjk.134.1591396402606;
-        Fri, 05 Jun 2020 15:33:22 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id c1sm539415pfo.197.2020.06.05.15.33.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 15:33:21 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 8E4B8403AB; Fri,  5 Jun 2020 22:33:20 +0000 (UTC)
-Date:   Fri, 5 Jun 2020 22:33:20 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
-        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v5 5/7] blktrace: fix debugfs use after free
-Message-ID: <20200605223320.GN11244@42.do-not-panic.com>
-References: <20200516031956.2605-1-mcgrof@kernel.org>
- <20200516031956.2605-6-mcgrof@kernel.org>
- <20200519163713.GA29944@infradead.org>
- <20200527031202.GT11244@42.do-not-panic.com>
- <20200601170500.GF13911@42.do-not-panic.com>
- <d4ef5da1-7d11-657c-f864-8b2ca6ea082c@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4ef5da1-7d11-657c-f864-8b2ca6ea082c@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1728296AbgFEXPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 19:15:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44864 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728290AbgFEXPT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Jun 2020 19:15:19 -0400
+Subject: Re: [git pull v2] device mapper changes for 5.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591398919;
+        bh=Hx9Lqe52dmWcYZwruCnYgyjNrNw+D+fuPK+l/lRXEl0=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=sXgk1GTCunNZhEPa9DOKeULMewqiWYRGlMVKAbn3/88BJLsoiJPBp/0rDRD4BV8Xc
+         XLzTBXRcS+tablLAIP14/gd50D+uHnY/WfBjyyOf38UKgW82/T6hp3QBDJ6Y3KCMrG
+         9R2z+pY9k/ukK39CyL5Mr9Triq/tLFH/33psgINM=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200605191613.GA621@redhat.com>
+References: <20200605145124.GA31972@redhat.com>
+ <20200605191613.GA621@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200605191613.GA621@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.8/dm-changes
+X-PR-Tracked-Commit-Id: 64611a15ca9da91ff532982429c44686f4593b5f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b25c6644bfd3affd7d0127ce95c5c96c155a7515
+Message-Id: <159139891929.4436.16769068315334032119.pr-tracker-bot@kernel.org>
+Date:   Fri, 05 Jun 2020 23:15:19 +0000
+To:     Mike Snitzer <gustavoars@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Dmitry Baryshkov <dmitry_baryshkov@mentor.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        Khazhismel Kumykov <khazhy@google.com>,
+        Martin Wilck <mwilck@suse.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        YueHaibing <yuehaibing@huawei.com>,
+        Zhiqiang Liu <liuzhiqiang26@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 09:48:43PM -0700, Bart Van Assche wrote:
-> On 2020-06-01 10:05, Luis Chamberlain wrote:
-> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> > index a55cbfd060f5..5b0310f38e11 100644
-> > --- a/kernel/trace/blktrace.c
-> > +++ b/kernel/trace/blktrace.c
-> > @@ -511,6 +511,11 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-> >  	 */
-> >  	if (bdev && bdev != bdev->bd_contains) {
-> >  		dir = bdev->bd_part->debugfs_dir;
-> > +	} else if (q->sg_debugfs_dir &&
-> > +		   strlen(buts->name) == strlen(q->sg_debugfs_dir->d_name.name)
-> > +		   && strcmp(buts->name, q->sg_debugfs_dir->d_name.name) == 0) {
-> > +		/* scsi-generic requires use of its own directory */
-> > +		dir = q->sg_debugfs_dir;
-> >  	} else {
-> >  		/*
-> >  		 * For queues that do not have a gendisk attached to them, that
-> > 
-> 
-> Please Cc Martin Petersen for patches that modify SCSI code.
+The pull request you sent on Fri, 5 Jun 2020 15:16:13 -0400:
 
-Sure thing.
-> The string comparison check looks fragile to me. Is the purpose of that
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.8/dm-changes
 
-> check perhaps to verify whether tracing is being activated through the
-> SCSI generic interface?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b25c6644bfd3affd7d0127ce95c5c96c155a7515
 
-Yes.
+Thank you!
 
-> If so, how about changing that test into
-> something like the following?
-> 
-> 	MAJOR(dev) == SCSI_GENERIC_MAJOR
-
-Sure.
-
-  Luis
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
