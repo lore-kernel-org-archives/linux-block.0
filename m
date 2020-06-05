@@ -2,122 +2,105 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A38C433DF
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518A4C433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:44:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69991207D0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:28:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29E26207D0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:44:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fh3v6xc2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgFEJ2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 05:28:50 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2284 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726227AbgFEJ2u (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 05:28:50 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id E1AAEA2634ECAAA0C8B5;
-        Fri,  5 Jun 2020 10:28:48 +0100 (IST)
-Received: from [127.0.0.1] (10.210.169.114) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 5 Jun 2020
- 10:28:48 +0100
-Subject: Re: [PATCH] blk-mq: don't fail driver tag allocation because of
- inactive hctx
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Christoph Hellwig <hch@lst.de>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-References: <20200603105128.2147139-1-ming.lei@redhat.com>
- <20200603115347.GA8653@lst.de> <20200603133608.GA2149752@T590>
- <6b58e473-16a4-4ce2-a4ac-50b952d364d7@huawei.com>
- <6fbd3669-4358-6d9f-5c94-e1bc7acecb86@oracle.com>
- <b37b1f30-722b-4767-0627-103b94c7421c@huawei.com>
- <20200604112615.GA2336493@T590>
- <7291fd02-3c2c-f3f9-f3eb-725cd85d5523@huawei.com>
- <20200604120747.GB2336493@T590>
- <38b4c7a3-057f-c52c-993b-523660085e3c@huawei.com>
- <20200605083349.GA2392879@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <161ad789-11f9-b422-99e3-0abf18e1b167@huawei.com>
-Date:   Fri, 5 Jun 2020 10:27:35 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726243AbgFEJo1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 05:44:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34252 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726242AbgFEJo1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 05:44:27 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0559WPAR020418;
+        Fri, 5 Jun 2020 09:44:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=qqApPwaVsfD9KsWb9ZyJEdEVujKUGkYoa9MNEy7rOgw=;
+ b=fh3v6xc2K8PcQ+zXUCdybeuP5xdRJxcdvjETG0pvaclDVmio2zsBTIhjDulrOz1XZFYQ
+ iaak6lheEb0bDsEeuQ7ADjnNOjJghIwmPKzdkGPe10v+SWOWWPqj0w8au8drGUvyzpGp
+ BLgNIidDGZxdbrT5PYpw594bqmF0hTxkegqXF2Nve/qe5bPDaCoY04/gAZUskchs+TMV
+ 38FHKd53dX8M+3htO5XiRqOdwrsLQyGIQgfncrPVoEn0IBNhmTCc0Ip2FFWcrcdx4AB1
+ cOMI564TFkm33GTZXtsr5mQTQoHwX2k1H0GwHbm8GmQNzffno9NpjpJHIWJLabqSteaF AA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 31f926227d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 05 Jun 2020 09:44:09 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0559YLqa146838;
+        Fri, 5 Jun 2020 09:44:08 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 31f926y236-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Jun 2020 09:44:08 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0559i3Ee022645;
+        Fri, 5 Jun 2020 09:44:06 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 05 Jun 2020 02:44:02 -0700
+Date:   Fri, 5 Jun 2020 12:43:54 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jason Yan <yanaijie@huawei.com>, Jan Kara <jack@suse.cz>
+Cc:     Markus Elfring <Markus.Elfring@web.de>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        hulkci@huawei.com, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2] block: Fix use-after-free in blkdev_get()
+Message-ID: <20200605094353.GS30374@kadam>
+References: <88676ff2-cb7e-70ec-4421-ecf8318990b1@web.de>
+ <5fa658bf-3028-9b5c-30cc-dbdef6bf8f7a@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200605083349.GA2392879@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.169.114]
-X-ClientProxiedBy: lhreml720-chm.china.huawei.com (10.201.108.71) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5fa658bf-3028-9b5c-30cc-dbdef6bf8f7a@huawei.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 bulkscore=0
+ suspectscore=2 mlxscore=0 adultscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006050074
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
+ suspectscore=2 cotscore=-2147483648 bulkscore=0 clxscore=1011
+ impostorscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=999
+ spamscore=0 lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006050074
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/06/2020 09:33, Ming Lei wrote:
->> LLDD does not use request->tag - it generates its own.
->>
->>   and suggest you to double check
->>> hisi_sas's queue mapping which has to be exactly same with blk-mq's
->>> mapping.
->>>
->> scheduler=none is ok, so I am skeptical of a problem there.
-> Please try the following patch, and we may not drain in-flight
-> requests correctly:
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 97bb650f0ed6..ae110e2754bf 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -265,6 +265,7 @@ struct bt_tags_iter_data {
->   
->   #define BT_TAG_ITER_RESERVED		(1 << 0)
->   #define BT_TAG_ITER_STARTED		(1 << 1)
-> +#define BT_TAG_ITER_STATIC_RQS		(1 << 2)
->   
->   static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->   {
-> @@ -280,7 +281,10 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->   	 * We can hit rq == NULL here, because the tagging functions
->   	 * test and set the bit before assining ->rqs[].
->   	 */
-> -	rq = tags->rqs[bitnr];
-> +	if (iter_data->flags & BT_TAG_ITER_STATIC_RQS)
-> +		rq = tags->static_rqs[bitnr];
-> +	else
-> +		rq = tags->rqs[bitnr];
->   	if (!rq)
->   		return true;
->   	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
-> @@ -335,11 +339,13 @@ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
->    *		indicates whether or not @rq is a reserved request. Return
->    *		true to continue iterating tags, false to stop.
->    * @priv:	Will be passed as second argument to @fn.
-> + *
-> + * Caller has to pass the tag map from which requests are allocated.
->    */
->   void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
->   		void *priv)
->   {
-> -	return __blk_mq_all_tag_iter(tags, fn, priv, 0);
-> +	return __blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
->   }
->   
->   /**
-> 
+A lot of maintainers have blocked Markus and asked him to stop trying
+to help people write commit message.  Saying "bdev" instead of "block
+device" is more clear so your original message was better.
 
-ok, so early test shows that this is ok. I didn't try scheduler=none though.
+The Fixes tag is a good idea though:
 
-I'll let you know.
+Fixes: 89e524c04fa9 ("loop: Fix mount(2) failure due to race with LOOP_SET_FD")
 
-Thanks,
-John
+It broke last July.  Before that, we used to check if __blkdev_get()
+failed before dereferencing "bdev".
+
+I wonder if maybe the best fix is to re-add the "if (!res) " check back
+to blkdev_get().  The __blkdev_get() looks like it can also free "whole"
+though if it calls itself recursively and I don't really know this code
+so I can't say for sure...
+
+regards,
+dan carpenter
 
