@@ -2,47 +2,47 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CF5C433E1
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FAB4C433E1
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2F8220772
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:21:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBC0A20772
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 09:25:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="O+8vC72i"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="SvjBYyWJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbgFEJVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 05:21:08 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:50777 "EHLO m43-7.mailgun.net"
+        id S1726242AbgFEJZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 05:25:37 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:11374 "EHLO m43-7.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726177AbgFEJVI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 05:21:08 -0400
+        id S1726213AbgFEJZh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Jun 2020 05:25:37 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1591348868; h=Content-Type: MIME-Version: Message-ID:
+ s=smtp; t=1591349136; h=Content-Type: MIME-Version: Message-ID:
  In-Reply-To: Date: References: Subject: Cc: To: From: Sender;
- bh=kOyRDD2wM/7haweFJ6NAJPQaW5V0bTz8j0qf/YEB3F8=; b=O+8vC72iT6/7sFEK33aFI3/dbGHZQE1VSnI+Xr5kjRKYff9m/F++oSSI7iPk/ybc3Tm4Axpt
- yQasEFRvQntenTrgUEudBoeKABraxOt0zsiS17eFdqpZCUyFWLJ23Z8QgtyzkCzY0ie4jOVK
- M4SleUZxEE1M3AvCIOEfGjOvaRE=
+ bh=4DMYxLsLHIEhVdnqccTaMZxujDa7ILXa6vhA3dmslLM=; b=SvjBYyWJ9LA/5JwxYqsiFGlS2pSwhnfSAK6QmLGk1Ni3pmlqDB7HDzDhpZtjy1zFwQYTbtYZ
+ /TXRGWqiWNo1+jJnyS5uUB+iRl9qJGHYwwuG3HNQ2YJHqMku/t1gNQR7epLH1ppZgrIyZDKP
+ XniV6AQiye28RFrPD/IFpSduQfU=
 X-Mailgun-Sending-Ip: 69.72.43.7
 X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
- 5eda0e7e27386861266429f0 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 05 Jun 2020 09:21:02
+ smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
+ 5eda0f792738686126653d50 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 05 Jun 2020 09:25:13
  GMT
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 54699C433B2; Fri,  5 Jun 2020 09:21:01 +0000 (UTC)
+        id 3E72CC433A0; Fri,  5 Jun 2020 09:25:12 +0000 (UTC)
 Received: from tynnyri.adurom.net (tynnyri.adurom.net [51.15.11.48])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         (Authenticated sender: kvalo)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 0979DC433C6;
-        Fri,  5 Jun 2020 09:20:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 0979DC433C6
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id EA82AC433C6;
+        Fri,  5 Jun 2020 09:25:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org EA82AC433C6
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=kvalo@codeaurora.org
 From:   Kalle Valo <kvalo@codeaurora.org>
@@ -58,13 +58,13 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-clk@vger.kernel.org, linux-spi@vger.kernel.org,
         linux-mm@kvack.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 03/10] b43: Remove uninitialized_var() usage
+Subject: Re: [PATCH 09/10] treewide: Remove uninitialized_var() usage
 References: <20200603233203.1695403-1-keescook@chromium.org>
-        <20200603233203.1695403-4-keescook@chromium.org>
-Date:   Fri, 05 Jun 2020 12:20:55 +0300
-In-Reply-To: <20200603233203.1695403-4-keescook@chromium.org> (Kees Cook's
-        message of "Wed, 3 Jun 2020 16:31:56 -0700")
-Message-ID: <87d06dg96w.fsf@tynnyri.adurom.net>
+        <20200603233203.1695403-10-keescook@chromium.org>
+Date:   Fri, 05 Jun 2020 12:25:05 +0300
+In-Reply-To: <20200603233203.1695403-10-keescook@chromium.org> (Kees Cook's
+        message of "Wed, 3 Jun 2020 16:32:02 -0700")
+Message-ID: <878sh1g8zy.fsf@tynnyri.adurom.net>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -76,11 +76,24 @@ X-Mailing-List: linux-block@vger.kernel.org
 Kees Cook <keescook@chromium.org> writes:
 
 > Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> (or can in the future), and suppresses unrelated compiler warnings (e.g.
-> "unused variable"). If the compiler thinks it is uninitialized, either
-> simply initialize the variable or make compiler changes. As a precursor
-> to removing[2] this[3] macro[4], just initialize this variable to NULL,
-> and make the (unreachable!) code do a conditional test.
+> (or can in the future), and suppresses unrelated compiler warnings
+> (e.g. "unused variable"). If the compiler thinks it is uninitialized,
+> either simply initialize the variable or make compiler changes.
+>
+> I preparation for removing[2] the[3] macro[4], remove all remaining
+> needless uses with the following script:
+>
+> git grep '\buninitialized_var\b' | cut -d: -f1 | sort -u | \
+> 	xargs perl -pi -e \
+> 		's/\buninitialized_var\(([^\)]+)\)/\1/g;
+> 		 s:\s*/\* (GCC be quiet|to make compiler happy) \*/$::g;'
+>
+> drivers/video/fbdev/riva/riva_hw.c was manually tweaked to avoid
+> pathological white-space.
+>
+> No outstanding warnings were found building allmodconfig with GCC 9.3.0
+> for x86_64, i386, arm64, arm, powerpc, powerpc64le, s390x, mips, sparc64,
+> alpha, and m68k.
 >
 > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
 > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
@@ -91,21 +104,23 @@ Kees Cook <keescook@chromium.org> writes:
 
 [...]
 
-> @@ -4256,9 +4256,13 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
->  			pga_gain = (table[i] >> 24) & 0xf;
->  			pad_gain = (table[i] >> 19) & 0x1f;
->  			if (b43_current_band(dev->wl) == NL80211_BAND_2GHZ)
-> -				rfpwr_offset = rf_pwr_offset_table[pad_gain];
-> +				rfpwr_offset = rf_pwr_offset_table
-> +						? rf_pwr_offset_table[pad_gain]
-> +						: 0;
->  			else
-> -				rfpwr_offset = rf_pwr_offset_table[pga_gain];
-> +				rfpwr_offset = rf_pwr_offset_table
-> +						? rf_pwr_offset_table[pga_gain]
-> +						: 0;
+>  drivers/net/wireless/ath/ath10k/core.c           |  2 +-
+>  drivers/net/wireless/ath/ath6kl/init.c           |  2 +-
+>  drivers/net/wireless/ath/ath9k/init.c            |  2 +-
+>  drivers/net/wireless/broadcom/b43/debugfs.c      |  2 +-
+>  drivers/net/wireless/broadcom/b43/dma.c          |  2 +-
+>  drivers/net/wireless/broadcom/b43/lo.c           |  2 +-
+>  drivers/net/wireless/broadcom/b43/phy_n.c        |  2 +-
+>  drivers/net/wireless/broadcom/b43/xmit.c         | 12 ++++++------
+>  .../net/wireless/broadcom/b43legacy/debugfs.c    |  2 +-
+>  drivers/net/wireless/broadcom/b43legacy/main.c   |  2 +-
+>  drivers/net/wireless/intel/iwlegacy/3945.c       |  2 +-
+>  drivers/net/wireless/intel/iwlegacy/4965-mac.c   |  2 +-
+>  .../net/wireless/realtek/rtlwifi/rtl8192cu/hw.c  |  4 ++--
 
-To me this is ugly, isn't there a better way to fix this?
+For wireless drivers:
+
+Acked-by: Kalle Valo <kvalo@codeaurora.org>
 
 -- 
 https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
