@@ -2,150 +2,268 @@ Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A693C433DF
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 10:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1733AC433DF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:06:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DFA5206E6
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 10:57:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD807206FA
+	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 11:06:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="l8UBnGn8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3KcyY5b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726941AbgFEK5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 06:57:10 -0400
-Received: from mout.web.de ([212.227.15.14]:44467 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726834AbgFEK5J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jun 2020 06:57:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1591354606;
-        bh=rSnfjIPja85QGA/ERMsy+/tfFYjepZiJhqusKyxLkFk=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=l8UBnGn82p+OytB9mzehMWlXnE/c9Oa0oKX73nlwFOMmSxTUM9iuzbSB7c+Id8s+j
-         /v35GLHuIdLc4VxYeMekQslvC3eOPaPeJyD1THYPzGRRjtgInVfW4LEh3dPqCk5/zN
-         hIDrOsmTG4kNrAsghnmIQUrfzZT8vDZUBbBi3x8c=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.131.102.114]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MYcpr-1jTk0T2EPz-00Vgn7; Fri, 05
- Jun 2020 12:56:46 +0200
-Subject: Re: [PATCH v2] block: Fix use-after-free in blkdev_get()
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Jason Yan <yanaijie@huawei.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     hulkci@huawei.com, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-References: <88676ff2-cb7e-70ec-4421-ecf8318990b1@web.de>
- <5fa658bf-3028-9b5c-30cc-dbdef6bf8f7a@huawei.com>
- <20200605094353.GS30374@kadam>
-From:   Markus Elfring <Markus.Elfring@web.de>
-Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
- 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 FEE=
-Message-ID: <2ee6f2f7-eaec-e748-bead-0ad59f4c378b@web.de>
-Date:   Fri, 5 Jun 2020 12:56:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1726637AbgFELGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 07:06:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46634 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726690AbgFELGN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 07:06:13 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331E1C08C5C3;
+        Fri,  5 Jun 2020 04:06:08 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id e11so4023483ilr.4;
+        Fri, 05 Jun 2020 04:06:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=+VjCdw30w2Q+2F0bQm7D6xci037AIztHw8WSQCjuJhc=;
+        b=H3KcyY5bXpn+V4vb3etflUsQqYoN4droIJGI1EwZT/I4UDpCPIKz4MaNs+6iPTE4Nu
+         PzpeiMA4B9RMmyA0uNibApwQfcnQrC0E+J4DMWs4iXQOvP+XmLXK3ipU4IPDu2Jef6WW
+         3gVqpL8nyxM4bOKTvmM2Y9BjSRvGf+p9944zAeBD6ojaRBUHdfgid0CLfgUOte/MRw1q
+         Lbp+NV0EI8oTcjc5P1sHEaclOD1A2q5Hu13b01GzFYKUWiFCneoMPp0wWMdEwqHnvbW+
+         6uKEWJhrCt1Xo8T0zuE8jNfaK2GE2Md6gDHrK3i0nGCj+6VBtXFaGzzP9DiTENV+tT0E
+         NoTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=+VjCdw30w2Q+2F0bQm7D6xci037AIztHw8WSQCjuJhc=;
+        b=lQWRHwUPsOqkNJBBeVHEMx26S6TsM4P8SQ5tagQt0QQrinYd8sJxNAhuxIZLrx1z4b
+         mJ4ZblHwN6eCcVXxhHlgBrpYMqFqa8YcbUv570ifHxkV+KCePx7Df7lgY9mYHQPJ5FTe
+         kCtnmGxT6ZQHKFDcyvx80HdlcCA3AcLLDrkYuEXbKAcqgRfMTlDwprhPkU16A22XsM4H
+         oe25qGIT5tncE8t5Sz4Pl6WAij9rfCJeXo/dYU0X/Iyk04wEiBgNGs1PJQGMDpCBK41L
+         ltOpdRHi2CzpWRCZkTXxd/JtfHQJ0RJjxoqgId+MtwMjQ+76y4QhNNgZpwU++2qecIf0
+         joIA==
+X-Gm-Message-State: AOAM532tN1jbcoLxLa+pVIF/p0dbBuq66iJYUYcdcsgb+zzEGEkjVOvL
+        mARvFZsQ6G3Omns9N50Tt0dk2HnQJ1y/G9HCXEs=
+X-Google-Smtp-Source: ABdhPJzF8kP7uzUYyd9tEHXliWSes50ds4mLitS1rXYOpqVmd0mJGHR6x8nhbj6SgYyoXc1x6p7WSNa5KNEFeOTPPcs=
+X-Received: by 2002:a92:898e:: with SMTP id w14mr7638188ilk.212.1591355167447;
+ Fri, 05 Jun 2020 04:06:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200605094353.GS30374@kadam>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:dRd58kkRgO+FkYctmKLtqIsGHz847dnAboKzyJJI459iQb92L0I
- /jkxoCVcKUo2YN8Jdn5sB94LHb4rEp+TQwINI3ymXY1yYNAv4uZhga92XzKwEE4ThFmktgy
- 5U+fmIQ+tyjvgTMseXshgs/sGCYHTkTMB4JGW7w16omFGY98I1cgJ02Dd8PAG23vJ0yFDtj
- eN3w9nWa8XUNgD0VH1R8g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wCp/MjImjsw=:sbzqgK/Sbbg6Jvko1W2h/4
- JigwSaZnJBhV81llTnCKYWq6EBMeu1Hh1Oi3Wk+WrSq4/9B/1PEvVT6u5qL7kAn7kAzl9J8l2
- bnyjPoKAV6YaGliIS14j8MqxyFb9QUOiqS0JBcAfuac1nqWAqwXgm6h9oZgIl0fzLZJUX0Ym/
- IWuNpdRmnoPfcG9UPUCsh9z6RdRGIixeIsQDIgvOdf6gZBzO5wa3+SnSm4ZO3yOK8qQSh0yPl
- vDU7Kxwh4diiRBw+dbZvt21zcvTVvvKPOJkXy1j4ZqKVY6Y1M+ECwyPXaJPFiYAFuhk273DUb
- oRF6BTbNtRJxluJkEH5O+1LU6G3BHnrfvKxLLSsu8ZDqcHGZ8sYHL6lCDsU5zPOBVnMKuh6Vl
- I1S9A0b5VIN6thIY9Sp0MIWGml4aEVgoGxmS7imv5T1QB2GNMtZTfGAWOQyiZ3V2VN1I01o8F
- JqukmS0vQE4KZv0HdUXg9kG/95dOpDDDiv5buV4SGl8Kjs1s3pNTU5eZuO3vL8WVmO4dVMk1+
- S+n34TExgo+QQJG0492Q1wSotR6MYQciQIH/b+ZpsUpAy3dZCHjgKnPwWy0Nt42ps0ixefu+R
- S/t7SA65f8wU++dNcD0bDorIMDXmba5SGOSgPGuR3PLFBA7yNj4Q1L8Sa8tQlBTmkEoLY+mud
- hV63uIgCNm4a4uSLwMWDLDLsGl/relGKYviRZ0PNq/3vc2ZXp6soppcnD8KcfMTieEAC4wTHU
- +ulNjMdiIKK7jRWMNgY4B8aTWXuOpaHSsuW1stq7J5Ds6jMW6DTnMtMObs1eFzcR4liN9Zl+c
- i9yiXGTd+PJXkhEnJ8FV4wizcG0rhBIzh2uR+2c4bhAjoFJijB1hmsV5efwEWqE/88s1nKwFU
- kNUqFPXu1xoZ8zY/nlPeys5Ybr9peFx6y//yQbGjG84CefJXYemYo+IgfVAhLmFqGjx8Yk/Ko
- xPXLKWsrQligCeL7drWi3GmRxb9pSCIyhBZ3hjlJkiMG2j7K46seIYz/57jqQWBKNUUFJKl8K
- K19OBaoJ8efiQGf92Sa1okhvKP2FbaD5UnGcS+Z1MLBd9GxHjdSCy4DPltF0r9eDb7/MC+R87
- poD86MewSiElgrUsovAuQwJ4Q/ywHlTtbvPtPlm5omzpATckgiNKIfGr3fPpi4cbGPALLYnBM
- GO84m+sDfaGfn9FHlANNmiwdeaPVUORwnRP3gqoziLRmvpxkEqocd1V+7g4IUjyGg6uwHz8Mk
- 6Hz6ReOfv4I357hFH
+References: <20200605104558.16686-1-yanaijie@huawei.com>
+In-Reply-To: <20200605104558.16686-1-yanaijie@huawei.com>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Fri, 5 Jun 2020 13:05:55 +0200
+Message-ID: <CA+icZUU4osBYvjkyZRpuGc8epnEkjeQCEX3kSHFhgFJ+dMOgTw@mail.gmail.com>
+Subject: Re: [PATCH v3] block: Fix use-after-free in blkdev_get()
+To:     Jason Yan <yanaijie@huawei.com>
+Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
+        Hulk Robot <hulkci@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> A lot of maintainers have blocked Markus and asked him to stop trying
-> to help people write commit message.
-
-I am trying to contribute a bit of patch review as usual.
-
-
-> Saying "bdev" instead of "block device" is more clear
-
-I find this view interesting.
-
-
-> so your original message was better.
-
-Does this feedback include reported spelling mistakes?
-
-
-> The Fixes tag is a good idea though:
+On Fri, Jun 5, 2020 at 12:23 PM Jason Yan <yanaijie@huawei.com> wrote:
 >
-> Fixes: 89e524c04fa9 ("loop: Fix mount(2) failure due to race with LOOP_S=
-ET_FD")
+> In blkdev_get() we call __blkdev_get() to do some internal jobs and if
+> there is some errors in __blkdev_get(), the bdput() is called which
+> means we have released the refcount of the bdev (actually the refcount of
+> the bdev inode). This means we cannot access bdev after that point. But
+> accually bdev is still accessed in blkdev_get() after calling
+> __blkdev_get(). This may leads to use-after-free if the refcount is the
+> last one we released in __blkdev_get(). Let's take a look at the
+> following scenerio:
+>
+>   CPU0            CPU1                    CPU2
+> blkdev_open     blkdev_open           Remove disk
+>                   bd_acquire
+>                   blkdev_get
+>                     __blkdev_get      del_gendisk
+>                                         bdev_unhash_inode
+>   bd_acquire          bdev_get_gendisk
+>     bd_forget           failed because of unhashed
+>           bdput
+>                       bdput (the last one)
+>                         bdev_evict_inode
+>
+>                     access bdev => use after free
+>
+> [  459.350216] BUG: KASAN: use-after-free in __lock_acquire+0x24c1/0x31b0
+> [  459.351190] Read of size 8 at addr ffff88806c815a80 by task syz-executor.0/20132
+> [  459.352347]
+> [  459.352594] CPU: 0 PID: 20132 Comm: syz-executor.0 Not tainted 4.19.90 #2
+> [  459.353628] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+> [  459.354947] Call Trace:
+> [  459.355337]  dump_stack+0x111/0x19e
+> [  459.355879]  ? __lock_acquire+0x24c1/0x31b0
+> [  459.356523]  print_address_description+0x60/0x223
+> [  459.357248]  ? __lock_acquire+0x24c1/0x31b0
+> [  459.357887]  kasan_report.cold+0xae/0x2d8
+> [  459.358503]  __lock_acquire+0x24c1/0x31b0
+> [  459.359120]  ? _raw_spin_unlock_irq+0x24/0x40
+> [  459.359784]  ? lockdep_hardirqs_on+0x37b/0x580
+> [  459.360465]  ? _raw_spin_unlock_irq+0x24/0x40
+> [  459.361123]  ? finish_task_switch+0x125/0x600
+> [  459.361812]  ? finish_task_switch+0xee/0x600
+> [  459.362471]  ? mark_held_locks+0xf0/0xf0
+> [  459.363108]  ? __schedule+0x96f/0x21d0
+> [  459.363716]  lock_acquire+0x111/0x320
+> [  459.364285]  ? blkdev_get+0xce/0xbe0
+> [  459.364846]  ? blkdev_get+0xce/0xbe0
+> [  459.365390]  __mutex_lock+0xf9/0x12a0
+> [  459.365948]  ? blkdev_get+0xce/0xbe0
+> [  459.366493]  ? bdev_evict_inode+0x1f0/0x1f0
+> [  459.367130]  ? blkdev_get+0xce/0xbe0
+> [  459.367678]  ? destroy_inode+0xbc/0x110
+> [  459.368261]  ? mutex_trylock+0x1a0/0x1a0
+> [  459.368867]  ? __blkdev_get+0x3e6/0x1280
+> [  459.369463]  ? bdev_disk_changed+0x1d0/0x1d0
+> [  459.370114]  ? blkdev_get+0xce/0xbe0
+> [  459.370656]  blkdev_get+0xce/0xbe0
+> [  459.371178]  ? find_held_lock+0x2c/0x110
+> [  459.371774]  ? __blkdev_get+0x1280/0x1280
+> [  459.372383]  ? lock_downgrade+0x680/0x680
+> [  459.373002]  ? lock_acquire+0x111/0x320
+> [  459.373587]  ? bd_acquire+0x21/0x2c0
+> [  459.374134]  ? do_raw_spin_unlock+0x4f/0x250
+> [  459.374780]  blkdev_open+0x202/0x290
+> [  459.375325]  do_dentry_open+0x49e/0x1050
+> [  459.375924]  ? blkdev_get_by_dev+0x70/0x70
+> [  459.376543]  ? __x64_sys_fchdir+0x1f0/0x1f0
+> [  459.377192]  ? inode_permission+0xbe/0x3a0
+> [  459.377818]  path_openat+0x148c/0x3f50
+> [  459.378392]  ? kmem_cache_alloc+0xd5/0x280
+> [  459.379016]  ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> [  459.379802]  ? path_lookupat.isra.0+0x900/0x900
+> [  459.380489]  ? __lock_is_held+0xad/0x140
+> [  459.381093]  do_filp_open+0x1a1/0x280
+> [  459.381654]  ? may_open_dev+0xf0/0xf0
+> [  459.382214]  ? find_held_lock+0x2c/0x110
+> [  459.382816]  ? lock_downgrade+0x680/0x680
+> [  459.383425]  ? __lock_is_held+0xad/0x140
+> [  459.384024]  ? do_raw_spin_unlock+0x4f/0x250
+> [  459.384668]  ? _raw_spin_unlock+0x1f/0x30
+> [  459.385280]  ? __alloc_fd+0x448/0x560
+> [  459.385841]  do_sys_open+0x3c3/0x500
+> [  459.386386]  ? filp_open+0x70/0x70
+> [  459.386911]  ? trace_hardirqs_on_thunk+0x1a/0x1c
+> [  459.387610]  ? trace_hardirqs_off_caller+0x55/0x1c0
+> [  459.388342]  ? do_syscall_64+0x1a/0x520
+> [  459.388930]  do_syscall_64+0xc3/0x520
+> [  459.389490]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> [  459.390248] RIP: 0033:0x416211
+> [  459.390720] Code: 75 14 b8 02 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83
+> 04 19 00 00 c3 48 83 ec 08 e8 0a fa ff ff 48 89 04 24 b8 02 00 00 00 0f
+>    05 <48> 8b 3c 24 48 89 c2 e8 53 fa ff ff 48 89 d0 48 83 c4 08 48 3d
+>       01
+> [  459.393483] RSP: 002b:00007fe45dfe9a60 EFLAGS: 00000293 ORIG_RAX: 0000000000000002
+> [  459.394610] RAX: ffffffffffffffda RBX: 00007fe45dfea6d4 RCX: 0000000000416211
+> [  459.395678] RDX: 00007fe45dfe9b0a RSI: 0000000000000002 RDI: 00007fe45dfe9b00
+> [  459.396758] RBP: 000000000076bf20 R08: 0000000000000000 R09: 000000000000000a
+> [  459.397930] R10: 0000000000000075 R11: 0000000000000293 R12: 00000000ffffffff
+> [  459.399022] R13: 0000000000000bd9 R14: 00000000004cdb80 R15: 000000000076bf2c
+> [  459.400168]
+> [  459.400430] Allocated by task 20132:
+> [  459.401038]  kasan_kmalloc+0xbf/0xe0
+> [  459.401652]  kmem_cache_alloc+0xd5/0x280
+> [  459.402330]  bdev_alloc_inode+0x18/0x40
+> [  459.402970]  alloc_inode+0x5f/0x180
+> [  459.403510]  iget5_locked+0x57/0xd0
+> [  459.404095]  bdget+0x94/0x4e0
+> [  459.404607]  bd_acquire+0xfa/0x2c0
+> [  459.405113]  blkdev_open+0x110/0x290
+> [  459.405702]  do_dentry_open+0x49e/0x1050
+> [  459.406340]  path_openat+0x148c/0x3f50
+> [  459.406926]  do_filp_open+0x1a1/0x280
+> [  459.407471]  do_sys_open+0x3c3/0x500
+> [  459.408010]  do_syscall_64+0xc3/0x520
+> [  459.408572]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> [  459.409415]
+> [  459.409679] Freed by task 1262:
+> [  459.410212]  __kasan_slab_free+0x129/0x170
+> [  459.410919]  kmem_cache_free+0xb2/0x2a0
+> [  459.411564]  rcu_process_callbacks+0xbb2/0x2320
+> [  459.412318]  __do_softirq+0x225/0x8ac
+>
+> Fix this by delaying bdput() to the end of blkdev_get() which means we
+> have finished accessing bdev.
+>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Jason Yan <yanaijie@huawei.com>
 
-Thanks for your addition.
+In things of Fixes: tag...
 
-Regards,
-Markus
+For the 1st hunk I found:
+
+commit 8266602033d6adc6d10cb8811c1fd694767909b0 ("fix bdev leak in
+block_dev.c do_open()")
+
+- Sedat -
+
+> ---
+>  v3: Add bdput() when __blkdev_get() calling itself failed.
+>  v2: Add Reported-by tag and cc linux-block mailing list
+>
+>  fs/block_dev.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 47860e589388..d7b74e44ad5a 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1566,7 +1566,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+>         if (!for_part) {
+>                 ret = devcgroup_inode_permission(bdev->bd_inode, perm);
+>                 if (ret != 0) {
+> -                       bdput(bdev);
+>                         return ret;
+>                 }
+>         }
+> @@ -1637,8 +1636,10 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+>                                 goto out_clear;
+>                         BUG_ON(for_part);
+>                         ret = __blkdev_get(whole, mode, 1);
+> -                       if (ret)
+> +                       if (ret) {
+> +                               bdput(whole);
+>                                 goto out_clear;
+> +                       }
+>                         bdev->bd_contains = whole;
+>                         bdev->bd_part = disk_get_part(disk, partno);
+>                         if (!(disk->flags & GENHD_FL_UP) ||
+> @@ -1688,7 +1689,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+>         disk_unblock_events(disk);
+>         put_disk_and_module(disk);
+>   out:
+> -       bdput(bdev);
+>
+>         return ret;
+>  }
+> @@ -1755,6 +1755,9 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+>                 bdput(whole);
+>         }
+>
+> +       if (res)
+> +               bdput(bdev);
+> +
+>         return res;
+>  }
+>  EXPORT_SYMBOL(blkdev_get);
+> --
+> 2.21.3
+>
