@@ -1,281 +1,392 @@
-Return-Path: <SRS0=tuS3=7S=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=HdX3=7T=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10960C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 23:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B765C433E0
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jun 2020 03:26:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8E672075B
-	for <linux-block@archiver.kernel.org>; Fri,  5 Jun 2020 23:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D7FD207D5
+	for <linux-block@archiver.kernel.org>; Sat,  6 Jun 2020 03:26:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="c91DBXh5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgGfnuyc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728502AbgFEXpw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Jun 2020 19:45:52 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34484 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728353AbgFEXpv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jun 2020 19:45:51 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 055Nh37C042841;
-        Fri, 5 Jun 2020 23:45:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=JqTqGTpD5lPEvIy9rv8hiKVmI+4mibOk37PFkLI/YRg=;
- b=c91DBXh5PdmxmqsfwAe7zhWFvoyaBjKXwPkPCJJsXvIn8Uo2B1c75zyV72SX9KSf1joa
- 9omNpR4cKfz445qF3vJ/d0hj+HZxVaoYTlckg+RtP5uUN0erirL3c5h1Hv9qeZuGsYhX
- W+7T9aGoCKJNSw5kYS+A7oduTONqBo9ch4c7fZ1R1F1wKIULsDu6XfL8hJc7GpiXXlmJ
- 1OFOakV3sSk7IlHLgSy+48hTFtQBqh0g83gsE0sz9mEtd3vIvnK2VHxs1vgRJbLYUe1o
- 1Q0fVvaM8x/xxy3YbFq69+YIIuOpGoEyeRTrfgPvxb6PFmVSfzpW9oZXjlT/49nphouc mQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 31f9265292-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 05 Jun 2020 23:45:36 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 055NhRug120047;
-        Fri, 5 Jun 2020 23:45:35 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 31f92tcqxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Jun 2020 23:45:35 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 055NjWtj020132;
-        Fri, 5 Jun 2020 23:45:34 GMT
-Received: from [10.159.235.153] (/10.159.235.153)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 05 Jun 2020 16:45:31 -0700
-Subject: Re: [PATCH v2] docs: block: Create blk-mq documentation
-To:     =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
-        krisman@collabora.com, rdunlap@infradead.org
-References: <20200605175536.19681-1-andrealmeid@collabora.com>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <c249992b-a7c6-b6d9-3edb-143255141da2@oracle.com>
-Date:   Fri, 5 Jun 2020 16:45:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728542AbgFFD0B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Jun 2020 23:26:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59109 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728527AbgFFD0B (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Jun 2020 23:26:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591413958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iLLXFV/8GzWAF1DdNnZjW5Jf0xu/KRRiEpnUKnulajE=;
+        b=HgGfnuycFCxGtu7yGFZc8iOF9R78rp4zNUfsSK0pBoSW5aSdSRU5jskbea6DakrB6AEKv2
+        +dimN274c3vubiUac2woXnfYX5M384H74QSjpR6i5te00Sf3jUftmZxkc01H9XlHOd2jOm
+        +Yi2SYAfdc0FIAr7FCQTHxjm4MfqrGY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-icUVYSDiPmK_Pgi7emjdSA-1; Fri, 05 Jun 2020 23:25:56 -0400
+X-MC-Unique: icUVYSDiPmK_Pgi7emjdSA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C22AC800685;
+        Sat,  6 Jun 2020 03:25:53 +0000 (UTC)
+Received: from T590 (ovpn-12-71.pek2.redhat.com [10.72.12.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9ED27CCEE;
+        Sat,  6 Jun 2020 03:25:46 +0000 (UTC)
+Date:   Sat, 6 Jun 2020 11:25:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hou Tao <houtao1@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+        linux-block@vger.kernel.org,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        John Garry <john.garry@huawei.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [RFC PATCH] blk-mq: provide more tags for woken-up process when
+ tag allocation is busy
+Message-ID: <20200606032541.GA2455424@T590>
+References: <20200603073931.94435-1-houtao1@huawei.com>
+ <20200604100121.GA2234582@T590>
+ <7430b61f-f4a5-4582-e91c-1d46e43a3a64@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200605175536.19681-1-andrealmeid@collabora.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9643 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 spamscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006050176
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9643 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
- suspectscore=0 cotscore=-2147483648 bulkscore=0 clxscore=1011
- impostorscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=999
- spamscore=0 lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006050176
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7430b61f-f4a5-4582-e91c-1d46e43a3a64@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi André,
-
-On 6/5/20 10:55 AM, André Almeida wrote:
-> Create a documentation providing a background and explanation around the
-> operation of the Multi-Queue Block IO Queueing Mechanism (blk-mq).
+On Fri, Jun 05, 2020 at 10:21:31PM +0800, Hou Tao wrote:
+> Hi Ming,
 > 
-> The reference for writing this documentation was the source code and
-> "Linux Block IO: Introducing Multi-queue SSD Access on Multi-core
-> Systems", by Axboe et al.
+> On 2020/6/4 18:01, Ming Lei wrote:
+> > Hi Hou Tao,
+> > 
+> > On Wed, Jun 03, 2020 at 03:39:31PM +0800, Hou Tao wrote:
+> >> When there are many free-bit waiters, current batch wakeup method will
+> >> wake up at most wake_batch processes when wake_batch bits are freed.
+> >> The perfect result is each process will get a free bit, however the
+> >> real result is that a waken-up process may being unable to get
+> >> a free bit and will call io_schedule() multiple times. That's because
+> >> other processes (e.g. wake-up before) in the same wake-up batch
+> >> may have already allocated multiple free bits.
+> >>
+> >> And the race leads to two problems. The first one is the unnecessary
+> >> context switch, because multiple processes are waken up and then
+> >> go to sleep afterwards. And the second one is the performance
+> >> degradation when there is spatial locality between requests from
+> >> one process (e.g. split IO for HDD), because one process can not
+> >> allocated requests continuously for the split IOs, and
+> >> the sequential IOs will be dispatched separatedly.
+> > 
+> > I guess this way is a bit worse for HDD since sequential IO may be
+> > interrupted by other context.
+> Yes.
 > 
-> Signed-off-by: André Almeida <andrealmeid@collabora.com>
-> ---
-> Changes from v1:
-> - Fixed typos
-> - Reworked blk_mq_hw_ctx
+> >>
+> >> To fix the problem, we mimic the way how SQ handles this situation:
+> > 
+> > Do you mean the SQ way is the congestion control code in __get_request()?
+> > If not, could you provide more background of SQ's way for this issue?
+> > Cause it isn't easy for me to associate your approach with SQ's code.
+> > 
+> The congestion control is accomplished by both __get_request() and __freed_request().
+> In __get_request(), the max available requests is  nr_requests * 1.5 when
+
+Actually, SQ code classified requests into sync an async, and for each
+type: the max allowed requests is nr_requests * 1.5, and batching
+allocation is triggered if rl->count[is_sync]+1 >= q->nr_requests or
+waking up from blocking allocation.
+
+> there are multiple threads try to allocate requests, and in __free_requests()
+> it only start to wake up waiter when the busy requests is less than nr_requests,
+> so half of nr_request is free when the waiter is woken-up.
+
+The SQ's batching allocation usually allows one active process to
+complete one batch of requests and others are blocked. This way is
+really nice for sequential IO on HDD.
+
+I did observe some HDD's writeback performance drops a lot after SQ's
+batching allocation is killed:
+
+[1] https://lore.kernel.org/linux-scsi/Pine.LNX.4.44L0.1909181213141.1507-100000@iolanthe.rowland.org/
+[2] https://lore.kernel.org/linux-scsi/20191226083706.GA17974@ming.t460p/
+
 > 
-> Hello,
+> The approach in the patch is buggy, because it doesn't check whether
+> the number of busy bits is greater than the number of to-be-stashed
+> bits. So we just add an atomic (bit_busy) in struct sbitmap to track
+> the number of busy bits and use the number to decide whether
+
+Tracking busy bits is really expensive for SSD/NVMe, but it should be
+fine for HDD. Maybe we can one dedicated approach for HDD's request
+allocation.
+
+> we should wake one process or not:
 > 
-> This commit was tested using "make htmldocs" and the HTML output has
-> been verified.
+> +#define SBQ_WS_ACTIVE_MIN 4
+> +
+> +/* return true when fallback to batched wake-up is needed */
+> +static bool sbitmap_do_stash_and_wakeup(struct sbitmap_queue *sbq)
+> +{
+> +       bool fall_back = false;
+> +       int ws_active;
+> +       struct sbq_wait_state *ws;
+> +       int max_busy;
+> +       int bit_busy;
+> +       int wake_seq;
+> +       int old;
+> +
+> +       ws_active = atomic_read(&sbq->ws_active);
+> +       if (!ws_active)
+> +               goto done;
+> +
+> +       if (ws_active < SBQ_WS_ACTIVE_MIN) {
+> +               fall_back = true;
+> +               goto done;
+> +       }
+> +
+> +       /* stash and make sure free bits >= depth / 4 */
+> +       max_busy = max_t(int, sbq->sb.depth * 3 / 4, 1);
+> +       bit_busy = atomic_read(&sbq->bit_busy);
+> +       if (bit_busy > max_busy)
+> +               goto done;
+> +
+> +retry:
+> +       ws = sbq_wake_ptr(sbq);
+> +       if (!ws)
+> +               goto done;
+> +
+> +       wake_seq = atomic_read(&ws->wake_seq);
+> +       old = atomic_cmpxchg(&ws->wake_seq, wake_seq, wake_seq + 1);
+> +       if (old == wake_seq) {
+> +               sbq_index_atomic_inc(&sbq->wake_index);
+> +               wake_up(&ws->wait);
+> +               goto done;
+> +       }
+> +
+> +done:
+> +       return fall_back;
+> +}
+> +
+>  static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>  {
+>         struct sbq_wait_state *ws;
+>         unsigned int wake_batch;
+>         int wait_cnt;
 > 
-> Thanks,
-> 	André
-> ---
->  Documentation/block/blk-mq.rst | 154 +++++++++++++++++++++++++++++++++
->  Documentation/block/index.rst  |   1 +
->  2 files changed, 155 insertions(+)
->  create mode 100644 Documentation/block/blk-mq.rst
+> +       if (sbq->flags & SBQ_FLAG_BATCH_BIT_ALLOC) {
+> +               if (!sbitmap_do_stash_and_wakeup(sbq))
+> +                       return false;
+> +       }
+> +
+
+I feel that it is a good direction to add one such flag only for HDD's
+request tag allocation.
+
+>         ws = sbq_wake_ptr(sbq);
+>         if (!ws)
+>                 return false;
 > 
-> diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
-> new file mode 100644
-> index 000000000000..1f702adbc577
-> --- /dev/null
-> +++ b/Documentation/block/blk-mq.rst
-> @@ -0,0 +1,154 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +================================================
-> +Multi-Queue Block IO Queueing Mechanism (blk-mq)
-> +================================================
-> +
-> +The Multi-Queue Block IO Queueing Mechanism is an API to enable fast storage
-> +devices to achieve a huge number of input/output operations per second (IOPS)
-> +through queueing and submitting IO requests to block devices simultaneously,
-> +benefiting from the parallelism offered by modern storage devices.
-> +
-> +Introduction
-> +============
-> +
-> +Background
-> +----------
-> +
-> +Magnetic hard disks have been the de facto standard from the beginning of the
-> +development of the kernel. The Block IO subsystem aimed to achieve the best
-> +performance possible for those devices with a high penalty when doing random
-> +access, and the bottleneck was the mechanical moving parts, a lot more slower
-> +than any layer on the storage stack. One example of such optimization technique
-> +involves ordering read/write requests accordingly to the current position of
-> +the hard disk head.
-> +
-> +However, with the development of Solid State Drives and Non-Volatile Memories
-> +without mechanical parts nor random access penalty and capable of performing
-> +high parallel access, the bottleneck of the stack had moved from the storage
-> +device to the operating system. In order to  take advantage of the parallelism
-> +in those devices design, the multi-queue mechanism was introduced.
-> +
-> +The former design had a single queue to store block IO requests with a single
-> +lock. That did not scale well in SMP systems due to dirty data in cache and the
-> +bottleneck of having a single lock for multiple processors. This setup also
-> +suffered with congestion when different processes (or the same process, moving
-> +to different CPUs) wanted to perform block IO. Instead of this, the blk-mq API
-> +spawns multiple queues with individual entry points local to the CPU, removing
-> +the need for a lock. A deeper explanation on how this works is covered in the
-> +following section (`Operation`_).
-> +
-> +Operation
-> +---------
-> +
-> +When the userspace performs IO to a block device (reading or writing a file,
-> +for instance), blk-mq takes action: it will store and manage IO requests to
-> +the block device, acting as middleware between the userspace (and a file
-> +system, if present) and the block device driver.
-> +
-> +blk-mq has two group of queues: software staging queues and hardware dispatch
-> +queues. When the request arrives at the block layer, it will try the shortest
-> +path possible: send it directly to the hardware queue. However, there are two
-> +cases that it might not do that: if there's an IO scheduler attached at the
-> +layer or if we want to try to merge requests. In both cases, requests will be
-> +sent to the software queue.
-> +
-> +Then, after the requests are processed by software queues, they will be placed
-> +at the hardware queue, a second stage queue were the hardware has direct access
-> +to process those requests. However, if the hardware does not have enough
-> +resources to accept more requests, blk-mq will places requests on a temporary
-> +queue, to be sent in the future, when the hardware is able.
-> +
-> +Software staging queues
-> +~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +The block IO subsystem adds requests (represented by struct
-> +:c:type:`blk_mq_ctx`) in the software staging queues in case that they weren't
-> +sent directly to the driver. A request is a collection of BIOs. They arrived at
-> +the block layer through the data structure struct :c:type:`bio`. The block
-> +layer will then build a new structure from it, the struct :c:type:`request`
-> +that will be used to communicate with the device driver. Each queue has its
-> +own lock and the number of queues is defined by a per-CPU or per-node basis.
-> +
-> +The staging queue can be used to merge requests for adjacent sectors. For
-> +instance, requests for sector 3-6, 6-7, 7-9 can become one request for 3-9.
-> +Even if random access to SSDs and NVMs have the same time of response compared
-> +to sequential access, grouped requests for sequential access decreases the
-> +number of individual requests. This technique of merging requests is called
-> +plugging.
-> +
-> +Along with that, the requests can be reordered to ensure fairness of system
-> +resources (e.g. to ensure that no application suffers from starvation) and/or to
-> +improve IO performance, by an IO scheduler.
-> +
-> +IO Schedulers
-> +^^^^^^^^^^^^^
-> +
-> +There are several schedulers implemented by the block layer, each one following
-> +a heuristic to improve the IO performance. They are "pluggable" (as in plug
-> +and play), in the sense of they can be selected at run time using sysfs. You
-> +can read more about Linux's IO schedulers `here
-> +<https://www.kernel.org/doc/html/latest/block/index.html>`_. The scheduling
-> +happens only between requests in the same queue, so it is not possible to merge
-> +requests from different queues, otherwise there would be cache trashing and a
-> +need to have a lock for each queue. After the scheduling, the requests are
-> +eligible to be sent to the hardware. One of the possible schedulers to be
-> +selected is the NOOP scheduler, the most straightforward one, that implements a
-> +simple FIFO, without performing any reordering. This is useful in the following
-> +scenarios: when scheduling will be performed in a next step somewhere in the
-> +stack, like block device controllers; the actual sector position of blocks are
-> +transparent for the host, meaning it hasn't enough information to take a proper
-> +decision; or the overhead of reordering is higher than the handicap of
-> +non-sequential accesses.
-> +
-> +Hardware dispatch queues
-> +~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +The hardware queues (represented by struct :c:type:`blk_mq_hw_ctx`) have a 1:1
-> +correspondence to the device driver's submission queues, and are the last step
+> >> 1) stash a bulk of free bits
+> >> 2) wake up a process when a new bit is freed
+> >> 3) woken-up process consumes the stashed free bits
+> >> 4) when stashed free bits are exhausted, goto step 1)
+> >>>> Because the tag allocation path or io submit path is much faster than
+> >> the tag free path, so when the race for free tags is intensive,
+> > 
+> > Indeed, I guess you mean bio_endio is slow.
+> > 
+> Yes, thanks for the correction.
+> 
+> >> we can ensure:
+> >> 1) only few processes will be waken up and will exhaust the stashed
+> >>    free bits quickly.
+> >> 2) these processes will be able to allocate multiple requests
+> >>    continuously.
+> >>
+> >> An alternative fix is to dynamically adjust the number of woken-up
+> >> process according to the number of waiters and busy bits, instead of
+> >> using wake_batch each time in __sbq_wake_up(). However it will need
+> >> to record the number of busy bits all the time, so use the
+> >> stash-wake-use method instead.
+> >>
+> >> The following is the result of a simple fio test:
+> >>
+> >> 1. fio (random read, 1MB, libaio, iodepth=1024)
+> >>
+> >> (1) 4TB HDD (max_sectors_kb=256)
+> >>
+> >> IOPS (bs=1MB)
+> >> jobs | 4.18-sq  | 5.6.15 | 5.6.15-patched |
+> >> 1    | 120      | 120    | 119
+> >> 24   | 120      | 105    | 121
+> >> 48   | 122      | 102    | 121
+> >> 72   | 120      | 100    | 119
+> >>
+> >> context switch per second
+> >> jobs | 4.18-sq  | 5.6.15 | 5.6.15-patched |
+> >> 1    | 1058     | 1162   | 1188
+> >> 24   | 1047     | 1715   | 1105
+> >> 48   | 1109     | 1967   | 1105
+> >> 72   | 1084     | 1908   | 1106
+> >>
+> >> (2) 1.8TB SSD (set max_sectors_kb=256)
+> >>
+> >> IOPS (bs=1MB)
+> >> jobs | 4.18-sq  | 5.6.15 | 5.6.15-patched |
+> >> 1    | 1077     | 1075   | 1076
+> >> 24   | 1079     | 1075   | 1076
+> >> 48   | 1077     | 1076   | 1076
+> >> 72   | 1077     | 1076   | 1077
+> >>
+> >> context switch per second
+> >> jobs | 4.18-sq  | 5.6.15 | 5.6.15-patched |
+> >> 1    | 1833     | 5123   | 5264
+> >> 24   | 2143     | 15238  | 3859
+> >> 48   | 2182     | 19015  | 3617
+> >> 72   | 2268     | 19050  | 3662
+> >>
+> >> (3) 1.5TB nvme (set max_sectors_kb=256)
+> >>
+> >> 4 read queue, 72 CPU
+> >>
+> >> IOPS (bs=1MB)
+> >> jobs | 5.6.15 | 5.6.15-patched |
+> >> 1    | 3018   | 3018
+> >> 18   | 3015   | 3016
+> >> 36   | 3001   | 3005
+> >> 54   | 2993   | 2997
+> >> 72   | 2984   | 2990
+> >>
+> >> context switch per second
+> >> jobs | 5.6.15 | 5.6.15-patched |
+> >> 1    | 6292   | 6469
+> >> 18   | 19428  | 4253
+> >> 36   | 21290  | 3928
+> >> 54   | 23060  | 3957
+> >> 72   | 24221  | 4054
+> >>
+> >> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> >> ---
+> >> Hi,
+> >>
+> >> We found the problems (excessive context switch and few performance
+> >> degradation) during the performance comparison between blk-sq (4.18)
+> >> and blk-mq (5.16) on HDD, but we can not find a better way to fix it.
+> >>
+> >> It seems that in order to implement batched request allocation for
+> >> single process, we need to use an atomic variable to track
+> >> the number of busy bits. It's suitable for HDD or SDD, because the
+> >> IO latency is greater than 1ms, but no sure whether or not it's OK
+> >> for NVMe device.
+> >
+> > Do you have benchmark on NVMe/SSD with 4k BS?
+> > 
+> The following is the randread test on SSD and NVMe.
+> 
+> 1. fio randread 4KB
+> 
+> (1) SSD 1.8TB (nr_tags=1024, nr_requests=256)
+> 
+> It seems that when there is no race for tag allocation, the performance is the same,
+> but when there are intensive race for tag allocation, the performance gain is huge.
+> 
+> total iodepth=256, so when jobs=2, iodepth=256/2=128
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 193k  | 192k
+> 2    | 197k  | 196k
+> 4    | 198k  | 198k
+> 8    | 197k  | 197k
+> 16   | 197k  | 198k
+> 32   | 198k  | 198k
+> 64   | 195k  | 195k
+> 128  | 193k  | 192k
+> 256  | 198k  | 198k
+> 
+> total iodepth=512
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 193k  | 194k
+> 2    | 197k  | 196k
+> 4    | 198k  | 197k
+> 8    | 197k  | 219k
+> 16   | 197k  | 394k
+> 32   | 198k  | 395k
+> 64   | 196k  | 592k
+> 128  | 199k  | 591k
+> 256  | 196k  | 591k
+> 512  | 198k  | 591k
+> 
+> total iodepth=1024
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 195k  | 192k
+> 2    | 196k  | 197k
+> 4    | 197k  | 197k
+> 8    | 198k  | 197k
+> 16   | 197k  | 198k
+> 32   | 197k  | 243k
+> 64   | 197k  | 393k
+> 128  | 197k  | 986k
+> 256  | 200k  | 976k
+> 512  | 203k  | 984k
+> 1024 | 202k  | 354k
+> 
+> (2) NVMe 1.5TB (nr_tags=1023)
+> 
+> It seems there is no performance impact on NVMe device, but the
+> the number of context switch will be reduced.
+> 
+> total iodepth=256, so when jobs=2, iodepth=256/2=128
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 398k  | 394k
+> 4    | 774k  | 775k
+> 16   | 774k  | 774k
+> 64   | 774k  | 775k
+> 256  | 778k  | 784k
+> 
+> total iodepth=1024
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 406k  | 405k
+> 4    | 774k  | 773k
+> 16   | 774k  | 774k
+> 64   | 777k  | 773k
+> 256  | 783k  | 783k
+> 1024 | 764k  | 755k
+> 
+> total iodepth=2048
+> 
+> jobs | 5.6   | 5.6 patched
+> 1    | 369k  | 377k
+> 4    | 774k  | 774k
+> 16   | 774k  | 774k
+> 64   | 767k  | 773k
+> 256  | 784k  | 781k
+> 1024 | 741k  | 1416k
+> 2048 | 754k  | 753k
 
-I am not clear with the definition of "submission queues". Is it the device
-queue with DMA ring buffer?
+Frankly speaking, I am more interested in context switch & cpu
+utilization change on SSD/NVMe after applying your patch.
 
-If it is the DMA ring buffer, multiple blk_mq_hw_ctx would map to the same DMA
-ring buffer, e.g., multiple nvme namespaces would share the same tagset. This is
-not 1:1 any longer.
+We may improve HDD, meantime SSD/NVMe's perf can't be hurt, either
+latency, or cpu utilization.
 
-> +of the block layer submission code before the low level device driver taking
-> +ownership of the request. To run this queue, the block layer removes requests
-> +from the associated software queues and tries to dispatch to the hardware.
-> +
-> +If it's not possible to send the requests directly to hardware, they will be
-> +added to a linked list (:c:type:`hctx->dispatch`) of requests. Then,
-> +next time the block layer runs a queue, it will send the requests laying at the
-> +:c:type:`dispatch` list first, to ensure a fairness dispatch with those
-> +requests that were ready to be sent first. The number of hardware queues
-> +depends on the number of hardware contexts supported by the hardware and its
-> +device driver, but it will not be more than the number of cores of the system.
-> +There is no reordering at this stage, and each software queue has a set of
-> +hardware queues to send requests for.
-> +
-> +.. note::
-> +
-> +        Neither the block layer nor the device protocols guarantee
-> +        the order of completion of requests. This must be handled by
-> +        higher layers, like the filesystem.
-> +
-> +Tag-based completion
-> +~~~~~~~~~~~~~~~~~~~~
-> +
-> +In order to indicate which request has been completed, every request is
-> +identified by an integer, ranging from 0 to the dispatch queue size. This tag
-> +is generated by the block layer and later reused by the device driver, removing
-> +the need to create a redundant identifier. When a request is completed in the
-> +drive, the tag is sent back to the block layer to notify it of the finalization.
-> +This removes the need to do a linear search to find out which IO has been
-> +completed.
 
-Assume I am a beginner and does not know about blk-mq well. What I expect is to
-expand this sections to explain the usage of sbitmap to manage tags, e.g., like
-the comments in block/blk-mq-tag.c or block/blk-mq-tag.h.
+Thanks, 
+Ming
 
-In addition, I would be interested in that percpu-refcount is used to track the
-lifecycle of requests.
-
-I have no idea how much detail is required for a kernel doc. The is just the
-feedback from me by assuming the audience is beginner :)
-
-Thank you very much!
-
-Dongli Zhang
