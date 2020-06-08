@@ -1,103 +1,167 @@
-Return-Path: <SRS0=x+nQ=7U=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=X1aF=7V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41432C433E0
-	for <linux-block@archiver.kernel.org>; Sun,  7 Jun 2020 14:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E863C433E2
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 00:58:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 148632067B
-	for <linux-block@archiver.kernel.org>; Sun,  7 Jun 2020 14:57:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xcEShDoG"
+	by mail.kernel.org (Postfix) with ESMTP id 4605C2077D
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 00:58:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726590AbgFGO5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Jun 2020 10:57:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48216 "EHLO
+        id S1728807AbgFHA6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Jun 2020 20:58:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726528AbgFGO5g (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Jun 2020 10:57:36 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3FFC08C5C3
-        for <linux-block@vger.kernel.org>; Sun,  7 Jun 2020 07:57:35 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id d8so2459678plo.12
-        for <linux-block@vger.kernel.org>; Sun, 07 Jun 2020 07:57:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OrPIMIyi5BhhyDJr5YGAX/Ehw8/mYxY1q09wl16B21M=;
-        b=xcEShDoGcjXZaqQfnG2qZ6Er3xpWL/4Gf4RATaU3qiZW5ngaxc8X+8FrThZ9cu/FbC
-         UfpAsJAyl4a3tp3p/Rhzast6Qu3pHAXxMpMV7srbFyrFjwImB/FETVpI/OM7Yd8Xc1Sr
-         GMwe3pYdOdKdFtHEFW3Aun9L5u3LpYZe5Moqym+DMUQjoSW63pG89tQWm0RnG2HxrsJD
-         SAz7R+EFea6cFxElI/tbMk7RVcb065psS/xltundqurze+VV/6dWglthdmEUHf3JTXXM
-         UXZF7W9hJeoFVPqvrJVqFB/I81InUbI3lqmqdRuUWAAjV2LfYewXbnUdTmy/ebURJxYX
-         0b1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OrPIMIyi5BhhyDJr5YGAX/Ehw8/mYxY1q09wl16B21M=;
-        b=i7poSp1x63kJgXn4sqbMxSwV9jlughyPpFahLgBFQJ+85IFaX6tTcEYBSuexJJiqMD
-         cmC8nARq92OE+D8LIt+uftlzDd5ZlAV3LJi6pRO3BbRcF55pftWcw3ME+YgagYBm4aGp
-         lW0tnVCezrFr89KabYVsmfaaSIDb+nahv/92kSJHD7fAtkD0SLh3IwCRUphfwSjfHi3u
-         bd+yf/QLS0meHZW/SExGudM63ROkq9tJR3MNK2FTmwHwNR2idMniw5R3lKGquuE6JPFN
-         7fIJXd6Evc0Nkkc7SDom/nyAFLlnfNw0J2Mygpt/zrJFRNvwvsKzw1kNZdZYSs44bxdH
-         bHuQ==
-X-Gm-Message-State: AOAM530wIc0UhYMaVTB2qyHvgxyiAI8WTO5VEE6YG/OBef9nZR3uZRgl
-        BjOBao2Ba8Ri7FHjyNgJ45/8SSeOwHby4g==
-X-Google-Smtp-Source: ABdhPJxaLYMQsPLrGMdpDs9WOqAhUxxDgBc0wThCoi+nYAZ9p08tHkuUPRAs84ksAHrFKnp1GW6UeA==
-X-Received: by 2002:a17:902:ab8d:: with SMTP id f13mr17885584plr.58.1591541855238;
-        Sun, 07 Jun 2020 07:57:35 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id j15sm13089579pjj.12.2020.06.07.07.57.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jun 2020 07:57:34 -0700 (PDT)
-Subject: Re: [PATCH 0/2] blk-mq: fix handling cpu hotplug
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Daniel Wagner <dwagner@suse.de>,
-        Christoph Hellwig <hch@lst.de>,
-        John Garry <john.garry@huawei.com>
-References: <20200605114410.2416726-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7652e408-9c70-b0fc-9595-0ce12fbe53bf@kernel.dk>
-Date:   Sun, 7 Jun 2020 08:57:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        with ESMTP id S1728667AbgFHA6G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Jun 2020 20:58:06 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C2FC08C5C4;
+        Sun,  7 Jun 2020 17:58:06 -0700 (PDT)
+Received: from [5.158.153.53] (helo=debian-buster-darwi.lab.linutronix.de.)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+        (Exim 4.80)
+        (envelope-from <a.darwish@linutronix.de>)
+        id 1ji66U-0000hc-WF; Mon, 08 Jun 2020 02:57:31 +0200
+From:   "Ahmed S. Darwish" <a.darwish@linutronix.de>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Sebastian A. Siewior" <bigeasy@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Ahmed S. Darwish" <a.darwish@linutronix.de>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH v2 00/18] seqlock: Extend seqcount API with associated locks
+Date:   Mon,  8 Jun 2020 02:57:11 +0200
+Message-Id: <20200608005729.1874024-1-a.darwish@linutronix.de>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200519214547.352050-1-a.darwish@linutronix.de>
+References: <20200519214547.352050-1-a.darwish@linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200605114410.2416726-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/20 5:44 AM, Ming Lei wrote:
-> Hi Jens,
-> 
-> The 1st patch avoids to fail driver tag allocation because of inactive
-> hctx, so hang risk can be killed during cpu hotplug.
-> 
-> The 2nd patch fixes blk_mq_all_tag_iter so that we can drain all
-> requests before one hctx becomes inactive.
-> 
-> Both fixes bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are
-> offline").
-> 
-> John has verified that the two can fix his request timeout issue during
-> cpu hotplug.
+Hi,
 
-Thanks, applied.
+This is v2 of the seqlock patch series:
 
--- 
-Jens Axboe
+   [PATCH v1 00/25] seqlock: Extend seqcount API with associated locks
+   https://lore.kernel.org/lkml/20200519214547.352050-1-a.darwish@linutronix.de
 
+Patches 1=>3 of this v2 series add documentation for the existing
+seqlock.h datatypes and APIs. Hopefully they can hit v5.8 -rc2 or -rc3.
+
+Changelog-v2
+============
+
+1. Drop, for now, the seqlock v1 patches #7 and #8. These patches added
+lockdep non-preemptibility checks to seqcount_t write paths, but they
+now depend on on-going work by Peter:
+
+   [PATCH v3 0/5] lockdep: Change IRQ state tracking to use per-cpu variables
+   https://lkml.kernel.org/r/20200529213550.683440625@infradead.org
+
+   [PATCH 00/14] x86/entry: disallow #DB more and x86/entry lockdep/nmi
+   https://lkml.kernel.org/r/20200529212728.795169701@infradead.org
+
+Once Peter's work get merged, I'll send the non-preemptibility checks as
+a separate series.
+
+2. Drop the v1 seqcount_t call-sites bugfixes. I've already posted them
+in an isolated series. They got merged into their respective trees, and
+will hit v5.8-rc1 soon:
+
+   [PATCH v2 0/6] seqlock: seqcount_t call sites bugfixes
+   https://lore.kernel.org/lkml/20200603144949.1122421-1-a.darwish@linutronix.de
+
+3. Patch #1: Add a small paragraph explaining that seqcount_t/seqlock_t
+cannot be used if the protected data contains pointers. A similar
+paragraph already existed in seqlock.h, but got mistakenly dropped.
+
+4. Patch #2: Don't add RST directives inside kernel-doc comments. Peter
+doesn't like them :) I've kept the indentation though, and found a
+minimal way for Sphinx to properly render these code samples without too
+much disruption.
+
+5. Patch #3: Brush up the introduced kernel-doc comments. Make them more
+consistent overall, and more concise.
+
+Thanks,
+
+8<--------------
+
+Ahmed S. Darwish (18):
+  Documentation: locking: Describe seqlock design and usage
+  seqlock: Properly format kernel-doc code samples
+  seqlock: Add missing kernel-doc annotations
+  seqlock: Extend seqcount API with associated locks
+  dma-buf: Remove custom seqcount lockdep class key
+  dma-buf: Use sequence counter with associated wound/wait mutex
+  sched: tasks: Use sequence counter with associated spinlock
+  netfilter: conntrack: Use sequence counter with associated spinlock
+  netfilter: nft_set_rbtree: Use sequence counter with associated rwlock
+  xfrm: policy: Use sequence counters with associated lock
+  timekeeping: Use sequence counter with associated raw spinlock
+  vfs: Use sequence counter with associated spinlock
+  raid5: Use sequence counter with associated spinlock
+  iocost: Use sequence counter with associated spinlock
+  NFSv4: Use sequence counter with associated spinlock
+  userfaultfd: Use sequence counter with associated spinlock
+  kvm/eventfd: Use sequence counter with associated spinlock
+  hrtimer: Use sequence counter with associated raw spinlock
+
+ Documentation/locking/index.rst               |   1 +
+ Documentation/locking/seqlock.rst             | 242 +++++
+ MAINTAINERS                                   |   2 +-
+ block/blk-iocost.c                            |   5 +-
+ drivers/dma-buf/dma-resv.c                    |  15 +-
+ .../gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c  |   2 -
+ drivers/md/raid5.c                            |   2 +-
+ drivers/md/raid5.h                            |   2 +-
+ fs/dcache.c                                   |   2 +-
+ fs/fs_struct.c                                |   4 +-
+ fs/nfs/nfs4_fs.h                              |   2 +-
+ fs/nfs/nfs4state.c                            |   2 +-
+ fs/userfaultfd.c                              |   4 +-
+ include/linux/dcache.h                        |   2 +-
+ include/linux/dma-resv.h                      |   4 +-
+ include/linux/fs_struct.h                     |   2 +-
+ include/linux/hrtimer.h                       |   2 +-
+ include/linux/kvm_irqfd.h                     |   2 +-
+ include/linux/sched.h                         |   2 +-
+ include/linux/seqlock.h                       | 855 ++++++++++++++----
+ include/linux/seqlock_types_internal.h        | 187 ++++
+ include/net/netfilter/nf_conntrack.h          |   2 +-
+ init/init_task.c                              |   3 +-
+ kernel/fork.c                                 |   2 +-
+ kernel/time/hrtimer.c                         |  13 +-
+ kernel/time/timekeeping.c                     |  19 +-
+ net/netfilter/nf_conntrack_core.c             |   5 +-
+ net/netfilter/nft_set_rbtree.c                |   4 +-
+ net/xfrm/xfrm_policy.c                        |  10 +-
+ virt/kvm/eventfd.c                            |   2 +-
+ 30 files changed, 1175 insertions(+), 226 deletions(-)
+ create mode 100644 Documentation/locking/seqlock.rst
+ create mode 100644 include/linux/seqlock_types_internal.h
+
+base-commit: 3d77e6a8804abcc0504c904bd6e5cdf3a5cf8162
+--
+2.20.1
