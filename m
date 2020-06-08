@@ -6,48 +6,50 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823D6C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 14:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 632ADC433E0
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 14:20:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64FBD20774
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 14:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45EF92072F
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 14:20:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728988AbgFHONO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jun 2020 10:13:14 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:39415 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726097AbgFHONO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 10:13:14 -0400
-Received: by mail-pl1-f194.google.com with SMTP id v24so6707269plo.6
-        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2020 07:13:13 -0700 (PDT)
+        id S1726092AbgFHOU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jun 2020 10:20:29 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:51168 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726074AbgFHOU3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 10:20:29 -0400
+Received: by mail-pj1-f66.google.com with SMTP id jz3so5821525pjb.0
+        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2020 07:20:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DN0O+QccX66cetGTZydxf0UAP3KhSNbwWfBqi0kGguU=;
-        b=D+0m0GOvQdAZRdr7yrlENfMO/zHE3ZB0IdxtztUN1h4Cf5lIc/4axsaxsioCNg4fAs
-         /WIM/6EapAMRTWZZRL5VQuTwSbhg42yhIV/F1YMLWvCiICV/m+Ve5ZwMWldVaIymQmME
-         0oqSgBW9zJSujqNvRNyyXcrLOzIKJIZuKIFaw5O4qznob+V50nRdFVPGfRjYTEhKPE4b
-         xo6kLJvv3Zj+hrr+u94adEzqCokCG3BYEBDyc1XY7ULCGJsZct1kIzq5ozJJu+kukJdH
-         2lu4CEr8NAobutGwvcjqFZB0mmuLpjS/qaVYhPJHkY0e3KsCRq8FuLzXGNyD3UH7N7fI
-         cNCA==
-X-Gm-Message-State: AOAM532V0YaNiTyFdPJTC4bTplTDFz/Axz0sEf5EE82tq7t1M4rMW+QR
-        LrhaXydGCVRNJoOnow0gGEgFaijO
-X-Google-Smtp-Source: ABdhPJyWTqJBDWU65Z9RIFncOdpjetrhcj+yDhnBLjdzCmgEvVhrAWWXPzXMsVTUtUi01cW6cLn2Jw==
-X-Received: by 2002:a17:90a:bf14:: with SMTP id c20mr17422104pjs.228.1591625592880;
-        Mon, 08 Jun 2020 07:13:12 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=f2WKLo5yJaGtcE3HUtysqV2L8jfUJh9QDofCkroCqhk=;
+        b=PfjtZQ8HpeoZ6W+wrluDf/+tlnSJLkCCrdvoBNBBioC5Fzwi91rPYV567rFoTthCfv
+         FvppikJYE6S+kmzdq/Ft27+FYi4+1PzhXLegDMWQho7GjK312/FRUodwnTbWwXVMIsbk
+         a90p7lYOwKFbL9gTNc24iVZwVrYm2JUSb1H6V+/CgSFHfXs0rJQPkWac+ebLdZkLD9qg
+         LtU0+mRtNy1FRseREAfcu0pI1zZ7CspUmnNkHN3IekzdD++HnK54ElzFutcmlKyVAKKa
+         SFvAAJHtU+lrL4oc4SehB2S3GUJPGGc9KvEdikK4Hod1hlN5N+dk292JJVntgWlsB6I/
+         qnRg==
+X-Gm-Message-State: AOAM530Ehd4jxZbh7iTpaEzD3OgTYdz2Ow12zFHWdNG3AwGQ8t/f03En
+        uODEfdFHQdTbSof8PXLql382NaXD
+X-Google-Smtp-Source: ABdhPJxAnJWTLLE9icIawlEzXxtSIGYIU93DBdZVwqpOQK40X59F5Ox4cuNNTJj71wwFE4G9SQa1sA==
+X-Received: by 2002:a17:902:70c2:: with SMTP id l2mr21256590plt.237.1591626028192;
+        Mon, 08 Jun 2020 07:20:28 -0700 (PDT)
 Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id z9sm14854996pjr.39.2020.06.08.07.13.11
+        by smtp.gmail.com with ESMTPSA id y26sm7433217pff.26.2020.06.08.07.20.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2020 07:13:11 -0700 (PDT)
+        Mon, 08 Jun 2020 07:20:26 -0700 (PDT)
 Subject: Re: [PATCH] blktrace: put bounds on BLKTRACESETUP buf_size and buf_nr
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Harshad Shirwadkar <harshadshirwadkar@gmail.com>,
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     harshad shirwadkar <harshadshirwadkar@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20200604054434.216698-1-harshadshirwadkar@gmail.com>
  <49a4c410-6d42-46b3-adde-1d0a8fc6b594@acm.org>
- <BYAPR04MB4965B37AC6B19F51AAE291D186850@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <CAD+ocbzdh0eq+wBQ-DqUUw_Gvwc0xv-FbBUNS0aZfpn+eToUEg@mail.gmail.com>
+ <8787ab94-4573-56d4-2e59-0adbaa979c4f@acm.org>
+ <BYAPR04MB496523AEF4C84B7BA2D2680486850@BYAPR04MB4965.namprd04.prod.outlook.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -72,12 +74,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <40f0c94f-1f9f-f45f-2974-1b562a7e5c32@acm.org>
-Date:   Mon, 8 Jun 2020 07:13:09 -0700
+Message-ID: <35a5f5a7-770e-1cbe-10a3-118591b64f29@acm.org>
+Date:   Mon, 8 Jun 2020 07:20:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB4965B37AC6B19F51AAE291D186850@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <BYAPR04MB496523AEF4C84B7BA2D2680486850@BYAPR04MB4965.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,34 +88,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-06-07 23:34, Chaitanya Kulkarni wrote:
+On 2020-06-07 23:40, Chaitanya Kulkarni wrote:
 > Bart,
+> On 6/5/20 6:43 AM, Bart Van Assche wrote:
+>> We typically do not implement arbitrary limits in the kernel. So I'd
+>> prefer not to introduce any artificial limits.
 > 
-> On 6/4/20 9:31 PM, Bart Van Assche wrote:
->> Where is the code that imposes these limits? I haven't found it. Did I
->> perhaps overlook something?
->
-> It is in blktrace.c user-space tool.
+> That is what I mentioned in [1] that we can add a check suggested in 
+> [1]. That way we will not enforce any limits in the kernel and keep
+> the backward compatibility.
 > 
->    55
->    56 /*
->    57  * You may want to increase this even more, if you are logging at 
-> a high
->    58  * rate and see skipped/missed events
->    59  */
->    60 #define BUF_SIZE                (512 * 1024)
->    61 #define BUF_NR                  (4)
->    62
->    63 #define FILE_VBUF_SIZE          (128 * 1024)
->    64
->    65 #define DEBUGFS_TYPE            (0x64626720)
->    66 #define TRACE_NET_PORT          (8462)
->    67
+> Do you see any problem with the approach suggested in [1].
+> 
+> [1] https://www.spinics.net/lists/linux-block/msg54754.html
 
-Hi Chaitanya,
-
-With my question I was referring to kernel code. I think Harshad
-understood that part of my question.
+Please take another look at Harshad's patch description. My
+understanding is that Harshad wants to protect the kernel against
+malicious user space software. Modifying the user space blktrace
+software as proposed in [1] doesn't help at all towards the goal of
+hardening the kernel.
 
 Thanks,
 
