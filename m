@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05843C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81DE8C433E1
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEBFD2078C
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C45A2053B
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591635720;
-	bh=M3Y9qjq1IYVGWHeSUHNlJod1XBpYY7djWBt6/Vj9Qow=;
+	s=default; t=1591635722;
+	bh=8RBttsTc5fxLDzf9UECZE+d7O/Cvr3uZJ1Udu55aNlk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1xlHEc9n6H/cvLtvSY2K1dB+9y+I0ytQHC0sPXBRW/KjkZbR7U5U3j1i+/zqI8rxE
-	 gmy3YOTI01vciR80fokBmQlmV41M1g5Psn29wpdrWicNIBjB4ZbPxTpuxY2G5hVMRe
-	 OcHgPbBW2CRAlJ9ZqIJaZBgeoIb+afJIgqHqxHfo=
+	b=f2AWCsMo1adPqYCE5uTU5sSQRPXoCCZ3gb4cyOuy6lfFOLZAptCteQVZ65YcXVMyS
+	 w9XEkbn8s1Qd57/8hYtRAox7wz7t5X8EiLU7G72Dh+knnpkgzDY93/oFOjP/mQq7sP
+	 /tUn97dCuSRHnoavdFqZmxbTPnSS6pgpWu4Vwf10=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730731AbgFHRBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jun 2020 13:01:42 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46234 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730712AbgFHRBd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 13:01:33 -0400
-Received: by mail-pg1-f196.google.com with SMTP id p21so8985108pgm.13;
-        Mon, 08 Jun 2020 10:01:33 -0700 (PDT)
+        id S1730669AbgFHRBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jun 2020 13:01:38 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:50706 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730680AbgFHRBh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 13:01:37 -0400
+Received: by mail-pj1-f65.google.com with SMTP id jz3so97581pjb.0;
+        Mon, 08 Jun 2020 10:01:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IR8sE8tegFIZFEE9c+9scyuraOZnu4HrFVBH9bLfdFU=;
-        b=ONKj/SgCOoavM5X1uVQKx0vtnaNkVXxBKTlx3qpecjraPrfkdUa/IDRa84Din9cKfo
-         Lv892KVL4Na0XvwtVOrFZaUe1OgOaUf3wiBnRPJkEVDpU8It883mttR+ksSN5JIp8Vxo
-         Y2lZHFooMNibcHusm0/uFrxVhZSVBgdCZqQZpiYaY/8ikG3O7s+sAGBhXOW8GfJmYKx7
-         ZKGtGJq42DCHCKUtWWa+qY+Xb/uWn8iwIMyoPG91QosVCdjFD2qw+bYmVrXMc9L5AVgQ
-         xBEKGiCXc9slLG/U8d/G2QxQhIVHcCosqwaQrm6GOj2f2mssXF8CMbqMmDxSNzLYHLjM
-         lcww==
-X-Gm-Message-State: AOAM532KDrpxccRx/9QM7VC5c8od4XxmZlIseDiyNh9HZkdv2nZhx4bE
-        zdFqnVIQ6FDTh2MZLnLUlto=
-X-Google-Smtp-Source: ABdhPJxt2pD6W+zmvHH4/qZYFASujPCD7TMwgg/ner/gHNpT88Lk15hCgOpUe+6qMytW01UEwr4DCw==
-X-Received: by 2002:a63:7e5a:: with SMTP id o26mr21581596pgn.134.1591635692300;
-        Mon, 08 Jun 2020 10:01:32 -0700 (PDT)
+        bh=czNjXU30rSIShN0VGIH9O9NmGY2Ep4u1wGzVMmo2EPc=;
+        b=DbA4S180WBcETO1870qgiY1tA8q1M3IMQqo5c3oBAsG9KkRRwQUTOTfDDtxF4Ueqwk
+         zZlbpWAekWrqDshBh6vNVqBL7zsJ6VH0bgdrEg+EbE1JqbTwTgm4CYTdp1iQCzBp7lrJ
+         oJKnFIqvqbZGeDWu+dIxeJ758YRdiNghDs5dDwx6eYd0FBgWTr3e+7mQTB2d4TJ0zkTD
+         HqycbOWXFEmTu1ba49qKNkEeTCsmm0RSe0cWwuIUb2+tsry3rMr802A3ln3R9zfENyA7
+         sKIyYlMbvLoAcRzYTeb/71V7V9iLlXNoYZMSN5BaVVYkAp37lI7pXP9AqTNqUt0lfCpf
+         fQ3A==
+X-Gm-Message-State: AOAM531Z9U6NlQySENZXwpGHuS01mAdLkF/j7dcKeMKPLmjDCYj3qgRk
+        6ek/0Vv0mK2hUR9PG43uZTo=
+X-Google-Smtp-Source: ABdhPJyFWnizLnXRGDBsljYjqN67qm0DZiifB27mOcjtR4o0sSeP8FcBSncD65XYbTy97RXzjGWCKg==
+X-Received: by 2002:a17:902:7297:: with SMTP id d23mr4713106pll.35.1591635693722;
+        Mon, 08 Jun 2020 10:01:33 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id b140sm7542863pfb.119.2020.06.08.10.01.28
+        by smtp.gmail.com with ESMTPSA id l3sm6404738pgm.59.2020.06.08.10.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 10:01:28 -0700 (PDT)
+        Mon, 08 Jun 2020 10:01:31 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id F0A7740945; Mon,  8 Jun 2020 17:01:27 +0000 (UTC)
+        id 4A77B41C23; Mon,  8 Jun 2020 17:01:28 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -59,10 +59,13 @@ Cc:     mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
         jejb@linux.ibm.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 1/6] block: add docs for gendisk / request_queue refcount helpers
-Date:   Mon,  8 Jun 2020 17:01:21 +0000
-Message-Id: <20200608170127.20419-2-mcgrof@kernel.org>
+Subject: [PATCH v6 3/6] block: revert back to synchronous request_queue removal
+Date:   Mon,  8 Jun 2020 17:01:23 +0000
+Message-Id: <20200608170127.20419-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
 In-Reply-To: <20200608170127.20419-1-mcgrof@kernel.org>
 References: <20200608170127.20419-1-mcgrof@kernel.org>
@@ -73,137 +76,232 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds documentation for the gendisk / request_queue refcount
-helpers.
+Commit dc9edc44de6c ("block: Fix a blk_exit_rl() regression") merged on
+v4.12 moved the work behind blk_release_queue() into a workqueue after a
+splat floated around which indicated some work on blk_release_queue()
+could sleep in blk_exit_rl(). This splat would be possible when a driver
+called blk_put_queue() or blk_cleanup_queue() (which calls blk_put_queue()
+as its final call) from an atomic context.
 
+blk_put_queue() decrements the refcount for the request_queue kobject,
+and upon reaching 0 blk_release_queue() is called. Although blk_exit_rl()
+is now removed through commit db6d9952356 ("block: remove request_list code")
+on v5.0, we reserve the right to be able to sleep within blk_release_queue()
+context.
+
+The last reference for the request_queue must not be called from atomic
+context. *When* the last reference to the request_queue reaches 0 varies,
+and so let's take the opportunity to document when that is expected to
+happen and also document the context of the related calls as best as possible
+so we can avoid future issues, and with the hopes that the synchronous
+request_queue removal sticks.
+
+We revert back to synchronous request_queue removal because asynchronous
+removal creates a regression with expected userspace interaction with
+several drivers. An example is when removing the loopback driver, one
+uses ioctls from userspace to do so, but upon return and if successful,
+one expects the device to be removed. Likewise if one races to add another
+device the new one may not be added as it is still being removed. This was
+expected behavior before and it now fails as the device is still present
+and busy still. Moving to asynchronous request_queue removal could have
+broken many scripts which relied on the removal to have been completed if
+there was no error. Document this expectation as well so that this
+doesn't regress userspace again.
+
+Using asynchronous request_queue removal however has helped us find
+other bugs. In the future we can test what could break with this
+arrangement by enabling CONFIG_DEBUG_KOBJECT_RELEASE.
+
+While at it, update the docs with the context expectations for the
+request_queue / gendisk refcount decrement, and make these
+expectations explicit by using might_sleep().
+
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: yu kuai <yukuai3@huawei.com>
+Suggested-by: Nicolai Stange <nstange@suse.de>
+Fixes: dc9edc44de6c ("block: Fix a blk_exit_rl() regression")
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/blk-core.c | 13 +++++++++++++
- block/genhd.c    | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 62 insertions(+), 1 deletion(-)
+ block/blk-core.c       |  8 ++++++++
+ block/blk-sysfs.c      | 43 +++++++++++++++++++++---------------------
+ block/genhd.c          | 17 +++++++++++++++++
+ include/linux/blkdev.h |  2 --
+ 4 files changed, 47 insertions(+), 23 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 62a4904db921..a0760aac110a 100644
+index 14c09daf55f3..a5126c0be777 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -321,6 +321,13 @@ void blk_clear_pm_only(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_clear_pm_only);
- 
-+/**
-+ * blk_put_queue - decrement the request_queue refcount
-+ * @q: the request_queue structure to decrement the refcount for
+@@ -327,6 +327,9 @@ EXPORT_SYMBOL_GPL(blk_clear_pm_only);
+  *
+  * Decrements the refcount of the request_queue kobject. When this reaches 0
+  * we'll have blk_release_queue() called.
 + *
-+ * Decrements the refcount of the request_queue kobject. When this reaches 0
-+ * we'll have blk_release_queue() called.
-+ */
++ * Context: Any context, but the last reference must not be dropped from
++ *          atomic context.
+  */
  void blk_put_queue(struct request_queue *q)
  {
- 	kobject_put(&q->kobj);
-@@ -598,6 +605,12 @@ struct request_queue *blk_alloc_queue(make_request_fn make_request, int node_id)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
- 
-+/**
-+ * blk_get_queue - increment the request_queue refcount
-+ * @q: the request_queue structure to increment the refcount for
+@@ -359,9 +362,14 @@ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+  *
+  * Mark @q DYING, drain all pending requests, mark @q DEAD, destroy and
+  * put it.  All future requests will be failed immediately with -ENODEV.
 + *
-+ * Increment the refcount of the request_queue kobject.
-+ */
- bool blk_get_queue(struct request_queue *q)
++ * Context: can sleep
+  */
+ void blk_cleanup_queue(struct request_queue *q)
  {
- 	if (likely(!blk_queue_dying(q))) {
++	/* cannot be called from atomic context */
++	might_sleep();
++
+ 	WARN_ON_ONCE(blk_queue_registered(q));
+ 
+ 	/* mark @q DYING, no new request or merges will be allowed afterwards */
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 02643e149d5e..561624d4cc4e 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -873,22 +873,32 @@ static void blk_exit_queue(struct request_queue *q)
+ 	bdi_put(q->backing_dev_info);
+ }
+ 
+-
+ /**
+- * __blk_release_queue - release a request queue
+- * @work: pointer to the release_work member of the request queue to be released
++ * blk_release_queue - releases all allocated resources of the request_queue
++ * @kobj: pointer to a kobject, whose container is a request_queue
++ *
++ * This function releases all allocated resources of the request queue.
++ *
++ * The struct request_queue refcount is incremented with blk_get_queue() and
++ * decremented with blk_put_queue(). Once the refcount reaches 0 this function
++ * is called.
++ *
++ * For drivers that have a request_queue on a gendisk and added with
++ * __device_add_disk() the refcount to request_queue will reach 0 with
++ * the last put_disk() called by the driver. For drivers which don't use
++ * __device_add_disk() this happens with blk_cleanup_queue().
+  *
+- * Description:
+- *     This function is called when a block device is being unregistered. The
+- *     process of releasing a request queue starts with blk_cleanup_queue, which
+- *     set the appropriate flags and then calls blk_put_queue, that decrements
+- *     the reference counter of the request queue. Once the reference counter
+- *     of the request queue reaches zero, blk_release_queue is called to release
+- *     all allocated resources of the request queue.
++ * Drivers exist which depend on the release of the request_queue to be
++ * synchronous, it should not be deferred.
++ *
++ * Context: can sleep
+  */
+-static void __blk_release_queue(struct work_struct *work)
++static void blk_release_queue(struct kobject *kobj)
+ {
+-	struct request_queue *q = container_of(work, typeof(*q), release_work);
++	struct request_queue *q =
++		container_of(kobj, struct request_queue, kobj);
++
++	might_sleep();
+ 
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+@@ -917,15 +927,6 @@ static void __blk_release_queue(struct work_struct *work)
+ 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+ }
+ 
+-static void blk_release_queue(struct kobject *kobj)
+-{
+-	struct request_queue *q =
+-		container_of(kobj, struct request_queue, kobj);
+-
+-	INIT_WORK(&q->release_work, __blk_release_queue);
+-	schedule_work(&q->release_work);
+-}
+-
+ static const struct sysfs_ops queue_sysfs_ops = {
+ 	.show	= queue_attr_show,
+ 	.store	= queue_attr_store,
 diff --git a/block/genhd.c b/block/genhd.c
-index 1a7659327664..f741613d731f 100644
+index 1be86b1f43ec..60ae4e1b4d38 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -876,6 +876,20 @@ static void invalidate_partition(struct gendisk *disk, int partno)
- 	bdput(bdev);
- }
- 
-+/**
-+ * del_gendisk - remove the gendisk
-+ * @disk: the struct gendisk to remove
+@@ -889,12 +889,19 @@ static void invalidate_partition(struct gendisk *disk, int partno)
+  * The final removal of the struct gendisk happens when its refcount reaches 0
+  * with put_disk(), which should be called after del_gendisk(), if
+  * __device_add_disk() was used.
 + *
-+ * Removes the gendisk and all its associated resources. This deletes the
-+ * partitions associated with the gendisk, and unregisters the associated
-+ * request_queue.
++ * Drivers exist which depend on the release of the gendisk to be synchronous,
++ * it should not be deferred.
 + *
-+ * This is the counter to the respective __device_add_disk() call.
-+ *
-+ * The final removal of the struct gendisk happens when its refcount reaches 0
-+ * with put_disk(), which should be called after del_gendisk(), if
-+ * __device_add_disk() was used.
-+ */
++ * Context: can sleep
+  */
  void del_gendisk(struct gendisk *disk)
  {
  	struct disk_part_iter piter;
-@@ -1514,6 +1528,23 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
- 	return 0;
- }
+ 	struct hd_struct *part;
  
-+/**
-+ * disk_release - releases all allocated resources of the gendisk
-+ * @dev: the device representing this disk
++	might_sleep();
++
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
+@@ -1548,11 +1555,15 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
+  * drivers we also call blk_put_queue() for them, and we expect the
+  * request_queue refcount to reach 0 at this point, and so the request_queue
+  * will also be freed prior to the disk.
 + *
-+ * This function releases all allocated resources of the gendisk.
-+ *
-+ * The struct gendisk refcount is incremented with get_gendisk() or
-+ * get_disk_and_module(), and its refcount is decremented with
-+ * put_disk_and_module() or put_disk(). Once the refcount reaches 0 this
-+ * function is called.
-+ *
-+ * Drivers which used __device_add_disk() have a gendisk with a request_queue
-+ * assigned. Since the request_queue sits on top of the gendisk for these
-+ * drivers we also call blk_put_queue() for them, and we expect the
-+ * request_queue refcount to reach 0 at this point, and so the request_queue
-+ * will also be freed prior to the disk.
-+ */
++ * Context: can sleep
+  */
  static void disk_release(struct device *dev)
  {
  	struct gendisk *disk = dev_to_disk(dev);
-@@ -1727,6 +1758,13 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- }
- EXPORT_SYMBOL(__alloc_disk_node);
  
-+/**
-+ * get_disk_and_module - increments the gendisk and gendisk fops module refcount
-+ * @disk: the struct gendisk to to increment the refcount for
++	might_sleep();
++
+ 	blk_free_devt(dev->devt);
+ 	disk_release_events(disk);
+ 	kfree(disk->random);
+@@ -1797,6 +1808,9 @@ EXPORT_SYMBOL(get_disk_and_module);
+  *
+  * This decrements the refcount for the struct gendisk. When this reaches 0
+  * we'll have disk_release() called.
 + *
-+ * This increments the refcount for the struct gendisk, and the gendisk's
-+ * fops module owner.
-+ */
- struct kobject *get_disk_and_module(struct gendisk *disk)
- {
- 	struct module *owner;
-@@ -1747,6 +1785,13 @@ struct kobject *get_disk_and_module(struct gendisk *disk)
- }
- EXPORT_SYMBOL(get_disk_and_module);
- 
-+/**
-+ * put_disk - decrements the gendisk refcount
-+ * @disk: the struct gendisk to to decrement the refcount for
-+ *
-+ * This decrements the refcount for the struct gendisk. When this reaches 0
-+ * we'll have disk_release() called.
-+ */
++ * Context: Any context, but the last reference must not be dropped from
++ *          atomic context.
+  */
  void put_disk(struct gendisk *disk)
  {
- 	if (disk)
-@@ -1754,7 +1799,10 @@ void put_disk(struct gendisk *disk)
- }
- EXPORT_SYMBOL(put_disk);
- 
--/*
-+/**
-+ * put_disk_and_module - decrements the module and gendisk refcount
-+ * @disk: the struct gendisk to to decrement the refcount for
-+ *
+@@ -1811,6 +1825,9 @@ EXPORT_SYMBOL(put_disk);
+  *
   * This is a counterpart of get_disk_and_module() and thus also of
   * get_gendisk().
++ *
++ * Context: Any context, but the last reference must not be dropped from
++ *          atomic context.
   */
+ void put_disk_and_module(struct gendisk *disk)
+ {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 27887bf36d50..2462b78c1013 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -584,8 +584,6 @@ struct request_queue {
+ 
+ 	size_t			cmd_size;
+ 
+-	struct work_struct	release_work;
+-
+ #define BLK_MAX_WRITE_HINTS	5
+ 	u64			write_hints[BLK_MAX_WRITE_HINTS];
+ };
 -- 
 2.26.2
 
