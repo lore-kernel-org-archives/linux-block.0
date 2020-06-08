@@ -2,54 +2,54 @@ Return-Path: <SRS0=X1aF=7V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C39C433E2
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B31CC433E1
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC5242053B
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3A522078C
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 17:02:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591635739;
-	bh=GFDS5ZeXJWKepPtGtYd1p8VC4NzatXMF4WFN56n95Xc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xqFw7Ta+HSgtVJRQ18agwA3oZsbIXsyvY4JmANN2gDf0h6guaOoS+oCykAPQWQcV/
-	 3au0qabkdmG6f+RAYeGo6k1lts69OR3oeLhWmf61mFeaqEfj9WR4j0V2BpzHU4u+N0
-	 oyPA4mOPBW5wj7Q1qxkVXuAq6sDJARrb2RjqEPj8=
+	s=default; t=1591635743;
+	bh=hO60vjJVDDiC5cf3wC49Lu12zZgI74dVdUzl2hkQF5k=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=rPxWJGJC3dlWX4vdWm52f7306huKdH0Ht9aNy5NIaEZ4hJwz0a7wfwEn5JaR7PMmK
+	 OAxz5AZSRdcMzGdfpC02OqCMogPF6jMlrXZei326Cn09vJIT4Jkc9aaecAIu1TejCW
+	 XueNwKPtBf25/DOJ7NLnuFyQAG1dNgjZEQJvf4XU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387504AbgFHRCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jun 2020 13:02:02 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:33115 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730726AbgFHRBj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 13:01:39 -0400
-Received: by mail-pf1-f196.google.com with SMTP id b201so8822009pfb.0;
-        Mon, 08 Jun 2020 10:01:37 -0700 (PDT)
+        id S1730704AbgFHRBc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jun 2020 13:01:32 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43870 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730680AbgFHRBc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 13:01:32 -0400
+Received: by mail-pg1-f195.google.com with SMTP id 185so8999294pgb.10;
+        Mon, 08 Jun 2020 10:01:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=f88bEORI++QIsnJdKm2ca64CmhxGUzC3g+SSrwClYUg=;
-        b=fFY9lOlx1tsbi3CWNCs5HITSv6HGFSS6uQzU2SDIeXdrSs9JSC0cGIGAUKMcznY3uM
-         ZXLpFFlhw+Tjvs56UTnnFK1JykEDSVXDQ3MatEDJ7aTGn7GljYVGtOrNgJxZARHZVi3O
-         dWCa5bI8l/IHKozet5oo9FqZB8sF3hUX650r5yRvyHFRfXknw2SX9WARPjMDiq1RuGfX
-         TsiwrJe1qPx1/J0S9yp7gygBdcZCrPoU2OC71PBpE/ZLWLC91o7/kreIhHwxjzW8aV/0
-         JggYnb4B1GohPdV8pa0ONRUTBAMrED/pgubAQfp34+SRtJkLgYM43VCWuKmWLA4/RKmO
-         YNUw==
-X-Gm-Message-State: AOAM5320Ph1jDP87dX0Cxdx510UX79yeV9sGxJ/uASUotrxq8vIe/Maj
-        1Jf9Dzv1nAt3p/MZtAg8BR4=
-X-Google-Smtp-Source: ABdhPJwmTcpNrr37VElfNpqehHSBvOJFHFFfHrHovcAKxDpg8BeyMYMNILKDT4r2RmVxa1x2U8XKog==
-X-Received: by 2002:a63:f14a:: with SMTP id o10mr21710759pgk.216.1591635696982;
-        Mon, 08 Jun 2020 10:01:36 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qUXzgbRX2wKZYMA8ok0uoS1JUpyLuZc0+BTfrQx3Bi8=;
+        b=JGEuQvRaHyHT1vd8fp6D4LuxLAYmsC6Toq5m+9Gh2aUZFzkW67oW/hXzZQBvB1olnl
+         DqV8UoXaRiYiRt36GyrpaNYMLI42yaRYrh78/qgqdRPG9wek0pIUAg/KaYQhc3niLMEn
+         h6P1ysCXm15E4gGAoHS1SnemypG76Fo84hmmkqm7dRXejqOJX2dML/Zzf3gHYbAGFl+z
+         pk6Wef+0i1946rz6xwakvMSD1ciQF+KqP6cF6+WpBgZlQxaPLHzXAJS/zqoYzJGOHwrh
+         LqIQfh9+WY+JFVxkp80XvITJKefiZ/g3wPco1R99JmQ3Eszyjkz+RYG2GY3epKEC7jFV
+         Mehg==
+X-Gm-Message-State: AOAM530GAWfn8BrhUFF8xMtiIU0sdRMdOdigF82vDFmKiecoqyxGP8aO
+        tSBqz9fLNejfFjYjzUISSlM=
+X-Google-Smtp-Source: ABdhPJxAdCHgKvd/QmgBvDw7T4q6bq0lGS5DH72sx0NO830E9BqR93jPtM6XpNPD7SkanCzM5xJylA==
+X-Received: by 2002:a62:ee0b:: with SMTP id e11mr3788583pfi.185.1591635690050;
+        Mon, 08 Jun 2020 10:01:30 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id iq3sm103489pjb.6.2020.06.08.10.01.30
+        by smtp.gmail.com with ESMTPSA id x77sm7839391pfc.4.2020.06.08.10.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 10:01:32 -0700 (PDT)
+        Mon, 08 Jun 2020 10:01:28 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 9045A41DD1; Mon,  8 Jun 2020 17:01:28 +0000 (UTC)
+        id DBD5D403AB; Mon,  8 Jun 2020 17:01:27 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -58,14 +58,11 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
 Cc:     mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
         jejb@linux.ibm.com, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 5/6] loop: be paranoid on exit and prevent new additions / removals
-Date:   Mon,  8 Jun 2020 17:01:25 +0000
-Message-Id: <20200608170127.20419-6-mcgrof@kernel.org>
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v6 0/8] block: fix blktrace debugfs use after free
+Date:   Mon,  8 Jun 2020 17:01:20 +0000
+Message-Id: <20200608170127.20419-1-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
-In-Reply-To: <20200608170127.20419-1-mcgrof@kernel.org>
-References: <20200608170127.20419-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -73,38 +70,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Be pedantic on removal as well and hold the mutex.
-This should prevent uses of addition while we exit.
+Here is v6 of the blktrace fixes which address the debugfs use after
+free. I've followed the strategy suggested by Christoph of open coding
+the solution in place, and extended it with the required work for
+partitions and scsi-generic. Jan's blktrace sparse fix ended up
+depending on one of my patch, "blktrace: break out of blktrace setup
+on concurrent calls", and so he has sent those for inclusion prior to my
+series. This series would have to be applied after those two patches
+from Jan are merged then.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/loop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Since the patch "blktrace: fix debugfs use after free" ends up being the
+only one modified lately, I've moved that patch to be the last one in
+the series now.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c33bbbfd1bd9..d55e1b52f076 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2402,6 +2402,8 @@ static void __exit loop_exit(void)
- 
- 	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
- 
-+	mutex_lock(&loop_ctl_mutex);
-+
- 	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
- 	idr_destroy(&loop_index_idr);
- 
-@@ -2409,6 +2411,8 @@ static void __exit loop_exit(void)
- 	unregister_blkdev(LOOP_MAJOR, "loop");
- 
- 	misc_deregister(&loop_misc);
-+
-+	mutex_unlock(&loop_ctl_mutex);
- }
- 
- module_init(loop_init);
+You can find these on my git tree branch 20200608-blktrace-fixes based
+on linux-next 20200608 [0].
+
+Hopefully this is it.
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20200608-blktrace-fixes
+
+Luis Chamberlain (6):
+  block: add docs for gendisk / request_queue refcount helpers
+  block: clarify context for refcount increment helpers
+  block: revert back to synchronous request_queue removal
+  blktrace: annotate required lock on do_blk_trace_setup()
+  loop: be paranoid on exit and prevent new additions / removals
+  blktrace: fix debugfs use after free
+
+ block/blk-core.c             | 27 ++++++++++--
+ block/blk-mq-debugfs.c       |  5 ---
+ block/blk-sysfs.c            | 83 +++++++++++++++++++++++++++---------
+ block/blk.h                  |  2 -
+ block/genhd.c                | 73 ++++++++++++++++++++++++++++++-
+ block/partitions/core.c      |  3 ++
+ drivers/block/loop.c         |  4 ++
+ drivers/scsi/sg.c            |  3 ++
+ include/linux/blkdev.h       |  6 +--
+ include/linux/blktrace_api.h |  1 -
+ include/linux/genhd.h        |  1 +
+ kernel/trace/blktrace.c      | 55 ++++++++++++++++++------
+ 12 files changed, 214 insertions(+), 49 deletions(-)
+
 -- 
 2.26.2
 
