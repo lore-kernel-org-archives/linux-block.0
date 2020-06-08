@@ -2,125 +2,128 @@ Return-Path: <SRS0=X1aF=7V=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183EAC433E1
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 23:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E5BC433DF
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 23:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED91B2085B
-	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 23:19:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591658374;
-	bh=i9Cm6uE8F2dwMgkxMHO8K4IqGtya6rXxjwkvqMYxwkw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Vk599XQcD1kOPBrFeebMEvWkyW1eY3cGITIZWg4BIBgBxKGjJcOBjTx8Y5N+PLUIa
-	 9O2qo4/szyYUws+w/ugdE/FIzuKVN50QOzQadHy4f93xWvt9qeyduG/vmpz3RS1d0d
-	 BeuVaFgVokzud0Elzy+115sguQRyt+xpqqdr4y1o=
+	by mail.kernel.org (Postfix) with ESMTP id BD67E20659
+	for <linux-block@archiver.kernel.org>; Mon,  8 Jun 2020 23:40:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g5+5VlvV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730795AbgFHXTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Jun 2020 19:19:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42264 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730404AbgFHXT3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:19:29 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1B7B82086A;
-        Mon,  8 Jun 2020 23:19:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658368;
-        bh=i9Cm6uE8F2dwMgkxMHO8K4IqGtya6rXxjwkvqMYxwkw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GUla7vGpz8ttbP8vRm0OBDoeUA6yBP/SkPuEKJeEOA7pyyNlr+Ge8oFDuyRNW9IL9
-         DJQEeBHTQhSMqRho275J5KGI5EZYsCVWkv3rXPq7R+5jDSMW2jS10orX8B5wWzLC86
-         HppLInAmU2LxuxZvhw3Rk10Ur1Mv152zUFwxoHq4=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Bart van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 032/175] block: reset mapping if failed to update hardware queue count
-Date:   Mon,  8 Jun 2020 19:16:25 -0400
-Message-Id: <20200608231848.3366970-32-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608231848.3366970-1-sashal@kernel.org>
-References: <20200608231848.3366970-1-sashal@kernel.org>
+        id S1731031AbgFHXkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Jun 2020 19:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731273AbgFHXkd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jun 2020 19:40:33 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D627FC08C5C2
+        for <linux-block@vger.kernel.org>; Mon,  8 Jun 2020 16:40:32 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id m2so15140956otr.12
+        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2020 16:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=B0ijiEm6+Snh9QxS1Zcj/PhcZrYdloldxYcA2M93sy4=;
+        b=g5+5VlvVithVim19QYwMERO2dSXAMGCVxLTqjIM664YiJYYRIsYxgoJukDoxIzhnPU
+         yewlklya1Wr2m2elEPcJKYMgBWjc2p7LP56robgtPmo3tKT/+VMdcyB1M25NhdYjclwB
+         t0FFwRk22Nycp5lhHdVJpp74CMvU+wZDfpBETwGCpSgW8lEFQsRVgzvcNZHuvWbt67O5
+         cuDUVFwn5kVZIGk9QlXESj5RxeqX6XThtmqok7JHbCTR5vj2MYPP+sbX795DFwFTKHo8
+         DL1ZNJ4eUG2+6mmktOX35v/GNMG+WPX4NeyNGfm0guHOzVHhv/wDxpqOUiLdbOKbodpE
+         6yTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=B0ijiEm6+Snh9QxS1Zcj/PhcZrYdloldxYcA2M93sy4=;
+        b=ijb4V+XXC2X/Nji/rjRkM76nE72ybfmHRexMUbzu1spiWDdDG17VFleiIla25pvNCr
+         SCTOhFjrlqf57aeWU5QF5dy7tEKHHeDiAJW93U7WxjKmwPSW/rXD3vg6KDCdxV/b5+RF
+         eVicp3bq7V2gshvTDWMF3Z7tQW8fj+rLulmhozGVvMpaQj3LS1UscMGyyhPkXCI05b7G
+         rdyySS6VCcWOJ5MpLJ5w/P3TfzvC3gry+UKUzZv8RLLCoF1EWGevcdnC4z+eDyURpAHz
+         eI3K9t8HLkV14SQA2n0+5btwRmhBuI2jzaln0JDGvA3iqGoBmwXtINtpP0RNtNU9ktDl
+         9aQw==
+X-Gm-Message-State: AOAM533pq17QvNWWveEKSA7xkFcNs2yxWaJo53z28ATQMkTGxICDqudz
+        gEmszI4bfl2dEfoDjCDH4/vACcyH+r61BhFgHFY=
+X-Google-Smtp-Source: ABdhPJyvntwFjs+TwofHyWpHB8ueuZAiC3t2p/M6gD08XjQNM14Wv9BCCuK/CY+tJ+ObD7G7vNytFFHJgIwKop2CJsE=
+X-Received: by 2002:a9d:145:: with SMTP id 63mr16683895otu.141.1591659631860;
+ Mon, 08 Jun 2020 16:40:31 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <20200604054434.216698-1-harshadshirwadkar@gmail.com>
+ <49a4c410-6d42-46b3-adde-1d0a8fc6b594@acm.org> <CAD+ocbzdh0eq+wBQ-DqUUw_Gvwc0xv-FbBUNS0aZfpn+eToUEg@mail.gmail.com>
+ <8787ab94-4573-56d4-2e59-0adbaa979c4f@acm.org> <BYAPR04MB496523AEF4C84B7BA2D2680486850@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <35a5f5a7-770e-1cbe-10a3-118591b64f29@acm.org> <BYAPR04MB4965D2A36AE58C4519DBD77A86850@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <BYAPR04MB4965D2A36AE58C4519DBD77A86850@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   harshad shirwadkar <harshadshirwadkar@gmail.com>
+Date:   Mon, 8 Jun 2020 16:40:21 -0700
+Message-ID: <CAD+ocbygDJgeAPXodAOLcWJL6SmNxF-AhE=yMCYJU7QyQRgOww@mail.gmail.com>
+Subject: Re: [PATCH] blktrace: put bounds on BLKTRACESETUP buf_size and buf_nr
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Weiping Zhang <zhangweiping@didiglobal.com>
+Given that this is a kernel bug and can be exploited by any user-space
+application, the fix in the kernel is a must have. But we don't want
+to break any existing user-space applications. So, we do need to go
+make sure that this patch doesn't break any existing applications. I
+originally sent this patch assuming that blktrace is the only user of
+this IOCTL. So, if anyone knows any other callers that we need to
+investigate, please let me know. I have verified that these limits
+don't break blktrace.
 
-[ Upstream commit aa880ad690ab6d4c53934af85fb5a43e69ecb0f5 ]
+On Mon, Jun 8, 2020 at 2:59 PM Chaitanya Kulkarni
+<Chaitanya.Kulkarni@wdc.com> wrote:
+>
+> Bart,
+> On 6/8/20 7:20 AM, Bart Van Assche wrote:
+> > On 2020-06-07 23:40, Chaitanya Kulkarni wrote:
+> >> Bart,
+> >> On 6/5/20 6:43 AM, Bart Van Assche wrote:
+> >>> We typically do not implement arbitrary limits in the kernel. So I'd
+> >>> prefer not to introduce any artificial limits.
+> >> That is what I mentioned in [1] that we can add a check suggested in
+> >> [1]. That way we will not enforce any limits in the kernel and keep
+> >> the backward compatibility.
+> >>
+> >> Do you see any problem with the approach suggested in [1].
+> >>
+> >> [1]https://www.spinics.net/lists/linux-block/msg54754.html
+> > Please take another look at Harshad's patch description. My
+> > understanding is that Harshad wants to protect the kernel against
+> > malicious user space software. Modifying the user space blktrace
+> > software as proposed in [1] doesn't help at all towards the goal of
+> > hardening the kernel.
+> >
+> > Thanks,
+> >
+> > Bart.
+> >
+>
+> Hmmm, I agree that we need fix for that. What I did't understand that
+> why we don't need userspace fix ?
+>
+> Also, what is a right way to impose these limits without having any
+> bounds in kernel ?
+From what I understand, there's no alternative to having a fix in the
+kernel. That's because, if the kernel is not fixed and only the
+commonly used user-space apps are fixed, I can always write a new
+program to break the kernel. So, as mentioned above, maybe we can make
+these limits configurable via sysfs but we'll need these bound checks
+in the kernel.
 
-When we increase hardware queue count, blk_mq_update_queue_map will
-reset the mapping between cpu and hardware queue base on the hardware
-queue count(set->nr_hw_queues). The mapping cannot be reset if it
-encounters error in blk_mq_realloc_hw_ctxs, but the fallback flow will
-continue using it, then blk_mq_map_swqueue will touch a invalid memory,
-because the mapping points to a wrong hctx.
-
-blktest block/030:
-
-null_blk: module loaded
-Increasing nr_hw_queues to 8 fails, fallback to 1
-==================================================================
-BUG: KASAN: null-ptr-deref in blk_mq_map_swqueue+0x2f2/0x830
-Read of size 8 at addr 0000000000000128 by task nproc/8541
-
-CPU: 5 PID: 8541 Comm: nproc Not tainted 5.7.0-rc4-dbg+ #3
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-rel-1.13.0-0-gf21b5a4-rebuilt.opensuse.org 04/01/2014
-Call Trace:
-dump_stack+0xa5/0xe6
-__kasan_report.cold+0x65/0xbb
-kasan_report+0x45/0x60
-check_memory_region+0x15e/0x1c0
-__kasan_check_read+0x15/0x20
-blk_mq_map_swqueue+0x2f2/0x830
-__blk_mq_update_nr_hw_queues+0x3df/0x690
-blk_mq_update_nr_hw_queues+0x32/0x50
-nullb_device_submit_queues_store+0xde/0x160 [null_blk]
-configfs_write_file+0x1c4/0x250 [configfs]
-__vfs_write+0x4c/0x90
-vfs_write+0x14b/0x2d0
-ksys_write+0xdd/0x180
-__x64_sys_write+0x47/0x50
-do_syscall_64+0x6f/0x310
-entry_SYSCALL_64_after_hwframe+0x49/0xb3
-
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-Tested-by: Bart van Assche <bvanassche@acm.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 22ce0c6a8e6a..0550366e25d8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3304,8 +3304,8 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	prev_nr_hw_queues = set->nr_hw_queues;
- 	set->nr_hw_queues = nr_hw_queues;
--	blk_mq_update_queue_map(set);
- fallback:
-+	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
- 		if (q->nr_hw_queues != set->nr_hw_queues) {
--- 
-2.25.1
-
+Thanks,
+Harshad
+>
+> Either I did not understand your comment(s) or I'm confuse.
+>
+> Can you please elaborate ?
