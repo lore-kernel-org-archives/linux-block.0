@@ -2,169 +2,139 @@ Return-Path: <SRS0=iQ6z=7W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA6CC433DF
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1F8C433DF
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 17:29:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D67302074B
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0510F207ED
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 17:29:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591723775;
+	bh=acydBiGeh8FwrKWtO6J/nfBkJ6+s9T2S3xqZj+Gg9U4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=V6XNf30ieeNJ4F5zTAr3xvZb5uz2MMzQDxdG79cESlZs+jF6dO5ttLoTCqRWvcEpB
+	 pL+GZ2BRO4ad0txFDDqWxBe0FJmZ4IqCP9e7+Dqp0HdbB5RywNYaY0aFxkUJHQAEew
+	 nZdYO3+rMLuB7EBNersa/3HcBZuyaszOWE6FGS9k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730903AbgFIPmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jun 2020 11:42:35 -0400
-Received: from verein.lst.de ([213.95.11.211]:43050 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730902AbgFIPmd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Jun 2020 11:42:33 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id EAA0968B02; Tue,  9 Jun 2020 17:42:30 +0200 (CEST)
-Date:   Tue, 9 Jun 2020 17:42:30 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     brking@us.ibm.com, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org
-Subject: Re: ipr crashes due to NULL dma_need_drain since cc97923a5bcc
- ("block: move dma drain handling to scsi")
-Message-ID: <20200609154230.GA18426@lst.de>
-References: <87zh9cftj0.fsf@mpe.ellerman.id.au>
+        id S1731780AbgFIR33 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jun 2020 13:29:29 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40096 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728110AbgFIR3Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jun 2020 13:29:25 -0400
+Received: by mail-pf1-f195.google.com with SMTP id s23so9049312pfh.7;
+        Tue, 09 Jun 2020 10:29:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0OeLiDypwAI4S3gVXdOOM121C3htVuuP9lkSYSY9yfg=;
+        b=RlEHJkeRXtywvGPDC2901D5+20ddROqtNsY1+h6j4oCsAD8B2yZ8ZMLxEk1LJ+ejDr
+         XQTtNkyV616jPCRlFAJlZAMQvbYXr0VV8SmAee12gNYtv+u/ALuo2rU9HxYZF1WYaITe
+         A0xVukhidYppLX+3scVcgxo2fhPm6v2XvhZsTYoWPu6IYNJA9BwOkB7cHRmxgR2a4Mt1
+         HbGeGw+BnBj6Y2ju5/L8pZdtMzivjVyIozFOlo0jyO/iXq/baLZVK/PxwBjW9ygtCuWp
+         GKMPJ/BaBZWjpHR5TLEa9sJyx9aCKO6P9RwsXF9vlr9ZpDipxqYwo4ZrmiXZCf2lz/o4
+         6SZA==
+X-Gm-Message-State: AOAM532N54heaMk5CedKpQQGJh/MO/nKGHq5b100oVHyIPsirBRpi04s
+        qERC61kANPDlmRe/8iqNYNA=
+X-Google-Smtp-Source: ABdhPJw7qyoggD4kTRMCmpjIgC5B/C5Ow+WGPUmYCS78BMRrwophWg5IQ1YAU2QskReoNULrHSPqYA==
+X-Received: by 2002:a63:f502:: with SMTP id w2mr25064936pgh.321.1591723764725;
+        Tue, 09 Jun 2020 10:29:24 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id n1sm10777379pfd.156.2020.06.09.10.29.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2020 10:29:23 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 7D342403AB; Tue,  9 Jun 2020 17:29:22 +0000 (UTC)
+Date:   Tue, 9 Jun 2020 17:29:22 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
+Message-ID: <20200609172922.GP11244@42.do-not-panic.com>
+References: <20200608170127.20419-1-mcgrof@kernel.org>
+ <20200608170127.20419-7-mcgrof@kernel.org>
+ <20200609150602.GA7111@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87zh9cftj0.fsf@mpe.ellerman.id.au>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200609150602.GA7111@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Can you try this patch?
+I like this, more below.
 
----
-From 1c9913360a0494375c5655b133899cb4323bceb4 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Tue, 9 Jun 2020 14:07:31 +0200
-Subject: scsi: wire up ata_scsi_dma_need_drain for SAS HBA drivers
+On Tue, Jun 09, 2020 at 08:06:02AM -0700, Christoph Hellwig wrote:
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 432fa60e7f8808..44239f603379d5 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -492,34 +493,23 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+>  	 */
+>  	strreplace(buts->name, '/', '_');
+>  
+> -	/*
+> -	 * We have to use a partition directory if a partition is being worked
+> -	 * on. The same request_queue is shared between all partitions.
+> -	 */
+> -	if (bdev && bdev != bdev->bd_contains) {
+> -		dir = bdev->bd_part->debugfs_dir;
+> -	} else if (IS_ENABLED(CONFIG_CHR_DEV_SG) &&
+> -		   MAJOR(dev) == SCSI_GENERIC_MAJOR) {
+> +	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
+> +	if (!bt)
+> +		return -ENOMEM;
+> +
+> +	if (unlikely(!bdev)) {
+>  		/*
+> -		 * scsi-generic exposes the request_queue through the /dev/sg*
+> -		 * interface but since that uses a different path than whatever
+> -		 * the respective scsi driver device name may expose and use
+> -		 * for the request_queue debugfs_dir. We have a dedicated
+> -		 * dentry for scsi-generic then.
+> +		 * When tracing something that is not a block device (e.g. the
+> +		 * /dev/sg nodes), create debugfs directory on demand.  This
+> +		 * directory will be remove when stopping the trace.
 
-We need ata_scsi_dma_need_drain for all drivers wired up to drive ATAPI
-devices through libata.  That also includes the SAS HBA drivers in
-addition to native libata HBA drivers.
+Is scsi-generic is the only unwanted ugly child blktrace has to deal
+with? For some reason I thought drivers/md/md.c was one but it seems
+like it is not. Do we have an easy way to search for these? I think
+this would just affect how we express the comment only.
 
-Fixes: cc97923a5bcc ("block: move dma drain handling to scsi")
-Reported-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/aic94xx/aic94xx_init.c    | 1 +
- drivers/scsi/hisi_sas/hisi_sas_v1_hw.c | 1 +
- drivers/scsi/hisi_sas/hisi_sas_v2_hw.c | 1 +
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 1 +
- drivers/scsi/ipr.c                     | 1 +
- drivers/scsi/isci/init.c               | 1 +
- drivers/scsi/mvsas/mv_init.c           | 1 +
- drivers/scsi/pm8001/pm8001_init.c      | 1 +
- 8 files changed, 8 insertions(+)
+>  		 */
+> -		dir = q->sg_debugfs_dir;
+> +		dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+> +		bt->dir = dir;
 
-diff --git a/drivers/scsi/aic94xx/aic94xx_init.c b/drivers/scsi/aic94xx/aic94xx_init.c
-index d022407e5645c7..bef47f38dd0dbc 100644
---- a/drivers/scsi/aic94xx/aic94xx_init.c
-+++ b/drivers/scsi/aic94xx/aic94xx_init.c
-@@ -40,6 +40,7 @@ static struct scsi_host_template aic94xx_sht = {
- 	/* .name is initialized */
- 	.name			= "aic94xx",
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= sas_slave_configure,
- 	.scan_finished		= asd_scan_finished,
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
-index 2e1718f9ade218..09a7669dad4c67 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
-@@ -1756,6 +1756,7 @@ static struct scsi_host_template sht_v1_hw = {
- 	.proc_name		= DRV_NAME,
- 	.module			= THIS_MODULE,
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= hisi_sas_slave_configure,
- 	.scan_finished		= hisi_sas_scan_finished,
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-index e7e7849a4c14e2..968d3870235359 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-@@ -3532,6 +3532,7 @@ static struct scsi_host_template sht_v2_hw = {
- 	.proc_name		= DRV_NAME,
- 	.module			= THIS_MODULE,
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= hisi_sas_slave_configure,
- 	.scan_finished		= hisi_sas_scan_finished,
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-index 3e6b78a1f993b9..55e2321a65bc5f 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-@@ -3075,6 +3075,7 @@ static struct scsi_host_template sht_v3_hw = {
- 	.proc_name		= DRV_NAME,
- 	.module			= THIS_MODULE,
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= hisi_sas_slave_configure,
- 	.scan_finished		= hisi_sas_scan_finished,
-diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
-index 7d77997d26d457..7d86f4ca266c86 100644
---- a/drivers/scsi/ipr.c
-+++ b/drivers/scsi/ipr.c
-@@ -6731,6 +6731,7 @@ static struct scsi_host_template driver_template = {
- 	.compat_ioctl = ipr_ioctl,
- #endif
- 	.queuecommand = ipr_queuecommand,
-+	.dma_need_drain = ata_scsi_dma_need_drain,
- 	.eh_abort_handler = ipr_eh_abort,
- 	.eh_device_reset_handler = ipr_eh_dev_reset,
- 	.eh_host_reset_handler = ipr_eh_host_reset,
-diff --git a/drivers/scsi/isci/init.c b/drivers/scsi/isci/init.c
-index 974c3b9116d5ba..085e285f427d93 100644
---- a/drivers/scsi/isci/init.c
-+++ b/drivers/scsi/isci/init.c
-@@ -153,6 +153,7 @@ static struct scsi_host_template isci_sht = {
- 	.name				= DRV_NAME,
- 	.proc_name			= DRV_NAME,
- 	.queuecommand			= sas_queuecommand,
-+	.dma_need_drain			= ata_scsi_dma_need_drain,
- 	.target_alloc			= sas_target_alloc,
- 	.slave_configure		= sas_slave_configure,
- 	.scan_finished			= isci_host_scan_finished,
-diff --git a/drivers/scsi/mvsas/mv_init.c b/drivers/scsi/mvsas/mv_init.c
-index 5973eed9493820..b0de3bdb01db06 100644
---- a/drivers/scsi/mvsas/mv_init.c
-+++ b/drivers/scsi/mvsas/mv_init.c
-@@ -33,6 +33,7 @@ static struct scsi_host_template mvs_sht = {
- 	.module			= THIS_MODULE,
- 	.name			= DRV_NAME,
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= sas_slave_configure,
- 	.scan_finished		= mvs_scan_finished,
-diff --git a/drivers/scsi/pm8001/pm8001_init.c b/drivers/scsi/pm8001/pm8001_init.c
-index a8f5344fdfda2a..9e99262a2b9dd3 100644
---- a/drivers/scsi/pm8001/pm8001_init.c
-+++ b/drivers/scsi/pm8001/pm8001_init.c
-@@ -87,6 +87,7 @@ static struct scsi_host_template pm8001_sht = {
- 	.module			= THIS_MODULE,
- 	.name			= DRV_NAME,
- 	.queuecommand		= sas_queuecommand,
-+	.dma_need_drain		= ata_scsi_dma_need_drain,
- 	.target_alloc		= sas_target_alloc,
- 	.slave_configure	= sas_slave_configure,
- 	.scan_finished		= pm8001_scan_finished,
--- 
-2.26.2
+The other chicken and egg problem to consider at least in the comments
+is that the debugfs directory for these types of devices *have* an
+exposed path, but the data structure is rather opaque to the device and
+even blktrace.  Fortunately given the recent set of changes around the
+q->blk_trace and clarifications around its use we have made it clear now
+that so long as hold the q->blk_trace_mutex *and* check q->blk_trace we
+*should* not race against two separate creations of debugfs directories,
+so I think this is safe, so long as these indpendent drivers don't end
+up re-using the same path for some other things later in the future, and
+since we have control over what goes under debugfsroot block / I think
+we should be good.
 
+But I think that the concern for race on names may still be worth
+explaining a bit here.
+
+  Luis
