@@ -2,259 +2,169 @@ Return-Path: <SRS0=iQ6z=7W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C715C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA6CC433DF
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:42:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1EE62078D
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:06:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k61HwdJG"
+	by mail.kernel.org (Postfix) with ESMTP id D67302074B
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 15:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbgFIPGq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jun 2020 11:06:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726903AbgFIPGp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jun 2020 11:06:45 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6025AC05BD1E;
-        Tue,  9 Jun 2020 08:06:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Sijyqf5Wrq6MRvgpiyONAL7g60SU+r119SO1Vhd8DOA=; b=k61HwdJGwgp0qZ1U+fWmP3TZH8
-        88wpoQek7G6c0RFX/ViENSEgNErMlPXnzvJQuJEf4mPRaJPFurIiDpCZ0TRY652BM+trKa81+5Wzf
-        9KXNCXzlcoVrAM5FyfSif0Q4B/Z7DoWkBIH2Tf2JhE5xOSGmCzRbL/1V884rzU8EA8diBZmxNizPb
-        SzI8RGY+5y3XVuhU1lBHMfON2mqLAukH9Ow0gTS/2SHcoGYKAuyJO2bdUKEHaUl0RX8rlgd2ZyTvd
-        9BAU3WnA7f89ELuunHS3B7tJRSqf9xjnewKhkDXUV9I00+dFZvfb2+EyFV2dULF7wQJw/tfobddZM
-        W/1g4QPg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jifpC-0005Qr-93; Tue, 09 Jun 2020 15:06:02 +0000
-Date:   Tue, 9 Jun 2020 08:06:02 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        martin.petersen@oracle.com, jejb@linux.ibm.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
-Message-ID: <20200609150602.GA7111@infradead.org>
-References: <20200608170127.20419-1-mcgrof@kernel.org>
- <20200608170127.20419-7-mcgrof@kernel.org>
+        id S1730903AbgFIPmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jun 2020 11:42:35 -0400
+Received: from verein.lst.de ([213.95.11.211]:43050 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730902AbgFIPmd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Jun 2020 11:42:33 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id EAA0968B02; Tue,  9 Jun 2020 17:42:30 +0200 (CEST)
+Date:   Tue, 9 Jun 2020 17:42:30 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     brking@us.ibm.com, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org
+Subject: Re: ipr crashes due to NULL dma_need_drain since cc97923a5bcc
+ ("block: move dma drain handling to scsi")
+Message-ID: <20200609154230.GA18426@lst.de>
+References: <87zh9cftj0.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200608170127.20419-7-mcgrof@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <87zh9cftj0.fsf@mpe.ellerman.id.au>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All the complicated code to deal with delayed creation of the debugfs
-directory was only needed for sg.  With sg handled speparately that
-can go away.  Also I think the sg handling can be cleaned up by:
+Can you try this patch?
 
- a) checking for a NULL block_devic instead of the major, especially as
-    majors can be used independently for character and block devices
- b) just keeping the old method of creating the entry on demand for the
-    sg devices, as no one shares the debugfs directory in that case.
+---
+From 1c9913360a0494375c5655b133899cb4323bceb4 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Tue, 9 Jun 2020 14:07:31 +0200
+Subject: scsi: wire up ata_scsi_dma_need_drain for SAS HBA drivers
 
-Untested patch on top of your series below:
+We need ata_scsi_dma_need_drain for all drivers wired up to drive ATAPI
+devices through libata.  That also includes the SAS HBA drivers in
+addition to native libata HBA drivers.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 70168435f07983..4e9909e1b25736 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -920,8 +920,6 @@ static void blk_release_queue(struct kobject *kobj)
- 	blk_trace_shutdown(q);
- 
- 	debugfs_remove_recursive(q->debugfs_dir);
--	if (IS_ENABLED(CONFIG_CHR_DEV_SG))
--		debugfs_remove_recursive(q->sg_debugfs_dir);
- 	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
- 
-@@ -941,20 +939,6 @@ struct kobj_type blk_queue_ktype = {
- 	.release	= blk_release_queue,
- };
- 
--/**
-- * blk_sg_debugfs_init - initialize debugfs for scsi-generic
-- * @q: the associated queue
-- * @name: name of the scsi-generic device
-- *
-- * To be used by scsi-generic for allowing it to use blktrace.
-- */
--void blk_sg_debugfs_init(struct request_queue *q, const char *name)
--{
--	if (IS_ENABLED(CONFIG_CHR_DEV_SG))
--		q->sg_debugfs_dir = debugfs_create_dir(name, blk_debugfs_root);
--}
--EXPORT_SYMBOL_GPL(blk_sg_debugfs_init);
--
- /**
-  * blk_register_queue - register a block layer queue with sysfs
-  * @disk: Disk of which the request queue should be registered with sysfs.
-@@ -1007,27 +991,8 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
- 	}
- 
--	/*
--	 * Blktrace needs a debugfs name even for queues that don't register
--	 * a gendisk, so it lazily registers the debugfs directory.  But that
--	 * can get us into a situation where a SCSI device is found, with no
--	 * driver for it (yet).  Then blktrace is used on the device, creating
--	 * the debugfs directory, and only after that a driver is loaded. In
--	 * that case we might already have a debugfs directory registered here.
--	 * Even worse we could be racing with blktrace to register it.
--	 */
--#ifdef CONFIG_BLK_DEV_IO_TRACE
--	mutex_lock(&q->blk_trace_mutex);
--	if (!q->debugfs_dir) {
--		q->debugfs_dir =
--			debugfs_create_dir(kobject_name(q->kobj.parent),
--				blk_debugfs_root);
--	}
--	mutex_unlock(&q->blk_trace_mutex);
--#else
- 	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
- 					    blk_debugfs_root);
--#endif
- 
- 	if (queue_is_mq(q)) {
- 		__blk_mq_register_dev(dev, q);
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 5f6ccf4ba4d907..20472aaaf630a4 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1117,9 +1117,6 @@ sg_ioctl_common(struct file *filp, Sg_device *sdp, Sg_fd *sfp,
- 		return put_user(max_sectors_bytes(sdp->device->request_queue),
- 				ip);
- 	case BLKTRACESETUP:
--		if (!sdp->device->request_queue->sg_debugfs_dir)
--			blk_sg_debugfs_init(sdp->device->request_queue,
--					    sdp->disk->disk_name);
- 		return blk_trace_setup(sdp->device->request_queue,
- 				       sdp->disk->disk_name,
- 				       MKDEV(SCSI_GENERIC_MAJOR, sdp->index),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 05a929329157fa..b49c7c741bc9f3 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -575,7 +575,6 @@ struct request_queue {
- 	struct bio_set		bio_split;
- 
- 	struct dentry		*debugfs_dir;
--	struct dentry		*sg_debugfs_dir;
- #ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*sched_debugfs_dir;
- 	struct dentry		*rqos_debugfs_dir;
-@@ -859,7 +858,6 @@ static inline void rq_flush_dcache_pages(struct request *rq)
- 
- extern int blk_register_queue(struct gendisk *disk);
- extern void blk_unregister_queue(struct gendisk *disk);
--extern void blk_sg_debugfs_init(struct request_queue *q, const char *name);
- extern blk_qc_t generic_make_request(struct bio *bio);
- extern blk_qc_t direct_make_request(struct bio *bio);
- extern void blk_rq_init(struct request_queue *q, struct request *rq);
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index eb6db276e29310..3b6ff5902edce6 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -22,6 +22,7 @@ struct blk_trace {
- 	u64 end_lba;
- 	u32 pid;
- 	u32 dev;
-+	struct dentry *dir;
- 	struct dentry *dropped_file;
- 	struct dentry *msg_file;
- 	struct list_head running_list;
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 432fa60e7f8808..44239f603379d5 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -311,6 +311,7 @@ static void blk_trace_free(struct blk_trace *bt)
- 	debugfs_remove(bt->msg_file);
- 	debugfs_remove(bt->dropped_file);
- 	relay_close(bt->rchan);
-+	debugfs_remove(bt->dir);
- 	free_percpu(bt->sequence);
- 	free_percpu(bt->msg_data);
- 	kfree(bt);
-@@ -492,34 +493,23 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	 */
- 	strreplace(buts->name, '/', '_');
- 
--	/*
--	 * We have to use a partition directory if a partition is being worked
--	 * on. The same request_queue is shared between all partitions.
--	 */
--	if (bdev && bdev != bdev->bd_contains) {
--		dir = bdev->bd_part->debugfs_dir;
--	} else if (IS_ENABLED(CONFIG_CHR_DEV_SG) &&
--		   MAJOR(dev) == SCSI_GENERIC_MAJOR) {
-+	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
-+	if (!bt)
-+		return -ENOMEM;
-+
-+	if (unlikely(!bdev)) {
- 		/*
--		 * scsi-generic exposes the request_queue through the /dev/sg*
--		 * interface but since that uses a different path than whatever
--		 * the respective scsi driver device name may expose and use
--		 * for the request_queue debugfs_dir. We have a dedicated
--		 * dentry for scsi-generic then.
-+		 * When tracing something that is not a block device (e.g. the
-+		 * /dev/sg nodes), create debugfs directory on demand.  This
-+		 * directory will be remove when stopping the trace.
- 		 */
--		dir = q->sg_debugfs_dir;
-+		dir = debugfs_create_dir(buts->name, blk_debugfs_root);
-+		bt->dir = dir;
- 	} else {
--		/*
--		 * Drivers which do not use the *add_disk*() interfaces will
--		 * not have their debugfs_dir created for them automatically,
--		 * so we must create it for them.
--		 */
--		if (!q->debugfs_dir) {
--			q->debugfs_dir =
--				debugfs_create_dir(buts->name,
--						   blk_debugfs_root);
--		}
--		dir = q->debugfs_dir;
-+		if (bdev != bdev->bd_contains)
-+			dir = bdev->bd_part->debugfs_dir;
-+		else
-+			dir = q->debugfs_dir;
- 	}
- 
- 	/*
-@@ -530,12 +520,10 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (IS_ERR_OR_NULL(dir)) {
- 		pr_warn("debugfs_dir not present for %s so skipping\n",
- 			buts->name);
--		return -ENOENT;
-+		ret = -ENOENT;
-+		goto err;
- 	}
- 
--	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
--	if (!bt)
--		return -ENOMEM;
- 
- 	ret = -ENOMEM;
- 	bt->sequence = alloc_percpu(unsigned long);
+Fixes: cc97923a5bcc ("block: move dma drain handling to scsi")
+Reported-by: Michael Ellerman <mpe@ellerman.id.au>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/aic94xx/aic94xx_init.c    | 1 +
+ drivers/scsi/hisi_sas/hisi_sas_v1_hw.c | 1 +
+ drivers/scsi/hisi_sas/hisi_sas_v2_hw.c | 1 +
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 1 +
+ drivers/scsi/ipr.c                     | 1 +
+ drivers/scsi/isci/init.c               | 1 +
+ drivers/scsi/mvsas/mv_init.c           | 1 +
+ drivers/scsi/pm8001/pm8001_init.c      | 1 +
+ 8 files changed, 8 insertions(+)
+
+diff --git a/drivers/scsi/aic94xx/aic94xx_init.c b/drivers/scsi/aic94xx/aic94xx_init.c
+index d022407e5645c7..bef47f38dd0dbc 100644
+--- a/drivers/scsi/aic94xx/aic94xx_init.c
++++ b/drivers/scsi/aic94xx/aic94xx_init.c
+@@ -40,6 +40,7 @@ static struct scsi_host_template aic94xx_sht = {
+ 	/* .name is initialized */
+ 	.name			= "aic94xx",
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= sas_slave_configure,
+ 	.scan_finished		= asd_scan_finished,
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
+index 2e1718f9ade218..09a7669dad4c67 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v1_hw.c
+@@ -1756,6 +1756,7 @@ static struct scsi_host_template sht_v1_hw = {
+ 	.proc_name		= DRV_NAME,
+ 	.module			= THIS_MODULE,
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= hisi_sas_slave_configure,
+ 	.scan_finished		= hisi_sas_scan_finished,
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
+index e7e7849a4c14e2..968d3870235359 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
+@@ -3532,6 +3532,7 @@ static struct scsi_host_template sht_v2_hw = {
+ 	.proc_name		= DRV_NAME,
+ 	.module			= THIS_MODULE,
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= hisi_sas_slave_configure,
+ 	.scan_finished		= hisi_sas_scan_finished,
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+index 3e6b78a1f993b9..55e2321a65bc5f 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+@@ -3075,6 +3075,7 @@ static struct scsi_host_template sht_v3_hw = {
+ 	.proc_name		= DRV_NAME,
+ 	.module			= THIS_MODULE,
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= hisi_sas_slave_configure,
+ 	.scan_finished		= hisi_sas_scan_finished,
+diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
+index 7d77997d26d457..7d86f4ca266c86 100644
+--- a/drivers/scsi/ipr.c
++++ b/drivers/scsi/ipr.c
+@@ -6731,6 +6731,7 @@ static struct scsi_host_template driver_template = {
+ 	.compat_ioctl = ipr_ioctl,
+ #endif
+ 	.queuecommand = ipr_queuecommand,
++	.dma_need_drain = ata_scsi_dma_need_drain,
+ 	.eh_abort_handler = ipr_eh_abort,
+ 	.eh_device_reset_handler = ipr_eh_dev_reset,
+ 	.eh_host_reset_handler = ipr_eh_host_reset,
+diff --git a/drivers/scsi/isci/init.c b/drivers/scsi/isci/init.c
+index 974c3b9116d5ba..085e285f427d93 100644
+--- a/drivers/scsi/isci/init.c
++++ b/drivers/scsi/isci/init.c
+@@ -153,6 +153,7 @@ static struct scsi_host_template isci_sht = {
+ 	.name				= DRV_NAME,
+ 	.proc_name			= DRV_NAME,
+ 	.queuecommand			= sas_queuecommand,
++	.dma_need_drain			= ata_scsi_dma_need_drain,
+ 	.target_alloc			= sas_target_alloc,
+ 	.slave_configure		= sas_slave_configure,
+ 	.scan_finished			= isci_host_scan_finished,
+diff --git a/drivers/scsi/mvsas/mv_init.c b/drivers/scsi/mvsas/mv_init.c
+index 5973eed9493820..b0de3bdb01db06 100644
+--- a/drivers/scsi/mvsas/mv_init.c
++++ b/drivers/scsi/mvsas/mv_init.c
+@@ -33,6 +33,7 @@ static struct scsi_host_template mvs_sht = {
+ 	.module			= THIS_MODULE,
+ 	.name			= DRV_NAME,
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= sas_slave_configure,
+ 	.scan_finished		= mvs_scan_finished,
+diff --git a/drivers/scsi/pm8001/pm8001_init.c b/drivers/scsi/pm8001/pm8001_init.c
+index a8f5344fdfda2a..9e99262a2b9dd3 100644
+--- a/drivers/scsi/pm8001/pm8001_init.c
++++ b/drivers/scsi/pm8001/pm8001_init.c
+@@ -87,6 +87,7 @@ static struct scsi_host_template pm8001_sht = {
+ 	.module			= THIS_MODULE,
+ 	.name			= DRV_NAME,
+ 	.queuecommand		= sas_queuecommand,
++	.dma_need_drain		= ata_scsi_dma_need_drain,
+ 	.target_alloc		= sas_target_alloc,
+ 	.slave_configure	= sas_slave_configure,
+ 	.scan_finished		= pm8001_scan_finished,
+-- 
+2.26.2
+
