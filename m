@@ -2,120 +2,70 @@ Return-Path: <SRS0=iQ6z=7W=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1A7C433DF
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 14:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0434FC433E0
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 14:19:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21C32204EA
-	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 14:08:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAEAE206D5
+	for <linux-block@archiver.kernel.org>; Tue,  9 Jun 2020 14:19:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HBEISCPL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728338AbgFIOIt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Jun 2020 10:08:49 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35635 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726967AbgFIOIs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jun 2020 10:08:48 -0400
-Received: by mail-pg1-f193.google.com with SMTP id o6so10374547pgh.2
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2020 07:08:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=CYZb8EUD2/J3ksaUTyzpHJ40LqChFke5e9mW0jUuoJg=;
-        b=NcX4En3a+E8rsduAT0t4qUYw+zRqR8D5zSTADCyUK3OGbri2PlEVHFU9r2UZUGVpGT
-         v2XPrGLulJaqj+Gy2XnNgAFf/+H0gvbKaP8Y74WbOsWM2r5gNFy1TNoB9Xxwq6fYYebq
-         ax0uMrE66emwBP2i0y7C3MblRxVUvPxXVTo7pK2rUuX0j7gsE8jVYyH1jFYWZiOZBl1E
-         fi/JES3Ll3K9S9kstXljQdUrCQO2e7svz91INmlCj9EEiAcSU54CgiN/wr9n6pFG7BqW
-         t5h7XRjOIwDfEoKE27RRxTHzbS59LSkDVuPFGG4gR3rt9k7PCTHi2a/OnSoDa3kIyon9
-         jn4Q==
-X-Gm-Message-State: AOAM532NvoVDnP4FuH2HM3lZyfBu9rcVKFdbEzqBGrCEv2qOQQSvMWoM
-        B8MoWAuibTXuOddw0eqtfI8EEg0s
-X-Google-Smtp-Source: ABdhPJz83q4b9NE8wLAq3Biev8gEjnCu8w3m3TLwsLLweRCAH9BcARtnfXOy7MbvMPgjmZvp5AFRdA==
-X-Received: by 2002:a63:214e:: with SMTP id s14mr12426326pgm.20.1591711727415;
-        Tue, 09 Jun 2020 07:08:47 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id o13sm8945149pgs.82.2020.06.09.07.08.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2020 07:08:46 -0700 (PDT)
-Subject: Re: [PATCH blktests] Restore support for running tests without prior
- test results
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org
-References: <20200520165241.24798-1-bvanassche@acm.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <8d53b2a8-c9bf-959c-52a0-bcc649151c6f@acm.org>
-Date:   Tue, 9 Jun 2020 07:08:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1730125AbgFIOTE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Jun 2020 10:19:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726967AbgFIOTD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jun 2020 10:19:03 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0585C05BD1E;
+        Tue,  9 Jun 2020 07:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=FBLwkRXMTc6vHgytia3rUnElGSA+xmDAjdkBwfrqI+A=; b=HBEISCPLcFCYG6+JfomMD4NZnr
+        2ADrh+/oQuHTMV84JQmnVfvOF6Qw1uEqloRvzK23R40M6iC23fXJl5kOvmMG+tkcFWvJY7ZmV75i5
+        qiYbDa9XfCQEYT5lUdd9jnTqw3xP6Rcf71cGAVKgPh2vaFOknBltrXWwSPPKUzBJPKRRWLydhK4wz
+        YsAuuIpq5hZDPlH5gtCAngRfNFjiThqfURj1e1vy1QkfCavzMzy8H8KdfNT90Di24vSNqd6RueyHE
+        gCmAyS/Ya914HqFqNqcry5CWweb9IMZQCtC5BrR8y2uXg7SD9MZxXr5SOaef/wKShT8ZRs364tKQj
+        a0rLVNSw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jif5E-0004vp-5D; Tue, 09 Jun 2020 14:18:32 +0000
+Date:   Tue, 9 Jun 2020 07:18:32 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        martin.petersen@oracle.com, jejb@linux.ibm.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 4/6] blktrace: annotate required lock on
+ do_blk_trace_setup()
+Message-ID: <20200609141832.GA14176@infradead.org>
+References: <20200608170127.20419-1-mcgrof@kernel.org>
+ <20200608170127.20419-5-mcgrof@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200520165241.24798-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200608170127.20419-5-mcgrof@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-05-20 09:52, Bart Van Assche wrote:
-> This patch fixes the following runtime error:
+On Mon, Jun 08, 2020 at 05:01:24PM +0000, Luis Chamberlain wrote:
+> Ensure it is clear which lock is required on do_blk_trace_setup().
 > 
-> ./check: line 245: LAST_TEST_RUN: unbound variable
-> 
-> Fixes: 203b5723a28e ("Show last run for skipped tests")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  check | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/check b/check
-> index 0a4e539a5cd9..5151d01995ac 100755
-> --- a/check
-> +++ b/check
-> @@ -240,9 +240,15 @@ _output_last_test_run() {
->  }
->  
->  _output_test_run() {
-> +	local param_count
->  	if [[ -t 1 ]]; then
->  		# Move the cursor back up to the status.
-> -		tput cuu $((${#LAST_TEST_RUN[@]} + 1))
-> +		if [ -n "${LAST_TEST_RUN+set}" ]; then
-> +			param_count=${#LAST_TEST_RUN[@]}
-> +		else
-> +			param_count=0
-> +		fi
-> +		tput cuu $((param_count + 1))
->  	fi
->  
->  	local status=${TEST_RUN["status"]}
-> 
+> Suggested-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 
-Omar, ping?
+Looks good,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
