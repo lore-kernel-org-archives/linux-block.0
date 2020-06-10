@@ -2,202 +2,121 @@ Return-Path: <SRS0=qLys=7X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627A1C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 06:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64971C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 07:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3582F207ED
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 06:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D8AD207ED
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 07:26:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tL4wIK6N"
+	dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b="lafpKDCM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbgFJGnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 02:43:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
+        id S1726462AbgFJH0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 03:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbgFJGnQ (ORCPT
+        with ESMTP id S1726473AbgFJH0p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 02:43:16 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39E4C03E96B;
-        Tue,  9 Jun 2020 23:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=O6XB3y7iP5PElbqh7ZAm6TiDYuBfIirIuSUwEnknJtQ=; b=tL4wIK6N92i3MrpckN6LKQJmtz
-        HdOLmmacDx4TQJx7NZ1wtwJmRMbrEvWM/7DgvnDBHitLelejf0E/4FoxicSG3aCXwjNbwGyIG3JJb
-        YEneEhXFkPw812wSmWIOpgq5Js7sm1i0ycjVzAjjbnFm/jMROmTVezHTNeufrtAisMQBOnRkCsqiL
-        nqEwd0Jk5eoIMSzYNbtf8bekmCAnAnNWWFh8QMtdktZZpLiT6M7O+DuHFSk6e3oveqYQiG1fu/vj/
-        mK72cRmhmqmoNcVsZM5uw3fbT2zET0MwA4197fkVb1lKzjYm+W5IldS6izcMgX63ykGOhyMFYdj+e
-        dai4OkOw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jiuRW-0001at-Eh; Wed, 10 Jun 2020 06:42:34 +0000
-Date:   Tue, 9 Jun 2020 23:42:34 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
-        mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
-Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
-Message-ID: <20200610064234.GB24975@infradead.org>
-References: <20200608170127.20419-1-mcgrof@kernel.org>
- <20200608170127.20419-7-mcgrof@kernel.org>
- <20200609150602.GA7111@infradead.org>
- <20200609172922.GP11244@42.do-not-panic.com>
- <20200609173218.GA7968@infradead.org>
- <20200609175359.GR11244@42.do-not-panic.com>
+        Wed, 10 Jun 2020 03:26:45 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F30C03E96F
+        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2020 00:26:44 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id v13so957102otp.4
+        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2020 00:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netflix.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=icQyLe1x0JtVbH2h0JIR6glxOffDGiETwl2nJBOJkMA=;
+        b=lafpKDCMm3DeuM+OTgu5T8Qf2tkuZ7c6gSdQPGBucRUhmFKAPhdSvHixRj+8KjzjVh
+         2MCDGdz9s2gyNzI/i/dH4crrvq3m86yN6v0HoLO7vO2uFk3xiBAsafLpjo39IJkocDNn
+         OXke9WuiSjA6rE4wgV+JvZudHH+syCPya85k8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=icQyLe1x0JtVbH2h0JIR6glxOffDGiETwl2nJBOJkMA=;
+        b=iV83VhLwnFbKzD2EnXYJ7oVmqg6CDIquKskOksfK4vF8ojVBKJAiiXD/Ab91Q5jkVy
+         N3kghbqImUlaHb+WeY/fx/3kgtZTbHd7YEgUydG7Ls3L2GYOopESCG2oXPJ3whrjLsO/
+         z8jz/AdmDaA7CUXnTqDp+MDamC7zd8PEvbePwqpQiPuUZcseIn+acZ084tHtpVGoI8f0
+         e5Act2SjbWR/Lc2KAzerAk4fYeLppB7xanOb3e0Kja/ojhbNwoIb5p6xV0BkNTZHltO+
+         CFut0FaoQl6fsUsUU4PdVnrlQZSHLvpwdk5OkBxs9H4rRLYW7Uo5RcfCh9MhGXpY1ZPY
+         GJnA==
+X-Gm-Message-State: AOAM530Vm9ZE9zeMOWYzx3lkScNLsajwWnh8i6bZ4oqcMX9uzWSXGQuN
+        kDdun+jiydynGeZN4hnzkh2lhQ==
+X-Google-Smtp-Source: ABdhPJxsXjBzzM+sQpS1NYnAHvWZyutMSD6PvDWTeaoQuEw0H6Rq4sAmQXqP4w1JR1byoQ8VGS2dFA==
+X-Received: by 2002:a9d:6546:: with SMTP id q6mr1528551otl.365.1591774002683;
+        Wed, 10 Jun 2020 00:26:42 -0700 (PDT)
+Received: from ?IPv6:2600:1700:3ec3:2450:25ca:3996:acb2:84a6? ([2600:1700:3ec3:2450:25ca:3996:acb2:84a6])
+        by smtp.gmail.com with ESMTPSA id 13sm3732094ois.44.2020.06.10.00.26.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2020 00:26:41 -0700 (PDT)
+Subject: Re: [RFC 1/2] Eliminate over- and under-counting of io_ticks
+To:     Hou Tao <houtao1@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Josh Snyder <josh@code406.com>, Ming Lei <ming.lei@redhat.com>
+References: <20200609040724.448519-1-joshs@netflix.com>
+ <20200609040724.448519-2-joshs@netflix.com>
+ <0b7e623e-2146-5e44-f486-ba9e1657f2a3@huawei.com>
+From:   Josh Snyder <joshs@netflix.com>
+Message-ID: <a026a60f-e319-de35-8274-fb14ada29eff@netflix.com>
+Date:   Wed, 10 Jun 2020 00:26:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200609175359.GR11244@42.do-not-panic.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <0b7e623e-2146-5e44-f486-ba9e1657f2a3@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 09, 2020 at 05:53:59PM +0000, Luis Chamberlain wrote:
-> > Feel free to add more comments, but please try to keep them short
-> > and crisp.  At the some point long comments really distract from what
-> > is going on.
-> 
-> Sure.
-> 
-> Come to think of it, given the above, I think we can also do way with
-> the the partition stuff too, and rely on the buts->name too. I'll try
-> this out, and test it.
+Hello!
 
-Yes, the sg path should work for partitions as well.  That should not
-only simplify the code, but also the comments, we can do something like
-the full patch below (incorporating your original one).  This doesn't
-include the error check on the creation - I think that check probably
-is a good idea for this case based on the comments in the old patch, but
-also a separate issue that should go into another patch on top.
+On 6/9/20 6:41 PM, Hou Tao wrote:
+> Hi,
+> 
+> For the following case, the under-counting is still possible if io2 wins cmpxchg():
+> 
+>   t          0123456
+>   io1        |-----|
+>   io2           |--|
+>   stamp      0     6
+>   io_ticks   0     3
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 15df3a36e9fa43..a2800bc56fb4d3 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -824,9 +824,6 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
--					    blk_debugfs_root);
--
- 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
- 
- 	/*
-@@ -857,9 +854,7 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 
- void blk_mq_debugfs_unregister(struct request_queue *q)
- {
--	debugfs_remove_recursive(q->debugfs_dir);
- 	q->sched_debugfs_dir = NULL;
--	q->debugfs_dir = NULL;
- }
- 
- static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 561624d4cc4e7f..4e9909e1b25736 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -11,6 +11,7 @@
- #include <linux/blktrace_api.h>
- #include <linux/blk-mq.h>
- #include <linux/blk-cgroup.h>
-+#include <linux/debugfs.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-@@ -918,6 +919,7 @@ static void blk_release_queue(struct kobject *kobj)
- 
- 	blk_trace_shutdown(q);
- 
-+	debugfs_remove_recursive(q->debugfs_dir);
- 	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
- 
-@@ -989,6 +991,9 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
- 	}
- 
-+	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-+					    blk_debugfs_root);
-+
- 	if (queue_is_mq(q)) {
- 		__blk_mq_register_dev(dev, q);
- 		blk_mq_debugfs_register(q);
-diff --git a/block/blk.h b/block/blk.h
-index b5d1f0fc6547c7..499308c6ab3b0f 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -14,9 +14,7 @@
- /* Max future timer expiry for timeouts */
- #define BLK_MAX_TIMEOUT		(5 * HZ)
- 
--#ifdef CONFIG_DEBUG_FS
- extern struct dentry *blk_debugfs_root;
--#endif
- 
- struct blk_flush_queue {
- 	unsigned int		flush_pending_idx:1;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index fc88330a3d97ed..b49c7c741bc9f3 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -574,8 +574,8 @@ struct request_queue {
- 	struct list_head	tag_set_list;
- 	struct bio_set		bio_split;
- 
--#ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*debugfs_dir;
-+#ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*sched_debugfs_dir;
- 	struct dentry		*rqos_debugfs_dir;
- #endif
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index fee5c8d8916690..6eb364b393714f 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -509,10 +509,15 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (!bt->msg_data)
- 		goto err;
- 
--	ret = -ENOENT;
--
--	dir = debugfs_lookup(buts->name, blk_debugfs_root);
--	if (!dir)
-+	/*
-+	 * When tracing a whole block device, reuse the existing debugfs
-+	 * directory created by the block layer.  For partitions or character
-+	 * devices (e.g. /dev/sg), create a new debugfs directory that will be
-+	 * removed once the trace ends.
-+	 */
-+	if (bdev && bdev == bdev->bd_contains)
-+		dir = q->debugfs_dir;
-+	else
- 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
- 
- 	bt->dev = dev;
-@@ -553,8 +558,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 
- 	ret = 0;
- err:
--	if (dir && !bt->dir)
--		dput(dir);
- 	if (ret)
- 		blk_trace_free(bt);
- 	return ret;
+I hadn't noticed that bug. It looks like it can produce an unbounded quantity of undercount.
+
+> However considering patch 2 tries to improve sampling rate to 1 us, the problem will gone.
+
+Now that you mention it, the below case is also poorly handled, and will be incorrect
+regardless of sampling frequency. It experiences issues both under this patch (labeled
+io_ticks) and the current implementation (labeled io_ticks~):
+
+   t          0123456
+   io1        |-----|
+   io2           |-|
+   stamp      0    56
+   io_ticks        28
+
+   stamp~     0  3 56
+   io_ticks~     1 34
+
+I am beginning to doubt whether it is even possible to produce an algorithm that is
+simultaneously unbiased and synchronization-lite. At the same time, Ming's comment on
+patch 2 was leading me to wonder about the value of being synchronization-lite in the
+first place. At the proposed sampling rate of 1M/s, it is unlikely that we'd ever exercise
+the synchronization-free code path (and, as your case shows, incorrect). And for every
+block device that I'm aware of (even the ones that return in 10us), the cost of a disk
+access still completely dominates the cost of a locked CPU operation by three orders of
+magnitude.
+
+Josh
