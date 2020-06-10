@@ -4,27 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A714C433E7
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285C9C433E5
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 545792070B
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F87C2070B
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726987AbgFJRdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 13:33:36 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5809 "EHLO huawei.com"
+        id S1727043AbgFJRdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 13:33:39 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5814 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726713AbgFJRdf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 13:33:35 -0400
+        id S1726794AbgFJRdg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Jun 2020 13:33:36 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 142185FA3A0285FBF2DE;
+        by Forcepoint Email with ESMTP id 4331E5A829A4F59AED6D;
         Thu, 11 Jun 2020 01:33:27 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 11 Jun 2020 01:33:19 +0800
+ 14.3.487.0; Thu, 11 Jun 2020 01:33:20 +0800
 From:   John Garry <john.garry@huawei.com>
 To:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -35,9 +34,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         <megaraidlinux.pdl@broadcom.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH RFC v7 07/12] blk-mq: Add support in hctx_tags_bitmap_show() for a shared sbitmap
-Date:   Thu, 11 Jun 2020 01:29:14 +0800
-Message-ID: <1591810159-240929-8-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v7 08/12] scsi: Add template flag 'host_tagset'
+Date:   Thu, 11 Jun 2020 01:29:15 +0800
+Message-ID: <1591810159-240929-9-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
 References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
@@ -50,101 +49,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since a set-wide shared tag sbitmap may be used, it is no longer valid to
-examine the per-hctx tagset for getting the active requests for a hctx
-(when a shared sbitmap is used).
+From: Hannes Reinecke <hare@suse.com>
 
-As such, add support for the shared sbitmap by using an intermediate
-sbitmap per hctx, iterating all active tags for the specific hctx in the
-shared sbitmap.
+Add a host template flag 'host_tagset' so hostwide tagset can be
+shared on multiple reply queues after the SCSI device's reply queue
+is converted to blk-mq hw queue.
 
-Originally-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de> #earlier version
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+jpg: Update comment on can_queue
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- block/blk-mq-debugfs.c | 62 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ drivers/scsi/scsi_lib.c  | 2 ++
+ include/scsi/scsi_host.h | 6 +++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 05b4be0c03d9..4da7e54adf3b 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -495,6 +495,67 @@ static int hctx_tags_show(void *data, struct seq_file *m)
- 	return res;
- }
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 0ba7a65e7c8d..0652acdcec22 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1894,6 +1894,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+ 	tag_set->flags |=
+ 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
+ 	tag_set->driver_data = shost;
++	if (shost->hostt->host_tagset)
++		tag_set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
  
-+struct hctx_sb_data {
-+	struct sbitmap		*sb;	/* output bitmap */
-+	struct blk_mq_hw_ctx	*hctx;	/* input hctx */
-+};
+ 	return blk_mq_alloc_tag_set(tag_set);
+ }
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index 46ef8cccc982..9b7e333a681d 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -436,6 +436,9 @@ struct scsi_host_template {
+ 	/* True if the controller does not support WRITE SAME */
+ 	unsigned no_write_same:1;
+ 
++	/* True if the host uses host-wide tagspace */
++	unsigned host_tagset:1;
 +
-+static bool hctx_filter_fn(struct blk_mq_hw_ctx *hctx, struct request *req,
-+			   void *priv, bool reserved)
-+{
-+	struct hctx_sb_data *hctx_sb_data = priv;
-+
-+	if (hctx == hctx_sb_data->hctx)
-+		sbitmap_set_bit(hctx_sb_data->sb, req->tag);
-+
-+	return true;
-+}
-+
-+static void hctx_filter_sb(struct sbitmap *sb, struct blk_mq_hw_ctx *hctx)
-+{
-+	struct hctx_sb_data hctx_sb_data = { .sb = sb, .hctx = hctx };
-+
-+	blk_mq_queue_tag_busy_iter(hctx->queue, hctx_filter_fn, &hctx_sb_data);
-+}
-+
-+static int hctx_tags_shared_sbitmap_bitmap_show(void *data, struct seq_file *m)
-+{
-+	struct blk_mq_hw_ctx *hctx = data;
-+	struct request_queue *q = hctx->queue;
-+	struct blk_mq_tag_set *set = q->tag_set;
-+	struct sbitmap shared_sb, *sb;
-+	int res;
-+
-+	if (!set)
-+		return 0;
-+
-+	/*
-+	 * We could use the allocated sbitmap for that hctx here, but
-+	 * that would mean that we would need to clean it prior to use.
-+	 */
-+	res = sbitmap_init_node(&shared_sb,
-+				set->__bitmap_tags.sb.depth,
-+				set->__bitmap_tags.sb.shift,
-+				GFP_KERNEL, NUMA_NO_NODE);
-+	if (res)
-+		return res;
-+	sb = &shared_sb;
-+
-+	res = mutex_lock_interruptible(&q->sysfs_lock);
-+	if (res)
-+		goto out;
-+	if (hctx->tags) {
-+		hctx_filter_sb(sb, hctx);
-+		sbitmap_bitmap_show(sb, m);
-+	}
-+
-+	mutex_unlock(&q->sysfs_lock);
-+
-+out:
-+	sbitmap_free(&shared_sb);
-+	return res;
-+}
-+
- static int hctx_tags_bitmap_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_hw_ctx *hctx = data;
-@@ -823,6 +884,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs
- 	{"busy", 0400, hctx_busy_show},
- 	{"ctx_map", 0400, hctx_ctx_map_show},
- 	{"tags", 0400, hctx_tags_show},
-+	{"tags_bitmap", 0400, hctx_tags_shared_sbitmap_bitmap_show},
- 	{"sched_tags", 0400, hctx_sched_tags_show},
- 	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
- 	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+ 	/*
+ 	 * Countdown for host blocking with no commands outstanding.
+ 	 */
+@@ -603,7 +606,8 @@ struct Scsi_Host {
+ 	 *
+ 	 * Note: it is assumed that each hardware queue has a queue depth of
+ 	 * can_queue. In other words, the total queue depth per host
+-	 * is nr_hw_queues * can_queue.
++	 * is nr_hw_queues * can_queue. However, for when host_tagset is set,
++	 * the total queue depth is can_queue.
+ 	 */
+ 	unsigned nr_hw_queues;
+ 	unsigned active_mode:2;
 -- 
 2.26.2
 
