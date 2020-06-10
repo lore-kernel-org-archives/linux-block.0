@@ -4,22 +4,23 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D8CC433E4
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A12DC433EA
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 312D62070B
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10D722070B
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:33:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbgFJRdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 13:33:36 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5810 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726525AbgFJRdf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1726924AbgFJRdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 10 Jun 2020 13:33:35 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5807 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726393AbgFJRde (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Jun 2020 13:33:34 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 1D2E7B0A4BC7E47E04F1;
+        by Forcepoint Email with ESMTP id 023A14CF78F34D365122;
         Thu, 11 Jun 2020 01:33:27 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
@@ -34,9 +35,9 @@ CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         <megaraidlinux.pdl@broadcom.com>,
         John Garry <john.garry@huawei.com>
-Subject: [PATCH RFC v7 06/12] blk-mq: Record active_queues_shared_sbitmap per tag_set for when using shared sbitmap
-Date:   Thu, 11 Jun 2020 01:29:13 +0800
-Message-ID: <1591810159-240929-7-git-send-email-john.garry@huawei.com>
+Subject: [PATCH RFC v7 05/12] blk-mq: Record nr_active_requests per queue for when using shared sbitmap
+Date:   Thu, 11 Jun 2020 01:29:12 +0800
+Message-ID: <1591810159-240929-6-git-send-email-john.garry@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
 References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
@@ -49,198 +50,215 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For when using a shared sbitmap, no longer should the number of active
-request queues per hctx be relied on for when judging how to share the tag
-bitmap.
+The per-hctx nr_active value can no longer be used to fairly assign a share
+of tag depth per request queue for when using a shared sbitmap, as it does
+not consider that the tags are shared tags over all hctx's.
 
-Instead maintain the number of active request queues per tag_set, and make
-the judgment based on that.
+For this case, record the nr_active_requests per request_queue, and make
+the judgment based on that value.
 
-And since the blk_mq_tags.active_queues is no longer maintained, do not
-show it in debugfs.
+Also introduce a debugfs version of per-hctx blk_mq_debugfs_attr, omitting
+hctx_active_show() (as blk_mq_hw_ctx.nr_active is no longer maintained for
+the case of shared sbitmap) and other entries which we can add which would
+be revised specifically for when using a shared sbitmap.
 
-Originally-from: Kashyap Desai <kashyap.desai@broadcom.com>
+Co-developed-with: Kashyap Desai <kashyap.desai@broadcom.com>
 Signed-off-by: John Garry <john.garry@huawei.com>
 ---
- block/blk-mq-debugfs.c | 25 ++++++++++++++++++++--
- block/blk-mq-tag.c     | 47 ++++++++++++++++++++++++++++++++----------
- block/blk-mq.c         |  2 ++
- include/linux/blk-mq.h |  1 +
- include/linux/blkdev.h |  1 +
- 5 files changed, 63 insertions(+), 13 deletions(-)
+ block/blk-core.c       |  2 ++
+ block/blk-mq-debugfs.c | 23 ++++++++++++++++++++++-
+ block/blk-mq-tag.c     | 10 ++++++----
+ block/blk-mq.c         |  6 +++---
+ block/blk-mq.h         | 28 +++++++++++++++++++++++++++-
+ include/linux/blkdev.h |  2 ++
+ 6 files changed, 62 insertions(+), 9 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 03252af8c82c..c622453c1363 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -529,6 +529,8 @@ struct request_queue *__blk_alloc_queue(int node_id)
+ 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+ 	q->node = node_id;
+ 
++	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
++
+ 	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
+ 		    laptop_mode_timer_fn, 0);
+ 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 0fa3af41ab65..05b4be0c03d9 100644
+index a400b6698dff..0fa3af41ab65 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -458,17 +458,37 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
- 	}
- }
+@@ -796,6 +796,23 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
+ 	{},
+ };
  
-+static void blk_mq_debugfs_tags_shared_sbitmap_show(struct seq_file *m,
-+				     struct blk_mq_tags *tags)
-+{
-+	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
-+	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
++static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs[] = {
++	{"state", 0400, hctx_state_show},
++	{"flags", 0400, hctx_flags_show},
++	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
++	{"busy", 0400, hctx_busy_show},
++	{"ctx_map", 0400, hctx_ctx_map_show},
++	{"sched_tags", 0400, hctx_sched_tags_show},
++	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
++	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
++	{"dispatched", 0600, hctx_dispatched_show, hctx_dispatched_write},
++	{"queued", 0600, hctx_queued_show, hctx_queued_write},
++	{"run", 0600, hctx_run_show, hctx_run_write},
++	{"active", 0400, hctx_active_show},
++	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
++	{}
++};
 +
-+	seq_puts(m, "\nbitmap_tags:\n");
-+	sbitmap_queue_show(tags->bitmap_tags, m);
-+
-+	if (tags->nr_reserved_tags) {
-+		seq_puts(m, "\nbreserved_tags:\n");
-+		sbitmap_queue_show(tags->breserved_tags, m);
-+	}
-+}
-+
- static int hctx_tags_show(void *data, struct seq_file *m)
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ 	{"default_rq_list", 0400, .seq_ops = &ctx_default_rq_list_seq_ops},
+ 	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
+@@ -878,13 +895,17 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
+ 				  struct blk_mq_hw_ctx *hctx)
  {
- 	struct blk_mq_hw_ctx *hctx = data;
- 	struct request_queue *q = hctx->queue;
+ 	struct blk_mq_ctx *ctx;
 +	struct blk_mq_tag_set *set = q->tag_set;
- 	int res;
+ 	char name[20];
+ 	int i;
  
- 	res = mutex_lock_interruptible(&q->sysfs_lock);
- 	if (res)
- 		goto out;
--	if (hctx->tags)
--		blk_mq_debugfs_tags_show(m, hctx->tags);
-+	if (hctx->tags) {
-+		if (blk_mq_is_sbitmap_shared(set))
-+			blk_mq_debugfs_tags_shared_sbitmap_show(m, hctx->tags);
-+		else
-+			blk_mq_debugfs_tags_show(m, hctx->tags);
-+	}
- 	mutex_unlock(&q->sysfs_lock);
+ 	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
+ 	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
  
- out:
-@@ -802,6 +822,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs
- 	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
- 	{"busy", 0400, hctx_busy_show},
- 	{"ctx_map", 0400, hctx_ctx_map_show},
-+	{"tags", 0400, hctx_tags_show},
- 	{"sched_tags", 0400, hctx_sched_tags_show},
- 	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
- 	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+-	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
++	if (blk_mq_is_sbitmap_shared(set))
++		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_shared_sbitmap_attrs);
++	else
++		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
+ 
+ 	hctx_for_each_ctx(hctx, ctx, i)
+ 		blk_mq_debugfs_register_ctx(hctx, ctx);
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 7db16e49f6f6..6ca06b1c3a99 100644
+index 92843e3e1a2a..7db16e49f6f6 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
-@@ -23,9 +23,19 @@
+@@ -60,9 +60,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+  * For shared tag users, we track the number of currently active users
+  * and attempt to provide a fair share of the tag depth for each of them.
   */
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+-static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
++static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
+ 				  struct sbitmap_queue *bt)
  {
--	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--		atomic_inc(&hctx->tags->active_queues);
-+	struct request_queue *q = hctx->queue;
-+	struct blk_mq_tag_set *set = q->tag_set;
-+
-+	if (blk_mq_is_sbitmap_shared(set)){
-+		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
-+		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
-+			atomic_inc(&set->active_queues_shared_sbitmap);
-+
-+	} else {
-+		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-+		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+			atomic_inc(&hctx->tags->active_queues);
-+	}
- 
- 	return true;
- }
-@@ -47,11 +57,19 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
- void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
- 	struct blk_mq_tags *tags = hctx->tags;
--
--	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--		return;
--
--	atomic_dec(&tags->active_queues);
-+	struct request_queue *q = hctx->queue;
-+	struct blk_mq_tag_set *set = q->tag_set;
-+
-+	if (blk_mq_is_sbitmap_shared(q->tag_set)){
-+		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_ACTIVE,
-+					&q->queue_flags))
-+			return;
-+		atomic_dec(&set->active_queues_shared_sbitmap);
-+	} else {
-+		if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+			return;
-+		atomic_dec(&tags->active_queues);
-+	}
- 
- 	blk_mq_tag_wakeup_all(tags, false);
- }
-@@ -65,12 +83,11 @@ static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
- {
- 	struct blk_mq_hw_ctx *hctx = data->hctx;
- 	struct request_queue *q = data->q;
-+	struct blk_mq_tag_set *set = q->tag_set;
++	struct blk_mq_hw_ctx *hctx = data->hctx;
++	struct request_queue *q = data->q;
  	unsigned int depth, users;
  
  	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
- 		return true;
--	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--		return true;
+@@ -84,15 +86,15 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	 * Allow at least some tags
+ 	 */
+ 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+-	return atomic_read(&hctx->nr_active) < depth;
++	return __blk_mq_active_requests(hctx, q) < depth;
+ }
  
- 	/*
- 	 * Don't try dividing an ant
-@@ -78,7 +95,15 @@ static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
- 	if (bt->sb.depth == 1)
- 		return true;
- 
--	users = atomic_read(&hctx->tags->active_queues);
-+	if (blk_mq_is_sbitmap_shared(q->tag_set)) {
-+		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
-+			return true;
-+		users = atomic_read(&set->active_queues_shared_sbitmap);
-+	} else {
-+		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-+			return true;
-+		users = atomic_read(&hctx->tags->active_queues);
-+	}
- 	if (!users)
- 		return true;
- 
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 			    struct sbitmap_queue *bt)
+ {
+ 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+-	    !hctx_may_queue(data->hctx, bt))
+-		return BLK_MQ_NO_TAG;
++	    !hctx_may_queue(data, bt))
++		return -1;
+ 	if (data->shallow_depth)
+ 		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0f7e062a1665..f73a2f9c58bd 100644
+index 77120dd4e4d5..0f7e062a1665 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -3350,6 +3350,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 		goto out_free_mq_map;
+@@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	} else {
+ 		if (data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) {
+ 			rq_flags = RQF_MQ_INFLIGHT;
+-			atomic_inc(&data->hctx->nr_active);
++			__blk_mq_inc_active_requests(data->hctx, data->q);
+ 		}
+ 		rq->tag = tag;
+ 		rq->internal_tag = BLK_MQ_NO_TAG;
+@@ -527,7 +527,7 @@ void blk_mq_free_request(struct request *rq)
  
- 	if (blk_mq_is_sbitmap_shared(set)) {
-+		atomic_set(&set->active_queues_shared_sbitmap, 0);
+ 	ctx->rq_completed[rq_is_sync(rq)]++;
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT)
+-		atomic_dec(&hctx->nr_active);
++		__blk_mq_dec_active_requests(hctx, q);
+ 
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->backing_dev_info);
+@@ -1073,7 +1073,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+ 	if (rq->tag >= 0) {
+ 		if (shared) {
+ 			rq->rq_flags |= RQF_MQ_INFLIGHT;
+-			atomic_inc(&data.hctx->nr_active);
++			__blk_mq_inc_active_requests(rq->mq_hctx, rq->q);
+ 		}
+ 		data.hctx->tags->rqs[rq->tag] = rq;
+ 	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 1a283c707215..9c1e612c2298 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -202,6 +202,32 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ 	return true;
+ }
+ 
++static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx,
++						struct request_queue *q)
++{
++	if (blk_mq_is_sbitmap_shared(q->tag_set))
++		atomic_inc(&q->nr_active_requests_shared_sbitmap);
++	else
++		atomic_inc(&hctx->nr_active);
++}
 +
- 		if (!blk_mq_init_shared_sbitmap(set)) {
- 			ret = -ENOMEM;
- 			goto out_free_mq_rq_maps;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 7b31cdb92a71..66711c7234db 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -252,6 +252,7 @@ struct blk_mq_tag_set {
- 	unsigned int		timeout;
- 	unsigned int		flags;
- 	void			*driver_data;
-+	atomic_t		active_queues_shared_sbitmap;
++static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx,
++						struct request_queue *q)
++{
++	if (blk_mq_is_sbitmap_shared(q->tag_set))
++		atomic_dec(&q->nr_active_requests_shared_sbitmap);
++	else
++		atomic_dec(&hctx->nr_active);
++}
++
++static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx,
++					   struct request_queue *q)
++{
++	if (blk_mq_is_sbitmap_shared(q->tag_set))
++		return atomic_read(&q->nr_active_requests_shared_sbitmap);
++	return atomic_read(&hctx->nr_active);
++}
++
+ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+@@ -210,7 +236,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
  
- 	struct sbitmap_queue	__bitmap_tags;
- 	struct sbitmap_queue	__breserved_tags;
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+ 		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+-		atomic_dec(&hctx->nr_active);
++		__blk_mq_dec_active_requests(hctx, rq->q);
+ 	}
+ }
+ 
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c536278bec9e..1b0087e8d01a 100644
+index 8fd900998b4e..c536278bec9e 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -619,6 +619,7 @@ struct request_queue {
- #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
- #define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
- #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
-+#define QUEUE_FLAG_HCTX_ACTIVE 28	/* at least one blk-mq hctx is active */
+@@ -488,6 +488,8 @@ struct request_queue {
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
  
- #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP))
++	atomic_t		nr_active_requests_shared_sbitmap;
++
+ 	struct list_head	icq_list;
+ #ifdef CONFIG_BLK_CGROUP
+ 	DECLARE_BITMAP		(blkcg_pols, BLKCG_MAX_POLS);
 -- 
 2.26.2
 
