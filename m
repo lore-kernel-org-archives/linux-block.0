@@ -2,129 +2,111 @@ Return-Path: <SRS0=qLys=7X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F87C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 14:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2E2C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:24:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 682782078C
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 14:52:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9AD820734
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 17:24:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NTX/q4qG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o/K8gaqD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726998AbgFJOwm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 10:52:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgFJOwm (ORCPT
+        id S1726419AbgFJRYN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 13:24:13 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52436 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726254AbgFJRYM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 10:52:42 -0400
-Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804F1C03E96F
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2020 07:52:42 -0700 (PDT)
-Received: by mail-vs1-xe42.google.com with SMTP id q2so1412885vsr.1
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2020 07:52:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=L8rp+MArSRRSpQFZbpuYYbVfBKFL7AdnnK2tR2ekGzs=;
-        b=NTX/q4qGHr9EjYtkkXB7Nj9DSl33xCzTiVxJhZzHrH3IcQIbJcROsY12VwdxliLX/V
-         k2XNVmqHAz4QAOrCjP8zCyLPKS/dMfyUA++4zpCXnQaxNBvcoCnFmIQmLE9+WpCFKDNb
-         WrM9FK8yuorcC9QeTKqkQZjQETjpEm2xC9x/81T1vvwe2pNOH+RDsxTZGQ0oJ0zGMTOH
-         qY2g0ksDgrJubYc+x3EQaPgHLvOz8e5HCi0vjRdSmQz9cYacsSYRmqPxC1GKXD+yOiQ/
-         CsJ04GyO9ioleQX5OqMuXUlnYu5EmeHGb0UUfNEKE1D/bqZydCxa80kfRDxY9sJbSGbk
-         J+0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L8rp+MArSRRSpQFZbpuYYbVfBKFL7AdnnK2tR2ekGzs=;
-        b=aZ5aB3IljuPut7YUeopaRmTaXr0eNllFfUVMMhvq0mEReQ9PF5jrDJQiXACZrppniM
-         eXlRpZ5FVstFIdbQJTMVqkc70tOiGiBbC4rPgdCIzml5ym4zqJmLWJqmRoex7f5ra6Yi
-         qXMxauc3aGgJbNDALFcmr/ePX2kEN6Xld84PPLchw3eRRNPtcavsaRlMo5zBcQSRIdUI
-         e1eck3+x7SvN7tuSCDTtCNerVeULXaO8n39k/CSDsgt6KUl7LgbC9MRQIzCFKU5BFdO7
-         upQt2ZnajSNhTqmxJh2zCHmC1qgjEQh5ajBGdS0nkWIQpHVPJJXwQ0Fi1eh+8rptwRwA
-         5b3A==
-X-Gm-Message-State: AOAM532aaA/tL2MWorvhS4DU6rhsBOtxSb5hYjyJIamR4tFItHv3DnXN
-        j4Sq6TwfbTwCe7wbhCyKs3pILkEmr5w716ap5PsFZ28bHDUXbA==
-X-Google-Smtp-Source: ABdhPJw6aMJ9dyy4G/daFrXMNngDBFvzxNsGSUQNmxPAlbpy4epgww2/u+lBmaNyLn3UM7NX8xS/DrAfDxhNdVyKGtM=
-X-Received: by 2002:a67:db88:: with SMTP id f8mr2729187vsk.165.1591800761473;
- Wed, 10 Jun 2020 07:52:41 -0700 (PDT)
+        Wed, 10 Jun 2020 13:24:12 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05AHMcxD148306;
+        Wed, 10 Jun 2020 17:24:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=xWK0SsPzdRxAbm5qxbxrT1uitLDVumqDlSt+PmBeNPI=;
+ b=o/K8gaqDeyqshGD4gsikjHIw/FkJ7XOsyZN9xWiJ7TXbJrutOd8hDhUf1WzwchYnGl5Y
+ B5ipiiH71U4TxiyLtiqq4efUO0qOursSupifIiBq34uebPQWCy4Ezj4vNP+3LWi58uri
+ my00yvxmlUM69JpX4nimPwj18Zt5aKCh2P6qJDMB6tc4GrNBE4mErXaa51ShRyhoMh3x
+ 4f4ZW4soc0/w8ofFGP0g1pDrR6N6giTsw6r1Vht0GHkXb6sfYds+jY/C2I8osqzZ6BsE
+ kEa2NLY033Z7kY3gUdumC0llqtsZx9XpEjgUz6PwnITkGPwW7uv0Zyjq6XPHU1mW3WxE Ng== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 31g3sn3hes-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 10 Jun 2020 17:24:09 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05AHNjfF099623;
+        Wed, 10 Jun 2020 17:24:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 31gn2ytpc7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Jun 2020 17:24:08 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05AHO5RP012671;
+        Wed, 10 Jun 2020 17:24:07 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 10 Jun 2020 10:24:05 -0700
+Date:   Wed, 10 Jun 2020 20:23:59 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH 1/2] rsxx: Fix potential NULL dereference setting up debugfs
+Message-ID: <20200610172359.GB90634@mwanda>
 MIME-Version: 1.0
-References: <fb0340aaf273be84e915214a3d8bae4ac85d7c0b.camel@ew.tq-group.com>
-In-Reply-To: <fb0340aaf273be84e915214a3d8bae4ac85d7c0b.camel@ew.tq-group.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 10 Jun 2020 16:52:05 +0200
-Message-ID: <CAPDyKFq+RiwbDj+58+W5GTcT7=ZOpZFmc02+FxjRGYwbBgA8oQ@mail.gmail.com>
-Subject: Re: Consistent block device references for root= cmdline
-To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9648 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 malwarescore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006100133
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9648 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 impostorscore=0 cotscore=-2147483648 suspectscore=0
+ spamscore=0 bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0
+ mlxlogscore=999 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006100133
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 10 Jun 2020 at 15:15, Matthias Schiffer
-<matthias.schiffer@ew.tq-group.com> wrote:
->
-> Hello all,
->
-> there have been numerous attempts to make the numbering of mmcblk
-> devices consistent, mostly by using aliases from the DTS ([1], [2],
-> [3]), but all have been (rightfully) rejected. Unless I have overlooked
-> a more recent development, no attempts for a different solution were
-> made.
+The "card->gendisk" pointer is allocated in rsxx_setup_dev() but there
+is a module option "enable_blkdev" which lets people disable the block
+device.  In that situation the "card->gendisk" pointer is NULL and it
+would lead to a NULL dereference here.
 
-According to aliases attempts, I think those have failed, mainly
-because of two reasons.
+Fixes: 36f988e978f8 ("rsxx: Adding in debugfs entries.")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+This patch is from static analysis.  The patch is obviously harmless.
+So far as I can tell, the bug is real.  But maybe a different solution
+is prefered?
 
-1. Arguments stating that LABELs/UUIDs are variable alternatives. This
-isn't the case, which I think was also concluded from the several
-earlier discussions.
-2. Patches that tried adding support for mmc aliases, were not
-correctly coded. More precisely, what needs to be addressed is that
-the mmc core also preserves the same ids to be set for the host class
-as the block device, mmc[n] must correspond to mmcblk[n].
+ drivers/block/rsxx/core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
->
-> As far as I can tell, the core of the issue seems to be the following:
->
-> The existing solutions like LABELs and UUIDs are viable alternatives in
-> many cases, but in particular on embedded systems, this is not quite
-> sufficient: In addition to the problem that more knowledge about the
-> system to boot is required in the bootloader, this approach fails
-> completely when the same firmware image exists on multiple devices, for
-> example on an eMMC and an SD card - not an entirely uncommon situation
-> during the development of embedded systems.
->
-> With udev, I can refer to a specific partition using a path like
-> /dev/disk/by-path/platform-2194000.usdhc-part2. In [4] it was proposed
-> to add a way to refer to a device path/phandle from the kernel command
-> line. Has there been any progress on this proposal?
+diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+index 10f6368117d81..6207449fa716f 100644
+--- a/drivers/block/rsxx/core.c
++++ b/drivers/block/rsxx/core.c
+@@ -228,6 +228,9 @@ static void rsxx_debugfs_dev_new(struct rsxx_cardinfo *card)
+ 	struct dentry *debugfs_pci_regs;
+ 	struct dentry *debugfs_cram;
+ 
++	if (!card->gendisk)
++		return;
++
+ 	card->debugfs_dir = debugfs_create_dir(card->gendisk->disk_name, NULL);
+ 	if (IS_ERR_OR_NULL(card->debugfs_dir))
+ 		goto failed_debugfs_dir;
+-- 
+2.26.2
 
-Lots of time during the years I have been approached, both publicly
-and offlist, about whether it would be possible to add support for
-"consistent" mmcblk devices. To me, I am fine with the aliases
-approach, as long as it gets implemented correctly.
-
->
-> Kind regards,
-> Matthias
->
->
-> [1] https://patchwork.kernel.org/patch/8685711/
-> [2] https://lore.kernel.org/patchwork/cover/674381/
-> [3] https://www.spinics.net/lists/linux-mmc/msg26586.html
-> [4] https://www.spinics.net/lists/linux-mmc/msg26708.html
->
-
-Kind regards
-Uffe
