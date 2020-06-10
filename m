@@ -2,83 +2,202 @@ Return-Path: <SRS0=qLys=7X=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CBDC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 05:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 627A1C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 06:43:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2900720829
-	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 05:43:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3582F207ED
+	for <linux-block@archiver.kernel.org>; Wed, 10 Jun 2020 06:43:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="F8IQUAA3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tL4wIK6N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725844AbgFJFne (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 01:43:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38624 "EHLO
+        id S1726272AbgFJGnQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 02:43:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725270AbgFJFne (ORCPT
+        with ESMTP id S1726109AbgFJGnQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 01:43:34 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1C7AC05BD1E;
-        Tue,  9 Jun 2020 22:43:33 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49hbWQ50Pcz9sRR;
-        Wed, 10 Jun 2020 15:43:30 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1591767812;
-        bh=pcbWSPwKHYKUiqwhEF2FHnUMBRR9mr+AM4yZy/n/Q8I=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=F8IQUAA3kWCkFCWuHeYkNqUREzy+4KqCzh7klNtixSzs921xmG/GxnersS77Mi9/U
-         sHdjk4Z7XhsgEB7dPXauvZKo+NcLEu3WHhqsl5ZY/4CW0u7jVAW32uOTtZ6YWGSylg
-         pFPYCAzg0F7MsWCrUBF47Sc/Oh+8/13K+3iK3IybEYtDsD2Q0N/EMOLzKlY+fP3L2E
-         K7QaVdu8KaiWPWhrmPr+YwUV2ymA7pLeI0l0Rz+FSumECm/O5gFxfyxLLFdUm7oaaP
-         Skn4eyNynDdzqfMo/nful4oZI19JZlMkg8XiWqA4xqgbRrEpMvSZ85VlksnkXwNL5M
-         EeRvhl8RR3JNQ==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     brking@us.ibm.com, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org
-Subject: Re: ipr crashes due to NULL dma_need_drain since cc97923a5bcc ("block: move dma drain handling to scsi")
-In-Reply-To: <20200609154230.GA18426@lst.de>
-References: <87zh9cftj0.fsf@mpe.ellerman.id.au> <20200609154230.GA18426@lst.de>
-Date:   Wed, 10 Jun 2020 15:43:58 +1000
-Message-ID: <87tuzjfpb5.fsf@mpe.ellerman.id.au>
+        Wed, 10 Jun 2020 02:43:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39E4C03E96B;
+        Tue,  9 Jun 2020 23:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=O6XB3y7iP5PElbqh7ZAm6TiDYuBfIirIuSUwEnknJtQ=; b=tL4wIK6N92i3MrpckN6LKQJmtz
+        HdOLmmacDx4TQJx7NZ1wtwJmRMbrEvWM/7DgvnDBHitLelejf0E/4FoxicSG3aCXwjNbwGyIG3JJb
+        YEneEhXFkPw812wSmWIOpgq5Js7sm1i0ycjVzAjjbnFm/jMROmTVezHTNeufrtAisMQBOnRkCsqiL
+        nqEwd0Jk5eoIMSzYNbtf8bekmCAnAnNWWFh8QMtdktZZpLiT6M7O+DuHFSk6e3oveqYQiG1fu/vj/
+        mK72cRmhmqmoNcVsZM5uw3fbT2zET0MwA4197fkVb1lKzjYm+W5IldS6izcMgX63ykGOhyMFYdj+e
+        dai4OkOw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jiuRW-0001at-Eh; Wed, 10 Jun 2020 06:42:34 +0000
+Date:   Tue, 9 Jun 2020 23:42:34 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
+Message-ID: <20200610064234.GB24975@infradead.org>
+References: <20200608170127.20419-1-mcgrof@kernel.org>
+ <20200608170127.20419-7-mcgrof@kernel.org>
+ <20200609150602.GA7111@infradead.org>
+ <20200609172922.GP11244@42.do-not-panic.com>
+ <20200609173218.GA7968@infradead.org>
+ <20200609175359.GR11244@42.do-not-panic.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200609175359.GR11244@42.do-not-panic.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> writes:
-> Can you try this patch?
->
-> ---
-> From 1c9913360a0494375c5655b133899cb4323bceb4 Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Tue, 9 Jun 2020 14:07:31 +0200
-> Subject: scsi: wire up ata_scsi_dma_need_drain for SAS HBA drivers
->
-> We need ata_scsi_dma_need_drain for all drivers wired up to drive ATAPI
-> devices through libata.  That also includes the SAS HBA drivers in
-> addition to native libata HBA drivers.
->
-> Fixes: cc97923a5bcc ("block: move dma drain handling to scsi")
-> Reported-by: Michael Ellerman <mpe@ellerman.id.au>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Tue, Jun 09, 2020 at 05:53:59PM +0000, Luis Chamberlain wrote:
+> > Feel free to add more comments, but please try to keep them short
+> > and crisp.  At the some point long comments really distract from what
+> > is going on.
+> 
+> Sure.
+> 
+> Come to think of it, given the above, I think we can also do way with
+> the the partition stuff too, and rely on the buts->name too. I'll try
+> this out, and test it.
 
-Yep that works for me here with ipr.
+Yes, the sg path should work for partitions as well.  That should not
+only simplify the code, but also the comments, we can do something like
+the full patch below (incorporating your original one).  This doesn't
+include the error check on the creation - I think that check probably
+is a good idea for this case based on the comments in the old patch, but
+also a separate issue that should go into another patch on top.
 
-Tested-by: Michael Ellerman <mpe@ellerman.id.au>
-
-cheers
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 15df3a36e9fa43..a2800bc56fb4d3 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -824,9 +824,6 @@ void blk_mq_debugfs_register(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
+-	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+-					    blk_debugfs_root);
+-
+ 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+ 
+ 	/*
+@@ -857,9 +854,7 @@ void blk_mq_debugfs_register(struct request_queue *q)
+ 
+ void blk_mq_debugfs_unregister(struct request_queue *q)
+ {
+-	debugfs_remove_recursive(q->debugfs_dir);
+ 	q->sched_debugfs_dir = NULL;
+-	q->debugfs_dir = NULL;
+ }
+ 
+ static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 561624d4cc4e7f..4e9909e1b25736 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -11,6 +11,7 @@
+ #include <linux/blktrace_api.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/debugfs.h>
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -918,6 +919,7 @@ static void blk_release_queue(struct kobject *kobj)
+ 
+ 	blk_trace_shutdown(q);
+ 
++	debugfs_remove_recursive(q->debugfs_dir);
+ 	if (queue_is_mq(q))
+ 		blk_mq_debugfs_unregister(q);
+ 
+@@ -989,6 +991,9 @@ int blk_register_queue(struct gendisk *disk)
+ 		goto unlock;
+ 	}
+ 
++	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
++					    blk_debugfs_root);
++
+ 	if (queue_is_mq(q)) {
+ 		__blk_mq_register_dev(dev, q);
+ 		blk_mq_debugfs_register(q);
+diff --git a/block/blk.h b/block/blk.h
+index b5d1f0fc6547c7..499308c6ab3b0f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -14,9 +14,7 @@
+ /* Max future timer expiry for timeouts */
+ #define BLK_MAX_TIMEOUT		(5 * HZ)
+ 
+-#ifdef CONFIG_DEBUG_FS
+ extern struct dentry *blk_debugfs_root;
+-#endif
+ 
+ struct blk_flush_queue {
+ 	unsigned int		flush_pending_idx:1;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index fc88330a3d97ed..b49c7c741bc9f3 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -574,8 +574,8 @@ struct request_queue {
+ 	struct list_head	tag_set_list;
+ 	struct bio_set		bio_split;
+ 
+-#ifdef CONFIG_BLK_DEBUG_FS
+ 	struct dentry		*debugfs_dir;
++#ifdef CONFIG_BLK_DEBUG_FS
+ 	struct dentry		*sched_debugfs_dir;
+ 	struct dentry		*rqos_debugfs_dir;
+ #endif
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index fee5c8d8916690..6eb364b393714f 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -509,10 +509,15 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	if (!bt->msg_data)
+ 		goto err;
+ 
+-	ret = -ENOENT;
+-
+-	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+-	if (!dir)
++	/*
++	 * When tracing a whole block device, reuse the existing debugfs
++	 * directory created by the block layer.  For partitions or character
++	 * devices (e.g. /dev/sg), create a new debugfs directory that will be
++	 * removed once the trace ends.
++	 */
++	if (bdev && bdev == bdev->bd_contains)
++		dir = q->debugfs_dir;
++	else
+ 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+ 
+ 	bt->dev = dev;
+@@ -553,8 +558,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 
+ 	ret = 0;
+ err:
+-	if (dir && !bt->dir)
+-		dput(dir);
+ 	if (ret)
+ 		blk_trace_free(bt);
+ 	return ret;
