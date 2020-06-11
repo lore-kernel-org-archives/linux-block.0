@@ -2,150 +2,230 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA26C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 686AEC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:24:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B86CA2083E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:09:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dGcIY12W"
+	by mail.kernel.org (Postfix) with ESMTP id 451312065C
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726109AbgFKOJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 10:09:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56806 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726444AbgFKOJA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 10:09:00 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6661C08C5C2
-        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:08:58 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id y13so6633675eju.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ywxAzDifu4/Lt4nUclP2yZ7GdJmm8BVW01PZ3M/CpuU=;
-        b=dGcIY12W7IQN/4zKQpo+enj84L9FnrrJ4Z4DvDO8uXvIyn7V9tjmYK4R83qhrEaKN8
-         gXV4S0MoR27uqIQqyWnNdXa4Ri0i5itrlxLkUREhGvKw87qMZGc46/baDbSYaxg3TaPw
-         iC9ts+ubPddq0s0nLTHJ66HnPNUn/117dPJBLfTzmPbzRrr/fft6Eerf3KL08hRSDRNh
-         b9VEvKLp3qzK6/XXTJqbakQbLCgL53KKEykSJ9QRdNw+qR0VKGGB5GCAc6AEU/FDBndh
-         VwxtmmFGBuk6QnNT9C2FwKrrIqirRFP8uFI/eQ5KIWiU7Lg/fTsoY1S6s8inQc1401I3
-         npIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ywxAzDifu4/Lt4nUclP2yZ7GdJmm8BVW01PZ3M/CpuU=;
-        b=Uey7sBgKdg/GNz1YOnIiLXabBCw4vIisKoWoFLnqDrgX3rTNUcbMNYXeOhiuLX1WYx
-         iMwfDYRr8ys0SWQVNFL0WnVgWLOqwi0jdtPv7D8bbZ0l3CoumNk4hHr4mIgm5pnLh2dz
-         TAn2yIKIO7sLsMWeeFl0n5sFBffUWR/6zz87i6AG1CM12NO+KFb55s3D+jSX2H8lhniZ
-         4t/rDGHk2yvPPZfCGcu//JtXIjSme72CGe0DIMYw+kHQA7hSHOXvXSq4n4RaSlSrPTsc
-         PqeF6qaHw7ndSTogCiDQ+45gs8B6HPrmeJ8x8e7o4S4aO9VeZ5KhgXKyF2WUgjVTY8WN
-         nzQA==
-X-Gm-Message-State: AOAM530wl4HB1B9pAaSquMB02N+eikqAbP1l17rHjtc+5rlFlpvSy7iv
-        7U0ok22DZxU8QSYdX5dPWlC3lQ==
-X-Google-Smtp-Source: ABdhPJzHCFEYHDE6Y7f7Zi15DPw4zTS2b17SG2jrg9z9gfMVBuW/Q5+jGH7XSAHxsu3sm33u9sB3mg==
-X-Received: by 2002:a17:906:7acf:: with SMTP id k15mr8830436ejo.410.1591884536972;
-        Thu, 11 Jun 2020 07:08:56 -0700 (PDT)
-Received: from [192.168.0.2] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id n16sm1918051ejl.70.2020.06.11.07.08.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jun 2020 07:08:56 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 1/3] bfq: Avoid false bfq queue merging
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20200611083149.GB18088@quack2.suse.cz>
-Date:   Thu, 11 Jun 2020 16:12:15 +0200
-Cc:     linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AF7DA035-BC93-42D2-B0B6-8ECC3273DEBC@linaro.org>
-References: <20200605140837.5394-1-jack@suse.cz>
- <20200605141629.15347-1-jack@suse.cz>
- <FC3651A1-DB65-4A77-9BFB-ACAB80E54F3E@linaro.org>
- <20200611083149.GB18088@quack2.suse.cz>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1728173AbgFKOYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 10:24:15 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2302 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726414AbgFKOYP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jun 2020 10:24:15 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 147FADAAA204334EE69F;
+        Thu, 11 Jun 2020 15:24:11 +0100 (IST)
+Received: from [127.0.0.1] (10.210.169.30) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 11 Jun
+ 2020 15:24:09 +0100
+Subject: Re: [PATCH RFC v7 06/12] blk-mq: Record active_queues_shared_sbitmap
+ per tag_set for when using shared sbitmap
+To:     Hannes Reinecke <hare@suse.de>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <don.brace@microsemi.com>, <kashyap.desai@broadcom.com>,
+        <sumit.saxena@broadcom.com>, <ming.lei@redhat.com>,
+        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-7-git-send-email-john.garry@huawei.com>
+ <a10a20de-d8e2-8505-65ec-1c26bfbf6cfc@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <8bafb633-de7c-8b9e-7369-8e59c93712f8@huawei.com>
+Date:   Thu, 11 Jun 2020 15:22:50 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <a10a20de-d8e2-8505-65ec-1c26bfbf6cfc@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.210.169.30]
+X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+>>   out:
+>> @@ -802,6 +822,7 @@ static const struct blk_mq_debugfs_attr 
+>> blk_mq_debugfs_hctx_shared_sbitmap_attrs
+>>       {"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
+>>       {"busy", 0400, hctx_busy_show},
+>>       {"ctx_map", 0400, hctx_ctx_map_show},
+>> +    {"tags", 0400, hctx_tags_show},
+>>       {"sched_tags", 0400, hctx_sched_tags_show},
+>>       {"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
+>>       {"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+> 
+> I had been pondering this, too, when creating v6. Problem is that it'll 
+> show the tags per hctx, but as they are shared I guess the list looks 
+> pretty identical per hctx.
 
+Right, so my main concern in this series is debugfs, and how to present 
+the tag/hctx info. We can hide things under the hood mostly, but not so 
+much for debugfs.
 
-> Il giorno 11 giu 2020, alle ore 10:31, Jan Kara <jack@suse.cz> ha =
-scritto:
->=20
-> On Thu 11-06-20 09:13:07, Paolo Valente wrote:
->>=20
->>=20
->>> Il giorno 5 giu 2020, alle ore 16:16, Jan Kara <jack@suse.cz> ha =
-scritto:
->>>=20
->>> bfq_setup_cooperator() uses bfqd->in_serv_last_pos so detect whether =
-it
->>> makes sense to merge current bfq queue with the in-service queue.
->>> However if the in-service queue is freshly scheduled and didn't =
-dispatch
->>> any requests yet, bfqd->in_serv_last_pos is stale and contains value
->>> from the previously scheduled bfq queue which can thus result in a =
-bogus
->>> decision that the two queues should be merged.
->>=20
->> Good catch!=20
->>=20
->>> This bug can be observed
->>> for example with the following fio jobfile:
->>>=20
->>> [global]
->>> direct=3D0
->>> ioengine=3Dsync
->>> invalidate=3D1
->>> size=3D1g
->>> rw=3Dread
->>>=20
->>> [reader]
->>> numjobs=3D4
->>> directory=3D/mnt
->>>=20
->>> where the 4 processes will end up in the one shared bfq queue =
-although
->>> they do IO to physically very distant files (for some reason I was =
-able to
->>> observe this only with slice_idle=3D1ms setting).
->>>=20
->>> Fix the problem by invalidating bfqd->in_serv_last_pos when =
-switching
->>> in-service queue.
->>>=20
->>=20
->> Apart from the nonexistent problem that even 0 is a valid LBA :)
->=20
-> Yes, I was also thinking about that and decided 0 is "good enough" :). =
-But
-> I just as well just switch to (sector_t)-1 if you think it would be =
-better.
->=20
+> So I guess we should filter the tags per hctx to have only those active 
+> on that hctx displayed. But when doing so we can only print the 
+> in-flight tags, the others are not assigned to a hctx and as such we 
+> can't make a decision on which hctx they'll end up.
 
-0 is ok :)
+So we filter the tags in 7/12, and that should be ok.
 
-Thanks,
-Paolo
+But a concern is that we present identical hctx_tags_show() -> 
+blk_mq_debugfs_shared_sitmap_show() -> sbitmap_queue_show() per-hctx 
+info, which may be inappropriate/misleading/wrong. I need to audit that 
+more thoroughly.
 
->> Acked-by: Paolo Valente <paolo.valente@linaro.org>
->=20
-> Thanks!
->=20
-> 								Honza
->=20
-> --=20
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+> 
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 7db16e49f6f6..6ca06b1c3a99 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -23,9 +23,19 @@
+>>    */
+>>   bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>>   {
+>> -    if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+>> -        !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> -        atomic_inc(&hctx->tags->active_queues);
+>> +    struct request_queue *q = hctx->queue;
+>> +    struct blk_mq_tag_set *set = q->tag_set;
+>> +
+>> +    if (blk_mq_is_sbitmap_shared(set)){
+>> +        if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
+>> +            !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+>> +            atomic_inc(&set->active_queues_shared_sbitmap);
+>> +
+>> +    } else {
+>> +        if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+>> +            !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> +            atomic_inc(&hctx->tags->active_queues);
+>> +    }
+>>       return true;
+>>   }
+> At one point someone would need to educate me what this double 
+> 'test_bit' and 'test_and_set_bit' is supposed to achieve.
+> Other than deliberately injecting a race condition ...
 
+As I see, it's not a dangerous race, and meant as a performance 
+optimization.
+
+test_bit() should be is quick compared to test_and_set_bit(), so nicer 
+to avoid always doing a test_and_set_bit().
+
+So if we race with failed test_bit() calls and have multiple attempts 
+with the test_and_set_bit(), only 1 will succeed and do the increment.
+
+> 
+>> @@ -47,11 +57,19 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags 
+>> *tags, bool include_reserve)
+>>   void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>>   {
+>>       struct blk_mq_tags *tags = hctx->tags;
+>> -
+>> -    if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> -        return;
+>> -
+>> -    atomic_dec(&tags->active_queues);
+>> +    struct request_queue *q = hctx->queue;
+>> +    struct blk_mq_tag_set *set = q->tag_set;
+>> +
+>> +    if (blk_mq_is_sbitmap_shared(q->tag_set)){
+>> +        if (!test_and_clear_bit(QUEUE_FLAG_HCTX_ACTIVE,
+>> +                    &q->queue_flags))
+>> +            return;
+>> +        atomic_dec(&set->active_queues_shared_sbitmap);
+>> +    } else {
+>> +        if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> +            return;
+>> +        atomic_dec(&tags->active_queues);
+>> +    }
+>>       blk_mq_tag_wakeup_all(tags, false);
+>>   }
+>> @@ -65,12 +83,11 @@ static inline bool hctx_may_queue(struct 
+>> blk_mq_alloc_data *data,
+>>   {
+>>       struct blk_mq_hw_ctx *hctx = data->hctx;
+>>       struct request_queue *q = data->q;
+>> +    struct blk_mq_tag_set *set = q->tag_set;
+>>       unsigned int depth, users;
+>>       if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+>>           return true;
+>> -    if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> -        return true;
+>>       /*
+>>        * Don't try dividing an ant
+>> @@ -78,7 +95,15 @@ static inline bool hctx_may_queue(struct 
+>> blk_mq_alloc_data *data,
+>>       if (bt->sb.depth == 1)
+>>           return true;
+>> -    users = atomic_read(&hctx->tags->active_queues);
+>> +    if (blk_mq_is_sbitmap_shared(q->tag_set)) {
+>> +        if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
+>> +            return true;
+>> +        users = atomic_read(&set->active_queues_shared_sbitmap);
+>> +    } else {
+>> +        if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>> +            return true;
+>> +        users = atomic_read(&hctx->tags->active_queues);
+>> +    }
+>>       if (!users)
+>>           return true;
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 0f7e062a1665..f73a2f9c58bd 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -3350,6 +3350,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set 
+>> *set)
+>>           goto out_free_mq_map;
+>>       if (blk_mq_is_sbitmap_shared(set)) {
+>> +        atomic_set(&set->active_queues_shared_sbitmap, 0);
+>> +
+>>           if (!blk_mq_init_shared_sbitmap(set)) {
+>>               ret = -ENOMEM;
+>>               goto out_free_mq_rq_maps;
+>> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+>> index 7b31cdb92a71..66711c7234db 100644
+>> --- a/include/linux/blk-mq.h
+>> +++ b/include/linux/blk-mq.h
+>> @@ -252,6 +252,7 @@ struct blk_mq_tag_set {
+>>       unsigned int        timeout;
+>>       unsigned int        flags;
+>>       void            *driver_data;
+>> +    atomic_t        active_queues_shared_sbitmap;
+
+I'm not sure if we should present this in debugfs. It is not according 
+to this series.
+
+>>       struct sbitmap_queue    __bitmap_tags;
+>>       struct sbitmap_queue    __breserved_tags;
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index c536278bec9e..1b0087e8d01a 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -619,6 +619,7 @@ struct request_queue {
+>>   #define QUEUE_FLAG_PCI_P2PDMA    25    /* device supports PCI p2p 
+>> requests */
+>>   #define QUEUE_FLAG_ZONE_RESETALL 26    /* supports Zone Reset All */
+>>   #define QUEUE_FLAG_RQ_ALLOC_TIME 27    /* record rq->alloc_time_ns */
+>> +#define QUEUE_FLAG_HCTX_ACTIVE 28    /* at least one blk-mq hctx is 
+>> active */
+>>   #define QUEUE_FLAG_MQ_DEFAULT    ((1 << QUEUE_FLAG_IO_STAT) |        \
+>>                    (1 << QUEUE_FLAG_SAME_COMP))
+>>
+> Other than that it looks fine.
+
+Cheers
