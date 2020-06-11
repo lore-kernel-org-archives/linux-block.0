@@ -2,275 +2,105 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1EEC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 04:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E100C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 05:40:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C66F2075F
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 04:05:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E93D82075F
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 05:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYNog0Ho"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ep/0TGcR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgFKEFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 00:05:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28201 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725782AbgFKEFX (ORCPT
+        id S1726407AbgFKFko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 01:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726316AbgFKFkn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 00:05:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591848320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E2e8McLK4lWfa3xkg6el0ZABcLTeHo1YkLTPPnE2G00=;
-        b=RYNog0HocXro83xMgXLobBw1de8oHwZFDAZuidZkhzD4QHc4Tx2/Z/m4oaPzy4bOxkJLgU
-        Iygx0rXvzYOHtNRPtkOv8uBVMGwRkglM48M4bbZDkXI4iFLqesNVgkY/O/Frdw2lGylQK4
-        ilqCATcQM2lbalNJklGhK02tpa6LG0M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-eaHQLtvUOumDqdc6GQhkSw-1; Thu, 11 Jun 2020 00:05:15 -0400
-X-MC-Unique: eaHQLtvUOumDqdc6GQhkSw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E0BD7BAC;
-        Thu, 11 Jun 2020 04:05:13 +0000 (UTC)
-Received: from T590 (ovpn-12-163.pek2.redhat.com [10.72.12.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A7B957CCE6;
-        Thu, 11 Jun 2020 04:05:00 +0000 (UTC)
-Date:   Thu, 11 Jun 2020 12:04:55 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, kashyap.desai@broadcom.com,
-        sumit.saxena@broadcom.com, bvanassche@acm.org, hare@suse.com,
-        hch@lst.de, shivasharan.srikanteshwara@broadcom.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        megaraidlinux.pdl@broadcom.com
-Subject: Re: [PATCH RFC v7 05/12] blk-mq: Record nr_active_requests per queue
- for when using shared sbitmap
-Message-ID: <20200611040455.GD453671@T590>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-6-git-send-email-john.garry@huawei.com>
+        Thu, 11 Jun 2020 01:40:43 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8F2C08C5C1;
+        Wed, 10 Jun 2020 22:40:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nBcFQJGzJiEbDICiDXoaT+SkntQ3fuvNt0VNHFjSgyk=; b=Ep/0TGcRRFvDTNncjorrzAlS1t
+        uBwCTucTGScB5pbbDZx9vslfW9Z0mIzzLY/SsE/G5vx1ZSk99lqNHEtaxjoMOpWaiv8DN8n++AERG
+        fdLwww2/st6O6m4Tm0LALmQU/R8ug+VYSRV8nyhBiR1kzFNoVI+1Csc0tRlNXeNy/E7hV08CBjf+C
+        rexEqTsiuZitiFCW9wTUQ4bLVl3FrFIX17F5oly+MpJk2iM23f+3TIeWs3mjLR2yQfTBuDBNYZq/J
+        bwRHxWR4lAqEz4fiUOCWDPWMhOUKc4nbQNbCQ2QURpZKfQYbLb5hP9IloOIkU/brrMfTCxwYbl5kQ
+        lOAbNbag==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jjFwb-0007iI-9y; Thu, 11 Jun 2020 05:40:05 +0000
+Date:   Wed, 10 Jun 2020 22:40:05 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org,
+        mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
+Message-ID: <20200611054005.GA25742@infradead.org>
+References: <20200608170127.20419-1-mcgrof@kernel.org>
+ <20200608170127.20419-7-mcgrof@kernel.org>
+ <20200609150602.GA7111@infradead.org>
+ <20200609172922.GP11244@42.do-not-panic.com>
+ <20200609173218.GA7968@infradead.org>
+ <20200609175359.GR11244@42.do-not-panic.com>
+ <20200610064234.GB24975@infradead.org>
+ <20200610210917.GH11244@42.do-not-panic.com>
+ <20200610215213.GH13911@42.do-not-panic.com>
+ <20200610233116.GI13911@42.do-not-panic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1591810159-240929-6-git-send-email-john.garry@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200610233116.GI13911@42.do-not-panic.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 01:29:12AM +0800, John Garry wrote:
-> The per-hctx nr_active value can no longer be used to fairly assign a share
-> of tag depth per request queue for when using a shared sbitmap, as it does
-> not consider that the tags are shared tags over all hctx's.
+On Wed, Jun 10, 2020 at 11:31:16PM +0000, Luis Chamberlain wrote:
+> On Wed, Jun 10, 2020 at 09:52:13PM +0000, Luis Chamberlain wrote:
+> > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> > index 7ff2ea5cd05e..5cea04c05e09 100644
+> > --- a/kernel/trace/blktrace.c
+> > +++ b/kernel/trace/blktrace.c
+> > @@ -524,10 +524,16 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+> >  	if (!bt->msg_data)
+> >  		goto err;
+> >  
+> > -	ret = -ENOENT;
+> > -
+> > -	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+> > -	if (!dir)
+> > +	/*
+> > +	 * When tracing whole make_request drivers (multiqueue) block devices,
+> > +	 * reuse the existing debugfs directory created by the block layer on
+> > +	 * init. For request-based block devices, all partitions block devices,
+> > +	 * and scsi-generic block devices we create a temporary new debugfs
+> > +	 * directory that will be removed once the trace ends.
+> > +	 */
+> > +	if (queue_is_mq(q))
 > 
-> For this case, record the nr_active_requests per request_queue, and make
-> the judgment based on that value.
+> And this should be instead:
 > 
-> Also introduce a debugfs version of per-hctx blk_mq_debugfs_attr, omitting
-> hctx_active_show() (as blk_mq_hw_ctx.nr_active is no longer maintained for
-> the case of shared sbitmap) and other entries which we can add which would
-> be revised specifically for when using a shared sbitmap.
-> 
-> Co-developed-with: Kashyap Desai <kashyap.desai@broadcom.com>
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> ---
->  block/blk-core.c       |  2 ++
->  block/blk-mq-debugfs.c | 23 ++++++++++++++++++++++-
->  block/blk-mq-tag.c     | 10 ++++++----
->  block/blk-mq.c         |  6 +++---
->  block/blk-mq.h         | 28 +++++++++++++++++++++++++++-
->  include/linux/blkdev.h |  2 ++
->  6 files changed, 62 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 03252af8c82c..c622453c1363 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -529,6 +529,8 @@ struct request_queue *__blk_alloc_queue(int node_id)
->  	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
->  	q->node = node_id;
->  
-> +	atomic_set(&q->nr_active_requests_shared_sbitmap, 0);
-> +
->  	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
->  		    laptop_mode_timer_fn, 0);
->  	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index a400b6698dff..0fa3af41ab65 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -796,6 +796,23 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
->  	{},
->  };
->  
-> +static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs[] = {
-> +	{"state", 0400, hctx_state_show},
-> +	{"flags", 0400, hctx_flags_show},
-> +	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
-> +	{"busy", 0400, hctx_busy_show},
-> +	{"ctx_map", 0400, hctx_ctx_map_show},
-> +	{"sched_tags", 0400, hctx_sched_tags_show},
-> +	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
-> +	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
-> +	{"dispatched", 0600, hctx_dispatched_show, hctx_dispatched_write},
-> +	{"queued", 0600, hctx_queued_show, hctx_queued_write},
-> +	{"run", 0600, hctx_run_show, hctx_run_write},
-> +	{"active", 0400, hctx_active_show},
-> +	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
-> +	{}
-> +};
+> if (queue_is_mq(q) && bdev && bdev == bdev->bd_contains)
 
-You may use macro or whatever to avoid so the duplication.
-
-> +
->  static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
->  	{"default_rq_list", 0400, .seq_ops = &ctx_default_rq_list_seq_ops},
->  	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
-> @@ -878,13 +895,17 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
->  				  struct blk_mq_hw_ctx *hctx)
->  {
->  	struct blk_mq_ctx *ctx;
-> +	struct blk_mq_tag_set *set = q->tag_set;
->  	char name[20];
->  	int i;
->  
->  	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
->  	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
->  
-> -	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
-> +	if (blk_mq_is_sbitmap_shared(set))
-> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_shared_sbitmap_attrs);
-> +	else
-> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
->  
->  	hctx_for_each_ctx(hctx, ctx, i)
->  		blk_mq_debugfs_register_ctx(hctx, ctx);
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 92843e3e1a2a..7db16e49f6f6 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -60,9 +60,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
->   * For shared tag users, we track the number of currently active users
->   * and attempt to provide a fair share of the tag depth for each of them.
->   */
-> -static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
-> +static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
->  				  struct sbitmap_queue *bt)
->  {
-> +	struct blk_mq_hw_ctx *hctx = data->hctx;
-> +	struct request_queue *q = data->q;
->  	unsigned int depth, users;
->  
->  	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
-> @@ -84,15 +86,15 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
->  	 * Allow at least some tags
->  	 */
->  	depth = max((bt->sb.depth + users - 1) / users, 4U);
-> -	return atomic_read(&hctx->nr_active) < depth;
-> +	return __blk_mq_active_requests(hctx, q) < depth;
-
-There is big change on 'users' too:
-
-	users = atomic_read(&hctx->tags->active_queues);
-
-Originally there is single hctx->tags for these HBAs, now there are many
-hctx->tags, so 'users' may become much smaller than before.
-
-Maybe '->active_queues' can be moved to tag_set for blk_mq_is_sbitmap_shared().
-
->  }
->  
->  static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
->  			    struct sbitmap_queue *bt)
->  {
->  	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
-> -	    !hctx_may_queue(data->hctx, bt))
-> -		return BLK_MQ_NO_TAG;
-> +	    !hctx_may_queue(data, bt))
-> +		return -1;
-
-BLK_MQ_NO_TAG should have been returned.
-
->  	if (data->shallow_depth)
->  		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
->  	else
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 77120dd4e4d5..0f7e062a1665 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  	} else {
->  		if (data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) {
->  			rq_flags = RQF_MQ_INFLIGHT;
-> -			atomic_inc(&data->hctx->nr_active);
-> +			__blk_mq_inc_active_requests(data->hctx, data->q);
->  		}
->  		rq->tag = tag;
->  		rq->internal_tag = BLK_MQ_NO_TAG;
-> @@ -527,7 +527,7 @@ void blk_mq_free_request(struct request *rq)
->  
->  	ctx->rq_completed[rq_is_sync(rq)]++;
->  	if (rq->rq_flags & RQF_MQ_INFLIGHT)
-> -		atomic_dec(&hctx->nr_active);
-> +		__blk_mq_dec_active_requests(hctx, q);
->  
->  	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
->  		laptop_io_completion(q->backing_dev_info);
-> @@ -1073,7 +1073,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
->  	if (rq->tag >= 0) {
->  		if (shared) {
->  			rq->rq_flags |= RQF_MQ_INFLIGHT;
-> -			atomic_inc(&data.hctx->nr_active);
-> +			__blk_mq_inc_active_requests(rq->mq_hctx, rq->q);
->  		}
->  		data.hctx->tags->rqs[rq->tag] = rq;
->  	}
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index 1a283c707215..9c1e612c2298 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -202,6 +202,32 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
->  	return true;
->  }
->  
-> +static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx,
-> +						struct request_queue *q)
-> +{
-> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
-> +		atomic_inc(&q->nr_active_requests_shared_sbitmap);
-> +	else
-> +		atomic_inc(&hctx->nr_active);
-> +}
-> +
-> +static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx,
-> +						struct request_queue *q)
-> +{
-> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
-> +		atomic_dec(&q->nr_active_requests_shared_sbitmap);
-> +	else
-> +		atomic_dec(&hctx->nr_active);
-> +}
-> +
-> +static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx,
-> +					   struct request_queue *q)
-> +{
-> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
-
-I'd suggest to add one hctx version of blk_mq_is_sbitmap_shared() since
-q->tag_set is seldom used in fast path, and hctx->flags is more
-efficient than tag_set->flags.
-
-
-Thanks, 
-Ming
-
+Yes.  But I think keeping the queue_is_mq out and always creating the
+debugfs dir is an improvement as we'll sooner or later grow more debugfs
+files and than the whole set of problmes reappears.  But I'd be fine
+with doing the above in the first patch that is tiny and backportable,
+and then have another patch that always creates the debugfs directory.
