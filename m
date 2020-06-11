@@ -2,83 +2,84 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2ECC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 01:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA4FC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 01:53:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EEDB2064C
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 01:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64581206FA
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 01:53:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qkvaGuNN";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="saqnuThw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KVkgTf93";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SnVDpHRv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726268AbgFKBfi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 21:35:38 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44835 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726163AbgFKBfh (ORCPT
+        id S1726279AbgFKBxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 21:53:11 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:52130 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726416AbgFKBxK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 21:35:37 -0400
+        Wed, 10 Jun 2020 21:53:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1591839336; x=1623375336;
+  t=1591840390; x=1623376390;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=mR4lgEAtEVppV1+B0ZtUDuYy5Vx+qbjEb9C7TK9oDMA=;
-  b=qkvaGuNNeESCoqQo6XDhWx2sp3ao25AYuPUPbwXpN4BUdFj8PW+e9nMB
-   mg6xSPQmG68Gy9J6xSCP+esi+cEg9lFYncAEWKYN3WPt2rdePdQ2hNaby
-   LmwAQ2K3FBN/TRE7L2nucJ8z8UlYdFUnBDVVwwslnUOGK0pIYX8kQnwbn
-   0BqnS2vcdaG1LHJSCxQz4AcKeamdB8iydUovPJ0bAA4arzqxySG9G5Yb9
-   kvb4PuCCMWFOEEG7tiP9uTXn4npDJXy6M8uXJIujKrPI3mAjC1UDJwzbe
-   7BTl393vkXtmgI+KlwaOLdZDbaMMAPStUM5oSR5bmE/onRW7TMETs3aTV
+  bh=PBVGmCAS87s/B2Av5zQpx7M52b6/bvJ/yTlX3m6JnbI=;
+  b=KVkgTf93BvKQMqQdPPKOpze3te01m6ahuBaPXg24BFdRKuB/73AbHx0a
+   qL/5AmQ+O63G6S4/bzwOBFK29slPhLs8f6z46Mb1NFJQX5yqdWqY1ROhg
+   Iv0uIdkY5giRjsif/s+EDEhSYFgFmC4isECVCsYSsTF/50aqfGPI9vFBy
+   WfP4x2IW3IcR+aSyf+IKZiUlVd6JH/zfMRJJCzEuHavKHU2XowtKClvJa
+   y4b9b2PW5d2u2ZMxlZgqyhE8YbvE7X0yILWAy0VrSMKgX4S0Xj1FDmA5/
+   55ZJO9Kbw86CJrP6q9dowZXEpDAw9Hdjro+u7Mf4bCdS8wfviiQ11Ft1t
    g==;
-IronPort-SDR: SfzhKqKWOsvP2ciXtqn/P8aXcoO/J/hc0HO3yA/+drkVqMgkTVdlheW5kQ5jsimfQ3HtYoBIWT
- hfQu8ulTTQkomkNELficaBJF0AyNVBBK/O+BfoXZxUgVHHMCKNTLqYIXDT3+ZFN53XUXDI/++h
- RnEWNcfda5TyjcRSLBz+tKlbFUZFx3Z+3nhdsT5zoxiQZxHH/Po8W9uWUJoz7ZSAXX9hHjYoQU
- Fiz68uSJFwZW5D8M0sXqf0nH9jjNZHU2UB6ymZFbuGI4Za3dEodiFsuzdWtWKXVax8+mx/ScdQ
- LoA=
+IronPort-SDR: 1wjlCAFPtM9bP9vbLZG8nJUZUnLGq0sFrg5pO0N9midYf7DRnIH/IYYdskFZ7q019/KcUDrBZ3
+ AyGfYkW56IGcN4YF6xdiF49R7TAOvJsGJr3+pwOnoiTyuBCTEkjCRqPlqUXKwQ1zMWaktLpiww
+ qgjDUSYIX/DDoEjTrTMMMTeLt8khrfzB+Hs0qcVyJz/iAYVCt320kFRPDXvOhEz4Lk5UMzxgVi
+ rOC5j2cjcjFF+cFM4nk53U795sU10W5x8dm7tynCBpSQtjm9Ptd8oVAHvUEHpaPKqC10WW9KYe
+ cn0=
 X-IronPort-AV: E=Sophos;i="5.73,498,1583164800"; 
-   d="scan'208";a="139687078"
-Received: from mail-bn8nam11lp2177.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.177])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 09:35:35 +0800
+   d="scan'208";a="144013691"
+Received: from mail-dm6nam10lp2109.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.109])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 09:53:10 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=krM9ptydNZeDUVYVHJ3aiXY0zVsXNveSDN6EyiOYpNbY+NAgDIypAkucsS6+H+m/tLHCaiVYcFJnrOaDcaKBO0m0y5cvIsyyehpC7kpBK82tLEO+9weOi5pkJZQyzsaMr+brvT/MXeIi2ygvetT1DcdaJ/9Kl6+u6uhzuHIx3qfbxXINgAFDQ8QCVxPZGToon/qFDT15qOs/gmGSLr4rFeAJ0IE6Kgd50cRFuNHA830u+YX9TI6QV0XCNIoS0ayx5PrYWhQuEbP6Ec4HM+seXl7etOwiKjQfjFjXBZXrp0iPZreNsPeYiTi5NH5c1P7dOzS6xvGmzsq6+vIx2AIG+g==
+ b=TZtgLZ6bwj6R1wPRrLb/t4lgfEy2sUb2ybdBkbnWPdiFs/v+ho2ZJLD1uni8v4HJiMce11ZwvfjmF8cN9GQiP07cpdWpWaHIrh9k1b6HQIcNWEon2jX3C7jB99xCv2nmlFA5pM1/GWHUQ7jX3UxOUGS9BGeDB7ovyVN+SyWd/EMw1ZdBa7AtMRgsw/s4bVSgxpwIvyAtYB4Acqb+1jsIM9Y2OQ0L4nDSF0kGHG+NpC0rpjziWNmyLeIvsJM5AtikkkohA6Ylf1x1J48X7m2hwMGJicZUm+5CdjhrYV9oCKsfVJXT0QD/byLOg8VWnYcuR/Is9EKqCElQU7yRojHuHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NJm0S2QQXlSezEK7VTdNsDc3OGYreQT+1IPNMY+eX5A=;
- b=Wx9iV0LjuRsGnYDdRzlCJdhxcz4EavCX6xfotJ6fFWU4uOSfR0G/SQ65RJ2tTm9IMeb0JOMk/9u9bcP7PE5L1pMVvytTTLq69ScaPRjiHAoKotPu4cFSgKenAik0xYI7/ci1o7B6gaQAGgZgLttPaYMiv8IbyWHq+13O0/vxZ3+/zlZWB178MKyXW4UfJfV6UeA+gZBN19LdNvbz8eFNZ6/kgHgZeXIpWZklybKlP3J2UGxrZStrcCVFwsaRXsCWNXgXlhVm24piPc+sf3EV9YFU3qDQ5OEIAsTNPumcSRL0gYL81a2xYoNhsmaDF8ZnlPKhYvlx/Wiq+uPK9qFoCA==
+ bh=Mk3fmKp6Ye4Xi+ksKXbp0FVG988g61HDqudHbzsv8Sk=;
+ b=cPHuhPledD6+OBARqhe2YUbwShwo8Ic9R4EL9SfV/doj18clcg7+sGPbxkNoemlY/a818IJlKp78GPAi6//ylhsn22ykl5spO8MVps9v9BcKtcrTwBoZC5erQhJW33wu+ZGWcAiKILwzUtQqAw9vg2VPOFQL4dVjuMs4s/Kr32IOw03bgTQl1g+9pBioFJNzCGmrpYutHOZMGIrHReE+ztrtnOiXFZewtIX5bnY1P+tw5wOfvcM4mo4M2WVkIgIQaKIWXfpyorZ09A9LeWR1dc8Ypvb/1OpEhZU7HtIGvcWvaVJHpHXUKynqEsU+RdKAk1V33qmTVEw3iUqg95tg1g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NJm0S2QQXlSezEK7VTdNsDc3OGYreQT+1IPNMY+eX5A=;
- b=saqnuThww2N5M1S5sTY6QEZTEhNUEly8K7s+6RIDFpTskFD4mPsT7lWjycV48bXeO6Wl82Dmsj17oZSoWkX8zPDLEl4yiltjWDIzMKZ5PoMxJ8i8lgj3nxXYxhFTknRISdsyXi7TI/cmBvwg87IFAVuHR3hMb/3eD8XgdKnbxWc=
+ bh=Mk3fmKp6Ye4Xi+ksKXbp0FVG988g61HDqudHbzsv8Sk=;
+ b=SnVDpHRvwl/oUT4m1+fLcYTA4j94V4HMnCwXFzBugZDoVGvwywxwuJvb5gxnEtClA0JNSldan67x5Pj1KaOvGypusmnpJVyGdOGNfBkPwn3uLJEw/fRFEWR8njSFKIIfGmxVG0xV+Yyivf8nMaqDdDMoWdskUG2VLE0vWnMPHyk=
 Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB4520.namprd04.prod.outlook.com (2603:10b6:a03:5f::33) with
+ by BY5PR04MB6884.namprd04.prod.outlook.com (2603:10b6:a03:222::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Thu, 11 Jun
- 2020 01:35:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Thu, 11 Jun
+ 2020 01:53:07 +0000
 Received: from BYAPR04MB4965.namprd04.prod.outlook.com
  ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
  ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3066.023; Thu, 11 Jun 2020
- 01:35:34 +0000
+ 01:53:06 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Daeho Jeong <daeho43@gmail.com>,
-        Daeho Jeong <daehojeong@google.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: Question about blkdev_issue_zeroout()
-Thread-Topic: Question about blkdev_issue_zeroout()
-Thread-Index: AQHWPgrYecJlsJZTA06ZiAEFeZpWDg==
-Date:   Thu, 11 Jun 2020 01:35:34 +0000
-Message-ID: <BYAPR04MB49655E779DE03C5149CCBBB586800@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <CACOAw_zf5HNDaFtaMBAFYDFQaQj6YaXADke8JGm=A7CYXiCN5w@mail.gmail.com>
+To:     Harshad Shirwadkar <harshadshirwadkar@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "bvanassche@acm.org" <bvanassche@acm.org>
+Subject: Re: [PATCH v2] blktrace: put bounds on BLKTRACESETUP buf_size and
+ buf_nr
+Thread-Topic: [PATCH v2] blktrace: put bounds on BLKTRACESETUP buf_size and
+ buf_nr
+Thread-Index: AQHWP5BXDx26ID9vUECrnGzQKUaQfA==
+Date:   Thu, 11 Jun 2020 01:53:06 +0000
+Message-ID: <BYAPR04MB4965F7009BA4E07B57B0E0CE86800@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20200611013326.218542-1-harshadshirwadkar@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -88,139 +89,218 @@ authentication-results: gmail.com; dkim=none (message not signed)
 x-originating-ip: [199.255.45.62]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: c8d3e2f6-6fc0-4c02-bed1-08d80da7bc47
-x-ms-traffictypediagnostic: BYAPR04MB4520:
-x-microsoft-antispam-prvs: <BYAPR04MB45207A0A9305062A0C9658A886800@BYAPR04MB4520.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 891fb5f4-5861-42a4-6a5e-08d80daa2fc1
+x-ms-traffictypediagnostic: BY5PR04MB6884:
+x-microsoft-antispam-prvs: <BY5PR04MB68845DAECE679E6AD74F257886800@BY5PR04MB6884.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 0431F981D8
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +WS0UWoM6Q+Y0kOSEM/a74TrdH4cvhSacKe/YrLy5XJQVR4xkFOfhuBGrwoDnX0Hy7rN241aoz6aQFNyYsz6l9lH/SlFygnpO4/7WDTVcE2QhKFaQD26sK1f24lR6X3d0Ljr36S2nJ+61libAPhVhT/oGsmSBMwuiB56wosaWBCNwCcvfHHfuDu6EhT0onZML7vuThVhwmVbJZGYsBmUKGhE45acF3nVe6A3yRLZhDPER6vnPW0JQ9P/Tn0r9kmhyMvYEeXijE8FWyV3NLPw1x+lJyvAIFN25MV4BGCiSiCJLyYFUYVnCxZYz0/92bFEu22PTECNYR0Sizhx8/k3bA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(136003)(346002)(376002)(39860400002)(186003)(66556008)(76116006)(64756008)(5660300002)(8936002)(26005)(316002)(66446008)(66476007)(52536014)(8676002)(478600001)(33656002)(66946007)(55016002)(7116003)(9686003)(110136005)(83380400001)(6506007)(53546011)(86362001)(71200400001)(2906002)(4326008)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: rc7SA4v0JZCMCKXyHSH5aDjfZlyvowEju4Z7Mf+jR+scvB99kxg5k90jsDrciaov/1LrbirW+OFQUIKdM0wscDEoIfaX9ZH37dryCS3/qw+SnUEyDbEDIWq+WJNgn6HWVA8YMRLP6hrlCyqneVXOvSOYqo4N+ODdMMUwx6RyNV99ochUliLWCzWExm6hsH49Kw6ZXfqkzUFfao8/8u1t5hFi+KIb3WdYZnBJHTK4KptWxUI+dTzr2v5ssBi+rTXf5tcopEtqVj/M2xNW4VT5tSVWEYU0blbv3mN/UPtPujhs62RKjY8Agd5fovwhctQ+rMo3Jod69JHoLYXQX9GepuTdzbrs+OyTVEvtNzpqBW0ExmZk0NO/pIwGEsZ4ahDM8fZutBfHEksQmQ4OVa1PH0vyazVHzcd7POhgrxH/zymJP+zmBfx7Uq5Ns8ufhoAJ55hhEXQe06QjvX5OQx4PpuGUjGCjh9EYhqdU0aqEchY=
+x-microsoft-antispam-message-info: 2AoLVAoQYHBidvmaaSOW41+UoVEuj7hixtlMvWn+138sgJm7YnJUaQxR+h6WLrSnKjg1amUi0mkVptfMMXzawEBu/vmq7+SwfreGx7+fy2DBuBxhRjRl7sMGPRdtZ14fC6bYgYCSMkv70w1tK/z688SAbIUHQ6Xox82rTFYrG0qAnRnBeuHMhGMndR9GNiXwtsTNKMUZYw/XFN2W5zk/r4Pm7jG2QN1VLSNOCV5SVGSFzS6B5AD5LjVFPMcp2RdQgwgukxAAjbbOTglY9Uad4Xx44hRIFlHMnlZ/n3icixcpFEKj1g4I37CjzFj1Gbcc9gNnwuMuweCF2l0N84bUvg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(376002)(346002)(396003)(136003)(478600001)(53546011)(316002)(26005)(110136005)(7696005)(186003)(6506007)(33656002)(4326008)(83380400001)(71200400001)(5660300002)(52536014)(66556008)(76116006)(66946007)(55016002)(8936002)(8676002)(9686003)(66476007)(86362001)(66446008)(64756008)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: X9LSrIAO5Tqlf9uryQpOQdVKXZcZRzDsjNwlz5iXOf67ay9obBWuNPwoYST/7kJ7Q4sbBZVtpn5S32wn+qGG+UpT4TTGb2tnoGIB0tRoCeymjiYkrq0D5S+bdIC3YSeTQYyi9qY0VtAeVrEfMZq2Q4zLkMxNMIVJ1+nU0aSsFdrkveMmcsxEfnlT6pbYcwXTSigA6dAogyEb5q+OuOkdYIKrxCZZne10m/qqLsCZBrKCu6+o4hBGxOFMo4nZYPTqx4QlhYBm89CIQUh+fz9QfWAY5std6rvcH5mbAQq6CxVK5Vqhvm6v6UA7OXohPo8QOyGvrlXINe1o2JTWtWDq5Vuz9+cyrREZ4QDz6+/K+321k9Rh1X3Q6HDcwXcgMAlBTyrk3pR8pIsRp7d0F73WGEDxReJQ4YaJJuKgciPlm2UZ+joqJvC0PQu9ZyHqSE+0AKfNh01GMGLLy+HUIuXFaWRpVoNZdr4we4RPRxqD07w=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8d3e2f6-6fc0-4c02-bed1-08d80da7bc47
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2020 01:35:34.1113
+X-MS-Exchange-CrossTenant-Network-Message-Id: 891fb5f4-5861-42a4-6a5e-08d80daa2fc1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2020 01:53:06.8532
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: M8f+2Oh2bDABV/KcJ8otl1mnaCHZFUfjPvbfMb8pkftXmKsWdywJAVPgtG4D3M3mCU9hHRykbSI3LzpNWC1s9Qq9OCZp4Lq6qPgIux36Z8A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4520
+X-MS-Exchange-CrossTenant-userprincipalname: 9sn55FOfuKhvr7w1r5oAbpczVIhVgRpbgDuyc2AH8zIlRACZhv64TepKFqTkiiHye77LUiOwjGeztHrH45EtFJENPokD85o6MVOGYZx27Zo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6884
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Daeho,=0A=
-=0A=
-On 6/8/20 8:05 PM, Daeho Jeong wrote:=0A=
-> Hi guys,=0A=
+On 6/10/20 6:33 PM, Harshad Shirwadkar wrote:=0A=
+> Make sure that user requested memory via BLKTRACESETUP is within=0A=
+> bounds. This can be easily exploited by setting really large values=0A=
+> for buf_size and buf_nr in BLKTRACESETUP ioctl.=0A=
 > =0A=
-> When I looked into blkdev_issue_zeroout(), I found something that I=0A=
-> cannot understand there. In my understanding, all the submitted bio=0A=
-> will stay in the plug list during plugging. But, I found=0A=
-> submit_bio_wait() calling during the plugging. I guess the below=0A=
-> submit_bio_wait() might wait forever in the lower kernel version like=0A=
-> 4.14, because of plugging. If I am wrong, plz, correct me.=0A=
+> blktrace program has following hardcoded values for bufsize and bufnr:=0A=
+> BUF_SIZE=3D(512 * 1024)=0A=
+> BUF_NR=3D(4)=0A=
 > =0A=
->       >>>  blk_start_plug(&plug); <<<=0A=
->          if (try_write_zeroes) {=0A=
->                  ret =3D __blkdev_issue_write_zeroes(bdev, sector, nr_sec=
-ts,=0A=
->                                                    gfp_mask, &bio, flags)=
-;=0A=
->          } else if (!(flags & BLKDEV_ZERO_NOFALLBACK)) {=0A=
->                  ret =3D __blkdev_issue_zero_pages(bdev, sector, nr_sects=
-,=0A=
->                                                  gfp_mask, &bio);=0A=
->          } else {=0A=
->                  /* No zeroing offload support */=0A=
->                  ret =3D -EOPNOTSUPP;=0A=
->          }=0A=
->          if (ret =3D=3D 0 && bio) {=0A=
->                  ret =3D submit_bio_wait(bio);=0A=
->                  bio_put(bio);=0A=
->          }=0A=
->        >>> blk_finish_plug(&plug); <<<=0A=
+> This is very easy to exploit. Setting buf_size / buf_nr in userspace=0A=
+> program to big values make kernel go oom.=0A=
 > =0A=
+> This patch adds a new new sysfs tunable called "blktrace_max_alloc"=0A=
+> with the default value as:=0A=
+> blktrace_max_alloc=3D(1024 * 1024 * 16)=0A=
+> =0A=
+> Verified that the fix makes BLKTRACESETUP return -E2BIG if the=0A=
+> buf_size * buf_nr crosses the configured upper bound in the device's=0A=
+> sysfs file. Verified that the bound checking is turned off when we=0A=
+> write 0 to the sysfs file.=0A=
+> =0A=
+> Signed-off-by: Harshad Shirwadkar <harshadshirwadkar@gmail.com>=0A=
+> ---=0A=
+>   Documentation/block/queue-sysfs.rst |  8 ++++++++=0A=
+>   block/blk-settings.c                |  1 +=0A=
+>   block/blk-sysfs.c                   | 27 +++++++++++++++++++++++++++=0A=
+>   include/linux/blkdev.h              |  5 +++++=0A=
+>   kernel/trace/blktrace.c             |  8 ++++++++=0A=
+>   5 files changed, 49 insertions(+)=0A=
+> =0A=
+> diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/qu=
+eue-sysfs.rst=0A=
+> index 6a8513af9201..ef4eec68cd24 100644=0A=
+> --- a/Documentation/block/queue-sysfs.rst=0A=
+> +++ b/Documentation/block/queue-sysfs.rst=0A=
+> @@ -251,4 +251,12 @@ devices are described in the ZBC (Zoned Block Comman=
+ds) and ZAC=0A=
+>   do not support zone commands, they will be treated as regular block dev=
+ices=0A=
+>   and zoned will report "none".=0A=
+>   =0A=
+> +blktrace_max_alloc (RW)=0A=
+> +----------=0A=
+nit:-based on the pattern present in the same file how about following?=0A=
 =0A=
-If your analysis is correct then this is true for=0A=
-blkdev_issue_write_same() and blkdev_issue_discard() also ?=0A=
+blk_trace_max_alloc (RW)=0A=
+------------------------=0A=
 =0A=
-If I understand plugging correctly then when a process is going to wait =0A=
-on the I/O to finish (here submit_bio_wait(), the device is unplugged=0A=
-and request dispatching to the device driver is started. Does that mean =0A=
-we should finish plug before we wait ?=0A=
+> +BLKTRACESETUP ioctl takes the number of buffers and the size of each=0A=
+> +buffer as an argument and uses these values to allocate kernel memory=0A=
+> +for tracing purpose. This is the limit on the maximum kernel memory=0A=
+> +that can be allocated by BLKTRACESETUP ioctl. The default limit is=0A=
+> +16MB. Value of 0 indicates that this bound checking is disabled.=0A=
+> +=0A=
+>   Jens Axboe <jens.axboe@oracle.com>, February 2009=0A=
+> diff --git a/block/blk-settings.c b/block/blk-settings.c=0A=
+> index 9a2c23cd9700..38535aa146f4 100644=0A=
+> --- a/block/blk-settings.c=0A=
+> +++ b/block/blk-settings.c=0A=
+> @@ -60,6 +60,7 @@ void blk_set_default_limits(struct queue_limits *lim)=
 =0A=
-Just for a discussion following untested patch which unplugs before =0A=
-submit_bio_wait() in blk-lib.c and maintains the original behaviour :-=0A=
+>   	lim->io_opt =3D 0;=0A=
+>   	lim->misaligned =3D 0;=0A=
+>   	lim->zoned =3D BLK_ZONED_NONE;=0A=
+> +	lim->blktrace_max_alloc =3D BLKTRACE_MAX_ALLOC;=0A=
+>   }=0A=
+>   EXPORT_SYMBOL(blk_set_default_limits);=0A=
+>   =0A=
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c=0A=
+> index 02643e149d5e..e849e80930c4 100644=0A=
+> --- a/block/blk-sysfs.c=0A=
+> +++ b/block/blk-sysfs.c=0A=
+> @@ -496,6 +496,26 @@ static ssize_t queue_wb_lat_store(struct request_que=
+ue *q, const char *page,=0A=
+>   	return count;=0A=
+>   }=0A=
+>   =0A=
+> +static ssize_t queue_blktrace_max_alloc_show(struct request_queue *q, ch=
+ar *page)=0A=
+> +{=0A=
+> +	return queue_var_show(q->limits.blktrace_max_alloc, page);=0A=
+> +}=0A=
+> +=0A=
+> +static ssize_t queue_blktrace_max_alloc_store(struct request_queue *q,=
 =0A=
- From 253ae720f721b2789d8fcde3861aeac6766b4836 Mon Sep 17 00:00:00 2001=0A=
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-Date: Wed, 10 Jun 2020 18:23:19 -0700=0A=
-Subject: [PATCH] block: finish plug before submit_bio_wait()=0A=
+> +					      const char *page,=0A=
+> +					      size_t count)=0A=
+> +{=0A=
+> +	unsigned long blktrace_max_alloc;=0A=
+> +	int ret;=0A=
+> +=0A=
+> +	ret =3D queue_var_store(&blktrace_max_alloc, page, count);=0A=
+> +	if (ret < 0)=0A=
+> +		return ret;=0A=
+> +=0A=
+> +	q->limits.blktrace_max_alloc =3D blktrace_max_alloc;=0A=
+> +	return count;=0A=
+> +}=0A=
+> +=0A=
+>   static ssize_t queue_wc_show(struct request_queue *q, char *page)=0A=
+>   {=0A=
+>   	if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))=0A=
+> @@ -731,6 +751,12 @@ static struct queue_sysfs_entry queue_wb_lat_entry =
+=3D {=0A=
+>   	.store =3D queue_wb_lat_store,=0A=
+>   };=0A=
+>   =0A=
+> +static struct queue_sysfs_entry queue_blktrace_max_alloc_entry =3D {=0A=
+> +	.attr =3D {.name =3D "blktrace_max_alloc", .mode =3D 0644 },=0A=
+> +	.show =3D queue_blktrace_max_alloc_show,=0A=
+> +	.store =3D queue_blktrace_max_alloc_store,=0A=
+> +};=0A=
+> +=0A=
+>   #ifdef CONFIG_BLK_DEV_THROTTLING_LOW=0A=
+>   static struct queue_sysfs_entry throtl_sample_time_entry =3D {=0A=
+>   	.attr =3D {.name =3D "throttle_sample_time", .mode =3D 0644 },=0A=
+> @@ -779,6 +805,7 @@ static struct attribute *queue_attrs[] =3D {=0A=
+>   #ifdef CONFIG_BLK_DEV_THROTTLING_LOW=0A=
+>   	&throtl_sample_time_entry.attr,=0A=
+>   #endif=0A=
+> +	&queue_blktrace_max_alloc_entry.attr,=0A=
+Is above attribute needs to be under CONFIG_BLK_DEV_IO_TRACE guard ?=0A=
+>   	NULL,=0A=
+>   };=0A=
+>   =0A=
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
+> index 8fd900998b4e..3a72b0fd723e 100644=0A=
+> --- a/include/linux/blkdev.h=0A=
+> +++ b/include/linux/blkdev.h=0A=
+> @@ -309,6 +309,10 @@ enum blk_queue_state {=0A=
+>   #define BLK_SCSI_MAX_CMDS	(256)=0A=
+>   #define BLK_SCSI_CMD_PER_LONG	(BLK_SCSI_MAX_CMDS / (sizeof(long) * 8))=
 =0A=
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
----=0A=
-  block/blk-lib.c | 6 +++---=0A=
-  1 file changed, 3 insertions(+), 3 deletions(-)=0A=
+>   =0A=
+> +#define BLKTRACE_MAX_BUFSIZ	(1024 * 1024)=0A=
+nit:- macro name ending with SIZ is unusual for include/linux/blkdev.h.=0A=
+Consider renaming it to BLKTRACE_MAX_BUF_SIZE.=0A=
+> +#define BLKTRACE_MAX_BUFNR	16=0A=
+nit:- just like BLKTRACE_MAX_BUFSIZ value of BLKTRACE_MAX_BUFNR needs to =
 =0A=
-diff --git a/block/blk-lib.c b/block/blk-lib.c=0A=
-index 5f2c429d4378..992de09b258d 100644=0A=
---- a/block/blk-lib.c=0A=
-+++ b/block/blk-lib.c=0A=
-@@ -104,13 +104,13 @@ int blkdev_issue_discard(struct block_device =0A=
-*bdev, sector_t sector,=0A=
-  	blk_start_plug(&plug);=0A=
-  	ret =3D __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, flags,=
+be guarded by () ?=0A=
+> +#define BLKTRACE_MAX_ALLOC	((BLKTRACE_MAX_BUFSIZ) * (BLKTRACE_MAX_BUFNR)=
+)=0A=
+nit:- The macro BLKTRACE_MAX_BUFSIZ already has () we can get rid of the =
 =0A=
-  			&bio);=0A=
-+	blk_finish_plug(&plug);=0A=
-  	if (!ret && bio) {=0A=
-  		ret =3D submit_bio_wait(bio);=0A=
-  		if (ret =3D=3D -EOPNOTSUPP)=0A=
-  			ret =3D 0;=0A=
-  		bio_put(bio);=0A=
-  	}=0A=
--	blk_finish_plug(&plug);=0A=
-=0A=
-  	return ret;=0A=
-  }=0A=
-@@ -200,11 +200,11 @@ int blkdev_issue_write_same(struct block_device =0A=
-*bdev, sector_t sector,=0A=
-  	blk_start_plug(&plug);=0A=
-  	ret =3D __blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask, page=
-,=0A=
-  			&bio);=0A=
-+	blk_finish_plug(&plug);=0A=
-  	if (ret =3D=3D 0 && bio) {=0A=
-  		ret =3D submit_bio_wait(bio);=0A=
-  		bio_put(bio);=0A=
-  	}=0A=
--	blk_finish_plug(&plug);=0A=
-  	return ret;=0A=
-  }=0A=
-  EXPORT_SYMBOL(blkdev_issue_write_same);=0A=
-@@ -381,11 +381,11 @@ int blkdev_issue_zeroout(struct block_device =0A=
-*bdev, sector_t sector,=0A=
-  		/* No zeroing offload support */=0A=
-  		ret =3D -EOPNOTSUPP;=0A=
-  	}=0A=
-+	blk_finish_plug(&plug);=0A=
-  	if (ret =3D=3D 0 && bio) {=0A=
-  		ret =3D submit_bio_wait(bio);=0A=
-  		bio_put(bio);=0A=
-  	}=0A=
--	blk_finish_plug(&plug);=0A=
-  	if (ret && try_write_zeroes) {=0A=
-  		if (!(flags & BLKDEV_ZERO_NOFALLBACK)) {=0A=
-  			try_write_zeroes =3D false;=0A=
--- =0A=
-2.27.0=0A=
+extra inner () for BLKTRACE_MAX_BUFSIZ in BLKTRACE_MAX_ALLOC.=0A=
+> +=0A=
+>   /*=0A=
+>    * Zoned block device models (zoned limit).=0A=
+>    */=0A=
+> @@ -322,6 +326,7 @@ struct queue_limits {=0A=
+>   	unsigned long		bounce_pfn;=0A=
+>   	unsigned long		seg_boundary_mask;=0A=
+>   	unsigned long		virt_boundary_mask;=0A=
+> +	unsigned long		blktrace_max_alloc;=0A=
+>   =0A=
+>   	unsigned int		max_hw_sectors;=0A=
+>   	unsigned int		max_dev_sectors;=0A=
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c=0A=
+> index ea47f2084087..de028bdbb148 100644=0A=
+> --- a/kernel/trace/blktrace.c=0A=
+> +++ b/kernel/trace/blktrace.c=0A=
+> @@ -477,11 +477,19 @@ static int do_blk_trace_setup(struct request_queue =
+*q, char *name, dev_t dev,=0A=
+>   {=0A=
+>   	struct blk_trace *bt =3D NULL;=0A=
+>   	struct dentry *dir =3D NULL;=0A=
+> +	u32 alloc_siz;=0A=
+nit:- please use full names 's/alloc_siz/alloc_size/'=0A=
+>   	int ret;=0A=
+>   =0A=
+>   	if (!buts->buf_size || !buts->buf_nr)=0A=
+>   		return -EINVAL;=0A=
+>   =0A=
+> +	if (check_mul_overflow(buts->buf_size, buts->buf_nr, &alloc_siz))=0A=
+> +		return -E2BIG;=0A=
+> +=0A=
+> +	if (q->limits.blktrace_max_alloc &&=0A=
+> +	    alloc_siz > q->limits.blktrace_max_alloc)=0A=
+> +		return -E2BIG;=0A=
+> +=0A=
+>   	if (!blk_debugfs_root)=0A=
+>   		return -ENOENT;=0A=
+>   =0A=
+> =0A=
 =0A=
