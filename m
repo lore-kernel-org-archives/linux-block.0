@@ -2,75 +2,75 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 359BDC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA26C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E8F22083E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B86CA2083E
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 14:09:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMZgDBZn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dGcIY12W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726471AbgFKOHy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 10:07:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        id S1726109AbgFKOJB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 10:09:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbgFKOHy (ORCPT
+        with ESMTP id S1726444AbgFKOJA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 10:07:54 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1A7C08C5C1
-        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:07:52 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id y13so6629537eju.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:07:52 -0700 (PDT)
+        Thu, 11 Jun 2020 10:09:00 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6661C08C5C2
+        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:08:58 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id y13so6633675eju.2
+        for <linux-block@vger.kernel.org>; Thu, 11 Jun 2020 07:08:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=sBZCAFP78v5xfVnE168pR3j2RBXpcVNVGT19lNoxO1w=;
-        b=SMZgDBZn0jwIw/TZ8ir5nFxm+c6/RE98ofUO2Ip7RNKzlyrGNb4b+xIOZyNCzDZ9b1
-         JtSpR5Wt7Bvv6RzCYqN71xdx0uBbM3Ca26ZSGaUC4Z+SLGMI1Zn0wzSBezXOXV+0AW+r
-         /NJRhAUE0UT+tyaNKR2kZ/C5SL+l1UtwN6QoIybls7jixNekpLmJYUhpX/F9Z+zXLLMG
-         EY5CKJDZCib8mZqbvMeZU5f5yI64vN7lErl62iR9sETuNykcrZ5CXJ+xXF3gwQFnpGdm
-         jQtNUfawgJGGgjYI2ZdF7SVHeVEOGfX9cVyKGrmG3KQIcXcxM/bF65hJiDYx3mObQ6K0
-         GISw==
+        bh=ywxAzDifu4/Lt4nUclP2yZ7GdJmm8BVW01PZ3M/CpuU=;
+        b=dGcIY12W7IQN/4zKQpo+enj84L9FnrrJ4Z4DvDO8uXvIyn7V9tjmYK4R83qhrEaKN8
+         gXV4S0MoR27uqIQqyWnNdXa4Ri0i5itrlxLkUREhGvKw87qMZGc46/baDbSYaxg3TaPw
+         iC9ts+ubPddq0s0nLTHJ66HnPNUn/117dPJBLfTzmPbzRrr/fft6Eerf3KL08hRSDRNh
+         b9VEvKLp3qzK6/XXTJqbakQbLCgL53KKEykSJ9QRdNw+qR0VKGGB5GCAc6AEU/FDBndh
+         VwxtmmFGBuk6QnNT9C2FwKrrIqirRFP8uFI/eQ5KIWiU7Lg/fTsoY1S6s8inQc1401I3
+         npIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=sBZCAFP78v5xfVnE168pR3j2RBXpcVNVGT19lNoxO1w=;
-        b=ukiRwU/ipR0y24JvON0FiYuuOH8M4BtPPk5NHdwQKfz+zIF2hCff/TF4F/2e6Nuks8
-         /x2RfXmYGSN+3Y24S8Z68g+Sz3tl6eOxYO57LF/0LXJcxDuIt2irJgAEirAoYuiDldUj
-         XCAkz1ZgCb0wAoH+xXo5L5v1HH+4mOFem3mEsyWWciMU2oofg82zrNfyO4SxDAJ/8g5f
-         K21KmAfGDdBiS02Vx+lPGeee/RVOUZd6yt/BPb19sIIyzf64uALJJiIcOKSX4CrStsrg
-         wYBZrZHscBmMkbqzJQjJw2QfwBnTlhIVD5Vbk/Sq/3izrdOh3N8HszUkK43J/5G/9Z4g
-         4vPw==
-X-Gm-Message-State: AOAM530Dw1sYGCkDuqCx07vCC01hciskDJ+By8ynGWrL8qVtPf22h/nI
-        7AH3NTFoKqsQOPfGsTuJ2YDoHZKbOaY=
-X-Google-Smtp-Source: ABdhPJx2DTndnEqtVam0Pg75BQb+cPzKUTILGbLHtaRAnBb9BmBDZRxxO5jTKn5DcWqPOotUfpW8Ug==
-X-Received: by 2002:a17:906:4ec1:: with SMTP id i1mr8294417ejv.152.1591884471277;
-        Thu, 11 Jun 2020 07:07:51 -0700 (PDT)
+        bh=ywxAzDifu4/Lt4nUclP2yZ7GdJmm8BVW01PZ3M/CpuU=;
+        b=Uey7sBgKdg/GNz1YOnIiLXabBCw4vIisKoWoFLnqDrgX3rTNUcbMNYXeOhiuLX1WYx
+         iMwfDYRr8ys0SWQVNFL0WnVgWLOqwi0jdtPv7D8bbZ0l3CoumNk4hHr4mIgm5pnLh2dz
+         TAn2yIKIO7sLsMWeeFl0n5sFBffUWR/6zz87i6AG1CM12NO+KFb55s3D+jSX2H8lhniZ
+         4t/rDGHk2yvPPZfCGcu//JtXIjSme72CGe0DIMYw+kHQA7hSHOXvXSq4n4RaSlSrPTsc
+         PqeF6qaHw7ndSTogCiDQ+45gs8B6HPrmeJ8x8e7o4S4aO9VeZ5KhgXKyF2WUgjVTY8WN
+         nzQA==
+X-Gm-Message-State: AOAM530wl4HB1B9pAaSquMB02N+eikqAbP1l17rHjtc+5rlFlpvSy7iv
+        7U0ok22DZxU8QSYdX5dPWlC3lQ==
+X-Google-Smtp-Source: ABdhPJzHCFEYHDE6Y7f7Zi15DPw4zTS2b17SG2jrg9z9gfMVBuW/Q5+jGH7XSAHxsu3sm33u9sB3mg==
+X-Received: by 2002:a17:906:7acf:: with SMTP id k15mr8830436ejo.410.1591884536972;
+        Thu, 11 Jun 2020 07:08:56 -0700 (PDT)
 Received: from [192.168.0.2] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id fw16sm1906673ejb.55.2020.06.11.07.07.50
+        by smtp.gmail.com with ESMTPSA id n16sm1918051ejl.70.2020.06.11.07.08.55
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jun 2020 07:07:50 -0700 (PDT)
+        Thu, 11 Jun 2020 07:08:56 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 3/3] bfq: Use only idle IO periods for think time
- calculations
+Subject: Re: [PATCH 1/3] bfq: Avoid false bfq queue merging
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20200605141629.15347-3-jack@suse.cz>
-Date:   Thu, 11 Jun 2020 16:11:10 +0200
-Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20200611083149.GB18088@quack2.suse.cz>
+Date:   Thu, 11 Jun 2020 16:12:15 +0200
+Cc:     linux-block <linux-block@vger.kernel.org>, stable@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <934FEB51-BB23-4ACA-BCEC-310E56A910CC@linaro.org>
+Message-Id: <AF7DA035-BC93-42D2-B0B6-8ECC3273DEBC@linaro.org>
 References: <20200605140837.5394-1-jack@suse.cz>
- <20200605141629.15347-3-jack@suse.cz>
+ <20200605141629.15347-1-jack@suse.cz>
+ <FC3651A1-DB65-4A77-9BFB-ACAB80E54F3E@linaro.org>
+ <20200611083149.GB18088@quack2.suse.cz>
 To:     Jan Kara <jack@suse.cz>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-block-owner@vger.kernel.org
@@ -80,64 +80,72 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 5 giu 2020, alle ore 16:16, Jan Kara <jack@suse.cz> ha =
+> Il giorno 11 giu 2020, alle ore 10:31, Jan Kara <jack@suse.cz> ha =
 scritto:
 >=20
-> Currently whenever bfq queue has a request queued we add now -
-> last_completion_time to the think time statistics. This is however
-> misleading in case the process is able to submit several requests in
-> parallel because e.g. if the queue has request completed at time T0 =
-and
-> then queues new requests at times T1, T2, then we will add T1-T0 and
-> T2-T0 to think time statistics which just doesn't make any sence (the
-> queue's think time is penalized by the queue being able to submit more
-> IO).
+> On Thu 11-06-20 09:13:07, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 5 giu 2020, alle ore 16:16, Jan Kara <jack@suse.cz> ha =
+scritto:
+>>>=20
+>>> bfq_setup_cooperator() uses bfqd->in_serv_last_pos so detect whether =
+it
+>>> makes sense to merge current bfq queue with the in-service queue.
+>>> However if the in-service queue is freshly scheduled and didn't =
+dispatch
+>>> any requests yet, bfqd->in_serv_last_pos is stale and contains value
+>>> from the previously scheduled bfq queue which can thus result in a =
+bogus
+>>> decision that the two queues should be merged.
+>>=20
+>> Good catch!=20
+>>=20
+>>> This bug can be observed
+>>> for example with the following fio jobfile:
+>>>=20
+>>> [global]
+>>> direct=3D0
+>>> ioengine=3Dsync
+>>> invalidate=3D1
+>>> size=3D1g
+>>> rw=3Dread
+>>>=20
+>>> [reader]
+>>> numjobs=3D4
+>>> directory=3D/mnt
+>>>=20
+>>> where the 4 processes will end up in the one shared bfq queue =
+although
+>>> they do IO to physically very distant files (for some reason I was =
+able to
+>>> observe this only with slice_idle=3D1ms setting).
+>>>=20
+>>> Fix the problem by invalidating bfqd->in_serv_last_pos when =
+switching
+>>> in-service queue.
+>>>=20
+>>=20
+>> Apart from the nonexistent problem that even 0 is a valid LBA :)
+>=20
+> Yes, I was also thinking about that and decided 0 is "good enough" :). =
+But
+> I just as well just switch to (sector_t)-1 if you think it would be =
+better.
+>=20
 
-I've thought about this issue several times.  My concern is that, by
-updating the think time only when strictly meaningful, we reduce the
-number of samples.  In some cases, we may reduce it to a very low
-value.  For this reason, so far I have desisted from changing the
-current scheme.  IOW, I opted for dirtier statistics to avoid the risk
-of too scarse statistics.  Any feedback is very welcome.
+0 is ok :)
 
 Thanks,
 Paolo
 
-> So add to think time statistics only time intervals when the queue
-> had no IO pending.
+>> Acked-by: Paolo Valente <paolo.valente@linaro.org>
 >=20
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
-> block/bfq-iosched.c | 12 ++++++++++--
-> 1 file changed, 10 insertions(+), 2 deletions(-)
+> Thanks!
 >=20
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index c66c3eaa9e26..4b1c9c5f57b6 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -5192,8 +5192,16 @@ static void bfq_update_io_thinktime(struct =
-bfq_data *bfqd,
-> 				    struct bfq_queue *bfqq)
-> {
-> 	struct bfq_ttime *ttime =3D &bfqq->ttime;
-> -	u64 elapsed =3D ktime_get_ns() - bfqq->ttime.last_end_request;
-> -
-> +	u64 elapsed;
-> +=09
-> +	/*
-> +	 * We are really interested in how long it takes for the queue =
-to
-> +	 * become busy when there is no outstanding IO for this queue. =
-So
-> +	 * ignore cases when the bfq queue has already IO queued.
-> +	 */
-> +	if (bfqq->dispatched || bfq_bfqq_busy(bfqq))
-> +		return;
-> +	elapsed =3D ktime_get_ns() - bfqq->ttime.last_end_request;
-> 	elapsed =3D min_t(u64, elapsed, 2ULL * bfqd->bfq_slice_idle);
+> 								Honza
 >=20
-> 	ttime->ttime_samples =3D (7*ttime->ttime_samples + 256) / 8;
 > --=20
-> 2.16.4
->=20
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
 
