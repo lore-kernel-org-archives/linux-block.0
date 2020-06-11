@@ -2,234 +2,175 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB9BC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F47C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 11:20:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CC0F20760
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51288207C3
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 11:20:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="Il3HXSPN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727045AbgFKKYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 06:24:10 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2301 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726693AbgFKKYJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 06:24:09 -0400
-Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id DF66BA7A270A5D09600F;
-        Thu, 11 Jun 2020 11:24:06 +0100 (IST)
-Received: from [127.0.0.1] (10.210.169.30) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 11 Jun
- 2020 11:24:05 +0100
-Subject: Re: [PATCH RFC v7 05/12] blk-mq: Record nr_active_requests per queue
- for when using shared sbitmap
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
-        <kashyap.desai@broadcom.com>, <sumit.saxena@broadcom.com>,
-        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
-        <shivasharan.srikanteshwara@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
-        <megaraidlinux.pdl@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-6-git-send-email-john.garry@huawei.com>
- <20200611040455.GD453671@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <9a5dcb3a-8f5c-ab10-7631-4bd1b58b49bb@huawei.com>
-Date:   Thu, 11 Jun 2020 11:22:47 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <20200611040455.GD453671@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+        id S1728015AbgFKLUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 07:20:38 -0400
+Received: from mx1.tq-group.com ([62.157.118.193]:49594 "EHLO mx1.tq-group.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727931AbgFKLUh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jun 2020 07:20:37 -0400
+IronPort-SDR: TRlUY6Sbw6GBO2PUyaGsRLL3BOYH+iccJ/vi5DyPw98yEi1khuYV639z6MOp84Sr21bmx45RjB
+ gp6VmhXap1miX9P7tf2DvnMcqxNirTE/I+UZmCWGLnv9bXRE70ZHn2HB8A15QhywkPkFCsyjW8
+ aufMr285bDtat7ldY3kXFMJWCG9t7p3beR3EtCmZMiqcN/pEnEaED3qt44tckgMwCbdiWnbc59
+ T75Feji9NfFv1Mdl9KW3dCXn4d8YM6BsYjEu+s7ZSzJXpmOPzsdb3GQJKsc05Vy3jk1QaZrX76
+ omQ=
+X-IronPort-AV: E=Sophos;i="5.73,499,1583190000"; 
+   d="scan'208";a="12649134"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 11 Jun 2020 13:20:32 +0200
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Thu, 11 Jun 2020 13:20:32 +0200
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Thu, 11 Jun 2020 13:20:32 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1591874432; x=1623410432;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ucvXkYYt7tPx+/jxBJ3kWXHMAb4QHM7JJ1bBSklbroU=;
+  b=Il3HXSPNoqV4h0Bj6C4G2Lm30B0tUYye7yhBpn5+WhKmA5CPxJna4CkA
+   lgYqgnNadti+7d+Dumorl3GKD5+WZQVuyNWIxmLDXZRtWAXpWyvYbbHpj
+   ZvJjRrzhej4SkCS7sf54+uobL0ZrenXPbr/Nlgj4k01WohruK4hOs0ywd
+   7Yss3U7CqeeSq/J99M5jTol0b0S4BemWlntfqJwrhkC38YFPj0wyxGw1T
+   5tjpW2y3J91AlU7erYhbD0zMJHoamZFbp9S4w4ya0CesrvFEs4m9XkNvL
+   2i0msZN2GnqlUBfUNEjueQfm68NvYdh3pwQxiMKkMS1iUr2DBC6cT5zLN
+   g==;
+IronPort-SDR: id5UekctAs1cKGw03oHNfmPm++wv/9AyR2WgCFVEMSiQV/BSVf09oUtHs3gFYtLoZJqmDQqnPu
+ HILsQ4+zt9AcZ/1XgHoDER8CPGZIgpWX3wF/t3oBtt5UQT8IKqKijeQwpKqi11T8xnKBkxdxdC
+ ymkHY4KOIqUmQST00l72Csp9ld9tWfYmMq03jNT5s/3bW7S16KNle6dnUce2DT7dSF1g2PfPon
+ 5BX4ui8Yeau6S0RU5NH2ChJ8500RtM2XdxAraSWZQgAkDGVcREmJ0GApYZaPGgK5e9W9XDwKJ/
+ Ybc=
+X-IronPort-AV: E=Sophos;i="5.73,499,1583190000"; 
+   d="scan'208";a="12649133"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 11 Jun 2020 13:20:32 +0200
+Received: from schifferm-ubuntu4.tq-net.de (schifferm-ubuntu4.tq-net.de [10.117.49.26])
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id B3679280065;
+        Thu, 11 Jun 2020 13:20:33 +0200 (CEST)
+Message-ID: <cfcec3df57e6dd5ef353ef3a5b4b9793c28eb401.camel@ew.tq-group.com>
+Subject: Re: (EXT) Re: Consistent block device references for root= cmdline
+From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Date:   Thu, 11 Jun 2020 13:20:30 +0200
+In-Reply-To: <CAPDyKFq+RiwbDj+58+W5GTcT7=ZOpZFmc02+FxjRGYwbBgA8oQ@mail.gmail.com>
+References: <fb0340aaf273be84e915214a3d8bae4ac85d7c0b.camel@ew.tq-group.com>
+         <CAPDyKFq+RiwbDj+58+W5GTcT7=ZOpZFmc02+FxjRGYwbBgA8oQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.169.30]
-X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> +static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs[] = {
->> +	{"state", 0400, hctx_state_show},
->> +	{"flags", 0400, hctx_flags_show},
->> +	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
->> +	{"busy", 0400, hctx_busy_show},
->> +	{"ctx_map", 0400, hctx_ctx_map_show},
->> +	{"sched_tags", 0400, hctx_sched_tags_show},
->> +	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
->> +	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
->> +	{"dispatched", 0600, hctx_dispatched_show, hctx_dispatched_write},
->> +	{"queued", 0600, hctx_queued_show, hctx_queued_write},
->> +	{"run", 0600, hctx_run_show, hctx_run_write},
->> +	{"active", 0400, hctx_active_show},
->> +	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
->> +	{}
->> +};
+On Wed, 2020-06-10 at 16:52 +0200, Ulf Hansson wrote:
+> On Wed, 10 Jun 2020 at 15:15, Matthias Schiffer
+> <matthias.schiffer@ew.tq-group.com> wrote:
+> > 
+> > Hello all,
+> > 
+> > there have been numerous attempts to make the numbering of mmcblk
+> > devices consistent, mostly by using aliases from the DTS ([1], [2],
+> > [3]), but all have been (rightfully) rejected. Unless I have
+> > overlooked
+> > a more recent development, no attempts for a different solution
+> > were
+> > made.
 > 
-> You may use macro or whatever to avoid so the duplication.
+> According to aliases attempts, I think those have failed, mainly
+> because of two reasons.
+> 
+> 1. Arguments stating that LABELs/UUIDs are variable alternatives.
+> This
+> isn't the case, which I think was also concluded from the several
+> earlier discussions.
+> 2. Patches that tried adding support for mmc aliases, were not
+> correctly coded. More precisely, what needs to be addressed is that
+> the mmc core also preserves the same ids to be set for the host class
+> as the block device, mmc[n] must correspond to mmcblk[n].
+> 
+> > 
+> > As far as I can tell, the core of the issue seems to be the
+> > following:
+> > 
+> > The existing solutions like LABELs and UUIDs are viable
+> > alternatives in
+> > many cases, but in particular on embedded systems, this is not
+> > quite
+> > sufficient: In addition to the problem that more knowledge about
+> > the
+> > system to boot is required in the bootloader, this approach fails
+> > completely when the same firmware image exists on multiple devices,
+> > for
+> > example on an eMMC and an SD card - not an entirely uncommon
+> > situation
+> > during the development of embedded systems.
+> > 
+> > With udev, I can refer to a specific partition using a path like
+> > /dev/disk/by-path/platform-2194000.usdhc-part2. In [4] it was
+> > proposed
+> > to add a way to refer to a device path/phandle from the kernel
+> > command
+> > line. Has there been any progress on this proposal?
+> 
+> Lots of time during the years I have been approached, both publicly
+> and offlist, about whether it would be possible to add support for
+> "consistent" mmcblk devices. To me, I am fine with the aliases
+> approach, as long as it gets implemented correctly.
 
-Let me check alternatives.
 
-> 
->> +
->>   static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
->>   	{"default_rq_list", 0400, .seq_ops = &ctx_default_rq_list_seq_ops},
->>   	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
->> @@ -878,13 +895,17 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
->>   				  struct blk_mq_hw_ctx *hctx)
->>   {
->>   	struct blk_mq_ctx *ctx;
->> +	struct blk_mq_tag_set *set = q->tag_set;
->>   	char name[20];
->>   	int i;
->>   
->>   	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
->>   	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
->>   
->> -	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
->> +	if (blk_mq_is_sbitmap_shared(set))
->> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_shared_sbitmap_attrs);
->> +	else
->> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
->>   
->>   	hctx_for_each_ctx(hctx, ctx, i)
->>   		blk_mq_debugfs_register_ctx(hctx, ctx);
->> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->> index 92843e3e1a2a..7db16e49f6f6 100644
->> --- a/block/blk-mq-tag.c
->> +++ b/block/blk-mq-tag.c
->> @@ -60,9 +60,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
->>    * For shared tag users, we track the number of currently active users
->>    * and attempt to provide a fair share of the tag depth for each of them.
->>    */
->> -static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
->> +static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
->>   				  struct sbitmap_queue *bt)
->>   {
->> +	struct blk_mq_hw_ctx *hctx = data->hctx;
->> +	struct request_queue *q = data->q;
->>   	unsigned int depth, users;
->>   
->>   	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
->> @@ -84,15 +86,15 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
->>   	 * Allow at least some tags
->>   	 */
->>   	depth = max((bt->sb.depth + users - 1) / users, 4U);
->> -	return atomic_read(&hctx->nr_active) < depth;
->> +	return __blk_mq_active_requests(hctx, q) < depth;
-> 
-> There is big change on 'users' too:
-> 
-> 	users = atomic_read(&hctx->tags->active_queues);
-> 
-> Originally there is single hctx->tags for these HBAs, now there are many
-> hctx->tags, so 'users' may become much smaller than before.
+It seems the principal technical problem is the one described here:
 
-Can you please check how I handled that in the next patch? There we 
-record the number of active request queues per set.
+https://www.spinics.net/lists/linux-mmc/msg26602.html
 
-(I will note that I could have combined some of these patches, but I 
-liked the piecemeal appraoch, and none of these paths are enabled until 
-later).
+I don't see any way to solve this completely, as there seem to be two
+fundamentally conflicting requirements:
+
+1) If a mounted SD card is replaced, it must be assigned a new
+/dev/mmcblkN
+2) /dev/mmcblkN should always match the configured alias IDs
+
+What is the reason we need 1) - is it possible to have multiple eMMCs
+or SD cards on a single bus, with detection at runtime? Otherwise I'd
+expect this to be handled like other drives with removable media (CD,
+floppy), with static device assignment.
+
+If we can't give up on 1) for some reason, we'll have to accept that we
+can't guarantee 2) unconditionally. As far as I can tell, the patches
+provided by Sascha and others did that in a reasonable way: The aliases
+would work in most cases - in particular for the first assignment on
+boot, which is required to find the correct rootfs.
 
 > 
-> Maybe '->active_queues' can be moved to tag_set for blk_mq_is_sbitmap_shared().
+> > 
+> > Kind regards,
+> > Matthias
+> > 
+> > 
+> > [1] https://patchwork.kernel.org/patch/8685711/
+> > [2] https://lore.kernel.org/patchwork/cover/674381/
+> > [3] https://www.spinics.net/lists/linux-mmc/msg26586.html
+> > [4] https://www.spinics.net/lists/linux-mmc/msg26708.html
+> > 
 > 
->>   }
->>   
->>   static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
->>   			    struct sbitmap_queue *bt)
->>   {
->>   	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
->> -	    !hctx_may_queue(data->hctx, bt))
->> -		return BLK_MQ_NO_TAG;
->> +	    !hctx_may_queue(data, bt))
->> +		return -1;
-> 
-> BLK_MQ_NO_TAG should have been returned.
+> Kind regards
+> Uffe
 
-OK, I missed that in the rebase.
-
-> 
->>   	if (data->shallow_depth)
->>   		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
->>   	else
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 77120dd4e4d5..0f7e062a1665 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->>   	} else {
->>   		if (data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) {
->>   			rq_flags = RQF_MQ_INFLIGHT;
->> -			atomic_inc(&data->hctx->nr_active);
->> +			__blk_mq_inc_active_requests(data->hctx, data->q);
->>   		}
->>   		rq->tag = tag;
->>   		rq->internal_tag = BLK_MQ_NO_TAG;
->> @@ -527,7 +527,7 @@ void blk_mq_free_request(struct request *rq)
->>   
->>   	ctx->rq_completed[rq_is_sync(rq)]++;
->>   	if (rq->rq_flags & RQF_MQ_INFLIGHT)
->> -		atomic_dec(&hctx->nr_active);
->> +		__blk_mq_dec_active_requests(hctx, q);
->>   
->>   	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
->>   		laptop_io_completion(q->backing_dev_info);
->> @@ -1073,7 +1073,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
->>   	if (rq->tag >= 0) {
->>   		if (shared) {
->>   			rq->rq_flags |= RQF_MQ_INFLIGHT;
->> -			atomic_inc(&data.hctx->nr_active);
->> +			__blk_mq_inc_active_requests(rq->mq_hctx, rq->q);
->>   		}
->>   		data.hctx->tags->rqs[rq->tag] = rq;
->>   	}
->> diff --git a/block/blk-mq.h b/block/blk-mq.h
->> index 1a283c707215..9c1e612c2298 100644
->> --- a/block/blk-mq.h
->> +++ b/block/blk-mq.h
->> @@ -202,6 +202,32 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
->>   	return true;
->>   }
->>   
->> +static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx,
->> +						struct request_queue *q)
->> +{
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
->> +		atomic_inc(&q->nr_active_requests_shared_sbitmap);
->> +	else
->> +		atomic_inc(&hctx->nr_active);
->> +}
->> +
->> +static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx,
->> +						struct request_queue *q)
->> +{
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
->> +		atomic_dec(&q->nr_active_requests_shared_sbitmap);
->> +	else
->> +		atomic_dec(&hctx->nr_active);
->> +}
->> +
->> +static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx,
->> +					   struct request_queue *q)
->> +{
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
-> 
-> I'd suggest to add one hctx version of blk_mq_is_sbitmap_shared() since
-> q->tag_set is seldom used in fast path, and hctx->flags is more
-> efficient than tag_set->flags.
-
-OK
-
-Thanks,
-John
