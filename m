@@ -2,102 +2,88 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B08C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 02:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47E62C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 02:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27BFA2074B
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 02:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21E03207C3
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 02:58:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5z/tGIx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UmKKKX0B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgFKCoi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Jun 2020 22:44:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60754 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726316AbgFKCoi (ORCPT
+        id S1726322AbgFKC6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Jun 2020 22:58:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40601 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726306AbgFKC6W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jun 2020 22:44:38 -0400
+        Wed, 10 Jun 2020 22:58:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591843477;
+        s=mimecast20190719; t=1591844301;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1+nAH9EHymRayJcALo1XTuzbnoiP4s/FKdOqqpv2KIg=;
-        b=S5z/tGIx6GLqyGtIxiYMrv8wJsCsXfUhDUFclsYbEVBXnakTMNsANQsbEqljCwdjt2g7MO
-        YAlcNVVSKBQo1+aC/xIgBL4HJ5yLc1ZX6QCuKsAEhJwoVjoZy8iUQsoJWHRJg9qFFnJYgj
-        5SDDilu6HCnqdJp5Qn4zfOyj5F8oTBg=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HozhPc+jhF+92mc58nmdjI3auoHaR32wwEZfyjGFdlM=;
+        b=UmKKKX0BrFxTBu62V/z77AG3A9U4DQT2S8nGZQIh1p9nsllPWBNfy+vurploW8+RrmgJWl
+        Xltmp63CuAqjzV7MduhaXISE7giOkfg1adF8raLQdmXYC5QUDlMQBMkWlx4ZS1wEfYqZTT
+        WC3+nv3+U3MOijHrsPgeCdcXhoRc6Lk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-QNvqgyMpP4qnCHYamqyxfw-1; Wed, 10 Jun 2020 22:44:35 -0400
-X-MC-Unique: QNvqgyMpP4qnCHYamqyxfw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-460-xuS9A7T_Pm-rW-5f8IEsuQ-1; Wed, 10 Jun 2020 22:58:17 -0400
+X-MC-Unique: xuS9A7T_Pm-rW-5f8IEsuQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A15B1005513;
-        Thu, 11 Jun 2020 02:44:34 +0000 (UTC)
-Received: from localhost (ovpn-12-163.pek2.redhat.com [10.72.12.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C97141002382;
-        Thu, 11 Jun 2020 02:44:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 164ED10073AC;
+        Thu, 11 Jun 2020 02:58:15 +0000 (UTC)
+Received: from T590 (ovpn-12-163.pek2.redhat.com [10.72.12.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C15A5C1B0;
+        Thu, 11 Jun 2020 02:58:03 +0000 (UTC)
+Date:   Thu, 11 Jun 2020 10:57:59 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Brian Foster <bfoster@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH] fs/fs-writeback.c: don't WARN on unregistered BDI
-Date:   Thu, 11 Jun 2020 10:44:17 +0800
-Message-Id: <20200611024417.462479-1-ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, kashyap.desai@broadcom.com,
+        sumit.saxena@broadcom.com, bvanassche@acm.org, hare@suse.com,
+        hch@lst.de, shivasharan.srikanteshwara@broadcom.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        megaraidlinux.pdl@broadcom.com, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH RFC v7 02/12] blk-mq: rename blk_mq_update_tag_set_depth()
+Message-ID: <20200611025759.GA453671@T590>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-3-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1591810159-240929-3-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BDI is unregistered from del_gendisk() which is usually done in device's
-release handler from device hotplug or error handling context, so BDI
-can be unregistered anytime.
+On Thu, Jun 11, 2020 at 01:29:09AM +0800, John Garry wrote:
+> From: Hannes Reinecke <hare@suse.de>
+> 
+> The function does not set the depth, but rather transitions from
+> shared to non-shared queues and vice versa.
+> So rename it to blk_mq_update_tag_set_shared() to better reflect
+> its purpose.
 
-It should be normal for __mark_inode_dirty to see un-registered BDI,
-so replace the WARN() with pr_debug() just for debug purpose.
+It is fine to rename it for me, however:
 
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Brian Foster <bfoster@redhat.com>
-Cc: Dave Chinner <dchinner@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/fs-writeback.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This patch claims to rename blk_mq_update_tag_set_shared(), but also
+change blk_mq_init_bitmap_tags's signature.
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index a605c3dddabc..5b7a5f5803ff 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -2318,9 +2318,10 @@ void __mark_inode_dirty(struct inode *inode, int flags)
- 
- 			wb = locked_inode_to_wb_and_lock_list(inode);
- 
--			WARN(bdi_cap_writeback_dirty(wb->bdi) &&
--			     !test_bit(WB_registered, &wb->state),
--			     "bdi-%s not registered\n", bdi_dev_name(wb->bdi));
-+			if (bdi_cap_writeback_dirty(wb->bdi) &&
-+			     !test_bit(WB_registered, &wb->state))
-+				pr_debug("bdi-%s not registered\n",
-+						bdi_dev_name(wb->bdi));
- 
- 			inode->dirtied_when = jiffies;
- 			if (dirtytime)
--- 
-2.25.2
+So suggest to split this patch into two or add comment log on changing
+blk_mq_init_bitmap_tags().
+
+
+Thanks, 
+Ming
 
