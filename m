@@ -2,31 +2,31 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0EBC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB9BC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:24:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 029DD20747
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:11:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CC0F20760
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:24:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727779AbgFKKLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 06:11:04 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2300 "EHLO huawei.com"
+        id S1727045AbgFKKYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 06:24:10 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2301 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726802AbgFKKLE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 06:11:04 -0400
+        id S1726693AbgFKKYJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jun 2020 06:24:09 -0400
 Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 63A40B928A75ECC11DD6;
-        Thu, 11 Jun 2020 11:11:02 +0100 (IST)
+        by Forcepoint Email with ESMTP id DF66BA7A270A5D09600F;
+        Thu, 11 Jun 2020 11:24:06 +0100 (IST)
 Received: from [127.0.0.1] (10.210.169.30) by lhreml724-chm.china.huawei.com
  (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 11 Jun
- 2020 11:11:00 +0100
-Subject: Re: [PATCH RFC v7 04/12] blk-mq: Facilitate a shared sbitmap per
- tagset
+ 2020 11:24:05 +0100
+Subject: Re: [PATCH RFC v7 05/12] blk-mq: Record nr_active_requests per queue
+ for when using shared sbitmap
 To:     Ming Lei <ming.lei@redhat.com>
 CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
@@ -37,15 +37,15 @@ CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
         <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
         <megaraidlinux.pdl@broadcom.com>
 References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-5-git-send-email-john.garry@huawei.com>
- <20200611033728.GC453671@T590>
+ <1591810159-240929-6-git-send-email-john.garry@huawei.com>
+ <20200611040455.GD453671@T590>
 From:   John Garry <john.garry@huawei.com>
-Message-ID: <4a5ef683-91f4-093c-4fed-675f9fcfda31@huawei.com>
-Date:   Thu, 11 Jun 2020 11:09:43 +0100
+Message-ID: <9a5dcb3a-8f5c-ab10-7631-4bd1b58b49bb@huawei.com>
+Date:   Thu, 11 Jun 2020 11:22:47 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <20200611033728.GC453671@T590>
+In-Reply-To: <20200611040455.GD453671@T590>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -58,99 +58,178 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/06/2020 04:37, Ming Lei wrote:
+>> +static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs[] = {
+>> +	{"state", 0400, hctx_state_show},
+>> +	{"flags", 0400, hctx_flags_show},
+>> +	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
+>> +	{"busy", 0400, hctx_busy_show},
+>> +	{"ctx_map", 0400, hctx_ctx_map_show},
+>> +	{"sched_tags", 0400, hctx_sched_tags_show},
+>> +	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
+>> +	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+>> +	{"dispatched", 0600, hctx_dispatched_show, hctx_dispatched_write},
+>> +	{"queued", 0600, hctx_queued_show, hctx_queued_write},
+>> +	{"run", 0600, hctx_run_show, hctx_run_write},
+>> +	{"active", 0400, hctx_active_show},
+>> +	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
+>> +	{}
+>> +};
+> 
+> You may use macro or whatever to avoid so the duplication.
 
-Hi Ming,
-
-Thanks for checking this.
-
->> bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->>   	 * We can hit rq == NULL here, because the tagging functions
->>   	 * test and set the bit before assigning ->rqs[].
->>   	 */
->> -	if (rq && rq->q == hctx->queue)
->> +	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
->>   		return iter_data->fn(hctx, rq, iter_data->data, reserved);
->>   	return true;
->>   }
->> @@ -466,6 +466,7 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>   		     round_robin, node))
->>   		goto free_bitmap_tags;
->>   
->> +	/* We later overwrite these in case of per-set shared sbitmap */
->>   	tags->bitmap_tags = &tags->__bitmap_tags;
->>   	tags->breserved_tags = &tags->__breserved_tags;
-> You may skip to allocate anything for blk_mq_is_sbitmap_shared(), and
-> similar change for blk_mq_free_tags().
-
-I did try that, but it breaks scheduler tags allocation - this is common 
-code. Maybe I can pass some flag, to avoid the allocation for case of 
-shared sbitmap and !sched tags. Same for free path.
-
-BTW, if you check patch 7/12, I mentioned that we could use this sbitmap 
-for iterating to get the per-hctx bitmap, instead of allocating a temp 
-sbitmap. Maybe it's better.
+Let me check alternatives.
 
 > 
+>> +
+>>   static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+>>   	{"default_rq_list", 0400, .seq_ops = &ctx_default_rq_list_seq_ops},
+>>   	{"read_rq_list", 0400, .seq_ops = &ctx_read_rq_list_seq_ops},
+>> @@ -878,13 +895,17 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
+>>   				  struct blk_mq_hw_ctx *hctx)
+>>   {
+>>   	struct blk_mq_ctx *ctx;
+>> +	struct blk_mq_tag_set *set = q->tag_set;
+>>   	char name[20];
+>>   	int i;
 >>   
->> @@ -475,7 +476,32 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>   	return -ENOMEM;
+>>   	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
+>>   	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
+>>   
+>> -	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
+>> +	if (blk_mq_is_sbitmap_shared(set))
+>> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_shared_sbitmap_attrs);
+>> +	else
+>> +		debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
+>>   
+>>   	hctx_for_each_ctx(hctx, ctx, i)
+>>   		blk_mq_debugfs_register_ctx(hctx, ctx);
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 92843e3e1a2a..7db16e49f6f6 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -60,9 +60,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>>    * For shared tag users, we track the number of currently active users
+>>    * and attempt to provide a fair share of the tag depth for each of them.
+>>    */
+>> -static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+>> +static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
+>>   				  struct sbitmap_queue *bt)
+>>   {
+>> +	struct blk_mq_hw_ctx *hctx = data->hctx;
+>> +	struct request_queue *q = data->q;
+>>   	unsigned int depth, users;
+>>   
+>>   	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+>> @@ -84,15 +86,15 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+>>   	 * Allow at least some tags
+>>   	 */
+>>   	depth = max((bt->sb.depth + users - 1) / users, 4U);
+>> -	return atomic_read(&hctx->nr_active) < depth;
+>> +	return __blk_mq_active_requests(hctx, q) < depth;
+> 
+> There is big change on 'users' too:
+> 
+> 	users = atomic_read(&hctx->tags->active_queues);
+> 
+> Originally there is single hctx->tags for these HBAs, now there are many
+> hctx->tags, so 'users' may become much smaller than before.
+
+Can you please check how I handled that in the next patch? There we 
+record the number of active request queues per set.
+
+(I will note that I could have combined some of these patches, but I 
+liked the piecemeal appraoch, and none of these paths are enabled until 
+later).
+
+> 
+> Maybe '->active_queues' can be moved to tag_set for blk_mq_is_sbitmap_shared().
+> 
 >>   }
 >>   
->> -struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
->> +bool blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *tag_set)
->> +{
->> +	unsigned int depth = tag_set->queue_depth - tag_set->reserved_tags;
->> +	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(tag_set->flags);
->> +	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
->> +	int node = tag_set->numa_node;
->> +
->> +	if (bt_alloc(&tag_set->__bitmap_tags, depth, round_robin, node))
->> +		return false;
->> +	if (bt_alloc(&tag_set->__breserved_tags, tag_set->reserved_tags,
->> +		     round_robin, node))
->> +		goto free_bitmap_tags;
->> +	return true;
->> +free_bitmap_tags:
->> +	sbitmap_queue_free(&tag_set->__bitmap_tags);
->> +	return false;
->> +}
->> +
+>>   static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+>>   			    struct sbitmap_queue *bt)
+>>   {
+>>   	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+>> -	    !hctx_may_queue(data->hctx, bt))
+>> -		return BLK_MQ_NO_TAG;
+>> +	    !hctx_may_queue(data, bt))
+>> +		return -1;
+> 
+> BLK_MQ_NO_TAG should have been returned.
 
-[...]
+OK, I missed that in the rebase.
 
->> index 90b645c3092c..77120dd4e4d5 100644
+> 
+>>   	if (data->shallow_depth)
+>>   		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
+>>   	else
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 77120dd4e4d5..0f7e062a1665 100644
 >> --- a/block/blk-mq.c
 >> +++ b/block/blk-mq.c
->> @@ -2229,7 +2229,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
->>   	if (node == NUMA_NO_NODE)
->>   		node = set->numa_node;
+>> @@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+>>   	} else {
+>>   		if (data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) {
+>>   			rq_flags = RQF_MQ_INFLIGHT;
+>> -			atomic_inc(&data->hctx->nr_active);
+>> +			__blk_mq_inc_active_requests(data->hctx, data->q);
+>>   		}
+>>   		rq->tag = tag;
+>>   		rq->internal_tag = BLK_MQ_NO_TAG;
+>> @@ -527,7 +527,7 @@ void blk_mq_free_request(struct request *rq)
 >>   
->> -	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
->> +	tags = blk_mq_init_tags(set, nr_tags, reserved_tags, node,
->>   				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
->>   	if (!tags)
->>   		return NULL;
->> @@ -3349,11 +3349,28 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
->>   	if (ret)
->>   		goto out_free_mq_map;
+>>   	ctx->rq_completed[rq_is_sync(rq)]++;
+>>   	if (rq->rq_flags & RQF_MQ_INFLIGHT)
+>> -		atomic_dec(&hctx->nr_active);
+>> +		__blk_mq_dec_active_requests(hctx, q);
 >>   
->> +	if (blk_mq_is_sbitmap_shared(set)) {
->> +		if (!blk_mq_init_shared_sbitmap(set)) {
->> +			ret = -ENOMEM;
->> +			goto out_free_mq_rq_maps;
->> +		}
+>>   	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+>>   		laptop_io_completion(q->backing_dev_info);
+>> @@ -1073,7 +1073,7 @@ bool blk_mq_get_driver_tag(struct request *rq)
+>>   	if (rq->tag >= 0) {
+>>   		if (shared) {
+>>   			rq->rq_flags |= RQF_MQ_INFLIGHT;
+>> -			atomic_inc(&data.hctx->nr_active);
+>> +			__blk_mq_inc_active_requests(rq->mq_hctx, rq->q);
+>>   		}
+>>   		data.hctx->tags->rqs[rq->tag] = rq;
+>>   	}
+>> diff --git a/block/blk-mq.h b/block/blk-mq.h
+>> index 1a283c707215..9c1e612c2298 100644
+>> --- a/block/blk-mq.h
+>> +++ b/block/blk-mq.h
+>> @@ -202,6 +202,32 @@ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+>>   	return true;
+>>   }
+>>   
+>> +static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx,
+>> +						struct request_queue *q)
+>> +{
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
+>> +		atomic_inc(&q->nr_active_requests_shared_sbitmap);
+>> +	else
+>> +		atomic_inc(&hctx->nr_active);
+>> +}
 >> +
->> +		for (i = 0; i < set->nr_hw_queues; i++) {
->> +			struct blk_mq_tags *tags = set->tags[i];
+>> +static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx,
+>> +						struct request_queue *q)
+>> +{
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
+>> +		atomic_dec(&q->nr_active_requests_shared_sbitmap);
+>> +	else
+>> +		atomic_dec(&hctx->nr_active);
+>> +}
 >> +
->> +			tags->bitmap_tags = &set->__bitmap_tags;
->> +			tags->breserved_tags = &set->__breserved_tags;
->> +		}
-> I am wondering why you don't put ->[bitmap|breserved]_tags initialization into
-> blk_mq_init_shared_sbitmap().
+>> +static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx,
+>> +					   struct request_queue *q)
+>> +{
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set))
+> 
+> I'd suggest to add one hctx version of blk_mq_is_sbitmap_shared() since
+> q->tag_set is seldom used in fast path, and hctx->flags is more
+> efficient than tag_set->flags.
 
-I suppose I could.
+OK
 
 Thanks,
 John
