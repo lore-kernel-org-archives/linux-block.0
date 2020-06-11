@@ -2,177 +2,267 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12126C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 11:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 858E4C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 13:16:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2462207ED
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 11:23:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="D5T4hJX4"
+	by mail.kernel.org (Postfix) with ESMTP id 602BE20691
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 13:16:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbgFKLXS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 07:23:18 -0400
-Received: from mx1.tq-group.com ([62.157.118.193]:38499 "EHLO mx1.tq-group.com"
+        id S1726506AbgFKNQf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 09:16:35 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37300 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727904AbgFKLXR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 07:23:17 -0400
-IronPort-SDR: K/Fz8CzlNt0Sls90ffuamuQjdSAoeVs7WX5hKr1ZBOkWQHFga6tKQnGVdxAzyMk1J4tcbGxHqO
- kaq1IvkTFeXrBYxArTZiUbQkglQeCpcMVS/12QTfBy5x9AqyTgA5Oq7+28d7SGFUeB1OiBjQR2
- /rdNw7GD3pkbTZlZVxfrJcYXEfGbIiPjarLoTWONiyeoPe9/L5xjE2I7OM9KbQXWduSHaY3jbL
- YRgptM+9AlPZPirWGJprS1utvicTg4hLbKkHkGUMRVv25HZDhnDCT+TrPyLyxuv+ks8OvTMtqc
- Rdk=
-X-IronPort-AV: E=Sophos;i="5.73,499,1583190000"; 
-   d="scan'208";a="12649147"
-Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
-  by mx1-pgp.tq-group.com with ESMTP; 11 Jun 2020 13:23:15 +0200
-Received: from mx1.tq-group.com ([192.168.6.7])
-  by tq-pgp-pr1.tq-net.de (PGP Universal service);
-  Thu, 11 Jun 2020 13:23:15 +0200
-X-PGP-Universal: processed;
-        by tq-pgp-pr1.tq-net.de on Thu, 11 Jun 2020 13:23:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1591874595; x=1623410595;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L/lgEa4ngwESBUIJx1nHCkPgKmQSKt9J/YaWqXauyUY=;
-  b=D5T4hJX4FEoWAS/wvQwynmTaIeqQvuskhlM/PDu4E80stFfhaKrNz7wJ
-   Ur4lAhKPqW2ZXa8EQrNmEWXqifmPoXr2J1WLASGunUA56/rlfu7xAgy1L
-   IIYLgruaulVukYN4Fvjexg4rmBadBNhGVsK9yv8H2tWF6gom+OXPDcgJV
-   z94gAaQWH2wVw9kS8MsbAGRJsZmdhWJFqEm/1oKRBmJPAG4su3HzlDSh9
-   2oaA1rm2XwrNeU0q5EVsmcdgjtR6P/TWf1YtMEUU9Zd8QA4oeO/UVHfmO
-   hVpRACaBVuomaI8rRSRxEFBYLIgoFb8efJfDIL27wEAQeBkB+Ck28n71E
-   A==;
-IronPort-SDR: BBPnzRjo5PtKvM3sAoKKY/91efyUw36B8KUb3x0FrhdKvXoii3SYRfpW7ffwNcSyL31qRBh+25
- 93tfMfF8KK971BnNFi8HBA2zNHw4d5Q/LpoBqvKBL0D7/LWsMXvyflargHSdF9tvMy412WYp0U
- piWfYYQ/tVpSOWWAmy97dwF4HwmFcqbkpY4E7z62bwPoFcq38frXok8ntIUtIniAIiOq1TWzVy
- z9gDwgSmhmj+IUhtx6JVmaepfaAcEYtcWba8z1yj8b+A1hhjI4VIO0jvWyPc71x7DIEjFV1EOS
- hQo=
-X-IronPort-AV: E=Sophos;i="5.73,499,1583190000"; 
-   d="scan'208";a="12649146"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 11 Jun 2020 13:23:15 +0200
-Received: from schifferm-ubuntu4.tq-net.de (schifferm-ubuntu4.tq-net.de [10.117.49.26])
-        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id C7DCE280065;
-        Thu, 11 Jun 2020 13:23:16 +0200 (CEST)
-Message-ID: <0637641b8872a84481f5177876893cd1543a0d0b.camel@ew.tq-group.com>
-Subject: Re: (EXT) Re: Consistent block device references for root= cmdline
-From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To:     Roger Heflin <rogerheflin@gmail.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 11 Jun 2020 13:23:13 +0200
-In-Reply-To: <CAAMCDef2g8t5u1GuVH7p4bM1C7UMsC=fV4RKGU9jSG1rScPc9g@mail.gmail.com>
-References: <fb0340aaf273be84e915214a3d8bae4ac85d7c0b.camel@ew.tq-group.com>
-         <CAPDyKFq+RiwbDj+58+W5GTcT7=ZOpZFmc02+FxjRGYwbBgA8oQ@mail.gmail.com>
-         <CAAMCDef2g8t5u1GuVH7p4bM1C7UMsC=fV4RKGU9jSG1rScPc9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1726435AbgFKNQf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jun 2020 09:16:35 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 55B51ADAA;
+        Thu, 11 Jun 2020 13:16:34 +0000 (UTC)
+Subject: Re: [PATCH RFC v7 06/12] blk-mq: Record active_queues_shared_sbitmap
+ per tag_set for when using shared sbitmap
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, kashyap.desai@broadcom.com,
+        sumit.saxena@broadcom.com, ming.lei@redhat.com, bvanassche@acm.org,
+        hare@suse.com, hch@lst.de, shivasharan.srikanteshwara@broadcom.com
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        megaraidlinux.pdl@broadcom.com
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-7-git-send-email-john.garry@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <a10a20de-d8e2-8505-65ec-1c26bfbf6cfc@suse.de>
+Date:   Thu, 11 Jun 2020 15:16:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <1591810159-240929-7-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2020-06-10 at 12:33 -0500, Roger Heflin wrote:
-> No idea if this would still work, but back before label/uuid and lvm
-> in initird I had a staticly linked "C" program that ran inside
-> initrd,
-> it searched for likely places a boot device could be (mounted them
-> and
-> looked for a file to confirm it was the right device, then unmounted
-> it), and when it found the right one, it then echo's is major/minor
-> numbers into /proc/sys/kernel/real-root-dev and that is used for
-> root=
-> without it being on the command line.  Assuming you could get
-> something similar started by sytemd and/or udev inside the initrd it
-> might still work.
-
-Using an initramfs is obviously an option, but it complicates both the
-build setup and boot process, so we would like to avoid making this a
-hard requirement if possible.
-
-
+On 6/10/20 7:29 PM, John Garry wrote:
+> For when using a shared sbitmap, no longer should the number of active
+> request queues per hctx be relied on for when judging how to share the tag
+> bitmap.
 > 
-> On Wed, Jun 10, 2020 at 11:51 AM Ulf Hansson <ulf.hansson@linaro.org>
-> wrote:
-> > 
-> > On Wed, 10 Jun 2020 at 15:15, Matthias Schiffer
-> > <matthias.schiffer@ew.tq-group.com> wrote:
-> > > 
-> > > Hello all,
-> > > 
-> > > there have been numerous attempts to make the numbering of mmcblk
-> > > devices consistent, mostly by using aliases from the DTS ([1],
-> > > [2],
-> > > [3]), but all have been (rightfully) rejected. Unless I have
-> > > overlooked
-> > > a more recent development, no attempts for a different solution
-> > > were
-> > > made.
-> > 
-> > According to aliases attempts, I think those have failed, mainly
-> > because of two reasons.
-> > 
-> > 1. Arguments stating that LABELs/UUIDs are variable alternatives.
-> > This
-> > isn't the case, which I think was also concluded from the several
-> > earlier discussions.
-> > 2. Patches that tried adding support for mmc aliases, were not
-> > correctly coded. More precisely, what needs to be addressed is that
-> > the mmc core also preserves the same ids to be set for the host
-> > class
-> > as the block device, mmc[n] must correspond to mmcblk[n].
-> > 
-> > > 
-> > > As far as I can tell, the core of the issue seems to be the
-> > > following:
-> > > 
-> > > The existing solutions like LABELs and UUIDs are viable
-> > > alternatives in
-> > > many cases, but in particular on embedded systems, this is not
-> > > quite
-> > > sufficient: In addition to the problem that more knowledge about
-> > > the
-> > > system to boot is required in the bootloader, this approach fails
-> > > completely when the same firmware image exists on multiple
-> > > devices, for
-> > > example on an eMMC and an SD card - not an entirely uncommon
-> > > situation
-> > > during the development of embedded systems.
-> > > 
-> > > With udev, I can refer to a specific partition using a path like
-> > > /dev/disk/by-path/platform-2194000.usdhc-part2. In [4] it was
-> > > proposed
-> > > to add a way to refer to a device path/phandle from the kernel
-> > > command
-> > > line. Has there been any progress on this proposal?
-> > 
-> > Lots of time during the years I have been approached, both publicly
-> > and offlist, about whether it would be possible to add support for
-> > "consistent" mmcblk devices. To me, I am fine with the aliases
-> > approach, as long as it gets implemented correctly.
-> > 
-> > > 
-> > > Kind regards,
-> > > Matthias
-> > > 
-> > > 
-> > > [1] https://patchwork.kernel.org/patch/8685711/
-> > > [2] https://lore.kernel.org/patchwork/cover/674381/
-> > > [3] https://www.spinics.net/lists/linux-mmc/msg26586.html
-> > > [4] https://www.spinics.net/lists/linux-mmc/msg26708.html
-> > > 
-> > 
-> > Kind regards
-> > Uffe
+> Instead maintain the number of active request queues per tag_set, and make
+> the judgment based on that.
+> 
+> And since the blk_mq_tags.active_queues is no longer maintained, do not
+> show it in debugfs.
+> 
+> Originally-from: Kashyap Desai <kashyap.desai@broadcom.com>
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+>   block/blk-mq-debugfs.c | 25 ++++++++++++++++++++--
+>   block/blk-mq-tag.c     | 47 ++++++++++++++++++++++++++++++++----------
+>   block/blk-mq.c         |  2 ++
+>   include/linux/blk-mq.h |  1 +
+>   include/linux/blkdev.h |  1 +
+>   5 files changed, 63 insertions(+), 13 deletions(-)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 0fa3af41ab65..05b4be0c03d9 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -458,17 +458,37 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
+>   	}
+>   }
+>   
+> +static void blk_mq_debugfs_tags_shared_sbitmap_show(struct seq_file *m,
+> +				     struct blk_mq_tags *tags)
+> +{
+> +	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
+> +	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+> +
+> +	seq_puts(m, "\nbitmap_tags:\n");
+> +	sbitmap_queue_show(tags->bitmap_tags, m);
+> +
+> +	if (tags->nr_reserved_tags) {
+> +		seq_puts(m, "\nbreserved_tags:\n");
+> +		sbitmap_queue_show(tags->breserved_tags, m);
+> +	}
+> +}
+> +
+>   static int hctx_tags_show(void *data, struct seq_file *m)
+>   {
+>   	struct blk_mq_hw_ctx *hctx = data;
+>   	struct request_queue *q = hctx->queue;
+> +	struct blk_mq_tag_set *set = q->tag_set;
+>   	int res;
+>   
+>   	res = mutex_lock_interruptible(&q->sysfs_lock);
+>   	if (res)
+>   		goto out;
+> -	if (hctx->tags)
+> -		blk_mq_debugfs_tags_show(m, hctx->tags);
+> +	if (hctx->tags) {
+> +		if (blk_mq_is_sbitmap_shared(set))
+> +			blk_mq_debugfs_tags_shared_sbitmap_show(m, hctx->tags);
+> +		else
+> +			blk_mq_debugfs_tags_show(m, hctx->tags);
+> +	}
+>   	mutex_unlock(&q->sysfs_lock);
+>   
+>   out:
+> @@ -802,6 +822,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_shared_sbitmap_attrs
+>   	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
+>   	{"busy", 0400, hctx_busy_show},
+>   	{"ctx_map", 0400, hctx_ctx_map_show},
+> +	{"tags", 0400, hctx_tags_show},
+>   	{"sched_tags", 0400, hctx_sched_tags_show},
+>   	{"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
+>   	{"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
 
+I had been pondering this, too, when creating v6. Problem is that it'll 
+show the tags per hctx, but as they are shared I guess the list looks 
+pretty identical per hctx.
+So I guess we should filter the tags per hctx to have only those active 
+on that hctx displayed. But when doing so we can only print the 
+in-flight tags, the others are not assigned to a hctx and as such we 
+can't make a decision on which hctx they'll end up.
+
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 7db16e49f6f6..6ca06b1c3a99 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -23,9 +23,19 @@
+>    */
+>   bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>   {
+> -	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+> -	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> -		atomic_inc(&hctx->tags->active_queues);
+> +	struct request_queue *q = hctx->queue;
+> +	struct blk_mq_tag_set *set = q->tag_set;
+> +
+> +	if (blk_mq_is_sbitmap_shared(set)){
+> +		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
+> +		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+> +			atomic_inc(&set->active_queues_shared_sbitmap);
+> +
+> +	} else {
+> +		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+> +		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> +			atomic_inc(&hctx->tags->active_queues);
+> +	}
+>   
+>   	return true;
+>   }
+At one point someone would need to educate me what this double 
+'test_bit' and 'test_and_set_bit' is supposed to achieve.
+Other than deliberately injecting a race condition ...
+
+> @@ -47,11 +57,19 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
+>   void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	struct blk_mq_tags *tags = hctx->tags;
+> -
+> -	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> -		return;
+> -
+> -	atomic_dec(&tags->active_queues);
+> +	struct request_queue *q = hctx->queue;
+> +	struct blk_mq_tag_set *set = q->tag_set;
+> +
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set)){
+> +		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_ACTIVE,
+> +					&q->queue_flags))
+> +			return;
+> +		atomic_dec(&set->active_queues_shared_sbitmap);
+> +	} else {
+> +		if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> +			return;
+> +		atomic_dec(&tags->active_queues);
+> +	}
+>   
+>   	blk_mq_tag_wakeup_all(tags, false);
+>   }
+> @@ -65,12 +83,11 @@ static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
+>   {
+>   	struct blk_mq_hw_ctx *hctx = data->hctx;
+>   	struct request_queue *q = data->q;
+> +	struct blk_mq_tag_set *set = q->tag_set;
+>   	unsigned int depth, users;
+>   
+>   	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+>   		return true;
+> -	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> -		return true;
+>   
+>   	/*
+>   	 * Don't try dividing an ant
+> @@ -78,7 +95,15 @@ static inline bool hctx_may_queue(struct blk_mq_alloc_data *data,
+>   	if (bt->sb.depth == 1)
+>   		return true;
+>   
+> -	users = atomic_read(&hctx->tags->active_queues);
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set)) {
+> +		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
+> +			return true;
+> +		users = atomic_read(&set->active_queues_shared_sbitmap);
+> +	} else {
+> +		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> +			return true;
+> +		users = atomic_read(&hctx->tags->active_queues);
+> +	}
+>   	if (!users)
+>   		return true;
+>   
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 0f7e062a1665..f73a2f9c58bd 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3350,6 +3350,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+>   		goto out_free_mq_map;
+>   
+>   	if (blk_mq_is_sbitmap_shared(set)) {
+> +		atomic_set(&set->active_queues_shared_sbitmap, 0);
+> +
+>   		if (!blk_mq_init_shared_sbitmap(set)) {
+>   			ret = -ENOMEM;
+>   			goto out_free_mq_rq_maps;
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 7b31cdb92a71..66711c7234db 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -252,6 +252,7 @@ struct blk_mq_tag_set {
+>   	unsigned int		timeout;
+>   	unsigned int		flags;
+>   	void			*driver_data;
+> +	atomic_t		active_queues_shared_sbitmap;
+>   
+>   	struct sbitmap_queue	__bitmap_tags;
+>   	struct sbitmap_queue	__breserved_tags;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c536278bec9e..1b0087e8d01a 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -619,6 +619,7 @@ struct request_queue {
+>   #define QUEUE_FLAG_PCI_P2PDMA	25	/* device supports PCI p2p requests */
+>   #define QUEUE_FLAG_ZONE_RESETALL 26	/* supports Zone Reset All */
+>   #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+> +#define QUEUE_FLAG_HCTX_ACTIVE 28	/* at least one blk-mq hctx is active */
+>   
+>   #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+>   				 (1 << QUEUE_FLAG_SAME_COMP))
+> 
+Other than that it looks fine.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
