@@ -2,132 +2,155 @@ Return-Path: <SRS0=H7KM=7Y=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937EBC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 09:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0EBC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:11:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C84C207C3
-	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 09:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591869358;
-	bh=+WFFEnJdhn44WKcXH9ef2WLCK5OupD6/OMB1xTrq4Sc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VHBqh+WANBIvZqda1sVenYTx5F4M5DW7EHCxu6TIMRAsJQzRgM4SMQPLmAipdqvAh
-	 juuFzY4mnVsHl/q3pfetx1kxAUlYkRm7z9PgKmfMF+2J8M/0wwf3wnZACx/+IDcwIV
-	 YGYSzv5wmNsNuyDRgm2Ow/4afGWlzLivBcNpc+2Y=
+	by mail.kernel.org (Postfix) with ESMTP id 029DD20747
+	for <linux-block@archiver.kernel.org>; Thu, 11 Jun 2020 10:11:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbgFKJzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 05:55:45 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33737 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726783AbgFKJzT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 05:55:19 -0400
-Received: by mail-wm1-f67.google.com with SMTP id j198so6574348wmj.0;
-        Thu, 11 Jun 2020 02:55:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OGc4Jynhv8J9+LXwEVD2pmhTRYA7A0SBRA8Y9bWfwBM=;
-        b=ZP3WT+PqgLjTcOB43l6GxF4o9GVmkvGG8l8sH87x0bHL7XqW1KaHyZDmXKTjJKOzkt
-         RMgvMWpExF98C4c5Y8zco5vLKDG7hWRa43rDJfaSezsHoqaU+WlrqodiEafdyOR6DLBQ
-         sVAhvx5jJLoHj705kpT+10r+i2FjIpJr8PQg+MUeEUNoTiXzrXv0eurO1JGi1H1SIPOZ
-         S/KzhrJBCblA+SH0Gx9hzDttKjs8TI+oOrIpJt1f1hPWRjpYSRFdWMjxC2GYJ1vt1jOJ
-         t2JOGG6A6SmkoGwePy6IL/YHQJu+TjWJQs041ML6lujAcOHokviij9GvmZXEDyLTidDh
-         gLrA==
-X-Gm-Message-State: AOAM530ngMhb6vfGTQmJl/t9EPNN5CQTYVgAf7hkzc9JAKRH3GtCAfhI
-        VHBihFejIgcUSJAK6Xm9qRg=
-X-Google-Smtp-Source: ABdhPJxdFlFuIOqczVMYLEkBB/5DcRTZD3uW4Gi3wzWe6yykRWLuYTOprRKGwBQhCme4nouL4V90Cw==
-X-Received: by 2002:a7b:c18a:: with SMTP id y10mr7719246wmi.73.1591869316876;
-        Thu, 11 Jun 2020 02:55:16 -0700 (PDT)
-Received: from localhost (ip-37-188-174-201.eurotel.cz. [37.188.174.201])
-        by smtp.gmail.com with ESMTPSA id 67sm4301281wrk.49.2020.06.11.02.55.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2020 02:55:15 -0700 (PDT)
-Date:   Thu, 11 Jun 2020 11:55:14 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Chris Down <chris@chrisdown.name>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200611095514.GD20450@dhcp22.suse.cz>
-References: <20200521095515.GK6462@dhcp22.suse.cz>
- <20200521163450.GV6462@dhcp22.suse.cz>
- <CA+G9fYuDWGZx50UpD+WcsDeHX9vi3hpksvBAWbMgRZadb0Pkww@mail.gmail.com>
- <CA+G9fYs2jg-j_5fdb0OW0G-JzDjN7b8d9qnX7uuk9p4c7mVSig@mail.gmail.com>
- <20200528150310.GG27484@dhcp22.suse.cz>
- <CA+G9fYvDXiZ9E9EfU6h0gsJ+xaXY77mRu9Jg+J7C=X4gJ3qvLg@mail.gmail.com>
- <20200528164121.GA839178@chrisdown.name>
- <CALOAHbAHGOsAUUM7qn=9L1u8kAf6Gztqt=SyHSmZ9XuYZWcKmg@mail.gmail.com>
- <20200529015644.GA84588@chrisdown.name>
- <20200529094910.GH4406@dhcp22.suse.cz>
+        id S1727779AbgFKKLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Jun 2020 06:11:04 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2300 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726802AbgFKKLE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jun 2020 06:11:04 -0400
+Received: from lhreml724-chm.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 63A40B928A75ECC11DD6;
+        Thu, 11 Jun 2020 11:11:02 +0100 (IST)
+Received: from [127.0.0.1] (10.210.169.30) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Thu, 11 Jun
+ 2020 11:11:00 +0100
+Subject: Re: [PATCH RFC v7 04/12] blk-mq: Facilitate a shared sbitmap per
+ tagset
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <don.brace@microsemi.com>,
+        <kashyap.desai@broadcom.com>, <sumit.saxena@broadcom.com>,
+        <bvanassche@acm.org>, <hare@suse.com>, <hch@lst.de>,
+        <shivasharan.srikanteshwara@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <esc.storagedev@microsemi.com>, <chenxiang66@hisilicon.com>,
+        <megaraidlinux.pdl@broadcom.com>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-5-git-send-email-john.garry@huawei.com>
+ <20200611033728.GC453671@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <4a5ef683-91f4-093c-4fed-675f9fcfda31@huawei.com>
+Date:   Thu, 11 Jun 2020 11:09:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529094910.GH4406@dhcp22.suse.cz>
+In-Reply-To: <20200611033728.GC453671@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.169.30]
+X-ClientProxiedBy: lhreml713-chm.china.huawei.com (10.201.108.64) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 29-05-20 11:49:20, Michal Hocko wrote:
-> On Fri 29-05-20 02:56:44, Chris Down wrote:
-> > Yafang Shao writes:
-> > > Look at this patch[1] carefully you will find that it introduces the
-> > > same issue that I tried to fix in another patch [2]. Even more sad is
-> > > these two patches are in the same patchset. Although this issue isn't
-> > > related with the issue found by Naresh, we have to ask ourselves why
-> > > we always make the same mistake ?
-> > > One possible answer is that we always forget the lifecyle of
-> > > memory.emin before we read it. memory.emin doesn't have the same
-> > > lifecycle with the memcg, while it really has the same lifecyle with
-> > > the reclaimer. IOW, once a reclaimer begins the protetion value should
-> > > be set to 0, and after we traversal the memcg tree we calculate a
-> > > protection value for this reclaimer, finnaly it disapears after the
-> > > reclaimer stops. That is why I highly suggest to add an new protection
-> > > member in scan_control before.
-> > 
-> > I agree with you that the e{min,low} lifecycle is confusing for everyone --
-> > the only thing I've not seen confirmation of is any confirmed correlation
-> > with the i386 oom killer issue. If you've validated that, I'd like to see
-> > the data :-)
-> 
-> Agreed. Even if e{low,min} might still have some rough edges I am
-> completely puzzled how we could end up oom if none of the protection
-> path triggers which the additional debugging should confirm. Maybe my
-> debugging patch is incomplete or used incorrectly (maybe it would be
-> esier to use printk rather than trace_printk?).
+On 11/06/2020 04:37, Ming Lei wrote:
 
-It would be really great if we could move forward. While the fix (which
-has been dropped from mmotm) is not super urgent I would really like to
-understand how it could hit the observed behavior. Can we double check
-that the debugging patch really doesn't trigger (e.g.
-s@trace_printk@printk in the first step)? I have checked it again but
-do not see any potential code path which would be affected by the patch
-yet not trigger any output. But another pair of eyes would be really
-great.
--- 
-Michal Hocko
-SUSE Labs
+Hi Ming,
+
+Thanks for checking this.
+
+>> bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+>>   	 * We can hit rq == NULL here, because the tagging functions
+>>   	 * test and set the bit before assigning ->rqs[].
+>>   	 */
+>> -	if (rq && rq->q == hctx->queue)
+>> +	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
+>>   		return iter_data->fn(hctx, rq, iter_data->data, reserved);
+>>   	return true;
+>>   }
+>> @@ -466,6 +466,7 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>>   		     round_robin, node))
+>>   		goto free_bitmap_tags;
+>>   
+>> +	/* We later overwrite these in case of per-set shared sbitmap */
+>>   	tags->bitmap_tags = &tags->__bitmap_tags;
+>>   	tags->breserved_tags = &tags->__breserved_tags;
+> You may skip to allocate anything for blk_mq_is_sbitmap_shared(), and
+> similar change for blk_mq_free_tags().
+
+I did try that, but it breaks scheduler tags allocation - this is common 
+code. Maybe I can pass some flag, to avoid the allocation for case of 
+shared sbitmap and !sched tags. Same for free path.
+
+BTW, if you check patch 7/12, I mentioned that we could use this sbitmap 
+for iterating to get the per-hctx bitmap, instead of allocating a temp 
+sbitmap. Maybe it's better.
+
+> 
+>>   
+>> @@ -475,7 +476,32 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>>   	return -ENOMEM;
+>>   }
+>>   
+>> -struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
+>> +bool blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *tag_set)
+>> +{
+>> +	unsigned int depth = tag_set->queue_depth - tag_set->reserved_tags;
+>> +	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(tag_set->flags);
+>> +	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+>> +	int node = tag_set->numa_node;
+>> +
+>> +	if (bt_alloc(&tag_set->__bitmap_tags, depth, round_robin, node))
+>> +		return false;
+>> +	if (bt_alloc(&tag_set->__breserved_tags, tag_set->reserved_tags,
+>> +		     round_robin, node))
+>> +		goto free_bitmap_tags;
+>> +	return true;
+>> +free_bitmap_tags:
+>> +	sbitmap_queue_free(&tag_set->__bitmap_tags);
+>> +	return false;
+>> +}
+>> +
+
+[...]
+
+>> index 90b645c3092c..77120dd4e4d5 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2229,7 +2229,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+>>   	if (node == NUMA_NO_NODE)
+>>   		node = set->numa_node;
+>>   
+>> -	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
+>> +	tags = blk_mq_init_tags(set, nr_tags, reserved_tags, node,
+>>   				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
+>>   	if (!tags)
+>>   		return NULL;
+>> @@ -3349,11 +3349,28 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+>>   	if (ret)
+>>   		goto out_free_mq_map;
+>>   
+>> +	if (blk_mq_is_sbitmap_shared(set)) {
+>> +		if (!blk_mq_init_shared_sbitmap(set)) {
+>> +			ret = -ENOMEM;
+>> +			goto out_free_mq_rq_maps;
+>> +		}
+>> +
+>> +		for (i = 0; i < set->nr_hw_queues; i++) {
+>> +			struct blk_mq_tags *tags = set->tags[i];
+>> +
+>> +			tags->bitmap_tags = &set->__bitmap_tags;
+>> +			tags->breserved_tags = &set->__breserved_tags;
+>> +		}
+> I am wondering why you don't put ->[bitmap|breserved]_tags initialization into
+> blk_mq_init_shared_sbitmap().
+
+I suppose I could.
+
+Thanks,
+John
