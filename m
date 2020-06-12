@@ -2,78 +2,132 @@ Return-Path: <SRS0=gmaS=7Z=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D4AC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jun 2020 02:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8CFC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jun 2020 06:06:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 000762078C
-	for <linux-block@archiver.kernel.org>; Fri, 12 Jun 2020 02:44:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66239207F7
+	for <linux-block@archiver.kernel.org>; Fri, 12 Jun 2020 06:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbgFLCoO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Jun 2020 22:44:14 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:55741 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726321AbgFLCoO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jun 2020 22:44:14 -0400
-X-IronPort-AV: E=Sophos;i="5.73,501,1583164800"; 
-   d="scan'208";a="94344459"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
-  by heian.cn.fujitsu.com with ESMTP; 12 Jun 2020 10:44:01 +0800
-Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
-        by cn.fujitsu.com (Postfix) with ESMTP id DE41F4CE2E89;
-        Fri, 12 Jun 2020 10:43:59 +0800 (CST)
-Received: from localhost.localdomain (10.167.220.84) by
- G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
- (TLS) id 15.0.1497.2; Fri, 12 Jun 2020 10:44:01 +0800
-From:   Yang Xu <xuyang2018.jy@cn.fujitsu.com>
-To:     <linux-block@vger.kernel.org>
-CC:     Yang Xu <xuyang2018.jy@cn.fujitsu.com>,
-        Martijn Coenen <maco@android.com>
-Subject: [PATCH] loop: Remove redundant status flag operation
-Date:   Fri, 12 Jun 2020 10:43:51 +0800
-Message-ID: <1591929831-2397-1-git-send-email-xuyang2018.jy@cn.fujitsu.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726401AbgFLGGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Jun 2020 02:06:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44954 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726391AbgFLGGH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Jun 2020 02:06:07 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 67F77AD5E;
+        Fri, 12 Jun 2020 06:06:07 +0000 (UTC)
+Subject: Re: [PATCH RFC v7 07/12] blk-mq: Add support in
+ hctx_tags_bitmap_show() for a shared sbitmap
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, kashyap.desai@broadcom.com,
+        sumit.saxena@broadcom.com, ming.lei@redhat.com, bvanassche@acm.org,
+        hare@suse.com, hch@lst.de, shivasharan.srikanteshwara@broadcom.com
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        megaraidlinux.pdl@broadcom.com
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <1591810159-240929-8-git-send-email-john.garry@huawei.com>
+ <9f4741c5-d117-d764-cf3a-a57192a788c3@suse.de>
+ <aad6efa3-2d7f-ca68-d239-44ea187c8017@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <7ed6ccf1-6ad9-1df7-f55d-4ed6cac1e08d@suse.de>
+Date:   Fri, 12 Jun 2020 08:06:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.167.220.84]
-X-ClientProxiedBy: G08CNEXCHPEKD04.g08.fujitsu.local (10.167.33.200) To
- G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201)
-X-yoursite-MailScanner-ID: DE41F4CE2E89.A0C97
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: xuyang2018.jy@cn.fujitsu.com
+In-Reply-To: <aad6efa3-2d7f-ca68-d239-44ea187c8017@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since ~LOOP_SET_STATUS_SETTABLE_FLAG is always a subset of ~LOOP_SET_STATUS_CLEARABLE_FLAGS
-,remove this redundant flags operation.
+On 6/11/20 4:33 PM, John Garry wrote:
+>>> +static int hctx_tags_shared_sbitmap_bitmap_show(void *data, struct 
+>>> seq_file *m)
+>>> +{
+>>> +    struct blk_mq_hw_ctx *hctx = data;
+>>> +    struct request_queue *q = hctx->queue;
+>>> +    struct blk_mq_tag_set *set = q->tag_set;
+>>> +    struct sbitmap shared_sb, *sb;
+>>> +    int res;
+>>> +
+>>> +    if (!set)
+>>> +        return 0;
+>>> +
+>>> +    /*
+>>> +     * We could use the allocated sbitmap for that hctx here, but
+>>> +     * that would mean that we would need to clean it prior to use.
+>>> +     */
+> 
+> *
+> 
+>>> +    res = sbitmap_init_node(&shared_sb,
+>>> +                set->__bitmap_tags.sb.depth,
+>>> +                set->__bitmap_tags.sb.shift,
+>>> +                GFP_KERNEL, NUMA_NO_NODE);
+>>> +    if (res)
+>>> +        return res;
+>>> +    sb = &shared_sb;
+>>> +
+>>> +    res = mutex_lock_interruptible(&q->sysfs_lock);
+>>> +    if (res)
+>>> +        goto out;
+>>> +    if (hctx->tags) {
+>>> +        hctx_filter_sb(sb, hctx);
+>>> +        sbitmap_bitmap_show(sb, m);
+>>> +    }
+>>> +
+>>> +    mutex_unlock(&q->sysfs_lock);
+>>> +
+>>> +out:
+>>> +    sbitmap_free(&shared_sb);
+>>> +    return res;
+>>> +}
+>>> +
+>>>   static int hctx_tags_bitmap_show(void *data, struct seq_file *m)
+>>>   {
+>>>       struct blk_mq_hw_ctx *hctx = data;
+>>> @@ -823,6 +884,7 @@ static const struct blk_mq_debugfs_attr 
+>>> blk_mq_debugfs_hctx_shared_sbitmap_attrs
+>>>       {"busy", 0400, hctx_busy_show},
+>>>       {"ctx_map", 0400, hctx_ctx_map_show},
+>>>       {"tags", 0400, hctx_tags_show},
+>>> +    {"tags_bitmap", 0400, hctx_tags_shared_sbitmap_bitmap_show},
+>>>       {"sched_tags", 0400, hctx_sched_tags_show},
+>>>       {"sched_tags_bitmap", 0400, hctx_sched_tags_bitmap_show},
+>>>       {"io_poll", 0600, hctx_io_poll_show, hctx_io_poll_write},
+>>>
+>> Ah, right. Here it is.
+>>
+>> But I don't get it; why do we have to allocate a temporary bitmap and 
+>> can't walk the existing shared sbitmap?
+> 
+> For the bitmap dump - sbitmap_bitmap_show() - it is passed a struct 
+> sbitmap *. So we have to filter into a temp per-hctx struct sbitmap. We 
+> could change sbitmap_bitmap_show() to accept a filter iterator - which I 
+> think you're getting at - but I am not sure it's worth the change. Or 
+> else use the allocated sbitmap for the hctx, as above*, but I may be 
+> remove that (see 4/12 response).
+> 
+Yes, I do think I would prefer updating sbitmap_bitmap_show() to accept 
+a filter. Especially as Ming Lei has now updated the tag iterators to 
+accept a filter, too, so it should be an easy change.
 
-Cc: Martijn Coenen <maco@android.com>
-Signed-off-by: Yang Xu <xuyang2018.jy@cn.fujitsu.com>
----
- drivers/block/loop.c | 2 --
- 1 file changed, 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c33bbbf..2a61079 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1391,8 +1391,6 @@ static int loop_clr_fd(struct loop_device *lo)
- 
- 	/* Mask out flags that can't be set using LOOP_SET_STATUS. */
- 	lo->lo_flags &= LOOP_SET_STATUS_SETTABLE_FLAGS;
--	/* For those flags, use the previous values instead */
--	lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_SETTABLE_FLAGS;
- 	/* For flags that can't be cleared, use previous values too */
- 	lo->lo_flags |= prev_lo_flags & ~LOOP_SET_STATUS_CLEARABLE_FLAGS;
- 
+Hannes
 -- 
-1.8.3.1
-
-
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
