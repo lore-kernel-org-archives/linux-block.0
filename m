@@ -6,30 +6,29 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B45C0C433DF
-	for <linux-block@archiver.kernel.org>; Sun, 14 Jun 2020 16:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4D0C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 14 Jun 2020 16:53:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9ED0820775
-	for <linux-block@archiver.kernel.org>; Sun, 14 Jun 2020 16:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A69B520747
+	for <linux-block@archiver.kernel.org>; Sun, 14 Jun 2020 16:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727001AbgFNQxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Jun 2020 12:53:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46924 "EHLO mx2.suse.de"
+        id S1727039AbgFNQxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Jun 2020 12:53:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47062 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbgFNQxo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jun 2020 12:53:44 -0400
+        id S1726982AbgFNQxs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Jun 2020 12:53:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 4D1A4AD88;
-        Sun, 14 Jun 2020 16:53:45 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 2C6D5AE00;
+        Sun, 14 Jun 2020 16:53:51 +0000 (UTC)
 From:   colyli@suse.de
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Zhiqiang Liu <liuzhiqiang26@huawei.com>,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 1/4] bcache: fix potential deadlock problem in btree_gc_coalesce
-Date:   Mon, 15 Jun 2020 00:53:30 +0800
-Message-Id: <20200614165333.124999-2-colyli@suse.de>
+        Coly Li <colyli@suse.de>, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 3/4] bcache: use delayed kworker fo asynchronous devices registration
+Date:   Mon, 15 Jun 2020 00:53:32 +0800
+Message-Id: <20200614165333.124999-4-colyli@suse.de>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200614165333.124999-1-colyli@suse.de>
 References: <20200614165333.124999-1-colyli@suse.de>
@@ -40,90 +39,78 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+From: Coly Li <colyli@suse.de>
 
-coccicheck reports:
-  drivers/md//bcache/btree.c:1538:1-7: preceding lock on line 1417
+This patch changes the asynchronous registration kworker to a delayed
+kworker. There is probability queue_work() queues the async registration
+kworker to the same CPU (even though very little), then the process
+which writing sysfs interface to reigster bcache device may won't return
+immeidately. queue_delayed_work() in this patch will delay 10 jiffies
+before insert the kworker to run queue, which makes sure the registering
+process may always returns to user space in time.
 
-In btree_gc_coalesce func, if the coalescing process fails, we will goto
-to out_nocoalesce tag directly without releasing new_nodes[i]->write_lock.
-Then, it will cause a deadlock when trying to acquire new_nodes[i]->
-write_lock for freeing new_nodes[i] before return.
-
-btree_gc_coalesce func details as follows:
-	if alloc new_nodes[i] fails:
-		goto out_nocoalesce;
-	// obtain new_nodes[i]->write_lock
-	mutex_lock(&new_nodes[i]->write_lock)
-	// main coalescing process
-	for (i = nodes - 1; i > 0; --i)
-		[snipped]
-		if coalescing process fails:
-			// Here, directly goto out_nocoalesce
-			 // tag will cause a deadlock
-			goto out_nocoalesce;
-		[snipped]
-	// release new_nodes[i]->write_lock
-	mutex_unlock(&new_nodes[i]->write_lock)
-	// coalesing succ, return
-	return;
-out_nocoalesce:
-	btree_node_free(new_nodes[i])	// free new_nodes[i]
-	// obtain new_nodes[i]->write_lock
-	mutex_lock(&new_nodes[i]->write_lock);
-	// set flag for reuse
-	clear_bit(BTREE_NODE_dirty, &ew_nodes[i]->flags);
-	// release new_nodes[i]->write_lock
-	mutex_unlock(&new_nodes[i]->write_lock);
-
-To fix the problem, we add a new tag 'out_unlock_nocoalesce' for
-releasing new_nodes[i]->write_lock before out_nocoalesce tag. If
-coalescing process fails, we will go to out_unlock_nocoalesce tag
-for releasing new_nodes[i]->write_lock before free new_nodes[i] in
-out_nocoalesce tag.
-
-(Coly Li helps to clean up commit log format.)
-
-Fixes: 2a285686c109816 ("bcache: btree locking rework")
-Signed-off-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+Fixes: 9e23ccf8f0a22 ("bcache: asynchronous devices registration")
 Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Hannes Reinecke <hare@suse.de>
 ---
- drivers/md/bcache/btree.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/md/bcache/super.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 39de94edd73a..6548a601edf0 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1389,7 +1389,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 			if (__set_blocks(n1, n1->keys + n2->keys,
- 					 block_bytes(b->c)) >
- 			    btree_blocks(new_nodes[i]))
--				goto out_nocoalesce;
-+				goto out_unlock_nocoalesce;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 904ea9bbb5c4..a6e79083010a 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -19,6 +19,7 @@
+ #include <linux/genhd.h>
+ #include <linux/idr.h>
+ #include <linux/kthread.h>
++#include <linux/workqueue.h>
+ #include <linux/module.h>
+ #include <linux/random.h>
+ #include <linux/reboot.h>
+@@ -2380,7 +2381,7 @@ static bool bch_is_open(struct block_device *bdev)
+ }
  
- 			keys = n2->keys;
- 			/* Take the key of the node we're getting rid of */
-@@ -1418,7 +1418,7 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
+ struct async_reg_args {
+-	struct work_struct reg_work;
++	struct delayed_work reg_work;
+ 	char *path;
+ 	struct cache_sb *sb;
+ 	struct cache_sb_disk *sb_disk;
+@@ -2391,7 +2392,7 @@ static void register_bdev_worker(struct work_struct *work)
+ {
+ 	int fail = false;
+ 	struct async_reg_args *args =
+-		container_of(work, struct async_reg_args, reg_work);
++		container_of(work, struct async_reg_args, reg_work.work);
+ 	struct cached_dev *dc;
  
- 		if (__bch_keylist_realloc(&keylist,
- 					  bkey_u64s(&new_nodes[i]->key)))
--			goto out_nocoalesce;
-+			goto out_unlock_nocoalesce;
+ 	dc = kzalloc(sizeof(*dc), GFP_KERNEL);
+@@ -2421,7 +2422,7 @@ static void register_cache_worker(struct work_struct *work)
+ {
+ 	int fail = false;
+ 	struct async_reg_args *args =
+-		container_of(work, struct async_reg_args, reg_work);
++		container_of(work, struct async_reg_args, reg_work.work);
+ 	struct cache *ca;
  
- 		bch_btree_node_write(new_nodes[i], &cl);
- 		bch_keylist_add(&keylist, &new_nodes[i]->key);
-@@ -1464,6 +1464,10 @@ static int btree_gc_coalesce(struct btree *b, struct btree_op *op,
- 	/* Invalidated our iterator */
- 	return -EINTR;
+ 	ca = kzalloc(sizeof(*ca), GFP_KERNEL);
+@@ -2449,11 +2450,12 @@ static void register_cache_worker(struct work_struct *work)
+ static void register_device_aync(struct async_reg_args *args)
+ {
+ 	if (SB_IS_BDEV(args->sb))
+-		INIT_WORK(&args->reg_work, register_bdev_worker);
++		INIT_DELAYED_WORK(&args->reg_work, register_bdev_worker);
+ 	else
+-		INIT_WORK(&args->reg_work, register_cache_worker);
++		INIT_DELAYED_WORK(&args->reg_work, register_cache_worker);
  
-+out_unlock_nocoalesce:
-+	for (i = 0; i < nodes; i++)
-+		mutex_unlock(&new_nodes[i]->write_lock);
-+
- out_nocoalesce:
- 	closure_sync(&cl);
+-	queue_work(system_wq, &args->reg_work);
++	/* 10 jiffies is enough for a delay */
++	queue_delayed_work(system_wq, &args->reg_work, 10);
+ }
  
+ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
 -- 
 2.25.0
 
