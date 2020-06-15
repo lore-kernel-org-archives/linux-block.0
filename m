@@ -2,68 +2,72 @@ Return-Path: <SRS0=pdd5=74=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3210EC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 04:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9D8C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 06:12:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17A3E20747
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 04:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4886206E2
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 06:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725779AbgFOEH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 00:07:59 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5888 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725294AbgFOEH6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 00:07:58 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id C0EECCC1801FA386502A;
-        Mon, 15 Jun 2020 12:07:55 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Mon, 15 Jun 2020
- 12:07:54 +0800
-From:   Hou Tao <houtao1@huawei.com>
-To:     <linux-block@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@canonical.com>
-Subject: [PATCH] virtio-blk: free vblk-vqs in error path of virtblk_probe()
-Date:   Mon, 15 Jun 2020 12:14:59 +0800
-Message-ID: <20200615041459.22477-1-houtao1@huawei.com>
-X-Mailer: git-send-email 2.25.0.4.g0ad7144999
+        id S1728342AbgFOGMu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 02:12:50 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49922 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728163AbgFOGMu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jun 2020 02:12:50 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 7AA0AAE65;
+        Mon, 15 Jun 2020 06:12:52 +0000 (UTC)
+Subject: Re: [PATCH 3/4] bcache: use delayed kworker fo asynchronous devices
+ registration
+To:     colyli@suse.de, axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20200614165333.124999-1-colyli@suse.de>
+ <20200614165333.124999-4-colyli@suse.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <9bd21fc5-2666-e239-3da1-dc51c3ca2e49@suse.de>
+Date:   Mon, 15 Jun 2020 08:12:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200614165333.124999-4-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Else there will be memory leak if alloc_disk() fails.
+On 6/14/20 6:53 PM, colyli@suse.de wrote:
+> From: Coly Li <colyli@suse.de>
+> 
+> This patch changes the asynchronous registration kworker to a delayed
+> kworker. There is probability queue_work() queues the async registration
+> kworker to the same CPU (even though very little), then the process
+> which writing sysfs interface to reigster bcache device may won't return
+> immeidately. queue_delayed_work() in this patch will delay 10 jiffies
+> before insert the kworker to run queue, which makes sure the registering
+> process may always returns to user space in time.
+> 
+> Fixes: 9e23ccf8f0a22 ("bcache: asynchronous devices registration")
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Hannes Reinecke <hare@suse.de>
+> ---
+>   drivers/md/bcache/super.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Fixes: 6a27b656fc02 ("block: virtio-blk: support multi virt queues per virtio-blk device")
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- drivers/block/virtio_blk.c | 1 +
- 1 file changed, 1 insertion(+)
+Cheers,
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 9d21bf0f155e..980df853ee49 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -878,6 +878,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	put_disk(vblk->disk);
- out_free_vq:
- 	vdev->config->del_vqs(vdev);
-+	kfree(vblk->vqs);
- out_free_vblk:
- 	kfree(vblk);
- out_free_index:
+Hannes
 -- 
-2.25.0.4.g0ad7144999
-
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
