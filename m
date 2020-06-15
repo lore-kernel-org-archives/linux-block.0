@@ -2,84 +2,144 @@ Return-Path: <SRS0=pdd5=74=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BEFC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F909C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5365320756
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 208CF207DD
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JLGm/mOA"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QBeg3rvb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728062AbgFOTWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 15:22:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55184 "EHLO
+        id S1729845AbgFOTcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 15:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728093AbgFOTWz (ORCPT
+        with ESMTP id S1728571AbgFOTcw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 15:22:55 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C6DC061A0E;
-        Mon, 15 Jun 2020 12:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Date:Message-ID:Subject:From:Cc:To:Sender:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=1SYTwpfB40+JGZH3GQvOKxvSVPzTOSW3WlfOs5EOLH0=; b=JLGm/mOAW+/i4uJ5JrpcZNUndT
-        w3i4B341Ih/AC8yrlBlLTOpPHZdLHl6Dju82tC2wReRTx6nYmCILE22RdtxTsYW2IOvVfzH7FSFZC
-        h3HJoTbFzueBfPOFJom+mGAIL9NpEMn6OnFYKVtnIEQWUK2YAzMFHdPXFDhMueI4/1Tq7GCIQJqVm
-        ItT8tAK3p14xyDnAdroABoNLdUupPoyv7bcaViU3f6IhaZjgOK1ZWHAaKQaZbStfV+7FGfqyrJ78S
-        g2SWVVxL+rAfOLm3Vm6P8rbhLrni4/OxZM/MCFha92X/Qf9ucYh5bIe9+Wb4gy9FQFKNOMUrVBdT9
-        C1/02cSA==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jkuh4-0003nA-CC; Mon, 15 Jun 2020 19:22:54 +0000
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] trace/events/block.h: drop kernel-doc for dropped function
- parameter
-Message-ID: <d572a150-192a-bbce-4449-8de45bce1a9b@infradead.org>
-Date:   Mon, 15 Jun 2020 12:22:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Mon, 15 Jun 2020 15:32:52 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C697C08C5C2
+        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 12:32:51 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id k1so7108626pls.2
+        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 12:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZjAXfZy5BudfnO86h+8mAf1S7F89/y7Ht34uQW17/+U=;
+        b=QBeg3rvb86U6Tj0IyJR5u6BBRDaGksrhbixbVGEFMNAmYYAm2vi8ezn7Pzjsx+8Y/N
+         0spIQQjXlTeZa6JYxyI0WQLYZewE/IOrv1eu80kZOYOGkcIsaJYdoUbYKY8F56IoVrW7
+         todjyiaALbdigpVH6qkq1a3bhohRwm98ntcpI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZjAXfZy5BudfnO86h+8mAf1S7F89/y7Ht34uQW17/+U=;
+        b=ewCPECpRdJ83xOBewqqX1PHWElg9k9XdYRK0UStQSolR86IKofxuJf82NWZWmjlcwn
+         ZjTo6ahsqb3wJyOHmoHJpmQY5DE8+q6TrHritqOhyTViCDiMa/BntFZH/jX08cgEBQk9
+         7ut5KBCvpfX065SE7XDcY5KSU0iZgbkRlIZvU2++XhVwwsYED/lBwt50lRMYGtdmQOX7
+         4g5Ohwjj4xGH0mTNShdaZ//jobCWEalKXK/CL3LzstLj2B49WEtaoKLR4YTDNdTKbp4e
+         nlPOsQWcINIay6CXZZHrHVn0gFnIEkmdQtXdWzx81Mi5znJQUI5uEbc8fD7qU167V5bT
+         Tq5w==
+X-Gm-Message-State: AOAM5318TSjBu2BqATy3uXgVezZiF6VWEwnUm6XHtWhAXAuq+N7JgKNi
+        GQauq1NjeSLi4zG8qgTnN4GdXw==
+X-Google-Smtp-Source: ABdhPJxugszkh+55zcQ6ID8nCD+Y2mp2lHGMEtD9VsXD4kV92TrXKjIOZPR9BYw/ID9xL1GXxiQnCg==
+X-Received: by 2002:a17:90b:23d2:: with SMTP id md18mr774459pjb.179.1592249571413;
+        Mon, 15 Jun 2020 12:32:51 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id n189sm14973604pfn.108.2020.06.15.12.32.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2020 12:32:50 -0700 (PDT)
+Date:   Mon, 15 Jun 2020 12:32:49 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Joe Perches <joe@perches.com>,
+        Andy Whitcroft <apw@canonical.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        b43-dev@lists.infradead.org,
+        Network Development <netdev@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-spi@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Saravana Kannan <saravanak@google.com>
+Subject: Re: [PATCH 05/10] ide: Remove uninitialized_var() usage
+Message-ID: <202006151231.74D2315450@keescook>
+References: <20200603233203.1695403-1-keescook@chromium.org>
+ <20200603233203.1695403-6-keescook@chromium.org>
+ <CAKwvOdm5zDide5RuppY_jG=r46=UMdVJBrkBqD5x=dOMTG9cZg@mail.gmail.com>
+ <202006041318.B0EA9059C7@keescook>
+ <CAKwvOdk3Wc1gC0UMsFZsZqQ8n_bkPjNAJo5u3nfcyXcBaZCMHw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdk3Wc1gC0UMsFZsZqQ8n_bkPjNAJo5u3nfcyXcBaZCMHw@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Thu, Jun 04, 2020 at 01:29:44PM -0700, Nick Desaulniers wrote:
+> On Thu, Jun 4, 2020 at 1:20 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > On Thu, Jun 04, 2020 at 12:29:17PM -0700, Nick Desaulniers wrote:
+> > > On Wed, Jun 3, 2020 at 4:32 PM Kees Cook <keescook@chromium.org> wrote:
+> > > >
+> > > > Using uninitialized_var() is dangerous as it papers over real bugs[1]
+> > > > (or can in the future), and suppresses unrelated compiler warnings (e.g.
+> > > > "unused variable"). If the compiler thinks it is uninitialized, either
+> > > > simply initialize the variable or make compiler changes. As a precursor
+> > > > to removing[2] this[3] macro[4], just remove this variable since it was
+> > > > actually unused:
+> > > >
+> > > > drivers/ide/ide-taskfile.c:232:34: warning: unused variable 'flags' [-Wunused-variable]
+> > > >         unsigned long uninitialized_var(flags);
+> > > >                                         ^
+> > > >
+> > > > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+> > > > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+> > > > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+> > > > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+> > > >
+> > > > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > >
+> > > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> >
+> > Thanks for the reviews!
+> >
+> > > Fixes ce1e518190ea ("ide: don't disable interrupts during kmap_atomic()")
+> >
+> > I originally avoided adding Fixes tags because I didn't want these
+> > changes backported into a -stable without -Wmaybe-uninitialized
+> > disabled, but in these cases (variable removal), that actually does make
+> > sense. Thanks!
+> 
+> Saravana showed me a cool trick for quickly finding commits that
+> removed a particular identifier that I find faster than `git blame` or
+> vim-fugitive for the purpose of Fixes tags:
+> $ git log -S <string> <file>
 
-Fix kernel-doc warning: the parameter was removed, so also remove
-the kernel-doc notation for it.
+Ah yes, I always have to look up "-S". Good reminder!
 
-../include/trace/events/block.h:278: warning: Excess function parameter 'error' description in 'trace_block_bio_complete'
+> I've added it to our wiki:
+> https://github.com/ClangBuiltLinux/linux/wiki/Command-line-tips-and-tricks#for-finding-which-commit-may-have-removed-a-string-try.
+> I should update the first tip; what was your suggestion for
+> constraining the search to the current remote?
 
-Fixes: d24de76af836 ("block: remove the error argument to the block_bio_complete tracepoint")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
----
- include/trace/events/block.h |    1 -
- 1 file changed, 1 deletion(-)
+Ah cool. I've updated it now. It was really to narrow to a "known set of
+tags", and Linus's tree's tags always start with "v".
 
---- linux-next-20200615.orig/include/trace/events/block.h
-+++ linux-next-20200615/include/trace/events/block.h
-@@ -254,7 +254,6 @@ TRACE_EVENT(block_bio_bounce,
-  * block_bio_complete - completed all work on the block operation
-  * @q: queue holding the block operation
-  * @bio: block operation completed
-- * @error: io error value
-  *
-  * This tracepoint indicates there is no further work to do on this
-  * block IO operation @bio.
-
+-- 
+Kees Cook
