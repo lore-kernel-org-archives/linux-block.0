@@ -2,123 +2,84 @@ Return-Path: <SRS0=pdd5=74=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB49C433E3
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BEFC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 999FF207DD
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5365320756
+	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 19:22:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kali.org header.i=@kali.org header.b="WNJIIb/L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JLGm/mOA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731429AbgFOTHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 15:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
+        id S1728062AbgFOTWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 15:22:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731428AbgFOTH2 (ORCPT
+        with ESMTP id S1728093AbgFOTWz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 15:07:28 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79DEC08C5C2
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 12:07:27 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id g5so13976761otg.6
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 12:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=gkisYoqPUHl9LL0bMseRIRvV+9UIa3Tr6nRZ75os/94=;
-        b=WNJIIb/LEdiABSPWau+fuOw7xHs2zDQrgqhRIJqIcPdHFpFDXr/7kVCm6XFrZYNotm
-         9x69N7NIXg6LueAOyHhTUs3Q8bI5Yfv4Cz6dJSP2upRHyQUgb3i3opKO/7ZRNTwlsjt9
-         AdF6N+T9WDDaBaVhGjx5C5GGkc/um765axhNEADTEDRPHwWiIIUY0VwyqyOc9Y0Ip+su
-         mq/XWN0vU+gX+2JLCiqqEroKy55EkDL2CeaaPpd+y+fMYSu2NzB2tpcTwJ3Hzx2o634c
-         jBCCtc6J3EgGtpmNxMpR9+LW6CZzbwiMSlJLx8RQ2+XI1KXKhpD29fZL3ibYbBZkSqxY
-         8KwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=gkisYoqPUHl9LL0bMseRIRvV+9UIa3Tr6nRZ75os/94=;
-        b=TzZBRjBYkYWWzWVKzYtweKHZoi6/2r7mLBvAPN3vY9PYd6X00oq/uuRoPStZ78mqdk
-         C3rnFIUJGHLHgDyH7cnTIkylwC/Td46GM6MISw0cGIGcEhTQYCbepDhh7Iw6DoSi7/iM
-         TanZBpUgCK9A498o6wH/iC+XFYfvFN5rKZ99Kqo6DHox3f7yMi2gGsxd9BOooZKwI6k2
-         +SoXmswODLcdha+nrhjlB37dW1EJrYwqLHGfA7uwqAydiFS4N1rPJqEb0qwf9S/ByNiA
-         8SvLV9LEskZw+slGdifz1s1vZN3QsRGqy56FzG3wKVNHBG1ujfqt55QJBoUVJCHNk/GI
-         d0LQ==
-X-Gm-Message-State: AOAM531URyf8iNmfL5BCZA4KHLeytYJWd7SyCTTnL3pzuTA5E9d+U+cG
-        UcHTFIEss/kWWuiibNL2qU1PCw==
-X-Google-Smtp-Source: ABdhPJwfv5W3EVhFyjfklabyBQ0AqghguZeeODyksn4WYKzWBKXJnT04Z0JIf4XQp9S7QAPcJb+NnA==
-X-Received: by 2002:a9d:a14:: with SMTP id 20mr23869540otg.292.1592248047094;
-        Mon, 15 Jun 2020 12:07:27 -0700 (PDT)
-Received: from Steevs-MBP.hackershack.net (cpe-173-175-113-3.satx.res.rr.com. [173.175.113.3])
-        by smtp.gmail.com with ESMTPSA id z7sm3484098oto.2.2020.06.15.12.07.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jun 2020 12:07:26 -0700 (PDT)
-Subject: Re: [RFC PATCH v4 4/4] scsi: ufs-qcom: add Inline Crypto Engine
- support
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Thara Gopinath <thara.gopinath@linaro.org>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Andy Gross <agross@kernel.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Barani Muthukumaran <bmuthuku@qti.qualcomm.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Can Guo <cang@codeaurora.org>,
-        Elliot Berman <eberman@codeaurora.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Satya Tangirala <satyat@google.com>
-References: <20200501045111.665881-1-ebiggers@kernel.org>
- <20200501045111.665881-5-ebiggers@kernel.org>
- <31fa95e5-7757-96ae-2e86-1f54959e3a6c@linaro.org>
- <20200507180435.GB236103@gmail.com> <20200507180838.GC236103@gmail.com>
- <150ddaaf-12ec-231e-271a-c65b1d88d30f@kali.org>
- <20200508202513.GA233206@gmail.com>
- <1aa17b19-0ca7-1ff1-b945-442e56ef942a@kali.org>
- <20200615185806.GC85413@gmail.com>
-From:   Steev Klimaszewski <steev@kali.org>
-Message-ID: <dc735157-77a2-34a3-12c2-5fe060afa153@kali.org>
-Date:   Mon, 15 Jun 2020 14:07:25 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        Mon, 15 Jun 2020 15:22:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C6DC061A0E;
+        Mon, 15 Jun 2020 12:22:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Date:Message-ID:Subject:From:Cc:To:Sender:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=1SYTwpfB40+JGZH3GQvOKxvSVPzTOSW3WlfOs5EOLH0=; b=JLGm/mOAW+/i4uJ5JrpcZNUndT
+        w3i4B341Ih/AC8yrlBlLTOpPHZdLHl6Dju82tC2wReRTx6nYmCILE22RdtxTsYW2IOvVfzH7FSFZC
+        h3HJoTbFzueBfPOFJom+mGAIL9NpEMn6OnFYKVtnIEQWUK2YAzMFHdPXFDhMueI4/1Tq7GCIQJqVm
+        ItT8tAK3p14xyDnAdroABoNLdUupPoyv7bcaViU3f6IhaZjgOK1ZWHAaKQaZbStfV+7FGfqyrJ78S
+        g2SWVVxL+rAfOLm3Vm6P8rbhLrni4/OxZM/MCFha92X/Qf9ucYh5bIe9+Wb4gy9FQFKNOMUrVBdT9
+        C1/02cSA==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jkuh4-0003nA-CC; Mon, 15 Jun 2020 19:22:54 +0000
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] trace/events/block.h: drop kernel-doc for dropped function
+ parameter
+Message-ID: <d572a150-192a-bbce-4449-8de45bce1a9b@infradead.org>
+Date:   Mon, 15 Jun 2020 12:22:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200615185806.GC85413@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Randy Dunlap <rdunlap@infradead.org>
 
-On 6/15/20 1:58 PM, Eric Biggers wrote:
->
->> Hi Eric,
->>
->>
->> I've been testing this on a Lenovo Yoga C630 installed to a partition on
->> the UFS drive, using a 5.7(ish) kernel with fscrypt/inline-encryption
->> and a few patches on top that are still in flux for c630 support.  The
->> sources I use can be found at
->> https://github.com/steev/linux/tree/linux-5.7.y-c630-fscrypt and the
->> config I'm using can be found at
->> https://dev.gentoo.org/~steev/files/lenovo-yoga-c630-5.7.0-rc7-fs-inline-encryption.config.
->>
->>
->> Everything seems to be working here.  I've run the tests you've
->> mentioned and haven't seen any issues.
->>
-> Great!  Can I add your Tested-by when I send out this patchset again?
->
-> - Eric
+Fix kernel-doc warning: the parameter was removed, so also remove
+the kernel-doc notation for it.
 
+../include/trace/events/block.h:278: warning: Excess function parameter 'error' description in 'trace_block_bio_complete'
 
-Absolutely.  Tested-By: Steev Klimaszewski <steev@kali.org> is preferred
+Fixes: d24de76af836 ("block: remove the error argument to the block_bio_complete tracepoint")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+---
+ include/trace/events/block.h |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- linux-next-20200615.orig/include/trace/events/block.h
++++ linux-next-20200615/include/trace/events/block.h
+@@ -254,7 +254,6 @@ TRACE_EVENT(block_bio_bounce,
+  * block_bio_complete - completed all work on the block operation
+  * @q: queue holding the block operation
+  * @bio: block operation completed
+- * @error: io error value
+  *
+  * This tracepoint indicates there is no further work to do on this
+  * block IO operation @bio.
 
