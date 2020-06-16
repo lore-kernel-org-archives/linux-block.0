@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF01C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 13:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF57C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BBE8207D3
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 13:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A0A4207C3
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:00:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728934AbgFPNyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 09:54:46 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:47588 "EHLO
+        id S1728984AbgFPOAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 10:00:06 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:47646 "EHLO
         bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728553AbgFPNyp (ORCPT
+        with ESMTP id S1726606AbgFPOAD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 09:54:45 -0400
+        Tue, 16 Jun 2020 10:00:03 -0400
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (Authenticated sender: tonyk)
-        with ESMTPSA id 94B84260D8D
+        with ESMTPSA id 134132A065C
 Subject: Re: [PATCH v2] docs: block: Create blk-mq documentation
-To:     Dongli Zhang <dongli.zhang@oracle.com>, axboe@kernel.dk,
+To:     Randy Dunlap <rdunlap@infradead.org>, axboe@kernel.dk,
         corbet@lwn.net, linux-block@vger.kernel.org,
         linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
-        krisman@collabora.com, rdunlap@infradead.org
+        krisman@collabora.com
 References: <20200605175536.19681-1-andrealmeid@collabora.com>
- <c249992b-a7c6-b6d9-3edb-143255141da2@oracle.com>
+ <3fc90f94-c034-7508-3938-f24beddbc5f3@infradead.org>
 From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
-Message-ID: <ecb3447f-5dfb-d60a-bfaa-3cbdfd85025e@collabora.com>
-Date:   Tue, 16 Jun 2020 10:54:29 -0300
+Message-ID: <31c78e71-10fc-8629-6aa0-50e08b42387f@collabora.com>
+Date:   Tue, 16 Jun 2020 10:59:53 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <c249992b-a7c6-b6d9-3edb-143255141da2@oracle.com>
+In-Reply-To: <3fc90f94-c034-7508-3938-f24beddbc5f3@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -46,8 +46,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/20 8:45 PM, Dongli Zhang wrote:
-> Hi André,
+On 6/15/20 9:15 PM, Randy Dunlap wrote:
+> Hi,
+> I have a few more editing comments for you (below):
 > 
 > On 6/5/20 10:55 AM, André Almeida wrote:
 >> Create a documentation providing a background and explanation around the
@@ -103,15 +104,28 @@ On 6/5/20 8:45 PM, Dongli Zhang wrote:
 >> +development of the kernel. The Block IO subsystem aimed to achieve the best
 >> +performance possible for those devices with a high penalty when doing random
 >> +access, and the bottleneck was the mechanical moving parts, a lot more slower
+> 
+>                                                                a lot slower
+> or                                                             much slower
+> 
 >> +than any layer on the storage stack. One example of such optimization technique
 >> +involves ordering read/write requests accordingly to the current position of
+> 
+> I would say                              according to
+> 
 >> +the hard disk head.
 >> +
 >> +However, with the development of Solid State Drives and Non-Volatile Memories
 >> +without mechanical parts nor random access penalty and capable of performing
 >> +high parallel access, the bottleneck of the stack had moved from the storage
 >> +device to the operating system. In order to  take advantage of the parallelism
+> 
+> drop one space                               ^^^^
+> 
 >> +in those devices design, the multi-queue mechanism was introduced.
+> 
+>             devices'
+> 
 >> +
 >> +The former design had a single queue to store block IO requests with a single
 >> +lock. That did not scale well in SMP systems due to dirty data in cache and the
@@ -190,25 +204,6 @@ On 6/5/20 8:45 PM, Dongli Zhang wrote:
 >> +
 >> +The hardware queues (represented by struct :c:type:`blk_mq_hw_ctx`) have a 1:1
 >> +correspondence to the device driver's submission queues, and are the last step
-> 
-> I am not clear with the definition of "submission queues". Is it the device
-> queue with DMA ring buffer?
-> 
-
-Yes, the memory area where hardware can perform DMA and access requests.
-
-> If it is the DMA ring buffer, multiple blk_mq_hw_ctx would map to the same DMA
-> ring buffer, e.g., multiple nvme namespaces would share the same tagset. This is
-> not 1:1 any longer.
->
-
-I see, thanks for the feedback. What do you think about this version:
-
-The hardware queues (represented by struct :c:type:`blk_mq_hw_ctx`) is a
-struct used by device drivers to map the to the device submission queues
-(or device DMA ring buffer), and are the last step ...
-
-
 >> +of the block layer submission code before the low level device driver taking
 >> +ownership of the request. To run this queue, the block layer removes requests
 >> +from the associated software queues and tries to dispatch to the hardware.
@@ -239,34 +234,24 @@ struct used by device drivers to map the to the device submission queues
 >> +drive, the tag is sent back to the block layer to notify it of the finalization.
 >> +This removes the need to do a linear search to find out which IO has been
 >> +completed.
+>> +
+>> +Further reading
+>> +---------------
+>> +
+>> +- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
+>> +
+>> +- `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
+>> +
+>> +- `Null block device driver <https://www.kernel.org/doc/html/latest/block/null_blk.html>`_
+>> +
+>> +Source code documentation
+>> +=========================
+>> +
+>> +.. kernel-doc:: include/linux/blk-mq.h
+>> +
+>> +.. kernel-doc:: block/blk-mq.c
 > 
-> Assume I am a beginner and does not know about blk-mq well. What I expect is to
-> expand this sections to explain the usage of sbitmap to manage tags, e.g., like
-> the comments in block/blk-mq-tag.c or block/blk-mq-tag.h.
-> 
-> In addition, I would be interested in that percpu-refcount is used to track the
-> lifecycle of requests.
-> 
-> I have no idea how much detail is required for a kernel doc. The is just the
-> feedback from me by assuming the audience is beginner :)
-> 
-
-Indeed, it would be good to have this kind of information available. We
-can easily include comments in source files given that they are in
-kernel-doc format, just using `kernel-doc:: block/blk-mq-tag.c`.
-However, as I see, there's some useful information that need to be
-converted to kernel-doc before being ready to show up here in the
-documentation.
-
-So, while I agree with you, I think this can be a next step for block
-documentation: update, format and expand blk-mq-tag comments, then add
-them in this file.
-
-> Thank you very much!
-> 
-> Dongli Zhang
+> thanks.
 > 
 
-Thanks for the feedback :)
-
-André
+Thanks Randy, all changes applied for v3.
