@@ -2,256 +2,182 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF57C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91947C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:16:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A0A4207C3
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:00:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6493020786
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 14:16:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Njo0oUKY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbgFPOAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 10:00:06 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:47646 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726606AbgFPOAD (ORCPT
+        id S1728847AbgFPOQY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 10:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60610 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728716AbgFPOQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 10:00:03 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: tonyk)
-        with ESMTPSA id 134132A065C
-Subject: Re: [PATCH v2] docs: block: Create blk-mq documentation
-To:     Randy Dunlap <rdunlap@infradead.org>, axboe@kernel.dk,
-        corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
-        krisman@collabora.com
-References: <20200605175536.19681-1-andrealmeid@collabora.com>
- <3fc90f94-c034-7508-3938-f24beddbc5f3@infradead.org>
-From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
-Message-ID: <31c78e71-10fc-8629-6aa0-50e08b42387f@collabora.com>
-Date:   Tue, 16 Jun 2020 10:59:53 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Tue, 16 Jun 2020 10:16:24 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E06C061573
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 07:16:23 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id y13so21697215eju.2
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 07:16:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=6PWDuPTkrXleyY02khhPslJk/OM89kQqOYof8Xt9yHk=;
+        b=Njo0oUKYpM2x8GPJ/D8RopLES3YBM9Ix48tYOprYcVt+9EfKZKDy/sDD+L+kUL1eXT
+         01RzLC7T0Vyldau9ODEXV1VChCqNyjpYhYo5hVYs/63kEJnXdlnA2ZUCP3E085YpX82K
+         wxLm0Q3yyOyVUKrMNMMTGbyrMD0j4H87G/8N9mlWtjljv4YUGDpzvSVS71kUeSdoLI2i
+         r4rQYNoa9xihIoa04PASggkKg0n6Qlr3q9N6ubkdOVt1hgwYPU6h7cPcDYg+EbwyuMZg
+         wdKIl548fehCeffn6M9HiBDKHxtusnfDMwA/YJ1NllMaerBMmk/YoNJIHxsa45kBiEIS
+         7r8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=6PWDuPTkrXleyY02khhPslJk/OM89kQqOYof8Xt9yHk=;
+        b=TvxZGluLKuC7rToNFnn+inX7T3wF6fnVb8Aj1LibMBAbdjIBbcSYL6lfPYAwWfjxB0
+         2GKUFdyOuEyO/ubJFUs/pgFngyCvHFOJQ8b/enNukE9mI8rqvc9ViQcTdZbmgjCsKFh2
+         3poQddydl3WW/Rs+Ay+mvmQAEg5qZM+qOAdcHrt9/ZSfW7nJuX1Cws8nSaULVHZGbgWL
+         YYIYkRbn80p5wdoE8RJb2DUAR0CCMsL6ejlEmr/xb/viF0f/WZ2OXbzByDFQYPWethKZ
+         WEZnE9gcdUsfLl6JP8TZGTW29QC2spptN5Twuod7c4CMv9mXOEm0mnEWvPv1y2WMKUTq
+         qfUg==
+X-Gm-Message-State: AOAM532rbP389va7sBN823W5H4Ws7Xp+bNfeTgSb9jgXfurSjR62s8nN
+        v+76Nqoztzx8Mj2euGpK2gHsMg==
+X-Google-Smtp-Source: ABdhPJzhsm7I9PyI7ohWJAAIdecI/C9wgCHgZ2I9lCFpLr7leG+zZv2BlHmNSY9Jc1GLRrPO8EuR7w==
+X-Received: by 2002:a17:906:69c3:: with SMTP id g3mr3152625ejs.47.1592316982230;
+        Tue, 16 Jun 2020 07:16:22 -0700 (PDT)
+Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
+        by smtp.gmail.com with ESMTPSA id z38sm6863582ede.96.2020.06.16.07.16.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2020 07:16:21 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 16:16:20 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Matias =?utf-8?B?QmrDuHJsaW5n?= <mb@lightnvm.io>,
+        Jens Axboe <axboe@kernel.dk>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>
+Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
+Message-ID: <20200616141620.omqf64up523of35t@MacBook-Pro.localdomain>
+References: <20200615233424.13458-1-keith.busch@wdc.com>
+ <20200615233424.13458-6-keith.busch@wdc.com>
+ <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
+ <d433450a-6e18-217c-d133-ea367d8936be@lightnvm.io>
+ <20200616120018.en337lcs5y2jh5ne@mpHalley.local>
+ <cf899cd9-c3de-7436-84d4-744c0988a6c9@lightnvm.io>
+ <20200616122448.4e3slfghv4cojafq@mpHalley.local>
+ <CY4PR04MB3751CC8FE4BDFC256F9E9CD1E79D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <3fc90f94-c034-7508-3938-f24beddbc5f3@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CY4PR04MB3751CC8FE4BDFC256F9E9CD1E79D0@CY4PR04MB3751.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/20 9:15 PM, Randy Dunlap wrote:
-> Hi,
-> I have a few more editing comments for you (below):
-> 
-> On 6/5/20 10:55 AM, André Almeida wrote:
->> Create a documentation providing a background and explanation around the
->> operation of the Multi-Queue Block IO Queueing Mechanism (blk-mq).
+On 16.06.2020 12:35, Damien Le Moal wrote:
+>On 2020/06/16 21:24, Javier González wrote:
+>> On 16.06.2020 14:06, Matias Bjørling wrote:
+>>> On 16/06/2020 14.00, Javier González wrote:
+>>>> On 16.06.2020 13:18, Matias Bjørling wrote:
+>>>>> On 16/06/2020 12.41, Javier González wrote:
+>>>>>> On 16.06.2020 08:34, Keith Busch wrote:
+>>>>>>> Add support for NVM Express Zoned Namespaces (ZNS) Command Set defined
+>>>>>>> in NVM Express TP4053. Zoned namespaces are discovered based on their
+>>>>>>> Command Set Identifier reported in the namespaces Namespace
+>>>>>>> Identification Descriptor list. A successfully discovered Zoned
+>>>>>>> Namespace will be registered with the block layer as a host managed
+>>>>>>> zoned block device with Zone Append command support. A namespace that
+>>>>>>> does not support append is not supported by the driver.
+>>>>>>
+>>>>>> Why are we enforcing the append command? Append is optional on the
+>>>>>> current ZNS specification, so we should not make this mandatory in the
+>>>>>> implementation. See specifics below.
+>>>>
+>>>>>
+>>>>> There is already general support in the kernel for the zone append
+>>>>> command. Feel free to submit patches to emulate the support. It is
+>>>>> outside the scope of this patchset.
+>>>>>
+>>>>
+>>>> It is fine that the kernel supports append, but the ZNS specification
+>>>> does not impose the implementation for append, so the driver should not
+>>>> do that either.
+>>>>
+>>>> ZNS SSDs that choose to leave append as a non-implemented optional
+>>>> command should not rely on emulated SW support, specially when
+>>>> traditional writes work very fine for a large part of current ZNS use
+>>>> cases.
+>>>>
+>>>> Please, remove this virtual constraint.
+>>>
+>>> The Zone Append command is mandatory for zoned block devices. Please
+>>> see https://lwn.net/Articles/818709/ for the background.
 >>
->> The reference for writing this documentation was the source code and
->> "Linux Block IO: Introducing Multi-queue SSD Access on Multi-core
->> Systems", by Axboe et al.
->>
->> Signed-off-by: André Almeida <andrealmeid@collabora.com>
->> ---
->> Changes from v1:
->> - Fixed typos
->> - Reworked blk_mq_hw_ctx
->>
->> Hello,
->>
->> This commit was tested using "make htmldocs" and the HTML output has
->> been verified.
->>
->> Thanks,
->> 	André
->> ---
->>  Documentation/block/blk-mq.rst | 154 +++++++++++++++++++++++++++++++++
->>  Documentation/block/index.rst  |   1 +
->>  2 files changed, 155 insertions(+)
->>  create mode 100644 Documentation/block/blk-mq.rst
->>
->> diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
->> new file mode 100644
->> index 000000000000..1f702adbc577
->> --- /dev/null
->> +++ b/Documentation/block/blk-mq.rst
->> @@ -0,0 +1,154 @@
->> +.. SPDX-License-Identifier: GPL-2.0
->> +
->> +================================================
->> +Multi-Queue Block IO Queueing Mechanism (blk-mq)
->> +================================================
->> +
->> +The Multi-Queue Block IO Queueing Mechanism is an API to enable fast storage
->> +devices to achieve a huge number of input/output operations per second (IOPS)
->> +through queueing and submitting IO requests to block devices simultaneously,
->> +benefiting from the parallelism offered by modern storage devices.
->> +
->> +Introduction
->> +============
->> +
->> +Background
->> +----------
->> +
->> +Magnetic hard disks have been the de facto standard from the beginning of the
->> +development of the kernel. The Block IO subsystem aimed to achieve the best
->> +performance possible for those devices with a high penalty when doing random
->> +access, and the bottleneck was the mechanical moving parts, a lot more slower
-> 
->                                                                a lot slower
-> or                                                             much slower
-> 
->> +than any layer on the storage stack. One example of such optimization technique
->> +involves ordering read/write requests accordingly to the current position of
-> 
-> I would say                              according to
-> 
->> +the hard disk head.
->> +
->> +However, with the development of Solid State Drives and Non-Volatile Memories
->> +without mechanical parts nor random access penalty and capable of performing
->> +high parallel access, the bottleneck of the stack had moved from the storage
->> +device to the operating system. In order to  take advantage of the parallelism
-> 
-> drop one space                               ^^^^
-> 
->> +in those devices design, the multi-queue mechanism was introduced.
-> 
->             devices'
-> 
->> +
->> +The former design had a single queue to store block IO requests with a single
->> +lock. That did not scale well in SMP systems due to dirty data in cache and the
->> +bottleneck of having a single lock for multiple processors. This setup also
->> +suffered with congestion when different processes (or the same process, moving
->> +to different CPUs) wanted to perform block IO. Instead of this, the blk-mq API
->> +spawns multiple queues with individual entry points local to the CPU, removing
->> +the need for a lock. A deeper explanation on how this works is covered in the
->> +following section (`Operation`_).
->> +
->> +Operation
->> +---------
->> +
->> +When the userspace performs IO to a block device (reading or writing a file,
->> +for instance), blk-mq takes action: it will store and manage IO requests to
->> +the block device, acting as middleware between the userspace (and a file
->> +system, if present) and the block device driver.
->> +
->> +blk-mq has two group of queues: software staging queues and hardware dispatch
->> +queues. When the request arrives at the block layer, it will try the shortest
->> +path possible: send it directly to the hardware queue. However, there are two
->> +cases that it might not do that: if there's an IO scheduler attached at the
->> +layer or if we want to try to merge requests. In both cases, requests will be
->> +sent to the software queue.
->> +
->> +Then, after the requests are processed by software queues, they will be placed
->> +at the hardware queue, a second stage queue were the hardware has direct access
->> +to process those requests. However, if the hardware does not have enough
->> +resources to accept more requests, blk-mq will places requests on a temporary
->> +queue, to be sent in the future, when the hardware is able.
->> +
->> +Software staging queues
->> +~~~~~~~~~~~~~~~~~~~~~~~
->> +
->> +The block IO subsystem adds requests (represented by struct
->> +:c:type:`blk_mq_ctx`) in the software staging queues in case that they weren't
->> +sent directly to the driver. A request is a collection of BIOs. They arrived at
->> +the block layer through the data structure struct :c:type:`bio`. The block
->> +layer will then build a new structure from it, the struct :c:type:`request`
->> +that will be used to communicate with the device driver. Each queue has its
->> +own lock and the number of queues is defined by a per-CPU or per-node basis.
->> +
->> +The staging queue can be used to merge requests for adjacent sectors. For
->> +instance, requests for sector 3-6, 6-7, 7-9 can become one request for 3-9.
->> +Even if random access to SSDs and NVMs have the same time of response compared
->> +to sequential access, grouped requests for sequential access decreases the
->> +number of individual requests. This technique of merging requests is called
->> +plugging.
->> +
->> +Along with that, the requests can be reordered to ensure fairness of system
->> +resources (e.g. to ensure that no application suffers from starvation) and/or to
->> +improve IO performance, by an IO scheduler.
->> +
->> +IO Schedulers
->> +^^^^^^^^^^^^^
->> +
->> +There are several schedulers implemented by the block layer, each one following
->> +a heuristic to improve the IO performance. They are "pluggable" (as in plug
->> +and play), in the sense of they can be selected at run time using sysfs. You
->> +can read more about Linux's IO schedulers `here
->> +<https://www.kernel.org/doc/html/latest/block/index.html>`_. The scheduling
->> +happens only between requests in the same queue, so it is not possible to merge
->> +requests from different queues, otherwise there would be cache trashing and a
->> +need to have a lock for each queue. After the scheduling, the requests are
->> +eligible to be sent to the hardware. One of the possible schedulers to be
->> +selected is the NOOP scheduler, the most straightforward one, that implements a
->> +simple FIFO, without performing any reordering. This is useful in the following
->> +scenarios: when scheduling will be performed in a next step somewhere in the
->> +stack, like block device controllers; the actual sector position of blocks are
->> +transparent for the host, meaning it hasn't enough information to take a proper
->> +decision; or the overhead of reordering is higher than the handicap of
->> +non-sequential accesses.
->> +
->> +Hardware dispatch queues
->> +~~~~~~~~~~~~~~~~~~~~~~~~
->> +
->> +The hardware queues (represented by struct :c:type:`blk_mq_hw_ctx`) have a 1:1
->> +correspondence to the device driver's submission queues, and are the last step
->> +of the block layer submission code before the low level device driver taking
->> +ownership of the request. To run this queue, the block layer removes requests
->> +from the associated software queues and tries to dispatch to the hardware.
->> +
->> +If it's not possible to send the requests directly to hardware, they will be
->> +added to a linked list (:c:type:`hctx->dispatch`) of requests. Then,
->> +next time the block layer runs a queue, it will send the requests laying at the
->> +:c:type:`dispatch` list first, to ensure a fairness dispatch with those
->> +requests that were ready to be sent first. The number of hardware queues
->> +depends on the number of hardware contexts supported by the hardware and its
->> +device driver, but it will not be more than the number of cores of the system.
->> +There is no reordering at this stage, and each software queue has a set of
->> +hardware queues to send requests for.
->> +
->> +.. note::
->> +
->> +        Neither the block layer nor the device protocols guarantee
->> +        the order of completion of requests. This must be handled by
->> +        higher layers, like the filesystem.
->> +
->> +Tag-based completion
->> +~~~~~~~~~~~~~~~~~~~~
->> +
->> +In order to indicate which request has been completed, every request is
->> +identified by an integer, ranging from 0 to the dispatch queue size. This tag
->> +is generated by the block layer and later reused by the device driver, removing
->> +the need to create a redundant identifier. When a request is completed in the
->> +drive, the tag is sent back to the block layer to notify it of the finalization.
->> +This removes the need to do a linear search to find out which IO has been
->> +completed.
->> +
->> +Further reading
->> +---------------
->> +
->> +- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
->> +
->> +- `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
->> +
->> +- `Null block device driver <https://www.kernel.org/doc/html/latest/block/null_blk.html>`_
->> +
->> +Source code documentation
->> +=========================
->> +
->> +.. kernel-doc:: include/linux/blk-mq.h
->> +
->> +.. kernel-doc:: block/blk-mq.c
-> 
-> thanks.
-> 
+>> I do not see anywhere in the block layer that append is mandatory for
+>> zoned devices. Append is emulated on ZBC, but beyond that there is no
+>> mandatory bits. Please explain.
+>
+>This is to allow a single write IO path for all types of zoned block device for
+>higher layers, e.g file systems. The on-going re-work of btrfs zone support for
+>instance now relies 100% on zone append being supported. That significantly
+>simplifies the file system support and more importantly remove the need for
+>locking around block allocation and BIO issuing, allowing to preserve a fully
+>asynchronous write path that can include workqueues for efficient CPU usage of
+>things like encryption and compression. Without zone append, file system would
+>either (1) have to reject these drives that do not support zone append, or (2)
+>implement 2 different write IO path (slower regular write and zone append). None
+>of these options are ideal, to say the least.
+>
+>So the approach is: mandate zone append support for ZNS devices. To allow other
+>ZNS drives, an emulation similar to SCSI can be implemented, with that emulation
+>ideally combined to work for both types of drives if possible.
 
-Thanks Randy, all changes applied for v3.
+Enforcing QD=1 becomes a problem on devices with large zones. In
+a ZNS device that has smaller zones this should not be a problem.
+
+Would you agree that it is possible to have a write path that relies on
+QD=1, where the FS / application has the responsibility for enforcing
+this? Down the road this QD can be increased if the device is able to
+buffer the writes.
+
+I would be OK with some FS implementations to rely on append and impose
+the constraint that append has to be supported (and it would be our job
+to change that), but I would like to avoid the driver rejecting
+initializing the device because current FS implementations have
+implemented this logic.
+
+We can agree that a number of initial customers will use these devices
+raw, using the in-kernel I/O path, but without a FS on top.
+
+Thoughts?
+
+> and note that
+>this emulation would require the drive to be operated with mq-deadline to enable
+>zone write locking for preserving write command order. While on a HDD the
+>performance penalty is minimal, it will likely be significant on a SSD.
+
+Exactly my concern. I do not want ZNS SSDs to be impacted by this type
+of design decision at the driver level.
+
+Thanks,
+Javier
