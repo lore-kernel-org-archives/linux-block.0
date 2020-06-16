@@ -2,133 +2,97 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD0BC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 11:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC503C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 11:50:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2F6920CC7
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 11:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C596C2098B
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 11:50:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GPGQEEU5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbgFPLYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 07:24:20 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52602 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725901AbgFPLYU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 07:24:20 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B0195D2BEC9DA731698C;
-        Tue, 16 Jun 2020 19:24:16 +0800 (CST)
-Received: from [127.0.0.1] (10.166.213.7) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Tue, 16 Jun 2020
- 19:24:07 +0800
-Subject: Re: [PATCH v6] block: Fix use-after-free in blkdev_get()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
+        id S1726261AbgFPLuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 07:50:18 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40966 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725775AbgFPLuR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jun 2020 07:50:17 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05GBbelB098648;
+        Tue, 16 Jun 2020 11:49:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=Y9/FOWmEEqBP6lXX9J5VN2ObB6C/XvgQK6xWy2d/FXA=;
+ b=GPGQEEU5JyVtFBAnqhplyAqsm2gn+7qCzTrMiaDFvSu97CRT1eaU4UTIfmabljSYmi4W
+ Db26KIUj2IGBWFabh2e9mpWLWCIrilJ/KK9go8dVcWAnuj9itOVQxer4myRo5NSlME0r
+ FhlVV/k1Z8xd3FnxlxFvzKw4XfvS2p2HBO19eBuNPTq/LMIpCSRS6Ts2BEoQQRH9ux24
+ vvQygbu5OdLDZqeYAWMg+F8AGTBIa8VbQVeVChnKxlgYeqd0pXKoDsyWm16vCsNbxg4g
+ TBKEVaDargMmg9YqS8aacvjYoLMkrpqPPgxWith2dynGOE0I4SjtcUGYTtjRZJN4oS9R FQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 31p6e5xbb9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 16 Jun 2020 11:49:53 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05GBX676139009;
+        Tue, 16 Jun 2020 11:49:53 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 31p6dgcevk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jun 2020 11:49:52 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05GBnn2N030373;
+        Tue, 16 Jun 2020 11:49:50 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 16 Jun 2020 04:49:49 -0700
+Date:   Tue, 16 Jun 2020 14:49:42 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jason Yan <yanaijie@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
         Hulk Robot <hulkci@huawei.com>,
         Sedat Dilek <sedat.dilek@gmail.com>
+Subject: Re: [PATCH v6] block: Fix use-after-free in blkdev_get()
+Message-ID: <20200616114942.GM4282@kadam>
 References: <20200616034002.2473743-1-yanaijie@huawei.com>
  <20200616102048.GL4282@kadam>
-From:   Jason Yan <yanaijie@huawei.com>
-Message-ID: <3d0d8b5e-2adc-dc53-0bd2-7e28a58931f8@huawei.com>
-Date:   Tue, 16 Jun 2020 19:24:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+ <3d0d8b5e-2adc-dc53-0bd2-7e28a58931f8@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200616102048.GL4282@kadam>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.166.213.7]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d0d8b5e-2adc-dc53-0bd2-7e28a58931f8@huawei.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9653 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 adultscore=0 bulkscore=0
+ phishscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006160088
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9653 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 adultscore=0
+ mlxscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
+ suspectscore=2 spamscore=0 bulkscore=0 malwarescore=0 impostorscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006160088
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Dan£¬
+On Tue, Jun 16, 2020 at 07:24:07PM +0800, Jason Yan wrote:
+> This commit added accessing bdev->bd_mutex before checking res, which will
+> cause use-after-free. So I think the fixes tag should be:
+> 
+> Fixes: 77ea887e433a ("implement in-kernel gendisk events handling")
 
-ÔÚ 2020/6/16 18:20, Dan Carpenter Ð´µÀ:
-> On Tue, Jun 16, 2020 at 11:40:02AM +0800, Jason Yan wrote:
->>
->> Fixes: e525fd89d380 ("block: make blkdev_get/put() handle exclusive access")
-> 
-> I still don't understand how this is the correct fixes tag...  :/
-> 
-> git show e525fd89d380:fs/block_dev.c | cat -n
->    1208  int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
->    1209  {
->    1210          struct block_device *whole = NULL;
->    1211          int res;
->    1212
->    1213          WARN_ON_ONCE((mode & FMODE_EXCL) && !holder);
->    1214
->    1215          if ((mode & FMODE_EXCL) && holder) {
->    1216                  whole = bd_start_claiming(bdev, holder);
->    1217                  if (IS_ERR(whole)) {
->    1218                          bdput(bdev);
->    1219                          return PTR_ERR(whole);
->    1220                  }
->    1221          }
->    1222
->    1223          res = __blkdev_get(bdev, mode, 0);
->    1224
->    1225          if (whole) {
->    1226                  if (res == 0)
->                              ^^^^^^^^
-> 
->    1227                          bd_finish_claiming(bdev, whole, holder);
->    1228                  else
->    1229                          bd_abort_claiming(whole, holder);
->                                                    ^^^^^^^^^^^^^
-> If __blkdev_get() then this doesn't dereference "bdev" so it's not a
-> use after free bug.
-> 
->    1230          }
->    1231
->    1232          return res;
->    1233  }
-> 
-> So far as I can see the Fixes tag should be what I said earlier.
-> 
-> Fixes: 89e524c04fa9 ("loop: Fix mount(2) failure due to race with LOOP_SET_FD")
-> 
+Yeah.  That looks right.  I'm surprised it goes back so far.
 
-I tried kernel before this commit and can still reproduce this issue.
-
-After some digging, at last I found this one:
-77ea887e433a "implement in-kernel gendisk events handling"
-
-@@ -1158,9 +1159,10 @@ int blkdev_get(struct block_device *bdev, fmode_t 
-mode, void *holder)
-
-         if (whole) {
-                 /* finish claiming */
-+               mutex_lock(&bdev->bd_mutex);
-                 spin_lock(&bdev_lock);
-
--               if (res == 0) {
-+               if (!res) {
-                         BUG_ON(!bd_may_claim(bdev, whole, holder));
-                         /*
-                          * Note that for a whole device bd_holders
-
-
-This commit added accessing bdev->bd_mutex before checking res, which 
-will cause use-after-free. So I think the fixes tag should be:
-
-Fixes: 77ea887e433a ("implement in-kernel gendisk events handling")
-
-> Otherwise the patch looks good to me.
-> 
-> Reviewed-by: Dan Carpenter <dan.carpenter@oracle.com>
-> 
-> regards,
-> dan carpenter
-> 
-> .
-> 
+regards,
+dan carpenter
 
