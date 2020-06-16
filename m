@@ -2,81 +2,64 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8D2C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 04:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A9EC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 07:30:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83C9F207E8
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 04:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C97C20734
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 07:30:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sv8NB9se"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mX7KVS76"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725562AbgFPEQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 00:16:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45433 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725306AbgFPEQi (ORCPT
+        id S1725911AbgFPHaC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 03:30:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725710AbgFPHaC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 00:16:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592280997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=O1xnRnGhMhEwz+wjNoiBLED8iGeKhij45TdHR9vNevI=;
-        b=Sv8NB9seoKSHuH/D6DWfs4L9k3f9f6jswFqIFJmtVU8ZdFHEMQ+K0hwcCxtWmiFnbdt4Fm
-        EZD5ZoGhGw8a8OxE5pGqxE0Hr2V82vPPPxxWZr4GMXW0XrtGn9xvv9WJKa1hLtXLJlmOAx
-        uwo2y+oZMc8WKLnA/zdKyftCjYxOp2k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-dxsaplCfNMSfSVigeg3-jg-1; Tue, 16 Jun 2020 00:16:34 -0400
-X-MC-Unique: dxsaplCfNMSfSVigeg3-jg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9FA5188361B;
-        Tue, 16 Jun 2020 04:16:33 +0000 (UTC)
-Received: from T590 (ovpn-12-136.pek2.redhat.com [10.72.12.136])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C9E7160C05;
-        Tue, 16 Jun 2020 04:16:28 +0000 (UTC)
-Date:   Tue, 16 Jun 2020 12:16:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     harshad shirwadkar <harshadshirwadkar@gmail.com>
-Cc:     linux-block@vger.kernel.org, "Theodore Y. Ts'o" <tytso@mit.edu>
+        Tue, 16 Jun 2020 03:30:02 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E689C05BD43
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 00:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hRLjeXbeNz86qwreVK3h2qFmY9Q9Ni6dZ5nLmd1OMuM=; b=mX7KVS76k+LeNkfNMXE2F/jKKE
+        1EoMutiNBzoYUo0bpUxEklRYY9PF+S9FdcKjeAA4BpeSsVEF9gUMwIkfKeITHWSDhuPTDK0Tp2pN2
+        /Ifci+UYf9KLgJNe8yLl3HgjE9PwnIycGYqVQdSbbifTTihqXozjDX9POAAy9r55iPXu2ZLnLSPga
+        /ekr2BpvT9QF8qPZi3L4q5hYgz4L17/+OW2LiVGm8nxnPj23aNoeOtLzbO9TKqF0rYou2QS1rdn2r
+        dIwqNwVWNugCk8vYneZEZzPghSEkwVtZnPCQq9Y/DiSsR0AifAAPxXJYMyMMzXo/mO/f4w1rBsmEa
+        vqNLZ/bA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jl62d-00083Q-Fh; Tue, 16 Jun 2020 07:29:55 +0000
+Date:   Tue, 16 Jun 2020 00:29:55 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Harshad Shirwadkar <harshadshirwadkar@gmail.com>
+Cc:     linux-block@vger.kernel.org, tytso@mit.edu
 Subject: Re: [PATCH] block: add split_alignment for request queue
-Message-ID: <20200616041624.GA52855@T590>
+Message-ID: <20200616072955.GA30385@infradead.org>
 References: <20200616005633.172804-1-harshadshirwadkar@gmail.com>
- <20200616024028.GE27192@T590>
- <CAD+ocbyJ7hfC-UyO5MupgnzbPbVAVO5b1Ff-+xgHLin_FXCE-w@mail.gmail.com>
- <CAD+ocbzP70UXWRdhx-j2=+DdGihEbP94Djksij_Ykzgaayim3Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAD+ocbzP70UXWRdhx-j2=+DdGihEbP94Djksij_Ykzgaayim3Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200616005633.172804-1-harshadshirwadkar@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 08:24:08PM -0700, harshad shirwadkar wrote:
-> After taking a closer look, I don't see chunk_sectors being accounted
-> for in the splitting code. If I understand correctly, the implementation
-> of chunk_sectors is such that it allows for one big IO to go through.
-> In other words, it tries to avoid the splitting code if possible. But,
-> it doesn't seem to guarantee that when an IO is split, it will be
+On Mon, Jun 15, 2020 at 05:56:33PM -0700, Harshad Shirwadkar wrote:
+> This feature allows the user to control the alignment at which request
+> queue is allowed to split bios. Google CloudSQL's 16k user space
+> application expects that direct io writes aligned at 16k boundary in
+> the user-space are not split by kernel at non-16k boundaries.
 
-Please take a look at blk_max_size_offset() which is called by
-get_max_io_size() from blk_bio_segment_split(), which splits
-bio into chunk_sectors aligned bio.
+That is a completely bogus assumptions and people who think they can
+make that assumption should not be allowed to write software.
 
-Also you may run IO trace on queue with chunk_sectors setup, and check
-if the splitted IO request is what you expected.
-
-
-Thanks, 
-Ming
-
+Can we stop this crap now please?
