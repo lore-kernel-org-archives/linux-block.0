@@ -1,144 +1,270 @@
-Return-Path: <SRS0=pdd5=74=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E372C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 23:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF11BC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 00:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74ACB206DB
-	for <linux-block@archiver.kernel.org>; Mon, 15 Jun 2020 23:49:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDAD42074D
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 00:15:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nunAefrn";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Y8UQx/sH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ktQHexPK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbgFOXtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 19:49:10 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:3821 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbgFOXtJ (ORCPT
+        id S1726332AbgFPAPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 20:15:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725960AbgFPAPW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 19:49:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1592264949; x=1623800949;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=h3OvlzAEbqP2Z3xW7d+nuXCJrUrENp1dkDE/7c5bUwg=;
-  b=nunAefrnuX1872gO3Uzs81+MhNfyoU4piChJaE17zIUYGDhYp2JA+uos
-   NgmXbsKlsvnOo2bj6yZwc2VUH4UAYKxX3k0mwUevT/h1/SY5aO0zfafXH
-   UJlv96XRNnvc4kwRp2bpmnZV5F3G6Ney3weOhn6zz/DD92Ct3pgnE5ZJp
-   ppdviT4LZYryVS4Qa2X5fRTjaxompiL5UQcOkZ6AUnSD1NXosONEJYNjF
-   R+bLubFAzVUzvetc1z+sixrNo+Ivde0t3C8zB5ZnCMqEn7mw1fIJ662L3
-   nAdmgdydY29YyGTuJbxExZaAa0b2IaT9Szzzlm+UrD8MHZ1q4kFLx+Ssn
-   g==;
-IronPort-SDR: uIqmYyih6jxtbywhiVcspjsyCJRyUgZFukjO1tO8UPpS9AaLH/5f0KLqcEcPAi3w19cjPkXrbe
- k2Z1zkiYEE9Dn+V5iGDNP5CZpsqp90gcpce4N0SYsj8QbPm8dGU6y/UdAgkj1lQDgrjAdSyR4+
- tYmXswEXuBGYOEO3+ICsA/UDlkhC2dYT23/T3Kfg7XGE1e5FTisz3O6zzdmmkrIVQ12BrJYArS
- 1Xrn69ST0Lp5NVxUKL4g5b8FPXve7VT/yNGhG6SRC/Ln8PHXNf5s2bWcMxr5IVLqxBwSFP/RK5
- Zjg=
-X-IronPort-AV: E=Sophos;i="5.73,516,1583164800"; 
-   d="scan'208";a="144395100"
-Received: from mail-dm6nam12lp2173.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.173])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2020 07:49:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UIHzM94xb7VoR3S9gikfeFY+x+A4ZTSTJz4rCmjtlAhlXGgp/nOhjKZ3xrbiRTV+MSwwl9Qv35PDSt9RLwYi+2dPc7dLyrXZZRSGaKSV9RbtyBANtGT07k7ZlZHwifFMBrL6gn5G+AJ075RTC9fHLwBk7SvMsyZDsSMAcJcn4MpgZwYybXqJ8ZENWZtS3iSAMGrxR3eRAddjvlE3EWVdTd2EkGi+8hfVtJHQFhqfS5DEmGfP4vg+w7qKL3upaUHRcaJRKmr7QzvbzqFxNGLhwhgeyme+2gHoJwhZuD3g3V3LRpZ4tQcImTxEBvw1Y1yMa5y3e9S/G1fOAXqFHiuyMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h3OvlzAEbqP2Z3xW7d+nuXCJrUrENp1dkDE/7c5bUwg=;
- b=X3xgs600XsCfpof8lu1vf/SNY93+ih7KSf0rXqpMi2R4AEBybGNj94yof4djMt3D1IefoYLCxKXL1e1jOFiPQuMmD2BeRA0KCtyRKEZ2R0mZXNHrPrVy9B6JnLfvw334Nb/4S5N8P/m62mbzXYimhPWXD+qr/XGpKI8SNvVsPFTwhBo3WR75omR3qedkBx/HR2aQNrGxVYT4oDVAla1vaQhetHl12csleUlTe2hATfyQDomtgW1YdwLrStIpvjinDBwFx/NS1SYhHTaA2rzpiVEn1VOUymYQ3vx2N9EvG1OdtfZqMtAd7+ShngtVntoXbDuSmD6zxoO0bEVqqFo8lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h3OvlzAEbqP2Z3xW7d+nuXCJrUrENp1dkDE/7c5bUwg=;
- b=Y8UQx/sHhxAtelqkOalTYZqY1Dm8UhOqI7+VwNPYKL87VvsMnSzh91nRGPvEvv9dINucrAwzFSTMK/W0Hv/4KS131oPaR0gRsOzE9kaBT7+njxhUcy/VwuKNYqbYyc32lEx1Wb8IO5b4ifQWadEl5eWmVkDwyXjwbuBI/r0HQqs=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB5334.namprd04.prod.outlook.com (2603:10b6:a03:c8::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.24; Mon, 15 Jun
- 2020 23:49:06 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3088.029; Mon, 15 Jun 2020
- 23:49:06 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 1/5] block: add capacity field to zone descriptors
-Thread-Topic: [PATCH 1/5] block: add capacity field to zone descriptors
-Thread-Index: AQHWQ22j2ywuL6LihkGfGiVomzsODA==
-Date:   Mon, 15 Jun 2020 23:49:06 +0000
-Message-ID: <BYAPR04MB4965F20FA755283EB9EFBCE1869C0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200615233424.13458-1-keith.busch@wdc.com>
- <20200615233424.13458-2-keith.busch@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 4f6cfbdf-d2af-45bd-3321-08d81186b12a
-x-ms-traffictypediagnostic: BYAPR04MB5334:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB53348CE558635353A8193283869C0@BYAPR04MB5334.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 04359FAD81
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mrxAZqmtmroH7kqnt4Bxh8papuIc33Zux2jZKQONIEpTyUkaB4Y5H0BJgKneeK+1ZsyfuijO/PzH1KyOEKqT+R3S8Y+UYklEu9099uq8fabEZeFpwBqHgTqsGXfUhSU0A5ZQnoL3poWU4PCZRNM3sikPhvS5TNqQN9uGBeg8STUFy5I8NntxPsLu+GRLzT9AYJlMUiX9LnLu1UwoLcEw9k+V253+I5eD4okOToolAQ2svEfNCfCmKjeuNUSTA/idwvzlv4p+HqPcWYeNTKtufniLPabHaMHhhmJoCzDsVZar1QLwxKAUIQ2+HaP/A4ULqHgL8FhlriUcluKh0HnfMQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(366004)(136003)(376002)(346002)(110136005)(316002)(33656002)(8676002)(186003)(4326008)(6506007)(5660300002)(53546011)(66574015)(55016002)(26005)(76116006)(52536014)(9686003)(54906003)(478600001)(7696005)(66476007)(66946007)(64756008)(8936002)(86362001)(4744005)(66556008)(66446008)(71200400001)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: d5rbt+Zt/6pfJRnIokxlPi1xNGRvtcPWZXuzo3G+tfUBF2ezh+7SC/X0e0p8x66u9a39+3kxZjPgqFGH3fO77Bp0KIE6yRX2LQ9KKpkB9RLGduXftG/0oRq/OVjWFO6P3AtDJpvKU3hPT/MC6OYM6vaKQPaHhTM/tJFSMR5A+hFszFu0qlKeLat685SZ7AZ9lEjSQiU19G8iH0Klvp8I7QaYY5s+bEfghmJfvXM7ntXScLZeYbwqo8nziWXlArhI6Dzpdg0pat3etxotbJl/8c1RAr7Brdj1ZcF2+AX7x6fAj9FdCBTPaYOrBNoRSavmogAIZuu9et+1y0+8oWLPv5Iauolx8TYWcUO4PKGyrL9axywcoAgSrFUkUc+hC32NU/7EVkppU34hoWRpvXCYLJsvKQyNPmS322+Xqb15riAvC/x9nSSGHubTX0L3Yv9HWkcKCQNJuaq0xDr0bRfMNQ1KfLaPbNMkOZdAtWe2MOY=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 15 Jun 2020 20:15:22 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40DCFC061A0E;
+        Mon, 15 Jun 2020 17:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=O3apYYix+Rn65JFO3L94llIwE+pqtFqkO/3PhpCAJAE=; b=ktQHexPKlD7JMXJsID2hNJ5+Ik
+        viM6WTvwWnUrWlW3V1j8qKxcdy8Nr+Fh7O8IfCTR5kDHOiMF71K6xibEM1cRJEvbDV3JZ42uCJx+U
+        uPRZr92n2AJjAXB9aeaPfSr00cMK9RkOp4N79w7wcIDuFqWZhFUdwkEuGzP+gcvvCUGmhMYPJopmc
+        54AauXvxo2VTcg+YoXj8voJGUZFZ38pYy9hCFu1HIvW8+v2kfffcH/vdYuQQ1caXrmMxOmlHZBxEv
+        6aCf0f509qR/PxIfMzLuZo/sWqeZjROtaPj8tGOLQnATXrN4ijXyczodJhz8vYVoHeWL4SO8HoxHi
+        WlqhcNwA==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jkzG0-0006s9-Ua; Tue, 16 Jun 2020 00:15:16 +0000
+Subject: Re: [PATCH v2] docs: block: Create blk-mq documentation
+To:     =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
+        axboe@kernel.dk, corbet@lwn.net, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
+        krisman@collabora.com
+References: <20200605175536.19681-1-andrealmeid@collabora.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <3fc90f94-c034-7508-3938-f24beddbc5f3@infradead.org>
+Date:   Mon, 15 Jun 2020 17:15:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f6cfbdf-d2af-45bd-3321-08d81186b12a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2020 23:49:06.6858
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: InwjEMfbVWalhZzFqv6fqUuT2WISG+95ksR3lkIhknRb240qnB0+dXq/dpYISo1aM7PyQG8LL7QTvW+HlNflnC8WuHb5oSDqNPOvFjKolrw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5334
+In-Reply-To: <20200605175536.19681-1-andrealmeid@collabora.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/20 4:35 PM, Keith Busch wrote:=0A=
-> From: Matias Bj=F8rling<matias.bjorling@wdc.com>=0A=
-> =0A=
-> In the zoned storage model, the sectors within a zone are typically all=
-=0A=
-> writeable. With the introduction of the Zoned Namespace (ZNS) Command=0A=
-> Set in the NVM Express organization, the model was extended to have a=0A=
-> specific writeable capacity.=0A=
-> =0A=
-> Extend the zone descriptor data structure with a zone capacity field to=
-=0A=
-> indicate to the user how many sectors in a zone are writeable.=0A=
-> =0A=
-> Introduce backward compatibility in the zone report ioctl by extending=0A=
-> the zone report header data structure with a flags field to indicate if=
-=0A=
-> the capacity field is available.=0A=
-> =0A=
-> Signed-off-by: Matias Bj=F8rling<matias.bjorling@wdc.com>=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+Hi,
+I have a few more editing comments for you (below):
+
+On 6/5/20 10:55 AM, André Almeida wrote:
+> Create a documentation providing a background and explanation around the
+> operation of the Multi-Queue Block IO Queueing Mechanism (blk-mq).
+> 
+> The reference for writing this documentation was the source code and
+> "Linux Block IO: Introducing Multi-queue SSD Access on Multi-core
+> Systems", by Axboe et al.
+> 
+> Signed-off-by: André Almeida <andrealmeid@collabora.com>
+> ---
+> Changes from v1:
+> - Fixed typos
+> - Reworked blk_mq_hw_ctx
+> 
+> Hello,
+> 
+> This commit was tested using "make htmldocs" and the HTML output has
+> been verified.
+> 
+> Thanks,
+> 	André
+> ---
+>  Documentation/block/blk-mq.rst | 154 +++++++++++++++++++++++++++++++++
+>  Documentation/block/index.rst  |   1 +
+>  2 files changed, 155 insertions(+)
+>  create mode 100644 Documentation/block/blk-mq.rst
+> 
+> diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
+> new file mode 100644
+> index 000000000000..1f702adbc577
+> --- /dev/null
+> +++ b/Documentation/block/blk-mq.rst
+> @@ -0,0 +1,154 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +================================================
+> +Multi-Queue Block IO Queueing Mechanism (blk-mq)
+> +================================================
+> +
+> +The Multi-Queue Block IO Queueing Mechanism is an API to enable fast storage
+> +devices to achieve a huge number of input/output operations per second (IOPS)
+> +through queueing and submitting IO requests to block devices simultaneously,
+> +benefiting from the parallelism offered by modern storage devices.
+> +
+> +Introduction
+> +============
+> +
+> +Background
+> +----------
+> +
+> +Magnetic hard disks have been the de facto standard from the beginning of the
+> +development of the kernel. The Block IO subsystem aimed to achieve the best
+> +performance possible for those devices with a high penalty when doing random
+> +access, and the bottleneck was the mechanical moving parts, a lot more slower
+
+                                                               a lot slower
+or                                                             much slower
+
+> +than any layer on the storage stack. One example of such optimization technique
+> +involves ordering read/write requests accordingly to the current position of
+
+I would say                              according to
+
+> +the hard disk head.
+> +
+> +However, with the development of Solid State Drives and Non-Volatile Memories
+> +without mechanical parts nor random access penalty and capable of performing
+> +high parallel access, the bottleneck of the stack had moved from the storage
+> +device to the operating system. In order to  take advantage of the parallelism
+
+drop one space                               ^^^^
+
+> +in those devices design, the multi-queue mechanism was introduced.
+
+            devices'
+
+> +
+> +The former design had a single queue to store block IO requests with a single
+> +lock. That did not scale well in SMP systems due to dirty data in cache and the
+> +bottleneck of having a single lock for multiple processors. This setup also
+> +suffered with congestion when different processes (or the same process, moving
+> +to different CPUs) wanted to perform block IO. Instead of this, the blk-mq API
+> +spawns multiple queues with individual entry points local to the CPU, removing
+> +the need for a lock. A deeper explanation on how this works is covered in the
+> +following section (`Operation`_).
+> +
+> +Operation
+> +---------
+> +
+> +When the userspace performs IO to a block device (reading or writing a file,
+> +for instance), blk-mq takes action: it will store and manage IO requests to
+> +the block device, acting as middleware between the userspace (and a file
+> +system, if present) and the block device driver.
+> +
+> +blk-mq has two group of queues: software staging queues and hardware dispatch
+> +queues. When the request arrives at the block layer, it will try the shortest
+> +path possible: send it directly to the hardware queue. However, there are two
+> +cases that it might not do that: if there's an IO scheduler attached at the
+> +layer or if we want to try to merge requests. In both cases, requests will be
+> +sent to the software queue.
+> +
+> +Then, after the requests are processed by software queues, they will be placed
+> +at the hardware queue, a second stage queue were the hardware has direct access
+> +to process those requests. However, if the hardware does not have enough
+> +resources to accept more requests, blk-mq will places requests on a temporary
+> +queue, to be sent in the future, when the hardware is able.
+> +
+> +Software staging queues
+> +~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +The block IO subsystem adds requests (represented by struct
+> +:c:type:`blk_mq_ctx`) in the software staging queues in case that they weren't
+> +sent directly to the driver. A request is a collection of BIOs. They arrived at
+> +the block layer through the data structure struct :c:type:`bio`. The block
+> +layer will then build a new structure from it, the struct :c:type:`request`
+> +that will be used to communicate with the device driver. Each queue has its
+> +own lock and the number of queues is defined by a per-CPU or per-node basis.
+> +
+> +The staging queue can be used to merge requests for adjacent sectors. For
+> +instance, requests for sector 3-6, 6-7, 7-9 can become one request for 3-9.
+> +Even if random access to SSDs and NVMs have the same time of response compared
+> +to sequential access, grouped requests for sequential access decreases the
+> +number of individual requests. This technique of merging requests is called
+> +plugging.
+> +
+> +Along with that, the requests can be reordered to ensure fairness of system
+> +resources (e.g. to ensure that no application suffers from starvation) and/or to
+> +improve IO performance, by an IO scheduler.
+> +
+> +IO Schedulers
+> +^^^^^^^^^^^^^
+> +
+> +There are several schedulers implemented by the block layer, each one following
+> +a heuristic to improve the IO performance. They are "pluggable" (as in plug
+> +and play), in the sense of they can be selected at run time using sysfs. You
+> +can read more about Linux's IO schedulers `here
+> +<https://www.kernel.org/doc/html/latest/block/index.html>`_. The scheduling
+> +happens only between requests in the same queue, so it is not possible to merge
+> +requests from different queues, otherwise there would be cache trashing and a
+> +need to have a lock for each queue. After the scheduling, the requests are
+> +eligible to be sent to the hardware. One of the possible schedulers to be
+> +selected is the NOOP scheduler, the most straightforward one, that implements a
+> +simple FIFO, without performing any reordering. This is useful in the following
+> +scenarios: when scheduling will be performed in a next step somewhere in the
+> +stack, like block device controllers; the actual sector position of blocks are
+> +transparent for the host, meaning it hasn't enough information to take a proper
+> +decision; or the overhead of reordering is higher than the handicap of
+> +non-sequential accesses.
+> +
+> +Hardware dispatch queues
+> +~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +The hardware queues (represented by struct :c:type:`blk_mq_hw_ctx`) have a 1:1
+> +correspondence to the device driver's submission queues, and are the last step
+> +of the block layer submission code before the low level device driver taking
+> +ownership of the request. To run this queue, the block layer removes requests
+> +from the associated software queues and tries to dispatch to the hardware.
+> +
+> +If it's not possible to send the requests directly to hardware, they will be
+> +added to a linked list (:c:type:`hctx->dispatch`) of requests. Then,
+> +next time the block layer runs a queue, it will send the requests laying at the
+> +:c:type:`dispatch` list first, to ensure a fairness dispatch with those
+> +requests that were ready to be sent first. The number of hardware queues
+> +depends on the number of hardware contexts supported by the hardware and its
+> +device driver, but it will not be more than the number of cores of the system.
+> +There is no reordering at this stage, and each software queue has a set of
+> +hardware queues to send requests for.
+> +
+> +.. note::
+> +
+> +        Neither the block layer nor the device protocols guarantee
+> +        the order of completion of requests. This must be handled by
+> +        higher layers, like the filesystem.
+> +
+> +Tag-based completion
+> +~~~~~~~~~~~~~~~~~~~~
+> +
+> +In order to indicate which request has been completed, every request is
+> +identified by an integer, ranging from 0 to the dispatch queue size. This tag
+> +is generated by the block layer and later reused by the device driver, removing
+> +the need to create a redundant identifier. When a request is completed in the
+> +drive, the tag is sent back to the block layer to notify it of the finalization.
+> +This removes the need to do a linear search to find out which IO has been
+> +completed.
+> +
+> +Further reading
+> +---------------
+> +
+> +- `Linux Block IO: Introducing Multi-queue SSD Access on Multi-core Systems <http://kernel.dk/blk-mq.pdf>`_
+> +
+> +- `NOOP scheduler <https://en.wikipedia.org/wiki/Noop_scheduler>`_
+> +
+> +- `Null block device driver <https://www.kernel.org/doc/html/latest/block/null_blk.html>`_
+> +
+> +Source code documentation
+> +=========================
+> +
+> +.. kernel-doc:: include/linux/blk-mq.h
+> +
+> +.. kernel-doc:: block/blk-mq.c
+
+thanks.
+-- 
+~Randy
+
