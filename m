@@ -2,133 +2,241 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 228C6C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 03:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE7BC433DF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 03:39:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3F6820756
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 03:24:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZPuqXA0"
+	by mail.kernel.org (Postfix) with ESMTP id 9E3AE20776
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 03:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726790AbgFPDYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 23:24:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbgFPDYV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 23:24:21 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB2DC061A0E
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 20:24:20 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id u23so14885441otq.10
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 20:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vN+PIRvXpEDMYX5ahGs8/syC2Ss/q434jgA/XHAfWCs=;
-        b=hZPuqXA0zeemOPFHX1NDEElhpkRpt03zla08pfa3vcTisfeBXxOEJrG3WrA3LTjL6l
-         SWNcigxXK0Xu8CSOJkX0nMSPzIOCzDXZ2UDYjPrpsDZkpjlgkeCHW3+gX8dpMogecFm+
-         pRLA60pu5LeFfnb2TTaUzIS2qjATCVuYWI3CTmH+23wBHiAMlsd0qxy5mca/8UG58wlN
-         5h57+8CwH4Xi37DFWbREzpx76/lm28ieN+tszYtdORAqP8fUag41lqN+C9WLWerC/A54
-         oAnnog2LAM1EW0Oao1+9RnbkDdPseUe3lqr2dqsAiJI874SI+LVWkded97lKTTkm3C/2
-         /sdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vN+PIRvXpEDMYX5ahGs8/syC2Ss/q434jgA/XHAfWCs=;
-        b=nAanqKi7f1nrgy3/QAlqmR/O5vM6WCavozWbRyhl1YPZQdx94ivr58qweG9cLvUww5
-         qYyN+fBFPJu6T7ChcHLBDpmHGxVzhePUvH4BnUTTDfXfkEpsxGq2HgZ6Ww+REGbLRsHc
-         de8xMykaC0LQMNiihaThJvZZ71NmOQqzqFPvI8UP4g1r6jt6/UD+gXs+JhVjRDjiqiNE
-         lWPN4iQV3p+r6oxnwPfOI55m2bKuFZZnfx7RjHADlr6VBiOXhv1cLdakGPSJ8nKEK2lo
-         E+5uFhAnZySuNhyYXageyzfRwWmk2QzrRp2x3OL5lmeeI2fe0LItq6xNJNkzSjyKwRlk
-         p/MA==
-X-Gm-Message-State: AOAM531Z3z2rHjspdEaC9QtCGemPtiox8d3Zrsg+zNjM4MVaOaI7Re5X
-        td8bmIJ7eJPer5JVY/bmLj/kxZ7umcBS1DJnEFFA8hIF
-X-Google-Smtp-Source: ABdhPJxwiLP1xSF+k203OR6ftEa3nWC1lqt7LsoKfgyvFk4tMYmhtn4yQWY2nmO+WVfDOs1goxVDi2ilaDVa0yiTwnM=
-X-Received: by 2002:a9d:6e0a:: with SMTP id e10mr907824otr.171.1592277859654;
- Mon, 15 Jun 2020 20:24:19 -0700 (PDT)
+        id S1726820AbgFPDjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 23:39:13 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:39464 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725985AbgFPDjM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jun 2020 23:39:12 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 155D5701EE9F8FC63D57;
+        Tue, 16 Jun 2020 11:39:10 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Tue, 16 Jun 2020
+ 11:39:03 +0800
+From:   Jason Yan <yanaijie@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>
+CC:     Jason Yan <yanaijie@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Hulk Robot <hulkci@huawei.com>,
+        Sedat Dilek <sedat.dilek@gmail.com>
+Subject: [PATCH v6] block: Fix use-after-free in blkdev_get()
+Date:   Tue, 16 Jun 2020 11:40:02 +0800
+Message-ID: <20200616034002.2473743-1-yanaijie@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-References: <20200616005633.172804-1-harshadshirwadkar@gmail.com>
- <20200616024028.GE27192@T590> <CAD+ocbyJ7hfC-UyO5MupgnzbPbVAVO5b1Ff-+xgHLin_FXCE-w@mail.gmail.com>
-In-Reply-To: <CAD+ocbyJ7hfC-UyO5MupgnzbPbVAVO5b1Ff-+xgHLin_FXCE-w@mail.gmail.com>
-From:   harshad shirwadkar <harshadshirwadkar@gmail.com>
-Date:   Mon, 15 Jun 2020 20:24:08 -0700
-Message-ID: <CAD+ocbzP70UXWRdhx-j2=+DdGihEbP94Djksij_Ykzgaayim3Q@mail.gmail.com>
-Subject: Re: [PATCH] block: add split_alignment for request queue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, "Theodore Y. Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After taking a closer look, I don't see chunk_sectors being accounted
-for in the splitting code. If I understand correctly, the implementation
-of chunk_sectors is such that it allows for one big IO to go through.
-In other words, it tries to avoid the splitting code if possible. But,
-it doesn't seem to guarantee that when an IO is split, it will be
-split at configured alignment. With commit
-07173c3ec276cbb18dc0e0687d37d310e98a1480 ("block: enable multipage
-bvecs"), we now see bigger multi-page IOs. So, if an app sent out
-multiple writes, those all would get combined into one big IO.
-"chunk_requests" would allow that one big IO to go through *ONLY IF*
-the total size is < max_sectors. If that's not the case, chunk_sectors
-doesn't seem to have control on how this big IO will now be split.
-Please correct me if I'm wrong.
+In blkdev_get() we call __blkdev_get() to do some internal jobs and if
+there is some errors in __blkdev_get(), the bdput() is called which
+means we have released the refcount of the bdev (actually the refcount of
+the bdev inode). This means we cannot access bdev after that point. But
+acctually bdev is still accessed in blkdev_get() after calling
+__blkdev_get(). This results in use-after-free if the refcount is the
+last one we released in __blkdev_get(). Let's take a look at the
+following scenerio:
 
+  CPU0            CPU1                    CPU2
+blkdev_open     blkdev_open           Remove disk
+                  bd_acquire
+		  blkdev_get
+		    __blkdev_get      del_gendisk
+					bdev_unhash_inode
+  bd_acquire          bdev_get_gendisk
+    bd_forget           failed because of unhashed
+	  bdput
+	              bdput (the last one)
+		        bdev_evict_inode
 
-On Mon, Jun 15, 2020 at 7:50 PM harshad shirwadkar
-<harshadshirwadkar@gmail.com> wrote:
->
-> Thanks for the feedback everyone, I totally overlook chunk_sectors and
-> it sounds like that's exactly what we want. I'll send another patch
-> where that becomes writable.
->
->
-> On Mon, Jun 15, 2020 at 7:40 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Mon, Jun 15, 2020 at 05:56:33PM -0700, Harshad Shirwadkar wrote:
-> > > This feature allows the user to control the alignment at which request
-> > > queue is allowed to split bios. Google CloudSQL's 16k user space
-> > > application expects that direct io writes aligned at 16k boundary in
-> > > the user-space are not split by kernel at non-16k boundaries. More
-> > > details about this feature can be found in CloudSQL's Cloud Next 2018
-> > > presentation[1]. The underlying block device is capable of performing
-> > > 16k aligned writes atomically. Thus, this allows the user-space SQL
-> > > application to avoid double-writes (to protect against partial
-> > > failures) which are very costly provided that these writes are not
-> > > split at non-16k boundary by any underlying layers.
-> > >
-> > > We make use of Ext4's bigalloc feature to ensure that writes issued by
-> > > Ext4 are 16k aligned. But, 16K aligned data writes may get merged with
-> > > contiguous non-16k aligned Ext4 metadata writes. Such a write request
-> > > would be broken by the kernel only guaranteeing that the individually
-> > > split requests are physical block size aligned.
-> > >
-> > > We started observing a significant increase in 16k unaligned splits in
-> > > 5.4. Bisect points to commit 07173c3ec276cbb18dc0e0687d37d310e98a1480
-> > > ("block: enable multipage bvecs"). This patch enables multipage bvecs
-> > > resulting in multiple 16k aligned writes issued by the user-space to
-> > > be merged into one big IO at first. Later, __blk_queue_split() splits
-> > > these IOs while trying to align individual split IOs to be physical
-> > > block size.
-> > >
-> > > Newly added split_alignment parameter is the alignment at which
-> > > requeust queue is allowed to split IO request. By default this
-> > > alignment is turned off and current behavior is unchanged.
-> > >
-> >
-> > Such alignment can be reached via q->limits.chunk_sectors, and you
-> > just need to expose it via sysfs and make it writable.
-> >
-> > Thanks,
-> > Ming
-> >
+	  	    access bdev => use after free
+
+[  459.350216] BUG: KASAN: use-after-free in __lock_acquire+0x24c1/0x31b0
+[  459.351190] Read of size 8 at addr ffff88806c815a80 by task syz-executor.0/20132
+[  459.352347]
+[  459.352594] CPU: 0 PID: 20132 Comm: syz-executor.0 Not tainted 4.19.90 #2
+[  459.353628] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+[  459.354947] Call Trace:
+[  459.355337]  dump_stack+0x111/0x19e
+[  459.355879]  ? __lock_acquire+0x24c1/0x31b0
+[  459.356523]  print_address_description+0x60/0x223
+[  459.357248]  ? __lock_acquire+0x24c1/0x31b0
+[  459.357887]  kasan_report.cold+0xae/0x2d8
+[  459.358503]  __lock_acquire+0x24c1/0x31b0
+[  459.359120]  ? _raw_spin_unlock_irq+0x24/0x40
+[  459.359784]  ? lockdep_hardirqs_on+0x37b/0x580
+[  459.360465]  ? _raw_spin_unlock_irq+0x24/0x40
+[  459.361123]  ? finish_task_switch+0x125/0x600
+[  459.361812]  ? finish_task_switch+0xee/0x600
+[  459.362471]  ? mark_held_locks+0xf0/0xf0
+[  459.363108]  ? __schedule+0x96f/0x21d0
+[  459.363716]  lock_acquire+0x111/0x320
+[  459.364285]  ? blkdev_get+0xce/0xbe0
+[  459.364846]  ? blkdev_get+0xce/0xbe0
+[  459.365390]  __mutex_lock+0xf9/0x12a0
+[  459.365948]  ? blkdev_get+0xce/0xbe0
+[  459.366493]  ? bdev_evict_inode+0x1f0/0x1f0
+[  459.367130]  ? blkdev_get+0xce/0xbe0
+[  459.367678]  ? destroy_inode+0xbc/0x110
+[  459.368261]  ? mutex_trylock+0x1a0/0x1a0
+[  459.368867]  ? __blkdev_get+0x3e6/0x1280
+[  459.369463]  ? bdev_disk_changed+0x1d0/0x1d0
+[  459.370114]  ? blkdev_get+0xce/0xbe0
+[  459.370656]  blkdev_get+0xce/0xbe0
+[  459.371178]  ? find_held_lock+0x2c/0x110
+[  459.371774]  ? __blkdev_get+0x1280/0x1280
+[  459.372383]  ? lock_downgrade+0x680/0x680
+[  459.373002]  ? lock_acquire+0x111/0x320
+[  459.373587]  ? bd_acquire+0x21/0x2c0
+[  459.374134]  ? do_raw_spin_unlock+0x4f/0x250
+[  459.374780]  blkdev_open+0x202/0x290
+[  459.375325]  do_dentry_open+0x49e/0x1050
+[  459.375924]  ? blkdev_get_by_dev+0x70/0x70
+[  459.376543]  ? __x64_sys_fchdir+0x1f0/0x1f0
+[  459.377192]  ? inode_permission+0xbe/0x3a0
+[  459.377818]  path_openat+0x148c/0x3f50
+[  459.378392]  ? kmem_cache_alloc+0xd5/0x280
+[  459.379016]  ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.379802]  ? path_lookupat.isra.0+0x900/0x900
+[  459.380489]  ? __lock_is_held+0xad/0x140
+[  459.381093]  do_filp_open+0x1a1/0x280
+[  459.381654]  ? may_open_dev+0xf0/0xf0
+[  459.382214]  ? find_held_lock+0x2c/0x110
+[  459.382816]  ? lock_downgrade+0x680/0x680
+[  459.383425]  ? __lock_is_held+0xad/0x140
+[  459.384024]  ? do_raw_spin_unlock+0x4f/0x250
+[  459.384668]  ? _raw_spin_unlock+0x1f/0x30
+[  459.385280]  ? __alloc_fd+0x448/0x560
+[  459.385841]  do_sys_open+0x3c3/0x500
+[  459.386386]  ? filp_open+0x70/0x70
+[  459.386911]  ? trace_hardirqs_on_thunk+0x1a/0x1c
+[  459.387610]  ? trace_hardirqs_off_caller+0x55/0x1c0
+[  459.388342]  ? do_syscall_64+0x1a/0x520
+[  459.388930]  do_syscall_64+0xc3/0x520
+[  459.389490]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.390248] RIP: 0033:0x416211
+[  459.390720] Code: 75 14 b8 02 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83
+04 19 00 00 c3 48 83 ec 08 e8 0a fa ff ff 48 89 04 24 b8 02 00 00 00 0f
+   05 <48> 8b 3c 24 48 89 c2 e8 53 fa ff ff 48 89 d0 48 83 c4 08 48 3d
+      01
+[  459.393483] RSP: 002b:00007fe45dfe9a60 EFLAGS: 00000293 ORIG_RAX: 0000000000000002
+[  459.394610] RAX: ffffffffffffffda RBX: 00007fe45dfea6d4 RCX: 0000000000416211
+[  459.395678] RDX: 00007fe45dfe9b0a RSI: 0000000000000002 RDI: 00007fe45dfe9b00
+[  459.396758] RBP: 000000000076bf20 R08: 0000000000000000 R09: 000000000000000a
+[  459.397930] R10: 0000000000000075 R11: 0000000000000293 R12: 00000000ffffffff
+[  459.399022] R13: 0000000000000bd9 R14: 00000000004cdb80 R15: 000000000076bf2c
+[  459.400168]
+[  459.400430] Allocated by task 20132:
+[  459.401038]  kasan_kmalloc+0xbf/0xe0
+[  459.401652]  kmem_cache_alloc+0xd5/0x280
+[  459.402330]  bdev_alloc_inode+0x18/0x40
+[  459.402970]  alloc_inode+0x5f/0x180
+[  459.403510]  iget5_locked+0x57/0xd0
+[  459.404095]  bdget+0x94/0x4e0
+[  459.404607]  bd_acquire+0xfa/0x2c0
+[  459.405113]  blkdev_open+0x110/0x290
+[  459.405702]  do_dentry_open+0x49e/0x1050
+[  459.406340]  path_openat+0x148c/0x3f50
+[  459.406926]  do_filp_open+0x1a1/0x280
+[  459.407471]  do_sys_open+0x3c3/0x500
+[  459.408010]  do_syscall_64+0xc3/0x520
+[  459.408572]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+[  459.409415]
+[  459.409679] Freed by task 1262:
+[  459.410212]  __kasan_slab_free+0x129/0x170
+[  459.410919]  kmem_cache_free+0xb2/0x2a0
+[  459.411564]  rcu_process_callbacks+0xbb2/0x2320
+[  459.412318]  __do_softirq+0x225/0x8ac
+
+Fix this by delaying bdput() to the end of blkdev_get() which means we
+have finished accessing bdev.
+
+Fixes: e525fd89d380 ("block: make blkdev_get/put() handle exclusive access")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Carpenter <dan.carpenter@oracle.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Jason Yan <yanaijie@huawei.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+---
+ v6: Add Tested-by tag from Sedat and cc Dan.
+ v5: Add fixes tag and Reviewed-by tag from Christoph.
+ v4: Remove uneeded braces and add Reviewed-by tag from Jan Kara.
+ v3: Add bdput() when __blkdev_get() calling itself failed.
+ v2: Add Reported-by tag and cc linux-block mailing list
+
+ fs/block_dev.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 47860e589388..08c87db3a92b 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1565,10 +1565,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	 */
+ 	if (!for_part) {
+ 		ret = devcgroup_inode_permission(bdev->bd_inode, perm);
+-		if (ret != 0) {
+-			bdput(bdev);
++		if (ret != 0)
+ 			return ret;
+-		}
+ 	}
+ 
+  restart:
+@@ -1637,8 +1635,10 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 				goto out_clear;
+ 			BUG_ON(for_part);
+ 			ret = __blkdev_get(whole, mode, 1);
+-			if (ret)
++			if (ret) {
++				bdput(whole);
+ 				goto out_clear;
++			}
+ 			bdev->bd_contains = whole;
+ 			bdev->bd_part = disk_get_part(disk, partno);
+ 			if (!(disk->flags & GENHD_FL_UP) ||
+@@ -1688,7 +1688,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	disk_unblock_events(disk);
+ 	put_disk_and_module(disk);
+  out:
+-	bdput(bdev);
+ 
+ 	return ret;
+ }
+@@ -1755,6 +1754,9 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+ 		bdput(whole);
+ 	}
+ 
++	if (res)
++		bdput(bdev);
++
+ 	return res;
+ }
+ EXPORT_SYMBOL(blkdev_get);
+-- 
+2.25.4
+
