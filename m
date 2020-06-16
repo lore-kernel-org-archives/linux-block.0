@@ -2,134 +2,237 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C91DC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 10:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CC2C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 10:28:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15D122074D
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 10:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2ED3620786
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 10:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RuElR14U"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FaiaaeyH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbgFPKVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 06:21:17 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:41704 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725843AbgFPKVQ (ORCPT
+        id S1728314AbgFPK2k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 06:28:40 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:50724 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726606AbgFPK0n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 06:21:16 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05GAILsT154365;
-        Tue, 16 Jun 2020 10:20:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=j5kegrmGeTDSB0ig2F5qX6z4umw1vzMFuB/NKoAL+6c=;
- b=RuElR14UanHGq5GunllI0MWA4B7q6RgiHOJOW3YtQWOASZbTsfDa/oOdMoZIw0kjutoI
- QDhuv5rQiSpn1uqvmndFDFXQInxWZ+orRLp7ZUCnMIUXBiYJ+8o9/TP7i29o/LatvYas
- DjASjtipSEKsA8361yrxMDLKeII7jhCwJCWm+9t5R3sHeVpYh9NUym/VVkpRrSTPmQP6
- NXhZrfZGleZ4vaBbWsdvK15yNCEgnv9hCOo4t1CSLiwz1iaLaHXP5v2f2PU4pBC1HclN
- BZcbrNVrDmqWXNQLIUNxsUQ5/lb5NI2KwY+2mJA2PZRztiKnIt583eDx/m2r2T9b0Ca6 Ew== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 31p6s25w66-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 16 Jun 2020 10:20:58 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05GADS4S196050;
-        Tue, 16 Jun 2020 10:20:58 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 31p6dcvwxy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 10:20:58 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 05GAKuxB004012;
-        Tue, 16 Jun 2020 10:20:56 GMT
-Received: from kadam (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 16 Jun 2020 03:20:55 -0700
-Date:   Tue, 16 Jun 2020 13:20:48 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jason Yan <yanaijie@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
-        Hulk Robot <hulkci@huawei.com>,
-        Sedat Dilek <sedat.dilek@gmail.com>
-Subject: Re: [PATCH v6] block: Fix use-after-free in blkdev_get()
-Message-ID: <20200616102048.GL4282@kadam>
-References: <20200616034002.2473743-1-yanaijie@huawei.com>
+        Tue, 16 Jun 2020 06:26:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1592303214; x=1623839214;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=SYiwTIZBRAV6wiwuuEXSiwpuXaZ6DLxpgsS3y8h54FI=;
+  b=FaiaaeyHACnGxw1a6FqnlKlwvq6JzxI5BRBziEInB6hzUkSeakkVp1sr
+   kcE4ua80EIJIB8dln7lvF/1KpxqBUV09RBpOLFSUDWOTj0Cinvld9dEnf
+   80HgfAyMvmFJSugxhEBkKKY5ygFvJJJx53olch6KaU/0jrnwhUoMqHN7Y
+   DdofQ0P4lQQwxK5TZFXe9IZDxTlPj2KTqHH3UvMAKVRxtQVVxGehB01tz
+   NSTxhyPY8nUV+ufHScprIxMiYziysngExpyUZoN91b3nSVDWA4RIuBAFa
+   hUnyHFQUzXtXXokCqPjgCyZAUHMl3z2Suob890wVF7nDenR8E6sF0uUAm
+   w==;
+IronPort-SDR: ITfUbBi5PZrJRnGwaQN7G10bEjqoP/aFnz9gxJ49uhfodrvBF984XTTiZGoTR5D0hW3hYScGcW
+ eGJK95tqfaXA0hJeaHq7/yRz4a/Ti1lzrXof6TAzSLiAg75a+NRHdhSO6avgftWJngeDPuchBg
+ MzUizHfX0J76PYkjnsWd7qAArN/YOjnge5ApHxtBOxWU5YCnUMoVVNq1u5ySA51cKHjGSVo9Sz
+ 4/eP0oWfSGOp/v1G9I2C02xPW++/I2dtm2Dm26CqNH09kA12O+jj+QCAWwc2NsXDNQ6fe1d90u
+ 71M=
+X-IronPort-AV: E=Sophos;i="5.73,518,1583164800"; 
+   d="scan'208";a="243068969"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2020 18:26:13 +0800
+IronPort-SDR: 7xAk4Naf4wW09vAvr3Ve1fjf0XNGCTJ0cYXWzogWKgNHOH+Jr4eHzUBAPz2uxiiIfqXpgKQta2
+ Gn31OBaCgTU377vhOvG1rDQlWtHlefJr8=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 03:14:54 -0700
+IronPort-SDR: 90gALNMvcK70jzZfWQFIdzgTh+mAOheaBxs02rkftqOVXy1M3EXvC7KydNr8pxit98ZZ05tjYk
+ uqisGJ42rrSA==
+WDCIronportException: Internal
+Received: from 31yhj72.ad.shared (HELO localhost.hgst.com) ([10.86.58.100])
+  by uls-op-cesaip02.wdc.com with ESMTP; 16 Jun 2020 03:26:07 -0700
+From:   Niklas Cassel <niklas.cassel@wdc.com>
+To:     Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Niklas Cassel <niklas.cassel@wdc.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 2/2] block: add max_active_zones to blk-sysfs
+Date:   Tue, 16 Jun 2020 12:25:46 +0200
+Message-Id: <20200616102546.491961-3-niklas.cassel@wdc.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200616102546.491961-1-niklas.cassel@wdc.com>
+References: <20200616102546.491961-1-niklas.cassel@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200616034002.2473743-1-yanaijie@huawei.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9653 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=2
- mlxlogscore=999 mlxscore=0 phishscore=0 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160076
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9653 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 impostorscore=0
- clxscore=1015 mlxscore=0 mlxlogscore=999 priorityscore=1501 phishscore=0
- malwarescore=0 suspectscore=2 spamscore=0 cotscore=-2147483648 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006160077
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 11:40:02AM +0800, Jason Yan wrote:
->
-> Fixes: e525fd89d380 ("block: make blkdev_get/put() handle exclusive access")
+Add a new max_active zones definition in the sysfs documentation.
+This definition will be common for all devices utilizing the zoned block
+device support in the kernel.
 
-I still don't understand how this is the correct fixes tag...  :/
+Export max_active_zones according to this new definition for NVMe Zoned
+Namespace devices, ZAC ATA devices (which are treated as SCSI devices by
+the kernel), and ZBC SCSI devices.
 
-git show e525fd89d380:fs/block_dev.c | cat -n
-  1208  int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
-  1209  {
-  1210          struct block_device *whole = NULL;
-  1211          int res;
-  1212  
-  1213          WARN_ON_ONCE((mode & FMODE_EXCL) && !holder);
-  1214  
-  1215          if ((mode & FMODE_EXCL) && holder) {
-  1216                  whole = bd_start_claiming(bdev, holder);
-  1217                  if (IS_ERR(whole)) {
-  1218                          bdput(bdev);
-  1219                          return PTR_ERR(whole);
-  1220                  }
-  1221          }
-  1222  
-  1223          res = __blkdev_get(bdev, mode, 0);
-  1224  
-  1225          if (whole) {
-  1226                  if (res == 0)
-                            ^^^^^^^^
+Add the new max_active_zones struct member to the request_queue, rather
+than as a queue limit, since this property cannot be split across stacking
+drivers.
 
-  1227                          bd_finish_claiming(bdev, whole, holder);
-  1228                  else
-  1229                          bd_abort_claiming(whole, holder);
-                                                  ^^^^^^^^^^^^^
-If __blkdev_get() then this doesn't dereference "bdev" so it's not a
-use after free bug.
+For SCSI devices, even though max active zones is not part of the ZBC/ZAC
+spec, export max_active_zones as 0, signifying "no limit".
 
-  1230          }
-  1231  
-  1232          return res;
-  1233  }
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+---
+ Documentation/block/queue-sysfs.rst |  7 +++++++
+ block/blk-sysfs.c                   | 14 +++++++++++++-
+ drivers/nvme/host/zns.c             |  1 +
+ drivers/scsi/sd_zbc.c               |  1 +
+ include/linux/blkdev.h              | 20 ++++++++++++++++++++
+ 5 files changed, 42 insertions(+), 1 deletion(-)
 
-So far as I can see the Fixes tag should be what I said earlier.
+diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
+index f01cf8530ae4..f261a5c84170 100644
+--- a/Documentation/block/queue-sysfs.rst
++++ b/Documentation/block/queue-sysfs.rst
+@@ -117,6 +117,13 @@ Maximum number of elements in a DMA scatter/gather list with integrity
+ data that will be submitted by the block layer core to the associated
+ block driver.
+ 
++max_active_zones (RO)
++---------------------
++For zoned block devices (zoned attribute indicating "host-managed" or
++"host-aware"), the sum of zones belonging to any of the zone states:
++EXPLICIT OPEN, IMPLICIT OPEN or CLOSED, is limited by this value.
++If this value is 0, there is no limit.
++
+ max_open_zones (RO)
+ -------------------
+ For zoned block devices (zoned attribute indicating "host-managed" or
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index fa42961e9678..624bb4d85fc7 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -310,6 +310,11 @@ static ssize_t queue_max_open_zones_show(struct request_queue *q, char *page)
+ 	return queue_var_show(queue_max_open_zones(q), page);
+ }
+ 
++static ssize_t queue_max_active_zones_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(queue_max_active_zones(q), page);
++}
++
+ static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show((blk_queue_nomerges(q) << 1) |
+@@ -677,6 +682,11 @@ static struct queue_sysfs_entry queue_max_open_zones_entry = {
+ 	.show = queue_max_open_zones_show,
+ };
+ 
++static struct queue_sysfs_entry queue_max_active_zones_entry = {
++	.attr = {.name = "max_active_zones", .mode = 0444 },
++	.show = queue_max_active_zones_show,
++};
++
+ static struct queue_sysfs_entry queue_nomerges_entry = {
+ 	.attr = {.name = "nomerges", .mode = 0644 },
+ 	.show = queue_nomerges_show,
+@@ -776,6 +786,7 @@ static struct attribute *queue_attrs[] = {
+ 	&queue_zoned_entry.attr,
+ 	&queue_nr_zones_entry.attr,
+ 	&queue_max_open_zones_entry.attr,
++	&queue_max_active_zones_entry.attr,
+ 	&queue_nomerges_entry.attr,
+ 	&queue_rq_affinity_entry.attr,
+ 	&queue_iostats_entry.attr,
+@@ -803,7 +814,8 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+ 		(!q->mq_ops || !q->mq_ops->timeout))
+ 			return 0;
+ 
+-	if (attr == &queue_max_open_zones_entry.attr &&
++	if ((attr == &queue_max_open_zones_entry.attr ||
++	     attr == &queue_max_active_zones_entry.attr) &&
+ 	    !blk_queue_is_zoned(q))
+ 		return 0;
+ 
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index af156529f3b6..502070763266 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -83,6 +83,7 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+ 	q->limits.zoned = BLK_ZONED_HM;
+ 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+ 	blk_queue_max_open_zones(q, le32_to_cpu(id->mor) + 1);
++	blk_queue_max_active_zones(q, le32_to_cpu(id->mar) + 1);
+ free_data:
+ 	kfree(id);
+ 	return status;
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index aa3564139b40..d8b2c49d645b 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -721,6 +721,7 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 		blk_queue_max_open_zones(q, 0);
+ 	else
+ 		blk_queue_max_open_zones(q, sdkp->zones_max_open);
++	blk_queue_max_active_zones(q, 0);
+ 	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
+ 
+ 	/* READ16/WRITE16 is mandatory for ZBC disks */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2f332f00501d..3776140f8f20 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -521,6 +521,7 @@ struct request_queue {
+ 	unsigned long		*conv_zones_bitmap;
+ 	unsigned long		*seq_zones_wlock;
+ 	unsigned int		max_open_zones;
++	unsigned int		max_active_zones;
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ 	/*
+@@ -741,6 +742,17 @@ static inline unsigned int queue_max_open_zones(const struct request_queue *q)
+ {
+ 	return q->max_open_zones;
+ }
++
++static inline void blk_queue_max_active_zones(struct request_queue *q,
++		unsigned int max_active_zones)
++{
++	q->max_active_zones = max_active_zones;
++}
++
++static inline unsigned int queue_max_active_zones(const struct request_queue *q)
++{
++	return q->max_active_zones;
++}
+ #else /* CONFIG_BLK_DEV_ZONED */
+ static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
+ {
+@@ -764,6 +776,14 @@ static inline unsigned int queue_max_open_zones(const struct request_queue *q)
+ {
+ 	return 0;
+ }
++static inline void blk_queue_max_active_zones(struct request_queue *q,
++		unsigned int max_active_zones)
++{
++}
++static inline unsigned int queue_max_active_zones(const struct request_queue *q)
++{
++	return 0;
++}
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ static inline bool rq_is_sync(struct request *rq)
+-- 
+2.26.2
 
-Fixes: 89e524c04fa9 ("loop: Fix mount(2) failure due to race with LOOP_SET_FD")
-
-Otherwise the patch looks good to me.
-
-Reviewed-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-regards,
-dan carpenter
