@@ -2,242 +2,138 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6E5C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7356C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:24:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5CE320B80
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C079620C56
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:24:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="NdH81GWD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgFPMQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 08:16:17 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:6341 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726606AbgFPMQQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 08:16:16 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 106909FE2BED9B6CC9D4;
-        Tue, 16 Jun 2020 20:16:12 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Tue, 16 Jun 2020
- 20:16:02 +0800
-From:   Jason Yan <yanaijie@huawei.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>
-CC:     Jason Yan <yanaijie@huawei.com>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, Jan Kara <jack@suse.cz>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Hulk Robot <hulkci@huawei.com>,
-        Sedat Dilek <sedat.dilek@gmail.com>
-Subject: [PATCH v7] block: Fix use-after-free in blkdev_get()
-Date:   Tue, 16 Jun 2020 20:16:55 +0800
-Message-ID: <20200616121655.3516305-1-yanaijie@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S1728959AbgFPMYx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 08:24:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbgFPMYv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jun 2020 08:24:51 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FC9C08C5C2
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 05:24:50 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id q11so20575773wrp.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 05:24:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=/kIpCjCnT58JEG0mlUt9/EOieRJkzoytsmJ6uVIikG4=;
+        b=NdH81GWDoVE8IpZvXIvmiD9pU0wl/DubsUnumfs2pm8ffF3/3S9hBD32MTJQ12z3vx
+         tg+dvD1OBOPIIMfoFOGk8RV18xUtaOOG8r1frHLCXDyZa2037wz5VWo8pQsNjxVoNafo
+         HnjBoCefxCRABCpMcrPb0BSu1NUoZjHiH6BkJSxsO9mwIyUSe9N9FN4un3UmTdZ5Kfxd
+         PjRvVXJvHjaLpZbx8B4mm1LmS7fRs9wJUtrZ2r0ZyQrUpMXKBK46cGAva0TGw9KZHjz6
+         E2R2EFQZX7SgzqxBYkoZ094rpMpCmzMAvvUkkXFn1YBvtJRUKQ1V6mjUvr6vRRZ8aECI
+         ZsBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=/kIpCjCnT58JEG0mlUt9/EOieRJkzoytsmJ6uVIikG4=;
+        b=Cr26h8jpJF4j+tSyljH4o0yMT6yuKKY98RIumzM9qwg3NpkVU+FpuBewytXTLcRAvh
+         chc9t8Ho0UuG/vt6YfPZ9W/0/l2oH+tQO2Jh00Uj140ReJc4+olrTH29sdZeHNMF6Ps3
+         wb0ULORLe345vVFkN+2lr3UItKeOT2v3LHUSGOFc4wcvqhO3xlbXwEYEaqyqzbQJg64s
+         xjJ1yvmVi6Fysf/T4dgV4Gipz+SReoJZFPPP0w9dX6wqLtUbR5tKaDUKtoN0EEvQAtsX
+         edHfcTBMcoazSPl/4z1usRk9073JEMqufFvs/WDxAz9W6aLprVkJOIuKUCt+QOpfldeS
+         zwsQ==
+X-Gm-Message-State: AOAM531CE+rP/ikNARHljrzR3p16Ixvt8xSxA3UhDTdmouSpA8bLcm4l
+        B/uviCi+VKH0xQE13Yqt1GRqZQ==
+X-Google-Smtp-Source: ABdhPJxdYMJPpziDe8iXirHeV1pcVKa8DYd2hmGQF7C8+5WnJxa7+yKYZEo/WSDPHXONxAKse1WU/g==
+X-Received: by 2002:a5d:56c3:: with SMTP id m3mr2807086wrw.393.1592310289602;
+        Tue, 16 Jun 2020 05:24:49 -0700 (PDT)
+Received: from localhost ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id w10sm29085408wrp.16.2020.06.16.05.24.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2020 05:24:48 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 14:24:48 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Matias =?utf-8?B?QmrDuHJsaW5n?= <mb@lightnvm.io>
+Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Aravind Ramesh <aravind.ramesh@wdc.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
+Message-ID: <20200616122448.4e3slfghv4cojafq@mpHalley.local>
+References: <20200615233424.13458-1-keith.busch@wdc.com>
+ <20200615233424.13458-6-keith.busch@wdc.com>
+ <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
+ <d433450a-6e18-217c-d133-ea367d8936be@lightnvm.io>
+ <20200616120018.en337lcs5y2jh5ne@mpHalley.local>
+ <cf899cd9-c3de-7436-84d4-744c0988a6c9@lightnvm.io>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cf899cd9-c3de-7436-84d4-744c0988a6c9@lightnvm.io>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In blkdev_get() we call __blkdev_get() to do some internal jobs and if
-there is some errors in __blkdev_get(), the bdput() is called which
-means we have released the refcount of the bdev (actually the refcount of
-the bdev inode). This means we cannot access bdev after that point. But
-acctually bdev is still accessed in blkdev_get() after calling
-__blkdev_get(). This results in use-after-free if the refcount is the
-last one we released in __blkdev_get(). Let's take a look at the
-following scenerio:
+On 16.06.2020 14:06, Matias Bjørling wrote:
+>On 16/06/2020 14.00, Javier González wrote:
+>>On 16.06.2020 13:18, Matias Bjørling wrote:
+>>>On 16/06/2020 12.41, Javier González wrote:
+>>>>On 16.06.2020 08:34, Keith Busch wrote:
+>>>>>Add support for NVM Express Zoned Namespaces (ZNS) Command Set defined
+>>>>>in NVM Express TP4053. Zoned namespaces are discovered based on their
+>>>>>Command Set Identifier reported in the namespaces Namespace
+>>>>>Identification Descriptor list. A successfully discovered Zoned
+>>>>>Namespace will be registered with the block layer as a host managed
+>>>>>zoned block device with Zone Append command support. A namespace that
+>>>>>does not support append is not supported by the driver.
+>>>>
+>>>>Why are we enforcing the append command? Append is optional on the
+>>>>current ZNS specification, so we should not make this mandatory in the
+>>>>implementation. See specifics below.
+>>
+>>>
+>>>There is already general support in the kernel for the zone append 
+>>>command. Feel free to submit patches to emulate the support. It is 
+>>>outside the scope of this patchset.
+>>>
+>>
+>>It is fine that the kernel supports append, but the ZNS specification
+>>does not impose the implementation for append, so the driver should not
+>>do that either.
+>>
+>>ZNS SSDs that choose to leave append as a non-implemented optional
+>>command should not rely on emulated SW support, specially when
+>>traditional writes work very fine for a large part of current ZNS use
+>>cases.
+>>
+>>Please, remove this virtual constraint.
+>
+>The Zone Append command is mandatory for zoned block devices. Please 
+>see https://lwn.net/Articles/818709/ for the background.
 
-  CPU0            CPU1                    CPU2
-blkdev_open     blkdev_open           Remove disk
-                  bd_acquire
-		  blkdev_get
-		    __blkdev_get      del_gendisk
-					bdev_unhash_inode
-  bd_acquire          bdev_get_gendisk
-    bd_forget           failed because of unhashed
-	  bdput
-	              bdput (the last one)
-		        bdev_evict_inode
+I do not see anywhere in the block layer that append is mandatory for
+zoned devices. Append is emulated on ZBC, but beyond that there is no
+mandatory bits. Please explain.
 
-	  	    access bdev => use after free
+> Please submitpatches if you want to have support for ZNS devices that
+> does not implement the Zone Append command. It is outside the scope
+> of this patchset.
 
-[  459.350216] BUG: KASAN: use-after-free in __lock_acquire+0x24c1/0x31b0
-[  459.351190] Read of size 8 at addr ffff88806c815a80 by task syz-executor.0/20132
-[  459.352347]
-[  459.352594] CPU: 0 PID: 20132 Comm: syz-executor.0 Not tainted 4.19.90 #2
-[  459.353628] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
-[  459.354947] Call Trace:
-[  459.355337]  dump_stack+0x111/0x19e
-[  459.355879]  ? __lock_acquire+0x24c1/0x31b0
-[  459.356523]  print_address_description+0x60/0x223
-[  459.357248]  ? __lock_acquire+0x24c1/0x31b0
-[  459.357887]  kasan_report.cold+0xae/0x2d8
-[  459.358503]  __lock_acquire+0x24c1/0x31b0
-[  459.359120]  ? _raw_spin_unlock_irq+0x24/0x40
-[  459.359784]  ? lockdep_hardirqs_on+0x37b/0x580
-[  459.360465]  ? _raw_spin_unlock_irq+0x24/0x40
-[  459.361123]  ? finish_task_switch+0x125/0x600
-[  459.361812]  ? finish_task_switch+0xee/0x600
-[  459.362471]  ? mark_held_locks+0xf0/0xf0
-[  459.363108]  ? __schedule+0x96f/0x21d0
-[  459.363716]  lock_acquire+0x111/0x320
-[  459.364285]  ? blkdev_get+0xce/0xbe0
-[  459.364846]  ? blkdev_get+0xce/0xbe0
-[  459.365390]  __mutex_lock+0xf9/0x12a0
-[  459.365948]  ? blkdev_get+0xce/0xbe0
-[  459.366493]  ? bdev_evict_inode+0x1f0/0x1f0
-[  459.367130]  ? blkdev_get+0xce/0xbe0
-[  459.367678]  ? destroy_inode+0xbc/0x110
-[  459.368261]  ? mutex_trylock+0x1a0/0x1a0
-[  459.368867]  ? __blkdev_get+0x3e6/0x1280
-[  459.369463]  ? bdev_disk_changed+0x1d0/0x1d0
-[  459.370114]  ? blkdev_get+0xce/0xbe0
-[  459.370656]  blkdev_get+0xce/0xbe0
-[  459.371178]  ? find_held_lock+0x2c/0x110
-[  459.371774]  ? __blkdev_get+0x1280/0x1280
-[  459.372383]  ? lock_downgrade+0x680/0x680
-[  459.373002]  ? lock_acquire+0x111/0x320
-[  459.373587]  ? bd_acquire+0x21/0x2c0
-[  459.374134]  ? do_raw_spin_unlock+0x4f/0x250
-[  459.374780]  blkdev_open+0x202/0x290
-[  459.375325]  do_dentry_open+0x49e/0x1050
-[  459.375924]  ? blkdev_get_by_dev+0x70/0x70
-[  459.376543]  ? __x64_sys_fchdir+0x1f0/0x1f0
-[  459.377192]  ? inode_permission+0xbe/0x3a0
-[  459.377818]  path_openat+0x148c/0x3f50
-[  459.378392]  ? kmem_cache_alloc+0xd5/0x280
-[  459.379016]  ? entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  459.379802]  ? path_lookupat.isra.0+0x900/0x900
-[  459.380489]  ? __lock_is_held+0xad/0x140
-[  459.381093]  do_filp_open+0x1a1/0x280
-[  459.381654]  ? may_open_dev+0xf0/0xf0
-[  459.382214]  ? find_held_lock+0x2c/0x110
-[  459.382816]  ? lock_downgrade+0x680/0x680
-[  459.383425]  ? __lock_is_held+0xad/0x140
-[  459.384024]  ? do_raw_spin_unlock+0x4f/0x250
-[  459.384668]  ? _raw_spin_unlock+0x1f/0x30
-[  459.385280]  ? __alloc_fd+0x448/0x560
-[  459.385841]  do_sys_open+0x3c3/0x500
-[  459.386386]  ? filp_open+0x70/0x70
-[  459.386911]  ? trace_hardirqs_on_thunk+0x1a/0x1c
-[  459.387610]  ? trace_hardirqs_off_caller+0x55/0x1c0
-[  459.388342]  ? do_syscall_64+0x1a/0x520
-[  459.388930]  do_syscall_64+0xc3/0x520
-[  459.389490]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  459.390248] RIP: 0033:0x416211
-[  459.390720] Code: 75 14 b8 02 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83
-04 19 00 00 c3 48 83 ec 08 e8 0a fa ff ff 48 89 04 24 b8 02 00 00 00 0f
-   05 <48> 8b 3c 24 48 89 c2 e8 53 fa ff ff 48 89 d0 48 83 c4 08 48 3d
-      01
-[  459.393483] RSP: 002b:00007fe45dfe9a60 EFLAGS: 00000293 ORIG_RAX: 0000000000000002
-[  459.394610] RAX: ffffffffffffffda RBX: 00007fe45dfea6d4 RCX: 0000000000416211
-[  459.395678] RDX: 00007fe45dfe9b0a RSI: 0000000000000002 RDI: 00007fe45dfe9b00
-[  459.396758] RBP: 000000000076bf20 R08: 0000000000000000 R09: 000000000000000a
-[  459.397930] R10: 0000000000000075 R11: 0000000000000293 R12: 00000000ffffffff
-[  459.399022] R13: 0000000000000bd9 R14: 00000000004cdb80 R15: 000000000076bf2c
-[  459.400168]
-[  459.400430] Allocated by task 20132:
-[  459.401038]  kasan_kmalloc+0xbf/0xe0
-[  459.401652]  kmem_cache_alloc+0xd5/0x280
-[  459.402330]  bdev_alloc_inode+0x18/0x40
-[  459.402970]  alloc_inode+0x5f/0x180
-[  459.403510]  iget5_locked+0x57/0xd0
-[  459.404095]  bdget+0x94/0x4e0
-[  459.404607]  bd_acquire+0xfa/0x2c0
-[  459.405113]  blkdev_open+0x110/0x290
-[  459.405702]  do_dentry_open+0x49e/0x1050
-[  459.406340]  path_openat+0x148c/0x3f50
-[  459.406926]  do_filp_open+0x1a1/0x280
-[  459.407471]  do_sys_open+0x3c3/0x500
-[  459.408010]  do_syscall_64+0xc3/0x520
-[  459.408572]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  459.409415]
-[  459.409679] Freed by task 1262:
-[  459.410212]  __kasan_slab_free+0x129/0x170
-[  459.410919]  kmem_cache_free+0xb2/0x2a0
-[  459.411564]  rcu_process_callbacks+0xbb2/0x2320
-[  459.412318]  __do_softirq+0x225/0x8ac
-
-Fix this by delaying bdput() to the end of blkdev_get() which means we
-have finished accessing bdev.
-
-Fixes: 77ea887e433a ("implement in-kernel gendisk events handling")
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Carpenter <dan.carpenter@oracle.com>
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Jason Yan <yanaijie@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Dan Carpenter <dan.carpenter@oracle.com>
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
----
- v7: Change the fixes commit to 77ea887e433a and add Reviewed-by tag from Dan.
- v6: Add Tested-by tag from Sedat and cc Dan.
- v5: Add fixes tag and Reviewed-by tag from Christoph.
- v4: Remove uneeded braces and add Reviewed-by tag from Jan Kara.
- v3: Add bdput() when __blkdev_get() calling itself failed.
- v2: Add Reported-by tag and cc linux-block mailing list
-
- fs/block_dev.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 47860e589388..08c87db3a92b 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1565,10 +1565,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	 */
- 	if (!for_part) {
- 		ret = devcgroup_inode_permission(bdev->bd_inode, perm);
--		if (ret != 0) {
--			bdput(bdev);
-+		if (ret != 0)
- 			return ret;
--		}
- 	}
- 
-  restart:
-@@ -1637,8 +1635,10 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 				goto out_clear;
- 			BUG_ON(for_part);
- 			ret = __blkdev_get(whole, mode, 1);
--			if (ret)
-+			if (ret) {
-+				bdput(whole);
- 				goto out_clear;
-+			}
- 			bdev->bd_contains = whole;
- 			bdev->bd_part = disk_get_part(disk, partno);
- 			if (!(disk->flags & GENHD_FL_UP) ||
-@@ -1688,7 +1688,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	disk_unblock_events(disk);
- 	put_disk_and_module(disk);
-  out:
--	bdput(bdev);
- 
- 	return ret;
- }
-@@ -1755,6 +1754,9 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
- 		bdput(whole);
- 	}
- 
-+	if (res)
-+		bdput(bdev);
-+
- 	return res;
- }
- EXPORT_SYMBOL(blkdev_get);
--- 
-2.25.4
+That we will.
 
