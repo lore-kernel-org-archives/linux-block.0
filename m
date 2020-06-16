@@ -2,979 +2,748 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDF8C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2571FC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAE462071A
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBC0D2071A
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 12:40:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="KZzPAxiy"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Q9MjW7jZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgFPMhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Jun 2020 08:37:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45206 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726261AbgFPMhy (ORCPT
+        id S1725901AbgFPMkk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Jun 2020 08:40:40 -0400
+Received: from mailout2.w2.samsung.com ([211.189.100.12]:51289 "EHLO
+        mailout2.w2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725843AbgFPMkj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jun 2020 08:37:54 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59259C08C5C2
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 05:37:54 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id g10so2717598wmh.4
-        for <linux-block@vger.kernel.org>; Tue, 16 Jun 2020 05:37:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=rNoG9ExE9wlasZmaJ5vrRfkyze1R6SYXuP5osddr1tQ=;
-        b=KZzPAxiyhEBz42ZQobtrgZxhWTqGSFSJvzcIzUnWegS3pmmKQ7ZjSBb8S8bbQdiG8i
-         Yyxjg+0uq8usa7IOrZhNawSLaysEaXUchIwgjAIz9uMhSVODkHXBoWoSH2MxXoJM2sXM
-         tKCkPtA09CvXf4EwtNTYRxNkhiyUQ7ctUSrW4pXZaq4jULzkoBMpHcjfPHwwPQ25AYLy
-         bqOHOE5v+lMhuJ98bwqSFdnxDaxr64zqhodxWRzD183yxC6jJVukJc2pquMypw3D0NoW
-         db5ohqIpRjBLqEApAhD2X5oIpKzFOw5KIPV9rV40AWYYAAINIwTadD5SvDOTxvBFKS11
-         Mlow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=rNoG9ExE9wlasZmaJ5vrRfkyze1R6SYXuP5osddr1tQ=;
-        b=XIpoeEqdENkBSU9YsDKh3qYZJqDFzj5xrazOhHGtmFUHq0L06SQrGyZvWOzNSGloZP
-         MYucFlh25JD2MpWRDdm03SzlwXc/ejnwdtVYgC4QmrahpyHi0fQT8Bb4gvn+ukjJSiKh
-         iGBIw1cQp2uXgA6x1//FqZcaRYB5b1ZkvcIMRC4XUaIxFWGY9y2K8imcZweUCh473+xk
-         Fyz5KjWHmKMQfgA+JJtFjkIk5VwdISaGWLTH1T4I+g7sbTt/4pAk6MUlP7B+Lh1qnKUx
-         Jo3PFTkYqsV54NFtJRAaXNR+rUY/QoAEu48hKcoPze84AVghd8Dqfl5IfyPXHvELxfD8
-         G0Gg==
-X-Gm-Message-State: AOAM531PwsG/Ymtgha2q175i3HoV0pVFRG/Dd4xCTqM1zKW+gjl86uZH
-        RUW0F18QpLZsK7vuL30XYjtdEg==
-X-Google-Smtp-Source: ABdhPJwNTGjF3ItuMnIetENhGwVL3g5klElNScDf7EjQWsUZ1jJekIsCGjiJx7HUHkW3Cse/WqMAoQ==
-X-Received: by 2002:a7b:c0cc:: with SMTP id s12mr3136795wmh.111.1592311072827;
-        Tue, 16 Jun 2020 05:37:52 -0700 (PDT)
-Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
-        by smtp.gmail.com with ESMTPSA id d17sm30296011wrg.75.2020.06.16.05.37.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jun 2020 05:37:52 -0700 (PDT)
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-To:     Judy Brock <judy.brock@samsung.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
+        Tue, 16 Jun 2020 08:40:39 -0400
+X-Greylist: delayed 334 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Jun 2020 08:40:39 EDT
+Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20200616123503usoutp023bbc5c0ac4d93701f8f26255bab736d0~ZBlSVzAbZ3264732647usoutp02U;
+        Tue, 16 Jun 2020 12:35:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20200616123503usoutp023bbc5c0ac4d93701f8f26255bab736d0~ZBlSVzAbZ3264732647usoutp02U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1592310903;
+        bh=NveL9MS+mVIKYIW0i1UbOfM57A+B/71GE3uKYi4ij9U=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=Q9MjW7jZK4TP1GUjSi0B1MuQpJ3FDFwy2CkBFvXZzUeCtIt+YYdXEe6eHnI3kNWbN
+         qOhUMf2MJt7JqDT4nbHWHpvvWGEbEIH4q43KUfXSQ8NCQJOPy74jqfFIkCb6Qk20qy
+         eyeqTtBwk9EvUlbkCDWO8k0yuVEjsGhppEYvMQuE=
+Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
+        [203.254.195.112]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200616123503uscas1p12c78653a5031025c45b6f259b4a6625f~ZBlSPPSWT1305013050uscas1p1q;
+        Tue, 16 Jun 2020 12:35:03 +0000 (GMT)
+Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
+        ussmges3new.samsung.com (USCPEMTA) with SMTP id 19.2F.43726.77CB8EE5; Tue,
+        16 Jun 2020 08:35:03 -0400 (EDT)
+Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
+        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20200616123503uscas1p22ce22054a1b4152a20437b5abdd55119~ZBlR2okuk1762117621uscas1p2Q;
+        Tue, 16 Jun 2020 12:35:03 +0000 (GMT)
+X-AuditID: cbfec370-409ff7000002aace-21-5ee8bc77385e
+Received: from SSI-EX4.ssi.samsung.com ( [105.128.2.145]) by
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id EB.8E.59698.67CB8EE5; Tue,
+        16 Jun 2020 08:35:02 -0400 (EDT)
+Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
+        SSI-EX4.ssi.samsung.com (105.128.2.229) with Microsoft SMTP Server
+        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+        15.1.1713.5; Tue, 16 Jun 2020 05:35:02 -0700
+Received: from SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36]) by
+        SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36%3]) with mapi id
+        15.01.1713.004; Tue, 16 Jun 2020 05:35:02 -0700
+From:   Judy Brock <judy.brock@samsung.com>
+To:     =?utf-8?B?SmF2aWVyIEdvbnrDoWxleg==?= <javier@javigon.com>,
+        =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC:     Jens Axboe <axboe@kernel.dk>,
         Niklas Cassel <niklas.cassel@wdc.com>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Ajay Joshi <ajay.joshi@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
+        "Sagi Grimberg" <sagi@grimberg.me>,
         Keith Busch <keith.busch@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        "Dmitry Fomichev" <dmitry.fomichev@wdc.com>,
         Aravind Ramesh <aravind.ramesh@wdc.com>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Hans Holmberg <hans.holmberg@wdc.com>,
         Christoph Hellwig <hch@lst.de>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>
-References: <20200615233424.13458-1-keith.busch@wdc.com>
- <20200615233424.13458-6-keith.busch@wdc.com>
- <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
- <d433450a-6e18-217c-d133-ea367d8936be@lightnvm.io>
- <20200616120018.en337lcs5y2jh5ne@mpHalley.local>
- <CGME20200616123503uscas1p22ce22054a1b4152a20437b5abdd55119@uscas1p2.samsung.com>
- <3ab4032c18a8411389d3879026cde2a2@samsung.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <7c76c93b-d8de-831c-f41c-3ee3a8e48169@lightnvm.io>
-Date:   Tue, 16 Jun 2020 14:37:52 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <3ab4032c18a8411389d3879026cde2a2@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <matias.bjorling@wdc.com>
+Subject: RE: [PATCH 5/5] nvme: support for zoned namespaces
+Thread-Topic: [PATCH 5/5] nvme: support for zoned namespaces
+Thread-Index: AQHWQ23O6HVrKIfYL0qwGW6H27y34ajbg+8AgAAKNQCAAAvBAP//kHpQ
+Date:   Tue, 16 Jun 2020 12:35:01 +0000
+Message-ID: <3ab4032c18a8411389d3879026cde2a2@samsung.com>
+In-Reply-To: <20200616120018.en337lcs5y2jh5ne@mpHalley.local>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [105.128.2.176]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0hTcRjld+/d3d1oeV2lXwqBiygtsyjqlha9WUHUf0GhtvQyLTdt11dR
+        pIWam9isrJzRw2T5LFy2Qm3q1HKalUWZj3yuSFpk2VIiI7c7yf/O+X3n+8458KNw6YjAj4pV
+        J7IatSJORooJ81Pny+CUus8Rqwa0UuZG5VKm4M0kYso/XCCZjKxfGFOZpSMZvaNFyJSWt2BM
+        dvsrjDHXN5LMk57lzE3jRyGjz3TiTMmjZoIZ/DMiZO59+UZs8ZK/7K8i5Odu9RHyNx1Jct3b
+        SSR/UHxGXtudRsrHTYvkWQ06bD91UBwWzcbFJrOakM2HxTG9kwZBgmUCS7Vb0ok05PiKaZGI
+        AnotTLSfxbVITEnpUgTd9ZcFPMnAYMxxg5xRWfusJD+oROC4bvaQ7wi0OUaMJw0I8o29AtcK
+        SQdCy/OzhAvPp5PhuaHabYjTzQTccyAXnkeHwtSVTiGvCYOrhf04j3fBWKfDrSfoJdDRWO/G
+        EnojjNruundF9CZo+mFzvyPaBybaKjz3faHHftNTzhuKCutwHvvA35ohT50AGJgYnfalpvWB
+        cL8mhF8NgMu6ISFv5Q22AjvByxdCY8l7wtUR6K9CuD1e47m/A36OVXuwP7ztysd5UQ2CS7lt
+        GE+eIdC3vkC8KhSKnGVC3m4uTP0eRnq02DAruOF/KMOsUIZZoW4hogz5JnGcSslya9RsykpO
+        oeKS1MqVUfEqE5r+eu1/mxIeo67iKCuiKSSbI0m7/TlCKlAkcydUVgQULpsv2dbRHiGVRCtO
+        nGQ18ZGapDiWsyJ/ipD5SgaHR8OltFKRyB5j2QRWMzPFKJFfGtp7bXHf+fDOtvVLkM8G0z6t
+        SJd5umC8lv0hWLHWnK5vQim2XcqdjDN/d1jvw9eFR34NrYsoWbD1jldFpKS1ItD5LtVYdSr7
+        /tX0i345cZYtqtwjY3B8cg+pXtaiPBqyzjZyPc/+aPueQ5GhljqsJyiYPfCpP76gy8tpytu9
+        VCsYkBFcjGJ1EK7hFP8A2ltOX3YDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWS2cA0Ubdsz4s4g1n/rC3mrVW3mHn5B6PF
+        6rv9bBat7d+YLNa2d7NZTHhzlN1i5eqjTBadpy8wWWzbf5DNYu8tbYv5y56yW0xo+8pssWL7
+        ERaLB38es1use/2exYHf4/y9jSwezQvusHhcPlvq0X31B6PH5iX1HrtvNrB5fN4k59F+oJsp
+        gCOKyyYlNSezLLVI3y6BK+P2j1msBfu+M1U82dfI0sD45i1TFyMnh4SAicShO4fYuhi5OIQE
+        VjNK/Jn5nxnC+cgoser7O2aQKiGBA4wSx3pkQWw2AU2Jo2eaWEBsEYEyiTOztoBNYhY4wiKx
+        7g0jiC0sYC3xd9pFdogaG4nps+8xQ9huEh8uvgGrZxFQlTh7cD+YzStgJfHy5HJGiMVNTBL7
+        9s9kA0lwCthKHP50EqyIUUBM4vupNVDLxCVuPZkP9YKAxJI955khbFGJl4//sULYihL3v78E
+        OoIDqF5TYv0ufYhWRYkp3Q/ZIfYKSpyc+YQFolxS4uCKGywTGMVnIdkwC6F7FpLuWUi6FzCy
+        rGIULy0uzk2vKDbMSy3XK07MLS7NS9dLzs/dxAhMCaf/HY7cwXjidPIhRgEORiUe3oaFL+KE
+        WBPLiitzDzFKcDArifA6nT0dJ8SbklhZlVqUH19UmpNafIhRmoNFSZx3udiCKCGB9MSS1OzU
+        1ILUIpgsEwenVAPjon3CIj0f464U2m88+ts+zml32f8HHAzML2eaeHwQ6L7zdZXdbo1TCvHT
+        Mw48fd3I+pltU03J49c+qwqvFq5Si5t4aFdC+JLMpcsufpX8++V5kfddtXcbU81nBxmt2hUq
+        Mi/ysu69JC6ZhG3/WxzLJCI/rlW5mHP4xD3pHEHO88JTTVM/GMq0KbEUZyQaajEXFScCAILm
+        QkUFAwAA
+X-CMS-MailID: 20200616123503uscas1p22ce22054a1b4152a20437b5abdd55119
+CMS-TYPE: 301P
+X-CMS-RootMailID: 20200616123503uscas1p22ce22054a1b4152a20437b5abdd55119
+References: <20200615233424.13458-1-keith.busch@wdc.com>
+        <20200615233424.13458-6-keith.busch@wdc.com>
+        <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
+        <d433450a-6e18-217c-d133-ea367d8936be@lightnvm.io>
+        <20200616120018.en337lcs5y2jh5ne@mpHalley.local>
+        <CGME20200616123503uscas1p22ce22054a1b4152a20437b5abdd55119@uscas1p2.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 16/06/2020 14.35, Judy Brock wrote:
-> 	>>> A namespace that does not support append is not supported by the driver.
->
-> I am not that knowledgeable about Linux kernel drivers so maybe this is a dumb question but won't the driver in question be the default kernel driver for ZNS devices? If so, why would that driver deliberately reject a device which is 100% compliant with the ZNS spec?
-> That would seem to favor specific implementations which seems like an inappropriate thing for a community driver to do unless there is an actual technical reason the driver is unable to function w/o append. Is there any such reason and if so what is it? Thanks and sorry if I've misunderstood.
-
-Hi Judy,
-
-This has been solved. Javier has said he will send patches that supports 
-the above use-case. It is outside the scope of this patchset.
-
-Best, Matias
-
-> Judy
->
-> -----Original Message-----
-> From: linux-nvme [mailto:linux-nvme-bounces@lists.infradead.org] On Behalf Of Javier González
-> Sent: Tuesday, June 16, 2020 5:00 AM
-> To: Matias Bjørling
-> Cc: Jens Axboe; Niklas Cassel; Damien Le Moal; Ajay Joshi; Sagi Grimberg; Keith Busch; Dmitry Fomichev; Aravind Ramesh; linux-nvme@lists.infradead.org; linux-block@vger.kernel.org; Hans Holmberg; Christoph Hellwig; Matias Bjørling
-> Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
->
-> On 16.06.2020 13:18, Matias Bjørling wrote:
->> On 16/06/2020 12.41, Javier González wrote:
->>> On 16.06.2020 08:34, Keith Busch wrote:
->>>> Add support for NVM Express Zoned Namespaces (ZNS) Command Set defined
->>>> in NVM Express TP4053. Zoned namespaces are discovered based on their
->>>> Command Set Identifier reported in the namespaces Namespace
->>>> Identification Descriptor list. A successfully discovered Zoned
->>>> Namespace will be registered with the block layer as a host managed
->>>> zoned block device with Zone Append command support. A namespace that
->>>> does not support append is not supported by the driver.
->>> Why are we enforcing the append command? Append is optional on the
->>> current ZNS specification, so we should not make this mandatory in the
->>> implementation. See specifics below.
->> There is already general support in the kernel for the zone append
->> command. Feel free to submit patches to emulate the support. It is
->> outside the scope of this patchset.
->>
-> It is fine that the kernel supports append, but the ZNS specification
-> does not impose the implementation for append, so the driver should not
-> do that either.
->
-> ZNS SSDs that choose to leave append as a non-implemented optional
-> command should not rely on emulated SW support, specially when
-> traditional writes work very fine for a large part of current ZNS use
-> cases.
->
-> Please, remove this virtual constraint.
->
->>>> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
->>>> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
->>>> Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
->>>> Signed-off-by: Aravind Ramesh <aravind.ramesh@wdc.com>
->>>> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
->>>> Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
->>>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
->>>> Signed-off-by: Keith Busch <keith.busch@wdc.com>
->>>> ---
->>>> drivers/nvme/host/Makefile |   1 +
->>>> drivers/nvme/host/core.c   |  91 ++++++++++++--
->>>> drivers/nvme/host/nvme.h   |  39 ++++++
->>>> drivers/nvme/host/zns.c    | 238 +++++++++++++++++++++++++++++++++++++
->>>> include/linux/nvme.h       | 111 +++++++++++++++++
->>>> 5 files changed, 468 insertions(+), 12 deletions(-)
->>>> create mode 100644 drivers/nvme/host/zns.c
->>>>
->>>> diff --git a/drivers/nvme/host/Makefile b/drivers/nvme/host/Makefile
->>>> index fc7b26be692d..d7f6a87687b8 100644
->>>> --- a/drivers/nvme/host/Makefile
->>>> +++ b/drivers/nvme/host/Makefile
->>>> @@ -13,6 +13,7 @@ nvme-core-y                := core.o
->>>> nvme-core-$(CONFIG_TRACING)        += trace.o
->>>> nvme-core-$(CONFIG_NVME_MULTIPATH)    += multipath.o
->>>> nvme-core-$(CONFIG_NVM)            += lightnvm.o
->>>> +nvme-core-$(CONFIG_BLK_DEV_ZONED)    += zns.o
->>>> nvme-core-$(CONFIG_FAULT_INJECTION_DEBUG_FS)    += fault_inject.o
->>>> nvme-core-$(CONFIG_NVME_HWMON)        += hwmon.o
->>>>
->>>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->>>> index 58f137b9f2c5..e961910da4ac 100644
->>>> --- a/drivers/nvme/host/core.c
->>>> +++ b/drivers/nvme/host/core.c
->>>> @@ -89,7 +89,7 @@ static dev_t nvme_chr_devt;
->>>> static struct class *nvme_class;
->>>> static struct class *nvme_subsys_class;
->>>>
->>>> -static int nvme_revalidate_disk(struct gendisk *disk);
->>>> +static int _nvme_revalidate_disk(struct gendisk *disk);
->>>> static void nvme_put_subsystem(struct nvme_subsystem *subsys);
->>>> static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
->>>>                         unsigned nsid);
->>>> @@ -287,6 +287,10 @@ void nvme_complete_rq(struct request *req)
->>>>              nvme_retry_req(req);
->>>>              return;
->>>>          }
->>>> +    } else if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
->>>> +           req_op(req) == REQ_OP_ZONE_APPEND) {
->>>> +        req->__sector = nvme_lba_to_sect(req->q->queuedata,
->>>> +            le64_to_cpu(nvme_req(req)->result.u64));
->>>>      }
->>>>
->>>>      nvme_trace_bio_complete(req, status);
->>>> @@ -673,7 +677,8 @@ static inline blk_status_t
->>>> nvme_setup_write_zeroes(struct nvme_ns *ns,
->>>> }
->>>>
->>>> static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
->>>> -        struct request *req, struct nvme_command *cmnd)
->>>> +        struct request *req, struct nvme_command *cmnd,
->>>> +        enum nvme_opcode op)
->>>> {
->>>>      struct nvme_ctrl *ctrl = ns->ctrl;
->>>>      u16 control = 0;
->>>> @@ -687,7 +692,7 @@ static inline blk_status_t
->>>> nvme_setup_rw(struct nvme_ns *ns,
->>>>      if (req->cmd_flags & REQ_RAHEAD)
->>>>          dsmgmt |= NVME_RW_DSM_FREQ_PREFETCH;
->>>>
->>>> -    cmnd->rw.opcode = (rq_data_dir(req) ? nvme_cmd_write :
->>>> nvme_cmd_read);
->>>> +    cmnd->rw.opcode = op;
->>>>      cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
->>>>      cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
->>>>      cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >>
->>>> ns->lba_shift) - 1);
->>>> @@ -716,6 +721,8 @@ static inline blk_status_t
->>>> nvme_setup_rw(struct nvme_ns *ns,
->>>>          case NVME_NS_DPS_PI_TYPE2:
->>>>              control |= NVME_RW_PRINFO_PRCHK_GUARD |
->>>>                      NVME_RW_PRINFO_PRCHK_REF;
->>>> +            if (op == nvme_cmd_zone_append)
->>>> +                control |= NVME_RW_APPEND_PIREMAP;
->>>>              cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
->>>>              break;
->>>>          }
->>>> @@ -756,6 +763,19 @@ blk_status_t nvme_setup_cmd(struct nvme_ns
->>>> *ns, struct request *req,
->>>>      case REQ_OP_FLUSH:
->>>>          nvme_setup_flush(ns, cmd);
->>>>          break;
->>>> +    case REQ_OP_ZONE_RESET_ALL:
->>>> +    case REQ_OP_ZONE_RESET:
->>>> +        ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_RESET);
->>>> +        break;
->>>> +    case REQ_OP_ZONE_OPEN:
->>>> +        ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_OPEN);
->>>> +        break;
->>>> +    case REQ_OP_ZONE_CLOSE:
->>>> +        ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_CLOSE);
->>>> +        break;
->>>> +    case REQ_OP_ZONE_FINISH:
->>>> +        ret = nvme_setup_zone_mgmt_send(ns, req, cmd,
->>>> NVME_ZONE_FINISH);
->>>> +        break;
->>>>      case REQ_OP_WRITE_ZEROES:
->>>>          ret = nvme_setup_write_zeroes(ns, req, cmd);
->>>>          break;
->>>> @@ -763,8 +783,13 @@ blk_status_t nvme_setup_cmd(struct nvme_ns
->>>> *ns, struct request *req,
->>>>          ret = nvme_setup_discard(ns, req, cmd);
->>>>          break;
->>>>      case REQ_OP_READ:
->>>> +        ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
->>>> +        break;
->>>>      case REQ_OP_WRITE:
->>>> -        ret = nvme_setup_rw(ns, req, cmd);
->>>> +        ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
->>>> +        break;
->>>> +    case REQ_OP_ZONE_APPEND:
->>>> +        ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_zone_append);
->>>>          break;
->>>>      default:
->>>>          WARN_ON_ONCE(1);
->>>> @@ -1392,14 +1417,23 @@ static u32 nvme_passthru_start(struct
->>>> nvme_ctrl *ctrl, struct nvme_ns *ns,
->>>>      return effects;
->>>> }
->>>>
->>>> -static void nvme_update_formats(struct nvme_ctrl *ctrl)
->>>> +static void nvme_update_formats(struct nvme_ctrl *ctrl, u32 *effects)
->>>> {
->>>>      struct nvme_ns *ns;
->>>>
->>>>      down_read(&ctrl->namespaces_rwsem);
->>>>      list_for_each_entry(ns, &ctrl->namespaces, list)
->>>> -        if (ns->disk && nvme_revalidate_disk(ns->disk))
->>>> +        if (ns->disk && _nvme_revalidate_disk(ns->disk))
->>>>              nvme_set_queue_dying(ns);
->>>> +        else if (blk_queue_is_zoned(ns->disk->queue)) {
->>>> +            /*
->>>> +             * IO commands are required to fully revalidate a zoned
->>>> +             * device. Force the command effects to trigger rescan
->>>> +             * work so report zones can run in a context with
->>>> +             * unfrozen IO queues.
->>>> +             */
->>>> +            *effects |= NVME_CMD_EFFECTS_NCC;
->>>> +        }
->>>>      up_read(&ctrl->namespaces_rwsem);
->>>> }
->>>>
->>>> @@ -1411,7 +1445,7 @@ static void nvme_passthru_end(struct
->>>> nvme_ctrl *ctrl, u32 effects)
->>>>       * this command.
->>>>       */
->>>>      if (effects & NVME_CMD_EFFECTS_LBCC)
->>>> -        nvme_update_formats(ctrl);
->>>> +        nvme_update_formats(ctrl, &effects);
->>>>      if (effects & (NVME_CMD_EFFECTS_LBCC | NVME_CMD_EFFECTS_CSE_MASK)) {
->>>>          nvme_unfreeze(ctrl);
->>>>          nvme_mpath_unfreeze(ctrl->subsys);
->>>> @@ -1526,7 +1560,7 @@ static int nvme_user_cmd64(struct nvme_ctrl
->>>> *ctrl, struct nvme_ns *ns,
->>>>   * Issue ioctl requests on the first available path.  Note that
->>>> unlike normal
->>>>   * block layer requests we will not retry failed request on
->>>> another controller.
->>>>   */
->>>> -static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
->>>> +struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
->>>>          struct nvme_ns_head **head, int *srcu_idx)
->>>> {
->>>> #ifdef CONFIG_NVME_MULTIPATH
->>>> @@ -1546,7 +1580,7 @@ static struct nvme_ns
->>>> *nvme_get_ns_from_disk(struct gendisk *disk,
->>>>      return disk->private_data;
->>>> }
->>>>
->>>> -static void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx)
->>>> +void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx)
->>>> {
->>>>      if (head)
->>>>          srcu_read_unlock(&head->srcu, idx);
->>>> @@ -1939,21 +1973,28 @@ static void nvme_update_disk_info(struct
->>>> gendisk *disk,
->>>>
->>>> static int __nvme_revalidate_disk(struct gendisk *disk, struct
->>>> nvme_id_ns *id)
->>>> {
->>>> +    unsigned lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
->>>>      struct nvme_ns *ns = disk->private_data;
->>>>      struct nvme_ctrl *ctrl = ns->ctrl;
->>>> +    int ret;
->>>>      u32 iob;
->>>>
->>>>      /*
->>>>       * If identify namespace failed, use default 512 byte block size so
->>>>       * block layer can use before failing read/write for 0 capacity.
->>>>       */
->>>> -    ns->lba_shift = id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ds;
->>>> +    ns->lba_shift = id->lbaf[lbaf].ds;
->>>>      if (ns->lba_shift == 0)
->>>>          ns->lba_shift = 9;
->>>>
->>>>      switch (ns->head->ids.csi) {
->>>>      case NVME_CSI_NVM:
->>>>          break;
->>>> +    case NVME_CSI_ZNS:
->>>> +        ret = nvme_update_zone_info(disk, ns, lbaf);
->>>> +        if (ret)
->>>> +            return ret;
->>>> +        break;
->>>>      default:
->>>>          dev_warn(ctrl->device, "unknown csi:%d ns:%d\n",
->>>>              ns->head->ids.csi, ns->head->ns_id);
->>>> @@ -1967,7 +2008,7 @@ static int __nvme_revalidate_disk(struct
->>>> gendisk *disk, struct nvme_id_ns *id)
->>>>          iob = nvme_lba_to_sect(ns, le16_to_cpu(id->noiob));
->>>>
->>>>      ns->features = 0;
->>>> -    ns->ms = le16_to_cpu(id->lbaf[id->flbas &
->>>> NVME_NS_FLBAS_LBA_MASK].ms);
->>>> +    ns->ms = le16_to_cpu(id->lbaf[lbaf].ms);
->>>>      /* the PI implementation requires metadata equal t10 pi tuple
->>>> size */
->>>>      if (ns->ms == sizeof(struct t10_pi_tuple))
->>>>          ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
->>>> @@ -2010,7 +2051,7 @@ static int __nvme_revalidate_disk(struct
->>>> gendisk *disk, struct nvme_id_ns *id)
->>>>      return 0;
->>>> }
->>>>
->>>> -static int nvme_revalidate_disk(struct gendisk *disk)
->>>> +static int _nvme_revalidate_disk(struct gendisk *disk)
->>>> {
->>>>      struct nvme_ns *ns = disk->private_data;
->>>>      struct nvme_ctrl *ctrl = ns->ctrl;
->>>> @@ -2058,6 +2099,28 @@ static int nvme_revalidate_disk(struct
->>>> gendisk *disk)
->>>>      return ret;
->>>> }
->>>>
->>>> +static int nvme_revalidate_disk(struct gendisk *disk)
->>>> +{
->>>> +    int ret;
->>>> +
->>>> +    ret = _nvme_revalidate_disk(disk);
->>>> +    if (ret)
->>>> +        return ret;
->>>> +
->>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>> +    if (blk_queue_is_zoned(disk->queue)) {
->>>> +        struct nvme_ns *ns = disk->private_data;
->>>> +        struct nvme_ctrl *ctrl = ns->ctrl;
->>>> +
->>>> +        ret = blk_revalidate_disk_zones(disk, NULL);
->>>> +        if (!ret)
->>>> +            blk_queue_max_zone_append_sectors(disk->queue,
->>>> +                              ctrl->max_zone_append);
->>>> +    }
->>>> +#endif
->>>> +    return ret;
->>>> +}
->>>> +
->>>> static char nvme_pr_type(enum pr_type type)
->>>> {
->>>>      switch (type) {
->>>> @@ -2188,6 +2251,7 @@ static const struct block_device_operations
->>>> nvme_fops = {
->>>>      .release    = nvme_release,
->>>>      .getgeo        = nvme_getgeo,
->>>>      .revalidate_disk= nvme_revalidate_disk,
->>>> +    .report_zones    = nvme_report_zones,
->>>>      .pr_ops        = &nvme_pr_ops,
->>>> };
->>>>
->>>> @@ -2213,6 +2277,7 @@ const struct block_device_operations
->>>> nvme_ns_head_ops = {
->>>>      .ioctl        = nvme_ioctl,
->>>>      .compat_ioctl    = nvme_compat_ioctl,
->>>>      .getgeo        = nvme_getgeo,
->>>> +    .report_zones    = nvme_report_zones,
->>>>      .pr_ops        = &nvme_pr_ops,
->>>> };
->>>> #endif /* CONFIG_NVME_MULTIPATH */
->>>> @@ -4439,6 +4504,8 @@ static inline void _nvme_check_size(void)
->>>>      BUILD_BUG_ON(sizeof(struct nvme_command) != 64);
->>>>      BUILD_BUG_ON(sizeof(struct nvme_id_ctrl) !=
->>>> NVME_IDENTIFY_DATA_SIZE);
->>>>      BUILD_BUG_ON(sizeof(struct nvme_id_ns) != NVME_IDENTIFY_DATA_SIZE);
->>>> +    BUILD_BUG_ON(sizeof(struct nvme_id_ns_zns) !=
->>>> NVME_IDENTIFY_DATA_SIZE);
->>>> +    BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_zns) !=
->>>> NVME_IDENTIFY_DATA_SIZE);
->>>>      BUILD_BUG_ON(sizeof(struct nvme_lba_range_type) != 64);
->>>>      BUILD_BUG_ON(sizeof(struct nvme_smart_log) != 512);
->>>>      BUILD_BUG_ON(sizeof(struct nvme_dbbuf) != 64);
->>>> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
->>>> index 58428e3a590e..662f95fbd909 100644
->>>> --- a/drivers/nvme/host/nvme.h
->>>> +++ b/drivers/nvme/host/nvme.h
->>>> @@ -239,6 +239,9 @@ struct nvme_ctrl {
->>>>      u32 max_hw_sectors;
->>>>      u32 max_segments;
->>>>      u32 max_integrity_segments;
->>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>> +    u32 max_zone_append;
->>>> +#endif
->>>>      u16 crdt[3];
->>>>      u16 oncs;
->>>>      u16 oacs;
->>>> @@ -403,6 +406,9 @@ struct nvme_ns {
->>>>      u16 sgs;
->>>>      u32 sws;
->>>>      u8 pi_type;
->>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>> +    u64 zsze;
->>>> +#endif
->>>>      unsigned long features;
->>>>      unsigned long flags;
->>>> #define NVME_NS_REMOVING    0
->>>> @@ -568,6 +574,9 @@ int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
->>>>
->>>> int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8
->>>> lsp, u8 csi,
->>>>          void *log, size_t size, u64 offset);
->>>> +struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
->>>> +        struct nvme_ns_head **head, int *srcu_idx);
->>>> +void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx);
->>>>
->>>> extern const struct attribute_group *nvme_ns_id_attr_groups[];
->>>> extern const struct block_device_operations nvme_ns_head_ops;
->>>> @@ -689,6 +698,36 @@ static inline void
->>>> nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
->>>> }
->>>> #endif /* CONFIG_NVME_MULTIPATH */
->>>>
->>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>> +int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
->>>> +              unsigned lbaf);
->>>> +
->>>> +int nvme_report_zones(struct gendisk *disk, sector_t sector,
->>>> +              unsigned int nr_zones, report_zones_cb cb, void *data);
->>>> +
->>>> +blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct
->>>> request *req,
->>>> +                       struct nvme_command *cmnd,
->>>> +                       enum nvme_zone_mgmt_action action);
->>>> +#else
->>>> +#define nvme_report_zones NULL
->>>> +
->>>> +static inline blk_status_t nvme_setup_zone_mgmt_send(struct
->>>> nvme_ns *ns,
->>>> +        struct request *req, struct nvme_command *cmnd,
->>>> +        enum nvme_zone_mgmt_action action)
->>>> +{
->>>> +    return BLK_STS_NOTSUPP;
->>>> +}
->>>> +
->>>> +static inline int nvme_update_zone_info(struct gendisk *disk,
->>>> +                    struct nvme_ns *ns,
->>>> +                    unsigned lbaf)
->>>> +{
->>>> +    dev_warn(ns->ctrl->device,
->>>> +         "Please enable CONFIG_BLK_DEV_ZONED to support ZNS
->>>> devices\n");
->>>> +    return -EPROTONOSUPPORT;
->>>> +}
->>>> +#endif
->>>> +
->>>> #ifdef CONFIG_NVM
->>>> int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
->>>> void nvme_nvm_unregister(struct nvme_ns *ns);
->>>> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
->>>> new file mode 100644
->>>> index 000000000000..c08f6281b614
->>>> --- /dev/null
->>>> +++ b/drivers/nvme/host/zns.c
->>>> @@ -0,0 +1,238 @@
->>>> +// SPDX-License-Identifier: GPL-2.0
->>>> +/*
->>>> + * Copyright (C) 2020 Western Digital Corporation or its affiliates.
->>>> + */
->>>> +
->>>> +#include <linux/blkdev.h>
->>>> +#include <linux/vmalloc.h>
->>>> +#include "nvme.h"
->>>> +
->>>> +static int nvme_set_max_append(struct nvme_ctrl *ctrl)
->>>> +{
->>>> +    struct nvme_command c = { };
->>>> +    struct nvme_id_ctrl_zns *id;
->>>> +    int status;
->>>> +
->>>> +    id = kzalloc(sizeof(*id), GFP_KERNEL);
->>>> +    if (!id)
->>>> +        return -ENOMEM;
->>>> +
->>>> +    c.identify.opcode = nvme_admin_identify;
->>>> +    c.identify.cns = NVME_ID_CNS_CS_CTRL;
->>>> +    c.identify.csi = NVME_CSI_ZNS;
->>>> +
->>>> +    status = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
->>>> +    if (status) {
->>>> +        kfree(id);
->>>> +        return status;
->>>> +    }
->>>> +
->>>> +    ctrl->max_zone_append = 1 << (id->zamds + 3);
->>>> +    kfree(id);
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
->>>> +              unsigned lbaf)
->>>> +{
->>>> +    struct nvme_effects_log *log = ns->head->effects;
->>>> +    struct request_queue *q = disk->queue;
->>>> +    struct nvme_command c = { };
->>>> +    struct nvme_id_ns_zns *id;
->>>> +    int status;
->>>> +
->>>> +    /* Driver requires zone append support */
->>>> +    if (!(log->iocs[nvme_cmd_zone_append] & NVME_CMD_EFFECTS_CSUPP))
->>>> +        return -ENODEV;
->>> Following up on the initial comment, this check should go.
->> See first comment.
-> See above and please remove.
->
->>>> +
->>>> +    /* Lazily query controller append limit for the first zoned
->>>> namespace */
->>>> +    if (!ns->ctrl->max_zone_append) {
->>>> +        status = nvme_set_max_append(ns->ctrl);
->>>> +        if (status)
->>>> +            return status;
->>>> +    }
->>> This should only be applied if append is supported.
->> See first comment.
->>
->>>> +
->>>> +    id = kzalloc(sizeof(*id), GFP_KERNEL);
->>>> +    if (!id)
->>>> +        return -ENOMEM;
->>>> +
->>>> +    c.identify.opcode = nvme_admin_identify;
->>>> +    c.identify.nsid = cpu_to_le32(ns->head->ns_id);
->>>> +    c.identify.cns = NVME_ID_CNS_CS_NS;
->>>> +    c.identify.csi = NVME_CSI_ZNS;
->>>> +
->>>> +    status = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, id,
->>>> sizeof(*id));
->>>> +    if (status)
->>>> +        goto free_data;
->>>> +
->>>> +    /*
->>>> +     * We currently do not handle devices requiring any of the zoned
->>>> +     * operation characteristics.
->>>> +     */
->>>> +    if (id->zoc) {
->>>> +        status = -EINVAL;
->>>> +        goto free_data;
->>>> +    }
->>> I understand that "Variable Zone Capacity" is not supported as it
->>> requires major changes at this moment, but we should support controllers
->>> that enable "Zone Active Excursions", even when the AER event is not
->>> implemented in this patchset.
->>
->> NAK. Similarly to VZC, this allows an unsuspecting user to have major
->> data loss when a zone is suddenly moved to Full.
-> I buy that.
->
->>
->>>> +
->>>> +    ns->zsze = nvme_lba_to_sect(ns, le64_to_cpu(id->lbafe[lbaf].zsze));
->>>> +    if (!ns->zsze) {
->>>> +        status = -EINVAL;
->>>> +        goto free_data;
->>>> +    }
->>>> +
->>>> +    q->limits.zoned = BLK_ZONED_HM;
->>>> +    blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
->>>> +free_data:
->>>> +    kfree(id);
->>>> +    return status;
->>>> +}
->>>> +
->>>> +static void *nvme_zns_alloc_report_buffer(struct nvme_ns *ns,
->>>> +                      unsigned int nr_zones, size_t *buflen)
->>>> +{
->>>> +    struct request_queue *q = ns->disk->queue;
->>>> +    size_t bufsize;
->>>> +    void *buf;
->>>> +
->>>> +    const size_t min_bufsize = sizeof(struct nvme_zone_report) +
->>>> +                   sizeof(struct nvme_zone_descriptor);
->>>> +
->>>> +    nr_zones = min_t(unsigned int, nr_zones,
->>>> +             get_capacity(ns->disk) >> ilog2(ns->zsze));
->>>> +
->>>> +    bufsize = sizeof(struct nvme_zone_report) +
->>>> +        nr_zones * sizeof(struct nvme_zone_descriptor);
->>>> +    bufsize = min_t(size_t, bufsize,
->>>> +            queue_max_hw_sectors(q) << SECTOR_SHIFT);
->>>> +    bufsize = min_t(size_t, bufsize, queue_max_segments(q) <<
->>>> PAGE_SHIFT);
->>>> +
->>>> +    while (bufsize >= min_bufsize) {
->>>> +        buf = __vmalloc(bufsize,
->>>> +                GFP_KERNEL | __GFP_ZERO | __GFP_NORETRY);
->>>> +        if (buf) {
->>>> +            *buflen = bufsize;
->>>> +            return buf;
->>>> +        }
->>>> +        bufsize >>= 1;
->>>> +    }
->>>> +    return NULL;
->>>> +}
->>>> +
->>>> +static int __nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>>> +                  struct nvme_zone_report *report,
->>>> +                  size_t buflen)
->>>> +{
->>>> +    struct nvme_command c = { };
->>>> +    int ret;
->>>> +
->>>> +    c.zmr.opcode = nvme_cmd_zone_mgmt_recv;
->>>> +    c.zmr.nsid = cpu_to_le32(ns->head->ns_id);
->>>> +    c.zmr.slba = cpu_to_le64(nvme_sect_to_lba(ns, sector));
->>>> +    c.zmr.numd = cpu_to_le32(nvme_bytes_to_numd(buflen));
->>>> +    c.zmr.zra = NVME_ZRA_ZONE_REPORT;
->>>> +    c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
->>>> +    c.zmr.pr = NVME_REPORT_ZONE_PARTIAL;
->>>> +
->>>> +    ret = nvme_submit_sync_cmd(ns->queue, &c, report, buflen);
->>>> +    if (ret)
->>>> +        return ret;
->>>> +
->>>> +    return le64_to_cpu(report->nr_zones);
->>>> +}
->>>> +
->>>> +static int nvme_zone_parse_entry(struct nvme_ns *ns,
->>>> +                 struct nvme_zone_descriptor *entry,
->>>> +                 unsigned int idx, report_zones_cb cb,
->>>> +                 void *data)
->>>> +{
->>>> +    struct blk_zone zone = { };
->>>> +
->>>> +    if ((entry->zt & 0xf) != NVME_ZONE_TYPE_SEQWRITE_REQ) {
->>>> +        dev_err(ns->ctrl->device, "invalid zone type %#x\n",
->>>> +                entry->zt);
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    zone.type = BLK_ZONE_TYPE_SEQWRITE_REQ;
->>>> +    zone.cond = entry->zs >> 4;
->>>> +    zone.len = ns->zsze;
->>>> +    zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
->>>> +    zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
->>>> +    zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
->>>> +
->>>> +    return cb(&zone, idx, data);
->>>> +}
->>>> +
->>>> +static int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>>> +            unsigned int nr_zones, report_zones_cb cb, void *data)
->>>> +{
->>>> +    struct nvme_zone_report *report;
->>>> +    int ret, zone_idx = 0;
->>>> +    unsigned int nz, i;
->>>> +    size_t buflen;
->>>> +
->>>> +    report = nvme_zns_alloc_report_buffer(ns, nr_zones, &buflen);
->>>> +    if (!report)
->>>> +        return -ENOMEM;
->>>> +
->>>> +    sector &= ~(ns->zsze - 1);
->>>> +    while (zone_idx < nr_zones && sector < get_capacity(ns->disk)) {
->>>> +        memset(report, 0, buflen);
->>>> +        ret = __nvme_ns_report_zones(ns, sector, report, buflen);
->>>> +        if (ret < 0)
->>>> +            goto out_free;
->>>> +
->>>> +        nz = min_t(unsigned int, ret, nr_zones);
->>>> +        if (!nz)
->>>> +            break;
->>>> +
->>>> +        for (i = 0; i < nz && zone_idx < nr_zones; i++) {
->>>> +            ret = nvme_zone_parse_entry(ns, &report->entries[i],
->>>> +                            zone_idx, cb, data);
->>>> +            if (ret)
->>>> +                goto out_free;
->>>> +            zone_idx++;
->>>> +        }
->>>> +
->>>> +        sector += ns->zsze * nz;
->>>> +    }
->>>> +
->>>> +    ret = zone_idx;
->>>> +out_free:
->>>> +    kvfree(report);
->>>> +    return ret;
->>>> +}
->>>> +
->>>> +int nvme_report_zones(struct gendisk *disk, sector_t sector,
->>>> +              unsigned int nr_zones, report_zones_cb cb, void *data)
->>>> +{
->>>> +    struct nvme_ns_head *head = NULL;
->>>> +    struct nvme_ns *ns;
->>>> +    int srcu_idx, ret;
->>>> +
->>>> +    ns = nvme_get_ns_from_disk(disk, &head, &srcu_idx);
->>>> +    if (unlikely(!ns))
->>>> +        return -EWOULDBLOCK;
->>>> +
->>>> +    if (ns->head->ids.csi == NVME_CSI_ZNS)
->>>> +        ret = nvme_ns_report_zones(ns, sector, nr_zones, cb, data);
->>>> +    else
->>>> +        ret = -EINVAL;
->>>> +    nvme_put_ns_from_disk(head, srcu_idx);
->>>> +
->>>> +    return ret;
->>>> +}
->>>> +
->>>> +blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct
->>>> request *req,
->>>> +        struct nvme_command *c, enum nvme_zone_mgmt_action action)
->>>> +{
->>>> +    c->zms.opcode = nvme_cmd_zone_mgmt_send;
->>>> +    c->zms.nsid = cpu_to_le32(ns->head->ns_id);
->>>> +    c->zms.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
->>>> +    c->zms.action = action;
->>>> +
->>>> +    if (req_op(req) == REQ_OP_ZONE_RESET_ALL)
->>>> +        c->zms.select = 1;
->>>> +
->>>> +    return BLK_STS_OK;
->>>> +}
->>>> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
->>>> index ea25da572eed..7b3fa7de07bd 100644
->>>> --- a/include/linux/nvme.h
->>>> +++ b/include/linux/nvme.h
->>>> @@ -374,6 +374,30 @@ struct nvme_id_ns {
->>>>      __u8            vs[3712];
->>>> };
->>>>
->>>> +struct nvme_zns_lbafe {
->>>> +    __le64            zsze;
->>>> +    __u8            zdes;
->>>> +    __u8            rsvd9[7];
->>>> +};
->>>> +
->>>> +struct nvme_id_ns_zns {
->>>> +    __le16            zoc;
->>>> +    __le16            ozcs;
->>>> +    __le32            mar;
->>>> +    __le32            mor;
->>>> +    __le32            rrl;
->>>> +    __le32            frl;
->>>> +    __u8            rsvd20[2796];
->>>> +    struct nvme_zns_lbafe    lbafe[16];
->>>> +    __u8            rsvd3072[768];
->>>> +    __u8            vs[256];
->>>> +};
->>>> +
->>>> +struct nvme_id_ctrl_zns {
->>>> +    __u8    zamds;
->>>> +    __u8    rsvd1[4095];
->>>> +};
->>>> +
->>>> enum {
->>>>      NVME_ID_CNS_NS            = 0x00,
->>>>      NVME_ID_CNS_CTRL        = 0x01,
->>>> @@ -392,6 +416,7 @@ enum {
->>>>
->>>> enum {
->>>>      NVME_CSI_NVM            = 0,
->>>> +    NVME_CSI_ZNS            = 2,
->>>> };
->>>>
->>>> enum {
->>>> @@ -532,6 +557,27 @@ struct nvme_ana_rsp_hdr {
->>>>      __le16    rsvd10[3];
->>>> };
->>>>
->>>> +struct nvme_zone_descriptor {
->>>> +    __u8        zt;
->>>> +    __u8        zs;
->>>> +    __u8        za;
->>>> +    __u8        rsvd3[5];
->>>> +    __le64        zcap;
->>>> +    __le64        zslba;
->>>> +    __le64        wp;
->>>> +    __u8        rsvd32[32];
->>>> +};
->>>> +
->>>> +enum {
->>>> +    NVME_ZONE_TYPE_SEQWRITE_REQ    = 0x2,
->>>> +};
->>>> +
->>>> +struct nvme_zone_report {
->>>> +    __le64        nr_zones;
->>>> +    __u8        resv8[56];
->>>> +    struct nvme_zone_descriptor entries[];
->>>> +};
->>>> +
->>>> enum {
->>>>      NVME_SMART_CRIT_SPARE        = 1 << 0,
->>>>      NVME_SMART_CRIT_TEMPERATURE    = 1 << 1,
->>>> @@ -626,6 +672,9 @@ enum nvme_opcode {
->>>>      nvme_cmd_resv_report    = 0x0e,
->>>>      nvme_cmd_resv_acquire    = 0x11,
->>>>      nvme_cmd_resv_release    = 0x15,
->>>> +    nvme_cmd_zone_mgmt_send    = 0x79,
->>>> +    nvme_cmd_zone_mgmt_recv    = 0x7a,
->>>> +    nvme_cmd_zone_append    = 0x7d,
->>>> };
->>>>
->>>> #define nvme_opcode_name(opcode)    { opcode, #opcode }
->>>> @@ -764,6 +813,7 @@ struct nvme_rw_command {
->>>> enum {
->>>>      NVME_RW_LR            = 1 << 15,
->>>>      NVME_RW_FUA            = 1 << 14,
->>>> +    NVME_RW_APPEND_PIREMAP        = 1 << 9,
->>>>      NVME_RW_DSM_FREQ_UNSPEC        = 0,
->>>>      NVME_RW_DSM_FREQ_TYPICAL    = 1,
->>>>      NVME_RW_DSM_FREQ_RARE        = 2,
->>>> @@ -829,6 +879,53 @@ struct nvme_write_zeroes_cmd {
->>>>      __le16            appmask;
->>>> };
->>>>
->>>> +enum nvme_zone_mgmt_action {
->>>> +    NVME_ZONE_CLOSE        = 0x1,
->>>> +    NVME_ZONE_FINISH    = 0x2,
->>>> +    NVME_ZONE_OPEN        = 0x3,
->>>> +    NVME_ZONE_RESET        = 0x4,
->>>> +    NVME_ZONE_OFFLINE    = 0x5,
->>>> +    NVME_ZONE_SET_DESC_EXT    = 0x10,
->>>> +};
->>>> +
->>>> +struct nvme_zone_mgmt_send_cmd {
->>>> +    __u8            opcode;
->>>> +    __u8            flags;
->>>> +    __u16            command_id;
->>>> +    __le32            nsid;
->>>> +    __le32            cdw2[2];
->>>> +    __le64            metadata;
->>>> +    union nvme_data_ptr    dptr;
->>>> +    __le64            slba;
->>>> +    __le32            cdw12;
->>>> +    __u8            action;
->>> Why not zsa to make it easier to match to the spec
->>>
->>>
->>>> +    __u8            select;
->>> sel_all?
->>>
->>>> +    __u8            rsvd13[2];
->>>> +    __le32            cdw14[2];
->>>> +};
->>>> +
->>>> +struct nvme_zone_mgmt_recv_cmd {
->>>> +    __u8            opcode;
->>>> +    __u8            flags;
->>>> +    __u16            command_id;
->>>> +    __le32            nsid;
->>>> +    __le64            rsvd2[2];
->>>> +    union nvme_data_ptr    dptr;
->>>> +    __le64            slba;
->>>> +    __le32            numd;
->>>> +    __u8            zra;
->>>> +    __u8            zrasf;
->>>> +    __u8            pr;
->>> Partial Report is just one bit in the "Zone Receive Action Specific
->>> Features". What about zrasfe?
->> There currently no users of pr, and bit 1-7 are reserved in the spec.
->> Users of the pr variable should shift and mask as necessary.
->>
->> zrasf looks good to me. It is defined as a byte in the spec.
-> I meant for the pr variable name. Agree with the rest.
->
->>>> +    __u8            rsvd13;
->>>> +    __le32            cdw14[2];
->>>> +};
->>>> +
->>>> +enum {
->>>> +    NVME_ZRA_ZONE_REPORT        = 0,
->>>> +    NVME_ZRASF_ZONE_REPORT_ALL    = 0,
->>>> +    NVME_REPORT_ZONE_PARTIAL    = 1,
->>>> +};
->>>> +
->>>> /* Features */
->>>>
->>>> enum {
->>>> @@ -1300,6 +1397,8 @@ struct nvme_command {
->>>>          struct nvme_format_cmd format;
->>>>          struct nvme_dsm_cmd dsm;
->>>>          struct nvme_write_zeroes_cmd write_zeroes;
->>>> +        struct nvme_zone_mgmt_send_cmd zms;
->>>> +        struct nvme_zone_mgmt_recv_cmd zmr;
->>>>          struct nvme_abort_cmd abort;
->>>>          struct nvme_get_log_page_command get_log_page;
->>>>          struct nvmf_common_command fabrics;
->>>> @@ -1433,6 +1532,18 @@ enum {
->>>>      NVME_SC_DISCOVERY_RESTART    = 0x190,
->>>>      NVME_SC_AUTH_REQUIRED        = 0x191,
->>>>
->>>> +    /*
->>>> +     * I/O Command Set Specific - Zoned commands:
->>>> +     */
->>>> +    NVME_SC_ZONE_BOUNDARY_ERROR    = 0x1b8,
->>>> +    NVME_SC_ZONE_FULL        = 0x1b9,
->>>> +    NVME_SC_ZONE_READ_ONLY        = 0x1ba,
->>>> +    NVME_SC_ZONE_OFFLINE        = 0x1bb,
->>>> +    NVME_SC_ZONE_INVALID_WRITE    = 0x1bc,
->>>> +    NVME_SC_ZONE_TOO_MANY_ACTIVE    = 0x1bd,
->>>> +    NVME_SC_ZONE_TOO_MANY_OPEN    = 0x1be,
->>>> +    NVME_SC_ZONE_INVALID_TRANSITION    = 0x1bf,
->>>> +
->>>>      /*
->>>>       * Media and Data Integrity Errors:
->>>>       */
->>>> -- 
->>>> 2.24.1
->>>>
-> _______________________________________________
-> linux-nvme mailing list
-> linux-nvme@lists.infradead.org
-> https://urldefense.proofpoint.com/v2/url?u=http-3A__lists.infradead.org_mailman_listinfo_linux-2Dnvme&d=DwIGaQ&c=JfeWlBa6VbDyTXraMENjy_b_0yKWuqQ4qY-FPhxK4x8w-TfgRBDyeV4hVQQBEgL2&r=YJM_QPk2w1CRIo5NNBXnCXGzNnmIIfG_iTRs6chBf6s&m=vuAxizG1aX1Dc1Tj0NPWUbhwmZIe1Y12kNIbJHLIdBU&s=uCIVhY22an8jd0FJv1lizpv_vA0tpe37xpz4af6KA10&e=
-
-
+CT4+PiBBIG5hbWVzcGFjZSB0aGF0IGRvZXMgbm90IHN1cHBvcnQgYXBwZW5kIGlzIG5vdCBzdXBw
+b3J0ZWQgYnkgdGhlIGRyaXZlci4NCg0KSSBhbSBub3QgdGhhdCBrbm93bGVkZ2VhYmxlIGFib3V0
+IExpbnV4IGtlcm5lbCBkcml2ZXJzIHNvIG1heWJlIHRoaXMgaXMgYSBkdW1iIHF1ZXN0aW9uIGJ1
+dCB3b24ndCB0aGUgZHJpdmVyIGluIHF1ZXN0aW9uIGJlIHRoZSBkZWZhdWx0IGtlcm5lbCBkcml2
+ZXIgZm9yIFpOUyBkZXZpY2VzPyBJZiBzbywgd2h5IHdvdWxkIHRoYXQgZHJpdmVyIGRlbGliZXJh
+dGVseSByZWplY3QgYSBkZXZpY2Ugd2hpY2ggaXMgMTAwJSBjb21wbGlhbnQgd2l0aCB0aGUgWk5T
+IHNwZWM/DQpUaGF0IHdvdWxkIHNlZW0gdG8gZmF2b3Igc3BlY2lmaWMgaW1wbGVtZW50YXRpb25z
+IHdoaWNoIHNlZW1zIGxpa2UgYW4gaW5hcHByb3ByaWF0ZSB0aGluZyBmb3IgYSBjb21tdW5pdHkg
+ZHJpdmVyIHRvIGRvIHVubGVzcyB0aGVyZSBpcyBhbiBhY3R1YWwgdGVjaG5pY2FsIHJlYXNvbiB0
+aGUgZHJpdmVyIGlzIHVuYWJsZSB0byBmdW5jdGlvbiB3L28gYXBwZW5kLiBJcyB0aGVyZSBhbnkg
+c3VjaCByZWFzb24gYW5kIGlmIHNvIHdoYXQgaXMgaXQ/IFRoYW5rcyBhbmQgc29ycnkgaWYgSSd2
+ZSBtaXN1bmRlcnN0b29kLg0KDQoNCkp1ZHkNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
+CkZyb206IGxpbnV4LW52bWUgW21haWx0bzpsaW51eC1udm1lLWJvdW5jZXNAbGlzdHMuaW5mcmFk
+ZWFkLm9yZ10gT24gQmVoYWxmIE9mIEphdmllciBHb256w6FsZXoNClNlbnQ6IFR1ZXNkYXksIEp1
+bmUgMTYsIDIwMjAgNTowMCBBTQ0KVG86IE1hdGlhcyBCasO4cmxpbmcNCkNjOiBKZW5zIEF4Ym9l
+OyBOaWtsYXMgQ2Fzc2VsOyBEYW1pZW4gTGUgTW9hbDsgQWpheSBKb3NoaTsgU2FnaSBHcmltYmVy
+ZzsgS2VpdGggQnVzY2g7IERtaXRyeSBGb21pY2hldjsgQXJhdmluZCBSYW1lc2g7IGxpbnV4LW52
+bWVAbGlzdHMuaW5mcmFkZWFkLm9yZzsgbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnOyBIYW5z
+IEhvbG1iZXJnOyBDaHJpc3RvcGggSGVsbHdpZzsgTWF0aWFzIEJqw7hybGluZw0KU3ViamVjdDog
+UmU6IFtQQVRDSCA1LzVdIG52bWU6IHN1cHBvcnQgZm9yIHpvbmVkIG5hbWVzcGFjZXMNCg0KT24g
+MTYuMDYuMjAyMCAxMzoxOCwgTWF0aWFzIEJqw7hybGluZyB3cm90ZToNCj5PbiAxNi8wNi8yMDIw
+IDEyLjQxLCBKYXZpZXIgR29uesOhbGV6IHdyb3RlOg0KPj5PbiAxNi4wNi4yMDIwIDA4OjM0LCBL
+ZWl0aCBCdXNjaCB3cm90ZToNCj4+PkFkZCBzdXBwb3J0IGZvciBOVk0gRXhwcmVzcyBab25lZCBO
+YW1lc3BhY2VzIChaTlMpIENvbW1hbmQgU2V0IGRlZmluZWQNCj4+PmluIE5WTSBFeHByZXNzIFRQ
+NDA1My4gWm9uZWQgbmFtZXNwYWNlcyBhcmUgZGlzY292ZXJlZCBiYXNlZCBvbiB0aGVpcg0KPj4+
+Q29tbWFuZCBTZXQgSWRlbnRpZmllciByZXBvcnRlZCBpbiB0aGUgbmFtZXNwYWNlcyBOYW1lc3Bh
+Y2UNCj4+PklkZW50aWZpY2F0aW9uIERlc2NyaXB0b3IgbGlzdC4gQSBzdWNjZXNzZnVsbHkgZGlz
+Y292ZXJlZCBab25lZA0KPj4+TmFtZXNwYWNlIHdpbGwgYmUgcmVnaXN0ZXJlZCB3aXRoIHRoZSBi
+bG9jayBsYXllciBhcyBhIGhvc3QgbWFuYWdlZA0KPj4+em9uZWQgYmxvY2sgZGV2aWNlIHdpdGgg
+Wm9uZSBBcHBlbmQgY29tbWFuZCBzdXBwb3J0LiBBIG5hbWVzcGFjZSB0aGF0DQo+Pj5kb2VzIG5v
+dCBzdXBwb3J0IGFwcGVuZCBpcyBub3Qgc3VwcG9ydGVkIGJ5IHRoZSBkcml2ZXIuDQo+Pg0KPj5X
+aHkgYXJlIHdlIGVuZm9yY2luZyB0aGUgYXBwZW5kIGNvbW1hbmQ/IEFwcGVuZCBpcyBvcHRpb25h
+bCBvbiB0aGUNCj4+Y3VycmVudCBaTlMgc3BlY2lmaWNhdGlvbiwgc28gd2Ugc2hvdWxkIG5vdCBt
+YWtlIHRoaXMgbWFuZGF0b3J5IGluIHRoZQ0KPj5pbXBsZW1lbnRhdGlvbi4gU2VlIHNwZWNpZmlj
+cyBiZWxvdy4NCg0KPg0KPlRoZXJlIGlzIGFscmVhZHkgZ2VuZXJhbCBzdXBwb3J0IGluIHRoZSBr
+ZXJuZWwgZm9yIHRoZSB6b25lIGFwcGVuZCANCj5jb21tYW5kLiBGZWVsIGZyZWUgdG8gc3VibWl0
+IHBhdGNoZXMgdG8gZW11bGF0ZSB0aGUgc3VwcG9ydC4gSXQgaXMgDQo+b3V0c2lkZSB0aGUgc2Nv
+cGUgb2YgdGhpcyBwYXRjaHNldC4NCj4NCg0KSXQgaXMgZmluZSB0aGF0IHRoZSBrZXJuZWwgc3Vw
+cG9ydHMgYXBwZW5kLCBidXQgdGhlIFpOUyBzcGVjaWZpY2F0aW9uDQpkb2VzIG5vdCBpbXBvc2Ug
+dGhlIGltcGxlbWVudGF0aW9uIGZvciBhcHBlbmQsIHNvIHRoZSBkcml2ZXIgc2hvdWxkIG5vdA0K
+ZG8gdGhhdCBlaXRoZXIuDQoNClpOUyBTU0RzIHRoYXQgY2hvb3NlIHRvIGxlYXZlIGFwcGVuZCBh
+cyBhIG5vbi1pbXBsZW1lbnRlZCBvcHRpb25hbA0KY29tbWFuZCBzaG91bGQgbm90IHJlbHkgb24g
+ZW11bGF0ZWQgU1cgc3VwcG9ydCwgc3BlY2lhbGx5IHdoZW4NCnRyYWRpdGlvbmFsIHdyaXRlcyB3
+b3JrIHZlcnkgZmluZSBmb3IgYSBsYXJnZSBwYXJ0IG9mIGN1cnJlbnQgWk5TIHVzZQ0KY2FzZXMu
+DQoNClBsZWFzZSwgcmVtb3ZlIHRoaXMgdmlydHVhbCBjb25zdHJhaW50Lg0KDQo+Pg0KPj4+DQo+
+Pj5TaWduZWQtb2ZmLWJ5OiBIYW5zIEhvbG1iZXJnIDxoYW5zLmhvbG1iZXJnQHdkYy5jb20+DQo+
+Pj5TaWduZWQtb2ZmLWJ5OiBEbWl0cnkgRm9taWNoZXYgPGRtaXRyeS5mb21pY2hldkB3ZGMuY29t
+Pg0KPj4+U2lnbmVkLW9mZi1ieTogQWpheSBKb3NoaSA8YWpheS5qb3NoaUB3ZGMuY29tPg0KPj4+
+U2lnbmVkLW9mZi1ieTogQXJhdmluZCBSYW1lc2ggPGFyYXZpbmQucmFtZXNoQHdkYy5jb20+DQo+
+Pj5TaWduZWQtb2ZmLWJ5OiBOaWtsYXMgQ2Fzc2VsIDxuaWtsYXMuY2Fzc2VsQHdkYy5jb20+DQo+
+Pj5TaWduZWQtb2ZmLWJ5OiBNYXRpYXMgQmrDuHJsaW5nIDxtYXRpYXMuYmpvcmxpbmdAd2RjLmNv
+bT4NCj4+PlNpZ25lZC1vZmYtYnk6IERhbWllbiBMZSBNb2FsIDxkYW1pZW4ubGVtb2FsQHdkYy5j
+b20+DQo+Pj5TaWduZWQtb2ZmLWJ5OiBLZWl0aCBCdXNjaCA8a2VpdGguYnVzY2hAd2RjLmNvbT4N
+Cj4+Pi0tLQ0KPj4+ZHJpdmVycy9udm1lL2hvc3QvTWFrZWZpbGUgfMKgwqAgMSArDQo+Pj5kcml2
+ZXJzL252bWUvaG9zdC9jb3JlLmPCoMKgIHzCoCA5MSArKysrKysrKysrKystLQ0KPj4+ZHJpdmVy
+cy9udm1lL2hvc3QvbnZtZS5owqDCoCB8wqAgMzkgKysrKysrDQo+Pj5kcml2ZXJzL252bWUvaG9z
+dC96bnMuY8KgwqDCoCB8IDIzOCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+DQo+Pj5pbmNsdWRlL2xpbnV4L252bWUuaMKgwqDCoMKgwqDCoCB8IDExMSArKysrKysrKysrKysr
+KysrKw0KPj4+NSBmaWxlcyBjaGFuZ2VkLCA0NjggaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25z
+KC0pDQo+Pj5jcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9udm1lL2hvc3Qvem5zLmMNCj4+Pg0K
+Pj4+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L01ha2VmaWxlIGIvZHJpdmVycy9udm1l
+L2hvc3QvTWFrZWZpbGUNCj4+PmluZGV4IGZjN2IyNmJlNjkyZC4uZDdmNmE4NzY4N2I4IDEwMDY0
+NA0KPj4+LS0tIGEvZHJpdmVycy9udm1lL2hvc3QvTWFrZWZpbGUNCj4+PisrKyBiL2RyaXZlcnMv
+bnZtZS9ob3N0L01ha2VmaWxlDQo+Pj5AQCAtMTMsNiArMTMsNyBAQCBudm1lLWNvcmUtecKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA6PSBjb3JlLm8NCj4+Pm52bWUtY29yZS0kKENPTkZJ
+R19UUkFDSU5HKcKgwqDCoMKgwqDCoMKgICs9IHRyYWNlLm8NCj4+Pm52bWUtY29yZS0kKENPTkZJ
+R19OVk1FX01VTFRJUEFUSCnCoMKgwqAgKz0gbXVsdGlwYXRoLm8NCj4+Pm52bWUtY29yZS0kKENP
+TkZJR19OVk0pwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCArPSBsaWdodG52bS5vDQo+Pj4rbnZtZS1j
+b3JlLSQoQ09ORklHX0JMS19ERVZfWk9ORUQpwqDCoMKgICs9IHpucy5vDQo+Pj5udm1lLWNvcmUt
+JChDT05GSUdfRkFVTFRfSU5KRUNUSU9OX0RFQlVHX0ZTKcKgwqDCoCArPSBmYXVsdF9pbmplY3Qu
+bw0KPj4+bnZtZS1jb3JlLSQoQ09ORklHX05WTUVfSFdNT04pwqDCoMKgwqDCoMKgwqAgKz0gaHdt
+b24ubw0KPj4+DQo+Pj5kaWZmIC0tZ2l0IGEvZHJpdmVycy9udm1lL2hvc3QvY29yZS5jIGIvZHJp
+dmVycy9udm1lL2hvc3QvY29yZS5jDQo+Pj5pbmRleCA1OGYxMzdiOWYyYzUuLmU5NjE5MTBkYTRh
+YyAxMDA2NDQNCj4+Pi0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYw0KPj4+KysrIGIvZHJp
+dmVycy9udm1lL2hvc3QvY29yZS5jDQo+Pj5AQCAtODksNyArODksNyBAQCBzdGF0aWMgZGV2X3Qg
+bnZtZV9jaHJfZGV2dDsNCj4+PnN0YXRpYyBzdHJ1Y3QgY2xhc3MgKm52bWVfY2xhc3M7DQo+Pj5z
+dGF0aWMgc3RydWN0IGNsYXNzICpudm1lX3N1YnN5c19jbGFzczsNCj4+Pg0KPj4+LXN0YXRpYyBp
+bnQgbnZtZV9yZXZhbGlkYXRlX2Rpc2soc3RydWN0IGdlbmRpc2sgKmRpc2spOw0KPj4+K3N0YXRp
+YyBpbnQgX252bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCBnZW5kaXNrICpkaXNrKTsNCj4+PnN0
+YXRpYyB2b2lkIG52bWVfcHV0X3N1YnN5c3RlbShzdHJ1Y3QgbnZtZV9zdWJzeXN0ZW0gKnN1YnN5
+cyk7DQo+Pj5zdGF0aWMgdm9pZCBudm1lX3JlbW92ZV9pbnZhbGlkX25hbWVzcGFjZXMoc3RydWN0
+IG52bWVfY3RybCAqY3RybCwNCj4+PsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHVuc2lnbmVkIG5zaWQpOw0KPj4+QEAgLTI4Nyw2ICsyODcsMTAgQEAgdm9pZCBu
+dm1lX2NvbXBsZXRlX3JxKHN0cnVjdCByZXF1ZXN0ICpyZXEpDQo+Pj7CoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIG52bWVfcmV0cnlfcmVxKHJlcSk7DQo+Pj7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJl
+dHVybjsNCj4+PsKgwqDCoMKgwqDCoMKgIH0NCj4+PivCoMKgwqAgfSBlbHNlIGlmIChJU19FTkFC
+TEVEKENPTkZJR19CTEtfREVWX1pPTkVEKSAmJg0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKgIHJl
+cV9vcChyZXEpID09IFJFUV9PUF9aT05FX0FQUEVORCkgew0KPj4+K8KgwqDCoMKgwqDCoMKgIHJl
+cS0+X19zZWN0b3IgPSBudm1lX2xiYV90b19zZWN0KHJlcS0+cS0+cXVldWVkYXRhLA0KPj4+K8Kg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgbGU2NF90b19jcHUobnZtZV9yZXEocmVxKS0+cmVzdWx0LnU2
+NCkpOw0KPj4+wqDCoMKgwqB9DQo+Pj4NCj4+PsKgwqDCoMKgbnZtZV90cmFjZV9iaW9fY29tcGxl
+dGUocmVxLCBzdGF0dXMpOw0KPj4+QEAgLTY3Myw3ICs2NzcsOCBAQCBzdGF0aWMgaW5saW5lIGJs
+a19zdGF0dXNfdCANCj4+Pm52bWVfc2V0dXBfd3JpdGVfemVyb2VzKHN0cnVjdCBudm1lX25zICpu
+cywNCj4+Pn0NCj4+Pg0KPj4+c3RhdGljIGlubGluZSBibGtfc3RhdHVzX3QgbnZtZV9zZXR1cF9y
+dyhzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+Pj4twqDCoMKgwqDCoMKgwqAgc3RydWN0IHJlcXVlc3Qg
+KnJlcSwgc3RydWN0IG52bWVfY29tbWFuZCAqY21uZCkNCj4+PivCoMKgwqDCoMKgwqDCoCBzdHJ1
+Y3QgcmVxdWVzdCAqcmVxLCBzdHJ1Y3QgbnZtZV9jb21tYW5kICpjbW5kLA0KPj4+K8KgwqDCoMKg
+wqDCoMKgIGVudW0gbnZtZV9vcGNvZGUgb3ApDQo+Pj57DQo+Pj7CoMKgwqDCoHN0cnVjdCBudm1l
+X2N0cmwgKmN0cmwgPSBucy0+Y3RybDsNCj4+PsKgwqDCoMKgdTE2IGNvbnRyb2wgPSAwOw0KPj4+
+QEAgLTY4Nyw3ICs2OTIsNyBAQCBzdGF0aWMgaW5saW5lIGJsa19zdGF0dXNfdCANCj4+Pm52bWVf
+c2V0dXBfcncoc3RydWN0IG52bWVfbnMgKm5zLA0KPj4+wqDCoMKgwqBpZiAocmVxLT5jbWRfZmxh
+Z3MgJiBSRVFfUkFIRUFEKQ0KPj4+wqDCoMKgwqDCoMKgwqAgZHNtZ210IHw9IE5WTUVfUldfRFNN
+X0ZSRVFfUFJFRkVUQ0g7DQo+Pj4NCj4+Pi3CoMKgwqAgY21uZC0+cncub3Bjb2RlID0gKHJxX2Rh
+dGFfZGlyKHJlcSkgPyBudm1lX2NtZF93cml0ZSA6IA0KPj4+bnZtZV9jbWRfcmVhZCk7DQo+Pj4r
+wqDCoMKgIGNtbmQtPnJ3Lm9wY29kZSA9IG9wOw0KPj4+wqDCoMKgwqBjbW5kLT5ydy5uc2lkID0g
+Y3B1X3RvX2xlMzIobnMtPmhlYWQtPm5zX2lkKTsNCj4+PsKgwqDCoMKgY21uZC0+cncuc2xiYSA9
+IGNwdV90b19sZTY0KG52bWVfc2VjdF90b19sYmEobnMsIGJsa19ycV9wb3MocmVxKSkpOw0KPj4+
+wqDCoMKgwqBjbW5kLT5ydy5sZW5ndGggPSBjcHVfdG9fbGUxNigoYmxrX3JxX2J5dGVzKHJlcSkg
+Pj4gDQo+Pj5ucy0+bGJhX3NoaWZ0KSAtIDEpOw0KPj4+QEAgLTcxNiw2ICs3MjEsOCBAQCBzdGF0
+aWMgaW5saW5lIGJsa19zdGF0dXNfdCANCj4+Pm52bWVfc2V0dXBfcncoc3RydWN0IG52bWVfbnMg
+Km5zLA0KPj4+wqDCoMKgwqDCoMKgwqAgY2FzZSBOVk1FX05TX0RQU19QSV9UWVBFMjoNCj4+PsKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udHJvbCB8PSBOVk1FX1JXX1BSSU5GT19QUkNIS19HVUFS
+RCB8DQo+Pj7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBOVk1FX1JXX1BS
+SU5GT19QUkNIS19SRUY7DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAob3AgPT0gbnZt
+ZV9jbWRfem9uZV9hcHBlbmQpDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNv
+bnRyb2wgfD0gTlZNRV9SV19BUFBFTkRfUElSRU1BUDsNCj4+PsKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgY21uZC0+cncucmVmdGFnID0gY3B1X3RvX2xlMzIodDEwX3BpX3JlZl90YWcocmVxKSk7DQo+
+Pj7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPj4+wqDCoMKgwqDCoMKgwqAgfQ0KPj4+
+QEAgLTc1Niw2ICs3NjMsMTkgQEAgYmxrX3N0YXR1c190IG52bWVfc2V0dXBfY21kKHN0cnVjdCBu
+dm1lX25zIA0KPj4+Km5zLCBzdHJ1Y3QgcmVxdWVzdCAqcmVxLA0KPj4+wqDCoMKgwqBjYXNlIFJF
+UV9PUF9GTFVTSDoNCj4+PsKgwqDCoMKgwqDCoMKgIG52bWVfc2V0dXBfZmx1c2gobnMsIGNtZCk7
+DQo+Pj7CoMKgwqDCoMKgwqDCoCBicmVhazsNCj4+PivCoMKgwqAgY2FzZSBSRVFfT1BfWk9ORV9S
+RVNFVF9BTEw6DQo+Pj4rwqDCoMKgIGNhc2UgUkVRX09QX1pPTkVfUkVTRVQ6DQo+Pj4rwqDCoMKg
+wqDCoMKgwqAgcmV0ID0gbnZtZV9zZXR1cF96b25lX21nbXRfc2VuZChucywgcmVxLCBjbWQsIE5W
+TUVfWk9ORV9SRVNFVCk7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+Pj4rwqDCoMKgIGNh
+c2UgUkVRX09QX1pPTkVfT1BFTjoNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBudm1lX3NldHVw
+X3pvbmVfbWdtdF9zZW5kKG5zLCByZXEsIGNtZCwgTlZNRV9aT05FX09QRU4pOw0KPj4+K8KgwqDC
+oMKgwqDCoMKgIGJyZWFrOw0KPj4+K8KgwqDCoCBjYXNlIFJFUV9PUF9aT05FX0NMT1NFOg0KPj4+
+K8KgwqDCoMKgwqDCoMKgIHJldCA9IG52bWVfc2V0dXBfem9uZV9tZ210X3NlbmQobnMsIHJlcSwg
+Y21kLCBOVk1FX1pPTkVfQ0xPU0UpOw0KPj4+K8KgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPj4+K8Kg
+wqDCoCBjYXNlIFJFUV9PUF9aT05FX0ZJTklTSDoNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBu
+dm1lX3NldHVwX3pvbmVfbWdtdF9zZW5kKG5zLCByZXEsIGNtZCwgDQo+Pj5OVk1FX1pPTkVfRklO
+SVNIKTsNCj4+PivCoMKgwqDCoMKgwqDCoCBicmVhazsNCj4+PsKgwqDCoMKgY2FzZSBSRVFfT1Bf
+V1JJVEVfWkVST0VTOg0KPj4+wqDCoMKgwqDCoMKgwqAgcmV0ID0gbnZtZV9zZXR1cF93cml0ZV96
+ZXJvZXMobnMsIHJlcSwgY21kKTsNCj4+PsKgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPj4+QEAgLTc2
+Myw4ICs3ODMsMTMgQEAgYmxrX3N0YXR1c190IG52bWVfc2V0dXBfY21kKHN0cnVjdCBudm1lX25z
+IA0KPj4+Km5zLCBzdHJ1Y3QgcmVxdWVzdCAqcmVxLA0KPj4+wqDCoMKgwqDCoMKgwqAgcmV0ID0g
+bnZtZV9zZXR1cF9kaXNjYXJkKG5zLCByZXEsIGNtZCk7DQo+Pj7CoMKgwqDCoMKgwqDCoCBicmVh
+azsNCj4+PsKgwqDCoMKgY2FzZSBSRVFfT1BfUkVBRDoNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQg
+PSBudm1lX3NldHVwX3J3KG5zLCByZXEsIGNtZCwgbnZtZV9jbWRfcmVhZCk7DQo+Pj4rwqDCoMKg
+wqDCoMKgwqAgYnJlYWs7DQo+Pj7CoMKgwqDCoGNhc2UgUkVRX09QX1dSSVRFOg0KPj4+LcKgwqDC
+oMKgwqDCoMKgIHJldCA9IG52bWVfc2V0dXBfcncobnMsIHJlcSwgY21kKTsNCj4+PivCoMKgwqDC
+oMKgwqDCoCByZXQgPSBudm1lX3NldHVwX3J3KG5zLCByZXEsIGNtZCwgbnZtZV9jbWRfd3JpdGUp
+Ow0KPj4+K8KgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPj4+K8KgwqDCoCBjYXNlIFJFUV9PUF9aT05F
+X0FQUEVORDoNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBudm1lX3NldHVwX3J3KG5zLCByZXEs
+IGNtZCwgbnZtZV9jbWRfem9uZV9hcHBlbmQpOw0KPj4+wqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+
+Pj7CoMKgwqDCoGRlZmF1bHQ6DQo+Pj7CoMKgwqDCoMKgwqDCoCBXQVJOX09OX09OQ0UoMSk7DQo+
+Pj5AQCAtMTM5MiwxNCArMTQxNywyMyBAQCBzdGF0aWMgdTMyIG52bWVfcGFzc3RocnVfc3RhcnQo
+c3RydWN0IA0KPj4+bnZtZV9jdHJsICpjdHJsLCBzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+Pj7CoMKg
+wqDCoHJldHVybiBlZmZlY3RzOw0KPj4+fQ0KPj4+DQo+Pj4tc3RhdGljIHZvaWQgbnZtZV91cGRh
+dGVfZm9ybWF0cyhzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsKQ0KPj4+K3N0YXRpYyB2b2lkIG52bWVf
+dXBkYXRlX2Zvcm1hdHMoc3RydWN0IG52bWVfY3RybCAqY3RybCwgdTMyICplZmZlY3RzKQ0KPj4+
+ew0KPj4+wqDCoMKgwqBzdHJ1Y3QgbnZtZV9ucyAqbnM7DQo+Pj4NCj4+PsKgwqDCoMKgZG93bl9y
+ZWFkKCZjdHJsLT5uYW1lc3BhY2VzX3J3c2VtKTsNCj4+PsKgwqDCoMKgbGlzdF9mb3JfZWFjaF9l
+bnRyeShucywgJmN0cmwtPm5hbWVzcGFjZXMsIGxpc3QpDQo+Pj4twqDCoMKgwqDCoMKgwqAgaWYg
+KG5zLT5kaXNrICYmIG52bWVfcmV2YWxpZGF0ZV9kaXNrKG5zLT5kaXNrKSkNCj4+PivCoMKgwqDC
+oMKgwqDCoCBpZiAobnMtPmRpc2sgJiYgX252bWVfcmV2YWxpZGF0ZV9kaXNrKG5zLT5kaXNrKSkN
+Cj4+PsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbnZtZV9zZXRfcXVldWVfZHlpbmcobnMpOw0KPj4+
+K8KgwqDCoMKgwqDCoMKgIGVsc2UgaWYgKGJsa19xdWV1ZV9pc196b25lZChucy0+ZGlzay0+cXVl
+dWUpKSB7DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKg0KPj4+K8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCAqIElPIGNvbW1hbmRzIGFyZSByZXF1aXJlZCB0byBmdWxseSByZXZhbGlkYXRl
+IGEgem9uZWQNCj4+PivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBkZXZpY2UuIEZvcmNlIHRo
+ZSBjb21tYW5kIGVmZmVjdHMgdG8gdHJpZ2dlciByZXNjYW4NCj4+PivCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgKiB3b3JrIHNvIHJlcG9ydCB6b25lcyBjYW4gcnVuIGluIGEgY29udGV4dCB3aXRo
+DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogdW5mcm96ZW4gSU8gcXVldWVzLg0KPj4+
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLw0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+KmVmZmVjdHMgfD0gTlZNRV9DTURfRUZGRUNUU19OQ0M7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgfQ0K
+Pj4+wqDCoMKgwqB1cF9yZWFkKCZjdHJsLT5uYW1lc3BhY2VzX3J3c2VtKTsNCj4+Pn0NCj4+Pg0K
+Pj4+QEAgLTE0MTEsNyArMTQ0NSw3IEBAIHN0YXRpYyB2b2lkIG52bWVfcGFzc3RocnVfZW5kKHN0
+cnVjdCANCj4+Pm52bWVfY3RybCAqY3RybCwgdTMyIGVmZmVjdHMpDQo+Pj7CoMKgwqDCoCAqIHRo
+aXMgY29tbWFuZC4NCj4+PsKgwqDCoMKgICovDQo+Pj7CoMKgwqDCoGlmIChlZmZlY3RzICYgTlZN
+RV9DTURfRUZGRUNUU19MQkNDKQ0KPj4+LcKgwqDCoMKgwqDCoMKgIG52bWVfdXBkYXRlX2Zvcm1h
+dHMoY3RybCk7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgbnZtZV91cGRhdGVfZm9ybWF0cyhjdHJsLCAm
+ZWZmZWN0cyk7DQo+Pj7CoMKgwqDCoGlmIChlZmZlY3RzICYgKE5WTUVfQ01EX0VGRkVDVFNfTEJD
+QyB8IE5WTUVfQ01EX0VGRkVDVFNfQ1NFX01BU0spKSB7DQo+Pj7CoMKgwqDCoMKgwqDCoCBudm1l
+X3VuZnJlZXplKGN0cmwpOw0KPj4+wqDCoMKgwqDCoMKgwqAgbnZtZV9tcGF0aF91bmZyZWV6ZShj
+dHJsLT5zdWJzeXMpOw0KPj4+QEAgLTE1MjYsNyArMTU2MCw3IEBAIHN0YXRpYyBpbnQgbnZtZV91
+c2VyX2NtZDY0KHN0cnVjdCBudm1lX2N0cmwgDQo+Pj4qY3RybCwgc3RydWN0IG52bWVfbnMgKm5z
+LA0KPj4+wqAqIElzc3VlIGlvY3RsIHJlcXVlc3RzIG9uIHRoZSBmaXJzdCBhdmFpbGFibGUgcGF0
+aC7CoCBOb3RlIHRoYXQgDQo+Pj51bmxpa2Ugbm9ybWFsDQo+Pj7CoCogYmxvY2sgbGF5ZXIgcmVx
+dWVzdHMgd2Ugd2lsbCBub3QgcmV0cnkgZmFpbGVkIHJlcXVlc3Qgb24gDQo+Pj5hbm90aGVyIGNv
+bnRyb2xsZXIuDQo+Pj7CoCovDQo+Pj4tc3RhdGljIHN0cnVjdCBudm1lX25zICpudm1lX2dldF9u
+c19mcm9tX2Rpc2soc3RydWN0IGdlbmRpc2sgKmRpc2ssDQo+Pj4rc3RydWN0IG52bWVfbnMgKm52
+bWVfZ2V0X25zX2Zyb21fZGlzayhzdHJ1Y3QgZ2VuZGlzayAqZGlzaywNCj4+PsKgwqDCoMKgwqDC
+oMKgIHN0cnVjdCBudm1lX25zX2hlYWQgKipoZWFkLCBpbnQgKnNyY3VfaWR4KQ0KPj4+ew0KPj4+
+I2lmZGVmIENPTkZJR19OVk1FX01VTFRJUEFUSA0KPj4+QEAgLTE1NDYsNyArMTU4MCw3IEBAIHN0
+YXRpYyBzdHJ1Y3QgbnZtZV9ucyANCj4+Pipudm1lX2dldF9uc19mcm9tX2Rpc2soc3RydWN0IGdl
+bmRpc2sgKmRpc2ssDQo+Pj7CoMKgwqDCoHJldHVybiBkaXNrLT5wcml2YXRlX2RhdGE7DQo+Pj59
+DQo+Pj4NCj4+Pi1zdGF0aWMgdm9pZCBudm1lX3B1dF9uc19mcm9tX2Rpc2soc3RydWN0IG52bWVf
+bnNfaGVhZCAqaGVhZCwgaW50IGlkeCkNCj4+Pit2b2lkIG52bWVfcHV0X25zX2Zyb21fZGlzayhz
+dHJ1Y3QgbnZtZV9uc19oZWFkICpoZWFkLCBpbnQgaWR4KQ0KPj4+ew0KPj4+wqDCoMKgwqBpZiAo
+aGVhZCkNCj4+PsKgwqDCoMKgwqDCoMKgIHNyY3VfcmVhZF91bmxvY2soJmhlYWQtPnNyY3UsIGlk
+eCk7DQo+Pj5AQCAtMTkzOSwyMSArMTk3MywyOCBAQCBzdGF0aWMgdm9pZCBudm1lX3VwZGF0ZV9k
+aXNrX2luZm8oc3RydWN0IA0KPj4+Z2VuZGlzayAqZGlzaywNCj4+Pg0KPj4+c3RhdGljIGludCBf
+X252bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCBnZW5kaXNrICpkaXNrLCBzdHJ1Y3QgDQo+Pj5u
+dm1lX2lkX25zICppZCkNCj4+PnsNCj4+PivCoMKgwqAgdW5zaWduZWQgbGJhZiA9IGlkLT5mbGJh
+cyAmIE5WTUVfTlNfRkxCQVNfTEJBX01BU0s7DQo+Pj7CoMKgwqDCoHN0cnVjdCBudm1lX25zICpu
+cyA9IGRpc2stPnByaXZhdGVfZGF0YTsNCj4+PsKgwqDCoMKgc3RydWN0IG52bWVfY3RybCAqY3Ry
+bCA9IG5zLT5jdHJsOw0KPj4+K8KgwqDCoCBpbnQgcmV0Ow0KPj4+wqDCoMKgwqB1MzIgaW9iOw0K
+Pj4+DQo+Pj7CoMKgwqDCoC8qDQo+Pj7CoMKgwqDCoCAqIElmIGlkZW50aWZ5IG5hbWVzcGFjZSBm
+YWlsZWQsIHVzZSBkZWZhdWx0IDUxMiBieXRlIGJsb2NrIHNpemUgc28NCj4+PsKgwqDCoMKgICog
+YmxvY2sgbGF5ZXIgY2FuIHVzZSBiZWZvcmUgZmFpbGluZyByZWFkL3dyaXRlIGZvciAwIGNhcGFj
+aXR5Lg0KPj4+wqDCoMKgwqAgKi8NCj4+Pi3CoMKgwqAgbnMtPmxiYV9zaGlmdCA9IGlkLT5sYmFm
+W2lkLT5mbGJhcyAmIE5WTUVfTlNfRkxCQVNfTEJBX01BU0tdLmRzOw0KPj4+K8KgwqDCoCBucy0+
+bGJhX3NoaWZ0ID0gaWQtPmxiYWZbbGJhZl0uZHM7DQo+Pj7CoMKgwqDCoGlmIChucy0+bGJhX3No
+aWZ0ID09IDApDQo+Pj7CoMKgwqDCoMKgwqDCoCBucy0+bGJhX3NoaWZ0ID0gOTsNCj4+Pg0KPj4+
+wqDCoMKgwqBzd2l0Y2ggKG5zLT5oZWFkLT5pZHMuY3NpKSB7DQo+Pj7CoMKgwqDCoGNhc2UgTlZN
+RV9DU0lfTlZNOg0KPj4+wqDCoMKgwqDCoMKgwqAgYnJlYWs7DQo+Pj4rwqDCoMKgIGNhc2UgTlZN
+RV9DU0lfWk5TOg0KPj4+K8KgwqDCoMKgwqDCoMKgIHJldCA9IG52bWVfdXBkYXRlX3pvbmVfaW5m
+byhkaXNrLCBucywgbGJhZik7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgaWYgKHJldCkNCj4+PivCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiByZXQ7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgYnJlYWs7
+DQo+Pj7CoMKgwqDCoGRlZmF1bHQ6DQo+Pj7CoMKgwqDCoMKgwqDCoCBkZXZfd2FybihjdHJsLT5k
+ZXZpY2UsICJ1bmtub3duIGNzaTolZCBuczolZFxuIiwNCj4+PsKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgbnMtPmhlYWQtPmlkcy5jc2ksIG5zLT5oZWFkLT5uc19pZCk7DQo+Pj5AQCAtMTk2Nyw3ICsy
+MDA4LDcgQEAgc3RhdGljIGludCBfX252bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCANCj4+Pmdl
+bmRpc2sgKmRpc2ssIHN0cnVjdCBudm1lX2lkX25zICppZCkNCj4+PsKgwqDCoMKgwqDCoMKgIGlv
+YiA9IG52bWVfbGJhX3RvX3NlY3QobnMsIGxlMTZfdG9fY3B1KGlkLT5ub2lvYikpOw0KPj4+DQo+
+Pj7CoMKgwqDCoG5zLT5mZWF0dXJlcyA9IDA7DQo+Pj4twqDCoMKgIG5zLT5tcyA9IGxlMTZfdG9f
+Y3B1KGlkLT5sYmFmW2lkLT5mbGJhcyAmIA0KPj4+TlZNRV9OU19GTEJBU19MQkFfTUFTS10ubXMp
+Ow0KPj4+K8KgwqDCoCBucy0+bXMgPSBsZTE2X3RvX2NwdShpZC0+bGJhZltsYmFmXS5tcyk7DQo+
+Pj7CoMKgwqDCoC8qIHRoZSBQSSBpbXBsZW1lbnRhdGlvbiByZXF1aXJlcyBtZXRhZGF0YSBlcXVh
+bCB0MTAgcGkgdHVwbGUgDQo+Pj5zaXplICovDQo+Pj7CoMKgwqDCoGlmIChucy0+bXMgPT0gc2l6
+ZW9mKHN0cnVjdCB0MTBfcGlfdHVwbGUpKQ0KPj4+wqDCoMKgwqDCoMKgwqAgbnMtPnBpX3R5cGUg
+PSBpZC0+ZHBzICYgTlZNRV9OU19EUFNfUElfTUFTSzsNCj4+PkBAIC0yMDEwLDcgKzIwNTEsNyBA
+QCBzdGF0aWMgaW50IF9fbnZtZV9yZXZhbGlkYXRlX2Rpc2soc3RydWN0IA0KPj4+Z2VuZGlzayAq
+ZGlzaywgc3RydWN0IG52bWVfaWRfbnMgKmlkKQ0KPj4+wqDCoMKgwqByZXR1cm4gMDsNCj4+Pn0N
+Cj4+Pg0KPj4+LXN0YXRpYyBpbnQgbnZtZV9yZXZhbGlkYXRlX2Rpc2soc3RydWN0IGdlbmRpc2sg
+KmRpc2spDQo+Pj4rc3RhdGljIGludCBfbnZtZV9yZXZhbGlkYXRlX2Rpc2soc3RydWN0IGdlbmRp
+c2sgKmRpc2spDQo+Pj57DQo+Pj7CoMKgwqDCoHN0cnVjdCBudm1lX25zICpucyA9IGRpc2stPnBy
+aXZhdGVfZGF0YTsNCj4+PsKgwqDCoMKgc3RydWN0IG52bWVfY3RybCAqY3RybCA9IG5zLT5jdHJs
+Ow0KPj4+QEAgLTIwNTgsNiArMjA5OSwyOCBAQCBzdGF0aWMgaW50IG52bWVfcmV2YWxpZGF0ZV9k
+aXNrKHN0cnVjdCANCj4+PmdlbmRpc2sgKmRpc2spDQo+Pj7CoMKgwqDCoHJldHVybiByZXQ7DQo+
+Pj59DQo+Pj4NCj4+PitzdGF0aWMgaW50IG52bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCBnZW5k
+aXNrICpkaXNrKQ0KPj4+K3sNCj4+PivCoMKgwqAgaW50IHJldDsNCj4+PisNCj4+PivCoMKgwqAg
+cmV0ID0gX252bWVfcmV2YWxpZGF0ZV9kaXNrKGRpc2spOw0KPj4+K8KgwqDCoCBpZiAocmV0KQ0K
+Pj4+K8KgwqDCoMKgwqDCoMKgIHJldHVybiByZXQ7DQo+Pj4rDQo+Pj4rI2lmZGVmIENPTkZJR19C
+TEtfREVWX1pPTkVEDQo+Pj4rwqDCoMKgIGlmIChibGtfcXVldWVfaXNfem9uZWQoZGlzay0+cXVl
+dWUpKSB7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgc3RydWN0IG52bWVfbnMgKm5zID0gZGlzay0+cHJp
+dmF0ZV9kYXRhOw0KPj4+K8KgwqDCoMKgwqDCoMKgIHN0cnVjdCBudm1lX2N0cmwgKmN0cmwgPSBu
+cy0+Y3RybDsNCj4+PisNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBibGtfcmV2YWxpZGF0ZV9k
+aXNrX3pvbmVzKGRpc2ssIE5VTEwpOw0KPj4+K8KgwqDCoMKgwqDCoMKgIGlmICghcmV0KQ0KPj4+
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYmxrX3F1ZXVlX21heF96b25lX2FwcGVuZF9zZWN0b3Jz
+KGRpc2stPnF1ZXVlLA0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgY3RybC0+bWF4X3pvbmVfYXBwZW5kKTsNCj4+PivCoMKgwqAg
+fQ0KPj4+KyNlbmRpZg0KPj4+K8KgwqDCoCByZXR1cm4gcmV0Ow0KPj4+K30NCj4+PisNCj4+PnN0
+YXRpYyBjaGFyIG52bWVfcHJfdHlwZShlbnVtIHByX3R5cGUgdHlwZSkNCj4+PnsNCj4+PsKgwqDC
+oMKgc3dpdGNoICh0eXBlKSB7DQo+Pj5AQCAtMjE4OCw2ICsyMjUxLDcgQEAgc3RhdGljIGNvbnN0
+IHN0cnVjdCBibG9ja19kZXZpY2Vfb3BlcmF0aW9ucyANCj4+Pm52bWVfZm9wcyA9IHsNCj4+PsKg
+wqDCoMKgLnJlbGVhc2XCoMKgwqAgPSBudm1lX3JlbGVhc2UsDQo+Pj7CoMKgwqDCoC5nZXRnZW/C
+oMKgwqDCoMKgwqDCoCA9IG52bWVfZ2V0Z2VvLA0KPj4+wqDCoMKgwqAucmV2YWxpZGF0ZV9kaXNr
+PSBudm1lX3JldmFsaWRhdGVfZGlzaywNCj4+PivCoMKgwqAgLnJlcG9ydF96b25lc8KgwqDCoCA9
+IG52bWVfcmVwb3J0X3pvbmVzLA0KPj4+wqDCoMKgwqAucHJfb3BzwqDCoMKgwqDCoMKgwqAgPSAm
+bnZtZV9wcl9vcHMsDQo+Pj59Ow0KPj4+DQo+Pj5AQCAtMjIxMyw2ICsyMjc3LDcgQEAgY29uc3Qg
+c3RydWN0IGJsb2NrX2RldmljZV9vcGVyYXRpb25zIA0KPj4+bnZtZV9uc19oZWFkX29wcyA9IHsN
+Cj4+PsKgwqDCoMKgLmlvY3RswqDCoMKgwqDCoMKgwqAgPSBudm1lX2lvY3RsLA0KPj4+wqDCoMKg
+wqAuY29tcGF0X2lvY3RswqDCoMKgID0gbnZtZV9jb21wYXRfaW9jdGwsDQo+Pj7CoMKgwqDCoC5n
+ZXRnZW/CoMKgwqDCoMKgwqDCoCA9IG52bWVfZ2V0Z2VvLA0KPj4+K8KgwqDCoCAucmVwb3J0X3pv
+bmVzwqDCoMKgID0gbnZtZV9yZXBvcnRfem9uZXMsDQo+Pj7CoMKgwqDCoC5wcl9vcHPCoMKgwqDC
+oMKgwqDCoCA9ICZudm1lX3ByX29wcywNCj4+Pn07DQo+Pj4jZW5kaWYgLyogQ09ORklHX05WTUVf
+TVVMVElQQVRIICovDQo+Pj5AQCAtNDQzOSw2ICs0NTA0LDggQEAgc3RhdGljIGlubGluZSB2b2lk
+IF9udm1lX2NoZWNrX3NpemUodm9pZCkNCj4+PsKgwqDCoMKgQlVJTERfQlVHX09OKHNpemVvZihz
+dHJ1Y3QgbnZtZV9jb21tYW5kKSAhPSA2NCk7DQo+Pj7CoMKgwqDCoEJVSUxEX0JVR19PTihzaXpl
+b2Yoc3RydWN0IG52bWVfaWRfY3RybCkgIT0gDQo+Pj5OVk1FX0lERU5USUZZX0RBVEFfU0laRSk7
+DQo+Pj7CoMKgwqDCoEJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0IG52bWVfaWRfbnMpICE9IE5W
+TUVfSURFTlRJRllfREFUQV9TSVpFKTsNCj4+PivCoMKgwqAgQlVJTERfQlVHX09OKHNpemVvZihz
+dHJ1Y3QgbnZtZV9pZF9uc196bnMpICE9IA0KPj4+TlZNRV9JREVOVElGWV9EQVRBX1NJWkUpOw0K
+Pj4+K8KgwqDCoCBCVUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVjdCBudm1lX2lkX2N0cmxfem5zKSAh
+PSANCj4+Pk5WTUVfSURFTlRJRllfREFUQV9TSVpFKTsNCj4+PsKgwqDCoMKgQlVJTERfQlVHX09O
+KHNpemVvZihzdHJ1Y3QgbnZtZV9sYmFfcmFuZ2VfdHlwZSkgIT0gNjQpOw0KPj4+wqDCoMKgwqBC
+VUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVjdCBudm1lX3NtYXJ0X2xvZykgIT0gNTEyKTsNCj4+PsKg
+wqDCoMKgQlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgbnZtZV9kYmJ1ZikgIT0gNjQpOw0KPj4+
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L252bWUuaCBiL2RyaXZlcnMvbnZtZS9ob3N0
+L252bWUuaA0KPj4+aW5kZXggNTg0MjhlM2E1OTBlLi42NjJmOTVmYmQ5MDkgMTAwNjQ0DQo+Pj4t
+LS0gYS9kcml2ZXJzL252bWUvaG9zdC9udm1lLmgNCj4+PisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0
+L252bWUuaA0KPj4+QEAgLTIzOSw2ICsyMzksOSBAQCBzdHJ1Y3QgbnZtZV9jdHJsIHsNCj4+PsKg
+wqDCoMKgdTMyIG1heF9od19zZWN0b3JzOw0KPj4+wqDCoMKgwqB1MzIgbWF4X3NlZ21lbnRzOw0K
+Pj4+wqDCoMKgwqB1MzIgbWF4X2ludGVncml0eV9zZWdtZW50czsNCj4+PisjaWZkZWYgQ09ORklH
+X0JMS19ERVZfWk9ORUQNCj4+PivCoMKgwqAgdTMyIG1heF96b25lX2FwcGVuZDsNCj4+PisjZW5k
+aWYNCj4+PsKgwqDCoMKgdTE2IGNyZHRbM107DQo+Pj7CoMKgwqDCoHUxNiBvbmNzOw0KPj4+wqDC
+oMKgwqB1MTYgb2FjczsNCj4+PkBAIC00MDMsNiArNDA2LDkgQEAgc3RydWN0IG52bWVfbnMgew0K
+Pj4+wqDCoMKgwqB1MTYgc2dzOw0KPj4+wqDCoMKgwqB1MzIgc3dzOw0KPj4+wqDCoMKgwqB1OCBw
+aV90eXBlOw0KPj4+KyNpZmRlZiBDT05GSUdfQkxLX0RFVl9aT05FRA0KPj4+K8KgwqDCoCB1NjQg
+enN6ZTsNCj4+PisjZW5kaWYNCj4+PsKgwqDCoMKgdW5zaWduZWQgbG9uZyBmZWF0dXJlczsNCj4+
+PsKgwqDCoMKgdW5zaWduZWQgbG9uZyBmbGFnczsNCj4+PiNkZWZpbmUgTlZNRV9OU19SRU1PVklO
+R8KgwqDCoCAwDQo+Pj5AQCAtNTY4LDYgKzU3NCw5IEBAIGludCBudm1lX2RlbGV0ZV9jdHJsKHN0
+cnVjdCBudm1lX2N0cmwgKmN0cmwpOw0KPj4+DQo+Pj5pbnQgbnZtZV9nZXRfbG9nKHN0cnVjdCBu
+dm1lX2N0cmwgKmN0cmwsIHUzMiBuc2lkLCB1OCBsb2dfcGFnZSwgdTggDQo+Pj5sc3AsIHU4IGNz
+aSwNCj4+PsKgwqDCoMKgwqDCoMKgIHZvaWQgKmxvZywgc2l6ZV90IHNpemUsIHU2NCBvZmZzZXQp
+Ow0KPj4+K3N0cnVjdCBudm1lX25zICpudm1lX2dldF9uc19mcm9tX2Rpc2soc3RydWN0IGdlbmRp
+c2sgKmRpc2ssDQo+Pj4rwqDCoMKgwqDCoMKgwqAgc3RydWN0IG52bWVfbnNfaGVhZCAqKmhlYWQs
+IGludCAqc3JjdV9pZHgpOw0KPj4+K3ZvaWQgbnZtZV9wdXRfbnNfZnJvbV9kaXNrKHN0cnVjdCBu
+dm1lX25zX2hlYWQgKmhlYWQsIGludCBpZHgpOw0KPj4+DQo+Pj5leHRlcm4gY29uc3Qgc3RydWN0
+IGF0dHJpYnV0ZV9ncm91cCAqbnZtZV9uc19pZF9hdHRyX2dyb3Vwc1tdOw0KPj4+ZXh0ZXJuIGNv
+bnN0IHN0cnVjdCBibG9ja19kZXZpY2Vfb3BlcmF0aW9ucyBudm1lX25zX2hlYWRfb3BzOw0KPj4+
+QEAgLTY4OSw2ICs2OTgsMzYgQEAgc3RhdGljIGlubGluZSB2b2lkIA0KPj4+bnZtZV9tcGF0aF9z
+dGFydF9mcmVlemUoc3RydWN0IG52bWVfc3Vic3lzdGVtICpzdWJzeXMpDQo+Pj59DQo+Pj4jZW5k
+aWYgLyogQ09ORklHX05WTUVfTVVMVElQQVRIICovDQo+Pj4NCj4+PisjaWZkZWYgQ09ORklHX0JM
+S19ERVZfWk9ORUQNCj4+PitpbnQgbnZtZV91cGRhdGVfem9uZV9pbmZvKHN0cnVjdCBnZW5kaXNr
+ICpkaXNrLCBzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgdW5zaWduZWQgbGJhZik7DQo+Pj4rDQo+Pj4raW50IG52bWVfcmVwb3J0X3pvbmVzKHN0cnVj
+dCBnZW5kaXNrICpkaXNrLCBzZWN0b3JfdCBzZWN0b3IsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgdW5zaWduZWQgaW50IG5yX3pvbmVzLCByZXBvcnRfem9uZXNfY2IgY2IsIHZvaWQg
+KmRhdGEpOw0KPj4+Kw0KPj4+K2Jsa19zdGF0dXNfdCBudm1lX3NldHVwX3pvbmVfbWdtdF9zZW5k
+KHN0cnVjdCBudm1lX25zICpucywgc3RydWN0IA0KPj4+cmVxdWVzdCAqcmVxLA0KPj4+K8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBudm1lX2NvbW1h
+bmQgKmNtbmQsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgZW51bSBudm1lX3pvbmVfbWdtdF9hY3Rpb24gYWN0aW9uKTsNCj4+PisjZWxzZQ0KPj4+KyNk
+ZWZpbmUgbnZtZV9yZXBvcnRfem9uZXMgTlVMTA0KPj4+Kw0KPj4+K3N0YXRpYyBpbmxpbmUgYmxr
+X3N0YXR1c190IG52bWVfc2V0dXBfem9uZV9tZ210X3NlbmQoc3RydWN0IA0KPj4+bnZtZV9ucyAq
+bnMsDQo+Pj4rwqDCoMKgwqDCoMKgwqAgc3RydWN0IHJlcXVlc3QgKnJlcSwgc3RydWN0IG52bWVf
+Y29tbWFuZCAqY21uZCwNCj4+PivCoMKgwqDCoMKgwqDCoCBlbnVtIG52bWVfem9uZV9tZ210X2Fj
+dGlvbiBhY3Rpb24pDQo+Pj4rew0KPj4+K8KgwqDCoCByZXR1cm4gQkxLX1NUU19OT1RTVVBQOw0K
+Pj4+K30NCj4+PisNCj4+PitzdGF0aWMgaW5saW5lIGludCBudm1lX3VwZGF0ZV96b25lX2luZm8o
+c3RydWN0IGdlbmRpc2sgKmRpc2ssDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgc3RydWN0IG52bWVfbnMgKm5zLA0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHVuc2lnbmVkIGxiYWYpDQo+Pj4rew0KPj4+K8KgwqDCoCBkZXZfd2Fy
+bihucy0+Y3RybC0+ZGV2aWNlLA0KPj4+K8KgwqDCoMKgwqDCoMKgwqAgIlBsZWFzZSBlbmFibGUg
+Q09ORklHX0JMS19ERVZfWk9ORUQgdG8gc3VwcG9ydCBaTlMgDQo+Pj5kZXZpY2VzXG4iKTsNCj4+
+PivCoMKgwqAgcmV0dXJuIC1FUFJPVE9OT1NVUFBPUlQ7DQo+Pj4rfQ0KPj4+KyNlbmRpZg0KPj4+
+Kw0KPj4+I2lmZGVmIENPTkZJR19OVk0NCj4+PmludCBudm1lX252bV9yZWdpc3RlcihzdHJ1Y3Qg
+bnZtZV9ucyAqbnMsIGNoYXIgKmRpc2tfbmFtZSwgaW50IG5vZGUpOw0KPj4+dm9pZCBudm1lX252
+bV91bnJlZ2lzdGVyKHN0cnVjdCBudm1lX25zICpucyk7DQo+Pj5kaWZmIC0tZ2l0IGEvZHJpdmVy
+cy9udm1lL2hvc3Qvem5zLmMgYi9kcml2ZXJzL252bWUvaG9zdC96bnMuYw0KPj4+bmV3IGZpbGUg
+bW9kZSAxMDA2NDQNCj4+PmluZGV4IDAwMDAwMDAwMDAwMC4uYzA4ZjYyODFiNjE0DQo+Pj4tLS0g
+L2Rldi9udWxsDQo+Pj4rKysgYi9kcml2ZXJzL252bWUvaG9zdC96bnMuYw0KPj4+QEAgLTAsMCAr
+MSwyMzggQEANCj4+PisvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMA0KPj4+Ky8q
+DQo+Pj4rICogQ29weXJpZ2h0IChDKSAyMDIwIFdlc3Rlcm4gRGlnaXRhbCBDb3Jwb3JhdGlvbiBv
+ciBpdHMgYWZmaWxpYXRlcy4NCj4+PisgKi8NCj4+PisNCj4+PisjaW5jbHVkZSA8bGludXgvYmxr
+ZGV2Lmg+DQo+Pj4rI2luY2x1ZGUgPGxpbnV4L3ZtYWxsb2MuaD4NCj4+PisjaW5jbHVkZSAibnZt
+ZS5oIg0KPj4+Kw0KPj4+K3N0YXRpYyBpbnQgbnZtZV9zZXRfbWF4X2FwcGVuZChzdHJ1Y3QgbnZt
+ZV9jdHJsICpjdHJsKQ0KPj4+K3sNCj4+PivCoMKgwqAgc3RydWN0IG52bWVfY29tbWFuZCBjID0g
+eyB9Ow0KPj4+K8KgwqDCoCBzdHJ1Y3QgbnZtZV9pZF9jdHJsX3pucyAqaWQ7DQo+Pj4rwqDCoMKg
+IGludCBzdGF0dXM7DQo+Pj4rDQo+Pj4rwqDCoMKgIGlkID0ga3phbGxvYyhzaXplb2YoKmlkKSwg
+R0ZQX0tFUk5FTCk7DQo+Pj4rwqDCoMKgIGlmICghaWQpDQo+Pj4rwqDCoMKgwqDCoMKgwqAgcmV0
+dXJuIC1FTk9NRU07DQo+Pj4rDQo+Pj4rwqDCoMKgIGMuaWRlbnRpZnkub3Bjb2RlID0gbnZtZV9h
+ZG1pbl9pZGVudGlmeTsNCj4+PivCoMKgwqAgYy5pZGVudGlmeS5jbnMgPSBOVk1FX0lEX0NOU19D
+U19DVFJMOw0KPj4+K8KgwqDCoCBjLmlkZW50aWZ5LmNzaSA9IE5WTUVfQ1NJX1pOUzsNCj4+PisN
+Cj4+PivCoMKgwqAgc3RhdHVzID0gbnZtZV9zdWJtaXRfc3luY19jbWQoY3RybC0+YWRtaW5fcSwg
+JmMsIGlkLCBzaXplb2YoKmlkKSk7DQo+Pj4rwqDCoMKgIGlmIChzdGF0dXMpIHsNCj4+PivCoMKg
+wqDCoMKgwqDCoCBrZnJlZShpZCk7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHN0YXR1czsN
+Cj4+PivCoMKgwqAgfQ0KPj4+Kw0KPj4+K8KgwqDCoCBjdHJsLT5tYXhfem9uZV9hcHBlbmQgPSAx
+IDw8IChpZC0+emFtZHMgKyAzKTsNCj4+PivCoMKgwqAga2ZyZWUoaWQpOw0KPj4+K8KgwqDCoCBy
+ZXR1cm4gMDsNCj4+Pit9DQo+Pj4rDQo+Pj4raW50IG52bWVfdXBkYXRlX3pvbmVfaW5mbyhzdHJ1
+Y3QgZ2VuZGlzayAqZGlzaywgc3RydWN0IG52bWVfbnMgKm5zLA0KPj4+K8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIHVuc2lnbmVkIGxiYWYpDQo+Pj4rew0KPj4+K8KgwqDCoCBzdHJ1Y3QgbnZt
+ZV9lZmZlY3RzX2xvZyAqbG9nID0gbnMtPmhlYWQtPmVmZmVjdHM7DQo+Pj4rwqDCoMKgIHN0cnVj
+dCByZXF1ZXN0X3F1ZXVlICpxID0gZGlzay0+cXVldWU7DQo+Pj4rwqDCoMKgIHN0cnVjdCBudm1l
+X2NvbW1hbmQgYyA9IHsgfTsNCj4+PivCoMKgwqAgc3RydWN0IG52bWVfaWRfbnNfem5zICppZDsN
+Cj4+PivCoMKgwqAgaW50IHN0YXR1czsNCj4+PisNCj4+PivCoMKgwqAgLyogRHJpdmVyIHJlcXVp
+cmVzIHpvbmUgYXBwZW5kIHN1cHBvcnQgKi8NCj4+PivCoMKgwqAgaWYgKCEobG9nLT5pb2NzW252
+bWVfY21kX3pvbmVfYXBwZW5kXSAmIE5WTUVfQ01EX0VGRkVDVFNfQ1NVUFApKQ0KPj4+K8KgwqDC
+oMKgwqDCoMKgIHJldHVybiAtRU5PREVWOw0KPj4NCj4+Rm9sbG93aW5nIHVwIG9uIHRoZSBpbml0
+aWFsIGNvbW1lbnQsIHRoaXMgY2hlY2sgc2hvdWxkIGdvLg0KPg0KPlNlZSBmaXJzdCBjb21tZW50
+Lg0KDQpTZWUgYWJvdmUgYW5kIHBsZWFzZSByZW1vdmUuDQoNCj4NCj4+DQo+Pj4rDQo+Pj4rwqDC
+oMKgIC8qIExhemlseSBxdWVyeSBjb250cm9sbGVyIGFwcGVuZCBsaW1pdCBmb3IgdGhlIGZpcnN0
+IHpvbmVkIA0KPj4+bmFtZXNwYWNlICovDQo+Pj4rwqDCoMKgIGlmICghbnMtPmN0cmwtPm1heF96
+b25lX2FwcGVuZCkgew0KPj4+K8KgwqDCoMKgwqDCoMKgIHN0YXR1cyA9IG52bWVfc2V0X21heF9h
+cHBlbmQobnMtPmN0cmwpOw0KPj4+K8KgwqDCoMKgwqDCoMKgIGlmIChzdGF0dXMpDQo+Pj4rwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gc3RhdHVzOw0KPj4+K8KgwqDCoCB9DQo+Pg0KPj5U
+aGlzIHNob3VsZCBvbmx5IGJlIGFwcGxpZWQgaWYgYXBwZW5kIGlzIHN1cHBvcnRlZC4NCj4NCj5T
+ZWUgZmlyc3QgY29tbWVudC4NCj4NCj4+DQo+Pj4rDQo+Pj4rwqDCoMKgIGlkID0ga3phbGxvYyhz
+aXplb2YoKmlkKSwgR0ZQX0tFUk5FTCk7DQo+Pj4rwqDCoMKgIGlmICghaWQpDQo+Pj4rwqDCoMKg
+wqDCoMKgwqAgcmV0dXJuIC1FTk9NRU07DQo+Pj4rDQo+Pj4rwqDCoMKgIGMuaWRlbnRpZnkub3Bj
+b2RlID0gbnZtZV9hZG1pbl9pZGVudGlmeTsNCj4+PivCoMKgwqAgYy5pZGVudGlmeS5uc2lkID0g
+Y3B1X3RvX2xlMzIobnMtPmhlYWQtPm5zX2lkKTsNCj4+PivCoMKgwqAgYy5pZGVudGlmeS5jbnMg
+PSBOVk1FX0lEX0NOU19DU19OUzsNCj4+PivCoMKgwqAgYy5pZGVudGlmeS5jc2kgPSBOVk1FX0NT
+SV9aTlM7DQo+Pj4rDQo+Pj4rwqDCoMKgIHN0YXR1cyA9IG52bWVfc3VibWl0X3N5bmNfY21kKG5z
+LT5jdHJsLT5hZG1pbl9xLCAmYywgaWQsIA0KPj4+c2l6ZW9mKCppZCkpOw0KPj4+K8KgwqDCoCBp
+ZiAoc3RhdHVzKQ0KPj4+K8KgwqDCoMKgwqDCoMKgIGdvdG8gZnJlZV9kYXRhOw0KPj4+Kw0KPj4+
+K8KgwqDCoCAvKg0KPj4+K8KgwqDCoMKgICogV2UgY3VycmVudGx5IGRvIG5vdCBoYW5kbGUgZGV2
+aWNlcyByZXF1aXJpbmcgYW55IG9mIHRoZSB6b25lZA0KPj4+K8KgwqDCoMKgICogb3BlcmF0aW9u
+IGNoYXJhY3RlcmlzdGljcy4NCj4+PivCoMKgwqDCoCAqLw0KPj4+K8KgwqDCoCBpZiAoaWQtPnpv
+Yykgew0KPj4+K8KgwqDCoMKgwqDCoMKgIHN0YXR1cyA9IC1FSU5WQUw7DQo+Pj4rwqDCoMKgwqDC
+oMKgwqAgZ290byBmcmVlX2RhdGE7DQo+Pj4rwqDCoMKgIH0NCj4+DQo+PkkgdW5kZXJzdGFuZCB0
+aGF0ICJWYXJpYWJsZSBab25lIENhcGFjaXR5IiBpcyBub3Qgc3VwcG9ydGVkIGFzIGl0DQo+PnJl
+cXVpcmVzIG1ham9yIGNoYW5nZXMgYXQgdGhpcyBtb21lbnQsIGJ1dCB3ZSBzaG91bGQgc3VwcG9y
+dCBjb250cm9sbGVycw0KPj50aGF0IGVuYWJsZSAiWm9uZSBBY3RpdmUgRXhjdXJzaW9ucyIsIGV2
+ZW4gd2hlbiB0aGUgQUVSIGV2ZW50IGlzIG5vdA0KPj5pbXBsZW1lbnRlZCBpbiB0aGlzIHBhdGNo
+c2V0Lg0KPg0KPg0KPk5BSy4gU2ltaWxhcmx5IHRvIFZaQywgdGhpcyBhbGxvd3MgYW4gdW5zdXNw
+ZWN0aW5nIHVzZXIgdG8gaGF2ZSBtYWpvciANCj5kYXRhIGxvc3Mgd2hlbiBhIHpvbmUgaXMgc3Vk
+ZGVubHkgbW92ZWQgdG8gRnVsbC4NCg0KSSBidXkgdGhhdC4NCg0KPg0KPg0KPj4NCj4+PisNCj4+
+PivCoMKgwqAgbnMtPnpzemUgPSBudm1lX2xiYV90b19zZWN0KG5zLCBsZTY0X3RvX2NwdShpZC0+
+bGJhZmVbbGJhZl0uenN6ZSkpOw0KPj4+K8KgwqDCoCBpZiAoIW5zLT56c3plKSB7DQo+Pj4rwqDC
+oMKgwqDCoMKgwqAgc3RhdHVzID0gLUVJTlZBTDsNCj4+PivCoMKgwqDCoMKgwqDCoCBnb3RvIGZy
+ZWVfZGF0YTsNCj4+PivCoMKgwqAgfQ0KPj4+Kw0KPj4+K8KgwqDCoCBxLT5saW1pdHMuem9uZWQg
+PSBCTEtfWk9ORURfSE07DQo+Pj4rwqDCoMKgIGJsa19xdWV1ZV9mbGFnX3NldChRVUVVRV9GTEFH
+X1pPTkVfUkVTRVRBTEwsIHEpOw0KPj4+K2ZyZWVfZGF0YToNCj4+PivCoMKgwqAga2ZyZWUoaWQp
+Ow0KPj4+K8KgwqDCoCByZXR1cm4gc3RhdHVzOw0KPj4+K30NCj4+PisNCj4+PitzdGF0aWMgdm9p
+ZCAqbnZtZV96bnNfYWxsb2NfcmVwb3J0X2J1ZmZlcihzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+Pj4r
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVuc2lnbmVkIGludCBu
+cl96b25lcywgc2l6ZV90ICpidWZsZW4pDQo+Pj4rew0KPj4+K8KgwqDCoCBzdHJ1Y3QgcmVxdWVz
+dF9xdWV1ZSAqcSA9IG5zLT5kaXNrLT5xdWV1ZTsNCj4+PivCoMKgwqAgc2l6ZV90IGJ1ZnNpemU7
+DQo+Pj4rwqDCoMKgIHZvaWQgKmJ1ZjsNCj4+PisNCj4+PivCoMKgwqAgY29uc3Qgc2l6ZV90IG1p
+bl9idWZzaXplID0gc2l6ZW9mKHN0cnVjdCBudm1lX3pvbmVfcmVwb3J0KSArDQo+Pj4rwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNpemVvZihzdHJ1Y3QgbnZtZV96b25lX2Rl
+c2NyaXB0b3IpOw0KPj4+Kw0KPj4+K8KgwqDCoCBucl96b25lcyA9IG1pbl90KHVuc2lnbmVkIGlu
+dCwgbnJfem9uZXMsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdldF9jYXBhY2l0eShu
+cy0+ZGlzaykgPj4gaWxvZzIobnMtPnpzemUpKTsNCj4+PisNCj4+PivCoMKgwqAgYnVmc2l6ZSA9
+IHNpemVvZihzdHJ1Y3QgbnZtZV96b25lX3JlcG9ydCkgKw0KPj4+K8KgwqDCoMKgwqDCoMKgIG5y
+X3pvbmVzICogc2l6ZW9mKHN0cnVjdCBudm1lX3pvbmVfZGVzY3JpcHRvcik7DQo+Pj4rwqDCoMKg
+IGJ1ZnNpemUgPSBtaW5fdChzaXplX3QsIGJ1ZnNpemUsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBxdWV1ZV9tYXhfaHdfc2VjdG9ycyhxKSA8PCBTRUNUT1JfU0hJRlQpOw0KPj4+K8KgwqDC
+oCBidWZzaXplID0gbWluX3Qoc2l6ZV90LCBidWZzaXplLCBxdWV1ZV9tYXhfc2VnbWVudHMocSkg
+PDwgDQo+Pj5QQUdFX1NISUZUKTsNCj4+PisNCj4+PivCoMKgwqAgd2hpbGUgKGJ1ZnNpemUgPj0g
+bWluX2J1ZnNpemUpIHsNCj4+PivCoMKgwqDCoMKgwqDCoCBidWYgPSBfX3ZtYWxsb2MoYnVmc2l6
+ZSwNCj4+PivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgR0ZQX0tFUk5FTCB8IF9fR0ZQ
+X1pFUk8gfCBfX0dGUF9OT1JFVFJZKTsNCj4+PivCoMKgwqDCoMKgwqDCoCBpZiAoYnVmKSB7DQo+
+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqYnVmbGVuID0gYnVmc2l6ZTsNCj4+PivCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHJldHVybiBidWY7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgfQ0KPj4+K8Kg
+wqDCoMKgwqDCoMKgIGJ1ZnNpemUgPj49IDE7DQo+Pj4rwqDCoMKgIH0NCj4+PivCoMKgwqAgcmV0
+dXJuIE5VTEw7DQo+Pj4rfQ0KPj4+Kw0KPj4+K3N0YXRpYyBpbnQgX19udm1lX25zX3JlcG9ydF96
+b25lcyhzdHJ1Y3QgbnZtZV9ucyAqbnMsIHNlY3Rvcl90IHNlY3RvciwNCj4+PivCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBudm1lX3pvbmVfcmVwb3J0ICpyZXBvcnQs
+DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzaXplX3QgYnVmbGVuKQ0K
+Pj4+K3sNCj4+PivCoMKgwqAgc3RydWN0IG52bWVfY29tbWFuZCBjID0geyB9Ow0KPj4+K8KgwqDC
+oCBpbnQgcmV0Ow0KPj4+Kw0KPj4+K8KgwqDCoCBjLnptci5vcGNvZGUgPSBudm1lX2NtZF96b25l
+X21nbXRfcmVjdjsNCj4+PivCoMKgwqAgYy56bXIubnNpZCA9IGNwdV90b19sZTMyKG5zLT5oZWFk
+LT5uc19pZCk7DQo+Pj4rwqDCoMKgIGMuem1yLnNsYmEgPSBjcHVfdG9fbGU2NChudm1lX3NlY3Rf
+dG9fbGJhKG5zLCBzZWN0b3IpKTsNCj4+PivCoMKgwqAgYy56bXIubnVtZCA9IGNwdV90b19sZTMy
+KG52bWVfYnl0ZXNfdG9fbnVtZChidWZsZW4pKTsNCj4+PivCoMKgwqAgYy56bXIuenJhID0gTlZN
+RV9aUkFfWk9ORV9SRVBPUlQ7DQo+Pj4rwqDCoMKgIGMuem1yLnpyYXNmID0gTlZNRV9aUkFTRl9a
+T05FX1JFUE9SVF9BTEw7DQo+Pj4rwqDCoMKgIGMuem1yLnByID0gTlZNRV9SRVBPUlRfWk9ORV9Q
+QVJUSUFMOw0KPj4+Kw0KPj4+K8KgwqDCoCByZXQgPSBudm1lX3N1Ym1pdF9zeW5jX2NtZChucy0+
+cXVldWUsICZjLCByZXBvcnQsIGJ1Zmxlbik7DQo+Pj4rwqDCoMKgIGlmIChyZXQpDQo+Pj4rwqDC
+oMKgwqDCoMKgwqAgcmV0dXJuIHJldDsNCj4+PisNCj4+PivCoMKgwqAgcmV0dXJuIGxlNjRfdG9f
+Y3B1KHJlcG9ydC0+bnJfem9uZXMpOw0KPj4+K30NCj4+PisNCj4+PitzdGF0aWMgaW50IG52bWVf
+em9uZV9wYXJzZV9lbnRyeShzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+Pj4rwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IG52bWVfem9uZV9kZXNjcmlwdG9yICplbnRyeSwNCj4+
+PivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnQgaWR4LCByZXBv
+cnRfem9uZXNfY2IgY2IsDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9p
+ZCAqZGF0YSkNCj4+Pit7DQo+Pj4rwqDCoMKgIHN0cnVjdCBibGtfem9uZSB6b25lID0geyB9Ow0K
+Pj4+Kw0KPj4+K8KgwqDCoCBpZiAoKGVudHJ5LT56dCAmIDB4ZikgIT0gTlZNRV9aT05FX1RZUEVf
+U0VRV1JJVEVfUkVRKSB7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgZGV2X2Vycihucy0+Y3RybC0+ZGV2
+aWNlLCAiaW52YWxpZCB6b25lIHR5cGUgJSN4XG4iLA0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBlbnRyeS0+enQpOw0KPj4+K8KgwqDCoMKgwqDCoMKgIHJldHVybiAtRUlOVkFM
+Ow0KPj4+K8KgwqDCoCB9DQo+Pj4rDQo+Pj4rwqDCoMKgIHpvbmUudHlwZSA9IEJMS19aT05FX1RZ
+UEVfU0VRV1JJVEVfUkVROw0KPj4+K8KgwqDCoCB6b25lLmNvbmQgPSBlbnRyeS0+enMgPj4gNDsN
+Cj4+PivCoMKgwqAgem9uZS5sZW4gPSBucy0+enN6ZTsNCj4+PivCoMKgwqAgem9uZS5jYXBhY2l0
+eSA9IG52bWVfbGJhX3RvX3NlY3QobnMsIGxlNjRfdG9fY3B1KGVudHJ5LT56Y2FwKSk7DQo+Pj4r
+wqDCoMKgIHpvbmUuc3RhcnQgPSBudm1lX2xiYV90b19zZWN0KG5zLCBsZTY0X3RvX2NwdShlbnRy
+eS0+enNsYmEpKTsNCj4+PivCoMKgwqAgem9uZS53cCA9IG52bWVfbGJhX3RvX3NlY3QobnMsIGxl
+NjRfdG9fY3B1KGVudHJ5LT53cCkpOw0KPj4+Kw0KPj4+K8KgwqDCoCByZXR1cm4gY2IoJnpvbmUs
+IGlkeCwgZGF0YSk7DQo+Pj4rfQ0KPj4+Kw0KPj4+K3N0YXRpYyBpbnQgbnZtZV9uc19yZXBvcnRf
+em9uZXMoc3RydWN0IG52bWVfbnMgKm5zLCBzZWN0b3JfdCBzZWN0b3IsDQo+Pj4rwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnQgbnJfem9uZXMsIHJlcG9ydF96b25lc19jYiBjYiwg
+dm9pZCAqZGF0YSkNCj4+Pit7DQo+Pj4rwqDCoMKgIHN0cnVjdCBudm1lX3pvbmVfcmVwb3J0ICpy
+ZXBvcnQ7DQo+Pj4rwqDCoMKgIGludCByZXQsIHpvbmVfaWR4ID0gMDsNCj4+PivCoMKgwqAgdW5z
+aWduZWQgaW50IG56LCBpOw0KPj4+K8KgwqDCoCBzaXplX3QgYnVmbGVuOw0KPj4+Kw0KPj4+K8Kg
+wqDCoCByZXBvcnQgPSBudm1lX3puc19hbGxvY19yZXBvcnRfYnVmZmVyKG5zLCBucl96b25lcywg
+JmJ1Zmxlbik7DQo+Pj4rwqDCoMKgIGlmICghcmVwb3J0KQ0KPj4+K8KgwqDCoMKgwqDCoMKgIHJl
+dHVybiAtRU5PTUVNOw0KPj4+Kw0KPj4+K8KgwqDCoCBzZWN0b3IgJj0gfihucy0+enN6ZSAtIDEp
+Ow0KPj4+K8KgwqDCoCB3aGlsZSAoem9uZV9pZHggPCBucl96b25lcyAmJiBzZWN0b3IgPCBnZXRf
+Y2FwYWNpdHkobnMtPmRpc2spKSB7DQo+Pj4rwqDCoMKgwqDCoMKgwqAgbWVtc2V0KHJlcG9ydCwg
+MCwgYnVmbGVuKTsNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBfX252bWVfbnNfcmVwb3J0X3pv
+bmVzKG5zLCBzZWN0b3IsIHJlcG9ydCwgYnVmbGVuKTsNCj4+PivCoMKgwqDCoMKgwqDCoCBpZiAo
+cmV0IDwgMCkNCj4+PivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gb3V0X2ZyZWU7DQo+Pj4r
+DQo+Pj4rwqDCoMKgwqDCoMKgwqAgbnogPSBtaW5fdCh1bnNpZ25lZCBpbnQsIHJldCwgbnJfem9u
+ZXMpOw0KPj4+K8KgwqDCoMKgwqDCoMKgIGlmICghbnopDQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBicmVhazsNCj4+PisNCj4+PivCoMKgwqDCoMKgwqDCoCBmb3IgKGkgPSAwOyBpIDwgbnog
+JiYgem9uZV9pZHggPCBucl96b25lczsgaSsrKSB7DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCByZXQgPSBudm1lX3pvbmVfcGFyc2VfZW50cnkobnMsICZyZXBvcnQtPmVudHJpZXNbaV0sDQo+
+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHpvbmVfaWR4LCBjYiwgZGF0YSk7DQo+Pj4rwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0
+KQ0KPj4+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnb3RvIG91dF9mcmVlOw0KPj4+
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgem9uZV9pZHgrKzsNCj4+PivCoMKgwqDCoMKgwqDCoCB9
+DQo+Pj4rDQo+Pj4rwqDCoMKgwqDCoMKgwqAgc2VjdG9yICs9IG5zLT56c3plICogbno7DQo+Pj4r
+wqDCoMKgIH0NCj4+PisNCj4+PivCoMKgwqAgcmV0ID0gem9uZV9pZHg7DQo+Pj4rb3V0X2ZyZWU6
+DQo+Pj4rwqDCoMKgIGt2ZnJlZShyZXBvcnQpOw0KPj4+K8KgwqDCoCByZXR1cm4gcmV0Ow0KPj4+
+K30NCj4+PisNCj4+PitpbnQgbnZtZV9yZXBvcnRfem9uZXMoc3RydWN0IGdlbmRpc2sgKmRpc2ss
+IHNlY3Rvcl90IHNlY3RvciwNCj4+PivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1bnNpZ25l
+ZCBpbnQgbnJfem9uZXMsIHJlcG9ydF96b25lc19jYiBjYiwgdm9pZCAqZGF0YSkNCj4+Pit7DQo+
+Pj4rwqDCoMKgIHN0cnVjdCBudm1lX25zX2hlYWQgKmhlYWQgPSBOVUxMOw0KPj4+K8KgwqDCoCBz
+dHJ1Y3QgbnZtZV9ucyAqbnM7DQo+Pj4rwqDCoMKgIGludCBzcmN1X2lkeCwgcmV0Ow0KPj4+Kw0K
+Pj4+K8KgwqDCoCBucyA9IG52bWVfZ2V0X25zX2Zyb21fZGlzayhkaXNrLCAmaGVhZCwgJnNyY3Vf
+aWR4KTsNCj4+PivCoMKgwqAgaWYgKHVubGlrZWx5KCFucykpDQo+Pj4rwqDCoMKgwqDCoMKgwqAg
+cmV0dXJuIC1FV09VTERCTE9DSzsNCj4+PisNCj4+PivCoMKgwqAgaWYgKG5zLT5oZWFkLT5pZHMu
+Y3NpID09IE5WTUVfQ1NJX1pOUykNCj4+PivCoMKgwqDCoMKgwqDCoCByZXQgPSBudm1lX25zX3Jl
+cG9ydF96b25lcyhucywgc2VjdG9yLCBucl96b25lcywgY2IsIGRhdGEpOw0KPj4+K8KgwqDCoCBl
+bHNlDQo+Pj4rwqDCoMKgwqDCoMKgwqAgcmV0ID0gLUVJTlZBTDsNCj4+PivCoMKgwqAgbnZtZV9w
+dXRfbnNfZnJvbV9kaXNrKGhlYWQsIHNyY3VfaWR4KTsNCj4+PisNCj4+PivCoMKgwqAgcmV0dXJu
+IHJldDsNCj4+Pit9DQo+Pj4rDQo+Pj4rYmxrX3N0YXR1c190IG52bWVfc2V0dXBfem9uZV9tZ210
+X3NlbmQoc3RydWN0IG52bWVfbnMgKm5zLCBzdHJ1Y3QgDQo+Pj5yZXF1ZXN0ICpyZXEsDQo+Pj4r
+wqDCoMKgwqDCoMKgwqAgc3RydWN0IG52bWVfY29tbWFuZCAqYywgZW51bSBudm1lX3pvbmVfbWdt
+dF9hY3Rpb24gYWN0aW9uKQ0KPj4+K3sNCj4+PivCoMKgwqAgYy0+em1zLm9wY29kZSA9IG52bWVf
+Y21kX3pvbmVfbWdtdF9zZW5kOw0KPj4+K8KgwqDCoCBjLT56bXMubnNpZCA9IGNwdV90b19sZTMy
+KG5zLT5oZWFkLT5uc19pZCk7DQo+Pj4rwqDCoMKgIGMtPnptcy5zbGJhID0gY3B1X3RvX2xlNjQo
+bnZtZV9zZWN0X3RvX2xiYShucywgYmxrX3JxX3BvcyhyZXEpKSk7DQo+Pj4rwqDCoMKgIGMtPnpt
+cy5hY3Rpb24gPSBhY3Rpb247DQo+Pj4rDQo+Pj4rwqDCoMKgIGlmIChyZXFfb3AocmVxKSA9PSBS
+RVFfT1BfWk9ORV9SRVNFVF9BTEwpDQo+Pj4rwqDCoMKgwqDCoMKgwqAgYy0+em1zLnNlbGVjdCA9
+IDE7DQo+Pj4rDQo+Pj4rwqDCoMKgIHJldHVybiBCTEtfU1RTX09LOw0KPj4+K30NCj4+PmRpZmYg
+LS1naXQgYS9pbmNsdWRlL2xpbnV4L252bWUuaCBiL2luY2x1ZGUvbGludXgvbnZtZS5oDQo+Pj5p
+bmRleCBlYTI1ZGE1NzJlZWQuLjdiM2ZhN2RlMDdiZCAxMDA2NDQNCj4+Pi0tLSBhL2luY2x1ZGUv
+bGludXgvbnZtZS5oDQo+Pj4rKysgYi9pbmNsdWRlL2xpbnV4L252bWUuaA0KPj4+QEAgLTM3NCw2
+ICszNzQsMzAgQEAgc3RydWN0IG52bWVfaWRfbnMgew0KPj4+wqDCoMKgwqBfX3U4wqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCB2c1szNzEyXTsNCj4+Pn07DQo+Pj4NCj4+PitzdHJ1Y3QgbnZtZV96bnNf
+bGJhZmUgew0KPj4+K8KgwqDCoCBfX2xlNjTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHpzemU7DQo+
+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHpkZXM7DQo+Pj4rwqDCoMKgIF9f
+dTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJzdmQ5WzddOw0KPj4+K307DQo+Pj4rDQo+Pj4rc3Ry
+dWN0IG52bWVfaWRfbnNfem5zIHsNCj4+PivCoMKgwqAgX19sZTE2wqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCB6b2M7DQo+Pj4rwqDCoMKgIF9fbGUxNsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3pjczsN
+Cj4+PivCoMKgwqAgX19sZTMywqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtYXI7DQo+Pj4rwqDCoMKg
+IF9fbGUzMsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbW9yOw0KPj4+K8KgwqDCoCBfX2xlMzLCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHJybDsNCj4+PivCoMKgwqAgX19sZTMywqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBmcmw7DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJzdmQy
+MFsyNzk2XTsNCj4+PivCoMKgwqAgc3RydWN0IG52bWVfem5zX2xiYWZlwqDCoMKgIGxiYWZlWzE2
+XTsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcnN2ZDMwNzJbNzY4XTsN
+Cj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdnNbMjU2XTsNCj4+Pit9Ow0K
+Pj4+Kw0KPj4+K3N0cnVjdCBudm1lX2lkX2N0cmxfem5zIHsNCj4+PivCoMKgwqAgX191OMKgwqDC
+oCB6YW1kczsNCj4+PivCoMKgwqAgX191OMKgwqDCoCByc3ZkMVs0MDk1XTsNCj4+Pit9Ow0KPj4+
+Kw0KPj4+ZW51bSB7DQo+Pj7CoMKgwqDCoE5WTUVfSURfQ05TX05TwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCA9IDB4MDAsDQo+Pj7CoMKgwqDCoE5WTUVfSURfQ05TX0NUUkzCoMKgwqDCoMKgwqDCoCA9
+IDB4MDEsDQo+Pj5AQCAtMzkyLDYgKzQxNiw3IEBAIGVudW0gew0KPj4+DQo+Pj5lbnVtIHsNCj4+
+PsKgwqDCoMKgTlZNRV9DU0lfTlZNwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA9IDAsDQo+Pj4rwqDC
+oMKgIE5WTUVfQ1NJX1pOU8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgPSAyLA0KPj4+fTsNCj4+Pg0K
+Pj4+ZW51bSB7DQo+Pj5AQCAtNTMyLDYgKzU1NywyNyBAQCBzdHJ1Y3QgbnZtZV9hbmFfcnNwX2hk
+ciB7DQo+Pj7CoMKgwqDCoF9fbGUxNsKgwqDCoCByc3ZkMTBbM107DQo+Pj59Ow0KPj4+DQo+Pj4r
+c3RydWN0IG52bWVfem9uZV9kZXNjcmlwdG9yIHsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDC
+oMKgIHp0Ow0KPj4+K8KgwqDCoCBfX3U4wqDCoMKgwqDCoMKgwqAgenM7DQo+Pj4rwqDCoMKgIF9f
+dTjCoMKgwqDCoMKgwqDCoCB6YTsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDCoMKgIHJzdmQz
+WzVdOw0KPj4+K8KgwqDCoCBfX2xlNjTCoMKgwqDCoMKgwqDCoCB6Y2FwOw0KPj4+K8KgwqDCoCBf
+X2xlNjTCoMKgwqDCoMKgwqDCoCB6c2xiYTsNCj4+PivCoMKgwqAgX19sZTY0wqDCoMKgwqDCoMKg
+wqAgd3A7DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoCByc3ZkMzJbMzJdOw0KPj4+K307
+DQo+Pj4rDQo+Pj4rZW51bSB7DQo+Pj4rwqDCoMKgIE5WTUVfWk9ORV9UWVBFX1NFUVdSSVRFX1JF
+UcKgwqDCoCA9IDB4MiwNCj4+Pit9Ow0KPj4+Kw0KPj4+K3N0cnVjdCBudm1lX3pvbmVfcmVwb3J0
+IHsNCj4+PivCoMKgwqAgX19sZTY0wqDCoMKgwqDCoMKgwqAgbnJfem9uZXM7DQo+Pj4rwqDCoMKg
+IF9fdTjCoMKgwqDCoMKgwqDCoCByZXN2OFs1Nl07DQo+Pj4rwqDCoMKgIHN0cnVjdCBudm1lX3pv
+bmVfZGVzY3JpcHRvciBlbnRyaWVzW107DQo+Pj4rfTsNCj4+PisNCj4+PmVudW0gew0KPj4+wqDC
+oMKgwqBOVk1FX1NNQVJUX0NSSVRfU1BBUkXCoMKgwqDCoMKgwqDCoCA9IDEgPDwgMCwNCj4+PsKg
+wqDCoMKgTlZNRV9TTUFSVF9DUklUX1RFTVBFUkFUVVJFwqDCoMKgID0gMSA8PCAxLA0KPj4+QEAg
+LTYyNiw2ICs2NzIsOSBAQCBlbnVtIG52bWVfb3Bjb2RlIHsNCj4+PsKgwqDCoMKgbnZtZV9jbWRf
+cmVzdl9yZXBvcnTCoMKgwqAgPSAweDBlLA0KPj4+wqDCoMKgwqBudm1lX2NtZF9yZXN2X2FjcXVp
+cmXCoMKgwqAgPSAweDExLA0KPj4+wqDCoMKgwqBudm1lX2NtZF9yZXN2X3JlbGVhc2XCoMKgwqAg
+PSAweDE1LA0KPj4+K8KgwqDCoCBudm1lX2NtZF96b25lX21nbXRfc2VuZMKgwqDCoCA9IDB4Nzks
+DQo+Pj4rwqDCoMKgIG52bWVfY21kX3pvbmVfbWdtdF9yZWN2wqDCoMKgID0gMHg3YSwNCj4+PivC
+oMKgwqAgbnZtZV9jbWRfem9uZV9hcHBlbmTCoMKgwqAgPSAweDdkLA0KPj4+fTsNCj4+Pg0KPj4+
+I2RlZmluZSBudm1lX29wY29kZV9uYW1lKG9wY29kZSnCoMKgwqAgeyBvcGNvZGUsICNvcGNvZGUg
+fQ0KPj4+QEAgLTc2NCw2ICs4MTMsNyBAQCBzdHJ1Y3QgbnZtZV9yd19jb21tYW5kIHsNCj4+PmVu
+dW0gew0KPj4+wqDCoMKgwqBOVk1FX1JXX0xSwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA9IDEgPDwg
+MTUsDQo+Pj7CoMKgwqDCoE5WTUVfUldfRlVBwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA9IDEgPDwg
+MTQsDQo+Pj4rwqDCoMKgIE5WTUVfUldfQVBQRU5EX1BJUkVNQVDCoMKgwqDCoMKgwqDCoCA9IDEg
+PDwgOSwNCj4+PsKgwqDCoMKgTlZNRV9SV19EU01fRlJFUV9VTlNQRUPCoMKgwqDCoMKgwqDCoCA9
+IDAsDQo+Pj7CoMKgwqDCoE5WTUVfUldfRFNNX0ZSRVFfVFlQSUNBTMKgwqDCoCA9IDEsDQo+Pj7C
+oMKgwqDCoE5WTUVfUldfRFNNX0ZSRVFfUkFSRcKgwqDCoMKgwqDCoMKgID0gMiwNCj4+PkBAIC04
+MjksNiArODc5LDUzIEBAIHN0cnVjdCBudm1lX3dyaXRlX3plcm9lc19jbWQgew0KPj4+wqDCoMKg
+wqBfX2xlMTbCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGFwcG1hc2s7DQo+Pj59Ow0KPj4+DQo+Pj4r
+ZW51bSBudm1lX3pvbmVfbWdtdF9hY3Rpb24gew0KPj4+K8KgwqDCoCBOVk1FX1pPTkVfQ0xPU0XC
+oMKgwqDCoMKgwqDCoCA9IDB4MSwNCj4+PivCoMKgwqAgTlZNRV9aT05FX0ZJTklTSMKgwqDCoCA9
+IDB4MiwNCj4+PivCoMKgwqAgTlZNRV9aT05FX09QRU7CoMKgwqDCoMKgwqDCoCA9IDB4MywNCj4+
+PivCoMKgwqAgTlZNRV9aT05FX1JFU0VUwqDCoMKgwqDCoMKgwqAgPSAweDQsDQo+Pj4rwqDCoMKg
+IE5WTUVfWk9ORV9PRkZMSU5FwqDCoMKgID0gMHg1LA0KPj4+K8KgwqDCoCBOVk1FX1pPTkVfU0VU
+X0RFU0NfRVhUwqDCoMKgID0gMHgxMCwNCj4+Pit9Ow0KPj4+Kw0KPj4+K3N0cnVjdCBudm1lX3pv
+bmVfbWdtdF9zZW5kX2NtZCB7DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IG9wY29kZTsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZmxhZ3M7DQo+
+Pj4rwqDCoMKgIF9fdTE2wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb21tYW5kX2lkOw0KPj4+K8Kg
+wqDCoCBfX2xlMzLCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5zaWQ7DQo+Pj4rwqDCoMKgIF9fbGUz
+MsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2R3MlsyXTsNCj4+PivCoMKgwqAgX19sZTY0wqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBtZXRhZGF0YTsNCj4+PivCoMKgwqAgdW5pb24gbnZtZV9kYXRhX3B0
+csKgwqDCoCBkcHRyOw0KPj4+K8KgwqDCoCBfX2xlNjTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNs
+YmE7DQo+Pj4rwqDCoMKgIF9fbGUzMsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2R3MTI7DQo+Pj4r
+wqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGFjdGlvbjsNCj4+DQo+PldoeSBub3Qg
+enNhIHRvIG1ha2UgaXQgZWFzaWVyIHRvIG1hdGNoIHRvIHRoZSBzcGVjDQo+Pg0KPj4NCj4+PivC
+oMKgwqAgX191OMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2VsZWN0Ow0KPj4NCj4+c2VsX2FsbD8N
+Cj4+DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJzdmQxM1syXTsNCj4+
+PivCoMKgwqAgX19sZTMywqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjZHcxNFsyXTsNCj4+Pit9Ow0K
+Pj4+Kw0KPj4+K3N0cnVjdCBudm1lX3pvbmVfbWdtdF9yZWN2X2NtZCB7DQo+Pj4rwqDCoMKgIF9f
+dTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG9wY29kZTsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgZmxhZ3M7DQo+Pj4rwqDCoMKgIF9fdTE2wqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBjb21tYW5kX2lkOw0KPj4+K8KgwqDCoCBfX2xlMzLCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IG5zaWQ7DQo+Pj4rwqDCoMKgIF9fbGU2NMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcnN2ZDJbMl07
+DQo+Pj4rwqDCoMKgIHVuaW9uIG52bWVfZGF0YV9wdHLCoMKgwqAgZHB0cjsNCj4+PivCoMKgwqAg
+X19sZTY0wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzbGJhOw0KPj4+K8KgwqDCoCBfX2xlMzLCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIG51bWQ7DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHpyYTsNCj4+PivCoMKgwqAgX191OMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgenJhc2Y7
+DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByOw0KPj4NCj4+UGFydGlh
+bCBSZXBvcnQgaXMganVzdCBvbmUgYml0IGluIHRoZSAiWm9uZSBSZWNlaXZlIEFjdGlvbiBTcGVj
+aWZpYw0KPj5GZWF0dXJlcyIuIFdoYXQgYWJvdXQgenJhc2ZlPw0KPg0KPlRoZXJlIGN1cnJlbnRs
+eSBubyB1c2VycyBvZiBwciwgYW5kIGJpdCAxLTcgYXJlIHJlc2VydmVkIGluIHRoZSBzcGVjLiAN
+Cj5Vc2VycyBvZiB0aGUgcHIgdmFyaWFibGUgc2hvdWxkIHNoaWZ0IGFuZCBtYXNrIGFzIG5lY2Vz
+c2FyeS4NCj4NCj56cmFzZiBsb29rcyBnb29kIHRvIG1lLiBJdCBpcyBkZWZpbmVkIGFzIGEgYnl0
+ZSBpbiB0aGUgc3BlYy4NCg0KSSBtZWFudCBmb3IgdGhlIHByIHZhcmlhYmxlIG5hbWUuIEFncmVl
+IHdpdGggdGhlIHJlc3QuDQoNCj4NCj4+DQo+Pj4rwqDCoMKgIF9fdTjCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHJzdmQxMzsNCj4+PivCoMKgwqAgX19sZTMywqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBj
+ZHcxNFsyXTsNCj4+Pit9Ow0KPj4+Kw0KPj4+K2VudW0gew0KPj4+K8KgwqDCoCBOVk1FX1pSQV9a
+T05FX1JFUE9SVMKgwqDCoMKgwqDCoMKgID0gMCwNCj4+PivCoMKgwqAgTlZNRV9aUkFTRl9aT05F
+X1JFUE9SVF9BTEzCoMKgwqAgPSAwLA0KPj4+K8KgwqDCoCBOVk1FX1JFUE9SVF9aT05FX1BBUlRJ
+QUzCoMKgwqAgPSAxLA0KPj4+K307DQo+Pj4rDQo+Pj4vKiBGZWF0dXJlcyAqLw0KPj4+DQo+Pj5l
+bnVtIHsNCj4+PkBAIC0xMzAwLDYgKzEzOTcsOCBAQCBzdHJ1Y3QgbnZtZV9jb21tYW5kIHsNCj4+
+PsKgwqDCoMKgwqDCoMKgIHN0cnVjdCBudm1lX2Zvcm1hdF9jbWQgZm9ybWF0Ow0KPj4+wqDCoMKg
+wqDCoMKgwqAgc3RydWN0IG52bWVfZHNtX2NtZCBkc207DQo+Pj7CoMKgwqDCoMKgwqDCoCBzdHJ1
+Y3QgbnZtZV93cml0ZV96ZXJvZXNfY21kIHdyaXRlX3plcm9lczsNCj4+PivCoMKgwqDCoMKgwqDC
+oCBzdHJ1Y3QgbnZtZV96b25lX21nbXRfc2VuZF9jbWQgem1zOw0KPj4+K8KgwqDCoMKgwqDCoMKg
+IHN0cnVjdCBudm1lX3pvbmVfbWdtdF9yZWN2X2NtZCB6bXI7DQo+Pj7CoMKgwqDCoMKgwqDCoCBz
+dHJ1Y3QgbnZtZV9hYm9ydF9jbWQgYWJvcnQ7DQo+Pj7CoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgbnZt
+ZV9nZXRfbG9nX3BhZ2VfY29tbWFuZCBnZXRfbG9nX3BhZ2U7DQo+Pj7CoMKgwqDCoMKgwqDCoCBz
+dHJ1Y3QgbnZtZl9jb21tb25fY29tbWFuZCBmYWJyaWNzOw0KPj4+QEAgLTE0MzMsNiArMTUzMiwx
+OCBAQCBlbnVtIHsNCj4+PsKgwqDCoMKgTlZNRV9TQ19ESVNDT1ZFUllfUkVTVEFSVMKgwqDCoCA9
+IDB4MTkwLA0KPj4+wqDCoMKgwqBOVk1FX1NDX0FVVEhfUkVRVUlSRUTCoMKgwqDCoMKgwqDCoCA9
+IDB4MTkxLA0KPj4+DQo+Pj4rwqDCoMKgIC8qDQo+Pj4rwqDCoMKgwqAgKiBJL08gQ29tbWFuZCBT
+ZXQgU3BlY2lmaWMgLSBab25lZCBjb21tYW5kczoNCj4+PivCoMKgwqDCoCAqLw0KPj4+K8KgwqDC
+oCBOVk1FX1NDX1pPTkVfQk9VTkRBUllfRVJST1LCoMKgwqAgPSAweDFiOCwNCj4+PivCoMKgwqAg
+TlZNRV9TQ19aT05FX0ZVTEzCoMKgwqDCoMKgwqDCoCA9IDB4MWI5LA0KPj4+K8KgwqDCoCBOVk1F
+X1NDX1pPTkVfUkVBRF9PTkxZwqDCoMKgwqDCoMKgwqAgPSAweDFiYSwNCj4+PivCoMKgwqAgTlZN
+RV9TQ19aT05FX09GRkxJTkXCoMKgwqDCoMKgwqDCoCA9IDB4MWJiLA0KPj4+K8KgwqDCoCBOVk1F
+X1NDX1pPTkVfSU5WQUxJRF9XUklURcKgwqDCoCA9IDB4MWJjLA0KPj4+K8KgwqDCoCBOVk1FX1ND
+X1pPTkVfVE9PX01BTllfQUNUSVZFwqDCoMKgID0gMHgxYmQsDQo+Pj4rwqDCoMKgIE5WTUVfU0Nf
+Wk9ORV9UT09fTUFOWV9PUEVOwqDCoMKgID0gMHgxYmUsDQo+Pj4rwqDCoMKgIE5WTUVfU0NfWk9O
+RV9JTlZBTElEX1RSQU5TSVRJT07CoMKgwqAgPSAweDFiZiwNCj4+PisNCj4+PsKgwqDCoMKgLyoN
+Cj4+PsKgwqDCoMKgICogTWVkaWEgYW5kIERhdGEgSW50ZWdyaXR5IEVycm9yczoNCj4+PsKgwqDC
+oMKgICovDQo+Pj4tLSANCj4+PjIuMjQuMQ0KPj4+DQo+DQoNCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fDQpsaW51eC1udm1lIG1haWxpbmcgbGlzdA0KbGlu
+dXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnDQpodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2lu
+dC5jb20vdjIvdXJsP3U9aHR0cC0zQV9fbGlzdHMuaW5mcmFkZWFkLm9yZ19tYWlsbWFuX2xpc3Rp
+bmZvX2xpbnV4LTJEbnZtZSZkPUR3SUdhUSZjPUpmZVdsQmE2VmJEeVRYcmFNRU5qeV9iXzB5S1d1
+cVE0cVktRlBoeEs0eDh3LVRmZ1JCRHllVjRoVlFRQkVnTDImcj1ZSk1fUVBrMncxQ1JJbzVOTkJY
+bkNYR3pObm1JSWZHX2lUUnM2Y2hCZjZzJm09dnVBeGl6RzFhWDFEYzFUajBOUFdVYmh3bVpJZTFZ
+MTJrTkliSkhMSWRCVSZzPXVDSVZoWTIyYW44amQwRkp2MWxpenB2X3ZBMHRwZTM3eHB6NGFmNktB
+MTAmZT0gDQo=
