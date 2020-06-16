@@ -2,315 +2,271 @@ Return-Path: <SRS0=kfbW=75=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0ABC433DF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 00:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D981C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 01:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33B182074D
-	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 00:56:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EE08207D3
+	for <linux-block@archiver.kernel.org>; Tue, 16 Jun 2020 01:01:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCWd1M0K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5yBLcyo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgFPA4w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Jun 2020 20:56:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50202 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbgFPA4v (ORCPT
+        id S1726369AbgFPBBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Jun 2020 21:01:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39937 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726327AbgFPBBY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jun 2020 20:56:51 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3FEC061A0E
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 17:56:50 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id i4so741415pjd.0
-        for <linux-block@vger.kernel.org>; Mon, 15 Jun 2020 17:56:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sdE7QDiyNCaWfAAZLc00Pnlw07T4St6eqFHodzUAZ+Q=;
-        b=NCWd1M0KTbHhO4nPoVPPOEGQ//D6PQw7OjC29SZtezj7sA5jeChcEtTz97R84Z0eMA
-         hQxIJbjltBxPCD26sEeJ05xQIB4wLaoMgUWrfnR0gIWwLhOpneShTtSXeD6fmbdVAMvJ
-         GLUKZnc8bZ22500Lhe2qcTKZZybro637/Omr7pcCQBQnUGfjBl5GLpbdLw5qSaDBrBmz
-         CAFz5hFbWDcbNz4+HmTkUBK6lf7bf1ZKQh3ukuvpbEbBJw17cG38MSLO57AgKbW8yVPJ
-         sMkg90UADM8bo+m3mw/Q4lWSJzW4Yf7Hj/W0euRdOC6/5bAVWO9CpxjQZ2zlZk+kFOIx
-         Y80g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sdE7QDiyNCaWfAAZLc00Pnlw07T4St6eqFHodzUAZ+Q=;
-        b=LyMpx7WUZkUnhkxtolWKhgLHynnhS9duE5omwVUcltmb+SMWf8+RyaZC36EiFRePa0
-         zZz2sh9OQfypfobqeDYBvXF5g17ZC6BNa2PSW3zhBzDvpfITeUWtK+T+ExX3mFkJUO4D
-         hy364QGhAagKAKIWzM/OU7FdTaBIZGq7wyHtnHnt6wB3394qL/L6PL3YI+Es2FOXGayf
-         +3gVOeiGsKdVU7S3ryDFejROpQ8jPoQZaB5XRymPeURMi+5qnN2EYoj1eZYnU786QifK
-         JXfNspjt8+c/B/OfXmKonQV2FZslTAGFJ2DCvz7WQaxbKroZLVymae+mpomObDwC6UNP
-         kLfQ==
-X-Gm-Message-State: AOAM531FRdV/b82Wy/k/+RwSDgeA0AhV5NJs7ktBimQ0Xw+/jfNeKG/X
-        OctNYHrLQ/7QwSFIzSfHOLuLz6DL
-X-Google-Smtp-Source: ABdhPJztGJ47ezxG56WAAsKhjyx7xJBsP8j5UtS9VzHALZ/+xjCda9R1ZWj4p+jCA9EckwpL2Rupfg==
-X-Received: by 2002:a17:902:b10a:: with SMTP id q10mr472198plr.281.1592269009438;
-        Mon, 15 Jun 2020 17:56:49 -0700 (PDT)
-Received: from harshads-520.kir.corp.google.com ([2620:15c:17:10:6271:607:aca0:b6f7])
-        by smtp.googlemail.com with ESMTPSA id y4sm15135395pfr.182.2020.06.15.17.56.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2020 17:56:48 -0700 (PDT)
-From:   Harshad Shirwadkar <harshadshirwadkar@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     tytso@mit.edu, Harshad Shirwadkar <harshadshirwadkar@gmail.com>
-Subject: [PATCH] block: add split_alignment for request queue
-Date:   Mon, 15 Jun 2020 17:56:33 -0700
-Message-Id: <20200616005633.172804-1-harshadshirwadkar@gmail.com>
-X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
+        Mon, 15 Jun 2020 21:01:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592269281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gV/htuYCbihNq2obRzK747Mq/QbAEx0hl/ngxNjnhs4=;
+        b=G5yBLcyoUMSR5SGzL6gfDYTPoAjA0O+yZ+IW9KaUA1RoPy2Quh72jlCzj39Q1PfbVYKbWx
+        9CsR4/+Zjq42Uf63jfNHI764JrFy11o7ZrzMXV4MI37iSueqkCfQPII9KMlUGuCVnr9UDj
+        M6DK98uFzm0jHOJoVad1xH6U+VEqIiY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-PmRHPFpFMW254jnpCjxnIQ-1; Mon, 15 Jun 2020 21:01:17 -0400
+X-MC-Unique: PmRHPFpFMW254jnpCjxnIQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA7B280333F;
+        Tue, 16 Jun 2020 01:01:14 +0000 (UTC)
+Received: from T590 (ovpn-12-136.pek2.redhat.com [10.72.12.136])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D87C60C05;
+        Tue, 16 Jun 2020 01:00:59 +0000 (UTC)
+Date:   Tue, 16 Jun 2020 09:00:55 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
+        bvanassche@acm.org, hare@suse.com, hch@lst.de,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
+        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
+Subject: Re: [PATCH RFC v7 00/12] blk-mq/scsi: Provide hostwide shared tags
+ for SCSI HBAs
+Message-ID: <20200616010055.GA27192@T590>
+References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
+ <20200611030708.GB453671@T590>
+ <c033f445-97fd-6dc9-c270-9890681b39d9@huawei.com>
+ <bbdec3b3fbeb9907d2ec66a2afa56c29@mail.gmail.com>
+ <20200615021355.GA4012@T590>
+ <e49f164d867b53fd4495f1e05a85df03@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e49f164d867b53fd4495f1e05a85df03@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This feature allows the user to control the alignment at which request
-queue is allowed to split bios. Google CloudSQL's 16k user space
-application expects that direct io writes aligned at 16k boundary in
-the user-space are not split by kernel at non-16k boundaries. More
-details about this feature can be found in CloudSQL's Cloud Next 2018
-presentation[1]. The underlying block device is capable of performing
-16k aligned writes atomically. Thus, this allows the user-space SQL
-application to avoid double-writes (to protect against partial
-failures) which are very costly provided that these writes are not
-split at non-16k boundary by any underlying layers.
+On Mon, Jun 15, 2020 at 12:27:30PM +0530, Kashyap Desai wrote:
+> > >
+> > > John -
+> > >
+> > > I tried V7 series and debug further on mq-deadline interface. This
+> > > time I have used another setup since HDD based setup is not readily
+> > > available for me.
+> > > In fact, I was able to simulate issue very easily using single
+> > > scsi_device as well. BTW, this is not an issue with this RFC, but
+> generic issue.
+> > > Since I have converted nr_hw_queue > 1 for Broadcom product using this
+> > > RFC, It becomes noticeable now.
+> > >
+> > > Problem - Using below command  I see heavy CPU utilization on "
+> > > native_queued_spin_lock_slowpath". This is because kblockd work queue
+> > > is submitting IO from all the CPUs even though fio is bound to single
+> CPU.
+> > > Lock contention from " dd_dispatch_request" is causing this issue.
+> > >
+> > > numactl -C 13  fio
+> > > single.fio --iodepth=32 --bs=4k --rw=randread --ioscheduler=none
+> > > --numjobs=1  --cpus_allowed_policy=split --ioscheduler=mq-deadline
+> > > --group_reporting --filename=/dev/sdd
+> > >
+> > > While running above command, ideally we expect only kworker/13 to be
+> > active.
+> > > But you can see below - All the CPU is attempting submission and lots
+> > > of CPU consumption is due to lock contention.
+> > >
+> > >   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+
+> COMMAND
+> > >  2726 root       0 -20       0      0      0 R  56.5  0.0   0:53.20
+> > > kworker/13:1H-k
+> > >  7815 root      20   0  712404  15536   2228 R  43.2  0.0   0:05.03
+> fio
+> > >  2792 root       0 -20       0      0      0 I  26.6  0.0   0:22.19
+> > > kworker/18:1H-k
+> > >  2791 root       0 -20       0      0      0 I  19.9  0.0   0:17.17
+> > > kworker/19:1H-k
+> > >  1419 root       0 -20       0      0      0 I  19.6  0.0   0:17.03
+> > > kworker/20:1H-k
+> > >  2793 root       0 -20       0      0      0 I  18.3  0.0   0:15.64
+> > > kworker/21:1H-k
+> > >  1424 root       0 -20       0      0      0 I  17.3  0.0   0:14.99
+> > > kworker/22:1H-k
+> > >  2626 root       0 -20       0      0      0 I  16.9  0.0   0:14.68
+> > > kworker/26:1H-k
+> > >  2794 root       0 -20       0      0      0 I  16.9  0.0   0:14.87
+> > > kworker/23:1H-k
+> > >  2795 root       0 -20       0      0      0 I  16.9  0.0   0:14.81
+> > > kworker/24:1H-k
+> > >  2797 root       0 -20       0      0      0 I  16.9  0.0   0:14.62
+> > > kworker/27:1H-k
+> > >  1415 root       0 -20       0      0      0 I  16.6  0.0   0:14.44
+> > > kworker/30:1H-k
+> > >  2669 root       0 -20       0      0      0 I  16.6  0.0   0:14.38
+> > > kworker/31:1H-k
+> > >  2796 root       0 -20       0      0      0 I  16.6  0.0   0:14.74
+> > > kworker/25:1H-k
+> > >  2799 root       0 -20       0      0      0 I  16.6  0.0   0:14.56
+> > > kworker/28:1H-k
+> > >  1425 root       0 -20       0      0      0 I  16.3  0.0   0:14.21
+> > > kworker/34:1H-k
+> > >  2746 root       0 -20       0      0      0 I  16.3  0.0   0:14.33
+> > > kworker/32:1H-k
+> > >  2798 root       0 -20       0      0      0 I  16.3  0.0   0:14.50
+> > > kworker/29:1H-k
+> > >  2800 root       0 -20       0      0      0 I  16.3  0.0   0:14.27
+> > > kworker/33:1H-k
+> > >  1423 root       0 -20       0      0      0 I  15.9  0.0   0:14.10
+> > > kworker/54:1H-k
+> > >  1784 root       0 -20       0      0      0 I  15.9  0.0   0:14.03
+> > > kworker/55:1H-k
+> > >  2801 root       0 -20       0      0      0 I  15.9  0.0   0:14.15
+> > > kworker/35:1H-k
+> > >  2815 root       0 -20       0      0      0 I  15.9  0.0   0:13.97
+> > > kworker/56:1H-k
+> > >  1484 root       0 -20       0      0      0 I  15.6  0.0   0:13.90
+> > > kworker/57:1H-k
+> > >  1485 root       0 -20       0      0      0 I  15.6  0.0   0:13.82
+> > > kworker/59:1H-k
+> > >  1519 root       0 -20       0      0      0 I  15.6  0.0   0:13.64
+> > > kworker/62:1H-k
+> > >  2315 root       0 -20       0      0      0 I  15.6  0.0   0:13.87
+> > > kworker/58:1H-k
+> > >  2627 root       0 -20       0      0      0 I  15.6  0.0   0:13.69
+> > > kworker/61:1H-k
+> > >  2816 root       0 -20       0      0      0 I  15.6  0.0   0:13.75
+> > > kworker/60:1H-k
+> > >
+> > >
+> > > I root cause this issue -
+> > >
+> > > Block layer always queue IO on hctx context mapped to CPU-13, but hw
+> > > queue run from all the hctx context.
+> > > I noticed in my test hctx48 has queued all the IOs. No other hctx has
+> > > queued IO. But all the hctx is counting for "run".
+> > >
+> > > # cat hctx48/queued
+> > > 2087058
+> > >
+> > > #cat hctx*/run
+> > > 151318
+> > > 30038
+> > > 83110
+> > > 50680
+> > > 69907
+> > > 60391
+> > > 111239
+> > > 18036
+> > > 33935
+> > > 91648
+> > > 34582
+> > > 22853
+> > > 61286
+> > > 19489
+> > >
+> > > Below patch has fix - "Run the hctx queue for which request was
+> > > completed instead of running all the hardware queue."
+> > > If this looks valid fix, please include in V8 OR I can post separate
+> > > patch for this. Just want to have some level of review from this
+> discussion.
+> > >
+> > > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c index
+> > > 0652acd..f52118f 100644
+> > > --- a/drivers/scsi/scsi_lib.c
+> > > +++ b/drivers/scsi/scsi_lib.c
+> > > @@ -554,6 +554,7 @@ static bool scsi_end_request(struct request *req,
+> > > blk_status_t error,
+> > >         struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+> > >         struct scsi_device *sdev = cmd->device;
+> > >         struct request_queue *q = sdev->request_queue;
+> > > +       struct blk_mq_hw_ctx *mq_hctx = req->mq_hctx;
+> > >
+> > >         if (blk_update_request(req, error, bytes))
+> > >                 return true;
+> > > @@ -595,7 +596,8 @@ static bool scsi_end_request(struct request *req,
+> > > blk_status_t error,
+> > >             !list_empty(&sdev->host->starved_list))
+> > >                 kblockd_schedule_work(&sdev->requeue_work);
+> > >         else
+> > > -               blk_mq_run_hw_queues(q, true);
+> > > +               blk_mq_run_hw_queue(mq_hctx, true);
+> > > +               //blk_mq_run_hw_queues(q, true);
+> >
+> > This way may cause IO hang because ->device_busy is shared by all hctxs.
+> 
+> From SCSI stack, if we attempt to run all h/w queue, is it possible that
+> block layer actually run hw_queue which has really not queued any IO.
+> Currently, in case of mq-deadline, IOS are inserted using
+> "dd_insert_request". This function will add IOs on elevator data which is
+> per request queue and not per hctx.
+> When there is an attempt to run hctx, "blk_mq_sched_has_work" will check
+> pending work which is per request queue and not per hctx.
+> Because of this, IOs queued on only one hctx will be run from all the hctx
+> and this will create unnecessary lock contention.
 
-We make use of Ext4's bigalloc feature to ensure that writes issued by
-Ext4 are 16k aligned. But, 16K aligned data writes may get merged with
-contiguous non-16k aligned Ext4 metadata writes. Such a write request
-would be broken by the kernel only guaranteeing that the individually
-split requests are physical block size aligned.
+Deadline is supposed for HDD. slow disks, so the lock contention shouldn't have
+been one problem given there is seldom MQ HDD. before this patchset.
 
-We started observing a significant increase in 16k unaligned splits in
-5.4. Bisect points to commit 07173c3ec276cbb18dc0e0687d37d310e98a1480
-("block: enable multipage bvecs"). This patch enables multipage bvecs
-resulting in multiple 16k aligned writes issued by the user-space to
-be merged into one big IO at first. Later, __blk_queue_split() splits
-these IOs while trying to align individual split IOs to be physical
-block size.
+Another related issue is default scheduler, I guess deadline still should have
+been the default io sched for HDDs. attached to this kind HBA with multiple reply
+queues and single submission queue.
 
-Newly added split_alignment parameter is the alignment at which
-requeust queue is allowed to split IO request. By default this
-alignment is turned off and current behavior is unchanged.
+> 
+> How about below patch - ?
+> 
+> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+> index 126021f..1d30bd3 100644
+> --- a/block/blk-mq-sched.h
+> +++ b/block/blk-mq-sched.h
+> @@ -74,6 +74,13 @@ static inline bool blk_mq_sched_has_work(struct
+> blk_mq_hw_ctx *hctx)
+>  {
+>         struct elevator_queue *e = hctx->queue->elevator;
+> 
+> +       /* If current hctx has not queued any request, there is no need to
+> run.
+> +        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
+> +        * running specific hctx.
+> +        */
+> +       if (!hctx->queued)
+> +               return false;
+> +
+>         if (e && e->type->ops.has_work)
+>                 return e->type->ops.has_work(hctx);
 
-[1] CloudNext'18 "Optimizaing performance for Cloud SQL for MySQL"
-    https://www.youtube.com/watch?v=gIeuiGg-_iw
+->queued is increased only and not decreased just for debug purpose so far, so
+it can't be relied for this purpose.
 
-Signed-off-by: Harshad Shirwadkar <harshadshirwadkar@gmail.com>
----
- Documentation/block/queue-sysfs.rst |  8 ++++
- block/blk-merge.c                   | 64 ++++++++++++++++++++++-------
- block/blk-sysfs.c                   | 30 ++++++++++++++
- include/linux/blkdev.h              |  1 +
- 4 files changed, 88 insertions(+), 15 deletions(-)
+One approach is to add one similar counter, and maintain it by scheduler's insert/dispatch
+callback.
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index 6a8513af9201..c3eaba149415 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -251,4 +251,12 @@ devices are described in the ZBC (Zoned Block Commands) and ZAC
- do not support zone commands, they will be treated as regular block devices
- and zoned will report "none".
- 
-+split_alignment (RW)
-+----------------------
-+This is the alignment in bytes at which the requeust queue is allowed
-+to split IO requests. Once this value is set, the requeust queue
-+splits IOs such that the individual IOs are aligned to
-+split_alignment. The value of 0 indicates that an IO request can be
-+split anywhere. This value must be a power of 2.
-+
- Jens Axboe <jens.axboe@oracle.com>, February 2009
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 1534ed736363..cdf337c74b83 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -105,15 +105,18 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
- static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
- 		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
- {
-+	sector_t split;
-+
- 	*nsegs = 0;
- 
--	if (!q->limits.max_write_zeroes_sectors)
--		return NULL;
-+	split = q->limits.max_write_zeroes_sectors;
-+	if (split && q->split_alignment >> 9)
-+		split = round_down(split, q->split_alignment >> 9);
- 
--	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
-+	if (!split || bio_sectors(bio) <= split)
- 		return NULL;
- 
--	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
-+	return bio_split(bio, split, GFP_NOIO, bs);
- }
- 
- static struct bio *blk_bio_write_same_split(struct request_queue *q,
-@@ -121,15 +124,18 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
- 					    struct bio_set *bs,
- 					    unsigned *nsegs)
- {
-+	sector_t split;
-+
- 	*nsegs = 1;
- 
--	if (!q->limits.max_write_same_sectors)
--		return NULL;
-+	split = q->limits.max_write_same_sectors;
-+	if (split && q->split_alignment >> 9)
-+		split = round_down(split, q->split_alignment >> 9);
- 
--	if (bio_sectors(bio) <= q->limits.max_write_same_sectors)
-+	if (!split || bio_sectors(bio) <= split)
- 		return NULL;
- 
--	return bio_split(bio, q->limits.max_write_same_sectors, GFP_NOIO, bs);
-+	return bio_split(bio, split, GFP_NOIO, bs);
- }
- 
- /*
-@@ -248,7 +254,10 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- {
- 	struct bio_vec bv, bvprv, *bvprvp = NULL;
- 	struct bvec_iter iter;
--	unsigned nsegs = 0, sectors = 0;
-+	unsigned int nsegs = 0, nsegs_aligned = 0;
-+	unsigned int sectors = 0, sectors_aligned = 0, before = 0, after = 0;
-+	unsigned int sector_alignment =
-+		q->split_alignment ? (q->split_alignment >> 9) : 0;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
- 	const unsigned max_segs = queue_max_segments(q);
- 
-@@ -264,12 +273,31 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		    sectors + (bv.bv_len >> 9) <= max_sectors &&
- 		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
- 			nsegs++;
--			sectors += bv.bv_len >> 9;
--		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors, max_segs,
--					 max_sectors)) {
--			goto split;
-+			before = round_down(sectors, sector_alignment);
-+			sectors += (bv.bv_len >> 9);
-+			after = round_down(sectors, sector_alignment);
-+			if (sector_alignment && before != after) {
-+				/* This is a valid split point */
-+				nsegs_aligned = nsegs;
-+				sectors_aligned = after;
-+			}
-+			goto next;
- 		}
--
-+		if (sector_alignment) {
-+			before = round_down(sectors, sector_alignment);
-+			after = round_down(sectors + (bv.bv_len >> 9),
-+					  sector_alignment);
-+			if ((nsegs < max_segs) && before != after &&
-+			    ((after - before) << 9) + bv.bv_offset <=  PAGE_SIZE
-+			    && after <= max_sectors) {
-+				sectors_aligned = after;
-+				nsegs_aligned = nsegs + 1;
-+			}
-+		}
-+		if (bvec_split_segs(q, &bv, &nsegs, &sectors, max_segs,
-+				    max_sectors))
-+			goto split;
-+next:
- 		bvprv = bv;
- 		bvprvp = &bvprv;
- 	}
-@@ -278,7 +306,13 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	return NULL;
- split:
- 	*segs = nsegs;
--	return bio_split(bio, sectors, GFP_NOIO, bs);
-+	if (sector_alignment && sectors_aligned == 0)
-+		return NULL;
-+
-+	*segs = sector_alignment ? nsegs_aligned : nsegs;
-+
-+	return bio_split(bio, sector_alignment ? sectors_aligned : sectors,
-+			 GFP_NOIO, bs);
- }
- 
- /**
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fca9b158f4a0..f045c7a79a74 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -529,6 +529,29 @@ static ssize_t queue_dax_show(struct request_queue *q, char *page)
- 	return queue_var_show(blk_queue_dax(q), page);
- }
- 
-+static ssize_t queue_split_alignment_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->split_alignment, page);
-+}
-+
-+static ssize_t queue_split_alignment_store(struct request_queue *q, const char *page,
-+						size_t count)
-+{
-+	unsigned long split_alignment;
-+	int ret;
-+
-+	ret = queue_var_store(&split_alignment, page, count);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* split_alignment can only be a power of 2 */
-+	if (split_alignment & (split_alignment - 1))
-+		return -EINVAL;
-+
-+	q->split_alignment = split_alignment;
-+	return count;
-+}
-+
- static struct queue_sysfs_entry queue_requests_entry = {
- 	.attr = {.name = "nr_requests", .mode = 0644 },
- 	.show = queue_requests_show,
-@@ -727,6 +750,12 @@ static struct queue_sysfs_entry throtl_sample_time_entry = {
- };
- #endif
- 
-+static struct queue_sysfs_entry queue_split_alignment = {
-+	.attr = {.name = "split_alignment", .mode = 0644 },
-+	.show = queue_split_alignment_show,
-+	.store = queue_split_alignment_store,
-+};
-+
- static struct attribute *queue_attrs[] = {
- 	&queue_requests_entry.attr,
- 	&queue_ra_entry.attr,
-@@ -766,6 +795,7 @@ static struct attribute *queue_attrs[] = {
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	&throtl_sample_time_entry.attr,
- #endif
-+	&queue_split_alignment.attr,
- 	NULL,
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 32868fbedc9e..e8feb43f6fdd 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -473,6 +473,7 @@ struct request_queue {
- 	void			*dma_drain_buffer;
- 	unsigned int		dma_pad_mask;
- 	unsigned int		dma_alignment;
-+	unsigned int		split_alignment;
- 
- 	unsigned int		rq_timeout;
- 	int			poll_nsec;
--- 
-2.27.0.290.gba653c62da-goog
+Thanks,
+Ming
 
