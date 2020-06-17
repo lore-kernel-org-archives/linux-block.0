@@ -2,120 +2,140 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02727C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5976EC433E1
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 11:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6C3D208B3
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:57:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="hq1X9t5N"
+	by mail.kernel.org (Postfix) with ESMTP id 3DEA520776
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 11:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbgFQK5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 06:57:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725964AbgFQK5u (ORCPT
+        id S1726605AbgFQLGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 07:06:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17740 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726674AbgFQLGF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 06:57:50 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31693C06174E
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 03:57:50 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id f7so1823123ejq.6
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 03:57:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O+YfS0ttnLCfsNiE+e6ILMV8mORupQjGd84VFFvianI=;
-        b=hq1X9t5NU9g+T8dqEMPWoeuhUYPrzb8ZUmYbMzwy4FI4rfrVVLdlFySkqTREG3PLI0
-         wNVUGKOJ0OxjUvRg2ZBUobKmc+VBEVPWS+AEHaahxXnm7ZfKSYo/th/tRNSB5XQ3NpXP
-         OdxD+wllo1sBFq+bhFbwUOZwsJu4qN6icSbcUD4RFAxNUIcitmewso6zYrJCTCo86QDd
-         WP8Cx1+FKbZrF1FvSj5+GrtGT04ikVSD8iUhIMaHh0SslF7y6vlJ1v6QvlwqB1BITd61
-         Tu8hZ3yonJ/wHqoCc5f5iFzL64k5Y6XKW9ZRbTBq1bZdMm4ZVuPkb8E3eQimd0oqyItS
-         ZHdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O+YfS0ttnLCfsNiE+e6ILMV8mORupQjGd84VFFvianI=;
-        b=BeWRMGliReA+hjqU/t1qCaNQCezM5AfLlhki+JltxQDCRo7f2e75iDFqd+Rp3EK6FS
-         yS0iS8RcuMqL+y/RF55NP4wVSEFVCjHFr8NShTyKv/B4/vMjJnQSNM/INQNQP2WaE/D3
-         DRecNUbXUR9G/caKBqEOuE+7ICVUSUYToUE9dHdCyPys9PLDX8XjJM/vmbs8iMHuRXqB
-         uQ4udjwKdiemQCrckWbOdGJRXlZtgviNlrPruesah+DmOBq2LiZz6v3cAKj6gp3FHH1A
-         FBhUIt60TqzIs53XQ/v+b/jL6Lfy9zEJpUn59rQix2LSRxdnzUBkCIL6Tp9RUadomAsG
-         wgPQ==
-X-Gm-Message-State: AOAM530fXzylr8mRfFTYGFPxrAcHCXmNSk2fHLk+5Ot0cop6k/gau9xG
-        PaU02ezyyHHFscTawCGK9vpec7a4INRhA34Mu89+YuonjaA7Dw==
-X-Google-Smtp-Source: ABdhPJzP5nSfdYRuYpEBQ/kGmSwqj8HneuDENIWgcYcvcj33ZChZis6j7fB5yVbc7y6wZYu1jv0Oqs9v/fPP9L+hdIE=
-X-Received: by 2002:a17:906:7802:: with SMTP id u2mr7177417ejm.478.1592391468871;
- Wed, 17 Jun 2020 03:57:48 -0700 (PDT)
+        Wed, 17 Jun 2020 07:06:05 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HB4Shl183167;
+        Wed, 17 Jun 2020 07:06:02 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hdjd9d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Jun 2020 07:06:00 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HB60Qn192394;
+        Wed, 17 Jun 2020 07:06:00 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hdjd82-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Jun 2020 07:05:59 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HAu2rS000734;
+        Wed, 17 Jun 2020 11:05:57 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 31q6ckrc7f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Jun 2020 11:05:57 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HB5tlE36306996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Jun 2020 11:05:55 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6CDC711C054;
+        Wed, 17 Jun 2020 11:05:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0018411C052;
+        Wed, 17 Jun 2020 11:05:54 +0000 (GMT)
+Received: from oc4120165700.ibm.com (unknown [9.145.171.180])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 17 Jun 2020 11:05:54 +0000 (GMT)
+Subject: Re: [PATCH] Revert "zram: convert remaining CLASS_ATTR() to
+ CLASS_ATTR_RO()"
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wade Mealing <wmealing@redhat.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20200617103412.GA2027053@kroah.com>
+From:   Steffen Maier <maier@linux.ibm.com>
+Message-ID: <5cde1d94-275e-2555-b13d-0b04a7a70fc7@linux.ibm.com>
+Date:   Wed, 17 Jun 2020 13:05:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
-In-Reply-To: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 17 Jun 2020 12:57:38 +0200
-Message-ID: <CAMGffEnQ6acML7ze2dC6PH5m3E6gy00ohsWf=cQQOFG-NNUWvw@mail.gmail.com>
-Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
- late_initcall level
-To:     haris.iqbal@cloud.ionos.com
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        kernel test robot <rong.a.chen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200617103412.GA2027053@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-17_03:2020-06-17,2020-06-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 cotscore=-2147483648 malwarescore=0
+ suspectscore=0 clxscore=1011 lowpriorityscore=0 mlxlogscore=999
+ spamscore=0 impostorscore=0 bulkscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006170083
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Haris,
+On 6/17/20 12:34 PM, Greg Kroah-Hartman wrote:
+> From: Wade Mealing <wmealing@redhat.com>
+> 
+> Turns out that the permissions for 0400 really are what we want here,
+> otherwise any user can write to this file.
 
-Thanks for patch, a few comments inline
-On Wed, Jun 17, 2020 at 12:37 PM <haris.iqbal@cloud.ionos.com> wrote:
->
-> From: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
->
-> Fixes: 2de6c8de192b ("block/rnbd: server: main functionality")
-> Reported-by: kernel test robot <rong.a.chen@intel.com>
-> Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
-This part should be the last after commit message.
-The subject sounds better maybe: block/rnbd: Delay the initialization
-of rnbd_server module to late_initcall level
->
-> The rnbd_server module's communication manager initialization depends on the
-> registration of the "network namespace subsystem" of the RDMA CM agent module.
-> As such, when the kernel is configured to load the rnbd_server and the RDMA
-> cma module during initialization; and if the rnbd_server module is initialized
-> before RDMA cma module, a null ptr dereference occurs during the RDMA bind
-> operation.
-would be better to include the call trace here.
-> This patch delays the initialization of the rnbd_server module to the
-> late_initcall level, since RDMA cma module uses module_init which puts it into
-> the device_initcall level.
+Minor confusion on my side:
+Did you mean "read from" instead of "write to"?
+I.e. only owner may read but not group nor others.
+Whereas using CLASS_ATTR_RO would resolve into 0444.
 
-With the comments addressed:
-Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+> 
+> [fixed formatting and made static - gregkh]
+> 
+> Reported-by: Wade Mealing <wmealing@redhat.com>
+> Cc: stable <stable@vger.kernel.org>
+> Fixes: f40609d1591f ("zram: convert remaining CLASS_ATTR() to CLASS_ATTR_RO()")
+> Link: https://bugzilla.redhat.com/show_bug.cgi?id=1847832
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 > ---
->  drivers/block/rnbd/rnbd-srv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> index 86e61523907b..213df05e5994 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -840,5 +840,5 @@ static void __exit rnbd_srv_cleanup_module(void)
->         rnbd_srv_destroy_sysfs_files();
->  }
->
-> -module_init(rnbd_srv_init_module);
-> +late_initcall(rnbd_srv_init_module);
->  module_exit(rnbd_srv_cleanup_module);
-> --
-> 2.25.1
->
+>   drivers/block/zram/zram_drv.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index 6e2ad90b17a3..270dd810be54 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -2021,7 +2021,8 @@ static ssize_t hot_add_show(struct class *class,
+>   		return ret;
+>   	return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
+>   }
+> -static CLASS_ATTR_RO(hot_add);
+> +static struct class_attribute class_attr_hot_add =
+> +	__ATTR(hot_add, 0400, hot_add_show, NULL);
+> 
+>   static ssize_t hot_remove_store(struct class *class,
+>   			struct class_attribute *attr,
+> 
+
+
+-- 
+Mit freundlichen Gruessen / Kind regards
+Steffen Maier
+
+Linux on IBM Z Development
+
+https://www.ibm.com/privacy/us/en/
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Matthias Hartmann
+Geschaeftsfuehrung: Dirk Wittkopp
+Sitz der Gesellschaft: Boeblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
