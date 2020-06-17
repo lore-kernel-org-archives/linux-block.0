@@ -2,146 +2,130 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E12B7C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 14:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CF5C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 14:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1018207DD
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 14:12:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592403128;
-	bh=MYb/PMhUVvE0cnaOxKWKvBrW2DPjQFDtItA8+YHQqeQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=eTZsu6LObnE1VEUQcC+s8bOLBzvIBAACSbhI7T1N6V1VoSytz1oUynlzknCnpFDvs
-	 L4beZUfXIGSsbf0XBFrc0l1vXAWUHUKfmJNv+kTMmFlsHLBm00trWzdfvak1XkK/Fb
-	 AZYdYK8k7dTbFkYfzXBfIICl6/x4ASfs3A7czqU0=
+	by mail.kernel.org (Postfix) with ESMTP id 1098F20888
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 14:42:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="bAPRE0JB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbgFQOMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 10:12:01 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36874 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726328AbgFQOMA (ORCPT
+        id S1726511AbgFQOmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 10:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726494AbgFQOme (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 10:12:00 -0400
-Received: by mail-ed1-f66.google.com with SMTP id k8so2068282edq.4;
-        Wed, 17 Jun 2020 07:11:58 -0700 (PDT)
+        Wed, 17 Jun 2020 10:42:34 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227D5C06174E
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 07:42:34 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id e12so2165449eds.2
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 07:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=+wmlp3TUuoCAlHj/LRi5Py3tIwsBfqYCvq+vpZAYdfY=;
+        b=bAPRE0JBfWg0oR0Ok+btLS+2KJwnv+ZCBYdpUraCke6A9U66YT6LvKfU/hAgMyGEca
+         n2uvj3kzoC2C3FbUwM/9E8rJYLuU+coH+TbsJ+ujWPbfU8XvZq0MxKdEzF3o1zqbuCeZ
+         We27K7087fLQfW44s7LSQqmuuNarBq6HwRX6d3Muw9brf5LGGPyk7JgkVSM8VbokIUBJ
+         /DE9l5TmsCuGGC5t2JuMgStMoR1f8dcxf1i6+8WK2I6kXGkanjYaYAQ+H3xsiMEbtuK8
+         LISKkNRRQ3m1OC3JDr28hkJcjShVLClUo4DP+xujOoNO1K0Tfs0k09mV1XCshV7AYpGa
+         wCcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FnLVx3mpNTRNn979KEIujDpuBEHdqJ/b/LKxqUKjo5U=;
-        b=R1VwMYEBBKcjm0+0e/VVQ6zthOJ9S/V7pWUvq8piWXdull4CjVyFS3wIHZyAx9ktTp
-         3qXgTYQZK3KS/Yp3eAY87y4OaCVI3QLMQBjTwdBwvyhNQuJgdLMV9cXOu/G6waPtd7QM
-         +6xuSQ7EHERKPcphHO8zudCohvDq7QEdI3J66W0sDsgre7xuDAeAUA9JiAzuRSNDP2m9
-         RIGiUMwHSv3lTliPg/jWsHR+ya7zvpVRs9ZHnt8x+gmGxKY5U6ToQiVaxqwYKfjcxIBd
-         PpLOs9ScVvFe+AhBB2Zs5L2HdhznT3D9s0Uu4wFapfGf4vpmNVZUjNR3q3soYBkQJxnh
-         ZAIQ==
-X-Gm-Message-State: AOAM530hzvjJjL5hbl/tc1l2ZDqwbcd280/86/8hIdcRRF9r/3auBwFC
-        ia6i23OeDyhu+wlNx22AMj4=
-X-Google-Smtp-Source: ABdhPJznS9MRNi7kFBPyQ0SPfnXV06mWSgLUfdEwyE6fs7gLQFQsvZDC9Kqw5DW5z+Zxjo6sXkZecQ==
-X-Received: by 2002:a05:6402:6cc:: with SMTP id n12mr7166151edy.266.1592403118087;
-        Wed, 17 Jun 2020 07:11:58 -0700 (PDT)
-Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
-        by smtp.gmail.com with ESMTPSA id z20sm34596ejb.68.2020.06.17.07.11.56
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=+wmlp3TUuoCAlHj/LRi5Py3tIwsBfqYCvq+vpZAYdfY=;
+        b=Qfn4VL1lgWqfx4miGH6LSMg86ca+xD7+bU3rx2K1f9s+1dAHqu6nk5vgnpiKo77c5g
+         2jng4URMvgoMDjcwDDmPUOZmP8Un5SgqabnU9wUwwahaKAYWs4Zqn/hJ9FGEisOUjlvo
+         SrfvbKKcwhbuxMZCi/WYKt1zpvuiC2PZdhPC+W4TmhX6yp+Hzygc2fujAfyzwIi6Qo3s
+         Tm6IrVJRcDRQm8NNcjdCDOycQC7zTozGtqY+gbrf/AO54dnEOVET2NxPQh6AG3NfWpha
+         AIekL7XJvQyvN1+4PVxzf9im4jNW0DrvwczizGOhk+C5RG8efzxphsfKbXX9CAcPl1L+
+         IqjQ==
+X-Gm-Message-State: AOAM5307+JyMDWW5awfnNkdfie5hWsB3VDENATMEH8UkAOChmUD8ox5V
+        nkj6Tj6PRtpdgoI8DFVD17CRYA==
+X-Google-Smtp-Source: ABdhPJzlTAmS3TBcxmUH68KPghT5S/KE85nkYi1efdB6MzA7a1CZZhyhR/kr8pTSuNz8Bjfh2KiJhw==
+X-Received: by 2002:a50:ee08:: with SMTP id g8mr7273823eds.267.1592404951890;
+        Wed, 17 Jun 2020 07:42:31 -0700 (PDT)
+Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
+        by smtp.gmail.com with ESMTPSA id dk19sm12272136edb.78.2020.06.17.07.42.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 07:11:57 -0700 (PDT)
-Date:   Wed, 17 Jun 2020 16:11:55 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Chris Down <chris@chrisdown.name>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200617141155.GQ9499@dhcp22.suse.cz>
-References: <20200519075213.GF32497@dhcp22.suse.cz>
- <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
- <20200519084535.GG32497@dhcp22.suse.cz>
- <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name>
- <20200521095515.GK6462@dhcp22.suse.cz>
- <20200521163450.GV6462@dhcp22.suse.cz>
- <CA+G9fYsdsgRmwLtSKJSzB1eWcUQ1z-_aaU+BNcQpker34XT6_w@mail.gmail.com>
- <20200617135758.GA548179@chrisdown.name>
+        Wed, 17 Jun 2020 07:42:30 -0700 (PDT)
+Date:   Wed, 17 Jun 2020 16:42:30 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Aravind Ramesh <aravind.ramesh@wdc.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
+Message-ID: <20200617144230.ojzk4f5gcwqonzrf@mpHalley.localdomain>
+References: <20200615233424.13458-1-keith.busch@wdc.com>
+ <20200615233424.13458-6-keith.busch@wdc.com>
+ <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
+ <20200617074328.GA13474@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20200617135758.GA548179@chrisdown.name>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200617074328.GA13474@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[Our emails have crossed]
+On 17.06.2020 09:43, Christoph Hellwig wrote:
+>On Tue, Jun 16, 2020 at 12:41:42PM +0200, Javier González wrote:
+>> On 16.06.2020 08:34, Keith Busch wrote:
+>>> Add support for NVM Express Zoned Namespaces (ZNS) Command Set defined
+>>> in NVM Express TP4053. Zoned namespaces are discovered based on their
+>>> Command Set Identifier reported in the namespaces Namespace
+>>> Identification Descriptor list. A successfully discovered Zoned
+>>> Namespace will be registered with the block layer as a host managed
+>>> zoned block device with Zone Append command support. A namespace that
+>>> does not support append is not supported by the driver.
+>>
+>> Why are we enforcing the append command? Append is optional on the
+>> current ZNS specification, so we should not make this mandatory in the
+>> implementation. See specifics below.
+>
+>Because Append is the way to go and we've moved the Linux zoned block
+>I/O stack to required it, as should have been obvious to anyone
+>following linux-block in the last few months.  I also have to say I'm
+>really tired of the stupid politics tha your company started in the
+>NVMe working group, and will say that these do not matter for Linux
+>development at all.  If you think it is worthwhile to support devices
+>without Zone Append you can contribute support for them on top of this
+>series by porting the SCSI Zone Append Emulation code to NVMe.
+>
+>And I'm not even going to read the rest of this thread as I'm on a
+>vacation that I badly needed because of the Samsung TWG bullshit.
 
-On Wed 17-06-20 14:57:58, Chris Down wrote:
-> Naresh Kamboju writes:
-> > mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8RQK14KF6XF
-> > mke2fs 1.43.8 (1-Jan-2018)
-> > Creating filesystem with 244190646 4k blocks and 61054976 inodes
-> > Filesystem UUID: 7c380766-0ed8-41ba-a0de-3c08e78f1891
-> > Superblock backups stored on blocks:
-> > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-> > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-> > 102400000, 214990848
-> > Allocating group tables:    0/7453 done
-> > Writing inode tables:    0/7453 done
-> > Creating journal (262144 blocks): [   51.544525] under min:0 emin:0
-> > [   51.845304] under min:0 emin:0
-> > [   51.848738] under min:0 emin:0
-> > [   51.858147] under min:0 emin:0
-> > [   51.861333] under min:0 emin:0
-> > [   51.862034] under min:0 emin:0
-> > [   51.862442] under min:0 emin:0
-> > [   51.862763] under min:0 emin:0
-> 
-> Thanks, this helps a lot. Somehow we're entering mem_cgroup_below_min even
-> when min/emin is 0 (which should indeed be the case if you haven't set them
-> in the hierarchy).
-> 
-> My guess is that page_counter_read(&memcg->memory) is 0, which means
-> mem_cgroup_below_min will return 1.
+My intention is to support some Samsung ZNS devices that will not enable
+append. I do not think this is an unreasonable thing to do. How / why
+append ended up being an optional feature in the ZNS TP is orthogonal to
+this conversation. Bullshit or not, it ends up on devices that we would
+like to support one way or another.
 
-Yes this is the case because this is likely the root memcg which skips
-all charges.
+After the discussion with Damien and Keith I have a clear idea how we
+can do this and we will go ahead with the work.
 
-> However, I don't know for sure why that should then result in the OOM killer
-> coming along. My guess is that since this memcg has 0 pages to scan anyway,
-> we enter premature OOM under some conditions. I don't know why we wouldn't
-> have hit that with the old version of mem_cgroup_protected that returned
-> MEMCG_PROT_* members, though.
+I apologize that this conversation got mixed with leftovers from NVMe
+TWG internals. This is a public mailing list, so I guess anyone can
+comment on it.
 
-Not really. There is likely no other memcg to reclaim from and assuming
-min limit protection will result in no reclaimable memory and thus the
-OOM killer.
-
-> Can you please try the patch with the `>=` checks in mem_cgroup_below_min
-> and mem_cgroup_below_low changed to `>`? If that fixes it, then that gives a
-> strong hint about what's going on here.
-
-This would work but I believe an explicit check for the root memcg would
-be easier to spot the reasoning.
-
--- 
-Michal Hocko
-SUSE Labs
+Thanks,
+Javier
