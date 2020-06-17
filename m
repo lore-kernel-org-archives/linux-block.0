@@ -2,100 +2,91 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C8CC433DF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7D0C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:34:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 530AF208B3
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:30:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1Rqzc/j"
+	by mail.kernel.org (Postfix) with ESMTP id 30559214DB
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 10:34:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592390062;
+	bh=05pv3vIG2hLtGzWurD18/Pe9Bk8FpvgeJDdod0TO2p8=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=ctvQUsQW/P02jXpbVfHa7wk/1eLwThG9YabKdgVKHinA5MZfONari2tdcDW1zSXBW
+	 FCWZD4ZhP44WLY3pm0iYaDkczCgTGIvrqwX2EQOOLMqt0OzhouS9vGlZSVZNaS2Phn
+	 YfTqFg3TnzWI6F++ktenBUpjubceD6Y6eq9y5FXQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725967AbgFQKax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 06:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50280 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbgFQKaw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 06:30:52 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41236C061573;
-        Wed, 17 Jun 2020 03:30:52 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id r7so1781559wro.1;
-        Wed, 17 Jun 2020 03:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=6cV4DHswB2EyeE07H4W7XCwzmJOtlP+W1W6yT4bg52g=;
-        b=C1Rqzc/japPum67ZTnuAVaiq2NPpCxTUZk2OOs7u92om/UHf8Ai1fJSa95yb+EikCj
-         FBZ1VOx2o/jL0/ss9n2sPgAJHTd3graTtuDv9BYwoKAb93VfJjObyyHcoutjcoGT8EOC
-         9hPIZjJSMZUyWOzmqJYxnHFdApHcEoxQYfIJd6h3fmQqZNcRqTmQ+WqPLNWgbLW0Q86p
-         TG4UxOrr2COtSPwxiPlsjpDusl8PVaBkUjxdYp+H9OkjEmKCu7Lq1Y+6hFmqe+Epn+Ht
-         wYEVI9ippMMUZlfY+0xSNPJ4TMZ0Cvy7Ac3jJJYc2Hs7T2I8mQ1tafjsm7vtC6fpfdal
-         t0tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=6cV4DHswB2EyeE07H4W7XCwzmJOtlP+W1W6yT4bg52g=;
-        b=XrmTVsgOpuLl1sxOPDvj6VkVWK4erBCWejzLLpcAbfj5UTmxjG0HFlLtN6r3jtareE
-         qVTyrkrccj3H9Eym+ogjaDvLsT4VYwyU0bwuMZX6Pafi+fVJ4Q8Uo1CquvVUzdpwf8vu
-         aFjejUMaqT/2amn67u5gor/3HE5bkRNatXssO7nyr20ngJqE9LopjQggX2R48CR8hGVi
-         Y8mB77tfuTiaJFiaeMi69YImPVIZb3T6ypc1er19NZwc4ETs+Hwiir2YcZtoJvSapUo/
-         gM0GdDpVqmeGv+V0sSo6qeekUCNxsrKwc2UCUTphKaMXn+B6K4s5Ntpwh2LMjWzNG3rj
-         Tz2Q==
-X-Gm-Message-State: AOAM530LtSkN8Iw3JvayCp0EXao6kmNKV2oFewer6GLvrPUSwLNOb1Eu
-        F97S0VaDKR2yU2R6BiA57FMofIrt5VW09//6Hxw=
-X-Google-Smtp-Source: ABdhPJyeQZRqJRgjSeusf9v5yBFBGvFjqIYCsu8BTeFkhrJ4QbR0F92kIGENOe/0gNpO5f5goNfGZYn7RWQvl6s5vns=
-X-Received: by 2002:adf:ecc8:: with SMTP id s8mr4518383wro.317.1592389850778;
- Wed, 17 Jun 2020 03:30:50 -0700 (PDT)
+        id S1726523AbgFQKeV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 06:34:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46534 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726275AbgFQKeV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jun 2020 06:34:21 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4DC4F208B3;
+        Wed, 17 Jun 2020 10:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592390060;
+        bh=05pv3vIG2hLtGzWurD18/Pe9Bk8FpvgeJDdod0TO2p8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=NN6jxyzu2WEdh1EfQLHcBJLBZzI23Xm+ouHzjpn8BMpGFWUypYcLlnvqInOSKzIZ2
+         6d2cqTCv8OEjdbF5L0TDJEKgQI7M6HIZh6xjHHonPCPPErydpZHRtn42pUdGizDGyy
+         olB2BCXFKWDWIA4kRsLYKlpre4YBfJvK3RXqu1J0=
+Date:   Wed, 17 Jun 2020 12:34:12 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wade Mealing <wmealing@redhat.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] Revert "zram: convert remaining CLASS_ATTR() to
+ CLASS_ATTR_RO()"
+Message-ID: <20200617103412.GA2027053@kroah.com>
 MIME-Version: 1.0
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Wed, 17 Jun 2020 18:30:39 +0800
-Message-ID: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
-Subject: krobe: __blkdev_put probe is missed
-To:     "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Masami Hiramatsu <mhiramat@kernel.org>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Guys,
+From: Wade Mealing <wmealing@redhat.com>
 
-I found probe on __blkdev_put is missed, which can be observed
-via bcc/perf reliably:
+Turns out that the permissions for 0400 really are what we want here,
+otherwise any user can write to this file.
 
-1) start trace
-- perf probe __blkdev_put
-- perf trace -a  -e probe:__blkdev_put
+[fixed formatting and made static - gregkh]
 
-or
+Reported-by: Wade Mealing <wmealing@redhat.com>
+Cc: stable <stable@vger.kernel.org>
+Fixes: f40609d1591f ("zram: convert remaining CLASS_ATTR() to CLASS_ATTR_RO()")
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=1847832
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/block/zram/zram_drv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-/usr/share/bcc/tools/stackcount __blkdev_put
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 6e2ad90b17a3..270dd810be54 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2021,7 +2021,8 @@ static ssize_t hot_add_show(struct class *class,
+ 		return ret;
+ 	return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
+ }
+-static CLASS_ATTR_RO(hot_add);
++static struct class_attribute class_attr_hot_add =
++	__ATTR(hot_add, 0400, hot_add_show, NULL);
+ 
+ static ssize_t hot_remove_store(struct class *class,
+ 			struct class_attribute *attr,
+-- 
+2.27.0
 
-2) run the following command:
-blockdev --getbsz /dev/sda1
 
-3) 'perf trace'  or stackcount just  dumps one trace event, and it
-should have been two
-__blkdev_put() traces, since one __blkdev_put() is called for
-partition(/dev/sda1),
-and another is for disk(/dev/sda). If trace_printk() is added in __blkdev_put(),
-two events will be captured from ftrace.
-
-The only special thing about __blkdev_put() is that the function will call into
-itself. However, no such issue on __blkdev_get() which calls itself too.
-
-
-Thanks,
-Ming Lei
