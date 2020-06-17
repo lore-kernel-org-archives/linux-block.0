@@ -2,96 +2,154 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C96C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB81C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:53:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93906208B3
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7AC3214DB
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aSmane2B"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zhIwFYvq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbgFQPHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 11:07:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36840 "EHLO
+        id S1726494AbgFQPxU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 11:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbgFQPHd (ORCPT
+        with ESMTP id S1726496AbgFQPxT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 11:07:33 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796DBC06174E
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:07:32 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id i12so1133181pju.3
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:07:32 -0700 (PDT)
+        Wed, 17 Jun 2020 11:53:19 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596F8C0613EE
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:53:19 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id a9so3481194ljn.6
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AgWF67PHI9atiPWS54R+pnzrJXTu3aqI3zonqO6HsSg=;
-        b=aSmane2BResES4fuQPuzz0g/1YLk70BqOxjiRFGE0tJEagC98po2UgpsSXQbBHVgHr
-         IcbW0tMqCkc4fEc521vbpdyiea/psdqfKwuk3zA50DHunRx2UZJAt0bfqnKZpJtt+RqQ
-         XNALKTkfvB7BRTkBt+taDvnL7B73WBgkggIc/v+EI/CbL7DzkTEksV6Haw3mcPmbqSo1
-         8RNWe1x5xagIbHSJDExMnPexzXXvI2CJA+Ly5dM25K6dKlhFgWi33JMO/eJkqDobPexA
-         5RkwCEjDGTYtMKWQXo3Gr0NIDx8bUB8rcz6Zb0xO+ipxcyi8qHJaPP+0sbUZoydtnaAi
-         FjHw==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Iil/oRjunCxRdn4O9EnhL5vFoe9sKPuHAAfETKSmZUw=;
+        b=zhIwFYvqS5d/Wg1MMLhDRV3GH6WnWZlkpKF5Gvf2n+o3mBbraSv6/+gF1/wVQ7Kcyp
+         adAODQsWOEjXxtmaTAY8OOgeomh977J+Ip2X4RUs+QJLXP8fCHiBMryYWwGWY4gfVz+j
+         OiEw3dpJmeQ9Ih8zjHeprM4Gt9tFC88PRlY3V32JvNQHp+cM065+LxGIkdQfR1HdKSbO
+         xKOJtEAbSIP0jDNqHyXlIFM3pvnyIAdrXeT9Vjt+d3kXsBP5VgSVyDytRxe/UXnnLsyA
+         sJ7nJiD9AsZ7Gc1Ka2IK/tLWXp9TnAK5clcp93WHPbbonXUq5u2axMTwgQjbamGfwQSH
+         D6KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AgWF67PHI9atiPWS54R+pnzrJXTu3aqI3zonqO6HsSg=;
-        b=kgP5iaqPC+zzv6QEpQ4yKr5kganBnIeuIEH+lWsl+CHk03I5ApUmj8YsipM89gDWtt
-         axsoQYSFscf6nd9DUivHWXFuSWx1VLGQZ0VEVuO+3V4NXdtsCLQP7XZvBc32bSXIyuUq
-         f2+CwfO3TZfEFj2RcABo7pi657x9G1AGNilaGtOvlHshacLVC2l7Sc0coYa6aVC0levk
-         ZyJKCGCy042J4SjgBrqhwDG/cB2OTU8P8B3jp+BElQyaxbDk7+sMKxcwpGf1Hjy7NTFV
-         daed6y3YlkAfTiLAy7ofKC/fBzA8H4/pJoM3zdwTfRziytmfycZ+M8cQdstoN6qZ01Cy
-         q4Bw==
-X-Gm-Message-State: AOAM532vfxZUaxYVhQ54njqU348cub+1YlJkZM6MzQO+L0vu0E48/wD2
-        uUSLh0ULl0qys0FQSZNYk+E9+Q==
-X-Google-Smtp-Source: ABdhPJzFtT6uX0ISpg1+PSZzf1U6DdGD0nuE86VPr3ougiC7phZ/+uEVXc7DuWCFnsp3tUZfZp633g==
-X-Received: by 2002:a17:90b:3793:: with SMTP id mz19mr8084856pjb.12.1592406451944;
-        Wed, 17 Jun 2020 08:07:31 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id i3sm170403pgj.52.2020.06.17.08.07.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jun 2020 08:07:29 -0700 (PDT)
-Subject: Re: [PATCH 0/2 v3] blktrace: Fix sparse annotations and warn if
- enabling multiple traces
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-References: <20200605145349.18454-1-jack@suse.cz>
- <20200617125151.GA30907@quack2.suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <66c99cdc-4028-a0c5-6ce7-fe29ebfc1ec3@kernel.dk>
-Date:   Wed, 17 Jun 2020 09:07:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Iil/oRjunCxRdn4O9EnhL5vFoe9sKPuHAAfETKSmZUw=;
+        b=YPKn0q9OyTWouYGMSS8kHtH5ACHTtfs4TrlvedNfnfCC9n96Xq3YQd4YISk4hYMLNT
+         odSzz/bQweTjLN8S0ySbGT2HFexK1NaANwYVXzRArY3Wxtk3H4pMCEU0l6cSYedTrIKZ
+         gRwfrPsIGVU/ei1DlaN1KIVvpLpLnUPMdqxBFrRC5szfl1p1OPLeOarsgiOwgBS/jQV+
+         EtiWSTWfAG5hqAelW0OFyAe48q7B4Fepe5aAFwyu3YqBt0oth5e1I7Eeai6mMqeDSRbm
+         OtWUYCH/i8oq5x0nTEDDmRqyHqbiDVZdc/839YIrpfCWjNjSUm3YqZUhc0tfVuY9TGoE
+         dKTQ==
+X-Gm-Message-State: AOAM530mFHkiUH4U/7Xf5XQfFxoJnkntheFsaAU3Th46e6uMTGssSXXu
+        2LpMHXlNVzu3kTRuSheLw9eZ1QOxUbJ4kiBZdew7Xg==
+X-Google-Smtp-Source: ABdhPJwm+SOMxQr6ZmVaQG7EF/eaCNB4joE8BGqCN9p7milYkBjvhRKAPIHCQedzXSIf3foSUUfPOKBfz2Igul1hd1Q=
+X-Received: by 2002:a2e:911:: with SMTP id 17mr4655723ljj.411.1592409197458;
+ Wed, 17 Jun 2020 08:53:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200617125151.GA30907@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200519075213.GF32497@dhcp22.suse.cz> <CAK8P3a2T_j-Ynvhsqe_FCqS2-ZdLbo0oMbHhHChzMbryE0izAQ@mail.gmail.com>
+ <20200519084535.GG32497@dhcp22.suse.cz> <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
+ <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
+ <20200520190906.GA558281@chrisdown.name> <20200521095515.GK6462@dhcp22.suse.cz>
+ <20200521163450.GV6462@dhcp22.suse.cz> <CA+G9fYsdsgRmwLtSKJSzB1eWcUQ1z-_aaU+BNcQpker34XT6_w@mail.gmail.com>
+ <20200617135758.GA548179@chrisdown.name> <20200617141155.GQ9499@dhcp22.suse.cz>
+In-Reply-To: <20200617141155.GQ9499@dhcp22.suse.cz>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Wed, 17 Jun 2020 21:23:05 +0530
+Message-ID: <CA+G9fYu+FB1PE0AMmE-9MrHpayE9kChwTyc3zfM6V83uQ0zcQA@mail.gmail.com>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+To:     Chris Down <chris@chrisdown.name>, Michal Hocko <mhocko@kernel.org>
+Cc:     Yafang Shao <laoar.shao@gmail.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/20 6:51 AM, Jan Kara wrote:
-> Hello Jens!
-> 
-> On Fri 05-06-20 16:58:35, Jan Kara wrote:
->> this series contains a patch from Luis' blktrace series and then my patch
->> to fix sparse warnings in blktrace. Luis' patch stands on its own, was
->> reviewed, and changes what I need to change as well so I've decided it's just
->> simplest to pull it in with my patch.
-> 
-> Can you please merge this series?
+On Wed, 17 Jun 2020 at 19:41, Michal Hocko <mhocko@kernel.org> wrote:
+>
+> [Our emails have crossed]
+>
+> On Wed 17-06-20 14:57:58, Chris Down wrote:
+> > Naresh Kamboju writes:
+> > > mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8RQK14KF6XF
+> > > mke2fs 1.43.8 (1-Jan-2018)
+> > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
+> > > Filesystem UUID: 7c380766-0ed8-41ba-a0de-3c08e78f1891
+> > > Superblock backups stored on blocks:
+> > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+> > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+> > > 102400000, 214990848
+> > > Allocating group tables:    0/7453 done
+> > > Writing inode tables:    0/7453 done
+> > > Creating journal (262144 blocks): [   51.544525] under min:0 emin:0
+> > > [   51.845304] under min:0 emin:0
+> > > [   51.848738] under min:0 emin:0
+> > > [   51.858147] under min:0 emin:0
+> > > [   51.861333] under min:0 emin:0
+> > > [   51.862034] under min:0 emin:0
+> > > [   51.862442] under min:0 emin:0
+> > > [   51.862763] under min:0 emin:0
+> >
+> > Thanks, this helps a lot. Somehow we're entering mem_cgroup_below_min even
+> > when min/emin is 0 (which should indeed be the case if you haven't set them
+> > in the hierarchy).
+> >
+> > My guess is that page_counter_read(&memcg->memory) is 0, which means
+> > mem_cgroup_below_min will return 1.
+>
+> Yes this is the case because this is likely the root memcg which skips
+> all charges.
+>
+> > However, I don't know for sure why that should then result in the OOM killer
+> > coming along. My guess is that since this memcg has 0 pages to scan anyway,
+> > we enter premature OOM under some conditions. I don't know why we wouldn't
+> > have hit that with the old version of mem_cgroup_protected that returned
+> > MEMCG_PROT_* members, though.
+>
+> Not really. There is likely no other memcg to reclaim from and assuming
+> min limit protection will result in no reclaimable memory and thus the
+> OOM killer.
+>
+> > Can you please try the patch with the `>=` checks in mem_cgroup_below_min
+> > and mem_cgroup_below_low changed to `>`? If that fixes it, then that gives a
+> > strong hint about what's going on here.
+>
+> This would work but I believe an explicit check for the root memcg would
+> be easier to spot the reasoning.
 
-Yep done, thanks.
+May I request you to send debugging or proposed fix patches here.
+I am happy to do more testing.
 
--- 
-Jens Axboe
+FYI,
+Here is my repository for testing.
+git: https://github.com/nareshkamboju/linux/tree/printk
+branch: printk
 
+- Naresh
