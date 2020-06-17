@@ -2,125 +2,96 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E11BAC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C96C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B98852073E
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:00:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93906208B3
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 15:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Sn3fqfGT"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aSmane2B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726494AbgFQPAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 11:00:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35780 "EHLO
+        id S1726511AbgFQPHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 11:07:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbgFQPAg (ORCPT
+        with ESMTP id S1726329AbgFQPHd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 11:00:36 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33126C06174E
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:00:35 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id x25so2172801edr.8
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:00:35 -0700 (PDT)
+        Wed, 17 Jun 2020 11:07:33 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796DBC06174E
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:07:32 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id i12so1133181pju.3
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 08:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ewYLiJNTJQyB+3rQIPwKj+FxYZbp7ZBwEtIXKeY2qqg=;
-        b=Sn3fqfGTHn6bYrrySPdwadSbaHKPPiBKIhvPi2KTzfd0DNiHw805I8fzFiWxpsNprX
-         wpIbEQbziRobHV1nIEbjd4ofrQol+I5SVoZtW3MPDAoFNNsz1BMo2IliXdwdADvrcR/S
-         yZAFEklrkDShy5LdwTepUusd1rA2WsDJEO5TCsvOUKrj3YO2R6uh9PEcA5zwqNELDsJC
-         oox5prCNqUPGa598SUwMxMG+06n7lGeWjBMjk2jbodCiSBqStt0iiWZaIrAyXDFoE+6E
-         wwk2wFV+9LlHgkD5L/NFkrQQritez6InH0ciP9Bvtz/xjijmFVI0ViLfbE9sP95AeX4b
-         Ypxw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=AgWF67PHI9atiPWS54R+pnzrJXTu3aqI3zonqO6HsSg=;
+        b=aSmane2BResES4fuQPuzz0g/1YLk70BqOxjiRFGE0tJEagC98po2UgpsSXQbBHVgHr
+         IcbW0tMqCkc4fEc521vbpdyiea/psdqfKwuk3zA50DHunRx2UZJAt0bfqnKZpJtt+RqQ
+         XNALKTkfvB7BRTkBt+taDvnL7B73WBgkggIc/v+EI/CbL7DzkTEksV6Haw3mcPmbqSo1
+         8RNWe1x5xagIbHSJDExMnPexzXXvI2CJA+Ly5dM25K6dKlhFgWi33JMO/eJkqDobPexA
+         5RkwCEjDGTYtMKWQXo3Gr0NIDx8bUB8rcz6Zb0xO+ipxcyi8qHJaPP+0sbUZoydtnaAi
+         FjHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ewYLiJNTJQyB+3rQIPwKj+FxYZbp7ZBwEtIXKeY2qqg=;
-        b=CABi1gETaHz4Vfzxr8XeNRxzmJcrbgdK9GoaNyI5tlqFe7D28V6yMZVvNyJFHHrW8+
-         h0ykchqG9RlCvpHNbx60iU6aAAAgeeoD9pHTIfb+femDx7gJRDhzdKrkBKGBzQzxNAn2
-         rx04jck0xwRP/6scmSUM9p/I6jNF3Qmdsl6++C9eVfyENgKvabgy/lUkEUwfE3mP0fDY
-         BaRGly3n/ENaJncYqpVYBo6BZClJS4fCilKGs2yDr2I19BGnzG0nZkdsI21vPAF3tZxV
-         Mnd+i+BBM4i4H/GcBPQMD6lcvK/LhHN44U5OmNC0qpAOTMKUZ1UrqikwCEppK/Vtbe7F
-         Js8g==
-X-Gm-Message-State: AOAM5310OGB55Yd/aPKfgDZxITUF+TXH0ASh0zrzpqBliWDruGrwHiO/
-        VH2yeUnbdjnqRZTuyuCtO+MgXw==
-X-Google-Smtp-Source: ABdhPJzZKVXfpt+AqDo00fk98HiTiL6MUQK+cv/hAolqAHenZd5/pRSFqI2sutgAEN9R6h8hqeALNQ==
-X-Received: by 2002:a05:6402:1bde:: with SMTP id ch30mr7806388edb.163.1592406033845;
-        Wed, 17 Jun 2020 08:00:33 -0700 (PDT)
-Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
-        by smtp.gmail.com with ESMTPSA id n3sm141063ejd.82.2020.06.17.08.00.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 08:00:33 -0700 (PDT)
-Date:   Wed, 17 Jun 2020 17:00:32 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
-        Aravind Ramesh <aravind.ramesh@wdc.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-Message-ID: <20200617150032.s5q6ktbbz5ndvvpi@mpHalley.localdomain>
-References: <20200615233424.13458-1-keith.busch@wdc.com>
- <20200615233424.13458-6-keith.busch@wdc.com>
- <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
- <20200617074328.GA13474@lst.de>
- <yq1r1uej7j6.fsf@ca-mkp.ca.oracle.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AgWF67PHI9atiPWS54R+pnzrJXTu3aqI3zonqO6HsSg=;
+        b=kgP5iaqPC+zzv6QEpQ4yKr5kganBnIeuIEH+lWsl+CHk03I5ApUmj8YsipM89gDWtt
+         axsoQYSFscf6nd9DUivHWXFuSWx1VLGQZ0VEVuO+3V4NXdtsCLQP7XZvBc32bSXIyuUq
+         f2+CwfO3TZfEFj2RcABo7pi657x9G1AGNilaGtOvlHshacLVC2l7Sc0coYa6aVC0levk
+         ZyJKCGCy042J4SjgBrqhwDG/cB2OTU8P8B3jp+BElQyaxbDk7+sMKxcwpGf1Hjy7NTFV
+         daed6y3YlkAfTiLAy7ofKC/fBzA8H4/pJoM3zdwTfRziytmfycZ+M8cQdstoN6qZ01Cy
+         q4Bw==
+X-Gm-Message-State: AOAM532vfxZUaxYVhQ54njqU348cub+1YlJkZM6MzQO+L0vu0E48/wD2
+        uUSLh0ULl0qys0FQSZNYk+E9+Q==
+X-Google-Smtp-Source: ABdhPJzFtT6uX0ISpg1+PSZzf1U6DdGD0nuE86VPr3ougiC7phZ/+uEVXc7DuWCFnsp3tUZfZp633g==
+X-Received: by 2002:a17:90b:3793:: with SMTP id mz19mr8084856pjb.12.1592406451944;
+        Wed, 17 Jun 2020 08:07:31 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id i3sm170403pgj.52.2020.06.17.08.07.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jun 2020 08:07:29 -0700 (PDT)
+Subject: Re: [PATCH 0/2 v3] blktrace: Fix sparse annotations and warn if
+ enabling multiple traces
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
+References: <20200605145349.18454-1-jack@suse.cz>
+ <20200617125151.GA30907@quack2.suse.cz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <66c99cdc-4028-a0c5-6ce7-fe29ebfc1ec3@kernel.dk>
+Date:   Wed, 17 Jun 2020 09:07:28 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <yq1r1uej7j6.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <20200617125151.GA30907@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 17.06.2020 08:01, Martin K. Petersen wrote:
->
->> Because Append is the way to go and we've moved the Linux zoned block
->> I/O stack to required it,
->
->Just to add some historical context: The first discussions about how to
->support block devices with a non-random write model in Linux happened
->maybe a decade ago.
->
->Drive vendors came to LSF/MM to solicit feedback on how Linux could
->support impending SMR devices. We spent a long time going over various
->approaches, including some that are similar to what is now being
->entertained as alternative to Append. The conclusion back then was that
->an Append-like model (tell-us-where-you-put-it) was the only reasonable
->way to accommodate these devices in Linux given how our filesystems and
->I/O stack worked.
->
->Consequently, I don't think it is at all unreasonable for us to focus on
->devices that implement that mode of operation in the kernel. This is
->exactly the that we as a community asked the storage industry to
->provide!
->
+On 6/17/20 6:51 AM, Jan Kara wrote:
+> Hello Jens!
+> 
+> On Fri 05-06-20 16:58:35, Jan Kara wrote:
+>> this series contains a patch from Luis' blktrace series and then my patch
+>> to fix sparse warnings in blktrace. Luis' patch stands on its own, was
+>> reviewed, and changes what I need to change as well so I've decided it's just
+>> simplest to pull it in with my patch.
+> 
+> Can you please merge this series?
 
-Martin,
+Yep done, thanks.
 
-Thanks for sharing the historical context. I agree that append solves a
-number of problems in Linux - we have had internal implementations of
-append for a long time (and are sending patches extending support for it
-later today).
+-- 
+Jens Axboe
 
-This said, there are users that do not see append as a good fit for
-their needs and we would like to support them too.
-
-We will go back to our code and re-iterate based on the feedback we have
-gotten out of this thread.
-
-Thanks,
-Javier
