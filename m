@@ -2,186 +2,135 @@ Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB70C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 16:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63467C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 17:26:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9317521835
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 16:06:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592409992;
-	bh=TDAkV5Jw68GE23y3fEU7BN2SFiTSUZC3oZl2Y+atGMU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=cz5OyBOgDrdL7Qiyhu4MMsGhOoiKN/16V0JKWqjj1WrUsem3Ms8GN3oedOewEeU5o
-	 d4v/FvWUSWU86HO6BpSgP4fh5wz/jOskc2V73Rg2xMZjEncMBkETcMPqqRt9qJ09+U
-	 c1thGv60hN55oA3eitOLQxqHV2Q4pQCXcOZrlta4=
+	by mail.kernel.org (Postfix) with ESMTP id 42A33208B8
+	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 17:26:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Ns/ECDWJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726881AbgFQQGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 12:06:31 -0400
-Received: from mail-ej1-f65.google.com ([209.85.218.65]:44822 "EHLO
-        mail-ej1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726853AbgFQQGa (ORCPT
+        id S1726597AbgFQR06 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 13:26:58 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:54180 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726835AbgFQR06 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 12:06:30 -0400
-Received: by mail-ej1-f65.google.com with SMTP id gl26so2918786ejb.11;
-        Wed, 17 Jun 2020 09:06:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tlbxG54rgd+6fqV6RAW61FEmri3bgkhNHXx9gI+QO08=;
-        b=jb16FbQVFpFEpuyqs/N22alEgPwD8x9ngTuRZ0vTRYYthZqmFk3V7LoVQ2wj9AkjlF
-         J2JXtJG0NfWhxIZzNulG008V2/eAYR5Z7AEaLbZc+hCNbGa+66gI5I2lLRnmbz8VQe4y
-         mNN2U/EeslehTuMbG464S57WoSSt8hPHA/yg5LNAVOdzPgKrR4WvbPhjiUjLUqFi3DAf
-         5aN1UO3M0SFAsjZMRyyZPCDl2zCZ6HSByHVsIrPI62j2ruOZRqRu6HqEtItCV9csBzI6
-         +Otk4KpUCr011snxsdVvHNpefAIlqoD2qvds7b0ewCSDPnhh4CwyATc4dajf+Sjxzp4M
-         g8Ow==
-X-Gm-Message-State: AOAM530gKbqJj/uHcWAZXcXH69lQ3PxM477ZJ6SyO2WEtEg9vR2CeD4L
-        7aZA2kR6eMAVmVh/GEbnoEIR2KWx
-X-Google-Smtp-Source: ABdhPJyTNwsKkxV+Do4IZBMmhJD8BUFelJmhG68Wk1D+d/Hsq8QURbAiEkw9lH4smi6/Pd/IOgjrnQ==
-X-Received: by 2002:a17:906:d0d7:: with SMTP id bq23mr8491327ejb.259.1592409987418;
-        Wed, 17 Jun 2020 09:06:27 -0700 (PDT)
-Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
-        by smtp.gmail.com with ESMTPSA id yw17sm276521ejb.83.2020.06.17.09.06.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 09:06:26 -0700 (PDT)
-Date:   Wed, 17 Jun 2020 18:06:24 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200617160624.GS9499@dhcp22.suse.cz>
-References: <20200519084535.GG32497@dhcp22.suse.cz>
- <CA+G9fYvzLm7n1BE7AJXd8_49fOgPgWWTiQ7sXkVre_zoERjQKg@mail.gmail.com>
- <CA+G9fYsXnwyGetj-vztAKPt8=jXrkY8QWe74u5EEA3XPW7aikQ@mail.gmail.com>
- <20200520190906.GA558281@chrisdown.name>
- <20200521095515.GK6462@dhcp22.suse.cz>
- <20200521163450.GV6462@dhcp22.suse.cz>
- <CA+G9fYsdsgRmwLtSKJSzB1eWcUQ1z-_aaU+BNcQpker34XT6_w@mail.gmail.com>
- <20200617135758.GA548179@chrisdown.name>
- <20200617141155.GQ9499@dhcp22.suse.cz>
- <CA+G9fYu+FB1PE0AMmE-9MrHpayE9kChwTyc3zfM6V83uQ0zcQA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYu+FB1PE0AMmE-9MrHpayE9kChwTyc3zfM6V83uQ0zcQA@mail.gmail.com>
+        Wed, 17 Jun 2020 13:26:58 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20200617172654epoutp03f235900397a126131054d75119a0be39~ZZNZV11Tj0963109631epoutp03U
+        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 17:26:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20200617172654epoutp03f235900397a126131054d75119a0be39~ZZNZV11Tj0963109631epoutp03U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1592414815;
+        bh=quPbHKvd3t/tKAk2Vd44HQREZ4TCnzbl9br8Bua5p/U=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=Ns/ECDWJPc4X81fFNtW7YRq8Gd/eMxlpBo+VlV8ayjCCInc1FJoAhH6/ZKvr8wFS4
+         6lH4XB9CKSpxxvUz27/JxNEqmEQAbGAXUL+foQ/84ZU+yFE0dapcUI4BMmr7WGRhef
+         PXqVJSfGGDswM3UOBRP+yFW3qdOKAWMCRkgb62dY=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200617172654epcas5p29bf502ec3f75e53e630e5ced45725658~ZZNYscZFV2352223522epcas5p2U;
+        Wed, 17 Jun 2020 17:26:54 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        3D.66.09475.E525AEE5; Thu, 18 Jun 2020 02:26:54 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20200617172653epcas5p488de50090415eb802e62acc0e23d8812~ZZNYDZtWv0132401324epcas5p4Y;
+        Wed, 17 Jun 2020 17:26:53 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200617172653epsmtrp19806cab50c6c159c2b00e4bbf421e4d9~ZZNYAp-BX1872618726epsmtrp1-;
+        Wed, 17 Jun 2020 17:26:53 +0000 (GMT)
+X-AuditID: b6c32a4b-389ff70000002503-21-5eea525e12d2
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        71.7E.08303.D525AEE5; Thu, 18 Jun 2020 02:26:53 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200617172651epsmtip1c8390df6b20117c9b29b6c11e6f54825~ZZNWEdhr61054210542epsmtip1D;
+        Wed, 17 Jun 2020 17:26:51 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, selvakuma.s1@samsung.com,
+        nj.shetty@samsung.com, javier.gonz@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH 0/3] zone-append support in aio and io-uring
+Date:   Wed, 17 Jun 2020 22:53:36 +0530
+Message-Id: <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.7.4
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFIsWRmVeSWpSXmKPExsWy7bCmum5c0Ks4gxcbuSxW3+1ns+j6t4XF
+        4l3rORaLx3c+s1sc/f+WzWLhxmVMFlOmNTFa7L2lbbFn70kWi8u75rBZbPs9n9niypRFzBav
+        f5xkszj/9zirA5/H5bOlHps+TWL36NuyitHj8yY5j01P3jIFsEZx2aSk5mSWpRbp2yVwZdyb
+        /IW54Ct7xdL//UwNjBPYuhg5OSQETCS+PtrECmILCexmlLhxqbiLkQvI/sQo8WfvCSYI5zOj
+        xOeDU1hhOi5suMcOkdjFKHHk0glGuKrmLTOB5nJwsAloSlyYXApiigjYSOxcogLSyyzQwCTx
+        /7sOiC0MFD7dvJQFpIRFQFVi6VsrkDCvgJPEl3/zmCFWyUncPNfJDDJdQuAeu0TvgcVQN7hI
+        LPq7CqpIWOLV8S3sELaUxMv+Nii7WOLXnaNQzR2MEtcbZrJAJOwlLu75ywSymBnozPW79CFu
+        45Po/f0ELCwhwCvR0SYEUa0ocW/SU6i14hIPZyyBsj0kJvW0MUICLlbiy7G57BMYZWYhDF3A
+        yLiKUTK1oDg3PbXYtMA4L7Vcrzgxt7g0L10vOT93EyM4OWh572B89OCD3iFGJg7GQ4wSHMxK
+        IrzOv1/ECfGmJFZWpRblxxeV5qQWH2KU5mBREudV+nEmTkggPbEkNTs1tSC1CCbLxMEp1cC0
+        UiJh2vxjEwVeePcYzLSUYjJeqvag+g7P3ulRc01L/OcmHrO0z1ivvkHug05FxMvcizJHpC9F
+        v/3O1r/Mp+mJ+bmT9lrZ5d7Xk9IXVn8JMnxv9ktR4UbWPTeWSUmL2RTeMM3okD/5J6N5Pm9w
+        0/kzttJPwjv9dH0aJizb8EB00kIJ3Xd8UxVO2ukYlK+aHiS1ZUct3+RTMhUH3f9OPdjUcI1x
+        XmKRKV9viNtrTt8ANf/puYnPXs7ZzPy62dXiykybJdt+73b/wFX9MGAKkx9HjEjTuRu+OlJ9
+        B7jsj9//E2p8X+Z1moZIz7t/ir28c5szxJi8jyl/VzVVvHKj6yvvC90La4NVVj3pv9zxw1SJ
+        pTgj0VCLuag4EQCZtNXMfQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHLMWRmVeSWpSXmKPExsWy7bCSnG5s0Ks4g6cXZSxW3+1ns+j6t4XF
+        4l3rORaLx3c+s1sc/f+WzWLhxmVMFlOmNTFa7L2lbbFn70kWi8u75rBZbPs9n9niypRFzBav
+        f5xkszj/9zirA5/H5bOlHps+TWL36NuyitHj8yY5j01P3jIFsEZx2aSk5mSWpRbp2yVwZdyb
+        /IW54Ct7xdL//UwNjBPYuhg5OSQETCQubLjHDmILCexglFjXGwYRF5dovvaDHcIWllj57zmQ
+        zQVU85FRoufXIqYuRg4ONgFNiQuTS0FqRAQcJLqOP2YCqWEW6GKSOHFzFxNIQljARuJ081IW
+        kHoWAVWJpW+tQMK8Ak4SX/7NY4aYLydx81wn8wRGngWMDKsYJVMLinPTc4sNC4zyUsv1ihNz
+        i0vz0vWS83M3MYKDUEtrB+OeVR/0DjEycTAeYpTgYFYS4XX+/SJOiDclsbIqtSg/vqg0J7X4
+        EKM0B4uSOO/XWQvjhATSE0tSs1NTC1KLYLJMHJxSDUyBX/V6+Riuvjygsub21p12rE9arr6/
+        Jslx8bzj7Zl93eIFz2fW8+/b8Ovni+aCokI/X6aP/bnqbmf9i1fdOR6zV+Wm/SXu+NsdRsUx
+        nCe4LvVmTXkQu7JTUtQlJXCaTn0xJ/eirY9VzOskrC7/mXYzk7tFzbmgQjeaq93wQFqssqNk
+        zal/0bzdJYyZRy3NPFV7ldZkbz9TL6QXpbJclLnon/BD4fun5ojHzZvBKH112pmVu/mW3bw3
+        /5ga80+L1Yof+cqMu/UmhNxi2+euK1SQtsr0M9/O6C5Ji4mPFl5ydCuQXyt5luVNYvzMzvW3
+        o1QesV84933lrHlR2W3nItYFNU18curnVsZkh9LodiWW4oxEQy3mouJEADL6srGxAgAA
+X-CMS-MailID: 20200617172653epcas5p488de50090415eb802e62acc0e23d8812
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200617172653epcas5p488de50090415eb802e62acc0e23d8812
+References: <CGME20200617172653epcas5p488de50090415eb802e62acc0e23d8812@epcas5p4.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 17-06-20 21:23:05, Naresh Kamboju wrote:
-> On Wed, 17 Jun 2020 at 19:41, Michal Hocko <mhocko@kernel.org> wrote:
-> >
-> > [Our emails have crossed]
-> >
-> > On Wed 17-06-20 14:57:58, Chris Down wrote:
-> > > Naresh Kamboju writes:
-> > > > mkfs -t ext4 /dev/disk/by-id/ata-TOSHIBA_MG04ACA100N_Y8RQK14KF6XF
-> > > > mke2fs 1.43.8 (1-Jan-2018)
-> > > > Creating filesystem with 244190646 4k blocks and 61054976 inodes
-> > > > Filesystem UUID: 7c380766-0ed8-41ba-a0de-3c08e78f1891
-> > > > Superblock backups stored on blocks:
-> > > > 32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-> > > > 4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-> > > > 102400000, 214990848
-> > > > Allocating group tables:    0/7453 done
-> > > > Writing inode tables:    0/7453 done
-> > > > Creating journal (262144 blocks): [   51.544525] under min:0 emin:0
-> > > > [   51.845304] under min:0 emin:0
-> > > > [   51.848738] under min:0 emin:0
-> > > > [   51.858147] under min:0 emin:0
-> > > > [   51.861333] under min:0 emin:0
-> > > > [   51.862034] under min:0 emin:0
-> > > > [   51.862442] under min:0 emin:0
-> > > > [   51.862763] under min:0 emin:0
-> > >
-> > > Thanks, this helps a lot. Somehow we're entering mem_cgroup_below_min even
-> > > when min/emin is 0 (which should indeed be the case if you haven't set them
-> > > in the hierarchy).
-> > >
-> > > My guess is that page_counter_read(&memcg->memory) is 0, which means
-> > > mem_cgroup_below_min will return 1.
-> >
-> > Yes this is the case because this is likely the root memcg which skips
-> > all charges.
-> >
-> > > However, I don't know for sure why that should then result in the OOM killer
-> > > coming along. My guess is that since this memcg has 0 pages to scan anyway,
-> > > we enter premature OOM under some conditions. I don't know why we wouldn't
-> > > have hit that with the old version of mem_cgroup_protected that returned
-> > > MEMCG_PROT_* members, though.
-> >
-> > Not really. There is likely no other memcg to reclaim from and assuming
-> > min limit protection will result in no reclaimable memory and thus the
-> > OOM killer.
-> >
-> > > Can you please try the patch with the `>=` checks in mem_cgroup_below_min
-> > > and mem_cgroup_below_low changed to `>`? If that fixes it, then that gives a
-> > > strong hint about what's going on here.
-> >
-> > This would work but I believe an explicit check for the root memcg would
-> > be easier to spot the reasoning.
-> 
-> May I request you to send debugging or proposed fix patches here.
-> I am happy to do more testing.
+This patchset enables issuing zone-append using aio and io-uring direct-io interface.
 
-Sure, here is the diff to test.
+For aio, this introduces opcode IOCB_CMD_ZONE_APPEND. Application uses start LBA
+of the zone to issue append. On completion 'res2' field is used to return
+zone-relative offset.
 
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index c74a8f2323f1..6b5a31672fbe 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -392,6 +392,13 @@ static inline bool mem_cgroup_below_low(struct mem_cgroup *memcg)
- 	if (mem_cgroup_disabled())
- 		return false;
- 
-+	/*
-+	 * Root memcg doesn't account charges and doesn't support
-+	 * protection
-+	 */
-+	if (mem_cgroup_is_root(memcg))
-+		return false;
-+
- 	return READ_ONCE(memcg->memory.elow) >=
- 		page_counter_read(&memcg->memory);
- }
-@@ -401,6 +408,13 @@ static inline bool mem_cgroup_below_min(struct mem_cgroup *memcg)
- 	if (mem_cgroup_disabled())
- 		return false;
- 
-+	/*
-+	 * Root memcg doesn't account charges and doesn't support
-+	 * protection
-+	 */
-+	if (mem_cgroup_is_root(memcg))
-+		return false;
-+
- 	return READ_ONCE(memcg->memory.emin) >=
- 		page_counter_read(&memcg->memory);
- }
+For io-uring, this introduces three opcodes: IORING_OP_ZONE_APPEND/APPENDV/APPENDV_FIXED.
+Since io_uring does not have aio-like res2, cqe->flags are repurposed to return zone-relative offset
+
+Kanchan Joshi (1):
+  aio: add support for zone-append
+
+Selvakumar S (2):
+  fs,block: Introduce IOCB_ZONE_APPEND and direct-io handling
+  io_uring: add support for zone-append
+
+ fs/aio.c                      |  8 +++++
+ fs/block_dev.c                | 19 +++++++++++-
+ fs/io_uring.c                 | 72 +++++++++++++++++++++++++++++++++++++++++--
+ include/linux/fs.h            |  1 +
+ include/uapi/linux/aio_abi.h  |  1 +
+ include/uapi/linux/io_uring.h |  8 ++++-
+ 6 files changed, 105 insertions(+), 4 deletions(-)
+
 -- 
-Michal Hocko
-SUSE Labs
+2.7.4
+
