@@ -4,48 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADE1C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0502C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 213E522229
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE372221FC
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592445372;
-	bh=tvf461QU4qSDSewaiVERpyvLNPJAQm/81XFIeHSppLM=;
+	s=default; t=1592445373;
+	bh=+PpjlUb1dxhq4JKmEBeSoRDBzT5KQsOuracHEapIOys=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=tILG8WVwgua4tP4zq6wCepgddzl19eyit7ljnY0Scfu4lidAsOdtlB/TMregGfB+E
-	 b1onqROf3i450OXW8X+qkzaH6ocJFGrSuMEVM3YA5t/sTgz82ifzb+/9objTrijzyP
-	 gKt/0EpBxoPFrsO6GaNc/RImdoPyD1yY+4tlaidk=
+	b=07WLnFblkeSwSUV3MWlWBYKh7VbG4nPvHuv2wyZ0bZ8Cu3MZIXz1z3JZ4RS/1yevi
+	 9iWoFcWoKyeBqxJx690VKpNRqo8GWbA7SZ2VpJKgSUkOGM+X9OsEwfDaIw7rM4+XcO
+	 Tq7iQi53zFLoZiMF0WUIaoHUaAm/8tAZ5p5XDvDQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731442AbgFRBZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 21:25:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60802 "EHLO mail.kernel.org"
+        id S1729902AbgFRB4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 21:56:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60782 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731439AbgFRBZc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:25:32 -0400
+        id S1731436AbgFRBZb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:25:31 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 645002088E;
-        Thu, 18 Jun 2020 01:25:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4C1C72075E;
+        Thu, 18 Jun 2020 01:25:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443532;
-        bh=tvf461QU4qSDSewaiVERpyvLNPJAQm/81XFIeHSppLM=;
+        s=default; t=1592443531;
+        bh=+PpjlUb1dxhq4JKmEBeSoRDBzT5KQsOuracHEapIOys=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SBZgZw3avSzMGjCcSLw84X3P5aHwnSFSs6qZkmpaP+T4IP5rhBBO8pxe/5DBWTPGZ
-         Wxv7Rcp/R8A6CWxv+GkLCJLCFGx5yLMu5NvomiNS9BsqLjR6pnyX2H5Dfd8OdpPLgF
-         lVoi0U6BFhK/K5Z2X0orzfu6TRXAyCazeV0AkF1c=
+        b=GGTNnFeQKVuBiIucZWGtODWQuJ8WA7xG0Xiji85PzzorfngmGusxwNFDN1rENfkIk
+         XLEgLhy/PBAKOUndDtdFx7NUp/KwUUUx4GYNK6GE/aTSN9y9cP0+UXOuZRbXwOukNb
+         8WZvIi5e/oQxc9XtaIS4OjBjqIj+SnzAYH27hxlg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 151/172] blktrace: fix endianness for blk_log_remap()
-Date:   Wed, 17 Jun 2020 21:21:57 -0400
-Message-Id: <20200618012218.607130-151-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 150/172] blktrace: fix endianness in get_pdu_int()
+Date:   Wed, 17 Jun 2020 21:21:56 -0400
+Message-Id: <20200618012218.607130-150-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
 References: <20200618012218.607130-1-sashal@kernel.org>
@@ -60,60 +60,31 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-[ Upstream commit 5aec598c456fe3c1b71a1202cbb42bdc2a643277 ]
+[ Upstream commit 71df3fd82e7cccec7b749a8607a4662d9f7febdd ]
 
-The function blk_log_remap() can be simplified by removing the
-call to get_pdu_remap() that copies the values into extra variable to
-print the data, which also fixes the endiannness warning reported by
-sparse.
+In function get_pdu_len() replace variable type from __u64 to
+__be64. This fixes sparse warning.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/trace/blktrace.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ kernel/trace/blktrace.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 42027cf4ea91..b7e1e09a0bef 100644
+index 5c84f7421871..42027cf4ea91 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -1271,17 +1271,6 @@ static __u64 get_pdu_int(const struct trace_entry *ent, bool has_cg)
+@@ -1267,7 +1267,7 @@ static inline __u16 t_error(const struct trace_entry *ent)
+ 
+ static __u64 get_pdu_int(const struct trace_entry *ent, bool has_cg)
+ {
+-	const __u64 *val = pdu_start(ent, has_cg);
++	const __be64 *val = pdu_start(ent, has_cg);
  	return be64_to_cpu(*val);
  }
  
--static void get_pdu_remap(const struct trace_entry *ent,
--			  struct blk_io_trace_remap *r, bool has_cg)
--{
--	const struct blk_io_trace_remap *__r = pdu_start(ent, has_cg);
--	__u64 sector_from = __r->sector_from;
--
--	r->device_from = be32_to_cpu(__r->device_from);
--	r->device_to   = be32_to_cpu(__r->device_to);
--	r->sector_from = be64_to_cpu(sector_from);
--}
--
- typedef void (blk_log_action_t) (struct trace_iterator *iter, const char *act,
- 	bool has_cg);
- 
-@@ -1407,13 +1396,13 @@ static void blk_log_with_error(struct trace_seq *s,
- 
- static void blk_log_remap(struct trace_seq *s, const struct trace_entry *ent, bool has_cg)
- {
--	struct blk_io_trace_remap r = { .device_from = 0, };
-+	const struct blk_io_trace_remap *__r = pdu_start(ent, has_cg);
- 
--	get_pdu_remap(ent, &r, has_cg);
- 	trace_seq_printf(s, "%llu + %u <- (%d,%d) %llu\n",
- 			 t_sector(ent), t_sec(ent),
--			 MAJOR(r.device_from), MINOR(r.device_from),
--			 (unsigned long long)r.sector_from);
-+			 MAJOR(be32_to_cpu(__r->device_from)),
-+			 MINOR(be32_to_cpu(__r->device_from)),
-+			 be64_to_cpu(__r->sector_from));
- }
- 
- static void blk_log_plug(struct trace_seq *s, const struct trace_entry *ent, bool has_cg)
 -- 
 2.25.1
 
