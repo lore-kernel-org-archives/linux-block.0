@@ -2,159 +2,224 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7075BC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 09:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B80BEC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 09:14:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A6A621D6C
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 09:11:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9018321BE5
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 09:14:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="zrEq0qH5"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="UXU1iOAF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728964AbgFRJLU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 05:11:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34312 "EHLO
+        id S1728995AbgFRJOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 05:14:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728819AbgFRJLR (ORCPT
+        with ESMTP id S1728400AbgFRJOo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 05:11:17 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1962EC0613EF
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 02:11:16 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id b6so5209464wrs.11
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 02:11:16 -0700 (PDT)
+        Thu, 18 Jun 2020 05:14:44 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764DBC0613ED
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 02:14:43 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id dp18so5604886ejc.8
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 02:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nJ/ameCVngCfbGYTO+5aI2tlO0POD3IpltXZZNLuxEs=;
-        b=zrEq0qH5SUEXfv9B8Ir5FQX8mZb9/7ShVjC1BqOnxa+nJeZZepPmEXK0JUq9Iyo/er
-         x2eV2pn2BWHZZYzdw8xWsFUWKUmeJ2LD0KtYxtFNlFFMMUrP3JuBoJQh5pCG0LPjeBXb
-         Bj/SSgbof0QLi7qLSpLHKlV1nbJkdJLFawhgO8tsKLBmz4bafqZR0T+4ppsS7C9a9SUW
-         Uqs9ZRYksz+MN2tnjrFdL7Q3hlp6toE2WynUOVWvB1951khtuJOXjysmpuQxmkjTaK9w
-         WKMnxGdseFfMzIDugIemYPP8DSqA3Reo0AAoyttSjL52Sb7wQ5cxg8jIDYGFDymW76Ol
-         /7LA==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s3BjVyMqzxvasjHSxs1xwmAU9gNqwAJ+/E3jsScdQmI=;
+        b=UXU1iOAFlT7Rb9PRULQSpPH9dcLBcfqvaxXFLKTWDrUcC3NXY/ytxZ5xyL43KdlC1x
+         xR/Z46t9+J0ZlQmpF62SFwp7IpNEwbDKzlPIQ6JuRV6Wb17HAaSBUhDxqib6mm7CyS9D
+         r+kEe28NOJyIfMrdKH/a+Im274OdSnaQ4zCvCjUKZ85C3axrsbSAm2CvaW+edY56UXlJ
+         kzc6tEKVeNH1FdLBh2BLa6yKofA64zfBC6zTQffqIjlijr9kFtl4ju0iw+OPbgP53uSk
+         Yiy3YWtYqm/ATDYj3TMlyWIclkv3Vf+ZMW/Sn3Bto4N8w+iHIkhGAhNRkIZusvGAxp7i
+         m0Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nJ/ameCVngCfbGYTO+5aI2tlO0POD3IpltXZZNLuxEs=;
-        b=Yt8mgIws1/0Xbn5l1uygnwgs7Vg4iwUjzRPoHR8n0L9i4mPvVukbrzTXuUh9JWapIP
-         qIUpl50XPyPggRALFDazzeBOqMzoqqs3uWWBo0bWCSK1umchi2XQ8kPFfW+dlBTFAxMq
-         kIW68ohjiwwFa3Vk3EYGFjhuIU+chIJBM2+F4Q9shYqLLsJMuT8Zqnq7opemgDvC+SRb
-         clv3qUZvSZKGskDfW9khnWBizWVNvnXcFgmykXqzwjFBhnTY8P9s09mOyYudogSKhx87
-         QwqgS2J17VdD2RFpucAh2rhnnKPOGtH+id/1PF1S9SByQnUnXxNSdn9IP2geD9jH7/wp
-         7udg==
-X-Gm-Message-State: AOAM5305vMB8+yZodgRpQAMtROJyMU1GquUkhto2MaGs2c9IKBy8RdXX
-        7PTnbzW3GLl0qlj1Fo2wJ3uBWg==
-X-Google-Smtp-Source: ABdhPJxtEFr+KfP6DTCsP0An0esK+61P9lyK23C48ndc7t0VhLzMWIdc+iJ9BZ0TktVPWIm3QuGzWg==
-X-Received: by 2002:a05:6000:114e:: with SMTP id d14mr3499793wrx.110.1592471475570;
-        Thu, 18 Jun 2020 02:11:15 -0700 (PDT)
-Received: from localhost ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id q4sm2773031wma.47.2020.06.18.02.11.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 02:11:14 -0700 (PDT)
-Date:   Thu, 18 Jun 2020 11:11:13 +0200
-From:   "javier.gonz@samsung.com" <javier@javigon.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
-Subject: Re: [PATCH 3/3] io_uring: add support for zone-append
-Message-ID: <20200618091113.eu2xdp6zmdooy5d2@mpHalley.local>
-References: <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
- <CGME20200617172713epcas5p352f2907a12bd4ee3c97be1c7d8e1569e@epcas5p3.samsung.com>
- <1592414619-5646-4-git-send-email-joshi.k@samsung.com>
- <CY4PR04MB37510E916B6F243D189B4EB0E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200618083529.ciifu4chr4vrv2j5@mpHalley.local>
- <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s3BjVyMqzxvasjHSxs1xwmAU9gNqwAJ+/E3jsScdQmI=;
+        b=ueMsIFhak23uocnAVXtZqmZeviPRtpkFlInHDmoGu9Ea1B9Vq5y0Z7/jPlsJWUach8
+         tmOh7y69TRKS9nT70gw2k4FiY3eS3wldHeEUOWCaWqeC4wIUX/R/jtgtubuR23eTry8Q
+         YJ2bBmsAH9yz0D1G7iKMDbIUYLGbqq2dEMu9LHyRrRvJf/YfYmBwiUJeBUlGMYhyLzp5
+         12Jbqhpgm4OoeGNAbSVmWnWJz4MuS5eFqP1pCzD6Vi+p0fUH4P4SY4A37QyMQEwvvfbU
+         Rc/eJqzJm9MJai/XJA6dMHChmaYuPG2Mo5U9QRFo5CUWq7mLgDjXeEN2nATiRMGnOAqw
+         srnQ==
+X-Gm-Message-State: AOAM530VBSkZDTll3yd+azwHL1HEU1IUCDdzkrRw0uEDD9jK3AevdArY
+        Hmuyn2O+RiHW3HMuDZC3M2aXYthJ7U2N4QnQPkSOzA==
+X-Google-Smtp-Source: ABdhPJyU26DCxZHfSbvRKOS86H5E3Y0qfAEeZmiicXjgOobR2QQPCCSaqUM6b/6qDj8h1MLslQGp5lJSGWuSaLzSEYQ=
+X-Received: by 2002:a17:906:7103:: with SMTP id x3mr2841605ejj.363.1592471682104;
+ Thu, 18 Jun 2020 02:14:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
+ <20200617112811.GL2383158@unreal> <20200617182046.GI6578@ziepe.ca>
+ <20200617190756.GA2721989@unreal> <20200617192642.GL6578@ziepe.ca> <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
+In-Reply-To: <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
+From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Date:   Thu, 18 Jun 2020 14:44:31 +0530
+Message-ID: <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
+ late_initcall level
+To:     Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
+        kernel test robot <rong.a.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18.06.2020 08:47, Damien Le Moal wrote:
->On 2020/06/18 17:35, javier.gonz@samsung.com wrote:
->> On 18.06.2020 07:39, Damien Le Moal wrote:
->>> On 2020/06/18 2:27, Kanchan Joshi wrote:
->>>> From: Selvakumar S <selvakuma.s1@samsung.com>
->>>>
->>>> Introduce three new opcodes for zone-append -
->>>>
->>>>    IORING_OP_ZONE_APPEND     : non-vectord, similiar to IORING_OP_WRITE
->>>>    IORING_OP_ZONE_APPENDV    : vectored, similar to IORING_OP_WRITEV
->>>>    IORING_OP_ZONE_APPEND_FIXED : append using fixed-buffers
->>>>
->>>> Repurpose cqe->flags to return zone-relative offset.
->>>>
->>>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
->>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->>>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
->>>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
->>>> ---
->>>>  fs/io_uring.c                 | 72 +++++++++++++++++++++++++++++++++++++++++--
->>>>  include/uapi/linux/io_uring.h |  8 ++++-
->>>>  2 files changed, 77 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
->>>> index 155f3d8..c14c873 100644
->>>> --- a/fs/io_uring.c
->>>> +++ b/fs/io_uring.c
->>>> @@ -649,6 +649,10 @@ struct io_kiocb {
->>>>  	unsigned long		fsize;
->>>>  	u64			user_data;
->>>>  	u32			result;
->>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>> +	/* zone-relative offset for append, in bytes */
->>>> +	u32			append_offset;
->>>
->>> this can overflow. u64 is needed.
->>
->> We chose to do it this way to start with because struct io_uring_cqe
->> only has space for u32 when we reuse the flags.
->>
->> We can of course create a new cqe structure, but that will come with
->> larger changes to io_uring for supporting append.
->>
->> Do you believe this is a better approach?
+It seems that the "rdma_bind_addr()" is called by the nvme rdma
+module; but during the following events
+1) When a discover happens from the client side. Call trace for that looks like,
+[ 1098.409398] nvmf_dev_write
+[ 1098.409403] nvmf_create_ctrl
+[ 1098.414568] nvme_rdma_create_ctrl
+[ 1098.415009] nvme_rdma_setup_ctrl
+[ 1098.415010] nvme_rdma_configure_admin_queue
+[ 1098.415010] nvme_rdma_alloc_queue
+                             -->(rdma_create_id)
+[ 1098.415032] rdma_resolve_addr
+[ 1098.415032] cma_bind_addr
+[ 1098.415033] rdma_bind_addr
+
+2) When a connect happens from the client side. Call trace is the same
+as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
+n being the number of IO queues being created.
+
+
+On the server side, when an nvmf port is enabled, that also triggers a
+call to "rdma_bind_addr()", but that is not from the nvme rdma module.
+may be nvme target rdma? (not sure).
+
+On Thu, Jun 18, 2020 at 7:15 AM Haris Iqbal <haris.iqbal@cloud.ionos.com> wrote:
 >
->The problem is that zone size are 32 bits in the kernel, as a number of sectors.
->So any device that has a zone size smaller or equal to 2^31 512B sectors can be
->accepted. Using a zone relative offset in bytes for returning zone append result
->is OK-ish, but to match the kernel supported range of possible zone size, you
->need 31+9 bits... 32 does not cut it.
-
-Agree. Our initial assumption was that u32 would cover current zone size
-requirements, but if this is a no-go, we will take the longer path.
-
+> (Apologies for multiple emails. Was having trouble with an extension,
+> cause of which emails did not get delivered to the mailing list.
+> Resolved now.)
 >
->Since you need a 64-bit sized result, I would also prefer that you drop the zone
->relative offset as a result and return the absolute offset instead. That makes
->life easier for the applications since the zone append requests also must use
->absolute offsets for zone start. An absolute offset as a result becomes
->consistent with that and all other read/write system calls that all use absolute
->offsets (seek() is the only one that I know of that can use a relative offset,
->but that is not an IO system call).
+> > Somehow nvme-rdma works:
+>
+> I think that's because the callchain during the nvme_rdma_init_module
+> initialization stops at "nvmf_register_transport()". Here only the
+> "struct nvmf_transport_ops nvme_rdma_transport" is registered, which
+> contains the function "nvme_rdma_create_ctrl()". I tested this in my
+> local setup and during kernel boot, that's the extent of the
+> callchain.
+> The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
+> called later from "nvmf_dev_write()". I am not sure when this is
+> called, probably when the "discover" happens from the client side or
+> during the server config. I am trying to test this to confirm, will
+> send more details once I am done.
+> Am I missing something here?
+>
+>
+> > If the rdma_create_id() is not on a callchain from module_init then you don't have a problem.
+>
+> I am a little confused. I thought the problem occurs from a call to
+> either "rdma_resolve_addr()" which calls "rdma_bind_addr()",
+> or a direct call to "rdma_bind_addr()" as in rtrs case.
+> In both the cases, a call to "rdma_create_id()" is needed before this.
+>
+>
+> > Similarly they are supposed to be created from the client attachment.
+> I am a beginner in terms of concepts here. Did you mean when a client
+> tries to establish the first connection to an rdma server?
+>
+>
+> On Thu, Jun 18, 2020 at 12:56 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Wed, Jun 17, 2020 at 10:07:56PM +0300, Leon Romanovsky wrote:
+> > > On Wed, Jun 17, 2020 at 03:20:46PM -0300, Jason Gunthorpe wrote:
+> > > > On Wed, Jun 17, 2020 at 02:28:11PM +0300, Leon Romanovsky wrote:
+> > > > > On Wed, Jun 17, 2020 at 04:07:32PM +0530, haris.iqbal@cloud.ionos.com wrote:
+> > > > > > From: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > > > > >
+> > > > > > Fixes: 2de6c8de192b ("block/rnbd: server: main functionality")
+> > > > > > Reported-by: kernel test robot <rong.a.chen@intel.com>
+> > > > > > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > > > > >
+> > > > > > The rnbd_server module's communication manager initialization depends on the
+> > > > > > registration of the "network namespace subsystem" of the RDMA CM agent module.
+> > > > > > As such, when the kernel is configured to load the rnbd_server and the RDMA
+> > > > > > cma module during initialization; and if the rnbd_server module is initialized
+> > > > > > before RDMA cma module, a null ptr dereference occurs during the RDMA bind
+> > > > > > operation.
+> > > > > > This patch delays the initialization of the rnbd_server module to the
+> > > > > > late_initcall level, since RDMA cma module uses module_init which puts it into
+> > > > > > the device_initcall level.
+> > > > > >  drivers/block/rnbd/rnbd-srv.c | 2 +-
+> > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > >
+> > > > > > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+> > > > > > index 86e61523907b..213df05e5994 100644
+> > > > > > +++ b/drivers/block/rnbd/rnbd-srv.c
+> > > > > > @@ -840,5 +840,5 @@ static void __exit rnbd_srv_cleanup_module(void)
+> > > > > >         rnbd_srv_destroy_sysfs_files();
+> > > > > >  }
+> > > > > >
+> > > > > > -module_init(rnbd_srv_init_module);
+> > > > > > +late_initcall(rnbd_srv_init_module);
+> > > > >
+> > > > > I don't think that this is correct change. Somehow nvme-rdma works:
+> > > > > module_init(nvme_rdma_init_module);
+> > > > > -> nvme_rdma_init_module
+> > > > >  -> nvmf_register_transport(&nvme_rdma_transport);
+> > > > >   -> nvme_rdma_create_ctrl
+> > > > >    -> nvme_rdma_setup_ctrl
+> > > > >     -> nvme_rdma_configure_admin_queue
+> > > > >      -> nvme_rdma_alloc_queue
+> > > > >       -> rdma_create_id
+> > > >
+> > > > If it does work, it is by luck.
+> > >
+> > > I didn't check every ULP, but it seems that all ULPs use the same
+> > > module_init.
+> > >
+> > > >
+> > > > Keep in mind all this only matters for kernels without modules.
+> > >
+> > > Can it be related to the fact that other ULPs call to ib_register_client()
+> > > before calling to rdma-cm? RNBD does not have such call.
+> >
+> > If the rdma_create_id() is not on a callchain from module_init then
+> > you don't have a problem.
+> >
+> > nvme has a bug here, IIRC. It is not OK to create RDMA CM IDs outside
+> > a client - CM IDs are supposed to be cleaned up when the client is
+> > removed.
+> >
+> > Similarly they are supposed to be created from the client attachment.
+> >
+> > Though listening CM IDs unbound to any device may change that
+> > slightly, I think it is probably best practice to create the listening
+> > ID only if a client is bound.
+> >
+> > Most probably that is the best way to fix rnbd
+> >
+> > > I'm not proposing this, but just loudly wondering, do we really need rdma-cm
+> > > as a separate module? Can we bring it to be part of ib_core?
+> >
+> > No idea.. It doesn't help this situation at least
+> >
+> > Jason
+>
+>
+>
+> --
+>
+> Regards
+> -Haris
 
-Agree. Using relative offsets was a product of reusing the existing u32.
-If we move to u64, there is no need to do an extra transformation.
 
-Thanks Damien!
-Javier
 
+-- 
+
+Regards
+-Haris
