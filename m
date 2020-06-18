@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD0EC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 16:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18777C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 16:47:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E9A0208D5
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 16:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3C2720B1F
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 16:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbgFRQmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 12:42:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52842 "EHLO mx2.suse.de"
+        id S1732032AbgFRQrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 12:47:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55016 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728587AbgFRQmS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 12:42:18 -0400
+        id S1728090AbgFRQrp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jun 2020 12:47:45 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id BADA6AC22;
-        Thu, 18 Jun 2020 16:42:16 +0000 (UTC)
-Date:   Thu, 18 Jun 2020 18:42:16 +0200
+        by mx2.suse.de (Postfix) with ESMTP id 0693AACC3;
+        Thu, 18 Jun 2020 16:47:43 +0000 (UTC)
+Date:   Thu, 18 Jun 2020 18:47:44 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Peter Zijlstra <peterz@infradead.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infrdead.org
-Subject: Re: [PATCH 11/12] nvme-rdma: factor out a nvme_rdma_end_request
- helper
-Message-ID: <20200618164216.dpfhijmlrd5xfofn@beryllium.lan>
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 12/12] nvme: use blk_mq_complete_request_remote to avoid
+ an indirect function call
+Message-ID: <20200618164744.f2kba2s3yvlcz4s5@beryllium.lan>
 References: <20200611064452.12353-1-hch@lst.de>
- <20200611064452.12353-12-hch@lst.de>
+ <20200611064452.12353-13-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200611064452.12353-12-hch@lst.de>
+In-Reply-To: <20200611064452.12353-13-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 08:44:51AM +0200, Christoph Hellwig wrote:
-> Factor a small sniplet of duplicated code into a new helper in
-> preparation for making this sniplet a little bit less trivial.
+On Thu, Jun 11, 2020 at 08:44:52AM +0200, Christoph Hellwig wrote:
+> Use the new blk_mq_complete_request_remote helper to avoid an indirect
+> function call in the completion fast path.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
