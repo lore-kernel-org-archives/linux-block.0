@@ -6,33 +6,35 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A01C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 21:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B63FC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 21:03:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D4C420CC7
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 21:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 186C5208D5
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 21:03:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728718AbgFRVCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 17:02:50 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:37765 "EHLO
+        id S1725829AbgFRVDD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 17:03:03 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:37776 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727982AbgFRVCu (ORCPT
+        with ESMTP id S1730008AbgFRVDC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 17:02:50 -0400
+        Thu, 18 Jun 2020 17:03:02 -0400
 Received: from [189.110.235.168] (helo=localhost.localdomain)
         by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.86_2)
         (envelope-from <cascardo@canonical.com>)
-        id 1jm1gM-00073w-EZ; Thu, 18 Jun 2020 21:02:46 +0000
+        id 1jm1gZ-00073w-PC; Thu, 18 Jun 2020 21:03:00 +0000
 From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
 To:     Josef Bacik <josef@toxicpanda.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         nbd@other.debian.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org, cascardo@canonical.com
 Subject: [PATCH] nbd: allocate sufficient space for NBD_CMD_STATUS
-Date:   Thu, 18 Jun 2020 18:02:39 -0300
-Message-Id: <20200618210240.157566-1-cascardo@canonical.com>
+Date:   Thu, 18 Jun 2020 18:02:40 -0300
+Message-Id: <20200618210240.157566-2-cascardo@canonical.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618210240.157566-1-cascardo@canonical.com>
+References: <20200618210240.157566-1-cascardo@canonical.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
