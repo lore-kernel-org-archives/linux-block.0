@@ -2,106 +2,100 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A4AC433E2
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 12:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFFAC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 12:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5910207DD
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 12:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8054A20884
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 12:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b="Dq0okwnm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRkfqXzR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728255AbgFRMt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 08:49:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39750 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729914AbgFRMt6 (ORCPT
+        id S1729970AbgFRMzA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 08:55:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26612 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728215AbgFRMy5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 08:49:58 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2049C0613EF
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 05:49:57 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id g10so5074263wmh.4
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 05:49:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chrisdown.name; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=2etjjb3Ig5XsGGEiKGN5JpNnFUz+x9R74hJMp+6KTAE=;
-        b=Dq0okwnm8dIAP3kvoa45FnYbLZDxzvv8uoBKmRBi3WMPUPQIN78xVXty0qrja4zjPk
-         EkOCjrVdGpZC3fyFgN4PiU7Z/JrNCe2w4BPn+7D78sGoz+KoDFgVPEaOKPEm8CFlP4at
-         ETRL68tu/ftXB8IYZAvreyq2MYw+RProIV020=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2etjjb3Ig5XsGGEiKGN5JpNnFUz+x9R74hJMp+6KTAE=;
-        b=YcCbQuQZ/sdL3gUuw8vinzU9t+wcCboABk4mg1VAKiU94WMzufl+xZIFQJvbphA3vs
-         7xVJTRl6Koqvk/bi/Ri9HVXys2woiJQ0jsNV+QBQ0zhy3B+uAiWoz8uz7zjM99pB6VVT
-         ynMjN7/JYDkJ/iPtIowdOKmRat3D+X1FS5ZI6IxuCERlhaSsDFmokl3rVINzUn4nM18P
-         hIE2mxljMbmHk4hPFBNYRiNSeipvObH9Oul/GKCa2tZgxBh3ny0C3wYmsNPPHeNkmRH2
-         Uw4OejiLlAPdgPX9jt3wTLtzDIPz4Ycpvn5kMtXs8a7hIIo7Ne44X+j1OtPTIa9VS9FI
-         MgCA==
-X-Gm-Message-State: AOAM531egh4aOXWL22hoOWa0zW7P4zRtem5YHnjNJngwK1YYiMev5pTR
-        5scld1dX913tKdfhKWJBD8JHbg==
-X-Google-Smtp-Source: ABdhPJylqVUy/P+K1gxZzXFfcVj7BdacNz4q5MIX08y2VIvq3tIsytvwPasTJsxBLJenfxoW3Q7jKg==
-X-Received: by 2002:a1c:2044:: with SMTP id g65mr4329441wmg.16.1592484596106;
-        Thu, 18 Jun 2020 05:49:56 -0700 (PDT)
-Received: from localhost ([2a01:4b00:8432:8a00:63de:dd93:20be:f460])
-        by smtp.gmail.com with ESMTPSA id b19sm11396014wmj.0.2020.06.18.05.49.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 05:49:55 -0700 (PDT)
-Date:   Thu, 18 Jun 2020 13:49:55 +0100
-From:   Chris Down <chris@chrisdown.name>
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     Yafang Shao <laoar.shao@gmail.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        "Linux F2FS DEV, Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
-Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
-Message-ID: <20200618124955.GB694719@chrisdown.name>
-References: <CA+G9fYsdsgRmwLtSKJSzB1eWcUQ1z-_aaU+BNcQpker34XT6_w@mail.gmail.com>
- <20200617135758.GA548179@chrisdown.name>
- <20200617141155.GQ9499@dhcp22.suse.cz>
- <CA+G9fYu+FB1PE0AMmE-9MrHpayE9kChwTyc3zfM6V83uQ0zcQA@mail.gmail.com>
- <20200617160624.GS9499@dhcp22.suse.cz>
- <CA+G9fYtCXrVGVtRTwxiqgfFNDDf_H4aNH=VpWLhsV4n_mCTLGg@mail.gmail.com>
- <20200617210935.GA578452@chrisdown.name>
- <CALOAHbBp7Ytd-Hta9NH-_HJtVTAsR5Pw2RYrVScp7PPezCEv2w@mail.gmail.com>
- <20200618123743.GA694719@chrisdown.name>
- <20200618124129.GC15447@dhcp22.suse.cz>
+        Thu, 18 Jun 2020 08:54:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592484895;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9FbjWBdAd7q99k+gAtkUvgrScXCggI31g4H1SHIHlE=;
+        b=VRkfqXzR4cNpGPbQ+BgdnIMNjR9HzFvCG/E5CRTTtS10q2gcVR19OWGRRgBTg1WKa5zuXq
+        CplvuwyAa4tZXyi0claAlkkg2T0H23GN5UytDsYhRb7UTEpIhgXhEQFfagvjW7we7apaqi
+        nAUhEUR861mvZoqWqFQFw5H48ji6aQk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-ozpWvtOxPhqpPeYZMlbwrw-1; Thu, 18 Jun 2020 08:54:51 -0400
+X-MC-Unique: ozpWvtOxPhqpPeYZMlbwrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDE5A835B42;
+        Thu, 18 Jun 2020 12:54:49 +0000 (UTC)
+Received: from T590 (ovpn-13-98.pek2.redhat.com [10.72.13.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D11585D9E5;
+        Thu, 18 Jun 2020 12:54:42 +0000 (UTC)
+Date:   Thu, 18 Jun 2020 20:54:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: kprobe: __blkdev_put probe is missed
+Message-ID: <20200618125438.GA191266@T590>
+References: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200618124129.GC15447@dhcp22.suse.cz>
-User-Agent: Mutt/1.14.3 (2020-06-14)
+In-Reply-To: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Michal Hocko writes:
->I would really prefer to do that work on top of the fixes we (used to)
->have in mmotm (with the fixup).
+On Wed, Jun 17, 2020 at 06:30:39PM +0800, Ming Lei wrote:
+> Hello Guys,
+> 
+> I found probe on __blkdev_put is missed, which can be observed
+> via bcc/perf reliably:
+> 
+> 1) start trace
+> - perf probe __blkdev_put
+> - perf trace -a  -e probe:__blkdev_put
+> 
+> or
+> 
+> /usr/share/bcc/tools/stackcount __blkdev_put
+> 
+> 2) run the following command:
+> blockdev --getbsz /dev/sda1
+> 
+> 3) 'perf trace'  or stackcount just  dumps one trace event, and it
+> should have been two
+> __blkdev_put() traces, since one __blkdev_put() is called for
+> partition(/dev/sda1),
+> and another is for disk(/dev/sda). If trace_printk() is added in __blkdev_put(),
+> two events will be captured from ftrace.
+> 
 
-Oh, for sure. We should reintroduce the patches with the fix, and then look at 
-longer-term solutions once that's in :-)
+The issue can be shown by loading a kprobe module which registers on
+__blkdev_put(), just by replacing _do_fork with __blkdev_put on
+samples/kprobes/kprobe_example.c.
+
+So the issue is really in kprobe code.
+
+Thanks,
+Ming
+
