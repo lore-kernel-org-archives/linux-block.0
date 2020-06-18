@@ -6,59 +6,74 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7DFC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 06:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59ACC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 06:56:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3619C2186A
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 06:54:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A42C920773
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 06:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WKWlytiP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iQ/jY6Bw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727055AbgFRGyA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 02:54:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41304 "EHLO
+        id S1727842AbgFRG4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 02:56:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726945AbgFRGyA (ORCPT
+        with ESMTP id S1727010AbgFRG4h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 02:54:00 -0400
+        Thu, 18 Jun 2020 02:56:37 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF93C06174E
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 23:54:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6ACC06174E;
+        Wed, 17 Jun 2020 23:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nltc649ESpUSb9RgWmw1IsUpGT6nkS+CmBjRABwNwJg=; b=WKWlytiParcxhkTsz/FpSzUWAj
-        AAaZLtbp2Q7WZoPJ606dXSgNeM9i22b9N3JtlUB+t3pKhUN4bzg55Xi1Exg7ZGwCmcne9Lve/dhtS
-        QjeOGgWEtGM2/+ihdKmJ14UPr0WrP/EqllPWCgc8FMzdB0szrDNzvg3FwmWaf8zJmMx4ohavyGikh
-        BDW7qvo7GnFp1Yf6t1/f6Em6/qw6Vu0KEUkdmpFsiaaxfL/dZ1rSlCWSfSxtz4KOwr8XFfNyReIan
-        u9wU5lvLlyLKuunF5SYynFGQz1aZ9GqI370wfEY9cxP5E9tRR4HqNdGBX6CmVBH8QkPKQ6P1mudf9
-        FzAywfOg==;
+        bh=uAvmk2CwDLs4X+Ko7ajFBaGyB0rcXPF4WnH3SQrYs4k=; b=iQ/jY6BwNU0GexOcII4Y8RmC90
+        vslaU7EwpUIeDbH4l3fPejGtKiiupUxIiUtFiXf9OKFRfNWnG9EfupRM5LYyTyoqkQ4NaCxf+rQEx
+        QpA0xyEbPpW6VGUiNbZPittAv+QRYNnNWsWAqedu0wTvaDrHGNzeST60Osvj66lkMXofncPReYaX4
+        xFEqPz0Pl/FlgUEfYqpEGhHy0/hcdSLaJ9QIprhDs1/QkI8aerds64dV+fhAfvor9e/DUmYIX86+S
+        TJC0Ps7C1qPcTVNwNM4UX+vYpk2ktc961oLqTiOI4ve7lfCJzRLxzGLqieBv7S/MYQVFHGZpIRreL
+        YlLoGcYw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jloQx-0006bu-QH; Thu, 18 Jun 2020 06:53:59 +0000
-Date:   Wed, 17 Jun 2020 23:53:59 -0700
+        id 1jloTS-00012N-So; Thu, 18 Jun 2020 06:56:34 +0000
+Date:   Wed, 17 Jun 2020 23:56:34 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH] blktrace: Provide event for request merging
-Message-ID: <20200618065359.GA24943@infradead.org>
-References: <20200617135823.980-1-jack@suse.cz>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, selvakuma.s1@samsung.com,
+        nj.shetty@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH 0/3] zone-append support in aio and io-uring
+Message-ID: <20200618065634.GB24943@infradead.org>
+References: <CGME20200617172653epcas5p488de50090415eb802e62acc0e23d8812@epcas5p4.samsung.com>
+ <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200617135823.980-1-jack@suse.cz>
+In-Reply-To: <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 03:58:23PM +0200, Jan Kara wrote:
->  	blk_account_io_merge_request(next);
->  
-> +	trace_block_rq_merge(q, next);
+On Wed, Jun 17, 2020 at 10:53:36PM +0530, Kanchan Joshi wrote:
+> This patchset enables issuing zone-append using aio and io-uring direct-io interface.
+> 
+> For aio, this introduces opcode IOCB_CMD_ZONE_APPEND. Application uses start LBA
+> of the zone to issue append. On completion 'res2' field is used to return
+> zone-relative offset.
+> 
+> For io-uring, this introduces three opcodes: IORING_OP_ZONE_APPEND/APPENDV/APPENDV_FIXED.
+> Since io_uring does not have aio-like res2, cqe->flags are repurposed to return zone-relative offset
 
-q can be derived from next, no need to explicitly pass it.  And yes,
-I know a lot of existing tracepoints do so, but I plan to fix that up
-as well.
+And what exactly are the semantics supposed to be?  Remember the
+unix file abstractions does not know about zones at all.
+
+I really don't think squeezing low-level not quite block storage
+protocol details into the Linux read/write path is a good idea.
+
+What could be a useful addition is a way for O_APPEND/RWF_APPEND writes
+to report where they actually wrote, as that comes close to Zone Append
+while still making sense at our usual abstraction level for file I/O.
