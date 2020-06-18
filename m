@@ -2,94 +2,127 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC40FC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CCEC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 15:00:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADAEF20890
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74C1F2073E
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 15:00:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GGzTdSY5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYwPKZdp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731039AbgFROyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 10:54:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59008 "EHLO
+        id S1728192AbgFRPAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 11:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731011AbgFROyU (ORCPT
+        with ESMTP id S1726193AbgFRPAI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 10:54:20 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC47C06174E
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 07:54:20 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id y18so2536332plr.4
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 07:54:20 -0700 (PDT)
+        Thu, 18 Jun 2020 11:00:08 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3CFC06174E;
+        Thu, 18 Jun 2020 08:00:07 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id m81so7406487ioa.1;
+        Thu, 18 Jun 2020 08:00:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wEuao5wn8UXQpITMLbI7NpgCyzdB4/2AS+Ysy0CQ4Sg=;
-        b=GGzTdSY5m/+RG9/R7F6uhZjZ4Cjccdq4hLYK8CfMO8lq854zI5fOybiL/qphzD2Etx
-         GEYYNjyuRD+bbju0mmC0cdBdfebDKnfh64BAUvrjldij8mjooBnyv/KP2fnvu4fJayFE
-         tSL9SBK6Kej5XA2+pTMTb1ULJuOjjoNWmRCJqzpfLQ91gkJgHZHCg3502oZa4uOQuW9b
-         Wkdo6BvdMXWYpCljTVq0Hm4dY0YkeA0yrIjSn56wrl6a3wWm79j9bJYW1soqab4JWvtV
-         am9eAXUrrxITQyeczKb9ljW9HBZY+cbpNA5hqVc5pR1C7RUBc7dsz5XRChvch86hd0et
-         2FNA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NtwtfirPIaj3hQKqt5NnTqLzfoXadlYH6xaXhH3mB+s=;
+        b=kYwPKZdp0pHLg9nzSkXLUjXIWhhGSDK+lUsX3kvZKhpx/abFTtNYjkojW4sVVt7bHm
+         qZGTxARuFd3WI6EfU1eBN6+4gj/yCc7G3VU2n21gea6aS3fkUz/uMmbZ6zjhs6dF/ctG
+         mtQLDzrh6EKtHb9OSOEmMjo3N7fWi8hwmYyXXXcwlEWheXzJEY46FsRDyYJ/YXapbZEL
+         GAjWeoKd6sh4vm2KkDp99cfVll6l6Xz1jcMVSif5RsT91SxuUdRKKCZShkXiMxJfDPO2
+         mEQ03gbiIGbBmN1vxaEfCsHPJle351uahP3BtuY+Amj/uplhgSOrlPpU1WHGNLMkS4iC
+         lVIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wEuao5wn8UXQpITMLbI7NpgCyzdB4/2AS+Ysy0CQ4Sg=;
-        b=Et/xTih2yDgYg+9w6V5Cte0o9M7WefiACGxkoQ4t1OkVwtCX0c300Mrme93bwxD8ON
-         xovj5Sh0nbbhuEN5KKFkMOYwiFtFTERabtz3dwkmsUFL4fnznA1+TQ8hDJ+Y04UNtfQr
-         pbNjZQTUVw8HRdTGVPTbgJ5vK8tEXJNMrpsB7DsR69RINB0v48iJ5FfqdCJePFfhxjWe
-         MT34m5SnatrZfv15m71kY7XCVgS6GPqZ4+5bPHIfa7fdm1k++YGLAhYSCpLK+FPdt6nv
-         IawBcuewVIxds0cnoT88pCKRBwmtnfEN6PfDTGyk3QcIAvnCVf2ifD7UkmtBN0O0ho3w
-         rykQ==
-X-Gm-Message-State: AOAM5323j79cEevNZP3bobmRtvXCfl+d1d1vPmxuMVOM5ABdvOpVYOcR
-        +u7U1JeKH1B2FvzuO1PuiI2osA==
-X-Google-Smtp-Source: ABdhPJwcFOc5Yr92uc93fm7894g1kSKgQZVoOZV5HwWbPNZS46MHJ8WAPgFlOhcLhn8gRP3SnaVudQ==
-X-Received: by 2002:a17:902:d902:: with SMTP id c2mr4292295plz.194.1592492059351;
-        Thu, 18 Jun 2020 07:54:19 -0700 (PDT)
-Received: from [192.168.1.159] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id 8sm3052619pja.0.2020.06.18.07.54.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jun 2020 07:54:18 -0700 (PDT)
-Subject: Re: blk_mq_complete_request overhaul
-To:     Christoph Hellwig <hch@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-References: <20200611064452.12353-1-hch@lst.de>
- <20200618141103.GA16866@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b46ff4dc-45de-0130-d36c-70278f49abb1@kernel.dk>
-Date:   Thu, 18 Jun 2020 08:54:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NtwtfirPIaj3hQKqt5NnTqLzfoXadlYH6xaXhH3mB+s=;
+        b=E9oYBpHSZYmC7FLuwZtM18HBTCZPtsRMxCzP0mIHBegoGebObr7eH9A7y4vuzcy66h
+         Kd3F62IdMGfD/Q8vLsxuqYRk5AhEPIBg55HPyVBb0PGzoXl0igvA0SIPhQLYundiIMx+
+         tcgJqFJOaqh9yEL5uSqY55GT+USlIRYZVF/VfS9kNr13eJ53fAIBYIBO47RDw9NCtDJx
+         yhJfYZTsJH7BAFHsYN1ySSDYNAWrsh5qRnguXjI7Nx5PypdyoEyfXovnVqwprgoFdeZx
+         0vHgfWRD82wxHZsrQ8boAvZ7JBHCLsK2Y/qXb1qZH4ZkXPcZs3sXiK4s9cDt8Jl3NJdC
+         Apdw==
+X-Gm-Message-State: AOAM531PZUpGh13VrmFL1AJBCGva+2B1zX1VYE6NkKS9TH70KddBrTFW
+        sDtIVOtYHe2ZjdVKqjAWQ1PnUYsWmMEG/bDDECQ=
+X-Google-Smtp-Source: ABdhPJyxduBF4FPnbsePTb+IJMrnaO574t87lgH7MXGDrxKnm7Fm0uPL20a9JpNnhO5AEW9mefqTwucGCC8avIECgKo=
+X-Received: by 2002:a05:6602:2dd4:: with SMTP id l20mr5412675iow.13.1592492407237;
+ Thu, 18 Jun 2020 08:00:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200618141103.GA16866@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200521095515.GK6462@dhcp22.suse.cz> <20200521163450.GV6462@dhcp22.suse.cz>
+ <CA+G9fYsdsgRmwLtSKJSzB1eWcUQ1z-_aaU+BNcQpker34XT6_w@mail.gmail.com>
+ <20200617135758.GA548179@chrisdown.name> <20200617141155.GQ9499@dhcp22.suse.cz>
+ <CA+G9fYu+FB1PE0AMmE-9MrHpayE9kChwTyc3zfM6V83uQ0zcQA@mail.gmail.com>
+ <20200617160624.GS9499@dhcp22.suse.cz> <CA+G9fYtCXrVGVtRTwxiqgfFNDDf_H4aNH=VpWLhsV4n_mCTLGg@mail.gmail.com>
+ <20200617210935.GA578452@chrisdown.name> <CALOAHbBp7Ytd-Hta9NH-_HJtVTAsR5Pw2RYrVScp7PPezCEv2w@mail.gmail.com>
+ <20200618123743.GA694719@chrisdown.name>
+In-Reply-To: <20200618123743.GA694719@chrisdown.name>
+From:   Yafang Shao <laoar.shao@gmail.com>
+Date:   Thu, 18 Jun 2020 22:59:28 +0800
+Message-ID: <CALOAHbCPd407z45e809VE5c8vP6ewqwkDkY9nrMP5TyP5cjG+A@mail.gmail.com>
+Subject: Re: mm: mkfs.ext4 invoked oom-killer on i386 - pagecache_get_page
+To:     Chris Down <chris@chrisdown.name>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        "Linux F2FS DEV, Mailing List" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Arnd Bergmann <arnd@arndb.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chao Yu <yuchao0@huawei.com>, lkft-triage@lists.linaro.org,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <guro@fb.com>, Cgroups <cgroups@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/20 8:11 AM, Christoph Hellwig wrote:
-> Any comments?
-> 
-> (and yes, I misspelled the nvme list address, but the interested
-> parties should be on linux-block anyway)
+On Thu, Jun 18, 2020 at 8:37 PM Chris Down <chris@chrisdown.name> wrote:
+>
+> Yafang Shao writes:
+> >On Thu, Jun 18, 2020 at 5:09 AM Chris Down <chris@chrisdown.name> wrote:
+> >>
+> >> Naresh Kamboju writes:
+> >> >After this patch applied the reported issue got fixed.
+> >>
+> >> Great! Thank you Naresh and Michal for helping to get to the bottom of this :-)
+> >>
+> >> I'll send out a new version tomorrow with the fixes applied and both of you
+> >> credited in the changelog for the detection and fix.
+> >
+> >As we have already found that the usage around memory.{emin, elow} has
+> >many limitations, I think memory.{emin, elow} should be used for
+> >memcg-tree internally only, that means they can only be used to
+> >calculate the protection of a memcg in a specified memcg-tree but
+> >should not be exposed to other MM parts.
+>
+> I agree that the current semantics are mentally taxing and we should generally
+> avoid exposing the implementation details outside of memcg where possible. Do
+> you have a suggested rework? :-)
 
-I've looked over it, and it looks fine to me. Haven't done a full
-test pass yet, but assuming that's good, I'll queue this up for
-5.9.
+Keeping the mem_cgroup_protected() as-is is my suggestion. Anyway I
+think it is bad to put memory.{emin, elow} here and there.
+If we don't have any better idea by now, just putting all the
+references of memory.{emin, elow}  into one
+wrapper(mem_cgroup_protected()) is the reasonable solution.
 
 -- 
-Jens Axboe
-
+Thanks
+Yafang
