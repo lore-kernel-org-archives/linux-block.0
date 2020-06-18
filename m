@@ -2,122 +2,169 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C1CC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 22:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F173C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 23:19:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51D3620734
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 22:05:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48B562078D
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 23:19:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="TWsaugqP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZsK6YRi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729796AbgFRWFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 18:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731632AbgFRWFk (ORCPT
+        id S1728171AbgFRXTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 19:19:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33058 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728049AbgFRXTW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 18:05:40 -0400
-Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31B86C06174E
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 15:05:39 -0700 (PDT)
-Received: by mail-oo1-xc43.google.com with SMTP id v26so1504768oof.7
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 15:05:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucsc.edu; s=ucsc-google-2018;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ukeJ1uDwqwEFaLI3EARWl0bw73efHeUYm2hJguJBEBo=;
-        b=TWsaugqPxzvYuOI9ohFUzP1FTDrrg8y4AA/KmWfWmbczPncUMlMhThod3UZpj28ywk
-         roaj/d/J45UjumfnOvFcM0Eo360LueE8Y4lftPmaDi0yK3Vc2EkliMkI7Wks15ZHZ96M
-         Lq2uyX4V4UvfgEeZmSNRzyZedyj6WaphzMLs5b9wv0uOVWyy0SCfR2JnIgQkK6dtkg9p
-         rO9jmbaqtq64Q4s1rxIr0t+03wrVVKgdxEv38hOq0NKuolFwNfmRde6yUSrB/WBYHsrR
-         YWQTHJZxzhtvOagUiMX7GHoRaEjYWswuVodmZoffC8pZoTBUhdm1hF4YYIZhq62edZ9i
-         Ck7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ukeJ1uDwqwEFaLI3EARWl0bw73efHeUYm2hJguJBEBo=;
-        b=t0A/XNOZpBNBgliGICwE4WiEQUCnHRCqp5XOGk1N6WIEY/DBzALsUTNk9NnBeGo0zJ
-         UPcS6kuaN4huRNKlGRxDDhwkl5I6T2yI3gbcmDrT6HUpTgmkt6sofXZgN1KZpNjedU6h
-         LEDSINVtHoNhddPoAo2OAkNJ5u1p1nUUzFr6gO0j+JIdCOQR7Nwyv4T9MkrIJdqNOMnP
-         XsI34dr1FS2KpgV+3JATMs9R5/dp4qxjx/PVsQtAdtUIT/vEvrKW9S0540qgEe8b8ZUM
-         JWeZWjVWcrLMb9NvCg9ygGptt/0qWfIjYR3g3KSSq9/ftDxujernN4ef+ykwWzZE63zv
-         IsXw==
-X-Gm-Message-State: AOAM533/M6dqZxKheWwsZfYG6OECK58Dkcmp8WKc+xlOsFtYWMSuyjoY
-        SbKiJmgqhEjZoldgb3dm5tFv2msG/Ud8is5Pib4vGA==
-X-Google-Smtp-Source: ABdhPJzgFvQAYhWUzETFTkrodlO0t+L2/qMyxslngVbk0NI8jAwHLqUx5rCztsTSMazNASVi9EBmZJo6GnZHM8bVwNI=
-X-Received: by 2002:a4a:bc8c:: with SMTP id m12mr911865oop.44.1592517938482;
- Thu, 18 Jun 2020 15:05:38 -0700 (PDT)
+        Thu, 18 Jun 2020 19:19:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592522361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qWRu5ynq63s6rvxwcBKG7uOd/H0E0TsjTr5wvg/oOPE=;
+        b=QZsK6YRihKX9lDYJ9YuxAAT3dbG/I9EdwuszP5k8L1t2HcnYBzl450SXYlSiAWsxOoCxUt
+        dytzzKYYBQ/ag/dURTe80+NV8xk5nxhNBj8GKvIiSLh6NyBbRcsyuppzNMRl5ViyIbBveT
+        Ek0IWssPTsbybgr7fcZ8O3AggUsrfeI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460--WN60a8zPlubEq7twmzMJg-1; Thu, 18 Jun 2020 19:19:17 -0400
+X-MC-Unique: -WN60a8zPlubEq7twmzMJg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2641108BD15;
+        Thu, 18 Jun 2020 23:19:15 +0000 (UTC)
+Received: from T590 (ovpn-12-44.pek2.redhat.com [10.72.12.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 697C389283;
+        Thu, 18 Jun 2020 23:19:05 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 07:19:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Masami Hiramatsu <mhiramat@kernel.org>
+Cc:     Ming Lei <tom.leiming@gmail.com>,
+        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: kprobe: __blkdev_put probe is missed
+Message-ID: <20200618231901.GA196099@T590>
+References: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
+ <20200618125438.GA191266@T590>
+ <20200618225602.3f2cca3f0ed48427fc0a483b@kernel.org>
 MIME-Version: 1.0
-References: <20200617182841.jnbxgshi7bawfzls@mpHalley.localdomain>
- <MN2PR04MB62236DC26A04A65A242A80D2F19A0@MN2PR04MB6223.namprd04.prod.outlook.com>
- <20200617190901.zpss2lsh6qsu5zuf@mpHalley.local> <1ab101ef-7b74-060f-c2bc-d4c36dec91f0@lightnvm.io>
- <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local> <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
- <20200618015526.GA1138429@dhcp-10-100-145-180.wdl.wdc.com>
- <CAJbgVnVKqDobpX8iwqRVeDqvmfdEd-uRzNFC2z5U03X9E3Pi_w@mail.gmail.com>
- <CY4PR04MB3751E6A6D6F04285CAB18514E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
- <CAJbgVnVnqGQiLx1PctDhAKkjLXRKFwr00tdTPJjkaXZDc+V6Bg@mail.gmail.com> <20200618211945.GA2347@C02WT3WMHTD6>
-In-Reply-To: <20200618211945.GA2347@C02WT3WMHTD6>
-From:   Heiner Litz <hlitz@ucsc.edu>
-Date:   Thu, 18 Jun 2020 15:05:27 -0700
-Message-ID: <CAJbgVnVxtfs3m6HKJOQw4E1sqTQBmtF_P-D4aAZ5zsz4rQUXNA@mail.gmail.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Judy Brock <judy.brock@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200618225602.3f2cca3f0ed48427fc0a483b@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Matias, Keith,
-thanks, this all sounds good and it makes total sense to hide striping
-from the user.
+On Thu, Jun 18, 2020 at 10:56:02PM +0900, Masami Hiramatsu wrote:
+> Hi Ming,
+> 
+> On Thu, 18 Jun 2020 20:54:38 +0800
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > On Wed, Jun 17, 2020 at 06:30:39PM +0800, Ming Lei wrote:
+> > > Hello Guys,
+> > > 
+> > > I found probe on __blkdev_put is missed, which can be observed
+> > > via bcc/perf reliably:
+> > > 
+> > > 1) start trace
+> > > - perf probe __blkdev_put
+> > > - perf trace -a  -e probe:__blkdev_put
+> 
+> Could you dump the kprobe_event as below?
+> 
+> # cat /sys/kernel/tracing/kprobe_events
+> 
+> 
+> > > 
+> > > or
+> > > 
+> > > /usr/share/bcc/tools/stackcount __blkdev_put
+> > > 
+> > > 2) run the following command:
+> > > blockdev --getbsz /dev/sda1
+> 
+> And dump the kprobe profile?
+> 
+> # cat /sys/kernel/tracing/kprobe_profile
+> 
+> > > 
+> > > 3) 'perf trace'  or stackcount just  dumps one trace event, and it
+> > > should have been two
+> > > __blkdev_put() traces, since one __blkdev_put() is called for
+> > > partition(/dev/sda1),
+> > > and another is for disk(/dev/sda). If trace_printk() is added in __blkdev_put(),
+> > > two events will be captured from ftrace.
+> > > 
+> > 
+> > The issue can be shown by loading a kprobe module which registers on
+> > __blkdev_put(), just by replacing _do_fork with __blkdev_put on
+> > samples/kprobes/kprobe_example.c.
+> 
+> Could you tell me what kernel are you using?
+> 
+> I'm using 5.4 on ubuntu and can not reproduce it with kprobe_event.
+> 
+> root@devnote2:/sys/kernel/tracing# uname -a
+> Linux devnote2 5.4.0-37-generic #41-Ubuntu SMP Wed Jun 3 18:57:02 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+> root@devnote2:/sys/kernel/tracing# echo p __blkdev_put > kprobe_events 
+> root@devnote2:/sys/kernel/tracing# echo 1 > events/kprobes/p___blkdev_put_0/enable 
+> root@devnote2:/sys/kernel/tracing# cat trace
+> # tracer: nop
+> #
+> # entries-in-buffer/entries-written: 0/0   #P:8
+> #
+> #                              _-----=> irqs-off
+> #                             / _----=> need-resched
+> #                            | / _---=> hardirq/softirq
+> #                            || / _--=> preempt-depth
+> #                            ||| /     delay
+> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+> #              | |       |   ||||       |         |
+> root@devnote2:/sys/kernel/tracing# blockdev --getbsz /dev/nvme0n1
+> 4096
+> root@devnote2:/sys/kernel/tracing# cat trace
+> # tracer: nop
+> #
+> # entries-in-buffer/entries-written: 1/1   #P:8
+> #
+> #                              _-----=> irqs-off
+> #                             / _----=> need-resched
+> #                            | / _---=> hardirq/softirq
+> #                            || / _--=> preempt-depth
+> #                            ||| /     delay
+> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+> #              | |       |   ||||       |         |
+>            <...>-111740 [002] .... 301734.476991: p___blkdev_put_0: (__blkdev_put+0x0/0x1e0)
+> 
+> Hmm, maybe some issue in the latest kernel...?
 
-In the end, the real problem really seems to be that ZNS effectively
-requires in-order IO delivery which the kernel cannot guarantee. I
-think fixing this problem in the ZNS specification instead of in the
-communication substrate (kernel) is problematic, especially as
-out-of-order delivery absolutely has no benefit in the case of ZNS.
-But I guess this has been discussed before..
+Hello Masami,
 
-On Thu, Jun 18, 2020 at 2:19 PM Keith Busch <kbusch@kernel.org> wrote:
->
-> On Thu, Jun 18, 2020 at 01:47:20PM -0700, Heiner Litz wrote:
-> > the striping explanation makes sense. In this case will rephase to: It
-> > is sufficient to support large enough un-splittable writes to achieve
-> > full per-zone bandwidth with a single writer/single QD.
->
-> This is subject to the capabilities of the device and software's memory
-> constraints. The maximum DMA size for a single request an nvme device can
-> handle often range anywhere from 64k to 4MB. The pci nvme driver maxes out at
-> 4MB anyway because that's the most we can guarantee forward progress right now,
-> otherwise the scatter lists become to big to ensure we'll be able to allocate
-> one to dispatch a write command.
->
-> We do report the size and the alignment constraints so that it won't get split,
-> but we still have to work with applications that don't abide by those
-> constraints.
->
-> > My main point is: There is no fundamental reason for splitting up
-> > requests intermittently just to re-assemble them in the same form
-> > later.
+I am testing the latest upstream kernel, your trace actually reproduces
+this issue.
+
+After 'blockdev --getbsz /dev/nvme0n1' returns, __blkdev_put() should
+have been called two times(one for partition, and the other for disk),
+however kprobe trace just shows one time of calling this function.
+
+If trace_printk() is added at the entry of __blkdev_put() manually,
+you will see that __blkdev_put() is called two times in 'blockdev
+--getbsz /dev/nvme0n1'.
+
+
+Thanks,
+Ming
+
