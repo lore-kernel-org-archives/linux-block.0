@@ -2,83 +2,118 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81270C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADE1C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D9EF2088E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:55:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 213E522229
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:56:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592445332;
-	bh=1ScLl72dTUy1xO1N3hqLzko5uMVB8SvU4OZlUhmacZI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZGfhJDHr1bbBJLa53l2Y4ge1jRv25G4ZT5MBMhPMT+TjUqxjnb+bCP+TO3ohGf0dC
-	 HjbiTK2T7zvsYQk3nmPBY5ZP6LvOzgmmpfceGiCotQOok71iU/RKk8Lf2nxJtPeDqH
-	 pHNmDXz+p3I4huxyxicgm9Ch2mB01YSPnj1HBsrA=
+	s=default; t=1592445372;
+	bh=tvf461QU4qSDSewaiVERpyvLNPJAQm/81XFIeHSppLM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=tILG8WVwgua4tP4zq6wCepgddzl19eyit7ljnY0Scfu4lidAsOdtlB/TMregGfB+E
+	 b1onqROf3i450OXW8X+qkzaH6ocJFGrSuMEVM3YA5t/sTgz82ifzb+/9objTrijzyP
+	 gKt/0EpBxoPFrsO6GaNc/RImdoPyD1yY+4tlaidk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731499AbgFRBzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 21:55:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46674 "EHLO mail.kernel.org"
+        id S1731442AbgFRBZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 21:25:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60802 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732877AbgFRBza (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:55:30 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1731439AbgFRBZc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:25:32 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A04E020885;
-        Thu, 18 Jun 2020 01:55:28 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 645002088E;
+        Thu, 18 Jun 2020 01:25:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592445329;
-        bh=1ScLl72dTUy1xO1N3hqLzko5uMVB8SvU4OZlUhmacZI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pPBFdMlPaxfzjddnYEX7IbDQVQjcfAuygE8jT8mszavxjeFfEcXTbAij0JNV04jM6
-         AJbl1Y86dmYeBT0iqQRQ6hMe0X/s7LPn/YXT48X8wodrRS8JweacVwS2BKE5vLPyFp
-         ZsPw9fXiD00utZfVAbm46vv9/8ghCcquLKiqR8bw=
-Date:   Wed, 17 Jun 2020 18:55:26 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Heiner Litz <hlitz@ucsc.edu>
-Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Judy Brock <judy.brock@samsung.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-Message-ID: <20200618015526.GA1138429@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200616104142.zxw25txhsg2eyhsb@mpHalley.local>
- <20200617074328.GA13474@lst.de>
- <20200617144230.ojzk4f5gcwqonzrf@mpHalley.localdomain>
- <f1bc34e0-c059-6127-d69f-e31c91ce6a9f@lightnvm.io>
- <20200617182841.jnbxgshi7bawfzls@mpHalley.localdomain>
- <MN2PR04MB62236DC26A04A65A242A80D2F19A0@MN2PR04MB6223.namprd04.prod.outlook.com>
- <20200617190901.zpss2lsh6qsu5zuf@mpHalley.local>
- <1ab101ef-7b74-060f-c2bc-d4c36dec91f0@lightnvm.io>
- <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local>
- <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
+        s=default; t=1592443532;
+        bh=tvf461QU4qSDSewaiVERpyvLNPJAQm/81XFIeHSppLM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SBZgZw3avSzMGjCcSLw84X3P5aHwnSFSs6qZkmpaP+T4IP5rhBBO8pxe/5DBWTPGZ
+         Wxv7Rcp/R8A6CWxv+GkLCJLCFGx5yLMu5NvomiNS9BsqLjR6pnyX2H5Dfd8OdpPLgF
+         lVoi0U6BFhK/K5Z2X0orzfu6TRXAyCazeV0AkF1c=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 151/172] blktrace: fix endianness for blk_log_remap()
+Date:   Wed, 17 Jun 2020 21:21:57 -0400
+Message-Id: <20200618012218.607130-151-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
+References: <20200618012218.607130-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 04:44:23PM -0700, Heiner Litz wrote:
-> Mandating zone-sized writes would address all problems with ease and
-> reduce request rate and overheads in the kernel.
+From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 
-Yikes, no. Typical zone sizes are much to large for that to be
-reasonable.
+[ Upstream commit 5aec598c456fe3c1b71a1202cbb42bdc2a643277 ]
+
+The function blk_log_remap() can be simplified by removing the
+call to get_pdu_remap() that copies the values into extra variable to
+print the data, which also fixes the endiannness warning reported by
+sparse.
+
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ kernel/trace/blktrace.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 42027cf4ea91..b7e1e09a0bef 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1271,17 +1271,6 @@ static __u64 get_pdu_int(const struct trace_entry *ent, bool has_cg)
+ 	return be64_to_cpu(*val);
+ }
+ 
+-static void get_pdu_remap(const struct trace_entry *ent,
+-			  struct blk_io_trace_remap *r, bool has_cg)
+-{
+-	const struct blk_io_trace_remap *__r = pdu_start(ent, has_cg);
+-	__u64 sector_from = __r->sector_from;
+-
+-	r->device_from = be32_to_cpu(__r->device_from);
+-	r->device_to   = be32_to_cpu(__r->device_to);
+-	r->sector_from = be64_to_cpu(sector_from);
+-}
+-
+ typedef void (blk_log_action_t) (struct trace_iterator *iter, const char *act,
+ 	bool has_cg);
+ 
+@@ -1407,13 +1396,13 @@ static void blk_log_with_error(struct trace_seq *s,
+ 
+ static void blk_log_remap(struct trace_seq *s, const struct trace_entry *ent, bool has_cg)
+ {
+-	struct blk_io_trace_remap r = { .device_from = 0, };
++	const struct blk_io_trace_remap *__r = pdu_start(ent, has_cg);
+ 
+-	get_pdu_remap(ent, &r, has_cg);
+ 	trace_seq_printf(s, "%llu + %u <- (%d,%d) %llu\n",
+ 			 t_sector(ent), t_sec(ent),
+-			 MAJOR(r.device_from), MINOR(r.device_from),
+-			 (unsigned long long)r.sector_from);
++			 MAJOR(be32_to_cpu(__r->device_from)),
++			 MINOR(be32_to_cpu(__r->device_from)),
++			 be64_to_cpu(__r->sector_from));
+ }
+ 
+ static void blk_log_plug(struct trace_seq *s, const struct trace_entry *ent, bool has_cg)
+-- 
+2.25.1
+
