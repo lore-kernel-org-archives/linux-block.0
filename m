@@ -1,303 +1,146 @@
-Return-Path: <SRS0=NzS0=76=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F351C433DF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 23:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49205C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE91021556
-	for <linux-block@archiver.kernel.org>; Wed, 17 Jun 2020 23:44:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="Ixd3NNQb"
+	by mail.kernel.org (Postfix) with ESMTP id 23C7021D80
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 01:39:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592444361;
+	bh=XW4YMqzdu7MMmljPmA8IcaO8/WjKcSZmPg76Reym4oA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Ze/JjlwlSAnIiTKjIEY1sCl3orsGN9RknjxESwrtVSGCXdoS9bkirJdbBtAezlYSX
+	 2jZefTzTHTLRIxdAzEFFhffX290zB2KKKy3LC7A2R9pet0/1gKE6ol7drpdelR2jZ/
+	 Z46vkOjAY/vWsE8SePMDjgb3awzEYd0GJQxZW5Qs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726833AbgFQXoi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 19:44:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60400 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726815AbgFQXoh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 19:44:37 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22970C06174E
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 16:44:37 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id f2so796397ooo.5
-        for <linux-block@vger.kernel.org>; Wed, 17 Jun 2020 16:44:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucsc.edu; s=ucsc-google-2018;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=uJ2PlPgrWohgBlHx3eMj/u+O3g5rs9Qkl8fBDfrrwi0=;
-        b=Ixd3NNQbfQIR/gfVrJCL3hxFisKXpgnPOTZULmTu7EJDNIiv+g+t4XQsKTIKppzCIO
-         Ger3q9ns/RBw3MockjFb49XE5YvFnB8PN/AUZDSq8dKueSiRwJW/9qEjD2QIPsSB9J1c
-         DuABSiLq+dgQJBsjJQzkGrxfEJuPTYKAKHL60SDe/1IMKvYOxKnqFfTFA4PmyunzLC1e
-         gT9DkjZwTY3tieaeOVUzIK9opZHWkjeYW2MTgB4aEhWLVYCCnypH57lFxfSFFBIXtIGO
-         wrGCH0IawU6xR4FhTf+vkahH36OvVf2yDUbxFKqAotnAKNsbTJRyuw/6W8W8bRiUEpu6
-         A4cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=uJ2PlPgrWohgBlHx3eMj/u+O3g5rs9Qkl8fBDfrrwi0=;
-        b=qks7LZpMvhtU9q3erazXZzQosLYdLEETVz/tVpj9oOcOwqZqCENk/zIFmPLNH0zfWV
-         uMZKnSfpw859s4IHXG/W/005BiX2OrllDqqx0cG2o7lz/l/VrzaoJx56ShHjOZUf3Dl3
-         LRQQA7WfiHklhLMK3HnSw+Dv3t2c1zcNdQLo7oqvaCzZgTwwLWxMxuAKbgjBRHaom9iH
-         x8ScbGwHOC+gwf5cERK/7Sq2nR26Y/Y7Tct3nuuRGkBhIE5Atbvm6mA9SnlY3HrtQjCI
-         HLi0QTwPfJhK5fJoZwfTlwvfgeVLaJH8C55kLpfDgPf3FXxhkvBPLplLjKVnSG+Ob/W0
-         d6Zg==
-X-Gm-Message-State: AOAM531SfrTRShPpu6jP/X+gd+ZfXabQfE/iH53j+HUdHvDQ6XoyeQOM
-        2ZUb72D8Rqovg0aiSe/eL/RfF+QLiJdO0LJcbdRmTaHY
-X-Google-Smtp-Source: ABdhPJysI11SS0RAgEbG/scwC9yswsmdXIzKegydVE2GkUgdw1KveEmf3oYTolOhlm6WxJvKJKtFscbq1Mvhyls9k60=
-X-Received: by 2002:a4a:ca8b:: with SMTP id x11mr1702275ooq.83.1592437475055;
- Wed, 17 Jun 2020 16:44:35 -0700 (PDT)
+        id S1731013AbgFRBaT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 21:30:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40252 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732488AbgFRBaT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:30:19 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4005C207E8;
+        Thu, 18 Jun 2020 01:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592443818;
+        bh=XW4YMqzdu7MMmljPmA8IcaO8/WjKcSZmPg76Reym4oA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=lQAL4RzWBx0mz4Rx+Ae8XG9968vR9xVJE7LkZ7dxvkYISM9z5NfqJXjsD+7g5PpB9
+         i9nUGEWLmSW3PPx/FtcotIRjEuX/b6gdcvyL6GtAlYE6kapGDHnpbHJ1Fqy6JnYq14
+         z9JL3CKRAm1P0bl2/4+KF6vy/5eX1QtN60uaPY30=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Emmanuel Nicolet <emmanuel.nicolet@gmail.com>,
+        Geoff Levand <geoff@infradead.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sasha Levin <sashal@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 10/60] ps3disk: use the default segment boundary
+Date:   Wed, 17 Jun 2020 21:29:14 -0400
+Message-Id: <20200618013004.610532-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618013004.610532-1-sashal@kernel.org>
+References: <20200618013004.610532-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200615233424.13458-1-keith.busch@wdc.com> <20200615233424.13458-6-keith.busch@wdc.com>
- <20200616104142.zxw25txhsg2eyhsb@mpHalley.local> <20200617074328.GA13474@lst.de>
- <20200617144230.ojzk4f5gcwqonzrf@mpHalley.localdomain> <f1bc34e0-c059-6127-d69f-e31c91ce6a9f@lightnvm.io>
- <20200617182841.jnbxgshi7bawfzls@mpHalley.localdomain> <MN2PR04MB62236DC26A04A65A242A80D2F19A0@MN2PR04MB6223.namprd04.prod.outlook.com>
- <20200617190901.zpss2lsh6qsu5zuf@mpHalley.local> <1ab101ef-7b74-060f-c2bc-d4c36dec91f0@lightnvm.io>
- <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local>
-In-Reply-To: <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local>
-From:   Heiner Litz <hlitz@ucsc.edu>
-Date:   Wed, 17 Jun 2020 16:44:23 -0700
-Message-ID: <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Cc:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Judy Brock <judy.brock@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for the interesting discussion but it made me wonder about the
-usefulness of 4K writes in the first place. Append seems to be a
-workaround for a problem (single writer/QD) that shouldn't exist in
-the first place. If writes need to be sequential, what is the purpose
-of allowing 4K writes at all (it provides no placement flexibility).
-Mandating zone-sized writes would address all problems with ease and
-reduce request rate and overheads in the kernel. I don't see why we
-would disassemble a zone-sized block into smaller writes just to
-re-assemble them again on the device. A promise of ZNS is to move the
-translation overhead from the device into the FS layer so why
-re-introduce complexity in the bio layer? Managing zone-sized blocks
-on the application/FS layer is also much more convenient than
-receiving random 4K addresses from append commands.
-Finally, note that splitting zone-sized bios in the kernel does not
-achieve any purpose as interleaving/scheduling within a zone isn't
-possible. If we want to interleave accesses to multiple open zones,
-this should be done on the device layer by exposing queue(s) per zone.
-For applications writing large, consecutive blocks (RocksDB), the best
-implementation seems to be providing a kernel path that guarantees
-non-splittable zone-sized writes.
+From: Emmanuel Nicolet <emmanuel.nicolet@gmail.com>
 
-On Wed, Jun 17, 2020 at 12:40 PM Javier Gonz=C3=A1lez <javier@javigon.com> =
-wrote:
->
-> On 17.06.2020 21:23, Matias Bj=C3=B8rling wrote:
-> >On 17/06/2020 21.09, Javier Gonz=C3=A1lez wrote:
-> >>On 17.06.2020 18:55, Matias Bjorling wrote:
-> >>>>-----Original Message-----
-> >>>>From: Javier Gonz=C3=A1lez <javier@javigon.com>
-> >>>>Sent: Wednesday, 17 June 2020 20.29
-> >>>>To: Matias Bj=C3=B8rling <mb@lightnvm.io>
-> >>>>Cc: Christoph Hellwig <hch@lst.de>; Keith Busch <Keith.Busch@wdc.com>=
-;
-> >>>>linux-nvme@lists.infradead.org; linux-block@vger.kernel.org;
-> >>>>Damien Le Moal
-> >>>><Damien.LeMoal@wdc.com>; Matias Bjorling <Matias.Bjorling@wdc.com>;
-> >>>>Sagi Grimberg <sagi@grimberg.me>; Jens Axboe <axboe@kernel.dk>; Hans
-> >>>>Holmberg <Hans.Holmberg@wdc.com>; Dmitry Fomichev
-> >>>><Dmitry.Fomichev@wdc.com>; Ajay Joshi <Ajay.Joshi@wdc.com>; Aravind
-> >>>>Ramesh <Aravind.Ramesh@wdc.com>; Niklas Cassel
-> >>>><Niklas.Cassel@wdc.com>; Judy Brock <judy.brock@samsung.com>
-> >>>>Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-> >>>>
-> >>>>On 17.06.2020 19:57, Matias Bj=C3=B8rling wrote:
-> >>>>>On 17/06/2020 16.42, Javier Gonz=C3=A1lez wrote:
-> >>>>>>On 17.06.2020 09:43, Christoph Hellwig wrote:
-> >>>>>>>On Tue, Jun 16, 2020 at 12:41:42PM +0200, Javier Gonz=C3=A1lez wro=
-te:
-> >>>>>>>>On 16.06.2020 08:34, Keith Busch wrote:
-> >>>>>>>>>Add support for NVM Express Zoned Namespaces (ZNS) Command Set
-> >>>>>>>>>defined in NVM Express TP4053. Zoned namespaces are discovered
-> >>>>>>>>>based on their Command Set Identifier reported in the namespaces
-> >>>>>>>>>Namespace Identification Descriptor list. A successfully
-> >>>>discovered
-> >>>>>>>>>Zoned Namespace will be registered with the block layer as a hos=
-t
-> >>>>>>>>>managed zoned block device with Zone Append command support. A
-> >>>>>>>>>namespace that does not support append is not supported by
-> >>>>the driver.
-> >>>>>>>>
-> >>>>>>>>Why are we enforcing the append command? Append is optional on th=
-e
-> >>>>>>>>current ZNS specification, so we should not make this mandatory i=
-n
-> >>>>>>>>the implementation. See specifics below.
-> >>>>>>>
-> >>>>>>>Because Append is the way to go and we've moved the Linux
-> >>>>zoned block
-> >>>>>>>I/O stack to required it, as should have been obvious to anyone
-> >>>>>>>following linux-block in the last few months.  I also have to
-> >>>>say I'm
-> >>>>>>>really tired of the stupid politics tha your company started in th=
-e
-> >>>>>>>NVMe working group, and will say that these do not matter for Linu=
-x
-> >>>>>>>development at all.  If you think it is worthwhile to support
-> >>>>devices
-> >>>>>>>without Zone Append you can contribute support for them on top of
-> >>>>>>>this series by porting the SCSI Zone Append Emulation code to NVMe=
-.
-> >>>>>>>
-> >>>>>>>And I'm not even going to read the rest of this thread as I'm on a
-> >>>>>>>vacation that I badly needed because of the Samsung TWG bullshit.
-> >>>>>>
-> >>>>>>My intention is to support some Samsung ZNS devices that will not
-> >>>>>>enable append. I do not think this is an unreasonable thing to
-> >>>>do. How
-> >>>>>>/ why append ended up being an optional feature in the ZNS TP is
-> >>>>>>orthogonal to this conversation. Bullshit or not, it ends up on
-> >>>>>>devices that we would like to support one way or another.
-> >>>>>
-> >>>>>I do not believe any of us have said that it is unreasonable to
-> >>>>>support. We've only asked that you make the patches for it.
-> >>>>>
-> >>>>>All of us have communicated why Zone Append is a great addition to t=
-he
-> >>>>>Linux kernel. Also, as Christoph points out, this has not been
-> >>>>a secret
-> >>>>>for the past couple of months, and as Martin pointed out, have been =
-a
-> >>>>>wanted feature for the past decade in the Linux community.
-> >>>>
-> >>>>>
-> >>>>>I do want to politely point out, that you've got a very clear signal
-> >>>>>from the key storage maintainers. Each of them is part of the planet=
-'s
-> >>>>>best of the best and most well-respected software developers, that
-> >>>>>literally have built the storage stack that most of the world depend=
-s
-> >>>>>on. The storage stack that recently sent manned rockets into space.
-> >>>>>They each unanimously said that the Zone Append command is the right
-> >>>>>approach for the Linux kernel to reduce the overhead of I/O tracking
-> >>>>>for zoned block devices. It may be worth bringing this information t=
-o
-> >>>>>your engineering organization, and also potentially consider Zone
-> >>>>>Append support for devices that you intend to used with the Linux
-> >>>>>kernel storage stack.
-> >>>>
-> >>>>I understand and I have never said the opposite.
-> >>>>
-> >>>>Append is a great addition that
-> >>>
-> >>>One may have interpreted your SDC EMEA talk the opposite. It was not
-> >>>very neutral towards Zone Append, but that is of cause one of its leas=
-t
-> >>>problems. But I am happy to hear that you've changed your opinion.
-> >>
-> >>As you are well aware, there are some cases where append introduces
-> >>challenges. This is well-documented on the bibliography around nameless
-> >>writes.
-> >
-> >The nameless writes idea is vastly different from Zone append, and
-> >have little of the drawbacks of nameless writes, which makes the
-> >well-documented literature not apply.
->
-> You can have that conversation with your customer base.
->
-> >
-> >>Part of the talk was on presenting an alternative for these
-> >>particular use cases.
-> >>
-> >>This said, I am not afraid of changing my point of view when I am prove=
-n
-> >>wrong.
-> >>
-> >>>
-> >>>>we also have been working on for several months (see patches
-> >>>>additions from
-> >>>>today). We just have a couple of use cases where append is not
-> >>>>required and I
-> >>>>would like to make sure that they are supported.
-> >>>>
-> >>>>At the end of the day, the only thing I have disagreed on is
-> >>>>that the NVMe
-> >>>>driver rejects ZNS SSDs that do not support append, as opposed
-> >>>>to doing this
-> >>>>instead when an in-kernel user wants to utilize the drive (e.g.,
-> >>>>formatting a FS
-> >>>>with zoned support) This would allow _today_
-> >>>>ioctl() passthru to work for normal writes.
-> >>>>
-> >>>>I still believe the above would be a more inclusive solution
-> >>>>with the current ZNS
-> >>>>specification, but I can see that the general consensus is different.
-> >>>
-> >>>The comment from the community, including me, is that there is a
-> >>>general requirement for Zone Append command when utilizing Zoned
-> >>>storage devices. This is similar to implement an API that one wants to
-> >>>support. It is not a general consensus or opinion. It is hard facts an=
-d
-> >>>how the Linux kernel source code is implemented at this point. One mus=
-t
-> >>>implement support for ZNS SSDs that do not expose the Zone Append
-> >>>command natively. Period.
-> >>
-> >>Again, I am not saying the opposite. Read the 2 lines below...
-> >
-> >My point with the above paragraph was to clarify that we are not
-> >trying to be difficult or opinionated, but point out that the reason
-> >we give you the specific feedback, is that it is the way it is in the
-> >kernel as today.
->
-> Again, yes, we will apply the feedback and come back with an approach
-> that fits so that we can enable the raw ZNS block access that we want to
-> enable.
->
-> >
-> >>
-> >>>>
-> >>>>So we will go back, apply the feedback that we got and return with an
-> >>>>approach that better fits the ecosystem.
-> >>>>
-> >>>>>
-> >>>>>Another approach, is to use SPDK, and bypass the Linux kernel. This
-> >>>>>might even be an advantage, your customers does not have to
-> >>>>wait on the
-> >>>>>Linux distribution being released with a long term release,
-> >>>>before they
-> >>>>>can even get started and deploy in volume. I.e., they will
-> >>>>actually get
-> >>>>>faster to market, and your company will be able to sell more drives.
-> >>>>
-> >>>>I think I will refrain from discussing our business strategy on
-> >>>>an open mailing
-> >>>>list. Appreciate the feedback though. Very insightful.
-> >>>
-> >>>I am not asking for you to discuss your business strategy on the
-> >>>mailing list. My comment was to give you genuinely advise that may
-> >>>save a lot of work, and might even get better results.
-> >>>
-> >>>>
-> >>>>Thanks,
-> >>>>Javier
-> >>
+[ Upstream commit 720bc316690bd27dea9d71510b50f0cd698ffc32 ]
+
+Since commit dcebd755926b ("block: use bio_for_each_bvec() to compute
+multi-page bvec count"), the kernel will bug_on on the PS3 because
+bio_split() is called with sectors == 0:
+
+  kernel BUG at block/bio.c:1853!
+  Oops: Exception in kernel mode, sig: 5 [#1]
+  BE PAGE_SIZE=4K MMU=Hash PREEMPT SMP NR_CPUS=8 NUMA PS3
+  Modules linked in: firewire_sbp2 rtc_ps3(+) soundcore ps3_gelic(+) \
+  ps3rom(+) firewire_core ps3vram(+) usb_common crc_itu_t
+  CPU: 0 PID: 97 Comm: blkid Not tainted 5.3.0-rc4 #1
+  NIP:  c00000000027d0d0 LR: c00000000027d0b0 CTR: 0000000000000000
+  REGS: c00000000135ae90 TRAP: 0700   Not tainted  (5.3.0-rc4)
+  MSR:  8000000000028032 <SF,EE,IR,DR,RI>  CR: 44008240  XER: 20000000
+  IRQMASK: 0
+  GPR00: c000000000289368 c00000000135b120 c00000000084a500 c000000004ff8300
+  GPR04: 0000000000000c00 c000000004c905e0 c000000004c905e0 000000000000ffff
+  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000000ffff
+  GPR12: 0000000000000000 c0000000008ef000 000000000000003e 0000000000080001
+  GPR16: 0000000000000100 000000000000ffff 0000000000000000 0000000000000004
+  GPR20: c00000000062fd7e 0000000000000001 000000000000ffff 0000000000000080
+  GPR24: c000000000781788 c00000000135b350 0000000000000080 c000000004c905e0
+  GPR28: c00000000135b348 c000000004ff8300 0000000000000000 c000000004c90000
+  NIP [c00000000027d0d0] .bio_split+0x28/0xac
+  LR [c00000000027d0b0] .bio_split+0x8/0xac
+  Call Trace:
+  [c00000000135b120] [c00000000027d130] .bio_split+0x88/0xac (unreliable)
+  [c00000000135b1b0] [c000000000289368] .__blk_queue_split+0x11c/0x53c
+  [c00000000135b2d0] [c00000000028f614] .blk_mq_make_request+0x80/0x7d4
+  [c00000000135b3d0] [c000000000283a8c] .generic_make_request+0x118/0x294
+  [c00000000135b4b0] [c000000000283d34] .submit_bio+0x12c/0x174
+  [c00000000135b580] [c000000000205a44] .mpage_bio_submit+0x3c/0x4c
+  [c00000000135b600] [c000000000206184] .mpage_readpages+0xa4/0x184
+  [c00000000135b750] [c0000000001ff8fc] .blkdev_readpages+0x24/0x38
+  [c00000000135b7c0] [c0000000001589f0] .read_pages+0x6c/0x1a8
+  [c00000000135b8b0] [c000000000158c74] .__do_page_cache_readahead+0x118/0x184
+  [c00000000135b9b0] [c0000000001591a8] .force_page_cache_readahead+0xe4/0xe8
+  [c00000000135ba50] [c00000000014fc24] .generic_file_read_iter+0x1d8/0x830
+  [c00000000135bb50] [c0000000001ffadc] .blkdev_read_iter+0x40/0x5c
+  [c00000000135bbc0] [c0000000001b9e00] .new_sync_read+0x144/0x1a0
+  [c00000000135bcd0] [c0000000001bc454] .vfs_read+0xa0/0x124
+  [c00000000135bd70] [c0000000001bc7a4] .ksys_read+0x70/0xd8
+  [c00000000135be20] [c00000000000a524] system_call+0x5c/0x70
+  Instruction dump:
+  7fe3fb78 482e30dc 7c0802a6 482e3085 7c9e2378 f821ff71 7ca42b78 7d3e00d0
+  7c7d1b78 79290fe0 7cc53378 69290001 <0b090000> 81230028 7bca0020 7929ba62
+  [ end trace 313fec760f30aa1f ]---
+
+The problem originates from setting the segment boundary of the
+request queue to -1UL. This makes get_max_segment_size() return zero
+when offset is zero, whatever the max segment size. The test with
+BLK_SEG_BOUNDARY_MASK fails and 'mask - (mask & offset) + 1' overflows
+to zero in the return statement.
+
+Not setting the segment boundary and using the default
+value (BLK_SEG_BOUNDARY_MASK) fixes the problem.
+
+Signed-off-by: Emmanuel Nicolet <emmanuel.nicolet@gmail.com>
+Signed-off-by: Geoff Levand <geoff@infradead.org>
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+Link: https://lore.kernel.org/r/060a416c43138f45105c0540eff1a45539f7e2fc.1589049250.git.geoff@infradead.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/ps3disk.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/block/ps3disk.c b/drivers/block/ps3disk.c
+index c120d70d3fb3..fc7a20286090 100644
+--- a/drivers/block/ps3disk.c
++++ b/drivers/block/ps3disk.c
+@@ -464,7 +464,6 @@ static int ps3disk_probe(struct ps3_system_bus_device *_dev)
+ 	blk_queue_bounce_limit(queue, BLK_BOUNCE_HIGH);
+ 
+ 	blk_queue_max_hw_sectors(queue, dev->bounce_size >> 9);
+-	blk_queue_segment_boundary(queue, -1UL);
+ 	blk_queue_dma_alignment(queue, dev->blk_size-1);
+ 	blk_queue_logical_block_size(queue, dev->blk_size);
+ 
+-- 
+2.25.1
+
