@@ -2,143 +2,158 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C5AC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 17:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B765EC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 17:55:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCD4F208C3
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 17:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ED01207DD
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 17:55:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dKvbrKaC";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="gebS8sVa"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gecGjsWK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729519AbgFRRbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 13:31:43 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:18458 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727805AbgFRRbm (ORCPT
+        id S1727904AbgFRRzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 13:55:21 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:21367 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727098AbgFRRzU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 13:31:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1592501502; x=1624037502;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=F+vLgXRoVQEPZ6z2LjwClqzyEPtTNF3mQFO/zvWF2c4=;
-  b=dKvbrKaCB4H4I3GERivJcIAi8lOaZhrMdwoBpc6G7RFCH3NzwLtJUNQ6
-   kqHoTw6Il7W6jg/mFacuMm+V7I+Jludx667ac+kmKSpMiViGb6J/emtna
-   4oBcj3br8RepTBoyMy0r4LS1rM1FGa7uDo+m03s5r41CM1X7maS92haQB
-   sna1naXwXB0flC7OC1czQnrkweNA1PIyTXyIOYqREW/L4Xv7omyKLTwpV
-   ckmDfnjN7pa3H3i5PByvcUrxM/kC5c/BuhIHeP5pst/wJ1mz7fp48NCvu
-   lrkjqfn2Fb9qZvVHWfl6ODLtapFt5UXjyG81YpPysAqzMfuUBl21boGlB
-   g==;
-IronPort-SDR: rWfZmAD8JfwSgvoQjVufs76jlfGdREcH6NZzaHRJQ/wXMZjCoLfejnJzRFCt5JccWIgUZa8wrV
- 9zbGLZJT8+OU8oFhZskCzBXbij++KUkY0rgSEEn6iJj3hCQE06dT7OO2KZBURXwtEPOb3jFzYn
- RgSZeCPZOKRPIWlCNTmoS9q7iNHBQKKJSpAactLD+OUN7zu1/XUyDSWv28gzY3ahdmcIm4YeZL
- 8C07ZnKwNXLWE+tILJZvPcFT4ESK2Huaa0Im8dRGAiYU34Xb1VOJwKPdqsKN5YYE3FuGgzM1iu
- kl0=
-X-IronPort-AV: E=Sophos;i="5.75,251,1589212800"; 
-   d="scan'208";a="140340975"
-Received: from mail-dm6nam12lp2177.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.177])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 01:31:41 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K2Qdvv5hlPWLJ5YaaY4y6oFPFMZat6LLICqTuIdOYCm2p3QnuJiQrGeYUQETCHQL2OPBIx5/ya5fTsxDJOBayQcd03pQ9ofOagf/tcvs29S1jx3Xh1n01e5JRVSjCE1eiepqgk/QLvFhbkV6M0iLK4JJMVmAObgnGnXNue0+kym5Yyujoau2Cp9byjK427eWKgc7RuS673JCi1LJpj/MSzrNmWjEF6My/ZY/WvxkxBSkxWpBcx1A8LaUp62g+TN8JCcgLkUAp+Bk6npicoc06jsyv0oG+Bax+5MIC4w9RAl5KOqFX2E4qTFEd+ti9LyWnS4IamRhv8xKksMlf6qtOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TNIy+4oYBDbcnWjYaIEpe8U7T4jQBnWcdiWhE/c8kWQ=;
- b=Ko1v3Nd22eaWUGx9FbXYxBvaLLQAIsvjvmxcAWsCB6mo5TiWBjeaj2WSb8cddU7He7sYUJ/jBL/HhK5Hd6wHUU/BdZZgEFl89bMcKxuUzm8DFEKKCxZl08lzkd+Mgj1uw2Ea9XAAYE/7noPlQ9ABex8LtL7rrw0Tj5585prUIWVstoSWJLSAbeuKz9lR3OMgTLWggP7WOT8sPEOxqxTwghMGK1yuMbVZtTwKJIQwM+yOGwrv9pHasYniOQ7xl7uUb5AcnY/kTJ2pssN760GaidHrL5yv22qPKHa2XrS3VAdpD8/VUswUzAysCfIoiXBcHc8IAAzLtDeu0h0Dr4BGHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TNIy+4oYBDbcnWjYaIEpe8U7T4jQBnWcdiWhE/c8kWQ=;
- b=gebS8sVa5MPLqaV9JQuTA97KeDk2JwOq5L070f4Vjl+N+VkCLL8FyDdgytNkzwHcYOgxyLgyt4wM5rSym+5yId3UEviCsZtlw3uAaByE8ffbs6tpDbrPKTwj/yyRxIRIHyXMiY24c0ZJDkHV6lCmLxZdM0K7eflJaKVVII2xHVY=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB5032.namprd04.prod.outlook.com (2603:10b6:a03:44::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Thu, 18 Jun
- 2020 17:31:40 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::4d72:27c:c075:c5e6%7]) with mapi id 15.20.3109.023; Thu, 18 Jun 2020
- 17:31:40 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Jan Kara <jack@suse.cz>, "hch@infradead.org" <hch@infradead.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH] blktrace: Provide event for request merging
-Thread-Topic: [PATCH] blktrace: Provide event for request merging
-Thread-Index: AQHWRLAMNttH7JUaU0CGzcROGKdTgw==
-Date:   Thu, 18 Jun 2020 17:31:39 +0000
-Message-ID: <BYAPR04MB4965D21B363957DF36372151869B0@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20200617135823.980-1-jack@suse.cz>
- <20200618065359.GA24943@infradead.org> <20200618161331.GD9664@quack2.suse.cz>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: suse.cz; dkim=none (message not signed)
- header.d=none;suse.cz; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: c09d9846-4701-47c6-0068-08d813ad75e2
-x-ms-traffictypediagnostic: BYAPR04MB5032:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <BYAPR04MB5032F33B3BFD1AB6554559E5869B0@BYAPR04MB5032.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:883;
-x-forefront-prvs: 0438F90F17
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: G0flERolmNEVM6SCANKnGcCwGaG+M7kCjHN6lKtyex/os5emnR4N4N+RZv61dEAYHNdQCs/SW5uH6AKm90GgMj2O8VjbXI4oYxb5j8pxKIGynkDDO9I/zQwzXgA0OqR8/bjhFp7ZChB8I5rk7YExEH4DRmFAlawiiEC+r1CZa4zYk5R3YyU/KCxhBzgTCY1LCTszVecG5LVCBK4DHjFQWeqx1W0ALz55Vb/OTr0kh1jm2ae0Zus9ONUgAblMX12BGjliTgwM5EuP5/AhWOHj/KXmtVYLM8hlFSBbMDiyVEqvOnJeC7bGLrf4bRiDL+CloZ4GIhvnVEWobGrUO93FIQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(366004)(396003)(39860400002)(136003)(376002)(64756008)(76116006)(66446008)(66946007)(66476007)(66556008)(54906003)(110136005)(478600001)(9686003)(316002)(55016002)(6506007)(53546011)(52536014)(4326008)(86362001)(8936002)(186003)(5660300002)(2906002)(71200400001)(4744005)(33656002)(83380400001)(7696005)(8676002)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: a9W7DONtOJ/h6ZCbEIRYbzFk03IBIEXtLHaBVdFK9x1qgagluYfRrm70Dou25MIVZqB8bis5n3BO1/QnzwGMYtU9jb8qurzxCYRMVcgKdjzpK9RFlsqRpQzrAtHLDORVP8oQR9C6fmBEsaMBu+Y0op+uHy/s6j97JA+RQJOTh8CWs/39uak/6GxPoBcttuwkI5eg7pqSYbOJoc22HI2m2Q8SBY67bdQFKeuDtSMsflddwI+/V1+31yJZPNuhah1ZB2dW6owtMkd3THHD1y36KcgxgMJoPz2VlRq9fE8GMdA++f9fFml3SREYgZ3EVXe3p2nnjsYIk2WZfJsguXAHZU0Tt69MDtmMYzJlqN1auXss/DDnFhsP/tdsYTO088jYyyCyh4rv4a1VI68ltlDQ4/yXmAAeWikBZUyFr+n1/gyctJqm0I7Nafk3zEN94t8+qK/vKrFbdbInAbTv2zuBidqIJgGh9etXVHFdlTMj8oY=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 18 Jun 2020 13:55:20 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20200618175517epoutp01c8ea3493a86c7fcf40466e1aaa5e9db4~ZtPdc_mv_1556415564epoutp01f
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 17:55:17 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20200618175517epoutp01c8ea3493a86c7fcf40466e1aaa5e9db4~ZtPdc_mv_1556415564epoutp01f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1592502917;
+        bh=23380seXF4LQQ6pQBR9gN9kzZCCfOnSZsPuBF4BqYIc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=gecGjsWKapgNOP5W6RKHoWm0KuqUCPvAu4vJz7EE+yXv6ztQLazhz5cXFwRp/jWYg
+         lZH3LfZB7ndMK75aieRx9KVAGeEfCsjedmdIFHIRW737FF+1SlxOWEnlfKnaaZQajI
+         acBo7DHJ2pGSpzy6wFONvzHyE8ZTq9hsBmVrPsU0=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200618175516epcas5p29a72b748dda5977b80e4b76f42236c97~ZtPcrk5t40357303573epcas5p2P;
+        Thu, 18 Jun 2020 17:55:16 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        28.A6.09475.48AABEE5; Fri, 19 Jun 2020 02:55:16 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20200618175516epcas5p33a2df3fbdcfb8a78096b326fd271c292~ZtPb9BCGO0053400534epcas5p3r;
+        Thu, 18 Jun 2020 17:55:16 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200618175516epsmtrp232287ce5a7ac7cbd3eb16c82afc8a5b3~ZtPb8KiBt2407124071epsmtrp2G;
+        Thu, 18 Jun 2020 17:55:16 +0000 (GMT)
+X-AuditID: b6c32a4b-39fff70000002503-c1-5eebaa84f84f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D3.AC.08382.38AABEE5; Fri, 19 Jun 2020 02:55:15 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200618175514epsmtip142e1ee19f7bc182d89f085a5e6f3cff8~ZtPaGLzbt1202912029epsmtip1W;
+        Thu, 18 Jun 2020 17:55:14 +0000 (GMT)
+Date:   Thu, 18 Jun 2020 23:22:58 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, selvakuma.s1@samsung.com,
+        nj.shetty@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH 0/3] zone-append support in aio and io-uring
+Message-ID: <20200618175258.GA4141152@test-zns>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c09d9846-4701-47c6-0068-08d813ad75e2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2020 17:31:39.9401
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lRHPx9RmvZNvB7eUUBBZG73dmodopddGLWBia8cH/Om/bRF4xMtrxiXDmT63ChCBJULDeMUfzq2ZGKcoedXPVCXaEPBs0Okp/oP/Y983flI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5032
+In-Reply-To: <20200618065634.GB24943@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCKsWRmVeSWpSXmKPExsWy7bCmhm7LqtdxBm0zTS1W3+1ns+j6t4XF
+        4vSERUwW71rPsVg8vvOZ3WLKtCZGi723tC327D3JYnF51xw2i22/5zNbXJmyiNni9Y+TbBbn
+        /x5ndeD12LxCy+Py2VKPTZ8msXv0bVnF6PF5k5zHpidvmQLYorhsUlJzMstSi/TtErgyVu/f
+        yVRwUqDi+uyrrA2MP3i7GDk5JARMJBredrN1MXJxCAnsZpTYvPMdO4TziVHiyfduZgjnG6PE
+        4ukTWGFaZj2+AFW1l1HiW+taJgjnGaNEz681TCBVLAKqEgffdwG1c3CwCWhKXJhcChIWATJv
+        LW8Hm8osMJVJ4uW+p+wgCWEBB4kb82cygti8AvoSm369ZYGwBSVOznwCZnMKGEucubwKzBYV
+        UJY4sO042GIJgaUcEjcvvmKCOM9F4tuepWwQtrDEq+Nb2CFsKYnP7/ZCxYslft05ygzR3MEo
+        cb1hJgtEwl7i4p6/TCBXMwtkSJw9GwASZhbgk+j9/QQsLCHAK9HRJgRRrShxb9JTaKiISzyc
+        sQTK9pCY1NPGCAmU/YwSdxftYZ7AKDcLyT+zEDbMAttgJdH5oYkVIiwtsfwfB4SpKbF+l/4C
+        RtZVjJKpBcW56anFpgXGeanlesWJucWleel6yfm5mxjBCUvLewfjowcf9A4xMnEwHmKU4GBW
+        EuF1/v0iTog3JbGyKrUoP76oNCe1+BCjNAeLkjiv0o8zcUIC6YklqdmpqQWpRTBZJg5OqQYm
+        QwvJQ4kLph23Fdn6QuvWwrVz02a1nZQ1/v6mlr/P8aDWjqnycqKloQvsdRSjDY6v77TfabXd
+        8Nuhbw3/Zy0+a84+5++e7rx1Olv294uVJV5cckSn3fHclCcB5pt3qi283PVNak7CjC8Hjusf
+        upwddDXxzHyrEw/8Zk9f3nTxy88YLaOLpZmPMmYuXDTl61Zrj6lvVl/MjFpuIRx77foFr5B1
+        P3R2f5zUbHb8vFlfsajJIW3TLqYpPgdmvWF1/y4289ATkVrTc9Ks99kW7mO6zXXrR2X8infr
+        DhRmaRxTOWXv6pwddCJQYVYYD39ty6TVLabGl5ry2Zc+lm8zi5/aK64/KeS545bmiwws6c81
+        XJVYijMSDbWYi4oTAfNj+SXHAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrDLMWRmVeSWpSXmKPExsWy7bCSnG7LqtdxBtdlLVbf7Wez6Pq3hcXi
+        9IRFTBbvWs+xWDy+85ndYsq0JkaLvbe0LfbsPclicXnXHDaLbb/nM1tcmbKI2eL1j5NsFuf/
+        Hmd14PXYvELL4/LZUo9Nnyaxe/RtWcXo8XmTnMemJ2+ZAtiiuGxSUnMyy1KL9O0SuDLmXprC
+        VvCbt2L21kbmBsYj3F2MnBwSAiYSsx5fYO9i5OIQEtjNKHFqzipmiIS4RPO1H+wQtrDEyn/P
+        oYqeMEpMeb4OLMEioCpx8H0XUAMHB5uApsSFyaUgYREg89bydrA5zALTmSQObdEHsYUFHCRu
+        zJ/JCGLzCuhLbPr1lgVi5n5GieNHV7FAJAQlTs58wgLRbCYxb/NDsPnMAtISy/9xgIQ5BYwl
+        zlyGKBcVUJY4sO040wRGwVlIumch6Z6F0L2AkXkVo2RqQXFuem6xYYFhXmq5XnFibnFpXrpe
+        cn7uJkZwBGlp7mDcvuqD3iFGJg7GQ4wSHMxKIrzOv1/ECfGmJFZWpRblxxeV5qQWH2KU5mBR
+        Eue9UbgwTkggPbEkNTs1tSC1CCbLxMEp1cC05N3jiux7uz+Fmu9l/yxll5W7Ru5nX3ir9rLm
+        h9Pdoh71Gv145RIpp8zOGz519ucvBQlt4a+v+l99ofhZ9L6OwOxbLJ/6L+lZTS9JMetQMly3
+        6DxPzLnlyxbf+/xonvbO5VNvxXBdKfnnl9YmYyF1a4kb65Ny/2iLZSe3LUo7v8k1wLcu4EdL
+        9R4HjTKRHRpGvic3T3WJn7HBr19V/5Waj05AwAMfzrPr3Y7Mcr3AJiKwcr36nquhfhuvtq1X
+        T/W5EdeTbPfwktuB/Oqfev9vh065/LPCSEpg64V/KazVjWGsx352eOnNkGqzmd9saezEFua2
+        a4ltef0bGQnrvYeu+Z7YvmTyLMXCWxdXu9QqsRRnJBpqMRcVJwIAcHiaqA8DAAA=
+X-CMS-MailID: 20200618175516epcas5p33a2df3fbdcfb8a78096b326fd271c292
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_77fd7_"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20200617172653epcas5p488de50090415eb802e62acc0e23d8812
+References: <CGME20200617172653epcas5p488de50090415eb802e62acc0e23d8812@epcas5p4.samsung.com>
+        <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+        <20200618065634.GB24943@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/20 9:13 AM, Jan Kara wrote:=0A=
-> On Wed 17-06-20 23:53:59, Christoph Hellwig wrote:=0A=
->> On Wed, Jun 17, 2020 at 03:58:23PM +0200, Jan Kara wrote:=0A=
->>>   	blk_account_io_merge_request(next);=0A=
->>>   =0A=
->>> +	trace_block_rq_merge(q, next);=0A=
->> q can be derived from next, no need to explicitly pass it.  And yes,=0A=
->> I know a lot of existing tracepoints do so, but I plan to fix that up=0A=
->> as well.=0A=
-> I had a look into it now and I could do this but that would mean that=0A=
-> block_rq_merge trace event would now differ from all other similar events=
-=0A=
-> and we couldn't use block_rq event class and have to define our own and s=
-o=0A=
-> overall it would IMO make future conversion to get rid of 'q' argument mo=
-re=0A=
-> difficult, not simpler. So I can do this but are you really sure?=0A=
-> =0A=
-> 								Honza=0A=
-> -- Jan Kara <jack@suse.com> SUSE Labs, CR=0A=
-=0A=
-If you guys are okay then I can look into this and send out a patch and=0A=
-we can keep this patch separate.=0A=
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_77fd7_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On Wed, Jun 17, 2020 at 11:56:34PM -0700, Christoph Hellwig wrote:
+>On Wed, Jun 17, 2020 at 10:53:36PM +0530, Kanchan Joshi wrote:
+>> This patchset enables issuing zone-append using aio and io-uring direct-io interface.
+>>
+>> For aio, this introduces opcode IOCB_CMD_ZONE_APPEND. Application uses start LBA
+>> of the zone to issue append. On completion 'res2' field is used to return
+>> zone-relative offset.
+>>
+>> For io-uring, this introduces three opcodes: IORING_OP_ZONE_APPEND/APPENDV/APPENDV_FIXED.
+>> Since io_uring does not have aio-like res2, cqe->flags are repurposed to return zone-relative offset
+>
+>And what exactly are the semantics supposed to be?  Remember the
+>unix file abstractions does not know about zones at all.
+>
+>I really don't think squeezing low-level not quite block storage
+>protocol details into the Linux read/write path is a good idea.
+
+I was thinking of raw block-access to zone device rather than pristine file
+abstraction. And in that context, semantics, at this point, are unchanged
+(i.e. same as direct writes) while flexibility of async-interface gets
+added.
+Synchronous-writes on single-zone sound fine, but synchronous-appends on
+single-zone do not sound that fine.
+
+>What could be a useful addition is a way for O_APPEND/RWF_APPEND writes
+>to report where they actually wrote, as that comes close to Zone Append
+>while still making sense at our usual abstraction level for file I/O.
+
+Thanks for suggesting this. O and RWF_APPEND may not go well with block
+access as end-of-file will be picked from dev inode. But perhaps a new
+flag like RWF_ZONE_APPEND can help to transform writes (aio or uring)
+into append without introducing new opcodes.
+And, I think, this can fit fine on file-abstraction of ZoneFS as well.
+
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_77fd7_
+Content-Type: text/plain; charset="utf-8"
+
+
+------LJmyoXw8O9.Ba._wAgamKaSQQ_oizdakYzSktnuewvRJuSc2=_77fd7_--
