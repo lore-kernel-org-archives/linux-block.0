@@ -2,104 +2,92 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18854C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 02:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 825CAC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 02:13:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC74220853
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 02:11:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592446318;
-	bh=6u7PWMV3j0m2+4CfIYZC7websJIBkxc3CKJbEdH1TSk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dglMhBVEoDs79SkLLoVhYwhAdWEuZTRgN+TDZ2d6U1HvcATBCvShM0BftHo94nEum
-	 V40TQ3qfVdIgmxmcmyA6yIr8ti9q9gSLat72PkaGH/ZQI/s0Ba1DF4JJuqW464wSeo
-	 dJQkiWpugBmmHUXUjuJC3PAGmWvRM3vGaJO/yBDc=
+	by mail.kernel.org (Postfix) with ESMTP id 6AE3320853
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 02:13:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732026AbgFRCLw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Jun 2020 22:11:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54070 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729891AbgFRBVc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:21:32 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B75C421D82;
-        Thu, 18 Jun 2020 01:21:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443291;
-        bh=6u7PWMV3j0m2+4CfIYZC7websJIBkxc3CKJbEdH1TSk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fvG2N+m4K0Gphhb7N6W0ARItw4+5k/3FxM8T75P+zP7S/17uWdxVF3bs/36GfNRz5
-         5DIVzacBqimhMlLS38va7QkP1r5xaKg9CUAu2El40mt8AzshVlRYhNXnk3VTaEXQM+
-         wsBQmvyDg9MzZAvnt1JtOInt/FGFUF9jBvu2FxtI=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 232/266] blktrace: use errno instead of bi_status
-Date:   Wed, 17 Jun 2020 21:15:57 -0400
-Message-Id: <20200618011631.604574-232-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
-References: <20200618011631.604574-1-sashal@kernel.org>
+        id S1733168AbgFRCNg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Jun 2020 22:13:36 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:44331 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730435AbgFRCNa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jun 2020 22:13:30 -0400
+Received: by mail-pg1-f169.google.com with SMTP id r18so2184927pgk.11;
+        Wed, 17 Jun 2020 19:13:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=aK/bYSH5F+ZeVvJdD/Zz3xXS5MT4DFtVf+PE4xuGbAk=;
+        b=nIdhj4s3UtS3Duo02FCJwuU/IVu3hoWIfYyUk06jKdfWvWIZCmFp9At90K8zDUwyVK
+         8EeAAVJOtDKwlWvMAiEAJRlJD7j7/vTFnVNM1TWh5kCHD23NN0R04qyd5jkrxo0GL0HT
+         GG1JmaTFnPHQamq+01PuSufv5yF8VVw7xzw/jX9yTxhHrzpvG/vB5CWf1IsoUXxe+Rac
+         GnAmGILq1n0Yh00Vcn3POosv3Wi0MekLWPykTU90RDlPJFAQcHo3Isj7hoRjgoAnLn11
+         xHfImWnWohuWVCcQ/BxPi1fRl2cyfsTUZHa5UhTO7RB+KKtj9ZmfU+fmd2ESprsclFl3
+         F5oA==
+X-Gm-Message-State: AOAM533MhlzrMTgdWUm3nfudvQ63STk1sBZ2GnXGg+BCLWl2RX8Zkba/
+        r4tnlpHMQI+uYsXHfiZ3JIK1tIpS
+X-Google-Smtp-Source: ABdhPJx6tEFWGkRuFu+gbdkcW3sm63w9UV1aCKHGgu+5Z4NXdljZLjFWm/M28K/tmiVmJpWaxYbleA==
+X-Received: by 2002:a65:6089:: with SMTP id t9mr1536586pgu.236.1592446409387;
+        Wed, 17 Jun 2020 19:13:29 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id n69sm1058936pfd.171.2020.06.17.19.13.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jun 2020 19:13:28 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] block: make function 'kill_bdev' static
+To:     Zheng Bin <zhengbin13@huawei.com>, hch@infradead.org,
+        axboe@kernel.dk, jaegeuk@kernel.org, viro@zeniv.linux.org.uk,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     houtao1@huawei.com, yi.zhang@huawei.com
+References: <20200530114032.125678-1-zhengbin13@huawei.com>
+ <20200530114032.125678-3-zhengbin13@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <807a9f7f-ea96-793b-2eca-a99bfe52dc5e@acm.org>
+Date:   Wed, 17 Jun 2020 19:13:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200530114032.125678-3-zhengbin13@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+On 2020-05-30 04:40, Zheng Bin wrote:
+> kill_bdev does not have any external user, so make it static.
 
-[ Upstream commit 48bc3cd3e07a1486f45d9971c75d6090976c3b1b ]
-
-In blk_add_trace_spliti() blk_add_trace_bio_remap() use
-blk_status_to_errno() to pass the error instead of pasing the bi_status.
-This fixes the sparse warning.
-
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- kernel/trace/blktrace.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index e7e483cdbea6..9e02e1ce0ac0 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -999,8 +999,10 @@ static void blk_add_trace_split(void *ignore,
- 
- 		__blk_add_trace(bt, bio->bi_iter.bi_sector,
- 				bio->bi_iter.bi_size, bio_op(bio), bio->bi_opf,
--				BLK_TA_SPLIT, bio->bi_status, sizeof(rpdu),
--				&rpdu, blk_trace_bio_get_cgid(q, bio));
-+				BLK_TA_SPLIT,
-+				blk_status_to_errno(bio->bi_status),
-+				sizeof(rpdu), &rpdu,
-+				blk_trace_bio_get_cgid(q, bio));
- 	}
- 	rcu_read_unlock();
- }
-@@ -1037,7 +1039,8 @@ static void blk_add_trace_bio_remap(void *ignore,
- 	r.sector_from = cpu_to_be64(from);
- 
- 	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
--			bio_op(bio), bio->bi_opf, BLK_TA_REMAP, bio->bi_status,
-+			bio_op(bio), bio->bi_opf, BLK_TA_REMAP,
-+			blk_status_to_errno(bio->bi_status),
- 			sizeof(r), &r, blk_trace_bio_get_cgid(q, bio));
- 	rcu_read_unlock();
- }
--- 
-2.25.1
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
