@@ -6,78 +6,89 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D841C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2EFAC433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:16:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FB6720884
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:11:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ACB620885
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 14:16:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qHJ0AeBF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="frBBXjmK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726905AbgFROLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 10:11:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52286 "EHLO
+        id S1730477AbgFROQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 10:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726001AbgFROLI (ORCPT
+        with ESMTP id S1730277AbgFROQu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 10:11:08 -0400
+        Thu, 18 Jun 2020 10:16:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2947CC06174E
-        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 07:11:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9A4C06174E;
+        Thu, 18 Jun 2020 07:16:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2VCYy4C36bVSKPOdZsbjyuJ7FYfjvBrWrzEm+tns33A=; b=qHJ0AeBF5GoJcfpszFy4lBUZn6
-        drIVbgYLyrVhfZYBTwaGUYv0XCxcOmCg9AVxpo36t4ibJe/mTfQ4LfV8Ug5KAj+jZzf5v9WSqi5AF
-        N+qz9tgWzcDKpCwavvvfkiV5n6zHO+dm3crgJtjssou20KzNZ4LayoloGIW3EryKA4z1QSFTjDI8w
-        pF1iRc8/PIHmXYvt812D2Qr+3VZqplAmJXDzDkWAwX7DkJxEpvYlqfz3S/IN7ovAxW1fKQRpwoo8t
-        cf4hRiYh6BeNRRS8QDiineasDvjDhrmHY9ynbZzE0uCi1dIyqXto9Dh/kRwwScY5ZjN6FFRaQRp/4
-        xUAUuP2Q==;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=59v7DL+Q6M0O6agqJhZf72SPocZXRPqx3iv/O5eS9Zk=; b=frBBXjmKpVtAc+AqKk5DD8LQNU
+        wbXudAS7/WiZVQ1wkOg5A1ixxX85phlK37al49JjUr3uf6dYnpaQrHmHDThIfg/5T2KcquAjDchIJ
+        5tbQR1JRhwgA8oiv/tbO5pI+PrShy4gU8oT5ZvztmYtlogsPm4n6sNtO33CkT5OGOrwMhquvwhgeA
+        FC6kTYlBxc43qy5rcUEsh9gLh7ZLSPn2l/HnHnJePiJizDk7EPysFbh5hxYI8YP/llFbTe0uMMwzd
+        nXmSN6L/g4upY7k4bzc+G1g2Fnu3gFfd95Y4PN1fvigpZVS+rQYFnfavVmMWaToR0PCyznDj3IR8T
+        0pGOqomA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jlvFw-0006ZL-0j; Thu, 18 Jun 2020 14:11:04 +0000
-Date:   Thu, 18 Jun 2020 07:11:03 -0700
+        id 1jlvLQ-0002tV-UP; Thu, 18 Jun 2020 14:16:44 +0000
+Date:   Thu, 18 Jun 2020 07:16:44 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: blk_mq_complete_request overhaul
-Message-ID: <20200618141103.GA16866@infradead.org>
-References: <20200611064452.12353-1-hch@lst.de>
+To:     Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, selvakuma.s1@samsung.com,
+        nj.shetty@samsung.com, javier.gonz@samsung.com,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <keith.busch@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 0/3] zone-append support in aio and io-uring
+Message-ID: <20200618141644.GB16866@infradead.org>
+References: <CGME20200617172653epcas5p488de50090415eb802e62acc0e23d8812@epcas5p4.samsung.com>
+ <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+ <f503c488-fa00-4fe2-1ceb-7093ea429e45@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200611064452.12353-1-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f503c488-fa00-4fe2-1ceb-7093ea429e45@lightnvm.io>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Any comments?
+On Thu, Jun 18, 2020 at 10:04:32AM +0200, Matias Bjørling wrote:
+> Please provide a pointers to applications that are updated and ready to take
+> advantage of zone append.
 
-(and yes, I misspelled the nvme list address, but the interested
-parties should be on linux-block anyway)
+That is a pretty high bar for kernel APIs that we don't otherwise
+apply unless seriously in doubt.
 
-On Thu, Jun 11, 2020 at 08:44:40AM +0200, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> Peters recent inquiry made me dust off various bits of unfinished work
-> around blk_mq_complete_request and massage it into a coherent series.
-> 
-> This does three different things all touching the same area:
-> 
->  - merge the softirq based single queue completion into the main
->    blk-mq completion mechanism, as there is a lot of duplicate logic
->    between the two
->  - move the error injection that just fails to complete requests out into
->    the drivers.  The fact that blk_mq_complete_request just wouldn't
->    complete when called from the error handle has been causing all kinds
->    of pain
->  - optimize the fast path by allowing drivers to avoid the indirect call
->    with a little more work for polled or per-CPU IRQ completions.  With
->    this a polled block device I/O only has two indirect calls let, one for
->    the file operation that ends up in the block device code, and another
->    one for disptching to the nvme driver
----end quoted text---
+> I do not believe it's beneficial at this point to change the libaio API,
+> applications that would want to use this API, should anyway switch to use
+> io_uring.
+
+I think that really depends on the amount of churn required.  We
+absolutely can expose things like small additional flags or simple
+new operations, as rewriting application to different APIs is not
+exactly trivial.  On the other hand we really shouldn't do huge
+additions to the machinery.
+
+> Please also note that applications and libraries that want to take advantage
+> of zone append, can already use the zonefs file-system, as it will use the
+> zone append command when applicable.
+
+Not really.  While we already use Zone Append in Zonefs for some cases,
+we can't fully take advantage of the scalability of Zone Append.  For
+that we'd need a way to return the file position where an O_APPEND
+write actually landed, as suggested in my earlier mail.  Which I think
+is a very useful addition, and Damien and I had looked into adding
+it both for zonefs and normal file systems, but didn't get around to
+doing the work yet.
