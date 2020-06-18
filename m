@@ -2,136 +2,125 @@ Return-Path: <SRS0=/Row=77=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F973C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 19:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F06C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 20:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86A9220739
-	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 19:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1FF120890
+	for <linux-block@archiver.kernel.org>; Thu, 18 Jun 2020 20:04:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="2Gdw9yRp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729112AbgFRTlY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Jun 2020 15:41:24 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:45994 "EHLO
-        charlie.dont.surf" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729080AbgFRTlX (ORCPT
+        id S1730874AbgFRUEd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Jun 2020 16:04:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730047AbgFRUEc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jun 2020 15:41:23 -0400
-X-Greylist: delayed 321 seconds by postgrey-1.27 at vger.kernel.org; Thu, 18 Jun 2020 15:41:22 EDT
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net [80.167.98.190])
-        by charlie.dont.surf (Postfix) with ESMTPSA id DA454BF56E;
-        Thu, 18 Jun 2020 19:35:59 +0000 (UTC)
-Date:   Thu, 18 Jun 2020 21:35:56 +0200
-From:   Klaus Jensen <its@irrelevant.dk>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, sagi@grimberg.me, axboe@kernel.dk,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ajay Joshi <ajay.joshi@wdc.com>,
+        Thu, 18 Jun 2020 16:04:32 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8F1C0613ED
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 13:04:32 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id q11so7413917wrp.3
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 13:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=I1X5PgsyDNPZk5OWUMSkw5d9tqtI+lNZgxN4Rtom3J4=;
+        b=2Gdw9yRpfZxYdJPIxo9vBo6m73ZCsO3/13tXY2w0ZeHHFdt4gSwy/htURFqSmKf4WG
+         Vcu9QN/YTZ8yD20PpRBi2W1z9zQBycqw9+em7uYgosUj77O6ve0zOSJs284LnMXdtYhn
+         raSPvaaJmx6EOie8eiwOIaUwDTyRibfq+uyl0nMTuqAj04owC7YOwYJQGxu9i0SnmkzT
+         2VCWv0KyTnidlmyeG4wxlx3uYNHsIuFDXcCpRD0+tr2hg6Yjg8u33PjfrIqzNiZyCkoI
+         oX5Mi2IywJXrc9KfaI9U+c895gh2SuZBZcFsJfzIBvxwGQrR4BHtcFQVeNUFXa81ZQ34
+         hG4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=I1X5PgsyDNPZk5OWUMSkw5d9tqtI+lNZgxN4Rtom3J4=;
+        b=q2YImEIdnWTU/d3VKzz3usrpmEbbRa4lcAiQNWlNYfkQbAJ7PJnOXU0XOfdTV7dVLz
+         QZcx/sIa3r1nVEL20oNVuPR4S1pyeuSBgL9kHeyC+S+nmxREI40kdYOMSKkIlfZ10Q8g
+         ghiaAXT5dsy9VX0Ty3P8VSGt5LRrgVPrm1EpNKBRojUoclxdpCl3zyzUvUpR6ISjujQu
+         QOpfusQ8zh0qcWWsVSH1ETjGPZO5bk94kmR5RJeLjY0nbqSQZoU2REv8wuLr6L2pWHB9
+         6RtsQCsa4MeMtoziY1oitTNmY2K/espJLmIrsxBZgpD3QQRpVTrfRyONd7A0EiYW/XhQ
+         M60A==
+X-Gm-Message-State: AOAM532/ejkPN5AZSNjSneDQURcv3OpCpnfcO/nH+8oT+ws+feg+xitO
+        XrSgAvkCjyuZOAGFrxUCEWXQMA==
+X-Google-Smtp-Source: ABdhPJxevHzd88MB3BtvBcSHFDfduqy63NdjLXzwRNfLfbeBHu+X/bIxcZVe6+j+aB1WA/b3mWH6NQ==
+X-Received: by 2002:adf:fd81:: with SMTP id d1mr206028wrr.96.1592510670761;
+        Thu, 18 Jun 2020 13:04:30 -0700 (PDT)
+Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
+        by smtp.gmail.com with ESMTPSA id e2sm2750197wrt.76.2020.06.18.13.04.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jun 2020 13:04:30 -0700 (PDT)
+Subject: Re: [PATCH 0/3] zone-append support in aio and io-uring
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, selvakuma.s1@samsung.com,
+        nj.shetty@samsung.com, javier.gonz@samsung.com,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Keith Busch <keith.busch@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        Aravind Ramesh <aravind.ramesh@wdc.com>,
-        Hans Holmberg <hans.holmberg@wdc.com>,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>
-Subject: Re: [PATCHv2 5/5] nvme: support for zoned namespaces
-Message-ID: <20200618193556.3s2gbkjsfotomot7@apples.localdomain>
-References: <20200618145354.1139350-1-kbusch@kernel.org>
- <20200618145354.1139350-6-kbusch@kernel.org>
+        Christoph Hellwig <hch@lst.de>
+References: <CGME20200617172653epcas5p488de50090415eb802e62acc0e23d8812@epcas5p4.samsung.com>
+ <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+ <f503c488-fa00-4fe2-1ceb-7093ea429e45@lightnvm.io>
+ <20200618192153.GA4141485@test-zns>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <12a630ce-599b-3877-8079-10b319b55d45@lightnvm.io>
+Date:   Thu, 18 Jun 2020 22:04:30 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200618145354.1139350-6-kbusch@kernel.org>
+In-Reply-To: <20200618192153.GA4141485@test-zns>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 18 07:53, Keith Busch wrote:
-> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
-> new file mode 100644
-> index 000000000000..d57fbbfe15e8
-> --- /dev/null
-> +++ b/drivers/nvme/host/zns.c
-> @@ -0,0 +1,238 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2020 Western Digital Corporation or its affiliates.
-> + */
-> +
-> +#include <linux/blkdev.h>
-> +#include <linux/vmalloc.h>
-> +#include "nvme.h"
-> +
-> +static int nvme_set_max_append(struct nvme_ctrl *ctrl)
-> +{
-> +	struct nvme_command c = { };
-> +	struct nvme_id_ctrl_zns *id;
-> +	int status;
-> +
-> +	id = kzalloc(sizeof(*id), GFP_KERNEL);
-> +	if (!id)
-> +		return -ENOMEM;
-> +
-> +	c.identify.opcode = nvme_admin_identify;
-> +	c.identify.cns = NVME_ID_CNS_CS_CTRL;
-> +	c.identify.csi = NVME_CSI_ZNS;
-> +
-> +	status = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
-> +	if (status) {
-> +		kfree(id);
-> +		return status;
-> +	}
-> +
-> +	ctrl->max_zone_append = 1 << (id->zamds + 3);
-> +	kfree(id);
-> +	return 0;
-> +}
-> +
-> +int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
-> +			  unsigned lbaf)
-> +{
-> +	struct nvme_effects_log *log = ns->head->effects;
-> +	struct request_queue *q = disk->queue;
-> +	struct nvme_command c = { };
-> +	struct nvme_id_ns_zns *id;
-> +	int status;
-> +
-> +	/* Driver requires zone append support */
-> +	if (!(log->iocs[nvme_cmd_zone_append] & NVME_CMD_EFFECTS_CSUPP))
-> +		return -ENODEV;
-> +
-> +	/* Lazily query controller append limit for the first zoned namespace */
-> +	if (!ns->ctrl->max_zone_append) {
-> +		status = nvme_set_max_append(ns->ctrl);
-> +		if (status)
-> +			return status;
-> +	}
-> +
-> +	id = kzalloc(sizeof(*id), GFP_KERNEL);
-> +	if (!id)
-> +		return -ENOMEM;
-> +
-> +	c.identify.opcode = nvme_admin_identify;
-> +	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
-> +	c.identify.cns = NVME_ID_CNS_CS_NS;
-> +	c.identify.csi = NVME_CSI_ZNS;
-> +
-> +	status = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, id, sizeof(*id));
-> +	if (status)
-> +		goto free_data;
-> +
-> +	/*
-> +	 * We currently do not handle devices requiring any of the zoned
-> +	 * operation characteristics.
-> +	 */
-> +	if (id->zoc) {
-> +		status = -EINVAL;
-> +		goto free_data;
-> +	}
+On 18/06/2020 21.21, Kanchan Joshi wrote:
+> On Thu, Jun 18, 2020 at 10:04:32AM +0200, Matias Bjørling wrote:
+>> On 17/06/2020 19.23, Kanchan Joshi wrote:
+>>> This patchset enables issuing zone-append using aio and io-uring 
+>>> direct-io interface.
+>>>
+>>> For aio, this introduces opcode IOCB_CMD_ZONE_APPEND. Application 
+>>> uses start LBA
+>>> of the zone to issue append. On completion 'res2' field is used to 
+>>> return
+>>> zone-relative offset.
+>>>
+>>> For io-uring, this introduces three opcodes: 
+>>> IORING_OP_ZONE_APPEND/APPENDV/APPENDV_FIXED.
+>>> Since io_uring does not have aio-like res2, cqe->flags are 
+>>> repurposed to return zone-relative offset
+>>
+>> Please provide a pointers to applications that are updated and ready 
+>> to take advantage of zone append.
+>>
+>> I do not believe it's beneficial at this point to change the libaio 
+>> API, applications that would want to use this API, should anyway 
+>> switch to use io_uring.
+>>
+>> Please also note that applications and libraries that want to take 
+>> advantage of zone append, can already use the zonefs file-system, as 
+>> it will use the zone append command when applicable.
+>
+> AFAIK, zonefs uses append while serving synchronous I/O. And append bio
+> is waited upon synchronously. That maybe serving some purpose I do
+> not know currently. But it seems applications using zonefs file
+> abstraction will get benefitted if they could use the append 
+> themselves to
+> carry the I/O, asynchronously.
+Yep, please see Christoph's comment regarding adding the support to zonefs.
 
-A dev_err() here would be nice. I had to dig a bit to track down why my
-emulated device didn't show up ;)
+
