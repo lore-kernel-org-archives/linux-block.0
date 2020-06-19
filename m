@@ -2,203 +2,109 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5C4C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 15:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4456CC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 15:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77EBF206FA
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 15:35:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24423206FA
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 15:36:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592580926;
-	bh=maaYENQJ8ZL0EP/jDZtR5Sg7D2VvDgzl8nJ0dHfmwGM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=XqCpdP8An+yTBKec9FWpWbcND9Z8SByW/MswYYh+kOa8qFgYAIjpzoW/CQVyQSeHH
-	 9VSWOPbe+meuhOQUJS2TwXfg5OsdsjCLR3AwfZc3yJ81HxHoIeVkZEZcwztUjpdPSq
-	 ZVqXzvt8aYpdJlHSi/9jRPK+uJtCVoAJEgRDdCvs=
+	s=default; t=1592580989;
+	bh=u/CdtheCagNnozUz5p3gqXOp6mrR7D99Q7P2/ig3Prg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=oxV8LMpU95hnyiiJvY8+HJFu1R0XbMaaoAoWEFfgQj7INH35q2a7QXxh7ZN1Ckcbn
+	 yRC+HWPTI3JbcxcvkfchioK82fJoyQa19VZnqFJArHwWqw9DkRy0c0Fv2UqOSY1s/5
+	 hxZqwttx8g6TM4VSY7JjsUdOymxgcGZMZI6zysYs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404791AbgFSPfZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 11:35:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38486 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393535AbgFSPfO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 11:35:14 -0400
-Received: from devnote2 (NE2965lan1.rev.em-net.ne.jp [210.141.244.193])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1772D2166E;
-        Fri, 19 Jun 2020 15:35:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592580914;
-        bh=maaYENQJ8ZL0EP/jDZtR5Sg7D2VvDgzl8nJ0dHfmwGM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=QKFkMf6CmSPcqyw5qJm923cZaKitao9xyRits+mLT1o5loUnNh9K3nPqJkQc3Eopa
-         vbf0NKpPB7Oqt6MXd5rtg+oOe9i4+XnBk2Z9AzigcDiUgFhM4RAoKOeSoCqYwuED/K
-         92nB46mQZbrh6THXGBQS7WhYLNzuQLqRWfR6wW/I=
-Date:   Sat, 20 Jun 2020 00:35:09 +0900
-From:   Masami Hiramatsu <mhiramat@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: kprobe: __blkdev_put probe is missed
-Message-Id: <20200620003509.9521053fbd384f4f5d23408f@kernel.org>
-In-Reply-To: <20200619133240.GA351476@T590>
-References: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
-        <20200618125438.GA191266@T590>
-        <20200618225602.3f2cca3f0ed48427fc0a483b@kernel.org>
-        <20200618231901.GA196099@T590>
-        <20200619141239.56f6dda0976453b790190ff7@kernel.org>
-        <20200619072859.GA205278@T590>
-        <20200619081954.3d72a252@oasis.local.home>
-        <20200619133240.GA351476@T590>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S2404879AbgFSPg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 11:36:27 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:56178 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391695AbgFSPgY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jun 2020 11:36:24 -0400
+Received: by mail-pj1-f67.google.com with SMTP id ne5so4198232pjb.5;
+        Fri, 19 Jun 2020 08:36:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=LjzrirVb+ZQBftcrRnoHLV9aRjuJIVfcPAYJhueLEQk=;
+        b=j5o5tO1tyDDGisXMWl6kWkDjdFhK2FjznjMc5EuwqXD/hVXUn54Cd94YxgQvB2eKm5
+         B3jQgLkjJ2auPVeSKVfjQjzc0alqO1f5jAraGYVl2fe3PDCKTSfwszZONn0pQX8QsP+X
+         pF2piML2/z4jHogDjdDkJzV3RHPbYiKytxjF8KSOfODkMaeuGn50tI1E5Q1eQhu9OzjV
+         BCq41297JQ1QAL/uxF9WRufJY4CeNYNhRLhVOr9mb1GY0S0nyMmR0GfMnf/vsH5llkdS
+         +Hag2VWUTm7flab+tFX4zfhVskY/PjsOBLq+nCKjDgRiMuc884h+CeWsI+IlpJgbZ8YU
+         bN1Q==
+X-Gm-Message-State: AOAM530ZiggpUZSitQ2Wb9nvdQwVhV0pv5Wny6SJA8ksO2SGdygu3nMn
+        Fdomf+a3jIMvmvnEPbRCM5s=
+X-Google-Smtp-Source: ABdhPJzViKsR3tVw6K/ch+JBLdo17uGcti8CT335conquQT26tgspJ89pJQG6ng0CCGMq0+rPtsHZQ==
+X-Received: by 2002:a17:902:b906:: with SMTP id bf6mr8845200plb.129.1592580983204;
+        Fri, 19 Jun 2020 08:36:23 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id p16sm5382348pgj.53.2020.06.19.08.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jun 2020 08:36:21 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id CD1B84063E; Fri, 19 Jun 2020 15:36:20 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 15:36:20 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        martin.petersen@oracle.com, jejb@linux.ibm.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        syzbot+603294af2d01acfdd6da@syzkaller.appspotmail.com
+Subject: Re: [PATCH v6 6/6] blktrace: fix debugfs use after free
+Message-ID: <20200619153620.GI11244@42.do-not-panic.com>
+References: <20200608170127.20419-1-mcgrof@kernel.org>
+ <20200608170127.20419-7-mcgrof@kernel.org>
+ <ec643803-2339-fe8d-7f58-b37871c83386@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec643803-2339-fe8d-7f58-b37871c83386@acm.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
-
-On Fri, 19 Jun 2020 21:32:40 +0800
-Ming Lei <ming.lei@redhat.com> wrote:
-
-> On Fri, Jun 19, 2020 at 08:19:54AM -0400, Steven Rostedt wrote:
-> > On Fri, 19 Jun 2020 15:28:59 +0800
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > > 
-> > > > OK, then let's make events (for sure)
-> > > > 
-> > > > root@devnote2:/sys/kernel/debug/tracing# echo p __blkdev_put >> kprobe_events 
-> > > > root@devnote2:/sys/kernel/debug/tracing# echo r __blkdev_put >> kprobe_events 
-> > > > root@devnote2:/sys/kernel/debug/tracing# echo p blkdev_put >> kprobe_events 
-> > 
-> > Hi Ming,
-> > 
-> > Do you have the kprobe_events file?
-> > 
-> > > > root@devnote2:/sys/kernel/debug/tracing# echo 1 > events/kprobes/enable   
-> > > 
-> > > I can't find 'events/kprobes' in my VM with upstream kernel, also not found
-> > > the dir under fedora31(5.5.15-200) & rhel8(v4.18 based).
-> > 
-> > The events/kprobes directly will be created when you create a
-> > kprobe_event. It wont exist until then.
+On Fri, Jun 12, 2020 at 07:42:12PM -0700, Bart Van Assche wrote:
+> On 2020-06-08 10:01, Luis Chamberlain wrote:
+> > +	/*
+> > +	 * Blktrace needs a debugfs name even for queues that don't register
+> > +	 * a gendisk, so it lazily registers the debugfs directory.  But that
+> > +	 * can get us into a situation where a SCSI device is found, with no
+> > +	 * driver for it (yet).  Then blktrace is used on the device, creating
+> > +	 * the debugfs directory, and only after that a driver is loaded. In
+> > +	 * that case we might already have a debugfs directory registered here.
+> > +	 * Even worse we could be racing with blktrace to register it.
+> > +	 */
 > 
-> Hi Steven and Masami,
+> There are LLD and ULD drivers in the SCSI subsystem. Please mention the
+> driver type explicitly. I assume that you are referring to SCSI ULDs
+> since only SCSI ULD drivers call device_add_disk()?
+
+I've simplified this and so this is no longer a valid comment.
+
+> >  	case BLKTRACESETUP:
+> > +		if (!sdp->device->request_queue->sg_debugfs_dir)
+> > +			blk_sg_debugfs_init(sdp->device->request_queue,
+> > +					    sdp->disk->disk_name);
 > 
-> Got it, thanks for your help, now I can run the test, follows the steps
-> and results, and there is still one __blkdev_put probed.
+> How about moving the sg_debugfs_dir check into blk_sg_debugfs_init()?
 
-Hmm, strange...
+I found a way to not have to do any of this, the fix will be short and
+sweet now.
 
-> And it is observed in my VM reliably with 5.7+ or Fedora kernel reliably,
-> kernel config is attached.
-
-Thanks for sharing it.
-
-> 
-> [root@ktest-01 tracing]# uname -a
-> Linux ktest-01 5.7.0+ #1900 SMP Fri Jun 19 16:26:47 CST 2020 x86_64 x86_64 x86_64 GNU/Linux
-> [root@ktest-01 tracing]#
-> [root@ktest-01 tracing]# cat kprobe_events
-> [root@ktest-01 tracing]#
-> [root@ktest-01 tracing]# echo p blkdev_put >> kprobe_events
-> [root@ktest-01 tracing]# echo p __blkdev_put >> kprobe_events
-> [root@ktest-01 tracing]# echo r __blkdev_put >> kprobe_events
-> [root@ktest-01 tracing]#
-> [root@ktest-01 tracing]# echo 1 > events/kprobes/enable
-> [root@ktest-01 tracing]# blockdev --getbsz /dev/sda1
-> 4096
-> [root@ktest-01 tracing]# echo 0 > events/kprobes/enable
-> [root@ktest-01 tracing]# cat trace
-> # tracer: nop
-> #
-> # entries-in-buffer/entries-written: 3/3   #P:8
-> #
-> #                              _-----=> irqs-off
-> #                             / _----=> need-resched
-> #                            | / _---=> hardirq/softirq
-> #                            || / _--=> preempt-depth
-> #                            ||| /     delay
-> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> #              | |       |   ||||       |         |
->         blockdev-970   [005] .... 17603.447236: p_blkdev_put_0: (blkdev_put+0x0/0xb4)
->         blockdev-970   [005] .... 17603.447244: p___blkdev_put_0: (__blkdev_put+0x0/0x19d)
->         blockdev-970   [005] d... 17603.447251: r___blkdev_put_0: (blkdev_close+0x22/0x25 <- __blkdev_put)
-
-This shows __blkdev_put() is a tail-call. It is possible that the
-internal (nested) __blkdev_put() call becomes a goto inside the
-function by the gcc optimization.
-
-Ah, after all it is as expected. With your kconfig, the kernel is
-very agressively optimized.
-
-$ objdump -dS vmlinux | less
-...
-ffffffff81256dc3 <__blkdev_put>:
-{
-ffffffff81256dc3:       e8 98 85 df ff          callq  ffffffff8104f360 <__fentry__>
-ffffffff81256dc8:       41 57                   push   %r15
-ffffffff81256dca:       41 56                   push   %r14
-ffffffff81256dcc:       41 55                   push   %r13
-...
-ffffffff81256f05:       75 02                   jne    ffffffff81256f09 <__blkdev_put+0x146>
-        struct block_device *victim = NULL;
-ffffffff81256f07:       31 db                   xor    %ebx,%ebx
-                bdev->bd_contains = NULL;
-ffffffff81256f09:       48 c7 45 60 00 00 00    movq   $0x0,0x60(%rbp)
-ffffffff81256f10:       00 
-                put_disk_and_module(disk);
-ffffffff81256f11:       4c 89 f7                mov    %r14,%rdi
-ffffffff81256f14:       e8 c6 3d 11 00          callq  ffffffff8136acdf <put_disk_and_module>
-        mutex_unlock(&bdev->bd_mutex);
-ffffffff81256f19:       4c 89 ff                mov    %r15,%rdi
-                __blkdev_put(victim, mode, 1);
-ffffffff81256f1c:       41 bc 01 00 00 00       mov    $0x1,%r12d
-        mutex_unlock(&bdev->bd_mutex);
-ffffffff81256f22:       e8 8d d7 48 00          callq  ffffffff816e46b4 <mutex_unlock>
-        bdput(bdev);
-ffffffff81256f27:       48 89 ef                mov    %rbp,%rdi
-ffffffff81256f2a:       e8 f0 e9 ff ff          callq  ffffffff8125591f <bdput>
-        if (victim)
-ffffffff81256f2f:       48 85 db                test   %rbx,%rbx
-ffffffff81256f32:       74 08                   je     ffffffff81256f3c <__blkdev_put+0x179>
-ffffffff81256f34:       48 89 dd                mov    %rbx,%rbp
-ffffffff81256f37:       e9 b4 fe ff ff          jmpq   ffffffff81256df0 <__blkdev_put+0x2d> <<-----THIS!!
-}
-ffffffff81256f3c:       48 8b 44 24 28          mov    0x28(%rsp),%rax
-ffffffff81256f41:       65 48 33 04 25 28 00    xor    %gs:0x28,%rax
-ffffffff81256f48:       00 00 
-ffffffff81256f4a:       74 05                   je     ffffffff81256f51 <__blkdev_put+0x18e>
-ffffffff81256f4c:       e8 5a 4e 48 00          callq  ffffffff816dbdab <__stack_chk_fail>
-ffffffff81256f51:       48 83 c4 30             add    $0x30,%rsp
-ffffffff81256f55:       5b                      pop    %rbx
-ffffffff81256f56:       5d                      pop    %rbp
-ffffffff81256f57:       41 5c                   pop    %r12
-ffffffff81256f59:       41 5d                   pop    %r13
-ffffffff81256f5b:       41 5e                   pop    %r14
-ffffffff81256f5d:       41 5f                   pop    %r15
-ffffffff81256f5f:       c3                      retq   
-
-
-As you can see, the nested __blkdev_put() is coverted to a loop.
-If you put kprobe on __blkdev_put+0x2d, you'll see the event twice.
-
-Thank you,
- 
-
-
--- 
-Masami Hiramatsu <mhiramat@kernel.org>
+  Luis
