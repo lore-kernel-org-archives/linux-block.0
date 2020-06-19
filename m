@@ -2,202 +2,76 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AEDC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 05:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DD9C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 06:52:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A993D20FC3
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 05:12:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592543565;
-	bh=QVNKMxbWIq7XLlJL0MehvoZpWnGUrjeyAMPYeky8naw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=Q7+yOsK2g7wYQ8LOXRiLle6uZJ0PIt4iU9gEgey98u/0wKNi5fGsx0ngysOJMJPxV
-	 RCNwyUxlU62nBQf1PiZdWM2jhNunbwwPXhJJ91ltRMMInwXXRSpLJiLvvE3CfhXx2B
-	 7/Snremfytk7G0IZrktb1gLWIH4C8HvfonGz5OrY=
+	by mail.kernel.org (Postfix) with ESMTP id 582EA20809
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 06:52:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TcoxCQiG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725778AbgFSFMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 01:12:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34602 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725290AbgFSFMo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 01:12:44 -0400
-Received: from devnote2 (NE2965lan1.rev.em-net.ne.jp [210.141.244.193])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 70B6220DD4;
-        Fri, 19 Jun 2020 05:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592543563;
-        bh=QVNKMxbWIq7XLlJL0MehvoZpWnGUrjeyAMPYeky8naw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VuVvV1PwGfdS/HmHbWPB7AaJArIGuSwK7Yc/SY8XbGrN4ySR+wz5E2X7S6oRJ0DKG
-         I6bIFGmWkcTFP7fILQMnVErGDXxxzv/apW+74iCdIKfEBvXqcpuJD2owishBl8F8zx
-         fFWH4SEDTqUMTNi9uGSFXIQ+mMh7EmcxuL7evQDo=
-Date:   Fri, 19 Jun 2020 14:12:39 +0900
-From:   Masami Hiramatsu <mhiramat@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>,
-        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: kprobe: __blkdev_put probe is missed
-Message-Id: <20200619141239.56f6dda0976453b790190ff7@kernel.org>
-In-Reply-To: <20200618231901.GA196099@T590>
-References: <CACVXFVO5saamQXs0naLamTKJfXZMW+p446weeqJK=9+V34UM0g@mail.gmail.com>
-        <20200618125438.GA191266@T590>
-        <20200618225602.3f2cca3f0ed48427fc0a483b@kernel.org>
-        <20200618231901.GA196099@T590>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1729164AbgFSGwl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 02:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729080AbgFSGwl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jun 2020 02:52:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88017C06174E
+        for <linux-block@vger.kernel.org>; Thu, 18 Jun 2020 23:52:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Nb1nK3zLgh0CjfDQ76fVSS7aK8UI2PgPurE/sZ4Pj/s=; b=TcoxCQiGHoO8TGgWXEL51m6KT1
+        qMAhs2VUHKTMz/53FpqQeEf08JJs+ZyGH22EjQw0o73ls9ZWRT01t62zw2Vg1fwsFH/9YZnWL0IVw
+        z5SXEOFYCDN9I/ouG7WwbegRcZWpe6P5JUpe1Pu5xEqpG6+qR/xWvg6K0OdXrrwkWPaccDtfNON8f
+        wGmZIhPZx2prE1t0xqP+e4PGMRMUmQrlD8k40U497a6Z/ZuCT7rKpvIeas72sdroIR+hHlTSh7IeM
+        JGDioEV9kHBmlW1yuurecM/xpNzqrHlU/Hz5J0VLA7G5XUZ/k9g3MqA7W2YqdPrWyrsPwoG7Z+ivD
+        lrytd9Dg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jmAtE-0000qK-Pk; Fri, 19 Jun 2020 06:52:40 +0000
+Date:   Thu, 18 Jun 2020 23:52:40 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH] blktrace: Provide event for request merging
+Message-ID: <20200619065240.GA3212@infradead.org>
+References: <20200617135823.980-1-jack@suse.cz>
+ <20200618065359.GA24943@infradead.org>
+ <20200618161331.GD9664@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200618161331.GD9664@quack2.suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
-
-On Fri, 19 Jun 2020 07:19:01 +0800
-Ming Lei <ming.lei@redhat.com> wrote:
-
-> > I'm using 5.4 on ubuntu and can not reproduce it with kprobe_event.
+On Thu, Jun 18, 2020 at 06:13:31PM +0200, Jan Kara wrote:
+> On Wed 17-06-20 23:53:59, Christoph Hellwig wrote:
+> > On Wed, Jun 17, 2020 at 03:58:23PM +0200, Jan Kara wrote:
+> > >  	blk_account_io_merge_request(next);
+> > >  
+> > > +	trace_block_rq_merge(q, next);
 > > 
-> > root@devnote2:/sys/kernel/tracing# uname -a
-> > Linux devnote2 5.4.0-37-generic #41-Ubuntu SMP Wed Jun 3 18:57:02 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
-> > root@devnote2:/sys/kernel/tracing# echo p __blkdev_put > kprobe_events 
-> > root@devnote2:/sys/kernel/tracing# echo 1 > events/kprobes/p___blkdev_put_0/enable 
-> > root@devnote2:/sys/kernel/tracing# cat trace
-> > # tracer: nop
-> > #
-> > # entries-in-buffer/entries-written: 0/0   #P:8
-> > #
-> > #                              _-----=> irqs-off
-> > #                             / _----=> need-resched
-> > #                            | / _---=> hardirq/softirq
-> > #                            || / _--=> preempt-depth
-> > #                            ||| /     delay
-> > #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> > #              | |       |   ||||       |         |
-> > root@devnote2:/sys/kernel/tracing# blockdev --getbsz /dev/nvme0n1
-> > 4096
-> > root@devnote2:/sys/kernel/tracing# cat trace
-> > # tracer: nop
-> > #
-> > # entries-in-buffer/entries-written: 1/1   #P:8
-> > #
-> > #                              _-----=> irqs-off
-> > #                             / _----=> need-resched
-> > #                            | / _---=> hardirq/softirq
-> > #                            || / _--=> preempt-depth
-> > #                            ||| /     delay
-> > #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> > #              | |       |   ||||       |         |
-> >            <...>-111740 [002] .... 301734.476991: p___blkdev_put_0: (__blkdev_put+0x0/0x1e0)
-> > 
-> > Hmm, maybe some issue in the latest kernel...?
+> > q can be derived from next, no need to explicitly pass it.  And yes,
+> > I know a lot of existing tracepoints do so, but I plan to fix that up
+> > as well.
 > 
-> Hello Masami,
-> 
-> I am testing the latest upstream kernel, your trace actually reproduces
-> this issue.
+> I had a look into it now and I could do this but that would mean that
+> block_rq_merge trace event would now differ from all other similar events
+> and we couldn't use block_rq event class and have to define our own and so
+> overall it would IMO make future conversion to get rid of 'q' argument more
+> difficult, not simpler. So I can do this but are you really sure?
 
-OK.
-
-> 
-> After 'blockdev --getbsz /dev/nvme0n1' returns, __blkdev_put() should
-> have been called two times(one for partition, and the other for disk),
-> however kprobe trace just shows one time of calling this function.
-> 
-> If trace_printk() is added at the entry of __blkdev_put() manually,
-> you will see that __blkdev_put() is called two times in 'blockdev
-> --getbsz /dev/nvme0n1'.
-
-OK, let me check again on the latest kernel.
-Here I tested with qemu.
-
-root@devnote2:/sys/kernel/debug/tracing# uname -a
-Linux devnote2 5.8.0-rc1+ #26 SMP PREEMPT Fri Jun 19 12:12:53 JST 2020 x86_64 x86_64 x86_64 GNU/Linux
-
-And we have a (virtual) sda with 1 partition.
-
-root@devnote2:/sys/kernel/debug/tracing# cat /proc/partitions 
-major minor  #blocks  name
-
-   8        0      10240 sda
-   8        1       9216 sda1
-
-OK, then let's make events (for sure)
-
-root@devnote2:/sys/kernel/debug/tracing# echo p __blkdev_put >> kprobe_events 
-root@devnote2:/sys/kernel/debug/tracing# echo r __blkdev_put >> kprobe_events 
-root@devnote2:/sys/kernel/debug/tracing# echo p blkdev_put >> kprobe_events 
-
-There are 3 events in the kernel, blkdev_put() and __blkdev_put() and
-the return of __blkdev_put().
-Then enable it and access to */dev/sda* (a disk)
-
-root@devnote2:/sys/kernel/debug/tracing# echo 1 > events/kprobes/enable 
-root@devnote2:/sys/kernel/debug/tracing# blockdev --getbsz /dev/sda
-4096
-root@devnote2:/sys/kernel/debug/tracing# echo 0 > events/kprobes/enable 
-root@devnote2:/sys/kernel/debug/tracing# cat trace 
-# tracer: nop
-#
-# entries-in-buffer/entries-written: 3/3   #P:8
-#
-#                              _-----=> irqs-off
-#                             / _----=> need-resched
-#                            | / _---=> hardirq/softirq
-#                            || / _--=> preempt-depth
-#                            ||| /     delay
-#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-#              | |       |   ||||       |         |
-        blockdev-185   [002] ...1    72.604266: p_blkdev_put_0: (blkdev_put+0x0/0x130)
-        blockdev-185   [002] ...1    72.604276: p___blkdev_put_0: (__blkdev_put+0x0/0x220)
-        blockdev-185   [002] d..2    72.604288: r___blkdev_put_0: (blkdev_put+0x50/0x130 <- __blkdev_put)
-
-So the __blkdev_put() is called once from blkdev_put().
-Next, we do same trace with accessing */dev/sda1* (a partition).
-
-root@devnote2:/sys/kernel/debug/tracing# echo > trace 
-root@devnote2:/sys/kernel/debug/tracing# echo 1 > events/kprobes/enable 
-root@devnote2:/sys/kernel/debug/tracing# blockdev --getbsz /dev/sda1 
-4096
-root@devnote2:/sys/kernel/debug/tracing# echo 0 > events/kprobes/enable 
-root@devnote2:/sys/kernel/debug/tracing# cat trace 
-# tracer: nop
-#
-# entries-in-buffer/entries-written: 5/5   #P:8
-#
-#                              _-----=> irqs-off
-#                             / _----=> need-resched
-#                            | / _---=> hardirq/softirq
-#                            || / _--=> preempt-depth
-#                            ||| /     delay
-#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-#              | |       |   ||||       |         |
-        blockdev-191   [005] ...1   194.401517: p_blkdev_put_0: (blkdev_put+0x0/0x130)
-        blockdev-191   [005] ...1   194.401527: p___blkdev_put_0: (__blkdev_put+0x0/0x220)
-        blockdev-191   [005] ...1   194.401529: p___blkdev_put_0: (__blkdev_put+0x0/0x220)
-        blockdev-191   [005] d..2   194.401535: r___blkdev_put_0: (__blkdev_put+0x1ea/0x220 <- __blkdev_put)
-        blockdev-191   [005] d..2   194.401536: r___blkdev_put_0: (blkdev_put+0x50/0x130 <- __blkdev_put)
-
-In this case, we can see the __blkdev_put() is called twice, from
-blkdev_put() and __blkdev_put() itself (nested call).
-
-So, it seems that the kprobe event correctly works.
-
-Could you do same thing on your environment, and share the result?
-
-Thank you,
-
--- 
-Masami Hiramatsu <mhiramat@kernel.org>
+Ok, let's keep the original version for now then.
