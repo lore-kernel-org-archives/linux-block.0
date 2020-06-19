@@ -2,58 +2,87 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C95BC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 134D0C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39D6B20890
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:09:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dYqfLLGF"
+	by mail.kernel.org (Postfix) with ESMTP id E92DE22243
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391195AbgFSVJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 17:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389580AbgFSVJj (ORCPT
+        id S1728759AbgFSV7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 17:59:34 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:42117 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728242AbgFSV7c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 17:09:39 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458B0C06174E;
-        Fri, 19 Jun 2020 14:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=SKXBg9QCixG/IchKHg9Q2/lXiIJ73XcZduzMIVVEuUQ=; b=dYqfLLGFB8fvVBDYf1TIgO0wYh
-        FP7werI4Q/FAE7u7P6X1AU6HfAOG/7ZHvwxQJPaxy6esNCCCsOy1C1V4TtnhFNIDBeMbyv9h+DdY3
-        IgHp8Y2NVmydmTD+aGKHWHUFz7deZOGTT3voPMo6eng9tD05KSXEe0vo4ON1EmxCpT8Dvu5CHBaNb
-        2jjxUbtd640+5DIUNY94jO+pXWc+/q3jb682oVQWx2jS/X2fQTxhin6yyDs1nuVl7agNac4CCJz5q
-        3U1waI7KAFxgfakjYr3kMR6yAAWWJK6Vsusz7MBTSwLXAzgar6NOJdTUDsFkmBSDoOB+yB6tfWGyZ
-        YS1qFaZA==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jmOGW-0004Vu-6E; Fri, 19 Jun 2020 21:09:36 +0000
-Subject: Re: [PATCH v3] docs: block: Create blk-mq documentation
-To:     Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>,
-        corbet@lwn.net, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
-        krisman@collabora.com, dongli.zhang@oracle.com
-References: <20200619200114.6896-1-andrealmeid@collabora.com>
- <c2f83c87-f473-4d30-2430-442e957de14f@kernel.dk>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <4ff82592-c5cb-bb2a-d298-10a91fb9e69d@infradead.org>
-Date:   Fri, 19 Jun 2020 14:09:34 -0700
+        Fri, 19 Jun 2020 17:59:32 -0400
+Received: by mail-pl1-f193.google.com with SMTP id k6so4459880pll.9;
+        Fri, 19 Jun 2020 14:59:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=AV7sMf6DKdniuUMlAi+PCzyUcAZ8zYs0XbZP7OgqLvo=;
+        b=EJRXZHIsW0P3yI0do5y+ISFK4xTQmy24IOFsz8Pr2L/5YZNh8lMwAf9keb3GtDmzHL
+         Bzv8epY/zgnVtK7UqZMpbEyYo0d6/srGEfneSC8XqHb0n6jW/ONt85tlgmGFnyvrAe2g
+         +qWsbgPqELk40tp8ab/xIaC6Zy01amTJgfQmTxek227pKyofBWP1WV6IFuEvWt28MXLB
+         99jjuK8XWPFibp+4G99EtHMGm/cD/h3TPD3W1Nbb7RQjr+mkm/efs2Dqd3Moax3Oeaye
+         EZ0oD5W5vfnd6hfEXQNhJpf2z7T9hQ8ONCMqTRxd+yc2lV2OvLu+F8voIt7ZfScWRMMo
+         TG5A==
+X-Gm-Message-State: AOAM531HHZfHRhRMUyaflb/6wqBheIZEz5OmtUR/qHqNm0OsodIrmhZV
+        oA7VtC0EzJkl6WHxS3vnqwQJIZDG
+X-Google-Smtp-Source: ABdhPJx4OW9HYswSIJLZOwlHOxYK4xw7Rnvfy6NUwHa5lYL4TdK49UM/lZSvhmLbfdP9bmtLYJ83gg==
+X-Received: by 2002:a17:90a:d803:: with SMTP id a3mr5821475pjv.125.1592603971568;
+        Fri, 19 Jun 2020 14:59:31 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id t201sm6757784pfc.104.2020.06.19.14.59.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 14:59:30 -0700 (PDT)
+Subject: Re: [PATCH 2/2] block: only return started requests from
+ blk_mq_tag_to_rq()
+To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <keith.busch@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20200619140159.141905-1-hare@suse.de>
+ <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <3d073c18-50da-a4c8-2f1e-332a1e717efc@acm.org>
+Date:   Fri, 19 Jun 2020 14:59:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <c2f83c87-f473-4d30-2430-442e957de14f@kernel.dk>
+In-Reply-To: <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -62,44 +91,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/19/20 1:56 PM, Jens Axboe wrote:
-> On 6/19/20 2:01 PM, André Almeida wrote:
->> Create a documentation providing a background and explanation around the
->> operation of the Multi-Queue Block IO Queueing Mechanism (blk-mq).
+On 2020-06-19 07:09, Hannes Reinecke wrote:
+> On 6/19/20 4:01 PM, Hannes Reinecke wrote:
+>> blk_mq_tag_to_rq() is used from within the driver to map a tag
+>> to a request. As such it should only return requests which are
+>> already started (ie passed to the driver); otherwise the driver
+>> might trip over requests which it has never seen and random
+>> crashes will occur.
 >>
->> The reference for writing this documentation was the source code and
->> "Linux Block IO: Introducing Multi-queue SSD Access on Multi-core
->> Systems", by Axboe et al.
->>
->> Signed-off-by: André Almeida <andrealmeid@collabora.com>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
 >> ---
->> Changes from v2:
->> - More fixed typos
->> - Once again, reworked the definition of `blk_mq_hw_ctx` in "Hardware
->>   dispatch queues" section
+>>   block/blk-mq.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
 >>
->> Changes from v1:
->> - Fixed typos
->> - Reworked blk_mq_hw_ctx
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 4f57d27bfa73..f02d18113f9e 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -815,9 +815,13 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+>>     struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
+>> unsigned int tag)
+>>   {
+>> +    struct request *rq;
+>> +
+>>       if (tag < tags->nr_tags) {
+>>           prefetch(tags->rqs[tag]);
+>> -        return tags->rqs[tag];
+>> +        rq = tags->rqs[tag];
+>> +        if (blk_mq_request_started(rq))
+>> +            return rq;
+>>       }
+>>         return NULL;
 >>
->> Hello,
->>
->> This commit was tested using "make htmldocs" and the HTML output has
->> been verified.
->>
->> Thanks,
->> 	André
->> ---
->>  Documentation/block/blk-mq.rst | 155 +++++++++++++++++++++++++++++++++
->>  Documentation/block/index.rst  |   1 +
->>  2 files changed, 156 insertions(+)
->>  create mode 100644 Documentation/block/blk-mq.rst
+> This becomes particularly obnoxious for SCSI drivers using
+> scsi_host_find_tag() for cleaning up stale commands (ie drivers like
+> qla4xxx, fnic, and snic).
+> All other drivers use it from the completion routine, so one can expect
+> a valid (and started) tag here. So for those it shouldn't matter.
+> 
+> But still, if there are objections I could look at fixing it within the
+> SCSI stack; although that would most likely mean I'll have to implement
+> the above patch as an additional function.
 
-LGTM.
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Hi Hannes,
 
+Will the above patch make the fast path of every block driver slightly
+slower?
 
-thanks.
--- 
-~Randy
+Shouldn't SCSI drivers (and other block drivers) use
+blk_mq_tagset_busy_iter() to clean up stale commands instead of
+iterating over all tags and calling blk_mq_tag_to_rq() directly?
 
+Thanks,
+
+Bart.
