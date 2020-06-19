@@ -2,99 +2,199 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E58C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 14:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BDDC433DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 14:15:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0FB6207E8
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 14:09:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 083EC20776
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 14:15:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="d1Z7NBN/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733155AbgFSOJf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 10:09:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44360 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733205AbgFSOJe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 10:09:34 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id CACBEAD2A;
-        Fri, 19 Jun 2020 14:09:31 +0000 (UTC)
-Subject: Re: [PATCH 2/2] block: only return started requests from
- blk_mq_tag_to_rq()
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20200619140159.141905-1-hare@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
-Date:   Fri, 19 Jun 2020 16:09:29 +0200
+        id S1733066AbgFSOPF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 10:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48652 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733012AbgFSOPE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jun 2020 10:15:04 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707E9C0613EE
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:15:04 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id s23so4479935pfh.7
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:15:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vKgaeJnyg9cLq81+E0+J+QD8Om9Rb9c3m9dc4xG9lHc=;
+        b=d1Z7NBN/J4rcYQozroSRSec7V4c8J8uQC7Sagh9+3gHV4/EUGZjouMvG8jmc1IERbT
+         KeSibIf9YZQpn3XPSo3FsVPSQaInICZH8MzKT3/o9y7ADIsXYfXi7S8q2iG0/OqCUS2x
+         xzhP8+m1g2l8uPg2MY1CJ9tnWZE+b71fSw0yzq4gsDq3oGThXsuqRq/+X6JVmBwUxVR8
+         XIncsGKi0j3r8UBMdHnElslFfoK/euFbUagqpNTJ0/epDTJxZ9ttSTTUJetKEtxHDmkT
+         AL4Biv192ULTPLTQYQxQs4X6brZMECUR7nzq5Uze2Fmi2xrsmvgCbtgWbxgIFSm9VJpL
+         CCCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vKgaeJnyg9cLq81+E0+J+QD8Om9Rb9c3m9dc4xG9lHc=;
+        b=QXkxkzPUtIjzAPaoDNSvki0frnxfMaDhLNAiGldgFlXnAO+E63skgW6p3+7bZpUc6s
+         vMvuMOlX7Uod7OIeyvcwApeTSkMZ0NCdpncmploqu9zSrokp4UHNcn/i4ag20Pku7Xki
+         3PBxnYl564iiceM0Nm6Eq9H0fKFLfD8YmIqHetVpNszj5tTcRhoyubMNJ+IfgnUTv99A
+         dDN0+adAReFsjOJAbew7m9RrN0gVNv7CMAnt0QRh6g+BjMBaXhPWdXhx7VnCQLjzP1IF
+         Enur9pxUTJLjgOlSRgbYgwfuSHwdgyKZk4V8MbsJWqi3WCtTD709yM5vBe+7O1LykuVJ
+         YY8A==
+X-Gm-Message-State: AOAM532pNiVHqquGbxvlCPJg6yFP6Ey5HY9s5qhmbZonfRJBMuwUmQGh
+        9ks1jg4AuHQL1NiN7QmUnpvXwQ==
+X-Google-Smtp-Source: ABdhPJxJ5rUdZQlZ85uNdWYu0aORrSm4Hs/gqNUu5fZPN0AfOVDyqgnm2fFHhgtfgfuyb46iF3hR1Q==
+X-Received: by 2002:a63:7987:: with SMTP id u129mr3109208pgc.353.1592576103577;
+        Fri, 19 Jun 2020 07:15:03 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id f29sm2504625pga.59.2020.06.19.07.15.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 07:15:03 -0700 (PDT)
+Subject: Re: [PATCH 3/3] io_uring: add support for zone-append
+To:     "javier.gonz@samsung.com" <javier@javigon.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
+References: <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200617172713epcas5p352f2907a12bd4ee3c97be1c7d8e1569e@epcas5p3.samsung.com>
+ <1592414619-5646-4-git-send-email-joshi.k@samsung.com>
+ <CY4PR04MB37510E916B6F243D189B4EB0E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618083529.ciifu4chr4vrv2j5@mpHalley.local>
+ <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618091113.eu2xdp6zmdooy5d2@mpHalley.local>
+ <20200619094149.uaorbger326s6yzz@mpHalley.local>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <31f1c27e-4a3d-a411-3d3b-f88a2d92ce7b@kernel.dk>
+Date:   Fri, 19 Jun 2020 08:15:01 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200619140159.141905-1-hare@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200619094149.uaorbger326s6yzz@mpHalley.local>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/19/20 4:01 PM, Hannes Reinecke wrote:
-> blk_mq_tag_to_rq() is used from within the driver to map a tag
-> to a request. As such it should only return requests which are
-> already started (ie passed to the driver); otherwise the driver
-> might trip over requests which it has never seen and random
-> crashes will occur.
+On 6/19/20 3:41 AM, javier.gonz@samsung.com wrote:
+> Jens,
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->   block/blk-mq.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+> Would you have time to answer a question below in this thread?
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4f57d27bfa73..f02d18113f9e 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -815,9 +815,13 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
->   
->   struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
->   {
-> +	struct request *rq;
-> +
->   	if (tag < tags->nr_tags) {
->   		prefetch(tags->rqs[tag]);
-> -		return tags->rqs[tag];
-> +		rq = tags->rqs[tag];
-> +		if (blk_mq_request_started(rq))
-> +			return rq;
->   	}
->   
->   	return NULL;
+> On 18.06.2020 11:11, javier.gonz@samsung.com wrote:
+>> On 18.06.2020 08:47, Damien Le Moal wrote:
+>>> On 2020/06/18 17:35, javier.gonz@samsung.com wrote:
+>>>> On 18.06.2020 07:39, Damien Le Moal wrote:
+>>>>> On 2020/06/18 2:27, Kanchan Joshi wrote:
+>>>>>> From: Selvakumar S <selvakuma.s1@samsung.com>
+>>>>>>
+>>>>>> Introduce three new opcodes for zone-append -
+>>>>>>
+>>>>>>   IORING_OP_ZONE_APPEND     : non-vectord, similiar to IORING_OP_WRITE
+>>>>>>   IORING_OP_ZONE_APPENDV    : vectored, similar to IORING_OP_WRITEV
+>>>>>>   IORING_OP_ZONE_APPEND_FIXED : append using fixed-buffers
+>>>>>>
+>>>>>> Repurpose cqe->flags to return zone-relative offset.
+>>>>>>
+>>>>>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>>>>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>>>>>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>>>>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+>>>>>> ---
+>>>>>> fs/io_uring.c                 | 72 +++++++++++++++++++++++++++++++++++++++++--
+>>>>>> include/uapi/linux/io_uring.h |  8 ++++-
+>>>>>> 2 files changed, 77 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>>>>>> index 155f3d8..c14c873 100644
+>>>>>> --- a/fs/io_uring.c
+>>>>>> +++ b/fs/io_uring.c
+>>>>>> @@ -649,6 +649,10 @@ struct io_kiocb {
+>>>>>> 	unsigned long		fsize;
+>>>>>> 	u64			user_data;
+>>>>>> 	u32			result;
+>>>>>> +#ifdef CONFIG_BLK_DEV_ZONED
+>>>>>> +	/* zone-relative offset for append, in bytes */
+>>>>>> +	u32			append_offset;
+>>>>>
+>>>>> this can overflow. u64 is needed.
+>>>>
+>>>> We chose to do it this way to start with because struct io_uring_cqe
+>>>> only has space for u32 when we reuse the flags.
+>>>>
+>>>> We can of course create a new cqe structure, but that will come with
+>>>> larger changes to io_uring for supporting append.
+>>>>
+>>>> Do you believe this is a better approach?
+>>>
+>>> The problem is that zone size are 32 bits in the kernel, as a number
+>>> of sectors.  So any device that has a zone size smaller or equal to
+>>> 2^31 512B sectors can be accepted. Using a zone relative offset in
+>>> bytes for returning zone append result is OK-ish, but to match the
+>>> kernel supported range of possible zone size, you need 31+9 bits...
+>>> 32 does not cut it.
+>>
+>> Agree. Our initial assumption was that u32 would cover current zone size
+>> requirements, but if this is a no-go, we will take the longer path.
 > 
-This becomes particularly obnoxious for SCSI drivers using 
-scsi_host_find_tag() for cleaning up stale commands (ie drivers like 
-qla4xxx, fnic, and snic).
-All other drivers use it from the completion routine, so one can expect 
-a valid (and started) tag here. So for those it shouldn't matter.
+> Converting to u64 will require a new version of io_uring_cqe, where we
+> extend at least 32 bits. I believe this will need a whole new allocation
+> and probably ioctl().
+> 
+> Is this an acceptable change for you? We will of course add support for
+> liburing when we agree on the right way to do this.
 
-But still, if there are objections I could look at fixing it within the 
-SCSI stack; although that would most likely mean I'll have to implement 
-the above patch as an additional function.
+If you need 64-bit of return value, then it's not going to work. Even
+with the existing patches, reusing cqe->flags isn't going to fly, as
+it would conflict with eg doing zone append writes with automatic
+buffer selection.
 
-Cheers,
+We're not changing the io_uring_cqe. It's important to keep it lean, and
+any other request type is generally fine with 64-bit tag + 32-bit result
+(and 32-bit flags on the side) for completions.
 
-Hannes
+Only viable alternative I see would be to provide an area to store this
+information, and pass in a pointer to this at submission time through
+the sqe. One issue I do see with that is if we only have this
+information available at completion time, then we'd need some async punt
+to copy it to user space... Generally not ideal.
+
+A hackier approach would be to play some tricks with cqe->res and
+cqe->flags, setting aside a flag to denote an extension of cqe->res.
+That would mean excluding zone append (etc) from using buffer selection,
+which probably isn't a huge deal. It'd be more problematic for any other
+future flags. But if you just need 40 bits, then it could certainly
+work. Rigth now, if cqe->flags & 1 is set, then (cqe->flags >> 16) is
+the buffer ID. You could define IORING_CQE_F_ZONE_FOO to be bit 1, so
+that:
+
+	uint64_t val = cqe->res; // assuming non-error here
+
+	if (cqe->flags & IORING_CQE_F_ZONE_FOO)
+		val |= (cqe->flags >> 16) << 32ULL;
+
+and hence use the upper 16 bits of cqe->flags for the upper bits of your
+(then) 48-bit total value.
+
 -- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jens Axboe
+
