@@ -2,155 +2,186 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8849C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B22BC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4CDE21532
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 227E621707
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:16:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dzjAdDqo"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ofA1AzoF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388909AbgFSQHX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 12:07:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48354 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2392075AbgFSQHW (ORCPT
+        id S2405508AbgFSQQW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 12:16:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390546AbgFSPDD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 12:07:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592582841;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RVZfiM/+ZxLNLKJaElbS7LuEpwS96Yl3jOTXFRnUgWg=;
-        b=dzjAdDqoV+1bVVRx35+gGnWsit9pQS5qc0Ign1ZOm3CZmTaOLHz0mzJhOkdP5HaaxJzvXq
-        mFhV6N6OMCk1DYH6e63E+Um710hMzI2NLDgJnlBzOTi83buxtfvYvBAoDWLic+xA5NCbsZ
-        vQG/hjq/ddhJ1vjTi2gS2qN7xey2Fto=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-i3JkU1XGP3OCo6NOhkl5OA-1; Fri, 19 Jun 2020 12:07:12 -0400
-X-MC-Unique: i3JkU1XGP3OCo6NOhkl5OA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EC411030C28;
-        Fri, 19 Jun 2020 16:07:11 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ADA8419D7B;
-        Fri, 19 Jun 2020 16:06:58 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 12:06:57 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: dm-rq: don't call blk_mq_queue_stopped in dm_stop_queue()
-Message-ID: <20200619160657.GA24520@redhat.com>
-References: <20200619084214.337449-1-ming.lei@redhat.com>
- <20200619094250.GA18410@redhat.com>
- <20200619101142.GA339442@T590>
+        Fri, 19 Jun 2020 11:03:03 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB20C06174E
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 08:03:03 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id d10so2130541pls.5
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 08:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+LnqhKjbJEUfkGCu1m/2g+LppzzVyXYZg47hg3uhOd0=;
+        b=ofA1AzoFRZ4MiXl9EfIriR7S7EEDw0MZ3OcZfvwiug8/LxQyXqMBhQNc2t5MB4T+MP
+         1cBRaqv+Adlb0QGtdhesz8tTqpZT/UwhaqJF283gfDbIcx+/t4EHoPX+zzrLRht1fkO7
+         /eKNTyjuZrSpP6Fa3jjLRB/oeFGV5+We667m5i+qOfK6jAKzhPFN4LZ7Aea1U3BBlq5y
+         r3hyxLdpzzZk0u/q8g8dw5E33HSygPnaxl4wZAuLkwk+LRt7Wwyb1K0YLAGrwQ694bzP
+         HPTAc7nLX+UjyYmLYhVbNDjEQQ2xyaNr+kVwkozO+qmrizxiTxaohrM6KVBv8BSzuh7G
+         rPbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+LnqhKjbJEUfkGCu1m/2g+LppzzVyXYZg47hg3uhOd0=;
+        b=jRMcSsFUjAE6pqflbc88x3vBv67sZpRmfv4713wSCjPOQhmqGzgRNvDXanL13thQ7V
+         gwgWNgTyBdrsIKbZqZynji3Wkbh5S4QOuw8OSLzTIWFEvu+7d5uAa7FID5gt87ZVcvyv
+         uBj6BWggZ4E8EJRBbbgRpAmooK/lYO4H/5+nW9foehwui2AoxQBPddJu/dWDu/z1Tz/3
+         tDA3bll20lqPEiFzUd1tqvuNidahn6c7VlCPr2FNCiDgd7OgO+eHylKn2HW/f+pORIya
+         Uyouhcby09w9k51AhCjAA3qszJdU+K9jrsJNLtduZsxlQWm62nzjEhcgJeGALKMT/vm9
+         tP7Q==
+X-Gm-Message-State: AOAM533syHEhNjjcuZW8//DoS22w4zOCuTHPaNF44cb5+TU9m3Hy9GkU
+        OWfs5+6WUI8m8jBtJMzg4xMk3Q==
+X-Google-Smtp-Source: ABdhPJzxl6m4GmVs1yhzQxBYGEsuQSldHuD3SkC6vlqhKC8YiMob8skih3KD4PgAX5KiZe8FPTwA+g==
+X-Received: by 2002:a17:902:d392:: with SMTP id e18mr8544615pld.295.1592578983045;
+        Fri, 19 Jun 2020 08:03:03 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id q65sm6281283pfc.155.2020.06.19.08.02.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 08:03:01 -0700 (PDT)
+Subject: Re: [PATCH 3/3] io_uring: add support for zone-append
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        "javier.gonz@samsung.com" <javier@javigon.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
+References: <1592414619-5646-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200617172713epcas5p352f2907a12bd4ee3c97be1c7d8e1569e@epcas5p3.samsung.com>
+ <1592414619-5646-4-git-send-email-joshi.k@samsung.com>
+ <CY4PR04MB37510E916B6F243D189B4EB0E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618083529.ciifu4chr4vrv2j5@mpHalley.local>
+ <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618091113.eu2xdp6zmdooy5d2@mpHalley.local>
+ <20200619094149.uaorbger326s6yzz@mpHalley.local>
+ <31f1c27e-4a3d-a411-3d3b-f88a2d92ce7b@kernel.dk>
+ <24297973-82ad-a629-e5f5-38a5b12db83a@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a68cb8f6-e17c-9ee3-b732-4be689ffebc3@kernel.dk>
+Date:   Fri, 19 Jun 2020 09:02:58 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200619101142.GA339442@T590>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <24297973-82ad-a629-e5f5-38a5b12db83a@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 19 2020 at  6:11am -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+On 6/19/20 8:59 AM, Pavel Begunkov wrote:
+> On 19/06/2020 17:15, Jens Axboe wrote:
+>> On 6/19/20 3:41 AM, javier.gonz@samsung.com wrote:
+>>> Jens,
+>>>
+>>> Would you have time to answer a question below in this thread?
+>>>
+>>> On 18.06.2020 11:11, javier.gonz@samsung.com wrote:
+>>>> On 18.06.2020 08:47, Damien Le Moal wrote:
+>>>>> On 2020/06/18 17:35, javier.gonz@samsung.com wrote:
+>>>>>> On 18.06.2020 07:39, Damien Le Moal wrote:
+>>>>>>> On 2020/06/18 2:27, Kanchan Joshi wrote:
+>>>>>>>> From: Selvakumar S <selvakuma.s1@samsung.com>
+>>>>>>>>
+>>>>>>>> Introduce three new opcodes for zone-append -
+>>>>>>>>
+>>>>>>>>   IORING_OP_ZONE_APPEND     : non-vectord, similiar to IORING_OP_WRITE
+>>>>>>>>   IORING_OP_ZONE_APPENDV    : vectored, similar to IORING_OP_WRITEV
+>>>>>>>>   IORING_OP_ZONE_APPEND_FIXED : append using fixed-buffers
+>>>>>>>>
+>>>>>>>> Repurpose cqe->flags to return zone-relative offset.
+>>>>>>>>
+>>>>>>>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>>>>>>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>>>>>>>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>>>>>>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+>>>>>>>> ---
+>>>>>>>> fs/io_uring.c                 | 72 +++++++++++++++++++++++++++++++++++++++++--
+>>>>>>>> include/uapi/linux/io_uring.h |  8 ++++-
+>>>>>>>> 2 files changed, 77 insertions(+), 3 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>>>>>>>> index 155f3d8..c14c873 100644
+>>>>>>>> --- a/fs/io_uring.c
+>>>>>>>> +++ b/fs/io_uring.c
+>>>>>>>> @@ -649,6 +649,10 @@ struct io_kiocb {
+>>>>>>>> 	unsigned long		fsize;
+>>>>>>>> 	u64			user_data;
+>>>>>>>> 	u32			result;
+>>>>>>>> +#ifdef CONFIG_BLK_DEV_ZONED
+>>>>>>>> +	/* zone-relative offset for append, in bytes */
+>>>>>>>> +	u32			append_offset;
+>>>>>>>
+>>>>>>> this can overflow. u64 is needed.
+>>>>>>
+>>>>>> We chose to do it this way to start with because struct io_uring_cqe
+>>>>>> only has space for u32 when we reuse the flags.
+>>>>>>
+>>>>>> We can of course create a new cqe structure, but that will come with
+>>>>>> larger changes to io_uring for supporting append.
+>>>>>>
+>>>>>> Do you believe this is a better approach?
+>>>>>
+>>>>> The problem is that zone size are 32 bits in the kernel, as a number
+>>>>> of sectors.  So any device that has a zone size smaller or equal to
+>>>>> 2^31 512B sectors can be accepted. Using a zone relative offset in
+>>>>> bytes for returning zone append result is OK-ish, but to match the
+>>>>> kernel supported range of possible zone size, you need 31+9 bits...
+>>>>> 32 does not cut it.
+>>>>
+>>>> Agree. Our initial assumption was that u32 would cover current zone size
+>>>> requirements, but if this is a no-go, we will take the longer path.
+>>>
+>>> Converting to u64 will require a new version of io_uring_cqe, where we
+>>> extend at least 32 bits. I believe this will need a whole new allocation
+>>> and probably ioctl().
+>>>
+>>> Is this an acceptable change for you? We will of course add support for
+>>> liburing when we agree on the right way to do this.
+>>
+>> If you need 64-bit of return value, then it's not going to work. Even
+>> with the existing patches, reusing cqe->flags isn't going to fly, as
+>> it would conflict with eg doing zone append writes with automatic
+>> buffer selection.
+> 
+> Buffer selection is for reads/recv kind of requests, but appends
+> are writes. In theory they can co-exist using cqe->flags.
 
-> Hi Mike,
-> 
-> On Fri, Jun 19, 2020 at 05:42:50AM -0400, Mike Snitzer wrote:
-> > Hi Ming,
-> > 
-> > Thanks for the patch!  But I'm having a hard time understanding what
-> > you've written in the patch header,
-> > 
-> > On Fri, Jun 19 2020 at  4:42am -0400,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > dm-rq won't stop queue, meantime blk-mq won't stop one queue too, so
-> > > remove the check.
-> > 
-> > It'd be helpful if you could unpack this with more detail before going on
-> > to explain why using blk_queue_quiesced, despite dm-rq using
-> > blk_mq_queue_stopped, would also be ineffective.
-> > 
-> > SO:
-> > 
-> > > dm-rq won't stop queue
-> > 
-> > 1) why won't dm-rq stop the queue?  Do you mean it won't reliably
-> >    _always_ stop the queue because of the blk_mq_queue_stopped() check?
-> 
-> device mapper doesn't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues.
-> 
-> > 
-> > > meantime blk-mq won't stop one queue too, so remove the check.
-> > 
-> > 2) Meaning?: blk_mq_queue_stopped() will return true even if only one hw
-> > queue is stopped, given blk-mq must stop all hw queues a positive return
-> > from this blk_mq_queue_stopped() check is incorrectly assuming it meanss
-> > all hw queues are stopped.
-> 
-> blk-mq won't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues for
-> dm-rq's queue too, so dm-rq's hw queue won't be stopped.
-> 
-> BTW blk_mq_stop_hw_queue or blk_mq_stop_hw_queues are supposed to be
-> used for throttling queue.
+Yeah good point, since it's just writes, doesn't matter. But the other
+point still stands, it could potentially conflict with other flags, but
+I guess only to the extent where both flags would need extra storage in
+->flags. So not a huge concern imho.
 
-I'm going to look at actually stopping the queue (using one of these
-interfaces).  I didn't realize I wasn't actually stopping the queue.
-The intent was to do so.
 
-In speaking with Jens yesterday about freeze vs stop: it is clear that
-dm-rq needs to still be able to allocate new requests, but _not_ call
-the queue_rq to issue the requests, while "stopped" (due to dm-mpath
-potentially deferring retries of failed requests because of path failure
-while quiescing the queue during DM device suspend).  But that freezing
-the queue goes too far because it won't allow such request allocation.
-
-> > > dm_stop_queue() actually tries to quiesce hw queues via blk_mq_quiesce_queue(),
-> > > we can't check via blk_queue_quiesced for avoiding unnecessary queue
-> > > quiesce because the flag is set before synchronize_rcu() and dm_stop_queue
-> > > may be called when synchronize_rcu from another blk_mq_quiesce_queue is
-> > > in-progress.
-> > 
-> > But I'm left with questions/confusion on this too:
-> > 
-> > 1) you mention blk_queue_quiesced instead of blk_mq_queue_stopped, so I
-> >    assume you mean that: not only is blk_mq_queue_stopped()
-> >    ineffective, blk_queue_quiesced() would be too?
-> 
-> blk_mq_queue_stopped isn't necessary because dm-rq's hw queue won't be
-> stopped by anyone, meantime replacing it with blk_queue_quiesced() is wrong.
-> 
-> > 
-> > 2) the race you detail (with competing blk_mq_quiesce_queue) relative to
-> >    synchronize_rcu() and testing "the flag" is very detailed yet vague.
-> 
-> If two code paths are calling dm_stop_queue() at the same time, one path may
-> return immediately and it is wrong, sine synchronize_rcu() from another path
-> may not be done.
-> 
-> > 
-> > Anyway, once we get this heaader cleaned up a bit more I'll be happy to
-> > get this staged as a stable@ fix for 5.8 inclusion ASAP.
-> 
-> This patch isn't a fix, and it shouldn't be related with rhel8's issue.
-
-I realize that now.  I've changed the patch header to be a bit clearer
-and staged it for 5.9, see:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.9&id=06e788ed59e0095b679bdce9e39c1a251032ae62
-
-Thanks,
-Mike
+-- 
+Jens Axboe
 
