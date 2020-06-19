@@ -2,106 +2,162 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A7BC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A625C433E1
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 123BD21707
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1FF121707
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvGmgj5r"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LG6FxQRI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390064AbgFSQ1O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 12:27:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34272 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390405AbgFSQ1I (ORCPT
+        id S2394901AbgFSQ1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 12:27:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388286AbgFSOza (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 12:27:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592584028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mZFD93MLr2SHmpmqv6lmYfLnc6UHqO7AHltgO7VAs2g=;
-        b=AvGmgj5r1l3lx4dyweXR8tLBMGrLg1qjfGeSwBY/GdbzSR/qkwkHhikWwPtWoa+MZ9M2F2
-        IykTp0svogeSGDYThe+GhwGLM1Ad6hKZQrg1ajidS5ZpYKEwJWCAfFBXXnTUm9X3MTaw3c
-        TdbTUd8eO4OHWc2xC/iMGdLruy3gEQk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-ygk5jDPbMkywf-JpdVT3YA-1; Fri, 19 Jun 2020 12:27:04 -0400
-X-MC-Unique: ygk5jDPbMkywf-JpdVT3YA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C7CA464;
-        Fri, 19 Jun 2020 16:27:03 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2042D5D9EF;
-        Fri, 19 Jun 2020 16:27:00 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 12:26:59 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>
-Subject: Re: [RFC PATCH 2/2] dm: don't try to split REQ_OP_ZONE_APPEND bios
-Message-ID: <20200619162658.GB24642@redhat.com>
-References: <20200619065905.22228-1-johannes.thumshirn@wdc.com>
- <20200619065905.22228-3-johannes.thumshirn@wdc.com>
- <CY4PR04MB37514CDC42E7F545244D66C6E7980@CY4PR04MB3751.namprd04.prod.outlook.com>
+        Fri, 19 Jun 2020 10:55:30 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B9BC06174E
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:55:30 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id g12so4008585pll.10
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:55:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=pbsVdpIbsqGdOwt5+ECjysg+L/fmi3GEHXmy3K89h/w=;
+        b=LG6FxQRIfqZHzEEEf9qxIO6q7PlcRLLsiYi40WuHHnpGuVZZljt/IUCXbvYjLroZlH
+         pyo/Zvbr4c0pv7bvyACCby8DEb5Fdqgm3MJrB6Oaf2LfhnCMAcjfanH/FlfSa3imI0bH
+         Ubx8xEJ5OA2vTXdEKEVeYi569LAzdzisVtfa9A+qvj/cZmtRR8MFNCpD93tbRNOn8j8J
+         jmk/lHwfKZt80XFT4s1tQyA5keHQE8xE5MbBQ34X8/mEye/0C5OyOefNSuOrSNuTH6Kw
+         7BqWFgS8jqGSpptX22o+Tjx4NIlgffYRRuGKNDDAlXIcHDX8GkyOAVhc3YqTjjOGdvWZ
+         pEnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=pbsVdpIbsqGdOwt5+ECjysg+L/fmi3GEHXmy3K89h/w=;
+        b=CJYeAKwFud6BYyluc1dQ4QVY+97u8NSDa+oJjkcXX1oqJXma+2LeiGL0zrWuGElDRO
+         vgT9xOQGlLp4xXdt6froZ2n0GqhHKmYld/XDNCubjy3pBTdJJaEg0mxiYiC8IujFyLtg
+         kr01w1qUZHtO5UCVcD5d1u2rwxLhJkV31o5mCRETQgAzsdSOtccWzgMj+5oFxmxIs11L
+         dkqnI3qtKerByR+h2RlSr9OKKvTiQn8NLbuxPiczvAaO1trC0xmyPjg3sZuOJ17296x9
+         Yv4VtUA80bIU2AHjGOym9QVHODzLfpBfkog+DqgwT3boYpZtM9FnpG4FN7w26ZNJjHP6
+         0U+A==
+X-Gm-Message-State: AOAM530a3awKv+MUUA/IBnyJoPUkujxFlHyBgc8EtBzjrv2sql/onHbS
+        IiSkzx58HGwRZDCyTqpChR00LKv7O9NB3w==
+X-Google-Smtp-Source: ABdhPJzaIpmkppRuYyo4JpqDj1IIjRmM4X6hzDP/h/Nt89PKCy3sy5yh0qN/4jStku9er3JGhHE2Qw==
+X-Received: by 2002:a17:90a:69c3:: with SMTP id s61mr3985052pjj.212.1592578529513;
+        Fri, 19 Jun 2020 07:55:29 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id d184sm6218121pfd.85.2020.06.19.07.55.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 07:55:29 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.8-rc2
+Message-ID: <a0978751-6105-a269-2c58-de4d7229a646@kernel.dk>
+Date:   Fri, 19 Jun 2020 08:55:28 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY4PR04MB37514CDC42E7F545244D66C6E7980@CY4PR04MB3751.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 19 2020 at  3:54am -0400,
-Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
+Hi Linus,
 
-> On 2020/06/19 15:59, Johannes Thumshirn wrote:
-> > REQ_OP_ZONE_APPEND bios cannot be split so return EIO if we can't fit it
-> > into one IO.
-> > 
-> > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> > ---
-> >  drivers/md/dm.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index 058c34abe9d1..c720a7e3269a 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> > @@ -1609,6 +1609,9 @@ static int __split_and_process_non_flush(struct clone_info *ci)
-> >  
-> >  	len = min_t(sector_t, max_io_len(ci->sector, ti), ci->sector_count);
-> >  
-> > +	if (bio_op(ci->bio) == REQ_OP_ZONE_APPEND && len < ci->sector_count)
-> > +		return -EIO;
-> > +
-> >  	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
-> >  	if (r < 0)
-> >  		return r;
-> > 
-> 
-> I think this is OK. The stacked max_zone_append_sectors limit should have
-> prevented that to happen  in the first place I think, but better safe than sorry.
-> 
-> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+Fixes that should go into this release:
 
-If stacked max_zone_append_sectors limit should prevent it then I'd
-rather not sprinkle more zoned specific checks in DM core.
+- Use import_uuid() where appropriate (Andy)
 
-Thanks,
-Mike
+- bcache fixes (Coly, Mauricio, Zhiqiang)
+
+- blktrace sparse warnings fix (Jan) 
+
+- blktrace concurrent setup fix (Luis)
+
+- blkdev_get use-after-free fix (Jason)
+
+- Ensure all blk-mq maps are updated (Weiping)
+
+- Loop invalidate bdev fix (Zheng)
+
+Please pull!
+
+The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+
+  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-06-19
+
+for you to fetch changes up to 3373a3461aa15b7f9a871fa4cb2c9ef21ac20b47:
+
+  block: make function 'kill_bdev' static (2020-06-18 09:24:35 -0600)
+
+----------------------------------------------------------------
+block-5.8-2020-06-19
+
+----------------------------------------------------------------
+Andy Shevchenko (1):
+      partitions/ldm: Replace uuid_copy() with import_uuid() where it makes sense
+
+Baolin Wang (1):
+      blk-mq: Remove redundant 'return' statement
+
+Coly Li (2):
+      bcache: use delayed kworker fo asynchronous devices registration
+      bcache: pr_info() format clean up in bcache_device_init()
+
+Jan Kara (1):
+      blktrace: Avoid sparse warnings when assigning q->blk_trace
+
+Jason Yan (1):
+      block: Fix use-after-free in blkdev_get()
+
+Luis Chamberlain (1):
+      blktrace: break out of blktrace setup on concurrent calls
+
+Mauricio Faria de Oliveira (1):
+      bcache: check and adjust logical block size for backing devices
+
+Randy Dunlap (1):
+      trace/events/block.h: drop kernel-doc for dropped function parameter
+
+Weiping Zhang (1):
+      block: update hctx map when use multiple maps
+
+Zheng Bin (2):
+      loop: replace kill_bdev with invalidate_bdev
+      block: make function 'kill_bdev' static
+
+Zhiqiang Liu (1):
+      bcache: fix potential deadlock problem in btree_gc_coalesce
+
+ block/blk-mq-tag.c           |  2 +-
+ block/blk-mq.c               |  4 +++-
+ block/partitions/ldm.c       |  2 +-
+ drivers/block/loop.c         |  8 ++++----
+ drivers/md/bcache/btree.c    |  8 ++++++--
+ drivers/md/bcache/super.c    | 35 ++++++++++++++++++++++++++---------
+ fs/block_dev.c               | 17 +++++++++--------
+ include/linux/fs.h           |  2 --
+ include/trace/events/block.h |  1 -
+ kernel/trace/blktrace.c      | 30 ++++++++++++++++++++----------
+ 10 files changed, 70 insertions(+), 39 deletions(-)
+
+-- 
+Jens Axboe
 
