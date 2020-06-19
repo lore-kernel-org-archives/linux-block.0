@@ -2,212 +2,148 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D46C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 17:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C68BC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 18:08:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFAAA207FC
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 17:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F256121527
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 18:08:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OoATyPGL"
+	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="ChZ+VoMR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731428AbgFSRky (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 13:40:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54744 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730934AbgFSRkx (ORCPT
+        id S2389713AbgFSSIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 14:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730338AbgFSSIj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 13:40:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592588451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SSpbTMXzbufsXH9rLr9CGShczMzOHa1HOXBaPDsWskY=;
-        b=OoATyPGLiTw5xA/C+IVa9zr9t6CyzcINFbcJuBETxP6tMkXynzU5H8L9ABvR9+XeLaSXKq
-        kdvy7pAbb2i40KKoelDlIbPdUuTjEKi1Sj9okBoAp9wFB1/hurqLaONCaoUdcBo5uN3CsT
-        3JhC2JyqdxrB9MprWMp+fVXW5pom2yk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-vwSGpqWLNw6k3V1hYXsTWA-1; Fri, 19 Jun 2020 13:40:49 -0400
-X-MC-Unique: vwSGpqWLNw6k3V1hYXsTWA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43BF9872FED;
-        Fri, 19 Jun 2020 17:40:48 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 308EB19D7B;
-        Fri, 19 Jun 2020 17:40:42 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 13:40:41 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org, axboe@kernel.dk,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: dm-rq: don't call blk_mq_queue_stopped in dm_stop_queue()
-Message-ID: <20200619174040.GA24968@redhat.com>
-References: <20200619084214.337449-1-ming.lei@redhat.com>
- <20200619094250.GA18410@redhat.com>
- <20200619101142.GA339442@T590>
- <20200619160657.GA24520@redhat.com>
+        Fri, 19 Jun 2020 14:08:39 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2205CC06174E
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 11:08:38 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id a3so9235250oid.4
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 11:08:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucsc.edu; s=ucsc-google-2018;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=D3DT/dvyeplutPzx9MyRCxvTfOCv1fH0L/e2zdrU1Ts=;
+        b=ChZ+VoMRW2BGAarmRuTatpQt+A2gEkWMBVqgXJQbdxvS/j/qrK6g25/SiVVsKmXji/
+         +bMSnPiyyTYYOQ0ggSaV7+oDGigp9Ml1dXNICrLE9+rx+oh4USC6aACXJ/Sv7u2eCFFh
+         kZclDbM2oLieqMEwbtoW7QLCkhhN40mapJV4kGCuWSZhfjXBCAwUaZXh3ubbmooiB+yQ
+         GVCuUfEd7ZhVrf3WQd5s+QlsNsLZhMf5kHugGn/67c9r7Xza2Wk9L3FEiEwy/our4Pqe
+         9cl83b50tBF/HBiba/3ldJLV/8qqrq4EZWio+jjwLwaePR3d9UEi21HZDd2DzsbDsPDF
+         teog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=D3DT/dvyeplutPzx9MyRCxvTfOCv1fH0L/e2zdrU1Ts=;
+        b=UpumzrLUxm2uS0CQ8FPDf1kuXvEk4wl8mkCabHsqN40A2/3UjcBhstR6RHy94Nk2sA
+         kkm75jHAxiFmdYW1UcRIiVZEl2RPar8kZ8iAf7lcIPPWIx11VNw5p6LJpbf8opnDQLw9
+         6U/l1toYBQHigQRysqPcQ12VewuRV+X1SOdwuMuXtpiA5b5e7JOy/gO2VLEnEaI7Brk7
+         EzhmYYS4tkgqk/OwCaB5y/1AXon1PX/77OGpD+1DnG5BVvKVqSB0+OJhsKMCkLEbbhah
+         u/13wOyaNF2xDA9NPF5114A1+fB6BQ0YUG4FRqQssP1VFSfN4TQ6cXLL7TKZigqnPiIV
+         Du8Q==
+X-Gm-Message-State: AOAM531hEwDI/2qFRA9vtXrLCH+nkQyeMqI/askhv74803hFjE2Wi/Lg
+        28RL7YY9hwmktAgG6rsc5jJa1Z+b6jKx3mGdDPOlsw==
+X-Google-Smtp-Source: ABdhPJyw4j4Q+v1uB8Pg2InuO2lrwXJPlBJJQTkw1GKIuJ75wkL37Vt92Kh2YqsyukJqYxXP2jT4LnMzUhmplwQ2634=
+X-Received: by 2002:aca:d15:: with SMTP id 21mr3826252oin.41.1592590117336;
+ Fri, 19 Jun 2020 11:08:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200619160657.GA24520@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20200617182841.jnbxgshi7bawfzls@mpHalley.localdomain>
+ <MN2PR04MB62236DC26A04A65A242A80D2F19A0@MN2PR04MB6223.namprd04.prod.outlook.com>
+ <20200617190901.zpss2lsh6qsu5zuf@mpHalley.local> <1ab101ef-7b74-060f-c2bc-d4c36dec91f0@lightnvm.io>
+ <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local> <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
+ <20200618015526.GA1138429@dhcp-10-100-145-180.wdl.wdc.com>
+ <CAJbgVnVKqDobpX8iwqRVeDqvmfdEd-uRzNFC2z5U03X9E3Pi_w@mail.gmail.com>
+ <CY4PR04MB3751E6A6D6F04285CAB18514E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <CAJbgVnVnqGQiLx1PctDhAKkjLXRKFwr00tdTPJjkaXZDc+V6Bg@mail.gmail.com>
+ <20200618211945.GA2347@C02WT3WMHTD6> <CAJbgVnVxtfs3m6HKJOQw4E1sqTQBmtF_P-D4aAZ5zsz4rQUXNA@mail.gmail.com>
+ <MN2PR04MB62234880B3FDBD7F9B2229CCF1980@MN2PR04MB6223.namprd04.prod.outlook.com>
+In-Reply-To: <MN2PR04MB62234880B3FDBD7F9B2229CCF1980@MN2PR04MB6223.namprd04.prod.outlook.com>
+From:   Heiner Litz <hlitz@ucsc.edu>
+Date:   Fri, 19 Jun 2020 11:08:26 -0700
+Message-ID: <CAJbgVnUd3U3G=RjpcCuWO+HT9pBP3zasdQfG7h-+PEk0=n4npw@mail.gmail.com>
+Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
+To:     Matias Bjorling <Matias.Bjorling@wdc.com>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+        Ajay Joshi <Ajay.Joshi@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Judy Brock <judy.brock@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 19 2020 at 12:06pm -0400,
-Mike Snitzer <snitzer@redhat.com> wrote:
+Hi Matias,
+no, I am rather saying that the Linux kernel has a deficit or at least
+is not a good fit for ZNS because it cannot enforce in-order delivery.
+The requirement of sequential writes basically imposes this
+requirement. Append essentially a Linux specific fix on the ZNS level
+and that enforcing ordering would be a cleaner way to enable QD>1.
 
-> On Fri, Jun 19 2020 at  6:11am -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > Hi Mike,
-> > 
-> > On Fri, Jun 19, 2020 at 05:42:50AM -0400, Mike Snitzer wrote:
-> > > Hi Ming,
-> > > 
-> > > Thanks for the patch!  But I'm having a hard time understanding what
-> > > you've written in the patch header,
-> > > 
-> > > On Fri, Jun 19 2020 at  4:42am -0400,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > dm-rq won't stop queue, meantime blk-mq won't stop one queue too, so
-> > > > remove the check.
-> > > 
-> > > It'd be helpful if you could unpack this with more detail before going on
-> > > to explain why using blk_queue_quiesced, despite dm-rq using
-> > > blk_mq_queue_stopped, would also be ineffective.
-> > > 
-> > > SO:
-> > > 
-> > > > dm-rq won't stop queue
-> > > 
-> > > 1) why won't dm-rq stop the queue?  Do you mean it won't reliably
-> > >    _always_ stop the queue because of the blk_mq_queue_stopped() check?
-> > 
-> > device mapper doesn't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues.
-> > 
-> > > 
-> > > > meantime blk-mq won't stop one queue too, so remove the check.
-> > > 
-> > > 2) Meaning?: blk_mq_queue_stopped() will return true even if only one hw
-> > > queue is stopped, given blk-mq must stop all hw queues a positive return
-> > > from this blk_mq_queue_stopped() check is incorrectly assuming it meanss
-> > > all hw queues are stopped.
-> > 
-> > blk-mq won't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues for
-> > dm-rq's queue too, so dm-rq's hw queue won't be stopped.
-> > 
-> > BTW blk_mq_stop_hw_queue or blk_mq_stop_hw_queues are supposed to be
-> > used for throttling queue.
-> 
-> I'm going to look at actually stopping the queue (using one of these
-> interfaces).  I didn't realize I wasn't actually stopping the queue.
-> The intent was to do so.
-> 
-> In speaking with Jens yesterday about freeze vs stop: it is clear that
-> dm-rq needs to still be able to allocate new requests, but _not_ call
-> the queue_rq to issue the requests, while "stopped" (due to dm-mpath
-> potentially deferring retries of failed requests because of path failure
-> while quiescing the queue during DM device suspend).  But that freezing
-> the queue goes too far because it won't allow such request allocation.
-
-Seems I'm damned if I do (stop) or damned if I don't (new reports of
-requests completing after DM device suspend's
-blk_mq_quiesce_queue()+dm_wait_for_completion()).
-
-I'm left at something of a loss about what to do!  Bart? Jens? Ming?
-
-Looking closer at the git history, commit 7b17c2f7292ba takes center
-stage:
-
-commit 7b17c2f7292ba1f3f98dae3f7077f9e569653276
-Author: Bart Van Assche <bart.vanassche@sandisk.com>
-Date:   Fri Oct 28 17:22:16 2016 -0700
-
-    dm: Fix a race condition related to stopping and starting queues
-
-    Ensure that all ongoing dm_mq_queue_rq() and dm_mq_requeue_request()
-    calls have stopped before setting the "queue stopped" flag. This
-    allows to remove the "queue stopped" test from dm_mq_queue_rq() and
-    dm_mq_requeue_request(). This patch fixes a race condition because
-    dm_mq_queue_rq() is called without holding the queue lock and hence
-    BLK_MQ_S_STOPPED can be set at any time while dm_mq_queue_rq() is
-    in progress. This patch prevents that the following hang occurs
-    sporadically when using dm-mq:
-
-    INFO: task systemd-udevd:10111 blocked for more than 480 seconds.
-    Call Trace:
-     [<ffffffff8161f397>] schedule+0x37/0x90
-     [<ffffffff816239ef>] schedule_timeout+0x27f/0x470
-     [<ffffffff8161e76f>] io_schedule_timeout+0x9f/0x110
-     [<ffffffff8161fb36>] bit_wait_io+0x16/0x60
-     [<ffffffff8161f929>] __wait_on_bit_lock+0x49/0xa0
-     [<ffffffff8114fe69>] __lock_page+0xb9/0xc0
-     [<ffffffff81165d90>] truncate_inode_pages_range+0x3e0/0x760
-     [<ffffffff81166120>] truncate_inode_pages+0x10/0x20
-     [<ffffffff81212a20>] kill_bdev+0x30/0x40
-     [<ffffffff81213d41>] __blkdev_put+0x71/0x360
-     [<ffffffff81214079>] blkdev_put+0x49/0x170
-     [<ffffffff812141c0>] blkdev_close+0x20/0x30
-     [<ffffffff811d48e8>] __fput+0xe8/0x1f0
-     [<ffffffff811d4a29>] ____fput+0x9/0x10
-     [<ffffffff810842d3>] task_work_run+0x83/0xb0
-     [<ffffffff8106606e>] do_exit+0x3ee/0xc40
-     [<ffffffff8106694b>] do_group_exit+0x4b/0xc0
-     [<ffffffff81073d9a>] get_signal+0x2ca/0x940
-     [<ffffffff8101bf43>] do_signal+0x23/0x660
-     [<ffffffff810022b3>] exit_to_usermode_loop+0x73/0xb0
-     [<ffffffff81002cb0>] syscall_return_slowpath+0xb0/0xc0
-     [<ffffffff81624e33>] entry_SYSCALL_64_fastpath+0xa6/0xa8
-
-    Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-    Acked-by: Mike Snitzer <snitzer@redhat.com>
-    Reviewed-by: Hannes Reinecke <hare@suse.com>
-    Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-    Reviewed-by: Christoph Hellwig <hch@lst.de>
-    Signed-off-by: Jens Axboe <axboe@fb.com>
-
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 09c958b6f038..8b92e066bb69 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -102,7 +102,7 @@ static void dm_mq_stop_queue(struct request_queue *q)
-        if (blk_mq_queue_stopped(q))
-                return;
-
--       blk_mq_stop_hw_queues(q);
-+       blk_mq_quiesce_queue(q);
- }
-
- void dm_stop_queue(struct request_queue *q)
-@@ -880,17 +880,6 @@ static int dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
-                dm_put_live_table(md, srcu_idx);
-        }
-
--       /*
--        * On suspend dm_stop_queue() handles stopping the blk-mq
--        * request_queue BUT: even though the hw_queues are marked
--        * BLK_MQ_S_STOPPED at that point there is still a race that
--        * is allowing block/blk-mq.c to call ->queue_rq against a
--        * hctx that it really shouldn't.  The following check guards
--        * against this rarity (albeit _not_ race-free).
--        */
--       if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
--               return BLK_MQ_RQ_QUEUE_BUSY;
--
-        if (ti->type->busy && ti->type->busy(ti))
-                return BLK_MQ_RQ_QUEUE_BUSY;
-
-
+On Fri, Jun 19, 2020 at 3:29 AM Matias Bjorling <Matias.Bjorling@wdc.com> w=
+rote:
+>
+> > -----Original Message-----
+> > From: Heiner Litz <hlitz@ucsc.edu>
+> > Sent: Friday, 19 June 2020 00.05
+> > To: Keith Busch <kbusch@kernel.org>
+> > Cc: Damien Le Moal <Damien.LeMoal@wdc.com>; Javier Gonz=C3=A1lez
+> > <javier@javigon.com>; Matias Bj=C3=B8rling <mb@lightnvm.io>; Matias Bjo=
+rling
+> > <Matias.Bjorling@wdc.com>; Christoph Hellwig <hch@lst.de>; Keith Busch
+> > <Keith.Busch@wdc.com>; linux-nvme@lists.infradead.org; linux-
+> > block@vger.kernel.org; Sagi Grimberg <sagi@grimberg.me>; Jens Axboe
+> > <axboe@kernel.dk>; Hans Holmberg <Hans.Holmberg@wdc.com>; Dmitry
+> > Fomichev <Dmitry.Fomichev@wdc.com>; Ajay Joshi <Ajay.Joshi@wdc.com>;
+> > Aravind Ramesh <Aravind.Ramesh@wdc.com>; Niklas Cassel
+> > <Niklas.Cassel@wdc.com>; Judy Brock <judy.brock@samsung.com>
+> > Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
+> >
+> > Matias, Keith,
+> > thanks, this all sounds good and it makes total sense to hide striping =
+from the
+> > user.
+> >
+> > In the end, the real problem really seems to be that ZNS effectively re=
+quires in-
+> > order IO delivery which the kernel cannot guarantee. I think fixing thi=
+s problem
+> > in the ZNS specification instead of in the communication substrate (ker=
+nel) is
+> > problematic, especially as out-of-order delivery absolutely has no bene=
+fit in the
+> > case of ZNS.
+> > But I guess this has been discussed before..
+>
+> I'm a bit dense, by the above, is your conclusion that ZNS has a deficit/=
+feature, which OCSSD didn't already have? They both had the same requiremen=
+t that a chunk/zone must be written sequentially. It's the name of the game=
+ when deploying NAND-based media, I am not sure how ZNS should be able to h=
+elp with this. The goal of ZNS is to align with the media (and OCSSD), whic=
+h makes writes required to be sequential, and one thereby gets a bunch of b=
+enefits.
+>
+> If there was an understanding that ZNS would allow one to write randomly,=
+ I must probably disappoint. For random writes, typical implementations eit=
+her use a write-back scheme, that stores data in random write media first, =
+and then later write it out sequentially, or write a host-side FTL (with it=
+s usual overheads).
