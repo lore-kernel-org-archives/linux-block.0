@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D68C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36B9C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 505BA2100A
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCCD821548
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:47:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592599656;
-	bh=M3Y9qjq1IYVGWHeSUHNlJod1XBpYY7djWBt6/Vj9Qow=;
+	s=default; t=1592599668;
+	bh=GFDS5ZeXJWKepPtGtYd1p8VC4NzatXMF4WFN56n95Xc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=GsOdtXX0NEHmmP/OqMQP2RIJ9MBzfXGhQx/SbjEaUeHNboJF5VdMD6/yZtivH/6Gf
-	 6/jujpp7t14ih9Xg/Oz0phWyuxsXQgIdeiEb9M/EYMQqk16orQtFsOSW8e1kwdZ+F3
-	 8lWoOU0gc7PGrYK4NeHSnMkDyKozBhCAqYta7jd8=
+	b=PZv8eQSiZq0mZsN5gCO+srWycyqWKc5PZAYZlajEis3+pWYRfsjvOlLVy8MtrvzEI
+	 WVGFrEBMStkgMtuXBxeHbEAEAR8eLerCgSbpW5LfzJMC6OIoXU1s+doZDl1debTqEz
+	 GpLnjBL4NqRtzao+lJ3WNgnCSANnXRbhLHDTDDy0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390570AbgFSUrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 16:47:35 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46253 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390439AbgFSUrf (ORCPT
+        id S2390831AbgFSUrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 16:47:47 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35810 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391113AbgFSUrn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 16:47:35 -0400
-Received: by mail-pf1-f193.google.com with SMTP id b16so4902043pfi.13;
-        Fri, 19 Jun 2020 13:47:34 -0700 (PDT)
+        Fri, 19 Jun 2020 16:47:43 -0400
+Received: by mail-pl1-f196.google.com with SMTP id k1so4385638pls.2;
+        Fri, 19 Jun 2020 13:47:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IR8sE8tegFIZFEE9c+9scyuraOZnu4HrFVBH9bLfdFU=;
-        b=BWiTdHtVZURnZz2zUnOZRqyEN4IAj8ni9Tx+85K0mzyck6nx7/CCv6SvE7adtf3suG
-         jpgRAH27IUQTZvs9JlHlv6jIoFuiV/4S0O3sreJ8VJyQDHljXrMyj/WS7ntduWJXVjFG
-         C854TL7m2c1Pg7C2dEu6HMPGrMyi5ioYSyY3HrWvgNM3RlvysGxr6RsURbZsoCdudp97
-         t0E5y434Zn9KVKkLlIWtH+9P0gkD9mRS9cJNX3F8x/oujX4FEeFqZRE+X0BE/YgX5LJJ
-         7dv7bCrcFUaZeEWv3ATSzj0phS0tEYJulSSSFI49A0sk2OXBOXGgiKtJbdWjV6ESQnJ3
-         HkxA==
-X-Gm-Message-State: AOAM5302q1wELOyZ1DKDZcD2JlLsf+fJGB3m7FSSqi6xyPSGICJPiivQ
-        uYxO+HCaDwhCVIwTUKWFwQQ=
-X-Google-Smtp-Source: ABdhPJyVHEmV58NGZTznpaBP/xgk4sbNqpUUFbscfauH7CNuFRiXIQShxRF2mjNHNu7Ts1PNNvwYJQ==
-X-Received: by 2002:a63:20d:: with SMTP id 13mr629527pgc.166.1592599654228;
-        Fri, 19 Jun 2020 13:47:34 -0700 (PDT)
+        bh=f88bEORI++QIsnJdKm2ca64CmhxGUzC3g+SSrwClYUg=;
+        b=b597umi/vwQhZzxLMDHbVDwgdPWBKhCvCp4M01vq276lf1KR8jDcUF058/2qmLGs/3
+         zyGtULDU824dglz2AvD0OHy0l6HmqBwJ1rYigiWiRtbUrQcQz4rGnLmH92s95CAFvgTH
+         UB3N41EPWoNpUqlso6CmVTwEr/eIEr1GEg+A4sW8al8AhwMyfUkIaq4NLyH7B25VjEFd
+         hru93WuDmgMrbn88iON5pAeBoCRXONHlddX/t5TaLdcJi0loWUj/FhQL4NbKDxQccNAO
+         GOuCdGxHBBYZOMlQxu6386i8aXVaoa+kI5hCVAYr8Zx12IwBItDDOiPGDlUJZIoRQ3P9
+         QaVw==
+X-Gm-Message-State: AOAM532f0wYUxQEaiopXZcaukXN4eTb/3VruOK97Io0KNAUyBtOmcSrd
+        7YqEyuGYevviWu/I+zIV7AY=
+X-Google-Smtp-Source: ABdhPJyoZ4/dvNRCLnarrxnxISmW+vu/kyGF815p5j84q6q1BrSobxtKcghLOojyOlj8eKMv/rwguw==
+X-Received: by 2002:a17:90a:8083:: with SMTP id c3mr5595094pjn.83.1592599661138;
+        Fri, 19 Jun 2020 13:47:41 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id 127sm4494638pgf.5.2020.06.19.13.47.32
+        by smtp.gmail.com with ESMTPSA id m10sm5741217pjs.27.2020.06.19.13.47.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 13:47:32 -0700 (PDT)
+        Fri, 19 Jun 2020 13:47:39 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 2A5FE40B6C; Fri, 19 Jun 2020 20:47:32 +0000 (UTC)
+        id 792F241DAB; Fri, 19 Jun 2020 20:47:32 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bvanassche@acm.org,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -61,9 +61,9 @@ Cc:     mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v7 1/8] block: add docs for gendisk / request_queue refcount helpers
-Date:   Fri, 19 Jun 2020 20:47:23 +0000
-Message-Id: <20200619204730.26124-2-mcgrof@kernel.org>
+Subject: [PATCH v7 5/8] loop: be paranoid on exit and prevent new additions / removals
+Date:   Fri, 19 Jun 2020 20:47:27 +0000
+Message-Id: <20200619204730.26124-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
 In-Reply-To: <20200619204730.26124-1-mcgrof@kernel.org>
 References: <20200619204730.26124-1-mcgrof@kernel.org>
@@ -74,137 +74,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds documentation for the gendisk / request_queue refcount
-helpers.
+Be pedantic on removal as well and hold the mutex.
+This should prevent uses of addition while we exit.
 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/blk-core.c | 13 +++++++++++++
- block/genhd.c    | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 62 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 62a4904db921..a0760aac110a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -321,6 +321,13 @@ void blk_clear_pm_only(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_clear_pm_only);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c33bbbfd1bd9..d55e1b52f076 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2402,6 +2402,8 @@ static void __exit loop_exit(void)
  
-+/**
-+ * blk_put_queue - decrement the request_queue refcount
-+ * @q: the request_queue structure to decrement the refcount for
-+ *
-+ * Decrements the refcount of the request_queue kobject. When this reaches 0
-+ * we'll have blk_release_queue() called.
-+ */
- void blk_put_queue(struct request_queue *q)
- {
- 	kobject_put(&q->kobj);
-@@ -598,6 +605,12 @@ struct request_queue *blk_alloc_queue(make_request_fn make_request, int node_id)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
+ 	range = max_loop ? max_loop << part_shift : 1UL << MINORBITS;
  
-+/**
-+ * blk_get_queue - increment the request_queue refcount
-+ * @q: the request_queue structure to increment the refcount for
-+ *
-+ * Increment the refcount of the request_queue kobject.
-+ */
- bool blk_get_queue(struct request_queue *q)
- {
- 	if (likely(!blk_queue_dying(q))) {
-diff --git a/block/genhd.c b/block/genhd.c
-index 1a7659327664..f741613d731f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -876,6 +876,20 @@ static void invalidate_partition(struct gendisk *disk, int partno)
- 	bdput(bdev);
++	mutex_lock(&loop_ctl_mutex);
++
+ 	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
+ 	idr_destroy(&loop_index_idr);
+ 
+@@ -2409,6 +2411,8 @@ static void __exit loop_exit(void)
+ 	unregister_blkdev(LOOP_MAJOR, "loop");
+ 
+ 	misc_deregister(&loop_misc);
++
++	mutex_unlock(&loop_ctl_mutex);
  }
  
-+/**
-+ * del_gendisk - remove the gendisk
-+ * @disk: the struct gendisk to remove
-+ *
-+ * Removes the gendisk and all its associated resources. This deletes the
-+ * partitions associated with the gendisk, and unregisters the associated
-+ * request_queue.
-+ *
-+ * This is the counter to the respective __device_add_disk() call.
-+ *
-+ * The final removal of the struct gendisk happens when its refcount reaches 0
-+ * with put_disk(), which should be called after del_gendisk(), if
-+ * __device_add_disk() was used.
-+ */
- void del_gendisk(struct gendisk *disk)
- {
- 	struct disk_part_iter piter;
-@@ -1514,6 +1528,23 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
- 	return 0;
- }
- 
-+/**
-+ * disk_release - releases all allocated resources of the gendisk
-+ * @dev: the device representing this disk
-+ *
-+ * This function releases all allocated resources of the gendisk.
-+ *
-+ * The struct gendisk refcount is incremented with get_gendisk() or
-+ * get_disk_and_module(), and its refcount is decremented with
-+ * put_disk_and_module() or put_disk(). Once the refcount reaches 0 this
-+ * function is called.
-+ *
-+ * Drivers which used __device_add_disk() have a gendisk with a request_queue
-+ * assigned. Since the request_queue sits on top of the gendisk for these
-+ * drivers we also call blk_put_queue() for them, and we expect the
-+ * request_queue refcount to reach 0 at this point, and so the request_queue
-+ * will also be freed prior to the disk.
-+ */
- static void disk_release(struct device *dev)
- {
- 	struct gendisk *disk = dev_to_disk(dev);
-@@ -1727,6 +1758,13 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- }
- EXPORT_SYMBOL(__alloc_disk_node);
- 
-+/**
-+ * get_disk_and_module - increments the gendisk and gendisk fops module refcount
-+ * @disk: the struct gendisk to to increment the refcount for
-+ *
-+ * This increments the refcount for the struct gendisk, and the gendisk's
-+ * fops module owner.
-+ */
- struct kobject *get_disk_and_module(struct gendisk *disk)
- {
- 	struct module *owner;
-@@ -1747,6 +1785,13 @@ struct kobject *get_disk_and_module(struct gendisk *disk)
- }
- EXPORT_SYMBOL(get_disk_and_module);
- 
-+/**
-+ * put_disk - decrements the gendisk refcount
-+ * @disk: the struct gendisk to to decrement the refcount for
-+ *
-+ * This decrements the refcount for the struct gendisk. When this reaches 0
-+ * we'll have disk_release() called.
-+ */
- void put_disk(struct gendisk *disk)
- {
- 	if (disk)
-@@ -1754,7 +1799,10 @@ void put_disk(struct gendisk *disk)
- }
- EXPORT_SYMBOL(put_disk);
- 
--/*
-+/**
-+ * put_disk_and_module - decrements the module and gendisk refcount
-+ * @disk: the struct gendisk to to decrement the refcount for
-+ *
-  * This is a counterpart of get_disk_and_module() and thus also of
-  * get_gendisk().
-  */
+ module_init(loop_init);
 -- 
 2.26.2
 
