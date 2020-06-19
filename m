@@ -2,146 +2,163 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134D0C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7547C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 22:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E92DE22243
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 21:59:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1FFF222E8
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 22:24:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lmh72bNP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728759AbgFSV7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 17:59:34 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42117 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728242AbgFSV7c (ORCPT
+        id S1729337AbgFSWYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 18:24:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58472 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729229AbgFSWYT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 17:59:32 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k6so4459880pll.9;
-        Fri, 19 Jun 2020 14:59:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=AV7sMf6DKdniuUMlAi+PCzyUcAZ8zYs0XbZP7OgqLvo=;
-        b=EJRXZHIsW0P3yI0do5y+ISFK4xTQmy24IOFsz8Pr2L/5YZNh8lMwAf9keb3GtDmzHL
-         Bzv8epY/zgnVtK7UqZMpbEyYo0d6/srGEfneSC8XqHb0n6jW/ONt85tlgmGFnyvrAe2g
-         +qWsbgPqELk40tp8ab/xIaC6Zy01amTJgfQmTxek227pKyofBWP1WV6IFuEvWt28MXLB
-         99jjuK8XWPFibp+4G99EtHMGm/cD/h3TPD3W1Nbb7RQjr+mkm/efs2Dqd3Moax3Oeaye
-         EZ0oD5W5vfnd6hfEXQNhJpf2z7T9hQ8ONCMqTRxd+yc2lV2OvLu+F8voIt7ZfScWRMMo
-         TG5A==
-X-Gm-Message-State: AOAM531HHZfHRhRMUyaflb/6wqBheIZEz5OmtUR/qHqNm0OsodIrmhZV
-        oA7VtC0EzJkl6WHxS3vnqwQJIZDG
-X-Google-Smtp-Source: ABdhPJx4OW9HYswSIJLZOwlHOxYK4xw7Rnvfy6NUwHa5lYL4TdK49UM/lZSvhmLbfdP9bmtLYJ83gg==
-X-Received: by 2002:a17:90a:d803:: with SMTP id a3mr5821475pjv.125.1592603971568;
-        Fri, 19 Jun 2020 14:59:31 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id t201sm6757784pfc.104.2020.06.19.14.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2020 14:59:30 -0700 (PDT)
-Subject: Re: [PATCH 2/2] block: only return started requests from
- blk_mq_tag_to_rq()
-To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20200619140159.141905-1-hare@suse.de>
- <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <3d073c18-50da-a4c8-2f1e-332a1e717efc@acm.org>
-Date:   Fri, 19 Jun 2020 14:59:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Fri, 19 Jun 2020 18:24:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592605458;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tmjs5D6L522iN3BsMMMDQ2azzXRy6e+DKSTe5FLnkR0=;
+        b=Lmh72bNPn+PQ3Xh85E8plJm/XF2TFXg0IABYgJVpfOdIt6qrQOWyLdM/10PhAHH67hAx6/
+        24uRCF6eRuszz8cbXKNsJOkb8ig89VgAMtZdpG+fweek2rYVHOiAvQOQPy2SIR6/lDK444
+        TnoJvaz1IxJ3CvborEEK+gxcowhabXM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-Jc7efI1aO5ep3XIPql9eFw-1; Fri, 19 Jun 2020 18:24:16 -0400
+X-MC-Unique: Jc7efI1aO5ep3XIPql9eFw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16FBD835B40;
+        Fri, 19 Jun 2020 22:24:15 +0000 (UTC)
+Received: from T590 (ovpn-12-19.pek2.redhat.com [10.72.12.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0ADDE5D9E5;
+        Fri, 19 Jun 2020 22:24:03 +0000 (UTC)
+Date:   Sat, 20 Jun 2020 06:23:59 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: dm-rq: don't call blk_mq_queue_stopped in dm_stop_queue()
+Message-ID: <20200619222359.GA353853@T590>
+References: <20200619084214.337449-1-ming.lei@redhat.com>
+ <20200619094250.GA18410@redhat.com>
+ <20200619101142.GA339442@T590>
+ <20200619160657.GA24520@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200619160657.GA24520@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-06-19 07:09, Hannes Reinecke wrote:
-> On 6/19/20 4:01 PM, Hannes Reinecke wrote:
->> blk_mq_tag_to_rq() is used from within the driver to map a tag
->> to a request. As such it should only return requests which are
->> already started (ie passed to the driver); otherwise the driver
->> might trip over requests which it has never seen and random
->> crashes will occur.
->>
->> Signed-off-by: Hannes Reinecke <hare@suse.de>
->> ---
->>   block/blk-mq.c | 6 +++++-
->>   1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 4f57d27bfa73..f02d18113f9e 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -815,9 +815,13 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
->>     struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
->> unsigned int tag)
->>   {
->> +    struct request *rq;
->> +
->>       if (tag < tags->nr_tags) {
->>           prefetch(tags->rqs[tag]);
->> -        return tags->rqs[tag];
->> +        rq = tags->rqs[tag];
->> +        if (blk_mq_request_started(rq))
->> +            return rq;
->>       }
->>         return NULL;
->>
-> This becomes particularly obnoxious for SCSI drivers using
-> scsi_host_find_tag() for cleaning up stale commands (ie drivers like
-> qla4xxx, fnic, and snic).
-> All other drivers use it from the completion routine, so one can expect
-> a valid (and started) tag here. So for those it shouldn't matter.
+On Fri, Jun 19, 2020 at 12:06:57PM -0400, Mike Snitzer wrote:
+> On Fri, Jun 19 2020 at  6:11am -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
 > 
-> But still, if there are objections I could look at fixing it within the
-> SCSI stack; although that would most likely mean I'll have to implement
-> the above patch as an additional function.
+> > Hi Mike,
+> > 
+> > On Fri, Jun 19, 2020 at 05:42:50AM -0400, Mike Snitzer wrote:
+> > > Hi Ming,
+> > > 
+> > > Thanks for the patch!  But I'm having a hard time understanding what
+> > > you've written in the patch header,
+> > > 
+> > > On Fri, Jun 19 2020 at  4:42am -0400,
+> > > Ming Lei <ming.lei@redhat.com> wrote:
+> > > 
+> > > > dm-rq won't stop queue, meantime blk-mq won't stop one queue too, so
+> > > > remove the check.
+> > > 
+> > > It'd be helpful if you could unpack this with more detail before going on
+> > > to explain why using blk_queue_quiesced, despite dm-rq using
+> > > blk_mq_queue_stopped, would also be ineffective.
+> > > 
+> > > SO:
+> > > 
+> > > > dm-rq won't stop queue
+> > > 
+> > > 1) why won't dm-rq stop the queue?  Do you mean it won't reliably
+> > >    _always_ stop the queue because of the blk_mq_queue_stopped() check?
+> > 
+> > device mapper doesn't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues.
+> > 
+> > > 
+> > > > meantime blk-mq won't stop one queue too, so remove the check.
+> > > 
+> > > 2) Meaning?: blk_mq_queue_stopped() will return true even if only one hw
+> > > queue is stopped, given blk-mq must stop all hw queues a positive return
+> > > from this blk_mq_queue_stopped() check is incorrectly assuming it meanss
+> > > all hw queues are stopped.
+> > 
+> > blk-mq won't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues for
+> > dm-rq's queue too, so dm-rq's hw queue won't be stopped.
+> > 
+> > BTW blk_mq_stop_hw_queue or blk_mq_stop_hw_queues are supposed to be
+> > used for throttling queue.
+> 
+> I'm going to look at actually stopping the queue (using one of these
+> interfaces).  I didn't realize I wasn't actually stopping the queue.
+> The intent was to do so.
+> 
+> In speaking with Jens yesterday about freeze vs stop: it is clear that
+> dm-rq needs to still be able to allocate new requests, but _not_ call
+> the queue_rq to issue the requests, while "stopped" (due to dm-mpath
+> potentially deferring retries of failed requests because of path failure
+> while quiescing the queue during DM device suspend).  But that freezing
+> the queue goes too far because it won't allow such request allocation.
 
-Hi Hannes,
+Freezing shouldn't be a good choice for driver usually, and quiesce is
+exactly what you expect: request allocation is allowed, meantime, no
+.queue_rq is possible.
 
-Will the above patch make the fast path of every block driver slightly
-slower?
+> 
+> > > > dm_stop_queue() actually tries to quiesce hw queues via blk_mq_quiesce_queue(),
+> > > > we can't check via blk_queue_quiesced for avoiding unnecessary queue
+> > > > quiesce because the flag is set before synchronize_rcu() and dm_stop_queue
+> > > > may be called when synchronize_rcu from another blk_mq_quiesce_queue is
+> > > > in-progress.
+> > > 
+> > > But I'm left with questions/confusion on this too:
+> > > 
+> > > 1) you mention blk_queue_quiesced instead of blk_mq_queue_stopped, so I
+> > >    assume you mean that: not only is blk_mq_queue_stopped()
+> > >    ineffective, blk_queue_quiesced() would be too?
+> > 
+> > blk_mq_queue_stopped isn't necessary because dm-rq's hw queue won't be
+> > stopped by anyone, meantime replacing it with blk_queue_quiesced() is wrong.
+> > 
+> > > 
+> > > 2) the race you detail (with competing blk_mq_quiesce_queue) relative to
+> > >    synchronize_rcu() and testing "the flag" is very detailed yet vague.
+> > 
+> > If two code paths are calling dm_stop_queue() at the same time, one path may
+> > return immediately and it is wrong, sine synchronize_rcu() from another path
+> > may not be done.
+> > 
+> > > 
+> > > Anyway, once we get this heaader cleaned up a bit more I'll be happy to
+> > > get this staged as a stable@ fix for 5.8 inclusion ASAP.
+> > 
+> > This patch isn't a fix, and it shouldn't be related with rhel8's issue.
+> 
+> I realize that now.  I've changed the patch header to be a bit clearer
+> and staged it for 5.9, see:
+> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.9&id=06e788ed59e0095b679bdce9e39c1a251032ae62
 
-Shouldn't SCSI drivers (and other block drivers) use
-blk_mq_tagset_busy_iter() to clean up stale commands instead of
-iterating over all tags and calling blk_mq_tag_to_rq() directly?
+Thanks!
 
-Thanks,
+-- 
+Ming
 
-Bart.
