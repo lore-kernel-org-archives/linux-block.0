@@ -2,162 +2,212 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A625C433E1
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D46C433DF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 17:40:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1FF121707
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 16:27:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFAAA207FC
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 17:40:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LG6FxQRI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OoATyPGL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394901AbgFSQ1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 12:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388286AbgFSOza (ORCPT
+        id S1731428AbgFSRky (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 13:40:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54744 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730934AbgFSRkx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 10:55:30 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B9BC06174E
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:55:30 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id g12so4008585pll.10
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 07:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=pbsVdpIbsqGdOwt5+ECjysg+L/fmi3GEHXmy3K89h/w=;
-        b=LG6FxQRIfqZHzEEEf9qxIO6q7PlcRLLsiYi40WuHHnpGuVZZljt/IUCXbvYjLroZlH
-         pyo/Zvbr4c0pv7bvyACCby8DEb5Fdqgm3MJrB6Oaf2LfhnCMAcjfanH/FlfSa3imI0bH
-         Ubx8xEJ5OA2vTXdEKEVeYi569LAzdzisVtfa9A+qvj/cZmtRR8MFNCpD93tbRNOn8j8J
-         jmk/lHwfKZt80XFT4s1tQyA5keHQE8xE5MbBQ34X8/mEye/0C5OyOefNSuOrSNuTH6Kw
-         7BqWFgS8jqGSpptX22o+Tjx4NIlgffYRRuGKNDDAlXIcHDX8GkyOAVhc3YqTjjOGdvWZ
-         pEnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=pbsVdpIbsqGdOwt5+ECjysg+L/fmi3GEHXmy3K89h/w=;
-        b=CJYeAKwFud6BYyluc1dQ4QVY+97u8NSDa+oJjkcXX1oqJXma+2LeiGL0zrWuGElDRO
-         vgT9xOQGlLp4xXdt6froZ2n0GqhHKmYld/XDNCubjy3pBTdJJaEg0mxiYiC8IujFyLtg
-         kr01w1qUZHtO5UCVcD5d1u2rwxLhJkV31o5mCRETQgAzsdSOtccWzgMj+5oFxmxIs11L
-         dkqnI3qtKerByR+h2RlSr9OKKvTiQn8NLbuxPiczvAaO1trC0xmyPjg3sZuOJ17296x9
-         Yv4VtUA80bIU2AHjGOym9QVHODzLfpBfkog+DqgwT3boYpZtM9FnpG4FN7w26ZNJjHP6
-         0U+A==
-X-Gm-Message-State: AOAM530a3awKv+MUUA/IBnyJoPUkujxFlHyBgc8EtBzjrv2sql/onHbS
-        IiSkzx58HGwRZDCyTqpChR00LKv7O9NB3w==
-X-Google-Smtp-Source: ABdhPJzaIpmkppRuYyo4JpqDj1IIjRmM4X6hzDP/h/Nt89PKCy3sy5yh0qN/4jStku9er3JGhHE2Qw==
-X-Received: by 2002:a17:90a:69c3:: with SMTP id s61mr3985052pjj.212.1592578529513;
-        Fri, 19 Jun 2020 07:55:29 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id d184sm6218121pfd.85.2020.06.19.07.55.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2020 07:55:29 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.8-rc2
-Message-ID: <a0978751-6105-a269-2c58-de4d7229a646@kernel.dk>
-Date:   Fri, 19 Jun 2020 08:55:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Fri, 19 Jun 2020 13:40:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592588451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SSpbTMXzbufsXH9rLr9CGShczMzOHa1HOXBaPDsWskY=;
+        b=OoATyPGLiTw5xA/C+IVa9zr9t6CyzcINFbcJuBETxP6tMkXynzU5H8L9ABvR9+XeLaSXKq
+        kdvy7pAbb2i40KKoelDlIbPdUuTjEKi1Sj9okBoAp9wFB1/hurqLaONCaoUdcBo5uN3CsT
+        3JhC2JyqdxrB9MprWMp+fVXW5pom2yk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-398-vwSGpqWLNw6k3V1hYXsTWA-1; Fri, 19 Jun 2020 13:40:49 -0400
+X-MC-Unique: vwSGpqWLNw6k3V1hYXsTWA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43BF9872FED;
+        Fri, 19 Jun 2020 17:40:48 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 308EB19D7B;
+        Fri, 19 Jun 2020 17:40:42 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 13:40:41 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org, axboe@kernel.dk,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: dm-rq: don't call blk_mq_queue_stopped in dm_stop_queue()
+Message-ID: <20200619174040.GA24968@redhat.com>
+References: <20200619084214.337449-1-ming.lei@redhat.com>
+ <20200619094250.GA18410@redhat.com>
+ <20200619101142.GA339442@T590>
+ <20200619160657.GA24520@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200619160657.GA24520@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, Jun 19 2020 at 12:06pm -0400,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-Fixes that should go into this release:
+> On Fri, Jun 19 2020 at  6:11am -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > Hi Mike,
+> > 
+> > On Fri, Jun 19, 2020 at 05:42:50AM -0400, Mike Snitzer wrote:
+> > > Hi Ming,
+> > > 
+> > > Thanks for the patch!  But I'm having a hard time understanding what
+> > > you've written in the patch header,
+> > > 
+> > > On Fri, Jun 19 2020 at  4:42am -0400,
+> > > Ming Lei <ming.lei@redhat.com> wrote:
+> > > 
+> > > > dm-rq won't stop queue, meantime blk-mq won't stop one queue too, so
+> > > > remove the check.
+> > > 
+> > > It'd be helpful if you could unpack this with more detail before going on
+> > > to explain why using blk_queue_quiesced, despite dm-rq using
+> > > blk_mq_queue_stopped, would also be ineffective.
+> > > 
+> > > SO:
+> > > 
+> > > > dm-rq won't stop queue
+> > > 
+> > > 1) why won't dm-rq stop the queue?  Do you mean it won't reliably
+> > >    _always_ stop the queue because of the blk_mq_queue_stopped() check?
+> > 
+> > device mapper doesn't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues.
+> > 
+> > > 
+> > > > meantime blk-mq won't stop one queue too, so remove the check.
+> > > 
+> > > 2) Meaning?: blk_mq_queue_stopped() will return true even if only one hw
+> > > queue is stopped, given blk-mq must stop all hw queues a positive return
+> > > from this blk_mq_queue_stopped() check is incorrectly assuming it meanss
+> > > all hw queues are stopped.
+> > 
+> > blk-mq won't call blk_mq_stop_hw_queue or blk_mq_stop_hw_queues for
+> > dm-rq's queue too, so dm-rq's hw queue won't be stopped.
+> > 
+> > BTW blk_mq_stop_hw_queue or blk_mq_stop_hw_queues are supposed to be
+> > used for throttling queue.
+> 
+> I'm going to look at actually stopping the queue (using one of these
+> interfaces).  I didn't realize I wasn't actually stopping the queue.
+> The intent was to do so.
+> 
+> In speaking with Jens yesterday about freeze vs stop: it is clear that
+> dm-rq needs to still be able to allocate new requests, but _not_ call
+> the queue_rq to issue the requests, while "stopped" (due to dm-mpath
+> potentially deferring retries of failed requests because of path failure
+> while quiescing the queue during DM device suspend).  But that freezing
+> the queue goes too far because it won't allow such request allocation.
 
-- Use import_uuid() where appropriate (Andy)
+Seems I'm damned if I do (stop) or damned if I don't (new reports of
+requests completing after DM device suspend's
+blk_mq_quiesce_queue()+dm_wait_for_completion()).
 
-- bcache fixes (Coly, Mauricio, Zhiqiang)
+I'm left at something of a loss about what to do!  Bart? Jens? Ming?
 
-- blktrace sparse warnings fix (Jan) 
+Looking closer at the git history, commit 7b17c2f7292ba takes center
+stage:
 
-- blktrace concurrent setup fix (Luis)
+commit 7b17c2f7292ba1f3f98dae3f7077f9e569653276
+Author: Bart Van Assche <bart.vanassche@sandisk.com>
+Date:   Fri Oct 28 17:22:16 2016 -0700
 
-- blkdev_get use-after-free fix (Jason)
+    dm: Fix a race condition related to stopping and starting queues
 
-- Ensure all blk-mq maps are updated (Weiping)
+    Ensure that all ongoing dm_mq_queue_rq() and dm_mq_requeue_request()
+    calls have stopped before setting the "queue stopped" flag. This
+    allows to remove the "queue stopped" test from dm_mq_queue_rq() and
+    dm_mq_requeue_request(). This patch fixes a race condition because
+    dm_mq_queue_rq() is called without holding the queue lock and hence
+    BLK_MQ_S_STOPPED can be set at any time while dm_mq_queue_rq() is
+    in progress. This patch prevents that the following hang occurs
+    sporadically when using dm-mq:
 
-- Loop invalidate bdev fix (Zheng)
+    INFO: task systemd-udevd:10111 blocked for more than 480 seconds.
+    Call Trace:
+     [<ffffffff8161f397>] schedule+0x37/0x90
+     [<ffffffff816239ef>] schedule_timeout+0x27f/0x470
+     [<ffffffff8161e76f>] io_schedule_timeout+0x9f/0x110
+     [<ffffffff8161fb36>] bit_wait_io+0x16/0x60
+     [<ffffffff8161f929>] __wait_on_bit_lock+0x49/0xa0
+     [<ffffffff8114fe69>] __lock_page+0xb9/0xc0
+     [<ffffffff81165d90>] truncate_inode_pages_range+0x3e0/0x760
+     [<ffffffff81166120>] truncate_inode_pages+0x10/0x20
+     [<ffffffff81212a20>] kill_bdev+0x30/0x40
+     [<ffffffff81213d41>] __blkdev_put+0x71/0x360
+     [<ffffffff81214079>] blkdev_put+0x49/0x170
+     [<ffffffff812141c0>] blkdev_close+0x20/0x30
+     [<ffffffff811d48e8>] __fput+0xe8/0x1f0
+     [<ffffffff811d4a29>] ____fput+0x9/0x10
+     [<ffffffff810842d3>] task_work_run+0x83/0xb0
+     [<ffffffff8106606e>] do_exit+0x3ee/0xc40
+     [<ffffffff8106694b>] do_group_exit+0x4b/0xc0
+     [<ffffffff81073d9a>] get_signal+0x2ca/0x940
+     [<ffffffff8101bf43>] do_signal+0x23/0x660
+     [<ffffffff810022b3>] exit_to_usermode_loop+0x73/0xb0
+     [<ffffffff81002cb0>] syscall_return_slowpath+0xb0/0xc0
+     [<ffffffff81624e33>] entry_SYSCALL_64_fastpath+0xa6/0xa8
 
-Please pull!
+    Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+    Acked-by: Mike Snitzer <snitzer@redhat.com>
+    Reviewed-by: Hannes Reinecke <hare@suse.com>
+    Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: Jens Axboe <axboe@fb.com>
 
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 09c958b6f038..8b92e066bb69 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -102,7 +102,7 @@ static void dm_mq_stop_queue(struct request_queue *q)
+        if (blk_mq_queue_stopped(q))
+                return;
 
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+-       blk_mq_stop_hw_queues(q);
++       blk_mq_quiesce_queue(q);
+ }
 
-are available in the Git repository at:
+ void dm_stop_queue(struct request_queue *q)
+@@ -880,17 +880,6 @@ static int dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+                dm_put_live_table(md, srcu_idx);
+        }
 
-  git://git.kernel.dk/linux-block.git tags/block-5.8-2020-06-19
+-       /*
+-        * On suspend dm_stop_queue() handles stopping the blk-mq
+-        * request_queue BUT: even though the hw_queues are marked
+-        * BLK_MQ_S_STOPPED at that point there is still a race that
+-        * is allowing block/blk-mq.c to call ->queue_rq against a
+-        * hctx that it really shouldn't.  The following check guards
+-        * against this rarity (albeit _not_ race-free).
+-        */
+-       if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
+-               return BLK_MQ_RQ_QUEUE_BUSY;
+-
+        if (ti->type->busy && ti->type->busy(ti))
+                return BLK_MQ_RQ_QUEUE_BUSY;
 
-for you to fetch changes up to 3373a3461aa15b7f9a871fa4cb2c9ef21ac20b47:
-
-  block: make function 'kill_bdev' static (2020-06-18 09:24:35 -0600)
-
-----------------------------------------------------------------
-block-5.8-2020-06-19
-
-----------------------------------------------------------------
-Andy Shevchenko (1):
-      partitions/ldm: Replace uuid_copy() with import_uuid() where it makes sense
-
-Baolin Wang (1):
-      blk-mq: Remove redundant 'return' statement
-
-Coly Li (2):
-      bcache: use delayed kworker fo asynchronous devices registration
-      bcache: pr_info() format clean up in bcache_device_init()
-
-Jan Kara (1):
-      blktrace: Avoid sparse warnings when assigning q->blk_trace
-
-Jason Yan (1):
-      block: Fix use-after-free in blkdev_get()
-
-Luis Chamberlain (1):
-      blktrace: break out of blktrace setup on concurrent calls
-
-Mauricio Faria de Oliveira (1):
-      bcache: check and adjust logical block size for backing devices
-
-Randy Dunlap (1):
-      trace/events/block.h: drop kernel-doc for dropped function parameter
-
-Weiping Zhang (1):
-      block: update hctx map when use multiple maps
-
-Zheng Bin (2):
-      loop: replace kill_bdev with invalidate_bdev
-      block: make function 'kill_bdev' static
-
-Zhiqiang Liu (1):
-      bcache: fix potential deadlock problem in btree_gc_coalesce
-
- block/blk-mq-tag.c           |  2 +-
- block/blk-mq.c               |  4 +++-
- block/partitions/ldm.c       |  2 +-
- drivers/block/loop.c         |  8 ++++----
- drivers/md/bcache/btree.c    |  8 ++++++--
- drivers/md/bcache/super.c    | 35 ++++++++++++++++++++++++++---------
- fs/block_dev.c               | 17 +++++++++--------
- include/linux/fs.h           |  2 --
- include/trace/events/block.h |  1 -
- kernel/trace/blktrace.c      | 30 ++++++++++++++++++++----------
- 10 files changed, 70 insertions(+), 39 deletions(-)
-
--- 
-Jens Axboe
 
