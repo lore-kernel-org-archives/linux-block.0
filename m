@@ -2,96 +2,68 @@ Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2831C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2C8C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:25:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A9CA2100A
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A25C220776
+	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 20:25:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592598237;
-	bh=xPQ7wOzVEkHg3r4WHmJ7J7B/G1kAI4ACFCIe+yjk5mg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=YmZno47MxWgYzvEPrJvQVpT5d2n5EiMX4O2/nFxM60quBqTmuyNgGytbhVzKjXaHV
-	 3QlPTg/38bLvyUz5KERg757fviTsQdouWB0WeXgAHFJ1lMehdKLHuLhsrtYthqhS5o
-	 mjYfAXFwyupdZl7PNjHv4pgrKYi+r0088u6GQYcg=
+	s=default; t=1592598336;
+	bh=ZQok6hFw08bHEaCWxXCOl6IJa0RpRLBHOGqSvYfBhAA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=U5mXlH//NwO5ubjR6vgiAcoaNtRuyn1dJQihKePQQx/5VG2yDmllpMQ7Q7JKzpZv1
+	 UKwXuX8Q/wZU18ireJO/tWkabuYpgsBO/KStJFPz2aA32rMXk7OFe224rneVJEVtjy
+	 e1QsYC7NmhiP+dxkdrU7nyUz5K7D119vhimtn+ys=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392184AbgFSUXx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 16:23:53 -0400
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:54794 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392082AbgFSUXw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 16:23:52 -0400
-Received: by mail-pj1-f68.google.com with SMTP id u8so4508001pje.4;
-        Fri, 19 Jun 2020 13:23:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RNk3YYxZgiMdt5E1Q+HAeQPHMt5QiUV6QIFeXf5YA6E=;
-        b=Znu/O3rgl5x+2/g2VK8Uox5QocoVot9+V13koAF7V5goz9AvVLHwRL2SlhqEUEyoze
-         kMhlaXutNvU03sEbVemqqm9PX+sll7AaWVOf03BtIm/4KZkAWBRuHEMvPZFtlbp7Oxb0
-         zobeEByLLXL8URLOCin2SuqCNC5UDKhil61DtfwDIlzBRYpIuUc+mhiexPAqbLXAuCiY
-         uqBXGfGhvV8n/X9dCU00h7voJsDLHnFR13yeQzXqi2wllfovX10lnUaJec2S9N1z2b5N
-         Pmf16mLyccJd06d7sQyd1oTA/QMa99U08QuX93DwHdfDehPKBKpiGz+RD0Js/DP0clb8
-         zV+w==
-X-Gm-Message-State: AOAM532GnDlQOpmz1nS4rnZnpa8pHvcyaQmSz5KM8stGMkV3SLAqubr2
-        DzyIQLI+18ITc7NB2+nw2XQ=
-X-Google-Smtp-Source: ABdhPJwyTucVAhYVByutNy/3iB7HUovNaBJeVj/WU7TGkfz1k4YvkICw6ZEx8Vi19BK0QPdR+PbQWw==
-X-Received: by 2002:a17:902:e989:: with SMTP id f9mr10040039plb.268.1592598231563;
-        Fri, 19 Jun 2020 13:23:51 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id b1sm6738696pfr.89.2020.06.19.13.23.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 13:23:49 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 9DED34063E; Fri, 19 Jun 2020 20:23:48 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 20:23:48 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        martin.petersen@oracle.com, jejb@linux.ibm.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v6 3/6] block: revert back to synchronous request_queue
- removal
-Message-ID: <20200619202348.GJ11244@42.do-not-panic.com>
-References: <20200608170127.20419-1-mcgrof@kernel.org>
- <20200608170127.20419-4-mcgrof@kernel.org>
- <e1fad3cd-32a1-7a08-b8a4-084dfbff4680@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e1fad3cd-32a1-7a08-b8a4-084dfbff4680@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S2389236AbgFSUZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 16:25:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46792 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389127AbgFSUZe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Jun 2020 16:25:34 -0400
+Subject: Re: [GIT PULL] Block fixes for 5.8-rc2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592598334;
+        bh=ZQok6hFw08bHEaCWxXCOl6IJa0RpRLBHOGqSvYfBhAA=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=M+OL3rFvmFdiwcwXoYO0gsg7gFML6sSlwRQPDF08vB03Uj33ABsGV/SDWEGGhL1Zy
+         mxuWnttaeJvJ+6tnTdZ/ZaePWV9Crk2gtY/G8rYzhoAZjUrFesUQHKWGV+QByNhjQy
+         lZ+8P3EEYh96EPNKND86a3jlUMEarRGAZJc1Kn0g=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <a0978751-6105-a269-2c58-de4d7229a646@kernel.dk>
+References: <a0978751-6105-a269-2c58-de4d7229a646@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a0978751-6105-a269-2c58-de4d7229a646@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/block-5.8-2020-06-19
+X-PR-Tracked-Commit-Id: 3373a3461aa15b7f9a871fa4cb2c9ef21ac20b47
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d2b1c81f5f6c3427bd900be5fed306ca83d649d4
+Message-Id: <159259833432.1498.6900938422581358347.pr-tracker-bot@kernel.org>
+Date:   Fri, 19 Jun 2020 20:25:34 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 12, 2020 at 06:53:40PM -0700, Bart Van Assche wrote:
-> On 2020-06-08 10:01, Luis Chamberlain wrote:
-> > + * Drivers exist which depend on the release of the request_queue to be
-> > + * synchronous, it should not be deferred.
-> 
-> This sounds mysterious. Which drivers? Why do these depend on this
-> function being synchronous?
+The pull request you sent on Fri, 19 Jun 2020 08:55:28 -0600:
 
-Sorry that should be "Userspace can exist". I've fixed that.
+> git://git.kernel.dk/linux-block.git tags/block-5.8-2020-06-19
 
-> Anyway:
-> 
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d2b1c81f5f6c3427bd900be5fed306ca83d649d4
 
-  Luis
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
