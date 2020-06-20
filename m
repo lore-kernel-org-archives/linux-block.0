@@ -2,131 +2,98 @@ Return-Path: <SRS0=essW=AB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BBCC433E3
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 15:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 408D2C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 17:03:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42D4023AFB
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 15:57:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QDUi4+cS"
+	by mail.kernel.org (Postfix) with ESMTP id 29A242404C
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 17:03:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727118AbgFTP5L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Jun 2020 11:57:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726065AbgFTP5K (ORCPT
+        id S1728237AbgFTRDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Jun 2020 13:03:04 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:33372 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728126AbgFTRDD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jun 2020 11:57:10 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 311FBC061797
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2020 08:57:09 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id k1so5391661pls.2
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2020 08:57:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9tYajToBSjCKrMeO3oPfRpy8eb8n4thx7RWSAT9gnU0=;
-        b=QDUi4+cS/+VkJarQJer8i54NB6wrYUApoWkctsr63KwWXWXArOZDidsHLokQDZp1dW
-         eZ4mUUVqPLdtc98QdwYojIxlVjsSvdT6uJdK2Pr6SfHfX+CS5ufDjNUbv4fBIhf1Kcxv
-         MQ/YY9T6qSNqLt4/98fJo5BCZXSyE37vzBS0w=
+        Sat, 20 Jun 2020 13:03:03 -0400
+Received: by mail-pf1-f194.google.com with SMTP id b201so6101394pfb.0;
+        Sat, 20 Jun 2020 10:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9tYajToBSjCKrMeO3oPfRpy8eb8n4thx7RWSAT9gnU0=;
-        b=REe4ApQRR5G8CN8lFHm+3E1RJTSfATePUAwD8EqfsmJsrEQfRFoKTKAcc6Jfdo9WEh
-         lJoAZoIFq493UPtvj8lWTYvK3ycKVSE52VHEmwluy4ILaP3Zw/gC2p7cYJjGO1UPCSgk
-         ertNC/Pfl/KRCLusrQRceNl4zyX7KUlxhZcFlrY4FAYO2K4Lvu9VQS2yK+wAUZeODy02
-         LoLnBdm3wrovS+lHsc72kJRPiAMdzh33yQFCzDZWCNb595go8HDxFSoDKOOo9JykdSrp
-         +O2TpDGf4Voju2qjy3yQSJVzQgJHXW5SG/bV2AQ6e348KOppZyVl7eZhwuTci0MAKi24
-         D6hQ==
-X-Gm-Message-State: AOAM530RzT7hffxUzrHXFqnI7MSXP6Nbwr1EvbphbMAGsg7D4XLX1083
-        alYrA8ANjct7C/1U4PtoDkUv6Q==
-X-Google-Smtp-Source: ABdhPJxL62JhXi8o+nSID6QHqBiLZ4YAHSAeaQKUwiACFjUcLS2k4S/MAlD8WL4T8tKBotrZuujIYg==
-X-Received: by 2002:a17:902:b78a:: with SMTP id e10mr12682612pls.201.1592668627259;
-        Sat, 20 Jun 2020 08:57:07 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id y4sm8954278pfr.182.2020.06.20.08.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Jun 2020 08:57:06 -0700 (PDT)
-Date:   Sat, 20 Jun 2020 08:57:04 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Sedat Dilek <sedat.dilek@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>, x86@kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-mm@kvack.org,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
-Subject: Re: [PATCH v2 00/16] Remove uninitialized_var() macro
-Message-ID: <202006200854.B2D8F21@keescook>
-References: <20200620033007.1444705-1-keescook@chromium.org>
- <CA+icZUWpHRR7ukyepiUH1dR3r4GMi-s2crfwR5vTszdt1SUTQw@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=uv671M4YeoYG72uKHXlTngm70x9Li+FIuEEWR7YdH74=;
+        b=eaUEo7i82Zyrs2pb2lGXjeRpnvStrWZ6+q3w0GXhcQTq9logleqRDLllUXuRsmT6nR
+         Q1fRDtnfFT8N/kf0lOJEbZEz7ZlZt+oY/psuGq6VwIYzy4+fpsHUEJL9xs9Yv9DP/Bvy
+         vRQTpsJIYvl+BTcrdgBveVYgozznZgBvOF0Bcf34jIrPRDSmwuGT2PFC9LuwKz3x+EAr
+         fDt16vWx0u52Q8dUKAuC5jTRNJ2fQJGW0s2MoCoblqp+hZqQZTeX7l9QD/iGAseII1HM
+         /CJataAe+eGr1MHUI24CBAyCujoeRDiA0jnRtyDAIlkPSAXhsAYnBxJC4XcfMR7If6uw
+         XAaA==
+X-Gm-Message-State: AOAM5329ZMR9x+qsF5bt/qcg2nEj462KLQWJhUOwmlsuxZ7Hh40nNlcZ
+        fYneo+GjjaoPEYfY5On0LRjMS11Mj94=
+X-Google-Smtp-Source: ABdhPJzx+S1j/KiIwXlVDpCnhxZMnpz0JMjLeSOd3LxT9HC9+yanxC7bvXiiRnuMgocCzUUaX0Z6nQ==
+X-Received: by 2002:a63:34c3:: with SMTP id b186mr7059114pga.173.1592672581746;
+        Sat, 20 Jun 2020 10:03:01 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id w11sm8993836pfi.93.2020.06.20.10.03.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Jun 2020 10:03:00 -0700 (PDT)
+Subject: Re: [PATCH v7 4/8] blktrace: annotate required lock on
+ do_blk_trace_setup()
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20200619204730.26124-1-mcgrof@kernel.org>
+ <20200619204730.26124-5-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <1558a4f3-edbd-c523-9421-860ec31b6473@acm.org>
+Date:   Sat, 20 Jun 2020 10:02:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+icZUWpHRR7ukyepiUH1dR3r4GMi-s2crfwR5vTszdt1SUTQw@mail.gmail.com>
+In-Reply-To: <20200619204730.26124-5-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 20, 2020 at 09:03:34AM +0200, Sedat Dilek wrote:
-> On Sat, Jun 20, 2020 at 5:30 AM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > v2:
-> > - more special-cased fixes
-> > - add reviews
-> > v1: https://lore.kernel.org/lkml/20200603233203.1695403-1-keescook@chromium.org
-> >
-> > Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> > (or can in the future), and suppresses unrelated compiler warnings
-> > (e.g. "unused variable"). If the compiler thinks it is uninitialized,
-> > either simply initialize the variable or make compiler changes.
-> >
-> > As recommended[2] by[3] Linus[4], remove the macro.
-> >
-> > Most of the 300 uses don't cause any warnings on gcc 9.3.0, so they're in
-> > a single treewide commit in this series. A few others needed to actually
-> > get cleaned up, and I broke those out into individual patches.
-> >
-> > The tree is:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=kspp/uninit/macro
-> >
-> > -Kees
-> >
-> 
-> Hi Kees,
-> 
-> thanks for doing a v2 of your patchset.
-> 
-> As I saw Jason Yan providing some "uninitialized_var() macro" patches
-> to the MLs I pointen him to your tree "v1".
+On 2020-06-19 13:47, Luis Chamberlain wrote:
+> Ensure it is clear which lock is required on do_blk_trace_setup().
 
-Thanks!
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-> BTW, I have tested your "v1" against Linux v5.7 (see [1]) - just
-> yesterday with Linux v5.7.5-rc1.
-> 
-> Is it possible to have a v2 of this patchset on top od Linux v5.7 - if
-> you do not mind.
-
-Since it's only going to be for post-v5.8, I'm fine skipping the v5.7
-testing. Mainly I'm looking at v5.8 and linux-next.
-
-Thanks for looking at it!
-
--- 
-Kees Cook
