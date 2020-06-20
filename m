@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3ACC433DF
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 07:17:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E58C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 07:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79B1E2396E
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 07:17:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F2942395C
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 07:17:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ILYf7Jof"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lea++MvG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbgFTHRH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Jun 2020 03:17:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36398 "EHLO
+        id S1727088AbgFTHRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Jun 2020 03:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727097AbgFTHRG (ORCPT
+        with ESMTP id S1727083AbgFTHRD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jun 2020 03:17:06 -0400
+        Sat, 20 Jun 2020 03:17:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1685AC06174E;
-        Sat, 20 Jun 2020 00:17:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46549C06174E;
+        Sat, 20 Jun 2020 00:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=PWoaAGkD37V49a5XO/d4L2SpxpwdiJM61vBFK3z1jao=; b=ILYf7Jofs+8veCFsDguNebS2Gq
-        +A8el1OsLv4tV1VEKZuWT1XW/oOJVB8piETb5Tu0Lh209/BsOV52f3Djhvt/QfrXYrvYvjIAYhv/m
-        zJBpxQQIZOIH8cYc0tf/x6Rs7Qfrtc/7KagJ4CqJUWPpxya2LaRdweibOKrS9UNuURKS+nXLUaY5+
-        y+lmuZfbAFjg44baawJdLeM2xqG7Wr7G5f59kmfcnJ45Gig6kIM4c5HZeq6h+qdkEdhgAXSrCGMEX
-        r7h2YEfJMhyOpEVjVHuDvxXigKaxzY2uj86VeyNtcksn0irpLKEhNYngU3Uz5oP4I/wGbF7Xxw/IX
-        di6yldeQ==;
+        bh=3sYWqj8JjLR1Bdg3r/XBhCA3mEw2Ww30VmPxbStNzPs=; b=Lea++MvGmvo2vTLnbq9YHSLUkK
+        STTWLb3tkkBifi11ZhIz21buWqXPhjcMfEtn3Bapr6a6QS9hzwNFRqZnHJQId3kHKRNsVMvKzgPIP
+        0yxrltdk1WqCDLTgfrEA1eKAorgJ90jVkMe6+X3hLU8OKqyjrJp4AXKmu0eeYoLEmtXZYSL43q1DP
+        CLTOJ1KBXEaFPOXicd2jsB/ioEYEh1WUu08n3WISFuEYyA0tOSQ3pE1R2Kjz6JvkPzLpCiA8Fpo6D
+        cLWvAV89YwrBhSIoEZyu2nN23s86CqAuE04jVcbSjekpisopH0BcXtNmvneJsduhLBGPqqxUHMpIi
+        VZzf3nEg==;
 Received: from 195-192-102-148.dyn.cablelink.at ([195.192.102.148] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jmXkO-0003sC-7C; Sat, 20 Jun 2020 07:17:04 +0000
+        id 1jmXkL-0003rw-BV; Sat, 20 Jun 2020 07:17:01 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jiri Slaby <jslaby@suse.com>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 06/10] block: simplify sb_is_blkdev_sb
-Date:   Sat, 20 Jun 2020 09:16:40 +0200
-Message-Id: <20200620071644.463185-7-hch@lst.de>
+Subject: [PATCH 05/10] fs: remove the mount_bdev and kill_block_super stubs
+Date:   Sat, 20 Jun 2020 09:16:39 +0200
+Message-Id: <20200620071644.463185-6-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200620071644.463185-1-hch@lst.de>
 References: <20200620071644.463185-1-hch@lst.de>
@@ -58,56 +58,52 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just use IS_ENABLED instead of providing a stub for !CONFIG_BLOCK.
+No one calls these functions without CONFIG_BLOCK, so don't bother
+stubbing them out.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/fs.h | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ include/linux/fs.h | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 9ee09e2b5a9716..7f3ae38335d4b3 100644
+index 224edcc5b56e62..9ee09e2b5a9716 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -2557,6 +2557,12 @@ extern struct kmem_cache *names_cachep;
- #define __getname()		kmem_cache_alloc(names_cachep, GFP_KERNEL)
- #define __putname(name)		kmem_cache_free(names_cachep, (void *)(name))
+@@ -2256,18 +2256,9 @@ struct file_system_type {
  
-+extern struct super_block *blockdev_superblock;
-+static inline bool sb_is_blkdev_sb(struct super_block *sb)
-+{
-+	return IS_ENABLED(CONFIG_BLOCK) && sb == blockdev_superblock;
-+}
-+
- #ifdef CONFIG_BLOCK
- extern int register_blkdev(unsigned int, const char *);
- extern void unregister_blkdev(unsigned int, const char *);
-@@ -2572,13 +2578,6 @@ extern struct super_block *freeze_bdev(struct block_device *);
- extern void emergency_thaw_bdev(struct super_block *sb);
- extern int thaw_bdev(struct block_device *bdev, struct super_block *sb);
- extern int fsync_bdev(struct block_device *);
--
--extern struct super_block *blockdev_superblock;
--
--static inline bool sb_is_blkdev_sb(struct super_block *sb)
+ #define MODULE_ALIAS_FS(NAME) MODULE_ALIAS("fs-" NAME)
+ 
+-#ifdef CONFIG_BLOCK
+ extern struct dentry *mount_bdev(struct file_system_type *fs_type,
+ 	int flags, const char *dev_name, void *data,
+ 	int (*fill_super)(struct super_block *, void *, int));
+-#else
+-static inline struct dentry *mount_bdev(struct file_system_type *fs_type,
+-	int flags, const char *dev_name, void *data,
+-	int (*fill_super)(struct super_block *, void *, int))
 -{
--	return sb == blockdev_superblock;
+-	return ERR_PTR(-ENODEV);
 -}
- #else
- static inline void bd_forget(struct inode *inode) {}
- static inline int sync_blockdev(struct block_device *bdev) { return 0; }
-@@ -2602,11 +2601,6 @@ static inline int emergency_thaw_bdev(struct super_block *sb)
- static inline void iterate_bdevs(void (*f)(struct block_device *, void *), void *arg)
- {
- }
--
--static inline bool sb_is_blkdev_sb(struct super_block *sb)
+-#endif
+ extern struct dentry *mount_single(struct file_system_type *fs_type,
+ 	int flags, void *data,
+ 	int (*fill_super)(struct super_block *, void *, int));
+@@ -2276,14 +2267,7 @@ extern struct dentry *mount_nodev(struct file_system_type *fs_type,
+ 	int (*fill_super)(struct super_block *, void *, int));
+ extern struct dentry *mount_subtree(struct vfsmount *mnt, const char *path);
+ void generic_shutdown_super(struct super_block *sb);
+-#ifdef CONFIG_BLOCK
+ void kill_block_super(struct super_block *sb);
+-#else
+-static inline void kill_block_super(struct super_block *sb)
 -{
--	return false;
+-	BUG();
 -}
- #endif
- void emergency_thaw_all(void);
- extern int sync_filesystem(struct super_block *);
+-#endif
+ void kill_anon_super(struct super_block *sb);
+ void kill_litter_super(struct super_block *sb);
+ void deactivate_super(struct super_block *sb);
 -- 
 2.26.2
 
