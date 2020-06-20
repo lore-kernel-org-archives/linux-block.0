@@ -2,62 +2,64 @@ Return-Path: <SRS0=essW=AB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBBDC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1865AC433E2
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:32:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CF6B23372
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E846F23359
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:32:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MihGMYKd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Rutn4YPk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733177AbgFTDcU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 23:32:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
+        id S1733136AbgFTDc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 23:32:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733145AbgFTDbL (ORCPT
+        with ESMTP id S1733127AbgFTDbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 23:31:11 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF9FC0617BE
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:28 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id u128so5378066pgu.13
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:28 -0700 (PDT)
+        Fri, 19 Jun 2020 23:31:09 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C052C0610E3
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:26 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id ne5so4984664pjb.5
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dfh/vw+ddjlYh9CDRFRkQhWgDe6VpIaXph6iMJk9GA8=;
-        b=MihGMYKdZDiLuZtFYTQG9hHMsTVzmuQ3DJp1RxmrKSOaCHLlYqx3RB7EzdxAAEd4dy
-         xUDLp5ekbRUHQEBzv61Wp4NXwSE99zyWUIbQoIUuKzEORyW2v8VjeUMh5o4KgUgFAoK+
-         QK/RDmLsOZKbaJ59vz56xsAOtVZ6x+uY8ER9c=
+        bh=I53/n5ydJ9yzbnxtmoDriMZB814XLzfic4sznaesD40=;
+        b=Rutn4YPkcmqXLdEaPjRwH0N9ohbI/CzpH9cf5y9vG4nYpAw1nQr5aBkVvJ5iC9ui6q
+         cLu5pHW/44+v6JlX39sxqMfNukxEy6S08EOmpnYgt90MBK4lvmz1Qm66oVfcHJZShxiQ
+         h7SFiaUV2yA5KII9Om+c9u+JdAg6xNa2K9JLA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dfh/vw+ddjlYh9CDRFRkQhWgDe6VpIaXph6iMJk9GA8=;
-        b=WewQlmT8TvdR9FUUgqcz/+lwtooO8Ct09cSPUJRUiyVhg6qYmfLLdfflPuFqfbrQZo
-         SONRSNdWdiwtUB+83qW14PigFXhKLi/oo5ns0kw7q6qre0enVJ5PslFQaEZH6/Fohrbk
-         t48qoiF8roHw9OFU7/zxyX7pc1jSsFTe/cTfTXbq2K98waIkv/bHzWROqq8xJ0NL7Lq/
-         33rOxIDjv/T9nhT9rW2kGvDWkPUl+3swUDDt7jQlZueweszrhg9b/sVfikmDqwqe1r1c
-         /mW11yYSd6UgMZwR/JzLbGZfFeWZc0pgGXRPWV671D8hRTO/w/lnWzTefx5TSaFWeFIz
-         3d9w==
-X-Gm-Message-State: AOAM532OlqOAQD0ljQSwy0Yz/jFEU+E71WhzSJqDFrsmzo/JgB6SonEj
-        Jj0F9RL/bo2OT2ZXWLbziNiWXQ==
-X-Google-Smtp-Source: ABdhPJx0aCYAbShJE+YVxO7qvT0bOjdhl9ynwJyizMCTWOBsedHyy3Q5JrRb42SiCaY2nko2swgfTw==
-X-Received: by 2002:aa7:9569:: with SMTP id x9mr10876864pfq.308.1592623827680;
-        Fri, 19 Jun 2020 20:30:27 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id i63sm6601330pje.34.2020.06.19.20.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=I53/n5ydJ9yzbnxtmoDriMZB814XLzfic4sznaesD40=;
+        b=CaqCoTPbho3HospEs/Mj4nDRTY4R/XxjQX4JKu9S8KnoEy93wdWQTCXwz/7Oip5Lob
+         Hjk7xw2YgieE+aFGhDPI8LhG8alo92ZHRmj5j+485YnZh1yNpOQi21kaYmxF1QuNJu5g
+         zD9Y6KTGymGd9MkcPorHaugGE0tTvH6yLowjpybxJ1RAIdSU1+erfnELknJ91bvvArx8
+         fFVrqAHJRL+3LwD46NLgxXwoAFijY4CEv8txYroMQuAvnglbkly0/sU92MmO7Nj9Bhgo
+         wcr82W53DpkDHtHv8LLT3IokFyezdze2iQ4/bDATR4L+wqmmuUbvv5kuPb6naz9HwmWX
+         0tBg==
+X-Gm-Message-State: AOAM5311cYATQAoEt61ojcDigUXfGLpAaZvZLlQia+E6qSIvK3cw9MUh
+        MrPEBmaazs5H5gvWmfSNzchvhw==
+X-Google-Smtp-Source: ABdhPJzDpg8kRLeVgrehMBlr+1UwoiUH6XXfWvLx404+vNnybEp9T2mmhskRjq6n4U4EQRsEK9B3AQ==
+X-Received: by 2002:a17:902:ff06:: with SMTP id f6mr10351618plj.22.1592623826055;
         Fri, 19 Jun 2020 20:30:26 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id 17sm7373750pfn.19.2020.06.19.20.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jun 2020 20:30:20 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
+Cc:     Kees Cook <keescook@chromium.org>, Jason Yan <yanaijie@huawei.com>,
+        Chao Yu <yuchao0@huawei.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Alexander Potapenko <glider@google.com>,
@@ -69,9 +71,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
         linux-spi@vger.kernel.org, linux-mm@kvack.org,
         clang-built-linux@googlegroups.com
-Subject: [PATCH v2 14/16] checkpatch: Remove awareness of uninitialized_var() macro
-Date:   Fri, 19 Jun 2020 20:30:04 -0700
-Message-Id: <20200620033007.1444705-14-keescook@chromium.org>
+Subject: [PATCH v2 12/16] f2fs: Eliminate usage of uninitialized_var() macro
+Date:   Fri, 19 Jun 2020 20:30:03 -0700
+Message-Id: <20200620033007.1444705-13-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200620033007.1444705-1-keescook@chromium.org>
 References: <20200620033007.1444705-1-keescook@chromium.org>
@@ -82,69 +84,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Using uninitialized_var() is dangerous as it papers over real bugs[1]
-(or can in the future), and suppresses unrelated compiler warnings
-(e.g. "unused variable"). If the compiler thinks it is uninitialized,
-either simply initialize the variable or make compiler changes.
+From: Jason Yan <yanaijie@huawei.com>
 
-In preparation for removing[2] the[3] macro[4], partially revert
-commit 16b7f3c89907 ("checkpatch: avoid warning about uninitialized_var()")
-and remove all remaining mentions of uninitialized_var().
+This is an effort to eliminate the uninitialized_var() macro[1].
 
-[1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-[2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-[3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-[4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+The use of this macro is the wrong solution because it forces off ANY
+analysis by the compiler for a given variable. It even masks "unused
+variable" warnings.
 
+Quoted from Linus[2]:
+
+"It's a horrible thing to use, in that it adds extra cruft to the
+source code, and then shuts up a compiler warning (even the _reliable_
+warnings from gcc)."
+
+Fix it by remove this variable since it is not needed at all.
+
+[1] https://github.com/KSPP/linux/issues/81
+[2] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+
+Suggested-by: Chao Yu <yuchao0@huawei.com>
+Signed-off-by: Jason Yan <yanaijie@huawei.com>
+Reviewed-by: Chao Yu <yuchao0@huawei.com>
+Link: https://lore.kernel.org/r/20200615085132.166470-1-yanaijie@huawei.com
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- scripts/checkpatch.pl | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ fs/f2fs/data.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 4c820607540b..60b737e222fe 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -840,7 +840,6 @@ our $FuncArg = qr{$Typecast{0,1}($LvalOrFunc|$Constant|$String)};
- our $declaration_macros = qr{(?x:
- 	(?:$Storage\s+)?(?:[A-Z_][A-Z0-9]*_){0,2}(?:DEFINE|DECLARE)(?:_[A-Z0-9]+){1,6}\s*\(|
- 	(?:$Storage\s+)?[HLP]?LIST_HEAD\s*\(|
--	(?:$Storage\s+)?${Type}\s+uninitialized_var\s*\(|
- 	(?:SKCIPHER_REQUEST|SHASH_DESC|AHASH_REQUEST)_ON_STACK\s*\(
- )};
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 326c63879ddc..3753ba06531b 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -2856,7 +2856,6 @@ static int f2fs_write_cache_pages(struct address_space *mapping,
+ 	};
+ #endif
+ 	int nr_pages;
+-	pgoff_t uninitialized_var(writeback_index);
+ 	pgoff_t index;
+ 	pgoff_t end;		/* Inclusive */
+ 	pgoff_t done_index;
+@@ -2875,8 +2874,7 @@ static int f2fs_write_cache_pages(struct address_space *mapping,
+ 		clear_inode_flag(mapping->host, FI_HOT_DATA);
  
-@@ -6330,8 +6329,7 @@ sub process {
- 			if (defined $cond) {
- 				substr($s, 0, length($cond), '');
- 			}
--			if ($s =~ /^\s*;/ &&
--			    $function_name ne 'uninitialized_var')
-+			if ($s =~ /^\s*;/)
- 			{
- 				WARN("AVOID_EXTERNS",
- 				     "externs should be avoided in .c files\n" .  $herecurr);
-@@ -6350,17 +6348,13 @@ sub process {
- 		}
- 
- # check for function declarations that have arguments without identifier names
--# while avoiding uninitialized_var(x)
- 		if (defined $stat &&
--		    $stat =~ /^.\s*(?:extern\s+)?$Type\s*(?:($Ident)|\(\s*\*\s*$Ident\s*\))\s*\(\s*([^{]+)\s*\)\s*;/s &&
--		    (!defined($1) ||
--		     (defined($1) && $1 ne "uninitialized_var")) &&
--		     $2 ne "void") {
--			my $args = trim($2);
-+		    $stat =~ /^.\s*(?:extern\s+)?$Type\s*(?:$Ident|\(\s*\*\s*$Ident\s*\))\s*\(\s*([^{]+)\s*\)\s*;/s &&
-+		    $1 ne "void") {
-+			my $args = trim($1);
- 			while ($args =~ m/\s*($Type\s*(?:$Ident|\(\s*\*\s*$Ident?\s*\)\s*$balanced_parens)?)/g) {
- 				my $arg = trim($1);
--				if ($arg =~ /^$Type$/ &&
--					$arg !~ /enum\s+$Ident$/) {
-+				if ($arg =~ /^$Type$/ && $arg !~ /enum\s+$Ident$/) {
- 					WARN("FUNCTION_ARGUMENTS",
- 					     "function definition argument '$arg' should also have an identifier name\n" . $herecurr);
- 				}
+ 	if (wbc->range_cyclic) {
+-		writeback_index = mapping->writeback_index; /* prev offset */
+-		index = writeback_index;
++		index = mapping->writeback_index; /* prev offset */
+ 		end = -1;
+ 	} else {
+ 		index = wbc->range_start >> PAGE_SHIFT;
 -- 
 2.25.1
 
