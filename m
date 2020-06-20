@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EABC433E6
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2297CC433E1
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:31:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A32523134
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:30:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01F3923158
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:31:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AtmMokfE"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nLZb9q5M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732722AbgFTDad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 23:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
+        id S1733006AbgFTDbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 23:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732777AbgFTDaY (ORCPT
+        with ESMTP id S1733040AbgFTDaz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 23:30:24 -0400
+        Fri, 19 Jun 2020 23:30:55 -0400
 Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B77CAC061371
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:19 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id s88so5282369pjb.5
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E6FC0619EA
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:25 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id jz3so5003259pjb.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=YYIu82vaLERDRRVNezIsYro3B9HeZTQxC/aBbKcbPE4=;
-        b=AtmMokfEBFiCVkYDMGVHGJuJS9fKp3FifwZogKQ2q6x4hzDovnsRDnERm9pIhMX5VI
-         ToWY1NArXw8XqplWnXUVi18xafByHCkKQ3jNMc0A7Q42LSaPw/Owem45vKA8WDI8WLVz
-         orkNoFzi4U8cu25M9SMeU7hdywlADX44zclAo=
+        bh=TsJU39le/9mzUUvkg/vEQ1ejtljvEC7MElEcoRxU/hs=;
+        b=nLZb9q5MNXSO30mRLC8p+Z6tp7SeKI4c8mbyilFhnvlC39t+V3j0iQJ4vfU5EbJ/Ge
+         yJs0yUXWykR2+lKlShzU2CG/atXeM++8u60h/nbziIo1McpvPT8URV5HcgXBrobq0ydJ
+         LtCik9CXYKbYzZN1wG1+1XbNp5/sueNlWfLSk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=YYIu82vaLERDRRVNezIsYro3B9HeZTQxC/aBbKcbPE4=;
-        b=TqM+FYwV1FRSHy+wfw6QipCpqxuICQk+YeDbq6vxlhZ4EBQqyraBRA7gT8kn/gIeze
-         aH5GnAcLIRSMUhLB05429lFvFgYcGZiDSjnfwWJqVxOZNwAR9B7XrQUlRY2RSlTDDMNt
-         9ulmD1ON0kcL0oebtrO/AD3sfLaWUj1xzBHkxtVf3bXBVRh18fGDuHD8DtkpkwHdCgBP
-         Sqlubge6iE2eh8ibtzUOjuyotiIUAV5I1PukMfyK8rEv5TPlsxxojiidKA61hKbjKxIi
-         w/DzkIP8kvdfA4Qdk3AH1YgpAwDImhYn4nLaIPf9R39GwfIB2kT83jCagcHzvKDGdbsA
-         6PeA==
-X-Gm-Message-State: AOAM532h36QSfvIK5PYkETC0FQ+9RMX3efl/roMJ9hnwCEmFp3gWI78m
-        1QoHnlHCfV5Y2F46e58n+AHr2w==
-X-Google-Smtp-Source: ABdhPJzr2vJct8/WkWUzne3Cmk1hS4+0nx/CV5ignmOUO6jPnss1JMiZ2KbcObWfeGsMcluI2vysoA==
-X-Received: by 2002:a17:90a:d244:: with SMTP id o4mr6477083pjw.186.1592623819315;
-        Fri, 19 Jun 2020 20:30:19 -0700 (PDT)
+        bh=TsJU39le/9mzUUvkg/vEQ1ejtljvEC7MElEcoRxU/hs=;
+        b=MphYCAz29JwbHIND94OKUS3Q0WLkONwE52L+osvtDtYl/A62o3lwpmiNqVgxsopHiH
+         916vvj5r8HBeVOt8MnmCfuslBhMFIRnS0Tct3XFk8jtyLNJuvYP+A9/OZO+p2HJqy3Fy
+         TvVBGLXHdV9Z8VyvDFOg3O3dJowiA2T8gz7tVsymiwLWoa6BRWS5s1xZf0W9xY5psG0D
+         Dj8eU9WXkfVakIdHMkxBjQnIAYwSDMEdhzV9BSoBMPnvejW9EFZDz/GUyjZX/p6nFCIK
+         8wjy5AB0PHlrGe2XfrGrAVt//45sbZqtFSWwo14weQ8g5p2sfrE5iHn1gCniwy364Fuz
+         +YPA==
+X-Gm-Message-State: AOAM531/qy8ROiwi5oYOfQ52h9DKGm77jRQ7k27eBG3uIZEQFYeJ8+v6
+        clPipORw9vZeg2ZhMfKaftkXWQ==
+X-Google-Smtp-Source: ABdhPJx/5DcfB27JAL/c3SFwGw95qhIKfr9dnkeTlJXy/0XzMHLMuVPklbRvet5f9iLDNbeJ3PiIXQ==
+X-Received: by 2002:a17:902:8f83:: with SMTP id z3mr10333002plo.203.1592623824777;
+        Fri, 19 Jun 2020 20:30:24 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id u14sm7848572pfk.211.2020.06.19.20.30.16
+        by smtp.gmail.com with ESMTPSA id ev20sm6238855pjb.8.2020.06.19.20.30.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 20:30:17 -0700 (PDT)
+        Fri, 19 Jun 2020 20:30:20 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Alexander Potapenko <glider@google.com>,
@@ -69,9 +70,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
         linux-spi@vger.kernel.org, linux-mm@kvack.org,
         clang-built-linux@googlegroups.com
-Subject: [PATCH v2 04/16] b43: Remove uninitialized_var() usage
-Date:   Fri, 19 Jun 2020 20:29:55 -0700
-Message-Id: <20200620033007.1444705-5-keescook@chromium.org>
+Subject: [PATCH v2 10/16] KVM: PPC: Book3S PR: Remove uninitialized_var() usage
+Date:   Fri, 19 Jun 2020 20:30:01 -0700
+Message-Id: <20200620033007.1444705-11-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200620033007.1444705-1-keescook@chromium.org>
 References: <20200620033007.1444705-1-keescook@chromium.org>
@@ -86,34 +87,39 @@ Using uninitialized_var() is dangerous as it papers over real bugs[1]
 (or can in the future), and suppresses unrelated compiler warnings (e.g.
 "unused variable"). If the compiler thinks it is uninitialized, either
 simply initialize the variable or make compiler changes. As a precursor
-to removing[2] this[3] macro[4], just initialize this variable to NULL.
-No later NULL deref is possible due to the early returns outside of the
-(phy->rev >= 7 && phy->rev < 19) case, which explicitly tests for NULL.
+to removing[2] this[3] macro[4], just remove this variable since it was
+actually unused:
+
+arch/powerpc/kvm/book3s_pr.c:1832:16: warning: unused variable 'vrsave' [-Wunused-variable]
+        unsigned long vrsave;
+                      ^
 
 [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
 [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
 [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
 [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
 
-Fixes: 58619b14d106 ("b43: move under broadcom vendor directory")
+Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
+Fixes: f05ed4d56e9c ("KVM: PPC: Split out code from book3s.c into book3s_pr.c")
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/wireless/broadcom/b43/phy_n.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/powerpc/kvm/book3s_pr.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
-index c33b4235839d..46db91846007 100644
---- a/drivers/net/wireless/broadcom/b43/phy_n.c
-+++ b/drivers/net/wireless/broadcom/b43/phy_n.c
-@@ -4222,7 +4222,7 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
- 	u32 rfpwr_offset;
- 	u8 pga_gain, pad_gain;
- 	int i;
--	const s16 *uninitialized_var(rf_pwr_offset_table);
-+	const s16 *rf_pwr_offset_table = NULL;
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index ef54f917bdaf..ed12dfbf9bb5 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -1828,9 +1828,6 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	int ret;
+-#ifdef CONFIG_ALTIVEC
+-	unsigned long uninitialized_var(vrsave);
+-#endif
  
- 	table = b43_nphy_get_tx_gain_table(dev);
- 	if (!table)
+ 	/* Check if we can run the vcpu at all */
+ 	if (!vcpu->arch.sane) {
 -- 
 2.25.1
 
