@@ -1,128 +1,196 @@
-Return-Path: <SRS0=2cC7=AA=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=essW=AB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9DB7C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 23:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDB7C433DF
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 00:16:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94899224D3
-	for <linux-block@archiver.kernel.org>; Fri, 19 Jun 2020 23:49:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h0D6F6Uj"
+	by mail.kernel.org (Postfix) with ESMTP id 7354322581
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 00:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727872AbgFSXtZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 19:49:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43439 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726321AbgFSXtW (ORCPT
+        id S1730703AbgFTAQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 20:16:39 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:35786 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730616AbgFTAQj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 19:49:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592610560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yNZnxlbGuPU4YC+U1/0TYouC5Ifb75XSHcGnTIYuOjc=;
-        b=h0D6F6Uji2G6SPmyRa06w9gyLt3IeA7tqzIqeMU/g31Y5xRtImynaMf/HslgirvQvUN6BY
-        FxdvpVzMYDd0QYhQszUd4WvFppuwdJrhybLERQW5YRPSrDAELU9gPHd5C1GWmmvSf2igFs
-        lKBxRVHBhY8dXwBREAx7oXi15L5qvak=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-d7n_UMonMtWJgywOjVzDNg-1; Fri, 19 Jun 2020 19:49:16 -0400
-X-MC-Unique: d7n_UMonMtWJgywOjVzDNg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 433C6800053;
-        Fri, 19 Jun 2020 23:49:15 +0000 (UTC)
-Received: from T590 (ovpn-12-19.pek2.redhat.com [10.72.12.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BFC8719C4F;
-        Fri, 19 Jun 2020 23:49:07 +0000 (UTC)
-Date:   Sat, 20 Jun 2020 07:49:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: only return started requests from
- blk_mq_tag_to_rq()
-Message-ID: <20200619234903.GG353853@T590>
-References: <20200619140159.141905-1-hare@suse.de>
- <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
- <57a809a0-d449-e5f1-8986-761d6417e2c2@kernel.dk>
+        Fri, 19 Jun 2020 20:16:39 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: tonyk)
+        with ESMTPSA id 2554B2A52D2
+Subject: Re: [PATCH v3] docs: block: Create blk-mq documentation
+To:     Jens Axboe <axboe@kernel.dk>, corbet@lwn.net,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, kernel@collabora.com,
+        krisman@collabora.com, rdunlap@infradead.org,
+        dongli.zhang@oracle.com
+References: <20200619200114.6896-1-andrealmeid@collabora.com>
+ <c2f83c87-f473-4d30-2430-442e957de14f@kernel.dk>
+From:   =?UTF-8?Q?Andr=c3=a9_Almeida?= <andrealmeid@collabora.com>
+Message-ID: <36fcdfc6-4ba2-fdfc-411c-e337d2d86ea5@collabora.com>
+Date:   Fri, 19 Jun 2020 21:16:29 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <57a809a0-d449-e5f1-8986-761d6417e2c2@kernel.dk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <c2f83c87-f473-4d30-2430-442e957de14f@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 12:38:01PM -0600, Jens Axboe wrote:
-> On 6/19/20 8:09 AM, Hannes Reinecke wrote:
-> > On 6/19/20 4:01 PM, Hannes Reinecke wrote:
-> >> blk_mq_tag_to_rq() is used from within the driver to map a tag
-> >> to a request. As such it should only return requests which are
-> >> already started (ie passed to the driver); otherwise the driver
-> >> might trip over requests which it has never seen and random
-> >> crashes will occur.
-> >>
-> >> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> >> ---
-> >>   block/blk-mq.c | 6 +++++-
-> >>   1 file changed, 5 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> >> index 4f57d27bfa73..f02d18113f9e 100644
-> >> --- a/block/blk-mq.c
-> >> +++ b/block/blk-mq.c
-> >> @@ -815,9 +815,13 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
-> >>   
-> >>   struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
-> >>   {
-> >> +	struct request *rq;
-> >> +
-> >>   	if (tag < tags->nr_tags) {
-> >>   		prefetch(tags->rqs[tag]);
-> >> -		return tags->rqs[tag];
-> >> +		rq = tags->rqs[tag];
-> >> +		if (blk_mq_request_started(rq))
-> >> +			return rq;
-> >>   	}
-> >>   
-> >>   	return NULL;
-> >>
-> > This becomes particularly obnoxious for SCSI drivers using 
-> > scsi_host_find_tag() for cleaning up stale commands (ie drivers like 
-> > qla4xxx, fnic, and snic).
-> > All other drivers use it from the completion routine, so one can expect 
-> > a valid (and started) tag here. So for those it shouldn't matter.
-> > 
-> > But still, if there are objections I could look at fixing it within the 
-> > SCSI stack; although that would most likely mean I'll have to implement 
-> > the above patch as an additional function.
+On 6/19/20 5:56 PM, Jens Axboe wrote:
+> On 6/19/20 2:01 PM, André Almeida wrote:
+>> Create a documentation providing a background and explanation around the
+>> operation of the Multi-Queue Block IO Queueing Mechanism (blk-mq).
+>>
+>> The reference for writing this documentation was the source code and
+>> "Linux Block IO: Introducing Multi-queue SSD Access on Multi-core
+>> Systems", by Axboe et al.
+>>
+>> Signed-off-by: André Almeida <andrealmeid@collabora.com>
+>> ---
+>> Changes from v2:
+>> - More fixed typos
+>> - Once again, reworked the definition of `blk_mq_hw_ctx` in "Hardware
+>>   dispatch queues" section
+>>
+>> Changes from v1:
+>> - Fixed typos
+>> - Reworked blk_mq_hw_ctx
+>>
+>> Hello,
+>>
+>> This commit was tested using "make htmldocs" and the HTML output has
+>> been verified.
+>>
+>> Thanks,
+>> 	André
+>> ---
+>>  Documentation/block/blk-mq.rst | 155 +++++++++++++++++++++++++++++++++
+>>  Documentation/block/index.rst  |   1 +
+>>  2 files changed, 156 insertions(+)
+>>  create mode 100644 Documentation/block/blk-mq.rst
+>>
+>> diff --git a/Documentation/block/blk-mq.rst b/Documentation/block/blk-mq.rst
+>> new file mode 100644
+>> index 000000000000..d1b8f04a822d
+>> --- /dev/null
+>> +++ b/Documentation/block/blk-mq.rst
+>> @@ -0,0 +1,155 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +================================================
+>> +Multi-Queue Block IO Queueing Mechanism (blk-mq)
+>> +================================================
+>> +
+>> +The Multi-Queue Block IO Queueing Mechanism is an API to enable fast storage
+>> +devices to achieve a huge number of input/output operations per second (IOPS)
+>> +through queueing and submitting IO requests to block devices simultaneously,
+>> +benefiting from the parallelism offered by modern storage devices.
+>> +
+>> +Introduction
+>> +============
+>> +
+>> +Background
+>> +----------
+>> +
+>> +Magnetic hard disks have been the de facto standard from the beginning of the
+>> +development of the kernel. The Block IO subsystem aimed to achieve the best
+>> +performance possible for those devices with a high penalty when doing random
+>> +access, and the bottleneck was the mechanical moving parts, a lot slower than
+>> +any layer on the storage stack. One example of such optimization technique
+>> +involves ordering read/write requests according to the current position of the
+>> +hard disk head.
+>> +
+>> +However, with the development of Solid State Drives and Non-Volatile Memories
+>> +without mechanical parts nor random access penalty and capable of performing
+>> +high parallel access, the bottleneck of the stack had moved from the storage
+>> +device to the operating system. In order to take advantage of the parallelism
+>> +in those devices' design, the multi-queue mechanism was introduced.
+>> +
+>> +The former design had a single queue to store block IO requests with a single
+>> +lock. That did not scale well in SMP systems due to dirty data in cache and the
+>> +bottleneck of having a single lock for multiple processors. This setup also
+>> +suffered with congestion when different processes (or the same process, moving
+>> +to different CPUs) wanted to perform block IO. Instead of this, the blk-mq API
+>> +spawns multiple queues with individual entry points local to the CPU, removing
+>> +the need for a lock. A deeper explanation on how this works is covered in the
+>> +following section (`Operation`_).
+>> +
+>> +Operation
+>> +---------
+>> +
+>> +When the userspace performs IO to a block device (reading or writing a file,
+>> +for instance), blk-mq takes action: it will store and manage IO requests to
+>> +the block device, acting as middleware between the userspace (and a file
+>> +system, if present) and the block device driver.
+>> +
+>> +blk-mq has two group of queues: software staging queues and hardware dispatch
+>> +queues. When the request arrives at the block layer, it will try the shortest
+>> +path possible: send it directly to the hardware queue. However, there are two
+>> +cases that it might not do that: if there's an IO scheduler attached at the
+>> +layer or if we want to try to merge requests. In both cases, requests will be
+>> +sent to the software queue.
+>> +
+>> +Then, after the requests are processed by software queues, they will be placed
+>> +at the hardware queue, a second stage queue were the hardware has direct access
+>> +to process those requests. However, if the hardware does not have enough
+>> +resources to accept more requests, blk-mq will places requests on a temporary
+>> +queue, to be sent in the future, when the hardware is able.
+>> +
+>> +Software staging queues
+>> +~~~~~~~~~~~~~~~~~~~~~~~
+>> +
+>> +The block IO subsystem adds requests (represented by struct
+>> +:c:type:`blk_mq_ctx`) in the software staging queues in case that they weren't
 > 
-> The helper does exactly what it should, return a request associated
-> with a tag. Either add the logic to the caller, or provide a new
-> helper that does what you need. I'd be inclined to just add it to
-> the caller that needs it.
+> This reads a bit funny, did you want to put the blk_mq_ctx thing after
+> the "software staging queues"? Right now it looks like the requests are
+> of that type, which of course isn't true.
+> 
 
-I agree, even though the idea is good for most of driver usage since driver
-should only care started request.
+Oops, good catch.
 
-It may cause kernel oops in some corner case, such as blk_mq_poll_hybrid(),
-blk_poll() may see one not-started request, one example is nvme_execute_rq_polled().
+>> +sent directly to the driver. A request is a collection of BIOs. They arrived at
+> 
+> I'd say "one or more BIOs", as there can be just one.
+> 
 
-Thanks,
-Ming
+Done.
 
+>> +IO Schedulers
+>> +^^^^^^^^^^^^^
+>> +
+>> +There are several schedulers implemented by the block layer, each one following
+>> +a heuristic to improve the IO performance. They are "pluggable" (as in plug
+>> +and play), in the sense of they can be selected at run time using sysfs. You
+>> +can read more about Linux's IO schedulers `here
+>> +<https://www.kernel.org/doc/html/latest/block/index.html>`_. The scheduling
+>> +happens only between requests in the same queue, so it is not possible to merge
+>> +requests from different queues, otherwise there would be cache trashing and a
+>> +need to have a lock for each queue. After the scheduling, the requests are
+>> +eligible to be sent to the hardware. One of the possible schedulers to be
+>> +selected is the NOOP scheduler, the most straightforward one, that implements a
+>> +simple FIFO, without performing any reordering. This is useful in the following
+> 
+> NOOP is a relic from the single queue days, the basic "doesn't do much"
+> scheduler is NONE these days. And it doesn't provide FIFO ordering,
+> requests will basically just end up in whatever software queue the
+> process is running on. When someone runs the hardware queue, the
+> software queues mapped to that hardware queue will be drained in
+> sequence according to their mapping (generally from 0..N, if 0..N are
+> mapped to that hardware queue).
+> 
+
+Thanks for the feedback. I replaced this part of the text with a basic
+explanation about NONE scheduler based on your words.
+
+v4 on the way.
