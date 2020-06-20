@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA7FC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 21:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179FCC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 21:26:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4258246BF
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 21:23:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDB232168B
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 21:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="w2xwOc2A"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tq9mJgf8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729011AbgFTVW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Jun 2020 17:22:56 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46309 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728936AbgFTVWz (ORCPT
+        id S1728984AbgFTV0M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Jun 2020 17:26:12 -0400
+Received: from mail-pf1-f172.google.com ([209.85.210.172]:47052 "EHLO
+        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728936AbgFTV0L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jun 2020 17:22:55 -0400
-Received: by mail-pf1-f194.google.com with SMTP id b16so6271617pfi.13
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2020 14:22:53 -0700 (PDT)
+        Sat, 20 Jun 2020 17:26:11 -0400
+Received: by mail-pf1-f172.google.com with SMTP id b16so6274751pfi.13
+        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2020 14:26:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=aNmYYThIQrwKb/CnYFR3qPzspsMeW9XF/8FmP59B/pA=;
-        b=w2xwOc2AnM6BiXKYV8JoFnLRvFbrjOAYOTkIDHcfZAeGuhn7z8U1ubraIOTXuYYCQo
-         STExqObm7UQKdamVnkf9bqs5IjG7eDSuPKYhFtH49/nFmVeKqQAIq4hW7+0eXS+/6L+m
-         hiXyDzXfhgj2Th6+mZD81o1sqcpKbtbKkfg/FixGzeJAUcExUXphOe6ERIwkXtISfhJT
-         tWL6RatMMMeWDspEjDzXJVGohrjuJRLexyu4ATa/LRwxsAmdYLuh1dJkHxzo6iyW5Jtj
-         rFOAJKm5sx9K6R0sl5v+zFgKT1uG+g/tLkCTjkEf0xrP8yMJS3F0MFpZwE7meC+3xzZz
-         tjtQ==
+        bh=ZHQxZ8TSsBGlpFQq4k9d8v+o7ASds0jY1nqeLeyAKZM=;
+        b=tq9mJgf8znyh63cAW4/PCMUgKxAvFPXOee0lCGMh+PVnK7V85Udxk8h8SFuYlnD3HA
+         kNQfv1l8ksPzM407nZlLinz8SF/qLgO/qsZS//FdSiDvrop/Ni6Vgr53A98UC8JSMAlQ
+         fbDJzvXLQ+1Sg7NRs2kRUKhN+ZNQxVM04UZoAlqX5BN6krzBB+CCHdzprJyM3V0XR9BZ
+         y/VscEiemKcwc8hS7iNjSiZXj3UfwOO0Cr70UAPvo9TV/CkX4gTYebwzvxyMrr0lewNK
+         7mCKXSN1fXA13mVyPBQb2+DscRE0RjoA5TAEnyNwlhQ/8u47O6Xfu4+CXh0AgP/HxTcS
+         4wNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=aNmYYThIQrwKb/CnYFR3qPzspsMeW9XF/8FmP59B/pA=;
-        b=lboP3u+qQr1WQlLgq5vGBqy5VsAr/2QCs3HnMeU9zoDyiI5reHUfaVdBDGmGH8dl1o
-         SvfNb41D1O/7odZAUU78CS397mXzDfWdw/2LVI+82NgN5AeRXPywJcfWGwqM+VFf5eea
-         T83aqpHD8Fk/lcurbEWWcHrfqQM+3SjN+/sn5hxZUhkp2RaL4JA0+UTc+ImKqKO5rnV+
-         hd0K2fxxl8WJ3nIEczZuA80btyaN8YB53Wl35pBFVn1anNaZ2KqJiAWUvFKwy1w95k7u
-         y53gbn8JmJ0IWDPS7S8gxfwQa4eK04A05dqzPZg+t/rrkkVihaUGzSZCuaIeR2FNslSC
-         EumA==
-X-Gm-Message-State: AOAM5320MgJ7pwbmhT23Nk0iuYm9ian0GS5iDCRlr0Va6c0NYjkfHmND
-        JxsXAo46N5pN3VgAxW4a1jGgVA==
-X-Google-Smtp-Source: ABdhPJwIOpcEUxLA+Tx2u4Sym8EmChXJqY90sCTB5kAjBGyWszcpwUeEvhpKhj3+IN7vie2zB9rm8g==
-X-Received: by 2002:a62:5e85:: with SMTP id s127mr253010pfb.236.1592688113516;
-        Sat, 20 Jun 2020 14:21:53 -0700 (PDT)
+        bh=ZHQxZ8TSsBGlpFQq4k9d8v+o7ASds0jY1nqeLeyAKZM=;
+        b=mjAOz6QFMjvezEA0XEkLtqb/NVcOzIyUc1E3GZb5Eak3gbioBYvDQ9iuX8mgLNixpr
+         2ZimuO2O/GYnHzmaUlTHKIemSNPh351N6tr249Uw/kGu98w5A8eRa3jE+yLIIoMoWyc+
+         /YqI/V2aqZaL2AFN/W53PRq91D3nKJ2mL3YettFNOkn5/CCBJXdY8G+J5FVRgltN0YUb
+         7cB+lOkAEFCVURsj/DvVsKpRrjZzrVm00BkVmkcKt6bfADdWwbPPe2XiKtXA9fqLVksb
+         f5i9GjCoB0JCmFcQx3nOcWNKpGWqprQNFQc4Mjm5qlkioeDresbKkUMNeDBeIopy+x/N
+         yibg==
+X-Gm-Message-State: AOAM532e70sj68+ietRI5kJG9K1G3tBSzBv0kEX9Vc1yVX0Htp4MhaOu
+        2LEOhnnblLpdR0GzLkqOQh+82Q==
+X-Google-Smtp-Source: ABdhPJwmnMQuLonweUZsPZUPLIboe9pPgWn1MfhYScHl5K2gI2YxMJhjuxDUHi0QW5YZGAoAX/Utow==
+X-Received: by 2002:a62:1c5:: with SMTP id 188mr13682576pfb.213.1592688310612;
+        Sat, 20 Jun 2020 14:25:10 -0700 (PDT)
 Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id q6sm9305202pff.79.2020.06.20.14.21.52
+        by smtp.gmail.com with ESMTPSA id p14sm8668872pju.7.2020.06.20.14.25.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jun 2020 14:21:52 -0700 (PDT)
-Subject: Re: [PATCH][next] block: bio: Use struct_size() in kmalloc()
+        Sat, 20 Jun 2020 14:25:10 -0700 (PDT)
+Subject: Re: [PATCH][next] blk-iocost: Use struct_size() in kzalloc_node()
 To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-References: <20200620004949.GA30923@embeddedor>
+References: <20200619230830.GA25608@embeddedor>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4ecbc8a9-42ec-c117-42f7-32572b750036@kernel.dk>
-Date:   Sat, 20 Jun 2020 15:21:51 -0600
+Message-ID: <e0afded8-386a-7619-a221-869ae2e606f6@kernel.dk>
+Date:   Sat, 20 Jun 2020 15:25:08 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200620004949.GA30923@embeddedor>
+In-Reply-To: <20200619230830.GA25608@embeddedor>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,7 +75,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/19/20 6:49 PM, Gustavo A. R. Silva wrote:
+On 6/19/20 5:08 PM, Gustavo A. R. Silva wrote:
 > Make use of the struct_size() helper instead of an open-coded version
 > in order to avoid any potential type mistakes.
 > 
