@@ -2,57 +2,58 @@ Return-Path: <SRS0=essW=AB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0B3C433DF
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0190CC433DF
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:33:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16C81233CF
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:33:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D358E23372
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 03:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gTDQzS0R"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="j8nQ3B7F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732702AbgFTDdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Jun 2020 23:33:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58208 "EHLO
+        id S1733041AbgFTDdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Jun 2020 23:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732894AbgFTDa3 (ORCPT
+        with ESMTP id S1732845AbgFTDaY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Jun 2020 23:30:29 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44152C0619C3
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:21 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id n2so4793246pld.13
-        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:21 -0700 (PDT)
+        Fri, 19 Jun 2020 23:30:24 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800CAC0613EE
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:20 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id g12so4801527pll.10
+        for <linux-block@vger.kernel.org>; Fri, 19 Jun 2020 20:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KtJf1eB0YMlrdncO0Lr6J725DqMYoYaHrhw5Cgkkruw=;
-        b=gTDQzS0R9OidQMG5e9+VmFfSSG04SBfqJ4unRxfvhHa8h+BRhqOurGCqtRjRXbtwmM
-         6qHaq3suirfdF4p2vTK9nVPvab/ze983kHVbVbdpqZ9jzfmQ209tdPY06qFcE4o+7kX3
-         tZECKumwZls9OBAgYV/KhQ2bgAnw8dWiC5t0A=
+        bh=Fi8ab2CkfvIdd/5P+r0S5dxyJT2k4tSVWykkUvi99fU=;
+        b=j8nQ3B7FpehCsunpSEVQSYjhSIMs22zucCRygwZBlcD7nkUj3GKDredCjm7jP++dYB
+         i7TY+cL1cZ8JWvzIZIwoGoSA4hKFNbTalPofMuwWJS+BqEcADvjf61J9SbvMWxiL2Qla
+         oIQyEGAM0IVcrPLyW1oKnN6H6KktioV1Ny5ps=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KtJf1eB0YMlrdncO0Lr6J725DqMYoYaHrhw5Cgkkruw=;
-        b=Pey64lQpRkN/+4ekOGRSwJQ5Hk0qHXs6MML1dkpCiznd62gQ5PuCo+xpCrntEl4Adr
-         7AumRrze6fE4H9DZ0oUttT/RLMtHAfpsADrPdOn61FGdyIbU63ghUSWrl56N7cAhXLNq
-         w/nvb76jzVrLHfsN8/1D1fMSUuSrZo3EU/hucN/yI1qAi1xbXBwMZj9yz7xcfRqUG9hq
-         Pr7iWeNcBn7kpZFZTIq9MLur6VcJcTjrPPrfwshl8Kf9tL0OUYhfyw/Fza1jNh75zlf7
-         8VGxaHNb1SXN0UXTJujqPZQoHcic84xDTo7pvp2QL1yngpELVyhVAeF67q886I0aZhGA
-         fg4Q==
-X-Gm-Message-State: AOAM533NVq2lDVFNiIDLBa53+USGWRbzsyH1wgzmRCtecj7pq/SxpnAE
-        uFm0GybXB08ID0wA3CSBj93O7A==
-X-Google-Smtp-Source: ABdhPJwKgmzNQXi/vbnAMFC7g+mel4lUeVcAQfzdBe9z4BUHWp/ZcsnxA9mdYSIljSqJHt1Xu1z0+Q==
-X-Received: by 2002:a17:902:760c:: with SMTP id k12mr806735pll.129.1592623820805;
+        bh=Fi8ab2CkfvIdd/5P+r0S5dxyJT2k4tSVWykkUvi99fU=;
+        b=J1h/SpIkd88tEsKTdV96R+A8qyjhz/cmgri5BI3YSQraH1AoZAd+MbUBZ26cRJ5+Gr
+         0LYDN5hQGXR8Mp4cKuYmrN9+Uvug9Gz93wBUNcsy6VqY3RwhOHjgqC30ny6l91G3SnMy
+         JmeiTiMTjUwcVUpH9kMHpT7OX63T1AYomAbWxe7YpjSQpJKJa58ALcenKsYB5wIfYFt0
+         sVYqLg0YhrKVJ3sG7zkj+Y+x93Zjnnxyefy9Bpguzh8WLLWQhk9zJH7JqvfbF0CpazDB
+         A+JCBZNwEvOSBbj+LnPqKfwTQQ0bBVBlT0W3589mXEROfUH/u6RNE0N3bKGzPdAP2T3l
+         CIgQ==
+X-Gm-Message-State: AOAM531OxV33QhAdLzXK0lzZM5epN11W3mFSm5gVTVkbaO2nwN4PDuAo
+        EKfN4RHse247AxYIa7HKg7Icfw==
+X-Google-Smtp-Source: ABdhPJzKykKp69oTsLEAQ228A8aBga9uw6xzilqOJlYhvnET2ogoJrzcYkicI+7HggPAmmAR7pqRqg==
+X-Received: by 2002:a17:90b:3614:: with SMTP id ml20mr6333214pjb.41.1592623820052;
         Fri, 19 Jun 2020 20:30:20 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 137sm6119819pgg.72.2020.06.19.20.30.16
+        by smtp.gmail.com with ESMTPSA id p19sm7198155pff.116.2020.06.19.20.30.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 19 Jun 2020 20:30:17 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -69,9 +70,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
         linux-spi@vger.kernel.org, linux-mm@kvack.org,
         clang-built-linux@googlegroups.com
-Subject: [PATCH v2 02/16] x86/mm/numa: Remove uninitialized_var() usage
-Date:   Fri, 19 Jun 2020 20:29:53 -0700
-Message-Id: <20200620033007.1444705-3-keescook@chromium.org>
+Subject: [PATCH v2 01/16] docs: deprecated.rst: Add uninitialized_var()
+Date:   Fri, 19 Jun 2020 20:29:52 -0700
+Message-Id: <20200620033007.1444705-2-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200620033007.1444705-1-keescook@chromium.org>
 References: <20200620033007.1444705-1-keescook@chromium.org>
@@ -82,83 +83,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Using uninitialized_var() is dangerous as it papers over real bugs[1]
-(or can in the future), and suppresses unrelated compiler warnings (e.g.
-"unused variable"). If the compiler thinks it is uninitialized, either
-simply initialize the variable or make compiler changes. As a precursor
-to removing[2] this[3] macro[4], refactor code to avoid its need.
+Nothing should be using this macro, and the entire idea of tricking the
+compiler into silencing such warnings is a mistake.
 
-The original reason for its use here was to work around the #ifdef
-being the only place the variable was used. This is better expressed
-using IS_ENABLED() and a new code block where the variable can be used
-unconditionally.
-
-[1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-[2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-[3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-[4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
-
-Fixes: 1e01979c8f50 ("x86, numa: Implement pfn -> nid mapping granularity check")
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/mm/numa.c                | 18 +++++++++---------
- include/linux/page-flags-layout.h |  4 +++-
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ Documentation/process/deprecated.rst | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/arch/x86/mm/numa.c b/arch/x86/mm/numa.c
-index 8ee952038c80..b05f45e5e8e2 100644
---- a/arch/x86/mm/numa.c
-+++ b/arch/x86/mm/numa.c
-@@ -543,7 +543,6 @@ static void __init numa_clear_kernel_node_hotplug(void)
+diff --git a/Documentation/process/deprecated.rst b/Documentation/process/deprecated.rst
+index 652e2aa02a66..943a926ecbbb 100644
+--- a/Documentation/process/deprecated.rst
++++ b/Documentation/process/deprecated.rst
+@@ -51,6 +51,24 @@ to make sure their systems do not continue running in the face of
+ "unreachable" conditions. (For example, see commits like `this one
+ <https://git.kernel.org/linus/d4689846881d160a4d12a514e991a740bcb5d65a>`_.)
  
- static int __init numa_register_memblks(struct numa_meminfo *mi)
- {
--	unsigned long uninitialized_var(pfn_align);
- 	int i, nid;
- 
- 	/* Account for nodes with cpus and no memory */
-@@ -571,15 +570,16 @@ static int __init numa_register_memblks(struct numa_meminfo *mi)
- 	 * If sections array is gonna be used for pfn -> nid mapping, check
- 	 * whether its granularity is fine enough.
- 	 */
--#ifdef NODE_NOT_IN_PAGE_FLAGS
--	pfn_align = node_map_pfn_alignment();
--	if (pfn_align && pfn_align < PAGES_PER_SECTION) {
--		printk(KERN_WARNING "Node alignment %LuMB < min %LuMB, rejecting NUMA config\n",
--		       PFN_PHYS(pfn_align) >> 20,
--		       PFN_PHYS(PAGES_PER_SECTION) >> 20);
--		return -EINVAL;
-+	if (IS_ENABLED(NODE_NOT_IN_PAGE_FLAGS)) {
-+		unsigned long pfn_align = node_map_pfn_alignment();
++uninitialized_var()
++-------------------
++For any compiler warnings about uninitialized variables, just add
++an initializer. Using the uninitialized_var() macro (or similar
++warning-silencing tricks) is dangerous as it papers over `real bugs
++<https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/>`_
++(or can in the future), and suppresses unrelated compiler warnings
++(e.g. "unused variable"). If the compiler thinks it is uninitialized,
++either simply initialize the variable or make compiler changes. Keep in
++mind that in most cases, if an initialization is obviously redundant,
++the compiler's dead-store elimination pass will make sure there are no
++needless variable writes.
 +
-+		if (pfn_align && pfn_align < PAGES_PER_SECTION) {
-+			pr_warn("Node alignment %LuMB < min %LuMB, rejecting NUMA config\n",
-+				PFN_PHYS(pfn_align) >> 20,
-+				PFN_PHYS(PAGES_PER_SECTION) >> 20);
-+			return -EINVAL;
-+		}
- 	}
--#endif
- 	if (!numa_meminfo_cover_memory(mi))
- 		return -EINVAL;
- 
-diff --git a/include/linux/page-flags-layout.h b/include/linux/page-flags-layout.h
-index 71283739ffd2..e200eef6a7fd 100644
---- a/include/linux/page-flags-layout.h
-+++ b/include/linux/page-flags-layout.h
-@@ -98,9 +98,11 @@
- /*
-  * We are going to use the flags for the page to node mapping if its in
-  * there.  This includes the case where there is no node, so it is implicit.
-+ * Note that this #define MUST have a value so that it can be tested with
-+ * the IS_ENABLED() macro.
-  */
- #if !(NODES_WIDTH > 0 || NODES_SHIFT == 0)
--#define NODE_NOT_IN_PAGE_FLAGS
-+#define NODE_NOT_IN_PAGE_FLAGS 1
- #endif
- 
- #if defined(CONFIG_NUMA_BALANCING) && LAST_CPUPID_WIDTH == 0
++As Linus has said, this macro
++`must <https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/>`_
++`be <https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/>`_
++`removed <https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/>`_.
++
+ open-coded arithmetic in allocator arguments
+ --------------------------------------------
+ Dynamic size calculations (especially multiplication) should not be
 -- 
 2.25.1
 
