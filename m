@@ -2,112 +2,124 @@ Return-Path: <SRS0=essW=AB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FA3C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 17:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFACBC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 18:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 509FC24125
-	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 17:53:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="UTbTzGsb"
+	by mail.kernel.org (Postfix) with ESMTP id AFD2123F58
+	for <linux-block@archiver.kernel.org>; Sat, 20 Jun 2020 18:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728126AbgFTRxe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Jun 2020 13:53:34 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:32920 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726838AbgFTRxd (ORCPT
+        id S1728243AbgFTSHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Jun 2020 14:07:47 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36862 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727808AbgFTSHr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jun 2020 13:53:33 -0400
-Received: by mail-ot1-f67.google.com with SMTP id n6so9858117otl.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Jun 2020 10:53:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucsc.edu; s=ucsc-google-2018;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8Mz+T0R3CmrVkyAiLGaJ8kfGJk+hpqodjeuLQrL/aRA=;
-        b=UTbTzGsbWCKY/FImoY5WfQYJ7oZQz6/Ykxs8LQYJMijNBHRsKDLOXj/FjddGttn6qx
-         kCa13NDUM5mZK78I7Q2goO+/lgcuR2s8zgvKdXPVCUyPnDJgCSkzwtW0T6YQ7v9rSyx4
-         uS1E49tNhzLY3qcO8SVTQmAq0x5hf9Hjpoid/6a/LL0Y03UFgfI4Bg6SmxN6AI8dty75
-         7q4jKtGdH3WQT8cI5+Wuzm3J7Kz/LCTFsTqcPITvQAsI4aAXhVPdqlN0H6TaM0bZR6c4
-         Kx+9/PHkDkRoXrIn+j5LJ6IwGNfb0Ulwa344Vo4VDrKj+WUmFjgztCsMmvpDGt7yK/gJ
-         2uig==
+        Sat, 20 Jun 2020 14:07:47 -0400
+Received: by mail-pg1-f193.google.com with SMTP id p3so3380764pgh.3;
+        Sat, 20 Jun 2020 11:07:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8Mz+T0R3CmrVkyAiLGaJ8kfGJk+hpqodjeuLQrL/aRA=;
-        b=E0Zgg6Pbs17zKyFj1aMZS0uhaB4Bnj1zPCoGFA/Ubzk0tU1IsxMJSC7ig8kOd6gnGQ
-         z/AezMMQpmSGJqu8O6T2Ugfwervl2y/CrMh6AuFy6VPN635fo3hHyfZaZCtepnHJ/znp
-         DAqRBV69/RgwITYW+Pidq+khfkY9kOYiCL1QGLsGxDIWlihBdjlgfNkY3OGPE+W4+Itu
-         +gHsI+P2utF8tvEJlw3oJBBgKcyHoKKApJVw/Yu61IJzpkSymfdg3gEAS1Gaun7MNIWz
-         vO9a4q+hTWlv41jQhcFzkJfCVL3l9FFSVQRCUUYhu9CJgx8o4hvvvAqEFsgdzpl5+txZ
-         Ed0g==
-X-Gm-Message-State: AOAM530KG4v7gGsfYw0SJVg+k1gxNcCVPTGbZ0K2S+zT5QJDNrfZV3pt
-        guXiFUCWKhWD9/FjiNIJS6gJ0u2LfzuYAmg3i9grzQ==
-X-Google-Smtp-Source: ABdhPJxG+NI+bUalvZTD9CwojB6vkCx6LZzpiseaSnMY0H1DGp8x/RDwPQKR3Fz+UXS/Hl1LCzDCAnWHbKU8D+6S4Y0=
-X-Received: by 2002:a9d:4503:: with SMTP id w3mr7491080ote.38.1592675552497;
- Sat, 20 Jun 2020 10:52:32 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=NzZdSjEt874a3GJH+7QELllYmmkWwmA69bmmuHgTAoc=;
+        b=hh4UONth6FNSudKukThq0sNryxE+OUj4MaywiVMXVCZsG96E7L41YXaSjFo76fy2gJ
+         sAzDdD1qNigqyzgnrGOi8/ODz3lC7+5zOnINlWwLw1LlpFzQWHFu3lndypKeI3xGL6lt
+         epZbwtA/C4hV+V7xTEry1UcSO9yZCG6aTpoBWH7PTkymPc1Aq0lxL6UftUMsDXIPC7iI
+         Z2OUhql+S5thxAlzM4cRKHcc5B/cbvuf79dUYnDXli2eOJUbT9fNfqFSdQN4MOTVEXWh
+         bcSu1hphLjrhIesM3/rgjxHDPJaPSstNzoJD8smvOWJa/fS4kMPIZljWU5//+t7L7Qih
+         Z/ag==
+X-Gm-Message-State: AOAM532ZB4zclxuJkJRhRZhEGhyD98XIdg85GJpqkbd1HCRgFWF45xOC
+        aABgAeQTHhW7gxIIRbo8NIrIqcQS5t0=
+X-Google-Smtp-Source: ABdhPJyXZ5+MX59b6ULR5gqIuxp5l3tCoeY0xbteLpJXFGzXJOEKGFgYUdAnj2qpGVZHCWN7S8ZLZw==
+X-Received: by 2002:a63:fa4d:: with SMTP id g13mr7185310pgk.26.1592676466144;
+        Sat, 20 Jun 2020 11:07:46 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id s22sm2614781pgv.43.2020.06.20.11.07.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Jun 2020 11:07:45 -0700 (PDT)
+Subject: Re: [PATCH v7 8/8] block: create the request_queue debugfs_dir on
+ registration
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        rostedt@goodmis.org, mingo@redhat.com, jack@suse.cz,
+        ming.lei@redhat.com, nstange@suse.de, akpm@linux-foundation.org
+Cc:     mhocko@suse.com, yukuai3@huawei.com, martin.petersen@oracle.com,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20200619204730.26124-1-mcgrof@kernel.org>
+ <20200619204730.26124-9-mcgrof@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <02112994-4cd7-c749-6bd7-66a772593c90@acm.org>
+Date:   Sat, 20 Jun 2020 11:07:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200617194013.3wlz2ajnb6iopd4k@mpHalley.local>
- <CAJbgVnVo53vLYHRixfQmukqFKKgzP5iPDwz87yanqKvSsYBvCg@mail.gmail.com>
- <20200618015526.GA1138429@dhcp-10-100-145-180.wdl.wdc.com>
- <CAJbgVnVKqDobpX8iwqRVeDqvmfdEd-uRzNFC2z5U03X9E3Pi_w@mail.gmail.com>
- <CY4PR04MB3751E6A6D6F04285CAB18514E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
- <CAJbgVnVnqGQiLx1PctDhAKkjLXRKFwr00tdTPJjkaXZDc+V6Bg@mail.gmail.com>
- <20200618211945.GA2347@C02WT3WMHTD6> <CAJbgVnVxtfs3m6HKJOQw4E1sqTQBmtF_P-D4aAZ5zsz4rQUXNA@mail.gmail.com>
- <MN2PR04MB62234880B3FDBD7F9B2229CCF1980@MN2PR04MB6223.namprd04.prod.outlook.com>
- <CAJbgVnUd3U3G=RjpcCuWO+HT9pBP3zasdQfG7h-+PEk0=n4npw@mail.gmail.com> <20200620063301.GA2381@lst.de>
-In-Reply-To: <20200620063301.GA2381@lst.de>
-From:   Heiner Litz <hlitz@ucsc.edu>
-Date:   Sat, 20 Jun 2020 10:52:21 -0700
-Message-ID: <CAJbgVnUFzP27Nx2jr4rLOuw9J0C5dRDdD+LfFMCwHY3=oBDYDw@mail.gmail.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Judy Brock <judy.brock@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200619204730.26124-9-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I don't remember saying that I don't understand the basics of NVMe, so
-I am not sure where you got this from.
+On 2020-06-19 13:47, Luis Chamberlain wrote:
+> We were only creating the request_queue debugfs_dir only
+> for make_request block drivers (multiqueue), but never for
+> request-based block drivers. We did this as we were only
+> creating non-blktrace additional debugfs files on that directory
+> for make_request drivers. However, since blktrace *always* creates
+> that directory anyway, we special-case the use of that directory
+> on blktrace. Other than this being an eye-sore, this exposes
+> request-based block drivers to the same debugfs fragile
+> race that used to exist with make_request block drivers
+> where if we start adding files onto that directory we can later
+> run a race with a double removal of dentries on the directory
+> if we don't deal with this carefully on blktrace.
+> 
+> Instead, just simplify things by always creating the request_queue
+> debugfs_dir on request_queue registration. Rename the mutex also to
+> reflect the fact that this is used outside of the blktrace context.
 
-That being said, the point I am trying to discuss is not about NVMe in
-particular. It is the general question of: What is the benefit of
-splitting and reordering (on whatever layer) for a hardware device
-that requires sequential writes? I claim that there is no benefit.
+There are two changes in this patch: a bug fix and a rename of a mutex.
+I don't like it to see two changes in a single patch.
 
-I have worked with SSDs in the past that exposed raw flash blocks over
-NVMe and that achieved maximum write bandwidth without append by
-enforcing splitting/ordering guarantees, so I know it is possible.
+Additionally, is the new mutex name really better than the old name? The
+proper way to use mutexes is to use mutexes to protect data instead of
+code. Where is the documentation that mentions which member variable(s)
+of which data structures are protected by the mutex formerly called
+blk_trace_mutex? Since the new name makes it even less clear which data
+is protected by this mutex, is the new name really better than the old name?
 
-I will accept that there is no interest in discussing the question
-above, so I'll stop here.
+Thanks,
 
-On Fri, Jun 19, 2020 at 11:33 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Fri, Jun 19, 2020 at 11:08:26AM -0700, Heiner Litz wrote:
-> > Hi Matias,
-> > no, I am rather saying that the Linux kernel has a deficit or at least
-> > is not a good fit for ZNS because it cannot enforce in-order delivery.
->
-> Seriously, if you don't understand the basics of NVMe can you please stop
-> spamming this list with your crap?
+Bart.
