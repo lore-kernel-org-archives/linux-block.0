@@ -2,217 +2,178 @@ Return-Path: <SRS0=th+H=AC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D96FC433E2
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 18:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63269C433DF
+	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 20:43:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E568C2522E
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 18:55:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="hvUtvLFD"
+	by mail.kernel.org (Postfix) with ESMTP id 4C3E525286
+	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 20:43:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730097AbgFUSzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Jun 2020 14:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730014AbgFUSzI (ORCPT
+        id S1730680AbgFUUnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Jun 2020 16:43:07 -0400
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:35219 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728860AbgFUUnG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jun 2020 14:55:08 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D98C061796
-        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2020 11:55:08 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id w7so11882388edt.1
-        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2020 11:55:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=GPfB6HK/DYyBqHUp1Y87210XO57AfA34v1HG1tywnFY=;
-        b=hvUtvLFDZfu921YgAQV648pjBmxV8sLIVULFI+eRVmqqMdEpYZ6BvTOhLzSkgtlski
-         GQ3Ryf/nMXInF5/69sRlDc2FKqBObmWW7FwBl86tOqLkEDThjoQGz71SS7HUA6Idlk0i
-         DRI0qyBeEUk16kZvoOcsyzG9mEpJx0HhbLk5hNHqwnu2TNtEix1np+N10fQJoXjVl9gp
-         sFaXF4qEqA8aVrtQEEuzvVDqYFTX3ARokc4keRJ2PeN5bRY9hy3ofYWnHSzf0u0kYN2c
-         xjQt7KdoeZywtEckS72pFIVfx+7EAPf/zkl86+XkaMpy2tSR69afwBlhNhu+0NXi17YZ
-         5fjw==
+        Sun, 21 Jun 2020 16:43:06 -0400
+Received: by mail-pj1-f67.google.com with SMTP id i4so7463175pjd.0
+        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2020 13:43:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=GPfB6HK/DYyBqHUp1Y87210XO57AfA34v1HG1tywnFY=;
-        b=Rc2luHA8kVxF710sfzrkTRahi45kVuakIT5HrxwKSDwuZjKH4XScnoGwJH3yZs0aGV
-         8GDfARblD/wTzNpUFc13Dr2fMThUaTT5RGPVJ5e7ixq0yQjvsRFCyYciL5ER7nrpIDMN
-         fuDn8dQkxHkM3wljJNGz0V8qMYF2V13QWl5Ers3KisY4svNwcZDlhrBTQnSraxuDCLNh
-         7EHAvqXJjp1cJ4P2UJI0DBVo2JMmOzewLLiXL0prPwUr9SWaYWoBf+4et9B/0nRrDk8A
-         H++B563rgymMJYl/K5O3GKX7/90v2e+fTk2IRZ/UUN6dmuzTxNJ1HTYkZGppmWF0QPQs
-         Guyw==
-X-Gm-Message-State: AOAM532rwfA9TU0/jYq7qBRVMQk93BDK4oQso4dyUPMmmWokZspa1KBe
-        1ZZ4MeFP1hYJiqfD4lTi4Zycvg==
-X-Google-Smtp-Source: ABdhPJwUGh0Y9sbKiF34wYfnVsOxc19mVyoxbtUmEk5Pe/iFQU1c6Woi4ndJJt4Ihh7nru3pjy4i4w==
-X-Received: by 2002:a05:6402:1d96:: with SMTP id dk22mr13957678edb.258.1592765706908;
-        Sun, 21 Jun 2020 11:55:06 -0700 (PDT)
-Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
-        by smtp.gmail.com with ESMTPSA id j3sm10363857edr.87.2020.06.21.11.55.06
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rZJFuxpeovNsTz8JjTPclvnoWjQ+zufpJjAmZmgHwq8=;
+        b=M4bLKXsNPa0YdaSRcljLbKP0k2TkYmVbpubnuk2NeYePTppVLJ8JqmkstF5OJMl7j4
+         B9yS6TmO9Cx3A0OpU7iHYyTzJ2wr8wHit7auM62shCt4eC3McGsR08rBOhrHROg9QT9X
+         tJyL4955YPFCDXpt5vyXPEPVgBBWcg2QlN8r8pUdYO8FHr2t9ffvvFIaxv8PhAoOs/5z
+         CxFFp6vStj0ArUt5bTvS7maiQEr/6wJmQDcv+AAixKwQ8bqnYFZ7Nn9mPbWdxUm1n0rc
+         ZJKON0KStQISpxsXskfioEcv6/PUODkIMzZNSw/RR+Z1sNdlsftZt0PqD6A4mSF7k1FZ
+         a1KQ==
+X-Gm-Message-State: AOAM5302yacIohXr1OVTq2Se2hQmM1WfzhCsCUXXTvEi4sJ82bZP58ky
+        sucXHhJsyom/2S/N1xd+hLfSb5EO
+X-Google-Smtp-Source: ABdhPJy31SWPHfIdq03HaUD4PH9lEjdVb2UU6UN5saVW0xarrNVNF5UJJ1QHFZvXyNVbmBWhLmezjw==
+X-Received: by 2002:a17:90a:58f:: with SMTP id i15mr14224736pji.78.1592772184885;
+        Sun, 21 Jun 2020 13:43:04 -0700 (PDT)
+Received: from localhost.localdomain (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id k126sm11877427pfd.129.2020.06.21.13.43.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2020 11:55:06 -0700 (PDT)
-Date:   Sun, 21 Jun 2020 20:55:05 +0200
-From:   "javier.gonz@samsung.com" <javier@javigon.com>
+        Sun, 21 Jun 2020 13:43:04 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Matias =?utf-8?B?QmrDuHJsaW5n?= <mb@lightnvm.io>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
-Subject: Re: [PATCH 3/3] io_uring: add support for zone-append
-Message-ID: <20200621185505.4i46y4kndzvqlzdm@MacBook-Pro.localdomain>
-References: <20200618083529.ciifu4chr4vrv2j5@mpHalley.local>
- <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
- <20200618091113.eu2xdp6zmdooy5d2@mpHalley.local>
- <20200619094149.uaorbger326s6yzz@mpHalley.local>
- <2ba2079c-9a5d-698a-a8f0-cbd6fdb9a9f0@lightnvm.io>
- <ca513fd1-4ca2-c16e-8b99-73cbd7fe6290@kernel.dk>
- <317fa6b5-ce64-114e-b34d-2be7b50c24f1@lightnvm.io>
- <26f41284-6e52-58d3-6119-8ed34511e5dc@kernel.dk>
- <87f750fb-d217-ab37-9790-de9ad1ef4a87@lightnvm.io>
- <d6463113-7dd1-7dc8-bf3b-46f067c5f57a@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Daniel Wagner <dwagner@suse.de>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] null_blk: Move the null_blk source files into a subdirectory
+Date:   Sun, 21 Jun 2020 13:42:57 -0700
+Message-Id: <20200621204257.16006-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d6463113-7dd1-7dc8-bf3b-46f067c5f57a@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19.06.2020 09:44, Jens Axboe wrote:
->On 6/19/20 9:40 AM, Matias Bjørling wrote:
->> On 19/06/2020 17.20, Jens Axboe wrote:
->>> On 6/19/20 9:14 AM, Matias Bjørling wrote:
->>>> On 19/06/2020 16.18, Jens Axboe wrote:
->>>>> On 6/19/20 5:15 AM, Matias Bjørling wrote:
->>>>>> On 19/06/2020 11.41, javier.gonz@samsung.com wrote:
->>>>>>> Jens,
->>>>>>>
->>>>>>> Would you have time to answer a question below in this thread?
->>>>>>>
->>>>>>> On 18.06.2020 11:11, javier.gonz@samsung.com wrote:
->>>>>>>> On 18.06.2020 08:47, Damien Le Moal wrote:
->>>>>>>>> On 2020/06/18 17:35, javier.gonz@samsung.com wrote:
->>>>>>>>>> On 18.06.2020 07:39, Damien Le Moal wrote:
->>>>>>>>>>> On 2020/06/18 2:27, Kanchan Joshi wrote:
->>>>>>>>>>>> From: Selvakumar S <selvakuma.s1@samsung.com>
->>>>>>>>>>>>
->>>>>>>>>>>> Introduce three new opcodes for zone-append -
->>>>>>>>>>>>
->>>>>>>>>>>>     IORING_OP_ZONE_APPEND     : non-vectord, similiar to
->>>>>>>>>>>> IORING_OP_WRITE
->>>>>>>>>>>>     IORING_OP_ZONE_APPENDV    : vectored, similar to IORING_OP_WRITEV
->>>>>>>>>>>>     IORING_OP_ZONE_APPEND_FIXED : append using fixed-buffers
->>>>>>>>>>>>
->>>>>>>>>>>> Repurpose cqe->flags to return zone-relative offset.
->>>>>>>>>>>>
->>>>>>>>>>>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
->>>>>>>>>>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->>>>>>>>>>>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
->>>>>>>>>>>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
->>>>>>>>>>>> ---
->>>>>>>>>>>> fs/io_uring.c                 | 72
->>>>>>>>>>>> +++++++++++++++++++++++++++++++++++++++++--
->>>>>>>>>>>> include/uapi/linux/io_uring.h |  8 ++++-
->>>>>>>>>>>> 2 files changed, 77 insertions(+), 3 deletions(-)
->>>>>>>>>>>>
->>>>>>>>>>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
->>>>>>>>>>>> index 155f3d8..c14c873 100644
->>>>>>>>>>>> --- a/fs/io_uring.c
->>>>>>>>>>>> +++ b/fs/io_uring.c
->>>>>>>>>>>> @@ -649,6 +649,10 @@ struct io_kiocb {
->>>>>>>>>>>>       unsigned long        fsize;
->>>>>>>>>>>>       u64            user_data;
->>>>>>>>>>>>       u32            result;
->>>>>>>>>>>> +#ifdef CONFIG_BLK_DEV_ZONED
->>>>>>>>>>>> +    /* zone-relative offset for append, in bytes */
->>>>>>>>>>>> +    u32            append_offset;
->>>>>>>>>>> this can overflow. u64 is needed.
->>>>>>>>>> We chose to do it this way to start with because struct io_uring_cqe
->>>>>>>>>> only has space for u32 when we reuse the flags.
->>>>>>>>>>
->>>>>>>>>> We can of course create a new cqe structure, but that will come with
->>>>>>>>>> larger changes to io_uring for supporting append.
->>>>>>>>>>
->>>>>>>>>> Do you believe this is a better approach?
->>>>>>>>> The problem is that zone size are 32 bits in the kernel, as a number
->>>>>>>>> of sectors.
->>>>>>>>> So any device that has a zone size smaller or equal to 2^31 512B
->>>>>>>>> sectors can be
->>>>>>>>> accepted. Using a zone relative offset in bytes for returning zone
->>>>>>>>> append result
->>>>>>>>> is OK-ish, but to match the kernel supported range of possible zone
->>>>>>>>> size, you
->>>>>>>>> need 31+9 bits... 32 does not cut it.
->>>>>>>> Agree. Our initial assumption was that u32 would cover current zone size
->>>>>>>> requirements, but if this is a no-go, we will take the longer path.
->>>>>>> Converting to u64 will require a new version of io_uring_cqe, where we
->>>>>>> extend at least 32 bits. I believe this will need a whole new allocation
->>>>>>> and probably ioctl().
->>>>>>>
->>>>>>> Is this an acceptable change for you? We will of course add support for
->>>>>>> liburing when we agree on the right way to do this.
->>>>>> I took a quick look at the code. No expert, but why not use the existing
->>>>>> userdata variable? use the lowest bits (40 bits) for the Zone Starting
->>>>>> LBA, and use the highest (24 bits) as index into the completion data
->>>>>> structure?
->>>>>>
->>>>>> If you want to pass the memory address (same as what fio does) for the
->>>>>> data structure used for completion, one may also play some tricks by
->>>>>> using a relative memory address to the data structure. For example, the
->>>>>> x86_64 architecture uses 48 address bits for its memory addresses. With
->>>>>> 24 bit, one can allocate the completion entries in a 32MB memory range,
->>>>>> and then use base_address + index to get back to the completion data
->>>>>> structure specified in the sqe.
->>>>> For any current request, sqe->user_data is just provided back as
->>>>> cqe->user_data. This would make these requests behave differently
->>>>> from everything else in that sense, which seems very confusing to me
->>>>> if I was an application writer.
->>>>>
->>>>> But generally I do agree with you, there are lots of ways to make
->>>>> < 64-bit work as a tag without losing anything or having to jump
->>>>> through hoops to do so. The lack of consistency introduced by having
->>>>> zone append work differently is ugly, though.
->>>>>
->>>> Yep, agree, and extending to three cachelines is big no-go. We could add
->>>> a flag that said the kernel has changes the userdata variable. That'll
->>>> make it very explicit.
->>> Don't like that either, as it doesn't really change the fact that you're
->>> now doing something very different with the user_data field, which is
->>> just supposed to be passed in/out directly. Adding a random flag to
->>> signal this behavior isn't very explicit either, imho. It's still some
->>> out-of-band (ish) notification of behavior that is different from any
->>> other command. This is very different from having a flag that says
->>> "there's extra information in this other field", which is much cleaner.
->>>
->> Ok. Then it's pulling in the bits from cqe->res and cqe->flags that you
->> mention in the other mail. Sounds good.
->
->I think that's the best approach, if we need > 32-bits. Maybe we can get
->by just using ->res, if we switch to multiples of 512b instead for the
->result like Pavel suggested. That'd provide enough room in ->res, and
->would be preferable imho. But if we do need > 32-bits, then we can use
->this approach.
+Since the number of source files of the null_blk driver keeps growing,
+move these source files into a new subdirectory.
 
-Sounds good.
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Daniel Wagner <dwagner@suse.de>
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/Kconfig                         | 8 +-------
+ drivers/block/Makefile                        | 7 +------
+ drivers/block/null_blk/Kconfig                | 9 +++++++++
+ drivers/block/null_blk/Makefile               | 8 ++++++++
+ drivers/block/{ => null_blk}/null_blk.h       | 0
+ drivers/block/{ => null_blk}/null_blk_main.c  | 0
+ drivers/block/{ => null_blk}/null_blk_trace.c | 0
+ drivers/block/{ => null_blk}/null_blk_trace.h | 0
+ drivers/block/{ => null_blk}/null_blk_zoned.c | 0
+ 9 files changed, 19 insertions(+), 13 deletions(-)
+ create mode 100644 drivers/block/null_blk/Kconfig
+ create mode 100644 drivers/block/null_blk/Makefile
+ rename drivers/block/{ => null_blk}/null_blk.h (100%)
+ rename drivers/block/{ => null_blk}/null_blk_main.c (100%)
+ rename drivers/block/{ => null_blk}/null_blk_trace.c (100%)
+ rename drivers/block/{ => null_blk}/null_blk_trace.h (100%)
+ rename drivers/block/{ => null_blk}/null_blk_zoned.c (100%)
 
-Thanks Matias too for chipping in with more ideas. We have enough for a
-v2.
-
-Javier
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ecceaaa1a66f..262326973ee0 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -16,13 +16,7 @@ menuconfig BLK_DEV
+ 
+ if BLK_DEV
+ 
+-config BLK_DEV_NULL_BLK
+-	tristate "Null test block driver"
+-	select CONFIGFS_FS
+-
+-config BLK_DEV_NULL_BLK_FAULT_INJECTION
+-	bool "Support fault injection for Null test block driver"
+-	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION
++source "drivers/block/null_blk/Kconfig"
+ 
+ config BLK_DEV_FD
+ 	tristate "Normal floppy disk support"
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index e1f63117ee94..31bc2cfa342f 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -41,12 +41,7 @@ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+ obj-$(CONFIG_ZRAM) += zram/
+ obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
+ 
+-obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+-null_blk-objs	:= null_blk_main.o
+-ifeq ($(CONFIG_BLK_DEV_ZONED), y)
+-null_blk-$(CONFIG_TRACING) += null_blk_trace.o
+-endif
+-null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
++obj-$(CONFIG_BLK_DEV)		+= null_blk/
+ 
+ skd-y		:= skd_main.o
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/null_blk/Kconfig b/drivers/block/null_blk/Kconfig
+new file mode 100644
+index 000000000000..1ce02a3572bd
+--- /dev/null
++++ b/drivers/block/null_blk/Kconfig
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++
++config BLK_DEV_NULL_BLK
++	tristate "Null test block driver"
++	select CONFIGFS_FS
++
++config BLK_DEV_NULL_BLK_FAULT_INJECTION
++	bool "Support fault injection for Null test block driver"
++	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION
+diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Makefile
+new file mode 100644
+index 000000000000..a93a16d5ba23
+--- /dev/null
++++ b/drivers/block/null_blk/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
++null_blk-objs			:= null_blk_main.o
++ifeq ($(CONFIG_BLK_DEV_ZONED), y)
++null_blk-$(CONFIG_TRACING)	+= null_blk_trace.o
++endif
++null_blk-$(CONFIG_BLK_DEV_ZONED) += null_blk_zoned.o
+diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk/null_blk.h
+similarity index 100%
+rename from drivers/block/null_blk.h
+rename to drivers/block/null_blk/null_blk.h
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk/null_blk_main.c
+similarity index 100%
+rename from drivers/block/null_blk_main.c
+rename to drivers/block/null_blk/null_blk_main.c
+diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk/null_blk_trace.c
+similarity index 100%
+rename from drivers/block/null_blk_trace.c
+rename to drivers/block/null_blk/null_blk_trace.c
+diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk/null_blk_trace.h
+similarity index 100%
+rename from drivers/block/null_blk_trace.h
+rename to drivers/block/null_blk/null_blk_trace.h
+diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk/null_blk_zoned.c
+similarity index 100%
+rename from drivers/block/null_blk_zoned.c
+rename to drivers/block/null_blk/null_blk_zoned.c
