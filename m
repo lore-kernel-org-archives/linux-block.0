@@ -2,95 +2,186 @@ Return-Path: <SRS0=th+H=AC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE22C433DF
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 03:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6436DC433DF
+	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 18:52:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B0E2247C8
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 03:03:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44F5625225
+	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 18:52:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="amBJNbYv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729149AbgFUDDw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Jun 2020 23:03:52 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40399 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728992AbgFUDDv (ORCPT
+        id S1729857AbgFUSwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Jun 2020 14:52:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729783AbgFUSwL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jun 2020 23:03:51 -0400
-Received: by mail-pl1-f196.google.com with SMTP id x11so5944788plo.7;
-        Sat, 20 Jun 2020 20:03:51 -0700 (PDT)
+        Sun, 21 Jun 2020 14:52:11 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174FDC061797
+        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2020 11:52:11 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id k11so15686323ejr.9
+        for <linux-block@vger.kernel.org>; Sun, 21 Jun 2020 11:52:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GttXTfH5NxnFcwZf4Fm2ECkiTB9eBi9aaT3Bqtm4swk=;
+        b=amBJNbYvy5lc+bE5pZ4KoeQASrwSom1ZY/4woHhtYjVoQNU/tqiUlC0lwOBGYvO+yc
+         ClQMV1qvtAPDCJoAy6V9Vg2ynUm1hSnQKORuiWzKtCvaBJv0YQu//AxO19sTc9wuh2/+
+         uDAmqOvz48L3zaT8Mffltyi95uAIEk8dfdV7T1ASByDevlDtRyz1LczMJm3C5OJCrBp8
+         yP/VxK0T5VRMOgY+ZtiNjQKZq/bSbtRMyohi60gfBahBSkHCpt0Nb4sfjR4QSGXDtlLL
+         9wEWaRnz49SOxiXAwsrhXusvf/AFvsaB5Dsd84kkW9vGudSt6Oojk8fDjHQfAqXeQPUU
+         OVDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=fbfx4fDhe2FB+C7RRQGxAyeicIq0vAnX+Jv4uU7Y0u0=;
-        b=tQ3rPeZLQlny6C3K+J5chh7OT8dlcqvxV0x1THNFTmgfcK625zMmoddrUcoJ5k+SOF
-         HqkRcv2PwZHfw+fk/Z8Zx4tr7zmSdPeEc5YC6SqosgiDaqom+yfs8+eyqEdqJSEVfBVp
-         u6Jal+tfzD/pwc2j5at1LEX3HME/Pgkk9v2h8IspnEEtZK2LWZulA7KN9vcYiGgj8/vz
-         x1mlPIDptHvLzrnzym4uvl5uu2rFhHeyznMyENBx/ZCuDOvzA44QsaGQQkCIB9q+K4bV
-         d0Ci7Po1zpqQGQo8/xYASBCaris7e4Tl8RlyZamNs68s5ZYNuE0MVENGsj2zyqMc4NG+
-         MkVQ==
-X-Gm-Message-State: AOAM532uWSSWnft/78+9xCmTqa51PstFsdw/w07mSmJIUfRe5bw8ugOV
-        Rd9i46UydvTB8BVWFwAdqfjeRz4H
-X-Google-Smtp-Source: ABdhPJzo9RB4ccik4ptkPYUBGdPxCKzBLNuGMQf6ezuNTisqAipFNox3fotu4zRwcOxg6f4w4nrIrw==
-X-Received: by 2002:a17:902:3:: with SMTP id 3mr13126779pla.120.1592708630395;
-        Sat, 20 Jun 2020 20:03:50 -0700 (PDT)
-Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id t7sm9074784pju.42.2020.06.20.20.03.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jun 2020 20:03:49 -0700 (PDT)
-Subject: Re: [PATCH 08/10] fs: move the buffer_heads_over_limit stub to
- buffer_head.h
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200620071644.463185-1-hch@lst.de>
- <20200620071644.463185-9-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
- mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
- LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
- fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
- AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
- 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
- AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
- igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
- Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
- jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
- macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
- CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
- RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
- PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
- eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
- lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
- T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
- ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
- CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
- oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
- //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
- mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
- goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <4336d6ee-edca-d439-b900-d7a38982b6a5@acm.org>
-Date:   Sat, 20 Jun 2020 20:03:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GttXTfH5NxnFcwZf4Fm2ECkiTB9eBi9aaT3Bqtm4swk=;
+        b=dP1PnHcTTV9pUaK9l5FCGujp7b3jzw2nbmsfaHzUEqUzmZ/Cn1AQEeuC5E85Bx7LZI
+         EZu86GBMg3mbwzW40fVMQaQhXO4bbVaG66KoP4xsmEWyXf/cH7KV82NgeoOy093hjS+K
+         kp5JiQjYj3qdV4QSrvlqdwqRreaxUo0qiA0OIleyGbF9n6mLaIBdArSzn6L4uoG3a/+X
+         VWEN49K1wbo/zHF0TTAqeIlGoqkLmU/S0O5v00dS+DAqaZ+XTArrz122u4ENKuUo+9K/
+         CwpJz432zB98jkiwhfN9z8RCtxImshhwW6F0m5V56oYQ9BpcC0xTNKbCmzhVge4NHP84
+         +CUQ==
+X-Gm-Message-State: AOAM531qPSYy+RgDYsFAVcTkgVJZ1mk3TzxA6Oy5cGTlzQTm9uhSID2l
+        /2n31ASgFkHh2qnUs5caqFBEIQ==
+X-Google-Smtp-Source: ABdhPJx5L5rd0FuHOCqFGxYdf2RvcYSxBqSJzmoHqwkSB0Cc+W1UTYVEfaQgDIg4Zesnv4y3MCz8eA==
+X-Received: by 2002:a17:906:b15:: with SMTP id u21mr7646345ejg.520.1592765529516;
+        Sun, 21 Jun 2020 11:52:09 -0700 (PDT)
+Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
+        by smtp.gmail.com with ESMTPSA id b26sm9328835eju.6.2020.06.21.11.52.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jun 2020 11:52:08 -0700 (PDT)
+Date:   Sun, 21 Jun 2020 20:52:07 +0200
+From:   "javier.gonz@samsung.com" <javier@javigon.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "selvakuma.s1@samsung.com" <selvakuma.s1@samsung.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>
+Subject: Re: [PATCH 3/3] io_uring: add support for zone-append
+Message-ID: <20200621185207.m7535hzpm4ubrk4i@MacBook-Pro.localdomain>
+References: <CGME20200617172713epcas5p352f2907a12bd4ee3c97be1c7d8e1569e@epcas5p3.samsung.com>
+ <1592414619-5646-4-git-send-email-joshi.k@samsung.com>
+ <CY4PR04MB37510E916B6F243D189B4EB0E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618083529.ciifu4chr4vrv2j5@mpHalley.local>
+ <CY4PR04MB3751D5D6AFB0DA7B8A2DFF61E79B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200618091113.eu2xdp6zmdooy5d2@mpHalley.local>
+ <20200619094149.uaorbger326s6yzz@mpHalley.local>
+ <31f1c27e-4a3d-a411-3d3b-f88a2d92ce7b@kernel.dk>
+ <24297973-82ad-a629-e5f5-38a5b12db83a@gmail.com>
+ <a68cb8f6-e17c-9ee3-b732-4be689ffebc3@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20200620071644.463185-9-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <a68cb8f6-e17c-9ee3-b732-4be689ffebc3@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-06-20 00:16, Christoph Hellwig wrote:
-> Move the !CONFIG_BLOCK stub to the same place as the non-stub
-> declaration.
+On 19.06.2020 09:02, Jens Axboe wrote:
+>On 6/19/20 8:59 AM, Pavel Begunkov wrote:
+>> On 19/06/2020 17:15, Jens Axboe wrote:
+>>> On 6/19/20 3:41 AM, javier.gonz@samsung.com wrote:
+>>>> Jens,
+>>>>
+>>>> Would you have time to answer a question below in this thread?
+>>>>
+>>>> On 18.06.2020 11:11, javier.gonz@samsung.com wrote:
+>>>>> On 18.06.2020 08:47, Damien Le Moal wrote:
+>>>>>> On 2020/06/18 17:35, javier.gonz@samsung.com wrote:
+>>>>>>> On 18.06.2020 07:39, Damien Le Moal wrote:
+>>>>>>>> On 2020/06/18 2:27, Kanchan Joshi wrote:
+>>>>>>>>> From: Selvakumar S <selvakuma.s1@samsung.com>
+>>>>>>>>>
+>>>>>>>>> Introduce three new opcodes for zone-append -
+>>>>>>>>>
+>>>>>>>>>   IORING_OP_ZONE_APPEND     : non-vectord, similiar to IORING_OP_WRITE
+>>>>>>>>>   IORING_OP_ZONE_APPENDV    : vectored, similar to IORING_OP_WRITEV
+>>>>>>>>>   IORING_OP_ZONE_APPEND_FIXED : append using fixed-buffers
+>>>>>>>>>
+>>>>>>>>> Repurpose cqe->flags to return zone-relative offset.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>>>>>>>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>>>>>>>>> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>>>>>>>> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
+>>>>>>>>> ---
+>>>>>>>>> fs/io_uring.c                 | 72 +++++++++++++++++++++++++++++++++++++++++--
+>>>>>>>>> include/uapi/linux/io_uring.h |  8 ++++-
+>>>>>>>>> 2 files changed, 77 insertions(+), 3 deletions(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>>>>>>>>> index 155f3d8..c14c873 100644
+>>>>>>>>> --- a/fs/io_uring.c
+>>>>>>>>> +++ b/fs/io_uring.c
+>>>>>>>>> @@ -649,6 +649,10 @@ struct io_kiocb {
+>>>>>>>>> 	unsigned long		fsize;
+>>>>>>>>> 	u64			user_data;
+>>>>>>>>> 	u32			result;
+>>>>>>>>> +#ifdef CONFIG_BLK_DEV_ZONED
+>>>>>>>>> +	/* zone-relative offset for append, in bytes */
+>>>>>>>>> +	u32			append_offset;
+>>>>>>>>
+>>>>>>>> this can overflow. u64 is needed.
+>>>>>>>
+>>>>>>> We chose to do it this way to start with because struct io_uring_cqe
+>>>>>>> only has space for u32 when we reuse the flags.
+>>>>>>>
+>>>>>>> We can of course create a new cqe structure, but that will come with
+>>>>>>> larger changes to io_uring for supporting append.
+>>>>>>>
+>>>>>>> Do you believe this is a better approach?
+>>>>>>
+>>>>>> The problem is that zone size are 32 bits in the kernel, as a number
+>>>>>> of sectors.  So any device that has a zone size smaller or equal to
+>>>>>> 2^31 512B sectors can be accepted. Using a zone relative offset in
+>>>>>> bytes for returning zone append result is OK-ish, but to match the
+>>>>>> kernel supported range of possible zone size, you need 31+9 bits...
+>>>>>> 32 does not cut it.
+>>>>>
+>>>>> Agree. Our initial assumption was that u32 would cover current zone size
+>>>>> requirements, but if this is a no-go, we will take the longer path.
+>>>>
+>>>> Converting to u64 will require a new version of io_uring_cqe, where we
+>>>> extend at least 32 bits. I believe this will need a whole new allocation
+>>>> and probably ioctl().
+>>>>
+>>>> Is this an acceptable change for you? We will of course add support for
+>>>> liburing when we agree on the right way to do this.
+>>>
+>>> If you need 64-bit of return value, then it's not going to work. Even
+>>> with the existing patches, reusing cqe->flags isn't going to fly, as
+>>> it would conflict with eg doing zone append writes with automatic
+>>> buffer selection.
+>>
+>> Buffer selection is for reads/recv kind of requests, but appends
+>> are writes. In theory they can co-exist using cqe->flags.
+>
+>Yeah good point, since it's just writes, doesn't matter. But the other
+>point still stands, it could potentially conflict with other flags, but
+>I guess only to the extent where both flags would need extra storage in
+>->flags. So not a huge concern imho.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Very good point Pavel!
+
+If co-existing with the current flags is an option, I'll explore this
+for the next version.
+
+Thanks Jens and Pavel for the time and ideas!
+
+Javier
