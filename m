@@ -4,52 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CCCC433E1
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 16:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023D3C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 16:25:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4BC620786
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 16:25:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF0AE207BB
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 16:25:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592843137;
-	bh=4XnWGMfEdpSfusvI4G8XTiSZaB5zP1YhTTdLBsfeDFM=;
+	s=default; t=1592843139;
+	bh=iVfHOo4riWxrDGj26XTi4DBMwZrG4NwkDAOZH/uljiI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Gc1sLoKgQxtdp7cFkH2npUZ7hGWbXCdNOt+6H+B1c7FOWEmlfMNoxJHRxXvRz/Myp
-	 liVtmShhyQCiLka5IN/G1bWtMYdMez/HPz4o8DbB3Ov7ar4MbUCanA4hzPacWbsze5
-	 gOWwtTj+hGnQylzo7Cjx0ge4bVAxxJQ9TCOzCXEg=
+	b=pge2po0lKTko+9SE+HN4OhCipz/Pi8E5Fm5z+HnDZOyA5LfdbsKCi4JgRc6kKkIV1
+	 XQqEDeTBy2hCHizQxl71QJ/UgfLfnTQ1s3Mr2RE9blDC7TU4CgHmAqZ/NzmRAP+aHH
+	 kpFhTmfImsiwPR6l/rXoSvkFum3d+nIPx7tkhNWE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729605AbgFVQZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 12:25:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35880 "EHLO mail.kernel.org"
+        id S1729493AbgFVQZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 12:25:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35990 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729493AbgFVQZg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 12:25:36 -0400
+        id S1729407AbgFVQZi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jun 2020 12:25:38 -0400
 Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 136D12076A;
+        by mail.kernel.org (Postfix) with ESMTPSA id 066662078E;
         Mon, 22 Jun 2020 16:25:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592843135;
-        bh=4XnWGMfEdpSfusvI4G8XTiSZaB5zP1YhTTdLBsfeDFM=;
+        s=default; t=1592843137;
+        bh=iVfHOo4riWxrDGj26XTi4DBMwZrG4NwkDAOZH/uljiI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GCDdpRMNJyJqQVNi6aY5H4rH0PQfC+r+E7QAzf9ct2r2vTqT47I7NUQ/L4LId1wHb
-         TO8Ispe5WOkzzfcvuZhBzr5lSNyPWii1cbxZvyB6DX5XQYjKhi254UVCQJsMn2p4+w
-         S7C/jFsR+onAIIVLgi9ziHztADfdusSikmhQiBPo=
+        b=r9MSCr9BKh9ncIF0s4C4CclYvuMaljZKAl/Mfjel6B2wLFwjywCNf5XPw/fJZIBCP
+         H8njGfCGIM5AplffkP0cK/OHlFU//Onm4rySzXV7bjiaRpFYOzBqcKgU8TqOziU3O1
+         GzXus2cTdeKOj7vlsW7hSYljOiFiGUmitnNd2XpE=
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, hch@lst.de, sagi@grimberg.me,
         linux-block@vger.kernel.org, axboe@kernel.dk
 Cc:     Keith Busch <keith.busch@wdc.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hans Holmberg <hans.holmberg@wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Ajay Joshi <ajay.joshi@wdc.com>,
+        Aravind Ramesh <aravind.ramesh@wdc.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCHv3 4/5] nvme: support for multi-command set effects
-Date:   Mon, 22 Jun 2020 09:25:29 -0700
-Message-Id: <20200622162530.1287650-5-kbusch@kernel.org>
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCHv3 5/5] nvme: support for zoned namespaces
+Date:   Mon, 22 Jun 2020 09:25:30 -0700
+Message-Id: <20200622162530.1287650-6-kbusch@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200622162530.1287650-1-kbusch@kernel.org>
 References: <20200622162530.1287650-1-kbusch@kernel.org>
@@ -63,285 +66,806 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <keith.busch@wdc.com>
 
-The Commands Supported and Effects log page was extended with a CSI
-field that enables the host to query the log page for each command set
-supported. Retrieve this log page for each command set that an attached
-namespace supports, and save a pointer to that log in the namespace head.
+Add support for NVM Express Zoned Namespaces (ZNS) Command Set defined
+in NVM Express TP4053. Zoned namespaces are discovered based on their
+Command Set Identifier reported in the namespaces Namespace
+Identification Descriptor list. A successfully discovered Zoned
+Namespace will be registered with the block layer as a host managed
+zoned block device with Zone Append command support. A namespace that
+does not support append is not supported by the driver.
 
-Reviewed-by: Javier González <javier.gonz@samsung.com>
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Matias Bjørling <matias.bjorling@wdc.com>
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
+Signed-off-by: Aravind Ramesh <aravind.ramesh@wdc.com>
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Signed-off-by: Keith Busch <keith.busch@wdc.com>
 ---
- drivers/nvme/host/core.c      | 79 ++++++++++++++++++++++++++---------
- drivers/nvme/host/hwmon.c     |  2 +-
- drivers/nvme/host/lightnvm.c  |  4 +-
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/nvme.h      | 10 ++++-
- include/linux/nvme.h          |  4 +-
- 6 files changed, 76 insertions(+), 25 deletions(-)
+ block/Kconfig              |   5 +-
+ drivers/nvme/host/Makefile |   1 +
+ drivers/nvme/host/core.c   |  91 ++++++++++++--
+ drivers/nvme/host/nvme.h   |  39 ++++++
+ drivers/nvme/host/zns.c    | 245 +++++++++++++++++++++++++++++++++++++
+ include/linux/nvme.h       | 114 ++++++++++++++++-
+ 6 files changed, 480 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/nvme/host/zns.c
 
+diff --git a/block/Kconfig b/block/Kconfig
+index 9357d7302398..bbad5e8bbffe 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -86,9 +86,10 @@ config BLK_DEV_ZONED
+ 	select MQ_IOSCHED_DEADLINE
+ 	help
+ 	Block layer zoned block device support. This option enables
+-	support for ZAC/ZBC host-managed and host-aware zoned block devices.
++	support for ZAC/ZBC/ZNS host-managed and host-aware zoned block
++	devices.
+ 
+-	Say yes here if you have a ZAC or ZBC storage device.
++	Say yes here if you have a ZAC, ZBC, or ZNS storage device.
+ 
+ config BLK_DEV_THROTTLING
+ 	bool "Block layer bio throttling support"
+diff --git a/drivers/nvme/host/Makefile b/drivers/nvme/host/Makefile
+index fc7b26be692d..d7f6a87687b8 100644
+--- a/drivers/nvme/host/Makefile
++++ b/drivers/nvme/host/Makefile
+@@ -13,6 +13,7 @@ nvme-core-y				:= core.o
+ nvme-core-$(CONFIG_TRACING)		+= trace.o
+ nvme-core-$(CONFIG_NVME_MULTIPATH)	+= multipath.o
+ nvme-core-$(CONFIG_NVM)			+= lightnvm.o
++nvme-core-$(CONFIG_BLK_DEV_ZONED)	+= zns.o
+ nvme-core-$(CONFIG_FAULT_INJECTION_DEBUG_FS)	+= fault_inject.o
+ nvme-core-$(CONFIG_NVME_HWMON)		+= hwmon.o
+ 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 45a3cb5a35bd..64b7b9fc2817 100644
+index 64b7b9fc2817..885db561de17 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -1363,8 +1363,8 @@ static u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	u32 effects = 0;
+@@ -89,7 +89,7 @@ static dev_t nvme_chr_devt;
+ static struct class *nvme_class;
+ static struct class *nvme_subsys_class;
  
- 	if (ns) {
--		if (ctrl->effects)
--			effects = le32_to_cpu(ctrl->effects->iocs[opcode]);
-+		if (ns->head->effects)
-+			effects = le32_to_cpu(ns->head->effects->iocs[opcode]);
- 		if (effects & ~(NVME_CMD_EFFECTS_CSUPP | NVME_CMD_EFFECTS_LBCC))
- 			dev_warn(ctrl->device,
- 				 "IO command:%02x has unhandled effects:%08x\n",
-@@ -2844,7 +2844,7 @@ static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
+-static int nvme_revalidate_disk(struct gendisk *disk);
++static int _nvme_revalidate_disk(struct gendisk *disk);
+ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
+ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
+ 					   unsigned nsid);
+@@ -287,6 +287,10 @@ void nvme_complete_rq(struct request *req)
+ 			nvme_retry_req(req);
+ 			return;
+ 		}
++	} else if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
++		   req_op(req) == REQ_OP_ZONE_APPEND) {
++		req->__sector = nvme_lba_to_sect(req->q->queuedata,
++			le64_to_cpu(nvme_req(req)->result.u64));
+ 	}
+ 
+ 	nvme_trace_bio_complete(req, status);
+@@ -673,7 +677,8 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
+ }
+ 
+ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+-		struct request *req, struct nvme_command *cmnd)
++		struct request *req, struct nvme_command *cmnd,
++		enum nvme_opcode op)
+ {
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
+ 	u16 control = 0;
+@@ -687,7 +692,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+ 	if (req->cmd_flags & REQ_RAHEAD)
+ 		dsmgmt |= NVME_RW_DSM_FREQ_PREFETCH;
+ 
+-	cmnd->rw.opcode = (rq_data_dir(req) ? nvme_cmd_write : nvme_cmd_read);
++	cmnd->rw.opcode = op;
+ 	cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
+ 	cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
+ 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
+@@ -716,6 +721,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+ 		case NVME_NS_DPS_PI_TYPE2:
+ 			control |= NVME_RW_PRINFO_PRCHK_GUARD |
+ 					NVME_RW_PRINFO_PRCHK_REF;
++			if (op == nvme_cmd_zone_append)
++				control |= NVME_RW_APPEND_PIREMAP;
+ 			cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
+ 			break;
+ 		}
+@@ -756,6 +763,19 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 	case REQ_OP_FLUSH:
+ 		nvme_setup_flush(ns, cmd);
+ 		break;
++	case REQ_OP_ZONE_RESET_ALL:
++	case REQ_OP_ZONE_RESET:
++		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_RESET);
++		break;
++	case REQ_OP_ZONE_OPEN:
++		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_OPEN);
++		break;
++	case REQ_OP_ZONE_CLOSE:
++		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_CLOSE);
++		break;
++	case REQ_OP_ZONE_FINISH:
++		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_FINISH);
++		break;
+ 	case REQ_OP_WRITE_ZEROES:
+ 		ret = nvme_setup_write_zeroes(ns, req, cmd);
+ 		break;
+@@ -763,8 +783,13 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 		ret = nvme_setup_discard(ns, req, cmd);
+ 		break;
+ 	case REQ_OP_READ:
++		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
++		break;
+ 	case REQ_OP_WRITE:
+-		ret = nvme_setup_rw(ns, req, cmd);
++		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
++		break;
++	case REQ_OP_ZONE_APPEND:
++		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_zone_append);
+ 		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+@@ -1391,14 +1416,23 @@ static u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 	return effects;
+ }
+ 
+-static void nvme_update_formats(struct nvme_ctrl *ctrl)
++static void nvme_update_formats(struct nvme_ctrl *ctrl, u32 *effects)
+ {
+ 	struct nvme_ns *ns;
+ 
+ 	down_read(&ctrl->namespaces_rwsem);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		if (ns->disk && nvme_revalidate_disk(ns->disk))
++		if (ns->disk && _nvme_revalidate_disk(ns->disk))
+ 			nvme_set_queue_dying(ns);
++		else if (blk_queue_is_zoned(ns->disk->queue)) {
++			/*
++			 * IO commands are required to fully revalidate a zoned
++			 * device. Force the command effects to trigger rescan
++			 * work so report zones can run in a context with
++			 * unfrozen IO queues.
++			 */
++			*effects |= NVME_CMD_EFFECTS_NCC;
++		}
+ 	up_read(&ctrl->namespaces_rwsem);
+ }
+ 
+@@ -1410,7 +1444,7 @@ static void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
+ 	 * this command.
+ 	 */
+ 	if (effects & NVME_CMD_EFFECTS_LBCC)
+-		nvme_update_formats(ctrl);
++		nvme_update_formats(ctrl, &effects);
+ 	if (effects & (NVME_CMD_EFFECTS_LBCC | NVME_CMD_EFFECTS_CSE_MASK)) {
+ 		nvme_unfreeze(ctrl);
+ 		nvme_mpath_unfreeze(ctrl->subsys);
+@@ -1525,7 +1559,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+  * Issue ioctl requests on the first available path.  Note that unlike normal
+  * block layer requests we will not retry failed request on another controller.
+  */
+-static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
++struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
+ 		struct nvme_ns_head **head, int *srcu_idx)
+ {
+ #ifdef CONFIG_NVME_MULTIPATH
+@@ -1545,7 +1579,7 @@ static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
+ 	return disk->private_data;
+ }
+ 
+-static void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx)
++void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx)
+ {
+ 	if (head)
+ 		srcu_read_unlock(&head->srcu, idx);
+@@ -1938,21 +1972,28 @@ static void nvme_update_disk_info(struct gendisk *disk,
+ 
+ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ {
++	unsigned lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
+ 	struct nvme_ns *ns = disk->private_data;
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
++	int ret;
+ 	u32 iob;
+ 
+ 	/*
+ 	 * If identify namespace failed, use default 512 byte block size so
+ 	 * block layer can use before failing read/write for 0 capacity.
+ 	 */
+-	ns->lba_shift = id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ds;
++	ns->lba_shift = id->lbaf[lbaf].ds;
+ 	if (ns->lba_shift == 0)
+ 		ns->lba_shift = 9;
+ 
+ 	switch (ns->head->ids.csi) {
+ 	case NVME_CSI_NVM:
+ 		break;
++	case NVME_CSI_ZNS:
++		ret = nvme_update_zone_info(disk, ns, lbaf);
++		if (ret)
++			return ret;
++		break;
+ 	default:
+ 		dev_warn(ctrl->device, "unknown csi:%d ns:%d\n",
+ 			ns->head->ids.csi, ns->head->ns_id);
+@@ -1966,7 +2007,7 @@ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 		iob = nvme_lba_to_sect(ns, le16_to_cpu(id->noiob));
+ 
+ 	ns->features = 0;
+-	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
++	ns->ms = le16_to_cpu(id->lbaf[lbaf].ms);
+ 	/* the PI implementation requires metadata equal t10 pi tuple size */
+ 	if (ns->ms == sizeof(struct t10_pi_tuple))
+ 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
+@@ -2009,7 +2050,7 @@ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 	return 0;
+ }
+ 
+-static int nvme_revalidate_disk(struct gendisk *disk)
++static int _nvme_revalidate_disk(struct gendisk *disk)
+ {
+ 	struct nvme_ns *ns = disk->private_data;
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
+@@ -2057,6 +2098,28 @@ static int nvme_revalidate_disk(struct gendisk *disk)
  	return ret;
  }
  
--int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp,
-+int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
- 		void *log, size_t size, u64 offset)
- {
- 	struct nvme_command c = { };
-@@ -2858,27 +2858,55 @@ int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp,
- 	c.get_log_page.numdu = cpu_to_le16(dwlen >> 16);
- 	c.get_log_page.lpol = cpu_to_le32(lower_32_bits(offset));
- 	c.get_log_page.lpou = cpu_to_le32(upper_32_bits(offset));
-+	c.get_log_page.csi = csi;
- 
- 	return nvme_submit_sync_cmd(ctrl->admin_q, &c, log, size);
- }
- 
--static int nvme_get_effects_log(struct nvme_ctrl *ctrl)
-+struct nvme_cel *nvme_find_cel(struct nvme_ctrl *ctrl, u8 csi)
- {
-+	struct nvme_cel *cel, *ret = NULL;
++static int nvme_revalidate_disk(struct gendisk *disk)
++{
++	int ret;
 +
-+	spin_lock(&ctrl->lock);
-+	list_for_each_entry(cel, &ctrl->cels, entry) {
-+		if (cel->csi == csi) {
-+			ret = cel;
-+			break;
-+		}
++	ret = _nvme_revalidate_disk(disk);
++	if (ret)
++		return ret;
++
++#ifdef CONFIG_BLK_DEV_ZONED
++	if (blk_queue_is_zoned(disk->queue)) {
++		struct nvme_ns *ns = disk->private_data;
++		struct nvme_ctrl *ctrl = ns->ctrl;
++
++		ret = blk_revalidate_disk_zones(disk, NULL);
++		if (!ret)
++			blk_queue_max_zone_append_sectors(disk->queue,
++							  ctrl->max_zone_append);
 +	}
-+	spin_unlock(&ctrl->lock);
++#endif
++	return ret;
++}
++
+ static char nvme_pr_type(enum pr_type type)
+ {
+ 	switch (type) {
+@@ -2187,6 +2250,7 @@ static const struct block_device_operations nvme_fops = {
+ 	.release	= nvme_release,
+ 	.getgeo		= nvme_getgeo,
+ 	.revalidate_disk= nvme_revalidate_disk,
++	.report_zones	= nvme_report_zones,
+ 	.pr_ops		= &nvme_pr_ops,
+ };
+ 
+@@ -2212,6 +2276,7 @@ const struct block_device_operations nvme_ns_head_ops = {
+ 	.ioctl		= nvme_ioctl,
+ 	.compat_ioctl	= nvme_compat_ioctl,
+ 	.getgeo		= nvme_getgeo,
++	.report_zones	= nvme_report_zones,
+ 	.pr_ops		= &nvme_pr_ops,
+ };
+ #endif /* CONFIG_NVME_MULTIPATH */
+@@ -4439,6 +4504,8 @@ static inline void _nvme_check_size(void)
+ 	BUILD_BUG_ON(sizeof(struct nvme_command) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl) != NVME_IDENTIFY_DATA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct nvme_id_ns) != NVME_IDENTIFY_DATA_SIZE);
++	BUILD_BUG_ON(sizeof(struct nvme_id_ns_zns) != NVME_IDENTIFY_DATA_SIZE);
++	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_zns) != NVME_IDENTIFY_DATA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct nvme_lba_range_type) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_smart_log) != 512);
+ 	BUILD_BUG_ON(sizeof(struct nvme_dbbuf) != 64);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 4a1982133e9a..ecf443efdf91 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -238,6 +238,9 @@ struct nvme_ctrl {
+ 	u32 max_hw_sectors;
+ 	u32 max_segments;
+ 	u32 max_integrity_segments;
++#ifdef CONFIG_BLK_DEV_ZONED
++	u32 max_zone_append;
++#endif
+ 	u16 crdt[3];
+ 	u16 oncs;
+ 	u16 oacs;
+@@ -402,6 +405,9 @@ struct nvme_ns {
+ 	u16 sgs;
+ 	u32 sws;
+ 	u8 pi_type;
++#ifdef CONFIG_BLK_DEV_ZONED
++	u64 zsze;
++#endif
+ 	unsigned long features;
+ 	unsigned long flags;
+ #define NVME_NS_REMOVING	0
+@@ -567,6 +573,9 @@ int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
+ 
+ int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
+ 		void *log, size_t size, u64 offset);
++struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk,
++		struct nvme_ns_head **head, int *srcu_idx);
++void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx);
+ 
+ extern const struct attribute_group *nvme_ns_id_attr_groups[];
+ extern const struct block_device_operations nvme_ns_head_ops;
+@@ -688,6 +697,36 @@ static inline void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
+ }
+ #endif /* CONFIG_NVME_MULTIPATH */
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
++int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
++			  unsigned lbaf);
++
++int nvme_report_zones(struct gendisk *disk, sector_t sector,
++		      unsigned int nr_zones, report_zones_cb cb, void *data);
++
++blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
++				       struct nvme_command *cmnd,
++				       enum nvme_zone_mgmt_action action);
++#else
++#define nvme_report_zones NULL
++
++static inline blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns,
++		struct request *req, struct nvme_command *cmnd,
++		enum nvme_zone_mgmt_action action)
++{
++	return BLK_STS_NOTSUPP;
++}
++
++static inline int nvme_update_zone_info(struct gendisk *disk,
++					struct nvme_ns *ns,
++					unsigned lbaf)
++{
++	dev_warn(ns->ctrl->device,
++		 "Please enable CONFIG_BLK_DEV_ZONED to support ZNS devices\n");
++	return -EPROTONOSUPPORT;
++}
++#endif
++
+ #ifdef CONFIG_NVM
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+ void nvme_nvm_unregister(struct nvme_ns *ns);
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+new file mode 100644
+index 000000000000..ee6f49a8aee4
+--- /dev/null
++++ b/drivers/nvme/host/zns.c
+@@ -0,0 +1,245 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2020 Western Digital Corporation or its affiliates.
++ */
++
++#include <linux/blkdev.h>
++#include <linux/vmalloc.h>
++#include "nvme.h"
++
++static int nvme_set_max_append(struct nvme_ctrl *ctrl)
++{
++	struct nvme_command c = { };
++	struct nvme_id_ctrl_zns *id;
++	int status;
++
++	id = kzalloc(sizeof(*id), GFP_KERNEL);
++	if (!id)
++		return -ENOMEM;
++
++	c.identify.opcode = nvme_admin_identify;
++	c.identify.cns = NVME_ID_CNS_CS_CTRL;
++	c.identify.csi = NVME_CSI_ZNS;
++
++	status = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
++	if (status) {
++		kfree(id);
++		return status;
++	}
++
++	ctrl->max_zone_append = 1 << (id->zamds + 3);
++	kfree(id);
++	return 0;
++}
++
++int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
++			  unsigned lbaf)
++{
++	struct nvme_effects_log *log = ns->head->effects;
++	struct request_queue *q = disk->queue;
++	struct nvme_command c = { };
++	struct nvme_id_ns_zns *id;
++	int status;
++
++	/* Driver requires zone append support */
++	if (!(log->iocs[nvme_cmd_zone_append] & NVME_CMD_EFFECTS_CSUPP)) {
++		dev_warn(ns->ctrl->device,
++			"append not supported for zoned namespace:%d\n",
++			ns->head->ns_id);
++		return -ENODEV;
++	}
++
++	/* Lazily query controller append limit for the first zoned namespace */
++	if (!ns->ctrl->max_zone_append) {
++		status = nvme_set_max_append(ns->ctrl);
++		if (status)
++			return status;
++	}
++
++	id = kzalloc(sizeof(*id), GFP_KERNEL);
++	if (!id)
++		return -ENOMEM;
++
++	c.identify.opcode = nvme_admin_identify;
++	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
++	c.identify.cns = NVME_ID_CNS_CS_NS;
++	c.identify.csi = NVME_CSI_ZNS;
++
++	status = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, id, sizeof(*id));
++	if (status)
++		goto free_data;
++
++	/*
++	 * We currently do not handle devices requiring any of the zoned
++	 * operation characteristics.
++	 */
++	if (id->zoc) {
++		dev_warn(ns->ctrl->device,
++			"zone operations:%x not supported for namespace:%d\n",
++			le_to_cpu16(id->zoc), ns->head->ns_id);
++		status = -EINVAL;
++		goto free_data;
++	}
++
++	ns->zsze = nvme_lba_to_sect(ns, le64_to_cpu(id->lbafe[lbaf].zsze));
++	if (!ns->zsze) {
++		status = -EINVAL;
++		goto free_data;
++	}
++
++	q->limits.zoned = BLK_ZONED_HM;
++	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
++free_data:
++	kfree(id);
++	return status;
++}
++
++static void *nvme_zns_alloc_report_buffer(struct nvme_ns *ns,
++					  unsigned int nr_zones, size_t *buflen)
++{
++	struct request_queue *q = ns->disk->queue;
++	size_t bufsize;
++	void *buf;
++
++	const size_t min_bufsize = sizeof(struct nvme_zone_report) +
++				   sizeof(struct nvme_zone_descriptor);
++
++	nr_zones = min_t(unsigned int, nr_zones,
++			 get_capacity(ns->disk) >> ilog2(ns->zsze));
++
++	bufsize = sizeof(struct nvme_zone_report) +
++		nr_zones * sizeof(struct nvme_zone_descriptor);
++	bufsize = min_t(size_t, bufsize,
++			queue_max_hw_sectors(q) << SECTOR_SHIFT);
++	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
++
++	while (bufsize >= min_bufsize) {
++		buf = __vmalloc(bufsize,
++				GFP_KERNEL | __GFP_ZERO | __GFP_NORETRY);
++		if (buf) {
++			*buflen = bufsize;
++			return buf;
++		}
++		bufsize >>= 1;
++	}
++	return NULL;
++}
++
++static int __nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
++				  struct nvme_zone_report *report,
++				  size_t buflen)
++{
++	struct nvme_command c = { };
++	int ret;
++
++	c.zmr.opcode = nvme_cmd_zone_mgmt_recv;
++	c.zmr.nsid = cpu_to_le32(ns->head->ns_id);
++	c.zmr.slba = cpu_to_le64(nvme_sect_to_lba(ns, sector));
++	c.zmr.numd = cpu_to_le32(nvme_bytes_to_numd(buflen));
++	c.zmr.zra = NVME_ZRA_ZONE_REPORT;
++	c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
++	c.zmr.pr = NVME_REPORT_ZONE_PARTIAL;
++
++	ret = nvme_submit_sync_cmd(ns->queue, &c, report, buflen);
++	if (ret)
++		return ret;
++
++	return le64_to_cpu(report->nr_zones);
++}
++
++static int nvme_zone_parse_entry(struct nvme_ns *ns,
++				 struct nvme_zone_descriptor *entry,
++				 unsigned int idx, report_zones_cb cb,
++				 void *data)
++{
++	struct blk_zone zone = { };
++
++	if ((entry->zt & 0xf) != NVME_ZONE_TYPE_SEQWRITE_REQ) {
++		dev_err(ns->ctrl->device, "invalid zone type %#x\n",
++				entry->zt);
++		return -EINVAL;
++	}
++
++	zone.type = BLK_ZONE_TYPE_SEQWRITE_REQ;
++	zone.cond = entry->zs >> 4;
++	zone.len = ns->zsze;
++	zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
++	zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
++	zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
++
++	return cb(&zone, idx, data);
++}
++
++static int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
++			unsigned int nr_zones, report_zones_cb cb, void *data)
++{
++	struct nvme_zone_report *report;
++	int ret, zone_idx = 0;
++	unsigned int nz, i;
++	size_t buflen;
++
++	report = nvme_zns_alloc_report_buffer(ns, nr_zones, &buflen);
++	if (!report)
++		return -ENOMEM;
++
++	sector &= ~(ns->zsze - 1);
++	while (zone_idx < nr_zones && sector < get_capacity(ns->disk)) {
++		memset(report, 0, buflen);
++		ret = __nvme_ns_report_zones(ns, sector, report, buflen);
++		if (ret < 0)
++			goto out_free;
++
++		nz = min_t(unsigned int, ret, nr_zones);
++		if (!nz)
++			break;
++
++		for (i = 0; i < nz && zone_idx < nr_zones; i++) {
++			ret = nvme_zone_parse_entry(ns, &report->entries[i],
++						    zone_idx, cb, data);
++			if (ret)
++				goto out_free;
++			zone_idx++;
++		}
++
++		sector += ns->zsze * nz;
++	}
++
++	ret = zone_idx;
++out_free:
++	kvfree(report);
++	return ret;
++}
++
++int nvme_report_zones(struct gendisk *disk, sector_t sector,
++		      unsigned int nr_zones, report_zones_cb cb, void *data)
++{
++	struct nvme_ns_head *head = NULL;
++	struct nvme_ns *ns;
++	int srcu_idx, ret;
++
++	ns = nvme_get_ns_from_disk(disk, &head, &srcu_idx);
++	if (unlikely(!ns))
++		return -EWOULDBLOCK;
++
++	if (ns->head->ids.csi == NVME_CSI_ZNS)
++		ret = nvme_ns_report_zones(ns, sector, nr_zones, cb, data);
++	else
++		ret = -EINVAL;
++	nvme_put_ns_from_disk(head, srcu_idx);
 +
 +	return ret;
 +}
 +
-+static int nvme_get_effects_log(struct nvme_ctrl *ctrl, u8 csi,
-+				struct nvme_effects_log **log)
++blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
++		struct nvme_command *c, enum nvme_zone_mgmt_action action)
 +{
-+	struct nvme_cel *cel = nvme_find_cel(ctrl, csi);
- 	int ret;
- 
--	if (!ctrl->effects)
--		ctrl->effects = kzalloc(sizeof(*ctrl->effects), GFP_KERNEL);
-+	if (cel)
-+		goto out;
- 
--	if (!ctrl->effects)
--		return 0;
-+	cel = kzalloc(sizeof(*cel), GFP_KERNEL);
-+	if (!cel)
-+		return -ENOMEM;
- 
--	ret = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_CMD_EFFECTS, 0,
--			ctrl->effects, sizeof(*ctrl->effects), 0);
-+	ret = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_CMD_EFFECTS, 0, csi,
-+			&cel->log, sizeof(cel->log), 0);
- 	if (ret) {
--		kfree(ctrl->effects);
--		ctrl->effects = NULL;
-+		kfree(cel);
-+		return ret;
- 	}
--	return ret;
++	c->zms.opcode = nvme_cmd_zone_mgmt_send;
++	c->zms.nsid = cpu_to_le32(ns->head->ns_id);
++	c->zms.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
++	c->zms.zsa = action;
 +
-+	cel->csi = csi;
++	if (req_op(req) == REQ_OP_ZONE_RESET_ALL)
++		c->zms.select_all = 1;
 +
-+	spin_lock(&ctrl->lock);
-+	list_add_tail(&cel->entry, &ctrl->cels);
-+	spin_unlock(&ctrl->lock);
-+out:
-+	*log = &cel->log;
-+	return 0;
- }
- 
- /*
-@@ -2911,7 +2939,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 	}
- 
- 	if (id->lpa & NVME_CTRL_LPA_CMD_EFFECTS_LOG) {
--		ret = nvme_get_effects_log(ctrl);
-+		ret = nvme_get_effects_log(ctrl, NVME_CSI_NVM, &ctrl->effects);
- 		if (ret < 0)
- 			goto out_free;
- 	}
-@@ -3544,6 +3572,13 @@ static struct nvme_ns_head *nvme_alloc_ns_head(struct nvme_ctrl *ctrl,
- 		goto out_cleanup_srcu;
- 	}
- 
-+	if (head->ids.csi) {
-+		ret = nvme_get_effects_log(ctrl, head->ids.csi, &head->effects);
-+		if (ret)
-+			goto out_cleanup_srcu;
-+	} else
-+		head->effects = ctrl->effects;
-+
- 	ret = nvme_mpath_alloc_disk(ctrl, head);
- 	if (ret)
- 		goto out_cleanup_srcu;
-@@ -3884,8 +3919,8 @@ static void nvme_clear_changed_ns_log(struct nvme_ctrl *ctrl)
- 	 * raced with us in reading the log page, which could cause us to miss
- 	 * updates.
- 	 */
--	error = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_CHANGED_NS, 0, log,
--			log_size, 0);
-+	error = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_CHANGED_NS, 0,
-+			NVME_CSI_NVM, log, log_size, 0);
- 	if (error)
- 		dev_warn(ctrl->device,
- 			"reading changed ns log failed: %d\n", error);
-@@ -4029,8 +4064,8 @@ static void nvme_get_fw_slot_info(struct nvme_ctrl *ctrl)
- 	if (!log)
- 		return;
- 
--	if (nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_FW_SLOT, 0, log,
--			sizeof(*log), 0))
-+	if (nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_FW_SLOT, 0, NVME_CSI_NVM,
-+			log, sizeof(*log), 0))
- 		dev_warn(ctrl->device, "Get FW SLOT INFO log error\n");
- 	kfree(log);
- }
-@@ -4167,11 +4202,16 @@ static void nvme_free_ctrl(struct device *dev)
- 	struct nvme_ctrl *ctrl =
- 		container_of(dev, struct nvme_ctrl, ctrl_device);
- 	struct nvme_subsystem *subsys = ctrl->subsys;
-+	struct nvme_cel *cel, *next;
- 
- 	if (subsys && ctrl->instance != subsys->instance)
- 		ida_simple_remove(&nvme_instance_ida, ctrl->instance);
- 
--	kfree(ctrl->effects);
-+	list_for_each_entry_safe(cel, next, &ctrl->cels, entry) {
-+		list_del(&cel->entry);
-+		kfree(cel);
-+	}
-+
- 	nvme_mpath_uninit(ctrl);
- 	__free_page(ctrl->discard_page);
- 
-@@ -4202,6 +4242,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	spin_lock_init(&ctrl->lock);
- 	mutex_init(&ctrl->scan_lock);
- 	INIT_LIST_HEAD(&ctrl->namespaces);
-+	INIT_LIST_HEAD(&ctrl->cels);
- 	init_rwsem(&ctrl->namespaces_rwsem);
- 	ctrl->dev = dev;
- 	ctrl->ops = ops;
-diff --git a/drivers/nvme/host/hwmon.c b/drivers/nvme/host/hwmon.c
-index 2e6477ed420f..23ba8bf678ae 100644
---- a/drivers/nvme/host/hwmon.c
-+++ b/drivers/nvme/host/hwmon.c
-@@ -62,7 +62,7 @@ static int nvme_hwmon_get_smart_log(struct nvme_hwmon_data *data)
- 	int ret;
- 
- 	ret = nvme_get_log(data->ctrl, NVME_NSID_ALL, NVME_LOG_SMART, 0,
--			   &data->log, sizeof(data->log), 0);
-+			   NVME_CSI_NVM, &data->log, sizeof(data->log), 0);
- 
- 	return ret <= 0 ? ret : -EIO;
- }
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 69608755d415..8e562d0f2c30 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -593,8 +593,8 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
- 		dev_meta_off = dev_meta;
- 
- 		ret = nvme_get_log(ctrl, ns->head->ns_id,
--				NVME_NVM_LOG_REPORT_CHUNK, 0, dev_meta, len,
--				offset);
-+				NVME_NVM_LOG_REPORT_CHUNK, 0, NVME_CSI_NVM,
-+				dev_meta, len, offset);
- 		if (ret) {
- 			dev_err(ctrl->device, "Get REPORT CHUNK log error\n");
- 			break;
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index da78e499947a..e4bbdf2acc09 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -531,7 +531,7 @@ static int nvme_read_ana_log(struct nvme_ctrl *ctrl)
- 	int error;
- 
- 	mutex_lock(&ctrl->ana_lock);
--	error = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_ANA, 0,
-+	error = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_ANA, 0, NVME_CSI_NVM,
- 			ctrl->ana_log_buf, ctrl->ana_log_size, 0);
- 	if (error) {
- 		dev_warn(ctrl->device, "Failed to get ANA log: %d\n", error);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a84f71459caa..4a1982133e9a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -191,6 +191,12 @@ struct nvme_fault_inject {
- #endif
- };
- 
-+struct nvme_cel {
-+	struct list_head	entry;
-+	struct nvme_effects_log	log;
-+	u8			csi;
-+};
-+
- struct nvme_ctrl {
- 	bool comp_seen;
- 	enum nvme_ctrl_state state;
-@@ -257,6 +263,7 @@ struct nvme_ctrl {
- 	unsigned long quirks;
- 	struct nvme_id_power_state psd[32];
- 	struct nvme_effects_log *effects;
-+	struct list_head cels;
- 	struct work_struct scan_work;
- 	struct work_struct async_event_work;
- 	struct delayed_work ka_work;
-@@ -359,6 +366,7 @@ struct nvme_ns_head {
- 	struct kref		ref;
- 	bool			shared;
- 	int			instance;
-+	struct nvme_effects_log *effects;
- #ifdef CONFIG_NVME_MULTIPATH
- 	struct gendisk		*disk;
- 	struct bio_list		requeue_list;
-@@ -557,7 +565,7 @@ int nvme_reset_ctrl_sync(struct nvme_ctrl *ctrl);
- int nvme_try_sched_reset(struct nvme_ctrl *ctrl);
- int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
- 
--int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp,
-+int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
- 		void *log, size_t size, u64 offset);
- 
- extern const struct attribute_group *nvme_ns_id_attr_groups[];
++	return BLK_STS_OK;
++}
 diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 81ffe5247505..95cd03e240a1 100644
+index 95cd03e240a1..d862e5d70818 100644
 --- a/include/linux/nvme.h
 +++ b/include/linux/nvme.h
-@@ -1101,7 +1101,9 @@ struct nvme_get_log_page_command {
- 		};
- 		__le64 lpo;
- 	};
--	__u32			rsvd14[2];
-+	__u8			rsvd14[3];
-+	__u8			csi;
-+	__u32			rsvd15;
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /*
+- * Definitions for the NVM Express interface
++ * Definitions for the NVM Ex
++ * ress interface
+  * Copyright (c) 2011-2014, Intel Corporation.
+  */
+ 
+@@ -374,6 +375,30 @@ struct nvme_id_ns {
+ 	__u8			vs[3712];
  };
  
- struct nvme_directive_cmd {
++struct nvme_zns_lbafe {
++	__le64			zsze;
++	__u8			zdes;
++	__u8			rsvd9[7];
++};
++
++struct nvme_id_ns_zns {
++	__le16			zoc;
++	__le16			ozcs;
++	__le32			mar;
++	__le32			mor;
++	__le32			rrl;
++	__le32			frl;
++	__u8			rsvd20[2796];
++	struct nvme_zns_lbafe	lbafe[16];
++	__u8			rsvd3072[768];
++	__u8			vs[256];
++};
++
++struct nvme_id_ctrl_zns {
++	__u8	zamds;
++	__u8	rsvd1[4095];
++};
++
+ enum {
+ 	NVME_ID_CNS_NS			= 0x00,
+ 	NVME_ID_CNS_CTRL		= 0x01,
+@@ -392,6 +417,7 @@ enum {
+ 
+ enum {
+ 	NVME_CSI_NVM			= 0,
++	NVME_CSI_ZNS			= 2,
+ };
+ 
+ enum {
+@@ -532,6 +558,27 @@ struct nvme_ana_rsp_hdr {
+ 	__le16	rsvd10[3];
+ };
+ 
++struct nvme_zone_descriptor {
++	__u8		zt;
++	__u8		zs;
++	__u8		za;
++	__u8		rsvd3[5];
++	__le64		zcap;
++	__le64		zslba;
++	__le64		wp;
++	__u8		rsvd32[32];
++};
++
++enum {
++	NVME_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
++};
++
++struct nvme_zone_report {
++	__le64		nr_zones;
++	__u8		resv8[56];
++	struct nvme_zone_descriptor entries[];
++};
++
+ enum {
+ 	NVME_SMART_CRIT_SPARE		= 1 << 0,
+ 	NVME_SMART_CRIT_TEMPERATURE	= 1 << 1,
+@@ -626,6 +673,9 @@ enum nvme_opcode {
+ 	nvme_cmd_resv_report	= 0x0e,
+ 	nvme_cmd_resv_acquire	= 0x11,
+ 	nvme_cmd_resv_release	= 0x15,
++	nvme_cmd_zone_mgmt_send	= 0x79,
++	nvme_cmd_zone_mgmt_recv	= 0x7a,
++	nvme_cmd_zone_append	= 0x7d,
+ };
+ 
+ #define nvme_opcode_name(opcode)	{ opcode, #opcode }
+@@ -764,6 +814,7 @@ struct nvme_rw_command {
+ enum {
+ 	NVME_RW_LR			= 1 << 15,
+ 	NVME_RW_FUA			= 1 << 14,
++	NVME_RW_APPEND_PIREMAP		= 1 << 9,
+ 	NVME_RW_DSM_FREQ_UNSPEC		= 0,
+ 	NVME_RW_DSM_FREQ_TYPICAL	= 1,
+ 	NVME_RW_DSM_FREQ_RARE		= 2,
+@@ -829,6 +880,53 @@ struct nvme_write_zeroes_cmd {
+ 	__le16			appmask;
+ };
+ 
++enum nvme_zone_mgmt_action {
++	NVME_ZONE_CLOSE		= 0x1,
++	NVME_ZONE_FINISH	= 0x2,
++	NVME_ZONE_OPEN		= 0x3,
++	NVME_ZONE_RESET		= 0x4,
++	NVME_ZONE_OFFLINE	= 0x5,
++	NVME_ZONE_SET_DESC_EXT	= 0x10,
++};
++
++struct nvme_zone_mgmt_send_cmd {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__le32			cdw2[2];
++	__le64			metadata;
++	union nvme_data_ptr	dptr;
++	__le64			slba;
++	__le32			cdw12;
++	__u8			zsa;
++	__u8			select_all;
++	__u8			rsvd13[2];
++	__le32			cdw14[2];
++};
++
++struct nvme_zone_mgmt_recv_cmd {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__le64			rsvd2[2];
++	union nvme_data_ptr	dptr;
++	__le64			slba;
++	__le32			numd;
++	__u8			zra;
++	__u8			zrasf;
++	__u8			pr;
++	__u8			rsvd13;
++	__le32			cdw14[2];
++};
++
++enum {
++	NVME_ZRA_ZONE_REPORT		= 0,
++	NVME_ZRASF_ZONE_REPORT_ALL	= 0,
++	NVME_REPORT_ZONE_PARTIAL	= 1,
++};
++
+ /* Features */
+ 
+ enum {
+@@ -1300,6 +1398,8 @@ struct nvme_command {
+ 		struct nvme_format_cmd format;
+ 		struct nvme_dsm_cmd dsm;
+ 		struct nvme_write_zeroes_cmd write_zeroes;
++		struct nvme_zone_mgmt_send_cmd zms;
++		struct nvme_zone_mgmt_recv_cmd zmr;
+ 		struct nvme_abort_cmd abort;
+ 		struct nvme_get_log_page_command get_log_page;
+ 		struct nvmf_common_command fabrics;
+@@ -1433,6 +1533,18 @@ enum {
+ 	NVME_SC_DISCOVERY_RESTART	= 0x190,
+ 	NVME_SC_AUTH_REQUIRED		= 0x191,
+ 
++	/*
++	 * I/O Command Set Specific - Zoned commands:
++	 */
++	NVME_SC_ZONE_BOUNDARY_ERROR	= 0x1b8,
++	NVME_SC_ZONE_FULL		= 0x1b9,
++	NVME_SC_ZONE_READ_ONLY		= 0x1ba,
++	NVME_SC_ZONE_OFFLINE		= 0x1bb,
++	NVME_SC_ZONE_INVALID_WRITE	= 0x1bc,
++	NVME_SC_ZONE_TOO_MANY_ACTIVE	= 0x1bd,
++	NVME_SC_ZONE_TOO_MANY_OPEN	= 0x1be,
++	NVME_SC_ZONE_INVALID_TRANSITION	= 0x1bf,
++
+ 	/*
+ 	 * Media and Data Integrity Errors:
+ 	 */
 -- 
 2.24.1
 
