@@ -2,59 +2,129 @@ Return-Path: <SRS0=vyV1=AD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3B2C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 14:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3861C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 14:20:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 425DD20738
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 14:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87C2D2070E
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 14:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728293AbgFVOBf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 10:01:35 -0400
-Received: from verein.lst.de ([213.95.11.211]:34896 "EHLO verein.lst.de"
+        id S1729245AbgFVOUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 10:20:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34118 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728070AbgFVOBf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 10:01:35 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 63DE168B02; Mon, 22 Jun 2020 16:01:30 +0200 (CEST)
-Date:   Mon, 22 Jun 2020 16:01:29 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Heiner Litz <hlitz@ucsc.edu>
+        id S1728956AbgFVOUB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jun 2020 10:20:01 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0ED32C1A8;
+        Mon, 22 Jun 2020 14:19:58 +0000 (UTC)
+Subject: Re: [PATCH 2/2] block: only return started requests from
+ blk_mq_tag_to_rq()
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@lst.de>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
-        Ajay Joshi <Ajay.Joshi@wdc.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Judy Brock <judy.brock@samsung.com>
-Subject: Re: [PATCH 5/5] nvme: support for zoned namespaces
-Message-ID: <20200622140129.GA3698@lst.de>
-References: <20200618015526.GA1138429@dhcp-10-100-145-180.wdl.wdc.com> <CAJbgVnVKqDobpX8iwqRVeDqvmfdEd-uRzNFC2z5U03X9E3Pi_w@mail.gmail.com> <CY4PR04MB3751E6A6D6F04285CAB18514E79B0@CY4PR04MB3751.namprd04.prod.outlook.com> <CAJbgVnVnqGQiLx1PctDhAKkjLXRKFwr00tdTPJjkaXZDc+V6Bg@mail.gmail.com> <20200618211945.GA2347@C02WT3WMHTD6> <CAJbgVnVxtfs3m6HKJOQw4E1sqTQBmtF_P-D4aAZ5zsz4rQUXNA@mail.gmail.com> <MN2PR04MB62234880B3FDBD7F9B2229CCF1980@MN2PR04MB6223.namprd04.prod.outlook.com> <CAJbgVnUd3U3G=RjpcCuWO+HT9pBP3zasdQfG7h-+PEk0=n4npw@mail.gmail.com> <20200620063301.GA2381@lst.de> <CAJbgVnUFzP27Nx2jr4rLOuw9J0C5dRDdD+LfFMCwHY3=oBDYDw@mail.gmail.com>
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <keith.busch@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20200619140159.141905-1-hare@suse.de>
+ <60e34dce-aea4-311f-22da-4cb130c5ba88@suse.de>
+ <3d073c18-50da-a4c8-2f1e-332a1e717efc@acm.org>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <ec87fc5f-a938-87ee-12c2-a08d76248b2e@suse.de>
+Date:   Mon, 22 Jun 2020 16:13:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJbgVnUFzP27Nx2jr4rLOuw9J0C5dRDdD+LfFMCwHY3=oBDYDw@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <3d073c18-50da-a4c8-2f1e-332a1e717efc@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 20, 2020 at 10:52:21AM -0700, Heiner Litz wrote:
-> I don't remember saying that I don't understand the basics of NVMe, so
-> I am not sure where you got this from.
+On 6/19/20 11:59 PM, Bart Van Assche wrote:
+> On 2020-06-19 07:09, Hannes Reinecke wrote:
+>> On 6/19/20 4:01 PM, Hannes Reinecke wrote:
+>>> blk_mq_tag_to_rq() is used from within the driver to map a tag
+>>> to a request. As such it should only return requests which are
+>>> already started (ie passed to the driver); otherwise the driver
+>>> might trip over requests which it has never seen and random
+>>> crashes will occur.
+>>>
+>>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>>> ---
+>>>    block/blk-mq.c | 6 +++++-
+>>>    1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index 4f57d27bfa73..f02d18113f9e 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -815,9 +815,13 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+>>>      struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
+>>> unsigned int tag)
+>>>    {
+>>> +    struct request *rq;
+>>> +
+>>>        if (tag < tags->nr_tags) {
+>>>            prefetch(tags->rqs[tag]);
+>>> -        return tags->rqs[tag];
+>>> +        rq = tags->rqs[tag];
+>>> +        if (blk_mq_request_started(rq))
+>>> +            return rq;
+>>>        }
+>>>          return NULL;
+>>>
+>> This becomes particularly obnoxious for SCSI drivers using
+>> scsi_host_find_tag() for cleaning up stale commands (ie drivers like
+>> qla4xxx, fnic, and snic).
+>> All other drivers use it from the completion routine, so one can expect
+>> a valid (and started) tag here. So for those it shouldn't matter.
+>>
+>> But still, if there are objections I could look at fixing it within the
+>> SCSI stack; although that would most likely mean I'll have to implement
+>> the above patch as an additional function.
+> 
+> Hi Hannes,
+> 
+> Will the above patch make the fast path of every block driver slightly
+> slower?
+> 
+> Shouldn't SCSI drivers (and other block drivers) use
+> blk_mq_tagset_busy_iter() to clean up stale commands instead of
+> iterating over all tags and calling blk_mq_tag_to_rq() directly?
+> 
+You can only iterate over all tags with blk_mq_tag_to_rq() if requests 
+are identified with tags, ie if there is a 1:1 mapping between tags and 
+internal commands.
+Quite some drivers have their internal housekeeping (like hpsa), or do 
+not track all commands via tags (eg fnic or csiostor).
+For those the block layer iterator will not work as designed.
 
-You didn't say that.  But from you incoherent comments on the list it
-is completely obvious.
+I'm currently preparing a patchset to clean that up (cf my patchset 
+'reserved tags for SCSI'), but that will probably take some time until 
+it'll be accepted.
+
+And even then some drivers have to rely on scsi_host_find_tag() in eg 
+TMF completions to figure out if the command for which the TMF was sent
+is still active.
+
+But we can move the check into the drivers if you are worried about 
+performance impacts; it's a bit lame if you ask me, but if that's the 
+way it should be handled, fine by me.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke            Teamlead Storage & Networking
+hare@suse.de                               +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
