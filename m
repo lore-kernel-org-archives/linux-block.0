@@ -1,4 +1,4 @@
-Return-Path: <SRS0=th+H=AC=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=vyV1=AD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,250 +6,188 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC627C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 23:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDF5C433DF
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 00:27:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68BE3252FF
-	for <linux-block@archiver.kernel.org>; Sun, 21 Jun 2020 23:57:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AD592531B
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 00:27:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iQSDyBqI";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="M+uMBk4i"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="okIm5Uof";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="pB5AU4I0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730934AbgFUX5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Jun 2020 19:57:39 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:6560 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730916AbgFUX5j (ORCPT
+        id S1730973AbgFVA1i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Jun 2020 20:27:38 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:44436 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726401AbgFVA1h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jun 2020 19:57:39 -0400
+        Sun, 21 Jun 2020 20:27:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1592783858; x=1624319858;
+  t=1592785658; x=1624321658;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=5qYh26ZrfRHqA8wvXQodVDyBaHnh7g3E2bE48AZJQ8c=;
-  b=iQSDyBqIh0E+umghCUr/S5e/W2edGzLalu3sGRiPYUg03E+FxIpH6X6j
-   bKgvn7rPGqir68uGGee610Umzs4Dea+UJMId3+4BSw4sjAbm9czk+cChx
-   X/d8/NIStJbG4R0ANZmDkhXVP5PKYLDUlGQ8ZLNrSbECuX5woUVIKqsPG
-   C5tN6XkNuqhOzdhBv8V6jU2MzvuhzLxaSBUOPslGX4cbw5TwS9dQWqeY0
-   bVIUtY8ehMcecxmcy6F4e9ICCM7geUN5jh4MRyii1GDNT73fC0aJBbeoF
-   I+YaiXHY07mbXTINVq+DTY6r/wN3YI4BFJ1X6O1/EmLxsv4jBFwoyJ21o
-   Q==;
-IronPort-SDR: 8uazL+vcbTQoshxz3QgrIt+7tQ7m0LuX/gmpJawTURoDHjJRJdISiEaTVEZHGzdmovwa1lIB3F
- Wjny3oAU5/vEyC24Vi/ENC11T4m2Ut5gj7L+1Vo5zTRdiy0tltyhTcSU9+KWKSrjy+JfmfkiSW
- gIKQxy4NcIl8XlOr1DnGnd8Y2dPp/GD5XnWTzZHuKq9vfqctOKkmHCVxxLXd095TvD3i2CTK28
- gwmMZJbG0FfoFmlD/A78loERAqSXqteN8uvCozXZGMoKtbCnbIzEUq8ArW2N7isvuyHg49eOn9
- EAc=
+  bh=IURKrbYqZXTSPQNw3WHe77rd8aK0zZblCy8yGPOSQQY=;
+  b=okIm5Uofci48ZfbXYrY5gp6G+TMvxEc+aeDmu48oiLyNVpXApfc6kKrZ
+   jm1VBaxznEngFHH2YiWOMlCEhAmT5NBIKay+OZu7BuwOajzHQ2uVKxA7m
+   a0yec6cxHyj7Dn7Z3yNe0MayO6nvLEf3fVnzlnqlfFxc68Xf9uPBSSIwV
+   Q8PyvwoqJdbZ1/aFeMG6ZHA0WBQI5JXDIXr/8afCCA3I9+ovc5Jp+iFfh
+   kdumhM0Jo7YbPqupZGWmC8wjJmR3KzQ231EeD9NxhhFhdhIYjOI5WWqJ/
+   InE85JaH4/uhhxBUqBav2nEcE72YPPVG1Cs3Mxm57CcH8akNYmI7jSC4w
+   A==;
+IronPort-SDR: QFQbcL856eiXFW46ZHZ7EOoqxvAwJrrs35mx0BuamqDvwClBe7bjjpDI7fg79l92q1HvNGTBYA
+ 1jf2Vpg/HFTr1D9pvVSmoFHt/mn8SS29BlIoXM+XYbIWBqoStScyd4YkfDIR4ZIIKrDd5ULy+1
+ V8pZVA1HA+s8TDe66rKmWMSW/mZg8ee8GJAD2MOtQIQUDtHUZ8WyucEAesTKrxMaxUVwrrpLkO
+ DqzjTj1XgkMR1MnWhO0Lto9Y3j/vhT3+MFIX2dC2GTbKnAxiVVo+GvIL/JBqTn1AEyslY2gHNc
+ Egg=
 X-IronPort-AV: E=Sophos;i="5.75,264,1589212800"; 
-   d="scan'208";a="249764422"
-Received: from mail-mw2nam12lp2043.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.43])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jun 2020 07:57:38 +0800
+   d="scan'208";a="144883644"
+Received: from mail-bn8nam12lp2175.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.175])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Jun 2020 08:27:37 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=he0670n4hzZWgK5whbO2LJ9aJ8Ljw9SHqSD2APM6gurW0gxHMZKgvY0QOyBrdWmPaXFf7YNEj77+roPyxQEjMrSZ3qTGsoQPQlJVT0elmSDCvxii8Ha+SSEQwv4RckG10+7IZ3iqcZnJMiqp4Nq81qM46JWF52r4V1/27llZwOqkJo3MIpSv9mtpiLJacLehdIOnwE7KPDXbQStiZ9bpmDlvdZBIwIAc36tpXu90XUmGCbZ9xpr503eP3yncmfjq5YWSF5gibdzdN8LQF3o2FYrPFon7fW9KUSRnB0wy49ZrTUyFiUH6HJmCdMj9PYhUUVmh7twa01Fho8wdb0fudg==
+ b=IaMStaYD6eq4fwnsJRURPJ42Y5WK0/rRl6JZ5k4nEejDgS92Q77sZP/yqsgvKFe5wMynM0Ntqk9A2K+R7xSz3NBLPpJ787KF0/iLh5r0pNhhqB7YmvBqeF4fs4OE1jEbE3DygcUqGWjDT1miA3te8z/rOLjYkTjq99m4JqpJGWENLNSyz3LM8PMfJmiPY4qsoQukvGCTb5yFc05Bo3rXseRDymCoEvQcj2DqBTLpt9LtaHeKr8UP6NvvqvRxU6IYdq8QT/oDuOTXE0B70UnaAdXtg3BCmAsybDUnI/8ha+Ha3b59UO5vbrV2Kw6bUSxGCS4vrPkQDoTzsvXN03v8Kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fZpW/EPxm9nMOBOvxXzGnmvGG2XQLuYH83aAfT/adFY=;
- b=QaSyjCHAJQXjzCYcVgGiXvHyajqtd4z0bXQuCBImvy2mNhWn2Tnc1DJiCqcXcRyr1Wil+bfqgh3qdQjVEZSw+h0XEqwuC9JkyCnsr4v6zMODJXHPKzF/ZdY+xY4K+5swVg5jyPRpob2o1JeMkVHwK2CnAoRgXrSpA/E4YLZKHz6NuakoKqsgSLfPpnrpNN+1vnibNuZksb9jtFqx5qZ8Je65FEczklDcNTzVkFTo6kjFObgtjtgJB9ePNw4VjcYX2XAxWinRINbM9QkIriTw8cPT9nbAzXxPOsdEkJ6nQz0iklK/ZRaeH+UII3yCZYoMhc5i2znt/aeQ9nVGGjVenw==
+ bh=za05aIq51lN+JrobyPW+kLUoz+blvEnfy5FGDldLQ/Q=;
+ b=A9HjiOhZGqfs0fXWJw36UecWZk3+rjCOnuEb7+uF6FgZh+HGM0iRC25EjHla0yk0Cf2SSWiXTo+9U+ZhO6/+DNyaNPXjrAINw2HO6C3jbVkg3GQtfu3zWF3se2dyzmBp5Dnn3tsSYr3OsXpRKx1pZ+B95sTqwdaZoo3N2JzFJeFkLgz5h0Ap+9GFexyY0uUMo66xXUyo49bjIhgcpI+E2B93F3t7eGcu3h6cn0qyZ9vbpQvYfHM4HfaRPcv35yv+KIDx+U4Tbwrt4AGjLL9IxBImfUpmrbwMUxVyxES4QG7dmDfdKWsjyQEbF8zw7HZ7QB+kTcCXYngoXU1Y4fkxNw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fZpW/EPxm9nMOBOvxXzGnmvGG2XQLuYH83aAfT/adFY=;
- b=M+uMBk4iOxx5kKC7gZY+4o01PuLgI+VuX65USm7f6WJeSixuG/vXBOfgzINnvz4/EIjgEX3SqPZbzSjmb7ATqmgmTWSoRKhPbRtz/qtFn0CY7mXnPIflx9SJl+MpVW94UdDAEbIqjguNJ2LKcTHnqpEHMBr+ZrUbDTqRVmPMxa8=
+ bh=za05aIq51lN+JrobyPW+kLUoz+blvEnfy5FGDldLQ/Q=;
+ b=pB5AU4I06ERcqb2IIELqPMRFUYc9TZ2mgX2sCzrKL7zpWnW/rnKAXsgvqKa4Uli8n065coiiA9FMOyAxixnL2A1shRsdWPq0ZZg7Gc98CgOcukpu3YlZrGWUmdLcQfs0lhKdnMFJ+1fdi9uxSluiBcNLH22TVv2P/Hsc1eg0HTY=
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY1PR04MB2219.namprd04.prod.outlook.com (2a01:111:e400:c611::13) with
+ by CY4PR04MB0376.namprd04.prod.outlook.com (2603:10b6:903:be::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.23; Sun, 21 Jun
- 2020 23:57:36 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.23; Mon, 22 Jun
+ 2020 00:27:34 +0000
 Received: from CY4PR04MB3751.namprd04.prod.outlook.com
  ([fe80::c593:f271:eebe:ac7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3109.023; Sun, 21 Jun 2020
- 23:57:36 +0000
+ ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3109.023; Mon, 22 Jun 2020
+ 00:27:34 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Daniel Wagner <dwagner@suse.de>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH] null_blk: Move the null_blk source files into a
- subdirectory
-Thread-Topic: [PATCH] null_blk: Move the null_blk source files into a
- subdirectory
-Thread-Index: AQHWSAyS356ZHKRE80yyQ/amV6VjiA==
-Date:   Sun, 21 Jun 2020 23:57:36 +0000
-Message-ID: <CY4PR04MB3751D048F64CFC8DA2D8FF99E7960@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <20200621204257.16006-1-bvanassche@acm.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Subject: Re: [RFC PATCH 2/2] dm: don't try to split REQ_OP_ZONE_APPEND bios
+Thread-Topic: [RFC PATCH 2/2] dm: don't try to split REQ_OP_ZONE_APPEND bios
+Thread-Index: AQHWRgczjPsIYl+9xUe/paWaQEGH6A==
+Date:   Mon, 22 Jun 2020 00:27:34 +0000
+Message-ID: <CY4PR04MB37514F8CCE7918A7C13FCA82E7970@CY4PR04MB3751.namprd04.prod.outlook.com>
+References: <20200619065905.22228-1-johannes.thumshirn@wdc.com>
+ <20200619065905.22228-3-johannes.thumshirn@wdc.com>
+ <CY4PR04MB37514CDC42E7F545244D66C6E7980@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200619162658.GB24642@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: acm.org; dkim=none (message not signed)
- header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=wdc.com;
 x-originating-ip: [129.253.182.57]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: cee4e4a9-1e8d-440b-2337-08d8163edf8f
-x-ms-traffictypediagnostic: CY1PR04MB2219:
+x-ms-office365-filtering-correlation-id: ddce9943-bdbe-4c26-9db7-08d816430f3c
+x-ms-traffictypediagnostic: CY4PR04MB0376:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY1PR04MB2219EE4147C7061004D364BFE7960@CY1PR04MB2219.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY4PR04MB0376685C8E0A499409F847B5E7970@CY4PR04MB0376.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:5236;
-x-forefront-prvs: 04410E544A
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0442E569BC
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PCXotlHH1sHS3XuKX6BBbt1jv2pKEubo/sCqgfce27yN50sZ+rwF1u1Ykv3dyUba6qOmJAbahVvo72Mj0uhLwyn2p/PG/BxxRbe1OgJ0vPZfq6h+0ftzvrWrBhXX8amF3p0yH4kbQ0fd9iTKyD5RJ7yiOUh/HScLVnvl+iYKSB8BgjYon71TrlmxSdPXdeUA44cHB227gqA+RjW6yAlAL2EPjghKX23zYyR70NFkGsqhuuKfM7+Z35lVTcZ2QHrCDIhFVYz+PUZhxP5Y1kuGmTEekATzKcA2B7Tp0cTklM1ts1uVKgZ/W002PTfrq5Pv
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(110136005)(33656002)(71200400001)(316002)(4326008)(6506007)(52536014)(9686003)(26005)(53546011)(5660300002)(7696005)(54906003)(55016002)(86362001)(2906002)(186003)(478600001)(8936002)(64756008)(76116006)(66946007)(8676002)(83380400001)(66446008)(91956017)(66476007)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: JzWiwneAcGNJRA8p7HjSs5197VoShYKjQ3MI6VqdLQbY8+wlO2YRDZ+rjZQDBXGlxCzb4kZGAzeV4eHxLgh4vRq6hYDxwORD+zdr13QYWFIPcbZ9W0jAOmhHqf98DxV3iqAZcxUmGQwkMMnuKxgLMfSG2xt9/xGM/D6LOcEg7TiKX6XFi3S84+PnHT5KBkUo2r5YJE5QbG6kXldLH41Pc5+aUh671NIjtxYx/bvp9zZxlYT3swag1Uzakt+YU3Sz4PzFacIQ6tCqlvMfZSI4drdGCZ2kgc8qAO6VNXwiak01s7VZgR1Uhk/+SSMaxUdgjFh3Gsbp5lZ4XvK0hJdHGTYSZkbTGqL0IjDUfKVppGtBQLlgY2GE4pThFr2R4WFL+gHOP3NXSprKf147TgUNvMQm/RAf5Xx7b0njE+/UE/59LWlTwrCvMX+49aGM7xQKpDIu41nagqAZL/cPaVLhAGqtjMUAVvGRImlpcaDUHJLq5HxsqbhDHoYyXo9+FfgN
+x-microsoft-antispam-message-info: ullllfG5DxpL3besiRSAgP7aeekmn3uXxB6A4KReZt9/9v0Grc1lmGh/5J30xhX6CV50m/J5UBzW7sMFM8Pi5ZjJWDIuiyd4Y7dYF0VIuyh3JFtTBheKU+2I66BL4EfrtbXQd8gxTRjx3cAhXLthwSbLHI9m1keiZyx9xEkpnv0UOKzByed5ugieL9YiEMJp2PU/GwA4ZfHcXqfa1f/SHpCFagPhOaoLHK6dWSnNxt1CMsri28Ku9Su5cECA5suEb//DRjKsvKXZGlsvqEPxj4L9gaisndMKtEy3DzeRNJcWU52kVVIOwwICqKHHE2uc
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(346002)(136003)(39850400004)(366004)(396003)(86362001)(6916009)(8936002)(52536014)(5660300002)(8676002)(64756008)(66446008)(66476007)(91956017)(66556008)(33656002)(76116006)(83380400001)(71200400001)(66946007)(4326008)(26005)(53546011)(6506007)(9686003)(55016002)(2906002)(186003)(478600001)(316002)(7696005)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: LGcBToxxP3D8JB3AOwYBq1HlGYscqUUdg0Q+4AtlX11xaH42cVwqdhHf9RDs1Hu8vPmEU5Wm5w3L+/riqeyEzxXgrja1//yUmnusORohs/v+h4uZ4BgvkYhib9hp0SVJCGWMyKFlFKE7SvHYUOU29deTykwkAhsqqmvzvYisULT0Evt6x6lvZgu/ls2ngAJ9W+EO3XMg4DVsSfW6JYvMak4OTrj/JfHlP6+fRiwSxCot6j82F6+AYhadxlFZYckkgL4+46Bwr+uoJYWNfBUDijXCFwpDJhCUy2NEuGWVnOJzocDxWsMfhHaRCxRe65CXN0dtrVufONW3VHMTpoWx+S7p6G4U7BMnNn3QvcLL7obicaG3bvshBvutcMS1YrA5P32XbbrZbmL4rzER25x9lq6emGE8FRhFCFQthmtdWb6GQYTYHM2decr0KJQVSVx8owU9YCztROGKI40jwRmiVArPqBQYs7GvtSuuEsR4O5wZrSOVvU+tclFz1+ldFQ36
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cee4e4a9-1e8d-440b-2337-08d8163edf8f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jun 2020 23:57:36.6209
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddce9943-bdbe-4c26-9db7-08d816430f3c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2020 00:27:34.5886
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CsWRcKohgLjWnDu3rwlRi3YQVfsq2W0d+xFgdx1yW/0uQbbDxPLEIQMJryROkaIAcpdUP7pT/5PgoWBaxwKzBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2219
+X-MS-Exchange-CrossTenant-userprincipalname: H1ga1qwKST8gr+uT+KoJYBHkWQDKepOCIgYvuuCShsefinXIkkui2ddSvLCg7S22gSKn5vg40MK1CTki5kbnOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0376
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/06/22 5:43, Bart Van Assche wrote:=0A=
-> Since the number of source files of the null_blk driver keeps growing,=0A=
-> move these source files into a new subdirectory.=0A=
+On 2020/06/20 1:27, Mike Snitzer wrote:=0A=
+> On Fri, Jun 19 2020 at  3:54am -0400,=0A=
+> Damien Le Moal <Damien.LeMoal@wdc.com> wrote:=0A=
+> =0A=
+>> On 2020/06/19 15:59, Johannes Thumshirn wrote:=0A=
+>>> REQ_OP_ZONE_APPEND bios cannot be split so return EIO if we can't fit i=
+t=0A=
+>>> into one IO.=0A=
+>>>=0A=
+>>> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+>>> ---=0A=
+>>>  drivers/md/dm.c | 3 +++=0A=
+>>>  1 file changed, 3 insertions(+)=0A=
+>>>=0A=
+>>> diff --git a/drivers/md/dm.c b/drivers/md/dm.c=0A=
+>>> index 058c34abe9d1..c720a7e3269a 100644=0A=
+>>> --- a/drivers/md/dm.c=0A=
+>>> +++ b/drivers/md/dm.c=0A=
+>>> @@ -1609,6 +1609,9 @@ static int __split_and_process_non_flush(struct c=
+lone_info *ci)=0A=
+>>>  =0A=
+>>>  	len =3D min_t(sector_t, max_io_len(ci->sector, ti), ci->sector_count)=
+;=0A=
+>>>  =0A=
+>>> +	if (bio_op(ci->bio) =3D=3D REQ_OP_ZONE_APPEND && len < ci->sector_cou=
+nt)=0A=
+>>> +		return -EIO;=0A=
+>>> +=0A=
+>>>  	r =3D __clone_and_map_data_bio(ci, ti, ci->sector, &len);=0A=
+>>>  	if (r < 0)=0A=
+>>>  		return r;=0A=
+>>>=0A=
+>>=0A=
+>> I think this is OK. The stacked max_zone_append_sectors limit should hav=
+e=0A=
+>> prevented that to happen  in the first place I think, but better safe th=
+an sorry.=0A=
+>>=0A=
+>> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+> =0A=
+> If stacked max_zone_append_sectors limit should prevent it then I'd=0A=
+> rather not sprinkle more zoned specific checks in DM core.=0A=
 =0A=
-Makes sense.=0A=
+Mike,=0A=
 =0A=
-Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
+Just to be extra sure, I checked this again. Since for zoned block devices =
+the=0A=
+mapping of a target must be zoned aligned and a zone append command is alwa=
+ys=0A=
+fully contained within a zone, we do not need this check. The stacked limit=
+s and=0A=
+submit_bio() code will fail a zone append command that is too large or that=
+=0A=
+spans zones before we get here.=0A=
+=0A=
+That is of course assuming that the target does not expose zones that are m=
+apped=0A=
+using multiple chunks from different devices. There is currently no target =
+doing=0A=
+that, so this is OK. We can safely drop this patch.=0A=
+=0A=
+Thanks.=0A=
 =0A=
 > =0A=
-> Cc: Christoph Hellwig <hch@lst.de>=0A=
-> Cc: Daniel Wagner <dwagner@suse.de>=0A=
-> Cc: Dongli Zhang <dongli.zhang@oracle.com>=0A=
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
-> Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>=0A=
-> ---=0A=
->  drivers/block/Kconfig                         | 8 +-------=0A=
->  drivers/block/Makefile                        | 7 +------=0A=
->  drivers/block/null_blk/Kconfig                | 9 +++++++++=0A=
->  drivers/block/null_blk/Makefile               | 8 ++++++++=0A=
->  drivers/block/{ =3D> null_blk}/null_blk.h       | 0=0A=
->  drivers/block/{ =3D> null_blk}/null_blk_main.c  | 0=0A=
->  drivers/block/{ =3D> null_blk}/null_blk_trace.c | 0=0A=
->  drivers/block/{ =3D> null_blk}/null_blk_trace.h | 0=0A=
->  drivers/block/{ =3D> null_blk}/null_blk_zoned.c | 0=0A=
->  9 files changed, 19 insertions(+), 13 deletions(-)=0A=
->  create mode 100644 drivers/block/null_blk/Kconfig=0A=
->  create mode 100644 drivers/block/null_blk/Makefile=0A=
->  rename drivers/block/{ =3D> null_blk}/null_blk.h (100%)=0A=
->  rename drivers/block/{ =3D> null_blk}/null_blk_main.c (100%)=0A=
->  rename drivers/block/{ =3D> null_blk}/null_blk_trace.c (100%)=0A=
->  rename drivers/block/{ =3D> null_blk}/null_blk_trace.h (100%)=0A=
->  rename drivers/block/{ =3D> null_blk}/null_blk_zoned.c (100%)=0A=
+> Thanks,=0A=
+> Mike=0A=
 > =0A=
-> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig=0A=
-> index ecceaaa1a66f..262326973ee0 100644=0A=
-> --- a/drivers/block/Kconfig=0A=
-> +++ b/drivers/block/Kconfig=0A=
-> @@ -16,13 +16,7 @@ menuconfig BLK_DEV=0A=
->  =0A=
->  if BLK_DEV=0A=
->  =0A=
-> -config BLK_DEV_NULL_BLK=0A=
-> -	tristate "Null test block driver"=0A=
-> -	select CONFIGFS_FS=0A=
-> -=0A=
-> -config BLK_DEV_NULL_BLK_FAULT_INJECTION=0A=
-> -	bool "Support fault injection for Null test block driver"=0A=
-> -	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION=0A=
-> +source "drivers/block/null_blk/Kconfig"=0A=
->  =0A=
->  config BLK_DEV_FD=0A=
->  	tristate "Normal floppy disk support"=0A=
-> diff --git a/drivers/block/Makefile b/drivers/block/Makefile=0A=
-> index e1f63117ee94..31bc2cfa342f 100644=0A=
-> --- a/drivers/block/Makefile=0A=
-> +++ b/drivers/block/Makefile=0A=
-> @@ -41,12 +41,7 @@ obj-$(CONFIG_BLK_DEV_RSXX) +=3D rsxx/=0A=
->  obj-$(CONFIG_ZRAM) +=3D zram/=0A=
->  obj-$(CONFIG_BLK_DEV_RNBD)	+=3D rnbd/=0A=
->  =0A=
-> -obj-$(CONFIG_BLK_DEV_NULL_BLK)	+=3D null_blk.o=0A=
-> -null_blk-objs	:=3D null_blk_main.o=0A=
-> -ifeq ($(CONFIG_BLK_DEV_ZONED), y)=0A=
-> -null_blk-$(CONFIG_TRACING) +=3D null_blk_trace.o=0A=
-> -endif=0A=
-> -null_blk-$(CONFIG_BLK_DEV_ZONED) +=3D null_blk_zoned.o=0A=
-> +obj-$(CONFIG_BLK_DEV)		+=3D null_blk/=0A=
->  =0A=
->  skd-y		:=3D skd_main.o=0A=
->  swim_mod-y	:=3D swim.o swim_asm.o=0A=
-> diff --git a/drivers/block/null_blk/Kconfig b/drivers/block/null_blk/Kcon=
-fig=0A=
-> new file mode 100644=0A=
-> index 000000000000..1ce02a3572bd=0A=
-> --- /dev/null=0A=
-> +++ b/drivers/block/null_blk/Kconfig=0A=
-> @@ -0,0 +1,9 @@=0A=
-> +# SPDX-License-Identifier: GPL-2.0=0A=
-> +=0A=
-> +config BLK_DEV_NULL_BLK=0A=
-> +	tristate "Null test block driver"=0A=
-> +	select CONFIGFS_FS=0A=
-> +=0A=
-> +config BLK_DEV_NULL_BLK_FAULT_INJECTION=0A=
-> +	bool "Support fault injection for Null test block driver"=0A=
-> +	depends on BLK_DEV_NULL_BLK && FAULT_INJECTION=0A=
-> diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Mak=
-efile=0A=
-> new file mode 100644=0A=
-> index 000000000000..a93a16d5ba23=0A=
-> --- /dev/null=0A=
-> +++ b/drivers/block/null_blk/Makefile=0A=
-> @@ -0,0 +1,8 @@=0A=
-> +# SPDX-License-Identifier: GPL-2.0=0A=
-> +=0A=
-> +obj-$(CONFIG_BLK_DEV_NULL_BLK)	+=3D null_blk.o=0A=
-> +null_blk-objs			:=3D null_blk_main.o=0A=
-> +ifeq ($(CONFIG_BLK_DEV_ZONED), y)=0A=
-> +null_blk-$(CONFIG_TRACING)	+=3D null_blk_trace.o=0A=
-> +endif=0A=
-> +null_blk-$(CONFIG_BLK_DEV_ZONED) +=3D null_blk_zoned.o=0A=
-> diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk/null_blk.h=
-=0A=
-> similarity index 100%=0A=
-> rename from drivers/block/null_blk.h=0A=
-> rename to drivers/block/null_blk/null_blk.h=0A=
-> diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk/null_=
-blk_main.c=0A=
-> similarity index 100%=0A=
-> rename from drivers/block/null_blk_main.c=0A=
-> rename to drivers/block/null_blk/null_blk_main.c=0A=
-> diff --git a/drivers/block/null_blk_trace.c b/drivers/block/null_blk/null=
-_blk_trace.c=0A=
-> similarity index 100%=0A=
-> rename from drivers/block/null_blk_trace.c=0A=
-> rename to drivers/block/null_blk/null_blk_trace.c=0A=
-> diff --git a/drivers/block/null_blk_trace.h b/drivers/block/null_blk/null=
-_blk_trace.h=0A=
-> similarity index 100%=0A=
-> rename from drivers/block/null_blk_trace.h=0A=
-> rename to drivers/block/null_blk/null_blk_trace.h=0A=
-> diff --git a/drivers/block/null_blk_zoned.c b/drivers/block/null_blk/null=
-_blk_zoned.c=0A=
-> similarity index 100%=0A=
-> rename from drivers/block/null_blk_zoned.c=0A=
-> rename to drivers/block/null_blk/null_blk_zoned.c=0A=
 > =0A=
 =0A=
 =0A=
