@@ -2,129 +2,90 @@ Return-Path: <SRS0=vyV1=AD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CADEC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 12:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D82C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 13:01:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66B852071A
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 12:42:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592829732;
-	bh=oGtTwHaGEYEjEDaRZxo4C/+w0rXCNGqG35wH3bXEspI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OETfZXF57isi2goD2MgtDQJicx4tKtyYGY82k2jGr4gaPzU2lHu5Bv29oZQtyeKyZ
-	 J6oolk7xowetgekRHB10lLjzZ5dCHmMqQg9cwGN4d/C0+AE5eTtvzX3mBpydFl8T3T
-	 RYhujf6S34ovdazHhiAskE6fdRD+ua4n5+DY3pm8=
+	by mail.kernel.org (Postfix) with ESMTP id 6F73B2073E
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 13:01:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728294AbgFVMmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 08:42:11 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43082 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728122AbgFVMmL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 08:42:11 -0400
-Received: by mail-pf1-f195.google.com with SMTP id j12so6137587pfn.10;
-        Mon, 22 Jun 2020 05:42:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=eZIvSoaeoetQ1jhe+tUmzTZniV3Vjg3TwcUn9XcJZg0=;
-        b=kKS1HW3YK3GVi03JECU2EME8lfjR3mBkTdbKVvWMzWUvIEwsf6AECkCYwx0twgIap8
-         qzak8v0OJZ3POjEGxBmW62nTtLc+M0tl+ta5lOjJrA6gEzGlJmXC1P5GVzQ0gkjz+2/D
-         4UEH0RklRd2ZiqnxHIO01s3lSkaFNBMqeL2+SexFASI67wYv6HW4G14e6GHUQf8dxfrU
-         D6skiRYGjxCjuuJ7Fxj6bFDoCtrfrGnox1bbgi/s0TkPY5xJmmkfpomlEvCqVvIiHutl
-         IWzO/ep9u0pfdgB/KisvDMLM+lUiQkB67QCdfuoXIobU0WDk0zcEHpeuhtWZNuRzugId
-         U5bQ==
-X-Gm-Message-State: AOAM5309INBlUrjpXgJ6v/jUlmD9m2A6S0533NDLcDzVPbKpEOhxeuZm
-        +L9uE83rmAvRkTCt36F+SuM=
-X-Google-Smtp-Source: ABdhPJzbR2A9IaZZuWZL9dXfY/ud3Lh1aZezzViYVOPeMiA3bWIwI/DKubiDM5mP3ixooEqRBs0niA==
-X-Received: by 2002:a63:5024:: with SMTP id e36mr12198090pgb.438.1592829730707;
-        Mon, 22 Jun 2020 05:42:10 -0700 (PDT)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id 137sm11288142pgg.72.2020.06.22.05.42.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2020 05:42:09 -0700 (PDT)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 7D5A140430; Mon, 22 Jun 2020 12:42:08 +0000 (UTC)
-Date:   Mon, 22 Jun 2020 12:42:08 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
-        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
-        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
-        martin.petersen@oracle.com, jejb@linux.ibm.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 8/8] block: create the request_queue debugfs_dir on
- registration
-Message-ID: <20200622124208.GW11244@42.do-not-panic.com>
-References: <20200619204730.26124-1-mcgrof@kernel.org>
- <20200619204730.26124-9-mcgrof@kernel.org>
- <02112994-4cd7-c749-6bd7-66a772593c90@acm.org>
+        id S1728070AbgFVNBv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 09:01:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39406 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728116AbgFVNBv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jun 2020 09:01:51 -0400
+Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 32B8B20732;
+        Mon, 22 Jun 2020 13:01:50 +0000 (UTC)
+Date:   Mon, 22 Jun 2020 09:01:48 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Masami Hiramatsu <mhiramat@kernel.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: kprobe: __blkdev_put probe is missed
+Message-ID: <20200622090148.6e0f2ac9@oasis.local.home>
+In-Reply-To: <20200622002753.GC670933@T590>
+References: <20200618125438.GA191266@T590>
+        <20200618225602.3f2cca3f0ed48427fc0a483b@kernel.org>
+        <20200618231901.GA196099@T590>
+        <20200619141239.56f6dda0976453b790190ff7@kernel.org>
+        <20200619072859.GA205278@T590>
+        <20200619081954.3d72a252@oasis.local.home>
+        <20200619133240.GA351476@T590>
+        <20200620003509.9521053fbd384f4f5d23408f@kernel.org>
+        <20200619232820.GE353853@T590>
+        <20200620103747.fb83f804083ef9956740acee@kernel.org>
+        <20200622002753.GC670933@T590>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02112994-4cd7-c749-6bd7-66a772593c90@acm.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 20, 2020 at 11:07:43AM -0700, Bart Van Assche wrote:
-> On 2020-06-19 13:47, Luis Chamberlain wrote:
-> > We were only creating the request_queue debugfs_dir only
-> > for make_request block drivers (multiqueue), but never for
-> > request-based block drivers. We did this as we were only
-> > creating non-blktrace additional debugfs files on that directory
-> > for make_request drivers. However, since blktrace *always* creates
-> > that directory anyway, we special-case the use of that directory
-> > on blktrace. Other than this being an eye-sore, this exposes
-> > request-based block drivers to the same debugfs fragile
-> > race that used to exist with make_request block drivers
-> > where if we start adding files onto that directory we can later
-> > run a race with a double removal of dentries on the directory
-> > if we don't deal with this carefully on blktrace.
-> > 
-> > Instead, just simplify things by always creating the request_queue
-> > debugfs_dir on request_queue registration. Rename the mutex also to
-> > reflect the fact that this is used outside of the blktrace context.
-> 
-> There are two changes in this patch: a bug fix and a rename of a mutex.
-> I don't like it to see two changes in a single patch.
+On Mon, 22 Jun 2020 08:27:53 +0800
+Ming Lei <ming.lei@redhat.com> wrote:
 
-I thought about doing the split first, and I did it at first, but
-then I could hear Christoph yelling at me for it. So I merged the
-two together. Although it makes it more difficult for review,
-the changes do go together.
+> Can you kprobe guys improve the implementation for covering this case?
+> For example, put probe on 3) in case the above situation is recognized.
 
-Kind of late to split this as its already merged now.
+To do so would require solving the halting problem.
 
-> Additionally, is the new mutex name really better than the old name? The
-> proper way to use mutexes is to use mutexes to protect data instead of
-> code. Where is the documentation that mentions which member variable(s)
-> of which data structures are protected by the mutex formerly called
-> blk_trace_mutex?
+  https://en.wikipedia.org/wiki/Halting_problem
 
-It does not exist, and that is the point. The debugfs_dir use after
-free showed us *when* that UAF can happen, and so care must be taken
-if we are to use the mutex to protect the debugfs_dir but also re-use
-the same directory for other block core shenanigans.
+Or perhaps reading the DWARF output of the compiler to determine if it
+optimized the location you are looking for.
 
-> Since the new name makes it even less clear which data
-> is protected by this mutex, is the new name really better than the old name?
+The first case is impossible to solve, the second would take a lot of
+work, (are you going to fund it?)
 
-I thought the new name makes it crystal clear what is being protected. I
-can however add a comment to explain that the q->debugfs_mutex protects
-the q->debugfs_dir if it is created, otherwise it protects the ephemeral
-debugfs_dir directory which would otherwise be created in lieue of
-q->debugfs_dir, however the patch still lies under <debugfs_root>/block/.
+Your comment about tracing internals is valid, but if you can't
+understand the optimization of the compiler on the kernel, I suggest
+you stick with the static trace events. kprobes can be added virtual
+anywhere in the kernel. It's very function requires a kprobe *user* to
+understand the internals of the kernel as well as its executable binary
+code, and not expect the kprobe to figure it out for you.
 
-Let me know if you think that will help.
+We are all for adding infrastructure to make kprobes easier. But
+figuring out that the kernel optimized a function call so that we can
+add some wrapper to *simulate* the optimized out function call is
+something I believe is out of scope for a kprobe. In fact, I would call
+that a feature! I would like to know that a function was optimized out.
+When I add a kprobe, I'm more interested in what the compiler actually
+did to the kernel than what the source code shows us. That is very
+useful information.
 
-  Luis
+-- Steve
