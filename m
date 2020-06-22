@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16603C433E2
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 09:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0D9C433E1
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 09:03:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAEB6206D7
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 09:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1F83206D7
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 09:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592816630;
-	bh=dfPq2bWzwrh5d/nPvytI9Z/3m/amVEV2Rcw1LlZyQmc=;
+	s=default; t=1592816632;
+	bh=uHzWPbIY/41z+WQ/nEUcOLsdKXZ7Qrprx0s9J3nM1WI=;
 	h=In-Reply-To:References:Subject:From:Cc:To:Date:List-ID:From;
-	b=sW0PM75eZZxUYWf8fo2BGiUZ6R6VkyJvuPEVJ43Th0ATSnuCXfXHjE7+ji9DLSPzP
-	 5/7zFByTR0wX1E4GzpFNB1dcYAVT+F8Ako737STBXSetGtW2Uqyfi0Si+HowfGkace
-	 0Z/hK/7PYIDO11My2REEdAwy1jwXksTwQ3tyB+rg=
+	b=wMlvlN0s0KgVvfUtSZNbB5lcCTgQJ93a1YjUBCCqg7VVuWsDwGsq2/NAKdG+3Z4ee
+	 M4cMbZ1kD5QWZBQAPunhVQBgmUnQGM/ggHeVnq/WGKxeO2YQtDgzIFAOdk/iRYQmor
+	 um57GdXvxdANNvMQQ32O/P8mRsTIh3RPKHmK50ZE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgFVJDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 05:03:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40434 "EHLO mail.kernel.org"
+        id S1725919AbgFVJDw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 05:03:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40632 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725907AbgFVJDm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 05:03:42 -0400
+        id S1725907AbgFVJDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jun 2020 05:03:51 -0400
 Received: from kernel.org (unknown [104.132.0.74])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C351B206D7;
-        Mon, 22 Jun 2020 09:03:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3708D20716;
+        Mon, 22 Jun 2020 09:03:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592816621;
-        bh=dfPq2bWzwrh5d/nPvytI9Z/3m/amVEV2Rcw1LlZyQmc=;
+        s=default; t=1592816630;
+        bh=uHzWPbIY/41z+WQ/nEUcOLsdKXZ7Qrprx0s9J3nM1WI=;
         h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-        b=vhvP7fE2MPNiHbfOeqUpBKYvYHUd3trLSwHmotHtfbD0VQFAa3Kwf3asD6snmMfVn
-         7p1K872LOY3D+lW5N2LJm3deS04WJDM10Qxgq0hfBEHc7pew9hlgtznyNjzvlDqDoI
-         hWZw7i2g7uSA8PFpTf60IR4oph7Kn4ltUnLQO8vI=
+        b=Xh/zfNmL3ERN7ZAuWqJeou0LUUvk4MxvRvqg/wo1SCR+kIFKaY9IoS91eJwSGmLxN
+         41gDTQtH3HmNO1ivPmHrDiY28L/xmHDYW6B2Zu88FibzNrSxqjvk4opMhmkVX7J1zb
+         BUvEkLF+J6WNitfbDSFytorOw4J66B/N2vbM1fp8=
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200620033007.1444705-8-keescook@chromium.org>
-References: <20200620033007.1444705-1-keescook@chromium.org> <20200620033007.1444705-8-keescook@chromium.org>
-Subject: Re: [PATCH v2 07/16] clk: st: Remove uninitialized_var() usage
+In-Reply-To: <20200620033007.1444705-10-keescook@chromium.org>
+References: <20200620033007.1444705-1-keescook@chromium.org> <20200620033007.1444705-10-keescook@chromium.org>
+Subject: Re: [PATCH v2 09/16] clk: spear: Remove uninitialized_var() usage
 From:   Stephen Boyd <sboyd@kernel.org>
 Cc:     Kees Cook <keescook@chromium.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -57,27 +57,23 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-spi@vger.kernel.org, linux-mm@kvack.org,
         clang-built-linux@googlegroups.com
 To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Date:   Mon, 22 Jun 2020 02:03:41 -0700
-Message-ID: <159281662109.62212.9073761737183602994@swboyd.mtv.corp.google.com>
+Date:   Mon, 22 Jun 2020 02:03:49 -0700
+Message-ID: <159281662960.62212.15318119299039755482@swboyd.mtv.corp.google.com>
 User-Agent: alot/0.9
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Quoting Kees Cook (2020-06-19 20:29:58)
+Quoting Kees Cook (2020-06-19 20:30:00)
 > Using uninitialized_var() is dangerous as it papers over real bugs[1]
 > (or can in the future), and suppresses unrelated compiler warnings (e.g.
 > "unused variable"). If the compiler thinks it is uninitialized, either
 > simply initialize the variable or make compiler changes. As a precursor
-> to removing[2] this[3] macro[4], just remove this variable since it was
-> actually unused:
->=20
-> drivers/clk/st/clkgen-fsyn.c: In function \u2018quadfs_set_rate\u2019:
-> drivers/clk/st/clkgen-fsyn.c:793:6: warning: unused variable \u2018i\u201=
-9 [-Wunused-variable]
->   793 |  int i;
->       |      ^
+> to removing[2] this[3] macro[4], initialize "i" to zero. The compiler
+> warning was not a false positive, since clk_pll_set_rate()'s call to
+> clk_pll_round_rate_index() will always fail (since "prate" is NULL), so
+> "i" was never being initialized.
 >=20
 > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.co=
 m/
@@ -88,8 +84,7 @@ OU6eedsudAixw@mail.gmail.com/
 > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=3DyVJu65TpLg=
 N_ybYNv0VEOKA@mail.gmail.com/
 >=20
-> Fixes: 5f7aa9071e93 ("clk: st: Support for QUADFS inside ClockGenB/C/D/E/=
-F")
+> Fixes: 7d4998f71b29 ("clk: SPEAr: Vco-pll: Fix compilation warning")
 > Signed-off-by: Kees Cook <keescook@chromium.org>
 > ---
 
