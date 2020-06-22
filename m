@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FD7C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 17:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BD2C433E2
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 17:23:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDB7720644
-	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 17:04:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B47FA2073E
+	for <linux-block@archiver.kernel.org>; Mon, 22 Jun 2020 17:23:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qKm/Whls"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T/gZ4H2J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729971AbgFVREb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 13:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
+        id S1729983AbgFVRXG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 13:23:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729876AbgFVREb (ORCPT
+        with ESMTP id S1729989AbgFVRXF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 13:04:31 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE13CC06179A
-        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2020 10:04:30 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id u14so108780pjj.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2020 10:04:30 -0700 (PDT)
+        Mon, 22 Jun 2020 13:23:05 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC868C061797
+        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2020 10:23:05 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id d6so129308pjs.3
+        for <linux-block@vger.kernel.org>; Mon, 22 Jun 2020 10:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=+m5221Ut6o3WuT6BjiL72c05hVwdkXllFG7aX4yJx4M=;
-        b=qKm/WhlsQKDgGm0JFnkCdb0IzzhquY358SdW3YjXotmWgdudNMJZnXNXgvLG0UCoo9
-         7Cw6pnkmDWaW0NfZwL15NqU9yndpUvZfap4/r4/N0EchCfKEkHwdBZzA06x2GNQH+3Mt
-         J/3WYO6M5B8qpkeQr8fpVlBadLhCAZf2C9poaWq+QLaHYcQ0rGyiUjvhR65Bxkj+hA2b
-         s9+jLdjx7crDjAvCyWnbR0bBghdrf6Nltn1qYGOn5boJGAxwdb3AWa19DW56iVy38cNF
-         K25EWlpr0J4GIzjxfrzpPzlHwPqk4eyUHRflEds57fzvbDL6gzcelUVq6RZ2ZRqHOBVq
-         4aaw==
+        bh=BqM48ZdR4QdYBTv2c7+F0igShsRmPGqVwAJTalrh3Vo=;
+        b=T/gZ4H2J+UpNQ96H4IQLTAW9jVMnZlvLzxm2OhJBDlYjOIQCD2FlzsoigqacLWJAhC
+         FAIymS/2Mdmvf5jp+PMPTZPszQlLdMUtLLlxEwYzzRg8451YxoBJQ2B6yep7Gr3zpQtx
+         oME5SyrfsBCu+p9qDBNWb5W0Ik4fADMMt3L3iqomKhLtenk4gH6tWYsAJe0N4bqlw6TY
+         e4kzYPrOVngrkzYP4ZO7qK52KTWkEaDOe/Hc26SYciu91gstYIuQ457fS2tO+3Fhc++S
+         J3tpbd0xhmS8RbKKoltaGvNLCIjSjHM0jjaUbZ0vQp8KhiEYCwyRbniMeg/jqRQHieMg
+         4n/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+m5221Ut6o3WuT6BjiL72c05hVwdkXllFG7aX4yJx4M=;
-        b=YhkJUQBNxIVTmq+qae5gRnh+lTV2OQRfbpkIgYIrq6qTFzHjz435D2jWhDvQgCNaBk
-         R8OKo6dgKkG4fZcSuHmIhAspLfjCcP/CSwwPox7fqSWGTC7TbRepLMbK/zmqaQMxkrfl
-         SQzNSwDKAJZup1/r1tfpulXqpyyIqtqTY7bp8qbEM5+BO962UvVu/+mxOkStXj0UGniQ
-         Z9PYn0JbGZrwZvPu/ZrN9WppY6luPaUgXu69bmEbL0BkaBuWHvgozNeMyydSihNxqpST
-         L7SkdSCASWppVtBiDFw9RLkHXsphWcAUDcEGYUdj103BCqORwbF2/Ny6w6b8KQ4WhDYb
-         LHvQ==
-X-Gm-Message-State: AOAM5327/pOz9zyfe5RGrKCs/+qk1ZV2eaHcbP0hQLEhNPnoLbZka1+j
-        sYxmovRbHGXvRqAVPk7gEOvKm0ve7t6mJVUsvxAkug==
-X-Google-Smtp-Source: ABdhPJwq3U6/P+kOQWrtaPsfC7pEtXaKjHv6HeLE+nRTnxPEDc+MHw061OC9xpPpZ7i7YIPBLzcZEdJFmiD+WA1tEsk=
-X-Received: by 2002:a17:90a:e2c4:: with SMTP id fr4mr19317188pjb.32.1592845469798;
- Mon, 22 Jun 2020 10:04:29 -0700 (PDT)
+        bh=BqM48ZdR4QdYBTv2c7+F0igShsRmPGqVwAJTalrh3Vo=;
+        b=Bp2iMUKiaFWALXfcV8uJ9/AxqTI51DeWoS+lMteVUOvl0eChV5DhSXWu93TFU/Emve
+         1gLHhpZkfGpQe0n0Z8noySsRz2SRAQiqdCXYwZdN9lCvNhbuF9o4sAirdhPzMxQXQi2I
+         /hCBSNXkesyqSrP0sUaLGhOx0LtWX2TabWEBt0kN732j03EazXMMjR5sHbvfIEHmtSHa
+         uQ7li5GKBHzLB3MKRJNvQqWh+K3PAxpH3ExNlRSJp7PRbvXyF7uAmLgiAmtQqJ2+6bRu
+         jUyo30zx+9Yu8TcZme0PEaIg4xDQSH5nk394jfbjjbXrAJDyU8sRdX0V1MFSu16Hsdmx
+         0TAg==
+X-Gm-Message-State: AOAM533+TLyuIOoCQbjXFrVX3xcfuTZ8g5t0rF1nfkE2p7pkjQavTB3O
+        MXwY5464hny+E7bqXkSrl6xXOI+iKEBPh4FC83pOxg==
+X-Google-Smtp-Source: ABdhPJzO+nq25CgrrJ901vreSYdCENCWSbB928SD41OoQSYC+oteTUNy5xrcCBXr3eXVXoqswpT2QCJu88gHklh2Xeo=
+X-Received: by 2002:a17:90a:1e:: with SMTP id 30mr18013542pja.25.1592846584932;
+ Mon, 22 Jun 2020 10:23:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200620033007.1444705-1-keescook@chromium.org> <20200620033007.1444705-5-keescook@chromium.org>
-In-Reply-To: <20200620033007.1444705-5-keescook@chromium.org>
+References: <20200620033007.1444705-1-keescook@chromium.org> <20200620033007.1444705-11-keescook@chromium.org>
+In-Reply-To: <20200620033007.1444705-11-keescook@chromium.org>
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 22 Jun 2020 10:04:18 -0700
-Message-ID: <CAKwvOdmsXuqx-3Rt_KNFq4psAeFjG2-7qQaqkJ7dDqqmscUFNw@mail.gmail.com>
-Subject: Re: [PATCH v2 04/16] b43: Remove uninitialized_var() usage
+Date:   Mon, 22 Jun 2020 10:22:53 -0700
+Message-ID: <CAKwvOd=N3HQNZfKMQ7eZWdawwNn13=YNNgMO0WAng2ERYX4Juw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/16] KVM: PPC: Book3S PR: Remove uninitialized_var() usage
 To:     Kees Cook <keescook@chromium.org>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Alexander Potapenko <glider@google.com>,
@@ -90,38 +91,42 @@ On Fri, Jun 19, 2020 at 8:30 PM Kees Cook <keescook@chromium.org> wrote:
 > (or can in the future), and suppresses unrelated compiler warnings (e.g.
 > "unused variable"). If the compiler thinks it is uninitialized, either
 > simply initialize the variable or make compiler changes. As a precursor
-> to removing[2] this[3] macro[4], just initialize this variable to NULL.
-> No later NULL deref is possible due to the early returns outside of the
-> (phy->rev >= 7 && phy->rev < 19) case, which explicitly tests for NULL.
+> to removing[2] this[3] macro[4], just remove this variable since it was
+> actually unused:
+>
+> arch/powerpc/kvm/book3s_pr.c:1832:16: warning: unused variable 'vrsave' [-Wunused-variable]
+>         unsigned long vrsave;
+>                       ^
 >
 > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
 > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
 > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
 > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
 >
-> Fixes: 58619b14d106 ("b43: move under broadcom vendor directory")
+> Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Fixes: f05ed4d56e9c ("KVM: PPC: Split out code from book3s.c into book3s_pr.c")
 > Signed-off-by: Kees Cook <keescook@chromium.org>
 
-I see three total uses of uninitialized_var() in this file, do we want
-to eliminate all of them?
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
 > ---
->  drivers/net/wireless/broadcom/b43/phy_n.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/powerpc/kvm/book3s_pr.c | 3 ---
+>  1 file changed, 3 deletions(-)
 >
-> diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
-> index c33b4235839d..46db91846007 100644
-> --- a/drivers/net/wireless/broadcom/b43/phy_n.c
-> +++ b/drivers/net/wireless/broadcom/b43/phy_n.c
-> @@ -4222,7 +4222,7 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
->         u32 rfpwr_offset;
->         u8 pga_gain, pad_gain;
->         int i;
-> -       const s16 *uninitialized_var(rf_pwr_offset_table);
-> +       const s16 *rf_pwr_offset_table = NULL;
+> diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+> index ef54f917bdaf..ed12dfbf9bb5 100644
+> --- a/arch/powerpc/kvm/book3s_pr.c
+> +++ b/arch/powerpc/kvm/book3s_pr.c
+> @@ -1828,9 +1828,6 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_run *run = vcpu->run;
+>         int ret;
+> -#ifdef CONFIG_ALTIVEC
+> -       unsigned long uninitialized_var(vrsave);
+> -#endif
 >
->         table = b43_nphy_get_tx_gain_table(dev);
->         if (!table)
+>         /* Check if we can run the vcpu at all */
+>         if (!vcpu->arch.sane) {
 > --
 
 -- 
