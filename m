@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 307B5C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 11:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE43C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:11:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F323F20768
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 11:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42BBA20707
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:11:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ms63V3XE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RQY/ESzG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732597AbgFWLvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 07:51:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S1732572AbgFWMLZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 08:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732587AbgFWLvD (ORCPT
+        with ESMTP id S1732539AbgFWMLY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 07:51:03 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93AE0C061573
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 04:51:02 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id dm12so274952qvb.9
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 04:51:02 -0700 (PDT)
+        Tue, 23 Jun 2020 08:11:24 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836ABC061573
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:11:24 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id i3so5628098qtq.13
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:11:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=from:references:in-reply-to:mime-version:thread-index:date
          :message-id:subject:to:cc;
-        bh=AOcZHl9tIfhWl5nHlERsjuMsiyHjKy8GNn/AvBj4YBo=;
-        b=Ms63V3XEK77MImUFLGAJ1CbDYcP6LSsCrQFMjV20mm/aNsK0FaqnagV3hYJZwFVQKL
-         /1jpL6PFqWqGgDQ7AbpfPhXDby6m5rrorLD3IY+B4wyi49Jxw9hPrg2ezKvn3Y425a0r
-         +RbE+S3kGjwRkBxKL3IidRitKjhJS/zF5m+Xk=
+        bh=ahUTe9XRJ8acBkcpa6ONk60UI2intY15Pgk4PKOCgS0=;
+        b=RQY/ESzGkhxZji4tPsplhJBlbizm0USPsgYnucQWPz8SHWSSoAw4/LTAKi6sTLEal+
+         xY0al366iH0mojctdZHNzLkJPa19z7iagNLr3MJI4rc2l1BefNfXO4H4bD5BV/yDlFx2
+         h5PhEtYHarUcz5i7AXqxQDuqyd/GZyUoQ8VxQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:references:in-reply-to:mime-version
          :thread-index:date:message-id:subject:to:cc;
-        bh=AOcZHl9tIfhWl5nHlERsjuMsiyHjKy8GNn/AvBj4YBo=;
-        b=n0AeHCWCGYKyXUIrGXSgQ1TGAev84BuNgx81K4EZ1t9MVxvJJoOsc23DT969EE9MID
-         LSt0xtVof25rk6ijKVvxbwwHAkl13eIEY4xg/J73jo0aNBmZVNgHSc9R+cENQeAMV3uH
-         /v3Fwl3Ff5x+TgfmyDTOMujiM++YKFrqnDicc7jmbMZYAh50USgcS1hFfSGrVkwG9mHa
-         VOC2BmMO0VioTVmUjxTeK0Wym7eAWUlckd/aqjck/5H5N6V0oFGdi8vMuYSy086YTHcq
-         pbh4ngPwq98MoytpLjiQO6yrJSScF77PXVgToTg8oiQrhp8TNr5OoGXE9gn3vJ9Hi4f3
-         VdrA==
-X-Gm-Message-State: AOAM530248ArkKxvAc/2zSiw8E50gy0VMEyLk6IyUU3CWgdsnbjXIK0X
-        1maA9WncuYEoS2fvXzb+ntFM84/hEB6jFxB+7vHyqA==
-X-Google-Smtp-Source: ABdhPJwKyXywAJ7FV3/1sVYGE5qlTL1Om5jGUMARAzKJorFbuyLlGtfvOfM6N7Caz8IAXCAz7R2Wut1/reNPbBRh3eA=
-X-Received: by 2002:ad4:476a:: with SMTP id d10mr13884374qvx.13.1592913061480;
- Tue, 23 Jun 2020 04:51:01 -0700 (PDT)
+        bh=ahUTe9XRJ8acBkcpa6ONk60UI2intY15Pgk4PKOCgS0=;
+        b=oV9Dkifq5Lq90vAxcfcfK5LP5KV4OLawNhudMvdtFRoektdnSaPpKsWOii4J8Gg+MD
+         Aco3fXtufVLblpctn6Yo38uUkMOW0VAFbN1sY1EfSDKUbpxVyYlbFo7h34XUSMbxDyw3
+         jF7dmqG+/g33L9U2RdvEEN7s3x/j4XESlrTbdW+Z2sgj0fp4O5upbzabuE/NFNebRqYR
+         F5CQNhiXA0vDS0Jnag+yi136YScSRmzBUX4YWcuJUepuKZghWlEdTHmcFrjDMNnxsCYd
+         JPa+0wAZmDJnGWtwMJIRQ8Z9S2Pj6pb7EM3sZAAq1h67oVzaCRTTM9BjbqI9elXvc/W/
+         HAtw==
+X-Gm-Message-State: AOAM5328/CKVuKBIBSjoNMNnj1G1ufbpXvXdWgxIbrZpjkYd69k1Kpm/
+        aRpGNa8iQ+yXv3WWjOCCHC86qvkFTtQvzpIRKSGHzw==
+X-Google-Smtp-Source: ABdhPJwcuKC3ED8V1jFmIuyDFa9N+YG59CVVkkvAHStB6GsAg7XHNCw/a3+6RE2IEopKCaWNjyRYMJZdUfl1u6TRJts=
+X-Received: by 2002:ac8:7cb8:: with SMTP id z24mr20283577qtv.190.1592914283499;
+ Tue, 23 Jun 2020 05:11:23 -0700 (PDT)
 From:   Kashyap Desai <kashyap.desai@broadcom.com>
 References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
  <20200611030708.GB453671@T590> <c033f445-97fd-6dc9-c270-9890681b39d9@huawei.com>
  <bbdec3b3fbeb9907d2ec66a2afa56c29@mail.gmail.com> <20200615021355.GA4012@T590>
  <e49f164d867b53fd4495f1e05a85df03@mail.gmail.com> <20200616010055.GA27192@T590>
  <f9a05331a46a8c60c10e35df4aa08c45@mail.gmail.com> <67d626a6-1b7c-fbc8-24b6-8d6b6df8a7b8@suse.de>
- <20200623005518.GA843366@T590>
-In-Reply-To: <20200623005518.GA843366@T590>
+ <20200623005518.GA843366@T590> 3b3c83d2ea14c73561f215ba15322702@mail.gmail.com
+In-Reply-To: 3b3c83d2ea14c73561f215ba15322702@mail.gmail.com
 MIME-Version: 1.0
 X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgGaerxUAVTJvjECMFFU0QGrq6UsAuDJt2sC5poHDQH30JQYAZ8VPSMDEFRlXqtNvHgw
-Date:   Tue, 23 Jun 2020 17:20:59 +0530
-Message-ID: <3b3c83d2ea14c73561f215ba15322702@mail.gmail.com>
+Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgGaerxUAVTJvjECMFFU0QGrq6UsAuDJt2sC5poHDQH30JQYAZ8VPSMDEFRlXqtNvHgwgAAGEeA=
+Date:   Tue, 23 Jun 2020 17:41:20 +0530
+Message-ID: <541b79b7007feda09cb810d55a6f0b73@mail.gmail.com>
 Subject: RE: [PATCH RFC v7 00/12] blk-mq/scsi: Provide hostwide shared tags
  for SCSI HBAs
 To:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
@@ -82,271 +82,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->
-> On Mon, Jun 22, 2020 at 08:24:39AM +0200, Hannes Reinecke wrote:
-> > On 6/17/20 1:26 PM, Kashyap Desai wrote:
 > > > >
-> > > > ->queued is increased only and not decreased just for debug
-> > > > ->purpose so far, so
-> > > > it can't be relied for this purpose.
-> > >
-> > > Thanks. I overlooked that that it is only incremental counter.
-> > >
-> > > >
-> > > > One approach is to add one similar counter, and maintain it by
-> > > scheduler's
-> > > > insert/dispatch callback.
-> > >
-> > > I tried below  and I see performance is on expected range.
-> > >
-> > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c index
-> > > fdcc2c1..ea201d0 100644
-> > > --- a/block/blk-mq-sched.c
-> > > +++ b/block/blk-mq-sched.c
-> > > @@ -485,6 +485,7 @@ void blk_mq_sched_insert_request(struct request
-> > > *rq, bool at_head,
-> > >
-> > >                  list_add(&rq->queuelist, &list);
-> > >                  e->type->ops.insert_requests(hctx, &list, at_head);
-> > > +               atomic_inc(&hctx->elevator_queued);
-> > >          } else {
-> > >                  spin_lock(&ctx->lock);
-> > >                  __blk_mq_insert_request(hctx, rq, at_head); @@
-> > > -511,8 +512,10 @@ void blk_mq_sched_insert_requests(struct
-> > > blk_mq_hw_ctx *hctx,
-> > >          percpu_ref_get(&q->q_usage_counter);
-> > >
-> > >          e = hctx->queue->elevator;
-> > > -       if (e && e->type->ops.insert_requests)
-> > > +       if (e && e->type->ops.insert_requests) {
-> > >                  e->type->ops.insert_requests(hctx, list, false);
-> > > +               atomic_inc(&hctx->elevator_queued);
-> > > +       }
-> > >          else {
-> > >                  /*
-> > >                   * try to issue requests directly if the hw queue
-> > > isn't diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h index
-> > > 126021f..946b47a 100644
-> > > --- a/block/blk-mq-sched.h
-> > > +++ b/block/blk-mq-sched.h
-> > > @@ -74,6 +74,13 @@ static inline bool blk_mq_sched_has_work(struct
-> > > blk_mq_hw_ctx *hctx)
-> > >   {
-> > >          struct elevator_queue *e = hctx->queue->elevator;
-> > >
-> > > +       /* If current hctx has not queued any request, there is no
-> > > + need to
-> > > run.
-> > > +        * blk_mq_run_hw_queue() on hctx which has queued IO will
-handle
-> > > +        * running specific hctx.
-> > > +        */
-> > > +       if (!atomic_read(&hctx->elevator_queued))
-> > > +               return false;
-> > > +
-> > >          if (e && e->type->ops.has_work)
-> > >                  return e->type->ops.has_work(hctx);
-> > >
-> > > diff --git a/block/blk-mq.c b/block/blk-mq.c index f73a2f9..48f1824
-> > > 100644
-> > > --- a/block/blk-mq.c
-> > > +++ b/block/blk-mq.c
-> > > @@ -517,8 +517,10 @@ void blk_mq_free_request(struct request *rq)
-> > >          struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-> > >
-> > >          if (rq->rq_flags & RQF_ELVPRIV) {
-> > > -               if (e && e->type->ops.finish_request)
-> > > +               if (e && e->type->ops.finish_request) {
-> > >                          e->type->ops.finish_request(rq);
-> > > +                       atomic_dec(&hctx->elevator_queued);
-> > > +               }
-> > >                  if (rq->elv.icq) {
-> > >                          put_io_context(rq->elv.icq->ioc);
-> > >                          rq->elv.icq = NULL; @@ -2571,6 +2573,7 @@
-> > > blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set
-> > > *set,
-> > >                  goto free_hctx;
-> > >
-> > >          atomic_set(&hctx->nr_active, 0);
-> > > +       atomic_set(&hctx->elevator_queued, 0);
-> > >          if (node == NUMA_NO_NODE)
-> > >                  node = set->numa_node;
-> > >          hctx->numa_node = node;
-> > > diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h index
-> > > 66711c7..ea1ddb1 100644
-> > > --- a/include/linux/blk-mq.h
-> > > +++ b/include/linux/blk-mq.h
-> > > @@ -139,6 +139,10 @@ struct blk_mq_hw_ctx {
-> > >           * shared across request queues.
-> > >           */
-> > >          atomic_t                nr_active;
-> > > +       /**
-> > > +        * @elevator_queued: Number of queued requests on hctx.
-> > > +        */
-> > > +       atomic_t                elevator_queued;
-> > >
-> > >          /** @cpuhp_online: List to store request if CPU is going to
-die */
-> > >          struct hlist_node       cpuhp_online;
-> > >
-> > >
-> > >
-> > Would it make sense to move it into the elevator itself?
-
-I am not sure where exactly I should add this counter since I need counter
-per hctx. Elevator data is per request object.
-Please suggest.
-
+> > > Would it make sense to move it into the elevator itself?
 >
-> That is my initial suggestion, and the counter is just done for bfq &
-mq-
-> deadline, then we needn't to pay the cost for others.
-
-I have updated patch -
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a1123d4..3e0005c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4640,6 +4640,12 @@ static bool bfq_has_work(struct blk_mq_hw_ctx
-*hctx)
- {
-        struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
-
-+       /* If current hctx has not queued any request, there is no need to
-run.
-+        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
-+        * running specific hctx.
-+        */
-+       if (!atomic_read(&hctx->elevator_queued))
-+               return false;
-        /*
-         * Avoiding lock: a race on bfqd->busy_queues should cause at
-         * most a call to dispatch for nothing
-@@ -5554,6 +5561,7 @@ static void bfq_insert_requests(struct blk_mq_hw_ctx
-*hctx,
-                rq = list_first_entry(list, struct request, queuelist);
-                list_del_init(&rq->queuelist);
-                bfq_insert_request(hctx, rq, at_head);
-+              atomic_inc(&hctx->elevator_queued);
-        }
- }
-
-@@ -5925,6 +5933,7 @@ static void bfq_finish_requeue_request(struct
-request *rq)
-
-        if (likely(rq->rq_flags & RQF_STARTED)) {
-                unsigned long flags;
-+              struct blk_mq_hw_ctx *mq_hctx = rq->mq_hctx;
-
-                spin_lock_irqsave(&bfqd->lock, flags);
-
-@@ -5934,6 +5943,7 @@ static void bfq_finish_requeue_request(struct
-request *rq)
-                bfq_completed_request(bfqq, bfqd);
-                bfq_finish_requeue_request_body(bfqq);
-
-+              atomic_dec(&hctx->elevator_queued);
-                spin_unlock_irqrestore(&bfqd->lock, flags);
-        } else {
-                /*
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 126021f..946b47a 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -74,6 +74,13 @@ static inline bool blk_mq_sched_has_work(struct
-blk_mq_hw_ctx *hctx)
- {
-        struct elevator_queue *e = hctx->queue->elevator;
-
-+       /* If current hctx has not queued any request, there is no need to
-run.
-+        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
-+        * running specific hctx.
-+        */
-+       if (!atomic_read(&hctx->elevator_queued))
-+               return false;
-+
-        if (e && e->type->ops.has_work)
-                return e->type->ops.has_work(hctx);
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f73a2f9..82dd152 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2571,6 +2571,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct
-blk_mq_tag_set *set,
-                goto free_hctx;
-
-        atomic_set(&hctx->nr_active, 0);
-+      atomic_set(&hctx->elevator_queued, 0);
-        if (node == NUMA_NO_NODE)
-                node = set->numa_node;
-        hctx->numa_node = node;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b57470e..703ac55 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -533,6 +533,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx
-*hctx,
-                rq = list_first_entry(list, struct request, queuelist);
-                list_del_init(&rq->queuelist);
-                dd_insert_request(hctx, rq, at_head);
-+              atomic_inc(&hctx->elevator_queued);
-        }
-        spin_unlock(&dd->lock);
- }
-@@ -562,6 +563,7 @@ static void dd_prepare_request(struct request *rq)
- static void dd_finish_request(struct request *rq)
- {
-        struct request_queue *q = rq->q;
-+      struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-
-        if (blk_queue_is_zoned(q)) {
-                struct deadline_data *dd = q->elevator->elevator_data;
-@@ -570,15 +572,23 @@ static void dd_finish_request(struct request *rq)
-                spin_lock_irqsave(&dd->zone_lock, flags);
-                blk_req_zone_write_unlock(rq);
-                if (!list_empty(&dd->fifo_list[WRITE]))
--                       blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
-+                       blk_mq_sched_mark_restart_hctx(hctx);
-                spin_unlock_irqrestore(&dd->zone_lock, flags);
-        }
-+       atomic_dec(&hctx->elevator_queued);
- }
-
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
-        struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-
-+       /* If current hctx has not queued any request, there is no need to
-run.
-+        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
-+        * running specific hctx.
-+        */
-+       if (!atomic_read(&hctx->elevator_queued))
-+               return false;
-+
-        return !list_empty_careful(&dd->dispatch) ||
-                !list_empty_careful(&dd->fifo_list[0]) ||
-                !list_empty_careful(&dd->fifo_list[1]);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 66711c7..ea1ddb1 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -139,6 +139,10 @@ struct blk_mq_hw_ctx {
-         * shared across request queues.
-         */
-        atomic_t                nr_active;
-+       /**
-+        * @elevator_queued: Number of queued requests on hctx.
-+        */
-+       atomic_t                elevator_queued;
-
-        /** @cpuhp_online: List to store request if CPU is going to die */
-        struct hlist_node       cpuhp_online;
-
-
+> I am not sure where exactly I should add this counter since I need
+counter per
+> hctx. Elevator data is per request object.
+> Please suggest.
 >
-> Thanks,
-> Ming
+> >
+> > That is my initial suggestion, and the counter is just done for bfq &
+> > mq- deadline, then we needn't to pay the cost for others.
+>
+> I have updated patch -
+>
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c index
+a1123d4..3e0005c
+> 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -4640,6 +4640,12 @@ static bool bfq_has_work(struct blk_mq_hw_ctx
+> *hctx)  {
+>         struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+>
+> +       /* If current hctx has not queued any request, there is no need
+to run.
+> +        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
+> +        * running specific hctx.
+> +        */
+> +       if (!atomic_read(&hctx->elevator_queued))
+> +               return false;
+>         /*
+>          * Avoiding lock: a race on bfqd->busy_queues should cause at
+>          * most a call to dispatch for nothing @@ -5554,6 +5561,7 @@
+static void
+> bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
+>                 rq = list_first_entry(list, struct request, queuelist);
+>                 list_del_init(&rq->queuelist);
+>                 bfq_insert_request(hctx, rq, at_head);
+> +              atomic_inc(&hctx->elevator_queued);
+>         }
+>  }
+>
+> @@ -5925,6 +5933,7 @@ static void bfq_finish_requeue_request(struct
+> request *rq)
+>
+>         if (likely(rq->rq_flags & RQF_STARTED)) {
+>                 unsigned long flags;
+> +              struct blk_mq_hw_ctx *mq_hctx = rq->mq_hctx;
+>
+>                 spin_lock_irqsave(&bfqd->lock, flags);
+>
+> @@ -5934,6 +5943,7 @@ static void bfq_finish_requeue_request(struct
+> request *rq)
+>                 bfq_completed_request(bfqq, bfqd);
+>                 bfq_finish_requeue_request_body(bfqq);
+>
+> +              atomic_dec(&hctx->elevator_queued);
+>                 spin_unlock_irqrestore(&bfqd->lock, flags);
+>         } else {
+>                 /*
+> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h index
+> 126021f..946b47a 100644
+> --- a/block/blk-mq-sched.h
+> +++ b/block/blk-mq-sched.h
+> @@ -74,6 +74,13 @@ static inline bool blk_mq_sched_has_work(struct
+> blk_mq_hw_ctx *hctx)  {
+>         struct elevator_queue *e = hctx->queue->elevator;
+>
+> +       /* If current hctx has not queued any request, there is no need
+to run.
+> +        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
+> +        * running specific hctx.
+> +        */
+> +       if (!atomic_read(&hctx->elevator_queued))
+> +               return false;
+> +
+
+I have missed this. I will remove above code since it is now managed
+within mq-deadline and bfq-iosched *has_work* callback.
+
+>         if (e && e->type->ops.has_work)
+>                 return e->type->ops.has_work(hctx);
+>
