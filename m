@@ -2,185 +2,113 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B57C433E1
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1751C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:36:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 705D020702
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:23:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DAKuPd7q"
+	by mail.kernel.org (Postfix) with ESMTP id 8A0DA20781
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:36:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592933791;
+	bh=BXpjKMRjKVDNEazo5/y3JtFBbZ+zFAHaaJVS6tJxJAU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=PAKA/8Fc0mAVpgzbugA5bYDszHXmRhWkkA8VQtDHVBPUARKFrFP+gExUwf4K/qv8l
+	 fehaPn0EhZ4xtX5GET1OPVK7pJ7eZUxhpKgiAPIdxAUwPIiS3KL0S69YZm1hz4zzk6
+	 yj8u21esyuzsTonWYK1Vvb6N/YiAh6hoeAm+kGIw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732969AbgFWRX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 13:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53218 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728916AbgFWRXZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:23:25 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E135C061755
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 10:23:24 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id fc4so10052165qvb.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 10:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gw8psqz+LsdrQykbanEcSIZrUl30WUVM4eD6OVwcjMI=;
-        b=DAKuPd7qO7XZ8um/Zh8jdfigims3lKCWHHkVOvR8gOxvCwuxxhM4+CgFwTEwzxhXMS
-         dH+ugBNS8/MTeDx/VaPb1fSwN3CyWlGQpnAfaDGVEWTIH53ooIwS3Nv3+dxcRPBO9kHZ
-         vpDX+YAQMZ6ZBuDEUNzMknpmNe9X4qE219JmF6a78vNVp5LVn22wBwhH92TmrwNQCMF4
-         FWfYZ6K+UBR89Y+1AhBFYG3JOdYLiEIWbWeciM5OYSICF08QeL8kEaxJcf8MxO6JpKP+
-         XYFiWVjMNQYJ5V4aJOPpZyaPKvjaNsvd6vAZNbwMAaS9+cIIfxtRRd8RDyOT/UWjzzu+
-         a96Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gw8psqz+LsdrQykbanEcSIZrUl30WUVM4eD6OVwcjMI=;
-        b=niR+ZwboddOC/a9fNhb6krPW8UlrDqQsrkB7sS0+b8kFgYHFnh+s/YsXkQ4RuYQ04v
-         1TtgsnfSgEnYuqiNdmYH51EzHl4jAwCF8v0qfpeOQenuX4h4vopFPM27uR4oaW/U45AG
-         zdqUYYUtKY8x2dhiYD4PjCXRBj+9RpthnxPEKU2AxLbiUdMwEwL20mKHoleFC6b8FhM1
-         og4/9HpK8BDipFGFw1tLYb62e9/N9DR/iPgTwLPlcIEGlYaKx9PgskWxf2WicW/yWkHw
-         jnYVb9evPNQXMG7491dHhgafetgCocF+FJDBwXMNM2XVeK2aDiSxRjH5pqd44Ta584Jd
-         RYOA==
-X-Gm-Message-State: AOAM531eqSujR93WTFg9LuAW+hKrvtCPZY7fDEReJcLml7/Lt7jHK5IV
-        Zg60fQUAKU6g2L+znHP6/gna9Q==
-X-Google-Smtp-Source: ABdhPJzTDOZeKHcl2foVCoytl0us5md/Z1N3AYXOx/ECHpEq5TE1o7N9efFhag5/TNMwYua5UWRxlg==
-X-Received: by 2002:ad4:49aa:: with SMTP id u10mr28418798qvx.162.1592933003146;
-        Tue, 23 Jun 2020 10:23:23 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id m26sm1280405qtm.73.2020.06.23.10.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2020 10:23:22 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.93)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jnmdl-00Cxwy-Ih; Tue, 23 Jun 2020 14:23:21 -0300
-Date:   Tue, 23 Jun 2020 14:23:21 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
-        kernel test robot <rong.a.chen@intel.com>
-Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
- late_initcall level
-Message-ID: <20200623172321.GC6578@ziepe.ca>
-References: <20200617182046.GI6578@ziepe.ca>
- <20200617190756.GA2721989@unreal>
- <20200617192642.GL6578@ziepe.ca>
- <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
- <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
- <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
- <20200623121721.GZ6578@ziepe.ca>
- <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
- <20200623142400.GB6578@ziepe.ca>
- <CAJpMwygDGpzmhzeYcy=14sBneSriBcRT6B2sO1rubkQLRKnOjA@mail.gmail.com>
+        id S2387585AbgFWRg3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 13:36:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33720 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387579AbgFWRg2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:36:28 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 702F6207D0;
+        Tue, 23 Jun 2020 17:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592933788;
+        bh=BXpjKMRjKVDNEazo5/y3JtFBbZ+zFAHaaJVS6tJxJAU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=df4uIvQV8WHSzz9yTfCSUuW/6vc4BD6avJuNVgoL47JAS+4YtmVYzBH0DyN/S75sE
+         xl/Ew6HSHnBXWMbHylo0XwVRub/lzh1I535ENFhBu82W1nsQ8It+lSitCqKOSbEgk+
+         EQL3zA2JCGOidfTA/skZ2IDtgl0LK1nPbhwWVm7w=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 23/24] block: update hctx map when use multiple maps
+Date:   Tue, 23 Jun 2020 13:35:58 -0400
+Message-Id: <20200623173559.1355728-23-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200623173559.1355728-1-sashal@kernel.org>
+References: <20200623173559.1355728-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJpMwygDGpzmhzeYcy=14sBneSriBcRT6B2sO1rubkQLRKnOjA@mail.gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 05:05:51PM +0530, Haris Iqbal wrote:
-> On Tue, Jun 23, 2020 at 7:54 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Jun 23, 2020 at 07:15:03PM +0530, Haris Iqbal wrote:
-> > > On Tue, Jun 23, 2020 at 5:47 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > >
-> > > > On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
-> > > > > Hi Jason and Leon,
-> > > > >
-> > > > > Did you get a chance to look into my previous email?
-> > > >
-> > > > Was there a question?
-> > >
-> > > Multiple actually :)
-> > >
-> > > >
-> > > > Jason
-> > >
-> > > In response to your emails,
-> > >
-> > > > Somehow nvme-rdma works:
-> > >
-> > > I think that's because the callchain during the nvme_rdma_init_module
-> > > initialization stops at "nvmf_register_transport()". Here only the
-> > > "struct nvmf_transport_ops nvme_rdma_transport" is registered, which
-> > > contains the function "nvme_rdma_create_ctrl()". I tested this in my
-> > > local setup and during kernel boot, that's the extent of the
-> > > callchain.
-> > > The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
-> > > called later from "nvmf_dev_write()". I am not sure when this is
-> > > called, probably when the "discover" happens from the client side or
-> > > during the server config.
-> > >
-> > > It seems that the "rdma_bind_addr()" is called by the nvme rdma
-> > > module; but during the following events
-> > > 1) When a discover happens from the client side. Call trace for that looks like,
-> > > [ 1098.409398] nvmf_dev_write
-> > > [ 1098.409403] nvmf_create_ctrl
-> > > [ 1098.414568] nvme_rdma_create_ctrl
-> > > [ 1098.415009] nvme_rdma_setup_ctrl
-> > > [ 1098.415010] nvme_rdma_configure_admin_queue
-> > > [ 1098.415010] nvme_rdma_alloc_queue
-> > > [ 1098.415032] rdma_resolve_addr
-> > > [ 1098.415032] cma_bind_addr
-> > > [ 1098.415033] rdma_bind_addr
-> > >
-> > > 2) When a connect happens from the client side. Call trace is the same
-> > > as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
-> > > n being the number of IO queues being created.
-> > >
-> > > On the server side, when an nvmf port is enabled, that also triggers a
-> > > call to "rdma_bind_addr()", but that is not from the nvme rdma module.
-> > > may be nvme target rdma? (not sure).
-> > >
-> > > Does this make sense or am I missing something here?
-> >
-> > It make sense, delaying creating and CM ID's until user space starts
-> > will solve this init time problme
-> 
-> Right, and the patch is trying to achieve the delay by changing the
-> init level to "late_initcall()"
+From: Weiping Zhang <zhangweiping@didiglobal.com>
 
-It should not be done with initcall levels
+[ Upstream commit fe35ec58f0d339221643287bbb7cee15c93a5389 ]
 
-> > Right rdma_create_id() must precede anything that has problems, and it
-> > should not be done from module_init.
-> 
-> I understand this, but I am not sure why that is; as in why it should
-> not be done from module_init?
+There is an issue when tune the number for read and write queues,
+if the total queue count was not changed. The hctx->type cannot
+be updated, since __blk_mq_update_nr_hw_queues will return directly
+if the total queue count has not been changed.
 
-Because that is how our module ordering scheme works
+Reproduce:
 
-> > It is not OK to create RDMA CM IDs outside
-> > a client - CM IDs are supposed to be cleaned up when the client is
-> > removed.
-> >
-> > Similarly they are supposed to be created from the client attachment.
-> 
-> This again is a little confusing to me, since what I've observed in
-> nvmt is, when a server port is created, the "rdma_bind_addr()"
-> function is called.
-> And this goes well with the server/target and client/initiator model,
-> where the server has to get ready and start listening before a client
-> can initiate a connection.
-> What am I missing here?
+dmesg | grep "default/read/poll"
+[    2.607459] nvme nvme0: 48/0/0 default/read/poll queues
+cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
+     48 default
 
-client means a struct ib_client
+tune the write queues to 24:
+echo 24 > /sys/module/nvme/parameters/write_queues
+echo 1 > /sys/block/nvme0n1/device/reset_controller
 
-Jason
+dmesg | grep "default/read/poll"
+[  433.547235] nvme nvme0: 24/24/0 default/read/poll queues
 
-> 
-> >
-> > Jason
-> 
+cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
+     48 default
+
+The driver's hardware queue mapping is not same as block layer.
+
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0550366e25d8b..f1b930a300a38 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3279,7 +3279,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 
+ 	if (set->nr_maps == 1 && nr_hw_queues > nr_cpu_ids)
+ 		nr_hw_queues = nr_cpu_ids;
+-	if (nr_hw_queues < 1 || nr_hw_queues == set->nr_hw_queues)
++	if (nr_hw_queues < 1)
++		return;
++	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+ 		return;
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-- 
+2.25.1
+
