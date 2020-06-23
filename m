@@ -2,99 +2,104 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94234C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE32C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 16:56:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6446420781
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16C6320774
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 16:56:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592924378;
-	bh=/Qkci1EEnMCWNpzEwR13xM7o3TscwH9pyJgzBww5lv0=;
+	s=default; t=1592931409;
+	bh=cjEiAH1obg+QZUqB4SECDeacZFOCOFzZsfaNXAFBmn0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=AVrjjBxZHix+bM8MeftXptzCxgb9G5SeQe+QYqQGZnfbojfuJb7f7Mx9PO0mVgfap
-	 g7OHyGrbDDMrga+KIsABGaJeyUaPSjYJPoZigVq06YJfy0TZ56/IcD48K+n+L05U7a
-	 lmZJorYfue2omGEfKjZKKprAGBN4qrjaRl/UQ+yE=
+	b=Wfz8WIe7fskWqPBWtSDDePd7U80bOu/8M1ZsiurymZcAhQgNB7A4vJGEfQxQA7acq
+	 lEdi8FltcmvS9TfevoztpujVtx6lAJ0c5Yj4eo4GYJM9fNME08xWZNoZJqV38LS1Xp
+	 2+lZnZXOyDMghuO0NgoZBww9Ow/mAkwzpu2a0m2k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732941AbgFWO7h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 10:59:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732887AbgFWO7h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 10:59:37 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4D12920723;
-        Tue, 23 Jun 2020 14:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592924377;
-        bh=/Qkci1EEnMCWNpzEwR13xM7o3TscwH9pyJgzBww5lv0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1e47alOJYPzSlqwRXo9pkqSlo+vYqR5JzNXKOTIptcly8djVuf7hlRw9DHD/zIkjI
-         8DVDrzswRdL7os0bUJTD/MtBbt5wC1fUTuYJx2IjUtofnGwF6g/LxSH8qFZzMY7/4P
-         8I+QvPwFym98s5b2clUJ9vVBFASKmTrKUz/gc1Lw=
-Date:   Tue, 23 Jun 2020 07:59:34 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
- support
-Message-ID: <20200623145934.GC1288900@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20200622162530.1287650-1-kbusch@kernel.org>
- <20200622162530.1287650-4-kbusch@kernel.org>
- <69e8e88c-097b-368d-58f4-85d11110386d@grimberg.me>
- <20200623112551.GB117742@localhost.localdomain>
+        id S1732416AbgFWQ4s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 12:56:48 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34568 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732292AbgFWQ4r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 12:56:47 -0400
+Received: by mail-pl1-f193.google.com with SMTP id d12so3375945ply.1;
+        Tue, 23 Jun 2020 09:56:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JDvdZbZLgDkFFSdCv0TnjjXgUyD2AB2yEimWstVnawg=;
+        b=uKhk2r5TqBmH0iwKPP5O1OBLcS3/eEY194eSg9VcRszPOEy9mlcPIQ6W1sgWFHaMVa
+         5S3LEiLsszIzLBkqYxpBY5YEpBC5KOlrnGE0ZKS5oBkdqc1rHISk865P7VL6G+hjIOcJ
+         PRrp7zjuMf2VSEugGTJ94yJz0rZYzN0oi6PyZr6ztuOtcbB/iZ7C/eM4wPDzr8oaHNTH
+         WSphVDOxArvWXhfuK0IG5KcX6P9zHr/VCeR7c2Jdsbh7PqJHdxd4NK29ScsAhvottX8O
+         gMVL37MtOoiZuoyHLNNclCxF0W+twbsoE3O6f+HmTxO1MGxVv8I2p1pG1PHNG0kwjvn8
+         qREQ==
+X-Gm-Message-State: AOAM530D00WVK1pSyRN9N/XpGqcFekBIfHu0LTxuqiAAGSPGrTW1HAcv
+        a7HSc3c6r9PWFy6J83tpo1U=
+X-Google-Smtp-Source: ABdhPJzCFTSHbh94OELz47L0BiNYIconLJwPLhznXY2yEus6l/oUG0gykNuFRS7NKmtbjU+o5z156w==
+X-Received: by 2002:a17:902:7045:: with SMTP id h5mr24682778plt.151.1592931407230;
+        Tue, 23 Jun 2020 09:56:47 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id t22sm2801970pjy.32.2020.06.23.09.56.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2020 09:56:45 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 9E0F240430; Tue, 23 Jun 2020 16:56:44 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 16:56:44 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
+        jack@suse.cz, ming.lei@redhat.com, nstange@suse.de,
+        akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
+        martin.petersen@oracle.com, jejb@linux.ibm.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v7 5/8] loop: be paranoid on exit and prevent new
+ additions / removals
+Message-ID: <20200623165644.GB4332@42.do-not-panic.com>
+References: <20200619204730.26124-1-mcgrof@kernel.org>
+ <20200619204730.26124-6-mcgrof@kernel.org>
+ <7e76d892-b5fd-18ec-c96e-cf4537379eba@acm.org>
+ <20200622122742.GU11244@42.do-not-panic.com>
+ <14dc9294-fa99-cad0-871b-b69f138e8ac9@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200623112551.GB117742@localhost.localdomain>
+In-Reply-To: <14dc9294-fa99-cad0-871b-b69f138e8ac9@acm.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 11:25:53AM +0000, Niklas Cassel wrote:
-> On Tue, Jun 23, 2020 at 01:53:47AM -0700, Sagi Grimberg wrote:
-> > >   static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
-> > > @@ -1930,6 +1950,15 @@ static int __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
-> > >   	if (ns->lba_shift == 0)
-> > >   		ns->lba_shift = 9;
-> > > +	switch (ns->head->ids.csi) {
-> > > +	case NVME_CSI_NVM:
-> > > +		break;
-> > > +	default:
-> > > +		dev_warn(ctrl->device, "unknown csi:%d ns:%d\n",
-> > > +			ns->head->ids.csi, ns->head->ns_id);
-> > > +		return -ENODEV;
-> > > +	}
+On Mon, Jun 22, 2020 at 07:16:15PM -0700, Bart Van Assche wrote:
+> On 2020-06-22 05:27, Luis Chamberlain wrote:
+> > Note: this will bring you sanity if you try to figure out *why* we still
+> > get:
 > > 
-> > Not sure we need a switch-case statement for a single case target...
+> > [235530.144343] debugfs: Directory 'loop0' with parent 'block' already present!
+> > [235530.149477] blktrace: debugfs_dir not present for loop0 so skipping
+> > [235530.232328] debugfs: Directory 'loop0' with parent 'block' already present!
+> > [235530.238962] blktrace: debugfs_dir not present for loop0 so skipping
+> > 
+> > If you run run_0004.sh from break-blktrace [0]. Even with all my patches
+> > merged we still run into this. And so the bug lies within the block
+> > layer or on the driver. I haven't been able to find the issue yet.
+> > 
+> > [0] https://github.com/mcgrof/break-blktrace
 > 
-> I would consider it two cases. A supported CSI or a non-supported CSI
-> (which means any CSI value != NVME_CSI_NVM).
-> 
-> However, a follow up patch (patch 5/5 in this series) adds another case
-> to this switch-case statement (NVME_CSI_ZNS).
-> 
-> I guess this patch could have used an if-else statement, and patch 5/5
-> replaced the if-statement with a switch-case.
-> However, since a patch in the same series actually adds another case,
-> I think that it is more clear this way.
-> (A switch-case with only two cases added, in a patch that is not the last
-> one in the series, suggests (at least to me), that it will most likely be
-> extended in a following patch.)
+> Thanks Luis for having shared this information. If I can find the time I
+> will have a look into this myself.
 
-Yeah, this patch is laying the foundation for future command sets.
+Let's keep track of it:
+
+https://bugzilla.kernel.org/show_bug.cgi?id=208301
+
+  Luis
