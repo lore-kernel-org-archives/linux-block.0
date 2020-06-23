@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AF6C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D92C433E0
 	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:18:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 088142082F
+	by mail.kernel.org (Postfix) with ESMTP id 9D8222082F
 	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:18:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvmYPyeH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6rlJ4GE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387509AbgFWTSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 15:18:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45593 "EHLO
+        id S2387502AbgFWTSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 15:18:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36725 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387489AbgFWTSA (ORCPT
+        by vger.kernel.org with ESMTP id S1733308AbgFWTSB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 15:18:00 -0400
+        Tue, 23 Jun 2020 15:18:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592939879;
+        s=mimecast20190719; t=1592939880;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Mw38SrAOK4PZpvbcKWC3wVsl3jfKtIJjGqTKE+RHMHI=;
-        b=JvmYPyeHwWoE0WzsFKt2BjyaXGtG8yxD4GWb3RPmjqnN6qaE16B0I9w6KMwXzCRflhER67
-        OB5xwJ50ORt6aZFPHyEVtZE7ssQhKGH6eQvXTtlgfBVM/1alJyIKILwMm1z2N+g2od21nK
-        ELjijTJTpDcKzr+wtay6+lO1rARm9Io=
+        bh=2pEwcRgLvtMw24J+haf2mTbN9rcYAaYqY5Ij/FN/Jf0=;
+        b=R6rlJ4GEa/Zb4o3C+1+OY9OruU/Vq06n4eiFYzwD4pJtvaQELG7jmGMSPCZIXXVM2wFk7p
+        ow6kxYfF1jEYD7o0D7r8dqdLGkD0Z8KeWZbOx7ENW0UT+l9B/+q8WmMdSQHhHuRPj9ngEG
+        NPjFYkS5FrmFBy7NTFMsargoCVB6bZQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-h5LrkLiZO1yElnw2pIGn3w-1; Tue, 23 Jun 2020 15:17:58 -0400
-X-MC-Unique: h5LrkLiZO1yElnw2pIGn3w-1
+ us-mta-46-HZBeNS4BOFK4k7JsVqXFwQ-1; Tue, 23 Jun 2020 15:17:59 -0400
+X-MC-Unique: HZBeNS4BOFK4k7JsVqXFwQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 057E418585A1;
-        Tue, 23 Jun 2020 19:17:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8344410059A5;
+        Tue, 23 Jun 2020 19:17:58 +0000 (UTC)
 Received: from sulaco.redhat.com (unknown [10.3.128.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F0B4A71694;
-        Tue, 23 Jun 2020 19:17:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 730E171699;
+        Tue, 23 Jun 2020 19:17:57 +0000 (UTC)
 From:   Tony Asleson <tasleson@redhat.com>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [RFC PATCH v3 4/8] buffer_io_error: Use dev_printk
-Date:   Tue, 23 Jun 2020 14:17:45 -0500
-Message-Id: <20200623191749.115200-5-tasleson@redhat.com>
+Subject: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
+Date:   Tue, 23 Jun 2020 14:17:46 -0500
+Message-Id: <20200623191749.115200-6-tasleson@redhat.com>
 In-Reply-To: <20200623191749.115200-1-tasleson@redhat.com>
 References: <20200623191749.115200-1-tasleson@redhat.com>
 MIME-Version: 1.0
@@ -59,34 +59,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Utilize the dev_printk function which will add structured data
+to the log message.
+
 Signed-off-by: Tony Asleson <tasleson@redhat.com>
 ---
- fs/buffer.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/ata/libata-core.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index a60f60396cfa..97b8f455c031 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -133,10 +133,16 @@ __clear_page_buffers(struct page *page)
- 
- static void buffer_io_error(struct buffer_head *bh, char *msg)
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index beca5f91bb4c..44c874367fe3 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -6475,6 +6475,7 @@ EXPORT_SYMBOL(ata_link_printk);
+ void ata_dev_printk(const struct ata_device *dev, const char *level,
+ 		    const char *fmt, ...)
  {
--	if (!test_bit(BH_Quiet, &bh->b_state))
--		printk_ratelimited(KERN_ERR
-+	if (!test_bit(BH_Quiet, &bh->b_state)) {
-+		struct device *gendev;
-+
-+		gendev = (bh->b_bdev->bd_disk) ?
-+			disk_to_dev(bh->b_bdev->bd_disk) : NULL;
-+
-+		dev_err_ratelimited(gendev,
- 			"Buffer I/O error on dev %pg, logical block %llu%s\n",
- 			bh->b_bdev, (unsigned long long)bh->b_blocknr, msg);
-+	}
- }
++	const struct device *gendev;
+ 	struct va_format vaf;
+ 	va_list args;
  
- /*
+@@ -6483,9 +6484,12 @@ void ata_dev_printk(const struct ata_device *dev, const char *level,
+ 	vaf.fmt = fmt;
+ 	vaf.va = &args;
+ 
+-	printk("%sata%u.%02u: %pV",
+-	       level, dev->link->ap->print_id, dev->link->pmp + dev->devno,
+-	       &vaf);
++	gendev = (dev->sdev) ? &dev->sdev->sdev_gendev : &dev->tdev;
++
++	dev_printk(level, gendev, "ata%u.%02u: %pV",
++			dev->link->ap->print_id,
++			dev->link->pmp + dev->devno,
++			&vaf);
+ 
+ 	va_end(args);
+ }
 -- 
 2.25.4
 
