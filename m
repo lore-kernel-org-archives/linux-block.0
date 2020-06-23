@@ -5,51 +5,51 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E296C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 094F8C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:42:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3623520781
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:39:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFD8620809
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:42:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592933974;
-	bh=wsgtA4hDnlZHqZBvwYKpvBWEaEx/+oDwU8YNjbN6jQk=;
+	s=default; t=1592934162;
+	bh=l/Fx7AtissAOI7sKQ4NNbynURHbMMk6kMVPfC3gUQEM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=E8l+tZv9zaz2L0XVDkz60LzDJznwS9sZZuE92KeqJVGvvKsz5Ws7A7y1CNoiiufYd
-	 SoZ4nI5TwhIiQQJvmX75fhBXDHdJbtcO2WjoBvOhiAN/025HAF1+3ZkhXCdrPp1xse
-	 WsXT7Zy2peCnijF1oVwADtLcGPZT6CmsdTlUOFl0=
+	b=G1j8yoxc7E0HIzrVbdVg06lb0mSENChlpXRqXFDjO9iDadp2kmgtvdn091X0hAZBx
+	 cK3k+/j/pLGjCqsEBy2pJIVmULHYY9UEOAFP21rlnLcfdgmgNceH+nVuqsnA7KY9hk
+	 Vj7CWpde/Js17XIjzMkg8HDwgpZ0YENfy+03/jdE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387581AbgFWRg2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 13:36:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33686 "EHLO mail.kernel.org"
+        id S1733292AbgFWRmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 13:42:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60748 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733113AbgFWRg2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:36:28 -0400
+        id S2387423AbgFWRfz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:35:55 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0FF5420781;
-        Tue, 23 Jun 2020 17:36:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AEDA620780;
+        Tue, 23 Jun 2020 17:35:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592933787;
-        bh=wsgtA4hDnlZHqZBvwYKpvBWEaEx/+oDwU8YNjbN6jQk=;
+        s=default; t=1592933754;
+        bh=l/Fx7AtissAOI7sKQ4NNbynURHbMMk6kMVPfC3gUQEM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lctivPedoyN1Qbjtqhngt5bPLhEN60RpMMsTl4rblXORQjtjJjzJENeRzErGDB8kz
-         5aT67+FoCTf2AdVNJNvbHLFZDmmPrhvGQhgSB9HVGRYwUov9HjnwUroo3BcKtq2FzQ
-         ojavvgG0OU2c40UvJX6m/y691GY0kp/PjfDVCtUY=
+        b=2V8flgVaurnW99fxuk21cfIsW1wYFgZLYbtFwLuU1sR29SrDdQ2OXbMckJBgZ07t5
+         9lqFyPyIYswdMJqug/ekA3X8RmrBa7K6JI7FGteeE2hd46f2iMSXoLD9ed7XgtmsCs
+         LIZXGE6B8SLgyV4kQBY9/ILQy7q0dxkL408NOKIU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luis Chamberlain <mcgrof@kernel.org>, Jan Kara <jack@suse.cz>,
         Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 22/24] blktrace: break out of blktrace setup on concurrent calls
-Date:   Tue, 23 Jun 2020 13:35:57 -0400
-Message-Id: <20200623173559.1355728-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 25/28] blktrace: break out of blktrace setup on concurrent calls
+Date:   Tue, 23 Jun 2020 13:35:20 -0400
+Message-Id: <20200623173523.1355411-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200623173559.1355728-1-sashal@kernel.org>
-References: <20200623173559.1355728-1-sashal@kernel.org>
+In-Reply-To: <20200623173523.1355411-1-sashal@kernel.org>
+References: <20200623173523.1355411-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -114,7 +114,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index e7e483cdbea61..5a1acb5b4c378 100644
+index ca39dc3230cb3..3a89aeb73d690 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
 @@ -3,6 +3,9 @@
@@ -127,7 +127,7 @@ index e7e483cdbea61..5a1acb5b4c378 100644
  #include <linux/kernel.h>
  #include <linux/blkdev.h>
  #include <linux/blktrace_api.h>
-@@ -495,6 +498,16 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+@@ -494,6 +497,16 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
  	 */
  	strreplace(buts->name, '/', '_');
  
