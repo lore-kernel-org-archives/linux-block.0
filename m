@@ -2,113 +2,72 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B055FC433E1
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EFCC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:43:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FA76206D4
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:42:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592934171;
-	bh=VdLNrCbuwMYCY9QDHYOlAwoBGMDQ4WJP7+Rn3wVFuD4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=i9l2/fuW/qmD1naEGZZsTn5Ft6ueo4EJZog2PmFivPUPE5zna5Dr9XP9pbnjjW5Ku
-	 CQvK90xQIU1a5jGYGarTvPc5zgnRoIq2d7j9FLGwmygnVsayXh5Sjcc1OlZHu3/7PX
-	 rn76ESfxfxQlvt/kd4osi7OKZlbgfBwOkTwOY7Q4=
+	by mail.kernel.org (Postfix) with ESMTP id 386C6206D4
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733119AbgFWRml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 13:42:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60810 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387427AbgFWRf5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:35:57 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3F774207E8;
-        Tue, 23 Jun 2020 17:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592933757;
-        bh=VdLNrCbuwMYCY9QDHYOlAwoBGMDQ4WJP7+Rn3wVFuD4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gwzAXhEZhnQnjzAfxTiXhq0zAP7qwWwldtvRssbuepHeyz9/e/Ks3p+lTYRmfRiK1
-         ntAFAdEeyQQwo1JRXW16cPa2ZxyM9rgXL5MxewFqliNZ5Yg5M30Dx1jUwdDLJfTd1o
-         xgtgQ9OLJNU373jIs2sd6m6l221ftafMAocpb0/I=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 27/28] block: update hctx map when use multiple maps
-Date:   Tue, 23 Jun 2020 13:35:22 -0400
-Message-Id: <20200623173523.1355411-27-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200623173523.1355411-1-sashal@kernel.org>
-References: <20200623173523.1355411-1-sashal@kernel.org>
+        id S1733050AbgFWRnM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 13:43:12 -0400
+Received: from mail-pg1-f176.google.com ([209.85.215.176]:41372 "EHLO
+        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733210AbgFWRnL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:43:11 -0400
+Received: by mail-pg1-f176.google.com with SMTP id b5so10172275pgm.8
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 10:43:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ckiUV8HeIYQ/rsOxCbMNm/VjxU8EUESI63njQcctYnQ=;
+        b=eOykswMPEGcxTFuFFItlTF6Jr3LxYnfZ/ezjLnUx58dv7CuP7FdKtBMyn6UI8uBy1Q
+         6k0jJDrhAJj8/mgWsQz+9V1fj5jb/+lB2NpIzD1hC/MGgEjayaD+hIHAeOaxTSFarCC9
+         zdYqbnvbYOwl5iouKIdFC6YqowB1jQ6XAujudDOnvSscVxz0L/WwqM5xPgoDZrK1gari
+         J5mMPgiMhH80XG58Gf+5qa/JDbenC+0uGe2OaFZRbw9pu4YRo2+JdxyDeY0F97Ofka0y
+         6QnI6U44R9RzrpYeMxqhjWjqJrjWlw6qkZ84emlTVs5ceu2HO6JmgW3EziLZ5NhCuLfL
+         bmxw==
+X-Gm-Message-State: AOAM530vzL/PI220Oatle4PEMEDDMzkEJPqzp9Ia8lVEDTwwvgUmOuyl
+        Q7FDMN8s9/gavBa2JcEt8xE=
+X-Google-Smtp-Source: ABdhPJzvOrvwr2DLTVVIde67x/c775RYVIHNXY8NHcSVpga+reIuikFYQrsLZ8mW0Kxoq9kCLhz+EQ==
+X-Received: by 2002:a65:6846:: with SMTP id q6mr17025054pgt.397.1592934191009;
+        Tue, 23 Jun 2020 10:43:11 -0700 (PDT)
+Received: from ?IPv6:2601:647:4802:9070:acd7:a900:b9f:8b8b? ([2601:647:4802:9070:acd7:a900:b9f:8b8b])
+        by smtp.gmail.com with ESMTPSA id c9sm17759079pfp.100.2020.06.23.10.43.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 10:43:10 -0700 (PDT)
+Subject: Re: [PATCHv3 4/5] nvme: support for multi-command set effects
+To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+        hch@lst.de, linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     Keith Busch <keith.busch@wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>,
+        Daniel Wagner <dwagner@suse.de>
+References: <20200622162530.1287650-1-kbusch@kernel.org>
+ <20200622162530.1287650-5-kbusch@kernel.org>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f78451a9-0df4-58c9-2398-bcec40dcddab@grimberg.me>
+Date:   Tue, 23 Jun 2020 10:43:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200622162530.1287650-5-kbusch@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Weiping Zhang <zhangweiping@didiglobal.com>
+Looks good,
 
-[ Upstream commit fe35ec58f0d339221643287bbb7cee15c93a5389 ]
-
-There is an issue when tune the number for read and write queues,
-if the total queue count was not changed. The hctx->type cannot
-be updated, since __blk_mq_update_nr_hw_queues will return directly
-if the total queue count has not been changed.
-
-Reproduce:
-
-dmesg | grep "default/read/poll"
-[    2.607459] nvme nvme0: 48/0/0 default/read/poll queues
-cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
-     48 default
-
-tune the write queues to 24:
-echo 24 > /sys/module/nvme/parameters/write_queues
-echo 1 > /sys/block/nvme0n1/device/reset_controller
-
-dmesg | grep "default/read/poll"
-[  433.547235] nvme nvme0: 24/24/0 default/read/poll queues
-
-cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
-     48 default
-
-The driver's hardware queue mapping is not same as block layer.
-
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a702761e2cc..8f580e66691b9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3328,7 +3328,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	if (set->nr_maps == 1 && nr_hw_queues > nr_cpu_ids)
- 		nr_hw_queues = nr_cpu_ids;
--	if (nr_hw_queues < 1 || nr_hw_queues == set->nr_hw_queues)
-+	if (nr_hw_queues < 1)
-+		return;
-+	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
- 		return;
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
--- 
-2.25.1
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
