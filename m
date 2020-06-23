@@ -2,154 +2,131 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C49ADC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 18:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C18C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:17:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F4E02081A
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 18:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CF1D2084D
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:17:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VRPOqKgX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcUaJKNQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387561AbgFWS3v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 14:29:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35246 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387554AbgFWS3t (ORCPT
+        id S2387427AbgFWTR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 15:17:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58516 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1733308AbgFWTR4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 14:29:49 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374AEC061797
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 11:29:49 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id i12so1837895pju.3
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 11:29:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JXkDSAr5/uPdypFT+vPhb9QM0XECCw1QogkIjza9trI=;
-        b=VRPOqKgXBbe1omCau4oEOar/p3bhX1hnmkDK5oo6kzWoboZd6SthW3HQ/fnF48E5Ad
-         TFy6wVC1Zt0tVzcHOtTOw47hdeOauaMgmaZ6zltDMfNdLob+S/bzF8RmsABX4aqnrS72
-         FqSw42FCWi78K/1FW37NBnAtRs40JSIujuQZ/C35kNhgObkKHAK+mu644bPs+DnywUvm
-         fYYXdKXmrR/Epl78LsQPaZhh4kpgqCqvEbEKQBq3LNEoOjFO3Gb/VXUTw5HcjdoODVkn
-         jAQBGKwdodjJ4m51Dq2h17KJmJpx4MvyUs2jS+Pi8XwYstLDwRvgem5B+kNI/TaA60cZ
-         bdTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JXkDSAr5/uPdypFT+vPhb9QM0XECCw1QogkIjza9trI=;
-        b=T2weBdhJuQ62uWu7Z2Bbw2K8GB7GxZcfvTOoY+JZ23QEFS/IGtQkzzMHAjwxnnYcFV
-         gEfIL3L1GgsnGT0pSMVu1FuFP8XgplHhEP8yRZUPJeP5vdjbv7aQ8JdctCmvUy095if2
-         grEoew8M5Aym1thjcYTQZEW2b5TDR7qUZ1Jt7jEDfTZyQicvVHwD48t9WnTKUs4MURgD
-         MVGCZVWP1dt69xVnlSUZZcMItf+MCIH1bpYiDPq70L0pLCLtTUUVC+L6S+sczRRlyx6s
-         C8IYBdnONrNV74w7r58nh0jTiCEiHWHV+KOuc7hiyvsPmse8hqd46sh9QQcRwzZ7cjIC
-         t3Dg==
-X-Gm-Message-State: AOAM531/+OysCTz4bWRJc0riXL7fz/x7sDPmfGNNtnGs3ln/UB4KDeEg
-        6Vh2qa57crfE26mfM4C+sEE+Y4tIwvGijAoSBnAOaA==
-X-Google-Smtp-Source: ABdhPJwFYRuJg9EUbjSytVc+yfQjuDOMjwE4SVCIBy3rni20OvAXlm0XdI+2Z8txK6JARtyDXhDgAzhgcWbhIpdXKAY=
-X-Received: by 2002:a17:902:fe8b:: with SMTP id x11mr24842368plm.179.1592936988375;
- Tue, 23 Jun 2020 11:29:48 -0700 (PDT)
+        Tue, 23 Jun 2020 15:17:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592939875;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MVXzDZJGgBD4xUv6v9WDwHRdtXXOvQAzISrUuLR4fHM=;
+        b=DcUaJKNQ+C06tR0om72J57qC9nPRjNDaGd+Bkn2v+Ms5PQqYr9jpZIcUpsF9dRoxst3nL8
+        p2BP0jrglanrChBF26lPmML1fIuhLBOSQSeFuv4h1LGYM/hkgiiqJ6otoK5GDL3lDXAK26
+        L6Dsl3oSKoOwuO85FGn0hbjwRDzyTsQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-l_94cfbbOquXuITPxu4PpA-1; Tue, 23 Jun 2020 15:17:54 -0400
+X-MC-Unique: l_94cfbbOquXuITPxu4PpA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D000801503;
+        Tue, 23 Jun 2020 19:17:53 +0000 (UTC)
+Received: from sulaco.redhat.com (unknown [10.3.128.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C59E7168D;
+        Tue, 23 Jun 2020 19:17:52 +0000 (UTC)
+From:   Tony Asleson <tasleson@redhat.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [RFC PATCH v3 1/8] struct device: Add function callback durable_name
+Date:   Tue, 23 Jun 2020 14:17:42 -0500
+Message-Id: <20200623191749.115200-2-tasleson@redhat.com>
+In-Reply-To: <20200623191749.115200-1-tasleson@redhat.com>
+References: <20200623191749.115200-1-tasleson@redhat.com>
 MIME-Version: 1.0
-References: <20200620033007.1444705-1-keescook@chromium.org>
- <20200620033007.1444705-5-keescook@chromium.org> <CAKwvOdmsXuqx-3Rt_KNFq4psAeFjG2-7qQaqkJ7dDqqmscUFNw@mail.gmail.com>
- <202006221403.EEAD37E94B@keescook>
-In-Reply-To: <202006221403.EEAD37E94B@keescook>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 23 Jun 2020 11:29:38 -0700
-Message-ID: <CAKwvOdmr0dmC7UtL9Qcgm9Ue_Q2mhKzYiHcXpaB=LpMKpYeYqA@mail.gmail.com>
-Subject: Re: [PATCH v2 04/16] b43: Remove uninitialized_var() usage
-To:     Kees Cook <keescook@chromium.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Joe Perches <joe@perches.com>,
-        Andy Whitcroft <apw@canonical.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        b43-dev@lists.infradead.org,
-        Network Development <netdev@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-spi@vger.kernel.org,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 2:04 PM Kees Cook <keescook@chromium.org> wrote:
->
-> On Mon, Jun 22, 2020 at 10:04:18AM -0700, Nick Desaulniers wrote:
-> > On Fri, Jun 19, 2020 at 8:30 PM Kees Cook <keescook@chromium.org> wrote:
-> > >
-> > > Using uninitialized_var() is dangerous as it papers over real bugs[1]
-> > > (or can in the future), and suppresses unrelated compiler warnings (e.g.
-> > > "unused variable"). If the compiler thinks it is uninitialized, either
-> > > simply initialize the variable or make compiler changes. As a precursor
-> > > to removing[2] this[3] macro[4], just initialize this variable to NULL.
-> > > No later NULL deref is possible due to the early returns outside of the
-> > > (phy->rev >= 7 && phy->rev < 19) case, which explicitly tests for NULL.
-> > >
-> > > [1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
-> > > [2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
-> > > [3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
-> > > [4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
-> > >
-> > > Fixes: 58619b14d106 ("b43: move under broadcom vendor directory")
-> > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> >
-> > I see three total uses of uninitialized_var() in this file, do we want
-> > to eliminate all of them?
->
-> This is the only one that needed an explicit initialization -- all the
-> others are handled in the treewide patch. I *could* split it out here,
-> but I found it easier to keep the "no op" changes together in the
-> treewide patch.
+Function callback and function to be used to write a persistent
+durable name to the supplied character buffer.  This will be used to add
+structured key-value data to log messages for hardware related errors
+which allows end users to correlate message and specific hardware.
 
-Ah, got it.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Tony Asleson <tasleson@redhat.com>
+---
+ drivers/base/core.c    | 24 ++++++++++++++++++++++++
+ include/linux/device.h |  4 ++++
+ 2 files changed, 28 insertions(+)
 
->
-> -Kees
->
-> >
-> > > ---
-> > >  drivers/net/wireless/broadcom/b43/phy_n.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
-> > > index c33b4235839d..46db91846007 100644
-> > > --- a/drivers/net/wireless/broadcom/b43/phy_n.c
-> > > +++ b/drivers/net/wireless/broadcom/b43/phy_n.c
-> > > @@ -4222,7 +4222,7 @@ static void b43_nphy_tx_gain_table_upload(struct b43_wldev *dev)
-> > >         u32 rfpwr_offset;
-> > >         u8 pga_gain, pad_gain;
-> > >         int i;
-> > > -       const s16 *uninitialized_var(rf_pwr_offset_table);
-> > > +       const s16 *rf_pwr_offset_table = NULL;
-> > >
-> > >         table = b43_nphy_get_tx_gain_table(dev);
-> > >         if (!table)
-> > > --
-> >
-> > --
-> > Thanks,
-> > ~Nick Desaulniers
->
-> --
-> Kees Cook
-
-
-
+diff --git a/drivers/base/core.c b/drivers/base/core.c
+index 0cad34f1eede..511b7d2fc916 100644
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -2304,6 +2304,30 @@ int dev_set_name(struct device *dev, const char *fmt, ...)
+ }
+ EXPORT_SYMBOL_GPL(dev_set_name);
+ 
++/**
++ * dev_durable_name - Write "DURABLE_NAME"=<durable name> in buffer
++ * @dev: device
++ * @buffer: character buffer to write results
++ * @len: length of buffer
++ * @return: Number of bytes written to buffer
++ */
++int dev_durable_name(const struct device *dev, char *buffer, size_t len)
++{
++	int tmp, dlen;
++
++	if (dev && dev->durable_name) {
++		tmp = snprintf(buffer, len, "DURABLE_NAME=");
++		if (tmp < len) {
++			dlen = dev->durable_name(dev, buffer + tmp,
++							len - tmp);
++			if (dlen > 0 && ((dlen + tmp) < len))
++				return dlen + tmp;
++		}
++	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(dev_durable_name);
++
+ /**
+  * device_to_dev_kobj - select a /sys/dev/ directory for the device
+  * @dev: device
+diff --git a/include/linux/device.h b/include/linux/device.h
+index ac8e37cd716a..281755404c21 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -613,6 +613,8 @@ struct device {
+ 	struct iommu_group	*iommu_group;
+ 	struct dev_iommu	*iommu;
+ 
++	int (*durable_name)(const struct device *dev, char *buff, size_t len);
++
+ 	bool			offline_disabled:1;
+ 	bool			offline:1;
+ 	bool			of_node_reused:1;
+@@ -654,6 +656,8 @@ static inline const char *dev_name(const struct device *dev)
+ extern __printf(2, 3)
+ int dev_set_name(struct device *dev, const char *name, ...);
+ 
++int dev_durable_name(const struct device *d, char *buffer, size_t len);
++
+ #ifdef CONFIG_NUMA
+ static inline int dev_to_node(struct device *dev)
+ {
 -- 
-Thanks,
-~Nick Desaulniers
+2.25.4
+
