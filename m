@@ -6,93 +6,146 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AC1C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5CADC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 13:45:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 606692072E
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:17:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9390420723
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 13:45:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RcxTddjf"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="fo6Nhbf9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732564AbgFWMRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 08:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34098 "EHLO
+        id S1732689AbgFWNpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 09:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732579AbgFWMRX (ORCPT
+        with ESMTP id S1732671AbgFWNpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 08:17:23 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8DACC061795
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id v19so12690919qtq.10
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
+        Tue, 23 Jun 2020 09:45:17 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FEEC061755
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 06:45:16 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id w16so21684896ejj.5
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 06:45:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JQks5GACh6h541Q4/8Hm5GmMAEZUeSD84PZv2UopM/E=;
-        b=RcxTddjfivtvB0c2KkiouO8M3/NGfoDAq3NPrsye30sgY8dXjoA1iY3Pahy3rz+yxl
-         /FaqkWMOaH2mLilfoiOpON9yMjHZP9qMpEspz72HPCQ9Fsy5GpXESQjDwcSJmYyA3G8z
-         fdRxhBOZIQqYUOCBsa+bMK1w788G9i1vnJ+fLDaT6y4K/K56hAypHtluBzexm6z3Xwf3
-         NGRsQ0G+sgodVXs4liklYhgpQfbS1txItvV/KdRicsvDf5YA1rgkeb2WY3pX5JmFvhSI
-         BRpiK0LAGVtkvRxYXL1J1wTyVhBr6zaOiTOSPl5GryNECC9LjrmInXYRr+C48n1GfoAr
-         cwLA==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VXQlqAlZZofDT5Ye539eWDUhLoUgjm6BXLgW5TxtpJ0=;
+        b=fo6Nhbf9Qp5QqAKLeva6nObIzuA0/vRkKJf3ZJjJ9LeVoOFZ4jvUrIS1QCH9V3NMmT
+         ahxk0oq4a3L9B25QFQ9pYrQ4NCGpqNaHCUm8TI+3WY6mpMNvFuk8p/Wqlh43JKlGQnf8
+         0qLLDqfsY0qW9ACTJaehNTTi9alKf22JP5i3gvDlNMiJaFsi+RCN55CtQVOB7GxeG0Nr
+         3UlcUMj4YTUjqpx6px/kCug2sy9/BwgzKfBNIhRZjHwcSHUGkXxOt8W9f8FEdM5wa2Js
+         Pzk4etXFVaTSJlUtdz8tlxil6LM9R8tbw/rXU+uu/EoWXsCpx2LsDJ9ENy1n8fSzMuev
+         z/5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JQks5GACh6h541Q4/8Hm5GmMAEZUeSD84PZv2UopM/E=;
-        b=T2bygRCgf5pAj/KJx7kRCYfTIhaLiN/iZcp6RgYGDw0+/FLNqBy3KaWcSmG27doXil
-         jHtJ95HCwzRkzVAR0h1xMHO16hxoLvUCs1X4uHjyne7XxLbGWb//ivgiCyPB4nFvH8UY
-         /s2k//SalDmMvQUYLzHwLs5fOk5pVQaG86Au7OrbltYXmFChVFHY4Z2aDFBAl9qPxnth
-         ug9MoJxH00STYFYbFh8K90b9oPkh59NNUTz/01sXHWZoDqEO+69P99CtBCvmdt+SJGDW
-         qOH34Ci9J9M7H1XqfGttxApz9rzvieprzEgO2cZapXLvjS89gI1MyaHNyvgNM9U6Vb69
-         jptQ==
-X-Gm-Message-State: AOAM530HsmAH6Z4WBKrhM1hNGq+mauMWacPAxArB2EBFeDff1c/fh8/5
-        jt++9+ec1jEeRI3xADQPe4Qz7A==
-X-Google-Smtp-Source: ABdhPJxpvHZg05zq1sHVCRcAfBK2AS4+Yo42wJ5elF26d9x1yYHzPS6gha1KxMvEO9Vc8ehpziFWoQ==
-X-Received: by 2002:ac8:7182:: with SMTP id w2mr21482791qto.115.1592914643025;
-        Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id v45sm437419qtv.47.2020.06.23.05.17.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2020 05:17:21 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.93)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jnhrd-00CUHe-5g; Tue, 23 Jun 2020 09:17:21 -0300
-Date:   Tue, 23 Jun 2020 09:17:21 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VXQlqAlZZofDT5Ye539eWDUhLoUgjm6BXLgW5TxtpJ0=;
+        b=eK4uAHa0zEpNJF9TcwFQ9PSJyfXpIWr1ttMpXjLWJtMwH2bCegnVF57E/92ZYtFTfx
+         Zh/oz/aTJp5Y7B5MpjnQ+eciRr5oCjKJQwPvSnl2cSokChU2scRshNs0u97DP6F5BYcL
+         2GsBvvwpuHjNR3PyRLmdtPu1DL4J3dqS3ml3Dw/AqFa6cBq6fx9k6J/PPSECElp+12FQ
+         FT7bH67FgULaFwPRYTStZYoM8qMDa0e6b3qgRU15RtvrKn/ndksHR9yD9k0LLr9uS0yn
+         3NsAj8Ck9YMpujjlmfR2t6epeuHrhTTASL3PKc9rBL6kwwTl0I6eTqG/dPvKdYCg5edn
+         VCCA==
+X-Gm-Message-State: AOAM533KbcwFqFg/vspA0rhxcuz9GdRLLrLjhnKv8RwxFQh67IBmSqXh
+        cWZ+tC7dkXyFXrlfkDJIoLBlpdFmBKcahXadKaetLA==
+X-Google-Smtp-Source: ABdhPJwdX6lc/Gi/7j4howCM+pxkij0TtKRONe71HZ75ub6P3aifFGVKJptcy75yC6WcZMxsL6owSUNPjQePjVIhvy4=
+X-Received: by 2002:a17:906:1682:: with SMTP id s2mr11554590ejd.532.1592919914915;
+ Tue, 23 Jun 2020 06:45:14 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
+ <20200617112811.GL2383158@unreal> <20200617182046.GI6578@ziepe.ca>
+ <20200617190756.GA2721989@unreal> <20200617192642.GL6578@ziepe.ca>
+ <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
+ <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+ <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com> <20200623121721.GZ6578@ziepe.ca>
+In-Reply-To: <20200623121721.GZ6578@ziepe.ca>
+From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Date:   Tue, 23 Jun 2020 19:15:03 +0530
+Message-ID: <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
+Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
+ late_initcall level
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
         linux-rdma@vger.kernel.org,
         Danil Kipnis <danil.kipnis@cloud.ionos.com>,
         Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
         kernel test robot <rong.a.chen@intel.com>
-Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
- late_initcall level
-Message-ID: <20200623121721.GZ6578@ziepe.ca>
-References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
- <20200617112811.GL2383158@unreal>
- <20200617182046.GI6578@ziepe.ca>
- <20200617190756.GA2721989@unreal>
- <20200617192642.GL6578@ziepe.ca>
- <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
- <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
- <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
-> Hi Jason and Leon,
-> 
-> Did you get a chance to look into my previous email?
+On Tue, Jun 23, 2020 at 5:47 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
+> > Hi Jason and Leon,
+> >
+> > Did you get a chance to look into my previous email?
+>
+> Was there a question?
 
-Was there a question?
+Multiple actually :)
 
-Jason
+>
+> Jason
+
+In response to your emails,
+
+> Somehow nvme-rdma works:
+
+I think that's because the callchain during the nvme_rdma_init_module
+initialization stops at "nvmf_register_transport()". Here only the
+"struct nvmf_transport_ops nvme_rdma_transport" is registered, which
+contains the function "nvme_rdma_create_ctrl()". I tested this in my
+local setup and during kernel boot, that's the extent of the
+callchain.
+The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
+called later from "nvmf_dev_write()". I am not sure when this is
+called, probably when the "discover" happens from the client side or
+during the server config.
+
+It seems that the "rdma_bind_addr()" is called by the nvme rdma
+module; but during the following events
+1) When a discover happens from the client side. Call trace for that looks like,
+[ 1098.409398] nvmf_dev_write
+[ 1098.409403] nvmf_create_ctrl
+[ 1098.414568] nvme_rdma_create_ctrl
+[ 1098.415009] nvme_rdma_setup_ctrl
+[ 1098.415010] nvme_rdma_configure_admin_queue
+[ 1098.415010] nvme_rdma_alloc_queue
+                             -->(rdma_create_id)
+[ 1098.415032] rdma_resolve_addr
+[ 1098.415032] cma_bind_addr
+[ 1098.415033] rdma_bind_addr
+
+2) When a connect happens from the client side. Call trace is the same
+as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
+n being the number of IO queues being created.
+
+On the server side, when an nvmf port is enabled, that also triggers a
+call to "rdma_bind_addr()", but that is not from the nvme rdma module.
+may be nvme target rdma? (not sure).
+
+Does this make sense or am I missing something here?
+
+
+> If the rdma_create_id() is not on a callchain from module_init then you don't have a problem.
+
+I am a little confused. I thought the problem occurs from a call to
+either "rdma_resolve_addr()" which calls "rdma_bind_addr()",
+or a direct call to "rdma_bind_addr()" as in rtrs case.
+In both the cases, a call to "rdma_create_id()" is needed before this.
+
+
+> Similarly they are supposed to be created from the client attachment.
+I am a beginner in terms of concepts here. Did you mean when a client
+tries to establish the first connection to an rdma server?
+
+
+-- 
+
+Regards
+-Haris
