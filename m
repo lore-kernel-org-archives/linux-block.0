@@ -2,216 +2,159 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA80DC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB23C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDB982072E
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85C1020716
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:24:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="guIsePbz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732835AbgFWOXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 10:23:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53622 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732830AbgFWOXg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 10:23:36 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id EDC01B012;
-        Tue, 23 Jun 2020 14:23:33 +0000 (UTC)
-Subject: Re: [PATCH RFC v7 02/12] blk-mq: rename blk_mq_update_tag_set_depth()
-To:     John Garry <john.garry@huawei.com>, Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, kashyap.desai@broadcom.com,
-        sumit.saxena@broadcom.com, bvanassche@acm.org, hare@suse.com,
-        hch@lst.de, shivasharan.srikanteshwara@broadcom.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <1591810159-240929-3-git-send-email-john.garry@huawei.com>
- <20200611025759.GA453671@T590>
- <6ef76cdf-2fb3-0ce8-5b5a-0d7af0145901@huawei.com>
- <8ef58912-d480-a7e1-f04c-da9bd85ea0ae@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <eaf188d5-dac0-da44-1c83-31ff2860d8fa@suse.de>
-Date:   Tue, 23 Jun 2020 16:23:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1732790AbgFWOYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 10:24:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53684 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732691AbgFWOYD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 10:24:03 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A46C061755
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 07:24:03 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id e13so656972qkg.5
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 07:24:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9JIavCsfL8D1rgwJrHGnA2KvuiN5OKxgBU0Bt6DYuVc=;
+        b=guIsePbz9htXvlL08j34eEmeHNqEHNlDJxuYq7stPAl4OT4aMzQGE3iIo1yXeQqXxe
+         eX5mALfVPbXQzlIYbvn61CTE2H0WE3VVvw99Ka62XpbjwX1YLJetJDZ8uIQmbnJ9ONWb
+         StX08KyUEmrFwnzy/Os3vIy+w148OcETU3RZic8wo0kJgGhzx5htx9lEAm0suFtNCidH
+         q9ajkdscGvw1ihLxC77c/Q6Yxa/I70b7uikmLM8JzUXemEyfiw3StlP3qIsHIT42OwJy
+         Se00MQM3opBDls3rZeJB/glyl0LzCKX8uhm8iopyR58BGiJiI1qRNwSTmMfgMZazSoN5
+         yBZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9JIavCsfL8D1rgwJrHGnA2KvuiN5OKxgBU0Bt6DYuVc=;
+        b=h8nJG1Llmmio0BJlFuJWML4jKWNGWccz13CgYkdZaMkMD4LZEIJMjyPvr8/D1SP645
+         VJQigAfJrsoTK+R8ZBQI0F2WzI2Uc2Y3fh2B+evvMzDm5Zn6Zj+5N/Uk311x6X2KWoi9
+         weSoTtCBn/zq9vt5KQjuRWqsQc1XVe5iV8ivoSCcOIU+9/iwbTfXw8u2GT8a+WA2vTBm
+         iNNdkGoVXIk4oEKvj3s3Ng2sagAx1KDSmCpVZD2l/Nummp6xYyq9pdVJCRNP8iF0IG+B
+         UmcXT3+HZezkBapGCAeOclFW7YS3aGOvw9uFoS5Z9LZsEa5AAxys1MAiktEgZteJ33Sf
+         VkKg==
+X-Gm-Message-State: AOAM533uK44AnNH2UG3nDcsrfhgJuCpj8HGPNS4l93El+/vA9q8cj6o0
+        +ojL/jg6uHGqtDe2jU/K6kJSJGyzcih0ZA==
+X-Google-Smtp-Source: ABdhPJyEQb7GwZqxn6OkBfJZzOtz4itsDUrIXYKsx+K+lNSQNNCju5aw4K0nk3p3pQ4Gef3KHQWsNw==
+X-Received: by 2002:a37:9581:: with SMTP id x123mr20361736qkd.163.1592922242205;
+        Tue, 23 Jun 2020 07:24:02 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id a25sm759818qtk.40.2020.06.23.07.24.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2020 07:24:00 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.93)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jnjqC-00CX3b-CR; Tue, 23 Jun 2020 11:24:00 -0300
+Date:   Tue, 23 Jun 2020 11:24:00 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
+        kernel test robot <rong.a.chen@intel.com>
+Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
+ late_initcall level
+Message-ID: <20200623142400.GB6578@ziepe.ca>
+References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
+ <20200617112811.GL2383158@unreal>
+ <20200617182046.GI6578@ziepe.ca>
+ <20200617190756.GA2721989@unreal>
+ <20200617192642.GL6578@ziepe.ca>
+ <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
+ <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+ <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
+ <20200623121721.GZ6578@ziepe.ca>
+ <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <8ef58912-d480-a7e1-f04c-da9bd85ea0ae@huawei.com>
-Content-Type: multipart/mixed;
- boundary="------------87FA99FADADEA3EE2B4E056B"
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------87FA99FADADEA3EE2B4E056B
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 6/23/20 1:25 PM, John Garry wrote:
-> On 11/06/2020 09:26, John Garry wrote:
->> On 11/06/2020 03:57, Ming Lei wrote:
->>> On Thu, Jun 11, 2020 at 01:29:09AM +0800, John Garry wrote:
->>>> From: Hannes Reinecke <hare@suse.de>
->>>>
->>>> The function does not set the depth, but rather transitions from
->>>> shared to non-shared queues and vice versa.
->>>> So rename it to blk_mq_update_tag_set_shared() to better reflect
->>>> its purpose.
->>>
->>> It is fine to rename it for me, however:
->>>
->>> This patch claims to rename blk_mq_update_tag_set_shared(), but also
->>> change blk_mq_init_bitmap_tags's signature.
->>
->> I was going to update the commit message here, but forgot again...
->>
->>>
->>> So suggest to split this patch into two or add comment log on changing
->>> blk_mq_init_bitmap_tags().
->>
->> I think I'll just split into 2x commits.
+On Tue, Jun 23, 2020 at 07:15:03PM +0530, Haris Iqbal wrote:
+> On Tue, Jun 23, 2020 at 5:47 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
+> > > Hi Jason and Leon,
+> > >
+> > > Did you get a chance to look into my previous email?
+> >
+> > Was there a question?
 > 
-> Hi Hannes,
+> Multiple actually :)
 > 
-> Do you have any issue with splitting the undocumented changes into 
-> another patch as so:
+> >
+> > Jason
 > 
-No, that's perfectly fine.
+> In response to your emails,
+> 
+> > Somehow nvme-rdma works:
+> 
+> I think that's because the callchain during the nvme_rdma_init_module
+> initialization stops at "nvmf_register_transport()". Here only the
+> "struct nvmf_transport_ops nvme_rdma_transport" is registered, which
+> contains the function "nvme_rdma_create_ctrl()". I tested this in my
+> local setup and during kernel boot, that's the extent of the
+> callchain.
+> The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
+> called later from "nvmf_dev_write()". I am not sure when this is
+> called, probably when the "discover" happens from the client side or
+> during the server config.
+> 
+> It seems that the "rdma_bind_addr()" is called by the nvme rdma
+> module; but during the following events
+> 1) When a discover happens from the client side. Call trace for that looks like,
+> [ 1098.409398] nvmf_dev_write
+> [ 1098.409403] nvmf_create_ctrl
+> [ 1098.414568] nvme_rdma_create_ctrl
+> [ 1098.415009] nvme_rdma_setup_ctrl
+> [ 1098.415010] nvme_rdma_configure_admin_queue
+> [ 1098.415010] nvme_rdma_alloc_queue
+> [ 1098.415032] rdma_resolve_addr
+> [ 1098.415032] cma_bind_addr
+> [ 1098.415033] rdma_bind_addr
+> 
+> 2) When a connect happens from the client side. Call trace is the same
+> as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
+> n being the number of IO queues being created.
+> 
+> On the server side, when an nvmf port is enabled, that also triggers a
+> call to "rdma_bind_addr()", but that is not from the nvme rdma module.
+> may be nvme target rdma? (not sure).
+> 
+> Does this make sense or am I missing something here?
 
-Kashyap, I've also attached an updated patch for the elevator_count 
-patch; if you agree John can include it in the next version.
+It make sense, delaying creating and CM ID's until user space starts
+will solve this init time problme
 
-Cheers,
+> 
+> > If the rdma_create_id() is not on a callchain from module_init then you don't have a problem.
+> 
+> I am a little confused. I thought the problem occurs from a call to
+> either "rdma_resolve_addr()" which calls "rdma_bind_addr()",
+> or a direct call to "rdma_bind_addr()" as in rtrs case.
+> In both the cases, a call to "rdma_create_id()" is needed before this.
 
-Hannes
--- 
-Dr. Hannes Reinecke            Teamlead Storage & Networking
-hare@suse.de                               +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Right rdma_create_id() must precede anything that has problems, and it
+should not be done from module_init.
 
---------------87FA99FADADEA3EE2B4E056B
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-elevator-count-requests-per-hctx-to-improve-performa.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-elevator-count-requests-per-hctx-to-improve-performa.pa";
- filename*1="tch"
-
-From d50b5f773713070208c405f7c7056eb1afed896a Mon Sep 17 00:00:00 2001
-From: Hannes Reinecke <hare@suse.de>
-Date: Tue, 23 Jun 2020 16:18:40 +0200
-Subject: [PATCH] elevator: count requests per hctx to improve performance
-
-Add a 'elevator_queued' count to the hctx to avoid triggering
-the elevator even though there are no requests queued.
-
-Suggested-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Signed-off-by: Hannes Reinecke <hare@suse.de>
----
- block/bfq-iosched.c    | 5 +++++
- block/blk-mq.c         | 1 +
- block/mq-deadline.c    | 5 +++++
- include/linux/blk-mq.h | 4 ++++
- 4 files changed, 15 insertions(+)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a1123d4d586d..3d63b35f6121 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4640,6 +4640,9 @@ static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 
-+	if (!atomic_read(&hctx->elevator_queued))
-+		return false;
-+
- 	/*
- 	 * Avoiding lock: a race on bfqd->busy_queues should cause at
- 	 * most a call to dispatch for nothing
-@@ -5554,6 +5557,7 @@ static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		bfq_insert_request(hctx, rq, at_head);
-+		atomic_inc(&hctx->elevator_queued)
- 	}
- }
- 
-@@ -5933,6 +5937,7 @@ static void bfq_finish_requeue_request(struct request *rq)
- 
- 		bfq_completed_request(bfqq, bfqd);
- 		bfq_finish_requeue_request_body(bfqq);
-+		atomic_dec(&rq->mq_hctx->elevator_queued);
- 
- 		spin_unlock_irqrestore(&bfqd->lock, flags);
- 	} else {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e06e8c9f326f..f5403fc97572 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2542,6 +2542,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 		goto free_hctx;
- 
- 	atomic_set(&hctx->nr_active, 0);
-+	atomic_set(&hctx->elevator_queued, 0);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 	hctx->numa_node = node;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b57470e154c8..9d753745e6be 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -533,6 +533,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		dd_insert_request(hctx, rq, at_head);
-+		atomic_inc(&hctx->elevator_queued);
- 	}
- 	spin_unlock(&dd->lock);
- }
-@@ -573,12 +574,16 @@ static void dd_finish_request(struct request *rq)
- 			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
- 		spin_unlock_irqrestore(&dd->zone_lock, flags);
- 	}
-+	atomic_dec(&rq->mq_hctx->elevator_queued);
- }
- 
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
- 
-+	if (!atomic_read(&hctx->elevator_queued))
-+		return false;
-+
- 	return !list_empty_careful(&dd->dispatch) ||
- 		!list_empty_careful(&dd->fifo_list[0]) ||
- 		!list_empty_careful(&dd->fifo_list[1]);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 66711c7234db..a18c506b14e7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -139,6 +139,10 @@ struct blk_mq_hw_ctx {
- 	 * shared across request queues.
- 	 */
- 	atomic_t		nr_active;
-+	/**
-+	 * @elevator_queued: Number of queued requests on hctx.
-+	 */
-+	atomic_t                elevator_queued;
- 
- 	/** @cpuhp_online: List to store request if CPU is going to die */
- 	struct hlist_node	cpuhp_online;
--- 
-2.26.2
-
-
---------------87FA99FADADEA3EE2B4E056B--
+Jason
