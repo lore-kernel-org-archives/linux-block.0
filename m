@@ -2,48 +2,48 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FB9C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 02:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14175C433E1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 03:18:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A34320720
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 02:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB859207DD
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 03:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731171AbgFWCQU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Jun 2020 22:16:20 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34289 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728447AbgFWCQT (ORCPT
+        id S1730330AbgFWDSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Jun 2020 23:18:32 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:41857 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728612AbgFWDSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jun 2020 22:16:19 -0400
-Received: by mail-pg1-f195.google.com with SMTP id t6so1339602pgq.1;
-        Mon, 22 Jun 2020 19:16:19 -0700 (PDT)
+        Mon, 22 Jun 2020 23:18:31 -0400
+Received: by mail-pg1-f193.google.com with SMTP id b5so9208330pgm.8;
+        Mon, 22 Jun 2020 20:18:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=M/lKgw0WIqHsOqIn5qkk2P21mZzLktylguXH7Jx+OVk=;
-        b=tqxq8Wgo3F6HifXAj6ZoPlu5n2aUQidj+j5DJPbbRbMNYSt/ewAArz93QpfqH5H64T
-         NeCpjtJjUnJ6qvHzun2OT6fZqIMJDZ67SbcWf4Ptwm2hwUMbZ+jKN5BHy3WXM958+uFV
-         dzNWB/7qFm6LoUTm1hA1BXVP7OEifKLvA6YDJKkukoar+EBAeVeOOthJ6CC5SfVr8Yxj
-         Z+pDqch5KXutT6kL4IYYbP5mYzfiYSmgmpoE7VwCeZPF3ohAgNqJrgWGzHbJxMG1rlxu
-         3a/n4JhTWDW8wLh0zsD1vSehPXVnD2PNgf3mrdiVn86QXow9ZhUw0ZNEHLtyPMn/tOwy
-         hMgQ==
-X-Gm-Message-State: AOAM533/meih7OltlveyYgom5SgPpffYOwv9s5Q5DqBhklLMQsu43j2V
-        pZ8tI32qbLqUrvqXDQWseTQ=
-X-Google-Smtp-Source: ABdhPJzQeAPANbiAmUwJbdDHqgqKLmC7CQe4oeQcA4IUQ/MBdOu2b/RZsx/t4Z569lut9IJk2LZxsA==
-X-Received: by 2002:a62:640b:: with SMTP id y11mr22670086pfb.195.1592878578089;
-        Mon, 22 Jun 2020 19:16:18 -0700 (PDT)
+        bh=mpFj7/RrGtSNh2oxeWkaM9uJQKNxbdQmz4wPUcNhQuU=;
+        b=sjtOC+7gsYm2/2Q0rYSPg15/MsWG9tl5HvIm7SKbYMi8oosEqyirnuaQxD5nqhuCwQ
+         NPB6BHkSTXqiRSom6IwgDrFxihrt9sUGXPtH8PeqR0PgsIKHNZ3DCsBLRDI2UHpOkQnF
+         WqzGAAioaOioVFn2P5t+vvlTbY6GIZHqnH2zfj5bivYDfCKcTsth2EVz+tuna+sR9G0w
+         CAODGkLdjFp1v41U94hyE8GCU+FkDeKzSSnmZ8vmVNFO4i+9qHPsJg63a10MRvt+Y3bm
+         zR/Z1WnRP+K/sJGtz8G5wtjsBpqxVC8WGVt0i3U7ydnnMiCnVQsvusc/0tI+3tFya8ef
+         4Tkw==
+X-Gm-Message-State: AOAM5306kgQ1KA+u5YwzJU82DHxyTD5daOPlkzKS1lIuMolqt/S75g10
+        UFSdwznUlP2UhZu27jxmXpTkmTL17OM=
+X-Google-Smtp-Source: ABdhPJzdc2VdT5EAFZIAAEZc3fGS4qcNI/gX/vWuYt7EogWDJNOGCKd180YoLKtAWecVyPItYkRK0Q==
+X-Received: by 2002:a63:6643:: with SMTP id a64mr12702889pgc.246.1592882309689;
+        Mon, 22 Jun 2020 20:18:29 -0700 (PDT)
 Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id w77sm15909899pff.126.2020.06.22.19.16.16
+        by smtp.gmail.com with ESMTPSA id q22sm11398036pgn.91.2020.06.22.20.18.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2020 19:16:17 -0700 (PDT)
-Subject: Re: [PATCH v7 5/8] loop: be paranoid on exit and prevent new
- additions / removals
+        Mon, 22 Jun 2020 20:18:28 -0700 (PDT)
+Subject: Re: [PATCH v7 8/8] block: create the request_queue debugfs_dir on
+ registration
 To:     Luis Chamberlain <mcgrof@kernel.org>
 Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
         gregkh@linuxfoundation.org, rostedt@goodmis.org, mingo@redhat.com,
@@ -51,12 +51,11 @@ Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
         akpm@linux-foundation.org, mhocko@suse.com, yukuai3@huawei.com,
         martin.petersen@oracle.com, jejb@linux.ibm.com,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
 References: <20200619204730.26124-1-mcgrof@kernel.org>
- <20200619204730.26124-6-mcgrof@kernel.org>
- <7e76d892-b5fd-18ec-c96e-cf4537379eba@acm.org>
- <20200622122742.GU11244@42.do-not-panic.com>
+ <20200619204730.26124-9-mcgrof@kernel.org>
+ <02112994-4cd7-c749-6bd7-66a772593c90@acm.org>
+ <20200622124208.GW11244@42.do-not-panic.com>
 From:   Bart Van Assche <bvanassche@acm.org>
 Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
@@ -81,12 +80,12 @@ Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
  //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
  mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
  goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
-Message-ID: <14dc9294-fa99-cad0-871b-b69f138e8ac9@acm.org>
-Date:   Mon, 22 Jun 2020 19:16:15 -0700
+Message-ID: <4d25dbd1-a001-9869-58d5-630696440abc@acm.org>
+Date:   Mon, 22 Jun 2020 20:18:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622122742.GU11244@42.do-not-panic.com>
+In-Reply-To: <20200622124208.GW11244@42.do-not-panic.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -95,22 +94,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-06-22 05:27, Luis Chamberlain wrote:
-> Note: this will bring you sanity if you try to figure out *why* we still
-> get:
+On 2020-06-22 05:42, Luis Chamberlain wrote:
+> On Sat, Jun 20, 2020 at 11:07:43AM -0700, Bart Van Assche wrote:
+>> On 2020-06-19 13:47, Luis Chamberlain wrote:
+>>> We were only creating the request_queue debugfs_dir only
+>>> for make_request block drivers (multiqueue), but never for
+>>> request-based block drivers. We did this as we were only
+>>> creating non-blktrace additional debugfs files on that directory
+>>> for make_request drivers. However, since blktrace *always* creates
+>>> that directory anyway, we special-case the use of that directory
+>>> on blktrace. Other than this being an eye-sore, this exposes
+>>> request-based block drivers to the same debugfs fragile
+>>> race that used to exist with make_request block drivers
+>>> where if we start adding files onto that directory we can later
+>>> run a race with a double removal of dentries on the directory
+>>> if we don't deal with this carefully on blktrace.
+>>>
+>>> Instead, just simplify things by always creating the request_queue
+>>> debugfs_dir on request_queue registration. Rename the mutex also to
+>>> reflect the fact that this is used outside of the blktrace context.
+>>
+>> There are two changes in this patch: a bug fix and a rename of a mutex.
+>> I don't like it to see two changes in a single patch.
 > 
-> [235530.144343] debugfs: Directory 'loop0' with parent 'block' already present!
-> [235530.149477] blktrace: debugfs_dir not present for loop0 so skipping
-> [235530.232328] debugfs: Directory 'loop0' with parent 'block' already present!
-> [235530.238962] blktrace: debugfs_dir not present for loop0 so skipping
-> 
-> If you run run_0004.sh from break-blktrace [0]. Even with all my patches
-> merged we still run into this. And so the bug lies within the block
-> layer or on the driver. I haven't been able to find the issue yet.
-> 
-> [0] https://github.com/mcgrof/break-blktrace
+> I thought about doing the split first, and I did it at first, but
+> then I could hear Christoph yelling at me for it. So I merged the
+> two together. Although it makes it more difficult for review,
+> the changes do go together.
 
-Thanks Luis for having shared this information. If I can find the time I
-will have a look into this myself.
+During the past weeks I have been more busy than usual. I will try to
+make sure that in the future I have the time to read all comments on the
+previous versions of a patch series before replying to the latest
+version of a patch series.
+
+>> Additionally, is the new mutex name really better than the old name? The
+>> proper way to use mutexes is to use mutexes to protect data instead of
+>> code. Where is the documentation that mentions which member variable(s)
+>> of which data structures are protected by the mutex formerly called
+>> blk_trace_mutex?
+> 
+> It does not exist, and that is the point. The debugfs_dir use after
+> free showed us *when* that UAF can happen, and so care must be taken
+> if we are to use the mutex to protect the debugfs_dir but also re-use
+> the same directory for other block core shenanigans.
+> 
+>> Since the new name makes it even less clear which data
+>> is protected by this mutex, is the new name really better than the old name?
+> 
+> I thought the new name makes it crystal clear what is being protected. I
+> can however add a comment to explain that the q->debugfs_mutex protects
+> the q->debugfs_dir if it is created, otherwise it protects the ephemeral
+> debugfs_dir directory which would otherwise be created in lieue of
+> q->debugfs_dir, however the patch still lies under <debugfs_root>/block/.
+> 
+> Let me know if you think that will help.
+
+My concern is that q->debugfs_mutex would evolve the same way as
+q->sysfs_lock: at the time of introduction the role of a mutex is very
+clear but over time the number of use cases grows to a point where it is
+no longer possible to recognize the original purpose. I think there are
+two possible approaches: either a comment is added now that explains the
+role of q->debugfs_mutex or someone who has followed this conversation
+yells when someone tries to use q->debugfs_mutex for another purpose
+than what it was intended for.
+
+Thanks,
 
 Bart.
+
