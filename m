@@ -2,159 +2,91 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB23C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD4EC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:25:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85C1020716
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:24:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="guIsePbz"
+	by mail.kernel.org (Postfix) with ESMTP id 3616520780
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 14:25:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592922309;
+	bh=WolNKP6AFb9F9+4XbRDDy9/99/EDMUqm5gJZnB0tSXo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=rb9xm0m6xQXqM8H8qAnnTHGgEzevKfey3HdJdzlz62umo6e1TgLqGpU6oZVuTu6IG
+	 dBNhtNEZG/qDqiHr1wRRFG8A/MqkWh393eJDShvYUG/6g5otasPQ/iKIt9jtmYneFk
+	 RQo4pyvcxjHmThU8Cv26t1fuq8LsZWs6B4Ev4zDA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732790AbgFWOYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 10:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732691AbgFWOYD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 10:24:03 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A46C061755
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 07:24:03 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id e13so656972qkg.5
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 07:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9JIavCsfL8D1rgwJrHGnA2KvuiN5OKxgBU0Bt6DYuVc=;
-        b=guIsePbz9htXvlL08j34eEmeHNqEHNlDJxuYq7stPAl4OT4aMzQGE3iIo1yXeQqXxe
-         eX5mALfVPbXQzlIYbvn61CTE2H0WE3VVvw99Ka62XpbjwX1YLJetJDZ8uIQmbnJ9ONWb
-         StX08KyUEmrFwnzy/Os3vIy+w148OcETU3RZic8wo0kJgGhzx5htx9lEAm0suFtNCidH
-         q9ajkdscGvw1ihLxC77c/Q6Yxa/I70b7uikmLM8JzUXemEyfiw3StlP3qIsHIT42OwJy
-         Se00MQM3opBDls3rZeJB/glyl0LzCKX8uhm8iopyR58BGiJiI1qRNwSTmMfgMZazSoN5
-         yBZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9JIavCsfL8D1rgwJrHGnA2KvuiN5OKxgBU0Bt6DYuVc=;
-        b=h8nJG1Llmmio0BJlFuJWML4jKWNGWccz13CgYkdZaMkMD4LZEIJMjyPvr8/D1SP645
-         VJQigAfJrsoTK+R8ZBQI0F2WzI2Uc2Y3fh2B+evvMzDm5Zn6Zj+5N/Uk311x6X2KWoi9
-         weSoTtCBn/zq9vt5KQjuRWqsQc1XVe5iV8ivoSCcOIU+9/iwbTfXw8u2GT8a+WA2vTBm
-         iNNdkGoVXIk4oEKvj3s3Ng2sagAx1KDSmCpVZD2l/Nummp6xYyq9pdVJCRNP8iF0IG+B
-         UmcXT3+HZezkBapGCAeOclFW7YS3aGOvw9uFoS5Z9LZsEa5AAxys1MAiktEgZteJ33Sf
-         VkKg==
-X-Gm-Message-State: AOAM533uK44AnNH2UG3nDcsrfhgJuCpj8HGPNS4l93El+/vA9q8cj6o0
-        +ojL/jg6uHGqtDe2jU/K6kJSJGyzcih0ZA==
-X-Google-Smtp-Source: ABdhPJyEQb7GwZqxn6OkBfJZzOtz4itsDUrIXYKsx+K+lNSQNNCju5aw4K0nk3p3pQ4Gef3KHQWsNw==
-X-Received: by 2002:a37:9581:: with SMTP id x123mr20361736qkd.163.1592922242205;
-        Tue, 23 Jun 2020 07:24:02 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id a25sm759818qtk.40.2020.06.23.07.24.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2020 07:24:00 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.93)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jnjqC-00CX3b-CR; Tue, 23 Jun 2020 11:24:00 -0300
-Date:   Tue, 23 Jun 2020 11:24:00 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
-        kernel test robot <rong.a.chen@intel.com>
-Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
- late_initcall level
-Message-ID: <20200623142400.GB6578@ziepe.ca>
-References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
- <20200617112811.GL2383158@unreal>
- <20200617182046.GI6578@ziepe.ca>
- <20200617190756.GA2721989@unreal>
- <20200617192642.GL6578@ziepe.ca>
- <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
- <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
- <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
- <20200623121721.GZ6578@ziepe.ca>
- <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
+        id S1732986AbgFWOZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 10:25:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47474 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732781AbgFWOZG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 10:25:06 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B635E20716;
+        Tue, 23 Jun 2020 14:25:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592922306;
+        bh=WolNKP6AFb9F9+4XbRDDy9/99/EDMUqm5gJZnB0tSXo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JoDTFM6WzRLRmusq17s81KEFBRc7Ne7InvHx/4dmMwGpegdnNwlxUqKE2v2lfLWMK
+         ovpMMb8WX5gUmCNMLCs2tcKTM8nVSkqPuFsegIvZXb3v7ThHsrB6bDFhAGD76Cvnum
+         10RCaNU6ZCIdAVZG72M9+f4ki5lcomn4Krs9zmfg=
+Date:   Tue, 23 Jun 2020 07:25:03 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
+ support
+Message-ID: <20200623142503.GA1288900@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200622162530.1287650-1-kbusch@kernel.org>
+ <20200622162530.1287650-4-kbusch@kernel.org>
+ <5b9af756-f99b-c1b5-ae2e-7dd2177208a1@suse.de>
+ <20200623092033.GA117742@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJpMwyj_Fa6AhYXcGh4kS79Vd2Dy3N7B5-9XhKHn4qWDo-HVjw@mail.gmail.com>
+In-Reply-To: <20200623092033.GA117742@localhost.localdomain>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 07:15:03PM +0530, Haris Iqbal wrote:
-> On Tue, Jun 23, 2020 at 5:47 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
-> > > Hi Jason and Leon,
-> > >
-> > > Did you get a chance to look into my previous email?
-> >
-> > Was there a question?
+On Tue, Jun 23, 2020 at 09:20:35AM +0000, Niklas Cassel wrote:
+> On Tue, Jun 23, 2020 at 08:20:23AM +0200, Hannes Reinecke wrote:
+> > On 6/22/20 6:25 PM, Keith Busch wrote:
+> > > From: Niklas Cassel <niklas.cassel@wdc.com>
+> > > -	if (ctrl->vs >= NVME_VS(1, 3, 0))
+> > > +	if (ctrl->vs >= NVME_VS(1, 3, 0) || nvme_multi_css(ctrl))
+> > >   		return nvme_identify_ns_descs(ctrl, nsid, ids);
+> > >   	return 0;
+> > >   }
+> > 
+> > Hmm? Are command sets even defined for something earlier than 1.3?
 > 
-> Multiple actually :)
-> 
-> >
-> > Jason
-> 
-> In response to your emails,
-> 
-> > Somehow nvme-rdma works:
-> 
-> I think that's because the callchain during the nvme_rdma_init_module
-> initialization stops at "nvmf_register_transport()". Here only the
-> "struct nvmf_transport_ops nvme_rdma_transport" is registered, which
-> contains the function "nvme_rdma_create_ctrl()". I tested this in my
-> local setup and during kernel boot, that's the extent of the
-> callchain.
-> The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
-> called later from "nvmf_dev_write()". I am not sure when this is
-> called, probably when the "discover" happens from the client side or
-> during the server config.
-> 
-> It seems that the "rdma_bind_addr()" is called by the nvme rdma
-> module; but during the following events
-> 1) When a discover happens from the client side. Call trace for that looks like,
-> [ 1098.409398] nvmf_dev_write
-> [ 1098.409403] nvmf_create_ctrl
-> [ 1098.414568] nvme_rdma_create_ctrl
-> [ 1098.415009] nvme_rdma_setup_ctrl
-> [ 1098.415010] nvme_rdma_configure_admin_queue
-> [ 1098.415010] nvme_rdma_alloc_queue
-> [ 1098.415032] rdma_resolve_addr
-> [ 1098.415032] cma_bind_addr
-> [ 1098.415033] rdma_bind_addr
-> 
-> 2) When a connect happens from the client side. Call trace is the same
-> as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
-> n being the number of IO queues being created.
-> 
-> On the server side, when an nvmf port is enabled, that also triggers a
-> call to "rdma_bind_addr()", but that is not from the nvme rdma module.
-> may be nvme target rdma? (not sure).
-> 
-> Does this make sense or am I missing something here?
+> According to Keith, usually new features are not really tied to a
+> specific NVMe version.
 
-It make sense, delaying creating and CM ID's until user space starts
-will solve this init time problme
+Not really according to me; nvme just allows controllers to implement
+features ratified after the initial version release.
+ 
+> So if someone implements/enables multiple command sets feature on
+> an older base spec of NVMe, we still want to support/allow that.
 
-> 
-> > If the rdma_create_id() is not on a callchain from module_init then you don't have a problem.
-> 
-> I am a little confused. I thought the problem occurs from a call to
-> either "rdma_resolve_addr()" which calls "rdma_bind_addr()",
-> or a direct call to "rdma_bind_addr()" as in rtrs case.
-> In both the cases, a call to "rdma_create_id()" is needed before this.
-
-Right rdma_create_id() must precede anything that has problems, and it
-should not be done from module_init.
-
-Jason
+Right. We don't check the version to see if multi-command sets are
+supported when we initially enable it, so we shouldn't need to check the
+version later.
