@@ -2,53 +2,54 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1751C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08379C433E2
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:37:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A0DA20781
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAB46207D0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 17:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592933791;
-	bh=BXpjKMRjKVDNEazo5/y3JtFBbZ+zFAHaaJVS6tJxJAU=;
+	s=default; t=1592933829;
+	bh=pF3pWv/GOcDxOoaEshP3nh+jd3va/7b8gr2M0p5wcCY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PAKA/8Fc0mAVpgzbugA5bYDszHXmRhWkkA8VQtDHVBPUARKFrFP+gExUwf4K/qv8l
-	 fehaPn0EhZ4xtX5GET1OPVK7pJ7eZUxhpKgiAPIdxAUwPIiS3KL0S69YZm1hz4zzk6
-	 yj8u21esyuzsTonWYK1Vvb6N/YiAh6hoeAm+kGIw=
+	b=lC0mh0D8u5OjkgPt4GcrG+RxgmkF5aJr8sfjc8jf1uP6S0iz5MvmtVNfKypJJNiTH
+	 KT+bkEw4WwCUZWsQD3ZuVEd/hM0PQl/tw95gCNOB/CPlqu7gwXdKxorDpUka2yarZp
+	 CLwgCoNGHz2ANbF02HsGCHBc0q9iVxl0azRhyTsw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387585AbgFWRg3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 13:36:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33720 "EHLO mail.kernel.org"
+        id S2387743AbgFWRhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 13:37:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34872 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387579AbgFWRg2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:36:28 -0400
+        id S2387740AbgFWRhH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:37:07 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 702F6207D0;
-        Tue, 23 Jun 2020 17:36:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2F77E20706;
+        Tue, 23 Jun 2020 17:37:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592933788;
-        bh=BXpjKMRjKVDNEazo5/y3JtFBbZ+zFAHaaJVS6tJxJAU=;
+        s=default; t=1592933826;
+        bh=pF3pWv/GOcDxOoaEshP3nh+jd3va/7b8gr2M0p5wcCY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=df4uIvQV8WHSzz9yTfCSUuW/6vc4BD6avJuNVgoL47JAS+4YtmVYzBH0DyN/S75sE
-         xl/Ew6HSHnBXWMbHylo0XwVRub/lzh1I535ENFhBu82W1nsQ8It+lSitCqKOSbEgk+
-         EQL3zA2JCGOidfTA/skZ2IDtgl0LK1nPbhwWVm7w=
+        b=yU+ZncpjrKRCNfILpNzw+Fe6/Yp0Elzd74GXV1aGshpF05xSuALgzghPk8b9mj/ko
+         wQnaGO3X+BgJpDbN6+q1hkYcnLC4uIfCqbTCFwWVuq9/pCLDQwbPVBQhuVwFTZA0EB
+         crZMliUgX3J10p2x8Qn5gtA/8FD67AUAO5kaE618=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Weiping Zhang <zhangweiping@didiglobal.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, Jan Kara <jack@suse.cz>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 23/24] block: update hctx map when use multiple maps
-Date:   Tue, 23 Jun 2020 13:35:58 -0400
-Message-Id: <20200623173559.1355728-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 6/6] blktrace: break out of blktrace setup on concurrent calls
+Date:   Tue, 23 Jun 2020 13:36:58 -0400
+Message-Id: <20200623173658.1356241-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200623173559.1355728-1-sashal@kernel.org>
-References: <20200623173559.1355728-1-sashal@kernel.org>
+In-Reply-To: <20200623173658.1356241-1-sashal@kernel.org>
+References: <20200623173658.1356241-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -58,57 +59,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Weiping Zhang <zhangweiping@didiglobal.com>
+From: Luis Chamberlain <mcgrof@kernel.org>
 
-[ Upstream commit fe35ec58f0d339221643287bbb7cee15c93a5389 ]
+[ Upstream commit 1b0b283648163dae2a214ca28ed5a99f62a77319 ]
 
-There is an issue when tune the number for read and write queues,
-if the total queue count was not changed. The hctx->type cannot
-be updated, since __blk_mq_update_nr_hw_queues will return directly
-if the total queue count has not been changed.
+We use one blktrace per request_queue, that means one per the entire
+disk.  So we cannot run one blktrace on say /dev/vda and then /dev/vda1,
+or just two calls on /dev/vda.
 
-Reproduce:
+We check for concurrent setup only at the very end of the blktrace setup though.
 
-dmesg | grep "default/read/poll"
-[    2.607459] nvme nvme0: 48/0/0 default/read/poll queues
-cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
-     48 default
+If we try to run two concurrent blktraces on the same block device the
+second one will fail, and the first one seems to go on. However when
+one tries to kill the first one one will see things like this:
 
-tune the write queues to 24:
-echo 24 > /sys/module/nvme/parameters/write_queues
-echo 1 > /sys/block/nvme0n1/device/reset_controller
+The kernel will show these:
 
-dmesg | grep "default/read/poll"
-[  433.547235] nvme nvme0: 24/24/0 default/read/poll queues
+```
+debugfs: File 'dropped' in directory 'nvme1n1' already present!
+debugfs: File 'msg' in directory 'nvme1n1' already present!
+debugfs: File 'trace0' in directory 'nvme1n1' already present!
+``
 
-cat /sys/kernel/debug/block/nvme0n1/hctx*/type | sort | uniq -c
-     48 default
+And userspace just sees this error message for the second call:
 
-The driver's hardware queue mapping is not same as block layer.
+```
+blktrace /dev/nvme1n1
+BLKTRACESETUP(2) /dev/nvme1n1 failed: 5/Input/output error
+```
 
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The first userspace process #1 will also claim that the files
+were taken underneath their nose as well. The files are taken
+away form the first process given that when the second blktrace
+fails, it will follow up with a BLKTRACESTOP and BLKTRACETEARDOWN.
+This means that even if go-happy process #1 is waiting for blktrace
+data, we *have* been asked to take teardown the blktrace.
+
+This can easily be reproduced with break-blktrace [0] run_0005.sh test.
+
+Just break out early if we know we're already going to fail, this will
+prevent trying to create the files all over again, which we know still
+exist.
+
+[0] https://github.com/mcgrof/break-blktrace
+
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ kernel/trace/blktrace.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0550366e25d8b..f1b930a300a38 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3279,7 +3279,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 6d3b432a748a6..88eb9261c7b5c 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -15,6 +15,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  *
+  */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <linux/kernel.h>
+ #include <linux/blkdev.h>
+ #include <linux/blktrace_api.h>
+@@ -481,6 +484,16 @@ int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	 */
+ 	strreplace(buts->name, '/', '_');
  
- 	if (set->nr_maps == 1 && nr_hw_queues > nr_cpu_ids)
- 		nr_hw_queues = nr_cpu_ids;
--	if (nr_hw_queues < 1 || nr_hw_queues == set->nr_hw_queues)
-+	if (nr_hw_queues < 1)
-+		return;
-+	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
- 		return;
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	/*
++	 * bdev can be NULL, as with scsi-generic, this is a helpful as
++	 * we can be.
++	 */
++	if (q->blk_trace) {
++		pr_warn("Concurrent blktraces are not allowed on %s\n",
++			buts->name);
++		return -EBUSY;
++	}
++
+ 	bt = kzalloc(sizeof(*bt), GFP_KERNEL);
+ 	if (!bt)
+ 		return -ENOMEM;
 -- 
 2.25.1
 
