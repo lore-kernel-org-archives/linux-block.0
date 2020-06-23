@@ -2,176 +2,238 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2410C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 09:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9580C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 09:50:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 992EA20724
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 09:20:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3C0A206C0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 09:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OZ12Dkmw";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ESowi1yO"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Klb9LvBr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731971AbgFWJUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 05:20:41 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:19179 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731938AbgFWJUk (ORCPT
+        id S1732040AbgFWJuk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 05:50:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39336 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731996AbgFWJuk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 05:20:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1592904053; x=1624440053;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=acr2u++7FQrbfQL2AxGLahquLcPGe1nT+TWZ2Dvzsw8=;
-  b=OZ12DkmwHNyki2T/Lw3EUpNDmi4TV7Uam+11ODPS3PoZGse3aRxgpacV
-   jmkhgK1J0AiOUJOjZxlTxP/3JIQMbzJPU4DEx3DRqFIVk9nYSgB0lTDfO
-   MVa5kaVdbZtRVW7rD9Csrhvf1Y1FQieHf2sHd9V7zclJ8zTIUHFvILOh2
-   Jkib17NPoOoahpvwTX/Trz6wddsxllTiSvG//rbFB2UwMqEpQAalKmAjV
-   N3HGKpPyBcwBJB+q5qfw3dtQrP2K6IwL1DyeyM0q9XN9V8cCtgW3iAO8D
-   t4djKsc8kTaDOGvwwzsLqjRu+RmYmyIaRhpvEUw4g2RJN05VFG0WRDAko
-   w==;
-IronPort-SDR: J92kb4ChDFaZmHcSlgO432iFcS170L1DTW9SY6Ec1T4WNoEB92HjHuN6QvHmCPcKMWv7QojDT/
- l7QNgPXPne8Wav5dXcjfWkOyn3+cf+GfkHJqh8BpfDXAQdbDgPt9a+F1wJ4ate7A0xEtUegI62
- U2KPMswQ7tEHVh63jAe9goL1xfTUU2FN+0srxos1GV4lMcMk7Z1zmJQFuWbpg4V5k6wKD3UjAl
- ycmL5062vRJgsECeg4iIZBswr9taxzYCautkRhPL9dwHAfCtL2+SAEiA6Li8P3c4EJ5LKYp/Zj
- EGM=
-X-IronPort-AV: E=Sophos;i="5.75,270,1589212800"; 
-   d="scan'208";a="243680213"
-Received: from mail-bn8nam11lp2174.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.174])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Jun 2020 17:20:50 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DkPChqMv1kgJYCroHpGmmH3P0mSqTrfOXMLh0ZTy3KLdAKjndpIm+vawV8dHeYbrfJsC5HExu2oGvCDOJui1je1rQMQE7uQ4LWLct1E2wmQ7IH6G0SgtYotRaG1MmP1UWIBvz6xUr4cUr3/GOwicKbqB4Uh8jm2mzwlvHjyytz9gBiURi6DOrLqgOR+h/noGx48tgTHfYW2xPF7sbC0vyJTNjLHvHXWW0NEVsz9zcJPgsZEJj9mqCwFyKk7gr8mFHFElJGWQPMAcAecLc7JG/oJBhIW0IuOvgjM044tBRpvUZsb66GrZ2036AjlKJG05tB0UF8FnQ70fVhxc+S8zcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/x8Pv88pDEatJsVDrF81bK0a5nl5fpRz6B+/2IBdpX8=;
- b=lX+PsgIFSY9JNk473qO00OAAU1tJ14YW+1N1uZVxcjlqg3khihg9Uht/FiuG5x318EORpVPHK5Mc7a4u9waGFjqWQBS2ZhK/5Wt5YuVixckQt8lYVEU/ZfHzAhgkLtyoj2gLpyMwOfD7M8mp+SNt2xrC9EHUvanmvfCfR0QQV1gzUST/eHuAf6UlOb/coUNhkIjPzuZmOTlg4lD+xhPep96MJK2XDzTSH2QOOFC23Zy2LNNP4+ONsDpPjU0YEksRde9At/EGOBl9ylC1U5IaD1TgEJjBM4Vl1b+NkN4Uuk1+vhRvQdVkhgXDCfBeLjTuGAq6dO9/yn+OY+1ZO0Rl6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Tue, 23 Jun 2020 05:50:40 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9740CC061755
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 02:50:39 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id w6so9641031ejq.6
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 02:50:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/x8Pv88pDEatJsVDrF81bK0a5nl5fpRz6B+/2IBdpX8=;
- b=ESowi1yO3fdu6ixtyd4YHOf4/cEcDbXhqDwflINNjGzfau9QvIwh0F2vXq/Otm6NvR0au2wn33x9RceQkB3E24wPf5wTsi+MbmK4qhxRyME52VXJyaIB3+yjMm5xulzLk+IKoHhHv9szhseok+BcZtABmF1UQibjIEG6Wu/SBlU=
-Received: from BYAPR04MB5112.namprd04.prod.outlook.com (2603:10b6:a03:45::10)
- by BYAPR04MB5941.namprd04.prod.outlook.com (2603:10b6:a03:109::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Tue, 23 Jun
- 2020 09:20:35 +0000
-Received: from BYAPR04MB5112.namprd04.prod.outlook.com
- ([fe80::a442:4836:baba:c84b]) by BYAPR04MB5112.namprd04.prod.outlook.com
- ([fe80::a442:4836:baba:c84b%6]) with mapi id 15.20.3109.027; Tue, 23 Jun 2020
- 09:20:35 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Hannes Reinecke <hare@suse.de>
-CC:     Keith Busch <kbusch@kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier.gonz@samsung.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
- support
-Thread-Topic: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
- support
-Thread-Index: AQHWSLHEI+avTIAeykKLqw+a7Aouuqjlu12AgAAyVoA=
-Date:   Tue, 23 Jun 2020 09:20:35 +0000
-Message-ID: <20200623092033.GA117742@localhost.localdomain>
-References: <20200622162530.1287650-1-kbusch@kernel.org>
- <20200622162530.1287650-4-kbusch@kernel.org>
- <5b9af756-f99b-c1b5-ae2e-7dd2177208a1@suse.de>
-In-Reply-To: <5b9af756-f99b-c1b5-ae2e-7dd2177208a1@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: suse.de; dkim=none (message not signed)
- header.d=none;suse.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.224.200.150]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 256aa8f1-0ec2-4928-5a33-08d81756afdb
-x-ms-traffictypediagnostic: BYAPR04MB5941:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB59418273BE3513ADA91C4E6FF2940@BYAPR04MB5941.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 04433051BF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qD9ex7UvfxCFZUcButx/KtvJTrPYDofhW0Xjxsc2fqMW3naHBv0LXfQB85TYCw1qC8JyigVxj3WY2coohNJVFZpsN+QOsNA/IzQiQkTwZLDGl6ntN/w4uUIMt5VjCUpHAqFJsej893PRjH7DsHxBDNRxv5D2qlaf1fcTaL3vmMMnQmiM0+F7LuC3QmsmpQvNTtqT7Ib/moYrk0168H0YsL9g7pTvU4TEnirqffmP6uRT3JWvToTHAITtp7ZJ1yP7D6C3/qsPCxArwj+v+ON2jKISssLRNejfxApP47GZUGOz4zyBto9RJPGRvbv591qUjj19WHna1c4CWujPp9oK0A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB5112.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(366004)(39860400002)(396003)(376002)(54906003)(71200400001)(6512007)(66946007)(66476007)(66556008)(64756008)(66446008)(2906002)(1076003)(76116006)(5660300002)(33656002)(6916009)(9686003)(91956017)(4326008)(86362001)(6486002)(7416002)(8676002)(26005)(478600001)(186003)(53546011)(316002)(6506007)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 1yfwLIrT3ZTdIRBrlv4wTjvU8n2PBJbZa6uqBiCiWSTBVCYFuUoYyfgQpcgqBJ7NGSwzEPRZNNAdzNFtXSQDNXowJ39HXNuXFEyKqsU8uN3+LXJFi6cTg7USvm7VLf99W7y+zaPk9Ge3FXleUcEu62C8CiAaeOviwVZ4oAKWROZ7dEv9f9d6LXe++s4vDRZCkGAXPvnS/zKJ/OtC1+5DlW3A7uT7VP/8uikxygu2YkxEffX4dhWW429PkdLg3ITGb+9xDPF7Zr96eETEjutPs0PUxg+maeOH+mNQxeUUjGzcE17CabuAn+he2Gv2Jaz0+kk9vSpWkUZrsqCQoOOcwW5wNYPoUOW/BubOF9vlN3ofOc8NUt58NupYG9Cs+NUfXhU4PxfQ5qpT5XWc+tTTGGGBedt4nNjV8MnPIeoTAk9qsqTXN2kL0pCU6b9E5QQDv358l1zFDXhiBsYOwasByHCiyvajkPf3b8paxxjDAWG1pI+BTe4NSh2lssVcys/q
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <DC14742D6C69154095969E8AF9CD682C@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=43Y6xmU50+sLAZ5J3fXA3wX4xl6aKaZmykjUjo6gTJ8=;
+        b=Klb9LvBrigVP6aasMs5mt8cmbwfEC0k02WDSzPJoiGht73X1SX4aq9sBSMTa7nYkL3
+         PRKOkLTjuT1IXzffTYvBBlnH7j/vZ31zG+AzA16iuFe/Z0yhEf9NW4sTXVvQ2JPtwDkU
+         Or0NcMin9HpWulHQgMzU/arC6UzsbzAqM0FVCoVvEAkdOL6uNYXwO/tnLem0T3c/5irh
+         3ldgD/BAMajEscbHFTXNEl8nL3g8gC/Veu6apemx5uQDFScBIDSXbiUowplelXt54LH2
+         OiU9tezBXQr+9JpRvPYYchK03bwCURFndjbHXYBJuPrtnhj9KwYUr14aM88309M6irEA
+         KNZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=43Y6xmU50+sLAZ5J3fXA3wX4xl6aKaZmykjUjo6gTJ8=;
+        b=ltZRGHBd1z0VFoMRpsPld1P3/RWFXF3b8l4LlNQEJ69wRRNfrjPZYf2WvEdr8J6TY2
+         3IYm5Xwv7DQ0FUB3X3kUmfDY8HnBM1LXgGLSgjB8CMqLbH11K+As73/e9lXtUt3cN/sy
+         be+Mn/ijfg3pundTNZixiMK9RoakhQlWC96maMOUX2DTpbcd2oz2A3w0NXhai0TOsPoi
+         wbmgD5+kHuE6qgBnfY+t+zHOuLkf1HLZi2mMKm9VslO/AtLr+tsRb4DgPkWp7aI0MioJ
+         NPf+boMIWWjPKwgS/+8P46QVS9/vQjj6jYR7auUqv7x1pro+Tj24fPJ2wZtBm2QRVXcw
+         svng==
+X-Gm-Message-State: AOAM531P6xXrMV4bACSByKFDd6iYVa1nFQ/z3cbseahGC/BL4NvVt03A
+        asrQE4UwSLhTyG7wFHB4y2xYBaGZXMqg0zPWmrr07A==
+X-Google-Smtp-Source: ABdhPJwz4oxeIjD4nOxCeZeBUDGwCkRfA2lwNAC6RaO25FamkK8rqDrozotUdVWyRFiFKXU7TYjbau9Gjm9UOo1vrwU=
+X-Received: by 2002:a17:906:1682:: with SMTP id s2mr10650062ejd.532.1592905838199;
+ Tue, 23 Jun 2020 02:50:38 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 256aa8f1-0ec2-4928-5a33-08d81756afdb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2020 09:20:35.6727
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZXpQ5k9cXp0Xk2Mb6aE5/y4YjikKQrYUsgP83yNKW9DHPYdqLnqmL6D5bw+C//TGkJH/fTdrpQaUWvKMmFye8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5941
+References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
+ <20200617112811.GL2383158@unreal> <20200617182046.GI6578@ziepe.ca>
+ <20200617190756.GA2721989@unreal> <20200617192642.GL6578@ziepe.ca>
+ <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com> <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+In-Reply-To: <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+From:   Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Date:   Tue, 23 Jun 2020 15:20:27 +0530
+Message-ID: <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
+Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
+ late_initcall level
+To:     Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
+        kernel test robot <rong.a.chen@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 08:20:23AM +0200, Hannes Reinecke wrote:
-> On 6/22/20 6:25 PM, Keith Busch wrote:
-> > From: Niklas Cassel <niklas.cassel@wdc.com>
-> >=20
-> > Implements support for the I/O Command Sets command set. The command se=
-t
-> > introduces a method to enumerate multiple command sets per namespace. I=
-f
-> > the command set is exposed, this method for enumeration will be used
-> > instead of the traditional method that uses the CC.CSS register command
-> > set register for command set identification.
-> >=20
-> > For namespaces where the Command Set Identifier is not supported or
-> > recognized, the specific namespace will not be created.
-> >=20
-> > Reviewed-by: Javier Gonz=E1lez <javier.gonz@samsung.com>
-> > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> > Reviewed-by: Matias Bj=F8rling <matias.bjorling@wdc.com>
-> > Reviewed-by: Daniel Wagner <dwagner@suse.de>
-> > Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> > ---
-> > @@ -1792,7 +1811,7 @@ static int nvme_report_ns_ids(struct nvme_ctrl *c=
-trl, unsigned int nsid,
-> >   		memcpy(ids->eui64, id->eui64, sizeof(id->eui64));
-> >   	if (ctrl->vs >=3D NVME_VS(1, 2, 0))
-> >   		memcpy(ids->nguid, id->nguid, sizeof(id->nguid));
-> > -	if (ctrl->vs >=3D NVME_VS(1, 3, 0))
-> > +	if (ctrl->vs >=3D NVME_VS(1, 3, 0) || nvme_multi_css(ctrl))
-> >   		return nvme_identify_ns_descs(ctrl, nsid, ids);
-> >   	return 0;
-> >   }
->=20
-> Hmm? Are command sets even defined for something earlier than 1.3?
+Hi Jason and Leon,
 
-According to Keith, usually new features are not really tied to a
-specific NVMe version.
+Did you get a chance to look into my previous email?
 
-So if someone implements/enables multiple command sets feature on
-an older base spec of NVMe, we still want to support/allow that.
+On Thu, Jun 18, 2020 at 2:44 PM Haris Iqbal <haris.iqbal@cloud.ionos.com> wrote:
+>
+> It seems that the "rdma_bind_addr()" is called by the nvme rdma
+> module; but during the following events
+> 1) When a discover happens from the client side. Call trace for that looks like,
+> [ 1098.409398] nvmf_dev_write
+> [ 1098.409403] nvmf_create_ctrl
+> [ 1098.414568] nvme_rdma_create_ctrl
+> [ 1098.415009] nvme_rdma_setup_ctrl
+> [ 1098.415010] nvme_rdma_configure_admin_queue
+> [ 1098.415010] nvme_rdma_alloc_queue
+>                              -->(rdma_create_id)
+> [ 1098.415032] rdma_resolve_addr
+> [ 1098.415032] cma_bind_addr
+> [ 1098.415033] rdma_bind_addr
+>
+> 2) When a connect happens from the client side. Call trace is the same
+> as above, plus "nvme_rdma_alloc_queue()" is called n number of times;
+> n being the number of IO queues being created.
+>
+>
+> On the server side, when an nvmf port is enabled, that also triggers a
+> call to "rdma_bind_addr()", but that is not from the nvme rdma module.
+> may be nvme target rdma? (not sure).
+>
+> On Thu, Jun 18, 2020 at 7:15 AM Haris Iqbal <haris.iqbal@cloud.ionos.com> wrote:
+> >
+> > (Apologies for multiple emails. Was having trouble with an extension,
+> > cause of which emails did not get delivered to the mailing list.
+> > Resolved now.)
+> >
+> > > Somehow nvme-rdma works:
+> >
+> > I think that's because the callchain during the nvme_rdma_init_module
+> > initialization stops at "nvmf_register_transport()". Here only the
+> > "struct nvmf_transport_ops nvme_rdma_transport" is registered, which
+> > contains the function "nvme_rdma_create_ctrl()". I tested this in my
+> > local setup and during kernel boot, that's the extent of the
+> > callchain.
+> > The ".create_ctrl"; which now points to "nvme_rdma_create_ctrl()" is
+> > called later from "nvmf_dev_write()". I am not sure when this is
+> > called, probably when the "discover" happens from the client side or
+> > during the server config. I am trying to test this to confirm, will
+> > send more details once I am done.
+> > Am I missing something here?
+> >
+> >
+> > > If the rdma_create_id() is not on a callchain from module_init then you don't have a problem.
+> >
+> > I am a little confused. I thought the problem occurs from a call to
+> > either "rdma_resolve_addr()" which calls "rdma_bind_addr()",
+> > or a direct call to "rdma_bind_addr()" as in rtrs case.
+> > In both the cases, a call to "rdma_create_id()" is needed before this.
+> >
+> >
+> > > Similarly they are supposed to be created from the client attachment.
+> > I am a beginner in terms of concepts here. Did you mean when a client
+> > tries to establish the first connection to an rdma server?
+> >
+> >
+> > On Thu, Jun 18, 2020 at 12:56 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Wed, Jun 17, 2020 at 10:07:56PM +0300, Leon Romanovsky wrote:
+> > > > On Wed, Jun 17, 2020 at 03:20:46PM -0300, Jason Gunthorpe wrote:
+> > > > > On Wed, Jun 17, 2020 at 02:28:11PM +0300, Leon Romanovsky wrote:
+> > > > > > On Wed, Jun 17, 2020 at 04:07:32PM +0530, haris.iqbal@cloud.ionos.com wrote:
+> > > > > > > From: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > > > > > >
+> > > > > > > Fixes: 2de6c8de192b ("block/rnbd: server: main functionality")
+> > > > > > > Reported-by: kernel test robot <rong.a.chen@intel.com>
+> > > > > > > Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+> > > > > > >
+> > > > > > > The rnbd_server module's communication manager initialization depends on the
+> > > > > > > registration of the "network namespace subsystem" of the RDMA CM agent module.
+> > > > > > > As such, when the kernel is configured to load the rnbd_server and the RDMA
+> > > > > > > cma module during initialization; and if the rnbd_server module is initialized
+> > > > > > > before RDMA cma module, a null ptr dereference occurs during the RDMA bind
+> > > > > > > operation.
+> > > > > > > This patch delays the initialization of the rnbd_server module to the
+> > > > > > > late_initcall level, since RDMA cma module uses module_init which puts it into
+> > > > > > > the device_initcall level.
+> > > > > > >  drivers/block/rnbd/rnbd-srv.c | 2 +-
+> > > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+> > > > > > > index 86e61523907b..213df05e5994 100644
+> > > > > > > +++ b/drivers/block/rnbd/rnbd-srv.c
+> > > > > > > @@ -840,5 +840,5 @@ static void __exit rnbd_srv_cleanup_module(void)
+> > > > > > >         rnbd_srv_destroy_sysfs_files();
+> > > > > > >  }
+> > > > > > >
+> > > > > > > -module_init(rnbd_srv_init_module);
+> > > > > > > +late_initcall(rnbd_srv_init_module);
+> > > > > >
+> > > > > > I don't think that this is correct change. Somehow nvme-rdma works:
+> > > > > > module_init(nvme_rdma_init_module);
+> > > > > > -> nvme_rdma_init_module
+> > > > > >  -> nvmf_register_transport(&nvme_rdma_transport);
+> > > > > >   -> nvme_rdma_create_ctrl
+> > > > > >    -> nvme_rdma_setup_ctrl
+> > > > > >     -> nvme_rdma_configure_admin_queue
+> > > > > >      -> nvme_rdma_alloc_queue
+> > > > > >       -> rdma_create_id
+> > > > >
+> > > > > If it does work, it is by luck.
+> > > >
+> > > > I didn't check every ULP, but it seems that all ULPs use the same
+> > > > module_init.
+> > > >
+> > > > >
+> > > > > Keep in mind all this only matters for kernels without modules.
+> > > >
+> > > > Can it be related to the fact that other ULPs call to ib_register_client()
+> > > > before calling to rdma-cm? RNBD does not have such call.
+> > >
+> > > If the rdma_create_id() is not on a callchain from module_init then
+> > > you don't have a problem.
+> > >
+> > > nvme has a bug here, IIRC. It is not OK to create RDMA CM IDs outside
+> > > a client - CM IDs are supposed to be cleaned up when the client is
+> > > removed.
+> > >
+> > > Similarly they are supposed to be created from the client attachment.
+> > >
+> > > Though listening CM IDs unbound to any device may change that
+> > > slightly, I think it is probably best practice to create the listening
+> > > ID only if a client is bound.
+> > >
+> > > Most probably that is the best way to fix rnbd
+> > >
+> > > > I'm not proposing this, but just loudly wondering, do we really need rdma-cm
+> > > > as a separate module? Can we bring it to be part of ib_core?
+> > >
+> > > No idea.. It doesn't help this situation at least
+> > >
+> > > Jason
+> >
+> >
+> >
+> > --
+> >
+> > Regards
+> > -Haris
+>
+>
+>
+> --
+>
+> Regards
+> -Haris
 
 
-Kind regards,
-Niklas=
+
+-- 
+
+Regards
+-Haris
