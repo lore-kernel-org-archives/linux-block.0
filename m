@@ -2,86 +2,85 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CF2C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8327BC433E1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 21:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF7F22082F
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 19:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5703120738
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 21:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHsqE9Yz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/QXO8h3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387520AbgFWTSJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 15:18:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28137 "EHLO
+        id S2389109AbgFWUcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 16:32:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30876 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1733308AbgFWTSJ (ORCPT
+        by vger.kernel.org with ESMTP id S2391268AbgFWUcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 15:18:09 -0400
+        Tue, 23 Jun 2020 16:32:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592939888;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
+        s=mimecast20190719; t=1592944327;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H1ShwfQ/jwFEqVsmbSMX+mrCeDuorCzonQ7UJ1/zhw8=;
-        b=hHsqE9YzLxeYW0RQ1+SMe+/AyWeh3v0Ar26XW2htfjWu/sTQi+HdfpxM6+MrrO9Vs79TdF
-        3V8Qi52iMg/dqyYmBEQV3+qTRwCyHuTBL2pHHeMUh4YcfLNsNsVtUcsWUfBU3LEodnziu5
-        9XV5T37nx+D6y9qPoIE6yZ5G65a7ImE=
+        bh=ZNhU0Jw+QDG73Ku9z9a1ysMcjkSuO17wWVzu44xt7kY=;
+        b=L/QXO8h3+KK7aF+PwmptBzbNyppU1IihO1kgRSn3+GW29ElS2JHNTRPSuPdBDALbGc3gQH
+        c2ZGwY61/1R2Nl/jQ8Pf0qLHimaDU62gr4Y3Hvdl3TqqNBbc05iRq+CvFGYx2TM1Ixg5hJ
+        LNY/yoFhAHW/UynR9gAA1H293Hd434M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-146-zBuTM42psyn7Tn6OUw-1; Tue, 23 Jun 2020 15:18:03 -0400
-X-MC-Unique: 146-zBuTM42psyn7Tn6OUw-1
+ us-mta-257-lWNS7emhOgyaztWH1OZ89w-1; Tue, 23 Jun 2020 16:32:05 -0400
+X-MC-Unique: lWNS7emhOgyaztWH1OZ89w-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2AF0107ACCA;
-        Tue, 23 Jun 2020 19:18:02 +0000 (UTC)
-Received: from sulaco.redhat.com (unknown [10.3.128.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5A577168D;
-        Tue, 23 Jun 2020 19:18:01 +0000 (UTC)
-From:   Tony Asleson <tasleson@redhat.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [RFC PATCH v3 8/8] dev_vprintk_emit: Increase hdr size
-Date:   Tue, 23 Jun 2020 14:17:49 -0500
-Message-Id: <20200623191749.115200-9-tasleson@redhat.com>
-In-Reply-To: <20200623191749.115200-1-tasleson@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0599106F731;
+        Tue, 23 Jun 2020 20:32:04 +0000 (UTC)
+Received: from [10.3.128.20] (unknown [10.3.128.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C2C997930B;
+        Tue, 23 Jun 2020 20:32:03 +0000 (UTC)
+Reply-To: tasleson@redhat.com
+Subject: Re: [RFC PATCH v3 7/8] nvme: Add durable name for dev_printk
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20200623191749.115200-1-tasleson@redhat.com>
+ <20200623191749.115200-8-tasleson@redhat.com>
+ <BYAPR04MB496553DF4EB78924AAEC1F2B86940@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Message-ID: <afad0484-17fe-d206-33a0-2d473dd68232@redhat.com>
+Date:   Tue, 23 Jun 2020 15:32:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <BYAPR04MB496553DF4EB78924AAEC1F2B86940@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the addition of the device persistent id we have the possibility
-of adding 154 more bytes to the hdr.  Thus if we assume the previous
-size of 128 was sufficent we can simply add the 2 amounts and round
-up.
+On 6/23/20 3:04 PM, Chaitanya Kulkarni wrote:
+> On 6/23/20 12:18 PM, Tony Asleson wrote:
+>> Corrections from Keith Busch review comments.
+>>
+>> Signed-off-by: Tony Asleson<tasleson@redhat.com>
+>> ---
+>>   drivers/nvme/host/core.c | 18 ++++++++++++++++++
+>>   1 file changed, 18 insertions(+)
+> This looks useful me, but why you still have an RFC fag ?
 
-Signed-off-by: Tony Asleson <tasleson@redhat.com>
----
- drivers/base/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index 964690572a89..c2439d12608d 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -3814,7 +3814,7 @@ create_syslog_header(const struct device *dev, char *hdr, size_t hdrlen)
- int dev_vprintk_emit(int level, const struct device *dev,
- 		     const char *fmt, va_list args)
- {
--	char hdr[128];
-+	char hdr[288];
- 	size_t hdrlen;
- 
- 	hdrlen = create_syslog_header(dev, hdr, sizeof(hdr));
--- 
-2.25.4
+I have some questions in the cover letter that I was thinking should be
+discussed before removing RFC, but maybe I'm going about this the wrong
+way and should remove that?
 
