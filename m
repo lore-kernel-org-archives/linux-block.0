@@ -2,166 +2,97 @@ Return-Path: <SRS0=PrCR=AE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE43C433DF
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AC1C433DF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:17:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42BBA20707
-	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:11:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 606692072E
+	for <linux-block@archiver.kernel.org>; Tue, 23 Jun 2020 12:17:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RQY/ESzG"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RcxTddjf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732572AbgFWMLZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 08:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
+        id S1732564AbgFWMRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 08:17:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732539AbgFWMLY (ORCPT
+        with ESMTP id S1732579AbgFWMRX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 08:11:24 -0400
+        Tue, 23 Jun 2020 08:17:23 -0400
 Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836ABC061573
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:11:24 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id i3so5628098qtq.13
-        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:11:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8DACC061795
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id v19so12690919qtq.10
+        for <linux-block@vger.kernel.org>; Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=ahUTe9XRJ8acBkcpa6ONk60UI2intY15Pgk4PKOCgS0=;
-        b=RQY/ESzGkhxZji4tPsplhJBlbizm0USPsgYnucQWPz8SHWSSoAw4/LTAKi6sTLEal+
-         xY0al366iH0mojctdZHNzLkJPa19z7iagNLr3MJI4rc2l1BefNfXO4H4bD5BV/yDlFx2
-         h5PhEtYHarUcz5i7AXqxQDuqyd/GZyUoQ8VxQ=
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JQks5GACh6h541Q4/8Hm5GmMAEZUeSD84PZv2UopM/E=;
+        b=RcxTddjfivtvB0c2KkiouO8M3/NGfoDAq3NPrsye30sgY8dXjoA1iY3Pahy3rz+yxl
+         /FaqkWMOaH2mLilfoiOpON9yMjHZP9qMpEspz72HPCQ9Fsy5GpXESQjDwcSJmYyA3G8z
+         fdRxhBOZIQqYUOCBsa+bMK1w788G9i1vnJ+fLDaT6y4K/K56hAypHtluBzexm6z3Xwf3
+         NGRsQ0G+sgodVXs4liklYhgpQfbS1txItvV/KdRicsvDf5YA1rgkeb2WY3pX5JmFvhSI
+         BRpiK0LAGVtkvRxYXL1J1wTyVhBr6zaOiTOSPl5GryNECC9LjrmInXYRr+C48n1GfoAr
+         cwLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=ahUTe9XRJ8acBkcpa6ONk60UI2intY15Pgk4PKOCgS0=;
-        b=oV9Dkifq5Lq90vAxcfcfK5LP5KV4OLawNhudMvdtFRoektdnSaPpKsWOii4J8Gg+MD
-         Aco3fXtufVLblpctn6Yo38uUkMOW0VAFbN1sY1EfSDKUbpxVyYlbFo7h34XUSMbxDyw3
-         jF7dmqG+/g33L9U2RdvEEN7s3x/j4XESlrTbdW+Z2sgj0fp4O5upbzabuE/NFNebRqYR
-         F5CQNhiXA0vDS0Jnag+yi136YScSRmzBUX4YWcuJUepuKZghWlEdTHmcFrjDMNnxsCYd
-         JPa+0wAZmDJnGWtwMJIRQ8Z9S2Pj6pb7EM3sZAAq1h67oVzaCRTTM9BjbqI9elXvc/W/
-         HAtw==
-X-Gm-Message-State: AOAM5328/CKVuKBIBSjoNMNnj1G1ufbpXvXdWgxIbrZpjkYd69k1Kpm/
-        aRpGNa8iQ+yXv3WWjOCCHC86qvkFTtQvzpIRKSGHzw==
-X-Google-Smtp-Source: ABdhPJwcuKC3ED8V1jFmIuyDFa9N+YG59CVVkkvAHStB6GsAg7XHNCw/a3+6RE2IEopKCaWNjyRYMJZdUfl1u6TRJts=
-X-Received: by 2002:ac8:7cb8:: with SMTP id z24mr20283577qtv.190.1592914283499;
- Tue, 23 Jun 2020 05:11:23 -0700 (PDT)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1591810159-240929-1-git-send-email-john.garry@huawei.com>
- <20200611030708.GB453671@T590> <c033f445-97fd-6dc9-c270-9890681b39d9@huawei.com>
- <bbdec3b3fbeb9907d2ec66a2afa56c29@mail.gmail.com> <20200615021355.GA4012@T590>
- <e49f164d867b53fd4495f1e05a85df03@mail.gmail.com> <20200616010055.GA27192@T590>
- <f9a05331a46a8c60c10e35df4aa08c45@mail.gmail.com> <67d626a6-1b7c-fbc8-24b6-8d6b6df8a7b8@suse.de>
- <20200623005518.GA843366@T590> 3b3c83d2ea14c73561f215ba15322702@mail.gmail.com
-In-Reply-To: 3b3c83d2ea14c73561f215ba15322702@mail.gmail.com
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JQks5GACh6h541Q4/8Hm5GmMAEZUeSD84PZv2UopM/E=;
+        b=T2bygRCgf5pAj/KJx7kRCYfTIhaLiN/iZcp6RgYGDw0+/FLNqBy3KaWcSmG27doXil
+         jHtJ95HCwzRkzVAR0h1xMHO16hxoLvUCs1X4uHjyne7XxLbGWb//ivgiCyPB4nFvH8UY
+         /s2k//SalDmMvQUYLzHwLs5fOk5pVQaG86Au7OrbltYXmFChVFHY4Z2aDFBAl9qPxnth
+         ug9MoJxH00STYFYbFh8K90b9oPkh59NNUTz/01sXHWZoDqEO+69P99CtBCvmdt+SJGDW
+         qOH34Ci9J9M7H1XqfGttxApz9rzvieprzEgO2cZapXLvjS89gI1MyaHNyvgNM9U6Vb69
+         jptQ==
+X-Gm-Message-State: AOAM530HsmAH6Z4WBKrhM1hNGq+mauMWacPAxArB2EBFeDff1c/fh8/5
+        jt++9+ec1jEeRI3xADQPe4Qz7A==
+X-Google-Smtp-Source: ABdhPJxpvHZg05zq1sHVCRcAfBK2AS4+Yo42wJ5elF26d9x1yYHzPS6gha1KxMvEO9Vc8ehpziFWoQ==
+X-Received: by 2002:ac8:7182:: with SMTP id w2mr21482791qto.115.1592914643025;
+        Tue, 23 Jun 2020 05:17:23 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id v45sm437419qtv.47.2020.06.23.05.17.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2020 05:17:21 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.93)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jnhrd-00CUHe-5g; Tue, 23 Jun 2020 09:17:21 -0300
+Date:   Tue, 23 Jun 2020 09:17:21 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jinpu Wang <jinpu.wang@cloud.ionos.com>, dledford@redhat.com,
+        kernel test robot <rong.a.chen@intel.com>
+Subject: Re: [PATCH] Delay the initialization of rnbd_server module to
+ late_initcall level
+Message-ID: <20200623121721.GZ6578@ziepe.ca>
+References: <20200617103732.10356-1-haris.iqbal@cloud.ionos.com>
+ <20200617112811.GL2383158@unreal>
+ <20200617182046.GI6578@ziepe.ca>
+ <20200617190756.GA2721989@unreal>
+ <20200617192642.GL6578@ziepe.ca>
+ <CAJpMwygeJ7uaNUKxhsF-bx=ufchkx7M6G0E237=-0C7GwJ3yog@mail.gmail.com>
+ <CAJpMwyjJSu4exkTAoFLhY-ubzNQLp6nWqq83k6vWn1Uw3eaK_Q@mail.gmail.com>
+ <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQBVjmvxAE7FMYb7GtMRWGcwtMcECgGaerxUAVTJvjECMFFU0QGrq6UsAuDJt2sC5poHDQH30JQYAZ8VPSMDEFRlXqtNvHgwgAAGEeA=
-Date:   Tue, 23 Jun 2020 17:41:20 +0530
-Message-ID: <541b79b7007feda09cb810d55a6f0b73@mail.gmail.com>
-Subject: RE: [PATCH RFC v7 00/12] blk-mq/scsi: Provide hostwide shared tags
- for SCSI HBAs
-To:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
-Cc:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        don.brace@microsemi.com, Sumit Saxena <sumit.saxena@broadcom.com>,
-        bvanassche@acm.org, hare@suse.com, hch@lst.de,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        esc.storagedev@microsemi.com, chenxiang66@hisilicon.com,
-        "PDL,MEGARAIDLINUX" <megaraidlinux.pdl@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJpMwygqz20=H7ovSL0nSWLbVpMv-KLOgYO=nRCLv==OC8sgHw@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > > >
-> > > Would it make sense to move it into the elevator itself?
->
-> I am not sure where exactly I should add this counter since I need
-counter per
-> hctx. Elevator data is per request object.
-> Please suggest.
->
-> >
-> > That is my initial suggestion, and the counter is just done for bfq &
-> > mq- deadline, then we needn't to pay the cost for others.
->
-> I have updated patch -
->
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c index
-a1123d4..3e0005c
-> 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -4640,6 +4640,12 @@ static bool bfq_has_work(struct blk_mq_hw_ctx
-> *hctx)  {
->         struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
->
-> +       /* If current hctx has not queued any request, there is no need
-to run.
-> +        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
-> +        * running specific hctx.
-> +        */
-> +       if (!atomic_read(&hctx->elevator_queued))
-> +               return false;
->         /*
->          * Avoiding lock: a race on bfqd->busy_queues should cause at
->          * most a call to dispatch for nothing @@ -5554,6 +5561,7 @@
-static void
-> bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
->                 rq = list_first_entry(list, struct request, queuelist);
->                 list_del_init(&rq->queuelist);
->                 bfq_insert_request(hctx, rq, at_head);
-> +              atomic_inc(&hctx->elevator_queued);
->         }
->  }
->
-> @@ -5925,6 +5933,7 @@ static void bfq_finish_requeue_request(struct
-> request *rq)
->
->         if (likely(rq->rq_flags & RQF_STARTED)) {
->                 unsigned long flags;
-> +              struct blk_mq_hw_ctx *mq_hctx = rq->mq_hctx;
->
->                 spin_lock_irqsave(&bfqd->lock, flags);
->
-> @@ -5934,6 +5943,7 @@ static void bfq_finish_requeue_request(struct
-> request *rq)
->                 bfq_completed_request(bfqq, bfqd);
->                 bfq_finish_requeue_request_body(bfqq);
->
-> +              atomic_dec(&hctx->elevator_queued);
->                 spin_unlock_irqrestore(&bfqd->lock, flags);
->         } else {
->                 /*
-> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h index
-> 126021f..946b47a 100644
-> --- a/block/blk-mq-sched.h
-> +++ b/block/blk-mq-sched.h
-> @@ -74,6 +74,13 @@ static inline bool blk_mq_sched_has_work(struct
-> blk_mq_hw_ctx *hctx)  {
->         struct elevator_queue *e = hctx->queue->elevator;
->
-> +       /* If current hctx has not queued any request, there is no need
-to run.
-> +        * blk_mq_run_hw_queue() on hctx which has queued IO will handle
-> +        * running specific hctx.
-> +        */
-> +       if (!atomic_read(&hctx->elevator_queued))
-> +               return false;
-> +
+On Tue, Jun 23, 2020 at 03:20:27PM +0530, Haris Iqbal wrote:
+> Hi Jason and Leon,
+> 
+> Did you get a chance to look into my previous email?
 
-I have missed this. I will remove above code since it is now managed
-within mq-deadline and bfq-iosched *has_work* callback.
+Was there a question?
 
->         if (e && e->type->ops.has_work)
->                 return e->type->ops.has_work(hctx);
->
+Jason
