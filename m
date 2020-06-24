@@ -2,440 +2,701 @@ Return-Path: <SRS0=vHgh=AF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3499C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 00:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49103C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 03:28:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7294720CC7
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 00:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0944920707
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 03:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kCg0qnTO";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Fvew9dH8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CYkNDJWp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387764AbgFXAqm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Jun 2020 20:46:42 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:47584 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729700AbgFXAqm (ORCPT
+        id S2388823AbgFXD2D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Jun 2020 23:28:03 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:17038 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387985AbgFXD2C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jun 2020 20:46:42 -0400
+        Tue, 23 Jun 2020 23:28:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1592959605; x=1624495605;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=5Rk7kvqew6mYPNFRR+jnF7tbuvKdlMwjbf6naqWi66M=;
-  b=kCg0qnTOcgWSqxpA6HPrJsWLbX3XTeEqdND5MiMxedJAxr4GB2iLjm91
-   mm6W4VfMloXTHnO7pQNQkK28nyoIHICOkXeeRZNy7sEwizcGTnoFmrBIV
-   ngni3UzVJBjDpeHTP/2/FSRNgId/dMzitS0qPQnC3izELZOpj/ywWrya/
-   jJcsssCX/8SPQ90mC6h0z01GSUsxTymUsLiCGCus/BQiHCxEiFPziPLtH
-   nPEtFveB1soWQHiLbSG130OB4jH5kBNS4ermB4RDKHhjuCREnyht73DfW
-   IaZsLayLb9HN4FoVW/zYwSOXc3mV9395UE9L6KEHwdbyunvlefvtAv67b
+  t=1592969282; x=1624505282;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Q+HgsYsdeDHGtvaWMipCZPJyS7LRd6FNBa9Ci9EXL9M=;
+  b=CYkNDJWp4PtjTPqPAebNO+0qpWYPRowUCTTLzjd8rTuWIyhFg3q4VyuY
+   rHUvfXrXOO7SuwxKHw2fjDPy/BaafDe05pPzlCHEEh7TMqRFMcJ7N9Awv
+   6032EFGdaCBNeCp1EcqyyO+oP7G0awR/TglB5Xtj9PcJBnHjrgxODIiXu
+   /uhBBWr6ziqpgsE6pNl43N3kFfu/EJR4XGg7RWCJfXbykpihj9GzpHBTo
+   QLgDcZk37GWbWI3CdRT1WnYlLulz3FRmhaXiM4bdpWvY62n2VPW17M1WR
+   fTMEt2fmix5BABkV8zJsM20ePo1PvTZsBivhJfxfaviJ8rjMbFx9MSOJc
    w==;
-IronPort-SDR: 3P4MlaaiIUxrgk2WMfvPbcIn0NhgVuESfdhgJ6Iu1dlbCCE7Xx/3B6XbrhTie9Y971Lg41ldLC
- +9FVFJL5OlJSEc89P3o9Khl51Gl6B91LS24+5N44Q6oOQxu979GRXRWCjx/CmrkPSyt2skLVeq
- rO1HwwkNxGVvmb01hldI8tgo/jgPjgqGoL152xbH06EKSBex9Gaodt3QsC/hIANYc9tGoaC4EJ
- G1U+WaD78psg7QxBcPc2FKux+oL8QxvuF0eicDVH+X45s5+D20ETo4SClh6n7BoWV+GmJNTcvI
- 7d0=
+IronPort-SDR: 2MzX/ZKlSZykW47l94ev51NwqlFgBliRRsWZ39/7aBrK2JQrdvH3nBB8nBLxvj9DuHwB+UxaHy
+ Hnqd6V3aff5QnmXwMk+2d9ypy9K4GyzjgCp0FhTNRu+KmL6XBQf632sMc+ShKrZ5+2wlhKokXB
+ JUhlF2gHK2QnoHkDAGNjzIVqaWvZseF+v6xbcCtX+nf+63uxQ4wUb7nOVC3yRmKfflniZrn3ny
+ iRqLzQxVk52JbS3QnQvuo1qpAqRXQoj4jPLwHZz7FfoiGwWafqDPHHAXgtz/aWBhysaryy/LD+
+ jP0=
 X-IronPort-AV: E=Sophos;i="5.75,273,1589212800"; 
-   d="scan'208";a="243748347"
-Received: from mail-bn7nam10lp2105.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.105])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Jun 2020 08:46:42 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cla42P9yUeHie+fzFx37ZYfPsaQtsX5Z4jPM6f9KN6XQ15ccbARgCf4huc5i1FdrX5RhG/FTFNtOF8ut2T/hpArR7KxjN509XBHzazDlyFGVDfbXfltBC3F2BwOmNgX/5VDoB9sHpvNrKJkudWrw//3OSldyW5G4seXz2DNVpwlmk1U933yPnKlNabY2F2iJrifj7lb1F36Kl6yhOT0X4lEt8fmmrQ+rNzK6xaVM5Dh7kpqvgiq1/y4khZahC9dd0fpymyZlF5DqWMetLSjKdotqA636/KZudWzxLRSJKlx5Y7N2xSdjJj9Yqf9MWGrvB3erUPcy/9oo9gSRcPOmew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hwZkzGcKCqpEbmNTJgY6CNtlCyvyu7UDgnkkV7r0saU=;
- b=SzvFDveOpVBWLhyuMMeA9BISG4qMWUlL50g6zE4f8c9t4vLi8PvA90fNdTf7nuzWWWCp9oQQWR6oCwjYIUYSJ7/DI7QNVk4UglzQy/2s76zm5nVMNiPH41hcefxPbszKsi/QC/0yuwOH17Q5CTfs11pOLSHtXglwQEWlA9CRTiZb1TB78zqK3YgTA7hg/N3V+ogwpveM4smRq5asFPWqROcxaOhl3mEOKbAIZZbhGFEzmXjiyQb/SiTyMFgsekj5GXnfKQELTZLM3gLdS0Z+M78DzzhQOzE2dwhf6fVR+xTHqWpW9S0ek6uRq9/C1TZqxqrZ0AVcoDcyrU9DlfRpjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hwZkzGcKCqpEbmNTJgY6CNtlCyvyu7UDgnkkV7r0saU=;
- b=Fvew9dH89nSEHfE1CpNpe4mj1pn41zrezV+AefprTeoPNWSMKQzo/3EdLjIHY94njMoQLHpevaLIKPqav5q5L23DrklqvxiX4Rc+bmUgeJXMDZp4EygkvbH+oROzhgeNccj+KK7dox0un5KzRnGP/qq2JrU7HLDf06biFDjFHrc=
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com (2603:10b6:903:ec::14)
- by CY4PR04MB0968.namprd04.prod.outlook.com (2603:10b6:910:51::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.26; Wed, 24 Jun
- 2020 00:46:38 +0000
-Received: from CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7]) by CY4PR04MB3751.namprd04.prod.outlook.com
- ([fe80::c593:f271:eebe:ac7%9]) with mapi id 15.20.3109.023; Wed, 24 Jun 2020
- 00:46:38 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "satyat@google.com" <satyat@google.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] block: move request_queue member docs to kdoc
-Thread-Topic: [PATCH 2/2] block: move request_queue member docs to kdoc
-Thread-Index: AQHWSaocy+swFSiiDEyuSPmUryXI/Q==
-Date:   Wed, 24 Jun 2020 00:46:38 +0000
-Message-ID: <CY4PR04MB3751713BBBC1291A0D3A6A21E7950@CY4PR04MB3751.namprd04.prod.outlook.com>
-References: <20200623220311.8033-1-mcgrof@kernel.org>
- <20200623220311.8033-3-mcgrof@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.182.57]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: dca8dd88-b95b-4f2b-1980-08d817d80d9f
-x-ms-traffictypediagnostic: CY4PR04MB0968:
-x-microsoft-antispam-prvs: <CY4PR04MB09682BBF3921DA31439D1234E7950@CY4PR04MB0968.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0444EB1997
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: knEMuBNIvF14Q6OrjEQTydRGGso87on0/xoypNlyIF+VhfoXAJA579wYudqPntflChlF7/k3b1io8koj16oHfi+YLSRsl1gcdGNPT4t3naC4VCPMI+jLjjGRe2s1qS+Iss6rA/o5xgpUz6dOliILLRlzADMKXWEgw9HopbVVSTymzxURekPpkKKhFg4qjxwXT2Rtxwnr9nbg+s+gKuTZOWP/AEPIT3BZ5ZiPotrPLLTIAn6PrZJHa6u33y3PrKxVcM/v9i25l/H23sJRKC4dSXQ0SWQjxsRWHc6oo6t+LiiOw6+sZSoOD2oBKDoEyCQNgBk+5tLzF4SzE+Lb7w2m0w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR04MB3751.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(26005)(54906003)(478600001)(110136005)(4326008)(316002)(64756008)(66556008)(66476007)(2906002)(66946007)(66446008)(76116006)(91956017)(5660300002)(7696005)(52536014)(53546011)(6506007)(55016002)(186003)(86362001)(33656002)(83380400001)(8936002)(71200400001)(9686003)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: eveHczcjx65NUwsk+Z2JyQshfCTXcvW7G8KeWfVYbMAhft9MekaPC5Go0vfPYFVoy7T2K2qG7Cl7RQ0w4mDkQWTdQfQ1ycPLzIDeOpysK9n1rSyVHcXpaG9whHQq65JY7cUKg5xofjql6Bo+5nT6h87LOpYeYlq63SWqH8XcWKe8cSpsYqFgKdIY/F6RWheW8OMk+GQYJBmq6J73Ppbf4nmjWwhTidx8mdd8idNjLm8xd3DMEljsIZC+8qrsg57MLD1wVv+DDPPt2z+LmOQ05kebduVhJKLfwJn+3PJL1G5Jop/vmXLsrWdF7HDisYIVX++42YRX6Qe/eMNx8kF9rGkTBq6ngWDr/+aTJQMW2TylMHpQxLzU7IOHdctdg4fZPD+cuSFK557yWvmSVTQsVZhTdZmfyCC3SIWsjPSi14hZsyb2bdr9GjjpOtgUm2HRUmU7FlKGcKvRyJd5boQmgvGj/k/hae9tJGmgM6B/U0h5eeTN+e6juN/iEOLNld3a
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="141001025"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Jun 2020 11:28:01 +0800
+IronPort-SDR: xGuorBGeJgWK5PxDoJBEEbWpYbOrKeG11CiaFZo7Bj4xoM+KkWDrP8i91dw0cgkmSk4DFOUGYj
+ jwrOKJ+sQ+HJydO3sTG1zCDGCteE4k2xk=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 20:16:30 -0700
+IronPort-SDR: hj4XUgUlxacISMllqlIYXAOjRbNAhEKbD3hd5hKV1grPvtJZ1rjgQd8SUNtcVCAeHEYBmgOl8O
+ v4hyCvhYYd6w==
+WDCIronportException: Internal
+Received: from iouring.labspan.wdc.com (HELO iouring.sc.wdc.com) ([10.6.138.107])
+  by uls-op-cesaip01.wdc.com with ESMTP; 23 Jun 2020 20:28:01 -0700
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+        kbusch@kernel.org, hch@lst.de, rostedt@goodmis.org,
+        mingo@redhat.com, rdunlap@infradead.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH RFC] block: blktrace framework cleanup
+Date:   Tue, 23 Jun 2020 20:27:52 -0700
+Message-Id: <20200624032752.4177-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dca8dd88-b95b-4f2b-1980-08d817d80d9f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2020 00:46:38.0601
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9PQM17GQAG3AaQN+hwfwDDJn/UchHntS2NH0Gx0/otpkI56m27wGzwMuRDn36pJO5RJ4nTECRrvGqJYlAWBzPg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0968
+Content-Type: text/plain; charset=Y
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/06/24 7:03, Luis Chamberlain wrote:=0A=
-> Now that we have a template, expand on the kdoc form for=0A=
-> the request_queue data structure with documentation from=0A=
-> the rest of the members, *only* for information we already=0A=
-> had.=0A=
-> =0A=
-> This does not add any new documentation. This just shifts=0A=
-> documentation to kdoc form.=0A=
-> =0A=
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>=0A=
-> ---=0A=
->  include/linux/blkdev.h | 139 ++++++++++++-----------------------------=
-=0A=
->  1 file changed, 40 insertions(+), 99 deletions(-)=0A=
-> =0A=
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
-> index ea319c2b0593..d30bfef893b9 100644=0A=
-> --- a/include/linux/blkdev.h=0A=
-> +++ b/include/linux/blkdev.h=0A=
-> @@ -396,8 +396,38 @@ static inline int blkdev_zone_mgmt_ioctl(struct bloc=
-k_device *bdev,=0A=
->  =0A=
->  /**=0A=
->   * struct request_queue - block device driver request queue=0A=
-> + * @queue_ctx: software queue context=0A=
-> + * @queue_hw_ctx: hw dispatch queues=0A=
-> + * @queuedata: the queue owner gets to use this for whatever they like.=
-=0A=
-> + *	ll_rw_blk doesn't touch it.=0A=
-> + * @queue_flags: various queue flags, see %QUEUE_* below=0A=
-> + * @pm_only: Number of contexts that have called blk_set_pm_only(). If t=
-his=0A=
-> + *	counter is above zero then only %RQF_PM and %RQF_PREEMPT requests are=
-=0A=
-> + *	processed.=0A=
-> + * @id: ida allocated id for this queue.  Used to index queues from ioct=
-x.=0A=
-> + * @bounce_gfp: queue needs bounce pages for pages above this limit=0A=
-> + * @kobj: queue kobject=0A=
-> + * @mq_kobj: mq queue kobject=0A=
-> + * @nr_requests: maximum number of of requests=0A=
-> + * @ksm: Inline crypto capabilities=0A=
-> + * @nr_zones:=0A=
-=0A=
-Above line is not needed, no ?=0A=
-=0A=
-> + * @nr_zones: total number of zones of the device. This is always 0 for =
-regular=0A=
-> + *	block devices.=0A=
-=0A=
-May be: "total number of zones for a zoned block device. This is..."=0A=
-=0A=
-> + * @conv_zones_bitmap: bitmap of nr_zones bits which indicates if a zone=
-=0A=
-> + *	is conventional (bit set) or sequential (bit clear).=0A=
-> + * @seq_zones_wlock: bitmap of nr_zones bits which indicates if a zone=
-=0A=
-> + *	is write locked, that is, if a write request targeting the zone was=
-=0A=
-> + *	dispatched.=0A=
-> + * @debugfs_mutex: used to protect access to the @ebugfs_dir=0A=
->   * @debugfs_mutex: used to protect access to the @debugfs_dir=0A=
->   * @blk_trace: used by blktrace to keep track of setup / tracing=0A=
-> + * @fq: for flush operations=0A=
-> + * @td: throttle data=0A=
-> + * @unused_hctx_list: list used for reusing dead hctx instance in case o=
-f=0A=
-> + *	updating nr_hw_queues.=0A=
-> + * @unused_hctx_lock: used to protect the @unused_hctx_list=0A=
-> + * @mq_freeze_lock: protects concurrent access to q_usage_counter by=0A=
-> + *	percpu_ref_kill() and percpu_ref_reinit().=0A=
->   * @debugfs_dir: directory created to place debugfs information. This is=
- always=0A=
->   *	created for make_request and request-based block drivers upon=0A=
->   *	initialization. blktrace requires for this directory to be created,=
-=0A=
-> @@ -413,67 +443,35 @@ static inline int blkdev_zone_mgmt_ioctl(struct blo=
-ck_device *bdev,=0A=
->   *   o custom solutions such as scsi-generic=0A=
->   *=0A=
->   * All partitions share the same request_queue data structure.=0A=
-> + *=0A=
-> + * Zoned block device dispatch control is managed by the fields @nr_zone=
-s,=0A=
-> + * @conv_zones_bitmap and @seq_zones_wlock. These fields are fields are>=
- + * initialized by the low level device driver (e.g. scsi/sd.c).  Stacking=
-=0A=
-> + * drivers (device mappers) may or may not initialize these fields.=0A=
-> + * Reads of this information must be protected with blk_queue_enter() /=
-=0A=
-> + * blk_queue_exit(). Modifying this information is only allowed while=0A=
-> + * no requests are being processed. See also blk_mq_freeze_queue() and=
-=0A=
-> + * blk_mq_unfreeze_queue().=0A=
-=0A=
-Ooops... This is outdated... This should be:=0A=
-=0A=
-* Dispatch of write commands to zoned block devices is controlled using the=
-=0A=
-* fields @nr_zones, @conv_zones_bitmap and @seq_zones_wlock. These fields a=
-re=0A=
-* initialized using the blk_revalidate_disk_zones() function from the level=
-=0A=
-* request based device drivers (e.g. scsi/sd.c).  BIO based drivers, if nee=
-ded,=0A=
-* can initialize these fields directly. Accesses to these fields must be=0A=
-* protected with blk_queue_enter() / blk_queue_exit(). Modification of the=
-=0A=
-* @nr_zones field and reallocation of the @conv_zones_bitmap and=0A=
-* @seq_zones_wlock bitmaps is only allowed while no requests are being=0A=
-* processed. See also blk_mq_freeze_queue() and blk_mq_unfreeze_queue().=0A=
-=0A=
->   */=0A=
->  struct request_queue {=0A=
->  	struct request		*last_merge;=0A=
->  	struct elevator_queue	*elevator;=0A=
-> -=0A=
->  	struct blk_queue_stats	*stats;=0A=
->  	struct rq_qos		*rq_qos;=0A=
-> -=0A=
->  	make_request_fn		*make_request_fn;=0A=
-> -=0A=
->  	const struct blk_mq_ops	*mq_ops;=0A=
-> -=0A=
-> -	/* sw queues */=0A=
->  	struct blk_mq_ctx __percpu	*queue_ctx;=0A=
-> -=0A=
->  	unsigned int		queue_depth;=0A=
-> -=0A=
-> -	/* hw dispatch queues */=0A=
->  	struct blk_mq_hw_ctx	**queue_hw_ctx;=0A=
->  	unsigned int		nr_hw_queues;=0A=
-> -=0A=
->  	struct backing_dev_info	*backing_dev_info;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * The queue owner gets to use this for whatever they like.=0A=
-> -	 * ll_rw_blk doesn't touch it.=0A=
-> -	 */=0A=
->  	void			*queuedata;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * various queue flags, see QUEUE_* below=0A=
-> -	 */=0A=
->  	unsigned long		queue_flags;=0A=
-> -	/*=0A=
-> -	 * Number of contexts that have called blk_set_pm_only(). If this=0A=
-> -	 * counter is above zero then only RQF_PM and RQF_PREEMPT requests are=
-=0A=
-> -	 * processed.=0A=
-> -	 */=0A=
->  	atomic_t		pm_only;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * ida allocated id for this queue.  Used to index queues from=0A=
-> -	 * ioctx.=0A=
-> -	 */=0A=
->  	int			id;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * queue needs bounce pages for pages above this limit=0A=
-> -	 */=0A=
->  	gfp_t			bounce_gfp;=0A=
-> -=0A=
->  	spinlock_t		queue_lock;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * queue kobject=0A=
-> -	 */=0A=
->  	struct kobject kobj;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * mq queue kobject=0A=
-> -	 */=0A=
->  	struct kobject *mq_kobj;=0A=
->  =0A=
->  #ifdef  CONFIG_BLK_DEV_INTEGRITY=0A=
-> @@ -485,66 +483,32 @@ struct request_queue {=0A=
->  	int			rpm_status;=0A=
->  	unsigned int		nr_pending;=0A=
->  #endif=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * queue settings=0A=
-> -	 */=0A=
-> -	unsigned long		nr_requests;	/* Max # of requests */=0A=
-> -=0A=
-> +	unsigned long		nr_requests;=0A=
->  	unsigned int		dma_pad_mask;=0A=
->  	unsigned int		dma_alignment;=0A=
-> -=0A=
->  #ifdef CONFIG_BLK_INLINE_ENCRYPTION=0A=
-> -	/* Inline crypto capabilities */=0A=
->  	struct blk_keyslot_manager *ksm;=0A=
->  #endif=0A=
-> -=0A=
->  	unsigned int		rq_timeout;=0A=
->  	int			poll_nsec;=0A=
-> -=0A=
->  	struct blk_stat_callback	*poll_cb;=0A=
->  	struct blk_rq_stat	poll_stat[BLK_MQ_POLL_STATS_BKTS];=0A=
-> -=0A=
->  	struct timer_list	timeout;=0A=
->  	struct work_struct	timeout_work;=0A=
-> -=0A=
->  	struct list_head	icq_list;=0A=
->  #ifdef CONFIG_BLK_CGROUP=0A=
->  	DECLARE_BITMAP		(blkcg_pols, BLKCG_MAX_POLS);=0A=
->  	struct blkcg_gq		*root_blkg;=0A=
->  	struct list_head	blkg_list;=0A=
->  #endif=0A=
-> -=0A=
->  	struct queue_limits	limits;=0A=
-> -=0A=
->  	unsigned int		required_elevator_features;=0A=
-> -=0A=
->  #ifdef CONFIG_BLK_DEV_ZONED=0A=
-> -	/*=0A=
-> -	 * Zoned block device information for request dispatch control.=0A=
-> -	 * nr_zones is the total number of zones of the device. This is always=
-=0A=
-> -	 * 0 for regular block devices. conv_zones_bitmap is a bitmap of nr_zon=
-es=0A=
-> -	 * bits which indicates if a zone is conventional (bit set) or=0A=
-> -	 * sequential (bit clear). seq_zones_wlock is a bitmap of nr_zones=0A=
-> -	 * bits which indicates if a zone is write locked, that is, if a write=
-=0A=
-> -	 * request targeting the zone was dispatched. All three fields are=0A=
-> -	 * initialized by the low level device driver (e.g. scsi/sd.c).=0A=
-> -	 * Stacking drivers (device mappers) may or may not initialize=0A=
-> -	 * these fields.=0A=
-> -	 *=0A=
-> -	 * Reads of this information must be protected with blk_queue_enter() /=
-=0A=
-> -	 * blk_queue_exit(). Modifying this information is only allowed while=
-=0A=
-> -	 * no requests are being processed. See also blk_mq_freeze_queue() and=
-=0A=
-> -	 * blk_mq_unfreeze_queue().=0A=
-> -	 */=0A=
->  	unsigned int		nr_zones;=0A=
->  	unsigned long		*conv_zones_bitmap;=0A=
->  	unsigned long		*seq_zones_wlock;=0A=
->  #endif /* CONFIG_BLK_DEV_ZONED */=0A=
->  =0A=
-> -	/*=0A=
-> -	 * sg stuff=0A=
-> -	 */=0A=
->  	unsigned int		sg_timeout;=0A=
->  	unsigned int		sg_reserved_size;=0A=
->  	int			node;=0A=
-> @@ -552,59 +516,36 @@ struct request_queue {=0A=
->  #ifdef CONFIG_BLK_DEV_IO_TRACE=0A=
->  	struct blk_trace __rcu	*blk_trace;=0A=
->  #endif=0A=
-> -	/*=0A=
-> -	 * for flush operations=0A=
-> -	 */=0A=
->  	struct blk_flush_queue	*fq;=0A=
-> -=0A=
->  	struct list_head	requeue_list;=0A=
->  	spinlock_t		requeue_lock;=0A=
->  	struct delayed_work	requeue_work;=0A=
-> -=0A=
->  	struct mutex		sysfs_lock;=0A=
->  	struct mutex		sysfs_dir_lock;=0A=
-> -=0A=
-> -	/*=0A=
-> -	 * for reusing dead hctx instance in case of updating=0A=
-> -	 * nr_hw_queues=0A=
-> -	 */=0A=
->  	struct list_head	unused_hctx_list;=0A=
->  	spinlock_t		unused_hctx_lock;=0A=
-> -=0A=
->  	int			mq_freeze_depth;=0A=
-> -=0A=
->  #if defined(CONFIG_BLK_DEV_BSG)=0A=
->  	struct bsg_class_device bsg_dev;=0A=
->  #endif=0A=
->  =0A=
->  #ifdef CONFIG_BLK_DEV_THROTTLING=0A=
-> -	/* Throttle data */=0A=
->  	struct throtl_data *td;=0A=
->  #endif=0A=
->  	struct rcu_head		rcu_head;=0A=
->  	wait_queue_head_t	mq_freeze_wq;=0A=
-> -	/*=0A=
-> -	 * Protect concurrent access to q_usage_counter by=0A=
-> -	 * percpu_ref_kill() and percpu_ref_reinit().=0A=
-> -	 */=0A=
->  	struct mutex		mq_freeze_lock;=0A=
->  	struct percpu_ref	q_usage_counter;=0A=
-> -=0A=
->  	struct blk_mq_tag_set	*tag_set;=0A=
->  	struct list_head	tag_set_list;=0A=
->  	struct bio_set		bio_split;=0A=
-> -=0A=
->  	struct dentry		*debugfs_dir;=0A=
-> -=0A=
->  #ifdef CONFIG_BLK_DEBUG_FS=0A=
->  	struct dentry		*sched_debugfs_dir;=0A=
->  	struct dentry		*rqos_debugfs_dir;=0A=
->  #endif=0A=
-> -=0A=
->  	bool			mq_sysfs_init_done;=0A=
-> -=0A=
->  	size_t			cmd_size;=0A=
-> -=0A=
->  #define BLK_MAX_WRITE_HINTS	5=0A=
->  	u64			write_hints[BLK_MAX_WRITE_HINTS];=0A=
->  };=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+There are many places where trace API accepts the struct request_queue*
+parameter which can be derived from other function parameters.
+
+This patch removes the struct request queue parameter from the
+blktrace framework and adjusts the tracepoints definition and usage
+along with the tracing API itself.
+
+This patch still needs a lot of improvement and testing of other
+tracepoints, I'll be happy to put more effort into this and send out
+well tested and formatted patch.
+
+Minimal testing shows that basic Q(queue), G (Get), I (Insert),
+Dispatch (D), and Complete (C) seems to work file with following
+commands:-
+
+# dd if=/dev/zero of=/dev/nullb0 bs=4k count=10 oflag=direct
+# ./blktrace -d /dev/nullb0 -o -| ./blkparse -a write  -i -
+252,0    9        1     0.000000000  4268  Q  WS 0 + 8 [dd]
+252,0    9        2     0.000006482  4268  G  WS 0 + 8 [dd]
+252,0    9        5     0.000010189  4268  I  WS 0 + 8 [dd]
+252,0    9        6     0.000029205  1001  D  WS 0 + 8 [kworker/9:1H]
+252,0    9        7     0.000039174    56  C  WS 0 + 8 [0]
+252,0    9        8     0.000055364  4268  Q  WS 8 + 8 [dd]
+252,0    9        9     0.000056496  4268  G  WS 8 + 8 [dd]
+252,0    9       12     0.000057808  4268  I  WS 8 + 8 [dd]
+252,0    9       13     0.000063820  1001  D  WS 8 + 8 [kworker/9:1H]
+252,0    9       14     0.000067567    56  C  WS 8 + 8 [0]
+252,0    9       15     0.000076604  4268  Q  WS 16 + 8 [dd]
+252,0    9       16     0.000077656  4268  G  WS 16 + 8 [dd]
+252,0    9       19     0.000078928  4268  I  WS 16 + 8 [dd]
+252,0    9       20     0.000083577  1001  D  WS 16 + 8 [kworker/9:1H]
+252,0    9       21     0.000086963    56  C  WS 16 + 8 [0]
+252,0    9       22     0.000095419  4268  Q  WS 24 + 8 [dd]
+252,0    9       23     0.000096411  4268  G  WS 24 + 8 [dd]
+252,0    9       26     0.000097653  4268  I  WS 24 + 8 [dd]
+252,0    9       27     0.000102122  1001  D  WS 24 + 8 [kworker/9:1H]
+252,0    9       28     0.000104827    56  C  WS 24 + 8 [0]
+252,0    9       29     0.000111159  4268  Q  WS 32 + 8 [dd]
+252,0    9       30     0.000111770  4268  G  WS 32 + 8 [dd]
+252,0    9       33     0.000112581  4268  I  WS 32 + 8 [dd]
+252,0    9       34     0.000115577  1001  D  WS 32 + 8 [kworker/9:1H]
+252,0    9       35     0.000117701    56  C  WS 32 + 8 [0]
+252,0    9       36     0.000122961  4268  Q  WS 40 + 8 [dd]
+252,0    9       37     0.000123592  4268  G  WS 40 + 8 [dd]
+252,0    9       40     0.000124363  4268  I  WS 40 + 8 [dd]
+252,0    9       41     0.000127269  1001  D  WS 40 + 8 [kworker/9:1H]
+252,0    9       42     0.000129353    56  C  WS 40 + 8 [0]
+252,0    9       43     0.000134793  4268  Q  WS 48 + 8 [dd]
+252,0    9       44     0.000135494  4268  G  WS 48 + 8 [dd]
+252,0    9       47     0.000136276  4268  I  WS 48 + 8 [dd]
+252,0    9       48     0.000139131  1001  D  WS 48 + 8 [kworker/9:1H]
+252,0    9       49     0.000141215    56  C  WS 48 + 8 [0]
+252,0    9       50     0.000146475  4268  Q  WS 56 + 8 [dd]
+252,0    9       51     0.000147156  4268  G  WS 56 + 8 [dd]
+252,0    9       54     0.000147917  4268  I  WS 56 + 8 [dd]
+252,0    9       55     0.000150753  1001  D  WS 56 + 8 [kworker/9:1H]
+252,0    9       56     0.000152857    56  C  WS 56 + 8 [0]
+252,0    9       57     0.000158157  4268  Q  WS 64 + 8 [dd]
+252,0    9       58     0.000158858  4268  G  WS 64 + 8 [dd]
+252,0    9       61     0.000159639  4268  I  WS 64 + 8 [dd]
+252,0    9       62     0.000162575  1001  D  WS 64 + 8 [kworker/9:1H]
+252,0    9       63     0.000164679    56  C  WS 64 + 8 [0]
+252,0    9       64     0.000169849  4268  Q  WS 72 + 8 [dd]
+252,0    9       65     0.000170500  4268  G  WS 72 + 8 [dd]
+252,0    9       68     0.000171281  4268  I  WS 72 + 8 [dd]
+252,0    9       69     0.000174337  1001  D  WS 72 + 8 [kworker/9:1H]
+252,0    9       70     0.000176411    56  C  WS 72 + 8 [0]
+
+Any feedback is welcome.
+
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
+ block/bio.c                  |  2 +-
+ block/blk-core.c             |  6 +--
+ block/blk-merge.c            |  2 +-
+ block/blk-mq-sched.c         |  2 +-
+ block/blk-mq.c               | 10 ++---
+ block/bounce.c               |  2 +-
+ drivers/md/dm.c              |  4 +-
+ drivers/nvme/host/nvme.h     |  4 +-
+ include/trace/events/block.h | 61 +++++++++++++++--------------
+ kernel/trace/blktrace.c      | 74 +++++++++++++++---------------------
+ 10 files changed, 76 insertions(+), 91 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index fb5533416fa6..0b202068e475 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1432,7 +1432,7 @@ void bio_endio(struct bio *bio)
+ 	}
+ 
+ 	if (bio->bi_disk && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+-		trace_block_bio_complete(bio->bi_disk->queue, bio);
++		trace_block_bio_complete(bio);
+ 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+ 	}
+ 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 72b102a389a5..6d4c57ef4533 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -674,7 +674,7 @@ bool bio_attempt_back_merge(struct request *req, struct bio *bio,
+ 	if (!ll_back_merge_fn(req, bio, nr_segs))
+ 		return false;
+ 
+-	trace_block_bio_backmerge(req->q, req, bio);
++	trace_block_bio_backmerge(bio);
+ 	rq_qos_merge(req->q, req, bio);
+ 
+ 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
+@@ -698,7 +698,7 @@ bool bio_attempt_front_merge(struct request *req, struct bio *bio,
+ 	if (!ll_front_merge_fn(req, bio, nr_segs))
+ 		return false;
+ 
+-	trace_block_bio_frontmerge(req->q, req, bio);
++	trace_block_bio_frontmerge(bio);
+ 	rq_qos_merge(req->q, req, bio);
+ 
+ 	if ((req->cmd_flags & REQ_FAILFAST_MASK) != ff)
+@@ -1082,7 +1082,7 @@ generic_make_request_checks(struct bio *bio)
+ 		return false;
+ 
+ 	if (!bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+-		trace_block_bio_queue(q, bio);
++		trace_block_bio_queue(bio);
+ 		/* Now that enqueuing has been traced, we need to trace
+ 		 * completion as well.
+ 		 */
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index f0b0bae075a0..da9e2a02c542 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -337,7 +337,7 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+ 		split->bi_opf |= REQ_NOMERGE;
+ 
+ 		bio_chain(split, *bio);
+-		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
++		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		generic_make_request(*bio);
+ 		*bio = split;
+ 	}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index fdcc2c1dd178..a3cade16ef80 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -409,7 +409,7 @@ EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
+ 
+ void blk_mq_sched_request_inserted(struct request *rq)
+ {
+-	trace_block_rq_insert(rq->q, rq);
++	trace_block_rq_insert(rq);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b8738b3c6d06..dbb98b2bc868 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -742,7 +742,7 @@ void blk_mq_start_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
+-	trace_block_rq_issue(q, rq);
++	trace_block_rq_issue(rq);
+ 
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+ 		rq->io_start_time_ns = ktime_get_ns();
+@@ -769,7 +769,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 
+ 	blk_mq_put_driver_tag(rq);
+ 
+-	trace_block_rq_requeue(q, rq);
++	trace_block_rq_requeue(rq);
+ 	rq_qos_requeue(q, rq);
+ 
+ 	if (blk_mq_request_started(rq)) {
+@@ -1758,7 +1758,7 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 
+ 	lockdep_assert_held(&ctx->lock);
+ 
+-	trace_block_rq_insert(hctx->queue, rq);
++	trace_block_rq_insert(rq);
+ 
+ 	if (at_head)
+ 		list_add(&rq->queuelist, &ctx->rq_lists[type]);
+@@ -1814,7 +1814,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 	 */
+ 	list_for_each_entry(rq, list, queuelist) {
+ 		BUG_ON(rq->mq_ctx != ctx);
+-		trace_block_rq_insert(hctx->queue, rq);
++		trace_block_rq_insert(rq);
+ 	}
+ 
+ 	spin_lock(&ctx->lock);
+@@ -2111,7 +2111,7 @@ blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		goto queue_exit;
+ 	}
+ 
+-	trace_block_getrq(q, bio, bio->bi_opf);
++	trace_block_getrq(bio, bio->bi_opf);
+ 
+ 	rq_qos_track(q, rq, bio);
+ 
+diff --git a/block/bounce.c b/block/bounce.c
+index c3aaed070124..9550640b1f86 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -341,7 +341,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 		}
+ 	}
+ 
+-	trace_block_bio_bounce(q, *bio_orig);
++	trace_block_bio_bounce(*bio_orig);
+ 
+ 	bio->bi_flags |= (1 << BIO_BOUNCED);
+ 
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 109e81f33edb..4b9ff226904d 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1678,7 +1678,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 				part_stat_unlock();
+ 
+ 				bio_chain(b, bio);
+-				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
++				trace_block_split(b, bio->bi_iter.bi_sector);
+ 				ret = generic_make_request(bio);
+ 				break;
+ 			}
+@@ -1745,7 +1745,7 @@ static void dm_queue_split(struct mapped_device *md, struct dm_target *ti, struc
+ 		struct bio *split = bio_split(*bio, len, GFP_NOIO, &md->queue->bio_split);
+ 
+ 		bio_chain(split, *bio);
+-		trace_block_split(md->queue, split, (*bio)->bi_iter.bi_sector);
++		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		generic_make_request(*bio);
+ 		*bio = split;
+ 	}
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 61780c38f51f..b12a7d082476 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -598,10 +598,8 @@ static inline void nvme_mpath_check_last_path(struct nvme_ns *ns)
+ static inline void nvme_trace_bio_complete(struct request *req,
+         blk_status_t status)
+ {
+-	struct nvme_ns *ns = req->q->queuedata;
+-
+ 	if (req->cmd_flags & REQ_NVME_MPATH)
+-		trace_block_bio_complete(ns->head->disk->queue, req->bio);
++		trace_block_bio_complete(req->bio);
+ }
+ 
+ extern struct device_attribute dev_attr_ana_grpid;
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 93b114226af8..a2a14f780652 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -73,9 +73,9 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
+  */
+ TRACE_EVENT(block_rq_requeue,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq),
++	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(  dev_t,	dev			)
+@@ -147,9 +147,9 @@ TRACE_EVENT(block_rq_complete,
+ 
+ DECLARE_EVENT_CLASS(block_rq,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq),
++	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(  dev_t,	dev			)
+@@ -191,9 +191,9 @@ DECLARE_EVENT_CLASS(block_rq,
+  */
+ DEFINE_EVENT(block_rq, block_rq_insert,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq)
++	TP_ARGS(rq)
+ );
+ 
+ /**
+@@ -206,9 +206,9 @@ DEFINE_EVENT(block_rq, block_rq_insert,
+  */
+ DEFINE_EVENT(block_rq, block_rq_issue,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq)
++	TP_ARGS(rq)
+ );
+ 
+ /**
+@@ -224,9 +224,9 @@ DEFINE_EVENT(block_rq, block_rq_issue,
+  */
+ TRACE_EVENT(block_bio_bounce,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, bio),
++	TP_ARGS(bio),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev			)
+@@ -260,9 +260,9 @@ TRACE_EVENT(block_bio_bounce,
+  */
+ TRACE_EVENT(block_bio_complete,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, bio),
++	TP_ARGS(bio),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev		)
+@@ -288,9 +288,9 @@ TRACE_EVENT(block_bio_complete,
+ 
+ DECLARE_EVENT_CLASS(block_bio_merge,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, rq, bio),
++	TP_ARGS(bio),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev			)
+@@ -325,9 +325,9 @@ DECLARE_EVENT_CLASS(block_bio_merge,
+  */
+ DEFINE_EVENT(block_bio_merge, block_bio_backmerge,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, rq, bio)
++	TP_ARGS(bio)
+ );
+ 
+ /**
+@@ -341,9 +341,9 @@ DEFINE_EVENT(block_bio_merge, block_bio_backmerge,
+  */
+ DEFINE_EVENT(block_bio_merge, block_bio_frontmerge,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, rq, bio)
++	TP_ARGS(bio)
+ );
+ 
+ /**
+@@ -355,9 +355,9 @@ DEFINE_EVENT(block_bio_merge, block_bio_frontmerge,
+  */
+ TRACE_EVENT(block_bio_queue,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio),
++	TP_PROTO(struct bio *bio),
+ 
+-	TP_ARGS(q, bio),
++	TP_ARGS(bio),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev			)
+@@ -383,9 +383,9 @@ TRACE_EVENT(block_bio_queue,
+ 
+ DECLARE_EVENT_CLASS(block_get_rq,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio, int rw),
++	TP_PROTO(struct bio *bio, int rw),
+ 
+-	TP_ARGS(q, bio, rw),
++	TP_ARGS(bio, rw),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev			)
+@@ -421,9 +421,9 @@ DECLARE_EVENT_CLASS(block_get_rq,
+  */
+ DEFINE_EVENT(block_get_rq, block_getrq,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio, int rw),
++	TP_PROTO(struct bio *bio, int rw),
+ 
+-	TP_ARGS(q, bio, rw)
++	TP_ARGS(bio, rw)
+ );
+ 
+ /**
+@@ -439,9 +439,9 @@ DEFINE_EVENT(block_get_rq, block_getrq,
+  */
+ DEFINE_EVENT(block_get_rq, block_sleeprq,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio, int rw),
++	TP_PROTO(struct bio *bio, int rw),
+ 
+-	TP_ARGS(q, bio, rw)
++	TP_ARGS(bio, rw)
+ );
+ 
+ /**
+@@ -517,10 +517,9 @@ DEFINE_EVENT(block_unplug, block_unplug,
+  */
+ TRACE_EVENT(block_split,
+ 
+-	TP_PROTO(struct request_queue *q, struct bio *bio,
+-		 unsigned int new_sector),
++	TP_PROTO(struct bio *bio, unsigned int new_sector),
+ 
+-	TP_ARGS(q, bio, new_sector),
++	TP_ARGS(bio, new_sector),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev				)
+@@ -558,7 +557,7 @@ TRACE_EVENT(block_split,
+ TRACE_EVENT(block_bio_remap,
+ 
+ 	TP_PROTO(struct request_queue *q, struct bio *bio, dev_t dev,
+-		 sector_t from),
++		sector_t from),
+ 
+ 	TP_ARGS(q, bio, dev, from),
+ 
+@@ -602,7 +601,7 @@ TRACE_EVENT(block_bio_remap,
+ TRACE_EVENT(block_rq_remap,
+ 
+ 	TP_PROTO(struct request_queue *q, struct request *rq, dev_t dev,
+-		 sector_t from),
++		sector_t from),
+ 
+ 	TP_ARGS(q, rq, dev, from),
+ 
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index c086c38f4954..59e809b40087 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -28,6 +28,11 @@
+ 
+ #ifdef CONFIG_BLK_DEV_IO_TRACE
+ 
++static inline struct request_queue *bio_q(struct bio *bio)
++{
++	return bio->bi_disk->queue;
++}
++
+ static unsigned int blktrace_seq __read_mostly = 1;
+ 
+ static struct trace_array *blk_tr;
+@@ -846,26 +851,22 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ 	rcu_read_unlock();
+ }
+ 
+-static void blk_add_trace_rq_insert(void *ignore,
+-				    struct request_queue *q, struct request *rq)
++static void blk_add_trace_rq_insert(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_INSERT,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq->q, rq));
+ }
+ 
+-static void blk_add_trace_rq_issue(void *ignore,
+-				   struct request_queue *q, struct request *rq)
++static void blk_add_trace_rq_issue(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_ISSUE,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq->q, rq));
+ }
+ 
+-static void blk_add_trace_rq_requeue(void *ignore,
+-				     struct request_queue *q,
+-				     struct request *rq)
++static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_REQUEUE,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq->q, rq));
+ }
+ 
+ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+@@ -886,13 +887,13 @@ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+  *     Records an action against a bio. Will log the bio offset + size.
+  *
+  **/
+-static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
++static void blk_add_trace_bio(struct bio *bio,
+ 			      u32 what, int error)
+ {
+ 	struct blk_trace *bt;
+ 
+ 	rcu_read_lock();
+-	bt = rcu_dereference(q->blk_trace);
++	bt = rcu_dereference(bio_q(bio)->blk_trace);
+ 	if (likely(!bt)) {
+ 		rcu_read_unlock();
+ 		return;
+@@ -900,56 +901,46 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+ 
+ 	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
+ 			bio_op(bio), bio->bi_opf, what, error, 0, NULL,
+-			blk_trace_bio_get_cgid(q, bio));
++			blk_trace_bio_get_cgid(bio_q(bio), bio));
+ 	rcu_read_unlock();
+ }
+ 
+-static void blk_add_trace_bio_bounce(void *ignore,
+-				     struct request_queue *q, struct bio *bio)
++static void blk_add_trace_bio_bounce(void *ignore, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_BOUNCE, 0);
++	blk_add_trace_bio(bio, BLK_TA_BOUNCE, 0);
+ }
+ 
+-static void blk_add_trace_bio_complete(void *ignore,
+-				       struct request_queue *q, struct bio *bio)
++static void blk_add_trace_bio_complete(void *ignore, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_COMPLETE,
++	blk_add_trace_bio(bio, BLK_TA_COMPLETE,
+ 			  blk_status_to_errno(bio->bi_status));
+ }
+ 
+-static void blk_add_trace_bio_backmerge(void *ignore,
+-					struct request_queue *q,
+-					struct request *rq,
+-					struct bio *bio)
++static void blk_add_trace_bio_backmerge(void *ignore, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_BACKMERGE, 0);
++	blk_add_trace_bio(bio, BLK_TA_BACKMERGE, 0);
+ }
+ 
+-static void blk_add_trace_bio_frontmerge(void *ignore,
+-					 struct request_queue *q,
+-					 struct request *rq,
+-					 struct bio *bio)
++static void blk_add_trace_bio_frontmerge(void *ignore, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_FRONTMERGE, 0);
++	blk_add_trace_bio(bio, BLK_TA_FRONTMERGE, 0);
+ }
+ 
+-static void blk_add_trace_bio_queue(void *ignore,
+-				    struct request_queue *q, struct bio *bio)
++static void blk_add_trace_bio_queue(void *ignore, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_QUEUE, 0);
++	blk_add_trace_bio(bio, BLK_TA_QUEUE, 0);
+ }
+ 
+ static void blk_add_trace_getrq(void *ignore,
+-				struct request_queue *q,
+ 				struct bio *bio, int rw)
+ {
+ 	if (bio)
+-		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0);
++		blk_add_trace_bio(bio, BLK_TA_GETRQ, 0);
+ 	else {
+ 		struct blk_trace *bt;
+ 
+ 		rcu_read_lock();
+-		bt = rcu_dereference(q->blk_trace);
++		bt = rcu_dereference(bio_q(bio)->blk_trace);
+ 		if (bt)
+ 			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_GETRQ, 0, 0,
+ 					NULL, 0);
+@@ -959,16 +950,15 @@ static void blk_add_trace_getrq(void *ignore,
+ 
+ 
+ static void blk_add_trace_sleeprq(void *ignore,
+-				  struct request_queue *q,
+ 				  struct bio *bio, int rw)
+ {
+ 	if (bio)
+-		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0);
++		blk_add_trace_bio(bio, BLK_TA_SLEEPRQ, 0);
+ 	else {
+ 		struct blk_trace *bt;
+ 
+ 		rcu_read_lock();
+-		bt = rcu_dereference(q->blk_trace);
++		bt = rcu_dereference(bio_q(bio)->blk_trace);
+ 		if (bt)
+ 			__blk_add_trace(bt, 0, 0, rw, 0, BLK_TA_SLEEPRQ,
+ 					0, 0, NULL, 0);
+@@ -1008,14 +998,12 @@ static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
+ 	rcu_read_unlock();
+ }
+ 
+-static void blk_add_trace_split(void *ignore,
+-				struct request_queue *q, struct bio *bio,
+-				unsigned int pdu)
++static void blk_add_trace_split(void *ignore, struct bio *bio, unsigned int pdu)
+ {
+ 	struct blk_trace *bt;
+ 
+ 	rcu_read_lock();
+-	bt = rcu_dereference(q->blk_trace);
++	bt = rcu_dereference(bio_q(bio)->blk_trace);
+ 	if (bt) {
+ 		__be64 rpdu = cpu_to_be64(pdu);
+ 
+@@ -1024,7 +1012,7 @@ static void blk_add_trace_split(void *ignore,
+ 				BLK_TA_SPLIT,
+ 				blk_status_to_errno(bio->bi_status),
+ 				sizeof(rpdu), &rpdu,
+-				blk_trace_bio_get_cgid(q, bio));
++				blk_trace_bio_get_cgid(bio_q(bio), bio));
+ 	}
+ 	rcu_read_unlock();
+ }
+-- 
+2.26.0
+
