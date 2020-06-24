@@ -2,108 +2,117 @@ Return-Path: <SRS0=vHgh=AF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A329C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75EB0C433DF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 17:25:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 790C52078A
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yGzNNUiU"
+	by mail.kernel.org (Postfix) with ESMTP id 5043520836
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 17:25:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593019514;
+	bh=HhO/sOQOOLLB8Ih6Q75GWOsi4UoMPxjoZ4C46ch4QRA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fAHwHBLQ75/uCu7wYAZwe93aScAQ8Zed+6F/f1RKYbb8DbH2zDbtF7q9YVL8S9XXO
+	 j3bhp7bM9imscnt1LYPEOhCfR79Ic+ISCkqo52ojt8NKt2MuJkWDJocGn2xFqtW/h2
+	 B99OESZcFkFZ7KAsVbZxbrw781Ou3352njxRuaZw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404565AbgFXPQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jun 2020 11:16:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404498AbgFXPQj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jun 2020 11:16:39 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90380C061573
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id h22so1288357pjf.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=TVX/MV1cRkugdklQX2owAo6W7k+5NFqvXnOlDA4kvRY=;
-        b=yGzNNUiU0zB4ia/e/BRLyub6jOMkcwxNBtVbxa2YAtqv9bXPxUetSHNyXmsHenrYHt
-         cjkFgPmkRZp/X2yNr2u9mju+xed5eYUhQk4Kpx+jH0CGmR61y8a9ouWVJug5DZ7A+Qlv
-         DJD/L8PQC/W42O0m9N96kcj4qg7p6UcD14f7MiBpKvVmmzYFuDReGBcXd8RNy518wKPV
-         wNXnls0RdYt9lZQO/MEmeg8HOax7edYnC7etow2AGG1sgeWTIFjKemddtFXoz8u+vQRr
-         Ma2eSMXnN6YljqXWa7Q+47mtbUe6tyaeYSy4XLkUoOPj471841XsJUywEBTvACE5vQ1m
-         8c/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TVX/MV1cRkugdklQX2owAo6W7k+5NFqvXnOlDA4kvRY=;
-        b=ZaNcjs2u9GKq31CjLtAZHtgIQtxpgiHgyAiabqeLA+mAUc+BdXTsaooqyyJ2MmHyUw
-         2AtWYOtjhzUNKnUZWrTs0Wm6qlUnR6xVTWcc51ryr/of4fmjh/4zk78tyO7PQ64WBRRy
-         Hpq3fDteGEqKTAGeSrJc8cPmKva5rHPXd4XXtzaWWiuXgbIAPsSZ/owlEZFgn4n5zis7
-         J2hdpDZK8pGMh3y/XIekLrNj4WGnQJRMbVTaYpy1Qs44X8sd6kHiXIOHYNCyML97fAmb
-         A452d+4YmMjUUHcBRa/CU1aHUHg6SLvTHC+l2zbUb6rF53b40+ofPgQLujpGcPuc9515
-         mNDQ==
-X-Gm-Message-State: AOAM5302eOE83uLiB54puSZxN6fAe7ENC4KKzoqQJQnq6eZR3F8p3M7Y
-        Puu8OV+mVtjjtHpbxMUefsAiWg==
-X-Google-Smtp-Source: ABdhPJycIgQsbIB02Wur2mBRtNGc1PyURqcruMtrpODXrvsCtMYEKd4KNUN/T13UfMqBLSg/gfKfEQ==
-X-Received: by 2002:a17:902:8d98:: with SMTP id v24mr17314674plo.276.1593011798114;
-        Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
-Received: from [192.168.1.188] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id n15sm3158702pgs.25.2020.06.24.08.16.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jun 2020 08:16:37 -0700 (PDT)
-Subject: Re: move block bits out of fs.h
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200620071644.463185-1-hch@lst.de>
- <c2fba635-b2ce-a2b5-772b-4bfcb9b43453@kernel.dk>
- <20200624151211.GA17344@lst.de>
- <216bcea4-a38d-8a64-bc0f-be61b2f26e79@kernel.dk>
- <20200624151454.GB17344@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <989cafe3-ddfd-8b0c-2bad-412eb3a20ee0@kernel.dk>
-Date:   Wed, 24 Jun 2020 09:16:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S2405444AbgFXRZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jun 2020 13:25:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41452 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405318AbgFXRZN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jun 2020 13:25:13 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C69022078D;
+        Wed, 24 Jun 2020 17:25:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593019512;
+        bh=HhO/sOQOOLLB8Ih6Q75GWOsi4UoMPxjoZ4C46ch4QRA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JrmwJ7Do1aY4hFozWLENjwf9W6i8yfDP71mPxKRPaI6w0QMYl8CRQTFXCuIfLoaeJ
+         B3TPbMDgwnc+ANYi3ihXau8KiLP7UKojw6Y+RXUr+ik/+4mGFy7M/WIlnYAQw+Ci2V
+         5zVSqMb9Lzj3snQaVFfRU2LI9GdaBtrbc+EvhE0M=
+Date:   Wed, 24 Jun 2020 10:25:09 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
+ support
+Message-ID: <20200624172509.GD1291930@dhcp-10-100-145-180.wdl.wdc.com>
+References: <20200622162530.1287650-1-kbusch@kernel.org>
+ <20200622162530.1287650-4-kbusch@kernel.org>
+ <69e8e88c-097b-368d-58f4-85d11110386d@grimberg.me>
+ <20200623112551.GB117742@localhost.localdomain>
+ <20200623221012.GA1291643@dhcp-10-100-145-180.wdl.wdc.com>
+ <b5b7f6bc-22d4-0601-1749-2a631fb7d055@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20200624151454.GB17344@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b5b7f6bc-22d4-0601-1749-2a631fb7d055@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/24/20 9:14 AM, Christoph Hellwig wrote:
-> On Wed, Jun 24, 2020 at 09:14:11AM -0600, Jens Axboe wrote:
->> On 6/24/20 9:12 AM, Christoph Hellwig wrote:
->>> On Wed, Jun 24, 2020 at 09:09:42AM -0600, Jens Axboe wrote:
->>>> Applied for 5.9 - I kept this in a separate topic branch, fwiw. There's the
->>>> potential for some annoying issues with this, so would rather have it in
->>>> a branch we can modify easily, if we need to.
->>>
->>> Hmm, I have a bunch of things building on top of this pending, so that
->>> branch split will be interesting to handle.
->>
->> We can stuff it in for-5.9/block, but then I'd rather just rebase that
->> on 5.8-rc2 now since it's still early days. If we don't, we already
->> have conflicts...
+On Tue, Jun 23, 2020 at 04:17:30PM -0700, Sagi Grimberg wrote:
 > 
-> I'll happily rebase.  rc1 also has funny ext4 warnings which are
-> pretty annoying.
+> > > > > -		len = nvme_process_ns_desc(ctrl, ids, cur);
+> > > > > +		len = nvme_process_ns_desc(ctrl, ids, cur, &csi_seen);
+> > > > >    		if (len < 0)
+> > > > >    			goto free_data;
+> > > > >    		len += sizeof(*cur);
+> > > > >    	}
+> > > > >    free_data:
+> > > > > +	if (!status && nvme_multi_css(ctrl) && !csi_seen) {
+> > > > 
+> > > > We will clear the status if we detect a path error, that is to
+> > > > avoid needlessly removing the ns for path failures, so you should
+> > > > check at the goto site.
+> > > 
+> > > The problem is that this check has to be done after checking all the ns descs,
+> > > so this check to be done as the final thing, at least after processing all the
+> > > ns descs. No matter if nvme_process_ns_desc() returned an error, or if
+> > > simply NVME_NIDT_CSI wasn't part of the ns desc list, so the loop reached the
+> > > end without error.
+> > > 
+> > > Even if the nvme command failed and the status was cleared:
+> > > 
+> > >                  if (status > 0 && !(status & NVME_SC_DNR))
+> > >                          status = 0;
+> > 
+> > This check is so weird. What has DNR got to do with whether or not we
+> > want to continue with this namespace? The commit that adds this says
+> > it's to check for a host failed IO, but a controller can just as validly
+> > set DNR in its error status, in which case we'd still want clear the
+> > status.
+> 
+> The reason is that if this error is not a DNR error, it means that we
+> should retry and succeed, we don't want to remove the namespace.
 
-Done, pushed it out.
+And what if it is a DNR error? For example, the controller simply
+doesn't support this CNS value. While the controller should support it,
+we definitely don't need it for NVM command set namespaces.
+ 
+> The problem that this solves is the fact that we have various error
+> recovery conditions (interconnect issues, failures, resets) and the
+> async works are designed to continue to run, issue I/O and fail. The
+> scan work, will revalidate namespaces and remove them if it fails to
+> do so, which is inherently wrong if these are simply inaccessible by
+> the host at this time.
 
--- 
-Jens Axboe
-
+Relying on a specific bit in the status code seems a bit indirect for
+this kind of condition.
