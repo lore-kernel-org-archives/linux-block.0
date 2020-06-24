@@ -2,92 +2,107 @@ Return-Path: <SRS0=vHgh=AF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3F0C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 12:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F02EBC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 12:08:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3122B20B1F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 12:08:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XJvwdkq4"
+	by mail.kernel.org (Postfix) with ESMTP id C5A9720B1F
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 12:08:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593000515;
+	bh=Aa/8MkArd4EWGij1kzI8suLnmqrtXk0z2p3kFoUhb1Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RS/Q0aUrRSVJ7CS+T2mRmyvupm/1dCsFg1xsIMN9xz6obxWfNBtQvcDI0rjgDumGu
+	 LZbxvBLIxg20q/HOxcCEuqEAfEscpu/uBJiYjAe/FiPfyQtFmxS6vfmqeOykJfBmrG
+	 VtCeJ9caBSsHRXaWhci6F7if6MPX55yOTZHpqGUQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389730AbgFXMIA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jun 2020 08:08:00 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:43640 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388522AbgFXMIA (ORCPT
+        id S2389337AbgFXMIf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jun 2020 08:08:35 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35020 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388522AbgFXMIe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jun 2020 08:08:00 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05OC2Zx8124084;
-        Wed, 24 Jun 2020 12:07:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=BEbvcmGfM5tz2pa3NoCamUu/o77G2mzvTOG95lKNFD4=;
- b=XJvwdkq4nfBjtLpVXFp4BmfLKu+qVfAoVvTsmFTeGJWKXViXcJRVVgwM7vC8AVVuND+4
- zUehiZxcCUbm4WNpy9NsUCweQFZuir/BjezVHYZp8PiSKpMaXkVry0IS/cJPHBgNlMsZ
- 6rFsvsr6SNlMLH+97eoHQhPfGEruMeLkTI2m6EmYm4zPau1tSTmhcqFCCi3esHC45ULa
- wDW0bLv8wEP0Bp2fFRxrnMp0HU8L5B/OunaR3Xh7AkGtwnUAVbSRr2VlWfcfwcRl55Dg
- HEBTVjEtCT0kfg+5IxfjigPhEskJqAq9jcp9+htojA8RU3DOMP8p/rd5W6aonerpCWfg DA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 31uut5jf39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 24 Jun 2020 12:07:39 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05OC49V8076680;
-        Wed, 24 Jun 2020 12:07:39 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 31uur677pw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Jun 2020 12:07:38 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05OC7Xlk020706;
-        Wed, 24 Jun 2020 12:07:33 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 24 Jun 2020 12:07:33 +0000
-To:     Chengguang Xu <cgxu519@mykernel.net>
-Cc:     axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] block: release bip in a right way in error path
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1v9jg1xcq.fsf@ca-mkp.ca.oracle.com>
-References: <20200624102139.5048-1-cgxu519@mykernel.net>
-Date:   Wed, 24 Jun 2020 08:07:31 -0400
-In-Reply-To: <20200624102139.5048-1-cgxu519@mykernel.net> (Chengguang Xu's
-        message of "Wed, 24 Jun 2020 18:21:39 +0800")
+        Wed, 24 Jun 2020 08:08:34 -0400
+Received: by mail-pf1-f195.google.com with SMTP id h185so1093975pfg.2;
+        Wed, 24 Jun 2020 05:08:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hKoC80Wq7vgR/nEQP76EsMeVeQcGFmckg9WTm/ySZtU=;
+        b=pzscmqkD2CfyMgtwS4bH5JMlgZRqTU24ntszPmhj9AXENcFPcwrPHImvzz2w+DYnlU
+         z3OHoBg8qkCI0N4cjGuaALBQKFjjJlWbIJdXrh/VOtOzIVMAwdspdPVRFKskNiu9LBTE
+         ogsY28r8WwWzWN6iuOt+vz/krf+GSbs4xZnVXrQwz45HiL8YKXTaF3uIuP0afygygbDL
+         6tONFB959g2oN4aYEdr9IQdVkax8TtERCjVpotBVshfb15PSJkj8geq/nTL2SSF/8sVF
+         THfTF2k9ogY+cAJQnGvChhxARHSeLWYE4XMTtElE1IvynJNAC6kIhuWm0hZUb+tlAR9O
+         6yKA==
+X-Gm-Message-State: AOAM532SXAPf2mUrjkAKxbiGHFxGxiD9Mq/WfItJ1QA6ehy/sdbRo9NI
+        wq8HqIIZL3HcZUjWwpDjnkk=
+X-Google-Smtp-Source: ABdhPJy7+qAAHibTBd59vj1TFF3NDV4/7CT9zsa35G/gvOUinbvpiYYa0boVxe+S9Xo6K6bzCLHpGg==
+X-Received: by 2002:a63:395:: with SMTP id 143mr17860516pgd.57.1593000512400;
+        Wed, 24 Jun 2020 05:08:32 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id cu9sm5249668pjb.28.2020.06.24.05.08.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2020 05:08:30 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id ADB9940430; Wed, 24 Jun 2020 12:08:29 +0000 (UTC)
+Date:   Wed, 24 Jun 2020 12:08:29 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jack@suse.cz" <jack@suse.cz>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "nstange@suse.de" <nstange@suse.de>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mhocko@suse.com" <mhocko@suse.com>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v7 5/8] loop: be paranoid on exit and prevent new
+ additions / removals
+Message-ID: <20200624120829.GE4332@42.do-not-panic.com>
+References: <20200619204730.26124-1-mcgrof@kernel.org>
+ <20200619204730.26124-6-mcgrof@kernel.org>
+ <7e76d892-b5fd-18ec-c96e-cf4537379eba@acm.org>
+ <20200622122742.GU11244@42.do-not-panic.com>
+ <SN4PR0401MB35982B3522B95FADDD06DC4C9B940@SN4PR0401MB3598.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9661 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 spamscore=0 adultscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=885 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006240088
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9661 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 clxscore=1011
- lowpriorityscore=0 bulkscore=0 adultscore=0 spamscore=0 suspectscore=1
- phishscore=0 impostorscore=0 cotscore=-2147483648 priorityscore=1501
- mlxscore=0 mlxlogscore=903 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006240088
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN4PR0401MB35982B3522B95FADDD06DC4C9B940@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jun 23, 2020 at 05:05:01PM +0000, Johannes Thumshirn wrote:
+> On 22/06/2020 14:27, Luis Chamberlain wrote:
+> [...]> If you run run_0004.sh from break-blktrace [0]. Even with all my patches
+> > merged we still run into this. And so the bug lies within the block
+> > layer or on the driver. I haven't been able to find the issue yet.
+> > 
+> > [0] https://github.com/mcgrof/break-blktrace
+> 
+> Would it be a good idea to merge this into blktests? Maybe start a blktrace 
+> section for it, which could host other regression test for blktrace.
+> 
+> Thoughts?
 
-Chengguang,
+Absolutely! That is the goal as well.
 
-> Release bip using kfree() in error path when that was allocated
-> by kmalloc().
-
-Looks good to me.
-
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+  Luis
