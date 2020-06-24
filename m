@@ -6,123 +6,114 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFDEC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 19:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5ED0C433E1
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 21:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF1EE2082F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 19:03:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C16FD20768
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 21:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404956AbgFXTDp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jun 2020 15:03:45 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39815 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404883AbgFXTDo (ORCPT
+        id S2390142AbgFXVRc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jun 2020 17:17:32 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:35321 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389773AbgFXVRc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jun 2020 15:03:44 -0400
-Received: by mail-pg1-f196.google.com with SMTP id z5so1852917pgb.6
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 12:03:44 -0700 (PDT)
+        Wed, 24 Jun 2020 17:17:32 -0400
+Received: by mail-pj1-f66.google.com with SMTP id i4so1788201pjd.0
+        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 14:17:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CxnPLwafznlw6uJemM271g2mVdpK3sZFeqy60qOzhic=;
-        b=f7hDJejYPcmZQkPWbKw0uHpqtBfEAdKfwTmSfUfOQmT1ioWTJ4bhjZXbUZElGo12wE
-         iIGsHw7HyvBug6dizKB+/taE1MP2jHFK86DgNSda3tOhuzqR44Rb+KMhidj1SGOjgCm0
-         /+L5GcZpwdsefBrOzQHk5enE13pgb73Hk7jtkFjP7+8TyttEEjEqN5A1x3Q2fvU78ci3
-         ffEvYntQ+8Al9/2OqmumvlCAfji7HbgZ5txkjBDO6pFZmN7xijOGGNVdvvH0h0NVfwDe
-         SdsYrZVEniUxIfO20TpTi1cFjV5Mr0YcHQXMjtnbFegNBMy95lfW6f3LRzSTWVlc8UCm
-         iCqw==
-X-Gm-Message-State: AOAM532999TeM9n6n/XBIxTe5B/4tbWFGqTTN24crz99F1fabiXoA+WT
-        qvrt6GQMrUw/YPu5ao5cwxA=
-X-Google-Smtp-Source: ABdhPJy/Hj214+mQy5P/DMkoPRn1OUvSUd/hKX06vUukopctG/W4/3m3RFpmd44LPrnBmlYJyPLaUg==
-X-Received: by 2002:aa7:82d5:: with SMTP id f21mr7035532pfn.219.1593025423919;
-        Wed, 24 Jun 2020 12:03:43 -0700 (PDT)
+        bh=b1eB2sGqcQ7HKCpKRxwDHuRLdFhJipYSwNVv0yPPktc=;
+        b=PwVIrLsl0aKlAODDoZc26psqhN6Advw27t0eHPG1H226uvxr0sEqdaL1fMO40WCOYR
+         o3elc06PnDNgbPtFFLk5/XTW2PYPbnvZ1zjWvAW9L4f5SW8vKTioxgRnuYVikQJi85Ea
+         Ab7QN8Ek96XFbXBJR512DDLTs4bPgCf9HkzUqnipfWRnmcahYmBP/GxqH5A5AvQDot0V
+         Bz/o7YAF+YB+2ANhAcUKTp6utyMe+rjrqeaA41A1zdjQ5RLRVkGGPPNHeeXWJG44pna+
+         Zz9xDzUg7kfiiKy9lxAJ/EfWOKzVH3vSyXN8YF/rE+o2I1hpGC50KI9/rn6TChbC1qKf
+         jGGA==
+X-Gm-Message-State: AOAM5337bSTouQW/3LjmHo0rt5b1oxAT/98tzNJgza4d2Q83omSoLpsd
+        FsvGVUJzo6M5yogV2qC5+3s=
+X-Google-Smtp-Source: ABdhPJyvOZ+gNSwE9W6wjgbV5Ulm7M7kvGUqhvu1vYxNZ4gb99nzBXiuQaRWkWhbGCeN4qeCI8hv1g==
+X-Received: by 2002:a17:90b:347:: with SMTP id fh7mr30484013pjb.64.1593033451134;
+        Wed, 24 Jun 2020 14:17:31 -0700 (PDT)
 Received: from ?IPv6:2601:647:4802:9070:4c08:474f:e61d:6947? ([2601:647:4802:9070:4c08:474f:e61d:6947])
-        by smtp.gmail.com with ESMTPSA id 4sm20391425pfn.205.2020.06.24.12.03.42
+        by smtp.gmail.com with ESMTPSA id k2sm17788780pgm.11.2020.06.24.14.17.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jun 2020 12:03:42 -0700 (PDT)
-Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
- support
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-References: <20200622162530.1287650-4-kbusch@kernel.org>
- <69e8e88c-097b-368d-58f4-85d11110386d@grimberg.me>
- <20200623112551.GB117742@localhost.localdomain>
- <20200623221012.GA1291643@dhcp-10-100-145-180.wdl.wdc.com>
- <b5b7f6bc-22d4-0601-1749-2a631fb7d055@grimberg.me>
- <20200624172509.GD1291930@dhcp-10-100-145-180.wdl.wdc.com>
- <e59e402b-de74-e670-59d1-a6c51680a31d@grimberg.me>
- <20200624180323.GE1291930@dhcp-10-100-145-180.wdl.wdc.com>
- <1ddbf614-f5a7-a265-b1a2-7c5ed0922f18@grimberg.me>
- <76966a48-0588-3f3c-0ec1-842cd2ac413d@grimberg.me>
- <20200624184016.GF1291930@dhcp-10-100-145-180.wdl.wdc.com>
+        Wed, 24 Jun 2020 14:17:30 -0700 (PDT)
+Subject: Re: [PATCH V5 0/6] blk-mq: support batching dispatch from scheduler
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Baolin Wang <baolin.wang7@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+References: <20200603094337.2064181-1-ming.lei@redhat.com>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <06623bef-7269-f45b-9f43-8c854ddf812d@grimberg.me>
-Date:   Wed, 24 Jun 2020 12:03:41 -0700
+Message-ID: <4c5d8c1b-2b5a-1bee-b5eb-5f4b7336b979@grimberg.me>
+Date:   Wed, 24 Jun 2020 14:17:28 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200624184016.GF1291930@dhcp-10-100-145-180.wdl.wdc.com>
+In-Reply-To: <20200603094337.2064181-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->>>> If the controller does not support the CNS value, it may return Invalid
->>>> Field with DNR set. That error currently gets propogated back to
->>>> nvme_init_ns_head(), which then abandons the namespace. Just as the code
->>>> coments say, we had been historically been clearing such errors because
->>>> we have other ways to identify the namespace, but now we're not clearing
->>>> that error.
->>>
->>> I don't understand what you are saying Keith.
->>>
->>> My comment was for this block:
->>> -- 
->>>       if (!status && nvme_multi_css(ctrl) && !csi_seen) {
->>>           dev_warn(ctrl->device, "Command set not reported for nsid:%d\n",
->>>                nsid);
->>>           status = -EINVAL;
->>>       }
->>> -- 
->>>
->>> I was saying that !status doesn't necessarily mean success, but it can
->>> also mean that its an retry-able error status (due to transport or
->>> controller). If we see a retry-able error we should still clear the
->>> status so we don't abandon the namespace.
->>>
->>> This for example would achieve that:
+> Hi Jens,
 > 
-> We're not talking about the same thing. I am only talking about what
-> introduced the DNR check, from commit 59c7c3caaaf87.
+> More and more drivers want to get batching requests queued from
+> block layer, such as mmc[1], and tcp based storage drivers[2]. Also
+> current in-tree users have virtio-scsi, virtio-blk and nvme.
 > 
-> I know you added it because you want to abort comparing identifiers on a
-> rescan when retrieving the identifiers failed. That's fine, but I am
-> saying this fails namespace creation in the first place for some types
-> of devices that used to succeed.
+> For none, we already support batching dispatch.
+> 
+> But for io scheduler, every time we just take one request from scheduler
+> and pass the single request to blk_mq_dispatch_rq_list(). This way makes
+> batching dispatch not possible when io scheduler is applied. One reason
+> is that we don't want to hurt sequential IO performance, becasue IO
+> merge chance is reduced if more requests are dequeued from scheduler
+> queue.
+> 
+> Tries to start the support by dequeuing more requests from scheduler
+> if budget is enough and device isn't busy.
+> 
+> Simple fio test over virtio-scsi shows IO can get improved by 5~10%.
+> 
+> Baolin has tested previous versions and found performance on MMC can be improved.
+> 
+> Patch 1 ~ 4 are improvement and cleanup, which can't applied without
+> supporting batching dispatch.
+> 
+> Patch 5 ~ 6 starts to support batching dispatch from scheduler.
+> 
+> 
+> 
+> [1] https://lore.kernel.org/linux-block/20200512075501.GF1531898@T590/#r
+> [2] https://lore.kernel.org/linux-block/fe6bd8b9-6ed9-b225-f80c-314746133722@grimberg.me/
+> 
+> V5:
+> 	- code style changes suggested by Damien
+> 
+> V4:
+> 	- fix releasing budgets and avoids IO hang(5/6)
+> 	- dispatch more batches if the device can accept more(6/6)
+> 	- verified by running more tests
+> 
+> V3:
+> 	- add reviewed-by tag
+> 	- fix one typo
+> 	- fix one budget leak issue in case that .queue_rq returned *_RESOURCE in 5/6
+> 
+> V2:
+> 	- remove 'got_budget' from blk_mq_dispatch_rq_list
+> 	- drop patch for getting driver tag & handling partial dispatch
 
-OK, now I think I understand (thanks for clarifying that the discussion
-is not on patch 3/5, but rather on 59c7c3caaaf87).
+Hey Ming,
 
-So the original proposal was to check NVME_SC_HOST_PATH_ERROR (and now
-we have NVME_SC_HOST_ABORTED_CMD) but with the review Christoph gave
-it seemed to make more sense that we generalize and check the DNR bit.
-
-We could restrict it back to checking the status is
-NVME_SC_HOST_PATH_ERROR or NVME_SC_HOST_ABORTED_CMD if you think it
-creates problems. However, if we keep the code as is, the original
-comment still holds.
+What ever happened to this one?
