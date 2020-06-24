@@ -2,163 +2,108 @@ Return-Path: <SRS0=vHgh=AF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D128C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A329C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04F7C20B1F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 790C52078A
+	for <linux-block@archiver.kernel.org>; Wed, 24 Jun 2020 15:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2uZaiDk"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="yGzNNUiU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403982AbgFXPQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jun 2020 11:16:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20271 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404530AbgFXPQL (ORCPT
+        id S2404565AbgFXPQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Jun 2020 11:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404498AbgFXPQj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jun 2020 11:16:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593011769;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6SksW3aU3D2PMOgemCe/PL6jOgFjOnbGQFc7Y/at9zM=;
-        b=R2uZaiDkyaM3J+HRA5H765j74wtQfnVb9XRFzF5TtNXVmrCsh10qGKhQY2GhZDDazWDXXv
-        nghpGR6qut2p0Jd1xygoZUoYclUP76krmrOcwnaWqqC57+dKCrPhQCTFqEh62qyE9AE2Yh
-        2xJmfdhbnjK8krqtGQEwd5m7oiOl31Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-Ft8miOGiPE2GsiUiCt6jNQ-1; Wed, 24 Jun 2020 11:15:57 -0400
-X-MC-Unique: Ft8miOGiPE2GsiUiCt6jNQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0B1991138;
-        Wed, 24 Jun 2020 15:15:46 +0000 (UTC)
-Received: from [10.3.128.20] (unknown [10.3.128.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8299A619D0;
-        Wed, 24 Jun 2020 15:15:45 +0000 (UTC)
-Reply-To: tasleson@redhat.com
-Subject: Re: [RFC PATCH v3 5/8] ata_dev_printk: Use dev_printk
-To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org
-References: <20200623191749.115200-1-tasleson@redhat.com>
- <20200623191749.115200-6-tasleson@redhat.com>
- <CGME20200624103532eucas1p2c0988207e4dfc2f992d309b75deac3ee@eucas1p2.samsung.com>
- <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
-From:   Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <33577b4f-6ee1-f054-8853-b61ca800e10a@redhat.com>
-Date:   Wed, 24 Jun 2020 10:15:44 -0500
+        Wed, 24 Jun 2020 11:16:39 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90380C061573
+        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id h22so1288357pjf.1
+        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TVX/MV1cRkugdklQX2owAo6W7k+5NFqvXnOlDA4kvRY=;
+        b=yGzNNUiU0zB4ia/e/BRLyub6jOMkcwxNBtVbxa2YAtqv9bXPxUetSHNyXmsHenrYHt
+         cjkFgPmkRZp/X2yNr2u9mju+xed5eYUhQk4Kpx+jH0CGmR61y8a9ouWVJug5DZ7A+Qlv
+         DJD/L8PQC/W42O0m9N96kcj4qg7p6UcD14f7MiBpKvVmmzYFuDReGBcXd8RNy518wKPV
+         wNXnls0RdYt9lZQO/MEmeg8HOax7edYnC7etow2AGG1sgeWTIFjKemddtFXoz8u+vQRr
+         Ma2eSMXnN6YljqXWa7Q+47mtbUe6tyaeYSy4XLkUoOPj471841XsJUywEBTvACE5vQ1m
+         8c/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TVX/MV1cRkugdklQX2owAo6W7k+5NFqvXnOlDA4kvRY=;
+        b=ZaNcjs2u9GKq31CjLtAZHtgIQtxpgiHgyAiabqeLA+mAUc+BdXTsaooqyyJ2MmHyUw
+         2AtWYOtjhzUNKnUZWrTs0Wm6qlUnR6xVTWcc51ryr/of4fmjh/4zk78tyO7PQ64WBRRy
+         Hpq3fDteGEqKTAGeSrJc8cPmKva5rHPXd4XXtzaWWiuXgbIAPsSZ/owlEZFgn4n5zis7
+         J2hdpDZK8pGMh3y/XIekLrNj4WGnQJRMbVTaYpy1Qs44X8sd6kHiXIOHYNCyML97fAmb
+         A452d+4YmMjUUHcBRa/CU1aHUHg6SLvTHC+l2zbUb6rF53b40+ofPgQLujpGcPuc9515
+         mNDQ==
+X-Gm-Message-State: AOAM5302eOE83uLiB54puSZxN6fAe7ENC4KKzoqQJQnq6eZR3F8p3M7Y
+        Puu8OV+mVtjjtHpbxMUefsAiWg==
+X-Google-Smtp-Source: ABdhPJycIgQsbIB02Wur2mBRtNGc1PyURqcruMtrpODXrvsCtMYEKd4KNUN/T13UfMqBLSg/gfKfEQ==
+X-Received: by 2002:a17:902:8d98:: with SMTP id v24mr17314674plo.276.1593011798114;
+        Wed, 24 Jun 2020 08:16:38 -0700 (PDT)
+Received: from [192.168.1.188] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id n15sm3158702pgs.25.2020.06.24.08.16.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jun 2020 08:16:37 -0700 (PDT)
+Subject: Re: move block bits out of fs.h
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200620071644.463185-1-hch@lst.de>
+ <c2fba635-b2ce-a2b5-772b-4bfcb9b43453@kernel.dk>
+ <20200624151211.GA17344@lst.de>
+ <216bcea4-a38d-8a64-bc0f-be61b2f26e79@kernel.dk>
+ <20200624151454.GB17344@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <989cafe3-ddfd-8b0c-2bad-412eb3a20ee0@kernel.dk>
+Date:   Wed, 24 Jun 2020 09:16:36 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <d817c9dd-6852-9233-5f61-1c0bc0f65ca4@samsung.com>
+In-Reply-To: <20200624151454.GB17344@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/24/20 5:35 AM, Bartlomiej Zolnierkiewicz wrote:
-> 
-> [ added linux-ide ML to Cc: ]
-> 
-> Hi,
-
-Hello,
-
-> 
-> On 6/23/20 9:17 PM, Tony Asleson wrote:
->> Utilize the dev_printk function which will add structured data
->> to the log message.
+On 6/24/20 9:14 AM, Christoph Hellwig wrote:
+> On Wed, Jun 24, 2020 at 09:14:11AM -0600, Jens Axboe wrote:
+>> On 6/24/20 9:12 AM, Christoph Hellwig wrote:
+>>> On Wed, Jun 24, 2020 at 09:09:42AM -0600, Jens Axboe wrote:
+>>>> Applied for 5.9 - I kept this in a separate topic branch, fwiw. There's the
+>>>> potential for some annoying issues with this, so would rather have it in
+>>>> a branch we can modify easily, if we need to.
+>>>
+>>> Hmm, I have a bunch of things building on top of this pending, so that
+>>> branch split will be interesting to handle.
 >>
->> Signed-off-by: Tony Asleson <tasleson@redhat.com>
->> ---
->>  drivers/ata/libata-core.c | 10 +++++++---
->>  1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
->> index beca5f91bb4c..44c874367fe3 100644
->> --- a/drivers/ata/libata-core.c
->> +++ b/drivers/ata/libata-core.c
->> @@ -6475,6 +6475,7 @@ EXPORT_SYMBOL(ata_link_printk);
->>  void ata_dev_printk(const struct ata_device *dev, const char *level,
->>  		    const char *fmt, ...)
->>  {
->> +	const struct device *gendev;
->>  	struct va_format vaf;
->>  	va_list args;
->>  
->> @@ -6483,9 +6484,12 @@ void ata_dev_printk(const struct ata_device *dev, const char *level,
->>  	vaf.fmt = fmt;
->>  	vaf.va = &args;
->>  
->> -	printk("%sata%u.%02u: %pV",
->> -	       level, dev->link->ap->print_id, dev->link->pmp + dev->devno,
->> -	       &vaf);
->> +	gendev = (dev->sdev) ? &dev->sdev->sdev_gendev : &dev->tdev;
->> +
->> +	dev_printk(level, gendev, "ata%u.%02u: %pV",
->> +			dev->link->ap->print_id,
+>> We can stuff it in for-5.9/block, but then I'd rather just rebase that
+>> on 5.8-rc2 now since it's still early days. If we don't, we already
+>> have conflicts...
 > 
-> This duplicates the device information and breaks integrity of
-> libata logging functionality (ata_{dev,link,port}_printk() should
-> be all converted to use dev_printk() at the same time).
-> 
-> The root source of problem is that libata transport uses different
-> naming scheme for ->tdev devices (please see dev_set_name() in
-> ata_t{dev,link,port}_add()) than libata core for its logging
-> functionality (ata_{dev,link,port}_printk()).
-> 
-> Since libata transport is part of sysfs ABI we should be careful
-> to not break it so one idea for solving the issue is to convert
-> ata_t{dev,link,port}_add() to use libata logging naming scheme and
-> at the same time add sysfs symlinks for the old libata transport
-> naming scheme.
-> 
-> dev->sdev usage is not required for dev_printk() conversion and
-> should be considered as a separate change (since it also breaks
-> integrity of libata logging and can be considered as a mild
-> "layering violation" I don't think that it should be applied).
+> I'll happily rebase.  rc1 also has funny ext4 warnings which are
+> pretty annoying.
 
-The point of this patch series is to attach a device unique identifier
-to the storage device log messages as structured data.  Originally I
-resurrected and used printk_emit, but it was suggested I leverage
-dev_printk.  dev_printk does change the output of the log message to
-include duplicate information if the message isn't changed. You are not
-the first person to raise that concern.  I listed this as an open
-question in the cover letter.  I've wanted to preserve the original log
-message, so as to not break user space mining tools and I've been
-concerned that dev_printk prefixing with an id may already do that.
-Adding structured data is invisible to them, or at the least shouldn't
-break them, eg. adding a new key-value pair.
+Done, pushed it out.
 
-I can understand the desire to make all the ata logging functions
-consistent, and use dev_printk if we go this way.  However, for this
-change it wasn't really the goal to refactor all the logging everywhere
-to use dev_printk, although that may be a good change in general.  This
-is especially true that if at the end of the refactor to use dev_printk
-we consider it a layering violation to call into the existing
-functionality to return the vpd ID for the device and reject that part
-of the change.
-
-What I am hoping is that we can all agree that having a persistent
-identifier associated to storage related log messages is indeed useful.
-If we can agree on that, then I would like to have the discussion on
-what's the best way to achieve that.
-
-Thanks,
-Tony
+-- 
+Jens Axboe
 
