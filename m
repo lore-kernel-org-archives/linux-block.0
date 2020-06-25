@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F395FC433DF
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7A1C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5AD620707
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F28A20724
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="pKwqM6/B"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="a4kPMuPR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404619AbgFYMWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 08:22:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55200 "EHLO
+        id S2404451AbgFYMWZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 08:22:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404508AbgFYMWY (ORCPT
+        with ESMTP id S2404343AbgFYMWY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 25 Jun 2020 08:22:24 -0400
 Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B78C0613ED
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:22 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id h15so5613172wrq.8
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A17DEC061573
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:24 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id a6so5629346wrm.4
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Uplg47+RomE9YaWxZaB8jq75+RVgxneSzcAc8bd9ca0=;
-        b=pKwqM6/BNNtcXKCnqMZeye8/adtX0X/kD2BvhvoojAvfru7Z8ZK4mKkjbZbxp9tbWo
-         HxBdLz44Pni9xhrCCnd1oFt9oJPzvizNfc78+H5GGICH+/lGRMs85hCDdmPwoXSmoJWx
-         at8xpmekaKwqpaNJaMuZRrmjniqcFCJNPPnTVEvl27FQZXMuXayOxT9X+zBX7oK23xsX
-         nUD9rOQ52tE5Yn9OZHGOBlXhWWJjJVl6dziT27/AxnVGLJLunr3bGLnHw451QsydaDDc
-         hlc4yoAUoY6iy/JrUOGAxRvOTpwG9/fEakD1h5bJK/4gahehBNDeLxdoJ0JOWImgk3r1
-         SULw==
+        bh=0Ju3UDNPPwBAk1TA1zeQdRuOHY5B22Z1S54Q7dxG7ro=;
+        b=a4kPMuPRI94jYMbUyDiniUkJA4zHEgowzmPRA9qYcmXUwmmW3U2rYITJC0+M3sTR78
+         KVXqrURRTM+O4yO3SgN2zJ86WC0cyeLX4d6ryi0wJ4Nebi7WZSqa6HHD+ZxZvrewq2P1
+         OX/BOsVovRoiGC4xBatKL4iWx1NRQVYBtAw4yOxNz/O3PjT9uXFP4y4Nj8oL38r/lITX
+         kAbq+bt36sje5oCKcgh4VWXRlBXjvDHYB7DPPqkFBXZ5RjqJzA2sYDnBwcoQeylDqJar
+         Y8bM/RXncZrCOKNrv/To5XmqAVNpHfZwuL7rHFdVrXynZOqA5NRy1K7PRNn08PiUkKLB
+         pxRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Uplg47+RomE9YaWxZaB8jq75+RVgxneSzcAc8bd9ca0=;
-        b=eVwOjU+uoAcgp2N+omUoxt7/40x6tVUc/t32YqfQ0MQIrDsel24Ed2L0XVrJDVNmhp
-         d4W+XULnfWB3y8baJX40yHDFftykIwj0NrQkCxhUk8VcA8GYAscyNBGiHhSKM/7nllq2
-         CWI71pWQnIJE3yvGJuib/R6+MU5g+Rr+lV+AUA1cZHwgwy4ff6G1TZCUS7TSefLM6f0k
-         vKF0HX9hSN9szKORBih4vbEqVpLUJnp84RpE95UqpiPC75bHE4U5gTYeTXg61igSn2Il
-         LImJRAMCSvjJ3pFPRSI2EO/6rVkU37Fcr/xYFiVTG1BmNVRE1zOeFmVpgAPW7p0hi/96
-         pQYw==
-X-Gm-Message-State: AOAM533FdPrZYUQ6MkhpBPhLw/2M8NKgHfc/TW4PmRK0x6fVRQ+0R69E
-        b8/ohwxUy3xpqtFEGwpNGbFPeA==
-X-Google-Smtp-Source: ABdhPJzl2u7SbnklyFfMa/Qyq7hFxasyRw6r1/oAry3ecNHjaxknZiMpQeqk9tjHTb1+Tl39UBn2Qg==
-X-Received: by 2002:a5d:68cc:: with SMTP id p12mr2763592wrw.111.1593087741592;
-        Thu, 25 Jun 2020 05:22:21 -0700 (PDT)
+        bh=0Ju3UDNPPwBAk1TA1zeQdRuOHY5B22Z1S54Q7dxG7ro=;
+        b=meV75KAL1RTNDU8MnO1GaEmPym3ztN1kbuf8DHMeuSrnB/vrXRKdTbIh7Pocxy25QL
+         fEYJ4gHsGYLKcctDlT8Lcab/+7hBSK2dPA/TYCB8cVQXve/ERHJBK0POj6aaO4zZ4qEj
+         lsxeTgM6zuKmUAMOYDQccalwU6niG8sYpRbPl/dBRNyxTD2nsFAHUY1y+gAYcd2etPYs
+         /dbY1b7M27eVnsMO7SerNrhZKfPx+dK0pBEw9AJQCIFNqbPpcmHOZZHXIsE5zFDb+slY
+         ofZGNBi2e+R2BuX4qmk3mElSJo3Ixvst6fuJYzkfV5aGvT6pscbQSotzm+iqyP35u3QG
+         jPyw==
+X-Gm-Message-State: AOAM531UtVEJqbtqJVpkOTChT76oH834/eev+DgNloCdQtvV6hd2w70g
+        lFVUNC/GhiFOznS7vEtGixrepqsqzKAJ7Q==
+X-Google-Smtp-Source: ABdhPJxWQm3VN+zqrMTnb8iXcKCR7M7Ez3ONvMlEt8CNYRRoA4A76A69bhclHB00O5N4pgSPkhGdNg==
+X-Received: by 2002:a05:6000:128e:: with SMTP id f14mr39466905wrx.276.1593087743370;
+        Thu, 25 Jun 2020 05:22:23 -0700 (PDT)
 Received: from localhost.localdomain ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id f186sm11934307wmf.29.2020.06.25.05.22.20
+        by smtp.gmail.com with ESMTPSA id f186sm11934307wmf.29.2020.06.25.05.22.21
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jun 2020 05:22:20 -0700 (PDT)
+        Thu, 25 Jun 2020 05:22:22 -0700 (PDT)
 From:   =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
@@ -66,9 +66,9 @@ Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
         SelvaKumar S <selvakuma.s1@samsung.com>,
         Kanchan Joshi <joshi.k@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>
-Subject: [PATCH 5/6] block: add zone attr. to zone mgmt IOCTL struct
-Date:   Thu, 25 Jun 2020 14:21:51 +0200
-Message-Id: <20200625122152.17359-6-javier@javigon.com>
+Subject: [PATCH 6/6] nvme: Add consistency check for zone count
+Date:   Thu, 25 Jun 2020 14:21:52 +0200
+Message-Id: <20200625122152.17359-7-javier@javigon.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200625122152.17359-1-javier@javigon.com>
 References: <20200625122152.17359-1-javier@javigon.com>
@@ -82,61 +82,37 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Javier González <javier.gonz@samsung.com>
 
-Add zone attributes field to the blk_zone structure. Use ZNS attributes
-as base for zoned block devices in general.
+Since the number of zones is calculated through the reported device
+capacity and the ZNS specification allows to report the total number of
+zones in the device, add an extra check to guarantee consistency between
+the device and the kernel.
 
 Signed-off-by: Javier González <javier.gonz@samsung.com>
 Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
 Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
 ---
- drivers/nvme/host/zns.c       |  1 +
- include/uapi/linux/blkzoned.h | 13 ++++++++++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ drivers/nvme/host/zns.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
-index 258d03610cc0..7d8381fe7665 100644
+index 7d8381fe7665..de806788a184 100644
 --- a/drivers/nvme/host/zns.c
 +++ b/drivers/nvme/host/zns.c
-@@ -195,6 +195,7 @@ static int nvme_zone_parse_entry(struct nvme_ns *ns,
- 	zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
- 	zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
- 	zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
-+	zone.attr = entry->za;
+@@ -234,6 +234,13 @@ static int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
+ 		sector += ns->zsze * nz;
+ 	}
  
- 	return cb(&zone, idx, data);
- }
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-index 0c49a4b2ce5d..2e43a00e3425 100644
---- a/include/uapi/linux/blkzoned.h
-+++ b/include/uapi/linux/blkzoned.h
-@@ -82,6 +82,16 @@ enum blk_zone_report_flags {
- 	BLK_ZONE_REP_CAPACITY	= (1 << 0),
- };
- 
-+/**
-+ * Zone Attributes
-+ */
-+enum blk_zone_attr {
-+	BLK_ZONE_ATTR_ZFC	= 1 << 0,
-+	BLK_ZONE_ATTR_FZR	= 1 << 1,
-+	BLK_ZONE_ATTR_RZR	= 1 << 2,
-+	BLK_ZONE_ATTR_ZDEV	= 1 << 7,
-+};
++	if (nr_zones < 0 && zone_idx != ns->nr_zones) {
++		dev_err(ns->ctrl->device, "inconsistent zone count %u/%u\n",
++				zone_idx, ns->nr_zones);
++		ret = -EINVAL;
++		goto out_free;
++	}
 +
- /**
-  * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
-  *
-@@ -108,7 +118,8 @@ struct blk_zone {
- 	__u8	cond;		/* Zone condition */
- 	__u8	non_seq;	/* Non-sequential write resources active */
- 	__u8	reset;		/* Reset write pointer recommended */
--	__u8	resv[4];
-+	__u8	attr;		/* Zone attributes */
-+	__u8	resv[3];
- 	__u64	capacity;	/* Zone capacity in number of sectors */
- 	__u8	reserved[24];
- };
+ 	ret = zone_idx;
+ out_free:
+ 	kvfree(report);
 -- 
 2.17.1
 
