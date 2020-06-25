@@ -2,278 +2,387 @@ Return-Path: <SRS0=Z/Mq=AG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D27C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 19:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3822C433E1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 19:42:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8E0C2076E
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 19:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA40920789
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 19:42:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjfSUyCJ"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="l9yRZIal"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406773AbgFYTmC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 15:42:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38920 "EHLO
+        id S2406598AbgFYTmw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 15:42:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406069AbgFYTmB (ORCPT
+        with ESMTP id S2406069AbgFYTmv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jun 2020 15:42:01 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 421D8C08C5C1;
-        Thu, 25 Jun 2020 12:42:01 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id u26so7396194wmn.1;
-        Thu, 25 Jun 2020 12:42:01 -0700 (PDT)
+        Thu, 25 Jun 2020 15:42:51 -0400
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7F2C08C5C1
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 12:42:51 -0700 (PDT)
+Received: by mail-ej1-x644.google.com with SMTP id w6so7124594ejq.6
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 12:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5d7yXKsJreT4Cu2Emc3DWVDyO2KlqiIjpk5Uc0grAno=;
-        b=HjfSUyCJNlrbOK3ZphHfy1CFNMGdjX43SUMxvrEDi0TC+s0SRLvtxkr7LJYiEVYIJ2
-         41zxxwb0xG7lo1OxhQfdinh5CyAV75rQ9ao1jrv7zd12YLt7ZKxDQzolrswIrWf6O+xc
-         VsNGN88J8CNZ4QC7cnadRnEwVbsr1Mu5VuT5lQ8pDfkgEvBd1mhQzQGnCR1jBQxLbgRx
-         0Tsx51nEqHZl54c+S97Ii5DXnMQFYroicheOAoSdlzEfqYFRfsTLMYJxmPrGcbEmCS/c
-         6NKQ2g4UbLQ18KNH4cDHlwe5/4P2zDqcQos8etaYgqYDdME49pXkFP/obHDg9bQR8ULM
-         /DzA==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=Yft3YI9mBWfaLsELFbWHBv0KtTLiopcEBpffEnb0D8g=;
+        b=l9yRZIalqardlDkc/v27K/tlH6zzyFCw/j+2sSzKKoJbrOWJIdzaD684hnyGxeo+0e
+         g6PJTRlLLrsSNLPRj3rwX4FkM6LJSL8c3mpvbNx+CLXsFkjfznG72tH4DxBBM+qkPkcP
+         fc3bb+ns0iy79HsHCniYO0QEsMbK/DWw6pWnCrTMM1Y8bP8KDh2W7X9arfs7dMNLP8MX
+         H21MJUsEKV0OZTJWaFu0Hh+KXILrhM1j7x67ybXK4EoJo4AGTR7f3JnsAe/gjtawDOAH
+         AB+uRQDVmhrdoQEVYuKasBFT3cGs4Vgl4iTja00ugursqwcAfrWLZJ9b0TC/8wBOTuqY
+         EVhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=5d7yXKsJreT4Cu2Emc3DWVDyO2KlqiIjpk5Uc0grAno=;
-        b=iszhr9hJvmpfn8rbp6OYIvkuvAcj1eGz38wN3bR2UdoasSqpCUmbLSBhvIQYbrmp7w
-         FBDPtPlciZGQimN+H1+ZzplV+74Dd7czro4aJVmi11KADoiZJbRoWPm8lXvQitt89VBn
-         PmLqpeqe8JuI27yBqrY9i9leN14vxDZ7UWBY9s8jMaU+1zsHddH1y30qsuYLGOHjJDd5
-         n8d1JmW0B5lQtNtE0B4dj1JToSMPRGekvRJjXbcC9SBCaMqgFbfvKtVVUNMvoZBIqTlA
-         tDgqgK74fOTXkiOaRs3cPiSr+FtO+YephxkXyXnmRDTgoiCMUKAeEPzUBTt8kZxbIXBA
-         zb4g==
-X-Gm-Message-State: AOAM533NpFxip1DpE2Q7KAZfEWmZ3X/GSOgbDD44hQvJ0o/az7oWwNcO
-        UbaqFKbjMbRqGmlJcKxaFQ0haouoYeE=
-X-Google-Smtp-Source: ABdhPJzP2TnATqF19pBthUKOaGqcad72qTWZ4up9MKhpGE4rVgHCsc9RU27lXnQ8I7ETdE8/+uPH4Q==
-X-Received: by 2002:a1c:2503:: with SMTP id l3mr5049987wml.188.1593114119871;
-        Thu, 25 Jun 2020 12:41:59 -0700 (PDT)
-Received: from [192.168.43.154] ([5.100.193.85])
-        by smtp.gmail.com with ESMTPSA id d201sm13529261wmd.34.2020.06.25.12.41.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 12:41:59 -0700 (PDT)
-To:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, bcrl@kvack.org
-Cc:     Damien.LeMoal@wdc.com, hch@infradead.org,
-        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
-        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        selvakuma.s1@samsung.com, nj.shetty@samsung.com,
-        javier.gonz@samsung.com
-References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
- <CGME20200625171838epcas5p449183e12770187142d8d55a9bf422a8d@epcas5p4.samsung.com>
- <1593105349-19270-3-git-send-email-joshi.k@samsung.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- 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 bA==
-Subject: Re: [PATCH v2 2/2] io_uring: add support for zone-append
-Message-ID: <e84be715-923d-90a2-f3c6-3cd2503ca69b@gmail.com>
-Date:   Thu, 25 Jun 2020 22:40:24 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Yft3YI9mBWfaLsELFbWHBv0KtTLiopcEBpffEnb0D8g=;
+        b=sgUEtUSSB9iTEvJBHodtoFWslE16+azwkx5Qa9yv1H/Cu5/Xj6E3G6Ec8r0EAPQNw4
+         JNQWSZ0bpiHQmAdUQnM16dhzXNPsyDLjDyAvgsE1Lx/6mH6USvZNosVsWdxQ2prHUymD
+         rzlfqZrp8u5VZaGRzUh2wweK4Z9fpFXsRiMjxWDReU7td+Rsg3RgZc+sb9wbgtlsCjL1
+         WI+wY2QtdjAuiUjMr34wyGHtuVXwpsAGIvah8jwSdU0X/R8/+TX3dOuKsqQMfvWorHMJ
+         BpLtnLdCyruzsdgV+sNI5PfiySB2O39ImO0GKNar//Obw+RSudiuBQ6/HyVugfn7MbNE
+         qvfw==
+X-Gm-Message-State: AOAM532Pp79FEn/Hk+9LCTX3qku/FxzLP7AtXmCBO5dFYO+L6ws4Np4J
+        UmdAS/j2a0GfZEq4xPhvBTbH/Q==
+X-Google-Smtp-Source: ABdhPJwfb/iDPhf5JLWL9mbHNEu93iyxMyagK6uathkYyTPwLK1sPGUtMUOpCZJTJPK2jR2RO0O7kA==
+X-Received: by 2002:a17:906:4086:: with SMTP id u6mr14830730ejj.9.1593114170020;
+        Thu, 25 Jun 2020 12:42:50 -0700 (PDT)
+Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
+        by smtp.gmail.com with ESMTPSA id cb6sm19045225edb.18.2020.06.25.12.42.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2020 12:42:49 -0700 (PDT)
+Date:   Thu, 25 Jun 2020 21:42:48 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Matias =?utf-8?B?QmrDuHJsaW5n?= <mb@lightnvm.io>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH 4/6] block: introduce IOCTL to report dev properties
+Message-ID: <20200625194248.44rwwestffgz4jks@MacBook-Pro.localdomain>
+References: <20200625122152.17359-1-javier@javigon.com>
+ <20200625122152.17359-5-javier@javigon.com>
+ <6333b2f1-a4f1-166f-5e0d-03f47389458a@lightnvm.io>
 MIME-Version: 1.0
-In-Reply-To: <1593105349-19270-3-git-send-email-joshi.k@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <6333b2f1-a4f1-166f-5e0d-03f47389458a@lightnvm.io>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/06/2020 20:15, Kanchan Joshi wrote:
-> From: Selvakumar S <selvakuma.s1@samsung.com>
-> 
-> For zone-append, block-layer will return zone-relative offset via ret2
-> of ki_complete interface. Make changes to collect it, and send to
-> user-space using ceq->flags.
-> Detect and report early error if zone-append is requested with
-> fixed-buffers.
-> 
-> Signed-off-by: Selvakumar S <selvakuma.s1@samsung.com>
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Javier Gonzalez <javier.gonz@samsung.com>
-> ---
->  fs/io_uring.c | 32 ++++++++++++++++++++++++++++++--
->  1 file changed, 30 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 155f3d8..31a9da58 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -402,6 +402,8 @@ struct io_rw {
->  	struct kiocb			kiocb;
->  	u64				addr;
->  	u64				len;
-> +	/* zone-relative offset for append, in sectors */
-> +	u32			append_offset;
->  };
->  
->  struct io_connect {
-> @@ -541,6 +543,7 @@ enum {
->  	REQ_F_NO_FILE_TABLE_BIT,
->  	REQ_F_QUEUE_TIMEOUT_BIT,
->  	REQ_F_WORK_INITIALIZED_BIT,
-> +	REQ_F_ZONE_APPEND_BIT,
->  
->  	/* not a real bit, just to check we're not overflowing the space */
->  	__REQ_F_LAST_BIT,
-> @@ -598,6 +601,8 @@ enum {
->  	REQ_F_QUEUE_TIMEOUT	= BIT(REQ_F_QUEUE_TIMEOUT_BIT),
->  	/* io_wq_work is initialized */
->  	REQ_F_WORK_INITIALIZED	= BIT(REQ_F_WORK_INITIALIZED_BIT),
-> +	/* to return zone relative offset for zone append*/
-> +	REQ_F_ZONE_APPEND	= BIT(REQ_F_ZONE_APPEND_BIT),
+On 25.06.2020 15:10, Matias Bjørling wrote:
+>On 25/06/2020 14.21, Javier González wrote:
+>>From: Javier González <javier.gonz@samsung.com>
+>>
+>>With the addition of ZNS, a new set of properties have been added to the
+>>zoned block device. This patch introduces a new IOCTL to expose these
+>>rroperties to user space.
+>>
+>>Signed-off-by: Javier González <javier.gonz@samsung.com>
+>>Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+>>Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>>Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+>>---
+>>  block/blk-zoned.c             | 46 ++++++++++++++++++++++++++
+>>  block/ioctl.c                 |  2 ++
+>>  drivers/nvme/host/core.c      |  2 ++
+>>  drivers/nvme/host/nvme.h      | 11 +++++++
+>>  drivers/nvme/host/zns.c       | 61 +++++++++++++++++++++++++++++++++++
+>>  include/linux/blkdev.h        |  9 ++++++
+>>  include/uapi/linux/blkzoned.h | 13 ++++++++
+>>  7 files changed, 144 insertions(+)
+>>
+>>diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+>>index 704fc15813d1..39ec72af9537 100644
+>>--- a/block/blk-zoned.c
+>>+++ b/block/blk-zoned.c
+>>@@ -169,6 +169,17 @@ int blkdev_report_zones(struct block_device *bdev, sector_t sector,
+>>  }
+>>  EXPORT_SYMBOL_GPL(blkdev_report_zones);
+>>+static int blkdev_report_zonedev_prop(struct block_device *bdev,
+>>+				      struct blk_zone_dev *zprop)
+>>+{
+>>+	struct gendisk *disk = bdev->bd_disk;
+>>+
+>>+	if (WARN_ON_ONCE(!bdev->bd_disk->fops->report_zone_p))
+>>+		return -EOPNOTSUPP;
+>>+
+>>+	return disk->fops->report_zone_p(disk, zprop);
+>>+}
+>>+
+>>  static inline bool blkdev_allow_reset_all_zones(struct block_device *bdev,
+>>  						sector_t sector,
+>>  						sector_t nr_sectors)
+>>@@ -430,6 +441,41 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>>  				GFP_KERNEL);
+>>  }
+>>+int blkdev_zonedev_prop(struct block_device *bdev, fmode_t mode,
+>>+			unsigned int cmd, unsigned long arg)
+>>+{
+>>+	void __user *argp = (void __user *)arg;
+>>+	struct request_queue *q;
+>>+	struct blk_zone_dev zprop;
+>>+	int ret;
+>>+
+>>+	if (!argp)
+>>+		return -EINVAL;
+>>+
+>>+	q = bdev_get_queue(bdev);
+>>+	if (!q)
+>>+		return -ENXIO;
+>>+
+>>+	if (!blk_queue_is_zoned(q))
+>>+		return -ENOTTY;
+>>+
+>>+	if (!capable(CAP_SYS_ADMIN))
+>>+		return -EACCES;
+>>+
+>>+	if (!(mode & FMODE_WRITE))
+>>+		return -EBADF;
+>>+
+>>+	ret = blkdev_report_zonedev_prop(bdev, &zprop);
+>>+	if (ret)
+>>+		goto out;
+>>+
+>>+	if (copy_to_user(argp, &zprop, sizeof(struct blk_zone_dev)))
+>>+		return -EFAULT;
+>>+
+>>+out:
+>>+	return ret;
+>>+}
+>>+
+>>  static inline unsigned long *blk_alloc_zone_bitmap(int node,
+>>  						   unsigned int nr_zones)
+>>  {
+>>diff --git a/block/ioctl.c b/block/ioctl.c
+>>index 0ea29754e7dd..f7b4e0f2dd4c 100644
+>>--- a/block/ioctl.c
+>>+++ b/block/ioctl.c
+>>@@ -517,6 +517,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+>>  		return blkdev_zone_ops_ioctl(bdev, mode, cmd, arg);
+>>  	case BLKMGMTZONE:
+>>  		return blkdev_zone_mgmt_ioctl(bdev, mode, cmd, arg);
+>>+	case BLKZONEDEVPROP:
+>>+		return blkdev_zonedev_prop(bdev, mode, cmd, arg);
+>>  	case BLKGETZONESZ:
+>>  		return put_uint(argp, bdev_zone_sectors(bdev));
+>>  	case BLKGETNRZONES:
+>>diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>>index 5b95c81d2a2d..a32c909a915f 100644
+>>--- a/drivers/nvme/host/core.c
+>>+++ b/drivers/nvme/host/core.c
+>>@@ -2254,6 +2254,7 @@ static const struct block_device_operations nvme_fops = {
+>>  	.getgeo		= nvme_getgeo,
+>>  	.revalidate_disk= nvme_revalidate_disk,
+>>  	.report_zones	= nvme_report_zones,
+>>+	.report_zone_p	= nvme_report_zone_prop,
+>>  	.pr_ops		= &nvme_pr_ops,
+>>  };
+>>@@ -2280,6 +2281,7 @@ const struct block_device_operations nvme_ns_head_ops = {
+>>  	.compat_ioctl	= nvme_compat_ioctl,
+>>  	.getgeo		= nvme_getgeo,
+>>  	.report_zones	= nvme_report_zones,
+>>+	.report_zone_p	= nvme_report_zone_prop,
+>>  	.pr_ops		= &nvme_pr_ops,
+>>  };
+>>  #endif /* CONFIG_NVME_MULTIPATH */
+>>diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+>>index ecf443efdf91..172e0531f37f 100644
+>>--- a/drivers/nvme/host/nvme.h
+>>+++ b/drivers/nvme/host/nvme.h
+>>@@ -407,6 +407,14 @@ struct nvme_ns {
+>>  	u8 pi_type;
+>>  #ifdef CONFIG_BLK_DEV_ZONED
+>>  	u64 zsze;
+>>+
+>>+	u32 nr_zones;
+>>+	u32 mar;
+>>+	u32 mor;
+>>+	u32 rrl;
+>>+	u32 frl;
+>>+	u16 zoc;
+>>+	u16 ozcs;
+>>  #endif
+>>  	unsigned long features;
+>>  	unsigned long flags;
+>>@@ -704,11 +712,14 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+>>  int nvme_report_zones(struct gendisk *disk, sector_t sector,
+>>  		      unsigned int nr_zones, report_zones_cb cb, void *data);
+>>+int nvme_report_zone_prop(struct gendisk *disk, struct blk_zone_dev *zprop);
+>>+
+>>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
+>>  				       struct nvme_command *cmnd,
+>>  				       enum nvme_zone_mgmt_action action);
+>>  #else
+>>  #define nvme_report_zones NULL
+>>+#define nvme_report_zone_prop NULL
+>>  static inline blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns,
+>>  		struct request *req, struct nvme_command *cmnd,
+>>diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+>>index 2e6512ac6f01..258d03610cc0 100644
+>>--- a/drivers/nvme/host/zns.c
+>>+++ b/drivers/nvme/host/zns.c
+>>@@ -32,6 +32,28 @@ static int nvme_set_max_append(struct nvme_ctrl *ctrl)
+>>  	return 0;
+>>  }
+>>+static u64 nvme_zns_nr_zones(struct nvme_ns *ns)
+>>+{
+>>+	struct nvme_command c = { };
+>>+	struct nvme_zone_report report;
+>>+	int buflen = sizeof(struct nvme_zone_report);
+>>+	int ret;
+>>+
+>>+	c.zmr.opcode = nvme_cmd_zone_mgmt_recv;
+>>+	c.zmr.nsid = cpu_to_le32(ns->head->ns_id);
+>>+	c.zmr.slba = cpu_to_le64(0);
+>>+	c.zmr.numd = cpu_to_le32(nvme_bytes_to_numd(buflen));
+>>+	c.zmr.zra = NVME_ZRA_ZONE_REPORT;
+>>+	c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
+>>+	c.zmr.pr = 0;
+>>+
+>>+	ret = nvme_submit_sync_cmd(ns->queue, &c, &report, buflen);
+>>+	if (ret)
+>>+		return ret;
+>>+
+>>+	return le64_to_cpu(report.nr_zones);
+>>+}
+>>+
+>>  int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+>>  			  unsigned lbaf)
+>>  {
+>>@@ -87,6 +109,13 @@ int nvme_update_zone_info(struct gendisk *disk, struct nvme_ns *ns,
+>>  		goto free_data;
+>>  	}
+>>+	ns->nr_zones = nvme_zns_nr_zones(ns);
+>>+	ns->mar = le32_to_cpu(id->mar);
+>>+	ns->mor = le32_to_cpu(id->mor);
+>>+	ns->rrl = le32_to_cpu(id->rrl);
+>>+	ns->frl = le32_to_cpu(id->frl);
+>>+	ns->zoc = le16_to_cpu(id->zoc);
+>>+
+>>  	q->limits.zoned = BLK_ZONED_HM;
+>>  	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+>>  free_data:
+>>@@ -230,6 +259,38 @@ int nvme_report_zones(struct gendisk *disk, sector_t sector,
+>>  	return ret;
+>>  }
+>>+static int nvme_ns_report_zone_prop(struct nvme_ns *ns, struct blk_zone_dev *zprop)
+>>+{
+>>+	zprop->nr_zones = ns->nr_zones;
+>>+	zprop->zoc = ns->zoc;
+>>+	zprop->ozcs = ns->ozcs;
+>>+	zprop->mar = ns->mar;
+>>+	zprop->mor = ns->mor;
+>>+	zprop->rrl = ns->rrl;
+>>+	zprop->frl = ns->frl;
+>>+
+>>+	return 0;
+>>+}
+>>+
+>>+int nvme_report_zone_prop(struct gendisk *disk, struct blk_zone_dev *zprop)
+>>+{
+>>+	struct nvme_ns_head *head = NULL;
+>>+	struct nvme_ns *ns;
+>>+	int srcu_idx, ret;
+>>+
+>>+	ns = nvme_get_ns_from_disk(disk, &head, &srcu_idx);
+>>+	if (unlikely(!ns))
+>>+		return -EWOULDBLOCK;
+>>+
+>>+	if (ns->head->ids.csi == NVME_CSI_ZNS)
+>>+		ret = nvme_ns_report_zone_prop(ns, zprop);
+>>+	else
+>>+		ret = -EINVAL;
+>>+	nvme_put_ns_from_disk(head, srcu_idx);
+>>+
+>>+	return ret;
+>>+}
+>>+
+>>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
+>>  		struct nvme_command *c, enum nvme_zone_mgmt_action action)
+>>  {
+>>diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>>index 8308d8a3720b..0c0faa58b7f4 100644
+>>--- a/include/linux/blkdev.h
+>>+++ b/include/linux/blkdev.h
+>>@@ -372,6 +372,8 @@ extern int blkdev_zone_ops_ioctl(struct block_device *bdev, fmode_t mode,
+>>  				  unsigned int cmd, unsigned long arg);
+>>  extern int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>>  				  unsigned int cmd, unsigned long arg);
+>>+extern int blkdev_zonedev_prop(struct block_device *bdev, fmode_t mode,
+>>+			unsigned int cmd, unsigned long arg);
+>>  #else /* CONFIG_BLK_DEV_ZONED */
+>>  static inline unsigned int blkdev_nr_zones(struct gendisk *disk)
+>>@@ -400,6 +402,12 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+>>  	return -ENOTTY;
+>>  }
+>>+static inline int blkdev_zonedev_prop(struct block_device *bdev, fmode_t mode,
+>>+				      unsigned int cmd, unsigned long arg)
+>>+{
+>>+	return -ENOTTY;
+>>+}
+>>+
+>>  #endif /* CONFIG_BLK_DEV_ZONED */
+>>  struct request_queue {
+>>@@ -1770,6 +1778,7 @@ struct block_device_operations {
+>>  	int (*report_zones)(struct gendisk *, sector_t sector,
+>>  			unsigned int nr_zones, report_zones_cb cb, void *data);
+>>  	char *(*devnode)(struct gendisk *disk, umode_t *mode);
+>>+	int (*report_zone_p)(struct gendisk *disk, struct blk_zone_dev *zprop);
+>>  	struct module *owner;
+>>  	const struct pr_ops *pr_ops;
+>>  };
+>>diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+>>index d0978ee10fc7..0c49a4b2ce5d 100644
+>>--- a/include/uapi/linux/blkzoned.h
+>>+++ b/include/uapi/linux/blkzoned.h
+>>@@ -142,6 +142,18 @@ struct blk_zone_range {
+>>  	__u64		nr_sectors;
+>>  };
+>>+struct blk_zone_dev {
+>>+	__u32	nr_zones;
+>>+	__u32	mar;
+>>+	__u32	mor;
+>>+	__u32	rrl;
+>>+	__u32	frl;
+>>+	__u16	zoc;
+>>+	__u16	ozcs;
+>>+	__u32	rsv31[2];
+>>+	__u64	rsv63[4];
+>>+};
+>>+
+>>  /**
+>>   * enum blk_zone_action - Zone state transitions managed from user-space
+>>   *
+>>@@ -209,5 +221,6 @@ struct blk_zone_mgmt {
+>>  #define BLKCLOSEZONE	_IOW(0x12, 135, struct blk_zone_range)
+>>  #define BLKFINISHZONE	_IOW(0x12, 136, struct blk_zone_range)
+>>  #define BLKMGMTZONE	_IOR(0x12, 137, struct blk_zone_mgmt)
+>>+#define BLKZONEDEVPROP	_IOR(0x12, 138, struct blk_zone_dev)
+>>  #endif /* _UAPI_BLKZONED_H */
+>
+>Nak. These properties can already be retrieved using the nvme ioctl 
+>passthru command and support have also been added to nvme-cli.
+>
 
-Do we need a new flag? We can check for IOCB_ZONE_APPEND, flags are always
-close by in req->rw.kiocb.ki_flags. May require to be careful about not
-setting it for read, so not screwing buf select.
+These properties are intended to be consumed by an application, so
+nvme-cli is of not much use. I would also like to avoid sysfs variables.
 
->  };
->  
->  struct async_poll {
-> @@ -1745,6 +1750,8 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
->  
->  		if (req->flags & REQ_F_BUFFER_SELECTED)
->  			cflags = io_put_kbuf(req);
-> +		if (req->flags & REQ_F_ZONE_APPEND)
-> +			cflags = req->rw.append_offset;
->  
->  		__io_cqring_fill_event(req, req->result, cflags);
->  		(*nr_events)++;
-> @@ -1943,7 +1950,7 @@ static inline void req_set_fail_links(struct io_kiocb *req)
->  		req->flags |= REQ_F_FAIL_LINK;
->  }
->  
-> -static void io_complete_rw_common(struct kiocb *kiocb, long res)
-> +static void io_complete_rw_common(struct kiocb *kiocb, long res, long res2)
->  {
->  	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw.kiocb);
->  	int cflags = 0;
-> @@ -1953,8 +1960,14 @@ static void io_complete_rw_common(struct kiocb *kiocb, long res)
->  
->  	if (res != req->result)
->  		req_set_fail_links(req);
-> +
->  	if (req->flags & REQ_F_BUFFER_SELECTED)
->  		cflags = io_put_kbuf(req);
-> +
-> +	/* use cflags to return zone append completion result */
-> +	if (req->flags & REQ_F_ZONE_APPEND)
-> +		cflags = res2;
-> +
->  	__io_cqring_add_event(req, res, cflags);
->  }
->  
-> @@ -1962,7 +1975,7 @@ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
->  {
->  	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw.kiocb);
->  
-> -	io_complete_rw_common(kiocb, res);
-> +	io_complete_rw_common(kiocb, res, res2);
->  	io_put_req(req);
->  }
->  
-> @@ -1975,6 +1988,9 @@ static void io_complete_rw_iopoll(struct kiocb *kiocb, long res, long res2)
->  
->  	if (res != req->result)
->  		req_set_fail_links(req);
-> +	if (req->flags & REQ_F_ZONE_APPEND)
-> +		req->rw.append_offset = res2;
-> +
->  	req->result = res;
->  	if (res != -EAGAIN)
->  		WRITE_ONCE(req->iopoll_completed, 1);
-> @@ -2127,6 +2143,9 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->  	if (kiocb->ki_flags & IOCB_NOWAIT)
->  		req->flags |= REQ_F_NOWAIT;
->  
-> +	if (kiocb->ki_flags & IOCB_ZONE_APPEND)
-> +		req->flags |= REQ_F_ZONE_APPEND;
-> +
->  	if (force_nonblock)
->  		kiocb->ki_flags |= IOCB_NOWAIT;
->  
-> @@ -2409,6 +2428,14 @@ static ssize_t io_import_iovec(int rw, struct io_kiocb *req,
->  
->  	opcode = req->opcode;
->  	if (opcode == IORING_OP_READ_FIXED || opcode == IORING_OP_WRITE_FIXED) {
-> +		/*
-> +		 * fixed-buffers not supported for zone-append.
-> +		 * This check can be removed when block-layer starts
-> +		 * supporting append with iov_iter of bvec type
-> +		 */
-> +		if (req->flags == REQ_F_ZONE_APPEND)
+We can use nvme passthru, but this bypasses the zoned block abstraction.
+Why not representing ZNS features in the standard zoned block API? I am
+happy to iterate on the actual implementation if you have feedback.
 
-s/==/&/
+Javier
 
-> +			return -EINVAL;
-> +
->  		*iovec = NULL;
->  		return io_import_fixed(req, rw, iter);
->  	}
-> @@ -2704,6 +2731,7 @@ static int io_write(struct io_kiocb *req, bool force_nonblock)
->  		req->rw.kiocb.ki_flags &= ~IOCB_NOWAIT;
->  
->  	req->result = 0;
-> +
-
-Extra \n
-
->  	io_size = ret;
->  	if (req->flags & REQ_F_LINK_HEAD)
->  		req->result = io_size;
-> 
-
--- 
-Pavel Begunkov
