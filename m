@@ -2,164 +2,93 @@ Return-Path: <SRS0=Z/Mq=AG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA398C433DF
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 15:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A537C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 16:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83FE020775
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 15:13:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3A9206BE
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 16:53:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="gZx9xpZ8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GmrGiSe0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405591AbgFYPNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 11:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53666 "EHLO
+        id S2390841AbgFYQx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 12:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405502AbgFYPNN (ORCPT
+        with ESMTP id S2390448AbgFYQx4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jun 2020 11:13:13 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22FFFC08C5C1
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 08:13:13 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id e15so4507659edr.2
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 08:13:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=ixdzoPeHqTjtWCkjfG+wRupSHf8MX9sNzTZVFeYguNQ=;
-        b=gZx9xpZ8xp2kLXzmjlge8TgWKxXJbtic7sXC//V0R/IFNIziL2ZRF0C2MNKf0FvuXb
-         8S6XEn5qU6OeoWVIXvFoLLMZIi06r3YSWTbmJB/IrD4RMbKfAAkSDyTPOH7lQYqrlohl
-         pr6NYaLYBxDIIZyk5sO+pyiUvj9AU7kGKdvio1pRVrkmxd24Z8EGrnfb3GzC5zH5Wlft
-         wXAqQHOgXIOKHS4bufmpAfM8OcRaqcVQ3+hrbB/0D/3L6/AC/A4WY1g/BWS1rdHnH9v6
-         7XCVLphiB1LvbOEAUyBk7pt4r1ndYkhKvYwKwr5uC1q4NKRU3pXBRWB/vuqVJosMtJiB
-         f7Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ixdzoPeHqTjtWCkjfG+wRupSHf8MX9sNzTZVFeYguNQ=;
-        b=Tc2iiylkkgcCglJzyVYOLe9MplI1dHZ1nHmL6OP9Cwi3elIcew34MrTxLISX8xvT1X
-         w7Hoe9BGcHrOlZwmChWSdZR59rwlzNLGuYOzZ5xVyR3Z8u7PP7Bfe/qAiScZBimEtsWl
-         F+JeaN522+qDkAxeAyXVECdlW9CEsy/SXMFjenXKR6c347unFzafDZA5HfdR9RfhBEBE
-         Kyz6pldYBhcmC7BQ67b26ssEuhIULYe+pNkllrDQ2qce2cwqEuF4zCrtF9VKp1invTLe
-         z4VnqtkOGmZIWPab8uzXudJsvu/LSZfCHyh6Fk8ebWYMiJaLuLhvMm0B3TfG8tEqcgbi
-         UZvg==
-X-Gm-Message-State: AOAM530qh72/rPa/XGWLO+Rr7rgTFVDJxlssxmYyMVgNF6jM/5x/6F0r
-        ePKKw/Mli7Brv5KQaV1AmhAVVg==
-X-Google-Smtp-Source: ABdhPJwMIRBPr3Srqb6v+nLNKSuOmvLocW13PX16x6OR7/WzTgLCBYVK6/lEIgATq6RrYUpc++hvVA==
-X-Received: by 2002:a05:6402:1285:: with SMTP id w5mr33047361edv.73.1593097991757;
-        Thu, 25 Jun 2020 08:13:11 -0700 (PDT)
-Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
-        by smtp.gmail.com with ESMTPSA id a13sm18315114edk.58.2020.06.25.08.13.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 08:13:10 -0700 (PDT)
-Subject: Re: [PATCH 5/6] block: add zone attr. to zone mgmt IOCTL struct
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        linux-nvme@lists.infradead.org
-Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
-        sagi@grimberg.me, axboe@kernel.dk,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <20200625122152.17359-1-javier@javigon.com>
- <20200625122152.17359-6-javier@javigon.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <9ac40166-5731-692a-d476-0da9aad2a9aa@lightnvm.io>
-Date:   Thu, 25 Jun 2020 17:13:10 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Thu, 25 Jun 2020 12:53:56 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6558BC08C5DB
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 09:53:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=Ovbcs12mvJLszoemDpWBQMsw9noi17CuGO1me0ZW8EI=; b=GmrGiSe0Cn0dLfIls2yj5qr3YB
+        yfIGj/KxWmRTkfLnu+S9mrQgFWaPZqQU8QRtbclgttgsiL0FZLEyFt0Qd3WWzPZ7SmoBvAlVcGlzZ
+        LhNf7BzzANmBWrL9YA1OyfjrfwPI21knLIIm3/t0PVuvcSCN3JuwsF1LI02apQhopqc9ghmgGtu62
+        WAtWf33wK74U3hXclFTgr/dNeYeORLGDumstRPcIsMSkQPcTy9emrmkA+Osn5OwCyRXwB1WkD0Emj
+        2QBWYg5WkRTHkAYG7Rh4I8dQ7HT+YnJYVvY0jT9znKfYFH8vnDjMn5Cs7zgmGgXaKJVs9Vk4LwueR
+        4s5ozfjA==;
+Received: from [2001:4bb8:184:76e3:ac72:d772:f6e1:212] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1joV83-0000DB-4N; Thu, 25 Jun 2020 16:53:35 +0000
+Date:   Thu, 25 Jun 2020 18:53:33 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     axboe@kernel.dk
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: [GIT PULL] nvme fixes for 5.8
+Message-ID: <20200625165333.GA1982738@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200625122152.17359-6-javier@javigon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/06/2020 14.21, Javier González wrote:
-> From: Javier González <javier.gonz@samsung.com>
->
-> Add zone attributes field to the blk_zone structure. Use ZNS attributes
-> as base for zoned block devices in general.
->
-> Signed-off-by: Javier González <javier.gonz@samsung.com>
-> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> ---
->   drivers/nvme/host/zns.c       |  1 +
->   include/uapi/linux/blkzoned.h | 13 ++++++++++++-
->   2 files changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
-> index 258d03610cc0..7d8381fe7665 100644
-> --- a/drivers/nvme/host/zns.c
-> +++ b/drivers/nvme/host/zns.c
-> @@ -195,6 +195,7 @@ static int nvme_zone_parse_entry(struct nvme_ns *ns,
->   	zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
->   	zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
->   	zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
-> +	zone.attr = entry->za;
->   
->   	return cb(&zone, idx, data);
->   }
-> diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-> index 0c49a4b2ce5d..2e43a00e3425 100644
-> --- a/include/uapi/linux/blkzoned.h
-> +++ b/include/uapi/linux/blkzoned.h
-> @@ -82,6 +82,16 @@ enum blk_zone_report_flags {
->   	BLK_ZONE_REP_CAPACITY	= (1 << 0),
->   };
->   
-> +/**
-> + * Zone Attributes
-> + */
-> +enum blk_zone_attr {
-> +	BLK_ZONE_ATTR_ZFC	= 1 << 0,
-> +	BLK_ZONE_ATTR_FZR	= 1 << 1,
-> +	BLK_ZONE_ATTR_RZR	= 1 << 2,
+The following changes since commit 0b8eb629a700c0ef15a437758db8255f8444e76c:
 
-The RZR bit is equivalent to the RESET bit accessible through the reset 
-byte in struct blk_zone.
+  block: release bip in a right way in error path (2020-06-24 08:49:07 -0600)
 
-ZFC is tied to Zone Active Excursions, as there is no support in the 
-kernel zone model for that. This should probably not be added until 
-there is generic support.
+are available in the Git repository at:
 
-Damien, could we overload the struct blk_zine reset variable for FZR? I 
-don't believe we can due to backward compatibility. Is that your 
-understanding as well?
+  git://git.infradead.org/nvme.git nvme-5.8
 
-> +	BLK_ZONE_ATTR_ZDEV	= 1 << 7,
+for you to fetch changes up to c31244669f57963b6ce133a5555b118fc50aec95:
 
-There is not currently an equivalent for zone descriptor extensions in 
-ZAC/ZBC. The addition of this field should probably be in a patch that 
-adds generic support for zone descriptor extensions.
+  nvme-multipath: fix bogus request queue reference put (2020-06-24 18:41:20 +0200)
 
-> +};
-> +
->   /**
->    * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
->    *
-> @@ -108,7 +118,8 @@ struct blk_zone {
->   	__u8	cond;		/* Zone condition */
->   	__u8	non_seq;	/* Non-sequential write resources active */
->   	__u8	reset;		/* Reset write pointer recommended */
-> -	__u8	resv[4];
-> +	__u8	attr;		/* Zone attributes */
-> +	__u8	resv[3];
->   	__u64	capacity;	/* Zone capacity in number of sectors */
->   	__u8	reserved[24];
->   };
+----------------------------------------------------------------
+Anton Eidelman (2):
+      nvme-multipath: fix deadlock between ana_work and scan_work
+      nvme-multipath: fix deadlock due to head->lock
 
+Max Gurtovoy (6):
+      nvme: set initial value for controller's numa node
+      nvme-pci: override the value of the controller's numa node
+      nvme-pci: initialize tagset numa value to the value of the ctrl
+      nvme-tcp: initialize tagset numa value to the value of the ctrl
+      nvme-loop: initialize tagset numa value to the value of the ctrl
+      nvme-rdma: assign completion vector correctly
 
+Sagi Grimberg (3):
+      nvme: fix possible deadlock when I/O is blocked
+      nvme: don't protect ns mutation with ns->head->lock
+      nvme-multipath: fix bogus request queue reference put
+
+ drivers/nvme/host/core.c      |  2 +-
+ drivers/nvme/host/multipath.c | 46 +++++++++++++++++++++++++++----------------
+ drivers/nvme/host/nvme.h      |  2 ++
+ drivers/nvme/host/pci.c       |  6 ++++--
+ drivers/nvme/host/rdma.c      |  2 +-
+ drivers/nvme/host/tcp.c       |  4 ++--
+ drivers/nvme/target/loop.c    |  4 ++--
+ 7 files changed, 41 insertions(+), 25 deletions(-)
