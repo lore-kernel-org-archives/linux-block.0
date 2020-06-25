@@ -2,117 +2,139 @@ Return-Path: <SRS0=Z/Mq=AG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7A1C433E1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA6DC433DF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 13:04:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F28A20724
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 12:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D178B20672
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 13:04:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="a4kPMuPR"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="xl82oj18"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404451AbgFYMWZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 08:22:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55206 "EHLO
+        id S2404812AbgFYNEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 09:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404343AbgFYMWY (ORCPT
+        with ESMTP id S2404709AbgFYNEc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jun 2020 08:22:24 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A17DEC061573
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:24 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id a6so5629346wrm.4
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 05:22:24 -0700 (PDT)
+        Thu, 25 Jun 2020 09:04:32 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93AA6C08C5C1
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 06:04:31 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id dg28so4141347edb.3
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 06:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0Ju3UDNPPwBAk1TA1zeQdRuOHY5B22Z1S54Q7dxG7ro=;
-        b=a4kPMuPRI94jYMbUyDiniUkJA4zHEgowzmPRA9qYcmXUwmmW3U2rYITJC0+M3sTR78
-         KVXqrURRTM+O4yO3SgN2zJ86WC0cyeLX4d6ryi0wJ4Nebi7WZSqa6HHD+ZxZvrewq2P1
-         OX/BOsVovRoiGC4xBatKL4iWx1NRQVYBtAw4yOxNz/O3PjT9uXFP4y4Nj8oL38r/lITX
-         kAbq+bt36sje5oCKcgh4VWXRlBXjvDHYB7DPPqkFBXZ5RjqJzA2sYDnBwcoQeylDqJar
-         Y8bM/RXncZrCOKNrv/To5XmqAVNpHfZwuL7rHFdVrXynZOqA5NRy1K7PRNn08PiUkKLB
-         pxRw==
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=LXs+TzGY6PPMha6FRa+oZWEDxK46Uyk5PsHPv06NVpI=;
+        b=xl82oj18jf62fmDoTChkZ8YmO7nenU7bhbYS/vO1c47CEVNQ45TAh4UIhcIAgqSNMG
+         oYK2MWos6eUYqvWP8hPKTEeFbRS+uGq4b4FOCiEMGWEOV+j6no3uKy5Dc9+6QFwnIo1j
+         CTN3aUPkrk9/+7FBZuyxK7qGMVpNVw+5p6LanglGWydIoqKMXjBMc95aj3nRP5YEBU/Y
+         N+8kKLKCgmcXRO6B6NZ4VnyqLTfa2p58VFW4tVRvSZM4bkRwDsiEidN41y3pwNES3xwX
+         TkQbmEVukYQo2ISUD52eCgjaqnvttzH06ojE4NVoJw3S+np+fXClb00jnvy6QOJfurSL
+         RbLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=0Ju3UDNPPwBAk1TA1zeQdRuOHY5B22Z1S54Q7dxG7ro=;
-        b=meV75KAL1RTNDU8MnO1GaEmPym3ztN1kbuf8DHMeuSrnB/vrXRKdTbIh7Pocxy25QL
-         fEYJ4gHsGYLKcctDlT8Lcab/+7hBSK2dPA/TYCB8cVQXve/ERHJBK0POj6aaO4zZ4qEj
-         lsxeTgM6zuKmUAMOYDQccalwU6niG8sYpRbPl/dBRNyxTD2nsFAHUY1y+gAYcd2etPYs
-         /dbY1b7M27eVnsMO7SerNrhZKfPx+dK0pBEw9AJQCIFNqbPpcmHOZZHXIsE5zFDb+slY
-         ofZGNBi2e+R2BuX4qmk3mElSJo3Ixvst6fuJYzkfV5aGvT6pscbQSotzm+iqyP35u3QG
-         jPyw==
-X-Gm-Message-State: AOAM531UtVEJqbtqJVpkOTChT76oH834/eev+DgNloCdQtvV6hd2w70g
-        lFVUNC/GhiFOznS7vEtGixrepqsqzKAJ7Q==
-X-Google-Smtp-Source: ABdhPJxWQm3VN+zqrMTnb8iXcKCR7M7Ez3ONvMlEt8CNYRRoA4A76A69bhclHB00O5N4pgSPkhGdNg==
-X-Received: by 2002:a05:6000:128e:: with SMTP id f14mr39466905wrx.276.1593087743370;
-        Thu, 25 Jun 2020 05:22:23 -0700 (PDT)
-Received: from localhost.localdomain ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id f186sm11934307wmf.29.2020.06.25.05.22.21
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jun 2020 05:22:22 -0700 (PDT)
-From:   =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-To:     linux-nvme@lists.infradead.org
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=LXs+TzGY6PPMha6FRa+oZWEDxK46Uyk5PsHPv06NVpI=;
+        b=MDFnJlPrZyRq51j8IvzKOij4UAOs0ia3thVrDJ4DM1CqvDHwlGC6HsQgow/bywZv6J
+         LxYe8WGZPe03arZ7Y3D0Vus/XHq8SauZPaQICtz5I4E9WeA56ndSn54OxBlctFbLjEZr
+         n3SvsbK/7TUfl19PoybZIlk90NgXd8FgEFVVFHy2abDnJbBeq4PKJmZ/EFobOvzSTmiH
+         syq+hnn4tZ+vXeycrDLp/CHn8b8/ktFKIk1rib/Nh1uvw+ngxX51X0Jpn/E6965XE3at
+         vsYnSv9jZwuEPBfNWF4ihGSxbGowqEJ2EJT31LiC0R9mVuVyddr8I+QFd1QFxpZ710kb
+         pZZQ==
+X-Gm-Message-State: AOAM532jMqMb+TYsvOgRD58tGPflXEToLPmF7lKXWlWMAJmke5Tmuftw
+        udOe/30a/KPbaKNJInZcOVu1KTaF4yQ=
+X-Google-Smtp-Source: ABdhPJwdStNd66XgsiZUp82JpCb2P6cjIylVEwAd7Diy4jK0ziWtYFEzFSu8MAvL2oHFqJRV0wPq4Q==
+X-Received: by 2002:a50:d78f:: with SMTP id w15mr32998851edi.245.1593090270288;
+        Thu, 25 Jun 2020 06:04:30 -0700 (PDT)
+Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
+        by smtp.gmail.com with ESMTPSA id bc23sm734494edb.90.2020.06.25.06.04.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jun 2020 06:04:29 -0700 (PDT)
+Subject: Re: [PATCH 0/6] ZNS: Extra features for current patches
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
         sagi@grimberg.me, axboe@kernel.dk,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: [PATCH 6/6] nvme: Add consistency check for zone count
-Date:   Thu, 25 Jun 2020 14:21:52 +0200
-Message-Id: <20200625122152.17359-7-javier@javigon.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200625122152.17359-1-javier@javigon.com>
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>
 References: <20200625122152.17359-1-javier@javigon.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <2067b6ce-fea0-99cd-39c7-56cf219f56d5@lightnvm.io>
+Date:   Thu, 25 Jun 2020 15:04:28 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200625122152.17359-1-javier@javigon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Javier González <javier.gonz@samsung.com>
+On 25/06/2020 14.21, Javier González wrote:
+> From: Javier González <javier.gonz@samsung.com>
+>
+> This patchset extends zoned device functionality on top of the existing
+> v3 ZNS patchset that Keith sent last week.
+>
+> Patches 1-5 are zoned block interface and IOCTL additions to expose ZNS
+> values to user-space. One major change is the addition of a new zone
+> management IOCTL that allows to extend zone management commands with
+> flags. I recall a conversation in the mailing list from early this year
+> where a similar approach was proposed by Matias, but never made it
+> upstream. We extended the IOCTL here to align with the comments in that
+> thread. Here, we are happy to get sign-offs by anyone that contributed
+> to the thread - just comment here or on the patch.
 
-Since the number of zones is calculated through the reported device
-capacity and the ZNS specification allows to report the total number of
-zones in the device, add an extra check to guarantee consistency between
-the device and the kernel.
+The original patchset is available here: https://lkml.org/lkml/2019/6/21/419
 
-Signed-off-by: Javier González <javier.gonz@samsung.com>
-Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- drivers/nvme/host/zns.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+We wanted to wait posting our updated patches until the base patches 
+were upstream. I guess the cat is out of the bag. :)
 
-diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
-index 7d8381fe7665..de806788a184 100644
---- a/drivers/nvme/host/zns.c
-+++ b/drivers/nvme/host/zns.c
-@@ -234,6 +234,13 @@ static int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
- 		sector += ns->zsze * nz;
- 	}
- 
-+	if (nr_zones < 0 && zone_idx != ns->nr_zones) {
-+		dev_err(ns->ctrl->device, "inconsistent zone count %u/%u\n",
-+				zone_idx, ns->nr_zones);
-+		ret = -EINVAL;
-+		goto out_free;
-+	}
-+
- 	ret = zone_idx;
- out_free:
- 	kvfree(report);
--- 
-2.17.1
+For the open/finish/reset patch, you'll want to take a look at the 
+original patchset, and apply the feedback from that thread to your 
+patch. Please also consider the users of these operations, e.g., dm, 
+scsi, null_blk, etc. The original patchset has patches for that.
+
+
+
+
+
+>
+> Patch 6 is nvme-only and adds an extra check to the ZNS report code to
+> ensure consistency on the zone count.
+>
+> The patches apply on top of Jens' block-5.8 + Keith's V3 ZNS patches.
+>
+> Thanks,
+> Javier
+>
+> Javier González (6):
+>    block: introduce IOCTL for zone mgmt
+>    block: add support for selecting all zones
+>    block: add support for zone offline transition
+>    block: introduce IOCTL to report dev properties
+>    block: add zone attr. to zone mgmt IOCTL struct
+>    nvme: Add consistency check for zone count
+>
+>   block/blk-core.c              |   2 +
+>   block/blk-zoned.c             | 108 +++++++++++++++++++++++++++++++++-
+>   block/ioctl.c                 |   4 ++
+>   drivers/nvme/host/core.c      |   5 ++
+>   drivers/nvme/host/nvme.h      |  11 ++++
+>   drivers/nvme/host/zns.c       |  69 ++++++++++++++++++++++
+>   include/linux/blk_types.h     |   6 +-
+>   include/linux/blkdev.h        |  19 +++++-
+>   include/uapi/linux/blkzoned.h |  69 +++++++++++++++++++++-
+>   9 files changed, 289 insertions(+), 4 deletions(-)
+>
 
