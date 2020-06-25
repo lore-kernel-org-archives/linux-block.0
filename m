@@ -2,66 +2,103 @@ Return-Path: <SRS0=Z/Mq=AG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D78C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 03:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98002C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 04:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB3EA20706
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 03:01:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7201D207DD
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 04:05:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389566AbgFYDBM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Jun 2020 23:01:12 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:56583 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389500AbgFYDBL (ORCPT
+        id S1726058AbgFYEF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 00:05:56 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33085 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725997AbgFYEF4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jun 2020 23:01:11 -0400
-Received: by mail-io1-f71.google.com with SMTP id l22so2922054iob.23
-        for <linux-block@vger.kernel.org>; Wed, 24 Jun 2020 20:01:11 -0700 (PDT)
+        Thu, 25 Jun 2020 00:05:56 -0400
+Received: by mail-pf1-f195.google.com with SMTP id f9so2434019pfn.0;
+        Wed, 24 Jun 2020 21:05:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=wKHziB1HTjinXOROzU9x8QSF9UVTTl5CGULxlu3fS2A=;
-        b=ElwUpiaGTszub7eOSzSHbqpYdi+YTRbRnYAB9XwdqqpvhoNBimlojXJvJZCUxqtS72
-         DZl8agl4Zv2eEr8nOqpvoFfE7uzL15ENWKcvSGlF414/6RNeKcGREM6f/u35NBq8TTmJ
-         qag8j+gWJOGALRbPvKC/ovCuSm48JtNX5d7bBB4ZE9WM7FxlV+ZDm8ZTnysLxsTu145b
-         3suPCRTZ2iuMEGN+TRzoKGR3QMsQmKOi9Lcsp2f4OhqFJJhlsYZVy1Uc4pQJsnEmrlXK
-         fa8U4BDlv2jOuNfYtTjbxuvQ01Emj7YVovQ5ZRaSXob/Go1DnRxZ0hYuw15L7a5ewY0n
-         tkJA==
-X-Gm-Message-State: AOAM532yT95vgTTnX+eW2ziFF2HhEDwPLeUGuqpPIEqchIsT9L12zD2p
-        VEPpzal2mgVR0z0c/YXlFtfm2sFvc5HvqMT/cLn3BSP+MdXF
-X-Google-Smtp-Source: ABdhPJxbs1SAyL/M/fgk3l40cIJl7wJzsJfAm+GKPt/0zA1RuUK6bKXZkytrERisRhBiK2xMcbSQIrQom47jw0jbMN8Qdv/m0rQo
-MIME-Version: 1.0
-X-Received: by 2002:a92:290b:: with SMTP id l11mr31731641ilg.145.1593054071282;
- Wed, 24 Jun 2020 20:01:11 -0700 (PDT)
-Date:   Wed, 24 Jun 2020 20:01:11 -0700
-In-Reply-To: <00000000000047770d05a1c70ecb@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000006e0ff05a8dfce2d@google.com>
+        h=x-gm-message-state:from:subject:to:references:autocrypt:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4Th1ySPu0Vm274TN6hS4pYdPss9aQtC2GIfpH8g+Qzs=;
+        b=RxkC8utxMw6EqGOS2bPtf8wyREkELqj91izZXOqlHjEn18eIEolo5j5CrJyq89ccNg
+         7b1e66bfYU4+i7T77VgH2D4W8GGWavUpPOe5HUhpruAnG6ql82G9wZbbBCOL4hO1zl94
+         1PkW92Oxz7/lgiswQJnhS8JXy97Wwfj4EMQYbNDu31uP+qfyIpxdA3VD0d0CwEjaiRm4
+         MeghExZCVhKHKA9wB1Y65+n2BtoPhBbQDLq3f9pgtao7soUGL3ji6mwTpJ9fVdMLQeB7
+         moQHSCM9y9bqNFZH91SceYW4YVg9ZRpL6rXwJJ1smskYIVVy81aQqzBOGh5UIirj9yzu
+         HRGw==
+X-Gm-Message-State: AOAM530dX9fTmXx92oEGhGn+1yLr8LeAXU3mJkVmUYbtBczBiseS6kGO
+        nLfLV0vwxp0GPY3kcHyvIzFtdX4z
+X-Google-Smtp-Source: ABdhPJxbOHJBWsjgXqqQU6Bl8VHVLy3W1i7Ax0RG7BuEn+J/+kc6Pv3a7NobvWQt0Scp8ScAE0lFXg==
+X-Received: by 2002:a63:1312:: with SMTP id i18mr24938054pgl.142.1593057955042;
+        Wed, 24 Jun 2020 21:05:55 -0700 (PDT)
+Received: from [192.168.50.147] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id g140sm11384273pfb.48.2020.06.24.21.05.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jun 2020 21:05:53 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
 Subject: Re: KASAN: null-ptr-deref Write in blk_mq_map_swqueue
-From:   syzbot <syzbot+313d95e8a7a49263f88d@syzkaller.appspotmail.com>
-To:     a@unstable.cc, axboe@kernel.dk, b.a.t.m.a.n@lists.open-mesh.org,
-        bvanassche@acm.org, davem@davemloft.net, dongli.zhang@oracle.com,
-        hdanton@sina.com, jianchao.w.wang@oracle.com,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch,
-        netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de,
+To:     syzbot <syzbot+313d95e8a7a49263f88d@syzkaller.appspotmail.com>,
+        a@unstable.cc, axboe@kernel.dk, b.a.t.m.a.n@lists.open-mesh.org,
+        davem@davemloft.net, dongli.zhang@oracle.com, hdanton@sina.com,
+        jianchao.w.wang@oracle.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mareklindner@neomailbox.ch, netdev@vger.kernel.org,
+        sven@narfation.org, sw@simonwunderlich.de,
         syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+References: <00000000000006e0ff05a8dfce2d@google.com>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <b30f9b35-1504-a8f6-91cd-828e56c59eef@acm.org>
+Date:   Wed, 24 Jun 2020 21:05:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <00000000000006e0ff05a8dfce2d@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This bug is marked as fixed by commit:
-blk-mq: Fix a recently introduced regression in
-But I can't find it in any tested tree for more than 90 days.
-Is it a correct commit? Please update it by replying:
-#syz fix: exact-commit-title
-Until then the bug is still considered open and
-new crashes with the same signature are ignored.
+On 2020-06-24 20:01, syzbot wrote:
+> This bug is marked as fixed by commit:
+> blk-mq: Fix a recently introduced regression in
+> But I can't find it in any tested tree for more than 90 days.
+> Is it a correct commit? Please update it by replying:
+> #syz fix: exact-commit-title
+> Until then the bug is still considered open and
+> new crashes with the same signature are ignored.
+
+#syz fix: blk-mq: Fix a recently introduced regression in blk_mq_realloc_hw_ctxs()
+
+
