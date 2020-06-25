@@ -2,77 +2,82 @@ Return-Path: <SRS0=Z/Mq=AG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4116C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 14:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA398C433DF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 15:13:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD528206C0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 14:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83FE020775
+	for <linux-block@archiver.kernel.org>; Thu, 25 Jun 2020 15:13:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="XvJ4hl3w"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="gZx9xpZ8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405497AbgFYOsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Jun 2020 10:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
+        id S2405591AbgFYPNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Jun 2020 11:13:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405495AbgFYOsq (ORCPT
+        with ESMTP id S2405502AbgFYPNN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jun 2020 10:48:46 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9923C08C5C1
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 07:48:45 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id y10so6241094eje.1
-        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 07:48:45 -0700 (PDT)
+        Thu, 25 Jun 2020 11:13:13 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22FFFC08C5C1
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 08:13:13 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id e15so4507659edr.2
+        for <linux-block@vger.kernel.org>; Thu, 25 Jun 2020 08:13:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
+        h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=GMY9x/C2jjwza6jdaPO0YKBVYFxcc9e+Li/ACoK6FL4=;
-        b=XvJ4hl3wv5/RLzG5VsmH0eDsMbvTCl+U/dU2EYUWl6Cf/Lq2L6Kie/dHLfTGMrVPjJ
-         L0BFVnc8QvmHmADYs65nI7jE9Hu2ITX9DluCNdCGMNX8eU6+eed9nqEBrxQ2c3dX5tyV
-         J7KaVEjOts1wfbDOQInyKusN3V5SLRac4sr+QHyZaAyhKbpBQLGaVgJvlVqji1vsep+N
-         oS1nULGkuqVVwcogJwmX45kV6SiRNnA7Cum6j97ARQOrNW30Wcq13v6JNkA/xLN5EHSD
-         Z1ukQN78qZFGcEpWvKCv4NrgNZw3KLqNTBFnOAbKtHZm+Ts0BUcqBiZSXwc0YE4HSOWK
-         8D7g==
+        bh=ixdzoPeHqTjtWCkjfG+wRupSHf8MX9sNzTZVFeYguNQ=;
+        b=gZx9xpZ8xp2kLXzmjlge8TgWKxXJbtic7sXC//V0R/IFNIziL2ZRF0C2MNKf0FvuXb
+         8S6XEn5qU6OeoWVIXvFoLLMZIi06r3YSWTbmJB/IrD4RMbKfAAkSDyTPOH7lQYqrlohl
+         pr6NYaLYBxDIIZyk5sO+pyiUvj9AU7kGKdvio1pRVrkmxd24Z8EGrnfb3GzC5zH5Wlft
+         wXAqQHOgXIOKHS4bufmpAfM8OcRaqcVQ3+hrbB/0D/3L6/AC/A4WY1g/BWS1rdHnH9v6
+         7XCVLphiB1LvbOEAUyBk7pt4r1ndYkhKvYwKwr5uC1q4NKRU3pXBRWB/vuqVJosMtJiB
+         f7Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=GMY9x/C2jjwza6jdaPO0YKBVYFxcc9e+Li/ACoK6FL4=;
-        b=q60PoGgGIOkACaeYtVXW4VCTYbKUNV0EvVbxeSVw2oyB/MRuibn00DqQ9Ey3gHl5Ld
-         BubSnsUYLQ/EUbMG8f/6s3g98iWRgIjQLgodZE+Cd4xHHjiHNuy8UNws5vg4V3TmJ7tY
-         phIwg6dXlgzAgMwjboSt/I7TclZ7FDnmNYBbmrEShqyBBGWR/y2CmRlbHMaOHR3Pwf/k
-         a0WFebRK0zDv2RCjimlgkVEgHcC10K5pvQ0U5DMyMyYq2CJZp8JTNP0KyaTgQt30yj8Z
-         HZs1FXxqy2jgHYx2R6oeDXpwyRO2aAsRJ61dZLjl6bc3Z6fl4JNLcnDbFMuMyYgo6jJN
-         lA+Q==
-X-Gm-Message-State: AOAM532pDOAc81jGQeVrY40IHEbxVYpWJBuRHnwJgJCVyo2Zp95EkniC
-        uIBK/tNN67rcjUEZIjJ/5s570w==
-X-Google-Smtp-Source: ABdhPJz/4DDwtuKtzRE/yvutiwlnjG9lON75Dx1PBLPhgyFFJYVcmAeqTuyDIX9oCC65Ck9WxTcGCQ==
-X-Received: by 2002:a17:907:1002:: with SMTP id ox2mr16141549ejb.358.1593096524553;
-        Thu, 25 Jun 2020 07:48:44 -0700 (PDT)
+        bh=ixdzoPeHqTjtWCkjfG+wRupSHf8MX9sNzTZVFeYguNQ=;
+        b=Tc2iiylkkgcCglJzyVYOLe9MplI1dHZ1nHmL6OP9Cwi3elIcew34MrTxLISX8xvT1X
+         w7Hoe9BGcHrOlZwmChWSdZR59rwlzNLGuYOzZ5xVyR3Z8u7PP7Bfe/qAiScZBimEtsWl
+         F+JeaN522+qDkAxeAyXVECdlW9CEsy/SXMFjenXKR6c347unFzafDZA5HfdR9RfhBEBE
+         Kyz6pldYBhcmC7BQ67b26ssEuhIULYe+pNkllrDQ2qce2cwqEuF4zCrtF9VKp1invTLe
+         z4VnqtkOGmZIWPab8uzXudJsvu/LSZfCHyh6Fk8ebWYMiJaLuLhvMm0B3TfG8tEqcgbi
+         UZvg==
+X-Gm-Message-State: AOAM530qh72/rPa/XGWLO+Rr7rgTFVDJxlssxmYyMVgNF6jM/5x/6F0r
+        ePKKw/Mli7Brv5KQaV1AmhAVVg==
+X-Google-Smtp-Source: ABdhPJwMIRBPr3Srqb6v+nLNKSuOmvLocW13PX16x6OR7/WzTgLCBYVK6/lEIgATq6RrYUpc++hvVA==
+X-Received: by 2002:a05:6402:1285:: with SMTP id w5mr33047361edv.73.1593097991757;
+        Thu, 25 Jun 2020 08:13:11 -0700 (PDT)
 Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
-        by smtp.gmail.com with ESMTPSA id z20sm507300edq.97.2020.06.25.07.48.43
+        by smtp.gmail.com with ESMTPSA id a13sm18315114edk.58.2020.06.25.08.13.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 07:48:43 -0700 (PDT)
-Subject: Re: [PATCH 0/6] ZNS: Extra features for current patches
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+        Thu, 25 Jun 2020 08:13:10 -0700 (PDT)
+Subject: Re: [PATCH 5/6] block: add zone attr. to zone mgmt IOCTL struct
 To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
         linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
         sagi@grimberg.me, axboe@kernel.dk,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
 References: <20200625122152.17359-1-javier@javigon.com>
- <2067b6ce-fea0-99cd-39c7-56cf219f56d5@lightnvm.io>
-Message-ID: <d7b3dc5f-a10c-bcf2-8d13-26301d7736df@lightnvm.io>
-Date:   Thu, 25 Jun 2020 16:48:43 +0200
+ <20200625122152.17359-6-javier@javigon.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <9ac40166-5731-692a-d476-0da9aad2a9aa@lightnvm.io>
+Date:   Thu, 25 Jun 2020 17:13:10 +0200
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <2067b6ce-fea0-99cd-39c7-56cf219f56d5@lightnvm.io>
+In-Reply-To: <20200625122152.17359-6-javier@javigon.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -81,38 +86,80 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/06/2020 15.04, Matias Bjørling wrote:
-> On 25/06/2020 14.21, Javier González wrote:
->> From: Javier González <javier.gonz@samsung.com>
->>
->> This patchset extends zoned device functionality on top of the existing
->> v3 ZNS patchset that Keith sent last week.
->>
->> Patches 1-5 are zoned block interface and IOCTL additions to expose ZNS
->> values to user-space. One major change is the addition of a new zone
->> management IOCTL that allows to extend zone management commands with
->> flags. I recall a conversation in the mailing list from early this year
->> where a similar approach was proposed by Matias, but never made it
->> upstream. We extended the IOCTL here to align with the comments in that
->> thread. Here, we are happy to get sign-offs by anyone that contributed
->> to the thread - just comment here or on the patch.
+On 25/06/2020 14.21, Javier González wrote:
+> From: Javier González <javier.gonz@samsung.com>
 >
-> The original patchset is available here: 
-> https://lkml.org/lkml/2019/6/21/419
+> Add zone attributes field to the blk_zone structure. Use ZNS attributes
+> as base for zoned block devices in general.
 >
-> We wanted to wait posting our updated patches until the base patches 
-> were upstream. I guess the cat is out of the bag. :)
+> Signed-off-by: Javier González <javier.gonz@samsung.com>
+> Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> ---
+>   drivers/nvme/host/zns.c       |  1 +
+>   include/uapi/linux/blkzoned.h | 13 ++++++++++++-
+>   2 files changed, 13 insertions(+), 1 deletion(-)
 >
-> For the open/finish/reset patch, you'll want to take a look at the 
-> original patchset, and apply the feedback from that thread to your 
-> patch. Please also consider the users of these operations, e.g., dm, 
-> scsi, null_blk, etc. The original patchset has patches for that.
->
-Please disregard the above - I forgot that the original patchset 
-actually went upstream.
+> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+> index 258d03610cc0..7d8381fe7665 100644
+> --- a/drivers/nvme/host/zns.c
+> +++ b/drivers/nvme/host/zns.c
+> @@ -195,6 +195,7 @@ static int nvme_zone_parse_entry(struct nvme_ns *ns,
+>   	zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
+>   	zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
+>   	zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
+> +	zone.attr = entry->za;
+>   
+>   	return cb(&zone, idx, data);
+>   }
+> diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+> index 0c49a4b2ce5d..2e43a00e3425 100644
+> --- a/include/uapi/linux/blkzoned.h
+> +++ b/include/uapi/linux/blkzoned.h
+> @@ -82,6 +82,16 @@ enum blk_zone_report_flags {
+>   	BLK_ZONE_REP_CAPACITY	= (1 << 0),
+>   };
+>   
+> +/**
+> + * Zone Attributes
+> + */
+> +enum blk_zone_attr {
+> +	BLK_ZONE_ATTR_ZFC	= 1 << 0,
+> +	BLK_ZONE_ATTR_FZR	= 1 << 1,
+> +	BLK_ZONE_ATTR_RZR	= 1 << 2,
 
-You're right that we discussed (I at least discussed it internally with 
-Damien, but I can't find the mail) having one mgmt issuing the commands. 
-We didn't go ahead and added it at that point due to ZNS still being in 
-a fluffy state.
+The RZR bit is equivalent to the RESET bit accessible through the reset 
+byte in struct blk_zone.
+
+ZFC is tied to Zone Active Excursions, as there is no support in the 
+kernel zone model for that. This should probably not be added until 
+there is generic support.
+
+Damien, could we overload the struct blk_zine reset variable for FZR? I 
+don't believe we can due to backward compatibility. Is that your 
+understanding as well?
+
+> +	BLK_ZONE_ATTR_ZDEV	= 1 << 7,
+
+There is not currently an equivalent for zone descriptor extensions in 
+ZAC/ZBC. The addition of this field should probably be in a patch that 
+adds generic support for zone descriptor extensions.
+
+> +};
+> +
+>   /**
+>    * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
+>    *
+> @@ -108,7 +118,8 @@ struct blk_zone {
+>   	__u8	cond;		/* Zone condition */
+>   	__u8	non_seq;	/* Non-sequential write resources active */
+>   	__u8	reset;		/* Reset write pointer recommended */
+> -	__u8	resv[4];
+> +	__u8	attr;		/* Zone attributes */
+> +	__u8	resv[3];
+>   	__u64	capacity;	/* Zone capacity in number of sectors */
+>   	__u8	reserved[24];
+>   };
+
 
