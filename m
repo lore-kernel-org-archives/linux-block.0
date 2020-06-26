@@ -2,87 +2,96 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7536C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 09:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA47C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 10:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E14B214F1
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 09:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82EA3207E8
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 10:01:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="w0WxvLqZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725850AbgFZJSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 05:18:01 -0400
-Received: from verein.lst.de ([213.95.11.211]:51068 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725820AbgFZJSA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 05:18:00 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DB65168CFC; Fri, 26 Jun 2020 11:17:58 +0200 (CEST)
-Date:   Fri, 26 Jun 2020 11:17:58 +0200
-From:   "hch@lst.de" <hch@lst.de>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     "hch@lst.de" <hch@lst.de>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
+        id S1727027AbgFZKBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 06:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbgFZKBD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jun 2020 06:01:03 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBFCC08C5C1
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 03:01:03 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id a8so5249354edy.1
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 03:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qUl1b6ZKOKu+8M/8iIs9MV6jOq39RM7yd/5UXrQhPBg=;
+        b=w0WxvLqZGuf7NzsEdBXumLQ4Dq0bASQTtoSlE2yk+jztzvPZukgMaGjduN8Kzm/cET
+         xYYHn80gxOlrs+uIRaJhaRa6D6waGxvec1mpxEMnKyxbCswaggT0JGYQLLcEvSNUTAvo
+         j8Vxr2Tkuv5yqCNFgDx4vWaj5FcVl0yVq5ZIEdgiGYPHSz8UinpTzGX4HvMulT0QbaRT
+         NMWveSYkx35tdCw6eRZPtF/JZy0qciGwWTBgaAbmeE0s0vXT6fSSxcXJTnT1SXEhvLpX
+         LhhdvX2W+utTQ9W8+K6s1oEIp0KxH8tVPcA53GuW+6Tq8WrJcZauPXpGtLtNTVRLAENY
+         P2kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qUl1b6ZKOKu+8M/8iIs9MV6jOq39RM7yd/5UXrQhPBg=;
+        b=brkhSqDzFGhfP6TraK1O2wIQMN1StV2VSaC3HeUtJY/HAaTSZ275Jbfkyl7jaRx/n7
+         Le6E4rOJGOOEur5nx1iD51rBEYWLyYP6YAuILkMw90PRv7BwaZIy22HBjCJY0ehVdyW0
+         n8iXGP50u4EhJogkqe326ROsoUFVz3eYpvh4OBJkM/w2gXN6LFmlX+i53V4SzB1x/ow9
+         reyP+lcW9CzIdPzgiEY8dtTCrJdKdXFoWJ9WJaOAOQgVp5xKxSQYt8EUC6/rtQj8hEXr
+         i3CZfpFo9prM1kkYVzxTohrS32MENLQvJTxPaf/67UqPYec7bI/+eOfnW4IQdPHG1PZe
+         ZPWw==
+X-Gm-Message-State: AOAM531uV3YIjt0bu+UAw3Ebud+J9CXNRmoyECztqqGtBp/LfRRoFdSy
+        nYbON5uLlxjAjQ8je91IvgsWSQ==
+X-Google-Smtp-Source: ABdhPJyX6ZGJUOZGR+giWfiEzv594FPvMsFiqAPf1gxFoZ4PsqFMv1gWz5Lx85XAqx/Mk5z895sgGQ==
+X-Received: by 2002:aa7:c609:: with SMTP id h9mr2548655edq.43.1593165661688;
+        Fri, 26 Jun 2020 03:01:01 -0700 (PDT)
+Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
+        by smtp.gmail.com with ESMTPSA id w18sm1030748ejc.62.2020.06.26.03.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2020 03:01:01 -0700 (PDT)
+Date:   Fri, 26 Jun 2020 12:01:00 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
         SelvaKumar S <selvakuma.s1@samsung.com>,
         Kanchan Joshi <joshi.k@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 3/6] block: add support for zone offline transition
-Message-ID: <20200626091758.GA27903@lst.de>
-References: <20200625122152.17359-1-javier@javigon.com> <20200625122152.17359-4-javier@javigon.com> <b3429226-16ae-df3c-38aa-50e3a8716e71@lightnvm.io> <20200625194835.5hojuvdwtjxtso2l@MacBook-Pro.localdomain> <CY4PR04MB3751E7721E5D5E15065B0ED2E7930@CY4PR04MB3751.namprd04.prod.outlook.com> <20200626091113.GB26616@lst.de> <CY4PR04MB3751E3DF3A1BD1FC77E6C101E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
+Subject: Re: [PATCH 5/6] block: add zone attr. to zone mgmt IOCTL struct
+Message-ID: <20200626100100.gxwdmww7h4kmfxsq@mpHalley.localdomain>
+References: <20200625122152.17359-1-javier@javigon.com>
+ <20200625122152.17359-6-javier@javigon.com>
+ <20200626091427.GC26616@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CY4PR04MB3751E3DF3A1BD1FC77E6C101E7930@CY4PR04MB3751.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200626091427.GC26616@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 26, 2020 at 09:15:14AM +0000, Damien Le Moal wrote:
-> On 2020/06/26 18:11, hch@lst.de wrote:
-> > On Fri, Jun 26, 2020 at 01:14:30AM +0000, Damien Le Moal wrote:
-> >> As long as you keep ZNS namespace report itself as being "host-managed" like
-> >> ZBC/ZAC disks, we need the consistency and common interface. If you break that,
-> >> the meaning of the zoned model queue attribute disappears and an application or
-> >> in-kernel user cannot rely on this model anymore to know how the drive will behave.
-> > 
-> > We just need a way to expose to applications that new feature are
-> > supported.  Just like we did with zone capacity support.  That is why
-> > we added the feature flags to uapi zone structure.
-> > 
-> >> Think of a file system, or any other in-kernel user. If they have to change
-> >> their code based on the device type (NVMe vs SCSI), then the zoned block device
-> >> interface is broken. Right now, that is not the case, everything works equally
-> >> well on ZNS and SCSI, modulo the need by a user for conventional zones that ZNS
-> >> do not define. But that is still consistent with the host-managed model since
-> >> conventional zones are optional.
-> > 
-> > That is why we have the feature flag.  That user should not know the
-> > underlying transport or spec.  But it can reliably discover "this thing
-> > support zone capacity" or "this thing supports offline zones" or even
-> > nasty thing like "this zone can time out when open" which are much
-> > harder to deal with.
-> > 
-> >> For this particular patch, there is currently no in-kernel user, and it is not
-> >> clear how this will be useful to applications. At least please clarify this. And
-> > 
-> > The main user is the ioctl.  And if you think about how offline zones are
-> > (suppose to) be used driving this from management tools in userspace
-> > actually totally make sense.  Unlike for example open/close all which
-> > just don't make sense as primitives to start with.
-> 
-> OK. Adding a new BLKZONEOFFLINE ioctl is easy though and fits into the current
-> zone management plumbing well, I think. So the patch can be significantly
-> simplified (no need for the new zone management op function with flags).
+On 26.06.2020 11:14, Christoph Hellwig wrote:
+>> + * Zone Attributes
+>> + */
+>> +enum blk_zone_attr {
+>> +	BLK_ZONE_ATTR_ZFC	= 1 << 0,
+>> +	BLK_ZONE_ATTR_FZR	= 1 << 1,
+>> +	BLK_ZONE_ATTR_RZR	= 1 << 2,
+>> +	BLK_ZONE_ATTR_ZDEV	= 1 << 7,
+>> +};
+>
+>I have no ^$^$#$%#% idea what this is supposed to be.  If you add
+>userspace ABIs you need to document them in detail.  Until I've seen
+>that documentation I can't even comment if they make sense.
 
-Yes, I'm all for reusing the existing plumbing and style as much as
-possible.
+Understood. I'll add the ZAC/ZBC attributes and document this properly
+on V2.
