@@ -2,216 +2,96 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D1DC433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 13:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2050C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 15:35:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F01720663
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 13:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81E7920706
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 15:35:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="EbBQGhxa"
+	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="GfFp3som";
+	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="GfFp3som"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728804AbgFZN4a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 09:56:30 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:39184 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725864AbgFZN4a (ORCPT
+        id S1726296AbgFZPfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 11:35:17 -0400
+Received: from fallback22.m.smailru.net ([94.100.176.132]:49254 "EHLO
+        fallback22.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725962AbgFZPfQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 09:56:30 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20200626135628euoutp02e40af088d261e0b18a9d36299ba5b1af~cHJOFGvWp1363013630euoutp02s
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 13:56:28 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20200626135628euoutp02e40af088d261e0b18a9d36299ba5b1af~cHJOFGvWp1363013630euoutp02s
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1593179788;
-        bh=a4vI0VsOOwJL8FbR9Rem46hINKT1NO3X60g4/O17scM=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=EbBQGhxaRLwuVM9k2ONgx9yEB6QE83Ej5diiCLQxt4jeo//SkgE5FoU9PPAkTl5i5
-         e5zuc2CquqeFEhtmwD0wrcDcAvzMIKM+gmWYmy3yTQNLwsnx19aFaKYmFyRnLS4eOB
-         X+LjvEXrvtu6cZrsy3GgDL/T6jvrtCO5hzVOZ3io=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20200626135627eucas1p2a9ee726e5fa75cf94cb890204f9238bb~cHJNzl1sV1232512325eucas1p2P;
-        Fri, 26 Jun 2020 13:56:27 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 29.10.06318.B8EF5FE5; Fri, 26
-        Jun 2020 14:56:27 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20200626135627eucas1p2d68eb5853f90bc636faab69149fbe02c~cHJNfTN7h3013530135eucas1p2t;
-        Fri, 26 Jun 2020 13:56:27 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200626135627eusmtrp190e8c28ea5e3042e40fc63d2874ecabf~cHJNespUv2488324883eusmtrp1b;
-        Fri, 26 Jun 2020 13:56:27 +0000 (GMT)
-X-AuditID: cbfec7f5-371ff700000018ae-ec-5ef5fe8b3bda
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id A4.0A.06314.B8EF5FE5; Fri, 26
-        Jun 2020 14:56:27 +0100 (BST)
-Received: from [106.120.51.71] (unknown [106.120.51.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200626135627eusmtip1f72c23802bc5164742dd5d89e62a4a4e~cHJNKS8xE1358813588eusmtip1P;
-        Fri, 26 Jun 2020 13:56:27 +0000 (GMT)
-Subject: Re: Re: [RFC PATCH v2 5/7] ata_dev_printk: Use dev_printk
-To:     tasleson@redhat.com
-Cc:     Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-From:   Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Message-ID: <b0118523-eec2-2e60-0b05-8f674d63abd2@samsung.com>
-Date:   Fri, 26 Jun 2020 15:56:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-        Thunderbird/60.8.0
+        Fri, 26 Jun 2020 11:35:16 -0400
+X-Greylist: delayed 3129 seconds by postgrey-1.27 at vger.kernel.org; Fri, 26 Jun 2020 11:35:15 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail2;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:Date:Cc:To:From:Subject:Message-ID; bh=sRthVSPitv/Iiss9OKUPY0U2XZAyIrIr0VSJReMu+oI=;
+        b=GfFp3somaD0HldLNiuo2Hj9ycCndyOmZYP1GjPvYbTgqgyOGjnXr4jXR1h4J4QSJuTt9OjLMH6LpEq+30lhw91iEazBNagPu4WZgAi4Dx5wYLSWduONrRQLEFYiwoa/s6WMRM4y+jIX95Yja4q+9o1NJcdmc4Vy84nd2ZaZLd1A=;
+Received: from [10.161.8.33] (port=56470 helo=smtp14.mail.ru)
+        by fallback22.m.smailru.net with esmtp (envelope-from <alekseymmm@mail.ru>)
+        id 1jopZI-0000xH-UK
+        for linux-block@vger.kernel.org; Fri, 26 Jun 2020 17:43:05 +0300
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail2;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:Date:Cc:To:From:Subject:Message-ID; bh=sRthVSPitv/Iiss9OKUPY0U2XZAyIrIr0VSJReMu+oI=;
+        b=GfFp3somaD0HldLNiuo2Hj9ycCndyOmZYP1GjPvYbTgqgyOGjnXr4jXR1h4J4QSJuTt9OjLMH6LpEq+30lhw91iEazBNagPu4WZgAi4Dx5wYLSWduONrRQLEFYiwoa/s6WMRM4y+jIX95Yja4q+9o1NJcdmc4Vy84nd2ZaZLd1A=;
+Received: by smtp14.mail.ru with esmtpa (envelope-from <alekseymmm@mail.ru>)
+        id 1jopZG-0000wd-Rp; Fri, 26 Jun 2020 17:43:03 +0300
+Message-ID: <bdef634a3a41dbecfd3d74f6bd25332445772902.camel@mail.ru>
+Subject: [PATCH] block: Set req quiet flag if bio is quiet
+From:   Aleksei Marov <alekseymmm@mail.ru>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Date:   Fri, 26 Jun 2020 17:42:57 +0300
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <e12aeb9e-fe5d-5b5e-d190-401997cecc34@redhat.com>
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsWy7djP87rd/77GGbx8pWuxZ9EkJouN/RwW
-        e29pW3Rf38FmcfHeTXYHVo9pk06xebzfd5XNY/Ppao/Pm+QCWKK4bFJSczLLUov07RK4Mpo3
-        H2UqOCpdcfXyNaYGxr1iXYwcHBICJhK/Xxl2MXJxCAmsYJR40LuXDcL5wijR3NnHBOF8ZpRY
-        9XAVI0zH5EXZEPHljBI3nj9ih3DeMkr8W/IbqIOTQ1jASeLdmq/MILaIgLjEvYVrmEGKmAVm
-        MEp8P/0RrIhNwEpiYjvIVE4OXgE7ic6be9hBbBYBVYmvE5tYQWxRgQiJTw8Os0LUCEqcnPmE
-        BcTmBKqfO6MBbAEz0IJbT+YzQdjyEs1bZ4MtkxCYzC7x9dI5sGYJAReJma3v2SFsYYlXx7dA
-        2TISpyf3sEA0rGOU+NvxAqp7O6PE8sn/2CCqrCXunPvFBgoAZgFNifW79CHCjhIX3u5ggYQL
-        n8SNt4IQR/BJTNo2nRkizCvR0SYEUa0msWHZBjaYtV07VzJPYFSaheS1WUjemYXknVkIexcw
-        sqxiFE8tLc5NTy02zkst1ytOzC0uzUvXS87P3cQITDCn/x3/uoNx35+kQ4wCHIxKPLwvHnyN
-        E2JNLCuuzD3EKMHBrCTC63T2dJwQb0piZVVqUX58UWlOavEhRmkOFiVxXuNFL2OFBNITS1Kz
-        U1MLUotgskwcnFINjOfyfb9n37Jo35wXUDer51j3Gf81we4+WnsZrshN+p7+bs6Cl/a/1p+U
-        imnm2bW6d/7D96ulK+8nn5Xni70xwcvm54af31J+XzFYcWOOUZJ09LS7H06X7N2ZcXN74qHP
-        TPwWD6a+m3pn5tpWu5cmLRPyXkkXMtw+4f0/WSdP/qaLc/y+QyqXn7grsRRnJBpqMRcVJwIA
-        7L+cqywDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFIsWRmVeSWpSXmKPExsVy+t/xu7rd/77GGaz8KWWxZ9EkJouN/RwW
-        e29pW3Rf38FmcfHeTXYHVo9pk06xebzfd5XNY/Ppao/Pm+QCWKL0bIryS0tSFTLyi0tslaIN
-        LYz0DC0t9IxMLPUMjc1jrYxMlfTtbFJSczLLUov07RL0Mpo3H2UqOCpdcfXyNaYGxr1iXYwc
-        HBICJhKTF2V3MXJxCAksZZS4sqCLBSIuI3F8fVkXIyeQKSzx51oXG0TNa0aJVV97WEASwgJO
-        Eu/WfGUGsUUExCXuLVzDDFF0jlHiwNYmsCJmgRmMEv9X5YDYbAJWEhPbVzGC2LwCdhKdN/ew
-        g9gsAqoSXyc2sYLYogIREod3zIKqEZQ4OfMJ2BxOoPq5MxqYIWaqS/yZdwnKFpe49WQ+E4Qt
-        L9G8dTbzBEahWUjaZyFpmYWkZRaSlgWMLKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzEC42nb
-        sZ+bdzBe2hh8iFGAg1GJh/fFg69xQqyJZcWVuYcYJTiYlUR4nc6ejhPiTUmsrEotyo8vKs1J
-        LT7EaAr03ERmKdHkfGCs55XEG5oamltYGpobmxubWSiJ83YIHIwREkhPLEnNTk0tSC2C6WPi
-        4JRqYAzWcp7qsz2/bPJxx3dPmoIsJLNTUjtq2u44+4idPlcxPzTF5s9LwYSFx4NUrkstnP1o
-        Qf819sXMWysOXkybk7iuOGMe4/00HsXg5p7qU27cGm6xj2szIv+x7vi7bqpc+j2TRQovk48c
-        uXJm+VqDnms/OXl4rWTljfK6jS8dV4qdfDDTj+81pxJLcUaioRZzUXEiAK0YMOy9AgAA
-X-CMS-MailID: 20200626135627eucas1p2d68eb5853f90bc636faab69149fbe02c
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200626135627eucas1p2d68eb5853f90bc636faab69149fbe02c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200626135627eucas1p2d68eb5853f90bc636faab69149fbe02c
-References: <20200513213621.470411-1-tasleson@redhat.com>
-        <20200513213621.470411-6-tasleson@redhat.com>
-        <82257837-c5a8-6a38-ce13-0f1ce7e245ac@suse.de>
-        <e12aeb9e-fe5d-5b5e-d190-401997cecc34@redhat.com>
-        <CGME20200626135627eucas1p2d68eb5853f90bc636faab69149fbe02c@eucas1p2.samsung.com>
+Content-Transfer-Encoding: 7bit
+X-7564579A: 646B95376F6C166E
+X-77F55803: 4F1203BC0FB41BD9AAC5A87EC32CE31EB6E01BDE3D7D768BA8AF3A12D18E8808182A05F538085040D86B18E1040BBA3D17501CAD2EDD5236E5F8C3F1A4DEAC88DE6DAB2DD5FAFFAC
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE75263010198C72082EA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F79006374E88016F1B7D8D248638F802B75D45FF5571747095F342E8C7A0BC55FA0FE5FC1BBC24754C4447ECE38699F1802EB0649E86EB6C6D3CCE24389733CBF5DBD5E913377AFFFEAFD269176DF2183F8FC7C0B687D752F9FE62218941B15DA834481FCF19DD082D7633A0E7DDDDC251EA7DABA471835C12D1D977725E5C173C3A84C3CF36E64A7E3F8E58117882F4460429728AD0CFFFB425014E40A5AABA2AD371193AA81AA40904B5D9A18204E546F3947C188B2BFCDC338A02302FCEF25BFAB3454AD6D5ED66289B52F4A82D016A4342E36136E347CC761E07725E5C173C3A84C391C27F7DDB3D8653BA3038C0950A5D36B5C8C57E37DE458B0B4866841D68ED3567F23339F89546C55F5C1EE8F4F765FC851EDB9C5A93305EA7F4EDE966BC389F395957E7521B51C24C7702A67D5C33162DBA43225CD8A89FB26E97DCB74E62526D8C47C27EEC5E9FB5C8C57E37DE458B4C7702A67D5C3316FA3894348FB808DBCF17F1EDFBC1FB573B503F486389A921A5CC5B56E945C8DA
+X-C8649E89: BCF06AA3CCCA8578954EA8024B853CFC88E089A39DD221185FB641856D73F50EBD11DAA2EA1E4AA2
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojtcCHZoKxZplKQq1SrXrNSg==
+X-Mailru-Sender: 8261CADE3D3FA0B4BDFD1058942BD7EAC90364FBA45CA0A3BA3E703A3B4AEC6A4EE14B57AC70EBE9FEDCCAD94ABAB60078274A4A9E9E44FD4301F6103F424F867A458BE9B16E12C867EA787935ED9F1B
+X-Mras: Ok
+X-7564579A: EEAE043A70213CC8
+X-77F55803: 669901E4625912A97F9F52485CB584D7271FD7DF62800FDCD5510F06DA415DA1CCC07CCE96A7512D9A7B7E3ADDB2F70AC33B6F82A77BB66C
+X-7FA49CB5: 0D63561A33F958A56F4977E42B6025E87355F023759C49794A3C34F1D6E80E8E8941B15DA834481FA18204E546F3947C7BD21ED50D08CA4DF6B57BC7E64490618DEB871D839B7333395957E7521B51C2545D4CF71C94A83E9FA2833FD35BB23D27C277FBC8AE2E8B974A882099E279BDA471835C12D1D977C4224003CC8364767815B9869FA544D8D32BA5DBAC0009BE9E8FC8737B5C2249EF499754DBF6557476E601842F6C81A12EF20D2F80756B5F7874E805F1D05189089D37D7C0E48F6CA18204E546F3947CB26E97DCB74E625235872C767BF85DA22EF20D2F80756B5F40A5AABA2AD3711975ECD9A6C639B01B78DA827A17800CE79E9721B410A3B6ED731C566533BA786A40A5AABA2AD371193C9F3DD0FB1AF5EBF64ED337B09931FD27F269C8F02392CD5571747095F342E88FB05168BE4CE3AF
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojtcCHZoKxZpkYVIgdco1iyw==
+X-Mailru-MI: 800
+X-Mailru-Sender: A5480F10D64C9005D917D4885F602B38B1BB42EB0835CAB893B68AA7122B399BB7EA9FE7735C3DBF82C4A51CE75DF6B43DDE9B364B0DF2897376EA924B960F6E96C236757D6432D5AE208404248635DF
+X-Mras: Ok
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The current behavior is that if bio flagged as BIO_QUIETis submitted to request based block device then the request
+that wraps this bio in a queue is not quiet. RQF_FLAG is not
+set anywhere. Hence, if errors happen we can see error
+messages (e.g. in print_req_error) even though bio is quiet.
+This patch fixes that by setting the flag in blk_rq_bio_prep.
 
-On 5/14/20 8:03 PM, Tony Asleson wrote:
-> On 5/14/20 12:53 AM, Hannes Reinecke wrote:
->> On 5/13/20 11:36 PM, Tony Asleson wrote:
->>> Utilize the dev_printk function which will add structured data
->>> to the log message.
->>>
->>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
->>> ---
->>>   drivers/ata/libata-core.c | 10 +++++++---
->>>   1 file changed, 7 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
->>> index 42c8728f6117..16978d615a17 100644
->>> --- a/drivers/ata/libata-core.c
->>> +++ b/drivers/ata/libata-core.c
->>> @@ -7301,6 +7301,7 @@ EXPORT_SYMBOL(ata_link_printk);
->>>   void ata_dev_printk(const struct ata_device *dev, const char *level,
->>>               const char *fmt, ...)
->>>   {
->>> +    const struct device *gendev;
->>>       struct va_format vaf;
->>>       va_list args;
->>>   @@ -7309,9 +7310,12 @@ void ata_dev_printk(const struct ata_device
->>> *dev, const char *level,
->>>       vaf.fmt = fmt;
->>>       vaf.va = &args;
->>>   -    printk("%sata%u.%02u: %pV",
->>> -           level, dev->link->ap->print_id, dev->link->pmp + dev->devno,
->>> -           &vaf);
->>> +    gendev = (dev->sdev) ? &dev->sdev->sdev_gendev : &dev->tdev;
->>> +
->>> +    dev_printk(level, gendev, "ata%u.%02u: %pV",
->>> +            dev->link->ap->print_id,
->>> +            dev->link->pmp + dev->devno,
->>> +            &vaf);
->>>         va_end(args);
->>>   }
->>>
->> That is wrong.
->> dev_printk() will already prefix the logging message with the device
->> name, so we'll end up having the name printed twice.
-> 
-> It certainly could be. Early in boot when &dev->sdev->sdev_gendev ==
-> NULL and &dev->tdev is used we get
-> 
-> dev1.0: ata1.00: configured for UDMA/100
-> 
-> later when &dev->sdev->sdev_gendev != NULL we get
-> 
-> sd 1:0:0:0: [sdb] 209715200 512-byte logical blocks: (107 GB/100 GiB)
+Signed-off-by: Aleksei Marov <alekseymmm@mail.ru>
+---
+ block/blk.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-This one comes from the SCSI layer.
+diff --git a/block/blk.h b/block/blk.h
+index b5d1f0f..04ca4e0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -108,6 +108,9 @@ static inline void blk_rq_bio_prep(struct request
+*rq, struct bio *bio,
 
-From libata we get i.e.:
+        if (bio->bi_disk)
+                rq->rq_disk = bio->bi_disk;
++
++       if (bio_flagged(bio, BIO_QUIET))
++               rq->rq_flags |= RQF_QUIET;
+ }
 
-sd 1:0:0:0: ata2.00: exception Emask 0x0 SAct 0x800000 SErr 0x800000
-action 0x6 frozen
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+-- 
+1.8.3.1
 
-instead of
 
-ata2.00: exception Emask 0x0 SAct 0x800000 SErr 0x800000 action 0x6 frozen
-
-> to clarify, your point is dev1.0 is redundant as ata1.00 exists in the
-> message?
-> 
-> 
-> In the block layer print_req_error we get:
-> 
-> block sdb: blk_update_request: I/O error, dev sdb, sector 10000 op
-> 0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
-
-I think it should be modified to not include dev any longer: 
-
-block sdb: blk_update_request: I/O error, sector 10000 op
-0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
-
-but it is up to Jens to make a final decision on that.
-
-> Which seems a bit more redundant.
-
-Yes but it is a debug message visible only on error while for libata
-_all_ messages are now changed.
-
-Best regards,
---
-Bartlomiej Zolnierkiewicz
-Samsung R&D Institute Poland
-Samsung Electronics
-
-> I've been trying to be careful to not change the human readable portion
-> of the message, so not to disturb all the log scraping tools that exist
-> mining errors.  Maybe this is the wrong approach?  In my original patch
-> series I brought back printk_emit so that I could add the structured
-> data without introducing changes in the message text output.  James
-> Bottomley suggested using dev_printk which certainly made things
-> cleaner, but it does add the prefix.
-> 
-> 
-> Thanks,
-> Tony
-> 
