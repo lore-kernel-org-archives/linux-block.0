@@ -2,62 +2,79 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBC1C433DF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 08:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B63C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 08:59:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E61320C09
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 08:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 253BF20DD4
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 08:59:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ec0yT0jW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbgFZIyt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 04:54:49 -0400
-Received: from verein.lst.de ([213.95.11.211]:50944 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725850AbgFZIyt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 04:54:49 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6891768C65; Fri, 26 Jun 2020 10:54:45 +0200 (CEST)
-Date:   Fri, 26 Jun 2020 10:54:45 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
-        hch@lst.de, linux-block@vger.kernel.org, axboe@kernel.dk,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCHv3 3/5] nvme: implement I/O Command Sets Command Set
- support
-Message-ID: <20200626085445.GB25535@lst.de>
-References: <20200622162530.1287650-1-kbusch@kernel.org> <20200622162530.1287650-4-kbusch@kernel.org> <69e8e88c-097b-368d-58f4-85d11110386d@grimberg.me>
+        id S1725915AbgFZI7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 04:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48948 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725905AbgFZI7L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jun 2020 04:59:11 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22962C08C5C1;
+        Fri, 26 Jun 2020 01:59:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=gW+E1Jv1j6enHoS9ci8iskFSPJ2rZo4CjUglSeffP7o=; b=ec0yT0jWfXYNE/yB3dPz5baX8B
+        7smSzXLFiuj9f0Ed4NKLekPpMe3/SiPIJja5Dct7nl3HgWRYIQXNMnHS6dpZPVOyL5xaG5iCqF9X0
+        CL3mCgMIilh6uQny45ec0cTru4ix75kp0Y/VoGHgARCzk12v4eRECmaoJuAJIQD0/Tp7bJ32ekvrI
+        YWqtMrFLoHgzk6rGoKlqFr+ht7kheor1fGdeZ/YN27RadZ0oDsErMMl00SvVyR2aEjChHMyYZlnWR
+        luo7btYT2RvswiLQ98qswiHpUXLJnF3hTV3xX9fg/ehbnNMRGmQTlrVE/fJQfHzp9COF8QB+Vrtm2
+        FLx1RVYg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jokC6-0007l8-Fb; Fri, 26 Jun 2020 08:58:46 +0000
+Date:   Fri, 26 Jun 2020 09:58:46 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, bcrl@kvack.org,
+        asml.silence@gmail.com, Damien.LeMoal@wdc.com, hch@infradead.org,
+        linux-fsdevel@vger.kernel.org, mb@lightnvm.io,
+        linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        selvakuma.s1@samsung.com, nj.shetty@samsung.com,
+        javier.gonz@samsung.com, Arnav Dawn <a.dawn@samsung.com>
+Subject: Re: [PATCH v2 1/2] fs,block: Introduce RWF_ZONE_APPEND and handling
+ in direct IO path
+Message-ID: <20200626085846.GA24962@infradead.org>
+References: <1593105349-19270-1-git-send-email-joshi.k@samsung.com>
+ <CGME20200625171834epcas5p226a24dfcb84cfa83fe29a2bd17795d85@epcas5p2.samsung.com>
+ <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <69e8e88c-097b-368d-58f4-85d11110386d@grimberg.me>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <1593105349-19270-2-git-send-email-joshi.k@samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 01:53:47AM -0700, Sagi Grimberg wrote:
->>   	if (ns->lba_shift == 0)
->>   		ns->lba_shift = 9;
->>   +	switch (ns->head->ids.csi) {
->> +	case NVME_CSI_NVM:
->> +		break;
->> +	default:
->> +		dev_warn(ctrl->device, "unknown csi:%d ns:%d\n",
->> +			ns->head->ids.csi, ns->head->ns_id);
->> +		return -ENODEV;
->> +	}
->
-> Not sure we need a switch-case statement for a single case target...
+To restate my previous NAK:
 
-I think a switch makes inherent sense when there is an identifier that
-can have multiple values, even if there only is one for now.
+A low-level protocol detail like RWF_ZONE_APPEND has absolutely no
+business being exposed in the Linux file system interface.
+
+And as mentioned before I think the idea of returning the actual
+position written for O_APPEND writes totally makes sense, and actually
+is generalizable to all files.  Together with zonefs that gives you a
+perfect interface for zone append.
+
+On Thu, Jun 25, 2020 at 10:45:48PM +0530, Kanchan Joshi wrote:
+> Introduce RWF_ZONE_APPEND flag to represent zone-append.
+
+And no one but us select few even know what zone append is, nevermind
+what the detailed semantics are.  If you add a userspace API you need
+to very clearly document the semantics inluding errors and corner cases.
