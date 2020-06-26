@@ -2,89 +2,108 @@ Return-Path: <SRS0=+Sn3=AH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35F6C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 10:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC34DC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 12:17:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5BFA214F1
-	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 10:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8D9620775
+	for <linux-block@archiver.kernel.org>; Fri, 26 Jun 2020 12:17:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="eff8vhG3"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mP1S9u/Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgFZKDe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Jun 2020 06:03:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58844 "EHLO
+        id S1728265AbgFZMRi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Jun 2020 08:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725283AbgFZKDd (ORCPT
+        with ESMTP id S1727977AbgFZMRi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jun 2020 06:03:33 -0400
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4C8C08C5C1
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 03:03:33 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id ga4so8755624ejb.11
-        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 03:03:33 -0700 (PDT)
+        Fri, 26 Jun 2020 08:17:38 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B931C08C5DB
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 05:17:38 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id h22so4879864pjf.1
+        for <linux-block@vger.kernel.org>; Fri, 26 Jun 2020 05:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=b9fA6cDuLKUl6r1JDk9GTL32fQwgnX5oPJIohbeJ4ew=;
-        b=eff8vhG3tzimaUuyj2AvlVKfej3ITvGf2noj+At1SLQDM9K2Ej3gVxysb1vhjJ7GvI
-         8ECtUApYQSdvfXIRNzZpB5Jc1/8FCluk/miHneqdOlM64FOLW/Yt9mEHxDgh++QUt1I2
-         mXoJqtk47YMelP1z5ffnR5sl0w2qNzFikCWltgyKg3vEVEI7adMjfzxAzuawpSGnHbbI
-         9r396j4HqTJ52i2CD54x5hdkNWieZIW9SmNqdWao/29h37QXOoDk9gj4fgDfFNzHjWKK
-         9X/qLgkclR46IMS8wvbfzJcoN1UgmYHg7D7tdxeiwd2TDfmkIgdcsWi11bg62Lvd6l9f
-         crgg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:subject:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=978wLGVs1UC0lJ8/UvI6dYC0JDFg86w7Psh56SEUsW4=;
+        b=mP1S9u/ZP5t6Z5fMrN3Ihm2rY4U6g4Q26beF94BXeqc8ZJwRS+ddvwFowrq8K9mTyw
+         qhS2Wlgq9pWgcAXLYgEF4EgVYV148MF3JpO9fcvczi/2drR00Ua0LEKV7Dyz472qCJuC
+         xu7pEg7dMqW+xDdMP5FoSb6H/SAe6gYw34gWpjRoVFMR1HAmL92sSj7IUjP+pX817TY+
+         oTByj/mz+mnUz1ZmRiSGOCiOZo9zeoFynymOkbhKLKErVe4MyfaHltJZrHuiKjDRYQ69
+         65vUQtHiYkBLUKDz7UQ0tg07MK5nhgdiJg11JacdKZyZxvn8cVxaSArgzoHQN59ArS7X
+         Ip/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b9fA6cDuLKUl6r1JDk9GTL32fQwgnX5oPJIohbeJ4ew=;
-        b=N2WhKNbUuMiDjGG46tH5hAizAuTLYFcUMVWyR/3K9ZDavnR2Oj9zDo3+uFjcKAeA/v
-         fqz6RcxutQ3Y0zbRnVbBmQy0kUK+MgJTjSodD5zW34nN0Hrjk1QX0MeYhvbln9zGDPvS
-         aUA2WY/QeWuTygKI7AbbmciRfXau8rqVPC6+ozQzz7SthXQW7DAYqo7SOiACaBPh82hs
-         M8fzKkjjYjvpuysr4Wsq8yjZpwNFRn750D67rQ2LCVfHWNBPgAN6jdkgfowwQsaz3pfn
-         j6mWDcmEbSToHv5mA3WmSyuxL4s84ZlmhZG75agaI/RhS8J/nBXCBB0FyKvwT7MVn/P/
-         MnHg==
-X-Gm-Message-State: AOAM530txhkHEqGotMAlcDOF/fbXFoe8i+L+m1NtzlV7sABw7AIq4OEF
-        5i5Xz6M1Hw1oyI4YMQ8KfBh47g==
-X-Google-Smtp-Source: ABdhPJwjA0HKtW5RnAhXG2FNgUUlpUw/qdy8sps0dvxv//ta2VkfUp1OsYXy7XpvrQigkWOMocasnA==
-X-Received: by 2002:a17:906:355b:: with SMTP id s27mr1962213eja.368.1593165812420;
-        Fri, 26 Jun 2020 03:03:32 -0700 (PDT)
-Received: from localhost (ip-5-186-127-235.cgn.fibianet.dk. [5.186.127.235])
-        by smtp.gmail.com with ESMTPSA id b11sm12032075edw.76.2020.06.26.03.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2020 03:03:31 -0700 (PDT)
-Date:   Fri, 26 Jun 2020 12:03:31 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, sagi@grimberg.me, axboe@kernel.dk,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 6/6] nvme: Add consistency check for zone count
-Message-ID: <20200626100331.x75kegnxutfogdoi@mpHalley.localdomain>
-References: <20200625122152.17359-1-javier@javigon.com>
- <20200625122152.17359-7-javier@javigon.com>
- <20200626091652.GD26616@lst.de>
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=978wLGVs1UC0lJ8/UvI6dYC0JDFg86w7Psh56SEUsW4=;
+        b=OHBTDJvsN8OY8KliLctdtl9zE95NcFbd4ws9HJUWCqH5becf4rUSWbn1Yj8USO1RcK
+         JGCV+2IWaowdBe/P4FQb9sBYZZZKbBzn9RfXfNX0/3fIKYFXUjEsfeUgnXNJ9Y7FhhXZ
+         YaSbzWQDgcIp6TB4dgqfvXgh28WfQ6eju/RxvMRP0FVBrOBp4wPRYY2aCF0TMOd/daPi
+         8sYA2/J58H9013MvaIEvcZaOfqp1pFEVdKse8OIgwPnRm5uW+caKZCW4sPswbk7S+7eb
+         PHq+Ug6qfoKbpf5nOrs0Ggdx6/npQFjbfeyAje8XusfEbBsncxzNNlKD9oVKjtF4Jbbq
+         HjFQ==
+X-Gm-Message-State: AOAM533mu6izXG1tIsJTFpLTTqP18OHQuVdOaX6VVkPl4+3w3B/1Pa9c
+        hGVAAk1TfNwEMMGZrUFAHKFPpw==
+X-Google-Smtp-Source: ABdhPJyAmSzV3UZfOD2Vf6pE6gjQKxRa7NlRNPAajR7KgCaVgF0iQhcU2RM6EorPKlaqFNy8cRcMjw==
+X-Received: by 2002:a17:90a:c84:: with SMTP id v4mr2944021pja.7.1593173857993;
+        Fri, 26 Jun 2020 05:17:37 -0700 (PDT)
+Received: from [192.168.1.182] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id j21sm4858445pfa.133.2020.06.26.05.17.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2020 05:17:37 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCHv3 1/5] block: add capacity field to zone descriptors
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Linux NVMe <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>, sagig <sagi@grimberg.me>,
+        linux-block <linux-block@vger.kernel.org>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        Daniel Wagner <dwagner@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20200622162530.1287650-1-kbusch@kernel.org>
+ <20200622162530.1287650-2-kbusch@kernel.org>
+Message-ID: <1a272c03-050c-8a59-f767-cc2170f4c377@kernel.dk>
+Date:   Fri, 26 Jun 2020 06:17:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200626091652.GD26616@lst.de>
+In-Reply-To: <20200622162530.1287650-2-kbusch@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26.06.2020 11:16, Christoph Hellwig wrote:
->As a bunch of folks noticed I don't zone_idx does what you think it
->does.  That being said I'm very happy about any kind of validation
->(except maybe in a supper hot path).  So if we want to validate the
->zone number we can do, just not as in this patch.
+On Mon, Jun 22, 2020 at 10:25 AM Keith Busch <kbusch@kernel.org> wrote:
+>
+> From: Matias Bjørling <matias.bjorling@wdc.com>
+>
+> In the zoned storage model, the sectors within a zone are typically all
+> writeable. With the introduction of the Zoned Namespace (ZNS) Command
+> Set in the NVM Express organization, the model was extended to have a
+> specific writeable capacity.
+>
+> Extend the zone descriptor data structure with a zone capacity field to
+> indicate to the user how many sectors in a zone are writeable.
+>
+> Introduce backward compatibility in the zone report ioctl by extending
+> the zone report header data structure with a flags field to indicate if
+> the capacity field is available.
 
-Ok. I will send a proper implementation of it and then we see if it
-fits.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
 
